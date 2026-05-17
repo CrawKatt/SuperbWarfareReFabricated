@@ -32,7 +32,7 @@ public class VehicleAssemblingCategory implements IRecipeCategory<VehicleAssembl
         this.background = helper.drawableBuilder(TEXTURE, 0, 0, 144, 36)
                 .setTextureSize(144, 36)
                 .build();
-        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE.get()));
+        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE));
     }
 
     @SuppressWarnings("removal")

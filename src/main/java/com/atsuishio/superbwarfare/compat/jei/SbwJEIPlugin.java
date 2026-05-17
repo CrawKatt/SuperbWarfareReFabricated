@@ -61,8 +61,8 @@ public class SbwJEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(ModItems.REFORGING_TABLE.get()), GunPerksCategory.TYPE);
-        registration.addRecipeCatalyst(new ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE.get()), VehicleAssemblingCategory.TYPE);
+        registration.addRecipeCatalyst(new ItemStack(ModItems.REFORGING_TABLE), GunPerksCategory.TYPE);
+        registration.addRecipeCatalyst(new ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE), VehicleAssemblingCategory.TYPE);
     }
 
     // TODO 正确注册subtypes
@@ -74,10 +74,10 @@ public class SbwJEIPlugin implements IModPlugin {
 
         var guns = BuiltInRegistries.ITEM.stream().filter(item -> item instanceof GunItem).map(Item::getDefaultInstance).toList();
         registration.addRecipes(GunPerksCategory.TYPE, guns);
-        registration.addRecipes(VehicleAssemblingCategory.TYPE, recipeManager.getAllRecipesFor(ModRecipes.VEHICLE_ASSEMBLING_TYPE.get()).stream().map(RecipeHolder::value).toList());
+        registration.addRecipes(VehicleAssemblingCategory.TYPE, recipeManager.getAllRecipesFor(ModRecipes.VEHICLE_ASSEMBLING_TYPE).stream().map(RecipeHolder::value).toList());
 
-        registration.addItemStackInfo(new ItemStack(ModItems.ANCIENT_CPU.get()), Component.translatable("jei.superbwarfare.ancient_cpu"));
-        registration.addItemStackInfo(new ItemStack(ModItems.CHARGING_STATION.get()), Component.translatable("jei.superbwarfare.charging_station"));
+        registration.addItemStackInfo(new ItemStack(ModItems.ANCIENT_CPU), Component.translatable("jei.superbwarfare.ancient_cpu"));
+        registration.addItemStackInfo(new ItemStack(ModItems.CHARGING_STATION), Component.translatable("jei.superbwarfare.charging_station"));
 
         var specialCraftingRecipes = PotionMortarShellRecipeMaker.createRecipes();
         registration.addRecipes(RecipeTypes.CRAFTING, specialCraftingRecipes);
@@ -85,7 +85,7 @@ public class SbwJEIPlugin implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
-        registration.registerSubtypeInterpreter(ModItems.CONTAINER.get(), new ISubtypeInterpreter<>() {
+        registration.registerSubtypeInterpreter(ModItems.CONTAINER, new ISubtypeInterpreter<>() {
             @Override
             public @NotNull Object getSubtypeData(ItemStack ingredient, @NotNull UidContext context) {
                 var data = ingredient.get(DataComponents.BLOCK_ENTITY_DATA);
@@ -103,7 +103,7 @@ public class SbwJEIPlugin implements IModPlugin {
             }
         });
 
-        registration.registerSubtypeInterpreter(ModItems.POTION_MORTAR_SHELL.get(), new ISubtypeInterpreter<>() {
+        registration.registerSubtypeInterpreter(ModItems.POTION_MORTAR_SHELL, new ISubtypeInterpreter<>() {
             @Override
             @ParametersAreNonnullByDefault
             public @Nullable Object getSubtypeData(ItemStack ingredient, UidContext context) {
@@ -127,7 +127,7 @@ public class SbwJEIPlugin implements IModPlugin {
             }
         });
 
-        registration.registerSubtypeInterpreter(ModItems.C4_BOMB.get(), new ISubtypeInterpreter<>() {
+        registration.registerSubtypeInterpreter(ModItems.C4_BOMB, new ISubtypeInterpreter<>() {
             @Override
             @ParametersAreNonnullByDefault
             public @NotNull Object getSubtypeData(ItemStack ingredient, UidContext context) {

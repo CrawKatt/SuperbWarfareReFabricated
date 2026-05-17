@@ -18,13 +18,13 @@ public class PotionMortarShellRecipeMaker {
 
     public static List<RecipeHolder<CraftingRecipe>> createRecipes() {
         String group = "jei.potion_mortar_shell";
-        Ingredient ingredient = Ingredient.of(new ItemStack(ModItems.MORTAR_SHELL.get()));
+        Ingredient ingredient = Ingredient.of(new ItemStack(ModItems.MORTAR_SHELL));
 
         return BuiltInRegistries.POTION.stream().map(potion -> {
             ItemStack input = new ItemStack(Items.LINGERING_POTION);
             input.set(DataComponents.POTION_CONTENTS, new PotionContents(Holder.direct(potion)));
 
-            ItemStack output = new ItemStack(ModItems.POTION_MORTAR_SHELL.get(), 4);
+            ItemStack output = new ItemStack(ModItems.POTION_MORTAR_SHELL, 4);
             output.set(DataComponents.POTION_CONTENTS, new PotionContents(Holder.direct(potion)));
 
             Ingredient potionIngredient = Ingredient.of(input);

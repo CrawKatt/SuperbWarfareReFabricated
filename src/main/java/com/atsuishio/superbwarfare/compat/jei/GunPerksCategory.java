@@ -38,7 +38,7 @@ public class GunPerksCategory implements IRecipeCategory<ItemStack> {
         this.background = helper.drawableBuilder(TEXTURE, 0, 0, 144, 128)
                 .setTextureSize(144, 128)
                 .build();
-        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModItems.AP_BULLET.get()));
+        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModItems.AP_BULLET));
     }
 
     @Override
@@ -95,7 +95,7 @@ public class GunPerksCategory implements IRecipeCategory<ItemStack> {
         builder.addSlot(RecipeIngredientRole.INPUT, 1, 1).addItemStack(stack);
 
         for (int i = 0; i < sortedPerks.size(); i++) {
-            var perkItem = sortedPerks.get(i).getItem().get();
+            var perkItem = sortedPerks.get(i).getItem();
             builder.addSlot(RecipeIngredientRole.INPUT, 1 + (i % 8) * 18, 21 + i / 8 * 18).addItemStack(perkItem.getDefaultInstance());
         }
     }

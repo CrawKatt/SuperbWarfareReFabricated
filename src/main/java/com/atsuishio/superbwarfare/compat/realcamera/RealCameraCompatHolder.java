@@ -3,12 +3,12 @@ package com.atsuishio.superbwarfare.compat.realcamera;
 import com.atsuishio.superbwarfare.compat.CompatHolder;
 import com.xtracr.realcamera.RealCameraCore;
 import com.xtracr.realcamera.util.CrosshairUtil;
-import net.neoforged.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 
 public class RealCameraCompatHolder {
 
     public static boolean hasMod() {
-        return ModList.get().isLoaded(CompatHolder.REALCAMERA);
+        return FabricLoader.getInstance().isModLoaded(CompatHolder.REALCAMERA);
     }
 
     public static float getCompatMoveX(float moveX) {

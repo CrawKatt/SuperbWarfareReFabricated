@@ -1,14 +1,14 @@
 package com.atsuishio.superbwarfare.compat.jei;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.fml.ModList;
 
 public class JeiCompatHolder {
 
     public static final String JEI = "jei";
 
     public static boolean hasJEI() {
-        return ModList.get().isLoaded(JEI);
+        return FabricLoader.getInstance().isModLoaded(JEI);
     }
 
     public static boolean showRecipes(ItemStack stack) {
