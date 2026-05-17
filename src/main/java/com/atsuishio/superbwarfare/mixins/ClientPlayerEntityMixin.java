@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
-import com.atsuishio.superbwarfare.item.curio.ParachuteItem;
+import com.atsuishio.superbwarfare.item.trinket.ParachuteItem;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;

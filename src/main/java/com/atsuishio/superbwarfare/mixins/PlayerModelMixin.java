@@ -4,7 +4,7 @@ import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType;
 import com.atsuishio.superbwarfare.entity.vehicle.TowEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.Yx100Entity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
-import com.atsuishio.superbwarfare.item.curio.ParachuteItem;
+import com.atsuishio.superbwarfare.item.trinket.ParachuteItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.util.Mth;
