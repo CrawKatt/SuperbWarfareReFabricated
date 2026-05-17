@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.capability.energy;
 
-import net.neoforged.neoforge.energy.EnergyStorage;
+import com.atsuishio.superbwarfare.capability.api.EnergyStorage;
 
 import java.util.function.Supplier;
 

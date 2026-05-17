@@ -36,7 +36,9 @@ public record PlayerVariablesSyncMessage(int target, Map<Byte, Integer> data) im
         var entity = Minecraft.getInstance().player.level().getEntity(message.target());
         if (entity == null) return;
 
-        var variable = entity.getData(ModAttachments.PLAYER_VARIABLE);
+        var variable = entity.getAttached(ModAttachments.PLAYER_VARIABLE);
+        if (variable == null) return;
+
         var map = message.data();
 
         for (var entry : map.entrySet()) {
@@ -52,7 +54,7 @@ public record PlayerVariablesSyncMessage(int target, Map<Byte, Integer> data) im
             }
         }
 
-        entity.setData(ModAttachments.PLAYER_VARIABLE, variable);
+        entity.setAttached(ModAttachments.PLAYER_VARIABLE, variable);
     }
 
     @Override

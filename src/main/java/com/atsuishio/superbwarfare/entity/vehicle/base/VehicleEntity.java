@@ -35,6 +35,8 @@ import com.atsuishio.superbwarfare.world.TDMSavedData;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.IntList;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -81,8 +83,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.*;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.energy.IEnergyStorage;
@@ -3631,7 +3631,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
      * @param zoom          是否在载具上瞄准
      * @param isFirstPerson 是否是第一人称视角
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public @Nullable Vec2 getCameraRotation(float partialTicks, Player player, boolean zoom, boolean isFirstPerson) {
         int index = this.getSeatIndex(player);
         var seat = computed().seats().get(index);
@@ -3661,7 +3661,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
      * @param zoom          是否在载具上瞄准
      * @param isFirstPerson 是否是第一人称视角
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public Vec3 getCameraPosition(float partialTicks, Player player, boolean zoom, boolean isFirstPerson) {
         int index = this.getSeatIndex(player);
         var seat = computed().seats().get(index);
@@ -3693,7 +3693,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     /**
      * 是否使用载具固定视角
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public boolean useFixedCameraPos(Entity entity) {
         int index = this.getSeatIndex(entity);
         var seat = computed().seats().get(index);
@@ -4071,7 +4071,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         return VehicleMiscUtils.isAmphibious(this);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public Component firstPersonAmmoComponent(GunData data, Player player) {
         var name = data.compute().name;
         if (name == null || name.isBlank()) return Component.empty();
@@ -4080,7 +4080,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         return Component.translatable(name, ammoCount == Integer.MAX_VALUE ? "∞" : ammoCount);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public Component thirdPersonAmmoComponent(GunData data, Player player) {
         return firstPersonAmmoComponent(data, player);
     }

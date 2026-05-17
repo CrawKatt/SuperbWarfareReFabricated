@@ -1,10 +1,10 @@
 package com.atsuishio.superbwarfare.capability.energy;
 
+import com.atsuishio.superbwarfare.capability.api.EnergyStorage;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.neoforged.neoforge.energy.EnergyStorage;
 import org.jetbrains.annotations.NotNull;
 
 /**

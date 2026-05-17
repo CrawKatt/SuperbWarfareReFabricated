@@ -4,65 +4,48 @@ import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.atsuishio.superbwarfare.init.ModAttachments;
 import com.atsuishio.superbwarfare.network.message.receive.PlayerVariablesSyncMessage;
-import net.minecraft.core.HolderLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.util.INBTSerializable;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
-
-@EventBusSubscriber(modid = Mod.MODID)
-public class PlayerVariable implements INBTSerializable<CompoundTag> {
+public class PlayerVariable {
     private PlayerVariable old = null;
 
     public Map<Ammo, Integer> ammo = new EnumMap<>(Ammo.class);
     public boolean tacticalSprint = false;
 
     public void sync(Entity entity) {
-        if (!entity.hasData(ModAttachments.PLAYER_VARIABLE)) return;
+        if (!entity.hasAttached(ModAttachments.PLAYER_VARIABLE)) return;
 
-        var newVariable = entity.getData(ModAttachments.PLAYER_VARIABLE);
+        var newVariable = entity.getAttached(ModAttachments.PLAYER_VARIABLE);
         if (old != null && old.equals(newVariable)) return;
 
         if (entity instanceof ServerPlayer serverPlayer) {
-            PacketDistributor.sendToPlayer(serverPlayer, new PlayerVariablesSyncMessage(entity.getId(), compareAndUpdate()));
+            ServerPlayNetworking.send(serverPlayer, new PlayerVariablesSyncMessage(entity.getId(), compareAndUpdate()));
         }
     }
 
 
     public static PlayerVariable getOrDefault(Entity entity) {
-        return entity.getData(ModAttachments.PLAYER_VARIABLE);
+        return entity.getAttached(ModAttachments.PLAYER_VARIABLE);
     }
 
-    @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-
-        PacketDistributor.sendToPlayer(player, new PlayerVariablesSyncMessage(player.getId(), getOrDefault(player).compareAndUpdate()));
+    public static void onPlayerLogin(ServerPlayer player) {
+        ServerPlayNetworking.send(player, new PlayerVariablesSyncMessage(player.getId(), getOrDefault(player).compareAndUpdate()));
     }
 
-    @SubscribeEvent
-    public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-
-        PacketDistributor.sendToPlayer(player, new PlayerVariablesSyncMessage(player.getId(), getOrDefault(player).compareAndUpdate()));
+    public static void onPlayerRespawn(ServerPlayer player) {
+        ServerPlayNetworking.send(player, new PlayerVariablesSyncMessage(player.getId(), getOrDefault(player).compareAndUpdate()));
     }
 
-    @SubscribeEvent
-    public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-
-        PacketDistributor.sendToPlayer(player, new PlayerVariablesSyncMessage(player.getId(), getOrDefault(player).forceUpdate()));
+    public static void onPlayerChangeDimension(ServerPlayer player) {
+        ServerPlayNetworking.send(player, new PlayerVariablesSyncMessage(player.getId(), getOrDefault(player).forceUpdate()));
     }
 
     public PlayerVariable watch() {
@@ -147,23 +130,10 @@ public class PlayerVariable implements INBTSerializable<CompoundTag> {
         return tacticalSprint == other.tacticalSprint;
     }
 
-    @SubscribeEvent
-    public static void clonePlayer(PlayerEvent.Clone event) {
-        event.getOriginal().revive();
-        var original = event.getOriginal().getData(ModAttachments.PLAYER_VARIABLE);
-        if (event.getEntity().level().isClientSide()) return;
-
-        event.getEntity().setData(ModAttachments.PLAYER_VARIABLE, original.copy());
-    }
-
-    @Override
-    public CompoundTag serializeNBT(HolderLookup.@NotNull Provider provider) {
-        return writeToNBT();
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
-        readFromNBT(nbt);
+    public static void onPlayerClone(ServerPlayer original, ServerPlayer player, boolean alive) {
+        var originalVar = original.getAttached(ModAttachments.PLAYER_VARIABLE);
+        if (originalVar != null) {
+            player.setAttached(ModAttachments.PLAYER_VARIABLE, originalVar.copy());
+        }
     }
 }
