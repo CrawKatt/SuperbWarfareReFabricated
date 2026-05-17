@@ -8,10 +8,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.items.wrapper.RecipeWrapper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class VehicleAssemblingRecipe implements Recipe<RecipeWrapper> {
+public class VehicleAssemblingRecipe implements Recipe<RecipeInput> {
 
     private final Category category;
     private final VehicleAssemblingResult result;
@@ -42,7 +42,7 @@ public class VehicleAssemblingRecipe implements Recipe<RecipeWrapper> {
         for (var entry : ingredients.entrySet()) {
             inputs.add(new VehicleAssemblingIngredient(entry.getKey(), entry.getValue()));
         }
-        var result = new VehicleAssemblingResult(ModItems.CONTAINER.getId().toString(), BuiltInRegistries.ENTITY_TYPE.getKey(type).toString(), 1);
+        var result = new VehicleAssemblingResult(BuiltInRegistries.ITEM.getKey(ModItems.CONTAINER).toString(), BuiltInRegistries.ENTITY_TYPE.getKey(type).toString(), 1);
         return new VehicleAssemblingRecipe(inputs, recipeCategory, result);
     }
 
@@ -56,13 +56,13 @@ public class VehicleAssemblingRecipe implements Recipe<RecipeWrapper> {
 
     @Override
     @ParametersAreNonnullByDefault
-    public boolean matches(RecipeWrapper pContainer, Level pLevel) {
+    public boolean matches(RecipeInput pContainer, Level pLevel) {
         return false;
     }
 
     @Override
     @ParametersAreNonnullByDefault
-    public @NotNull ItemStack assemble(RecipeWrapper recipeWrapper, HolderLookup.Provider provider) {
+    public @NotNull ItemStack assemble(RecipeInput recipeInput, HolderLookup.Provider provider) {
         return ItemStack.EMPTY;
     }
 
@@ -78,12 +78,12 @@ public class VehicleAssemblingRecipe implements Recipe<RecipeWrapper> {
 
     @Override
     public @NotNull RecipeSerializer<?> getSerializer() {
-        return ModRecipes.VEHICLE_ASSEMBLING_SERIALIZER.get();
+        return ModRecipes.VEHICLE_ASSEMBLING_SERIALIZER;
     }
 
     @Override
     public @NotNull RecipeType<?> getType() {
-        return ModRecipes.VEHICLE_ASSEMBLING_TYPE.get();
+        return ModRecipes.VEHICLE_ASSEMBLING_TYPE;
     }
 
     public Category getCategory() {
