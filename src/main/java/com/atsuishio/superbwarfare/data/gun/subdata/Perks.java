@@ -6,7 +6,6 @@ import com.atsuishio.superbwarfare.item.PerkItem;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.perk.PerkInstance;
 import net.minecraft.nbt.CompoundTag;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -30,10 +29,6 @@ public final class Perks {
 
     public void set(PerkInstance instance) {
         set(instance.perk(), instance.level());
-    }
-
-    public CompoundTag getTag(DeferredHolder<Perk, Perk> registry) {
-        return getTag(registry.get().type);
     }
 
     public CompoundTag getTag(Perk perk) {
@@ -63,10 +58,6 @@ public final class Perks {
         return getLevel(item.getPerk());
     }
 
-    public short getLevel(DeferredHolder<Perk, ? extends Perk> perk) {
-        return getLevel(perk.get());
-    }
-
     public short getLevel(Perk perk) {
         var name = perk.name;
         var tag = getTag(perk);
@@ -78,24 +69,20 @@ public final class Perks {
         return getTag(type).getShort("Level");
     }
 
-    public @Nullable Perk get(DeferredHolder<Perk, Perk> registry) {
-        return get(registry.get());
-    }
-
     public @Nullable Perk get(Perk perk) {
         return get(perk.type);
     }
 
     public @Nullable Perk get(Perk.Type type) {
-        var perksRegistry = new ArrayList<DeferredHolder<Perk, ? extends Perk>>();
-        perksRegistry.addAll(ModPerks.AMMO_PERKS.getEntries());
-        perksRegistry.addAll(ModPerks.FUNC_PERKS.getEntries());
-        perksRegistry.addAll(ModPerks.DAMAGE_PERKS.getEntries());
+        var perksRegistry = new ArrayList<Perk>();
+        perksRegistry.addAll(ModPerks.AMMO_PERKS);
+        perksRegistry.addAll(ModPerks.FUNC_PERKS);
+        perksRegistry.addAll(ModPerks.DAMAGE_PERKS);
 
         for (var registry : perksRegistry) {
             var name = getTag(type).getString("Name");
-            if (registry.get().name.equals(name)) {
-                return registry.get();
+            if (registry.name.equals(name)) {
+                return registry;
             }
         }
         return null;
@@ -110,10 +97,6 @@ public final class Perks {
         if (perk == null) return null;
 
         return new PerkInstance(perk, getLevel(type));
-    }
-
-    public void reduceCooldown(DeferredHolder<Perk, Perk> registry, String name) {
-        reduceCooldown(registry.get(), name);
     }
 
     public void reduceCooldown(Perk perk, String name) {

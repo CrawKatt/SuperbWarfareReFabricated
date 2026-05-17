@@ -8,26 +8,25 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 public class PerkItem<T extends Perk> extends Item {
-    private final DeferredHolder<Perk, T> perk;
+    private final T perk;
 
-    public PerkItem(DeferredHolder<Perk, T> perk) {
+    public PerkItem(T perk) {
         super(new Properties());
         this.perk = perk;
     }
 
-    public PerkItem(DeferredHolder<Perk, T> perk, Rarity rarity) {
+    public PerkItem(T perk, Rarity rarity) {
         super(new Properties().rarity(rarity));
         this.perk = perk;
     }
 
-    public Perk getPerk() {
-        return this.perk.get();
+    public T getPerk() {
+        return this.perk;
     }
 
     @Override
