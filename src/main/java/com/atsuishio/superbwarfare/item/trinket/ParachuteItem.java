@@ -1,22 +1,22 @@
-package com.atsuishio.superbwarfare.item.curio;
+package com.atsuishio.superbwarfare.item.trinket;
 
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.tools.NBTTool;
+import dev.emi.trinkets.api.SlotReference;
+import dev.emi.trinkets.api.TrinketItem;
+import dev.emi.trinkets.api.TrinketsApi;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
-public class ParachuteItem extends Item implements ICurioItem {
+public class ParachuteItem extends TrinketItem {
 
     public static final String TAG_OPEN = "Open";
 
@@ -30,21 +30,20 @@ public class ParachuteItem extends Item implements ICurioItem {
     }
 
     @Override
-    public boolean canEquip(SlotContext slotContext, ItemStack stack) {
-        return CuriosApi.getCuriosInventory(slotContext.entity())
-                .flatMap(c -> c.findFirstCurio(this))
-                .isEmpty();
+    public boolean canEquip(ItemStack stack, SlotReference slot, LivingEntity entity) {
+        return TrinketsApi.getTrinketComponent(entity)
+                .map(comp -> !comp.isEquipped(this))
+                .orElse(false);
     }
 
     @Override
-    public void curioTick(SlotContext slotContext, ItemStack stack) {
-        LivingEntity entity = slotContext.entity();
+    public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
         var tag = NBTTool.getTag(stack);
         if (tag.getBoolean(TAG_OPEN)) {
             if (entity.onGround() || entity.isInWater() || entity.isFallFlying() || entity.getVehicle() != null || (entity instanceof Player player && player.getAbilities().flying)) {
                 tag.putBoolean(TAG_OPEN, false);
                 NBTTool.saveTag(stack, tag);
-                entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), ModSounds.PARACHUTE_CLOSE.get(), SoundSource.PLAYERS, 1f, 1);
+                entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), ModSounds.PARACHUTE_CLOSE, SoundSource.PLAYERS, 1f, 1);
             }
             if (entity instanceof Player player) {
                 if (player.level().isClientSide) {
@@ -52,27 +51,25 @@ public class ParachuteItem extends Item implements ICurioItem {
                     player.setDeltaMovement(player.getDeltaMovement().multiply(1.03, 0.75, 1.03));
                 }
             }
-            if (entity.tickCount % 40 == 0 && entity.level() instanceof ServerLevel serverLevel) {
-                stack.hurtAndBreak(1, serverLevel, entity, item -> {
-                });
+            if (entity.tickCount % 40 == 0 && entity.level() instanceof ServerLevel) {
+                stack.hurtAndBreak(1, entity, EquipmentSlot.CHEST);
             }
             entity.resetFallDistance();
         }
     }
 
     public static boolean isParachuteOpen(LivingEntity entity) {
-        return CuriosApi.getCuriosInventory(entity)
-                .map(c -> c.findFirstCurio(ModItems.PARACHUTE.get())
-                        .map(slotResult -> NBTTool.getTag(slotResult.stack()).getBoolean(ParachuteItem.TAG_OPEN))
-                        .orElse(false)
-                ).orElse(false);
+        return TrinketsApi.getTrinketComponent(entity)
+                .map(comp -> comp.getEquipped(ModItems.PARACHUTE).stream()
+                        .findFirst()
+                        .map(tuple -> NBTTool.getTag(tuple.getB()).getBoolean(ParachuteItem.TAG_OPEN))
+                        .orElse(false))
+                .orElse(false);
     }
 
     public static boolean isParachuteVisible(LivingEntity entity) {
-        return CuriosApi.getCuriosInventory(entity)
-                .map(c -> c.findFirstCurio(ModItems.PARACHUTE.get())
-                        .map(slotResult -> slotResult.slotContext().visible())
-                        .orElse(false)
-                ).orElse(false);
+        return TrinketsApi.getTrinketComponent(entity)
+                .map(comp -> !comp.getEquipped(ModItems.PARACHUTE).isEmpty())
+                .orElse(false);
     }
 }
