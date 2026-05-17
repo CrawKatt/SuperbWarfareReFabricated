@@ -5,7 +5,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.function.Consumer;
 
@@ -27,11 +26,11 @@ public final class NBTTool {
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(newTag));
     }
 
-    public static ItemStack withTag(DeferredHolder<Item, ? extends Item> item, int count, Consumer<CompoundTag> setter) {
+    public static ItemStack withTag(Item item, int count, Consumer<CompoundTag> setter) {
         return withTag(new ItemStack(item, count), setter);
     }
 
-    public static ItemStack withTag(DeferredHolder<Item, ? extends Item> item, Consumer<CompoundTag> setter) {
+    public static ItemStack withTag(Item item, Consumer<CompoundTag> setter) {
         return withTag(item, 1, setter);
     }
 

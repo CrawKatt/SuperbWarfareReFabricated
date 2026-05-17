@@ -3,8 +3,6 @@ package com.atsuishio.superbwarfare.init;
 import com.atsuishio.superbwarfare.Mod;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
@@ -15,7 +13,7 @@ import net.minecraft.world.level.block.Block;
 public class ModTags {
 
     public static TagKey<Item> commonItemTag(String name) {
-        return ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", name));
+        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", name));
     }
 
     public static class Items {
@@ -60,10 +58,37 @@ public class ModTags {
         public static final TagKey<Item> ANIMATED_RPG = modItemTag("animated/rpg");
         public static final TagKey<Item> ANIMATED_MG = modItemTag("animated/mg");
         public static final TagKey<Item> ANIMATED_MINIGUN = modItemTag("animated/minigun");
+
+        // Common/convention tags (c: namespace)
+        public static final TagKey<Item> INGOTS_GOLD = commonItemTag("ingots/gold");
+        public static final TagKey<Item> INGOTS_IRON = commonItemTag("ingots/iron");
+        public static final TagKey<Item> INGOTS_COPPER = commonItemTag("ingots/copper");
+        public static final TagKey<Item> INGOTS_NETHERITE = commonItemTag("ingots/netherite");
+        public static final TagKey<Item> STORAGE_BLOCKS_IRON = commonItemTag("storage_blocks/iron");
+        public static final TagKey<Item> STORAGE_BLOCKS_GOLD = commonItemTag("storage_blocks/gold");
+        public static final TagKey<Item> STORAGE_BLOCKS_DIAMOND = commonItemTag("storage_blocks/diamond");
+        public static final TagKey<Item> STORAGE_BLOCKS_NETHERITE = commonItemTag("storage_blocks/netherite");
+        public static final TagKey<Item> STORAGE_BLOCKS_LAPIS = commonItemTag("storage_blocks/lapis");
+        public static final TagKey<Item> STORAGE_BLOCKS_COPPER = commonItemTag("storage_blocks/copper");
+        public static final TagKey<Item> STORAGE_BLOCKS_REDSTONE = commonItemTag("storage_blocks/redstone");
+        public static final TagKey<Item> NUGGETS_IRON = commonItemTag("nuggets/iron");
+        public static final TagKey<Item> NUGGETS_GOLD = commonItemTag("nuggets/gold");
+        public static final TagKey<Item> GEMS_DIAMOND = commonItemTag("gems/diamond");
+        public static final TagKey<Item> GEMS_LAPIS = commonItemTag("gems/lapis");
+        public static final TagKey<Item> GEMS_QUARTZ = commonItemTag("gems/quartz");
+        public static final TagKey<Item> DUSTS_REDSTONE = commonItemTag("dusts/redstone");
+        public static final TagKey<Item> GLASS_PANES = commonItemTag("glass_panes");
+        public static final TagKey<Item> SANDS = commonItemTag("sands");
+        public static final TagKey<Item> DYES_BLACK = commonItemTag("dyes/black");
+        public static final TagKey<Item> DYES_GREEN = commonItemTag("dyes/green");
+        public static final TagKey<Item> ORES_NETHERITE_SCRAP = commonItemTag("ores/netherite_scrap");
+        public static final TagKey<Item> CHESTS_ENDER = commonItemTag("chests/ender");
+        public static final TagKey<Item> CHESTS_WOODEN = commonItemTag("chests/wooden");
+        public static final TagKey<Item> ENDER_PEARLS = commonItemTag("ender_pearls");
     }
 
     public static TagKey<Item> modItemTag(String name) {
-        return ItemTags.create(Mod.loc(name));
+        return TagKey.create(Registries.ITEM, Mod.loc(name));
     }
 
     public static class Blocks {
@@ -82,7 +107,7 @@ public class ModTags {
         public static final TagKey<Block> AUTO_LANDING = tag("auto_landing");
 
         private static TagKey<Block> tag(String name) {
-            return BlockTags.create(Mod.loc(name));
+            return TagKey.create(Registries.BLOCK, Mod.loc(name));
         }
     }
 
