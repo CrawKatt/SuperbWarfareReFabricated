@@ -355,9 +355,9 @@ public class ModItems {
     public static Item INTELLIGENT_CHIP;
 
     public static void registerPerkItems() {
-        ModPerks.AMMO_PERKS.getEntries().forEach(ModItems::registerSinglePerkItem);
-        ModPerks.FUNC_PERKS.getEntries().forEach(ModItems::registerSinglePerkItem);
-        ModPerks.DAMAGE_PERKS.getEntries().forEach(ModItems::registerSinglePerkItem);
+        ModPerks.AMMO_PERKS.forEach(ModItems::registerSinglePerkItem);
+        ModPerks.FUNC_PERKS.forEach(ModItems::registerSinglePerkItem);
+        ModPerks.DAMAGE_PERKS.forEach(ModItems::registerSinglePerkItem);
 
         AP_BULLET = PERK_ITEMS.get(ModPerks.AP_BULLET);
         INTELLIGENT_CHIP = PERK_ITEMS.get(ModPerks.INTELLIGENT_CHIP);
