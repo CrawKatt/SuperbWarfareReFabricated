@@ -4,15 +4,18 @@ import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.advancement.criteria.OttoSprintTrigger;
 import com.atsuishio.superbwarfare.advancement.criteria.RPGMeleeExplosionTrigger;
 import net.minecraft.advancements.CriterionTrigger;
-import net.minecraft.core.registries.Registries;
-import net.neoforged.neoforge.registries.DeferredRegister;
-
-import java.util.function.Supplier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class ModCriteriaTriggers {
 
-    public static final DeferredRegister<CriterionTrigger<?>> REGISTRY = DeferredRegister.create(Registries.TRIGGER_TYPE, Mod.MODID);
+    public static final RPGMeleeExplosionTrigger RPG_MELEE_EXPLOSION = register("rpg_melee_explosion", new RPGMeleeExplosionTrigger());
+    public static final OttoSprintTrigger OTTO_SPRINT = register("otto_sprint", new OttoSprintTrigger());
 
-    public static final Supplier<RPGMeleeExplosionTrigger> RPG_MELEE_EXPLOSION = REGISTRY.register("rpg_melee_explosion", RPGMeleeExplosionTrigger::new);
-    public static final Supplier<OttoSprintTrigger> OTTO_SPRINT = REGISTRY.register("otto_sprint", OttoSprintTrigger::new);
+    private static <T extends CriterionTrigger<?>> T register(String name, T trigger) {
+        return Registry.register(BuiltInRegistries.TRIGGER_TYPES, Mod.loc(name), trigger);
+    }
+
+    public static void init() {
+    }
 }
