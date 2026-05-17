@@ -16,7 +16,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.*;
 
@@ -37,19 +36,11 @@ public class DefaultVehicleData implements IDBasedData<DefaultVehicleData> {
 
     @ServerOnly
     @SerializedName("RepairCooldown")
-    public int repairCooldown = getConfigOrDefault(VehicleConfig.REPAIR_COOLDOWN);
+    public int repairCooldown = VehicleConfig.REPAIR_COOLDOWN;
 
     @ServerOnly
     @SerializedName("RepairAmount")
-    public float repairAmount = getConfigOrDefault(VehicleConfig.REPAIR_AMOUNT).floatValue();
-
-    private static <T> T getConfigOrDefault(ModConfigSpec.ConfigValue<T> config) {
-        try {
-            return config.get();
-        } catch (Exception exception) {
-            return config.getDefault();
-        }
-    }
+    public float repairAmount = (float) VehicleConfig.REPAIR_AMOUNT;
 
     /**
      * 开始自动扣血时的血量比例
