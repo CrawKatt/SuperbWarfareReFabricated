@@ -5,16 +5,17 @@ import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.StrikeProtectionMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModMobEffects {
-    public static final DeferredRegister<MobEffect> REGISTRY = DeferredRegister.create(BuiltInRegistries.MOB_EFFECT, Mod.MODID);
+    public static final MobEffect SHOCK = register("shock", new ShockMobEffect());
+    public static final MobEffect BURN = register("burn", new BurnMobEffect());
+    public static final MobEffect STRIKE_PROTECTION = register("strike_protection", new StrikeProtectionMobEffect());
+    public static final MobEffect TRAUMA = register("trauma", new TraumaMobEffect());
 
-    public static final DeferredHolder<MobEffect, ShockMobEffect> SHOCK = REGISTRY.register("shock", ShockMobEffect::new);
-    public static final DeferredHolder<MobEffect, BurnMobEffect> BURN = REGISTRY.register("burn", BurnMobEffect::new);
-    public static final DeferredHolder<MobEffect, StrikeProtectionMobEffect> STRIKE_PROTECTION = REGISTRY.register("strike_protection", StrikeProtectionMobEffect::new);
-    public static final DeferredHolder<MobEffect, TraumaMobEffect> TRAUMA = REGISTRY.register("trauma", TraumaMobEffect::new);
+    private static MobEffect register(String name, MobEffect effect) {
+        return Registry.register(BuiltInRegistries.MOB_EFFECT, Mod.loc(name), effect);
+    }
 }
