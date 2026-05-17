@@ -1,16 +1,16 @@
 package com.atsuishio.superbwarfare.perk;
 
+import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.data.gun.DamageReduce;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.GunPropertyModifier;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.item.PerkItem;
 import net.minecraft.ChatFormatting;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
@@ -43,16 +43,14 @@ public class Perk implements GunPropertyModifier {
         this.name = builder.toString();
     }
 
-    public DeferredHolder<Item, ? extends Item> getItem() {
-        var result = ModItems.PERKS.getEntries().stream().filter(p -> {
-            if (p.get() instanceof PerkItem<?> perkItem) {
-                return perkItem.getPerk() == this;
-            }
-            return false;
-        }).findFirst();
-        if (result.isEmpty()) throw new IllegalStateException("Perk " + this.name + " not found");
+    public ResourceLocation getId() {
+        return Mod.loc(descriptionId);
+    }
 
-        return result.get();
+    public Item getItem() {
+        var item = ModItems.PERK_ITEMS.get(this);
+        if (item == null) throw new IllegalStateException("Perk " + this.name + " not found");
+        return item;
     }
 
     /**
