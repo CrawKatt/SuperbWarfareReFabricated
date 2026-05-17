@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.item.gun;
 
 import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.api.event.ShootEvent;
+import com.atsuishio.superbwarfare.capability.api.IEnergyStorage;
 import com.atsuishio.superbwarfare.client.particle.BulletDecalOption;
 import com.atsuishio.superbwarfare.client.screens.WeaponEditScreen;
 import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent;
@@ -14,17 +14,22 @@ import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
 import com.atsuishio.superbwarfare.entity.projectile.*;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModPerks;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.item.EnergyStorageItem;
 import com.atsuishio.superbwarfare.item.ItemScreenProvider;
+import com.atsuishio.superbwarfare.item.gun.neoforge.IItemExtension;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.resource.gun.GunResource;
 import com.atsuishio.superbwarfare.tools.*;
 import com.atsuishio.superbwarfare.world.phys.EntityResult;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -57,12 +62,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
@@ -78,7 +77,7 @@ import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.LASE
 import static com.atsuishio.superbwarfare.tools.EntityFindUtil.findEntity;
 import static com.atsuishio.superbwarfare.tools.ParticleTool.sendParticle;
 
-public abstract class GunItem extends Item implements ItemScreenProvider, GunPropertyModifier, EnergyStorageItem {
+public abstract class GunItem extends Item implements ItemScreenProvider, GunPropertyModifier, EnergyStorageItem, IItemExtension {
 
     protected static final ResourceLocation DEFAULT_ICON = Mod.loc("textures/gun_icon/default_icon.png");
 
@@ -129,7 +128,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         var data = GunData.from(stack);
         if (data.compute().maxDurability > 0) return super.isBarVisible(stack);
 
-        var cap = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
         return cap != null && cap.getEnergyStored() > 0 && cap.getMaxEnergyStored() > 0;
     }
 
@@ -141,7 +140,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         }
 
         if (data.compute().maxEnergy > 0) {
-            var cap = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+            var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
             return Math.round((float) (cap != null ? cap.getEnergyStored() : 0) * 13F / GunData.compute(stack).maxEnergy);
         }
 
@@ -198,17 +197,13 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         data.tick(entity, inMainHand);
     }
 
-    @Override
-    @ParametersAreNonnullByDefault
-    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
-        return false;
-    }
-
     private static final ResourceLocation SPEED_ID = Mod.loc("gun_movement_speed");
 
     @Override
-    public @NotNull ItemAttributeModifiers getDefaultAttributeModifiers(@NotNull ItemStack stack) {
-        var list = new ArrayList<>(super.getDefaultAttributeModifiers(stack).modifiers());
+    @NotNull
+    public ItemAttributeModifiers getDefaultAttributeModifiers() {
+        var stack = new ItemStack(this);
+        var list = new ArrayList<>(super.getDefaultAttributeModifiers().modifiers());
         var data = GunData.from(stack);
 
         // 移速
@@ -257,8 +252,8 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         return false;
     }
 
-    @Override
     @ParametersAreNonnullByDefault
+    @Override
     public boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment) {
         return false;
     }
@@ -513,7 +508,6 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
     public void beforeShoot(@NotNull ShootParameters parameters) {
         var data = parameters.data();
         var ammoSupplier = parameters.ammoSupplier();
-        NeoForge.EVENT_BUS.post(new ShootEvent.Pre(parameters));
 
         // 判断是否为栓动武器（BoltActionTime > 0），并在开火后给一个需要上膛的状态
         if (data.compute().boltActionTime > 0 && data.hasEnoughAmmoToShoot(ammoSupplier)) {
@@ -547,8 +541,6 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         var ammoSupplier = parameters.ammoSupplier();
         var level = parameters.level();
 
-        NeoForge.EVENT_BUS.post(new ShootEvent.Post(parameters));
-
         var computed = data.compute();
         if (!data.useBackpackAmmo()) {
             data.ammo.set(data.ammo.get() - computed.ammoCostPerShoot);
@@ -562,11 +554,11 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         }
 
         var stack = data.stack();
-        if (this.getMaxDamage(stack) > 0) {
+        if (computed.maxDurability > 0) {
             if (shooter instanceof LivingEntity living) {
                 stack.hurtAndBreak(computed.durabilityPerShoot, living, EquipmentSlot.MAINHAND);
             } else {
-                stack.hurtAndBreak(computed.durabilityPerShoot, level, (LivingEntity) null, item -> {
+                stack.hurtAndBreak(computed.durabilityPerShoot, level, null, item -> {
                 });
             }
         }
@@ -664,7 +656,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         if (data.heat.get() >= 100 && !data.overHeat.get()) {
             data.overHeat.set(true);
             if (shooter instanceof ServerPlayer serverPlayer) {
-                SoundTool.playLocalSound(serverPlayer, ModSounds.OVERHEAT.get(), 2f, 1f);
+                SoundTool.playLocalSound(serverPlayer, ModSounds.OVERHEAT, 2f, 1f);
             }
         }
 
@@ -699,8 +691,8 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         float pitch = data.heat.get() <= 75 ? 1 : (float) (1 - 0.02 * Math.abs(75 - data.heat.get()));
 
         var perk = data.perk.get(Perk.Type.AMMO);
-        if (perk == ModPerks.BEAST_BULLET.get()) {
-            shooter.playSound(ModSounds.HENG.get(), 4f, pitch);
+        if (perk == ModPerks.BEAST_BULLET) {
+            shooter.playSound(ModSounds.HENG, 4f, pitch);
         }
 
         float soundRadius = (float) data.compute().soundRadius;
@@ -730,7 +722,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         if (data.reload.prepareTimer.get() == 0 && data.reloading() && data.hasEnoughAmmoToShoot(player)) {
             data.forceStop.set(true);
         }
-        if (player instanceof ServerPlayer serverPlayer && data.stack.is(ModItems.QL_1031.get()) && data.selectedFireModeInfo().name.equals("Hold")) {
+        if (player instanceof ServerPlayer serverPlayer && data.stack.is(ModItems.QL_1031) && data.selectedFireModeInfo().name.equals("Hold")) {
             var clientboundstopsoundpacket = new ClientboundStopSoundPacket(Mod.loc("ql_1031_discharge"), SoundSource.PLAYERS);
             serverPlayer.connection.send(clientboundstopsoundpacket);
         }
@@ -747,7 +739,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
             var clientboundstopsoundpacket = new ClientboundStopSoundPacket(Mod.loc(name + "_lock"), SoundSource.PLAYERS);
             serverPlayer.connection.send(clientboundstopsoundpacket);
         }
-        if (player instanceof ServerPlayer serverPlayer && data.stack.is(ModItems.QL_1031.get()) && data.selectedFireModeInfo().name.equals("Hold")) {
+        if (player instanceof ServerPlayer serverPlayer && data.stack.is(ModItems.QL_1031) && data.selectedFireModeInfo().name.equals("Hold")) {
             var clientboundstopsoundpacket = new ClientboundStopSoundPacket(Mod.loc("ql_1031_charge"), SoundSource.PLAYERS);
             serverPlayer.connection.send(clientboundstopsoundpacket);
         }
@@ -1122,8 +1114,8 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         }
 
         if (shooter instanceof ServerPlayer player) {
-            player.level().playSound(null, player.blockPosition(), result.isHeadshot() ? ModSounds.HEADSHOT.get() : ModSounds.INDICATION.get(), SoundSource.VOICE, 0.1f, 1);
-            PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(type, 5));
+            player.level().playSound(null, player.blockPosition(), result.isHeadshot() ? ModSounds.HEADSHOT : ModSounds.INDICATION, SoundSource.VOICE, 0.1f, 1);
+            ServerPlayNetworking.send(player, new ClientIndicatorMessage(type, 5));
         }
 
         level.playSound(null, result.getHitPos().x, result.getHitPos().y, result.getHitPos().z, this.getRayHitEntitySound(data), SoundSource.PLAYERS, 0.7F, (float) ((2 * Math.random() - 1) * 0.05f + 1.0f));
@@ -1150,7 +1142,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public @Nullable Screen getItemScreen(ItemStack stack, Player player, InteractionHand hand) {
         if (ClientEventHandler.canOpenEditScreen(stack, hand) && stack.getItem() instanceof GunItem && canEditAttachments(GunData.from(stack))) {
@@ -1164,6 +1156,6 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
     }
 
     public IEnergyStorage getEnergyProvider(@NotNull GunData data, @Nullable Entity ammoSupplier) {
-        return data.stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        return ModCapabilities.ENERGY_ITEM.find(data.stack, null);
     }
 }
