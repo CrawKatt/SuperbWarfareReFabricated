@@ -7,7 +7,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.Entity;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
 public record ClientMotionSyncMessage(int id, float x, float y, float z) implements CustomPacketPayload {
@@ -31,7 +30,7 @@ public record ClientMotionSyncMessage(int id, float x, float y, float z) impleme
     }
 
 
-    public static void handler(final ClientMotionSyncMessage message, final IPayloadContext context) {
+    public static void handler(final ClientMotionSyncMessage message) {
         var level = Minecraft.getInstance().level;
         if (level == null) return;
 

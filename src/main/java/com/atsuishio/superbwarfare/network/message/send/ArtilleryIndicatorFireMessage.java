@@ -15,7 +15,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 import static com.atsuishio.superbwarfare.item.ArtilleryIndicator.TAG_CANNON;
@@ -26,15 +26,15 @@ public enum ArtilleryIndicatorFireMessage implements CustomPacketPayload {
 
     public static final StreamCodec<ByteBuf, ArtilleryIndicatorFireMessage> STREAM_CODEC = StreamCodec.unit(ArtilleryIndicatorFireMessage.INSTANCE);
 
-    public static void handler(final IPayloadContext context) {
+    public static void handler(final ServerPlayNetworking.Context context) {
         Player player = context.player();
         ItemStack stack = player.getMainHandItem();
 
-        if (player.getMainHandItem().is(ModItems.MONITOR.get()) && player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR.get())) {
+        if (player.getMainHandItem().is(ModItems.MONITOR) && player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR.get())) {
             stack = player.getOffhandItem();
         }
 
-        if (stack.is(ModItems.ARTILLERY_INDICATOR.get())) {
+        if (stack.is(ModItems.ARTILLERY_INDICATOR)) {
             var mainTag = NBTTool.getTag(stack);
             ListTag tags = mainTag.getList(TAG_CANNON, Tag.TAG_COMPOUND);
             if (tags.isEmpty()) {

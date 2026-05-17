@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -29,7 +28,7 @@ public record ContainerDataMessage(int containerId, List<Pair> data) implements 
     );
 
 
-    public static void handler(ContainerDataMessage message, final IPayloadContext context) {
+    public static void handler(ContainerDataMessage message) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null && mc.player.containerMenu.containerId == message.containerId) {
             message.data.forEach(p -> mc.player.containerMenu.setData(p.id, p.data));
@@ -37,7 +36,8 @@ public record ContainerDataMessage(int containerId, List<Pair> data) implements 
     }
 
     @Override
-    public @NotNull Type<? extends CustomPacketPayload> type() {
+    @NotNull
+    public Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 

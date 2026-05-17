@@ -18,7 +18,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -41,11 +41,11 @@ public record LungeMineAttackMessage(int msgType, UUID uuid, Vec3 pos) implement
             LungeMineAttackMessage::new
     );
 
-    public static void handler(LungeMineAttackMessage message, final IPayloadContext context) {
+    public static void handler(LungeMineAttackMessage message, final ServerPlayNetworking.Context context) {
         Player player = context.player();
         ItemStack stack = player.getMainHandItem();
 
-        if (stack.is(ModItems.LUNGE_MINE.get())) {
+        if (stack.is(ModItems.LUNGE_MINE)) {
             if (message.msgType == 0) {
                 if (!player.isCreative()) {
                     stack.shrink(1);

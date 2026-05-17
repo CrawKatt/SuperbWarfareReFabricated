@@ -9,7 +9,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public enum UnloadMessage implements CustomPacketPayload {
@@ -19,7 +19,7 @@ public enum UnloadMessage implements CustomPacketPayload {
 
     public static final StreamCodec<ByteBuf, UnloadMessage> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public static void handler(final IPayloadContext context) {
+    public static void handler(final ServerPlayNetworking.Context context) {
         var player = context.player();
 
         ItemStack stack = player.getMainHandItem();
@@ -27,7 +27,7 @@ public enum UnloadMessage implements CustomPacketPayload {
         var data = GunData.from(stack);
         data.withdrawAmmo(player);
         data.save();
-        SoundTool.playLocalSound(player, ModSounds.EDIT.get(), 1f, 1f);
+        SoundTool.playLocalSound(player, ModSounds.EDIT, 1f, 1f);
     }
 
     @Override

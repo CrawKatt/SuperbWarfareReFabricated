@@ -10,7 +10,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -30,7 +30,7 @@ public record FireKeyMessage(int msgType, double power, boolean zoom) implements
     );
 
 
-    public static void handler(FireKeyMessage message, final IPayloadContext context) {
+    public static void handler(FireKeyMessage message, final ServerPlayNetworking.Context context) {
         pressAction(context.player(), message.msgType, message.power, message.zoom);
     }
 

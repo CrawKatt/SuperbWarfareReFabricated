@@ -19,7 +19,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
@@ -33,15 +33,15 @@ public record DroneFireMessage(Vector3f pos) implements CustomPacketPayload {
             DroneFireMessage::new
     );
 
-    public static void handler(DroneFireMessage message, final IPayloadContext context) {
+    public static void handler(DroneFireMessage message, final ServerPlayNetworking.Context context) {
         Player player = context.player();
         ItemStack stack = player.getMainHandItem();
         var mainTag = NBTTool.getTag(stack);
 
-        if (stack.is(ModItems.MONITOR.get()) && mainTag.getBoolean("Using") && mainTag.getBoolean("Linked")) {
+        if (stack.is(ModItems.MONITOR) && mainTag.getBoolean("Using") && mainTag.getBoolean("Linked")) {
             DroneEntity drone = EntityFindUtil.findDrone(player.level(), mainTag.getString("LinkedDrone"));
             if (drone != null) {
-                if (player.getOffhandItem().is(ModItems.FIRING_PARAMETERS.get()) || player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR.get())) {
+                if (player.getOffhandItem().is(ModItems.FIRING_PARAMETERS) || player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR)) {
                     ItemStack offStack = player.getOffhandItem();
 
                     var parameters = offStack.get(ModDataComponents.FIRING_PARAMETERS);
@@ -59,7 +59,7 @@ public record DroneFireMessage(Vector3f pos) implements CustomPacketPayload {
                                     + "," + message.pos.y()
                                     + "," + message.pos.z() + "]")), true);
 
-                    SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN.get(), 2, 1);
+                    SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN, 2, 1);
 
                     if (offStack.getItem() instanceof ArtilleryIndicator indicator) {
                         indicator.setTarget(offStack, player);

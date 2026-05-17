@@ -14,7 +14,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -34,7 +34,7 @@ public record EditMessage(int msgType, boolean add, boolean isVehicle) implement
             EditMessage::new
     );
 
-    public static void handler(EditMessage message, final IPayloadContext context) {
+    public static void handler(EditMessage message, final ServerPlayNetworking.Context context) {
         pressAction(context.player(), message);
     }
 
@@ -90,7 +90,7 @@ public record EditMessage(int msgType, boolean add, boolean isVehicle) implement
                 }
             }
             data.save();
-            SoundTool.playLocalSound(player, ModSounds.EDIT.get(), 1f, 1f);
+            SoundTool.playLocalSound(player, ModSounds.EDIT, 1f, 1f);
         }
     }
 

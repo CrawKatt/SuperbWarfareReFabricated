@@ -15,8 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -39,8 +38,8 @@ public record LaserShootMessage(
             LaserShootMessage::new
     );
 
-    public static void handler(final LaserShootMessage message, final IPayloadContext context) {
-        pressAction((ServerPlayer) context.player(), message.damage, message.id, message.headshot);
+    public static void handler(final LaserShootMessage message, final ServerPlayNetworking.Context context) {
+        pressAction(context.player(), message.damage, message.id, message.headshot);
     }
 
     public static void pressAction(ServerPlayer player, double damage, UUID uuid, boolean headshot) {
@@ -51,12 +50,12 @@ public record LaserShootMessage(
         if (entity != null) {
             if (headshot) {
                 DamageHandler.doDamage(entity, ModDamageTypes.causeLaserHeadshotDamage(level.registryAccess(), player, player), (float) (2 * damage));
-                player.level().playSound(null, player.blockPosition(), ModSounds.HEADSHOT.get(), SoundSource.VOICE, 0.1f, 1);
-                PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(1, 5));
+                player.level().playSound(null, player.blockPosition(), ModSounds.HEADSHOT, SoundSource.VOICE, 0.1f, 1);
+                ServerPlayNetworking.send(player, new ClientIndicatorMessage(1, 5));
             } else {
                 DamageHandler.doDamage(entity, ModDamageTypes.causeLaserDamage(level.registryAccess(), player, player), (float) damage);
-                player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 0.1f, 1);
-                PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 0.1f, 1);
+                ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
             }
             entity.invulnerableTime = 0;
         }

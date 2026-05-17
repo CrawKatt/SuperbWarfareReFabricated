@@ -9,7 +9,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public enum ReloadMessage implements CustomPacketPayload {
@@ -19,7 +19,7 @@ public enum ReloadMessage implements CustomPacketPayload {
 
     public static final StreamCodec<ByteBuf, ReloadMessage> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public static void handler(final IPayloadContext context) {
+    public static void handler(final ServerPlayNetworking.Context context) {
         pressAction(context.player());
     }
 

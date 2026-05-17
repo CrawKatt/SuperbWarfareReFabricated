@@ -11,8 +11,8 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import team.reborn.energy.api.EnergyStorage;
 import org.jetbrains.annotations.NotNull;
 
 public record FireModeMessage(boolean forward) implements CustomPacketPayload {
@@ -25,7 +25,7 @@ public record FireModeMessage(boolean forward) implements CustomPacketPayload {
             FireModeMessage::new
     );
 
-    public static void handler(FireModeMessage message, final IPayloadContext context) {
+    public static void handler(FireModeMessage message, final ServerPlayNetworking.Context context) {
         changeFireMode(message, (ServerPlayer) context.player());
     }
 
@@ -41,28 +41,28 @@ public record FireModeMessage(boolean forward) implements CustomPacketPayload {
         if (fireModes.size() > 1) {
             int mode = (selectedFireMode + (message.forward() ? -1 : 1) + fireModes.size()) % fireModes.size();
             data.selectedFireMode.set(mode);
-            SoundTool.playLocalSound(player, ModSounds.FIRE_RATE.get());
+            SoundTool.playLocalSound(player, ModSounds.FIRE_RATE);
             return;
         }
 
-        if (stack.getItem() == ModItems.SENTINEL.get()
+        if (stack.getItem() == ModItems.SENTINEL
                 && !player.isSpectator()
                 && !(player.getCooldowns().isOnCooldown(stack.getItem()))
                 && GunData.from(stack).reload.time() == 0
                 && !GunData.from(stack).charging()) {
 
             for (var cell : player.getInventory().items) {
-                if (cell.is(ModItems.CELL.get())) {
-                    var cap = cell.getCapability(Capabilities.EnergyStorage.ITEM);
-                    if (cap != null && cap.getEnergyStored() > 0) {
+                if (cell.is(ModItems.CELL)) {
+                    var cap = EnergyStorage.ITEM.find(cell, null);
+                    if (cap != null && cap.getAmount() > 0) {
                         data.charge.starter.markStart();
                     }
                 }
             }
         }
 
-        if (stack.getItem() == ModItems.JAVELIN.get()) {
-            SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_OUT.get());
+        if (stack.getItem() == ModItems.JAVELIN) {
+            SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_OUT);
         }
         data.save();
     }

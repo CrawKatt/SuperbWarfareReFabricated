@@ -12,7 +12,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 import static com.atsuishio.superbwarfare.entity.vehicle.MortarEntity.TARGET_PITCH;
@@ -26,7 +26,7 @@ public record AdjustMortarAngleMessage(double scroll) implements CustomPacketPay
             AdjustMortarAngleMessage::new
     );
 
-    public static void handler(AdjustMortarAngleMessage message, final IPayloadContext context) {
+    public static void handler(AdjustMortarAngleMessage message, final ServerPlayNetworking.Context context) {
         ServerPlayer player = (ServerPlayer) context.player();
 
         Entity looking = TraceTool.findLookingEntity(player, 6);
@@ -36,7 +36,7 @@ public record AdjustMortarAngleMessage(double scroll) implements CustomPacketPay
             mortar.getEntityData().set(TARGET_PITCH, (float) Mth.clamp(mortar.getEntityData().get(TARGET_PITCH) + 0.5 * message.scroll, -89, -20));
         }
 
-        SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV.get(), 1f, 0.7f);
+        SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV, 1f, 0.7f);
     }
 
     @Override

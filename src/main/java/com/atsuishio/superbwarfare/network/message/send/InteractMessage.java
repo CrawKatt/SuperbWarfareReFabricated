@@ -19,7 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public enum InteractMessage implements CustomPacketPayload {
@@ -29,7 +29,7 @@ public enum InteractMessage implements CustomPacketPayload {
 
     public static final StreamCodec<ByteBuf, InteractMessage> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public static void handler(final IPayloadContext context) {
+    public static void handler(final ServerPlayNetworking.Context context) {
         handleInteract(context.player());
     }
 
@@ -37,7 +37,7 @@ public enum InteractMessage implements CustomPacketPayload {
         ItemStack stack = player.getMainHandItem();
         var tag = NBTTool.getTag(stack);
 
-        if (stack.is(ModItems.MONITOR.get())
+        if (stack.is(ModItems.MONITOR)
                 && tag.getBoolean("Using")
                 && tag.getBoolean("Linked")
                 && !player.getCooldowns().isOnCooldown(stack.getItem())

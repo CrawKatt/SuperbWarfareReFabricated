@@ -6,7 +6,6 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
 public record ClientIndicatorMessage(int messageType, int value) implements CustomPacketPayload {
@@ -20,7 +19,7 @@ public record ClientIndicatorMessage(int messageType, int value) implements Cust
             ClientIndicatorMessage::new
     );
 
-    public static void handler(final ClientIndicatorMessage message, final IPayloadContext context) {
+    public static void handler(final ClientIndicatorMessage message) {
         var type = message.messageType();
         switch (type) {
             case 1 -> CrossHairOverlay.headIndicator = message.value();

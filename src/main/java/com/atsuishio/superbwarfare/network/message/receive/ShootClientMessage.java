@@ -6,7 +6,6 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
 public record ShootClientMessage(double time) implements CustomPacketPayload {
@@ -18,7 +17,7 @@ public record ShootClientMessage(double time) implements CustomPacketPayload {
             ShootClientMessage::new
     );
 
-    public static void handler(ShootClientMessage message, final IPayloadContext context) {
+    public static void handler(ShootClientMessage message) {
         ClientEventHandler.handleClientShoot();
     }
 

@@ -12,7 +12,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.Pig;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -29,12 +29,12 @@ public record SeekingWeaponWarningMessage(boolean lockOn, UUID uuid) implements 
     );
 
 
-    public static void handler(SeekingWeaponWarningMessage message, final IPayloadContext context) {
+    public static void handler(SeekingWeaponWarningMessage message, final ServerPlayNetworking.Context context) {
         var player = context.player();
         Entity entity = EntityFindUtil.findEntity(player.level(), String.valueOf(message.uuid));
 
         if (entity != null) {
-            entity.level().playSound(null, entity.getOnPos(), entity instanceof Pig ? SoundEvents.PIG_HURT : message.lockOn ? ModSounds.LOCKED_WARNING.get() : ModSounds.LOCKING_WARNING.get(), SoundSource.PLAYERS, 2, 1f);
+            entity.level().playSound(null, entity.getOnPos(), entity instanceof Pig ? SoundEvents.PIG_HURT : message.lockOn ? ModSounds.LOCKED_WARNING : ModSounds.LOCKING_WARNING, SoundSource.PLAYERS, 2, 1f);
         }
     }
 

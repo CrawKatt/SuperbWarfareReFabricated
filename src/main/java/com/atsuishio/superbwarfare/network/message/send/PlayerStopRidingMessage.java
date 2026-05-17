@@ -15,8 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 import static com.atsuishio.superbwarfare.tools.ParticleTool.sendParticle;
@@ -31,13 +30,13 @@ public record PlayerStopRidingMessage(boolean ejection) implements CustomPacketP
             PlayerStopRidingMessage::new
     );
 
-    public static void handler(PlayerStopRidingMessage message, final IPayloadContext context) {
+    public static void handler(PlayerStopRidingMessage message, final ServerPlayNetworking.Context context) {
         ServerPlayer player = (ServerPlayer) context.player();
         if (player.getVehicle() instanceof VehicleEntity vehicle) {
             if (message.ejection) {
                 var vec = vehicle.getEjectionMovement(player, vehicle.getTagSeatIndex(player));
                 var pos = vehicle.getEjectionPosition(player, vehicle.getTagSeatIndex(player));
-                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.MEDIUM_ROCKET_FIRE.get(), SoundSource.PLAYERS, 4f, 1);
+                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), ModSounds.MEDIUM_ROCKET_FIRE, SoundSource.PLAYERS, 4f, 1);
                 if (player.level() instanceof ServerLevel serverLevel) {
                     for (int p = 0; p < 8; p++) {
                         Vec3 pPos = player.position().add(vec.scale(p * 0.5));
@@ -47,7 +46,7 @@ public record PlayerStopRidingMessage(boolean ejection) implements CustomPacketP
                     }
                 }
 
-                Mod.queueServerWork(1, () -> PacketDistributor.sendToPlayer(player, new ClientSetMotionMessage(vec.toVector3f(), pos.toVector3f())));
+                Mod.queueServerWork(1, () -> ServerPlayNetworking.send(player, new ClientSetMotionMessage(vec.toVector3f(), pos.toVector3f())));
             }
 
             player.stopRiding();

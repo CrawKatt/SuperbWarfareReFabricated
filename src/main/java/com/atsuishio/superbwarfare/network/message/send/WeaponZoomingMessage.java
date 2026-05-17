@@ -8,7 +8,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record WeaponZoomingMessage(boolean zooming) implements CustomPacketPayload {
@@ -20,7 +20,7 @@ public record WeaponZoomingMessage(boolean zooming) implements CustomPacketPaylo
             WeaponZoomingMessage::new
     );
 
-    public static void handler(WeaponZoomingMessage message, final IPayloadContext context) {
+    public static void handler(WeaponZoomingMessage message, final ServerPlayNetworking.Context context) {
         ItemStack stack = context.player().getMainHandItem();
         if (!(stack.getItem() instanceof GunItem)) return;
         var data = GunData.from(stack);

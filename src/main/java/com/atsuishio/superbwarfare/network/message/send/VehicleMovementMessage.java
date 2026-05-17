@@ -11,7 +11,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record VehicleMovementMessage(short keys) implements CustomPacketPayload {
@@ -23,7 +23,7 @@ public record VehicleMovementMessage(short keys) implements CustomPacketPayload 
             VehicleMovementMessage::new
     );
 
-    public static void handler(final VehicleMovementMessage message, final IPayloadContext context) {
+    public static void handler(final VehicleMovementMessage message, final ServerPlayNetworking.Context context) {
         var player = (ServerPlayer) context.player();
         var entity = player.getVehicle();
         ItemStack stack = player.getMainHandItem();
@@ -32,7 +32,7 @@ public record VehicleMovementMessage(short keys) implements CustomPacketPayload 
         VehicleEntity vehicle = null;
         if (entity instanceof VehicleEntity vehicleEntity && vehicleEntity.getFirstPassenger() == player) {
             vehicle = vehicleEntity;
-        } else if (stack.is(ModItems.MONITOR.get())
+        } else if (stack.is(ModItems.MONITOR)
                 && tag.getBoolean("Using")
                 && tag.getBoolean("Linked")
         ) vehicle = EntityFindUtil.findDrone(player.level(), tag.getString("LinkedDrone"));

@@ -8,7 +8,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
@@ -26,7 +26,7 @@ public record VehicleFireMessage(Optional<UUID> uuid, Optional<Vector3f> targetP
             VehicleFireMessage::new
     );
 
-    public static void handler(VehicleFireMessage message, final IPayloadContext context) {
+    public static void handler(VehicleFireMessage message, final ServerPlayNetworking.Context context) {
         var player = context.player();
 
         if (player.getVehicle() instanceof VehicleEntity vehicle) {

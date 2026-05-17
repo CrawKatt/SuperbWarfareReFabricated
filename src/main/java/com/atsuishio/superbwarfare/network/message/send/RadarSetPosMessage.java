@@ -8,7 +8,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record RadarSetPosMessage(BlockPos pos) implements CustomPacketPayload {
@@ -21,7 +21,7 @@ public record RadarSetPosMessage(BlockPos pos) implements CustomPacketPayload {
     );
 
 
-    public static void handler(RadarSetPosMessage message, final IPayloadContext context) {
+    public static void handler(RadarSetPosMessage message, final ServerPlayNetworking.Context context) {
         ServerPlayer player = (ServerPlayer) context.player();
 
         AbstractContainerMenu menu = player.containerMenu;

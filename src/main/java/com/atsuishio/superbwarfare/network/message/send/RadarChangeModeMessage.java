@@ -8,7 +8,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record RadarChangeModeMessage(byte mode) implements CustomPacketPayload {
@@ -20,7 +20,7 @@ public record RadarChangeModeMessage(byte mode) implements CustomPacketPayload {
             RadarChangeModeMessage::new
     );
 
-    public static void handler(RadarChangeModeMessage message, final IPayloadContext context) {
+    public static void handler(RadarChangeModeMessage message, final ServerPlayNetworking.Context context) {
         byte mode = message.mode;
         if (mode < 1 || mode > 4) return;
 

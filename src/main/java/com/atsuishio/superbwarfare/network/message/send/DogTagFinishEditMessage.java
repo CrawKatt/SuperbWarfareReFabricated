@@ -11,7 +11,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -28,11 +28,11 @@ public record DogTagFinishEditMessage(List<Short> colors, String name,
     );
 
 
-    public static void handler(DogTagFinishEditMessage message, final IPayloadContext context) {
-        ServerPlayer serverPlayer = (ServerPlayer) context.player();
+    public static void handler(DogTagFinishEditMessage message, final ServerPlayNetworking.Context context) {
+        ServerPlayer serverPlayer = context.player();
 
         ItemStack stack = message.mainHand ? serverPlayer.getMainHandItem() : serverPlayer.getOffhandItem();
-        if (!stack.is(ModItems.DOG_TAG.get())) return;
+        if (!stack.is(ModItems.DOG_TAG)) return;
 
         stack.set(ModDataComponents.DOG_TAG_IMAGE, message.colors);
 

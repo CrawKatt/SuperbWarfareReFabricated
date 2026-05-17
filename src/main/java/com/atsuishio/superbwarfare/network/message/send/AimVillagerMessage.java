@@ -10,7 +10,7 @@ import net.minecraft.world.entity.ai.gossip.GossipType;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.schedule.Activity;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record AimVillagerMessage(int villagerId) implements CustomPacketPayload {
@@ -22,7 +22,7 @@ public record AimVillagerMessage(int villagerId) implements CustomPacketPayload 
             AimVillagerMessage::new
     );
 
-    public static void handler(AimVillagerMessage message, final IPayloadContext context) {
+    public static void handler(AimVillagerMessage message, final ServerPlayNetworking.Context context) {
         var sender = context.player();
 
         Entity entity = sender.level().getEntity(message.villagerId);

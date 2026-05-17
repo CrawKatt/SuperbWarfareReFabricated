@@ -10,7 +10,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -24,12 +24,12 @@ public record MeleeAttackMessage(UUID uuid) implements CustomPacketPayload {
             MeleeAttackMessage::new
     );
 
-    public static void handler(MeleeAttackMessage message, final IPayloadContext context) {
+    public static void handler(MeleeAttackMessage message, final ServerPlayNetworking.Context context) {
         Player player = context.player();
 
         Entity lookingEntity = EntityFindUtil.findEntity(player.level(), String.valueOf(message.uuid));
         if (lookingEntity != null) {
-            player.level().playSound(null, lookingEntity.getOnPos(), ModSounds.MELEE_HIT.get(), SoundSource.PLAYERS, 1, (float) ((2 * org.joml.Math.random() - 1) * 0.1f + 1.0f));
+            player.level().playSound(null, lookingEntity.getOnPos(), ModSounds.MELEE_HIT, SoundSource.PLAYERS, 1, (float) ((2 * org.joml.Math.random() - 1) * 0.1f + 1.0f));
             player.attack(lookingEntity);
         }
     }

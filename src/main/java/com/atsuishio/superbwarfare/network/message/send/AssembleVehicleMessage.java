@@ -7,8 +7,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record AssembleVehicleMessage(ResourceLocation id, int containerId) implements CustomPacketPayload {
@@ -20,8 +19,8 @@ public record AssembleVehicleMessage(ResourceLocation id, int containerId) imple
             AssembleVehicleMessage::new
     );
 
-    public static void handler(AssembleVehicleMessage message, final IPayloadContext context) {
-        var player = (ServerPlayer) context.player();
+    public static void handler(AssembleVehicleMessage message, final ServerPlayNetworking.Context context) {
+        var player = context.player();
         if (player.containerMenu.containerId != message.containerId) return;
         if (player.containerMenu instanceof VehicleAssemblingMenu menu) {
             menu.assembleVehicle(message.id, player);

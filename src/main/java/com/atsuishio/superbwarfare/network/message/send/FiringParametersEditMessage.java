@@ -11,7 +11,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record FiringParametersEditMessage(
@@ -30,11 +30,11 @@ public record FiringParametersEditMessage(
             FiringParametersEditMessage::new
     );
 
-    public static void handler(FiringParametersEditMessage message, final IPayloadContext context) {
+    public static void handler(FiringParametersEditMessage message, final ServerPlayNetworking.Context context) {
         var player = context.player();
 
         ItemStack stack = message.mainHand ? player.getMainHandItem() : player.getOffhandItem();
-        if (!stack.is(ModItems.FIRING_PARAMETERS.get()) && !stack.is(ModItems.ARTILLERY_INDICATOR.get())) return;
+        if (!stack.is(ModItems.FIRING_PARAMETERS) && !stack.is(ModItems.ARTILLERY_INDICATOR.get())) return;
 
         var parameters = new FiringParameters.Parameters(new BlockPos(message.x, message.y, message.z), message.radius, message.isDepressed);
         stack.set(ModDataComponents.FIRING_PARAMETERS, parameters);

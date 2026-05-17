@@ -15,7 +15,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record AdjustZoomFovMessage(double scroll) implements CustomPacketPayload {
@@ -27,7 +27,7 @@ public record AdjustZoomFovMessage(double scroll) implements CustomPacketPayload
             AdjustZoomFovMessage::new
     );
 
-    public static void handler(AdjustZoomFovMessage message, final IPayloadContext context) {
+    public static void handler(AdjustZoomFovMessage message, final ServerPlayNetworking.Context context) {
         ServerPlayer player = (ServerPlayer) context.player();
 
         ItemStack stack = player.getMainHandItem();
@@ -35,7 +35,7 @@ public record AdjustZoomFovMessage(double scroll) implements CustomPacketPayload
         var gun = GunData.from(stack);
         var data = gun.data();
 
-        if (stack.is(ModItems.MINIGUN.get())) {
+        if (stack.is(ModItems.MINIGUN)) {
             double minRpm = 300 - 1200;
             double maxRpm = 2400 - 1200;
 
@@ -52,7 +52,7 @@ public record AdjustZoomFovMessage(double scroll) implements CustomPacketPayload
 
             player.displayClientMessage(Component.literal("RPM: " + FormatTool.format0D(customRPM + 1200)), true);
             if (customRPM > minRpm && customRPM < maxRpm) {
-                SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV.get(), 1f, 0.7f);
+                SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV, 1f, 0.7f);
             }
         } else {
             double minZoom = gun.minZoom() - 1.25;
@@ -61,7 +61,7 @@ public record AdjustZoomFovMessage(double scroll) implements CustomPacketPayload
             data.putDouble("CustomZoom", Mth.clamp(customZoom + 0.5 * message.scroll, minZoom, maxZoom));
 
             if (customZoom > minZoom && customZoom < maxZoom) {
-                SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV.get(), 1f, 0.7f);
+                SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV, 1f, 0.7f);
             }
         }
         gun.save();

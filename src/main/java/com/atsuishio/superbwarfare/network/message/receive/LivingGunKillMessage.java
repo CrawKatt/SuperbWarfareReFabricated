@@ -18,7 +18,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
 public class LivingGunKillMessage implements CustomPacketPayload {
@@ -79,7 +78,7 @@ public class LivingGunKillMessage implements CustomPacketPayload {
     );
 
 
-    public static void handler(LivingGunKillMessage message, final IPayloadContext context) {
+    public static void handler(LivingGunKillMessage message) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level != null) {
             var entity = level.getEntity(message.attackerId);
@@ -100,7 +99,7 @@ public class LivingGunKillMessage implements CustomPacketPayload {
             if (attacker != null && target != null) {
                 var type = message.getDamageType();
 
-                if (KillMessageHandler.QUEUE.size() >= KillMessageConfig.KILL_MESSAGE_COUNT.get()) {
+                if (KillMessageHandler.QUEUE.size() >= KillMessageConfig.KILL_MESSAGE_COUNT) {
                     KillMessageHandler.QUEUE.poll();
                 }
                 KillMessageHandler.QUEUE.offer(new LivingKillRecord(attacker, target, attacker.getMainHandItem(), message.headshot, type));
@@ -109,7 +108,8 @@ public class LivingGunKillMessage implements CustomPacketPayload {
     }
 
     @Override
-    public @NotNull Type<? extends CustomPacketPayload> type() {
+    @NotNull
+    public Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 }

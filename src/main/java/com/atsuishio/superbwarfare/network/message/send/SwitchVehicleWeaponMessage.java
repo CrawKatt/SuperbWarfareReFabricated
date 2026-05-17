@@ -8,7 +8,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record SwitchVehicleWeaponMessage(int index, double value, boolean isScroll) implements CustomPacketPayload {
@@ -24,8 +24,8 @@ public record SwitchVehicleWeaponMessage(int index, double value, boolean isScro
             SwitchVehicleWeaponMessage::new
     );
 
-    public static void handler(SwitchVehicleWeaponMessage message, final IPayloadContext context) {
-        ServerPlayer player = (ServerPlayer) context.player();
+    public static void handler(SwitchVehicleWeaponMessage message, final ServerPlayNetworking.Context context) {
+        ServerPlayer player = context.player();
 
         if (player.getVehicle() instanceof VehicleEntity vehicle && vehicle.hasWeapon(vehicle.getSeatIndex(player))) {
             var value = message.isScroll ? (Mth.clamp(message.value > 0 ? Mth.ceil(message.value) : Mth.floor(message.value), -1, 1)) : message.value;

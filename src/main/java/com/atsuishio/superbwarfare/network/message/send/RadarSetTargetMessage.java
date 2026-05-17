@@ -10,7 +10,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -27,7 +27,7 @@ public record RadarSetTargetMessage(UUID target) implements CustomPacketPayload 
             RadarSetTargetMessage::new
     );
 
-    public static void handler(RadarSetTargetMessage message, final IPayloadContext context) {
+    public static void handler(RadarSetTargetMessage message, final ServerPlayNetworking.Context context) {
         ServerPlayer player = (ServerPlayer) context.player();
 
         AbstractContainerMenu menu = player.containerMenu;

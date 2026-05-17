@@ -9,7 +9,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record ZoomMessage(int msgType) implements CustomPacketPayload {
@@ -21,21 +21,21 @@ public record ZoomMessage(int msgType) implements CustomPacketPayload {
             ZoomMessage::new
     );
 
-    public static void handler(ZoomMessage message, final IPayloadContext context) {
-        ServerPlayer player = (ServerPlayer) context.player();
+    public static void handler(ZoomMessage message, final ServerPlayNetworking.Context context) {
+        ServerPlayer player = context.player();
 
         if (!(player.getVehicle() instanceof VehicleEntity vehicle)) return;
 
         // 缩放音效播放条件: 载具是武器载具，且该位置有可用武器
         if (message.msgType == 0) {
             if (vehicle.hasWeapon(vehicle.getSeatIndex(player)) && vehicle.banHand(player)) {
-                SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN.get(), 2, 1);
+                SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN, 2, 1);
             }
         }
 
         if (message.msgType == 1) {
             if (vehicle.hasWeapon(vehicle.getSeatIndex(player)) && vehicle.banHand(player)) {
-                SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_OUT.get(), 2, 1);
+                SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_OUT, 2, 1);
             }
         }
     }

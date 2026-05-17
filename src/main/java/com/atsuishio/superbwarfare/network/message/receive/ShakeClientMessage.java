@@ -11,8 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record ShakeClientMessage(
@@ -37,7 +36,7 @@ public record ShakeClientMessage(
             ShakeClientMessage::new
     );
 
-    public static void handler(final ShakeClientMessage message, final IPayloadContext context) {
+    public static void handler(final ShakeClientMessage message) {
         ClientEventHandler.handleShakeClient(message.time, message.radius, message.amplitude, message.x, message.y, message.z);
     }
 
@@ -51,7 +50,7 @@ public record ShakeClientMessage(
         var center = new Vec3(x, y, z);
 
         for (var serverPlayer : level.getEntitiesOfClass(ServerPlayer.class, new AABB(center, center).inflate(sendRadius), e -> true)) {
-            PacketDistributor.sendToPlayer(serverPlayer, new ShakeClientMessage(time, sendRadius, amplitude, x, y, z));
+            ServerPlayNetworking.send(serverPlayer, new ShakeClientMessage(time, sendRadius, amplitude, x, y, z));
         }
     }
 

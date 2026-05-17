@@ -7,7 +7,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public enum GunReforgeMessage implements CustomPacketPayload {
@@ -17,8 +17,8 @@ public enum GunReforgeMessage implements CustomPacketPayload {
 
     public static final StreamCodec<ByteBuf, GunReforgeMessage> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public static void handler(final IPayloadContext context) {
-        ServerPlayer player = (ServerPlayer) context.player();
+    public static void handler(final ServerPlayNetworking.Context context) {
+        ServerPlayer player = context.player();
 
         AbstractContainerMenu abstractcontainermenu = player.containerMenu;
         if (abstractcontainermenu instanceof ReforgingTableMenu menu) {

@@ -11,7 +11,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record MouseMoveMessage(double speedX, double speedY) implements CustomPacketPayload {
@@ -25,7 +25,7 @@ public record MouseMoveMessage(double speedX, double speedY) implements CustomPa
             MouseMoveMessage::new
     );
 
-    public static void handler(MouseMoveMessage message, final IPayloadContext context) {
+    public static void handler(MouseMoveMessage message, final ServerPlayNetworking.Context context) {
         var player = context.player();
         var entity = player.getVehicle();
 
@@ -36,7 +36,7 @@ public record MouseMoveMessage(double speedX, double speedY) implements CustomPa
         ItemStack stack = player.getMainHandItem();
         var tag = NBTTool.getTag(stack);
 
-        if (stack.is(ModItems.MONITOR.get()) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
+        if (stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
             DroneEntity drone = EntityFindUtil.findDrone(player.level(), tag.getString("LinkedDrone"));
             if (drone != null) {
                 drone.mouseInput(message.speedX, message.speedY);

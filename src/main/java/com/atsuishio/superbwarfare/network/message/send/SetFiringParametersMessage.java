@@ -20,7 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -31,7 +31,7 @@ public enum SetFiringParametersMessage implements CustomPacketPayload {
 
     public static final StreamCodec<ByteBuf, SetFiringParametersMessage> STREAM_CODEC = StreamCodec.unit(SetFiringParametersMessage.INSTANCE);
 
-    public static void handler(final IPayloadContext context) {
+    public static void handler(final ServerPlayNetworking.Context context) {
         Player player = context.player();
         ItemStack stack = player.getOffhandItem();
         ItemStack mainStack = player.getMainHandItem();
@@ -45,7 +45,7 @@ public enum SetFiringParametersMessage implements CustomPacketPayload {
         if (lookingEntity != null && !player.isShiftKeyDown()) {
             lookAtEntity = true;
         }
-        if (stack.is(ModItems.FIRING_PARAMETERS.get())) {
+        if (stack.is(ModItems.FIRING_PARAMETERS)) {
 
             var parameters = stack.get(ModDataComponents.FIRING_PARAMETERS);
             var isDepressed = parameters != null && parameters.isDepressed();
@@ -85,7 +85,7 @@ public enum SetFiringParametersMessage implements CustomPacketPayload {
                             + "," + pos.getY()
                             + "," + pos.getZ()
                             + "]")), true);
-            SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN.get(), 2, 1);
+            SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN, 2, 1);
 
             indicator.setTarget(mainStack, player);
         }

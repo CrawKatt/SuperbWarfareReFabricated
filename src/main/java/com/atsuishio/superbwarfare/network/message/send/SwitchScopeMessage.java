@@ -9,7 +9,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record SwitchScopeMessage(double scroll) implements CustomPacketPayload {
@@ -21,8 +21,8 @@ public record SwitchScopeMessage(double scroll) implements CustomPacketPayload {
             SwitchScopeMessage::new
     );
 
-    public static void handler(SwitchScopeMessage message, final IPayloadContext context) {
-        ServerPlayer player = (ServerPlayer) context.player();
+    public static void handler(SwitchScopeMessage message, final ServerPlayNetworking.Context context) {
+        ServerPlayer player = context.player();
 
         ItemStack stack = player.getMainHandItem();
         if (!(stack.getItem() instanceof GunItem)) return;

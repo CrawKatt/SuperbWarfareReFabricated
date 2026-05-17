@@ -7,7 +7,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record ChangeVehicleSeatMessage(int index) implements CustomPacketPayload {
@@ -19,8 +19,8 @@ public record ChangeVehicleSeatMessage(int index) implements CustomPacketPayload
             ChangeVehicleSeatMessage::new
     );
 
-    public static void handler(ChangeVehicleSeatMessage message, final IPayloadContext context) {
-        ServerPlayer player = (ServerPlayer) context.player();
+    public static void handler(ChangeVehicleSeatMessage message, final ServerPlayNetworking.Context context) {
+        ServerPlayer player = context.player();
         if (!(player.getVehicle() instanceof VehicleEntity vehicle)) {
             return;
         }

@@ -2,27 +2,27 @@ package com.atsuishio.superbwarfare.network;
 
 import com.atsuishio.superbwarfare.network.message.receive.*;
 import com.atsuishio.superbwarfare.network.message.send.*;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.handling.IPayloadHandler;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public class NetworkRegistry {
 
-    private static void register() {
+    public static void register() {
         playToClient(PlayerVariablesSyncMessage.TYPE, PlayerVariablesSyncMessage.STREAM_CODEC, (msg, ctx) -> PlayerVariablesSyncMessage.handler(msg));
-        playToClient(ShakeClientMessage.TYPE, ShakeClientMessage.STREAM_CODEC, ShakeClientMessage::handler);
-        playToClient(ClientMotionSyncMessage.TYPE, ClientMotionSyncMessage.STREAM_CODEC, ClientMotionSyncMessage::handler);
-        playToClient(ClientIndicatorMessage.TYPE, ClientIndicatorMessage.STREAM_CODEC, ClientIndicatorMessage::handler);
-        playToClient(LivingGunKillMessage.TYPE, LivingGunKillMessage.STREAM_CODEC, LivingGunKillMessage::handler);
-        playToClient(GunsDataMessage.TYPE, GunsDataMessage.STREAM_CODEC, GunsDataMessage::handler);
-        playToClient(ContainerDataMessage.TYPE, ContainerDataMessage.STREAM_CODEC, ContainerDataMessage::handler);
-        playToClient(ShootClientMessage.TYPE, ShootClientMessage.STREAM_CODEC, ShootClientMessage::handler);
+        playToClient(ShakeClientMessage.TYPE, ShakeClientMessage.STREAM_CODEC, (msg, ctx) -> ShakeClientMessage.handler(msg));
+        playToClient(ClientMotionSyncMessage.TYPE, ClientMotionSyncMessage.STREAM_CODEC, (msg, ctx) -> ClientMotionSyncMessage.handler(msg));
+        playToClient(ClientIndicatorMessage.TYPE, ClientIndicatorMessage.STREAM_CODEC, (msg, ctx) -> ClientIndicatorMessage.handler(msg));
+        playToClient(LivingGunKillMessage.TYPE, LivingGunKillMessage.STREAM_CODEC, (msg, ctx) -> LivingGunKillMessage.handler(msg));
+        playToClient(GunsDataMessage.TYPE, GunsDataMessage.STREAM_CODEC, (msg, ctx) -> GunsDataMessage.handler(msg));
+        playToClient(ContainerDataMessage.TYPE, ContainerDataMessage.STREAM_CODEC, (msg, ctx) -> ContainerDataMessage.handler(msg));
+        playToClient(ShootClientMessage.TYPE, ShootClientMessage.STREAM_CODEC, (msg, ctx) -> ShootClientMessage.handler(msg));
         playToClient(DrawClientMessage.TYPE, DrawClientMessage.STREAM_CODEC, (msg, ctx) -> DrawClientMessage.handler());
         playToClient(ResetCameraTypeMessage.TYPE, ResetCameraTypeMessage.STREAM_CODEC, (message2, context2) -> ResetCameraTypeMessage.handler());
-        playToClient(RadarMenuOpenMessage.TYPE, RadarMenuOpenMessage.STREAM_CODEC, RadarMenuOpenMessage::handler);
+        playToClient(RadarMenuOpenMessage.TYPE, RadarMenuOpenMessage.STREAM_CODEC, (msg, ctx) -> RadarMenuOpenMessage.handler(msg));
         playToClient(RadarMenuCloseMessage.TYPE, RadarMenuCloseMessage.STREAM_CODEC, (message1, context1) -> RadarMenuCloseMessage.handler());
         playToClient(ClientTacticalSprintSyncMessage.TYPE, ClientTacticalSprintSyncMessage.STREAM_CODEC, (msg, ctx) -> ClientTacticalSprintSyncMessage.handler(msg));
         playToClient(VehiclesDataMessage.TYPE, VehiclesDataMessage.STREAM_CODEC, (msg, ctx) -> VehiclesDataMessage.handler(msg));
@@ -73,18 +73,13 @@ public class NetworkRegistry {
         playToServer(WeaponZoomingMessage.TYPE, WeaponZoomingMessage.STREAM_CODEC, WeaponZoomingMessage::handler);
     }
 
-    private static PayloadRegistrar registrar;
-
-    public static void register(final RegisterPayloadHandlersEvent event) {
-        registrar = event.registrar("1");
-        register();
+    private static <T extends CustomPacketPayload> void playToClient(CustomPacketPayload.Type<T> type, StreamCodec<? super RegistryFriendlyByteBuf, T> codec, ClientPlayNetworking.PlayPayloadHandler<T> handler) {
+        PayloadTypeRegistry.playS2C().register(type, codec);
+        ClientPlayNetworking.registerGlobalReceiver(type, handler);
     }
 
-    public static <T extends CustomPacketPayload> void playToClient(CustomPacketPayload.Type<T> type, StreamCodec<? super RegistryFriendlyByteBuf, T> reader, IPayloadHandler<T> handler) {
-        registrar.playToClient(type, reader, handler);
-    }
-
-    public static <T extends CustomPacketPayload> void playToServer(CustomPacketPayload.Type<T> type, StreamCodec<? super RegistryFriendlyByteBuf, T> reader, IPayloadHandler<T> handler) {
-        registrar.playToServer(type, reader, handler);
+    private static <T extends CustomPacketPayload> void playToServer(CustomPacketPayload.Type<T> type, StreamCodec<? super RegistryFriendlyByteBuf, T> codec, ServerPlayNetworking.PlayPayloadHandler<T> handler) {
+        PayloadTypeRegistry.playC2S().register(type, codec);
+        ServerPlayNetworking.registerGlobalReceiver(type, handler);
     }
 }

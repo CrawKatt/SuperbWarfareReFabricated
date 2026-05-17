@@ -9,7 +9,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record SensitivityMessage(boolean isAdd) implements CustomPacketPayload {
@@ -21,7 +21,7 @@ public record SensitivityMessage(boolean isAdd) implements CustomPacketPayload {
             SensitivityMessage::new
     );
 
-    public static void handler(SensitivityMessage message, final IPayloadContext context) {
+    public static void handler(SensitivityMessage message, final ServerPlayNetworking.Context context) {
         var player = context.player();
 
         ItemStack stack = player.getMainHandItem();

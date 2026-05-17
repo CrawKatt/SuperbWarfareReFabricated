@@ -6,7 +6,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record ShowChargingRangeMessage(boolean operation) implements CustomPacketPayload {
@@ -19,7 +19,7 @@ public record ShowChargingRangeMessage(boolean operation) implements CustomPacke
     );
 
 
-    public static void handler(ShowChargingRangeMessage message, final IPayloadContext context) {
+    public static void handler(ShowChargingRangeMessage message, final ServerPlayNetworking.Context context) {
         var player = context.player();
         var menu = player.containerMenu;
         if (menu instanceof ChargingStationMenu chargingStationMenu) {

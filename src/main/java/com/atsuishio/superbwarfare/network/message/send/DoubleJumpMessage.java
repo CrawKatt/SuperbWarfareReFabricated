@@ -11,7 +11,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public enum DoubleJumpMessage implements CustomPacketPayload {
@@ -21,15 +21,15 @@ public enum DoubleJumpMessage implements CustomPacketPayload {
 
     public static final StreamCodec<ByteBuf, DoubleJumpMessage> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public static void handler(final IPayloadContext context) {
-        ServerPlayer player = (ServerPlayer) context.player();
+    public static void handler(final ServerPlayNetworking.Context context) {
+        ServerPlayer player = context.player();
 
         Level level = player.level();
         double x = player.getX();
         double y = player.getY();
         double z = player.getZ();
 
-        level.playSound(null, BlockPos.containing(x, y, z), ModSounds.DOUBLE_JUMP.get(), SoundSource.BLOCKS, 1, 1);
+        level.playSound(null, BlockPos.containing(x, y, z), ModSounds.DOUBLE_JUMP, SoundSource.BLOCKS, 1, 1);
 
         Entity vehicle = player.getRootVehicle();
         if (vehicle != player) {

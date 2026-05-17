@@ -7,7 +7,6 @@ import com.atsuishio.superbwarfare.tools.BufferSerializer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public record GunsDataMessage(List<DefaultGunData> data) implements CustomPacket
         return new GunsDataMessage(CustomData.GUN_DATA.values().stream().toList());
     }
 
-    public static void handler(final GunsDataMessage message, final IPayloadContext context) {
+    public static void handler(final GunsDataMessage message) {
         CustomData.GUN_DATA.clear();
 
         for (var entry : message.data) {
