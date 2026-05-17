@@ -16,7 +16,7 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +47,7 @@ public class VehicleAssemblingMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player pPlayer) {
         return (pPlayer.isAlive() && !this.isVehicleMenu &&
-                this.access.evaluate((level, pos) -> level.getBlockState(pos).is(ModBlocks.VEHICLE_ASSEMBLING_TABLE.get())
+                this.access.evaluate((level, pos) -> level.getBlockState(pos).is(ModBlocks.VEHICLE_ASSEMBLING_TABLE)
                         && pPlayer.distanceToSqr((double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5) <= 64, true))
                 || (this.isVehicleMenu && pPlayer.getVehicle() instanceof VehicleAssemblingTableVehicleEntity);
     }
@@ -58,49 +58,48 @@ public class VehicleAssemblingMenu extends AbstractContainerMenu {
     public void assembleVehicle(ResourceLocation id, ServerPlayer player) {
         var recipe = this.getRecipeById(id, player.level().getRecipeManager());
         if (recipe == null) return;
-        var handler = player.getCapability(Capabilities.ItemHandler.ENTITY);
-        if (handler != null) {
-            if (!player.isCreative()) {
-                Int2IntArrayMap recordCount = new Int2IntArrayMap();
-                var ingredients = recipe.getInputs();
 
-                for (var ingredient : ingredients) {
-                    int count = 0;
+        if (!player.isCreative()) {
+            Int2IntArrayMap recordCount = new Int2IntArrayMap();
+            var ingredients = recipe.getInputs();
+            var inventory = player.getInventory();
 
-                    for (int i = 0; i < handler.getSlots(); ++i) {
-                        ItemStack stack = handler.getStackInSlot(i);
-                        int stackCount = stack.getCount();
-                        if (!stack.isEmpty() && ingredient.getIngredient().test(stack)) {
-                            count += stackCount;
-                            if (count > ingredient.getCount()) {
-                                int remaining = count - ingredient.getCount();
-                                recordCount.put(i, stackCount - remaining);
-                                break;
-                            }
-                            recordCount.put(i, stackCount);
+            for (var ingredient : ingredients) {
+                int count = 0;
+
+                for (int i = 0; i < inventory.getContainerSize(); ++i) {
+                    ItemStack stack = inventory.getItem(i);
+                    int stackCount = stack.getCount();
+                    if (!stack.isEmpty() && ingredient.getIngredient().test(stack)) {
+                        count += stackCount;
+                        if (count > ingredient.getCount()) {
+                            int remaining = count - ingredient.getCount();
+                            recordCount.put(i, stackCount - remaining);
+                            break;
                         }
-                    }
-
-                    if (count < ingredient.getCount()) {
-                        return;
+                        recordCount.put(i, stackCount);
                     }
                 }
 
-                for (int slotIndex : recordCount.keySet()) {
-                    handler.extractItem(slotIndex, recordCount.get(slotIndex), false);
+                if (count < ingredient.getCount()) {
+                    return;
                 }
             }
 
-            Level level = player.level();
-            if (!level.isClientSide) {
-                ItemEntity itemEntity = new ItemEntity(level, player.getX(), player.getY() + 0.5, player.getZ(), recipe.getResultItem(player.level().registryAccess()).copy());
-                itemEntity.setPickUpDelay(0);
-                level.addFreshEntity(itemEntity);
+            for (int slotIndex : recordCount.keySet()) {
+                inventory.removeItem(slotIndex, recordCount.get(slotIndex));
             }
-
-            player.inventoryMenu.broadcastFullState();
-            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, new FinishAssemblingVehicleMessage(this.containerId));
         }
+
+        Level level = player.level();
+        if (!level.isClientSide) {
+            ItemEntity itemEntity = new ItemEntity(level, player.getX(), player.getY() + 0.5, player.getZ(), recipe.getResultItem(player.level().registryAccess()).copy());
+            itemEntity.setPickUpDelay(0);
+            level.addFreshEntity(itemEntity);
+        }
+
+        player.inventoryMenu.broadcastFullState();
+        ServerPlayNetworking.send(player, new FinishAssemblingVehicleMessage(this.containerId));
     }
 
     @Nullable

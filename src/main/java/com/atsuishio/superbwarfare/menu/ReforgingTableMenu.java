@@ -146,7 +146,7 @@ public class ReforgingTableMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(@NotNull Player pPlayer) {
-        return this.access.evaluate((level, pos) -> level.getBlockState(pos).is(ModBlocks.REFORGING_TABLE.get())
+        return this.access.evaluate((level, pos) -> level.getBlockState(pos).is(ModBlocks.REFORGING_TABLE)
                 && pPlayer.distanceToSqr((double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5) <= 64, true);
     }
 
@@ -334,7 +334,7 @@ public class ReforgingTableMenu extends AbstractContainerMenu {
                     case DAMAGE -> this.damagePerkLevel.set(perkInstance.level());
                 }
 
-                var ammoPerkItem = perkInstance.perk().getItem().get();
+                var ammoPerkItem = perkInstance.perk().getItem();
 
                 this.container.setItem(switch (type) {
                     case AMMO -> AMMO_PERK_SLOT;

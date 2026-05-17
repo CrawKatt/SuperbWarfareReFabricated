@@ -9,10 +9,11 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities;
+import net.fabricmc.fabric.api.registry.FuelRegistry;
+import team.reborn.energy.api.EnergyStorage;
 import org.jetbrains.annotations.NotNull;
 
 public class ChargingStationMenu extends EnergyMenu {
@@ -64,12 +65,12 @@ public class ChargingStationMenu extends EnergyMenu {
                     return ItemStack.EMPTY;
                 }
             } else if (pIndex != 0) {
-                var itemCapability = itemstack1.getCapability(Capabilities.EnergyStorage.ITEM);
+                var itemCapability = EnergyStorage.ITEM.find(itemstack1, null);
                 if (itemCapability != null) {
                     if (!this.moveItemStackTo(itemstack1, 1, 2, true)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (itemstack1.getBurnTime(RecipeType.SMELTING) > 0 || itemstack1.getFoodProperties(null) != null) {
+                } else if (FuelRegistry.INSTANCE.get(itemstack1.getItem()) != null || itemstack1.get(DataComponents.FOOD) != null) {
                     if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }

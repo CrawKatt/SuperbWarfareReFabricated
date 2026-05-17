@@ -8,7 +8,11 @@ import com.atsuishio.superbwarfare.init.ModMenuTypes;
 import com.atsuishio.superbwarfare.item.FiringParameters;
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData;
 import com.atsuishio.superbwarfare.network.dataslot.SimpleEnergyData;
+import com.atsuishio.superbwarfare.network.message.receive.RadarMenuCloseMessage;
+import com.atsuishio.superbwarfare.network.message.receive.RadarMenuOpenMessage;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -147,12 +151,25 @@ public class FuMO25Menu extends EnergyMenu {
 
     @Override
     public boolean stillValid(@NotNull Player pPlayer) {
-        return this.access.evaluate((level, pos) -> level.getBlockState(pos).is(ModBlocks.FUMO_25.get())
+        return this.access.evaluate((level, pos) -> level.getBlockState(pos).is(ModBlocks.FUMO_25)
                 && pPlayer.distanceToSqr((double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5) <= 64, true);
     }
 
     @Override
+    protected void onOpened(ServerPlayer player) {
+        super.onOpened(player);
+        this.getSelfPos().ifPresent(pos -> ServerPlayNetworking.send(player, new RadarMenuOpenMessage(pos)));
+    }
+
+    @Override
+    protected void onClosed(ServerPlayer player) {
+        super.onClosed(player);
+        ServerPlayNetworking.send(player, RadarMenuCloseMessage.INSTANCE);
+    }
+
+    @Override
     public void removed(@NotNull Player pPlayer) {
+        super.removed(pPlayer);
         this.access.execute((level, pos) -> {
             ItemStack para = this.container.getItem(0);
             if (!para.isEmpty()) {
@@ -197,7 +214,7 @@ public class FuMO25Menu extends EnergyMenu {
 
         @Override
         public boolean mayPlace(ItemStack pStack) {
-            return pStack.is(ModItems.FIRING_PARAMETERS.get());
+            return pStack.is(ModItems.FIRING_PARAMETERS);
         }
     }
 }
