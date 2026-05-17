@@ -2,7 +2,9 @@ package com.atsuishio.superbwarfare.data;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.google.gson.JsonParseException;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -12,7 +14,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.Map;
 
-public class ComplexJsonResourceReloadListener extends SimplePreparableReloadListener<Object> {
+public class ComplexJsonResourceReloadListener extends SimplePreparableReloadListener<Object> implements IdentifiableResourceReloadListener {
 
     private final Map<String, DataLoader.GeneralData<?>> data;
 
@@ -63,4 +65,8 @@ public class ComplexJsonResourceReloadListener extends SimplePreparableReloadLis
     protected void apply(Object obj, ResourceManager resourceManager, ProfilerFiller profiler) {
     }
 
+    @Override
+    public ResourceLocation getFabricId() {
+        return Mod.loc("complex_json_data");
+    }
 }

@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.data;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.data.vehicle.subdata.CollisionLevel;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -9,14 +8,12 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +22,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-@EventBusSubscriber(modid = Mod.MODID)
 public class DataLoader {
 
     public static final Gson GSON = createCommonBuilder().create();
@@ -51,17 +47,9 @@ public class DataLoader {
     public static final ComplexJsonResourceReloadListener SERVER_LISTENER = new ComplexJsonResourceReloadListener(LOADED_DATA);
     public static final ComplexJsonResourceReloadListener CLIENT_LISTENER = new ComplexJsonResourceReloadListener(LOADED_RESOURCE);
 
-    @SubscribeEvent
-    public static void addDataReloadListener(AddReloadListenerEvent event) {
-        event.addListener(SERVER_LISTENER);
-    }
-
-    @EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.MOD)
-    static class ClientReloadListener {
-        @SubscribeEvent
-        public static void addResourceReloadListener(RegisterClientReloadListenersEvent event) {
-            event.registerReloadListener(CLIENT_LISTENER);
-        }
+    public static void register() {
+        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(SERVER_LISTENER);
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(CLIENT_LISTENER);
     }
 
     public static <T> DataMap<T> createData(String directory, Class<T> clazz) {
