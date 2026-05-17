@@ -9,47 +9,27 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.Locale;
-import java.util.function.Supplier;
 
 public enum Ammo {
-    HANDGUN(ChatFormatting.GREEN, ModItems.HANDGUN_AMMO::get),
-    RIFLE(ChatFormatting.AQUA, ModItems.RIFLE_AMMO::get),
-    SHOTGUN(ChatFormatting.RED, ModItems.SHOTGUN_AMMO::get),
-    SNIPER(ChatFormatting.GOLD, ModItems.SNIPER_AMMO::get),
-    HEAVY(ChatFormatting.LIGHT_PURPLE, ModItems.HEAVY_AMMO::get);
+    HANDGUN(ChatFormatting.GREEN, ModItems.HANDGUN_AMMO),
+    RIFLE(ChatFormatting.AQUA, ModItems.RIFLE_AMMO),
+    SHOTGUN(ChatFormatting.RED, ModItems.SHOTGUN_AMMO),
+    SNIPER(ChatFormatting.GOLD, ModItems.SNIPER_AMMO),
+    HEAVY(ChatFormatting.LIGHT_PURPLE, ModItems.HEAVY_AMMO);
 
-    /**
-     * 翻译字段名称，如 item.superbwarfare.ammo.rifle
-     */
     public final String translationKey;
-    /**
-     * 大驼峰格式命名的序列化字段名称，如 RifleAmmo
-     */
     public final String serializationName;
-    /**
-     * 下划线格式命名的小写名称，如 rifle
-     */
     public final String name;
-
-    /**
-     * 大驼峰格式命名的显示名称，如 Rifle Ammo
-     */
     public final String displayName;
-
-    /**
-     * 该类型弹药默认的Item
-     */
-    public final Supplier<Item> defaultItemSupplier;
-
+    public final Item defaultItem;
     public final ChatFormatting color;
-    public DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> dataComponent;
+    public DataComponentType<Integer> dataComponent;
 
-    Ammo(ChatFormatting color, Supplier<Item> defaultItemSupplier) {
+    Ammo(ChatFormatting color, Item defaultItem) {
         this.color = color;
-        this.defaultItemSupplier = defaultItemSupplier;
+        this.defaultItem = defaultItem;
 
         var name = name().toLowerCase(Locale.ROOT);
         this.name = name;
@@ -78,7 +58,7 @@ public enum Ammo {
     }
 
     public ItemStack getItemStack(int count) {
-        return new ItemStack(defaultItemSupplier.get(), count);
+        return new ItemStack(defaultItem, count);
     }
 
     public static Ammo getType(String name) {
@@ -136,15 +116,15 @@ public enum Ammo {
 
     // Entity
     public int get(Entity entity) {
-        return get(entity.getData(ModAttachments.PLAYER_VARIABLE));
+        return get(entity.getAttached(ModAttachments.PLAYER_VARIABLE));
     }
 
     public void set(Entity entity, int count) {
         if (entity.level().isClientSide) return;
-        var cap = entity.getData(ModAttachments.PLAYER_VARIABLE).watch();
+        var cap = entity.getAttached(ModAttachments.PLAYER_VARIABLE).watch();
 
         set(cap, count);
-        entity.setData(ModAttachments.PLAYER_VARIABLE, cap);
+        entity.setAttached(ModAttachments.PLAYER_VARIABLE, cap);
         cap.sync(entity);
     }
 

@@ -1,77 +1,95 @@
 package com.atsuishio.superbwarfare.config.server;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class MiscConfig {
 
-    public static ModConfigSpec.BooleanValue ALLOW_TACTICAL_SPRINT;
-    public static ModConfigSpec.BooleanValue SEND_KILL_FEEDBACK;
-    public static ModConfigSpec.BooleanValue ALLOW_FORCE_DAMAGE;
-    public static ModConfigSpec.BooleanValue DROP_AMMO_BOX;
-    public static ModConfigSpec.IntValue DEFAULT_ARMOR_LEVEL;
-    public static ModConfigSpec.IntValue MILITARY_ARMOR_LEVEL;
-    public static ModConfigSpec.IntValue HEAVY_MILITARY_ARMOR_LEVEL;
-    public static ModConfigSpec.IntValue ARMOR_POINT_PER_LEVEL;
-    public static ModConfigSpec.IntValue CHARGING_STATION_MAX_ENERGY;
-    public static ModConfigSpec.IntValue CHARGING_STATION_GENERATE_SPEED;
-    public static ModConfigSpec.IntValue CHARGING_STATION_TRANSFER_SPEED;
-    public static ModConfigSpec.IntValue CHARGING_STATION_CHARGE_RADIUS;
-    public static ModConfigSpec.IntValue CHARGING_STATION_DEFAULT_FUEL_TIME;
-    public static ModConfigSpec.IntValue ARTILLERY_INDICATOR_LIST_SIZE;
-    public static ModConfigSpec.BooleanValue MINE_HITBOX_INVISIBLE;
-    public static ModConfigSpec.BooleanValue SMOKE_HIDE_TARGET;
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Path CONFIG_PATH = Path.of("config", "superbwarfare", "misc.json");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    public static void init(ModConfigSpec.Builder builder) {
-        builder.push("misc");
+    public static boolean ALLOW_TACTICAL_SPRINT = false;
+    public static boolean SEND_KILL_FEEDBACK = true;
+    public static boolean ALLOW_FORCE_DAMAGE = false;
+    public static boolean DROP_AMMO_BOX = false;
+    public static int DEFAULT_ARMOR_LEVEL = 1;
+    public static int MILITARY_ARMOR_LEVEL = 2;
+    public static int HEAVY_MILITARY_ARMOR_LEVEL = 3;
+    public static int ARMOR_POINT_PER_LEVEL = 15;
+    public static int CHARGING_STATION_MAX_ENERGY = 4000000;
+    public static int CHARGING_STATION_GENERATE_SPEED = 128;
+    public static int CHARGING_STATION_TRANSFER_SPEED = 100000;
+    public static int CHARGING_STATION_CHARGE_RADIUS = 8;
+    public static int CHARGING_STATION_DEFAULT_FUEL_TIME = 1600;
+    public static int ARTILLERY_INDICATOR_LIST_SIZE = 32;
+    public static boolean MINE_HITBOX_INVISIBLE = false;
+    public static boolean SMOKE_HIDE_TARGET = false;
 
-        builder.comment("Set true to enable tactical sprint");
-        ALLOW_TACTICAL_SPRINT = builder.define("allow_tactical_sprint", false);
+    public static void load() {
+        if (Files.notExists(CONFIG_PATH)) {
+            save();
+            return;
+        }
+        try {
+            var reader = Files.newBufferedReader(CONFIG_PATH);
+            var data = GSON.fromJson(reader, Data.class);
+            if (data != null) {
+                ALLOW_TACTICAL_SPRINT = data.allowTacticalSprint;
+                SEND_KILL_FEEDBACK = data.sendKillFeedback;
+                ALLOW_FORCE_DAMAGE = data.allowForceDamage;
+                DROP_AMMO_BOX = data.dropAmmoBox;
+                DEFAULT_ARMOR_LEVEL = data.defaultArmorLevel;
+                MILITARY_ARMOR_LEVEL = data.militaryArmorLevel;
+                HEAVY_MILITARY_ARMOR_LEVEL = data.heavyMilitaryArmorLevel;
+                ARMOR_POINT_PER_LEVEL = data.armorPointPerLevel;
+                CHARGING_STATION_MAX_ENERGY = data.chargingStationMaxEnergy;
+                CHARGING_STATION_GENERATE_SPEED = data.chargingStationGenerateSpeed;
+                CHARGING_STATION_TRANSFER_SPEED = data.chargingStationTransferSpeed;
+                CHARGING_STATION_CHARGE_RADIUS = data.chargingStationChargeRadius;
+                CHARGING_STATION_DEFAULT_FUEL_TIME = data.chargingStationDefaultFuelTime;
+                ARTILLERY_INDICATOR_LIST_SIZE = data.artilleryIndicatorListSize;
+                MINE_HITBOX_INVISIBLE = data.mineHitboxInvisible;
+                SMOKE_HIDE_TARGET = data.smokeHideTarget;
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to load misc config", e);
+        }
+    }
 
-        builder.comment("Set true to enable kill feedback sending");
-        SEND_KILL_FEEDBACK = builder.define("send_kill_feedback", true);
+    public static void save() {
+        try {
+            Files.createDirectories(CONFIG_PATH.getParent());
+            var writer = Files.newBufferedWriter(CONFIG_PATH);
+            GSON.toJson(new Data(), writer);
+            writer.close();
+        } catch (IOException e) {
+            LOGGER.error("Failed to save misc config", e);
+        }
+    }
 
-        builder.comment("Set true to enable force damage");
-        ALLOW_FORCE_DAMAGE = builder.define("allow_force_damage", false);
-
-        builder.comment("Whether to drop an ammo box after the player dies");
-        DROP_AMMO_BOX = builder.define("drop_ammo_box", false);
-
-        builder.comment("The default maximum armor level for normal armors");
-        DEFAULT_ARMOR_LEVEL = builder.defineInRange("default_armor_level", 1, 0, 10000000);
-
-        builder.comment("The maximum armor level for armors with superbwarfare:military_armor tag");
-        MILITARY_ARMOR_LEVEL = builder.defineInRange("military_armor_level", 2, 0, 10000000);
-
-        builder.comment("The maximum armor level for armors with superbwarfare:military_armor_heavy tag(will override superbwarfare:military_armor tag!)");
-        HEAVY_MILITARY_ARMOR_LEVEL = builder.defineInRange("heavy_military_armor_level", 3, 0, 10000000);
-
-        builder.comment("The points per level for armor plate");
-        ARMOR_POINT_PER_LEVEL = builder.defineInRange("armor_point_per_level", 15, 0, 10000000);
-
-        builder.comment("Max energy storage of charging station");
-        CHARGING_STATION_MAX_ENERGY = builder.defineInRange("charging_station_max_energy", 4000000, 1, Integer.MAX_VALUE);
-
-        builder.comment("How much FE energy can charging station generate per tick");
-        CHARGING_STATION_GENERATE_SPEED = builder.defineInRange("charging_station_generate_speed", 128, 1, Integer.MAX_VALUE);
-
-        builder.comment("How much FE energy can charging station transfer per tick");
-        CHARGING_STATION_TRANSFER_SPEED = builder.defineInRange("charging_station_transfer_speed", 100000, 1, Integer.MAX_VALUE);
-
-        builder.comment("The charging radius of the charging station");
-        CHARGING_STATION_CHARGE_RADIUS = builder.defineInRange("charging_station_charge_radius", 8, 0, 128);
-
-        builder.comment("The default fuel time of the charging station");
-        CHARGING_STATION_DEFAULT_FUEL_TIME = builder.defineInRange("charging_station_default_fuel_time", 1600, 1, Integer.MAX_VALUE);
-
-        builder.comment("The max size of artillery indicator binding list");
-        ARTILLERY_INDICATOR_LIST_SIZE = builder.defineInRange("artillery_indicator_list_size", 32, 1, Integer.MAX_VALUE);
-
-        builder.comment("Set true to make mine hitbox invisible");
-        MINE_HITBOX_INVISIBLE = builder.define("mine_hitbox_invisible", false);
-
-        builder.comment("Set true to allow smoke to prevent entities from being set as target");
-        SMOKE_HIDE_TARGET = builder.define("smoke_hide_target", false);
-
-        builder.pop();
+    private static class Data {
+        public boolean allowTacticalSprint = ALLOW_TACTICAL_SPRINT;
+        public boolean sendKillFeedback = SEND_KILL_FEEDBACK;
+        public boolean allowForceDamage = ALLOW_FORCE_DAMAGE;
+        public boolean dropAmmoBox = DROP_AMMO_BOX;
+        public int defaultArmorLevel = DEFAULT_ARMOR_LEVEL;
+        public int militaryArmorLevel = MILITARY_ARMOR_LEVEL;
+        public int heavyMilitaryArmorLevel = HEAVY_MILITARY_ARMOR_LEVEL;
+        public int armorPointPerLevel = ARMOR_POINT_PER_LEVEL;
+        public int chargingStationMaxEnergy = CHARGING_STATION_MAX_ENERGY;
+        public int chargingStationGenerateSpeed = CHARGING_STATION_GENERATE_SPEED;
+        public int chargingStationTransferSpeed = CHARGING_STATION_TRANSFER_SPEED;
+        public int chargingStationChargeRadius = CHARGING_STATION_CHARGE_RADIUS;
+        public int chargingStationDefaultFuelTime = CHARGING_STATION_DEFAULT_FUEL_TIME;
+        public int artilleryIndicatorListSize = ARTILLERY_INDICATOR_LIST_SIZE;
+        public boolean mineHitboxInvisible = MINE_HITBOX_INVISIBLE;
+        public boolean smokeHideTarget = SMOKE_HIDE_TARGET;
     }
 }

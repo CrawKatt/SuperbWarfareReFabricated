@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.entity.vehicle.base;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.capability.api.IEnergyStorage;
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage;
 import com.atsuishio.superbwarfare.capability.energy.VehicleEnergyStorage;
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption;
@@ -83,15 +84,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.*;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.util.FakePlayer;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 import org.joml.*;
+import team.reborn.energy.api.EnergyStorage;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
@@ -116,7 +113,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     public static final EntityDataAccessor<Float> DELTA_ROT = SynchedEntityData.defineId(VehicleEntity.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Float> MOUSE_SPEED_X = SynchedEntityData.defineId(VehicleEntity.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Float> MOUSE_SPEED_Y = SynchedEntityData.defineId(VehicleEntity.class, EntityDataSerializers.FLOAT);
-    public static final EntityDataAccessor<List<Integer>> SELECTED_WEAPON = SynchedEntityData.defineId(VehicleEntity.class, ModSerializers.INT_LIST_SERIALIZER.get());
+    public static final EntityDataAccessor<List<Integer>> SELECTED_WEAPON = SynchedEntityData.defineId(VehicleEntity.class, ModSerializers.INT_LIST_SERIALIZER);
 
     public static final EntityDataAccessor<Float> TURRET_HEALTH = SynchedEntityData.defineId(VehicleEntity.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Float> L_WHEEL_HEALTH = SynchedEntityData.defineId(VehicleEntity.class, EntityDataSerializers.FLOAT);
@@ -180,7 +177,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     public static final EntityDataAccessor<Float> CHARGE_PROGRESS = SynchedEntityData.defineId(VehicleEntity.class, EntityDataSerializers.FLOAT);
 
     // Map SeatIndex -> GunData
-    protected static final EntityDataAccessor<Map<String, GunData>> GUN_DATA_MAP = SynchedEntityData.defineId(VehicleEntity.class, ModSerializers.VEHICLE_GUN_DATA_MAP_SERIALIZER.get());
+    protected static final EntityDataAccessor<Map<String, GunData>> GUN_DATA_MAP = SynchedEntityData.defineId(VehicleEntity.class, ModSerializers.VEHICLE_GUN_DATA_MAP_SERIALIZER);
 
     public Map<String, GunData> getGunDataMap() {
         var rawMap = entityData.get(GUN_DATA_MAP);
@@ -191,7 +188,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             var data = rawMap.get(kv.getKey());
 
             if (data == null) {
-                data = GunData.from(new ItemStack(ModItems.VEHICLE_GUN.get()));
+                data = GunData.from(new ItemStack(ModItems.VEHICLE_GUN));
             }
 
             data.defaultDataSupplier = kv::getValue;
@@ -1027,7 +1024,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     public void turretTurnSound(float diffX, float diffY, float pitch) {
         if (this instanceof MortarEntity) return;
         if (level().isClientSide && (Math.abs(diffY) > 0.5 || Math.abs(diffX) > 0.5)) {
-            level().playLocalSound(this.getX(), this.getY() + this.getBbHeight() * 0.5, this.getZ(), ModSounds.TURRET_TURN.get(), this.getSoundSource(), (float) java.lang.Math.min(0.15 * (java.lang.Math.max(Mth.abs(diffX), Mth.abs(diffY))), 0.75), (random.nextFloat() * 0.05f + pitch), false);
+            level().playLocalSound(this.getX(), this.getY() + this.getBbHeight() * 0.5, this.getZ(), ModSounds.TURRET_TURN, this.getSoundSource(), (float) java.lang.Math.min(0.15 * (java.lang.Math.max(Mth.abs(diffX), Mth.abs(diffY))), 0.75), (random.nextFloat() * 0.05f + pitch), false);
         }
     }
 
@@ -1599,7 +1596,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
 
         ItemStack stack = player.getMainHandItem();
 
-        if (stack.is(ModItems.VEHICLE_DAMAGE_ANALYZER.get())) {
+        if (stack.is(ModItems.VEHICLE_DAMAGE_ANALYZER)) {
             if (!level().isClientSide) {
                 if (this.damageDebugResultReceiver != null) {
                     this.damageDebugResultReceiver = null;
@@ -1746,7 +1743,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
 
     public void onHurt(float pHealAmount, Entity attacker, boolean send) {
         if (this.level() instanceof ServerLevel) {
-            var holder = Holder.direct(ModSounds.INDICATION_VEHICLE.get());
+            var holder = Holder.direct(ModSounds.INDICATION_VEHICLE);
             if (attacker instanceof ServerPlayer player && pHealAmount > 0 && this.getHealth() > 0 && send && !(this instanceof DroneEntity)) {
                 player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getEyeY(), player.getZ(), 0.25f + (2.75f * pHealAmount / getMaxHealth()), random.nextFloat() * 0.1f + 0.9f, player.level().random.nextLong()));
                 PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(3, 5));
@@ -1800,7 +1797,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     @Override
     @ParametersAreNonnullByDefault
     protected void playStepSound(BlockPos pPos, BlockState pState) {
-        this.playSound(ModSounds.WHEEL_VEHICLE_STEP.get(), (float) (getDeltaMovement().length() * 0.1), random.nextFloat() * 0.15f + 1.05f);
+        this.playSound(ModSounds.WHEEL_VEHICLE_STEP, (float) (getDeltaMovement().length() * 0.1), random.nextFloat() * 0.15f + 1.05f);
     }
 
     @Override
@@ -2108,7 +2105,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
                 int neededEnergy = this.getMaxEnergy() - this.getEnergy();
                 if (neededEnergy <= 0) break;
 
-                var energyCap = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+                var energyCap = stack.getCapability(EnergyStorage.ITEM);
                 if (energyCap == null) continue;
 
                 var stored = energyCap.getEnergyStored();
@@ -2397,9 +2394,9 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         }
 
         if (this.getHealth() < 0.1f * this.getMaxHealth() && tickCount % 13 == 0) {
-            this.level().playSound(null, this.getOnPos(), ModSounds.NO_HEALTH.get(), SoundSource.PLAYERS, 1, 1);
+            this.level().playSound(null, this.getOnPos(), ModSounds.NO_HEALTH, SoundSource.PLAYERS, 1, 1);
         } else if (this.getHealth() >= 0.1f && this.getHealth() < 0.4f * this.getMaxHealth() && tickCount % 10 == 0) {
-            this.level().playSound(null, this.getOnPos(), ModSounds.LOW_HEALTH.get(), SoundSource.PLAYERS, 1, 1);
+            this.level().playSound(null, this.getOnPos(), ModSounds.LOW_HEALTH, SoundSource.PLAYERS, 1, 1);
         }
     }
 
@@ -2948,10 +2945,10 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     protected void crashPassengers() {
         for (var entity : this.getPassengers()) {
             if (entity instanceof LivingEntity living) {
-                for (int i = 0; i < VehicleConfig.AIR_CRASH_EXPLOSION_COUNT.get(); i++) {
+                for (int i = 0; i < VehicleConfig.AIR_CRASH_EXPLOSION_COUNT; i++) {
                     var tempAttacker = living == getLastAttacker() ? null : getLastAttacker();
                     living.invulnerableTime = 0;
-                    living.hurt(ModDamageTypes.causeAirCrashDamage(this.level().registryAccess(), null, tempAttacker), VehicleConfig.AIR_CRASH_EXPLOSION_DAMAGE.get());
+                    living.hurt(ModDamageTypes.causeAirCrashDamage(this.level().registryAccess(), null, tempAttacker), VehicleConfig.AIR_CRASH_EXPLOSION_DAMAGE);
                 }
             }
         }
@@ -2960,10 +2957,10 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     protected void explodePassengers() {
         for (var entity : this.getPassengers()) {
             if (entity instanceof LivingEntity living) {
-                for (int i = 0; i < VehicleConfig.SELF_EXPLOSION_COUNT.get(); i++) {
+                for (int i = 0; i < VehicleConfig.SELF_EXPLOSION_COUNT; i++) {
                     var tempAttacker = living == getLastAttacker() ? null : getLastAttacker();
                     living.invulnerableTime = 0;
-                    living.hurt(ModDamageTypes.causeVehicleExplosionDamage(this.level().registryAccess(), null, tempAttacker), VehicleConfig.SELF_EXPLOSION_DAMAGE.get());
+                    living.hurt(ModDamageTypes.causeVehicleExplosionDamage(this.level().registryAccess(), null, tempAttacker), VehicleConfig.SELF_EXPLOSION_DAMAGE);
                 }
             }
         }
@@ -3781,7 +3778,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             if (this.getVehicleType() == VehicleType.AIRPLANE && ((entityData.get(GEAR_ROT) > 0.15 && !(this instanceof Tom6Entity)) || Mth.abs(getRoll()) > 20 || Mth.abs(getXRot()) > 30)) {
                 this.hurt(ModDamageTypes.causeVehicleStrikeDamage(this.level().registryAccess(), this, driver == null ? this : driver), (float) ((8 + Mth.abs(getRoll() * 0.2f)) * (lastTickSpeed - 0.3) * (lastTickSpeed - 0.3)));
                 if (!this.level().isClientSide) {
-                    this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE.get(), this.getSoundSource(), 1, 1);
+                    this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE, this.getSoundSource(), 1, 1);
                 }
                 this.bounceVertical(Direction.getNearest(this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z()).getOpposite());
             } else if (this.getVehicleType() == VehicleType.HELICOPTER) {
@@ -3790,7 +3787,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             } else if (Mth.abs((float) lastTickVerticalSpeed) > 0.4) {
                 this.hurt(ModDamageTypes.causeVehicleStrikeDamage(this.level().registryAccess(), this, driver == null ? this : driver), (float) (96 * ((Mth.abs((float) lastTickVerticalSpeed) - 0.4) * (lastTickSpeed - 0.3) * (lastTickSpeed - 0.3))));
                 if (!this.level().isClientSide) {
-                    this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE.get(), this.getSoundSource(), 1, 1);
+                    this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE, this.getSoundSource(), 1, 1);
                 }
                 this.bounceVertical(Direction.getNearest(this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z()).getOpposite());
             }
@@ -3800,7 +3797,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             this.hurt(ModDamageTypes.causeVehicleStrikeDamage(this.level().registryAccess(), this, driver == null ? this : driver), (float) (126 * ((lastTickSpeed - 0.4) * (lastTickSpeed - 0.4))));
             this.bounceHorizontal(Direction.getNearest(this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z()).getOpposite());
             if (!this.level().isClientSide) {
-                this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE.get(), this.getSoundSource(), 1, 1);
+                this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE, this.getSoundSource(), 1, 1);
             }
             collisionCoolDown = 4;
             crash = true;

@@ -1,83 +1,87 @@
 package com.atsuishio.superbwarfare.config.server;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class ExplosionConfig {
 
-    public static ModConfigSpec.IntValue EXPLOSION_PENETRATION_RATIO;
-    public static ModConfigSpec.BooleanValue EXPLOSION_DESTROY;
-    public static ModConfigSpec.BooleanValue EXTRA_EXPLOSION_EFFECT;
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Path CONFIG_PATH = Path.of("config", "superbwarfare", "explosion.json");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    public static ModConfigSpec.IntValue RGO_GRENADE_EXPLOSION_DAMAGE;
-    public static ModConfigSpec.IntValue RGO_GRENADE_EXPLOSION_RADIUS;
+    public static int EXPLOSION_PENETRATION_RATIO = 15;
+    public static boolean EXPLOSION_DESTROY = true;
+    public static boolean EXTRA_EXPLOSION_EFFECT = true;
 
-    public static ModConfigSpec.IntValue M67_GRENADE_EXPLOSION_DAMAGE;
-    public static ModConfigSpec.IntValue M67_GRENADE_EXPLOSION_RADIUS;
+    public static int RGO_GRENADE_EXPLOSION_DAMAGE = 90;
+    public static int RGO_GRENADE_EXPLOSION_RADIUS = 5;
 
-    public static ModConfigSpec.IntValue C4_EXPLOSION_COUNTDOWN;
-    public static ModConfigSpec.IntValue C4_EXPLOSION_DAMAGE;
-    public static ModConfigSpec.IntValue C4_EXPLOSION_RADIUS;
+    public static int M67_GRENADE_EXPLOSION_DAMAGE = 120;
+    public static int M67_GRENADE_EXPLOSION_RADIUS = 6;
 
-    public static ModConfigSpec.IntValue CLAYMORE_EXPLOSION_DAMAGE;
-    public static ModConfigSpec.IntValue CLAYMORE_EXPLOSION_RADIUS;
+    public static int C4_EXPLOSION_COUNTDOWN = 514;
+    public static int C4_EXPLOSION_DAMAGE = 300;
+    public static int C4_EXPLOSION_RADIUS = 10;
 
-    public static void init(ModConfigSpec.Builder builder) {
-        builder.push("explosion");
+    public static int CLAYMORE_EXPLOSION_DAMAGE = 140;
+    public static int CLAYMORE_EXPLOSION_RADIUS = 4;
 
-        builder.comment("The percentage of explosion damage you take behind cover");
-        EXPLOSION_PENETRATION_RATIO = builder.defineInRange("explosion_penetration_ratio", 15, 0, 100);
+    public static void load() {
+        if (Files.notExists(CONFIG_PATH)) {
+            save();
+            return;
+        }
+        try {
+            var reader = Files.newBufferedReader(CONFIG_PATH);
+            var data = GSON.fromJson(reader, Data.class);
+            if (data != null) {
+                EXPLOSION_PENETRATION_RATIO = data.explosionPenetrationRatio;
+                EXPLOSION_DESTROY = data.explosionDestroy;
+                EXTRA_EXPLOSION_EFFECT = data.extraExplosionEffect;
+                RGO_GRENADE_EXPLOSION_DAMAGE = data.rgoGrenadeExplosionDamage;
+                RGO_GRENADE_EXPLOSION_RADIUS = data.rgoGrenadeExplosionRadius;
+                M67_GRENADE_EXPLOSION_DAMAGE = data.m67GrenadeExplosionDamage;
+                M67_GRENADE_EXPLOSION_RADIUS = data.m67GrenadeExplosionRadius;
+                C4_EXPLOSION_COUNTDOWN = data.c4ExplosionCountdown;
+                C4_EXPLOSION_DAMAGE = data.c4ExplosionDamage;
+                C4_EXPLOSION_RADIUS = data.c4ExplosionRadius;
+                CLAYMORE_EXPLOSION_DAMAGE = data.claymoreExplosionDamage;
+                CLAYMORE_EXPLOSION_RADIUS = data.claymoreExplosionRadius;
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to load explosion config", e);
+        }
+    }
 
-        builder.comment("Set true to allow Explosion to destroy blocks");
-        EXPLOSION_DESTROY = builder.define("explosion_destroy", true);
+    public static void save() {
+        try {
+            Files.createDirectories(CONFIG_PATH.getParent());
+            var writer = Files.newBufferedWriter(CONFIG_PATH);
+            GSON.toJson(new Data(), writer);
+            writer.close();
+        } catch (IOException e) {
+            LOGGER.error("Failed to save explosion config", e);
+        }
+    }
 
-        builder.comment("Set true to enable extra explosion effect. For example, C4 and RPG will destroy blocks before explosion");
-        EXTRA_EXPLOSION_EFFECT = builder.define("extra_explosion_effect", true);
-
-        builder.push("RGO Grenade");
-
-        builder.comment("The explosion damage of RGO grenade");
-        RGO_GRENADE_EXPLOSION_DAMAGE = builder.defineInRange("rgo_grenade_explosion_damage", 90, 1, 10000000);
-
-        builder.comment("The explosion radius of RGO grenade");
-        RGO_GRENADE_EXPLOSION_RADIUS = builder.defineInRange("rgo_grenade_explosion_radius", 5, 1, 50);
-
-        builder.pop();
-
-
-        builder.push("M67 Grenade");
-
-        builder.comment("The explosion damage of M67 grenade");
-        M67_GRENADE_EXPLOSION_DAMAGE = builder.defineInRange("m67_grenade_explosion_damage", 120, 1, 10000000);
-
-        builder.comment("The explosion radius of M67 grenade");
-        M67_GRENADE_EXPLOSION_RADIUS = builder.defineInRange("m67_grenade_explosion_radius", 6, 1, 50);
-
-        builder.pop();
-
-
-        builder.push("C4");
-
-        builder.comment("The explosion damage of C4");
-        C4_EXPLOSION_DAMAGE = builder.defineInRange("c4_explosion_damage", 300, 1, Integer.MAX_VALUE);
-
-        builder.comment("The explosion countdown of C4");
-        C4_EXPLOSION_COUNTDOWN = builder.defineInRange("c4_explosion_countdown", 514, 1, Integer.MAX_VALUE);
-
-        builder.comment("The explosion radius of C4");
-        C4_EXPLOSION_RADIUS = builder.defineInRange("c4_explosion_radius", 10, 1, Integer.MAX_VALUE);
-
-        builder.pop();
-
-        builder.push("Claymore");
-
-        builder.comment("The explosion damage of Claymore");
-        CLAYMORE_EXPLOSION_DAMAGE = builder.defineInRange("claymore_explosion_damage", 140, 1, Integer.MAX_VALUE);
-
-        builder.comment("The explosion radius of Claymore");
-        CLAYMORE_EXPLOSION_RADIUS = builder.defineInRange("claymore_explosion_radius", 4, 1, Integer.MAX_VALUE);
-
-        builder.pop();
-
-        builder.pop();
+    private static class Data {
+        public int explosionPenetrationRatio = EXPLOSION_PENETRATION_RATIO;
+        public boolean explosionDestroy = EXPLOSION_DESTROY;
+        public boolean extraExplosionEffect = EXTRA_EXPLOSION_EFFECT;
+        public int rgoGrenadeExplosionDamage = RGO_GRENADE_EXPLOSION_DAMAGE;
+        public int rgoGrenadeExplosionRadius = RGO_GRENADE_EXPLOSION_RADIUS;
+        public int m67GrenadeExplosionDamage = M67_GRENADE_EXPLOSION_DAMAGE;
+        public int m67GrenadeExplosionRadius = M67_GRENADE_EXPLOSION_RADIUS;
+        public int c4ExplosionCountdown = C4_EXPLOSION_COUNTDOWN;
+        public int c4ExplosionDamage = C4_EXPLOSION_DAMAGE;
+        public int c4ExplosionRadius = C4_EXPLOSION_RADIUS;
+        public int claymoreExplosionDamage = CLAYMORE_EXPLOSION_DAMAGE;
+        public int claymoreExplosionRadius = CLAYMORE_EXPLOSION_RADIUS;
     }
 }
