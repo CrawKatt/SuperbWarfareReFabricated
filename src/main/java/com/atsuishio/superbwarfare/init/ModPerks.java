@@ -1,106 +1,89 @@
 package com.atsuishio.superbwarfare.init;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.perk.AmmoPerk;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.perk.ammo.*;
 import com.atsuishio.superbwarfare.perk.damage.*;
 import com.atsuishio.superbwarfare.perk.functional.*;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.effect.MobEffects;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NewRegistryEvent;
-import net.neoforged.neoforge.registries.RegistryBuilder;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+import java.util.ArrayList;
+import java.util.List;
+
 @SuppressWarnings("unused")
 public class ModPerks {
-
-    public static final ResourceKey<Registry<Perk>> PERK_KEY = ResourceKey.createRegistryKey(Mod.loc("perk"));
-
-    @SubscribeEvent
-    public static void registry(NewRegistryEvent event) {
-        event.create(new RegistryBuilder<Perk>(ResourceKey.createRegistryKey(Mod.loc("perk"))));
-    }
 
     /**
      * Ammo Perks
      */
-    public static final DeferredRegister<Perk> AMMO_PERKS = DeferredRegister.create(Mod.loc("perk"), Mod.MODID);
+    public static final List<Perk> AMMO_PERKS = new ArrayList<>();
 
-    public static final DeferredHolder<Perk, APBullet> AP_BULLET = AMMO_PERKS.register("ap_bullet", APBullet::new);
-    public static final DeferredHolder<Perk, JHPBullet> JHP_BULLET = AMMO_PERKS.register("jhp_bullet", JHPBullet::new);
-    public static final DeferredHolder<Perk, HEBullet> HE_BULLET = AMMO_PERKS.register("he_bullet", HEBullet::new);
-    public static final DeferredHolder<Perk, SilverBullet> SILVER_BULLET = AMMO_PERKS.register("silver_bullet", SilverBullet::new);
-    public static final DeferredHolder<Perk, Perk> POISONOUS_BULLET = AMMO_PERKS.register("poisonous_bullet",
-            () -> new AmmoPerk(new AmmoPerk.Builder("poisonous_bullet", Perk.Type.AMMO).bypassArmorRate(0.0f).damageRate(1.0f).speedRate(1.0f).rgb(48, 131, 6)
+    public static final Perk AP_BULLET = registerAmmo(new APBullet());
+    public static final Perk JHP_BULLET = registerAmmo(new JHPBullet());
+    public static final Perk HE_BULLET = registerAmmo(new HEBullet());
+    public static final Perk SILVER_BULLET = registerAmmo(new SilverBullet());
+    public static final Perk POISONOUS_BULLET = registerAmmo(
+            new AmmoPerk(new AmmoPerk.Builder("poisonous_bullet", Perk.Type.AMMO).bypassArmorRate(0.0f).damageRate(1.0f).speedRate(1.0f).rgb(48, 131, 6)
                     .mobEffect(() -> MobEffects.POISON)));
-    public static final DeferredHolder<Perk, BeastBullet> BEAST_BULLET = AMMO_PERKS.register("beast_bullet", BeastBullet::new);
-    public static final DeferredHolder<Perk, LongerWire> LONGER_WIRE = AMMO_PERKS.register("longer_wire", LongerWire::new);
-    public static final DeferredHolder<Perk, IncendiaryBullet> INCENDIARY_BULLET = AMMO_PERKS.register("incendiary_bullet", IncendiaryBullet::new);
-    public static final DeferredHolder<Perk, MicroMissile> MICRO_MISSILE = AMMO_PERKS.register("micro_missile", MicroMissile::new);
-    public static final DeferredHolder<Perk, CupidArrow> CUPID_ARROW = AMMO_PERKS.register("cupid_arrow", CupidArrow::new);
-    public static final DeferredHolder<Perk, RiotBullet> RIOT_BULLET = AMMO_PERKS.register("riot_bullet", RiotBullet::new);
-    public static final DeferredHolder<Perk, PhasePenetratingBullet> PHASE_PENETRATING_BULLET = AMMO_PERKS.register("phase_penetrating_bullet", PhasePenetratingBullet::new);
-    public static final DeferredHolder<Perk, BladeBullet> BLADE_BULLET = AMMO_PERKS.register("blade_bullet", BladeBullet::new);
+    public static final Perk BEAST_BULLET = registerAmmo(new BeastBullet());
+    public static final Perk LONGER_WIRE = registerAmmo(new LongerWire());
+    public static final Perk INCENDIARY_BULLET = registerAmmo(new IncendiaryBullet());
+    public static final Perk MICRO_MISSILE = registerAmmo(new MicroMissile());
+    public static final Perk CUPID_ARROW = registerAmmo(new CupidArrow());
+    public static final Perk RIOT_BULLET = registerAmmo(new RiotBullet());
+    public static final Perk PHASE_PENETRATING_BULLET = registerAmmo(new PhasePenetratingBullet());
+    public static final Perk BLADE_BULLET = registerAmmo(new BladeBullet());
 
     /**
      * Functional Perks
      */
-    public static final DeferredRegister<Perk> FUNC_PERKS = DeferredRegister.create(Mod.loc("perk"), Mod.MODID);
+    public static final List<Perk> FUNC_PERKS = new ArrayList<>();
 
-    public static final DeferredHolder<Perk, HealClip> HEAL_CLIP = FUNC_PERKS.register("heal_clip", HealClip::new);
-    public static final DeferredHolder<Perk, FourthTimesCharm> FOURTH_TIMES_CHARM = FUNC_PERKS.register("fourth_times_charm", FourthTimesCharm::new);
-    public static final DeferredHolder<Perk, Subsistence> SUBSISTENCE = FUNC_PERKS.register("subsistence", Subsistence::new);
-    public static final DeferredHolder<Perk, FieldDoctor> FIELD_DOCTOR = FUNC_PERKS.register("field_doctor", FieldDoctor::new);
-    public static final DeferredHolder<Perk, Regeneration> REGENERATION = FUNC_PERKS.register("regeneration", Regeneration::new);
-    public static final DeferredHolder<Perk, TurboCharger> TURBO_CHARGER = FUNC_PERKS.register("turbo_charger", TurboCharger::new);
-    public static final DeferredHolder<Perk, PowerfulAttraction> POWERFUL_ATTRACTION = FUNC_PERKS.register("powerful_attraction", PowerfulAttraction::new);
-    public static final DeferredHolder<Perk, Perk> INTELLIGENT_CHIP = FUNC_PERKS.register("intelligent_chip", () -> new Perk("intelligent_chip", Perk.Type.FUNCTIONAL));
-    public static final DeferredHolder<Perk, BackpackLinkedMagazine> BACKPACK_LINKED_MAGAZINE = FUNC_PERKS.register("backpack_linked_magazine", BackpackLinkedMagazine::new);
-    public static final DeferredHolder<Perk, PowerfulCooler> POWERFUL_COOLER = FUNC_PERKS.register("powerful_cooler", PowerfulCooler::new);
+    public static final Perk HEAL_CLIP = registerFunc(new HealClip());
+    public static final Perk FOURTH_TIMES_CHARM = registerFunc(new FourthTimesCharm());
+    public static final Perk SUBSISTENCE = registerFunc(new Subsistence());
+    public static final Perk FIELD_DOCTOR = registerFunc(new FieldDoctor());
+    public static final Perk REGENERATION = registerFunc(new Regeneration());
+    public static final Perk TURBO_CHARGER = registerFunc(new TurboCharger());
+    public static final Perk POWERFUL_ATTRACTION = registerFunc(new PowerfulAttraction());
+    public static final Perk INTELLIGENT_CHIP = registerFunc(new Perk("intelligent_chip", Perk.Type.FUNCTIONAL));
+    public static final Perk BACKPACK_LINKED_MAGAZINE = registerFunc(new BackpackLinkedMagazine());
+    public static final Perk POWERFUL_COOLER = registerFunc(new PowerfulCooler());
 
     /**
      * Damage Perks
      */
-    public static final DeferredRegister<Perk> DAMAGE_PERKS = DeferredRegister.create(Mod.loc("perk"), Mod.MODID);
+    public static final List<Perk> DAMAGE_PERKS = new ArrayList<>();
 
-    public static final DeferredHolder<Perk, KillClip> KILL_CLIP = DAMAGE_PERKS.register("kill_clip", KillClip::new);
-    public static final DeferredHolder<Perk, GutshotStraight> GUTSHOT_STRAIGHT = DAMAGE_PERKS.register("gutshot_straight", GutshotStraight::new);
-    public static final DeferredHolder<Perk, KillingTally> KILLING_TALLY = DAMAGE_PERKS.register("killing_tally", KillingTally::new);
-    public static final DeferredHolder<Perk, HeadSeeker> HEAD_SEEKER = DAMAGE_PERKS.register("head_seeker", HeadSeeker::new);
-    public static final DeferredHolder<Perk, MonsterHunter> MONSTER_HUNTER = DAMAGE_PERKS.register("monster_hunter", MonsterHunter::new);
-    public static final DeferredHolder<Perk, VoltOverload> VOLT_OVERLOAD = DAMAGE_PERKS.register("volt_overload", VoltOverload::new);
-    public static final DeferredHolder<Perk, Desperado> DESPERADO = DAMAGE_PERKS.register("desperado", Desperado::new);
-    public static final DeferredHolder<Perk, VorpalWeapon> VORPAL_WEAPON = DAMAGE_PERKS.register("vorpal_weapon", VorpalWeapon::new);
-    public static final DeferredHolder<Perk, MagnificentHowl> MAGNIFICENT_HOWL = DAMAGE_PERKS.register("magnificent_howl", MagnificentHowl::new);
-    public static final DeferredHolder<Perk, Firefly> FIREFLY = DAMAGE_PERKS.register("firefly", Firefly::new);
-    public static final DeferredHolder<Perk, FairMeans> FAIR_MEANS = DAMAGE_PERKS.register("fair_means", FairMeans::new);
-    public static final DeferredHolder<Perk, HighImpactReserves> HIGH_IMPACT_RESERVES = DAMAGE_PERKS.register("high_impact_reserves", HighImpactReserves::new);
-    public static final DeferredHolder<Perk, OneTwoPunch> ONE_TWO_PUNCH = DAMAGE_PERKS.register("one_two_punch", OneTwoPunch::new);
+    public static final Perk KILL_CLIP = registerDamage(new KillClip());
+    public static final Perk GUTSHOT_STRAIGHT = registerDamage(new GutshotStraight());
+    public static final Perk KILLING_TALLY = registerDamage(new KillingTally());
+    public static final Perk HEAD_SEEKER = registerDamage(new HeadSeeker());
+    public static final Perk MONSTER_HUNTER = registerDamage(new MonsterHunter());
+    public static final Perk VOLT_OVERLOAD = registerDamage(new VoltOverload());
+    public static final Perk DESPERADO = registerDamage(new Desperado());
+    public static final Perk VORPAL_WEAPON = registerDamage(new VorpalWeapon());
+    public static final Perk MAGNIFICENT_HOWL = registerDamage(new MagnificentHowl());
+    public static final Perk FIREFLY = registerDamage(new Firefly());
+    public static final Perk FAIR_MEANS = registerDamage(new FairMeans());
+    public static final Perk HIGH_IMPACT_RESERVES = registerDamage(new HighImpactReserves());
+    public static final Perk ONE_TWO_PUNCH = registerDamage(new OneTwoPunch());
 
-//    public static void registerCompatPerks() {
-//        if (ModList.get().isLoaded(CompatHolder.DMV)) {
-//            AMMO_PERKS.register("blade_bullet", BladeBullet::new);
-//            AMMO_PERKS.register("bread_bullet", BreadBullet::new);
-//        }
-//        if (ModList.get().isLoaded(CompatHolder.VRC)) {
-//            AMMO_PERKS.register("curse_flame_bullet", () -> new AmmoPerk(new AmmoPerk.Builder("curse_flame_bullet", Perk.Type.AMMO)
-//                    .bypassArmorRate(0.0f).damageRate(1.2f).speedRate(0.9f).rgb(0xB1, 0xC1, 0xF2).mobEffect(() -> CompatHolder.VRC_CURSE_FLAME)));
-//            AMMO_PERKS.register("butterfly_bullet", () -> new AmmoPerk(new AmmoPerk.Builder("butterfly_bullet", Perk.Type.AMMO)
-//                    .bypassArmorRate(0.0f)));
-//        }
-//    }
+    private static Perk registerAmmo(Perk perk) {
+        AMMO_PERKS.add(perk);
+        return perk;
+    }
 
-    public static void register(IEventBus bus) {
-//        registerCompatPerks();
-        AMMO_PERKS.register(bus);
-        FUNC_PERKS.register(bus);
-        DAMAGE_PERKS.register(bus);
+    private static Perk registerFunc(Perk perk) {
+        FUNC_PERKS.add(perk);
+        return perk;
+    }
+
+    private static Perk registerDamage(Perk perk) {
+        DAMAGE_PERKS.add(perk);
+        return perk;
+    }
+
+    public static void init() {
     }
 }
