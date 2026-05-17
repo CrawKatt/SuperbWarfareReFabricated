@@ -6,33 +6,31 @@ import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.network.chat.Component;
 
-import static com.atsuishio.superbwarfare.compat.clothconfig.ClothConfigHelper.save;
-
 public class GameplayClothConfig {
 
     public static void init(ConfigBuilder root, ConfigEntryBuilder entryBuilder) {
         ConfigCategory category = root.getOrCreateCategory(Component.translatable("config.superbwarfare.common.gameplay"));
 
         category.addEntry(entryBuilder
-                .startBooleanToggle(Component.translatable("config.superbwarfare.common.gameplay.respawn_reload"), GameplayConfig.RESPAWN_RELOAD.get())
+                .startBooleanToggle(Component.translatable("config.superbwarfare.common.gameplay.respawn_reload"), GameplayConfig.RESPAWN_RELOAD)
                 .setDefaultValue(true)
-                .setSaveConsumer(save(GameplayConfig.RESPAWN_RELOAD))
+                .setSaveConsumer(v -> { GameplayConfig.RESPAWN_RELOAD = v; GameplayConfig.save(); })
                 .setTooltip(Component.translatable("config.superbwarfare.common.gameplay.respawn_reload.des"))
                 .build()
         );
 
         category.addEntry(entryBuilder
-                .startBooleanToggle(Component.translatable("config.superbwarfare.common.gameplay.global_indication"), GameplayConfig.GLOBAL_INDICATION.get())
+                .startBooleanToggle(Component.translatable("config.superbwarfare.common.gameplay.global_indication"), GameplayConfig.GLOBAL_INDICATION)
                 .setDefaultValue(false)
-                .setSaveConsumer(save(GameplayConfig.GLOBAL_INDICATION))
+                .setSaveConsumer(v -> { GameplayConfig.GLOBAL_INDICATION = v; GameplayConfig.save(); })
                 .setTooltip(Component.translatable("config.superbwarfare.common.gameplay.global_indication.des"))
                 .build()
         );
 
         category.addEntry(entryBuilder
-                .startBooleanToggle(Component.translatable("config.superbwarfare.common.gameplay.respawn_auto_armor"), GameplayConfig.RESPAWN_AUTO_ARMOR.get())
+                .startBooleanToggle(Component.translatable("config.superbwarfare.common.gameplay.respawn_auto_armor"), GameplayConfig.RESPAWN_AUTO_ARMOR)
                 .setDefaultValue(true)
-                .setSaveConsumer(save(GameplayConfig.RESPAWN_AUTO_ARMOR))
+                .setSaveConsumer(v -> { GameplayConfig.RESPAWN_AUTO_ARMOR = v; GameplayConfig.save(); })
                 .setTooltip(Component.translatable("config.superbwarfare.common.gameplay.respawn_auto_armor.des"))
                 .build()
         );
