@@ -31,16 +31,11 @@ import com.atsuishio.superbwarfare.item.gun.special.TaserItem;
 import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGun;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.tiers.ModItemTier;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,330 +44,315 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public class ModItems {
-    /**
-     * guns
-     */
-    public static final DeferredRegister<Item> GUNS = DeferredRegister.create(BuiltInRegistries.ITEM, Mod.MODID);
 
-    public static final DeferredHolder<Item, RepairToolItem> REPAIR_TOOL = GUNS.register("repair_tool", RepairToolItem::new);
-    public static final DeferredHolder<Item, TaserItem> TASER = GUNS.register("taser", TaserItem::new);
-    public static final DeferredHolder<Item, Glock17Item> GLOCK_17 = GUNS.register("glock_17", Glock17Item::new);
-    public static final DeferredHolder<Item, Glock18Item> GLOCK_18 = GUNS.register("glock_18", Glock18Item::new);
-    public static final DeferredHolder<Item, Mp443Item> MP_443 = GUNS.register("mp_443", Mp443Item::new);
-    public static final DeferredHolder<Item, M1911Item> M_1911 = GUNS.register("m_1911", M1911Item::new);
-    public static final DeferredHolder<Item, HomemadeShotgunItem> HOMEMADE_SHOTGUN = GUNS.register("homemade_shotgun", HomemadeShotgunItem::new);
-    public static final DeferredHolder<Item, TracheliumItem> TRACHELIUM = GUNS.register("trachelium", TracheliumItem::new);
-    public static final DeferredHolder<Item, Mp5Item> MP_5 = GUNS.register("mp_5", Mp5Item::new);
-    public static final DeferredHolder<Item, VectorItem> VECTOR = GUNS.register("vector", VectorItem::new);
-    public static final DeferredHolder<Item, AK47Item> AK_47 = GUNS.register("ak_47", AK47Item::new);
-    public static final DeferredHolder<Item, AK12Item> AK_12 = GUNS.register("ak_12", AK12Item::new);
-    public static final DeferredHolder<Item, SksItem> SKS = GUNS.register("sks", SksItem::new);
-    public static final DeferredHolder<Item, M4Item> M_4 = GUNS.register("m_4", M4Item::new);
-    public static final DeferredHolder<Item, Hk416Item> HK_416 = GUNS.register("hk_416", Hk416Item::new);
-    public static final DeferredHolder<Item, Qbz95Item> QBZ_95 = GUNS.register("qbz_95", Qbz95Item::new);
-    public static final DeferredHolder<Item, Qbz191Item> QBZ_191 = GUNS.register("qbz_191", Qbz191Item::new);
-    public static final DeferredHolder<Item, InsidiousItem> INSIDIOUS = GUNS.register("insidious", InsidiousItem::new);
-    public static final DeferredHolder<Item, Mk14Item> MK_14 = GUNS.register("mk_14", Mk14Item::new);
-    public static final DeferredHolder<Item, Ql1031Item> QL_1031 = GUNS.register("ql_1031", Ql1031Item::new);
-    public static final DeferredHolder<Item, MarlinItem> MARLIN = GUNS.register("marlin", MarlinItem::new);
-    public static final DeferredHolder<Item, K98Item> K_98 = GUNS.register("k_98", K98Item::new);
-    public static final DeferredHolder<Item, MosinNagantItem> MOSIN_NAGANT = GUNS.register("mosin_nagant", MosinNagantItem::new);
-    public static final DeferredHolder<Item, SvdItem> SVD = GUNS.register("svd", SvdItem::new);
+    public static final Item REPAIR_TOOL = register("repair_tool", new RepairToolItem());
+    public static final Item TASER = register("taser", new TaserItem());
+    public static final Item GLOCK_17 = register("glock_17", new Glock17Item());
+    public static final Item GLOCK_18 = register("glock_18", new Glock18Item());
+    public static final Item MP_443 = register("mp_443", new Mp443Item());
+    public static final Item M_1911 = register("m_1911", new M1911Item());
+    public static final Item HOMEMADE_SHOTGUN = register("homemade_shotgun", new HomemadeShotgunItem());
+    public static final Item TRACHELIUM = register("trachelium", new TracheliumItem());
+    public static final Item MP_5 = register("mp_5", new Mp5Item());
+    public static final Item VECTOR = register("vector", new VectorItem());
+    public static final Item AK_47 = register("ak_47", new AK47Item());
+    public static final Item AK_12 = register("ak_12", new AK12Item());
+    public static final Item SKS = register("sks", new SksItem());
+    public static final Item M_4 = register("m_4", new M4Item());
+    public static final Item HK_416 = register("hk_416", new Hk416Item());
+    public static final Item QBZ_95 = register("qbz_95", new Qbz95Item());
+    public static final Item QBZ_191 = register("qbz_191", new Qbz191Item());
+    public static final Item INSIDIOUS = register("insidious", new InsidiousItem());
+    public static final Item MK_14 = register("mk_14", new Mk14Item());
+    public static final Item QL_1031 = register("ql_1031", new Ql1031Item());
+    public static final Item MARLIN = register("marlin", new MarlinItem());
+    public static final Item K_98 = register("k_98", new K98Item());
+    public static final Item MOSIN_NAGANT = register("mosin_nagant", new MosinNagantItem());
+    public static final Item SVD = register("svd", new SvdItem());
 
-    public static final DeferredHolder<Item, AwmItem> AWM = GUNS.register("awm", AwmItem::new);
-    public static final DeferredHolder<Item, M98bItem> M_98B = GUNS.register("m_98b", M98bItem::new);
-    public static final DeferredHolder<Item, SentinelItem> SENTINEL = GUNS.register("sentinel", SentinelItem::new);
-    public static final DeferredHolder<Item, HuntingRifleItem> HUNTING_RIFLE = GUNS.register("hunting_rifle", HuntingRifleItem::new);
-    public static final DeferredHolder<Item, Ntw20Item> NTW_20 = GUNS.register("ntw_20", Ntw20Item::new);
-    public static final DeferredHolder<Item, M870Item> M_870 = GUNS.register("m_870", M870Item::new);
-    public static final DeferredHolder<Item, Aa12Item> AA_12 = GUNS.register("aa_12", Aa12Item::new);
-    public static final DeferredHolder<Item, DevotionItem> DEVOTION = GUNS.register("devotion", DevotionItem::new);
-    public static final DeferredHolder<Item, RpkItem> RPK = GUNS.register("rpk", RpkItem::new);
-    public static final DeferredHolder<Item, M60Item> M_60 = GUNS.register("m_60", M60Item::new);
-    public static final DeferredHolder<Item, M2HBItem> M_2_HB = GUNS.register("m_2_hb", M2HBItem::new);
-    public static final DeferredHolder<Item, MinigunItem> MINIGUN = GUNS.register("minigun", MinigunItem::new);
-    public static final DeferredHolder<Item, M79Item> M_79 = GUNS.register("m_79", M79Item::new);
-    public static final DeferredHolder<Item, SecondaryCataclysmItem> SECONDARY_CATACLYSM = GUNS.register("secondary_cataclysm", SecondaryCataclysmItem::new);
-    public static final DeferredHolder<Item, RpgItem> RPG = GUNS.register("rpg", RpgItem::new);
-    public static final DeferredHolder<Item, JavelinItem> JAVELIN = GUNS.register("javelin", JavelinItem::new);
-    public static final DeferredHolder<Item, IglaItem> IGLA_9K38 = GUNS.register("igla_9k38", IglaItem::new);
-    public static final DeferredHolder<Item, AureliaSceptreItem> AURELIA_SCEPTRE = GUNS.register("aurelia_sceptre", AureliaSceptreItem::new);
-    public static final DeferredHolder<Item, BocekItem> BOCEK = GUNS.register("bocek", BocekItem::new);
+    public static final Item AWM = register("awm", new AwmItem());
+    public static final Item M_98B = register("m_98b", new M98bItem());
+    public static final Item SENTINEL = register("sentinel", new SentinelItem());
+    public static final Item HUNTING_RIFLE = register("hunting_rifle", new HuntingRifleItem());
+    public static final Item NTW_20 = register("ntw_20", new Ntw20Item());
+    public static final Item M_870 = register("m_870", new M870Item());
+    public static final Item AA_12 = register("aa_12", new Aa12Item());
+    public static final Item DEVOTION = register("devotion", new DevotionItem());
+    public static final Item RPK = register("rpk", new RpkItem());
+    public static final Item M_60 = register("m_60", new M60Item());
+    public static final Item M_2_HB = register("m_2_hb", new M2HBItem());
+    public static final Item MINIGUN = register("minigun", new MinigunItem());
+    public static final Item M_79 = register("m_79", new M79Item());
+    public static final Item SECONDARY_CATACLYSM = register("secondary_cataclysm", new SecondaryCataclysmItem());
+    public static final Item RPG = register("rpg", new RpgItem());
+    public static final Item JAVELIN = register("javelin", new JavelinItem());
+    public static final Item IGLA_9K38 = register("igla_9k38", new IglaItem());
+    public static final Item AURELIA_SCEPTRE = register("aurelia_sceptre", new AureliaSceptreItem());
+    public static final Item BOCEK = register("bocek", new BocekItem());
 
-    public static final DeferredHolder<Item, VehicleGun> VEHICLE_GUN = GUNS.register("vehicle_gun", VehicleGun::new);
+    public static final Item VEHICLE_GUN = register("vehicle_gun", new VehicleGun());
 
     /**
      * Ammo
      */
-    public static final DeferredRegister<Item> AMMO = DeferredRegister.create(BuiltInRegistries.ITEM, Mod.MODID);
 
-    public static final DeferredHolder<Item, AmmoSupplierItem> HANDGUN_AMMO = AMMO.register("handgun_ammo", () -> new AmmoSupplierItem(Ammo.HANDGUN, 1, new Item.Properties()));
-    public static final DeferredHolder<Item, AmmoSupplierItem> RIFLE_AMMO = AMMO.register("rifle_ammo", () -> new AmmoSupplierItem(Ammo.RIFLE, 1, new Item.Properties()));
-    public static final DeferredHolder<Item, AmmoSupplierItem> SNIPER_AMMO = AMMO.register("sniper_ammo", () -> new AmmoSupplierItem(Ammo.SNIPER, 1, new Item.Properties()));
-    public static final DeferredHolder<Item, AmmoSupplierItem> SHOTGUN_AMMO = AMMO.register("shotgun_ammo", () -> new AmmoSupplierItem(Ammo.SHOTGUN, 1, new Item.Properties()));
-    public static final DeferredHolder<Item, AmmoSupplierItem> HEAVY_AMMO = AMMO.register("heavy_ammo", () -> new AmmoSupplierItem(Ammo.HEAVY, 1, new Item.Properties()));
-    public static final DeferredHolder<Item, HandgunAmmoBox> HANDGUN_AMMO_BOX = AMMO.register("handgun_ammo_box", HandgunAmmoBox::new);
-    public static final DeferredHolder<Item, RifleAmmoBox> RIFLE_AMMO_BOX = AMMO.register("rifle_ammo_box", RifleAmmoBox::new);
-    public static final DeferredHolder<Item, SniperAmmoBox> SNIPER_AMMO_BOX = AMMO.register("sniper_ammo_box", SniperAmmoBox::new);
-    public static final DeferredHolder<Item, ShotgunAmmoBox> SHOTGUN_AMMO_BOX = AMMO.register("shotgun_ammo_box", ShotgunAmmoBox::new);
-    public static final DeferredHolder<Item, CreativeAmmoBox> CREATIVE_AMMO_BOX = AMMO.register("creative_ammo_box", CreativeAmmoBox::new);
-    public static final DeferredHolder<Item, AmmoBoxItem> AMMO_BOX = AMMO.register("ammo_box", AmmoBoxItem::new);
-    public static final DeferredHolder<Item, Item> TASER_ELECTRODE = AMMO.register("taser_electrode", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> GRENADE_40MM = AMMO.register("grenade_40mm", () -> new Item(new Item.Properties()));
+    public static final Item HANDGUN_AMMO = register("handgun_ammo", new AmmoSupplierItem(Ammo.HANDGUN, 1, new Item.Properties()));
+    public static final Item RIFLE_AMMO = register("rifle_ammo", new AmmoSupplierItem(Ammo.RIFLE, 1, new Item.Properties()));
+    public static final Item SNIPER_AMMO = register("sniper_ammo", new AmmoSupplierItem(Ammo.SNIPER, 1, new Item.Properties()));
+    public static final Item SHOTGUN_AMMO = register("shotgun_ammo", new AmmoSupplierItem(Ammo.SHOTGUN, 1, new Item.Properties()));
+    public static final Item HEAVY_AMMO = register("heavy_ammo", new AmmoSupplierItem(Ammo.HEAVY, 1, new Item.Properties()));
+    public static final Item HANDGUN_AMMO_BOX = register("handgun_ammo_box", new HandgunAmmoBox());
+    public static final Item RIFLE_AMMO_BOX = register("rifle_ammo_box", new RifleAmmoBox());
+    public static final Item SNIPER_AMMO_BOX = register("sniper_ammo_box", new SniperAmmoBox());
+    public static final Item SHOTGUN_AMMO_BOX = register("shotgun_ammo_box", new ShotgunAmmoBox());
+    public static final Item CREATIVE_AMMO_BOX = register("creative_ammo_box", new CreativeAmmoBox());
+    public static final Item AMMO_BOX = register("ammo_box", new AmmoBoxItem());
+    public static final Item TASER_ELECTRODE = register("taser_electrode", new Item(new Item.Properties()));
+    public static final Item GRENADE_40MM = register("grenade_40mm", new Item(new Item.Properties()));
 
-    public static final DeferredHolder<Item, MortarShell> MORTAR_SHELL = AMMO.register("mortar_shell", MortarShell::new);
-    public static final DeferredHolder<Item, PotionMortarShell> POTION_MORTAR_SHELL = AMMO.register("potion_mortar_shell", PotionMortarShell::new);
-    public static final DeferredHolder<Item, RpgRocketStandard> RPG_ROCKET_STANDARD = AMMO.register("rpg_rocket_standard", RpgRocketStandard::new);
-    public static final DeferredHolder<Item, RpgRocketTBG> RPG_ROCKET_TBG = AMMO.register("rpg_rocket_tbg", RpgRocketTBG::new);
-    public static final DeferredHolder<Item, LungeMine> LUNGE_MINE = AMMO.register("lunge_mine", LungeMine::new);
-    public static final DeferredHolder<Item, Item> HE_5_INCHES = AMMO.register("he_5_inches", () -> new CannonShellItem(new Item.Properties().rarity(Rarity.RARE)));
-    public static final DeferredHolder<Item, Item> AP_5_INCHES = AMMO.register("ap_5_inches", () -> new CannonShellItem(new Item.Properties().rarity(Rarity.RARE)));
-    public static final DeferredHolder<Item, Item> CM_5_INCHES = AMMO.register("cm_5_inches", () -> new CannonShellItem(new Item.Properties().rarity(Rarity.RARE)));
-    public static final DeferredHolder<Item, Item> GS_5_INCHES = AMMO.register("gs_5_inches", () -> new CannonShellItem(new Item.Properties().rarity(Rarity.RARE)));
-    public static final DeferredHolder<Item, HandGrenade> HAND_GRENADE = AMMO.register("hand_grenade", HandGrenade::new);
-    public static final DeferredHolder<Item, RgoGrenade> RGO_GRENADE = AMMO.register("rgo_grenade", RgoGrenade::new);
-    public static final DeferredHolder<Item, M18SmokeGrenade> M18_SMOKE_GRENADE = AMMO.register("m18_smoke_grenade", M18SmokeGrenade::new);
-    public static final DeferredHolder<Item, ClaymoreMine> CLAYMORE_MINE = AMMO.register("claymore_mine", ClaymoreMine::new);
-    public static final DeferredHolder<Item, Tm62Item> TM_62 = AMMO.register("tm_62", Tm62Item::new);
-    public static final DeferredHolder<Item, Ptkm1rItem> PTKM_1R = AMMO.register("ptkm_1r", Ptkm1rItem::new);
-    public static final DeferredHolder<Item, C4BombItem> C4_BOMB = AMMO.register("c4_bomb", C4BombItem::new);
-    public static final DeferredHolder<Item, Blu43MineItem> BLU_43_MINE = AMMO.register("blu_43_mine", Blu43MineItem::new);
-    public static final DeferredHolder<Item, Item> SMALL_SHELL = AMMO.register("small_shell", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> SMALL_ROCKET = AMMO.register("small_rocket", () -> new Item(new Item.Properties().stacksTo(16)));
-    public static final DeferredHolder<Item, MediumRocketItem> MEDIUM_ROCKET_AP = AMMO.register("medium_rocket_ap", () -> new MediumRocketItem(500, 6, 100, 0, 0, MediumRocketEntity.Type.AP, 0));
-    public static final DeferredHolder<Item, MediumRocketItem> MEDIUM_ROCKET_HE = AMMO.register("medium_rocket_he", () -> new MediumRocketItem(200, 12, 200, 0.2f, 40, MediumRocketEntity.Type.HE, 0));
-    public static final DeferredHolder<Item, MediumRocketItem> MEDIUM_ROCKET_CM = AMMO.register("medium_rocket_cm", () -> new MediumRocketItem(300, 12, 300, 0, 0, MediumRocketEntity.Type.CM, 20));
-    public static final DeferredHolder<Item, Item> JAVELIN_MISSILE = AMMO.register("javelin_missile", () -> new Item(new Item.Properties().stacksTo(4)));
-    public static final DeferredHolder<Item, Item> MEDIUM_ANTI_AIR_MISSILE = AMMO.register("medium_anti_air_missile", () -> new Item(new Item.Properties().stacksTo(4)));
-    public static final DeferredHolder<Item, Item> MEDIUM_ANTI_GROUND_MISSILE = AMMO.register("medium_anti_ground_missile", () -> new Item(new Item.Properties().stacksTo(4)));
-    public static final DeferredHolder<Item, Item> LARGE_ANTI_GROUND_MISSILE = AMMO.register("large_anti_ground_missile", () -> new Item(new Item.Properties().stacksTo(2)));
-    public static final DeferredHolder<Item, Item> SWARM_DRONE = AMMO.register("swarm_drone", () -> new Item(new Item.Properties().stacksTo(14)));
-    public static final DeferredHolder<Item, Item> MEDIUM_AERIAL_BOMB = AMMO.register("medium_aerial_bomb", () -> new Item(new Item.Properties().stacksTo(2)));
+    public static final Item MORTAR_SHELL = register("mortar_shell", new MortarShell());
+    public static final Item POTION_MORTAR_SHELL = register("potion_mortar_shell", new PotionMortarShell());
+    public static final Item RPG_ROCKET_STANDARD = register("rpg_rocket_standard", new RpgRocketStandard());
+    public static final Item RPG_ROCKET_TBG = register("rpg_rocket_tbg", new RpgRocketTBG());
+    public static final Item LUNGE_MINE = register("lunge_mine", new LungeMine());
+    public static final Item HE_5_INCHES = register("he_5_inches", new CannonShellItem(new Item.Properties().rarity(Rarity.RARE)));
+    public static final Item AP_5_INCHES = register("ap_5_inches", new CannonShellItem(new Item.Properties().rarity(Rarity.RARE)));
+    public static final Item CM_5_INCHES = register("cm_5_inches", new CannonShellItem(new Item.Properties().rarity(Rarity.RARE)));
+    public static final Item GS_5_INCHES = register("gs_5_inches", new CannonShellItem(new Item.Properties().rarity(Rarity.RARE)));
+    public static final Item HAND_GRENADE = register("hand_grenade", new HandGrenade());
+    public static final Item RGO_GRENADE = register("rgo_grenade", new RgoGrenade());
+    public static final Item M18_SMOKE_GRENADE = register("m18_smoke_grenade", new M18SmokeGrenade());
+    public static final Item CLAYMORE_MINE = register("claymore_mine", new ClaymoreMine());
+    public static final Item TM_62 = register("tm_62", new Tm62Item());
+    public static final Item PTKM_1R = register("ptkm_1r", new Ptkm1rItem());
+    public static final Item C4_BOMB = register("c4_bomb", new C4BombItem());
+    public static final Item BLU_43_MINE = register("blu_43_mine", new Blu43MineItem());
+    public static final Item SMALL_SHELL = register("small_shell", new Item(new Item.Properties()));
+    public static final Item SMALL_ROCKET = register("small_rocket", new Item(new Item.Properties().stacksTo(16)));
+    public static final Item MEDIUM_ROCKET_AP = register("medium_rocket_ap", new MediumRocketItem(500, 6, 100, 0, 0, MediumRocketEntity.Type.AP, 0));
+    public static final Item MEDIUM_ROCKET_HE = register("medium_rocket_he", new MediumRocketItem(200, 12, 200, 0.2f, 40, MediumRocketEntity.Type.HE, 0));
+    public static final Item MEDIUM_ROCKET_CM = register("medium_rocket_cm", new MediumRocketItem(300, 12, 300, 0, 0, MediumRocketEntity.Type.CM, 20));
+    public static final Item JAVELIN_MISSILE = register("javelin_missile", new Item(new Item.Properties().stacksTo(4)));
+    public static final Item MEDIUM_ANTI_AIR_MISSILE = register("medium_anti_air_missile", new Item(new Item.Properties().stacksTo(4)));
+    public static final Item MEDIUM_ANTI_GROUND_MISSILE = register("medium_anti_ground_missile", new Item(new Item.Properties().stacksTo(4)));
+    public static final Item LARGE_ANTI_GROUND_MISSILE = register("large_anti_ground_missile", new Item(new Item.Properties().stacksTo(2)));
+    public static final Item SWARM_DRONE = register("swarm_drone", new Item(new Item.Properties().stacksTo(14)));
+    public static final Item MEDIUM_AERIAL_BOMB = register("medium_aerial_bomb", new Item(new Item.Properties().stacksTo(2)));
 
     /**
      * items
      */
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, Mod.MODID);
 
-    public static final DeferredHolder<Item, DeferredSpawnEggItem> SENPAI_SPAWN_EGG = ITEMS.register("senpai_spawn_egg", () -> new DeferredSpawnEggItem(ModEntities.SENPAI::value, -11584987, -14014413, new Item.Properties()));
-    public static final DeferredHolder<Item, Item> ANCIENT_CPU = ITEMS.register("ancient_cpu", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
-    public static final DeferredHolder<Item, Item> PROPELLER = ITEMS.register("propeller", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> LARGE_PROPELLER = ITEMS.register("large_propeller", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> MOTOR = ITEMS.register("motor", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> LARGE_MOTOR = ITEMS.register("large_motor", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> WHEEL = ITEMS.register("wheel", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> TRACK = ITEMS.register("track", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Drone> DRONE = ITEMS.register("drone", Drone::new);
+    public static Item SENPAI_SPAWN_EGG;
 
-    public static final DeferredHolder<Item, Monitor> MONITOR = ITEMS.register("monitor", Monitor::new);
-    public static final DeferredHolder<Item, ArtilleryIndicator> ARTILLERY_INDICATOR = ITEMS.register("artillery_indicator", ArtilleryIndicator::new);
+    public static final Item ANCIENT_CPU = register("ancient_cpu", new Item(new Item.Properties().rarity(Rarity.RARE)));
+    public static final Item PROPELLER = register("propeller", new Item(new Item.Properties()));
+    public static final Item LARGE_PROPELLER = register("large_propeller", new Item(new Item.Properties()));
+    public static final Item MOTOR = register("motor", new Item(new Item.Properties()));
+    public static final Item LARGE_MOTOR = register("large_motor", new Item(new Item.Properties()));
+    public static final Item WHEEL = register("wheel", new Item(new Item.Properties()));
+    public static final Item TRACK = register("track", new Item(new Item.Properties()));
+    public static final Item DRONE = register("drone", new Drone());
 
-    public static final DeferredHolder<Item, Detonator> DETONATOR = ITEMS.register("detonator", Detonator::new);
-    public static final DeferredHolder<Item, TargetDeployer> TARGET_DEPLOYER = ITEMS.register("target_deployer", TargetDeployer::new);
-    public static final DeferredHolder<Item, DPSGeneratorDeployer> DPS_GENERATOR_DEPLOYER = ITEMS.register("dps_generator_deployer", DPSGeneratorDeployer::new);
-    public static final DeferredHolder<Item, SwordItem> KNIFE = ITEMS.register("knife", () -> new SwordItem(ModItemTier.STEEL, new CustomDamageProperty(1200).attributes(SwordItem.createAttributes(ModItemTier.STEEL, 0, -1.8f))));
-    public static final DeferredHolder<Item, Hammer> HAMMER = ITEMS.register("hammer", () -> new Hammer(Tiers.IRON, 11, -3.2f, 400));
-    public static final DeferredHolder<Item, Hammer> GOLDEN_HAMMER = ITEMS.register("golden_hammer", () -> new Hammer(Tiers.GOLD, 11, -3.2f, 150));
-    public static final DeferredHolder<Item, Hammer> STEEL_HAMMER = ITEMS.register("steel_hammer", () -> new Hammer(ModItemTier.STEEL, 9, -3.2f, 600));
-    public static final DeferredHolder<Item, Hammer> DIAMOND_HAMMER = ITEMS.register("diamond_hammer", () -> new Hammer(Tiers.DIAMOND, 12, -3.2f, 1500));
-    public static final DeferredHolder<Item, Hammer> CEMENTED_CARBIDE_HAMMER = ITEMS.register("cemented_carbide_hammer", () -> new Hammer(ModItemTier.CEMENTED_CARBIDE, 8, -3.2f, 2000));
-    public static final DeferredHolder<Item, Hammer> NETHERITE_HAMMER = ITEMS.register("netherite_hammer", NetheriteHammer::new);
-    public static final DeferredHolder<Item, TBaton> T_BATON = ITEMS.register("t_baton", TBaton::new);
-    public static final DeferredHolder<Item, ElectricBaton> ELECTRIC_BATON = ITEMS.register("electric_baton", ElectricBaton::new);
-    public static final DeferredHolder<Item, SteelPipe> STEEL_PIPE = ITEMS.register("steel_pipe", SteelPipe::new);
-    public static final DeferredHolder<Item, Crowbar> CROWBAR = ITEMS.register("crowbar", Crowbar::new);
-    public static final DeferredHolder<Item, Defuser> DEFUSER = ITEMS.register("defuser", Defuser::new);
-    public static final DeferredHolder<Item, ArmorPlate> ARMOR_PLATE = ITEMS.register("armor_plate", ArmorPlate::new);
+    public static final Item MONITOR = register("monitor", new Monitor());
+    public static final Item ARTILLERY_INDICATOR = register("artillery_indicator", new ArtilleryIndicator());
 
-    public static final DeferredHolder<Item, RuHelmet6b47> RU_HELMET_6B47 = ITEMS.register("ru_helmet_6b47", RuHelmet6b47::new);
-    public static final DeferredHolder<Item, RuChest6b43> RU_CHEST_6B43 = ITEMS.register("ru_chest_6b43", RuChest6b43::new);
-    public static final DeferredHolder<Item, UsHelmetPasgt> US_HELMET_PASGT = ITEMS.register("us_helmet_pasgt", UsHelmetPasgt::new);
-    public static final DeferredHolder<Item, UsChestIotv> US_CHEST_IOTV = ITEMS.register("us_chest_iotv", UsChestIotv::new);
-    public static final DeferredHolder<Item, GeHelmetM35> GE_HELMET_M_35 = ITEMS.register("ge_helmet_m_35", GeHelmetM35::new);
-    public static final DeferredHolder<Item, ParachuteItem> PARACHUTE = ITEMS.register("parachute", ParachuteItem::new);
+    public static final Item DETONATOR = register("detonator", new Detonator());
+    public static final Item TARGET_DEPLOYER = register("target_deployer", new TargetDeployer());
+    public static final Item DPS_GENERATOR_DEPLOYER = register("dps_generator_deployer", new DPSGeneratorDeployer());
+    public static final Item KNIFE = register("knife", new SwordItem(ModItemTier.STEEL, new CustomDamageProperty(1200).attributes(SwordItem.createAttributes(ModItemTier.STEEL, 0, -1.8f))));
+    public static final Item HAMMER = register("hammer", new Hammer(Tiers.IRON, 11, -3.2f, 400));
+    public static final Item GOLDEN_HAMMER = register("golden_hammer", new Hammer(Tiers.GOLD, 11, -3.2f, 150));
+    public static final Item STEEL_HAMMER = register("steel_hammer", new Hammer(ModItemTier.STEEL, 9, -3.2f, 600));
+    public static final Item DIAMOND_HAMMER = register("diamond_hammer", new Hammer(Tiers.DIAMOND, 12, -3.2f, 1500));
+    public static final Item CEMENTED_CARBIDE_HAMMER = register("cemented_carbide_hammer", new Hammer(ModItemTier.CEMENTED_CARBIDE, 8, -3.2f, 2000));
+    public static final Item NETHERITE_HAMMER = register("netherite_hammer", new NetheriteHammer());
+    public static final Item T_BATON = register("t_baton", new TBaton());
+    public static final Item ELECTRIC_BATON = register("electric_baton", new ElectricBaton());
+    public static final Item STEEL_PIPE = register("steel_pipe", new SteelPipe());
+    public static final Item CROWBAR = register("crowbar", new Crowbar());
+    public static final Item DEFUSER = register("defuser", new Defuser());
+    public static final Item ARMOR_PLATE = register("armor_plate", new ArmorPlate());
 
-    public static final DeferredHolder<Item, MortarDeployer> MORTAR_DEPLOYER = ITEMS.register("mortar_deployer", MortarDeployer::new);
-    public static final DeferredHolder<Item, Item> MORTAR_BARREL = ITEMS.register("mortar_barrel", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> MORTAR_BASE_PLATE = ITEMS.register("mortar_base_plate", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> MORTAR_BIPOD = ITEMS.register("mortar_bipod", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, TowDeployer> TOW_DEPLOYER = ITEMS.register("tow_deployer", TowDeployer::new);
-    public static final DeferredHolder<Item, Item> SEEKER = ITEMS.register("seeker", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> MISSILE_ENGINE = ITEMS.register("missile_engine", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> FUSEE = ITEMS.register("fusee", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> PRIMER = ITEMS.register("primer", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> AP_HEAD = ITEMS.register("ap_head", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> HE_HEAD = ITEMS.register("he_head", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> CM_HEAD = ITEMS.register("cm_head", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> GS_HEAD = ITEMS.register("gs_head", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> CANNON_CORE = ITEMS.register("cannon_core", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> COPPER_PLATE = ITEMS.register("copper_plate", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> STEEL_INGOT = ITEMS.register("steel_ingot", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> LEAD_INGOT = ITEMS.register("lead_ingot", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> SILVER_INGOT = ITEMS.register("silver_ingot", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> TUNGSTEN_INGOT = ITEMS.register("tungsten_ingot", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> CEMENTED_CARBIDE_INGOT = ITEMS.register("cemented_carbide_ingot", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> HIGH_ENERGY_EXPLOSIVES = ITEMS.register("high_energy_explosives", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> GRAIN = ITEMS.register("grain", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> IRON_POWDER = ITEMS.register("iron_powder", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> TUNGSTEN_POWDER = ITEMS.register("tungsten_powder", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> COAL_POWDER = ITEMS.register("coal_powder", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> COAL_IRON_POWDER = ITEMS.register("coal_iron_powder", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> RAW_CEMENTED_CARBIDE_POWDER = ITEMS.register("raw_cemented_carbide_powder", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> GALENA = ITEMS.register("galena", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> SCHEELITE = ITEMS.register("scheelite", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Item> RAW_SILVER = ITEMS.register("raw_silver", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, DogTagItem> DOG_TAG = ITEMS.register("dog_tag", DogTagItem::new);
-    public static final DeferredHolder<Item, IffItem> IFF = ITEMS.register("iff", IffItem::new);
-    public static final DeferredHolder<Item, BatteryItem> CELL = ITEMS.register("cell", () -> new BatteryItem(24000, new Item.Properties()));
-    public static final DeferredHolder<Item, BatteryItem> BATTERY = ITEMS.register("battery", () -> new BatteryItem(100000, new Item.Properties()));
-    public static final DeferredHolder<Item, BatteryItem> SMALL_BATTERY_PACK = ITEMS.register("small_battery_pack", () -> new BatteryItem(500000, new Item.Properties()));
-    public static final DeferredHolder<Item, BatteryItem> MEDIUM_BATTERY_PACK = ITEMS.register("medium_battery_pack", () -> new BatteryItem(5000000, new Item.Properties()));
-    public static final DeferredHolder<Item, BatteryItem> LARGE_BATTERY_PACK = ITEMS.register("large_battery_pack", () -> new BatteryItem(20000000, new Item.Properties()));
-    public static final DeferredHolder<Item, Item> LASER_UNIT = ITEMS.register("laser_unit", () -> new Item(new Item.Properties()));
-    public static final DeferredHolder<Item, Beast> BEAST = ITEMS.register("beast", Beast::new);
-    public static final DeferredHolder<Item, Transcript> TRANSCRIPT = ITEMS.register("transcript", Transcript::new);
-    public static final DeferredHolder<Item, FiringParameters> FIRING_PARAMETERS = ITEMS.register("firing_parameters", FiringParameters::new);
-    public static final DeferredHolder<Item, MedicalKitItem> MEDICAL_KIT = ITEMS.register("medical_kit", MedicalKitItem::new);
-    public static final DeferredHolder<Item, VehicleDamageAnalyzer> VEHICLE_DAMAGE_ANALYZER = ITEMS.register("vehicle_damage_analyzer", VehicleDamageAnalyzer::new);
-    public static final DeferredHolder<Item, VehicleResetKit> VEHICLE_RESET_KIT = ITEMS.register("vehicle_reset_kit", VehicleResetKit::new);
+    public static final Item RU_HELMET_6B47 = register("ru_helmet_6b47", new RuHelmet6b47());
+    public static final Item RU_CHEST_6B43 = register("ru_chest_6b43", new RuChest6b43());
+    public static final Item US_HELMET_PASGT = register("us_helmet_pasgt", new UsHelmetPasgt());
+    public static final Item US_CHEST_IOTV = register("us_chest_iotv", new UsChestIotv());
+    public static final Item GE_HELMET_M_35 = register("ge_helmet_m_35", new GeHelmetM35());
+    public static final Item PARACHUTE = register("parachute", new ParachuteItem());
 
-    public static final DeferredHolder<Item, Item> TUNGSTEN_ROD = ITEMS.register("tungsten_rod", () -> new Item(new Item.Properties()));
+    public static final Item MORTAR_DEPLOYER = register("mortar_deployer", new MortarDeployer());
+    public static final Item MORTAR_BARREL = register("mortar_barrel", new Item(new Item.Properties()));
+    public static final Item MORTAR_BASE_PLATE = register("mortar_base_plate", new Item(new Item.Properties()));
+    public static final Item MORTAR_BIPOD = register("mortar_bipod", new Item(new Item.Properties()));
+    public static final Item TOW_DEPLOYER = register("tow_deployer", new TowDeployer());
+    public static final Item SEEKER = register("seeker", new Item(new Item.Properties()));
+    public static final Item MISSILE_ENGINE = register("missile_engine", new Item(new Item.Properties()));
+    public static final Item FUSEE = register("fusee", new Item(new Item.Properties()));
+    public static final Item PRIMER = register("primer", new Item(new Item.Properties()));
+    public static final Item AP_HEAD = register("ap_head", new Item(new Item.Properties()));
+    public static final Item HE_HEAD = register("he_head", new Item(new Item.Properties()));
+    public static final Item CM_HEAD = register("cm_head", new Item(new Item.Properties()));
+    public static final Item GS_HEAD = register("gs_head", new Item(new Item.Properties()));
+    public static final Item CANNON_CORE = register("cannon_core", new Item(new Item.Properties()));
+    public static final Item COPPER_PLATE = register("copper_plate", new Item(new Item.Properties()));
+    public static final Item STEEL_INGOT = register("steel_ingot", new Item(new Item.Properties()));
+    public static final Item LEAD_INGOT = register("lead_ingot", new Item(new Item.Properties()));
+    public static final Item SILVER_INGOT = register("silver_ingot", new Item(new Item.Properties()));
+    public static final Item TUNGSTEN_INGOT = register("tungsten_ingot", new Item(new Item.Properties()));
+    public static final Item CEMENTED_CARBIDE_INGOT = register("cemented_carbide_ingot", new Item(new Item.Properties()));
+    public static final Item HIGH_ENERGY_EXPLOSIVES = register("high_energy_explosives", new Item(new Item.Properties()));
+    public static final Item GRAIN = register("grain", new Item(new Item.Properties()));
+    public static final Item IRON_POWDER = register("iron_powder", new Item(new Item.Properties()));
+    public static final Item TUNGSTEN_POWDER = register("tungsten_powder", new Item(new Item.Properties()));
+    public static final Item COAL_POWDER = register("coal_powder", new Item(new Item.Properties()));
+    public static final Item COAL_IRON_POWDER = register("coal_iron_powder", new Item(new Item.Properties()));
+    public static final Item RAW_CEMENTED_CARBIDE_POWDER = register("raw_cemented_carbide_powder", new Item(new Item.Properties()));
+    public static final Item GALENA = register("galena", new Item(new Item.Properties()));
+    public static final Item SCHEELITE = register("scheelite", new Item(new Item.Properties()));
+    public static final Item RAW_SILVER = register("raw_silver", new Item(new Item.Properties()));
+    public static final Item DOG_TAG = register("dog_tag", new DogTagItem());
+    public static final Item IFF = register("iff", new IffItem());
+    public static final Item CELL = register("cell", new BatteryItem(24000, new Item.Properties()));
+    public static final Item BATTERY = register("battery", new BatteryItem(100000, new Item.Properties()));
+    public static final Item SMALL_BATTERY_PACK = register("small_battery_pack", new BatteryItem(500000, new Item.Properties()));
+    public static final Item MEDIUM_BATTERY_PACK = register("medium_battery_pack", new BatteryItem(5000000, new Item.Properties()));
+    public static final Item LARGE_BATTERY_PACK = register("large_battery_pack", new BatteryItem(20000000, new Item.Properties()));
+    public static final Item LASER_UNIT = register("laser_unit", new Item(new Item.Properties()));
+    public static final Item BEAST = register("beast", new Beast());
+    public static final Item TRANSCRIPT = register("transcript", new Transcript());
+    public static final Item FIRING_PARAMETERS = register("firing_parameters", new FiringParameters());
+    public static final Item MEDICAL_KIT = register("medical_kit", new MedicalKitItem());
+    public static final Item VEHICLE_DAMAGE_ANALYZER = register("vehicle_damage_analyzer", new VehicleDamageAnalyzer());
+    public static final Item VEHICLE_RESET_KIT = register("vehicle_reset_kit", new VehicleResetKit());
+
+    public static final Item TUNGSTEN_ROD = register("tungsten_rod", new Item(new Item.Properties()));
 
     public static final Materials IRON_MATERIALS = registerMaterials("iron");
     public static final Materials STEEL_MATERIALS = registerMaterials("steel");
     public static final Materials CEMENTED_CARBIDE_MATERIALS = registerMaterials("cemented_carbide");
     public static final Materials NETHERITE_MATERIALS = registerMaterials("netherite");
 
-    public static final DeferredHolder<Item, MaterialPack> COMMON_MATERIAL_PACK = ITEMS.register("common_material_pack", () -> new MaterialPack(Rarity.COMMON));
-    public static final DeferredHolder<Item, MaterialPack> RARE_MATERIAL_PACK = ITEMS.register("rare_material_pack", () -> new MaterialPack(Rarity.RARE));
-    public static final DeferredHolder<Item, MaterialPack> EPIC_MATERIAL_PACK = ITEMS.register("epic_material_pack", () -> new MaterialPack(Rarity.EPIC));
-    public static final DeferredHolder<Item, MaterialPack> LEGENDARY_MATERIAL_PACK = ITEMS.register("legendary_material_pack", () -> new MaterialPack(ModEnumExtensions.getLegendary()));
+    public static final Item COMMON_MATERIAL_PACK = register("common_material_pack", new MaterialPack(Rarity.COMMON));
+    public static final Item RARE_MATERIAL_PACK = register("rare_material_pack", new MaterialPack(Rarity.RARE));
+    public static final Item EPIC_MATERIAL_PACK = register("epic_material_pack", new MaterialPack(Rarity.EPIC));
+    public static final Item LEGENDARY_MATERIAL_PACK = register("legendary_material_pack", new MaterialPack(Rarity.EPIC));
 
-    public static final DeferredHolder<Item, Item> LIGHT_ARMAMENT_MODULE = ITEMS.register("light_armament_module", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
-    public static final DeferredHolder<Item, Item> MEDIUM_ARMAMENT_MODULE = ITEMS.register("medium_armament_module", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
-    public static final DeferredHolder<Item, Item> HEAVY_ARMAMENT_MODULE = ITEMS.register("heavy_armament_module", () -> new Item(new Item.Properties().rarity(ModEnumExtensions.getLegendary())));
+    public static final Item LIGHT_ARMAMENT_MODULE = register("light_armament_module", new Item(new Item.Properties().rarity(Rarity.RARE)));
+    public static final Item MEDIUM_ARMAMENT_MODULE = register("medium_armament_module", new Item(new Item.Properties().rarity(Rarity.EPIC)));
+    public static final Item HEAVY_ARMAMENT_MODULE = register("heavy_armament_module", new Item(new Item.Properties().rarity(Rarity.EPIC)));
 
-    public static final DeferredHolder<Item, BlueprintItem> TRACHELIUM_BLUEPRINT = ITEMS.register("trachelium_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> GLOCK_17_BLUEPRINT = ITEMS.register("glock_17_blueprint", () -> new BlueprintItem(Rarity.COMMON));
-    public static final DeferredHolder<Item, BlueprintItem> MP_443_BLUEPRINT = ITEMS.register("mp_443_blueprint", () -> new BlueprintItem(Rarity.COMMON));
-    public static final DeferredHolder<Item, BlueprintItem> GLOCK_18_BLUEPRINT = ITEMS.register("glock_18_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> HUNTING_RIFLE_BLUEPRINT = ITEMS.register("hunting_rifle_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> M_79_BLUEPRINT = ITEMS.register("m_79_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> RPG_BLUEPRINT = ITEMS.register("rpg_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> BOCEK_BLUEPRINT = ITEMS.register("bocek_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> M_4_BLUEPRINT = ITEMS.register("m_4_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> AA_12_BLUEPRINT = ITEMS.register("aa_12_blueprint", () -> new BlueprintItem(ModEnumExtensions.getLegendary()));
-    public static final DeferredHolder<Item, BlueprintItem> HK_416_BLUEPRINT = ITEMS.register("hk_416_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> RPK_BLUEPRINT = ITEMS.register("rpk_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> SKS_BLUEPRINT = ITEMS.register("sks_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> NTW_20_BLUEPRINT = ITEMS.register("ntw_20_blueprint", () -> new BlueprintItem(ModEnumExtensions.getLegendary()));
-    public static final DeferredHolder<Item, BlueprintItem> MP_5_BLUEPRINT = ITEMS.register("mp_5_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> VECTOR_BLUEPRINT = ITEMS.register("vector_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> MINIGUN_BLUEPRINT = ITEMS.register("minigun_blueprint", () -> new BlueprintItem(ModEnumExtensions.getLegendary()));
-    public static final DeferredHolder<Item, BlueprintItem> MK_14_BLUEPRINT = ITEMS.register("mk_14_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> SENTINEL_BLUEPRINT = ITEMS.register("sentinel_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> M_60_BLUEPRINT = ITEMS.register("m_60_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> SVD_BLUEPRINT = ITEMS.register("svd_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> MARLIN_BLUEPRINT = ITEMS.register("marlin_blueprint", () -> new BlueprintItem(Rarity.COMMON));
-    public static final DeferredHolder<Item, BlueprintItem> M_870_BLUEPRINT = ITEMS.register("m_870_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> AWM_BLUEPRINT = ITEMS.register("awm_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> M_98B_BLUEPRINT = ITEMS.register("m_98b_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> AK_47_BLUEPRINT = ITEMS.register("ak_47_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> AK_12_BLUEPRINT = ITEMS.register("ak_12_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> DEVOTION_BLUEPRINT = ITEMS.register("devotion_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> TASER_BLUEPRINT = ITEMS.register("taser_blueprint", () -> new BlueprintItem(Rarity.COMMON));
-    public static final DeferredHolder<Item, BlueprintItem> M_1911_BLUEPRINT = ITEMS.register("m_1911_blueprint", () -> new BlueprintItem(Rarity.COMMON));
-    public static final DeferredHolder<Item, BlueprintItem> QBZ_95_BLUEPRINT = ITEMS.register("qbz_95_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> QBZ_191_BLUEPRINT = ITEMS.register("qbz_191_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> K_98_BLUEPRINT = ITEMS.register("k_98_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> MOSIN_NAGANT_BLUEPRINT = ITEMS.register("mosin_nagant_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> IGLA_BLUEPRINT = ITEMS.register("igla_9k38_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> JAVELIN_BLUEPRINT = ITEMS.register("javelin_blueprint", () -> new BlueprintItem(ModEnumExtensions.getLegendary()));
-    public static final DeferredHolder<Item, BlueprintItem> M_2_HB_BLUEPRINT = ITEMS.register("m_2_hb_blueprint", () -> new BlueprintItem(Rarity.RARE));
-    public static final DeferredHolder<Item, BlueprintItem> SECONDARY_CATACLYSM_BLUEPRINT = ITEMS.register("secondary_cataclysm_blueprint", () -> new BlueprintItem(ModEnumExtensions.getLegendary()));
-    public static final DeferredHolder<Item, BlueprintItem> INSIDIOUS_BLUEPRINT = ITEMS.register("insidious_blueprint", () -> new BlueprintItem(Rarity.EPIC));
-    public static final DeferredHolder<Item, BlueprintItem> AURELIA_SCEPTRE_BLUEPRINT = ITEMS.register("aurelia_sceptre_blueprint", () -> new BlueprintItem(ModEnumExtensions.getLegendary()));
-    public static final DeferredHolder<Item, BlueprintItem> QL_1031_BLUEPRINT = ITEMS.register("ql_1031_blueprint", () -> new BlueprintItem(ModEnumExtensions.getLegendary()));
-    public static final DeferredHolder<Item, BlueprintItem> MK_42_BLUEPRINT = ITEMS.register("mk_42_blueprint", () -> new BlueprintItem(ModEnumExtensions.getLegendary()));
-    public static final DeferredHolder<Item, BlueprintItem> MLE_1934_BLUEPRINT = ITEMS.register("mle_1934_blueprint", () -> new BlueprintItem(ModEnumExtensions.getLegendary()));
-    public static final DeferredHolder<Item, BlueprintItem> BL_132_BLUEPRINT = ITEMS.register("bl_132_blueprint", () -> new BlueprintItem(ModEnumExtensions.getLegendary()));
-    public static final DeferredHolder<Item, BlueprintItem> HPJ_11_BLUEPRINT = ITEMS.register("hpj_11_blueprint", () -> new BlueprintItem(ModEnumExtensions.getLegendary()));
-    public static final DeferredHolder<Item, BlueprintItem> ANNIHILATOR_BLUEPRINT = ITEMS.register("annihilator_blueprint", () -> new BlueprintItem(ModEnumExtensions.getLegendary()));
-
-    /**
-     * Block
-     */
-    public static final DeferredRegister<Item> BLOCKS = DeferredRegister.create(BuiltInRegistries.ITEM, Mod.MODID);
-
-    public static final DeferredHolder<Item, BlockItem> GALENA_ORE = block(ModBlocks.GALENA_ORE);
-    public static final DeferredHolder<Item, BlockItem> DEEPSLATE_GALENA_ORE = block(ModBlocks.DEEPSLATE_GALENA_ORE);
-    public static final DeferredHolder<Item, BlockItem> SCHEELITE_ORE = block(ModBlocks.SCHEELITE_ORE);
-    public static final DeferredHolder<Item, BlockItem> DEEPSLATE_SCHEELITE_ORE = block(ModBlocks.DEEPSLATE_SCHEELITE_ORE);
-    public static final DeferredHolder<Item, BlockItem> SILVER_ORE = block(ModBlocks.SILVER_ORE);
-    public static final DeferredHolder<Item, BlockItem> DEEPSLATE_SILVER_ORE = block(ModBlocks.DEEPSLATE_SILVER_ORE);
-    public static final DeferredHolder<Item, BlockItem> JUMP_PAD = block(ModBlocks.JUMP_PAD);
-    public static final DeferredHolder<Item, BlockItem> SANDBAG = block(ModBlocks.SANDBAG);
-    public static final DeferredHolder<Item, BlockItem> BARBED_WIRE = block(ModBlocks.BARBED_WIRE);
-    public static final DeferredHolder<Item, BlockItem> DRAGON_TEETH = block(ModBlocks.DRAGON_TEETH);
-    public static final DeferredHolder<Item, BlockItem> REFORGING_TABLE = block(ModBlocks.REFORGING_TABLE);
-    public static final DeferredHolder<Item, ChargingStationBlockItem> CHARGING_STATION = BLOCKS.register("charging_station", ChargingStationBlockItem::new);
-    public static final DeferredHolder<Item, CreativeChargingStationBlockItem> CREATIVE_CHARGING_STATION = BLOCKS.register("creative_charging_station", CreativeChargingStationBlockItem::new);
-    public static final DeferredHolder<Item, BlockItem> LEAD_BLOCK = block(ModBlocks.LEAD_BLOCK);
-    public static final DeferredHolder<Item, BlockItem> STEEL_BLOCK = block(ModBlocks.STEEL_BLOCK);
-    public static final DeferredHolder<Item, BlockItem> TUNGSTEN_BLOCK = block(ModBlocks.TUNGSTEN_BLOCK);
-    public static final DeferredHolder<Item, BlockItem> SILVER_BLOCK = block(ModBlocks.SILVER_BLOCK);
-    public static final DeferredHolder<Item, BlockItem> CEMENTED_CARBIDE_BLOCK = block(ModBlocks.CEMENTED_CARBIDE_BLOCK);
-    public static final DeferredHolder<Item, BlockItem> FUMO_25 = block(ModBlocks.FUMO_25);
-    public static final DeferredHolder<Item, VehicleDeployerBlockItem> VEHICLE_DEPLOYER = BLOCKS.register("vehicle_deployer", VehicleDeployerBlockItem::new);
-    public static final DeferredHolder<Item, BlockItem> AIRCRAFT_CATAPULT = block(ModBlocks.AIRCRAFT_CATAPULT);
-    public static final DeferredHolder<Item, BlockItem> SUPERB_ITEM_INTERFACE = block(ModBlocks.SUPERB_ITEM_INTERFACE);
-    public static final DeferredHolder<Item, BlockItem> CREATIVE_SUPERB_ITEM_INTERFACE = block(ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE, Rarity.EPIC);
-    public static final DeferredHolder<Item, BlockItem> VEHICLE_ASSEMBLING_TABLE = BLOCKS.register("vehicle_assembling_table", VehicleAssemblingTableBlockItem::new);
+    public static final Item TRACHELIUM_BLUEPRINT = register("trachelium_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item GLOCK_17_BLUEPRINT = register("glock_17_blueprint", new BlueprintItem(Rarity.COMMON));
+    public static final Item MP_443_BLUEPRINT = register("mp_443_blueprint", new BlueprintItem(Rarity.COMMON));
+    public static final Item GLOCK_18_BLUEPRINT = register("glock_18_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item HUNTING_RIFLE_BLUEPRINT = register("hunting_rifle_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item M_79_BLUEPRINT = register("m_79_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item RPG_BLUEPRINT = register("rpg_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item BOCEK_BLUEPRINT = register("bocek_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item M_4_BLUEPRINT = register("m_4_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item AA_12_BLUEPRINT = register("aa_12_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item HK_416_BLUEPRINT = register("hk_416_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item RPK_BLUEPRINT = register("rp_k_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item SKS_BLUEPRINT = register("sks_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item NTW_20_BLUEPRINT = register("ntw_20_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item MP_5_BLUEPRINT = register("mp_5_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item VECTOR_BLUEPRINT = register("vector_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item MINIGUN_BLUEPRINT = register("minigun_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item MK_14_BLUEPRINT = register("mk_14_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item SENTINEL_BLUEPRINT = register("sentinel_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item M_60_BLUEPRINT = register("m_60_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item SVD_BLUEPRINT = register("svd_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item MARLIN_BLUEPRINT = register("marlin_blueprint", new BlueprintItem(Rarity.COMMON));
+    public static final Item M_870_BLUEPRINT = register("m_870_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item AWM_BLUEPRINT = register("awm_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item M_98B_BLUEPRINT = register("m_98b_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item AK_47_BLUEPRINT = register("ak_47_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item AK_12_BLUEPRINT = register("ak_12_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item DEVOTION_BLUEPRINT = register("devotion_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item TASER_BLUEPRINT = register("taser_blueprint", new BlueprintItem(Rarity.COMMON));
+    public static final Item M_1911_BLUEPRINT = register("m_1911_blueprint", new BlueprintItem(Rarity.COMMON));
+    public static final Item QBZ_95_BLUEPRINT = register("qbz_95_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item QBZ_191_BLUEPRINT = register("qbz_191_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item K_98_BLUEPRINT = register("k_98_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item MOSIN_NAGANT_BLUEPRINT = register("mosin_nagant_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item IGLA_BLUEPRINT = register("igla_9k38_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item JAVELIN_BLUEPRINT = register("javelin_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item M_2_HB_BLUEPRINT = register("m_2_hb_blueprint", new BlueprintItem(Rarity.RARE));
+    public static final Item SECONDARY_CATACLYSM_BLUEPRINT = register("secondary_cataclysm_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item INSIDIOUS_BLUEPRINT = register("insidious_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item AURELIA_SCEPTRE_BLUEPRINT = register("aurelia_sceptre_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item QL_1031_BLUEPRINT = register("ql_1031_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item MK_42_BLUEPRINT = register("mk_42_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item MLE_1934_BLUEPRINT = register("mle_1934_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item BL_132_BLUEPRINT = register("bl_132_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item HPJ_11_BLUEPRINT = register("hpj_11_blueprint", new BlueprintItem(Rarity.EPIC));
+    public static final Item ANNIHILATOR_BLUEPRINT = register("annihilator_blueprint", new BlueprintItem(Rarity.EPIC));
 
     /**
-     * Vehicle
+     * Block Items
      */
-    public static final DeferredRegister<Item> VEHICLES = DeferredRegister.create(BuiltInRegistries.ITEM, Mod.MODID);
+    public static Item GALENA_ORE;
+    public static Item DEEPSLATE_GALENA_ORE;
+    public static Item SCHEELITE_ORE;
+    public static Item DEEPSLATE_SCHEELITE_ORE;
+    public static Item SILVER_ORE;
+    public static Item DEEPSLATE_SILVER_ORE;
+    public static Item JUMP_PAD;
+    public static Item SANDBAG;
+    public static Item BARBED_WIRE;
+    public static Item DRAGON_TEETH;
+    public static Item REFORGING_TABLE;
+    public static Item CHARGING_STATION;
+    public static Item CREATIVE_CHARGING_STATION;
+    public static Item LEAD_BLOCK;
+    public static Item STEEL_BLOCK;
+    public static Item TUNGSTEN_BLOCK;
+    public static Item SILVER_BLOCK;
+    public static Item CEMENTED_CARBIDE_BLOCK;
+    public static Item FUMO_25;
+    public static Item VEHICLE_DEPLOYER;
+    public static Item AIRCRAFT_CATAPULT;
+    public static Item SUPERB_ITEM_INTERFACE;
+    public static Item CREATIVE_SUPERB_ITEM_INTERFACE;
+    public static Item VEHICLE_ASSEMBLING_TABLE;
 
-    public static final DeferredHolder<Item, ContainerBlockItem> CONTAINER = VEHICLES.register("container", ContainerBlockItem::new);
-    public static final DeferredHolder<Item, SmallContainerBlockItem> SMALL_CONTAINER = VEHICLES.register("small_container", SmallContainerBlockItem::new);
-    public static final DeferredHolder<Item, LuckyContainerBlockItem> LUCKY_CONTAINER = VEHICLES.register("lucky_container", LuckyContainerBlockItem::new);
-
-    private static <T extends Block> DeferredHolder<Item, BlockItem> block(DeferredHolder<Block, T> block, Rarity rarity) {
-        return BLOCKS.register(block.getId().getPath(), () -> new BlockItem(block.get(), new Item.Properties().rarity(rarity)));
-    }
+    /**
+     * Vehicle Items
+     */
+    public static final Item CONTAINER = register("container", new ContainerBlockItem());
+    public static final Item SMALL_CONTAINER = register("small_container", new SmallContainerBlockItem());
+    public static final Item LUCKY_CONTAINER = register("lucky_container", new LuckyContainerBlockItem());
 
     public record Materials(
             String name,
-            DeferredHolder<Item, Item> barrel,
-            DeferredHolder<Item, Item> action,
-            DeferredHolder<Item, Item> spring,
-            DeferredHolder<Item, Item> trigger
+            Item barrel,
+            Item action,
+            Item spring,
+            Item trigger
     ) {
     }
 
     public static Materials registerMaterials(String name) {
         return new Materials(
                 name,
-                ITEMS.register(name + "_barrel", () -> new Item(new Item.Properties())),
-                ITEMS.register(name + "_action", () -> new Item(new Item.Properties())),
-                ITEMS.register(name + "_spring", () -> new Item(new Item.Properties())),
-                ITEMS.register(name + "_trigger", () -> new Item(new Item.Properties()))
+                register(name + "_barrel", new Item(new Item.Properties())),
+                register(name + "_action", new Item(new Item.Properties())),
+                register(name + "_spring", new Item(new Item.Properties())),
+                register(name + "_trigger", new Item(new Item.Properties()))
         );
     }
 
     /**
      * Perk Items
      */
-    public static final DeferredRegister<Item> PERKS = DeferredRegister.create(BuiltInRegistries.ITEM, Mod.MODID);
-
-    public static final Map<DeferredHolder<Perk, ? extends Perk>, DeferredHolder<Item, ? extends PerkItem<?>>> PERK_ITEMS = new HashMap<>();
+    public static final Map<Perk, Item> PERK_ITEMS = new HashMap<>();
 
     /**
      * 单独注册，用于Tab图标，不要删
      */
-    public static DeferredHolder<Item, ? extends PerkItem<?>> AP_BULLET;
-    public static DeferredHolder<Item, ? extends PerkItem<?>> INTELLIGENT_CHIP;
+    public static Item AP_BULLET;
+    public static Item INTELLIGENT_CHIP;
 
     public static void registerPerkItems() {
         ModPerks.AMMO_PERKS.getEntries().forEach(ModItems::registerSinglePerkItem);
@@ -383,54 +363,89 @@ public class ModItems {
         INTELLIGENT_CHIP = PERK_ITEMS.get(ModPerks.INTELLIGENT_CHIP);
     }
 
-    private static void registerSinglePerkItem(DeferredHolder<Perk, ? extends Perk> perk) {
-        PERK_ITEMS.put(perk, PERKS.register(perk.getId().getPath(), () -> new PerkItem<>(perk)));
+    private static void registerSinglePerkItem(Perk perk) {
+        PERK_ITEMS.put(perk, register(perk.getId().getPath(), new PerkItem<>(perk)));
     }
 
-    public static final DeferredHolder<Item, ShortcutPack> SHORTCUT_PACK = PERKS.register("shortcut_pack", ShortcutPack::new);
-    public static final DeferredHolder<Item, Item> EMPTY_PERK = PERKS.register("empty_perk", () -> new Item(new Item.Properties()));
+    public static final Item SHORTCUT_PACK = register("shortcut_pack", new ShortcutPack());
+    public static final Item EMPTY_PERK = register("empty_perk", new Item(new Item.Properties()));
 
-    private static <T extends Block> DeferredHolder<Item, BlockItem> block(DeferredHolder<Block, T> block) {
-        return BLOCKS.register(block.getId().getPath(), () -> new BlockItem(block.get(), new Item.Properties()));
+    public static void registerBlockItems() {
+        var epic = Rarity.EPIC;
+        var common = Rarity.COMMON;
+
+        GALENA_ORE = blockItem(ModBlocks.GALENA_ORE);
+        DEEPSLATE_GALENA_ORE = blockItem(ModBlocks.DEEPSLATE_GALENA_ORE);
+        SCHEELITE_ORE = blockItem(ModBlocks.SCHEELITE_ORE);
+        DEEPSLATE_SCHEELITE_ORE = blockItem(ModBlocks.DEEPSLATE_SCHEELITE_ORE);
+        SILVER_ORE = blockItem(ModBlocks.SILVER_ORE);
+        DEEPSLATE_SILVER_ORE = blockItem(ModBlocks.DEEPSLATE_SILVER_ORE);
+        JUMP_PAD = blockItem(ModBlocks.JUMP_PAD);
+        SANDBAG = blockItem(ModBlocks.SANDBAG);
+        BARBED_WIRE = blockItem(ModBlocks.BARBED_WIRE);
+        DRAGON_TEETH = blockItem(ModBlocks.DRAGON_TEETH);
+        REFORGING_TABLE = blockItem(ModBlocks.REFORGING_TABLE);
+        CHARGING_STATION = register("charging_station", new ChargingStationBlockItem());
+        CREATIVE_CHARGING_STATION = register("creative_charging_station", new CreativeChargingStationBlockItem());
+        LEAD_BLOCK = blockItem(ModBlocks.LEAD_BLOCK);
+        STEEL_BLOCK = blockItem(ModBlocks.STEEL_BLOCK);
+        TUNGSTEN_BLOCK = blockItem(ModBlocks.TUNGSTEN_BLOCK);
+        SILVER_BLOCK = blockItem(ModBlocks.SILVER_BLOCK);
+        CEMENTED_CARBIDE_BLOCK = blockItem(ModBlocks.CEMENTED_CARBIDE_BLOCK);
+        FUMO_25 = blockItem(ModBlocks.FUMO_25);
+        VEHICLE_DEPLOYER = register("vehicle_deployer", new VehicleDeployerBlockItem());
+        AIRCRAFT_CATAPULT = blockItem(ModBlocks.AIRCRAFT_CATAPULT);
+        SUPERB_ITEM_INTERFACE = blockItem(ModBlocks.SUPERB_ITEM_INTERFACE);
+        CREATIVE_SUPERB_ITEM_INTERFACE = blockItem(ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE, epic);
+        VEHICLE_ASSEMBLING_TABLE = register("vehicle_assembling_table", new VehicleAssemblingTableBlockItem());
     }
 
-    public static void registerDispenserBehavior(FMLCommonSetupEvent event) {
-        List<DeferredHolder<Item, ? extends Item>> list = new ArrayList<>();
-        list.addAll(AMMO.getEntries());
-        list.addAll(ITEMS.getEntries());
+    public static void registerSpawnEggs() {
+        SENPAI_SPAWN_EGG = register("senpai_spawn_egg", new SpawnEggItem(ModEntities.SENPAI, -11584987, -14014413, new Item.Properties()));
+    }
+
+    private static BlockItem blockItem(Block block) {
+        return Registry.register(BuiltInRegistries.ITEM, Mod.loc(BuiltInRegistries.BLOCK.getKey(block).getPath()), new BlockItem(block, new Item.Properties()));
+    }
+
+    private static BlockItem blockItem(Block block, Rarity rarity) {
+        return Registry.register(BuiltInRegistries.ITEM, Mod.loc(BuiltInRegistries.BLOCK.getKey(block).getPath()), new BlockItem(block, new Item.Properties().rarity(rarity)));
+    }
+
+    public static void registerDispenserBehavior() {
+        List<Item> list = new ArrayList<>();
+        list.addAll(List.of(
+                HANDGUN_AMMO, RIFLE_AMMO, SNIPER_AMMO, SHOTGUN_AMMO, HEAVY_AMMO,
+                HANDGUN_AMMO_BOX, RIFLE_AMMO_BOX, SNIPER_AMMO_BOX, SHOTGUN_AMMO_BOX,
+                CREATIVE_AMMO_BOX, AMMO_BOX,
+                ANCIENT_CPU, PROPELLER, LARGE_PROPELLER, MOTOR, LARGE_MOTOR, WHEEL, TRACK,
+                STEEL_INGOT, LEAD_INGOT, SILVER_INGOT, TUNGSTEN_INGOT, CEMENTED_CARBIDE_INGOT,
+                HIGH_ENERGY_EXPLOSIVES, GRAIN, IRON_POWDER, TUNGSTEN_POWDER, COAL_POWDER,
+                COAL_IRON_POWDER, RAW_CEMENTED_CARBIDE_POWDER, GALENA, SCHEELITE, RAW_SILVER
+        ));
 
         for (var item : list) {
-            if (item.get() instanceof ProjectileItem launchable) {
-                DispenserBlock.registerProjectileBehavior(item.get());
+            if (item instanceof ProjectileItem launchable) {
+                DispenserBlock.registerProjectileBehavior(item);
             }
         }
 
-//        DispenserBlock.registerBehavior(SWARM_DRONE.get(), new SwarmDroneItem.SwarmDroneDispenseBehavior());
-        DispenserBlock.registerBehavior(C4_BOMB.get(), new C4BombItem.C4DispenseItemBehavior());
-        DispenserBlock.registerBehavior(CLAYMORE_MINE.get(), new ClaymoreMine.ClaymoreDispenseBehavior());
-        DispenserBlock.registerBehavior(BLU_43_MINE.get(), new Blu43MineItem.Blu43MineDispenseBehavior());
-        DispenserBlock.registerBehavior(RPG_ROCKET_STANDARD.get(), new RpgRocketStandard.RocketDispenseBehavior());
-        DispenserBlock.registerBehavior(RPG_ROCKET_TBG.get(), new RpgRocketTBG.RocketDispenseBehavior());
-//        DispenserBlock.registerBehavior(SMALL_ROCKET.get(), new SmallRocketItem.SmallRocketDispenseBehavior());
-//        DispenserBlock.registerBehavior(MEDIUM_AERIAL_BOMB.get(), new MediumAerialBombItem.MediumAerialBombDispenseBehavior());
-        DispenserBlock.registerBehavior(RGO_GRENADE.get(), new RgoGrenade.RgoGrenadeDispenserBehavior());
-        DispenserBlock.registerBehavior(M18_SMOKE_GRENADE.get(), new M18SmokeGrenade.SmokeGrenadeDispenserBehavior());
-        DispenserBlock.registerBehavior(TM_62.get(), new Tm62Item.Tm62DispenseBehavior());
-        DispenserBlock.registerBehavior(MEDIUM_ROCKET_AP.get(), new MediumRocketItem.MediumRocketDispenseBehavior(MEDIUM_ROCKET_AP.get()));
-        DispenserBlock.registerBehavior(MEDIUM_ROCKET_CM.get(), new MediumRocketItem.MediumRocketDispenseBehavior(MEDIUM_ROCKET_CM.get()));
-        DispenserBlock.registerBehavior(MEDIUM_ROCKET_HE.get(), new MediumRocketItem.MediumRocketDispenseBehavior(MEDIUM_ROCKET_HE.get()));
-        DispenserBlock.registerBehavior(MORTAR_SHELL.get(), new MortarShell.MortarShellDispenseBehavior(MORTAR_SHELL.get()));
-        DispenserBlock.registerBehavior(POTION_MORTAR_SHELL.get(), new MortarShell.MortarShellDispenseBehavior(POTION_MORTAR_SHELL.get()));
+        DispenserBlock.registerBehavior(C4_BOMB, new C4BombItem.C4DispenseItemBehavior());
+        DispenserBlock.registerBehavior(CLAYMORE_MINE, new ClaymoreMine.ClaymoreDispenseBehavior());
+        DispenserBlock.registerBehavior(BLU_43_MINE, new Blu43MineItem.Blu43MineDispenseBehavior());
+        DispenserBlock.registerBehavior(RPG_ROCKET_STANDARD, new RpgRocketStandard.RocketDispenseBehavior());
+        DispenserBlock.registerBehavior(RPG_ROCKET_TBG, new RpgRocketTBG.RocketDispenseBehavior());
+        DispenserBlock.registerBehavior(RGO_GRENADE, new RgoGrenade.RgoGrenadeDispenserBehavior());
+        DispenserBlock.registerBehavior(M18_SMOKE_GRENADE, new M18SmokeGrenade.SmokeGrenadeDispenserBehavior());
+        DispenserBlock.registerBehavior(TM_62, new Tm62Item.Tm62DispenseBehavior());
+        DispenserBlock.registerBehavior(MEDIUM_ROCKET_AP, new MediumRocketItem.MediumRocketDispenseBehavior(MEDIUM_ROCKET_AP));
+        DispenserBlock.registerBehavior(MEDIUM_ROCKET_CM, new MediumRocketItem.MediumRocketDispenseBehavior(MEDIUM_ROCKET_CM));
+        DispenserBlock.registerBehavior(MEDIUM_ROCKET_HE, new MediumRocketItem.MediumRocketDispenseBehavior(MEDIUM_ROCKET_HE));
+        DispenserBlock.registerBehavior(MORTAR_SHELL, new MortarShell.MortarShellDispenseBehavior(MORTAR_SHELL));
+        DispenserBlock.registerBehavior(POTION_MORTAR_SHELL, new MortarShell.MortarShellDispenseBehavior(POTION_MORTAR_SHELL));
     }
 
-    public static void register(IEventBus bus) {
-        ITEMS.register(bus);
-        GUNS.register(bus);
-        AMMO.register(bus);
-        BLOCKS.register(bus);
-        VEHICLES.register(bus);
-        registerPerkItems();
-        PERKS.register(bus);
+    private static Item register(String name, Item item) {
+        return Registry.register(BuiltInRegistries.ITEM, Mod.loc(name), item);
     }
-
 }
