@@ -1,40 +1,30 @@
 package com.atsuishio.superbwarfare.data.vehicle;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.network.message.receive.VehiclesDataMessage;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.OnDatapackSyncEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
-@EventBusSubscriber(modid = Mod.MODID)
 public class VehicleDataTool {
-
-    @SubscribeEvent
-    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            var server = player.getServer();
-            if (server != null && server.isSingleplayerOwner(player.getGameProfile())) {
+    public static void register() {
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            var player = handler.getPlayer();
+            if (server.isSingleplayerOwner(player.getGameProfile())) {
                 return;
             }
 
-            PacketDistributor.sendToPlayer(player, VehiclesDataMessage.create());
-        }
-    }
+            ServerPlayNetworking.send(player, VehiclesDataMessage.create());
+        });
 
-    @SubscribeEvent
-    public static void onDataPackSync(OnDatapackSyncEvent event) {
-        var server = event.getPlayerList().getServer();
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, serverResourceManager, success) -> {
+            var message = VehiclesDataMessage.create();
+            for (var player : server.getPlayerList().getPlayers()) {
+                if (server.isSingleplayerOwner(player.getGameProfile())) {
+                    continue;
+                }
 
-        var message = VehiclesDataMessage.create();
-        for (var player : event.getRelevantPlayers().toList()) {
-            if (server.isSingleplayerOwner(player.getGameProfile())) {
-                continue;
+                ServerPlayNetworking.send(player, message);
             }
-
-            PacketDistributor.sendToPlayer(player, message);
-        }
+        });
     }
 }
