@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_authors}"
+  ],
+  "contact": {
+    "sources": "https://github.com/Atsuishio/SuperbWarfareReFabricated"
+  },
+  "license": "${mod_license}",
+  "icon": "logo.png",
+  "accessWidener": "superbwarfare.accesswidener",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.atsuishio.superbwarfare.SuperbWarfareFabric"
+    ],
+    "client": [
+      "com.atsuishio.superbwarfare.client.SuperbWarfareFabricClient"
+    ]
+  },
+  "mixins": [
+    "superbwarfare.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*",
+    "fabric-language-kotlin": "*",
+    "geckolib": "*",
+    "cloth-config": "*",
+    "architectury": ">=14.0.0"
+  },
+  "suggests": {
+    "jei": "*",
+    "jade": "*",
+    "kubejs": "*",
+    "patchouli": "*",
+    "realcamera": "*"
+  }
+}

@@ -1,0 +1,36 @@
+accessWidener v2 named
+
+accessible field net/minecraft/world/entity/Entity passengers Lcom/google/common/collect/ImmutableList;
+accessible method net/minecraft/client/multiplayer/ClientLevel getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
+
+mutable field net/minecraft/world/entity/Entity passengers
+
+accessible field net/minecraft/world/entity/Entity boardingCooldown
+mutable field net/minecraft/world/entity/Entity boardingCooldown
+
+accessible field net/minecraft/world/entity/Entity levelCallback
+mutable field net/minecraft/world/entity/Entity levelCallback
+
+accessible field net/minecraft/world/entity/Entity removalReason
+mutable field net/minecraft/world/entity/Entity removalReason
+
+accessible field net/minecraft/client/player/LocalPlayer handsBusy
+mutable field net/minecraft/client/player/LocalPlayer handsBusy
+
+accessible field net/minecraft/world/entity/LivingEntity jumping
+mutable field net/minecraft/world/entity/LivingEntity jumping
+
+accessible field net/minecraft/world/entity/LivingEntity lastHurt
+mutable field net/minecraft/world/entity/LivingEntity lastHurt
+
+accessible field net/minecraft/world/entity/LivingEntity lastHurtByPlayerTime
+mutable field net/minecraft/world/entity/LivingEntity lastHurtByPlayerTime
+
+accessible field net/minecraft/world/entity/LivingEntity lastDamageSource
+mutable field net/minecraft/world/entity/LivingEntity lastDamageSource
+
+accessible field net/minecraft/world/entity/LivingEntity lastDamageStamp
+mutable field net/minecraft/world/entity/LivingEntity lastDamageStamp
+
+accessible field net/minecraft/client/multiplayer/ClientPacketListener serverSimulationDistance
+mutable field net/minecraft/client/multiplayer/ClientPacketListener serverSimulationDistance

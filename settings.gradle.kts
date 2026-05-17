@@ -1,11 +1,13 @@
 pluginManagement {
     repositories {
-        mavenLocal()
+        maven {
+            name = "Fabric"
+            url = uri("https://maven.fabricmc.net/")
+        }
         gradlePluginPortal()
-        maven { url = uri("https://maven.neoforged.net/releases") }
     }
-}
-
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+    plugins {
+        id("fabric-loom") version "1.13.6"
+        id("org.jetbrains.kotlin.jvm") version "2.2.0"
+    }
 }
