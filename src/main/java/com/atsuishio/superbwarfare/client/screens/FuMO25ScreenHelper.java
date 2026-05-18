@@ -10,14 +10,9 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 import java.util.List;
 
-@EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class FuMO25ScreenHelper {
 
     public static BlockPos pos = null;
@@ -25,8 +20,7 @@ public class FuMO25ScreenHelper {
 
     public static final int TOLERANCE_DISTANCE = 16;
 
-    @SubscribeEvent
-    public static void onClientTick(ClientTickEvent.Post event) {
+    public static void onClientTick() {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         Camera camera = mc.gameRenderer.getMainCamera();

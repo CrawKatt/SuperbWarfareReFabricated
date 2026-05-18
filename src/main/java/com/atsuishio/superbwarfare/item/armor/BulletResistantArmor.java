@@ -13,8 +13,6 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
@@ -42,7 +40,7 @@ public abstract class BulletResistantArmor extends ArmorItem implements GeoItem 
         this.bulletResistance = bulletResistance;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     public abstract Supplier<GeoArmorRenderer<? extends Item>> getRenderer();
 
     @Override
@@ -69,11 +67,11 @@ public abstract class BulletResistantArmor extends ArmorItem implements GeoItem 
     }
 
     @Override
-    public @NotNull ItemAttributeModifiers getDefaultAttributeModifiers(@NotNull ItemStack stack) {
-        var modifiers = super.getDefaultAttributeModifiers(stack);
+    public @NotNull ItemAttributeModifiers getDefaultAttributeModifiers() {
+        var modifiers = super.getDefaultAttributeModifiers();
         var list = new ArrayList<>(modifiers.modifiers());
-        list.add(new ItemAttributeModifiers.Entry(ModAttributes.BULLET_RESISTANCE, new AttributeModifier(Mod.ATTRIBUTE_MODIFIER,
-                this.bulletResistance * Math.max(0, 1 - (double) stack.getDamageValue() / stack.getMaxDamage()), AttributeModifier.Operation.ADD_VALUE),
+        list.add(new ItemAttributeModifiers.Entry(net.minecraft.core.Holder.direct(ModAttributes.BULLET_RESISTANCE), new AttributeModifier(Mod.ATTRIBUTE_MODIFIER,
+                this.bulletResistance, AttributeModifier.Operation.ADD_VALUE),
                 EquipmentSlotGroup.bySlot(this.type.getSlot())));
         return new ItemAttributeModifiers(list, true);
     }

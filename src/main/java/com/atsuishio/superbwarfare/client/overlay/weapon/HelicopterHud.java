@@ -30,13 +30,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Math;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 
-@OnlyIn(Dist.CLIENT)
+
 public class HelicopterHud {
 
     public static final String ID = "@Helicopter";
@@ -213,7 +211,7 @@ public class HelicopterHud {
 
                 if (vehicle.hasDecoy()) {
                     if (vehicle.getDecoyState().equals("READY")) {
-                        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getKey().getDisplayName().getString() + "]")), screenWidth / 2 - 160, screenHeight / 2 - 50, color, false);
+                        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getDefaultKey().getDisplayName().getString() + "]")), screenWidth / 2 - 160, screenHeight / 2 - 50, color, false);
                     } else {
                         guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.reloading"), screenWidth / 2 - 160, screenHeight / 2 - 50, 0xFF0000, false);
                     }
@@ -243,7 +241,7 @@ public class HelicopterHud {
 
                 if (vehicle.hasDecoy()) {
                     if (vehicle.getDecoyState().equals("READY")) {
-                        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getKey().getDisplayName().getString() + "]")), 30, 1, -1, false);
+                        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getDefaultKey().getDisplayName().getString() + "]")), 30, 1, -1, false);
                     } else {
                         guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.reloading"), 30, 1, 0xFF0000, false);
                     }
@@ -257,13 +255,13 @@ public class HelicopterHud {
                 guiGraphics.drawString(Minecraft.getInstance().font, Component.literal("SINK RATE，PULL UP!"),
                         screenWidth / 2 - 53, screenHeight / 2 + 24, -65536, false);
                 if (player.tickCount % 30 == 0) {
-                    player.level().playLocalSound(player.getOnPos(), ModSounds.PULL_UP.get(), SoundSource.PLAYERS, 3, 1, false);
+                    player.level().playLocalSound(player.getOnPos(), ModSounds.PULL_UP, SoundSource.PLAYERS, 3, 1, false);
                 }
             } else if (((lerpVy < -10 || (lerpVy < -3 && speed > 100)) && height < 36) || (speed > 72 && blockInWay < 72)) {
                 guiGraphics.drawString(Minecraft.getInstance().font, Component.literal("TERRAIN TERRAIN"),
                         screenWidth / 2 - 42, screenHeight / 2 + 24, -65536, false);
                 if (player.tickCount % 30 == 0) {
-                    player.level().playLocalSound(player.getOnPos(), ModSounds.TERRAIN.get(), SoundSource.PLAYERS, 3, 1, false);
+                    player.level().playLocalSound(player.getOnPos(), ModSounds.TERRAIN, SoundSource.PLAYERS, 3, 1, false);
                 }
             }
             poseStack.popPose();

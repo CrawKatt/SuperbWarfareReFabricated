@@ -26,14 +26,12 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Math;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.*;
 
-@OnlyIn(Dist.CLIENT)
+
 public class LandVehicleHud {
 
     public static final String ID = "@Land";
@@ -149,7 +147,7 @@ public class LandVehicleHud {
             // 诱饵
             if (vehicle.hasDecoy() && player == vehicle.getFirstPassenger()) {
                 if (vehicle.getDecoyState().equals("READY")) {
-                    gui.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getKey().getDisplayName().getString() + "]")), screenWidth / 2 - 165, screenHeight / 2 - 36, color, false);
+                    gui.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getDefaultKey().getDisplayName().getString() + "]")), screenWidth / 2 - 165, screenHeight / 2 - 36, color, false);
                 } else {
                     gui.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.reloading"), screenWidth / 2 - 165, screenHeight / 2 - 36, 0xFF0000, false);
                 }

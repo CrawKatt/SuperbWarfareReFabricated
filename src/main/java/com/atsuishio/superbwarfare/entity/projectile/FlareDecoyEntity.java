@@ -19,7 +19,7 @@ public class FlareDecoyEntity extends Entity {
     }
 
     public FlareDecoyEntity(Level level) {
-        super(ModEntities.FLARE_DECOY.get(), level);
+        super(ModEntities.FLARE_DECOY, level);
     }
 
     @Override

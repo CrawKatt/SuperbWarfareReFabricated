@@ -46,7 +46,7 @@ public class AmmoBoxItem extends Item {
         if (info == null) info = new AmmoBoxInfo("All", false);
         String selectedType = info.type();
 
-        var cap = player.getData(ModAttachments.PLAYER_VARIABLE).watch();
+        var cap = player.getAttached(ModAttachments.PLAYER_VARIABLE).watch();
         if (!level.isClientSide()) {
             var types = (selectedType.equals("All") || info.isDrop()) ? Ammo.values() : new Ammo[]{Ammo.getType(selectedType)};
 
@@ -63,7 +63,7 @@ public class AmmoBoxItem extends Item {
                     type.set(stack, 0);
                 }
             }
-            player.setData(ModAttachments.PLAYER_VARIABLE, cap);
+            player.setAttached(ModAttachments.PLAYER_VARIABLE, cap);
             cap.sync(player);
             level.playSound(null, player.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1, 1);
 
@@ -86,7 +86,6 @@ public class AmmoBoxItem extends Item {
         return list;
     }
 
-    @Override
     @ParametersAreNonnullByDefault
     public boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand) {
         if (entity instanceof Player player && player.isCrouching() && player instanceof ServerPlayer serverPlayer) {
@@ -99,7 +98,7 @@ public class AmmoBoxItem extends Item {
             var typeString = AMMO_TYPE_LIST.get((index + 1) % AMMO_TYPE_LIST.size());
 
             stack.set(ModDataComponents.AMMO_BOX_INFO, new AmmoBoxInfo(typeString, false));
-            SoundTool.playLocalSound(serverPlayer, ModSounds.FIRE_RATE.get(), SoundSource.PLAYERS, 1f, 1f);
+            SoundTool.playLocalSound(serverPlayer, ModSounds.FIRE_RATE, SoundSource.PLAYERS, 1f, 1f);
             var type = Ammo.getType(typeString);
             if (type == null) {
                 player.displayClientMessage(Component.translatable("des.superbwarfare.ammo_box.type.all").withStyle(ChatFormatting.WHITE), true);

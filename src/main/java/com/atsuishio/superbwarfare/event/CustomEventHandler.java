@@ -14,13 +14,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.TargetBlock;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 
-@EventBusSubscriber
 public class CustomEventHandler {
 
-    @SubscribeEvent
     public static void onPreReload(ReloadEvent.Pre event) {
         var shooter = event.shooter;
         ItemStack stack = event.stack;
@@ -35,7 +31,6 @@ public class CustomEventHandler {
         }
     }
 
-    @SubscribeEvent
     public static void onPostReload(ReloadEvent.Post event) {
         var shooter = event.shooter;
         ItemStack stack = event.stack;
@@ -52,7 +47,6 @@ public class CustomEventHandler {
         }
     }
 
-    @SubscribeEvent
     public static void onProjectileHitEntity(ProjectileHitEvent.HitEntity event) {
         var entity = event.getOwner();
         if (!(entity instanceof LivingEntity attacker)) return;
@@ -75,7 +69,6 @@ public class CustomEventHandler {
         }
     }
 
-    @SubscribeEvent
     public static void onProjectileHitBlock(ProjectileHitEvent.HitBlock event) {
         var projectile = event.getProjectile();
         var state = event.getState();
@@ -89,7 +82,7 @@ public class CustomEventHandler {
         }
 
         if (projectile instanceof ProjectileEntity p) {
-            if (ProjectileConfig.ALLOW_PROJECTILE_DESTROY_BLOCKS.get() && state.is(ModTags.Blocks.BULLET_CAN_DESTROY)) {
+            if (ProjectileConfig.ALLOW_PROJECTILE_DESTROY_BLOCKS && state.is(ModTags.Blocks.BULLET_CAN_DESTROY)) {
                 p.level().destroyBlock(pos, false, p.getShooter());
             }
 
@@ -98,7 +91,7 @@ public class CustomEventHandler {
             }
         }
         if (projectile instanceof GrapeshotEntity grapeshotEntity) {
-            if (ProjectileConfig.ALLOW_PROJECTILE_DESTROY_BLOCKS.get() && state.is(ModTags.Blocks.CANNON_SHOT_CAN_DESTROY)) {
+            if (ProjectileConfig.ALLOW_PROJECTILE_DESTROY_BLOCKS && state.is(ModTags.Blocks.CANNON_SHOT_CAN_DESTROY)) {
                 grapeshotEntity.level().destroyBlock(pos, false, grapeshotEntity.getOwner());
             }
         }

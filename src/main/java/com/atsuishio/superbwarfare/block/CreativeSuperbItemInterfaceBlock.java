@@ -48,7 +48,7 @@ public class CreativeSuperbItemInterfaceBlock extends SuperbItemInterfaceBlock {
     @Nullable
     @ParametersAreNonnullByDefault
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        return pLevel.isClientSide ? null : createTickerHelper(pBlockEntityType, ModBlockEntities.CREATIVE_SUPERB_ITEM_INTERFACE.get(), CreativeSuperbItemInterfaceBlockEntity::serverTick);
+        return pLevel.isClientSide ? null : createTickerHelper(pBlockEntityType, ModBlockEntities.CREATIVE_SUPERB_ITEM_INTERFACE, CreativeSuperbItemInterfaceBlockEntity::serverTick);
     }
 
     @Override

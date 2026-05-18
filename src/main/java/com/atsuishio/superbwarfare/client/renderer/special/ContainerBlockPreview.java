@@ -4,23 +4,19 @@ import com.atsuishio.superbwarfare.block.ContainerBlock;
 import com.atsuishio.superbwarfare.block.entity.ContainerBlockEntity;
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes;
 import com.atsuishio.superbwarfare.init.ModTags;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ContainerBlockPreview {
-    @SubscribeEvent
-    public static void render(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
-            return;
-        }
+    public static void init() {
+        WorldRenderEvents.LAST.register(context -> render(context));
+    }
 
+    public static void render(WorldRenderContext context) {
         var player = Minecraft.getInstance().player;
         assert player != null;
 
@@ -35,8 +31,8 @@ public class ContainerBlockPreview {
         int distance = 32;
         var start = player.position().add(0, player.getEyeHeight(), 0);
         var end = player.position().add(look.x * distance, look.y * distance + player.getEyeHeight(), look.z * distance);
-        var context = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player);
-        var result = player.level().clip(context);
+        var clipContext = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player);
+        var result = player.level().clip(clipContext);
 
         if (result.getType().equals(BlockHitResult.Type.MISS)) return;
 
@@ -54,7 +50,7 @@ public class ContainerBlockPreview {
         }
         if (w == 0 || h == 0) return;
 
-        var poseStack = event.getPoseStack();
+        var poseStack = context.matrixStack();
         poseStack.pushPose();
         var pos = container.getBlockPos();
         var view = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();

@@ -11,8 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Supplier;
 
 public enum ModItemTier implements Tier {
-    STEEL(400, 6, 5, 15, () -> Ingredient.of(ModItems.STEEL_INGOT.get())),
-    CEMENTED_CARBIDE(2000, 8.0f, 8.0f, 18, () -> Ingredient.of(ModItems.CEMENTED_CARBIDE_INGOT.get()));
+    STEEL(400, 6, 5, 15, () -> Ingredient.of(ModItems.STEEL_INGOT)),
+    CEMENTED_CARBIDE(2000, 8.0f, 8.0f, 18, () -> Ingredient.of(ModItems.CEMENTED_CARBIDE_INGOT));
 
     private final int uses;
     private final float speed;

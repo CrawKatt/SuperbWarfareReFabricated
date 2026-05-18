@@ -3,15 +3,9 @@ package com.atsuishio.superbwarfare.tools;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 import org.joml.Matrix4f;
 import org.joml.Vector4d;
 
-@EventBusSubscriber(Dist.CLIENT)
 public class VectorUtil {
 
     public static double fov = 70;
@@ -42,11 +36,8 @@ public class VectorUtil {
         );
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void captureFov(ViewportEvent.ComputeFov event) {
-        if (event.usedConfiguredFov()) {
-            fov = event.getFOV();
-        }
+    public static void captureFov(double fov) {
+        VectorUtil.fov = fov;
     }
 
     public static boolean canSee(Vec3 pos) {

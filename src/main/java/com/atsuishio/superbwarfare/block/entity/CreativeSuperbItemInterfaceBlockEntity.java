@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class CreativeSuperbItemInterfaceBlockEntity extends SuperbItemInterfaceBlockEntity {
     public CreativeSuperbItemInterfaceBlockEntity(BlockPos pos, BlockState blockState) {
-        super(ModBlockEntities.CREATIVE_SUPERB_ITEM_INTERFACE.get(), pos, blockState);
+        super(ModBlockEntities.CREATIVE_SUPERB_ITEM_INTERFACE, pos, blockState);
     }
 
     @Override

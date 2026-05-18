@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.entity.projectile;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
@@ -25,16 +26,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-@OnlyIn(value = Dist.CLIENT, _interface = ItemSupplier.class)
+@net.fabricmc.api.Environment(net.fabricmc.api.EnvType.CLIENT)
 public class TaserBulletEntity extends AbstractArrow implements GeoEntity, CustomDamageProjectile {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -96,9 +94,9 @@ public class TaserBulletEntity extends AbstractArrow implements GeoEntity, Custo
             return;
         if (this.getOwner() instanceof LivingEntity living) {
             if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
-                living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
+                living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
 
-                PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
             }
         }
         if (entity instanceof LivingEntity living) {

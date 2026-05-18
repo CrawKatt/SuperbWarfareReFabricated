@@ -31,7 +31,7 @@ public class RPGMeleeExplosionTrigger extends SimpleCriterionTrigger<RPGMeleeExp
                         .forGetter(RPGMeleeExplosionTrigger.TriggerInstance::player)).apply(instance, TriggerInstance::new));
 
         public static Criterion<RPGMeleeExplosionTrigger.TriggerInstance> get() {
-            return ModCriteriaTriggers.RPG_MELEE_EXPLOSION.get().createCriterion(new TriggerInstance(Optional.empty()));
+            return ModCriteriaTriggers.RPG_MELEE_EXPLOSION.createCriterion(new TriggerInstance(Optional.empty()));
         }
 
         @Override

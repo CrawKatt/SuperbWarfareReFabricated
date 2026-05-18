@@ -1,19 +1,13 @@
 package com.atsuishio.superbwarfare.item.common.container;
 
 import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.client.renderer.item.LuckyContainerBlockItemRenderer;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.init.ModBlocks;
-import com.atsuishio.superbwarfare.init.ModItems;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -23,10 +17,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -41,7 +31,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.function.Supplier;
 
-@EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class LuckyContainerBlockItem extends BlockItem implements GeoItem {
 
     public static final List<Supplier<ItemStack>> LUCKY_CONTAINERS = List.of(
@@ -54,13 +43,7 @@ public class LuckyContainerBlockItem extends BlockItem implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public LuckyContainerBlockItem() {
-        super(ModBlocks.LUCKY_CONTAINER.get(), new Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant());
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public boolean canBeHurtBy(ItemStack stack, DamageSource source) {
-        return super.canBeHurtBy(stack, source) && !source.is(DamageTypeTags.IS_EXPLOSION) && !source.is(DamageTypes.CACTUS);
+        super(ModBlocks.LUCKY_CONTAINER, new Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant());
     }
 
     @Override
@@ -84,17 +67,7 @@ public class LuckyContainerBlockItem extends BlockItem implements GeoItem {
         return PlayState.CONTINUE;
     }
 
-    @SubscribeEvent
-    private static void registerItemExtensions(RegisterClientExtensionsEvent event) {
-        event.registerItem(new IClientItemExtensions() {
-            private final BlockEntityWithoutLevelRenderer renderer = new LuckyContainerBlockItemRenderer();
-
-            @Override
-            public @NotNull BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return renderer;
-            }
-        }, ModItems.LUCKY_CONTAINER);
-    }
+    
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
@@ -107,14 +80,14 @@ public class LuckyContainerBlockItem extends BlockItem implements GeoItem {
     }
 
     public static ItemStack createInstance(ResourceLocation location, @Nullable ResourceLocation icon) {
-        ItemStack stack = new ItemStack(ModBlocks.LUCKY_CONTAINER.get());
+        ItemStack stack = new ItemStack(ModBlocks.LUCKY_CONTAINER);
         CompoundTag tag = new CompoundTag();
 
         tag.putString("Location", location.toString());
         if (icon != null) {
             tag.putString("Icon", icon.toString());
         }
-        BlockItem.setBlockEntityData(stack, ModBlockEntities.LUCKY_CONTAINER.get(), tag);
+        BlockItem.setBlockEntityData(stack, ModBlockEntities.LUCKY_CONTAINER, tag);
         return stack;
     }
 

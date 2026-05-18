@@ -39,7 +39,7 @@ public class Mk82Entity extends DestroyableProjectile implements GeoEntity {
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.MEDIUM_AERIAL_BOMB.get();
+        return ModItems.MEDIUM_AERIAL_BOMB;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class Mk82Entity extends DestroyableProjectile implements GeoEntity {
 
     @Override
     public @NotNull SoundEvent getSound() {
-        return ModSounds.SHELL_FLY.get();
+        return ModSounds.SHELL_FLY;
     }
 
     @Override

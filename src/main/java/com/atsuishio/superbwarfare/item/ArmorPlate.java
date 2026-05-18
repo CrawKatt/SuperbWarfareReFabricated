@@ -47,14 +47,14 @@ public class ArmorPlate extends Item {
 
         if (armor == ItemStack.EMPTY) return InteractionResultHolder.fail(stack);
 
-        int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL.get();
+        int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL;
         if (armor.is(ModTags.Items.MILITARY_ARMOR)) {
-            armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL.get();
+            armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL;
         } else if (armor.is(ModTags.Items.MILITARY_ARMOR_HEAVY)) {
-            armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL.get();
+            armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL;
         }
 
-        if (NBTTool.getTag(armor).getDouble("ArmorPlate") < armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get()) {
+        if (NBTTool.getTag(armor).getDouble("ArmorPlate") < armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL) {
             playerIn.startUsingItem(handIn);
         }
 
@@ -72,15 +72,15 @@ public class ArmorPlate extends Item {
         if (!pLevel.isClientSide) {
             ItemStack armor = pLivingEntity.getItemBySlot(EquipmentSlot.CHEST);
 
-            int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL.get();
+            int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL;
             if (armor.is(ModTags.Items.MILITARY_ARMOR)) {
-                armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL.get();
+                armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL;
             } else if (armor.is(ModTags.Items.MILITARY_ARMOR_HEAVY)) {
-                armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL.get();
+                armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL;
             }
 
             var tag = NBTTool.getTag(armor);
-            tag.putDouble("ArmorPlate", Mth.clamp(tag.getDouble("ArmorPlate") + MiscConfig.ARMOR_POINT_PER_LEVEL.get(), 0, armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get()));
+            tag.putDouble("ArmorPlate", Mth.clamp(tag.getDouble("ArmorPlate") + MiscConfig.ARMOR_POINT_PER_LEVEL, 0, armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL));
             NBTTool.saveTag(armor, tag);
 
             if (pLivingEntity instanceof ServerPlayer serverPlayer) {
@@ -102,7 +102,7 @@ public class ArmorPlate extends Item {
     }
 
     public static ItemStack getInfiniteInstance() {
-        ItemStack stack = new ItemStack(ModItems.ARMOR_PLATE.get());
+        ItemStack stack = new ItemStack(ModItems.ARMOR_PLATE);
         final var tag = NBTTool.getTag(stack);
         tag.putBoolean("Infinite", true);
         NBTTool.saveTag(stack, tag);

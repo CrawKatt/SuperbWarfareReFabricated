@@ -31,12 +31,12 @@ public class VehicleResetRecipe extends CustomRecipe {
         for (int i = 0; i < input.size(); ++i) {
             ItemStack stack = input.getItem(i);
             if (!stack.isEmpty()) {
-                if (stack.is(ModItems.VEHICLE_RESET_KIT.get())) {
+                if (stack.is(ModItems.VEHICLE_RESET_KIT)) {
                     if (!kit.isEmpty()) {
                         return false;
                     }
                     kit = stack;
-                } else if (stack.is(ModItems.CONTAINER.get())) {
+                } else if (stack.is(ModItems.CONTAINER)) {
                     if (!container.isEmpty()) {
                         return false;
                     }
@@ -56,12 +56,12 @@ public class VehicleResetRecipe extends CustomRecipe {
         for (int i = 0; i < input.size(); ++i) {
             ItemStack stack = input.getItem(i);
             if (!stack.isEmpty()) {
-                if (stack.is(ModItems.VEHICLE_RESET_KIT.get())) {
+                if (stack.is(ModItems.VEHICLE_RESET_KIT)) {
                     if (!kit.isEmpty()) {
                         return ItemStack.EMPTY;
                     }
                     kit = stack.copy();
-                } else if (stack.is(ModItems.CONTAINER.get())) {
+                } else if (stack.is(ModItems.CONTAINER)) {
                     if (!container.isEmpty()) {
                         return ItemStack.EMPTY;
                     }
@@ -92,6 +92,6 @@ public class VehicleResetRecipe extends CustomRecipe {
 
     @Override
     public @NotNull RecipeSerializer<?> getSerializer() {
-        return ModRecipes.VEHICLE_RESET_SERIALIZER.get();
+        return ModRecipes.VEHICLE_RESET_SERIALIZER;
     }
 }

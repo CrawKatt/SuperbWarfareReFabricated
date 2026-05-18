@@ -26,27 +26,27 @@ public class VehicleMenu extends AbstractContainerMenu {
     }
 
     public static VehicleMenu mini(int pContainerId, Inventory pPlayerInventory, boolean hasUpgradeSlots) {
-        return new VehicleMenu(hasUpgradeSlots ? ModMenuTypes.VEHICLE_MENU_MINI_UPGRADE.get() : ModMenuTypes.VEHICLE_MENU_MINI.get(),
+        return new VehicleMenu(hasUpgradeSlots ? ModMenuTypes.VEHICLE_MENU_MINI_UPGRADE : ModMenuTypes.VEHICLE_MENU_MINI,
                 pContainerId, pPlayerInventory, 1, 9, hasUpgradeSlots);
     }
 
     public static VehicleMenu small(int pContainerId, Inventory pPlayerInventory, boolean hasUpgradeSlots) {
-        return new VehicleMenu(hasUpgradeSlots ? ModMenuTypes.VEHICLE_MENU_SMALL_UPGRADE.get() : ModMenuTypes.VEHICLE_MENU_SMALL.get(),
+        return new VehicleMenu(hasUpgradeSlots ? ModMenuTypes.VEHICLE_MENU_SMALL_UPGRADE : ModMenuTypes.VEHICLE_MENU_SMALL,
                 pContainerId, pPlayerInventory, 3, 9, hasUpgradeSlots);
     }
 
     public static VehicleMenu medium(int pContainerId, Inventory pPlayerInventory, boolean hasUpgradeSlots) {
-        return new VehicleMenu(hasUpgradeSlots ? ModMenuTypes.VEHICLE_MENU_MEDIUM_UPGRADE.get() : ModMenuTypes.VEHICLE_MENU_MEDIUM.get(),
+        return new VehicleMenu(hasUpgradeSlots ? ModMenuTypes.VEHICLE_MENU_MEDIUM_UPGRADE : ModMenuTypes.VEHICLE_MENU_MEDIUM,
                 pContainerId, pPlayerInventory, 6, 9, hasUpgradeSlots);
     }
 
     public static VehicleMenu large(int pContainerId, Inventory pPlayerInventory, boolean hasUpgradeSlots) {
-        return new VehicleMenu(hasUpgradeSlots ? ModMenuTypes.VEHICLE_MENU_LARGE_UPGRADE.get() : ModMenuTypes.VEHICLE_MENU_LARGE.get(),
+        return new VehicleMenu(hasUpgradeSlots ? ModMenuTypes.VEHICLE_MENU_LARGE_UPGRADE : ModMenuTypes.VEHICLE_MENU_LARGE,
                 pContainerId, pPlayerInventory, 6, 13, hasUpgradeSlots);
     }
 
     public static VehicleMenu huge(int pContainerId, Inventory pPlayerInventory, boolean hasUpgradeSlots) {
-        return new VehicleMenu(hasUpgradeSlots ? ModMenuTypes.VEHICLE_MENU_HUGE_UPGRADE.get() : ModMenuTypes.VEHICLE_MENU_HUGE.get(),
+        return new VehicleMenu(hasUpgradeSlots ? ModMenuTypes.VEHICLE_MENU_HUGE_UPGRADE : ModMenuTypes.VEHICLE_MENU_HUGE,
                 pContainerId, pPlayerInventory, 6, 17, hasUpgradeSlots);
     }
 

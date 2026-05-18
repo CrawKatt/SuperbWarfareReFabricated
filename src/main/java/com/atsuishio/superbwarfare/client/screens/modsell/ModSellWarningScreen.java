@@ -14,12 +14,6 @@ import net.minecraft.client.gui.screens.multiplayer.SafetyScreen;
 import net.minecraft.client.gui.screens.multiplayer.WarningScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ScreenEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.InetAddress;
@@ -27,8 +21,7 @@ import java.security.MessageDigest;
 import java.util.HexFormat;
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
-@EventBusSubscriber(value = Dist.CLIENT)
+
 public class ModSellWarningScreen extends WarningScreen {
 
     private static final String ENVIRONMENT_CHECKSUM = generateEnvironmentHash();
@@ -82,24 +75,21 @@ public class ModSellWarningScreen extends WarningScreen {
     private AbstractButton createProceedButton(int pYOffset) {
         return Button.builder(CommonComponents.GUI_PROCEED, button -> {
             if (this.stopShowing != null && this.stopShowing.selected()) {
-                EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.set(ENVIRONMENT_CHECKSUM);
-                EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.save();
+                EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM = ENVIRONMENT_CHECKSUM;
+                EnvironmentChecksumConfig.save();
             }
             Minecraft.getInstance().setScreen(new JoinMultiplayerScreen(this.lastScreen));
         }).bounds(this.width / 2 - 155, 100 + pYOffset, 150, 20).build();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onGuiOpen(ScreenEvent.Opening event) {
-        if (!((event.getNewScreen() instanceof JoinMultiplayerScreen || event.getNewScreen() instanceof SafetyScreen)
-                && event.getCurrentScreen() instanceof TitleScreen))
+    public static void onGuiOpen(Screen screen) {
+        if (!((screen instanceof JoinMultiplayerScreen || screen instanceof SafetyScreen)
+                && Minecraft.getInstance().screen instanceof TitleScreen))
             return;
 
-        if (EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.get().equals(ENVIRONMENT_CHECKSUM)) return;
+        if (EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.equals(ENVIRONMENT_CHECKSUM)) return;
 
-        // 拦截多人游戏界面加载
-        event.setCanceled(true);
-        Minecraft.getInstance().setScreen(new ModSellWarningScreen(event.getCurrentScreen()));
+        Minecraft.getInstance().setScreen(new ModSellWarningScreen(Minecraft.getInstance().screen));
     }
 
     @Override
@@ -107,8 +97,8 @@ public class ModSellWarningScreen extends WarningScreen {
         LinearLayout linearlayout = LinearLayout.horizontal().spacing(8);
         linearlayout.addChild(Button.builder(CommonComponents.GUI_PROCEED, p_280872_ -> {
             if (this.stopShowing != null && this.stopShowing.selected()) {
-                EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.set(ENVIRONMENT_CHECKSUM);
-                EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.save();
+                EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM = ENVIRONMENT_CHECKSUM;
+                EnvironmentChecksumConfig.save();
             }
 
             Minecraft.getInstance().setScreen(new JoinMultiplayerScreen(this.lastScreen));

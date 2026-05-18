@@ -20,8 +20,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 import static com.atsuishio.superbwarfare.entity.vehicle.Type63Entity.SHOOT_PITCH;
@@ -29,14 +27,14 @@ import static com.atsuishio.superbwarfare.entity.vehicle.Type63Entity.SHOOT_YAW;
 import static com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotFromVector;
 import static com.atsuishio.superbwarfare.tools.RangeTool.calculateLaunchVector;
 
-@OnlyIn(Dist.CLIENT)
+
 public class Type63InfoOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("type_63_info");
 
-    private static final ItemStack AP = new ItemStack(ModItems.MEDIUM_ROCKET_AP.get());
-    private static final ItemStack HE = new ItemStack(ModItems.MEDIUM_ROCKET_HE.get());
-    private static final ItemStack CM = new ItemStack(ModItems.MEDIUM_ROCKET_CM.get());
+    private static final ItemStack AP = new ItemStack(ModItems.MEDIUM_ROCKET_AP);
+    private static final ItemStack HE = new ItemStack(ModItems.MEDIUM_ROCKET_HE);
+    private static final ItemStack CM = new ItemStack(ModItems.MEDIUM_ROCKET_CM);
 
     @Override
     public void render(GuiGraphics guiGraphics, @NotNull DeltaTracker deltaTracker) {

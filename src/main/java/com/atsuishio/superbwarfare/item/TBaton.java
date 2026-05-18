@@ -19,7 +19,7 @@ public class TBaton extends SwordItem {
     @Override
     @ParametersAreNonnullByDefault
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        attacker.level().playSound(null, target.getOnPos(), ModSounds.MELEE_HIT.get(), SoundSource.PLAYERS, 1, (float) ((2 * org.joml.Math.random() - 1) * 0.1f + 1));
+        attacker.level().playSound(null, target.getOnPos(), ModSounds.MELEE_HIT, SoundSource.PLAYERS, 1, (float) ((2 * org.joml.Math.random() - 1) * 0.1f + 1));
         return super.hurtEnemy(stack, target, attacker);
     }
 

@@ -1,51 +1,45 @@
 package com.atsuishio.superbwarfare.init;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.screens.*;
 import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleContainerType;
 import com.atsuishio.superbwarfare.menu.VehicleMenu;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
-@EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModScreens {
 
-    @SubscribeEvent
-    public static void clientLoad(RegisterMenuScreensEvent event) {
-        event.register(ModMenuTypes.REFORGING_TABLE_MENU.get(), ReforgingTableScreen::new);
-        event.register(ModMenuTypes.CHARGING_STATION_MENU.get(), ChargingStationScreen::new);
+    public static void init() {
+        MenuScreens.register(ModMenuTypes.REFORGING_TABLE_MENU, ReforgingTableScreen::new);
+        MenuScreens.register(ModMenuTypes.CHARGING_STATION_MENU, ChargingStationScreen::new);
 
-        event.register(ModMenuTypes.VEHICLE_MENU_MINI.get(),
+        MenuScreens.register(ModMenuTypes.VEHICLE_MENU_MINI,
                 (VehicleMenu menu, Inventory inventory, Component title) -> new VehicleScreen(menu, inventory, title, VehicleContainerType.MINI));
-        event.register(ModMenuTypes.VEHICLE_MENU_MINI_UPGRADE.get(),
+        MenuScreens.register(ModMenuTypes.VEHICLE_MENU_MINI_UPGRADE,
                 (VehicleMenu menu, Inventory inventory, Component title) -> new VehicleScreen(menu, inventory, title, VehicleContainerType.MINI));
 
-        event.register(ModMenuTypes.VEHICLE_MENU_SMALL.get(),
+        MenuScreens.register(ModMenuTypes.VEHICLE_MENU_SMALL,
                 (VehicleMenu menu, Inventory inventory, Component title) -> new VehicleScreen(menu, inventory, title, VehicleContainerType.SMALL));
-        event.register(ModMenuTypes.VEHICLE_MENU_SMALL_UPGRADE.get(),
+        MenuScreens.register(ModMenuTypes.VEHICLE_MENU_SMALL_UPGRADE,
                 (VehicleMenu menu, Inventory inventory, Component title) -> new VehicleScreen(menu, inventory, title, VehicleContainerType.SMALL));
 
-        event.register(ModMenuTypes.VEHICLE_MENU_MEDIUM.get(),
+        MenuScreens.register(ModMenuTypes.VEHICLE_MENU_MEDIUM,
                 (VehicleMenu menu, Inventory inventory, Component title) -> new VehicleScreen(menu, inventory, title, VehicleContainerType.MEDIUM));
-        event.register(ModMenuTypes.VEHICLE_MENU_MEDIUM_UPGRADE.get(),
+        MenuScreens.register(ModMenuTypes.VEHICLE_MENU_MEDIUM_UPGRADE,
                 (VehicleMenu menu, Inventory inventory, Component title) -> new VehicleScreen(menu, inventory, title, VehicleContainerType.MEDIUM));
 
-        event.register(ModMenuTypes.VEHICLE_MENU_LARGE.get(),
+        MenuScreens.register(ModMenuTypes.VEHICLE_MENU_LARGE,
                 (VehicleMenu menu, Inventory inventory, Component title) -> new VehicleScreen(menu, inventory, title, VehicleContainerType.LARGE));
-        event.register(ModMenuTypes.VEHICLE_MENU_LARGE_UPGRADE.get(),
+        MenuScreens.register(ModMenuTypes.VEHICLE_MENU_LARGE_UPGRADE,
                 (VehicleMenu menu, Inventory inventory, Component title) -> new VehicleScreen(menu, inventory, title, VehicleContainerType.LARGE));
 
-        event.register(ModMenuTypes.VEHICLE_MENU_HUGE.get(),
+        MenuScreens.register(ModMenuTypes.VEHICLE_MENU_HUGE,
                 (VehicleMenu menu, Inventory inventory, Component title) -> new VehicleScreen(menu, inventory, title, VehicleContainerType.HUGE));
-        event.register(ModMenuTypes.VEHICLE_MENU_HUGE_UPGRADE.get(),
+        MenuScreens.register(ModMenuTypes.VEHICLE_MENU_HUGE_UPGRADE,
                 (VehicleMenu menu, Inventory inventory, Component title) -> new VehicleScreen(menu, inventory, title, VehicleContainerType.HUGE));
 
-        event.register(ModMenuTypes.SUPERB_ITEM_INTERFACE_MENU.get(), SuperbItemInterfaceScreen::new);
-        event.register(ModMenuTypes.FUMO_25_MENU.get(), FuMO25Screen::new);
-        event.register(ModMenuTypes.VEHICLE_ASSEMBLING_MENU.get(), VehicleAssemblingScreen::new);
+        MenuScreens.register(ModMenuTypes.SUPERB_ITEM_INTERFACE_MENU, SuperbItemInterfaceScreen::new);
+        MenuScreens.register(ModMenuTypes.FUMO_25_MENU, FuMO25Screen::new);
+        MenuScreens.register(ModMenuTypes.VEHICLE_ASSEMBLING_MENU, VehicleAssemblingScreen::new);
     }
 }

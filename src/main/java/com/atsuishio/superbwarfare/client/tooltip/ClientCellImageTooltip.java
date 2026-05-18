@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.client.tooltip;
 
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -10,7 +11,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import org.jetbrains.annotations.NotNull;
 
 public class ClientCellImageTooltip implements ClientTooltipComponent {
@@ -36,7 +36,7 @@ public class ClientCellImageTooltip implements ClientTooltipComponent {
     }
 
     protected boolean shouldRenderEnergyTooltip() {
-        return stack.getCapability(Capabilities.EnergyStorage.ITEM) != null;
+        return ModCapabilities.ENERGY_ITEM.find(stack, null) != null;
     }
 
     protected void renderEnergyTooltip(Font font, GuiGraphics guiGraphics, int x, int y) {
@@ -44,7 +44,7 @@ public class ClientCellImageTooltip implements ClientTooltipComponent {
     }
 
     protected Component getEnergyComponent() {
-        var storage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var storage = ModCapabilities.ENERGY_ITEM.find(stack, null);
         assert storage != null;
         int energy = storage.getEnergyStored();
         int maxEnergy = storage.getMaxEnergyStored();

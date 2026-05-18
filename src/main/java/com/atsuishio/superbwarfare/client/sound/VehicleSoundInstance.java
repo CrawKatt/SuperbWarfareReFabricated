@@ -73,7 +73,7 @@ public abstract class VehicleSoundInstance extends AbstractTickableSoundInstance
         }
 
         ItemStack stack = player.getMainHandItem();
-        if (stack.is(ModItems.MONITOR.get()) && NBTTool.getTag(stack).getBoolean("Using")) {
+        if (stack.is(ModItems.MONITOR) && NBTTool.getTag(stack).getBoolean("Using")) {
             DroneEntity drone = EntityFindUtil.findDrone(player.level(), NBTTool.getTag(stack).getString("LinkedDrone"));
             if (this.mobileVehicle == drone) {
                 pitch = 1;
@@ -106,7 +106,7 @@ public abstract class VehicleSoundInstance extends AbstractTickableSoundInstance
     public static class TrackSound extends VehicleSoundInstance {
 
         public TrackSound(VehicleEntity mobileVehicle) {
-            super(ModSounds.TRACK_VEHICLE_STEP.get(), Minecraft.getInstance(), mobileVehicle);
+            super(ModSounds.TRACK_VEHICLE_STEP, Minecraft.getInstance(), mobileVehicle);
         }
 
         @Override
@@ -128,7 +128,7 @@ public abstract class VehicleSoundInstance extends AbstractTickableSoundInstance
     public static class SwimSound extends VehicleSoundInstance {
 
         public SwimSound(VehicleEntity mobileVehicle) {
-            super(ModSounds.VEHICLE_SWIM.get(), Minecraft.getInstance(), mobileVehicle);
+            super(ModSounds.VEHICLE_SWIM, Minecraft.getInstance(), mobileVehicle);
         }
 
         @Override

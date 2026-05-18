@@ -44,7 +44,7 @@ public class VehicleAssemblingTableVehicleEntity extends GeoVehicleEntity implem
     }
 
     public VehicleAssemblingTableVehicleEntity(Level world) {
-        this(ModEntities.VEHICLE_ASSEMBLING_TABLE.get(), world);
+        this(ModEntities.VEHICLE_ASSEMBLING_TABLE, world);
     }
 
     // 变回方块
@@ -76,7 +76,7 @@ public class VehicleAssemblingTableVehicleEntity extends GeoVehicleEntity implem
                 if (canPlace) {
                     for (var part : BlockPart.values()) {
                         var blockPos = part.relative(targetBlockPos, facing);
-                        var state = ModBlocks.VEHICLE_ASSEMBLING_TABLE.get().defaultBlockState()
+                        var state = ModBlocks.VEHICLE_ASSEMBLING_TABLE.defaultBlockState()
                                 .setValue(VehicleAssemblingTableBlock.FACING, facing)
                                 .setValue(VehicleAssemblingTableBlock.BLOCK_PART, part);
 
@@ -168,7 +168,7 @@ public class VehicleAssemblingTableVehicleEntity extends GeoVehicleEntity implem
             if (upInputDown() && onGround() && jumpCooldown == 0) {
                 jumpCooldown = 40;
                 if (this.level() instanceof ServerLevel server) {
-                    server.playSound(null, this.getOnPos(), ModSounds.WHEEL_CHAIR_JUMP.get(), SoundSource.PLAYERS, 2, 1);
+                    server.playSound(null, this.getOnPos(), ModSounds.WHEEL_CHAIR_JUMP, SoundSource.PLAYERS, 2, 1);
                 }
                 var movement = this.getForward()
                         .multiply(1, 0, 1)
@@ -202,7 +202,7 @@ public class VehicleAssemblingTableVehicleEntity extends GeoVehicleEntity implem
     public void destroy() {
         super.destroy();
         if (level() instanceof ServerLevel) {
-            var item = new ItemEntity(level(), this.getX(), this.getY(), this.getZ(), new ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE.get()));
+            var item = new ItemEntity(level(), this.getX(), this.getY(), this.getZ(), new ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE));
             item.setPickUpDelay(50);
             this.level().addFreshEntity(item);
         }
@@ -210,7 +210,7 @@ public class VehicleAssemblingTableVehicleEntity extends GeoVehicleEntity implem
 
     @Override
     public @NotNull List<ItemStack> getRetrieveItems() {
-        return List.of(new ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE.get()));
+        return List.of(new ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE));
     }
 
     @Override

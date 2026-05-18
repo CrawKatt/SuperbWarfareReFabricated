@@ -70,7 +70,7 @@ public class SmallContainerBlock extends BaseEntityBlock {
         blockEntity.setPlayer(player);
 
         level.setBlockAndUpdate(pos, state.setValue(OPENED, true));
-        level.playSound(null, BlockPos.containing(pos.getX(), pos.getY(), pos.getZ()), ModSounds.OPEN.get(), SoundSource.BLOCKS, 1, 1);
+        level.playSound(null, BlockPos.containing(pos.getX(), pos.getY(), pos.getZ()), ModSounds.OPEN, SoundSource.BLOCKS, 1, 1);
 
         return InteractionResult.SUCCESS;
     }
@@ -79,7 +79,7 @@ public class SmallContainerBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> pBlockEntityType) {
         if (!level.isClientSide) {
-            return createTickerHelper(pBlockEntityType, ModBlockEntities.SMALL_CONTAINER.get(), SmallContainerBlockEntity::serverTick);
+            return createTickerHelper(pBlockEntityType, ModBlockEntities.SMALL_CONTAINER, SmallContainerBlockEntity::serverTick);
         }
         return null;
     }
@@ -147,12 +147,11 @@ public class SmallContainerBlock extends BaseEntityBlock {
         return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(OPENED, false);
     }
 
-    @Override
     @ParametersAreNonnullByDefault
     public @NotNull ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
-        var stack = super.getCloneItemStack(state, target, level, pos, player);
+        var stack = new ItemStack(this);
 
-        level.getBlockEntity(pos, ModBlockEntities.SMALL_CONTAINER.get()).ifPresent((blockEntity) -> blockEntity.saveToItem(stack, level.registryAccess()));
+        level.getBlockEntity(pos, ModBlockEntities.SMALL_CONTAINER).ifPresent((blockEntity) -> blockEntity.saveToItem(stack, level.registryAccess()));
         return stack;
     }
 }

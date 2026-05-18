@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity;
 
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.init.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -19,7 +20,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -53,7 +53,7 @@ public class MedicalKitEntity extends Entity implements GeoEntity {
             }
 
             if (!player.getAbilities().instabuild) {
-                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.MEDICAL_KIT.get()));
+                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.MEDICAL_KIT));
             }
         }
 
@@ -75,7 +75,7 @@ public class MedicalKitEntity extends Entity implements GeoEntity {
         if (this.onGround()) {
             this.setXRot(-90);
             BlockPos pos = this.getBlockPosBelowThatAffectsMyMovement();
-            f = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98F;
+            f = this.level().getBlockState(pos).getBlock().getFriction() * 0.98F;
         } else {
             this.updateRotation();
         }

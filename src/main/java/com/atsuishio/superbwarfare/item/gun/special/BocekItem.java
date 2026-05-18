@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.item.gun.special;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.client.renderer.gun.BocekItemRenderer;
 import com.atsuishio.superbwarfare.client.tooltip.component.BocekImageComponent;
@@ -24,7 +25,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.constant.DataTickets;
@@ -133,31 +133,31 @@ public class BocekItem extends GunGeoItem {
         var perk = data.perk.get(Perk.Type.AMMO);
 
         if (player instanceof ServerPlayer serverPlayer) {
-            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_1P.getId(), SoundSource.PLAYERS);
-            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_3P.getId(), SoundSource.PLAYERS);
-            PacketDistributor.sendToPlayer(serverPlayer, new ShootClientMessage(10));
+            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_1P.getLocation(), SoundSource.PLAYERS);
+            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_3P.getLocation(), SoundSource.PLAYERS);
+            ServerPlayNetworking.send(serverPlayer, new ShootClientMessage(10));
         }
 
         if (power * 12 >= 6) {
             if (zoom) {
                 spawnBullet(data, player, power, true);
 
-                SoundTool.playLocalSound(player, ModSounds.BOCEK_ZOOM_FIRE_1P.get(), 10, 1);
-                player.playSound(ModSounds.BOCEK_ZOOM_FIRE_3P.get(), 2, 1);
+                SoundTool.playLocalSound(player, ModSounds.BOCEK_ZOOM_FIRE_1P, 10, 1);
+                player.playSound(ModSounds.BOCEK_ZOOM_FIRE_3P, 2, 1);
             } else {
                 for (int i = 0; i < (perk instanceof AmmoPerk ammoPerk && ammoPerk.slug ? 1 : 10); i++) {
                     spawnBullet(data, player, power, false);
                 }
 
-                SoundTool.playLocalSound(player, ModSounds.BOCEK_SHATTER_CAP_FIRE_1P.get(), 10, 1);
-                player.playSound(ModSounds.BOCEK_SHATTER_CAP_FIRE_3P.get(), 2, 1);
+                SoundTool.playLocalSound(player, ModSounds.BOCEK_SHATTER_CAP_FIRE_1P, 10, 1);
+                player.playSound(ModSounds.BOCEK_SHATTER_CAP_FIRE_3P, 2, 1);
             }
 
-            if (perk == ModPerks.BEAST_BULLET.get()) {
-                player.playSound(ModSounds.HENG.get(), 4f, 1f);
+            if (perk == ModPerks.BEAST_BULLET) {
+                player.playSound(ModSounds.HENG, 4f, 1f);
 
                 if (player instanceof ServerPlayer serverPlayer) {
-                    SoundTool.playLocalSound(serverPlayer, ModSounds.HENG.get(), 4f, 1f);
+                    SoundTool.playLocalSound(serverPlayer, ModSounds.HENG, 4f, 1f);
                 }
             }
 

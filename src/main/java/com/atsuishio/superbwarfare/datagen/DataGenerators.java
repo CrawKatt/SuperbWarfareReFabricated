@@ -1,34 +1,24 @@
 package com.atsuishio.superbwarfare.datagen;
 
-import com.atsuishio.superbwarfare.Mod;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 
-import java.util.concurrent.CompletableFuture;
+public class DataGenerators implements DataGeneratorEntrypoint {
 
-@EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.MOD)
-public class DataGenerators {
+    @Override
+    public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
+        FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 
-    @SubscribeEvent
-    public static void gatherData(GatherDataEvent event) {
-        DataGenerator generator = event.getGenerator();
-        PackOutput packOutput = generator.getPackOutput();
-        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
-        ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
+        pack.addProvider(ModLootTableProvider::create);
+        pack.addProvider(ModRecipeProvider::new);
+        pack.addProvider((output, registriesFuture) -> new ModBlockStateProvider(output));
+        pack.addProvider((output, registriesFuture) -> new ModItemModelProvider(output));
 
-        generator.addProvider(event.includeServer(), ModLootTableProvider.create(packOutput, event.getLookupProvider()));
-        generator.addProvider(event.includeServer(), new ModRecipeProvider(packOutput, event.getLookupProvider()));
-        generator.addProvider(event.includeClient(), new ModBlockStateProvider(packOutput, existingFileHelper));
-        generator.addProvider(event.includeClient(), new ModItemModelProvider(packOutput, existingFileHelper));
-        ModBlockTagProvider tagProvider = generator.addProvider(event.includeServer(), new ModBlockTagProvider(packOutput, lookupProvider, existingFileHelper));
-        generator.addProvider(event.includeServer(), new ModItemTagProvider(packOutput, lookupProvider, tagProvider.contentsGetter(), existingFileHelper));
-        generator.addProvider(event.includeServer(), new ModEntityTypeTagProvider(packOutput, lookupProvider, existingFileHelper));
-        generator.addProvider(event.includeServer(), new ModDamageTypeTagProvider(packOutput, lookupProvider, existingFileHelper));
-        generator.addProvider(event.includeServer(), new ModAdvancementProvider(packOutput, lookupProvider, existingFileHelper));
+        var blockTags = pack.addProvider(ModBlockTagProvider::new);
+        pack.addProvider((output, registriesFuture) -> new ModItemTagProvider(output, registriesFuture, blockTags));
+
+        pack.addProvider(ModEntityTypeTagProvider::new);
+        pack.addProvider(ModDamageTypeTagProvider::new);
+        pack.addProvider(ModAdvancementProvider::new);
     }
 }

@@ -11,8 +11,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 
@@ -38,7 +36,7 @@ public class MinigunItem extends GunGeoItem {
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     @Override
     public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
         if (!stack.isEmpty()) {

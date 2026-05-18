@@ -26,15 +26,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 
-@OnlyIn(Dist.CLIENT)
+
 public class JavelinHudOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("javelin_hud");
@@ -68,7 +66,7 @@ public class JavelinHudOverlay implements LayeredDraw.Layer {
         if (player.getVehicle() instanceof VehicleEntity vehicle && vehicle.banHand(player))
             return;
 
-        if ((stack.getItem() == ModItems.JAVELIN.get() && ClientEventHandler.zoomPos > 0.8) && Minecraft.getInstance().options.getCameraType().isFirstPerson() && ClientEventHandler.zoom) {
+        if ((stack.getItem() == ModItems.JAVELIN && ClientEventHandler.zoomPos > 0.8) && Minecraft.getInstance().options.getCameraType().isFirstPerson() && ClientEventHandler.zoom) {
             var data = GunData.from(stack);
             var tag = data.tag();
 

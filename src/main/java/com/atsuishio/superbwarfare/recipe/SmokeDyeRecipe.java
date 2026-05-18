@@ -31,7 +31,7 @@ public class SmokeDyeRecipe extends CustomRecipe {
 
         for (var stack : input.items()) {
             if (stack.isEmpty()) continue;
-            if (stack.is(ModItems.M18_SMOKE_GRENADE.get())) {
+            if (stack.is(ModItems.M18_SMOKE_GRENADE)) {
                 if (!itemstack.isEmpty()) {
                     return false;
                 }
@@ -57,7 +57,7 @@ public class SmokeDyeRecipe extends CustomRecipe {
         for (var stack : input.items()) {
             if (!stack.isEmpty()) {
                 var item = stack.getItem();
-                if (stack.is(ModItems.M18_SMOKE_GRENADE.get())) {
+                if (stack.is(ModItems.M18_SMOKE_GRENADE)) {
                     if (!itemstack.isEmpty()) {
                         return ItemStack.EMPTY;
                     }
@@ -81,7 +81,7 @@ public class SmokeDyeRecipe extends CustomRecipe {
 
     @Override
     public @NotNull RecipeSerializer<?> getSerializer() {
-        return ModRecipes.SMOKE_DYE_SERIALIZER.get();
+        return ModRecipes.SMOKE_DYE_SERIALIZER;
     }
 
     public static ItemStack dyeItem(ItemStack pStack, List<DyeItem> pDyes) {

@@ -86,6 +86,6 @@ public class BulletDecalOption implements ParticleOptions {
 
     @Override
     public @NotNull ParticleType<?> getType() {
-        return ModParticleTypes.BULLET_DECAL.get();
+        return ModParticleTypes.BULLET_DECAL;
     }
 }

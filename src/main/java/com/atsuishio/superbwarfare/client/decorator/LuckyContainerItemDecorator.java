@@ -7,16 +7,12 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.IItemDecorator;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@OnlyIn(Dist.CLIENT)
-public class LuckyContainerItemDecorator implements IItemDecorator {
 
-    @Override
+public class LuckyContainerItemDecorator {
+
     @ParametersAreNonnullByDefault
     public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xOffset, int yOffset) {
         if (!(stack.getItem() instanceof LuckyContainerBlockItem)) return false;

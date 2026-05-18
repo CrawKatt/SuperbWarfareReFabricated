@@ -25,7 +25,7 @@ public class Detonator extends Item {
     }
 
     public static List<Entity> getC4(Player player, Level level) {
-        return StreamSupport.stream(EntityFindUtil.getEntities(level).getAll().spliterator(), false)
+        return StreamSupport.stream(EntityFindUtil.getEntities(level).spliterator(), false)
                 .filter(e -> e instanceof C4Entity c4 && c4.getOwner() == player)
                 .toList();
     }
@@ -37,7 +37,7 @@ public class Detonator extends Item {
         player.getCooldowns().addCooldown(stack.getItem(), 10);
 
         if (player instanceof ServerPlayer serverPlayer) {
-            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.C4_DETONATOR_CLICK.get(), SoundSource.PLAYERS, 1, 1);
+            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.C4_DETONATOR_CLICK, SoundSource.PLAYERS, 1, 1);
         }
 
         this.releaseUsing(stack, player.level(), player, 1);

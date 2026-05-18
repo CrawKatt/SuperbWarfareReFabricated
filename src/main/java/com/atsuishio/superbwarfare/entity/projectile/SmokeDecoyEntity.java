@@ -33,7 +33,7 @@ public class SmokeDecoyEntity extends Entity {
     }
 
     public SmokeDecoyEntity(Level level) {
-        super(ModEntities.SMOKE_DECOY.get(), level);
+        super(ModEntities.SMOKE_DECOY, level);
     }
 
     @Override
@@ -66,9 +66,9 @@ public class SmokeDecoyEntity extends Entity {
                     ParticleTool.sendParticle(serverLevel, new CustomSmokeOption(1, 1, 1), this.xo, this.yo, this.zo,
                             50, 0, 0, 0, 0.07, true);
                     ParticleTool.sendParticle(serverLevel, ParticleTypes.LARGE_SMOKE, this.xo, this.yo, this.zo, 10, 1, 1, 1, 0.1, true);
-                    ParticleTool.sendParticle(serverLevel, ModParticleTypes.FIRE_STAR.get(), this.xo, this.yo, this.zo, 30, 0, 0, 0, 0.2, true);
+                    ParticleTool.sendParticle(serverLevel, ModParticleTypes.FIRE_STAR, this.xo, this.yo, this.zo, 30, 0, 0, 0, 0.2, true);
                 }
-                this.level().playSound(null, this, ModSounds.SMOKE_FIRE.get(), this.getSoundSource(), 2, random.nextFloat() * 0.05f + 1);
+                this.level().playSound(null, this, ModSounds.SMOKE_FIRE, this.getSoundSource(), 2, random.nextFloat() * 0.05f + 1);
             }
             this.setDeltaMovement(Vec3.ZERO);
         }

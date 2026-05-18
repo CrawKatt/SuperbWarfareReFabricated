@@ -20,12 +20,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@OnlyIn(Dist.CLIENT)
+
 public class RedTriangleOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("red_triangle");
@@ -46,7 +44,7 @@ public class RedTriangleOverlay implements LayeredDraw.Layer {
         if (player.getVehicle() instanceof VehicleEntity vehicle && vehicle.banHand(player)) return;
 
         ItemStack stack = player.getMainHandItem();
-        if (stack.is(ModItems.RPG.get()) && GunData.from(stack).selectedAmmoType.get() == 0) {
+        if (stack.is(ModItems.RPG) && GunData.from(stack).selectedAmmoType.get() == 0) {
             Entity idf = SeekTool.seekLivingEntity(player, 128, 6);
             if (idf == null) return;
 

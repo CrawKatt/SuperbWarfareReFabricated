@@ -20,7 +20,7 @@ public class SuperbItemInterfaceMenu extends AbstractContainerMenu {
     }
 
     public SuperbItemInterfaceMenu(int containerId, Inventory playerInventory, Container container) {
-        super(ModMenuTypes.SUPERB_ITEM_INTERFACE_MENU.get(), containerId);
+        super(ModMenuTypes.SUPERB_ITEM_INTERFACE_MENU, containerId);
         this.container = container;
         checkContainerSize(container, CONTAINER_SIZE);
         container.startOpen(playerInventory.player);

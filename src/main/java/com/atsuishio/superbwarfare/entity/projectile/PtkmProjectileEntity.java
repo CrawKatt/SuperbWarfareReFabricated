@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.tools.CustomExplosion;
 import com.atsuishio.superbwarfare.tools.DamageHandler;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import com.atsuishio.superbwarfare.tools.RangeTool;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -25,7 +26,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -49,7 +49,7 @@ public class PtkmProjectileEntity extends FastThrowableProjectile implements Geo
     }
 
     public PtkmProjectileEntity(LivingEntity entity, Level level) {
-        super(ModEntities.PTKM_PROJECTILE.get(), entity, level);
+        super(ModEntities.PTKM_PROJECTILE, entity, level);
         this.damage = 500;
         this.explosionDamage = 80;
         this.explosionRadius = 7;
@@ -57,7 +57,7 @@ public class PtkmProjectileEntity extends FastThrowableProjectile implements Geo
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.PTKM_1R.get();
+        return ModItems.PTKM_1R;
     }
 
     @Override
@@ -90,9 +90,9 @@ public class PtkmProjectileEntity extends FastThrowableProjectile implements Geo
 
             if (this.getOwner() instanceof LivingEntity living) {
                 if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
-                    living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
+                    living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
 
-                    PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                    ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                 }
             }
 
@@ -122,7 +122,7 @@ public class PtkmProjectileEntity extends FastThrowableProjectile implements Geo
                 Vec3 targetVec = RangeTool.calculateFiringSolution(position(), target.getBoundingBox().getCenter(), targetVel, 15, 0.05);
                 this.setDeltaMovement(targetVec.scale(15));
                 if (this.level() instanceof ServerLevel serverLevel) {
-                    serverLevel.playSound(null, BlockPos.containing(position()), ModSounds.EXPLOSION_AIR.get(), SoundSource.BLOCKS, 8, 1);
+                    serverLevel.playSound(null, BlockPos.containing(position()), ModSounds.EXPLOSION_AIR, SoundSource.BLOCKS, 8, 1);
                     ParticleTool.spawnSmallExplosionParticles(serverLevel, position());
                     ParticleTool.sendParticle(serverLevel, ParticleTypes.LARGE_SMOKE, position().x, position().y, position().z,
                             40, 0.5, 0.25, 0.5, 0.01, true);

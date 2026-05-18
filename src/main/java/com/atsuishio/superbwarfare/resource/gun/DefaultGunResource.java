@@ -50,7 +50,7 @@ public class DefaultGunResource implements IDBasedData<DefaultGunResource> {
     public ModColor energyBarColor = new ModColor(0x95E9FF);
 
     @SerializedName("TriggerSound")
-    public SoundEvent triggerSound = ModSounds.TRIGGER_CLICK.get();
+    public SoundEvent triggerSound = ModSounds.TRIGGER_CLICK;
     @SerializedName("DischargeSound")
     public SoundEvent dischargeSound = null;
 

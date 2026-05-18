@@ -35,7 +35,7 @@ public class MortarShell extends Item implements ProjectileItem {
     @Override
     @ParametersAreNonnullByDefault
     public @NotNull Projectile asProjectile(Level level, Position pos, ItemStack stack, Direction direction) {
-        var shell = new MortarShellEntity(ModEntities.MORTAR_SHELL.get(), pos.x(), pos.y(), pos.z(), level, 0.13f);
+        var shell = new MortarShellEntity(ModEntities.MORTAR_SHELL, pos.x(), pos.y(), pos.z(), level, 0.13f);
         shell.setEffectsFromItem(stack);
         return shell;
     }
@@ -54,7 +54,7 @@ public class MortarShell extends Item implements ProjectileItem {
 
         @Override
         protected void playSound(BlockSource blockSource) {
-            blockSource.level().playSound(null, blockSource.pos(), ModSounds.MORTAR_FIRE.get(), SoundSource.BLOCKS, 1F, 1F);
+            blockSource.level().playSound(null, blockSource.pos(), ModSounds.MORTAR_FIRE, SoundSource.BLOCKS, 1F, 1F);
         }
     }
 

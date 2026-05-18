@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.item.gun.special;
 import com.atsuishio.superbwarfare.client.renderer.gun.TaserItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.init.ModPerks;
 import com.atsuishio.superbwarfare.item.BatteryItem;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
@@ -12,7 +13,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -39,12 +39,12 @@ public class TaserItem extends GunGeoItem {
         if (entity instanceof Player player) {
             for (var cell : player.getInventory().items) {
                 if (cell.getItem() instanceof BatteryItem) {
-                    var stackStorage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+                    var stackStorage = ModCapabilities.ENERGY_ITEM.find(stack, null);
                     if (stackStorage == null) continue;
                     int stackMaxEnergy = stackStorage.getMaxEnergyStored();
                     int stackEnergy = stackStorage.getEnergyStored();
 
-                    var cellStorage = cell.getCapability(Capabilities.EnergyStorage.ITEM);
+                    var cellStorage = ModCapabilities.ENERGY_ITEM.find(cell, null);
                     if (cellStorage == null) continue;
                     int cellEnergy = cellStorage.getEnergyStored();
 
@@ -68,7 +68,7 @@ public class TaserItem extends GunGeoItem {
         var stack = data.stack;
         int perkLevel = data.perk.getLevel(ModPerks.VOLT_OVERLOAD);
 
-        var energyStorage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var energyStorage = ModCapabilities.ENERGY_ITEM.find(stack, null);
         if (energyStorage != null) {
             energyStorage.extractEnergy(400 + 100 * perkLevel, false);
         }
@@ -78,7 +78,7 @@ public class TaserItem extends GunGeoItem {
     public boolean canShoot(GunData data, @Nullable Entity shooter) {
         int perkLevel = data.perk.getLevel(ModPerks.VOLT_OVERLOAD);
 
-        var energyStorage = data.stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var energyStorage = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
         var hasEnoughEnergy = energyStorage != null && energyStorage.getEnergyStored() >= 400 + 100 * perkLevel;
 
         if (!hasEnoughEnergy) return false;

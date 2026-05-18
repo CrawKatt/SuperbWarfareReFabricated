@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.config.server.ExplosionConfig;
 import com.atsuishio.superbwarfare.init.ModEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.tools.CustomExplosion;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
 import com.atsuishio.superbwarfare.tools.NBTTool;
@@ -34,7 +35,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -73,7 +73,7 @@ public class C4Entity extends Entity implements GeoEntity, OwnableEntity {
     }
 
     public C4Entity(LivingEntity owner, Level level, boolean isControllable) {
-        super(ModEntities.C4.get(), level);
+        super(ModEntities.C4, level);
         if (owner != null) {
             this.setOwnerUUID(owner.getUUID());
         }
@@ -185,17 +185,17 @@ public class C4Entity extends Entity implements GeoEntity, OwnableEntity {
         if (!this.entityData.get(IS_CONTROLLABLE)) {
             int bombTick = this.entityData.get(BOMB_TICK);
 
-            if (bombTick >= ExplosionConfig.C4_EXPLOSION_COUNTDOWN.get()) {
+            if (bombTick >= ExplosionConfig.C4_EXPLOSION_COUNTDOWN) {
                 this.explode();
             }
 
-            int countdown = ExplosionConfig.C4_EXPLOSION_COUNTDOWN.get();
+            int countdown = ExplosionConfig.C4_EXPLOSION_COUNTDOWN;
             if (countdown - bombTick > 39 && bombTick % ((20 * (countdown - bombTick)) / countdown + 1) == 0) {
-                this.level().playSound(null, this.getOnPos(), ModSounds.C4_BEEP.get(), SoundSource.PLAYERS, 1, 1);
+                this.level().playSound(null, this.getOnPos(), ModSounds.C4_BEEP, SoundSource.PLAYERS, 1, 1);
             }
 
             if (bombTick == countdown - 39) {
-                this.level().playSound(null, this.getOnPos(), ModSounds.C4_FINAL.get(), SoundSource.PLAYERS, 2, 1);
+                this.level().playSound(null, this.getOnPos(), ModSounds.C4_FINAL, SoundSource.PLAYERS, 2, 1);
             }
             this.entityData.set(BOMB_TICK, bombTick + 1);
         }
@@ -401,7 +401,7 @@ public class C4Entity extends Entity implements GeoEntity, OwnableEntity {
 
         BlockPos resultPos = pResult.getBlockPos();
         BlockState state = this.level().getBlockState(resultPos);
-        SoundEvent event = state.getBlock().getSoundType(state, this.level(), resultPos, this).getBreakSound();
+        SoundEvent event = state.getSoundType().getBreakSound();
         double speed = this.getDeltaMovement().length();
         if (speed > 0.1) {
             this.level().playSound(null, pResult.getLocation().x, pResult.getLocation().y, pResult.getLocation().z, event, SoundSource.AMBIENT, 1F, 1F);
@@ -419,7 +419,7 @@ public class C4Entity extends Entity implements GeoEntity, OwnableEntity {
             }
         }
 
-        if (this.level() instanceof ServerLevel && ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+        if (this.level() instanceof ServerLevel && ExplosionConfig.EXPLOSION_DESTROY && ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
             AABB aabb = new AABB(pos, pos).inflate(2);
             BlockPos.betweenClosedStream(aabb).forEach((blockPos) -> {
                 float hard = this.level().getBlockState(blockPos).getBlock().defaultDestroyTime();
@@ -431,8 +431,8 @@ public class C4Entity extends Entity implements GeoEntity, OwnableEntity {
 
         new CustomExplosion.Builder(this)
                 .attacker(this.getOwner())
-                .damage(ExplosionConfig.C4_EXPLOSION_DAMAGE.get())
-                .radius(ExplosionConfig.C4_EXPLOSION_RADIUS.get())
+                .damage(ExplosionConfig.C4_EXPLOSION_DAMAGE)
+                .radius(ExplosionConfig.C4_EXPLOSION_RADIUS)
                 .position(pos)
                 .withParticleType(ParticleTool.ParticleType.HUGE)
                 .explode();
@@ -464,7 +464,7 @@ public class C4Entity extends Entity implements GeoEntity, OwnableEntity {
     }
 
     public ItemStack getItemStack() {
-        ItemStack stack = new ItemStack(ModItems.C4_BOMB.get());
+        ItemStack stack = new ItemStack(ModItems.C4_BOMB);
         if (this.getEntityData().get(IS_CONTROLLABLE)) {
             final var tag = NBTTool.getTag(stack);
             tag.putBoolean(TAG_CONTROL, true);

@@ -19,8 +19,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -75,7 +73,7 @@ public class BulletDecalParticle extends TextureSheetParticle {
         Level clientLevel = minecraft.level;
         if (clientLevel != null) {
             BlockState state = clientLevel.getBlockState(pos);
-            return Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getTexture(state, clientLevel, pos);
+            return Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getParticleIcon(state);
         }
         return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(MissingTextureAtlasSprite.getLocation());
     }
@@ -181,7 +179,7 @@ public class BulletDecalParticle extends TextureSheetParticle {
         return ParticleRenderType.TERRAIN_SHEET;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     public static class Provider implements ParticleProvider<BulletDecalOption> {
         public Provider() {
         }

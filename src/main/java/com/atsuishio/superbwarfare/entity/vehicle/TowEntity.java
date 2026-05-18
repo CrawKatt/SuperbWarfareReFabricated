@@ -85,7 +85,7 @@ public class TowEntity extends GeoVehicleEntity {
                 modifyGunData(0, data -> data.reloadAmmo(player));
 
                 entityData.set(LOADED, true);
-                serverLevel.playSound(null, getOnPos(), ModSounds.TYPE_63_RELOAD.get(), SoundSource.PLAYERS, 1f, random.nextFloat() * 0.1f + 0.9f);
+                serverLevel.playSound(null, getOnPos(), ModSounds.TYPE_63_RELOAD, SoundSource.PLAYERS, 1f, random.nextFloat() * 0.1f + 0.9f);
             } else {
                 player.displayClientMessage(Component.literal(FormatTool.format1DZ((double) (coolDown - entityData.get(RELOAD_COOLDOWN)) / 20) + " / " + FormatTool.format1DZ((double) coolDown / 20)), true);
             }
@@ -106,7 +106,7 @@ public class TowEntity extends GeoVehicleEntity {
     @Override
     public @NotNull List<ItemStack> getRetrieveItems() {
         var list = new ArrayList<ItemStack>();
-        list.add(new ItemStack(ModItems.TOW_DEPLOYER.get()));
+        list.add(new ItemStack(ModItems.TOW_DEPLOYER));
 
         var data = getGunData(0);
         if (entityData.get(LOADED) && data != null) {
@@ -152,7 +152,7 @@ public class TowEntity extends GeoVehicleEntity {
             var y = this.getY();
             var z = this.getZ();
             level.explode(null, x, y, z, 0, Level.ExplosionInteraction.NONE);
-            ItemEntity mortar = new ItemEntity(level, x, (y + 1), z, new ItemStack(ModItems.MORTAR_BARREL.get()));
+            ItemEntity mortar = new ItemEntity(level, x, (y + 1), z, new ItemStack(ModItems.MORTAR_BARREL));
             mortar.setPickUpDelay(10);
             level.addFreshEntity(mortar);
         }

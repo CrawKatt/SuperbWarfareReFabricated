@@ -10,7 +10,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.item.curio.DogTagItem;
+import com.atsuishio.superbwarfare.item.trinket.DogTagItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.DamageTypeTool;
 import com.atsuishio.superbwarfare.tools.LivingKillRecord;
@@ -29,16 +29,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
-import top.theillusivec4.curios.api.CuriosApi;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 
-@OnlyIn(Dist.CLIENT)
+
 public class KillMessageOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("kill_message");
@@ -60,7 +57,7 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
     @ParametersAreNonnullByDefault
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         if (Minecraft.getInstance().options.hideGui) return;
-        if (!KillMessageConfig.SHOW_KILL_MESSAGE.get()) {
+        if (!KillMessageConfig.SHOW_KILL_MESSAGE) {
             return;
         }
 
@@ -77,31 +74,31 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
         int screenWidth = guiGraphics.guiWidth();
         int screenHeight = guiGraphics.guiHeight();
 
-        var pos = KillMessageConfig.KILL_MESSAGE_POSITION.get();
+        var pos = KillMessageConfig.KILL_MESSAGE_POSITION;
         int posX = screenWidth;
-        float posY = KillMessageConfig.KILL_MESSAGE_MARGIN_Y.get();
+        float posY = KillMessageConfig.KILL_MESSAGE_MARGIN_Y;
         boolean left = false;
         boolean bottom = false;
 
         switch (pos) {
             case LEFT_TOP -> {
-                posX = KillMessageConfig.KILL_MESSAGE_MARGIN_X.get();
-                posY = KillMessageConfig.KILL_MESSAGE_MARGIN_Y.get();
+                posX = KillMessageConfig.KILL_MESSAGE_MARGIN_X;
+                posY = KillMessageConfig.KILL_MESSAGE_MARGIN_Y;
                 left = true;
             }
             case RIGHT_TOP -> {
-                posX = screenWidth - KillMessageConfig.KILL_MESSAGE_MARGIN_X.get();
-                posY = KillMessageConfig.KILL_MESSAGE_MARGIN_Y.get();
+                posX = screenWidth - KillMessageConfig.KILL_MESSAGE_MARGIN_X;
+                posY = KillMessageConfig.KILL_MESSAGE_MARGIN_Y;
             }
             case LEFT_BOTTOM -> {
-                posX = KillMessageConfig.KILL_MESSAGE_MARGIN_X.get();
-                posY = screenHeight - KillMessageConfig.KILL_MESSAGE_MARGIN_Y.get() - 10;
+                posX = KillMessageConfig.KILL_MESSAGE_MARGIN_X;
+                posY = screenHeight - KillMessageConfig.KILL_MESSAGE_MARGIN_Y - 10;
                 left = true;
                 bottom = true;
             }
             case RIGHT_BOTTOM -> {
-                posX = screenWidth - KillMessageConfig.KILL_MESSAGE_MARGIN_X.get();
-                posY = screenHeight - KillMessageConfig.KILL_MESSAGE_MARGIN_Y.get() - 10;
+                posX = screenWidth - KillMessageConfig.KILL_MESSAGE_MARGIN_X;
+                posY = screenHeight - KillMessageConfig.KILL_MESSAGE_MARGIN_Y - 10;
                 bottom = true;
             }
         }
@@ -172,8 +169,8 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
             guiGraphics.drawString(
                     Minecraft.getInstance().font,
                     targetName,
-                    currentPosX,
-                    top,
+                    (int) currentPosX,
+                    (int) top,
                     record.target.getTeamColor(),
                     false
             );
@@ -225,8 +222,8 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
             guiGraphics.drawString(
                     Minecraft.getInstance().font,
                     attackerName,
-                    currentPosX,
-                    top,
+                    (int) currentPosX,
+                    (int) top,
                     record.attacker.getTeamColor(),
                     false
             );
@@ -250,8 +247,8 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
             guiGraphics.drawString(
                     Minecraft.getInstance().font,
                     attackerName,
-                    currentPosX,
-                    top,
+                    (int) currentPosX,
+                    (int) top,
                     record.attacker.getTeamColor(),
                     false
             );
@@ -302,8 +299,8 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
             guiGraphics.drawString(
                     Minecraft.getInstance().font,
                     targetName,
-                    currentPosX,
-                    top,
+                    (int) currentPosX,
+                    (int) top,
                     record.target.getTeamColor(),
                     false
             );
@@ -366,19 +363,19 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
         String entityName = entity.getDisplayName().getString();
         String[] name = {entityName};
         if (entity instanceof LivingEntity living && living instanceof OwnableEntity ownableEntity && ownableEntity.getOwner() instanceof Player player) {
-            if (DisplayConfig.DOG_TAG_NAME_VISIBLE.get()) {
+            if (DisplayConfig.DOG_TAG_NAME_VISIBLE) {
                 name[0] = player.getDisplayName().getString() + " + " + entityName;
-                CuriosApi.getCuriosInventory(player)
-                        .flatMap(c -> c.findFirstCurio(ModItems.DOG_TAG.get()))
-                        .ifPresent(s -> name[0] = s.stack().getHoverName().getString() + " + " + entityName);
+                dev.emi.trinkets.api.TrinketsApi.getTrinketComponent(player)
+                        .flatMap(c -> c.getEquipped(ModItems.DOG_TAG).stream().findFirst())
+                        .ifPresent(s -> name[0] = s.getB().getHoverName().getString() + " + " + entityName);
             } else {
                 name[0] = player.getDisplayName().getString() + " + " + entityName;
             }
         } else if (entity instanceof Player player) {
-            if (!DisplayConfig.DOG_TAG_NAME_VISIBLE.get()) return name[0];
-            CuriosApi.getCuriosInventory(player)
-                    .flatMap(c -> c.findFirstCurio(ModItems.DOG_TAG.get()))
-                    .ifPresent(s -> name[0] = s.stack().getHoverName().getString());
+            if (!DisplayConfig.DOG_TAG_NAME_VISIBLE) return name[0];
+            dev.emi.trinkets.api.TrinketsApi.getTrinketComponent(player)
+                    .flatMap(c -> c.getEquipped(ModItems.DOG_TAG).stream().findFirst())
+                    .ifPresent(s -> name[0] = s.getB().getHoverName().getString());
         }
         return name[0];
     }
@@ -387,10 +384,10 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
         String entityName = entity.getDisplayName().getString();
         String[] name = {entityName};
         if (entity instanceof Player player) {
-            if (!DisplayConfig.DOG_TAG_NAME_VISIBLE.get()) return name[0];
-            CuriosApi.getCuriosInventory(player)
-                    .flatMap(c -> c.findFirstCurio(ModItems.DOG_TAG.get()))
-                    .ifPresent(s -> name[0] = s.stack().getHoverName().getString());
+            if (!DisplayConfig.DOG_TAG_NAME_VISIBLE) return name[0];
+            dev.emi.trinkets.api.TrinketsApi.getTrinketComponent(player)
+                    .flatMap(c -> c.getEquipped(ModItems.DOG_TAG).stream().findFirst())
+                    .ifPresent(s -> name[0] = s.getB().getHoverName().getString());
         }
         return name[0];
     }
@@ -418,17 +415,17 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
 
     public static boolean shouldRenderDogTagIcon(LivingEntity living) {
         boolean[] flag = {false};
-        CuriosApi.getCuriosInventory(living).flatMap(c -> c.findFirstCurio(ModItems.DOG_TAG.get())).ifPresent(s -> {
-            if (ClientDogTagImageTooltip.shouldRenderIcon(s.stack())) {
+        dev.emi.trinkets.api.TrinketsApi.getTrinketComponent(living).flatMap(c -> c.getEquipped(ModItems.DOG_TAG).stream().findFirst()).ifPresent(s -> {
+            if (ClientDogTagImageTooltip.shouldRenderIcon(s.getB())) {
                 flag[0] = true;
             }
         });
-        return flag[0] && DisplayConfig.DOG_TAG_ICON_VISIBLE.get();
+        return flag[0] && DisplayConfig.DOG_TAG_ICON_VISIBLE;
     }
 
     public static void renderDogTagIcon(GuiGraphics guiGraphics, LivingEntity living, float x, float y) {
-        CuriosApi.getCuriosInventory(living).flatMap(c -> c.findFirstCurio(ModItems.DOG_TAG.get())).ifPresent(s -> {
-            var stack = s.stack();
+        dev.emi.trinkets.api.TrinketsApi.getTrinketComponent(living).flatMap(c -> c.getEquipped(ModItems.DOG_TAG).stream().findFirst()).ifPresent(s -> {
+            var stack = s.getB();
             short[][] icon = DogTagItem.getColors(stack);
 
             guiGraphics.pose().pushPose();

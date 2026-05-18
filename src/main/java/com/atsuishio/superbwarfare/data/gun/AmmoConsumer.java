@@ -2,8 +2,11 @@ package com.atsuishio.superbwarfare.data.gun;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.annotation.ServerOnly;
+import com.atsuishio.superbwarfare.capability.api.IItemHandler;
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.data.DeserializeFromString;
 import com.atsuishio.superbwarfare.data.JsonPropertyModifier;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.data.StringToObject;
 import com.atsuishio.superbwarfare.tools.InventoryTool;
 import com.google.gson.JsonObject;
@@ -18,9 +21,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -116,7 +116,7 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
             return energyStorage.extractEnergy(count, false);
         }
 
-        var handler = shooter.getCapability(Capabilities.ItemHandler.ENTITY);
+        var handler = ModCapabilities.ITEM_HANDLER_ENTITY.find(shooter, null);
         if (handler != null) {
             return consumed + consume(data, handler, count);
         } else {
@@ -142,7 +142,7 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
             data.virtualAmmo.add(rest);
             return count;
         } else if (type == AmmoConsumeType.ENERGY) {
-            var energyStorage = data.stack.getCapability(Capabilities.EnergyStorage.ITEM);
+            var energyStorage = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
             if (energyStorage == null) {
                 return 0;
             }
@@ -171,7 +171,7 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
             return energyStorage.getEnergyStored();
         }
 
-        return playerAmmoCount + count(data, entity.getCapability(Capabilities.ItemHandler.ENTITY));
+        return playerAmmoCount + count(data, ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null));
     }
 
     /**
@@ -185,7 +185,7 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
         if (type == AmmoConsumeType.ITEM) {
             return InventoryTool.countItem(handler, this::isAmmoItem);
         } else if (type == AmmoConsumeType.ENERGY) {
-            var energyStorage = data.stack.getCapability(Capabilities.EnergyStorage.ITEM);
+            var energyStorage = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
             if (energyStorage == null) {
                 return 0;
             }
@@ -222,7 +222,7 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
                     Mod.LOGGER.warn("withdraw player ammo failed: invalid player ammo type");
                 }
             } else {
-                var itemHandler = ammoSupplier.getCapability(Capabilities.ItemHandler.ENTITY);
+                var itemHandler = ModCapabilities.ITEM_HANDLER_ENTITY.find(ammoSupplier, null);
                 if (itemHandler != null) {
                     return withdraw(itemHandler, count);
                 } else {
@@ -239,7 +239,7 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
                 }
                 return count;
             } else {
-                var itemHandler = ammoSupplier.getCapability(Capabilities.ItemHandler.ENTITY);
+                var itemHandler = ModCapabilities.ITEM_HANDLER_ENTITY.find(ammoSupplier, null);
                 if (itemHandler != null) {
                     return withdraw(itemHandler, count);
                 } else {

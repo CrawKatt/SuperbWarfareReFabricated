@@ -13,6 +13,8 @@ import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.network.message.send.MouseMoveMessage;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
 import com.atsuishio.superbwarfare.tools.NBTTool;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.Camera;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -20,17 +22,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.CalculatePlayerTurnEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import static com.atsuishio.superbwarfare.event.ClientEventHandler.isFreeCam;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ClientMouseHandler {
     public static Vec2 posO = new Vec2(0, 0);
     public static Vec2 posN = new Vec2(0, 0);
@@ -55,8 +49,7 @@ public class ClientMouseHandler {
         return !mc.isWindowActive();
     }
 
-    @SubscribeEvent
-    public static void handleClientTick(ClientTickEvent.Post event) {
+    public static void handleClientTick(Minecraft minecraft) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
 
@@ -73,11 +66,11 @@ public class ClientMouseHandler {
         ItemStack stack = player.getMainHandItem();
         var tag = NBTTool.getTag(stack);
 
-        if (stack.is(ModItems.MONITOR.get()) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
+        if (stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
             DroneEntity drone = EntityFindUtil.findDrone(player.level(), tag.getString("LinkedDrone"));
             if (drone != null) {
                 if (notInGame()) {
-                    PacketDistributor.sendToServer(new MouseMoveMessage(0, 0));
+                    ClientPlayNetworking.send(new MouseMoveMessage(0, 0));
                     return;
                 }
                 speedX = (drone.getMouseSensitivity() / ClientEventHandler.droneFovLerp) * (posN.x - posO.x);
@@ -87,20 +80,20 @@ public class ClientMouseHandler {
                 lerpSpeedX = Mth.lerp(mouseSpeed.x, lerpSpeedX, speedX);
                 lerpSpeedY = Mth.lerp(mouseSpeed.y, lerpSpeedY, speedY);
 
-                PacketDistributor.sendToServer(new MouseMoveMessage(lerpSpeedX, lerpSpeedY));
+                ClientPlayNetworking.send(new MouseMoveMessage(lerpSpeedX, lerpSpeedY));
             }
             return;
         }
 
         if (player.getVehicle() instanceof VehicleEntity vehicle && player == vehicle.getFirstPassenger() && (vehicle.getVehicleType() == VehicleType.AIRPLANE || vehicle.getVehicleType() == VehicleType.HELICOPTER)) {
             if (notInGame()) {
-                PacketDistributor.sendToServer(new MouseMoveMessage(0, 0));
+                ClientPlayNetworking.send(new MouseMoveMessage(0, 0));
                 return;
             }
 
             int y = 1;
 
-            if (ControlConfig.INVERT_AIRCRAFT_CONTROL.get()) {
+            if (ControlConfig.INVERT_AIRCRAFT_CONTROL) {
                 y = -1;
             }
 
@@ -126,22 +119,21 @@ public class ClientMouseHandler {
             if (!isFreeCam(player)) {
                 if (Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON) {
                     if (!(vehicle instanceof Tom6Entity)) {
-                        PacketDistributor.sendToServer(new MouseMoveMessage(
+                        ClientPlayNetworking.send(new MouseMoveMessage(
                                 (1 - (Mth.abs(vehicle.getRoll()) / 90)) * lerpSpeedX + ((Mth.abs(vehicle.getRoll()) / 90)) * lerpSpeedY * i,
                                 (1 - (Mth.abs(vehicle.getRoll()) / 90)) * lerpSpeedY + ((Mth.abs(vehicle.getRoll()) / 90)) * lerpSpeedX * (vehicle.getRoll() < 0 ? -1 : 1))
                         );
                     }
                 } else {
-                    PacketDistributor.sendToServer(new MouseMoveMessage(lerpSpeedX, lerpSpeedY));
+                    ClientPlayNetworking.send(new MouseMoveMessage(lerpSpeedX, lerpSpeedY));
                 }
             } else {
-                PacketDistributor.sendToServer(new MouseMoveMessage(0, 0));
+                ClientPlayNetworking.send(new MouseMoveMessage(0, 0));
             }
         }
     }
 
-    @SubscribeEvent
-    public static void handleClientTick(ViewportEvent.ComputeCameraAngles event) {
+    public static void handleClientTick(Camera camera, float partialTick) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
 
@@ -151,7 +143,7 @@ public class ClientMouseHandler {
             return;
         }
 
-        float times = 0.6f * (float) Math.min(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), 0.8);
+        float times = 0.6f * (float) Math.min(partialTick, 0.8);
 
         freeCameraYaw -= 0.4f * times * lerpSpeedX;
         freeCameraPitch += 0.3f * times * lerpSpeedY;
@@ -176,11 +168,9 @@ public class ClientMouseHandler {
         custom3pDistanceLerp = Mth.lerp(times, custom3pDistanceLerp, custom3pDistance);
     }
 
-    @SubscribeEvent
-    public static void calculatePlayerTurn(CalculatePlayerTurnEvent event) {
-        var raw = event.getMouseSensitivity() * 0.6 + 0.2;
-        var newSensitivity = changeSensitivity(raw) * invertY();
-        event.setMouseSensitivity((newSensitivity - 0.2) / 0.6);
+    public static double calculatePlayerTurn(double mouseSensitivity) {
+        var raw = mouseSensitivity * 0.6 + 0.2;
+        return (changeSensitivity(raw) * invertY() - 0.2) / 0.6;
     }
 
     public static int invertY() {
@@ -194,7 +184,7 @@ public class ClientMouseHandler {
         if (player.getVehicle() instanceof VehicleEntity vehicle
                 && (vehicle.getVehicleType() == VehicleType.AIRPLANE || vehicle.getVehicleType() == VehicleType.HELICOPTER)
                 && vehicle.getFirstPassenger() == player) {
-            return ControlConfig.INVERT_AIRCRAFT_CONTROL.get() ? -1 : 1;
+            return ControlConfig.INVERT_AIRCRAFT_CONTROL ? -1 : 1;
         }
         return 1;
     }
@@ -215,11 +205,11 @@ public class ClientMouseHandler {
             float customSens = data.sensitivity.get();
 
             if (!player.getMainHandItem().isEmpty() && mc.options.getCameraType() == CameraType.FIRST_PERSON) {
-                return original / Math.max((1 + (0.2 * (data.zoom() - (0.3 * customSens)) * ClientEventHandler.zoomTime)), 0.1) * (ControlConfig.MOUSE_SENSITIVITY.get() / 100f);
+                return original / Math.max((1 + (0.2 * (data.zoom() - (0.3 * customSens)) * ClientEventHandler.zoomTime)), 0.1) * (ControlConfig.MOUSE_SENSITIVITY / 100f);
             }
         }
 
-        if (stack.is(ModItems.MONITOR.get()) && NBTTool.getTag(stack).getBoolean("Using") && NBTTool.getTag(stack).getBoolean("Linked")) {
+        if (stack.is(ModItems.MONITOR) && NBTTool.getTag(stack).getBoolean("Using") && NBTTool.getTag(stack).getBoolean("Linked")) {
             return 0;
         }
 
@@ -227,7 +217,7 @@ public class ClientMouseHandler {
             return 0;
         }
 
-        if (player.isUsingItem() && player.getUseItem().is(ModItems.ARTILLERY_INDICATOR.get()) && mc.options.getCameraType() == CameraType.FIRST_PERSON) {
+        if (player.isUsingItem() && player.getUseItem().is(ModItems.ARTILLERY_INDICATOR) && mc.options.getCameraType() == CameraType.FIRST_PERSON) {
             return original / Math.max(1 + 0.2 * ClientEventHandler.artilleryIndicatorZoom, 0.1);
         }
 

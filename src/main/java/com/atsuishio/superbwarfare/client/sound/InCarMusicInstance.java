@@ -8,7 +8,7 @@
 //import net.neoforged.api.distmarker.Dist;
 //import net.neoforged.api.distmarker.OnlyIn;
 //
-//@OnlyIn(Dist.CLIENT)
+//
 //public abstract class InCarMusicInstance extends AbstractTickableSoundInstance {
 //
 //    private final Minecraft client;
@@ -69,7 +69,7 @@
 //        }
 //    }
 //
-//    @OnlyIn(Dist.CLIENT)
+//    
 //    public static class InCarMusicSound extends InCarMusicInstance {
 //
 //        public InCarMusicSound(VehicleEntity entity) {

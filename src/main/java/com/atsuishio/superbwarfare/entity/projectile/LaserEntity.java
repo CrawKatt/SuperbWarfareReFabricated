@@ -27,7 +27,7 @@ public class LaserEntity extends AbstractLaserEntity {
     }
 
     public LaserEntity(Level level, LivingEntity caster, double x, double y, double z, float yaw, float pitch, int duration) {
-        super(ModEntities.LASER.get(), level, 1);
+        super(ModEntities.LASER, level, 1);
         this.caster = caster;
         this.setYaw(yaw);
         this.setPitch(pitch);

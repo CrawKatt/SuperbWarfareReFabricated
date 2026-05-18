@@ -27,8 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -36,7 +34,7 @@ import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 import static com.atsuishio.superbwarfare.client.overlay.IFFOverlay.FRIENDLY_ARTILLERY;
 import static com.atsuishio.superbwarfare.item.ArtilleryIndicator.TAG_CANNON;
 
-@OnlyIn(Dist.CLIENT)
+
 public class SpyglassRangeOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("spyglass_range");
@@ -60,8 +58,8 @@ public class SpyglassRangeOverlay implements LayeredDraw.Layer {
 
         if (player == null) return;
 
-        if (((player.isUsingItem() && player.getUseItem().is(ModItems.ARTILLERY_INDICATOR.get())) || player.isScoping()) && mc.options.getCameraType() == CameraType.FIRST_PERSON) {
-            if (player.getUseItem().is(ModItems.ARTILLERY_INDICATOR.get())) {
+        if (((player.isUsingItem() && player.getUseItem().is(ModItems.ARTILLERY_INDICATOR)) || player.isScoping()) && mc.options.getCameraType() == CameraType.FIRST_PERSON) {
+            if (player.getUseItem().is(ModItems.ARTILLERY_INDICATOR)) {
                 ItemStack stack = player.getUseItem();
                 poseStack.pushPose();
                 RenderSystem.disableDepthTest();

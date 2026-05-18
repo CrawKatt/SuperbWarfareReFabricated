@@ -27,7 +27,7 @@ public class MelonBombEntity extends DestroyableProjectile {
     }
 
     public MelonBombEntity(LivingEntity entity, Level level) {
-        super(ModEntities.MELON_BOMB.get(), entity, level);
+        super(ModEntities.MELON_BOMB, entity, level);
         this.noCulling = true;
         this.explosionRadius = 10;
         this.explosionDamage = 500;
@@ -42,7 +42,7 @@ public class MelonBombEntity extends DestroyableProjectile {
     public void onHitBlock(@NotNull BlockHitResult blockHitResult) {
         super.onHitBlock(blockHitResult);
         if (this.level() instanceof ServerLevel) {
-            if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+            if (ExplosionConfig.EXPLOSION_DESTROY && ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
                 AABB aabb = new AABB(blockHitResult.getLocation(), blockHitResult.getLocation()).inflate(5);
                 BlockPos.betweenClosedStream(aabb).forEach((pos) -> {
                     float hard = this.level().getBlockState(pos).getBlock().defaultDestroyTime();
@@ -75,7 +75,7 @@ public class MelonBombEntity extends DestroyableProjectile {
 
     @Override
     public @NotNull SoundEvent getSound() {
-        return ModSounds.SHELL_FLY.get();
+        return ModSounds.SHELL_FLY;
     }
 
     @Override

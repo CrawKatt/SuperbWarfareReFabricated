@@ -26,9 +26,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -37,7 +34,6 @@ import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-@EventBusSubscriber(modid = Mod.MODID)
 public class TargetEntity extends LivingEntity implements GeoEntity {
 
     public static final EntityDataAccessor<Integer> DOWN_TIME = SynchedEntityData.defineId(TargetEntity.class, EntityDataSerializers.INT);
@@ -98,33 +94,32 @@ public class TargetEntity extends LivingEntity implements GeoEntity {
         }
 
         if (!this.level().isClientSide()) {
-            this.level().playSound(null, BlockPos.containing(this.getX(), this.getY(), this.getZ()), ModSounds.HIT.get(), SoundSource.BLOCKS, 1, 1);
+            this.level().playSound(null, BlockPos.containing(this.getX(), this.getY(), this.getZ()), ModSounds.HIT, SoundSource.BLOCKS, 1, 1);
         } else {
-            this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), ModSounds.HIT.get(), SoundSource.BLOCKS, 1, 1, false);
+            this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), ModSounds.HIT, SoundSource.BLOCKS, 1, 1, false);
         }
         return super.hurt(source, amount);
     }
 
-    @SubscribeEvent
-    public static void onTargetDown(LivingDeathEvent event) {
-        var entity = event.getEntity();
+    public static boolean onTargetDown(LivingEntity entity, DamageSource source, float amount) {
         // 不处理/kill伤害
-        if (event.getSource().is(DamageTypes.GENERIC_KILL)) return;
-        var sourceEntity = event.getSource().getEntity();
+        if (source.is(DamageTypes.GENERIC_KILL)) return true;
+        var sourceEntity = source.getEntity();
 
         if (entity instanceof TargetEntity targetEntity) {
-            event.setCanceled(true);
             targetEntity.setHealth(targetEntity.getMaxHealth());
 
-            if (sourceEntity == null) return;
+            if (sourceEntity == null) return false;
 
             if (sourceEntity instanceof Player player) {
                 player.displayClientMessage(Component.translatable("tips.superbwarfare.target.down",
                         FormatTool.format1D(entity.position().distanceTo(sourceEntity.position()), "m")), true);
-                SoundTool.playLocalSound(player, ModSounds.TARGET_DOWN.get(), 1, 1);
+                SoundTool.playLocalSound(player, ModSounds.TARGET_DOWN, 1, 1);
                 targetEntity.entityData.set(DOWN_TIME, 40);
             }
+            return false;
         }
+        return true;
     }
 
     @Override
@@ -149,7 +144,7 @@ public class TargetEntity extends LivingEntity implements GeoEntity {
             }
 
             if (!player.getAbilities().instabuild) {
-                player.addItem(new ItemStack(ModItems.TARGET_DEPLOYER.get()));
+                player.addItem(new ItemStack(ModItems.TARGET_DEPLOYER));
             }
         } else {
             this.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3((player.getX()), this.getY(), (player.getZ())));
@@ -219,7 +214,7 @@ public class TargetEntity extends LivingEntity implements GeoEntity {
     protected void tickDeath() {
         ++this.deathTime;
         if (this.deathTime >= 100) {
-            this.spawnAtLocation(new ItemStack(ModItems.TARGET_DEPLOYER.get()));
+            this.spawnAtLocation(new ItemStack(ModItems.TARGET_DEPLOYER));
             this.remove(RemovalReason.KILLED);
         }
     }
@@ -244,6 +239,6 @@ public class TargetEntity extends LivingEntity implements GeoEntity {
     @Override
     @Nullable
     public ItemStack getPickResult() {
-        return new ItemStack(ModItems.TARGET_DEPLOYER.get());
+        return new ItemStack(ModItems.TARGET_DEPLOYER);
     }
 }

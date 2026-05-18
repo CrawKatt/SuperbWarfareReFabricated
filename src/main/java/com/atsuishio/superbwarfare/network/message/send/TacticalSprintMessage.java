@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 public record TacticalSprintMessage(boolean sprint) implements CustomPacketPayload {
@@ -19,11 +19,11 @@ public record TacticalSprintMessage(boolean sprint) implements CustomPacketPaylo
             TacticalSprintMessage::new
     );
 
-    public static void handler(TacticalSprintMessage message, final IPayloadContext context) {
+    public static void handler(TacticalSprintMessage message, final ServerPlayNetworking.Context context) {
         var player = context.player();
 
-        var cap = player.getData(ModAttachments.PLAYER_VARIABLE).watch();
-        cap.tacticalSprint = MiscConfig.ALLOW_TACTICAL_SPRINT.get() && message.sprint;
+        var cap = player.getAttached(ModAttachments.PLAYER_VARIABLE).watch();
+        cap.tacticalSprint = MiscConfig.ALLOW_TACTICAL_SPRINT && message.sprint;
         cap.sync(player);
     }
 

@@ -4,79 +4,92 @@ import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.datagen.builder.CustomSeparateModelBuilder;
 import com.atsuishio.superbwarfare.init.ModBlocks;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.item.common.BlueprintItem;
-import net.minecraft.client.renderer.block.model.BlockModel;
+import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
-import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.registries.DeferredHolder;
+import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"ConstantConditions", "UnusedReturnValue", "SameParameterValue", "unused"})
-public class ModItemModelProvider extends ItemModelProvider {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-    public ModItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
-        super(output, Mod.MODID, existingFileHelper);
+public class ModItemModelProvider implements DataProvider {
+
+    private final PackOutput output;
+    private final Map<ResourceLocation, JsonObject> models = new HashMap<>();
+
+    public ModItemModelProvider(PackOutput output) {
+        this.output = output;
     }
 
     @Override
-    protected void registerModels() {
-        // gun
-        gunItem(ModItems.AA_12);
-        gunItem(ModItems.AK_12);
-        gunItem(ModItems.AK_47);
-        gunItem(ModItems.AURELIA_SCEPTRE);
-        gunItem(ModItems.BOCEK);
-        gunItem(ModItems.DEVOTION);
-        gunItem(ModItems.GLOCK_17);
+    public @NotNull CompletableFuture<?> run(@NotNull CachedOutput cache) {
+        generate();
+        PackOutput.PathProvider modelPath = output.createPathProvider(PackOutput.Target.RESOURCE_PACK, "models/item");
+        List<CompletableFuture<?>> futures = new ArrayList<>();
+        for (var entry : models.entrySet()) {
+            futures.add(DataProvider.saveStable(cache, entry.getValue(), modelPath.json(entry.getKey())));
+        }
+        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
+    }
+
+    private void generate() {
+        gunItem(ModItems.AA_12, "aa_12");
+        gunItem(ModItems.AK_12, "ak_12");
+        gunItem(ModItems.AK_47, "ak_47");
+        gunItem(ModItems.AURELIA_SCEPTRE, "aurelia_sceptre");
+        gunItem(ModItems.BOCEK, "bocek");
+        gunItem(ModItems.DEVOTION, "devotion");
+        gunItem(ModItems.GLOCK_17, "glock_17");
         gunItem(ModItems.GLOCK_18, "glock_17");
-        gunItem(ModItems.HK_416);
-        gunItem(ModItems.HOMEMADE_SHOTGUN);
-        gunItem(ModItems.HUNTING_RIFLE);
-        gunItem(ModItems.INSIDIOUS);
-        gunItem(ModItems.JAVELIN);
-        gunItem(ModItems.K_98);
-        gunItem(ModItems.M_4);
-        gunItem(ModItems.M_60);
-        gunItem(ModItems.M_79);
-        gunItem(ModItems.M_1911);
-        gunItem(ModItems.M_870);
-        gunItem(ModItems.M_98B);
-        gunItem(ModItems.MARLIN);
-        gunItem(ModItems.MINIGUN);
-        gunItem(ModItems.MK_14);
-        gunItem(ModItems.MOSIN_NAGANT);
-        gunItem(ModItems.MP_443);
-        gunItem(ModItems.NTW_20);
-        gunItem(ModItems.QBZ_95);
-        gunItem(ModItems.RPG);
-        gunItem(ModItems.RPK);
-        gunItem(ModItems.SECONDARY_CATACLYSM);
-        gunItem(ModItems.SENTINEL);
-        gunItem(ModItems.SKS);
-        gunItem(ModItems.SVD);
-        gunItem(ModItems.TASER);
-        gunItem(ModItems.TRACHELIUM);
-        gunItem(ModItems.VECTOR);
-        gunItem(ModItems.MP_5);
-        gunItem(ModItems.M_2_HB);
-        gunItem(ModItems.QBZ_191);
-        gunItem(ModItems.AWM);
-        gunItem(ModItems.IGLA_9K38);
-        gunItem(ModItems.REPAIR_TOOL);
-        gunItem(ModItems.QL_1031);
+        gunItem(ModItems.HK_416, "hk_416");
+        gunItem(ModItems.HOMEMADE_SHOTGUN, "homemade_shotgun");
+        gunItem(ModItems.HUNTING_RIFLE, "hunting_rifle");
+        gunItem(ModItems.INSIDIOUS, "insidious");
+        gunItem(ModItems.JAVELIN, "javelin");
+        gunItem(ModItems.K_98, "k_98");
+        gunItem(ModItems.M_4, "m_4");
+        gunItem(ModItems.M_60, "m_60");
+        gunItem(ModItems.M_79, "m_79");
+        gunItem(ModItems.M_1911, "m_1911");
+        gunItem(ModItems.M_870, "m_870");
+        gunItem(ModItems.M_98B, "m_98b");
+        gunItem(ModItems.MARLIN, "marlin");
+        gunItem(ModItems.MINIGUN, "minigun");
+        gunItem(ModItems.MK_14, "mk_14");
+        gunItem(ModItems.MOSIN_NAGANT, "mosin_nagant");
+        gunItem(ModItems.MP_443, "mp_443");
+        gunItem(ModItems.NTW_20, "ntw_20");
+        gunItem(ModItems.QBZ_95, "qbz_95");
+        gunItem(ModItems.RPG, "rpg");
+        gunItem(ModItems.RPK, "rpk");
+        gunItem(ModItems.SECONDARY_CATACLYSM, "secondary_cataclysm");
+        gunItem(ModItems.SENTINEL, "sentinel");
+        gunItem(ModItems.SKS, "sks");
+        gunItem(ModItems.SVD, "svd");
+        gunItem(ModItems.TASER, "taser");
+        gunItem(ModItems.TRACHELIUM, "trachelium");
+        gunItem(ModItems.VECTOR, "vector");
+        gunItem(ModItems.MP_5, "mp_5");
+        gunItem(ModItems.M_2_HB, "m_2_hb");
+        gunItem(ModItems.QBZ_191, "qbz_191");
+        gunItem(ModItems.AWM, "awm");
+        gunItem(ModItems.IGLA_9K38, "igla_9k38");
+        gunItem(ModItems.REPAIR_TOOL, "repair_tool");
+        gunItem(ModItems.QL_1031, "ql_1031");
 
         simpleItem(ModItems.VEHICLE_GUN);
         simpleItem(ModItems.EMPTY_PERK, "perk/");
         simpleItem(ModItems.MORTAR_SHELL);
 
-        // misc
         simpleItem(ModItems.ANCIENT_CPU);
         simpleItem(ModItems.PROPELLER);
         simpleItem(ModItems.LARGE_PROPELLER);
@@ -124,9 +137,9 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.TRANSCRIPT);
         simpleItem(ModItems.RAW_SILVER);
         simpleItem(ModItems.SILVER_INGOT);
-        handheldItem(ModItems.BEAST.getId());
-        handheldItem(ModItems.CROWBAR.getId());
-        handheldItem(ModItems.DEFUSER.getId());
+        handheldItem(ModItems.BEAST);
+        handheldItem(ModItems.CROWBAR);
+        handheldItem(ModItems.DEFUSER);
         simpleItem(ModItems.FIRING_PARAMETERS);
         simpleItem(ModItems.HANDGUN_AMMO);
         simpleItem(ModItems.RIFLE_AMMO);
@@ -165,14 +178,12 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.EPIC_MATERIAL_PACK);
         simpleItem(ModItems.LEGENDARY_MATERIAL_PACK);
 
-        // armor
         simpleItem(ModItems.RU_HELMET_6B47);
         simpleItem(ModItems.RU_CHEST_6B43);
         simpleItem(ModItems.US_HELMET_PASGT);
         simpleItem(ModItems.US_CHEST_IOTV);
         simpleItem(ModItems.GE_HELMET_M_35);
 
-        // blueprints
         gunBlueprintItem(ModItems.TRACHELIUM_BLUEPRINT);
         gunBlueprintItem(ModItems.GLOCK_17_BLUEPRINT);
         gunBlueprintItem(ModItems.GLOCK_18_BLUEPRINT);
@@ -220,7 +231,6 @@ public class ModItemModelProvider extends ItemModelProvider {
         gunBlueprintItem(ModItems.IGLA_BLUEPRINT);
         gunBlueprintItem(ModItems.QL_1031_BLUEPRINT);
 
-        // blocks
         evenSimplerBlockItem(ModBlocks.BARBED_WIRE);
         evenSimplerBlockItem(ModBlocks.JUMP_PAD);
         evenSimplerBlockItem(ModBlocks.REFORGING_TABLE);
@@ -239,72 +249,104 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(materials.spring());
     }
 
-    private ItemModelBuilder simpleItem(DeferredHolder<Item, ? extends Item> item) {
-        return simpleItem(item, "");
+    private void simpleItem(Item item) {
+        simpleItem(item, "");
     }
 
-    private ItemModelBuilder simpleItem(DeferredHolder<Item, ? extends Item> item, String location) {
-        return withExistingParent(item.getId().getPath(), ResourceLocation.withDefaultNamespace("item/generated"))
-                .texture("layer0", Mod.loc("item/" + location + item.getId().getPath()));
+    private void simpleItem(Item item, String location) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+        JsonObject json = new JsonObject();
+        json.addProperty("parent", "minecraft:item/generated");
+        JsonObject textures = new JsonObject();
+        textures.addProperty("layer0", modLoc("item/" + location + id.getPath()).toString());
+        json.add("textures", textures);
+        models.put(id, json);
     }
 
-    private ItemModelBuilder simpleItem(DeferredHolder<Item, ? extends Item> item, String location, String renderType) {
-        return withExistingParent(item.getId().getPath(), ResourceLocation.withDefaultNamespace("item/generated"))
-                .texture("layer0", Mod.loc("item/" + location + item.getId().getPath())).renderType(renderType);
+    private void evenSimplerBlockItem(Block block) {
+        String name = BuiltInRegistries.BLOCK.getKey(block).getPath();
+        JsonObject json = new JsonObject();
+        json.addProperty("parent", modLoc("block/" + name).toString());
+        models.put(ResourceLocation.fromNamespaceAndPath(Mod.MODID, name), json);
     }
 
-    public <T extends Block> void evenSimplerBlockItem(DeferredHolder<Block, T> block) {
-        this.withExistingParent(Mod.MODID + ":" + BuiltInRegistries.BLOCK.getKey(block.get()).getPath(),
-                modLoc("block/" + BuiltInRegistries.BLOCK.getKey(block.get()).getPath()));
+    private void gunBlueprintItem(Item item) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+        JsonObject json = new JsonObject();
+        json.addProperty("parent", "minecraft:item/generated");
+        JsonObject textures = new JsonObject();
+        textures.addProperty("layer0", modLoc("item/gun_blueprint").toString());
+        json.add("textures", textures);
+        models.put(id, json);
     }
 
-    private ItemModelBuilder gunBlueprintItem(DeferredHolder<Item, BlueprintItem> item) {
-        return withExistingParent(item.getId().getPath(), ResourceLocation.withDefaultNamespace("item/generated"))
-                .texture("layer0", Mod.loc("item/gun_blueprint"));
+    private void cannonBlueprintItem(Item item) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+        JsonObject json = new JsonObject();
+        json.addProperty("parent", "minecraft:item/generated");
+        JsonObject textures = new JsonObject();
+        textures.addProperty("layer0", modLoc("item/cannon_blueprint").toString());
+        json.add("textures", textures);
+        models.put(id, json);
     }
 
-    private ItemModelBuilder cannonBlueprintItem(DeferredHolder<Item, BlueprintItem> item) {
-        return withExistingParent(item.getId().getPath(), ResourceLocation.withDefaultNamespace("item/generated"))
-                .texture("layer0", Mod.loc("item/cannon_blueprint"));
+    private void handheldItem(Item item) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+        JsonObject json = new JsonObject();
+        json.addProperty("parent", "minecraft:item/handheld");
+        JsonObject textures = new JsonObject();
+        textures.addProperty("layer0", modLoc("item/" + id.getPath()).toString());
+        json.add("textures", textures);
+        models.put(id, json);
     }
 
-    private ItemModelBuilder handheldItem(DeferredHolder<Item, Item> item) {
-        return withExistingParent(item.getId().getPath(), ResourceLocation.withDefaultNamespace("item/handheld"))
-                .texture("layer0", Mod.loc("item/" + item.getId().getPath()));
+    private void gunIcon(Item item, String name) {
+        JsonObject json = new JsonObject();
+        json.addProperty("parent", "minecraft:item/generated");
+        JsonObject textures = new JsonObject();
+        textures.addProperty("layer0", modLoc("item/" + name + "_icon").toString());
+        json.add("textures", textures);
+        models.put(Mod.loc(name + "_icon"), json);
     }
 
-    private ItemModelBuilder gunIcon(DeferredHolder<Item, ? extends Item> item, String name) {
-        return withExistingParent(item.getId().getPath() + "_icon", ResourceLocation.withDefaultNamespace("item/generated"))
-                .texture("layer0", Mod.loc("item/" + name + "_icon"));
+    private void gunBase(Item item, String name) {
+        JsonObject json = new JsonObject();
+        json.addProperty("parent", modLoc("displaysettings/" + name + ".item").toString());
+        JsonObject textures = new JsonObject();
+        textures.addProperty("layer0", modLoc("item/" + name).toString());
+        json.add("textures", textures);
+        models.put(Mod.loc(name + "_base"), json);
     }
 
-    private ItemModelBuilder gunBase(DeferredHolder<Item, ? extends Item> item, String name) {
-        return getBuilder(item.getId().getPath() + "_base")
-                .parent(new ModelFile.UncheckedModelFile(modLoc("displaysettings/" + name + ".item")))
-                .texture("layer0", Mod.loc("item/" + name));
+    private void customSeparatedGunModel(Item item, String name) {
+        ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+
+        CustomSeparateModelBuilder builder = CustomSeparateModelBuilder.begin()
+                .base(modLoc("item/" + name + "_base").toString())
+                .perspective(ItemDisplayContext.GUI, modLoc("item/" + name + "_icon").toString());
+
+        JsonObject json = builder.toJson();
+        json.addProperty("gui_light", "front");
+
+        JsonObject textures = new JsonObject();
+        textures.addProperty("particle", modLoc("item/" + name + "_icon").toString());
+        json.add("textures", textures);
+
+        models.put(id, json);
     }
 
-    private ItemModelBuilder customSeparatedGunModel(DeferredHolder<Item, ? extends Item> item, String name) {
-        String lod = modLoc("lod/" + name).toString();
-        String base = modLoc("item/" + name + "_base").toString();
-        String icon = modLoc("item/" + name + "_icon").toString();
-
-        return getBuilder(item.getId().getPath())
-                .guiLight(BlockModel.GuiLight.FRONT)
-                .customLoader(CustomSeparateModelBuilder::begin)
-                .base(base)
-                .perspective(ItemDisplayContext.GUI, icon)
-                .texture("particle", modLoc("item/" + name + "_icon"))
-                .end();
-    }
-
-    public void gunItem(DeferredHolder<Item, ? extends Item> item) {
-        this.gunItem(item, item.getId().getPath());
-    }
-
-    public void gunItem(DeferredHolder<Item, ? extends Item> item, String name) {
+    public void gunItem(Item item, String name) {
         this.gunIcon(item, name);
         this.gunBase(item, name);
         this.customSeparatedGunModel(item, name);
+    }
+
+    private ResourceLocation modLoc(String path) {
+        return Mod.loc(path);
+    }
+
+    @Override
+    public @NotNull String getName() {
+        return "Superb Warfare Item Models";
     }
 }

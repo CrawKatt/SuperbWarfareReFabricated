@@ -3,13 +3,14 @@ package com.atsuishio.superbwarfare.api.event;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.Event;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 @ApiStatus.Internal
 @ApiStatus.AvailableSince("0.8.0")
-public class ReloadEvent extends Event {
+public class ReloadEvent {
+
+    private boolean cancelled = false;
 
     public final Entity shooter;
     public final GunData data;
@@ -39,5 +40,13 @@ public class ReloadEvent extends Event {
 
     public ItemStack getStack() {
         return stack;
+    }
+
+    public boolean isCanceled() {
+        return cancelled;
+    }
+
+    public void setCanceled(boolean cancel) {
+        this.cancelled = cancel;
     }
 }

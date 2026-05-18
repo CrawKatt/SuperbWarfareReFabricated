@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.client.screens;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.block.entity.ChargingStationBlockEntity;
@@ -11,16 +12,13 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@OnlyIn(Dist.CLIENT)
+
 public class ChargingStationScreen extends AbstractContainerScreen<ChargingStationMenu> {
 
     private static final ResourceLocation TEXTURE = Mod.loc("textures/gui/charging_station.png");
@@ -78,7 +76,7 @@ public class ChargingStationScreen extends AbstractContainerScreen<ChargingStati
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     class ShowRangeButton extends AbstractButton {
 
         @Override
@@ -93,7 +91,7 @@ public class ChargingStationScreen extends AbstractContainerScreen<ChargingStati
 
         @Override
         public void onPress() {
-            PacketDistributor.sendToServer(new ShowChargingRangeMessage(!ChargingStationScreen.this.menu.showRange()));
+            ClientPlayNetworking.send(new ShowChargingRangeMessage(!ChargingStationScreen.this.menu.showRange()));
         }
 
         @Override

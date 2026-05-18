@@ -41,7 +41,7 @@ public class Type63Entity extends GeoVehicleEntity {
     public static final EntityDataAccessor<Float> BODY_YAW = SynchedEntityData.defineId(Type63Entity.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Float> SHOOT_PITCH = SynchedEntityData.defineId(Type63Entity.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Float> SHOOT_YAW = SynchedEntityData.defineId(Type63Entity.class, EntityDataSerializers.FLOAT);
-    public static final EntityDataAccessor<List<Integer>> LOADED_AMMO = SynchedEntityData.defineId(Type63Entity.class, ModSerializers.INT_LIST_SERIALIZER.get());
+    public static final EntityDataAccessor<List<Integer>> LOADED_AMMO = SynchedEntityData.defineId(Type63Entity.class, ModSerializers.INT_LIST_SERIALIZER);
 
     public OBB[] barrel = new OBB[12];
     public OBB pitchController;
@@ -155,7 +155,7 @@ public class Type63Entity extends GeoVehicleEntity {
                         if (cooldown == 0) {
                             cooldown = 6;
                             Vec3 vec3 = OBB.vector3dToVec3(hoe1.center());
-                            serverLevel.playSound(null, vec3.x, vec3.y, vec3.z, ModSounds.WHEEL_VEHICLE_STEP.get(), SoundSource.PLAYERS, 0.5f, random.nextFloat() * 0.05f + 0.975f);
+                            serverLevel.playSound(null, vec3.x, vec3.y, vec3.z, ModSounds.WHEEL_VEHICLE_STEP, SoundSource.PLAYERS, 0.5f, random.nextFloat() * 0.05f + 0.975f);
                         }
                     }
                     player.swing(InteractionHand.MAIN_HAND);
@@ -168,7 +168,7 @@ public class Type63Entity extends GeoVehicleEntity {
                         if (cooldown == 0) {
                             cooldown = 6;
                             Vec3 vec3 = OBB.vector3dToVec3(hoe1.center());
-                            serverLevel.playSound(null, vec3.x, vec3.y, vec3.z, ModSounds.WHEEL_VEHICLE_STEP.get(), SoundSource.PLAYERS, 0.5f, random.nextFloat() * 0.05f + 0.975f);
+                            serverLevel.playSound(null, vec3.x, vec3.y, vec3.z, ModSounds.WHEEL_VEHICLE_STEP, SoundSource.PLAYERS, 0.5f, random.nextFloat() * 0.05f + 0.975f);
                         }
                     }
                     player.swing(InteractionHand.MAIN_HAND);
@@ -182,7 +182,7 @@ public class Type63Entity extends GeoVehicleEntity {
                         if (lookingObb == this.barrel[i] && !items.get(i).isEmpty()) {
                             player.addItem(items.get(i).copyWithCount(1));
                             Vec3 vec3 = OBB.vector3dToVec3(this.barrel[i].center());
-                            serverLevel.playSound(null, vec3.x, vec3.y, vec3.z, ModSounds.TYPE_63_RELOAD.get(), SoundSource.PLAYERS, 1f, random.nextFloat() * 0.1f + 0.9f);
+                            serverLevel.playSound(null, vec3.x, vec3.y, vec3.z, ModSounds.TYPE_63_RELOAD, SoundSource.PLAYERS, 1f, random.nextFloat() * 0.1f + 0.9f);
                             cooldown = 5;
                             items.set(i, ItemStack.EMPTY);
                             setChanged();
@@ -213,7 +213,7 @@ public class Type63Entity extends GeoVehicleEntity {
                         stack.shrink(1);
                     }
                     Vec3 vec3 = OBB.vector3dToVec3(this.barrel[i].center());
-                    serverLevel.playSound(null, vec3.x, vec3.y, vec3.z, ModSounds.TYPE_63_RELOAD.get(), SoundSource.PLAYERS, 1f, random.nextFloat() * 0.1f + 0.9f);
+                    serverLevel.playSound(null, vec3.x, vec3.y, vec3.z, ModSounds.TYPE_63_RELOAD, SoundSource.PLAYERS, 1f, random.nextFloat() * 0.1f + 0.9f);
                     cooldown = 5;
                     setChanged();
                 }
@@ -269,7 +269,7 @@ public class Type63Entity extends GeoVehicleEntity {
             interactionTick++;
             if (cooldown <= 0) {
                 cooldown = 6;
-                serverLevel.playSound(null, vec3.x, vec3.y, vec3.z, ModSounds.HAND_WHEEL_ROT.get(), SoundSource.PLAYERS, 1f, random.nextFloat() * 0.05f + 0.975f);
+                serverLevel.playSound(null, vec3.x, vec3.y, vec3.z, ModSounds.HAND_WHEEL_ROT, SoundSource.PLAYERS, 1f, random.nextFloat() * 0.05f + 0.975f);
             }
         }
     }
@@ -292,7 +292,7 @@ public class Type63Entity extends GeoVehicleEntity {
         Vec3 shootPos = OBB.vector3dToVec3(obb.center());
 
         var computed = gunData.compute();
-        var entityToSpawn = new MediumRocketEntity(ModEntities.MEDIUM_ROCKET.get(), shootPos.x, shootPos.y, shootPos.z, level(),
+        var entityToSpawn = new MediumRocketEntity(ModEntities.MEDIUM_ROCKET, shootPos.x, shootPos.y, shootPos.z, level(),
                 (float) computed.damage, (float) computed.explosionRadius, (float) computed.explosionDamage,
                 0, 0, rocketItem.type, computed.spreadAmount, computed.spreadAngle);
         entityToSpawn.setGravity(shootGravity);

@@ -45,7 +45,7 @@ public class LuckyContainerBlockEntity extends BlockEntity implements GeoBlockEn
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public LuckyContainerBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.LUCKY_CONTAINER.get(), pos, state);
+        super(ModBlockEntities.LUCKY_CONTAINER, pos, state);
     }
 
     public static void serverTick(Level pLevel, BlockPos pPos, BlockState pState, LuckyContainerBlockEntity blockEntity) {

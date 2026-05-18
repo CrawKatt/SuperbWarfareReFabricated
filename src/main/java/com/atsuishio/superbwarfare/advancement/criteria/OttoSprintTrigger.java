@@ -30,7 +30,7 @@ public class OttoSprintTrigger extends SimpleCriterionTrigger<OttoSprintTrigger.
                         .forGetter(OttoSprintTrigger.TriggerInstance::player)).apply(instance, TriggerInstance::new));
 
         public static Criterion<OttoSprintTrigger.TriggerInstance> get() {
-            return ModCriteriaTriggers.OTTO_SPRINT.get().createCriterion(new TriggerInstance(Optional.empty()));
+            return ModCriteriaTriggers.OTTO_SPRINT.createCriterion(new TriggerInstance(Optional.empty()));
         }
 
         @Override

@@ -6,6 +6,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 
 public class TDMCommand {
@@ -20,7 +21,7 @@ public class TDMCommand {
                             var tdm = level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(TDMSavedData::new, TDMSavedData::load, null), TDMSavedData.FILE_ID);
 
                             entities.forEach(entity -> tdm.addEntity(entity.getStringUUID()));
-                            tdm.sync();
+                            tdm.sync((ServerLevel) level);
 
                             if (entities.size() == 1) {
                                 context.getSource().sendSuccess(() -> Component.translatable("commands.tdm.add.single", entities.iterator().next()), true);
@@ -38,7 +39,7 @@ public class TDMCommand {
                             var tdm = level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(TDMSavedData::new, TDMSavedData::load, null), TDMSavedData.FILE_ID);
 
                             entities.forEach(entity -> tdm.removeEntity(entity.getStringUUID()));
-                            tdm.sync();
+                            tdm.sync((ServerLevel) level);
 
                             if (entities.size() == 1) {
                                 context.getSource().sendSuccess(() -> Component.translatable("commands.tdm.remove.single", entities.iterator().next()), true);

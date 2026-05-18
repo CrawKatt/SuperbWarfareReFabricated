@@ -19,45 +19,32 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.AnvilUpdateEvent;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import static com.atsuishio.superbwarfare.tools.ParticleTool.sendParticle;
 
-@EventBusSubscriber
 public class PlayerEventHandler {
 
     public static final ResourceLocation TACTICAL_SPRINT = Mod.loc("tactical_sprint");
 
-    @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        Player player = event.getEntity();
+    public static void onPlayerLoggedIn(ServerPlayer player) {
         ItemStack mainStack = player.getMainHandItem();
         var tag = NBTTool.getTag(mainStack);
-        if (mainStack.is(ModItems.MONITOR.get()) && tag.getBoolean("Using")) {
+        if (mainStack.is(ModItems.MONITOR) && tag.getBoolean("Using")) {
             tag.putBoolean("Using", false);
             NBTTool.saveTag(mainStack, tag);
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerRespawned(PlayerEvent.PlayerRespawnEvent event) {
-        Player player = event.getEntity();
-
+    public static void onPlayerRespawned(ServerPlayer player, boolean conquered) {
         handleRespawnReload(player);
         handleRespawnAutoArmor(player);
     }
 
-    @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent.Post event) {
-        Player player = event.getEntity();
+    public static void onPlayerTick(ServerPlayer player) {
         ItemStack stack = player.getMainHandItem();
 
         if (stack.getItem() instanceof GunItem) {
@@ -74,13 +61,13 @@ public class PlayerEventHandler {
 
         var data = GunData.from(stack);
 
-        if ((stack.is(ModItems.RPG.get()) || stack.is(ModItems.BOCEK.get())) && data.hasEnoughAmmoToShoot(player)) {
+        if ((stack.is(ModItems.RPG) || stack.is(ModItems.BOCEK)) && data.hasEnoughAmmoToShoot(player)) {
             data.isEmpty.set(false);
         }
     }
 
     private static void handleRespawnReload(Player player) {
-        if (!GameplayConfig.RESPAWN_RELOAD.get()) return;
+        if (!GameplayConfig.RESPAWN_RELOAD) return;
 
         for (ItemStack stack : player.getInventory().items) {
             if (stack.getItem() instanceof GunItem) {
@@ -98,7 +85,7 @@ public class PlayerEventHandler {
     }
 
     private static void handleRespawnAutoArmor(Player player) {
-        if (!GameplayConfig.RESPAWN_AUTO_ARMOR.get()) return;
+        if (!GameplayConfig.RESPAWN_AUTO_ARMOR) return;
 
         ItemStack armor = player.getItemBySlot(EquipmentSlot.CHEST);
         if (armor == ItemStack.EMPTY) return;
@@ -106,25 +93,25 @@ public class PlayerEventHandler {
         var tag = NBTTool.getTag(armor);
         double armorPlate = tag.getDouble("ArmorPlate");
 
-        int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL.get();
+        int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL;
         if (armor.is(ModTags.Items.MILITARY_ARMOR)) {
-            armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL.get();
+            armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL;
         } else if (armor.is(ModTags.Items.MILITARY_ARMOR_HEAVY)) {
-            armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL.get();
+            armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL;
         }
 
-        if (armorPlate >= armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get()) return;
+        if (armorPlate >= armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL) return;
 
         for (var stack : player.getInventory().items) {
-            if (stack.is(ModItems.ARMOR_PLATE.get())) {
+            if (stack.is(ModItems.ARMOR_PLATE)) {
                 var stackTag = NBTTool.getTag(stack);
                 if (stackTag.getBoolean("Infinite")) {
-                    tag.putDouble("ArmorPlate", armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get());
+                    tag.putDouble("ArmorPlate", armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL);
                     if (player instanceof ServerPlayer serverPlayer) {
                         serverPlayer.level().playSound(null, serverPlayer.getOnPos(), SoundEvents.ARMOR_EQUIP_IRON.value(), SoundSource.PLAYERS, 0.5f, 1);
                     }
                 } else {
-                    for (int index0 = 0; index0 < Math.ceil(((armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get()) - armorPlate) / MiscConfig.ARMOR_POINT_PER_LEVEL.get()); index0++) {
+                    for (int index0 = 0; index0 < Math.ceil(((armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL) - armorPlate) / MiscConfig.ARMOR_POINT_PER_LEVEL); index0++) {
                         stack.finishUsingItem(player.level(), player);
                     }
                 }
@@ -145,43 +132,40 @@ public class PlayerEventHandler {
             attr.removeModifier(TACTICAL_SPRINT);
         }
 
-        if (MiscConfig.ALLOW_TACTICAL_SPRINT.get() && player.getData(ModAttachments.PLAYER_VARIABLE).tacticalSprint) {
+        if (MiscConfig.ALLOW_TACTICAL_SPRINT && player.getAttached(ModAttachments.PLAYER_VARIABLE).tacticalSprint) {
             player.setSprinting(true);
             attr.addTransientModifier(new AttributeModifier(TACTICAL_SPRINT, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
         }
     }
 
-    @SubscribeEvent
-    public static void onAnvilUpdate(AnvilUpdateEvent event) {
-        ItemStack left = event.getLeft();
-        ItemStack right = event.getRight();
+//    public static void onAnvilUpdate(AnvilUpdateEvent event) {
+//        ItemStack left = event.getLeft();
+//        ItemStack right = event.getRight();
+//
+//        if (left.getItem() instanceof GunItem && right.getItem() == ModItems.SHORTCUT_PACK) {
+//            ItemStack output = left.copy();
+//
+//            var data = GunData.from(output);
+//            data.level.add(1);
+//            data.save();
+//
+//            event.setOutput(output);
+//            event.setCost(10);
+//            event.setMaterialCost(1);
+//        }
+//    }
 
-        if (left.getItem() instanceof GunItem && right.getItem() == ModItems.SHORTCUT_PACK.get()) {
-            ItemStack output = left.copy();
-
-            var data = GunData.from(output);
-            data.level.add(1);
-            data.save();
-
-            event.setOutput(output);
-            event.setCost(10);
-            event.setMaterialCost(1);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onAttackEntity(AttackEntityEvent event) {
-        var target = event.getTarget();
+    public static void onAttackEntity(Player player, Entity target) {
         if (target instanceof VehicleEntity vehicle) {
-            Vec3 position = TraceTool.playerFindLookingPos(event.getEntity(), vehicle, event.getEntity().entityInteractionRange());
+            Vec3 position = TraceTool.playerFindLookingPos(player, vehicle, player.entityInteractionRange());
 
             if (position != null) {
                 if (vehicle.shouldSendHitSounds()) {
-                    vehicle.level().playSound(null, BlockPos.containing(position), ModSounds.HIT.get(), SoundSource.PLAYERS, 1, 1);
+                    vehicle.level().playSound(null, BlockPos.containing(position), ModSounds.HIT, SoundSource.PLAYERS, 1, 1);
                 }
 
                 if (vehicle.shouldSendHitParticles() && vehicle.level() instanceof ServerLevel serverLevel) {
-                    sendParticle(serverLevel, ModParticleTypes.FIRE_STAR.get(), position.x, position.y, position.z,
+                    sendParticle(serverLevel, ModParticleTypes.FIRE_STAR, position.x, position.y, position.z,
                             2, 0, 0, 0, 0.2, false);
                 }
             }

@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.GeoVehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.Monitor;
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.tools.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.Registries;
@@ -42,9 +43,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
@@ -68,7 +66,7 @@ public class DroneEntity extends GeoVehicleEntity {
     public static final EntityDataAccessor<CompoundTag> DISPLAY_ENTITY_TAG = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.COMPOUND_TAG);
 
     // scale[3], offset[3], rotation[3], xLength, zLength, tickCount
-    public static final EntityDataAccessor<List<Float>> DISPLAY_DATA = SynchedEntityData.defineId(DroneEntity.class, ModSerializers.FLOAT_LIST_SERIALIZER.get());
+    public static final EntityDataAccessor<List<Float>> DISPLAY_DATA = SynchedEntityData.defineId(DroneEntity.class, ModSerializers.FLOAT_LIST_SERIALIZER);
     public static final EntityDataAccessor<Integer> MAX_AMMO = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.INT);
 
     public boolean fire;
@@ -202,7 +200,7 @@ public class DroneEntity extends GeoVehicleEntity {
             if (controller != null) {
                 ItemStack stack = controller.getMainHandItem();
                 var tag = NBTTool.getTag(stack);
-                if (!stack.is(ModItems.MONITOR.get()) || !tag.getBoolean("Using")) {
+                if (!stack.is(ModItems.MONITOR) || !tag.getBoolean("Using")) {
                     setLeftInputDown(false);
                     setRightInputDown(false);
                     setForwardInputDown(false);
@@ -212,7 +210,7 @@ public class DroneEntity extends GeoVehicleEntity {
                 }
 
                 if (tickCount % 5 == 0) {
-                    controller.getInventory().items.stream().filter(pStack -> pStack.getItem() == ModItems.MONITOR.get())
+                    controller.getInventory().items.stream().filter(pStack -> pStack.getItem() == ModItems.MONITOR)
                             .forEach(pStack -> {
                                 if (tag.getString(Monitor.LINKED_DRONE).equals(this.getStringUUID())) {
                                     Monitor.getDronePos(pStack, this.position());
@@ -235,7 +233,7 @@ public class DroneEntity extends GeoVehicleEntity {
             } else {
                 if (controller != null) {
                     var stack = controller.getMainHandItem();
-                    if (stack.is(ModItems.MONITOR.get())) {
+                    if (stack.is(ModItems.MONITOR)) {
                         var tag = NBTTool.getTag(stack);
                         Monitor.disLink(tag, controller);
                         NBTTool.saveTag(stack, tag);
@@ -293,7 +291,7 @@ public class DroneEntity extends GeoVehicleEntity {
     @Override
     public @NotNull InteractionResult interact(Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getMainHandItem();
-        if (stack.getItem() == ModItems.MONITOR.get()) {
+        if (stack.getItem() == ModItems.MONITOR) {
             var tag = NBTTool.getTag(stack);
             if (!player.isCrouching()) {
                 if (!this.entityData.get(LINKED)) {
@@ -336,14 +334,14 @@ public class DroneEntity extends GeoVehicleEntity {
         } else if (player.isCrouching()) {
             if (stack.isEmpty() || stack.is(ModTags.Items.TOOLS_CROWBAR)) {
                 // 无人机拆除
-                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.DRONE.get()));
+                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.DRONE));
 
                 // 返还弹药
                 for (int index0 = 0; index0 < this.entityData.get(AMMO); index0++) {
                     ItemHandlerHelper.giveItemToPlayer(player, this.currentItem.copy());
                 }
 
-                player.getInventory().items.stream().filter(stack_ -> stack_.getItem() == ModItems.MONITOR.get())
+                player.getInventory().items.stream().filter(stack_ -> stack_.getItem() == ModItems.MONITOR)
                         .forEach(itemStack -> {
                             var tag = NBTTool.getTag(itemStack);
                             if (tag.getString(Monitor.LINKED_DRONE).equals(this.getStringUUID())) {
@@ -386,7 +384,7 @@ public class DroneEntity extends GeoVehicleEntity {
                             stack.shrink(1);
                         }
                         if (player instanceof ServerPlayer serverPlayer) {
-                            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.BULLET_SUPPLY.get(), SoundSource.PLAYERS, 0.5F, 1);
+                            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.BULLET_SUPPLY, SoundSource.PLAYERS, 0.5F, 1);
                         }
                     } else if (this.entityData.get(AMMO) == 0) {
                         // 不同种物品挂载
@@ -400,7 +398,7 @@ public class DroneEntity extends GeoVehicleEntity {
                             stack.shrink(1);
                         }
                         if (player instanceof ServerPlayer serverPlayer) {
-                            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.BULLET_SUPPLY.get(), SoundSource.PLAYERS, 0.5F, 1);
+                            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.BULLET_SUPPLY, SoundSource.PLAYERS, 0.5F, 1);
                         }
 
                         var scale = attachmentData.scale();
@@ -515,7 +513,7 @@ public class DroneEntity extends GeoVehicleEntity {
         if (controller != null) {
             ItemStack stack = controller.getMainHandItem();
             var tag = NBTTool.getTag(stack);
-            if (stack.is(ModItems.MONITOR.get()) && tag.getBoolean("Using")) {
+            if (stack.is(ModItems.MONITOR) && tag.getBoolean("Using")) {
                 this.setYRot(this.getYRot() + 0.5f * getMouseMoveSpeedX());
                 this.setXRot(Mth.clamp(this.getXRot() + 0.5f * getMouseMoveSpeedY(), -10, 90));
             }
@@ -550,7 +548,7 @@ public class DroneEntity extends GeoVehicleEntity {
                     }
                 }
 
-                if (player != null && player.getMainHandItem().is(ModItems.MONITOR.get())) {
+                if (player != null && player.getMainHandItem().is(ModItems.MONITOR)) {
                     var stack = player.getMainHandItem();
                     var tag = NBTTool.getTag(stack);
                     Monitor.disLink(tag, player);
@@ -577,7 +575,7 @@ public class DroneEntity extends GeoVehicleEntity {
         if (player == null) return entityData.get(POWER);
         ItemStack stack = player.getMainHandItem();
 
-        if (stack.is(ModItems.MONITOR.get()) && NBTTool.getTag(stack).getBoolean("Using") && NBTTool.getTag(stack).getBoolean("Linked")) {
+        if (stack.is(ModItems.MONITOR) && NBTTool.getTag(stack).getBoolean("Using") && NBTTool.getTag(stack).getBoolean("Linked")) {
             return entityData.get(POWER) * 0.25f;
         }
         return entityData.get(POWER) * 2f;
@@ -608,14 +606,14 @@ public class DroneEntity extends GeoVehicleEntity {
     @Override
     @Nullable
     public ItemStack getPickResult() {
-        return new ItemStack(ModItems.DRONE.get());
+        return new ItemStack(ModItems.DRONE);
     }
 
     @Override
     public void destroy() {
         Player controller = EntityFindUtil.findPlayer(this.level(), this.entityData.get(CONTROLLER));
         if (controller != null) {
-            if (controller.getMainHandItem().is(ModItems.MONITOR.get())) {
+            if (controller.getMainHandItem().is(ModItems.MONITOR)) {
                 var item = controller.getMainHandItem();
                 var tag = NBTTool.getTag(item);
                 Monitor.disLink(tag, controller);
@@ -653,7 +651,7 @@ public class DroneEntity extends GeoVehicleEntity {
 
         Player player = this.level().getPlayerByUUID(uuid);
         if (player != null) {
-            player.getInventory().items.stream().filter(stack -> stack.getItem() == ModItems.MONITOR.get())
+            player.getInventory().items.stream().filter(stack -> stack.getItem() == ModItems.MONITOR)
                     .forEach(stack -> {
                         var tag = NBTTool.getTag(stack);
                         if (tag.getString(Monitor.LINKED_DRONE).equals(this.getStringUUID())) {
@@ -710,7 +708,7 @@ public class DroneEntity extends GeoVehicleEntity {
 //            ParticleTool.spawnMediumExplosionParticles(this.level(), this.position());
 //
 //            if (this.currentItem.getItem() instanceof MortarShell) {
-//                this.createAreaCloud(this.currentItem.get(DataComponents.POTION_CONTENTS), this.level(), ExplosionConfig.DRONE_KAMIKAZE_EXPLOSION_DAMAGE.get(), ExplosionConfig.DRONE_KAMIKAZE_EXPLOSION_RADIUS.get());
+//                this.createAreaCloud(this.currentItem.get(DataComponents.POTION_CONTENTS), this.level(), ExplosionConfig.DRONE_KAMIKAZE_EXPLOSION_DAMAGE, ExplosionConfig.DRONE_KAMIKAZE_EXPLOSION_RADIUS);
 //            }
 //        }
     }
@@ -739,13 +737,13 @@ public class DroneEntity extends GeoVehicleEntity {
         return false;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     @Override
     public @Nullable Vec2 getCameraRotation(float partialTicks, Player player, boolean zoom, boolean isFirstPerson) {
         return new Vec2((float) (getYaw(partialTicks) - freeCameraYaw), (float) (getPitch(partialTicks) + freeCameraPitch));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     @Override
     public Vec3 getCameraPosition(float partialTicks, Player player, boolean zoom, boolean isFirstPerson) {
         Matrix4d transform = getClientVehicleTransform(partialTicks);

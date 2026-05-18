@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.mixins;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -7,7 +8,6 @@ import com.atsuishio.superbwarfare.network.message.send.SwitchVehicleWeaponMessa
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.player.LocalPlayer;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -54,7 +54,7 @@ public class MinecraftMixin {
             ci.cancel();
             options.keyHotbarSlots[index].consumeClick();
 
-            PacketDistributor.sendToServer(new ChangeVehicleSeatMessage(index));
+            ClientPlayNetworking.send(new ChangeVehicleSeatMessage(index));
             vehicle.changeSeat(player, index);
 
             return;
@@ -71,7 +71,7 @@ public class MinecraftMixin {
                     && vehicle.hasWeapon(seatIndex)
                     && vehicle.getWeaponIndex(seatIndex) != index) {
                 if (ClientEventHandler.switchVehicleWeaponCooldown <= 0) {
-                    PacketDistributor.sendToServer(new SwitchVehicleWeaponMessage(seatIndex, index, false));
+                    ClientPlayNetworking.send(new SwitchVehicleWeaponMessage(seatIndex, index, false));
                     ClientEventHandler.switchVehicleWeaponCooldown = 3;
                 }
             }

@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessag
 import com.atsuishio.superbwarfare.tools.DamageHandler;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import com.atsuishio.superbwarfare.tools.ProjectileTool;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -23,7 +24,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -56,7 +56,7 @@ public class RpgRocketTBGEntity extends FastThrowableProjectile implements GeoEn
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.RPG_ROCKET_TBG.get();
+        return ModItems.RPG_ROCKET_TBG;
     }
 
     @Override
@@ -66,13 +66,13 @@ public class RpgRocketTBGEntity extends FastThrowableProjectile implements GeoEn
             BlockPos resultPos = blockHitResult.getBlockPos();
             float hardness = this.level().getBlockState(resultPos).getBlock().defaultDestroyTime();
             if (hardness != -1) {
-                if (ExplosionConfig.EXPLOSION_DESTROY.get()) {
+                if (ExplosionConfig.EXPLOSION_DESTROY) {
                     if (firstHit) {
                         causeExplode(blockHitResult.getLocation());
                         firstHit = false;
                         Mod.queueServerWork(3, this::discard);
                     }
-                    if (ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+                    if (ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
                         this.level().destroyBlock(resultPos, true);
                     }
                 }
@@ -80,7 +80,7 @@ public class RpgRocketTBGEntity extends FastThrowableProjectile implements GeoEn
                 causeExplode(blockHitResult.getLocation());
                 this.discard();
             }
-            if (!ExplosionConfig.EXPLOSION_DESTROY.get()) {
+            if (!ExplosionConfig.EXPLOSION_DESTROY) {
                 causeExplode(blockHitResult.getLocation());
                 this.discard();
             }
@@ -98,9 +98,9 @@ public class RpgRocketTBGEntity extends FastThrowableProjectile implements GeoEn
                 return;
             if (this.getOwner() instanceof LivingEntity living) {
                 if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
-                    living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
+                    living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
 
-                    PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                    ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                 }
             }
 
@@ -165,6 +165,6 @@ public class RpgRocketTBGEntity extends FastThrowableProjectile implements GeoEn
 
     @Override
     public @NotNull SoundEvent getSound() {
-        return ModSounds.ROCKET_FLY.get();
+        return ModSounds.ROCKET_FLY;
     }
 }

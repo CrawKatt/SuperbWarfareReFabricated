@@ -36,7 +36,7 @@ public class RgoGrenade extends Item implements ProjectileItem {
         ItemStack stack = playerIn.getItemInHand(handIn);
         playerIn.startUsingItem(handIn);
         if (playerIn instanceof ServerPlayer serverPlayer) {
-            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.GRENADE_PULL.get(), SoundSource.PLAYERS, 1, 1);
+            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.GRENADE_PULL, SoundSource.PLAYERS, 1, 1);
         }
         return InteractionResultHolder.consume(stack);
     }
@@ -61,7 +61,7 @@ public class RgoGrenade extends Item implements ProjectileItem {
                     worldIn.addFreshEntity(rgoGrenade);
 
                     if (player instanceof ServerPlayer serverPlayer) {
-                        serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.GRENADE_THROW.get(), SoundSource.PLAYERS, 1, 1);
+                        serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.GRENADE_THROW, SoundSource.PLAYERS, 1, 1);
                     }
 
                     if (!player.isCreative()) {
@@ -80,8 +80,8 @@ public class RgoGrenade extends Item implements ProjectileItem {
 
             new CustomExplosion.Builder(rgoGrenade)
                     .attacker(pLivingEntity)
-                    .damage(ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE.get())
-                    .radius(ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS.get())
+                    .damage(ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE)
+                    .radius(ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS)
                     .damageMultiplier(1.25F)
                     .withParticleType(ParticleTool.ParticleType.MEDIUM)
                     .explode();
@@ -106,19 +106,19 @@ public class RgoGrenade extends Item implements ProjectileItem {
 
     public static class RgoGrenadeDispenserBehavior extends ProjectileDispenseBehavior {
         public RgoGrenadeDispenserBehavior() {
-            super(ModItems.RGO_GRENADE.get());
+            super(ModItems.RGO_GRENADE);
         }
 
         @Override
         protected void playSound(BlockSource blockSource) {
-            blockSource.level().playSound(null, blockSource.pos(), ModSounds.GRENADE_THROW.get(), SoundSource.BLOCKS, 1F, 1F);
+            blockSource.level().playSound(null, blockSource.pos(), ModSounds.GRENADE_THROW, SoundSource.BLOCKS, 1F, 1F);
         }
     }
 
     @Override
     @ParametersAreNonnullByDefault
     public @NotNull Projectile asProjectile(Level level, Position pos, ItemStack stack, Direction direction) {
-        return new RgoGrenadeEntity(ModEntities.RGO_GRENADE.get(), pos.x(), pos.y(), pos.z(), level);
+        return new RgoGrenadeEntity(ModEntities.RGO_GRENADE, pos.x(), pos.y(), pos.z(), level);
     }
 }
 

@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.tools.*;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +28,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -53,7 +53,7 @@ public class Kh39Entity extends MissileProjectile implements GeoEntity {
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.LARGE_ANTI_GROUND_MISSILE.get();
+        return ModItems.LARGE_ANTI_GROUND_MISSILE;
     }
 
     @Override
@@ -65,9 +65,9 @@ public class Kh39Entity extends MissileProjectile implements GeoEntity {
         if (this.level() instanceof ServerLevel) {
             if (this.getOwner() instanceof LivingEntity living) {
                 if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
-                    living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
+                    living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
 
-                    PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                    ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                 }
             }
 
@@ -90,13 +90,13 @@ public class Kh39Entity extends MissileProjectile implements GeoEntity {
             BlockPos resultPos = blockHitResult.getBlockPos();
             float hardness = this.level().getBlockState(resultPos).getBlock().defaultDestroyTime();
             if (hardness != -1) {
-                if (ExplosionConfig.EXPLOSION_DESTROY.get()) {
+                if (ExplosionConfig.EXPLOSION_DESTROY) {
                     if (firstHit) {
                         causeExplode(blockHitResult.getLocation());
                         firstHit = false;
                         Mod.queueServerWork(3, this::discard);
                     }
-                    if (ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+                    if (ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
                         this.level().destroyBlock(resultPos, true);
                     }
                 }
@@ -104,7 +104,7 @@ public class Kh39Entity extends MissileProjectile implements GeoEntity {
                 causeExplode(blockHitResult.getLocation());
                 this.discard();
             }
-            if (!ExplosionConfig.EXPLOSION_DESTROY.get()) {
+            if (!ExplosionConfig.EXPLOSION_DESTROY) {
                 causeExplode(blockHitResult.getLocation());
                 this.discard();
             }
@@ -135,7 +135,7 @@ public class Kh39Entity extends MissileProjectile implements GeoEntity {
                 if (entity != null) {
                     if (level() instanceof ServerLevel) {
                         if ((!entity.getPassengers().isEmpty() || entity instanceof VehicleEntity) && entity.tickCount % ((int) Math.max(0.04 * this.distanceTo(entity), 2)) == 0) {
-                            entity.level().playSound(null, entity.getOnPos(), entity instanceof Pig ? SoundEvents.PIG_HURT : ModSounds.MISSILE_WARNING.get(), SoundSource.PLAYERS, 2, 1f);
+                            entity.level().playSound(null, entity.getOnPos(), entity instanceof Pig ? SoundEvents.PIG_HURT : ModSounds.MISSILE_WARNING, SoundSource.PLAYERS, 2, 1f);
                         }
                         double dis = entity.position().vectorTo(position()).horizontalDistance();
                         double height = dis > 30 ? 0.4 * (dis - 30) : 0;
@@ -166,7 +166,7 @@ public class Kh39Entity extends MissileProjectile implements GeoEntity {
         }
 
         if (this.tickCount == 8) {
-            this.level().playSound(null, BlockPos.containing(position()), ModSounds.MISSILE_START.get(), SoundSource.PLAYERS, 4, 1);
+            this.level().playSound(null, BlockPos.containing(position()), ModSounds.MISSILE_START, SoundSource.PLAYERS, 4, 1);
             if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
                 ParticleTool.sendParticle(serverLevel, ParticleTypes.CLOUD, this.xo, this.yo, this.zo, 15, 0.8, 0.8, 0.8, 0.01, true);
                 ParticleTool.sendParticle(serverLevel, ParticleTypes.CAMPFIRE_COSY_SMOKE, this.xo, this.yo, this.zo, 10, 0.8, 0.8, 0.8, 0.01, true);
@@ -206,7 +206,7 @@ public class Kh39Entity extends MissileProjectile implements GeoEntity {
 
     @Override
     public @NotNull SoundEvent getSound() {
-        return ModSounds.ROCKET_FLY.get();
+        return ModSounds.ROCKET_FLY;
     }
 
     @Override

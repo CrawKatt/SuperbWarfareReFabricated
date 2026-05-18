@@ -26,7 +26,6 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.NeoForge;
 import org.joml.Matrix4f;
 import software.bernie.geckolib.animation.AnimationProcessor;
 import software.bernie.geckolib.cache.object.GeoBone;
@@ -209,12 +208,7 @@ public class AnimationHelper {
             RenderUtil.translateAwayFromPivotPoint(stack, bone);
 
             HumanoidArm arm = "Lefthand".equals(name) ? HumanoidArm.LEFT : HumanoidArm.RIGHT;
-            var renderPlayerArmEvent = new RenderPlayerArmEvent(localPlayer, transformType, stack, arm, bone, currentBuffer, renderType, packedLightIn, useOldHandRender);
-            if (NeoForge.EVENT_BUS.post(renderPlayerArmEvent).isCanceled()) {
-                currentBuffer.getBuffer(renderType); // 用来重置 Render Type，防止后续渲染出错
-                stack.popPose();
-                return;
-            }
+            // RenderPlayerArmEvent not available in Fabric - skipping NeoForge event
 
             ResourceLocation loc = localPlayer.getSkin().texture();
             VertexConsumer armBuilder = currentBuffer.getBuffer(RenderType.entitySolid(loc));

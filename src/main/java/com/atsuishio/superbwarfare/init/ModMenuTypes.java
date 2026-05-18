@@ -2,66 +2,51 @@ package com.atsuishio.superbwarfare.init;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.menu.*;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.MenuType;
-import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
-import net.neoforged.neoforge.registries.DeferredRegister;
-
-import java.util.function.Supplier;
 
 public class ModMenuTypes {
 
-    public static final DeferredRegister<MenuType<?>> REGISTRY = DeferredRegister.create(BuiltInRegistries.MENU, Mod.MODID);
+    public static final MenuType<ReforgingTableMenu> REFORGING_TABLE_MENU =
+            register("reforging_table_menu", new MenuType<>(ReforgingTableMenu::new, FeatureFlagSet.of()));
+    public static final MenuType<ChargingStationMenu> CHARGING_STATION_MENU =
+            register("charging_station_menu", new MenuType<>(ChargingStationMenu::new, FeatureFlagSet.of()));
 
-    public static final Supplier<MenuType<ReforgingTableMenu>> REFORGING_TABLE_MENU =
-            REGISTRY.register("reforging_table_menu",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> new ReforgingTableMenu(windowId, inv)));
-    public static final Supplier<MenuType<ChargingStationMenu>> CHARGING_STATION_MENU =
-            REGISTRY.register("charging_station_menu",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> new ChargingStationMenu(windowId, inv)));
+    public static final MenuType<VehicleMenu> VEHICLE_MENU_MINI =
+            register("vehicle_menu_mini", new MenuType<>((id, inv) -> VehicleMenu.mini(id, inv, false), FeatureFlagSet.of()));
+    public static final MenuType<VehicleMenu> VEHICLE_MENU_MINI_UPGRADE =
+            register("vehicle_menu_mini_upgrade", new MenuType<>((id, inv) -> VehicleMenu.mini(id, inv, true), FeatureFlagSet.of()));
 
-    public static final Supplier<MenuType<VehicleMenu>> VEHICLE_MENU_MINI =
-            REGISTRY.register("vehicle_menu_mini",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> VehicleMenu.mini(windowId, inv, false)));
-    public static final Supplier<MenuType<VehicleMenu>> VEHICLE_MENU_MINI_UPGRADE =
-            REGISTRY.register("vehicle_menu_mini_upgrade",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> VehicleMenu.mini(windowId, inv, true)));
+    public static final MenuType<VehicleMenu> VEHICLE_MENU_SMALL =
+            register("vehicle_menu_small", new MenuType<>((id, inv) -> VehicleMenu.small(id, inv, false), FeatureFlagSet.of()));
+    public static final MenuType<VehicleMenu> VEHICLE_MENU_SMALL_UPGRADE =
+            register("vehicle_menu_small_upgrade", new MenuType<>((id, inv) -> VehicleMenu.small(id, inv, true), FeatureFlagSet.of()));
 
-    public static final Supplier<MenuType<VehicleMenu>> VEHICLE_MENU_SMALL =
-            REGISTRY.register("vehicle_menu_small",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> VehicleMenu.small(windowId, inv, false)));
-    public static final Supplier<MenuType<VehicleMenu>> VEHICLE_MENU_SMALL_UPGRADE =
-            REGISTRY.register("vehicle_menu_small_upgrade",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> VehicleMenu.small(windowId, inv, true)));
+    public static final MenuType<VehicleMenu> VEHICLE_MENU_MEDIUM =
+            register("vehicle_menu_medium", new MenuType<>((id, inv) -> VehicleMenu.medium(id, inv, false), FeatureFlagSet.of()));
+    public static final MenuType<VehicleMenu> VEHICLE_MENU_MEDIUM_UPGRADE =
+            register("vehicle_menu_medium_upgrade", new MenuType<>((id, inv) -> VehicleMenu.medium(id, inv, true), FeatureFlagSet.of()));
 
-    public static final Supplier<MenuType<VehicleMenu>> VEHICLE_MENU_MEDIUM =
-            REGISTRY.register("vehicle_menu_medium",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> VehicleMenu.medium(windowId, inv, false)));
-    public static final Supplier<MenuType<VehicleMenu>> VEHICLE_MENU_MEDIUM_UPGRADE =
-            REGISTRY.register("vehicle_menu_medium_upgrade",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> VehicleMenu.medium(windowId, inv, true)));
+    public static final MenuType<VehicleMenu> VEHICLE_MENU_LARGE =
+            register("vehicle_menu_large", new MenuType<>((id, inv) -> VehicleMenu.large(id, inv, false), FeatureFlagSet.of()));
+    public static final MenuType<VehicleMenu> VEHICLE_MENU_LARGE_UPGRADE =
+            register("vehicle_menu_large_upgrade", new MenuType<>((id, inv) -> VehicleMenu.large(id, inv, true), FeatureFlagSet.of()));
 
-    public static final Supplier<MenuType<VehicleMenu>> VEHICLE_MENU_LARGE =
-            REGISTRY.register("vehicle_menu_large",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> VehicleMenu.large(windowId, inv, false)));
-    public static final Supplier<MenuType<VehicleMenu>> VEHICLE_MENU_LARGE_UPGRADE =
-            REGISTRY.register("vehicle_menu_large_upgrade",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> VehicleMenu.large(windowId, inv, true)));
+    public static final MenuType<VehicleMenu> VEHICLE_MENU_HUGE =
+            register("vehicle_menu_huge", new MenuType<>((id, inv) -> VehicleMenu.huge(id, inv, false), FeatureFlagSet.of()));
+    public static final MenuType<VehicleMenu> VEHICLE_MENU_HUGE_UPGRADE =
+            register("vehicle_menu_huge_upgrade", new MenuType<>((id, inv) -> VehicleMenu.huge(id, inv, true), FeatureFlagSet.of()));
 
-    public static final Supplier<MenuType<VehicleMenu>> VEHICLE_MENU_HUGE =
-            REGISTRY.register("vehicle_menu_huge",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> VehicleMenu.huge(windowId, inv, false)));
-    public static final Supplier<MenuType<VehicleMenu>> VEHICLE_MENU_HUGE_UPGRADE =
-            REGISTRY.register("vehicle_menu_huge_upgrade",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> VehicleMenu.huge(windowId, inv, true)));
+    public static final MenuType<SuperbItemInterfaceMenu> SUPERB_ITEM_INTERFACE_MENU =
+            register("superb_item_interface_menu", new MenuType<>(SuperbItemInterfaceMenu::new, FeatureFlagSet.of()));
+    public static final MenuType<FuMO25Menu> FUMO_25_MENU =
+            register("fumo_25_menu", new MenuType<>(FuMO25Menu::new, FeatureFlagSet.of()));
+    public static final MenuType<VehicleAssemblingMenu> VEHICLE_ASSEMBLING_MENU =
+            register("vehicle_assembling_menu", new MenuType<>(VehicleAssemblingMenu::new, FeatureFlagSet.of()));
 
-    public static final Supplier<MenuType<SuperbItemInterfaceMenu>> SUPERB_ITEM_INTERFACE_MENU =
-            REGISTRY.register("superb_item_interface_menu",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> new SuperbItemInterfaceMenu(windowId, inv)));
-    public static final Supplier<MenuType<FuMO25Menu>> FUMO_25_MENU =
-            REGISTRY.register("fumo_25_menu",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> new FuMO25Menu(windowId, inv)));
-    public static final Supplier<MenuType<VehicleAssemblingMenu>> VEHICLE_ASSEMBLING_MENU =
-            REGISTRY.register("vehicle_assembling_menu",
-                    () -> IMenuTypeExtension.create((windowId, inv, data) -> new VehicleAssemblingMenu(windowId, inv)));
+    private static <T extends MenuType<?>> T register(String name, T type) {
+        return Registry.register(BuiltInRegistries.MENU, Mod.loc(name), type);
+    }
 }

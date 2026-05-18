@@ -10,8 +10,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -19,7 +17,7 @@ import org.joml.Matrix4f;
 /**
  * Code based on @BobMowzie's MowziesMobs and @EEEAB's EEEABsMobs
  */
-@OnlyIn(Dist.CLIENT)
+
 public class LaserEntityRenderer extends AbstractLaserEntityRenderer<LaserEntity> {
 
     private boolean playerView;

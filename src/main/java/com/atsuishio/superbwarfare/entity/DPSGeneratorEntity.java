@@ -1,7 +1,9 @@
 package com.atsuishio.superbwarfare.entity;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.capability.api.IEnergyStorage;
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
@@ -29,11 +31,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -42,7 +39,6 @@ import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-@EventBusSubscriber(modid = Mod.MODID)
 public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
 
     public static final EntityDataAccessor<Integer> DOWN_TIME = SynchedEntityData.defineId(DPSGeneratorEntity.class, EntityDataSerializers.INT);
@@ -98,7 +94,7 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
         super.addAdditionalSaveData(compound);
         compound.putInt("Level", this.entityData.get(LEVEL));
 
-        var entityCap = this.getCapability(Capabilities.EnergyStorage.ENTITY, null);
+        var entityCap = this.getEnergyStorage();
         if (entityCap == null) return;
 
         compound.putInt("Energy", entityCap.getEnergyStored());
@@ -109,7 +105,7 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
         super.readAdditionalSaveData(compound);
         this.entityData.set(LEVEL, compound.getInt("Level"));
 
-        var entityCap = this.getCapability(Capabilities.EnergyStorage.ENTITY, null);
+        var entityCap = this.getEnergyStorage();
         if (entityCap == null) return;
 
         ((SyncedEntityEnergyStorage) entityCap).setEnergy(compound.getInt("Energy"));
@@ -132,29 +128,28 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
         }
 
         if (!this.level().isClientSide()) {
-            this.level().playSound(null, BlockPos.containing(this.getX(), this.getY(), this.getZ()), ModSounds.HIT.get(), SoundSource.BLOCKS, 1, 1);
+            this.level().playSound(null, BlockPos.containing(this.getX(), this.getY(), this.getZ()), ModSounds.HIT, SoundSource.BLOCKS, 1, 1);
         } else {
-            this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), ModSounds.HIT.get(), SoundSource.BLOCKS, 1, 1, false);
+            this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), ModSounds.HIT, SoundSource.BLOCKS, 1, 1, false);
         }
         return super.hurt(source, (float) (amount / Math.pow(2, getGeneratorLevel())));
     }
 
-    @SubscribeEvent
-    public static void onTargetDown(LivingDeathEvent event) {
-        var entity = event.getEntity();
+    public static boolean onTargetDown(LivingEntity entity, DamageSource source, float amount) {
         // 不处理/kill伤害
-        if (event.getSource().is(DamageTypes.GENERIC_KILL)) return;
-        var sourceEntity = event.getSource().getEntity();
+        if (source.is(DamageTypes.GENERIC_KILL)) return true;
+        var sourceEntity = source.getEntity();
 
         if (entity instanceof DPSGeneratorEntity generatorEntity) {
-            event.setCanceled(true);
             generatorEntity.setHealth(0.00001F);
 
             if (sourceEntity instanceof Player player) {
-                SoundTool.playLocalSound(player, ModSounds.TARGET_DOWN.get(), 1, 1);
+                SoundTool.playLocalSound(player, ModSounds.TARGET_DOWN, 1, 1);
                 generatorEntity.entityData.set(DOWN_TIME, 40);
             }
+            return false;
         }
+        return true;
     }
 
     @Override
@@ -174,7 +169,7 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
             }
 
             if (!player.getAbilities().instabuild) {
-                player.addItem(new ItemStack(ModItems.DPS_GENERATOR_DEPLOYER.get()));
+                player.addItem(new ItemStack(ModItems.DPS_GENERATOR_DEPLOYER));
             }
         } else {
             this.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3((player.getX()), this.getY(), (player.getZ())));
@@ -196,7 +191,7 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
         // 每秒恢复生命并充能下方方块
         if (this.tickCount % 20 == 0) {
             var damage = this.getMaxHealth() - this.getHealth();
-            var entityCap = this.getCapability(Capabilities.EnergyStorage.ENTITY, null);
+            var entityCap = this.getEnergyStorage();
 
             if (entityCap != null) {
                 if (damage > 0) {
@@ -226,9 +221,9 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
 
 
                     if (!this.level().isClientSide()) {
-                        this.level().playSound(null, BlockPos.containing(this.getX(), this.getY(), this.getZ()), ModSounds.DPS_GENERATOR_EVOLVE.get(), SoundSource.BLOCKS, 0.5f, 1);
+                        this.level().playSound(null, BlockPos.containing(this.getX(), this.getY(), this.getZ()), ModSounds.DPS_GENERATOR_EVOLVE, SoundSource.BLOCKS, 0.5f, 1);
                     } else {
-                        this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), ModSounds.DPS_GENERATOR_EVOLVE.get(), SoundSource.BLOCKS, 0.5f, 1, false);
+                        this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), ModSounds.DPS_GENERATOR_EVOLVE, SoundSource.BLOCKS, 0.5f, 1, false);
                     }
                 }
                 this.setHealth(this.getMaxHealth());
@@ -288,7 +283,7 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
     protected void tickDeath() {
         ++this.deathTime;
         if (this.deathTime >= 100) {
-            this.spawnAtLocation(new ItemStack(ModItems.DPS_GENERATOR_DEPLOYER.get()));
+            this.spawnAtLocation(new ItemStack(ModItems.DPS_GENERATOR_DEPLOYER));
             this.remove(RemovalReason.KILLED);
         }
     }
@@ -306,12 +301,12 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
     }
 
     protected void chargeBlockBelow() {
-        var entityCap = this.getCapability(Capabilities.EnergyStorage.ENTITY, null);
+        var entityCap = this.getEnergyStorage();
         if (entityCap == null) return;
 
         if (!entityCap.canExtract() || entityCap.getEnergyStored() <= 0) return;
         var blockPos = this.blockPosition().below();
-        var cap = this.level().getCapability(Capabilities.EnergyStorage.BLOCK, blockPos, Direction.UP);
+        var cap = ModCapabilities.ENERGY_BLOCK.find(this.level(), blockPos, Direction.UP);
         if (cap == null || !cap.canReceive()) return;
 
         var extract = entityCap.extractEnergy(entityCap.getEnergyStored(), true);
@@ -357,7 +352,7 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
     public void beastCharge() {
         if (this.entityData.get(LEVEL) < 7) {
             this.entityData.set(LEVEL, 7);
-            if (this.getCapability(Capabilities.EnergyStorage.ENTITY, null) instanceof SyncedEntityEnergyStorage storage) {
+            if (this.getEnergyStorage() instanceof SyncedEntityEnergyStorage storage) {
                 storage.setCapacity(this.getMaxEnergy());
                 storage.setMaxExtract(this.getMaxTransfer());
                 storage.setEnergy(this.getMaxEnergy());
@@ -368,6 +363,6 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
     @Override
     @Nullable
     public ItemStack getPickResult() {
-        return new ItemStack(ModItems.DPS_GENERATOR_DEPLOYER.get());
+        return new ItemStack(ModItems.DPS_GENERATOR_DEPLOYER);
     }
 }

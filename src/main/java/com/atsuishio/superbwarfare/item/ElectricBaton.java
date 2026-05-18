@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.item;
 
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.init.ModSounds;
@@ -19,7 +20,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -76,7 +76,7 @@ public class ElectricBaton extends SwordItem implements EnergyStorageItem {
     @Override
     public int getBarWidth(@NotNull ItemStack stack) {
         if (NBTTool.getTag(stack).getBoolean(TAG_OPEN)) {
-            var cap = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+            var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
             if (cap == null) return 0;
 
             return Math.round((float) cap.getEnergyStored() * 13F / MAX_ENERGY);
@@ -93,10 +93,10 @@ public class ElectricBaton extends SwordItem implements EnergyStorageItem {
     @Override
     @ParametersAreNonnullByDefault
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        attacker.level().playSound(null, target.getOnPos(), ModSounds.MELEE_HIT.get(), SoundSource.PLAYERS, 1, (float) ((2 * org.joml.Math.random() - 1) * 0.1f + 1));
+        attacker.level().playSound(null, target.getOnPos(), ModSounds.MELEE_HIT, SoundSource.PLAYERS, 1, (float) ((2 * org.joml.Math.random() - 1) * 0.1f + 1));
 
         if (NBTTool.getTag(stack).getBoolean(TAG_OPEN)) {
-            var cap = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+            var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
             if (cap != null && cap.getEnergyStored() >= ENERGY_COST) {
                 cap.extractEnergy(ENERGY_COST, false);
 
@@ -114,9 +114,9 @@ public class ElectricBaton extends SwordItem implements EnergyStorageItem {
     }
 
     public static ItemStack makeFullEnergyStack() {
-        ItemStack stack = new ItemStack(ModItems.ELECTRIC_BATON.get());
+        ItemStack stack = new ItemStack(ModItems.ELECTRIC_BATON);
 
-        var cap = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
         if (cap != null) {
             cap.receiveEnergy(MAX_ENERGY, false);
         }

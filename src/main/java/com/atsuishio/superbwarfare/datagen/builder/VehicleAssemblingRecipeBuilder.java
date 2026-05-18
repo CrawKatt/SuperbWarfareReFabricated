@@ -43,7 +43,7 @@ public class VehicleAssemblingRecipeBuilder implements RecipeBuilder {
     }
 
     public VehicleAssemblingRecipeBuilder(@Nullable EntityType<?> type, VehicleAssemblingRecipe.Category category) {
-        this.result = ModItems.CONTAINER.get();
+        this.result = ModItems.CONTAINER;
         this.entityType = type;
         this.count = 1;
         this.category = category;

@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.entity.projectile;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig;
 import com.atsuishio.superbwarfare.init.ModEntities;
@@ -24,7 +25,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -41,30 +41,30 @@ public class HandGrenadeEntity extends FastThrowableProjectile implements GeoEnt
         super(type, level);
         this.noCulling = true;
         this.damage = 1;
-        this.explosionDamage = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE.get();
-        this.explosionRadius = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS.get();
+        this.explosionDamage = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE;
+        this.explosionRadius = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS;
     }
 
     public HandGrenadeEntity(EntityType<? extends HandGrenadeEntity> type, double x, double y, double z, Level level) {
         super(type, x, y, z, level);
         this.noCulling = true;
         this.damage = 1;
-        this.explosionDamage = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE.get();
-        this.explosionRadius = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS.get();
+        this.explosionDamage = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE;
+        this.explosionRadius = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS;
     }
 
     public HandGrenadeEntity(LivingEntity entity, Level level, int fuse) {
-        super(ModEntities.HAND_GRENADE.get(), entity, level);
+        super(ModEntities.HAND_GRENADE, entity, level);
         this.noCulling = true;
         this.damage = 1;
-        this.explosionDamage = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE.get();
-        this.explosionRadius = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS.get();
+        this.explosionDamage = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE;
+        this.explosionRadius = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS;
         this.fuse = fuse;
     }
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.HAND_GRENADE.get();
+        return ModItems.HAND_GRENADE;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class HandGrenadeEntity extends FastThrowableProjectile implements GeoEnt
                 BlockHitResult blockResult = (BlockHitResult) result;
                 BlockPos resultPos = blockResult.getBlockPos();
                 BlockState state = this.level().getBlockState(resultPos);
-                SoundEvent event = state.getBlock().getSoundType(state, this.level(), resultPos, this).getBreakSound();
+                SoundEvent event = state.getSoundType().getBreakSound();
                 double speed = this.getDeltaMovement().length();
                 if (speed > 0.1) {
                     this.level().playSound(null, result.getLocation().x, result.getLocation().y, result.getLocation().z, event, SoundSource.AMBIENT, 1F, 1F);
@@ -94,9 +94,9 @@ public class HandGrenadeEntity extends FastThrowableProjectile implements GeoEnt
                 if (speed_e > 0.1) {
                     if (this.getOwner() instanceof LivingEntity living) {
                         if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
-                            living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
+                            living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
 
-                            PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                            ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                         }
                     }
                     entity.hurt(entity.damageSources().thrown(this, this.getOwner()), this.damage);

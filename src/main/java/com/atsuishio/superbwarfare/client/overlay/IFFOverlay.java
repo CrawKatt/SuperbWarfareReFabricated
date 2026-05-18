@@ -24,16 +24,13 @@ import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import top.theillusivec4.curios.api.CuriosApi;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 
-@OnlyIn(Dist.CLIENT)
+
 public class IFFOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("iff");
@@ -55,7 +52,7 @@ public class IFFOverlay implements LayeredDraw.Layer {
     @ParametersAreNonnullByDefault
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         if (Minecraft.getInstance().options.hideGui) return;
-        if (!DisplayConfig.VEHICLE_INFO.get()) return;
+        if (!DisplayConfig.VEHICLE_INFO) return;
 
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
@@ -68,7 +65,7 @@ public class IFFOverlay implements LayeredDraw.Layer {
 
         if (player == null) return;
 
-        CuriosApi.getCuriosInventory(player).flatMap(c -> c.findFirstCurio(ModItems.IFF.get())).ifPresent(s -> {
+        dev.emi.trinkets.api.TrinketsApi.getTrinketComponent(player).flatMap(c -> c.getEquipped(ModItems.IFF).stream().findFirst()).ifPresent(s -> {
             List<Entity> entities = new SeekTool.Builder(player)
                     .friendly()
                     .build();

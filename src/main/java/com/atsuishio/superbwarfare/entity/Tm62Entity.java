@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier;
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.tools.CustomExplosion;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import net.minecraft.core.BlockPos;
@@ -28,7 +29,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -54,7 +54,7 @@ public class Tm62Entity extends Entity implements GeoEntity, OwnableEntity {
     }
 
     public Tm62Entity(LivingEntity owner, Level level, boolean fuse) {
-        super(ModEntities.TM_62.get(), level);
+        super(ModEntities.TM_62, level);
         if (owner != null) {
             this.setOwnerUUID(owner.getUUID());
         }
@@ -162,7 +162,7 @@ public class Tm62Entity extends Entity implements GeoEntity, OwnableEntity {
             }
 
             if (!player.getAbilities().instabuild) {
-                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.TM_62.get()));
+                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.TM_62));
             }
         }
 
@@ -187,7 +187,7 @@ public class Tm62Entity extends Entity implements GeoEntity, OwnableEntity {
         float f = 0.98F;
         if (this.onGround()) {
             BlockPos pos = this.getBlockPosBelowThatAffectsMyMovement();
-            f = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98F;
+            f = this.level().getBlockState(pos).getBlock().getFriction() * 0.98F;
         }
 
         this.setDeltaMovement(this.getDeltaMovement().multiply(f, 0.98, f));
@@ -224,7 +224,7 @@ public class Tm62Entity extends Entity implements GeoEntity, OwnableEntity {
             if (trigger) {
                 this.triggerExplode();
 
-                if (this.level() instanceof ServerLevel && ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+                if (this.level() instanceof ServerLevel && ExplosionConfig.EXPLOSION_DESTROY && ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
                     AABB aabb = new AABB(position(), position()).inflate(2);
                     BlockPos.betweenClosedStream(aabb).forEach((blockPos) -> {
                         float hard = this.level().getBlockState(blockPos).getBlock().defaultDestroyTime();

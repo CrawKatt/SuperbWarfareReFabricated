@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.block.entity.ChargingStationBlockEntity;
 import com.atsuishio.superbwarfare.block.entity.CreativeChargingStationBlockEntity;
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
+import com.atsuishio.superbwarfare.block.entity.SuperbItemInterfaceBlockEntity;
 import com.atsuishio.superbwarfare.capability.api.IEnergyStorage;
 import com.atsuishio.superbwarfare.capability.api.IItemHandler;
 import com.atsuishio.superbwarfare.capability.api.InvWrapper;
@@ -11,6 +12,7 @@ import com.atsuishio.superbwarfare.capability.api.SidedInvWrapper;
 import com.atsuishio.superbwarfare.capability.energy.ItemEnergyStorage;
 import com.atsuishio.superbwarfare.capability.laser.LaserCapability;
 import com.atsuishio.superbwarfare.capability.laser.LaserCapabilityProvider;
+import com.atsuishio.superbwarfare.entity.DPSGeneratorEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.CreativeChargingStationBlockItem;
 import com.atsuishio.superbwarfare.item.EnergyStorageItem;
@@ -38,11 +40,11 @@ public class ModCapabilities {
     public static void init() {
         LASER_CAPABILITY.registerForTypes(new LaserCapabilityProvider(), EntityType.PLAYER);
 
-        ENERGY_BLOCK.registerForBlockEntity(ChargingStationBlockEntity::getEnergyStorage, ModBlockEntities.CHARGING_STATION.value());
-        ENERGY_BLOCK.registerForBlockEntity(CreativeChargingStationBlockEntity::getEnergyStorage, ModBlockEntities.CREATIVE_CHARGING_STATION.value());
-        ENERGY_BLOCK.registerForBlockEntity(FuMO25BlockEntity::getEnergyStorage, ModBlockEntities.FUMO_25.value());
+        ENERGY_BLOCK.registerForBlockEntity(ChargingStationBlockEntity::getEnergyStorage, ModBlockEntities.CHARGING_STATION);
+        ENERGY_BLOCK.registerForBlockEntity(CreativeChargingStationBlockEntity::getEnergyStorage, ModBlockEntities.CREATIVE_CHARGING_STATION);
+        ENERGY_BLOCK.registerForBlockEntity(FuMO25BlockEntity::getEnergyStorage, ModBlockEntities.FUMO_25);
 
-        ENERGY_ITEM.registerForItems((stack, ctx) -> ((CreativeChargingStationBlockItem) stack.getItem()).getEnergyStorage(), ModItems.CREATIVE_CHARGING_STATION.value());
+        ENERGY_ITEM.registerForItems((stack, ctx) -> ((CreativeChargingStationBlockItem) stack.getItem()).getEnergyStorage(), ModItems.CREATIVE_CHARGING_STATION);
 
         ITEM_HANDLER_BLOCK.registerForBlockEntity((ChargingStationBlockEntity be, Direction ctx) -> {
             if (ctx == null || be.isRemoved()) return null;
@@ -58,9 +60,9 @@ public class ModCapabilities {
                 case DOWN -> itemHandlers[1];
                 default -> itemHandlers[2];
             };
-        }, ModBlockEntities.CHARGING_STATION.value());
+        }, ModBlockEntities.CHARGING_STATION);
 
-        ITEM_HANDLER_BLOCK.registerForBlockEntities((object, context) -> new InvWrapper(object), ModBlockEntities.SUPERB_ITEM_INTERFACE.get());
+        ITEM_HANDLER_BLOCK.registerForBlockEntities((object, context) -> new InvWrapper((SuperbItemInterfaceBlockEntity) object), ModBlockEntities.SUPERB_ITEM_INTERFACE);
 
         for (var item : BuiltInRegistries.ITEM) {
             if (item instanceof EnergyStorageItem energyItem) {
@@ -81,6 +83,5 @@ public class ModCapabilities {
                     (obj instanceof VehicleEntity vehicle && vehicle.hasContainer()) ? new InvWrapper(vehicle) : null, entity);
         }
 
-        ENERGY_ENTITY.registerForTypes((obj, ctx) -> obj.getEnergyStorage(), ModEntities.DPS_GENERATOR.get());
     }
 }

@@ -92,6 +92,6 @@ public class CustomCloudOption implements ParticleOptions {
 
     @Override
     public @NotNull ParticleType<?> getType() {
-        return ModParticleTypes.CUSTOM_CLOUD.get();
+        return ModParticleTypes.CUSTOM_CLOUD;
     }
 }

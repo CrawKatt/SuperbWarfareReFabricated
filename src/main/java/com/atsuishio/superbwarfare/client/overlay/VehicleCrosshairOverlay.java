@@ -26,8 +26,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Math;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -36,7 +34,7 @@ import java.util.Map;
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 import static com.atsuishio.superbwarfare.client.overlay.weapon.LandVehicleHud.lerpRecoil;
 
-@OnlyIn(Dist.CLIENT)
+
 public class VehicleCrosshairOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("vehicle_crosshair");
@@ -196,7 +194,7 @@ public class VehicleCrosshairOverlay implements LayeredDraw.Layer {
                         String string = "[ " + FormatTool.format0D(vec3.x) + ", " + FormatTool.format0D(vec3.y) + ", " + FormatTool.format0D(vec3.z) + " ]";
                         int width = Minecraft.getInstance().font.width(string);
                         RenderHelper.preciseBlitWithColor(guiGraphics, texture, centerW, centerH, 0, 0, scaledMinWH, scaledMinWH, scaledMinWH, scaledMinWH, color);
-                        guiGraphics.drawString(Minecraft.getInstance().font, string, (float) screenWidth / 2 - (float) width / 2, (float) screenHeight - 73, color, false);
+                        guiGraphics.drawString(Minecraft.getInstance().font, string, (int) ((float) screenWidth / 2 - (float) width / 2), (int) ((float) screenHeight - 73), color, false);
                     }
                 } else {
                     RenderHelper.preciseBlitWithColor(guiGraphics, texture, centerW, centerH, 0, 0, scaledMinWH, scaledMinWH, scaledMinWH, scaledMinWH, color);
@@ -224,7 +222,7 @@ public class VehicleCrosshairOverlay implements LayeredDraw.Layer {
                 if (player == vehicle.getFirstPassenger()) {
                     if (vehicle.hasDecoy()) {
                         if (vehicle.getDecoyState().equals("READY")) {
-                            guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getKey().getDisplayName().getString() + "]")), 30, 1, -1, false);
+                            guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getDefaultKey().getDisplayName().getString() + "]")), 30, 1, -1, false);
                         } else {
                             guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.reloading"), 30, 1, 0xFF0000, false);
                         }

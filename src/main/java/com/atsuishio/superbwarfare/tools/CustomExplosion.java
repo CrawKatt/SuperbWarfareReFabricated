@@ -27,8 +27,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -160,7 +159,6 @@ public class CustomExplosion extends Explosion {
         int z0 = Mth.floor(this.z - (double) diameter - 1);
         int z1 = Mth.floor(this.z + (double) diameter + 1);
         List<Entity> list = this.level.getEntities(this.source, new AABB(x0, y0, z0, x1, y1, z1));
-        EventHooks.onExplosionDetonate(this.level, this, list, diameter);
         Vec3 position = new Vec3(this.x, this.y, this.z);
 
         boolean hit = false;
@@ -175,7 +173,7 @@ public class CustomExplosion extends Explosion {
                     double distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance + zDistance * zDistance);
 
                     if (distance != 0) {
-                        double seenPercent = Mth.clamp(getSeenPercent(position, entity), 0.01 * ExplosionConfig.EXPLOSION_PENETRATION_RATIO.get(), Double.POSITIVE_INFINITY);
+                        double seenPercent = Mth.clamp(getSeenPercent(position, entity), 0.01 * ExplosionConfig.EXPLOSION_PENETRATION_RATIO, Double.POSITIVE_INFINITY);
                         double damagePercent = (1 - distanceRate) * seenPercent;
                         double damageFinal = (damagePercent * damagePercent + damagePercent) / 2 * damage;
 
@@ -215,8 +213,8 @@ public class CustomExplosion extends Explosion {
 
             if (hit) {
                 if (this.damageSource.getEntity() instanceof ServerPlayer player) {
-                    SoundTool.playLocalSound(player, ModSounds.INDICATION.get());
-                    PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                    SoundTool.playLocalSound(player, ModSounds.INDICATION);
+                    ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                 }
             }
         }
@@ -230,7 +228,7 @@ public class CustomExplosion extends Explosion {
         private float damage;
         private float radius;
         private @Nullable ParticleTool.ParticleType particleType = ParticleTool.ParticleType.MINI;
-        private Supplier<BlockInteraction> destroyBlock = () -> ExplosionConfig.EXPLOSION_DESTROY.get() ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP;
+        private Supplier<BlockInteraction> destroyBlock = () -> ExplosionConfig.EXPLOSION_DESTROY ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP;
         private int fireTime = 0;
         private float damageMultiplier = 1;
         private DamageSource damageSource = null;
@@ -321,7 +319,6 @@ public class CustomExplosion extends Explosion {
                     .setFireTime(fireTime)
                     .setDamageMultiplier(damageMultiplier);
             customExplosion.explode();
-            EventHooks.onExplosionStart(directSource.level(), customExplosion);
             customExplosion.finalizeExplosion(false);
 
             ParticleTool.spawnExplosionParticles(particleType, directSource.level(), particlePosition != null ? particlePosition : position);

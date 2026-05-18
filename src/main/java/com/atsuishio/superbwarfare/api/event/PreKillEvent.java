@@ -2,8 +2,6 @@ package com.atsuishio.superbwarfare.api.event;
 
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.bus.api.Event;
-import net.neoforged.bus.api.ICancellableEvent;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -11,7 +9,9 @@ import org.jetbrains.annotations.ApiStatus;
  */
 @ApiStatus.Internal
 @ApiStatus.AvailableSince("0.8.0")
-public class PreKillEvent extends Event implements ICancellableEvent {
+public class PreKillEvent {
+
+    private boolean cancelled = false;
 
     private final LivingEntity entity;
     private final DamageSource source;
@@ -47,5 +47,13 @@ public class PreKillEvent extends Event implements ICancellableEvent {
 
     public LivingEntity getTarget() {
         return target;
+    }
+
+    public boolean isCanceled() {
+        return cancelled;
+    }
+
+    public void setCanceled(boolean cancel) {
+        this.cancelled = cancel;
     }
 }

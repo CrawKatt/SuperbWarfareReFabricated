@@ -38,7 +38,7 @@ public class ClientChargingStationImageTooltip implements ClientTooltipComponent
     }
 
     protected Component getEnergyComponent() {
-        int energy = stack.getOrDefault(ModDataComponents.ENERGY.get(), 0);
+        int energy = stack.getOrDefault(ModDataComponents.ENERGY, 0);
         int maxEnergy = ChargingStationBlockItem.MAX_ENERGY;
         float percentage = Mth.clamp((float) energy / maxEnergy, 0, 1);
         MutableComponent component = Component.empty();

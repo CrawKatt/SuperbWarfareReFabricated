@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -34,9 +35,6 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +43,6 @@ import java.util.List;
 
 import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.SERVER_YAW;
 
-@EventBusSubscriber(modid = Mod.MODID)
 public class VehicleAssemblingTableBlock extends BaseEntityBlock {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
@@ -146,11 +143,9 @@ public class VehicleAssemblingTableBlock extends BaseEntityBlock {
         return super.playerWillDestroy(level, pos, state, player);
     }
 
-    @SubscribeEvent
-    public static void interact(PlayerInteractEvent.RightClickBlock event) {
-        if (event.getLevel() instanceof ServerLevel server && event.getEntity().getMainHandItem().is(ModTags.Items.TOOLS_CROWBAR)) {
-            var pos = event.getHitVec().getBlockPos();
-            var state = server.getBlockState(pos);
+    public static InteractionResult interact(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (!level.isClientSide && player.getMainHandItem().is(ModTags.Items.TOOLS_CROWBAR)) {
+            ServerLevel server = (ServerLevel) level;
             if (state.getBlock() instanceof VehicleAssemblingTableBlock) {
                 var facing = state.getValue(FACING);
                 var part = state.getValue(BLOCK_PART);
@@ -163,9 +158,10 @@ public class VehicleAssemblingTableBlock extends BaseEntityBlock {
                     server.destroyBlock(p.relative(originalPos, facing), false);
                 }
 
-                event.setCancellationResult(InteractionResult.SUCCESS);
+                return InteractionResult.SUCCESS;
             }
         }
+        return InteractionResult.PASS;
     }
 
     private static @NotNull VehicleAssemblingTableVehicleEntity createVehicle(ServerLevel server, Direction facing, BlockPos originalPos) {

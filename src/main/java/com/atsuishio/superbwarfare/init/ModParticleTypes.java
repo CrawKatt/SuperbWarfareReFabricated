@@ -16,8 +16,8 @@ import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 
 public class ModParticleTypes {
-    public static final SimpleParticleType FIRE_STAR = register("fire_star", new SimpleParticleType(true));
-    public static final SimpleParticleType RISING_SMOKE = register("rising_smoke", new SimpleParticleType(true));
+    public static final SimpleParticleType FIRE_STAR = register("fire_star", new SimpleParticleType(true) {});
+    public static final SimpleParticleType RISING_SMOKE = register("rising_smoke", new SimpleParticleType(true) {});
     public static final ParticleType<BulletDecalOption> BULLET_DECAL = register("bullet_decal",
             createOptions(BulletDecalOption.CODEC, true, BulletDecalOption.STREAM_CODEC));
     public static final ParticleType<CustomSmokeOption> CUSTOM_SMOKE = register("custom_smoke",

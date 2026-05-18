@@ -24,19 +24,12 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class LungeMine extends Item implements GeoItem {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -46,29 +39,7 @@ public class LungeMine extends Item implements GeoItem {
         super(new Properties().stacksTo(4));
     }
 
-    @SubscribeEvent
-    private static void registerItemExtensions(RegisterClientExtensionsEvent event) {
-        event.registerItem(new IClientItemExtensions() {
-
-            private final BlockEntityWithoutLevelRenderer renderer = new LungeMineRenderer();
-
-            @Override
-            public @NotNull BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return renderer;
-            }
-
-            @Override
-            @ParametersAreNonnullByDefault
-            public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack itemStack) {
-                if (!itemStack.isEmpty()) {
-                    if (entityLiving.getUsedItemHand() == hand) {
-                        return ModEnumExtensions.Client.getLungeMinePose();
-                    }
-                }
-                return HumanoidModel.ArmPose.EMPTY;
-            }
-        }, ModItems.LUNGE_MINE);
-    }
+    
 
     public void getTransformType(ItemDisplayContext type) {
         transformType = type;
@@ -107,24 +78,19 @@ public class LungeMine extends Item implements GeoItem {
         return this.cache;
     }
 
-    @Override
-    @ParametersAreNonnullByDefault
     public boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand) {
         return false;
     }
 
-    @Override
-    @ParametersAreNonnullByDefault
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         return false;
     }
 
     @Override
-    @ParametersAreNonnullByDefault
     public @NotNull InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
         ItemStack stack = playerIn.getItemInHand(handIn);
         if (playerIn instanceof ServerPlayer serverPlayer) {
-            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.LUNGE_MINE_GROWL.get(), SoundSource.PLAYERS, 2, 1);
+            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.LUNGE_MINE_GROWL, SoundSource.PLAYERS, 2, 1);
         }
         if (!playerIn.level().isClientSide()) {
             playerIn.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100, (playerIn.hasEffect(MobEffects.MOVEMENT_SPEED) ? playerIn.getEffect(MobEffects.MOVEMENT_SPEED).getAmplifier() : 0) + 2));
@@ -136,7 +102,6 @@ public class LungeMine extends Item implements GeoItem {
     }
 
     @Override
-    @ParametersAreNonnullByDefault
     public boolean canAttackBlock(BlockState p_41441_, Level p_41442_, BlockPos p_41443_, Player p_41444_) {
         return false;
     }

@@ -1,6 +1,8 @@
 package com.atsuishio.superbwarfare.data.gun;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.capability.api.IEnergyStorage;
+import com.atsuishio.superbwarfare.capability.api.IItemHandler;
 import com.atsuishio.superbwarfare.data.DefaultDataSupplier;
 import com.atsuishio.superbwarfare.data.JsonPropertyModifier;
 import com.atsuishio.superbwarfare.data.StringOrVec3;
@@ -16,6 +18,7 @@ import com.atsuishio.superbwarfare.tools.InventoryTool;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -29,9 +32,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -694,13 +694,13 @@ public class GunData implements DefaultDataSupplier<DefaultGunData> {
         });
 
         // TODO 正确实现注册项读取
-        var perks = new ArrayList<DeferredHolder<Perk, ? extends Perk>>();
-        perks.addAll(ModPerks.AMMO_PERKS.getEntries());
-        perks.addAll(ModPerks.DAMAGE_PERKS.getEntries());
-        perks.addAll(ModPerks.FUNC_PERKS.getEntries());
+        var perks = new ArrayList<Perk>();
+        perks.addAll(ModPerks.AMMO_PERKS);
+        perks.addAll(ModPerks.DAMAGE_PERKS);
+        perks.addAll(ModPerks.FUNC_PERKS);
 
-        var perkValues = perks.stream().map(DeferredHolder::get).toList();
-        var perkKeys = perks.stream().map(perk -> perk.getKey().location().toString()).toList();
+        var perkValues = perks.stream().toList();
+        var perkKeys = perks.stream().map(perk -> perk.getId().toString()).toList();
 
         for (String name : sortedNames) {
             if (name.startsWith("@")) {
@@ -923,7 +923,12 @@ public class GunData implements DefaultDataSupplier<DefaultGunData> {
     public static StreamCodec<RegistryFriendlyByteBuf, GunData> VEHICLE_GUN_STREAM_CODEC = new StreamCodec<>() {
 
         public @NotNull GunData decode(@NotNull RegistryFriendlyByteBuf buf) {
-            return GunData.from(new ItemStack(ModItems.VEHICLE_GUN, 1, DataComponentPatch.STREAM_CODEC.decode(buf)));
+            var stack = new ItemStack(ModItems.VEHICLE_GUN, 1);
+            var patch = DataComponentPatch.STREAM_CODEC.decode(buf);
+            if (!patch.isEmpty()) {
+                stack.applyComponents(patch);
+            }
+            return GunData.from(stack);
         }
 
         public void encode(@NotNull RegistryFriendlyByteBuf buf, GunData data) {

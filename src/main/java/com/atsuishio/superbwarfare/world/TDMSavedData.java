@@ -3,6 +3,8 @@ package com.atsuishio.superbwarfare.world;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.network.message.receive.TDMSyncMessage;
 import com.google.common.collect.Sets;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -12,17 +14,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.Set;
 
-@EventBusSubscriber
 public class TDMSavedData extends SavedData {
 
     public static final String FILE_ID = "superbwarfare_tdm";
@@ -84,9 +81,11 @@ public class TDMSavedData extends SavedData {
         return this.entities.contains(entity);
     }
 
-    public void sync() {
+    public void sync(ServerLevel level) {
         this.setDirty();
-        PacketDistributor.sendToAllPlayers(new TDMSyncMessage(this));
+        for (ServerPlayer player : level.players()) {
+            ServerPlayNetworking.send(player, new TDMSyncMessage(this));
+        }
     }
 
     public static boolean enabledTDM(Entity entity) {
@@ -98,12 +97,13 @@ public class TDMSavedData extends SavedData {
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player && player.level() instanceof ServerLevel level)) return;
-
-        var data = level.getDataStorage().get(new SavedData.Factory<>(TDMSavedData::new, TDMSavedData::load, null), FILE_ID);
-        if (data == null) return;
-        PacketDistributor.sendToPlayer(player, new TDMSyncMessage(data));
+    public static void register() {
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            ServerPlayer player = handler.getPlayer();
+            ServerLevel level = player.serverLevel();
+            var data = level.getDataStorage().get(new SavedData.Factory<>(TDMSavedData::new, TDMSavedData::load, null), FILE_ID);
+            if (data == null) return;
+            ServerPlayNetworking.send(player, new TDMSyncMessage(data));
+        });
     }
 }

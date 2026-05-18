@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.event;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.api.event.PreKillEvent;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
@@ -31,21 +32,16 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.TriState;
-import net.neoforged.neoforge.event.entity.living.*;
-import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -53,23 +49,21 @@ import java.util.stream.Stream;
 import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.AI_PASSENGER_WEAPON_TARGET_UUID;
 import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.AI_TURRET_TARGET_UUID;
 
-@EventBusSubscriber
 public class LivingEventHandler {
 
-    @SubscribeEvent
-    public static void onLivingChangeTargetEvent(LivingChangeTargetEvent event) {
-        if (event.getEntity() instanceof Mob mob && mob.getVehicle() instanceof VehicleEntity vehicle) {
+    public static void onLivingChangeTargetEvent(Mob mob, LivingEntity target) {
+        if (mob.getVehicle() instanceof VehicleEntity vehicle) {
             if (mob == vehicle.getNthEntity(vehicle.getTurretControllerIndex())) {
-                if (event.getNewAboutToBeSetTarget() != null) {
-                    vehicle.getEntityData().set(AI_TURRET_TARGET_UUID, event.getNewAboutToBeSetTarget().getStringUUID());
+                if (target != null) {
+                    vehicle.getEntityData().set(AI_TURRET_TARGET_UUID, target.getStringUUID());
                 } else {
                     vehicle.getEntityData().set(AI_TURRET_TARGET_UUID, "undefined");
                 }
             }
 
             if (mob == vehicle.getNthEntity(vehicle.getPassengerWeaponStationControllerIndex())) {
-                if (event.getNewAboutToBeSetTarget() != null) {
-                    vehicle.getEntityData().set(AI_PASSENGER_WEAPON_TARGET_UUID, event.getNewAboutToBeSetTarget().getStringUUID());
+                if (target != null) {
+                    vehicle.getEntityData().set(AI_PASSENGER_WEAPON_TARGET_UUID, target.getStringUUID());
                 } else {
                     vehicle.getEntityData().set(AI_PASSENGER_WEAPON_TARGET_UUID, "undefined");
                 }
@@ -77,88 +71,80 @@ public class LivingEventHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void onEntityAttacked(LivingIncomingDamageEvent event) {
-        if (!event.getSource().is(ModDamageTypes.VEHICLE_EXPLOSION)
-                && event.getEntity().getVehicle() instanceof VehicleEntity vehicle
-                && vehicle.isEnclosed(event.getEntity())
+    public static boolean onEntityAttacked(LivingEntity entity, DamageSource source, float amount) {
+        if (!source.is(ModDamageTypes.VEHICLE_EXPLOSION)
+                && entity.getVehicle() instanceof VehicleEntity vehicle
+                && vehicle.isEnclosed(entity)
         ) {
-            if (!event.getSource().is(ModTags.DamageTypes.VEHICLE_NOT_ABSORB)) {
-                vehicle.hurt(event.getSource(), event.getAmount());
+            if (!source.is(ModTags.DamageTypes.VEHICLE_NOT_ABSORB)) {
+                vehicle.hurt(source, amount);
             }
-            event.setCanceled(true);
+            return true;
         }
+        return false;
     }
 
-    @SubscribeEvent
-    public static void onEntityHurt(LivingIncomingDamageEvent event) {
-        if (event == null) return;
+    public static float onEntityHurt(LivingEntity entity, DamageSource source, float amount) {
+        amount = handleVehicleHurt(entity, source, amount);
+        if (amount == 0f) return 0f;
 
-        handleVehicleHurt(event);
-        handleGunPerksWhenHurt(event);
-        renderDamageIndicator(event);
-        reduceDamage(event);
-        giveExpToWeapon(event);
-        handleGunLevels(event);
+        amount = handleGunPerksWhenHurt(entity, source, amount);
+        renderDamageIndicator(entity, source, amount);
+        amount = reduceDamage(entity, source, amount);
+        giveExpToWeapon(entity, source, amount);
+        handleGunLevels(entity, source, amount);
+        return amount;
     }
 
-    @SubscribeEvent
-    public static void onEntityDeath(LivingDeathEvent event) {
-        if (event == null) return;
+    public static void onEntityDeath(LivingEntity entity, DamageSource source) {
+        killIndication(entity, source);
+        handleGunPerksWhenDeath(entity, source);
+        handlePlayerKillEntity(entity, source);
+        giveKillExpToWeapon(entity, source);
 
-        killIndication(event);
-        handleGunPerksWhenDeath(event);
-        handlePlayerKillEntity(event);
-        giveKillExpToWeapon(event);
-
-        if (event.getEntity() instanceof Player player) {
+        if (entity instanceof Player player) {
             handlePlayerBeamReset(player);
         }
     }
 
-    private static void handleVehicleHurt(LivingIncomingDamageEvent event) {
-        var entity = event.getEntity().getVehicle();
-        if (entity instanceof VehicleEntity vehicle) {
-            var source = event.getSource();
-            if (source.is(ModTags.DamageTypes.VEHICLE_IGNORE)) return;
+    private static float handleVehicleHurt(LivingEntity livingEntity, DamageSource source, float amount) {
+        var vehicleEntity = livingEntity.getVehicle();
+        if (vehicleEntity instanceof VehicleEntity vehicle) {
+            if (source.is(ModTags.DamageTypes.VEHICLE_IGNORE)) return amount;
 
-            if (vehicle.isEnclosed(event.getEntity())) {
+            if (vehicle.isEnclosed(livingEntity)) {
                 if (!source.is(ModDamageTypes.VEHICLE_EXPLOSION)) {
-                    event.setCanceled(true);
+                    return 0f;
                 }
             } else {
                 if (!source.is(ModTags.DamageTypes.VEHICLE_NOT_ABSORB)) {
-                    entity.hurt(event.getSource(), 0.7f * event.getAmount());
+                    vehicleEntity.hurt(source, 0.7f * amount);
                 }
-
-                event.setAmount(0.3f * event.getAmount());
+                return 0.3f * amount;
             }
         }
+        return amount;
     }
 
     /**
      * 计算伤害减免
      */
-    private static void reduceDamage(LivingIncomingDamageEvent event) {
-        DamageSource source = event.getSource();
-        LivingEntity entity = event.getEntity();
+    private static float reduceDamage(LivingEntity entity, DamageSource source, float amount) {
         Entity sourceEntity = source.getEntity();
-        if (sourceEntity == null) return;
-        if (sourceEntity.level().isClientSide) return;
+        if (sourceEntity == null) return amount;
+        if (sourceEntity.level().isClientSide) return amount;
 
-        double amount = event.getAmount();
-        double damage = amount;
+        double dmg = amount;
+        double damage = dmg;
 
         ItemStack stack = sourceEntity instanceof LivingEntity living ? living.getMainHandItem() : ItemStack.EMPTY;
 
-        // 距离衰减
         if (DamageTypeTool.isGunDamage(source) && stack.getItem() instanceof GunItem) {
             var data = GunData.from(stack);
             double distance = entity.position().distanceTo(sourceEntity.position());
-            damage = reduceDamageByDistance(amount, distance, data.getDamageReduceRate(), data.getDamageReduceMinDistance());
+            damage = reduceDamageByDistance(dmg, distance, data.getDamageReduceRate(), data.getDamageReduceMinDistance());
         }
 
-        // 计算防弹插板减伤
         ItemStack armor = entity.getItemBySlot(EquipmentSlot.CHEST);
 
         var tag = NBTTool.getTag(armor);
@@ -169,31 +155,33 @@ public class LivingEventHandler {
             damage = Math.max(damage - armorValue, 0);
         }
 
-        // 计算防弹护具减伤
         if (source.is(ModTags.DamageTypes.PROJECTILE) || source.is(DamageTypes.MOB_PROJECTILE)) {
-            damage *= 1 - 0.8 * Mth.clamp(entity.getAttributeValue(ModAttributes.BULLET_RESISTANCE), 0, 1);
+            damage *= 1 - 0.8 * Mth.clamp(entity.getAttributeValue(ModAttributes.bulletResistanceHolder()), 0, 1);
         }
 
         if (source.is(ModTags.DamageTypes.PROJECTILE_ABSOLUTE)) {
-            damage *= 1 - 0.2 * Mth.clamp(entity.getAttributeValue(ModAttributes.BULLET_RESISTANCE), 0, 1);
+            damage *= 1 - 0.2 * Mth.clamp(entity.getAttributeValue(ModAttributes.bulletResistanceHolder()), 0, 1);
         }
 
         if (source.is(ModDamageTypes.PROJECTILE_EXPLOSION) || source.is(ModDamageTypes.MINE) || source.is(ModDamageTypes.PROJECTILE_HIT) || source.is(ModDamageTypes.CUSTOM_EXPLOSION)
                 || source.is(DamageTypes.EXPLOSION) || source.is(DamageTypes.PLAYER_EXPLOSION)) {
-            damage *= 1 - 0.3 * Mth.clamp(entity.getAttributeValue(ModAttributes.BULLET_RESISTANCE), 0, 1);
+            damage *= 1 - 0.3 * Mth.clamp(entity.getAttributeValue(ModAttributes.bulletResistanceHolder()), 0, 1);
         }
 
-        event.setAmount((float) damage);
+        float result = (float) damage;
 
         if (entity instanceof TargetEntity && sourceEntity instanceof Player player) {
-            if (event.getSource().is(ModDamageTypes.BEAST)) {
-                damage = Float.POSITIVE_INFINITY;
+            float display = result;
+            if (source.is(ModDamageTypes.BEAST)) {
+                display = Float.POSITIVE_INFINITY;
             }
 
             player.displayClientMessage(Component.translatable("tips.superbwarfare.target.damage",
-                    FormatTool.format2D(damage),
+                    FormatTool.format2D(display),
                     FormatTool.format1D(entity.position().distanceTo(sourceEntity.position()), "m")), false);
         }
+
+        return result;
     }
 
     private static double reduceDamageByDistance(double amount, double distance, double rate, double minDistance) {
@@ -203,55 +191,48 @@ public class LivingEventHandler {
     /**
      * 根据造成的伤害，提供武器经验
      */
-    private static void giveExpToWeapon(LivingIncomingDamageEvent event) {
-        DamageSource source = event.getSource();
+    private static void giveExpToWeapon(LivingEntity entity, DamageSource source, float amount) {
         Entity sourceEntity = source.getEntity();
         if (!(sourceEntity instanceof Player player)) return;
         ItemStack stack = player.getMainHandItem();
         if (!(stack.getItem() instanceof GunItem)) return;
-        if (event.getEntity().getType().is(ModTags.EntityTypes.NO_EXPERIENCE)) return;
+        if (entity.getType().is(ModTags.EntityTypes.NO_EXPERIENCE)) return;
 
         var data = GunData.from(stack);
-        double amount = Math.min(0.125 * event.getAmount(), event.getEntity().getMaxHealth());
+        double expAmount = Math.min(0.125 * amount, entity.getMaxHealth());
 
-        // 先处理发射器类武器或高爆弹的爆炸伤害
         if (source.is(ModDamageTypes.PROJECTILE_EXPLOSION)) {
             if (data.compute().explosionDamage > 0 || GunData.from(stack).perk.getLevel(ModPerks.HE_BULLET) > 0) {
-                data.exp.set(data.exp.get() + amount);
+                data.exp.set(data.exp.get() + expAmount);
             }
         }
 
-        // 再判断是不是枪械能造成的伤害
         if (!DamageTypeTool.isGunDamage(source)) return;
 
-        data.exp.set(data.exp.get() + amount);
+        data.exp.set(data.exp.get() + expAmount);
         data.save();
     }
 
-    private static void giveKillExpToWeapon(LivingDeathEvent event) {
-        DamageSource source = event.getSource();
+    private static void giveKillExpToWeapon(LivingEntity entity, DamageSource source) {
         Entity sourceEntity = source.getEntity();
         if (!(sourceEntity instanceof Player player)) return;
         ItemStack stack = player.getMainHandItem();
         if (!(stack.getItem() instanceof GunItem)) return;
-        if (event.getEntity().getType().is(ModTags.EntityTypes.NO_EXPERIENCE)) return;
+        if (entity.getType().is(ModTags.EntityTypes.NO_EXPERIENCE)) return;
 
         var data = GunData.from(stack);
-        double amount = 20 + 2 * event.getEntity().getMaxHealth();
+        double amount = 20 + 2 * entity.getMaxHealth();
 
-        // 先处理发射器类武器或高爆弹的爆炸伤害
         if (source.is(ModDamageTypes.PROJECTILE_EXPLOSION)) {
             if (data.compute().explosionDamage > 0 || GunData.from(stack).perk.getLevel(ModPerks.HE_BULLET) > 0) {
                 data.exp.add(amount);
             }
         }
 
-        // 再判断是不是枪械能造成的伤害
         if (DamageTypeTool.isGunDamage(source)) {
             data.exp.add(amount);
         }
 
-        // 提升武器等级
         int level = data.level.get();
         double exp = data.exp.get();
         double upgradeExpNeeded = 20 * Math.pow(level, 2) + 160 * level + 20;
@@ -266,13 +247,12 @@ public class LivingEventHandler {
         data.save();
     }
 
-    private static void handleGunLevels(LivingIncomingDamageEvent event) {
-        DamageSource source = event.getSource();
+    private static void handleGunLevels(LivingEntity entity, DamageSource source, float amount) {
         Entity sourceEntity = source.getEntity();
         if (!(sourceEntity instanceof Player player)) return;
         ItemStack stack = player.getMainHandItem();
         if (!(stack.getItem() instanceof GunItem)) return;
-        if (event.getEntity().getType().is(ModTags.EntityTypes.NO_EXPERIENCE)) return;
+        if (entity.getType().is(ModTags.EntityTypes.NO_EXPERIENCE)) return;
 
         var data = GunData.from(stack);
         int level = data.level.get();
@@ -289,74 +269,59 @@ public class LivingEventHandler {
         data.save();
     }
 
-    private static void killIndication(LivingDeathEvent event) {
-        if (!MiscConfig.SEND_KILL_FEEDBACK.get()) return;
-
-        DamageSource source = event.getSource();
+    private static void killIndication(LivingEntity entity, DamageSource source) {
+        if (!MiscConfig.SEND_KILL_FEEDBACK) return;
 
         var sourceEntity = source.getEntity();
-        if (sourceEntity == null) {
-            return;
-        }
+        if (sourceEntity == null) return;
 
-        // 如果配置不选择全局伤害提示，则只在伤害类型为mod添加的时显示指示器
-        if (!GameplayConfig.GLOBAL_INDICATION.get() && !DamageTypeTool.isModDamage(source)) {
-            return;
-        }
+        if (!GameplayConfig.GLOBAL_INDICATION && !DamageTypeTool.isModDamage(source)) return;
 
         if (!sourceEntity.level().isClientSide() && sourceEntity instanceof ServerPlayer player) {
-            if (NeoForge.EVENT_BUS.post(new PreKillEvent.Indicator(player, source, event.getEntity())).isCanceled()) {
-                return;
-            }
+            var preEvent = new PreKillEvent.Indicator(player, source, entity);
+            onPreIndicator(preEvent);
+            if (preEvent.isCanceled()) return;
 
-            SoundTool.playLocalSound(player, ModSounds.TARGET_DOWN.get(), 3f, 1f);
-            PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(2, 8));
+            SoundTool.playLocalSound(player, ModSounds.TARGET_DOWN, 3f, 1f);
+            ServerPlayNetworking.send(player, new ClientIndicatorMessage(2, 8));
         }
     }
 
-    private static void renderDamageIndicator(LivingIncomingDamageEvent event) {
-        if (event == null) return;
-
-        var damagesource = event.getSource();
-        var sourceEntity = damagesource.getEntity();
-
+    private static void renderDamageIndicator(LivingEntity entity, DamageSource source, float amount) {
+        var sourceEntity = source.getEntity();
         if (sourceEntity == null) return;
 
-        if (sourceEntity instanceof ServerPlayer player && (damagesource.is(DamageTypes.EXPLOSION) || damagesource.is(DamageTypes.PLAYER_EXPLOSION)
-                || damagesource.is(ModDamageTypes.MINE) || damagesource.is(ModDamageTypes.PROJECTILE_EXPLOSION))) {
-            SoundTool.playLocalSound(player, ModSounds.INDICATION.get(), 1f, 1f);
-            PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+        if (sourceEntity instanceof ServerPlayer player && (source.is(DamageTypes.EXPLOSION) || source.is(DamageTypes.PLAYER_EXPLOSION)
+                || source.is(ModDamageTypes.MINE) || source.is(ModDamageTypes.PROJECTILE_EXPLOSION))) {
+            SoundTool.playLocalSound(player, ModSounds.INDICATION, 1f, 1f);
+            ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
         }
     }
 
     /**
      * 换弹时切换枪械，取消换弹音效播放
      */
-    @SubscribeEvent
-    public static void handleChangeSlot(LivingEquipmentChangeEvent event) {
-        if (event.getEntity() instanceof Player player && event.getSlot() == EquipmentSlot.MAINHAND) {
+    public static void handleChangeSlot(LivingEntity entity, EquipmentSlot slot, ItemStack before, ItemStack after) {
+        if (entity instanceof Player player && slot == EquipmentSlot.MAINHAND) {
             if (player.level().isClientSide) return;
 
-            ItemStack oldStack = event.getFrom();
-            ItemStack newStack = event.getTo();
-
-            var laserCap = player.getCapability(ModCapabilities.LASER_CAPABILITY);
+            var laserCap = ModCapabilities.LASER_CAPABILITY.find(player, null);
             if (laserCap != null) laserCap.stop();
 
             if (player instanceof ServerPlayer serverPlayer) {
-                if (newStack.getItem() instanceof GunItem) {
-                    checkCopyGuns(newStack, player);
+                if (after.getItem() instanceof GunItem) {
+                    checkCopyGuns(after, player);
                 }
 
-                if (newStack.getItem() != oldStack.getItem()
-                        || (newStack.getItem() instanceof GunItem && !GunData.from(newStack).initialized())
-                        || (oldStack.getItem() instanceof GunItem && !GunData.from(oldStack).initialized())
-                        || (newStack.getItem() instanceof GunItem && oldStack.getItem() instanceof GunItem && !Objects.equals(GunsTool.getGunUUID(NBTTool.getTag(newStack)), GunsTool.getGunUUID(NBTTool.getTag(oldStack))))
+                if (after.getItem() != before.getItem()
+                        || (after.getItem() instanceof GunItem && !GunData.from(after).initialized())
+                        || (before.getItem() instanceof GunItem && !GunData.from(before).initialized())
+                        || (after.getItem() instanceof GunItem && before.getItem() instanceof GunItem && !Objects.equals(GunsTool.getGunUUID(NBTTool.getTag(after)), GunsTool.getGunUUID(NBTTool.getTag(before))))
                 ) {
-                    PacketDistributor.sendToPlayer(serverPlayer, DrawClientMessage.INSTANCE);
+                    ServerPlayNetworking.send(serverPlayer, DrawClientMessage.INSTANCE);
 
-                    if (oldStack.getItem() instanceof GunItem oldGun) {
-                        var oldData = GunData.from(oldStack);
+                    if (before.getItem() instanceof GunItem oldGun) {
+                        var oldData = GunData.from(before);
 
                         stopGunReloadSound(serverPlayer, oldData);
 
@@ -378,17 +343,16 @@ public class LivingEventHandler {
                             oldData.reload.finishTimer.reset();
                         }
 
-                        if (oldStack.is(ModItems.SENTINEL.get())) {
+                        if (before.is(ModItems.SENTINEL)) {
                             oldData.charge.timer.reset();
                         }
 
-                        // TODO 如何保存修改后的数据
                         oldGun.onChangeSlot(oldData, player);
                         oldData.save();
                     }
 
-                    if (newStack.getItem() instanceof GunItem) {
-                        var newData = GunData.from(newStack);
+                    if (after.getItem() instanceof GunItem) {
+                        var newData = GunData.from(after);
 
                         if (newData.compute().boltActionTime > 0) {
                             newData.bolt.actionTimer.reset();
@@ -407,7 +371,7 @@ public class LivingEventHandler {
                             newData.reload.finishTimer.reset();
                         }
 
-                        if (newStack.is(ModItems.SENTINEL.get())) {
+                        if (after.is(ModItems.SENTINEL)) {
                             newData.charge.timer.reset();
                         }
 
@@ -460,10 +424,7 @@ public class LivingEventHandler {
     /**
      * 发送击杀消息
      */
-    private static void handlePlayerKillEntity(LivingDeathEvent event) {
-        LivingEntity entity = event.getEntity();
-        DamageSource source = event.getSource();
-
+    private static void handlePlayerKillEntity(LivingEntity entity, DamageSource source) {
         ResourceKey<DamageType> damageTypeResourceKey = source.typeHolder().unwrapKey().isPresent() ? source.typeHolder().unwrapKey().get() : DamageTypes.GENERIC;
 
         LivingEntity attacker = null;
@@ -482,22 +443,21 @@ public class LivingEventHandler {
             }
         }
 
-        if (NeoForge.EVENT_BUS.post(new PreKillEvent.SendKillMessage(attacker, source, entity)).isCanceled()) {
-            return;
-        }
+        var preEvent = new PreKillEvent.SendKillMessage(attacker, source, entity);
+        onPreSendKillMessage(preEvent);
+        if (preEvent.isCanceled()) return;
 
-        if (attacker != null && MiscConfig.SEND_KILL_FEEDBACK.get()) {
+        if (attacker != null && MiscConfig.SEND_KILL_FEEDBACK) {
             if (DamageTypeTool.isHeadshotDamage(source)) {
-                PacketDistributor.sendToAllPlayers(new LivingGunKillMessage(attacker.getId(), entity.getId(), true, damageTypeResourceKey));
+                // FIXME: sendToAllPlayers(new LivingGunKillMessage(attacker.getId(), entity.getId(), true, damageTypeResourceKey));
             } else {
-                PacketDistributor.sendToAllPlayers(new LivingGunKillMessage(attacker.getId(), entity.getId(), false, damageTypeResourceKey));
+                // FIXME: sendToAllPlayers(new LivingGunKillMessage(attacker.getId(), entity.getId(), false, damageTypeResourceKey));
             }
         }
     }
 
-    private static void handleGunPerksWhenHurt(LivingIncomingDamageEvent event) {
-        DamageSource source = event.getSource();
-        if (!DamageTypeTool.isGunDamage(source) && !source.is(DamageTypes.PLAYER_ATTACK)) return;
+    private static float handleGunPerksWhenHurt(LivingEntity entity, DamageSource source, float amount) {
+        if (!DamageTypeTool.isGunDamage(source) && !source.is(DamageTypes.PLAYER_ATTACK)) return amount;
 
         LivingEntity attacker = null;
         if (source.getEntity() instanceof LivingEntity living) {
@@ -506,35 +466,30 @@ public class LivingEventHandler {
         if (source.getDirectEntity() instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity living) {
             attacker = living;
         }
-        if (attacker == null) {
-            return;
-        }
+        if (attacker == null) return amount;
 
         ItemStack stack = attacker.getMainHandItem();
-        if (!(stack.getItem() instanceof GunItem)) {
-            return;
-        }
+        if (!(stack.getItem() instanceof GunItem)) return amount;
 
         var data = GunData.from(stack);
-        float damage = event.getAmount();
+        float damage = amount;
 
         for (Perk.Type type : Perk.Type.values()) {
             var instance = data.perk.getInstance(type);
             if (instance != null) {
                 if (DamageTypeTool.isGunDamage(source)) {
-                    damage = instance.perk().getModifiedDamage(damage, data, instance, event.getEntity(), source);
-                    instance.perk().onHurtEntity(damage, data, instance, event.getEntity(), source);
+                    damage = instance.perk().getModifiedDamage(damage, data, instance, entity, source);
+                    instance.perk().onHurtEntity(damage, data, instance, entity, source);
                 } else if (source.is(DamageTypes.PLAYER_ATTACK)) {
-                    instance.perk().onMeleeAttack(data, instance, event.getEntity());
+                    instance.perk().onMeleeAttack(data, instance, entity);
                 }
             }
         }
 
-        event.setAmount(damage);
+        return damage;
     }
 
-    private static void handleGunPerksWhenDeath(LivingDeathEvent event) {
-        DamageSource source = event.getSource();
+    private static void handleGunPerksWhenDeath(LivingEntity entity, DamageSource source) {
         if (!DamageTypeTool.isGunDamage(source)) return;
 
         LivingEntity attacker = null;
@@ -544,57 +499,51 @@ public class LivingEventHandler {
         if (source.getDirectEntity() instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity living) {
             attacker = living;
         }
-        if (attacker == null) {
-            return;
-        }
+        if (attacker == null) return;
 
         ItemStack stack = attacker.getMainHandItem();
-        if (!(stack.getItem() instanceof GunItem)) {
-            return;
-        }
+        if (!(stack.getItem() instanceof GunItem)) return;
 
         GunData data = GunData.from(stack);
         for (Perk.Type type : Perk.Type.values()) {
             var instance = data.perk.getInstance(type);
             if (instance != null) {
-                instance.perk().onKill(data, instance, event.getEntity(), source);
+                instance.perk().onKill(data, instance, entity, source);
             }
         }
     }
 
-    @SubscribeEvent
-    public static void onPickup(ItemEntityPickupEvent.Pre event) {
-        if (!VehicleConfig.VEHICLE_ITEM_PICKUP.get()) return;
-        if (event.getPlayer().getVehicle() instanceof VehicleEntity vehicleEntity) {
-            var pickUp = event.getItemEntity();
+    public static boolean onPickup(ItemEntity itemEntity, Player player) {
+        if (!VehicleConfig.VEHICLE_ITEM_PICKUP) return true;
+        if (player.getVehicle() instanceof VehicleEntity vehicleEntity) {
             if (!vehicleEntity.level().isClientSide) {
-                HopperBlockEntity.addItem(vehicleEntity, pickUp);
+                HopperBlockEntity.addItem(vehicleEntity, itemEntity);
             }
-            event.setCanPickup(TriState.FALSE);
+            return false;
         }
+        return true;
     }
 
-    @SubscribeEvent
-    public static void onLivingDrops(LivingDropsEvent event) {
-        playerDropAmmoBox(event);
-        vehicleCollectDrops(event);
+    public static void onLivingDrops(LivingEntity entity, DamageSource source, Collection<ItemEntity> drops) {
+        playerDropAmmoBox(entity, source, drops);
+        vehicleCollectDrops(entity, source, drops);
     }
 
     /**
      * 开启死亡掉落 & 保留武器弹药时，玩家死亡会掉落一个弹药盒
      */
-    private static void playerDropAmmoBox(LivingDropsEvent event) {
-        if (!(event.getEntity() instanceof Player player)) return;
-        if (!MiscConfig.DROP_AMMO_BOX.get()) return;
+    private static void playerDropAmmoBox(LivingEntity entity, DamageSource source, Collection<ItemEntity> drops) {
+        if (!(entity instanceof Player player)) return;
+        if (!MiscConfig.DROP_AMMO_BOX) return;
 
-        var cap = player.getData(ModAttachments.PLAYER_VARIABLE).watch();
+        var cap = player.getAttached(ModAttachments.PLAYER_VARIABLE).watch();
 
         boolean drop = Stream.of(Ammo.values())
                 .mapToInt(type -> type.get(cap))
                 .sum() > 0;
         if (!drop) return;
 
-        var stack = new ItemStack(ModItems.AMMO_BOX.get());
+        var stack = new ItemStack(ModItems.AMMO_BOX);
 
         for (var type : Ammo.values()) {
             type.set(stack, type.get(cap));
@@ -604,26 +553,24 @@ public class LivingEventHandler {
         var info = new AmmoBoxInfo("All", true);
         stack.set(ModDataComponents.AMMO_BOX_INFO, info);
 
-        player.setData(ModAttachments.PLAYER_VARIABLE, cap);
+        player.setAttached(ModAttachments.PLAYER_VARIABLE, cap);
         cap.sync(player);
 
-        event.getDrops().add(new ItemEntity(player.level(), player.getX(), player.getY() + 1, player.getZ(), stack));
+        drops.add(new ItemEntity(player.level(), player.getX(), player.getY() + 1, player.getZ(), stack));
     }
 
     /**
      * 载具撞死生物时自动收集掉落物
      */
-    private static void vehicleCollectDrops(LivingDropsEvent event) {
-        if (!VehicleConfig.COLLECT_DROPS_BY_CRASHING.get()) return;
+    private static void vehicleCollectDrops(LivingEntity entity, DamageSource source, Collection<ItemEntity> drops) {
+        if (!VehicleConfig.COLLECT_DROPS_BY_CRASHING) return;
 
-        DamageSource source = event.getSource();
         if (!source.is(ModDamageTypes.VEHICLE_STRIKE)) return;
 
         Entity sourceEntity = source.getEntity();
         if (!(sourceEntity instanceof Player player)) return;
 
         if (player.getVehicle() instanceof VehicleEntity vehicle) {
-            var drops = event.getDrops();
             var removed = new ArrayList<ItemEntity>();
 
             drops.forEach(itemEntity -> {
@@ -641,63 +588,57 @@ public class LivingEventHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void onLivingExperienceDrop(LivingExperienceDropEvent event) {
-        Player player = event.getAttackingPlayer();
-        if (player == null) return;
+    public static boolean onLivingExperienceDrop(LivingEntity entity, Player attackingPlayer, int originalXp) {
+        if (attackingPlayer == null) return false;
 
-        if (player.getVehicle() instanceof VehicleEntity) {
-            player.giveExperiencePoints(event.getDroppedExperience());
-            event.setCanceled(true);
+        if (attackingPlayer.getVehicle() instanceof VehicleEntity) {
+            attackingPlayer.giveExperiencePoints(originalXp);
+            return true;
         }
+        return false;
     }
 
     public static void handlePlayerBeamReset(Player player) {
-        var cap = player.getCapability(ModCapabilities.LASER_CAPABILITY);
+        var cap = ModCapabilities.LASER_CAPABILITY.find(player, null);
         if (cap != null) {
             cap.end();
         }
     }
 
-    @SubscribeEvent
-    public static void onKnockback(LivingKnockBackEvent event) {
-        ICustomKnockback knockback = ICustomKnockback.getInstance(event.getEntity());
+    public static float onKnockback(LivingEntity entity) {
+        ICustomKnockback knockback = ICustomKnockback.getInstance(entity);
         if (knockback.superbWarfare$getKnockbackStrength() >= 0) {
-            event.setStrength((float) knockback.superbWarfare$getKnockbackStrength());
+            return (float) knockback.superbWarfare$getKnockbackStrength();
         }
+        return -1f;
     }
 
-    @SubscribeEvent
-    public static void onEntityFall(LivingFallEvent event) {
-        LivingEntity living = event.getEntity();
-        if (living.getVehicle() instanceof VehicleEntity) {
-            event.setCanceled(true);
+    public static boolean onEntityFall(LivingEntity entity, float fallDistance, float damageMultiplier) {
+        if (entity.getVehicle() instanceof VehicleEntity) {
+            return true;
         }
+        return false;
     }
 
-    @SubscribeEvent
     public static void onPreSendKillMessage(PreKillEvent.SendKillMessage event) {
         if (event.getSource().getDirectEntity() instanceof AutoAimableEntity && !(event.getTarget() instanceof Player)) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
     public static void onPreIndicator(PreKillEvent.Indicator event) {
         if (event.getSource().getDirectEntity() instanceof AutoAimableEntity && !(event.getTarget() instanceof Player)) {
             event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent
-    public static void onEffectApply(MobEffectEvent.Applicable event) {
-        var effectInstance = event.getEffectInstance();
-
+    public static boolean onEffectApply(LivingEntity entity, MobEffectInstance effectInstance) {
         if (effectInstance.getEffect().value().getCategory() == MobEffectCategory.HARMFUL
-                && event.getEntity().getVehicle() instanceof VehicleEntity vehicle
-                && vehicle.isEnclosed(vehicle.getSeatIndex(event.getEntity()))
+                && entity.getVehicle() instanceof VehicleEntity vehicle
+                && vehicle.isEnclosed(vehicle.getSeatIndex(entity))
         ) {
-            event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
+            return true;
         }
+        return false;
     }
 }

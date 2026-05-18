@@ -64,6 +64,6 @@ public record CannonMuzzleFlareOption(
 
     @Override
     public @NotNull ParticleType<?> getType() {
-        return ModParticleTypes.CANNON_MUZZLE_FLARE.get();
+        return ModParticleTypes.CANNON_MUZZLE_FLARE;
     }
 }

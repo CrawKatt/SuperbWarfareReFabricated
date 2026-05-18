@@ -53,8 +53,8 @@ public class ProjectileUtilMixin {
                             cir.setReturnValue(hitResult);
                             if (pLevel instanceof ServerLevel serverLevel && pProjectile.getDeltaMovement().lengthSqr() > 0.01 && pProjectile instanceof Projectile) {
                                 Vec3 hitPos = hitResult.getLocation();
-                                pLevel.playSound(null, BlockPos.containing(hitPos), ModSounds.HIT.get(), SoundSource.PLAYERS, 1, 1);
-                                sendParticle(serverLevel, ModParticleTypes.FIRE_STAR.get(), hitPos.x, hitPos.y, hitPos.z, 2, 0, 0, 0, 0.2, false);
+                                pLevel.playSound(null, BlockPos.containing(hitPos), ModSounds.HIT, SoundSource.PLAYERS, 1, 1);
+                                sendParticle(serverLevel, ModParticleTypes.FIRE_STAR, hitPos.x, hitPos.y, hitPos.z, 2, 0, 0, 0, 0.2, false);
                                 sendParticle(serverLevel, ParticleTypes.SMOKE, hitPos.x, hitPos.y, hitPos.z, 2, 0, 0, 0, 0.01, false);
                             }
                             return;
@@ -69,8 +69,8 @@ public class ProjectileUtilMixin {
                             cir.setReturnValue(hitResult);
                             if (pLevel instanceof ServerLevel serverLevel && pProjectile.getDeltaMovement().lengthSqr() > 0.01 && pProjectile instanceof Projectile) {
                                 Vec3 hitPos = hitResult.getLocation();
-                                pLevel.playSound(null, BlockPos.containing(hitPos), ModSounds.HIT.get(), SoundSource.PLAYERS, 1, 1);
-                                sendParticle(serverLevel, ModParticleTypes.FIRE_STAR.get(), hitPos.x, hitPos.y, hitPos.z, 2, 0, 0, 0, 0.2, false);
+                                pLevel.playSound(null, BlockPos.containing(hitPos), ModSounds.HIT, SoundSource.PLAYERS, 1, 1);
+                                sendParticle(serverLevel, ModParticleTypes.FIRE_STAR, hitPos.x, hitPos.y, hitPos.z, 2, 0, 0, 0, 0.2, false);
                                 sendParticle(serverLevel, ParticleTypes.SMOKE, hitPos.x, hitPos.y, hitPos.z, 2, 0, 0, 0, 0.01, false);
                             }
                             return;
@@ -110,7 +110,7 @@ public class ProjectileUtilMixin {
                     var vec = new Vector3d(optional.get());
                     double d1 = pStartVec.distanceToSqr(OBB.vector3dToVec3(vec));
                     if (d1 < pDistance || pDistance == 0) {
-                        if (entity.getRootVehicle() == pShooter.getRootVehicle() && !entity.canRiderInteract()) {
+                        if (entity.getRootVehicle() == pShooter.getRootVehicle()) {
                             if (pDistance == 0) {
                                 cir.setReturnValue(new EntityHitResult(entity, OBB.vector3dToVec3(vec)));
                                 return;

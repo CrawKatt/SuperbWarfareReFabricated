@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.item;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -6,6 +7,7 @@ import com.atsuishio.superbwarfare.network.message.receive.ResetCameraTypeMessag
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
 import com.atsuishio.superbwarfare.tools.FormatTool;
 import com.atsuishio.superbwarfare.tools.NBTTool;
+import com.atsuishio.superbwarfare.capability.PersistentDataAccessor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
@@ -25,9 +27,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -53,19 +52,20 @@ public class Monitor extends Item {
         tag.putBoolean(LINKED, false);
         tag.putString(LINKED_DRONE, "none");
         if (player instanceof ServerPlayer serverPlayer) {
-            PacketDistributor.sendToPlayer(serverPlayer, ResetCameraTypeMessage.INSTANCE);
+            ServerPlayNetworking.send(serverPlayer, ResetCameraTypeMessage.INSTANCE);
         }
     }
 
     private void resetDroneData(DroneEntity drone) {
         if (drone == null) return;
 
-        drone.getPersistentData().putBoolean("left", false);
-        drone.getPersistentData().putBoolean("right", false);
-        drone.getPersistentData().putBoolean("forward", false);
-        drone.getPersistentData().putBoolean("backward", false);
-        drone.getPersistentData().putBoolean("up", false);
-        drone.getPersistentData().putBoolean("down", false);
+        var data = ((PersistentDataAccessor) drone).superbwarfare$getPersistentData();
+        data.putBoolean("left", false);
+        data.putBoolean("right", false);
+        data.putBoolean("forward", false);
+        data.putBoolean("backward", false);
+        data.putBoolean("up", false);
+        data.putBoolean("down", false);
     }
 
     @Override
@@ -109,8 +109,8 @@ public class Monitor extends Item {
     }
 
     @Override
-    public @NotNull ItemAttributeModifiers getDefaultAttributeModifiers(@NotNull ItemStack stack) {
-        var list = new ArrayList<>(super.getDefaultAttributeModifiers(stack).modifiers());
+    public @NotNull ItemAttributeModifiers getDefaultAttributeModifiers() {
+        var list = new ArrayList<>(super.getDefaultAttributeModifiers().modifiers());
         list.addAll(List.of(
                 new ItemAttributeModifiers.Entry(
                         Attributes.ATTACK_DAMAGE,
@@ -135,7 +135,7 @@ public class Monitor extends Item {
         NBTTool.saveTag(stack, tag);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     @Override
     @ParametersAreNonnullByDefault
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
@@ -157,12 +157,6 @@ public class Monitor extends Item {
                 " Y: " + FormatTool.format1D(droneVec.y) +
                 " Z: " + FormatTool.format1D(droneVec.z)
         ));
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
-        return false;
     }
 
     @Override
@@ -199,7 +193,7 @@ public class Monitor extends Item {
 //    @Nullable
 //    public static UUID getDroneUUID(Player player) {
 //        if (player == null) return null;
-//        if (player.getMainHandItem().is(ModItems.MONITOR.get())) {
+//        if (player.getMainHandItem().is(ModItems.MONITOR)) {
 //            CompoundTag tag = player.getMainHandItem().getOrCreateTag();
 //            if (tag.contains(DRONE_UUID)) {
 //                return tag.getUUID(DRONE_UUID);

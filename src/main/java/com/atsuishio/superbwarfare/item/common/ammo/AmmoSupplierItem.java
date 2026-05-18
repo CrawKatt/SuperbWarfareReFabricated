@@ -46,19 +46,19 @@ public class AmmoSupplierItem extends Item {
 
         ItemStack offhandItem = player.getOffhandItem();
 
-        if (offhandItem.is(ModItems.AMMO_BOX.get())) {
+        if (offhandItem.is(ModItems.AMMO_BOX)) {
             this.type.add(offhandItem, ammoToAdd * count);
         } else {
-            var capability = player.getData(ModAttachments.PLAYER_VARIABLE).watch();
+            var capability = player.getAttached(ModAttachments.PLAYER_VARIABLE).watch();
 
             this.type.add(capability, ammoToAdd * count);
-            player.setData(ModAttachments.PLAYER_VARIABLE, capability);
+            player.setAttached(ModAttachments.PLAYER_VARIABLE, capability);
             capability.sync(player);
         }
 
         if (!level.isClientSide()) {
             player.displayClientMessage(Component.translatable("item.superbwarfare.ammo_supplier.supply", Component.translatable(this.type.translationKey), ammoToAdd * count), true);
-            level.playSound(null, player.blockPosition(), ModSounds.BULLET_SUPPLY.get(), SoundSource.PLAYERS, 1, 1);
+            level.playSound(null, player.blockPosition(), ModSounds.BULLET_SUPPLY, SoundSource.PLAYERS, 1, 1);
         }
         return InteractionResultHolder.success(stack);
     }

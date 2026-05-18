@@ -27,13 +27,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 
-@OnlyIn(Dist.CLIENT)
+
 public class IglaHudOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("igla_9k38_hud");
@@ -67,7 +65,7 @@ public class IglaHudOverlay implements LayeredDraw.Layer {
         if (player.getVehicle() instanceof VehicleEntity vehicle && vehicle.banHand(player))
             return;
 
-        if ((stack.getItem() == ModItems.IGLA_9K38.get() && ClientEventHandler.zoomPos > 0.83) && Minecraft.getInstance().options.getCameraType().isFirstPerson() && ClientEventHandler.zoom) {
+        if ((stack.getItem() == ModItems.IGLA_9K38 && ClientEventHandler.zoomPos > 0.83) && Minecraft.getInstance().options.getCameraType().isFirstPerson() && ClientEventHandler.zoom) {
             var data = GunData.from(stack);
 
             poseStack.pushPose();

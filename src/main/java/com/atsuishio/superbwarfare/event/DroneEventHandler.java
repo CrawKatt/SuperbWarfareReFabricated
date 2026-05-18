@@ -31,7 +31,7 @@ public class DroneEventHandler {
 //        if (event.getSide().isClient()) {
 //            var player = event.getEntity();
 //            if (player.isShiftKeyDown()) return;
-//            if (event.getItemStack().is(ModItems.MONITOR.get())) {
+//            if (event.getItemStack().is(ModItems.MONITOR)) {
 //                DronesTool.connect(player, event.getTarget());
 //                event.setCanceled(true);
 //            }
@@ -44,7 +44,7 @@ public class DroneEventHandler {
 //        Player player = Minecraft.getInstance().player;
 //        if (!DronesTool.hasInstanceOf(player)) return;
 //        if (event.getAction() == InputConstants.PRESS) {
-//            if (event.getKey() == ModKeyMappings.DISMOUNT.getKey().getValue()) {
+//            if (event.getKey() == ModKeyMappings.DISMOUNT.getDefaultKey().getValue()) {
 //                if (DronesTool.hasInstanceOf(player)) {
 //                    DronesTool.getInstanceOf(player).disconnect();
 //                }

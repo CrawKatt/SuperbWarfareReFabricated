@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.block;
 
 import com.atsuishio.superbwarfare.block.entity.CreativeChargingStationBlockEntity;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -24,7 +25,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,7 +69,7 @@ public class CreativeChargingStationBlock extends BaseEntityBlock {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, @NotNull BlockState pState, @NotNull BlockEntityType<T> pBlockEntityType) {
         if (!pLevel.isClientSide) {
             return createTickerHelper(
-                    pBlockEntityType, ModBlockEntities.CREATIVE_CHARGING_STATION.get(),
+                    pBlockEntityType, ModBlockEntities.CREATIVE_CHARGING_STATION,
                     CreativeChargingStationBlockEntity::serverTick
             );
         }
@@ -93,7 +93,7 @@ public class CreativeChargingStationBlock extends BaseEntityBlock {
     protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (stack.isEmpty()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 
-        var cap = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
         if (cap == null) return ItemInteractionResult.FAIL;
 
         if (cap.canReceive() && cap.getEnergyStored() < cap.getMaxEnergyStored()) {

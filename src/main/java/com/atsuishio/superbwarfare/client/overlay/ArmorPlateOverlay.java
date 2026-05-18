@@ -13,12 +13,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@OnlyIn(Dist.CLIENT)
+
 public class ArmorPlateOverlay implements LayeredDraw.Layer {
     public static final ResourceLocation ID = Mod.loc("armor_plate");
 
@@ -34,7 +32,7 @@ public class ArmorPlateOverlay implements LayeredDraw.Layer {
     @ParametersAreNonnullByDefault
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         if (Minecraft.getInstance().options.hideGui) return;
-        if (!DisplayConfig.ARMOR_PLATE_HUD.get()) return;
+        if (!DisplayConfig.ARMOR_PLATE_HUD) return;
 
         int h = guiGraphics.guiHeight();
 
@@ -47,14 +45,14 @@ public class ArmorPlateOverlay implements LayeredDraw.Layer {
         var tag = NBTTool.getTag(stack);
         if (!tag.contains("ArmorPlate")) return;
 
-        int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL.get();
+        int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL;
         if (stack.is(ModTags.Items.MILITARY_ARMOR)) {
-            armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL.get();
+            armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL;
         } else if (stack.is(ModTags.Items.MILITARY_ARMOR_HEAVY)) {
-            armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL.get();
+            armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL;
         }
 
-        var max = armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get();
+        var max = armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL;
         double amount = 60 * (NBTTool.getTag(stack).getDouble("ArmorPlate") / max);
 
         ResourceLocation texture = switch (armorLevel) {

@@ -20,12 +20,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@OnlyIn(Dist.CLIENT)
+
 public class AmmoCountOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("ammo_count");
@@ -61,14 +59,14 @@ public class AmmoCountOverlay implements LayeredDraw.Layer {
         // 动画计算
         var currentTime = System.currentTimeMillis();
         ItemStack stack = player.getMainHandItem();
-        if ((stack.getItem() instanceof AmmoSupplierItem || stack.getItem() == ModItems.AMMO_BOX.get())
+        if ((stack.getItem() instanceof AmmoSupplierItem || stack.getItem() == ModItems.AMMO_BOX)
                 && !(player.getVehicle() instanceof VehicleEntity vehicle && vehicle.banHand(player))
         ) {
             // 刚拿出弹药物品时，视为开始弹药信息渲染
             startRenderingAmmoInfo = ammoInfoTimer.getProgress(currentTime) == 0;
             ammoInfoTimer.forward(currentTime);
 
-            if (stack.getItem() == ModItems.AMMO_BOX.get()) {
+            if (stack.getItem() == ModItems.AMMO_BOX) {
                 isAmmoBox = true;
                 ammoBoxTimer.forward(currentTime);
             } else {
@@ -91,7 +89,7 @@ public class AmmoCountOverlay implements LayeredDraw.Layer {
         var yOffset = (-h - Ammo.values().length * fontHeight) / 2f;
 
         // 渲染总弹药数量
-        var cap = player.getData(ModAttachments.PLAYER_VARIABLE);
+        var cap = player.getAttached(ModAttachments.PLAYER_VARIABLE);
         var font = Minecraft.getInstance().font;
 
         for (var type : Ammo.values()) {
@@ -151,8 +149,8 @@ public class AmmoCountOverlay implements LayeredDraw.Layer {
             guiGraphics.drawString(
                     font,
                     ammoCountStr,
-                    ammoX + (30 - font.width(ammoCountStr)),
-                    h + yOffset,
+                    (int) (ammoX + (30 - font.width(ammoCountStr))),
+                    (int) (h + yOffset),
                     fontColor,
                     true
             );
@@ -161,8 +159,8 @@ public class AmmoCountOverlay implements LayeredDraw.Layer {
             guiGraphics.drawString(
                     font,
                     Component.translatable(type.translationKey).getString(),
-                    ammoX + 35,
-                    h + yOffset,
+                    (int) (ammoX + 35),
+                    (int) (h + yOffset),
                     fontColor,
                     true
             );
@@ -192,8 +190,8 @@ public class AmmoCountOverlay implements LayeredDraw.Layer {
                     Integer.toString(
                             Math.round(boxAnimator.lerp(boxAnimator.oldValue(), boxAmmoCount, currentTime))
                     ),
-                    ammoBoxX - 70,
-                    h + yOffset,
+                    (int) (ammoBoxX - 70),
+                    (int) (h + yOffset),
                     boxFontColor,
                     true
             );

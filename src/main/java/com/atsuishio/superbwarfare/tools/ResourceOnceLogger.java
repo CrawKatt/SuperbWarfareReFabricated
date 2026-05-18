@@ -1,11 +1,10 @@
 package com.atsuishio.superbwarfare.tools;
 
 import com.atsuishio.superbwarfare.Mod;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,8 +14,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-// 仅在客户端资源重载时记录一次的Logger
-@EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class ResourceOnceLogger {
     private static final ReloadListener INSTANCE = new ReloadListener();
     private static final List<ResourceOnceLogger> LOGGERS = new ArrayList<>();
@@ -34,12 +31,16 @@ public class ResourceOnceLogger {
         logger.accept(Mod.LOGGER);
     }
 
-    @SubscribeEvent
-    static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
-        event.registerReloadListener(INSTANCE);
+    public static void register() {
+        net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(net.minecraft.server.packs.PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
     }
 
-    static class ReloadListener implements ResourceManagerReloadListener {
+    static class ReloadListener implements ResourceManagerReloadListener, IdentifiableResourceReloadListener {
+
+        @Override
+        public ResourceLocation getFabricId() {
+            return Mod.loc("once_logger");
+        }
 
         @Override
         public void onResourceManagerReload(@NotNull ResourceManager resourceManager) {

@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.client.screens;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.block.ContainerBlock;
@@ -46,9 +47,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.phys.Vec2;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,7 +57,7 @@ import java.util.Map;
 /**
  * Code based on TaC-Z
  */
-@OnlyIn(Dist.CLIENT)
+
 public class VehicleAssemblingScreen extends AbstractContainerScreen<VehicleAssemblingMenu> {
 
     public static final ResourceLocation TEXTURE = Mod.loc("textures/gui/vehicle_assembling_table.png");
@@ -120,7 +118,7 @@ public class VehicleAssemblingScreen extends AbstractContainerScreen<VehicleAsse
         if (mc.level == null) return;
 
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
-        var recipeList = recipeManager.getAllRecipesFor(ModRecipes.VEHICLE_ASSEMBLING_TYPE.get());
+        var recipeList = recipeManager.getAllRecipesFor(ModRecipes.VEHICLE_ASSEMBLING_TYPE);
 
         for (var recipe : recipeList) {
             this.recipes.computeIfAbsent(recipe.value().getCategory(), k -> Lists.newArrayList()).add(recipe.id());
@@ -163,7 +161,7 @@ public class VehicleAssemblingScreen extends AbstractContainerScreen<VehicleAsse
             this.renderIngredients(guiGraphics, mouseX, mouseY);
         }
 
-        this.renderables.stream().filter(w -> w instanceof RecipeButton || w instanceof CategoryButton)
+        ((com.atsuishio.superbwarfare.mixins.ScreenAccessor) this).getRenderables().stream().filter(w -> w instanceof RecipeButton || w instanceof CategoryButton)
                 .forEach(w -> {
                     if (w instanceof RecipeButton recipeButton) {
                         recipeButton.renderTooltips(guiGraphics, mouseX, mouseY);
@@ -408,7 +406,7 @@ public class VehicleAssemblingScreen extends AbstractContainerScreen<VehicleAsse
                     return;
                 }
             }
-            PacketDistributor.sendToServer(new AssembleVehicleMessage(this.currentRecipe.id(), this.menu.containerId));
+            ClientPlayNetworking.send(new AssembleVehicleMessage(this.currentRecipe.id(), this.menu.containerId));
         }));
     }
 
@@ -449,7 +447,7 @@ public class VehicleAssemblingScreen extends AbstractContainerScreen<VehicleAsse
         ItemStack stack = holder.value().getResult().getResult();
         Entity renderEntity = null;
 
-        if (stack.is(ModItems.CONTAINER.get())) {
+        if (stack.is(ModItems.CONTAINER)) {
             var data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
             var tag = data != null ? data.copyTag() : null;
             typeFlag:
@@ -584,7 +582,7 @@ public class VehicleAssemblingScreen extends AbstractContainerScreen<VehicleAsse
         ItemStack stack = holder.value().getResult().getResult();
 
         boolean renderItemName = true;
-        if (stack.is(ModItems.CONTAINER.get())) {
+        if (stack.is(ModItems.CONTAINER)) {
             var data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
             var tag = data != null ? data.copyTag() : null;
             if (tag != null && tag.contains("EntityType")) {

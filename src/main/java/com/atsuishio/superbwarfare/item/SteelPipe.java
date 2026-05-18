@@ -11,15 +11,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SwordItem;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class SteelPipe extends SwordItem {
 
     public SteelPipe() {
@@ -30,7 +25,7 @@ public class SteelPipe extends SwordItem {
 
     @Override
     public boolean hurtEnemy(@NotNull ItemStack pStack, LivingEntity pTarget, LivingEntity pAttacker) {
-        pAttacker.level().playSound(null, pTarget.getOnPos(), ModSounds.STEEL_PIPE_HIT.get(), SoundSource.PLAYERS, 1, (float) ((2 * org.joml.Math.random() - 1) * 0.1f + 1.0f));
+        pAttacker.level().playSound(null, pTarget.getOnPos(), ModSounds.STEEL_PIPE_HIT, SoundSource.PLAYERS, 1, (float) ((2 * org.joml.Math.random() - 1) * 0.1f + 1.0f));
         return super.hurtEnemy(pStack, pTarget, pAttacker);
     }
 
@@ -46,13 +41,5 @@ public class SteelPipe extends SwordItem {
         }
     }
 
-    @SubscribeEvent
-    private static void registerItemExtensions(RegisterClientExtensionsEvent event) {
-        event.registerItem(new IClientItemExtensions() {
-            @Override
-            public boolean shouldBobAsEntity(@NotNull ItemStack stack) {
-                return false;
-            }
-        }, ModItems.STEEL_PIPE);
-    }
+    
 }

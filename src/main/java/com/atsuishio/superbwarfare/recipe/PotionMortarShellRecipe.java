@@ -39,7 +39,7 @@ public class PotionMortarShellRecipe extends CustomRecipe {
                         } else if (!itemstack.isEmpty()) {
                             return false;
                         }
-                    } else if (!itemstack.is(ModItems.MORTAR_SHELL.get())) {
+                    } else if (!itemstack.is(ModItems.MORTAR_SHELL)) {
                         return false;
                     }
                 }
@@ -57,7 +57,7 @@ public class PotionMortarShellRecipe extends CustomRecipe {
         if (!stack.is(Items.LINGERING_POTION)) {
             return ItemStack.EMPTY;
         } else {
-            ItemStack res = new ItemStack(ModItems.POTION_MORTAR_SHELL.get(), 4);
+            ItemStack res = new ItemStack(ModItems.POTION_MORTAR_SHELL, 4);
             res.set(DataComponents.POTION_CONTENTS, stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY));
 
             return res;
@@ -71,6 +71,6 @@ public class PotionMortarShellRecipe extends CustomRecipe {
 
     @Override
     public @NotNull RecipeSerializer<?> getSerializer() {
-        return ModRecipes.POTION_MORTAR_SHELL_SERIALIZER.get();
+        return ModRecipes.POTION_MORTAR_SHELL_SERIALIZER;
     }
 }

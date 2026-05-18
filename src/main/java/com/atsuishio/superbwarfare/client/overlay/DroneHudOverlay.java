@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.RenderHelper;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.mixins.ClientPacketListenerAccessor;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.tools.*;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -29,8 +30,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -41,7 +40,7 @@ import static com.atsuishio.superbwarfare.client.overlay.IFFOverlay.FRIENDLY_IND
 import static com.atsuishio.superbwarfare.entity.vehicle.DroneEntity.*;
 import static com.atsuishio.superbwarfare.item.ArtilleryIndicator.TAG_CANNON;
 
-@OnlyIn(Dist.CLIENT)
+
 public class DroneHudOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("drone_hud");
@@ -56,7 +55,7 @@ public class DroneHudOverlay implements LayeredDraw.Layer {
 
     public static int getMaxDistance() {
         var connection = Minecraft.getInstance().getConnection();
-        return (connection == null ? 16 : connection.serverSimulationDistance) * 16;
+        return (connection == null ? 16 : ((ClientPacketListenerAccessor) connection).getServerSimulationDistance()) * 16;
     }
 
     @Override
@@ -91,7 +90,7 @@ public class DroneHudOverlay implements LayeredDraw.Layer {
         var tag = NBTTool.getTag(stack);
         boolean firstPerson = Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON || Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK;
 
-        if (stack.is(ModItems.MONITOR.get()) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
+        if (stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
             if (firstPerson) {
                 guiGraphics.blit(CROSSHAIR, screenWidth / 2 - 16, screenHeight / 2 - 16, 0, 0, 32, 32, 32, 32);
                 guiGraphics.blit(DRONE_FOV, screenWidth / 2 + 100, screenHeight / 2 - 64, 0, 0, 64, 129, 64, 129);
@@ -184,7 +183,7 @@ public class DroneHudOverlay implements LayeredDraw.Layer {
 
                 // 射击诸元标记
                 ItemStack offStack = player.getOffhandItem();
-                if (offStack.is(ModItems.FIRING_PARAMETERS.get()) || offStack.is(ModItems.ARTILLERY_INDICATOR.get())) {
+                if (offStack.is(ModItems.FIRING_PARAMETERS) || offStack.is(ModItems.ARTILLERY_INDICATOR)) {
                     var parameters = offStack.get(ModDataComponents.FIRING_PARAMETERS);
                     BlockPos blockPos;
                     if (parameters != null) {
@@ -214,7 +213,7 @@ public class DroneHudOverlay implements LayeredDraw.Layer {
                     }
 
                     // 火炮位置
-                    if (offStack.is(ModItems.ARTILLERY_INDICATOR.get())) {
+                    if (offStack.is(ModItems.ARTILLERY_INDICATOR)) {
                         ListTag tags = NBTTool.getTag(offStack).getList(TAG_CANNON, Tag.TAG_COMPOUND);
                         for (int m = 0; m < tags.size(); m++) {
                             var t = tags.getCompound(m);

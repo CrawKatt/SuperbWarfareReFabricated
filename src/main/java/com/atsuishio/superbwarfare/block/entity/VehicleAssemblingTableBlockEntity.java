@@ -24,7 +24,7 @@ public class VehicleAssemblingTableBlockEntity extends BlockEntity implements Me
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public VehicleAssemblingTableBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE.get(), pPos, pBlockState);
+        super(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE, pPos, pBlockState);
     }
 
     @Override

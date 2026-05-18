@@ -21,7 +21,7 @@ public class MobMixin {
 
     @Inject(method = "getTarget", at = @At("RETURN"), cancellable = true)
     public void getTarget(CallbackInfoReturnable<LivingEntity> cir) {
-        if (!MiscConfig.SMOKE_HIDE_TARGET.get()) return;
+        if (!MiscConfig.SMOKE_HIDE_TARGET) return;
 
         var target = this.target;
         if (target != null && !SeekTool.NOT_IN_SMOKE_WITH_RANGE.test(target, 1d)) {

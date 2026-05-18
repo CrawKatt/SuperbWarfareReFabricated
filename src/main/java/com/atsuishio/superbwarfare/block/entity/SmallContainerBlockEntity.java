@@ -55,7 +55,7 @@ public class SmallContainerBlockEntity extends BlockEntity implements GeoBlockEn
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public SmallContainerBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.SMALL_CONTAINER.get(), pos, state);
+        super(ModBlockEntities.SMALL_CONTAINER, pos, state);
     }
 
     public static void serverTick(Level pLevel, BlockPos pPos, BlockState pState, SmallContainerBlockEntity blockEntity) {

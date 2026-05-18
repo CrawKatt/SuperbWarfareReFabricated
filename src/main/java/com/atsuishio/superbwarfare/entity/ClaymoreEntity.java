@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.config.server.ExplosionConfig;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier;
 import com.atsuishio.superbwarfare.init.*;
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.tools.CustomExplosion;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
@@ -26,7 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -51,7 +51,7 @@ public class ClaymoreEntity extends Entity implements GeoEntity, OwnableEntity {
     }
 
     public ClaymoreEntity(LivingEntity owner, Level level) {
-        this(ModEntities.CLAYMORE.get(), level);
+        this(ModEntities.CLAYMORE, level);
         if (owner != null) {
             this.setOwnerUUID(owner.getUUID());
         }
@@ -83,9 +83,9 @@ public class ClaymoreEntity extends Entity implements GeoEntity, OwnableEntity {
         }
 
         if (this.level() instanceof ServerLevel serverLevel) {
-            ParticleTool.sendParticle(serverLevel, ModParticleTypes.FIRE_STAR.get(), this.getX(), this.getY() + 0.2, this.getZ(), 2, 0.02, 0.02, 0.02, 0.1, false);
+            ParticleTool.sendParticle(serverLevel, ModParticleTypes.FIRE_STAR, this.getX(), this.getY() + 0.2, this.getZ(), 2, 0.02, 0.02, 0.02, 0.1, false);
         }
-        this.level().playSound(null, this.getOnPos(), ModSounds.HIT.get(), SoundSource.PLAYERS, 1, 1);
+        this.level().playSound(null, this.getOnPos(), ModSounds.HIT, SoundSource.PLAYERS, 1, 1);
         this.entityData.set(HEALTH, this.entityData.get(HEALTH) - amount);
 
         return super.hurt(source, amount);
@@ -158,7 +158,7 @@ public class ClaymoreEntity extends Entity implements GeoEntity, OwnableEntity {
             }
 
             if (!player.getAbilities().instabuild) {
-                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.CLAYMORE_MINE.get()));
+                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.CLAYMORE_MINE));
             }
         }
 
@@ -210,7 +210,7 @@ public class ClaymoreEntity extends Entity implements GeoEntity, OwnableEntity {
         float f = 0.98F;
         if (this.onGround()) {
             BlockPos pos = this.getBlockPosBelowThatAffectsMyMovement();
-            f = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98F;
+            f = this.level().getBlockState(pos).getBlock().getFriction() * 0.98F;
         }
 
         this.setDeltaMovement(this.getDeltaMovement().multiply(f, 0.98, f));
@@ -230,8 +230,8 @@ public class ClaymoreEntity extends Entity implements GeoEntity, OwnableEntity {
             Entity attacker = EntityFindUtil.findEntity(this.level(), this.entityData.get(LAST_ATTACKER_UUID));
 
             new CustomExplosion.Builder(attacker == null ? this : attacker)
-                    .damage(ExplosionConfig.CLAYMORE_EXPLOSION_DAMAGE.get().floatValue() / 5)
-                    .radius(ExplosionConfig.CLAYMORE_EXPLOSION_RADIUS.get())
+                    .damage((float) ExplosionConfig.CLAYMORE_EXPLOSION_DAMAGE / 5)
+                    .radius(ExplosionConfig.CLAYMORE_EXPLOSION_RADIUS)
                     .position(this.position())
                     .withParticleType(ParticleTool.ParticleType.MEDIUM)
                     .explode();
@@ -243,8 +243,8 @@ public class ClaymoreEntity extends Entity implements GeoEntity, OwnableEntity {
     private void triggerExplode() {
         new CustomExplosion.Builder(this)
                 .attacker(this.getOwner())
-                .damage(ExplosionConfig.CLAYMORE_EXPLOSION_DAMAGE.get())
-                .radius(ExplosionConfig.CLAYMORE_EXPLOSION_RADIUS.get())
+                .damage((float) ExplosionConfig.CLAYMORE_EXPLOSION_DAMAGE)
+                .radius(ExplosionConfig.CLAYMORE_EXPLOSION_RADIUS)
                 .withParticleType(ParticleTool.ParticleType.MEDIUM)
                 .explode();
     }

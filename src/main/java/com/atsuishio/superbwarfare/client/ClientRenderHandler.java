@@ -12,20 +12,15 @@ import com.atsuishio.superbwarfare.client.tooltip.component.*;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.emi.trinkets.api.client.TrinketRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
-import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
-import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientRenderHandler {
 
     // TODO 正确赋值该变量
@@ -46,65 +41,62 @@ public class ClientRenderHandler {
         stack.translate(offset.x, offset.y, offset.z);
     }
 
-    @SubscribeEvent
-    public static void registerTooltip(RegisterClientTooltipComponentFactoriesEvent event) {
-        event.register(GunImageComponent.class, ClientGunImageTooltip::new);
-        event.register(BocekImageComponent.class, ClientBocekImageTooltip::new);
-        event.register(CellImageComponent.class, ClientCellImageTooltip::new);
-        event.register(SentinelImageComponent.class, ClientSentinelImageTooltip::new);
-        event.register(ChargingStationImageComponent.class, ClientChargingStationImageTooltip::new);
-        event.register(DogTagImageComponent.class, ClientDogTagImageTooltip::new);
+    public static void registerTooltip() {
+        TooltipComponentCallback.EVENT.register(component -> {
+            if (component instanceof GunImageComponent c) return new ClientGunImageTooltip(c);
+            if (component instanceof BocekImageComponent c) return new ClientBocekImageTooltip(c);
+            if (component instanceof CellImageComponent c) return new ClientCellImageTooltip(c);
+            if (component instanceof SentinelImageComponent c) return new ClientSentinelImageTooltip(c);
+            if (component instanceof ChargingStationImageComponent c) return new ClientChargingStationImageTooltip(c);
+            if (component instanceof DogTagImageComponent c) return new ClientDogTagImageTooltip(c);
+            return null;
+        });
     }
 
-    @SubscribeEvent
-    public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(ModBlockEntities.CONTAINER.get(), context -> new ContainerBlockEntityRenderer());
-        event.registerBlockEntityRenderer(ModBlockEntities.FUMO_25.get(), context -> new FuMO25BlockEntityRenderer());
-        event.registerBlockEntityRenderer(ModBlockEntities.CHARGING_STATION.get(), context -> new ChargingStationBlockEntityRenderer());
-        event.registerBlockEntityRenderer(ModBlockEntities.SMALL_CONTAINER.get(), context -> new SmallContainerBlockEntityRenderer());
-        event.registerBlockEntityRenderer(ModBlockEntities.LUCKY_CONTAINER.get(), context -> new LuckyContainerBlockEntityRenderer());
-        event.registerBlockEntityRenderer(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE.get(), context -> new VehicleAssemblingTableBlockEntityRenderer());
+    public static void registerRenderers() {
+        BlockEntityRendererRegistry.register(ModBlockEntities.CONTAINER, context -> new ContainerBlockEntityRenderer());
+        BlockEntityRendererRegistry.register(ModBlockEntities.FUMO_25, context -> new FuMO25BlockEntityRenderer());
+        BlockEntityRendererRegistry.register(ModBlockEntities.CHARGING_STATION, context -> new ChargingStationBlockEntityRenderer());
+        BlockEntityRendererRegistry.register(ModBlockEntities.SMALL_CONTAINER, context -> new SmallContainerBlockEntityRenderer());
+        BlockEntityRendererRegistry.register(ModBlockEntities.LUCKY_CONTAINER, context -> new LuckyContainerBlockEntityRenderer());
+        BlockEntityRendererRegistry.register(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE, context -> new VehicleAssemblingTableBlockEntityRenderer());
     }
 
-    @SubscribeEvent
-    public static void registerOverlays(RegisterGuiLayersEvent event) {
-        event.registerBelowAll(KillMessageOverlay.ID, new KillMessageOverlay());
-        event.registerBelow(KillMessageOverlay.ID, ArmorPlateOverlay.ID, new ArmorPlateOverlay());
-        event.registerBelow(ArmorPlateOverlay.ID, AmmoBarOverlay.ID, new AmmoBarOverlay());
-        event.registerBelow(AmmoBarOverlay.ID, IFFOverlay.ID, new IFFOverlay());
-        event.registerBelow(IFFOverlay.ID, VehicleTeamOverlay.ID, new VehicleTeamOverlay());
-        event.registerBelow(VehicleTeamOverlay.ID, JavelinHudOverlay.ID, new JavelinHudOverlay());
-        event.registerBelow(JavelinHudOverlay.ID, IglaHudOverlay.ID, new IglaHudOverlay());
-        event.registerBelow(IglaHudOverlay.ID, VehicleHudOverlay.ID, new VehicleHudOverlay());
-        event.registerBelow(VehicleHudOverlay.ID, VehicleMainWeaponHudOverlay.ID, new VehicleMainWeaponHudOverlay());
-        event.registerBelow(VehicleMainWeaponHudOverlay.ID, VehicleCrosshairOverlay.ID, new VehicleCrosshairOverlay());
-        event.registerBelowAll(StaminaOverlay.ID, new StaminaOverlay());
-        event.registerBelowAll(AmmoCountOverlay.ID, new AmmoCountOverlay());
-        event.registerBelowAll(ItemRendererFixOverlay.ID, new ItemRendererFixOverlay());
-        event.registerBelowAll(CrossHairOverlay.ID, new CrossHairOverlay());
-        event.registerBelowAll(HeatBarOverlay.ID, new HeatBarOverlay());
-        event.registerBelowAll(DroneHudOverlay.ID, new DroneHudOverlay());
-        event.registerBelowAll(RedTriangleOverlay.ID, new RedTriangleOverlay());
-        event.registerBelowAll(HandsomeFrameOverlay.ID, new HandsomeFrameOverlay());
-        event.registerBelowAll(SpyglassRangeOverlay.ID, new SpyglassRangeOverlay());
-        event.registerBelowAll(TowOverlay.ID, new TowOverlay());
-        event.registerBelowAll(MortarInfoOverlay.ID, new MortarInfoOverlay());
-        event.registerBelowAll(Type63InfoOverlay.ID, new Type63InfoOverlay());
+    public static void registerOverlays() {
+        HudRenderCallback.EVENT.register((guiGraphics, deltaTracker) -> {
+            new KillMessageOverlay().render(guiGraphics, deltaTracker);
+            new ArmorPlateOverlay().render(guiGraphics, deltaTracker);
+            new AmmoBarOverlay().render(guiGraphics, deltaTracker);
+            new IFFOverlay().render(guiGraphics, deltaTracker);
+            new VehicleTeamOverlay().render(guiGraphics, deltaTracker);
+            new JavelinHudOverlay().render(guiGraphics, deltaTracker);
+            new IglaHudOverlay().render(guiGraphics, deltaTracker);
+            new VehicleHudOverlay().render(guiGraphics, deltaTracker);
+            new VehicleMainWeaponHudOverlay().render(guiGraphics, deltaTracker);
+            new VehicleCrosshairOverlay().render(guiGraphics, deltaTracker);
+            new StaminaOverlay().render(guiGraphics, deltaTracker);
+            new AmmoCountOverlay().render(guiGraphics, deltaTracker);
+            new ItemRendererFixOverlay().render(guiGraphics, deltaTracker);
+            new CrossHairOverlay().render(guiGraphics, deltaTracker);
+            new HeatBarOverlay().render(guiGraphics, deltaTracker);
+            new DroneHudOverlay().render(guiGraphics, deltaTracker);
+            new RedTriangleOverlay().render(guiGraphics, deltaTracker);
+            new HandsomeFrameOverlay().render(guiGraphics, deltaTracker);
+            new SpyglassRangeOverlay().render(guiGraphics, deltaTracker);
+            new TowOverlay().render(guiGraphics, deltaTracker);
+            new MortarInfoOverlay().render(guiGraphics, deltaTracker);
+            new Type63InfoOverlay().render(guiGraphics, deltaTracker);
+        });
     }
 
-    @SubscribeEvent
-    public static void registerItemDecorations(RegisterItemDecorationsEvent event) {
-        event.register(ModItems.CONTAINER.get(), new ContainerItemDecorator());
-        event.register(ModItems.LUCKY_CONTAINER.get(), new LuckyContainerItemDecorator());
+    public static void registerItemDecorations() {
     }
 
-    @SubscribeEvent
-    public static void onClientSetup(FMLClientSetupEvent event) {
-        CuriosRendererRegistry.register(ModItems.PARACHUTE.get(), ParachuteRenderer::new);
+    public static void onClientSetup() {
+        TrinketRendererRegistry.registerRenderer(ModItems.PARACHUTE, new ParachuteRenderer());
     }
 
-    @SubscribeEvent
-    public static void registerLayer(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(ParachuteModel.LAYER_LOCATION, ParachuteModel::createBodyLayer);
+    public static void registerLayer() {
+        EntityModelLayerRegistry.registerModelLayer(ParachuteModel.LAYER_LOCATION, ParachuteModel::createBodyLayer);
     }
 }

@@ -1,21 +1,14 @@
 package com.atsuishio.superbwarfare.item.common.container;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.api.event.RegisterContainersEvent;
-import com.atsuishio.superbwarfare.client.renderer.item.ContainerBlockItemRenderer;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.init.ModBlocks;
 import com.atsuishio.superbwarfare.init.ModEntities;
-import com.atsuishio.superbwarfare.init.ModItems;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -27,11 +20,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -43,13 +31,12 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class ContainerBlockItem extends BlockItem implements GeoItem {
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void registerContainers(RegisterContainersEvent event) {
+    public static void registerContainers() {
+        var event = new RegisterContainersEvent();
         event.add(ModEntities.WHEEL_CHAIR);
-        event.add(ModEntities.TRUCK.get());
+        event.add(ModEntities.TRUCK);
         event.add(ModEntities.TYPE_63);
         event.add(ModEntities.MK_42);
         event.add(ModEntities.MLE_1934);
@@ -73,13 +60,7 @@ public class ContainerBlockItem extends BlockItem implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public ContainerBlockItem() {
-        super(ModBlocks.CONTAINER.get(), new Properties().stacksTo(1).fireResistant());
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public boolean canBeHurtBy(ItemStack stack, DamageSource source) {
-        return super.canBeHurtBy(stack, source) && !source.is(DamageTypeTags.IS_EXPLOSION) && !source.is(DamageTypes.CACTUS);
+        super(ModBlocks.CONTAINER, new Properties().stacksTo(1).fireResistant());
     }
 
     @Override
@@ -124,19 +105,7 @@ public class ContainerBlockItem extends BlockItem implements GeoItem {
     }
 
 
-    @SubscribeEvent
-    private static void registerArmorExtensions(RegisterClientExtensionsEvent event) {
-        event.registerItem(new IClientItemExtensions() {
-
-            private final BlockEntityWithoutLevelRenderer renderer = new ContainerBlockItemRenderer();
-
-            @Override
-            public @NotNull BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return renderer;
-            }
-
-        }, ModItems.CONTAINER);
-    }
+    
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
@@ -149,13 +118,13 @@ public class ContainerBlockItem extends BlockItem implements GeoItem {
     }
 
     public static ItemStack createInstance(Entity entity) {
-        ItemStack stack = new ItemStack(ModBlocks.CONTAINER.get());
+        ItemStack stack = new ItemStack(ModBlocks.CONTAINER);
 
         var data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
         var tag = data != null ? data.copyTag() : new CompoundTag();
 
         var entityTag = new CompoundTag();
-        var encodedId = entity.getEncodeId();
+        var encodedId = EntityType.getKey(entity.getType()).toString();
         if (encodedId != null) {
             entityTag.putString("id", encodedId);
         }
@@ -163,17 +132,17 @@ public class ContainerBlockItem extends BlockItem implements GeoItem {
         tag.put("Entity", entityTag);
 
         tag.putString("EntityType", EntityType.getKey(entity.getType()).toString());
-        BlockItem.setBlockEntityData(stack, ModBlockEntities.CONTAINER.get(), tag);
+        BlockItem.setBlockEntityData(stack, ModBlockEntities.CONTAINER, tag);
         return stack;
     }
 
     public static ItemStack createInstance(EntityType<?> entityType) {
-        ItemStack stack = new ItemStack(ModBlocks.CONTAINER.get());
+        ItemStack stack = new ItemStack(ModBlocks.CONTAINER);
         var data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
         var tag = data != null ? data.copyTag() : new CompoundTag();
 
         tag.putString("EntityType", EntityType.getKey(entityType).toString());
-        BlockItem.setBlockEntityData(stack, ModBlockEntities.CONTAINER.get(), tag);
+        BlockItem.setBlockEntityData(stack, ModBlockEntities.CONTAINER, tag);
         return stack;
     }
 }

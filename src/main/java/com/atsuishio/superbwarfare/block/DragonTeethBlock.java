@@ -61,7 +61,6 @@ public class DragonTeethBlock extends Block {
         return Shapes.or(box(2, 0, 2, 14, 25, 14));
     }
 
-    @Override
     @ParametersAreNonnullByDefault
     public @Nullable PathType getAdjacentBlockPathType(BlockState state, BlockGetter level, BlockPos pos, @Nullable Mob mob, PathType originalType) {
         return PathType.LAVA;

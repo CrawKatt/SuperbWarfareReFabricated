@@ -33,7 +33,7 @@ public class HandGrenade extends Item implements ProjectileItem {
         ItemStack stack = playerIn.getItemInHand(handIn);
         playerIn.startUsingItem(handIn);
         if (playerIn instanceof ServerPlayer serverPlayer) {
-            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.GRENADE_PULL.get(), SoundSource.PLAYERS, 1, 1);
+            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.GRENADE_PULL, SoundSource.PLAYERS, 1, 1);
         }
         return InteractionResultHolder.consume(stack);
     }
@@ -58,7 +58,7 @@ public class HandGrenade extends Item implements ProjectileItem {
                     worldIn.addFreshEntity(handGrenade);
 
                     if (player instanceof ServerPlayer serverPlayer) {
-                        serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.GRENADE_THROW.get(), SoundSource.PLAYERS, 1, 1);
+                        serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.GRENADE_THROW, SoundSource.PLAYERS, 1, 1);
                     }
 
                     if (!player.isCreative()) {
@@ -77,8 +77,8 @@ public class HandGrenade extends Item implements ProjectileItem {
 
             new CustomExplosion.Builder(handGrenade)
                     .attacker(pLivingEntity)
-                    .damage(ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE.get())
-                    .radius(ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS.get())
+                    .damage(ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE)
+                    .radius(ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS)
                     .damageMultiplier(1.25F)
                     .withParticleType(ParticleTool.ParticleType.MEDIUM)
                     .explode();
@@ -104,7 +104,7 @@ public class HandGrenade extends Item implements ProjectileItem {
     @Override
     @ParametersAreNonnullByDefault
     public @NotNull Projectile asProjectile(Level level, Position pos, ItemStack stack, Direction direction) {
-        return new HandGrenadeEntity(ModEntities.HAND_GRENADE.get(), pos.x(), pos.y(), pos.z(), level);
+        return new HandGrenadeEntity(ModEntities.HAND_GRENADE, pos.x(), pos.y(), pos.z(), level);
     }
 }
 

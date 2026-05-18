@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.init.ModAttachments;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.perk.Perk;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.tools.InventoryTool;
 import com.atsuishio.superbwarfare.tools.SoundTool;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,8 +21,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,14 +65,14 @@ public class GunEventHandler {
                     var ammoType = data.selectedAmmoConsumer().getPlayerAmmoType();
                     switch (ammoType) {
                         case SHOTGUN ->
-                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_SHOTGUN.get(), (float) Math.max(0.75 - 0.12 * shooterHeight, 0), 1);
+                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_SHOTGUN, (float) Math.max(0.75 - 0.12 * shooterHeight, 0), 1);
                         case SNIPER, HEAVY ->
-                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_50CAL.get(), (float) Math.max(1 - 0.15 * shooterHeight, 0), 1);
+                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_50CAL, (float) Math.max(1 - 0.15 * shooterHeight, 0), 1);
                         default ->
-                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL.get(), (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1);
+                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL, (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1);
                     }
                 } else {
-                    SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL.get(), (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1);
+                    SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL, (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1);
                 }
             });
         }
@@ -204,12 +203,12 @@ public class GunEventHandler {
             int count = ammoCount - magazine - (hasBulletInBarrel ? 1 : 0);
 
             if (shooter instanceof Player player) {
-                var capability = player.getData(ModAttachments.PLAYER_VARIABLE).watch();
+                var capability = player.getAttached(ModAttachments.PLAYER_VARIABLE).watch();
                 if (data.selectedAmmoConsumer().type == AmmoConsumer.AmmoConsumeType.PLAYER_AMMO) {
                     var ammoType = data.selectedAmmoConsumer().getPlayerAmmoType();
                     ammoType.add(capability, count);
                 }
-                player.setData(ModAttachments.PLAYER_VARIABLE, capability);
+                player.setAttached(ModAttachments.PLAYER_VARIABLE, capability);
                 capability.sync(player);
             }
 
@@ -232,7 +231,7 @@ public class GunEventHandler {
 
             // 启动换弹
             if (data.reload.reloadStarter.start()) {
-                NeoForge.EVENT_BUS.post(new ReloadEvent.Pre(shooter, data));
+                CustomEventHandler.onPreReload(new ReloadEvent.Pre(shooter, data));
                 startReload(shooter, data);
             }
 
@@ -310,12 +309,12 @@ public class GunEventHandler {
     public static void finishGunNormalReload(@Nullable Entity shooter, @NotNull GunData data) {
         var gunItem = data.item();
         data.reloadAmmo(shooter, gunItem.hasBulletInBarrel(data));
-        NeoForge.EVENT_BUS.post(new ReloadEvent.Post(shooter, data));
+        CustomEventHandler.onPostReload(new ReloadEvent.Post(shooter, data));
     }
 
     public static void finishGunEmptyReload(@Nullable Entity shooter, @NotNull GunData data) {
         data.reloadAmmo(shooter);
-        NeoForge.EVENT_BUS.post(new ReloadEvent.Post(shooter, data));
+        CustomEventHandler.onPostReload(new ReloadEvent.Post(shooter, data));
     }
 
     public static void playGunEmptyReloadSounds(@Nullable Entity shooter, @NotNull GunData data) {
@@ -356,9 +355,9 @@ public class GunEventHandler {
         // 一阶段
         var computed = data.compute();
         if (reload.singleReloadStarter.start()) {
-            NeoForge.EVENT_BUS.post(new ReloadEvent.Pre(shooter, data));
+            CustomEventHandler.onPreReload(new ReloadEvent.Pre(shooter, data));
 
-            if (computed.prepareLoadTime != 0 && (!data.hasEnoughAmmoToShoot(shooter) || stack.is(ModItems.SECONDARY_CATACLYSM.get()))) {
+            if (computed.prepareLoadTime != 0 && (!data.hasEnoughAmmoToShoot(shooter) || stack.is(ModItems.SECONDARY_CATACLYSM))) {
                 // 此处判断空仓换弹的时候，是否在准备阶段就需要装填一发，如M870
                 playGunPrepareLoadReloadSounds(shooter, data);
                 int prepareLoadTime = computed.prepareLoadTime;
@@ -444,7 +443,7 @@ public class GunEventHandler {
             playGunEndReloadSounds(shooter, data);
         }
 
-        if (stack.getItem() == ModItems.MARLIN.get() && reload.finishTimer.get() == 10) {
+        if (stack.getItem() == ModItems.MARLIN && reload.finishTimer.get() == 10) {
             data.isEmpty.set(false);
             data.closeStrike.set(false);
         }
@@ -458,7 +457,7 @@ public class GunEventHandler {
             reload.setState(ReloadState.NOT_RELOADING);
             reload.singleReloadStarter.finish();
 
-            NeoForge.EVENT_BUS.post(new ReloadEvent.Post(shooter, data));
+            CustomEventHandler.onPostReload(new ReloadEvent.Post(shooter, data));
         }
     }
 
@@ -468,8 +467,8 @@ public class GunEventHandler {
         data.ammo.add(available);
         if (!InventoryTool.hasCreativeAmmoBox(shooter)) {
             if (shooter != null) {
-                var cap = shooter.getData(ModAttachments.PLAYER_VARIABLE);
-                shooter.setData(ModAttachments.PLAYER_VARIABLE, cap);
+                var cap = shooter.getAttached(ModAttachments.PLAYER_VARIABLE);
+                shooter.setAttached(ModAttachments.PLAYER_VARIABLE, cap);
             }
             data.consumeBackupAmmo(shooter, available);
         }
@@ -503,14 +502,14 @@ public class GunEventHandler {
                     var ammoType = data.selectedAmmoConsumer().getPlayerAmmoType();
                     switch (ammoType) {
                         case SHOTGUN ->
-                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_SHOTGUN.get(), (float) Math.max(0.75 - 0.12 * shooterHeight, 0), 1);
+                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_SHOTGUN, (float) Math.max(0.75 - 0.12 * shooterHeight, 0), 1);
                         case SNIPER, HEAVY ->
-                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_50CAL.get(), (float) Math.max(1 - 0.15 * shooterHeight, 0), 1);
+                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_50CAL, (float) Math.max(1 - 0.15 * shooterHeight, 0), 1);
                         default ->
-                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL.get(), (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1);
+                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL, (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1);
                     }
                 } else {
-                    SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL.get(), (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1);
+                    SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL, (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1);
                 }
             });
         }
@@ -533,14 +532,14 @@ public class GunEventHandler {
                     var ammoType = data.selectedAmmoConsumer().getPlayerAmmoType();
                     switch (ammoType) {
                         case SHOTGUN ->
-                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_SHOTGUN.get(), (float) Math.max(0.75 - 0.12 * shooterHeight, 0), 1);
+                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_SHOTGUN, (float) Math.max(0.75 - 0.12 * shooterHeight, 0), 1);
                         case SNIPER, HEAVY ->
-                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_50CAL.get(), (float) Math.max(1 - 0.15 * shooterHeight, 0), 1);
+                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_50CAL, (float) Math.max(1 - 0.15 * shooterHeight, 0), 1);
                         default ->
-                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL.get(), (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1);
+                                SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL, (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1);
                     }
                 } else {
-                    SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL.get(), (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1);
+                    SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL, (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1);
                 }
             });
         }
@@ -570,8 +569,8 @@ public class GunEventHandler {
                     ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, shooter)).getBlockPos())));
 
             // TODO 为什么要特判这个
-            if (data.stack.is(ModItems.MARLIN.get())) {
-                Mod.queueServerWork((int) (5 + 1.5 * shooterHeight), () -> SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL.get(), (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1));
+            if (data.stack.is(ModItems.MARLIN)) {
+                Mod.queueServerWork((int) (5 + 1.5 * shooterHeight), () -> SoundTool.playLocalSound(serverPlayer, ModSounds.SHELL_CASING_NORMAL, (float) Math.max(1.5 - 0.2 * shooterHeight, 0), 1));
             }
         }
     }
@@ -585,27 +584,27 @@ public class GunEventHandler {
             data.charge.timer.set(127);
 
             if (entity instanceof ServerPlayer serverPlayer) {
-                SoundTool.playLocalSound(serverPlayer, ModSounds.SENTINEL_CHARGE.get(), 2f, 1f);
+                SoundTool.playLocalSound(serverPlayer, ModSounds.SENTINEL_CHARGE, 2f, 1f);
             }
         }
 
         data.charge.timer.reduce();
 
         if (data.charge.timer.get() == 17) {
-            var itemHandler = entity.getCapability(Capabilities.ItemHandler.ENTITY);
+            var itemHandler = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null);
             if (itemHandler == null) return;
 
             for (int i = 0; i < itemHandler.getSlots(); i++) {
                 var cell = itemHandler.getStackInSlot(i);
 
-                if (cell.is(ModItems.CELL.get())) {
-                    var stackStorage = data.stack().getCapability(Capabilities.EnergyStorage.ITEM);
+                if (cell.is(ModItems.CELL)) {
+                    var stackStorage = ModCapabilities.ENERGY_ITEM.find(data.stack(), null);
                     if (stackStorage == null) continue;
 
                     int stackMaxEnergy = stackStorage.getMaxEnergyStored();
                     int stackEnergy = stackStorage.getEnergyStored();
 
-                    var cellStorage = cell.getCapability(Capabilities.EnergyStorage.ITEM);
+                    var cellStorage = ModCapabilities.ENERGY_ITEM.find(cell, null);
                     if (cellStorage == null) continue;
                     int cellEnergy = cellStorage.getEnergyStored();
 
@@ -627,16 +626,16 @@ public class GunEventHandler {
 //            if (Mod.MODID.equals(mapping.getKey().getNamespace())) {
 //                var item = mapping.getKey().getPath();
 //                if (item.equals("abekiri")) {
-//                    mapping.remap(ModItems.HOMEMADE_SHOTGUN.get());
+//                    mapping.remap(ModItems.HOMEMADE_SHOTGUN);
 //                }
 //                if (item.equals("m2hb_blueprint")) {
-//                    mapping.remap(ModItems.M_2_HB_BLUEPRINT.get());
+//                    mapping.remap(ModItems.M_2_HB_BLUEPRINT);
 //                }
 //                if (item.equals("rocket_70")) {
-//                    mapping.remap(ModItems.SMALL_ROCKET.get());
+//                    mapping.remap(ModItems.SMALL_ROCKET);
 //                }
 //                if (item.equals("us_helmet_pastg")) {
-//                    mapping.remap(ModItems.US_HELMET_PASGT.get());
+//                    mapping.remap(ModItems.US_HELMET_PASGT);
 //                }
 //            }
 //        }

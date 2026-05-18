@@ -60,7 +60,7 @@ public class CustomGunRenderer<T extends GunGeoItem & GeoAnimatable> extends Geo
     @Override
     public RenderType getRenderType(T animatable, ResourceLocation texture, MultiBufferSource bufferSource, float partialTick) {
         if (texture == null) {
-            return RenderType.TRANSLUCENT;
+            return RenderType.translucent();
         }
         return RenderType.entityTranslucent(texture);
     }
@@ -70,7 +70,7 @@ public class CustomGunRenderer<T extends GunGeoItem & GeoAnimatable> extends Geo
         var geoModel = getGeoModel();
 
         if (renderPerspective != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
-                && DisplayConfig.ENABLE_GUN_LOD.get()
+                && DisplayConfig.ENABLE_GUN_LOD
                 && geoModel instanceof CustomGunModel<T> gunModel
                 && !RenderHelper.isInGui()
         ) {
@@ -84,7 +84,7 @@ public class CustomGunRenderer<T extends GunGeoItem & GeoAnimatable> extends Geo
 //        var geoModel = getGeoModel();
 //
 //        if (renderPerspective != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
-//                && DisplayConfig.ENABLE_GUN_LOD.get()
+//                && DisplayConfig.ENABLE_GUN_LOD
 //                && geoModel instanceof CustomGunModel<T> gunModel
 //        ) {
 //            var player = Minecraft.getInstance().player;
@@ -130,7 +130,7 @@ public class CustomGunRenderer<T extends GunGeoItem & GeoAnimatable> extends Geo
         ResourceLocation modelLocation;
         var geoModel = getGeoModel();
         if (renderPerspective != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
-                && DisplayConfig.ENABLE_GUN_LOD.get()
+                && DisplayConfig.ENABLE_GUN_LOD
                 && geoModel instanceof CustomGunModel<T> gunModel
                 && !RenderHelper.isInGui()
         ) {

@@ -17,6 +17,7 @@ import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessag
 import com.atsuishio.superbwarfare.network.message.receive.ClientMotionSyncMessage;
 import com.atsuishio.superbwarfare.tools.*;
 import com.atsuishio.superbwarfare.world.phys.EntityResult;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import com.atsuishio.superbwarfare.world.phys.ExtendedEntityRayTraceResult;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
@@ -51,9 +52,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.entity.PartEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -130,7 +128,7 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
     }
 
     public ProjectileEntity(Level level) {
-        this(ModEntities.PROJECTILE.get(), level);
+        this(ModEntities.PROJECTILE, level);
     }
 
     @Nullable
@@ -210,8 +208,8 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
                 if (obbVec != null) {
                     hitPos = OBB.vector3dToVec3(obbVec);
                     if (this.level() instanceof ServerLevel serverLevel) {
-                        this.level().playSound(null, BlockPos.containing(hitPos), ModSounds.HIT.get(), SoundSource.PLAYERS, 1, 1);
-                        sendParticle(serverLevel, ModParticleTypes.FIRE_STAR.get(), hitPos.x, hitPos.y, hitPos.z, 2, 0, 0, 0, 0.2, false);
+                        this.level().playSound(null, BlockPos.containing(hitPos), ModSounds.HIT, SoundSource.PLAYERS, 1, 1);
+                        sendParticle(serverLevel, ModParticleTypes.FIRE_STAR, hitPos.x, hitPos.y, hitPos.z, 2, 0, 0, 0, 0.2, false);
                         sendParticle(serverLevel, ParticleTypes.SMOKE, hitPos.x, hitPos.y, hitPos.z, 2, 0, 0, 0, 0.01, false);
                     }
 
@@ -293,11 +291,11 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
             Vec3 endVec = startVec.add(this.getDeltaMovement());
             HitResult result = rayTraceBlocks(this.level(), new ClipContext(startVec, endVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this),
                     (this.penetrating || this.beast) ? state -> true :
-                            ProjectileConfig.ALLOW_PROJECTILE_DESTROY_BLOCKS.get() ? IGNORE_LIST.and(input -> !input.is(ModTags.Blocks.BULLET_CAN_DESTROY)) : IGNORE_LIST);
+                            ProjectileConfig.ALLOW_PROJECTILE_DESTROY_BLOCKS ? IGNORE_LIST.and(input -> !input.is(ModTags.Blocks.BULLET_CAN_DESTROY)) : IGNORE_LIST);
 
             BlockHitResult fluidResult = rayTraceBlocks(this.level(), new ClipContext(startVec, endVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, this),
                     (this.penetrating || this.beast) ? state -> true :
-                            ProjectileConfig.ALLOW_PROJECTILE_DESTROY_BLOCKS.get() ? IGNORE_LIST.and(input -> !input.is(ModTags.Blocks.BULLET_CAN_DESTROY)) : IGNORE_LIST);
+                            ProjectileConfig.ALLOW_PROJECTILE_DESTROY_BLOCKS ? IGNORE_LIST.and(input -> !input.is(ModTags.Blocks.BULLET_CAN_DESTROY)) : IGNORE_LIST);
 
             if (result.getType() != HitResult.Type.MISS) {
                 endVec = result.getLocation();
@@ -379,8 +377,11 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
 
     @Override
     public void syncMotion() {
-        if (!this.level().isClientSide) {
-            PacketDistributor.sendToPlayersTrackingEntity(this, new ClientMotionSyncMessage(this));
+        if (this.level() instanceof ServerLevel serverLevel) {
+            var packet = new ClientMotionSyncMessage(this);
+            for (var player : serverLevel.players()) {
+                ServerPlayNetworking.send(player, packet);
+            }
         }
     }
 
@@ -392,7 +393,7 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
             }
             BlockPos resultPos = blockHitResult.getBlockPos();
             BlockState state = this.level().getBlockState(resultPos);
-            SoundEvent event = state.getBlock().getSoundType(state, this.level(), resultPos, this).getBreakSound();
+            SoundEvent event = state.getSoundType().getBreakSound();
             this.level().playSound(null, result.getLocation().x, result.getLocation().y, result.getLocation().z, event, SoundSource.AMBIENT, 1F, 1F);
             Vec3 hitVec = result.getLocation();
 
@@ -454,14 +455,14 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
                 .append(Component.literal(" " + FormatTool.format1D(distance, "m"))), false);
 
         if (!this.level().isClientSide() && this.shooter instanceof ServerPlayer serverPlayer) {
-            var holder = score == 10 ? Holder.direct(ModSounds.HEADSHOT.get()) : Holder.direct(ModSounds.INDICATION.get());
+            var holder = score == 10 ? Holder.direct(ModSounds.HEADSHOT) : Holder.direct(ModSounds.INDICATION);
             serverPlayer.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1f, 1f, player.level().random.nextLong()));
-            PacketDistributor.sendToPlayer(serverPlayer, new ClientIndicatorMessage(score == 10 ? 1 : 0, 5));
+            ServerPlayNetworking.send(serverPlayer, new ClientIndicatorMessage(score == 10 ? 1 : 0, 5));
         }
 
         ItemStack stack = player.getOffhandItem();
 
-        if (stack.is(ModItems.TRANSCRIPT.get())) {
+        if (stack.is(ModItems.TRANSCRIPT)) {
             final int size = 10;
 
             var scores = stack.get(ModDataComponents.TRANSCRIPT_SCORE);
@@ -498,7 +499,7 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
                     }
 
                     ParticleTool.spawnBulletHitWaterParticles(serverLevel, location);
-                    serverLevel.playSound(null, new BlockPos((int) location.x, (int) location.y, (int) location.z), ModSounds.HIT_WATER.get(), SoundSource.BLOCKS, 1F, 1F);
+                    serverLevel.playSound(null, new BlockPos((int) location.x, (int) location.y, (int) location.z), ModSounds.HIT_WATER, SoundSource.BLOCKS, 1F, 1F);
 
                     // 水下路径气泡
                     double l = getDeltaMovement().length();
@@ -532,9 +533,6 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
             Direction face = result.getDirection();
             BlockState state = level().getBlockState(pos);
 
-            if (NeoForge.EVENT_BUS.post(new ProjectileHitEvent.HitBlock(pos, state, face, this.shooter, this, result.getLocation())).isCanceled())
-                return;
-
             double vx = face.getStepX();
             double vy = face.getStepY();
             double vz = face.getStepZ();
@@ -555,7 +553,7 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
 
                 this.discard();
             }
-            serverLevel.playSound(null, new BlockPos((int) location.x, (int) location.y, (int) location.z), ModSounds.LAND.get(), SoundSource.BLOCKS, 1F, 1F);
+            serverLevel.playSound(null, new BlockPos((int) location.x, (int) location.y, (int) location.z), ModSounds.LAND, SoundSource.BLOCKS, 1F, 1F);
         }
     }
 
@@ -570,11 +568,11 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
             ParticleTool.sendParticle(serverLevel, ParticleTypes.SMOKE, pos.x, pos.y, pos.z, 0, vec3.x, vec3.y, vec3.z, 0.05, true);
         }
         var blockPos = BlockPos.containing(pos);
-        if (state.getSoundType(serverLevel, blockPos, null) == SoundType.METAL || state.getSoundType(serverLevel, blockPos, null) == SoundType.ANVIL || state.getSoundType(serverLevel, blockPos, null) == SoundType.CHAIN || state.getSoundType(serverLevel, blockPos, null) == SoundType.COPPER || state.getSoundType(serverLevel, blockPos, null) == SoundType.NETHERITE_BLOCK) {
-            serverLevel.playSound(null, pos.x, pos.y, pos.z, ModSounds.HIT.get(), SoundSource.BLOCKS, 2, 1);
+        if (state.getSoundType() == SoundType.METAL || state.getSoundType() == SoundType.ANVIL || state.getSoundType() == SoundType.CHAIN || state.getSoundType() == SoundType.COPPER || state.getSoundType() == SoundType.NETHERITE_BLOCK) {
+            serverLevel.playSound(null, pos.x, pos.y, pos.z, ModSounds.HIT, SoundSource.BLOCKS, 2, 1);
             for (int i = 0; i < 3; i++) {
                 Vec3 vec3 = randomVec(dir, 80);
-                ParticleTool.sendParticle(serverLevel, ModParticleTypes.FIRE_STAR.get(), pos.x, pos.y, pos.z, 0, vec3.x, vec3.y, vec3.z, 0.2 + 0.1 * Math.random(), true);
+                ParticleTool.sendParticle(serverLevel, ModParticleTypes.FIRE_STAR, pos.x, pos.y, pos.z, 0, vec3.x, vec3.y, vec3.z, 0.2 + 0.1 * Math.random(), true);
             }
         }
     }
@@ -589,14 +587,10 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
         boolean headshot = result.isHeadshot();
         boolean legShot = result.isLegShot();
 
-        if (NeoForge.EVENT_BUS.post(new ProjectileHitEvent.HitEntity(this.shooter, this, result)).isCanceled()) return;
-
-        if (entity instanceof PartEntity<?> part) {
-            entity = part.getParent();
-        }
+        if (false) {}
 
         if (entity instanceof LivingEntity living) {
-            living.level().playSound(null, living.getOnPos(), ModSounds.MELEE_HIT.get(), SoundSource.PLAYERS, 1, (float) (2 * Math.random() - 1) * 0.1f + 1.0f);
+            living.level().playSound(null, living.getOnPos(), ModSounds.MELEE_HIT, SoundSource.PLAYERS, 1, (float) (2 * Math.random() - 1) * 0.1f + 1.0f);
 
             if (beast) {
                 Beast.beastKill(this.shooter, living);
@@ -608,16 +602,16 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
 
         if (headshot) {
             if (!this.level().isClientSide() && this.shooter instanceof ServerPlayer player) {
-                var holder = Holder.direct(ModSounds.HEADSHOT.get());
+                var holder = Holder.direct(ModSounds.HEADSHOT);
                 player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1f, 1f, player.level().random.nextLong()));
-                PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(1, 5));
+                ServerPlayNetworking.send(player, new ClientIndicatorMessage(1, 5));
             }
             performOnHit(entity, this.damage, true, this.knockback);
         } else {
             if (!this.level().isClientSide() && this.shooter instanceof ServerPlayer player) {
-                var holder = Holder.direct(ModSounds.INDICATION.get());
+                var holder = Holder.direct(ModSounds.INDICATION);
                 player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1f, 1f, player.level().random.nextLong()));
-                PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
             }
 
             if (legShot) {

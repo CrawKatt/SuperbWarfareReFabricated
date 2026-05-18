@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.client.screens;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.menu.ReforgingTableMenu;
@@ -14,12 +15,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-@OnlyIn(Dist.CLIENT)
+
 public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTableMenu> {
 
     private static final ResourceLocation TEXTURE = Mod.loc("textures/gui/reforging_table.png");
@@ -101,7 +99,7 @@ public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTable
         this.addRenderableWidget(damageDowngrade);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     static class ReforgeButton extends AbstractButton {
 
         @Override
@@ -116,7 +114,7 @@ public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTable
 
         @Override
         public void onPress() {
-            PacketDistributor.sendToServer(GunReforgeMessage.INSTANCE);
+            ClientPlayNetworking.send(GunReforgeMessage.INSTANCE);
         }
 
         @Override
@@ -124,7 +122,7 @@ public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTable
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     class UpgradeButton extends AbstractButton {
         public Perk.Type type;
 
@@ -162,7 +160,7 @@ public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTable
                 }
             }
 
-            PacketDistributor.sendToServer(new SetPerkLevelMessage(type.ordinal(), true));
+            ClientPlayNetworking.send(new SetPerkLevelMessage(type.ordinal(), true));
         }
 
         @Override
@@ -171,7 +169,7 @@ public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTable
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     class DowngradeButton extends AbstractButton {
         public Perk.Type type;
 
@@ -208,7 +206,7 @@ public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTable
                 }
             }
 
-            PacketDistributor.sendToServer(new SetPerkLevelMessage(type.ordinal(), false));
+            ClientPlayNetworking.send(new SetPerkLevelMessage(type.ordinal(), false));
         }
 
         @Override

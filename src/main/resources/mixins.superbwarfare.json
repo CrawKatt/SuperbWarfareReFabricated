@@ -10,6 +10,7 @@
     "EntityMixin",
     "FishingHookMixin",
     "LevelMixin",
+    "LivingEntityAccessor",
     "LivingEntityMixin",
     "MobMixin",
     "PlayerMixin",

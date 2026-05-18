@@ -7,8 +7,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.Event;
-import net.neoforged.bus.api.ICancellableEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +14,9 @@ import org.jetbrains.annotations.Nullable;
  * 子弹等投射物在命中实体或方块时触发的事件
  */
 @ApiStatus.AvailableSince("0.8.7")
-public class ProjectileHitEvent extends Event implements ICancellableEvent {
+public class ProjectileHitEvent {
+
+    private boolean cancelled = false;
 
     @Nullable
     private final Entity owner;
@@ -98,5 +98,13 @@ public class ProjectileHitEvent extends Event implements ICancellableEvent {
 
     public Vec3 getHitVec() {
         return hitVec;
+    }
+
+    public boolean isCanceled() {
+        return cancelled;
+    }
+
+    public void setCanceled(boolean cancel) {
+        this.cancelled = cancel;
     }
 }

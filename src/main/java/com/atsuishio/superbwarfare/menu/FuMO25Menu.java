@@ -47,7 +47,7 @@ public class FuMO25Menu extends EnergyMenu {
     }
 
     public FuMO25Menu(int pContainerId, Inventory inventory, Container container, ContainerLevelAccess access, ContainerEnergyData containerData) {
-        super(ModMenuTypes.FUMO_25_MENU.get(), pContainerId, containerData);
+        super(ModMenuTypes.FUMO_25_MENU, pContainerId, containerData);
 
         checkContainerSize(container, 1);
 

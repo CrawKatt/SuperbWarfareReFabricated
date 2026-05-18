@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.block.entity;
 
 import com.atsuishio.superbwarfare.block.SuperbItemInterfaceBlock;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.menu.SuperbItemInterfaceMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -20,7 +21,6 @@ import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -37,7 +37,7 @@ public class SuperbItemInterfaceBlockEntity extends BaseContainerBlockEntity {
     }
 
     public SuperbItemInterfaceBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        this(ModBlockEntities.SUPERB_ITEM_INTERFACE.get(), pPos, pBlockState);
+        this(ModBlockEntities.SUPERB_ITEM_INTERFACE, pPos, pBlockState);
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, SuperbItemInterfaceBlockEntity blockEntity) {
@@ -58,7 +58,7 @@ public class SuperbItemInterfaceBlockEntity extends BaseContainerBlockEntity {
         var list = level.getEntities(
                 (Entity) null,
                 new AABB(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y + 0.5, z + 0.5),
-                entity -> entity.getCapability(Capabilities.ItemHandler.ENTITY, null) != null
+                entity -> ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null) != null
         );
         if (list.isEmpty()) return;
         var target = list.get(level.random.nextInt(list.size()));
@@ -71,7 +71,7 @@ public class SuperbItemInterfaceBlockEntity extends BaseContainerBlockEntity {
 
             var originalStack = stack.copy();
 
-            var itemHandler = target.getCapability(Capabilities.ItemHandler.ENTITY, null);
+            var itemHandler = ModCapabilities.ITEM_HANDLER_ENTITY.find(target, null);
             assert itemHandler != null;
 
             var totalInserted = 0;

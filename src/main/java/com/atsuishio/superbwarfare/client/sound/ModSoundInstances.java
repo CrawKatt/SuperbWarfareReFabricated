@@ -3,10 +3,8 @@ package com.atsuishio.superbwarfare.client.sound;
 import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import net.minecraft.client.Minecraft;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
+
 public class ModSoundInstances {
 
     public static void init() {

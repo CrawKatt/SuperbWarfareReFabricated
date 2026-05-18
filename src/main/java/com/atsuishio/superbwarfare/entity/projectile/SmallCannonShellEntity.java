@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessag
 import com.atsuishio.superbwarfare.tools.CustomExplosion;
 import com.atsuishio.superbwarfare.tools.DamageHandler;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +28,6 @@ import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -53,7 +53,7 @@ public class SmallCannonShellEntity extends FastThrowableProjectile implements G
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.SMALL_SHELL.get();
+        return ModItems.SMALL_SHELL;
     }
 
     @Override
@@ -66,8 +66,8 @@ public class SmallCannonShellEntity extends FastThrowableProjectile implements G
         if (this.level() instanceof ServerLevel) {
             if (this.getOwner() instanceof LivingEntity living) {
                 if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
-                    living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
-                    PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                    living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
+                    ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                 }
             }
 
@@ -93,7 +93,7 @@ public class SmallCannonShellEntity extends FastThrowableProjectile implements G
         if (this.level() instanceof ServerLevel) {
             float hardness = this.level().getBlockState(resultPos).getBlock().defaultDestroyTime();
             if (hardness != -1) {
-                if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+                if (ExplosionConfig.EXPLOSION_DESTROY && ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
                     boolean destroy = Math.random() < Mth.clamp(1 - (hardness / 50), 0.1, 1);
                     if (destroy) {
                         this.level().destroyBlock(resultPos, true);
@@ -118,7 +118,7 @@ public class SmallCannonShellEntity extends FastThrowableProjectile implements G
                 .radius(explosionRadius)
                 .position(vec3)
                 .withParticleType(ParticleTool.ParticleType.SMALL)
-                .destroyBlock(() -> hitEntity ? Explosion.BlockInteraction.KEEP : (ExplosionConfig.EXPLOSION_DESTROY.get() ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP))
+                .destroyBlock(() -> hitEntity ? Explosion.BlockInteraction.KEEP : (ExplosionConfig.EXPLOSION_DESTROY ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP))
                 .damageMultiplier(1.25F)
                 .explode();
     }
@@ -161,8 +161,8 @@ public class SmallCannonShellEntity extends FastThrowableProjectile implements G
                 if (target.get() instanceof DestroyableProjectile destroyableProjectile) {
                     if (this.getOwner() instanceof LivingEntity living) {
                         if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
-                            living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
-                            PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                            living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
+                            ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                         }
                     }
                     DamageHandler.doDamage(destroyableProjectile, ModDamageTypes.causeProjectileHitDamage(this.level().registryAccess(), this, this.getOwner()), damage);

@@ -54,7 +54,7 @@ public class C4BombItem extends Item {
         }
 
         if (player instanceof ServerPlayer serverPlayer) {
-            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.C4_THROW.get(), SoundSource.PLAYERS, 1, 1);
+            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.C4_THROW, SoundSource.PLAYERS, 1, 1);
         }
 
         player.getCooldowns().addCooldown(this, 20);
@@ -77,7 +77,7 @@ public class C4BombItem extends Item {
     }
 
     public static ItemStack makeInstance() {
-        ItemStack stack = new ItemStack(ModItems.C4_BOMB.get());
+        ItemStack stack = new ItemStack(ModItems.C4_BOMB);
         final var tag = NBTTool.getTag(stack);
         tag.putBoolean(TAG_CONTROL, true);
         NBTTool.saveTag(stack, tag);
@@ -92,7 +92,7 @@ public class C4BombItem extends Item {
             Position position = DispenserBlock.getDispensePosition(blockSource);
             Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
 
-            var entity = new C4Entity(ModEntities.C4.get(), level);
+            var entity = new C4Entity(ModEntities.C4, level);
             entity.setPos(position.x(), position.y(), position.z());
 
             var pX = direction.getStepX();
@@ -113,7 +113,6 @@ public class C4BombItem extends Item {
     }
 
     // TODO data map?
-    @Override
     public int getBurnTime(@NotNull ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
         return 20000;
     }

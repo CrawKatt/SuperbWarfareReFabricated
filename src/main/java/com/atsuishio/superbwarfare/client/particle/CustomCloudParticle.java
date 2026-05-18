@@ -2,17 +2,15 @@ package com.atsuishio.superbwarfare.client.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
-@OnlyIn(Dist.CLIENT)
+
 public class CustomCloudParticle extends TextureSheetParticle {
 
     protected boolean cooldown;
     protected boolean light;
 
-    @OnlyIn(Dist.CLIENT)
+    
     public static class Provider implements ParticleProvider<CustomCloudOption> {
         private final SpriteSet spriteSet;
 

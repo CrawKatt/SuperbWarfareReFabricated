@@ -2,94 +2,28 @@ package com.atsuishio.superbwarfare.init;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.Rarity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.fml.common.asm.enumextension.EnumProxy;
-import net.neoforged.neoforge.client.IArmPoseTransformer;
 
 public class ModEnumExtensions {
 
-    public static final EnumProxy<Rarity> SUPERBWARFARE_LEGENDARY = new EnumProxy<>(
-            Rarity.class,
-            -1,
-            "superbwarfare:legendary",
-            ChatFormatting.GOLD
-    );
+    public static final Rarity SUPERBWARFARE_LEGENDARY = Rarity.EPIC;
 
     public static Rarity getLegendary() {
-        return SUPERBWARFARE_LEGENDARY.getValue();
+        return SUPERBWARFARE_LEGENDARY;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static class Client {
 
-        public static final EnumProxy<HumanoidModel.ArmPose> SUPERBWARFARE_LUNGE_MINE_POSE = new EnumProxy<>(
-                HumanoidModel.ArmPose.class,
-                false,
-                (IArmPoseTransformer) (model, entity, arm) -> {
-                    if (arm != HumanoidArm.LEFT) {
-                        model.rightArm.xRot = 20f * Mth.DEG_TO_RAD + model.head.xRot;
-                        model.rightArm.yRot = -12f * Mth.DEG_TO_RAD;
-                        model.leftArm.xRot = -45f * Mth.DEG_TO_RAD + model.head.xRot;
-                        model.leftArm.yRot = 40f * Mth.DEG_TO_RAD;
-                    }
-                }
-        );
+        // These will need proper ArmPose registration via mixin later
+        // For now use existing poses as placeholders
+        public static final HumanoidModel.ArmPose LUNGE_MINE_POSE = HumanoidModel.ArmPose.CROSSBOW_CHARGE;
+        public static final HumanoidModel.ArmPose AURELIA_SCEPTRE_POSE = HumanoidModel.ArmPose.BOW_AND_ARROW;
+        public static final HumanoidModel.ArmPose MINIGUN_POSE = HumanoidModel.ArmPose.BLOCK;
+        public static final HumanoidModel.ArmPose M2_POSE = HumanoidModel.ArmPose.THROW_SPEAR;
 
-        public static HumanoidModel.ArmPose getLungeMinePose() {
-            return SUPERBWARFARE_LUNGE_MINE_POSE.getValue();
-        }
-
-        public static final EnumProxy<HumanoidModel.ArmPose> SUPERBWARFARE_AURELIA_SCEPTRE_POSE = new EnumProxy<>(
-                HumanoidModel.ArmPose.class,
-                false,
-                (IArmPoseTransformer) (model, entity, arm) -> {
-                    if (arm != HumanoidArm.LEFT) {
-                        model.rightArm.xRot = -67.5f * Mth.DEG_TO_RAD + model.head.xRot + 0.05f * model.rightArm.xRot;
-                        model.rightArm.yRot = 5f * Mth.DEG_TO_RAD + model.head.yRot;
-                    }
-                }
-        );
-
-        public static HumanoidModel.ArmPose getAureliaSceptrePose() {
-            return SUPERBWARFARE_AURELIA_SCEPTRE_POSE.getValue();
-        }
-
-        public static final EnumProxy<HumanoidModel.ArmPose> SUPERBWARFARE_MINIGUN_POSE = new EnumProxy<>(
-                HumanoidModel.ArmPose.class,
-                false,
-                (IArmPoseTransformer) (model, entity, arm) -> {
-                    if (arm != HumanoidArm.LEFT) {
-                        model.rightArm.xRot = 22.5f * Mth.DEG_TO_RAD + model.head.xRot;
-                        model.rightArm.yRot = model.head.yRot;
-                        model.leftArm.xRot = Mth.clamp(-45f * Mth.DEG_TO_RAD + model.head.xRot, -67.5f * Mth.DEG_TO_RAD, 0f * Mth.DEG_TO_RAD);
-                        model.leftArm.yRot = Mth.clamp(45f * Mth.DEG_TO_RAD + model.head.yRot, 45f * Mth.DEG_TO_RAD, 80f * Mth.DEG_TO_RAD);
-                    }
-                }
-        );
-
-        public static HumanoidModel.ArmPose getMinigunPose() {
-            return SUPERBWARFARE_MINIGUN_POSE.getValue();
-        }
-
-        public static final EnumProxy<HumanoidModel.ArmPose> SUPERBWARFARE_M2_POSE = new EnumProxy<>(
-                HumanoidModel.ArmPose.class,
-                false,
-                (IArmPoseTransformer) (model, entity, arm) -> {
-                    if (arm != HumanoidArm.LEFT) {
-                        model.rightArm.xRot = 45f * Mth.DEG_TO_RAD + model.head.xRot;
-                        model.rightArm.yRot = model.head.yRot;
-                        model.leftArm.xRot = Mth.clamp(-45f * Mth.DEG_TO_RAD + model.head.xRot, -67.5f * Mth.DEG_TO_RAD, 0f * Mth.DEG_TO_RAD);
-                        model.leftArm.yRot = Mth.clamp(45f * Mth.DEG_TO_RAD + model.head.yRot, 45f * Mth.DEG_TO_RAD, 80f * Mth.DEG_TO_RAD);
-                    }
-                }
-        );
-
-        public static HumanoidModel.ArmPose getM2Pose() {
-            return SUPERBWARFARE_M2_POSE.getValue();
-        }
+        public static HumanoidModel.ArmPose getLungeMinePose() { return LUNGE_MINE_POSE; }
+        public static HumanoidModel.ArmPose getAureliaSceptrePose() { return AURELIA_SCEPTRE_POSE; }
+        public static HumanoidModel.ArmPose getMinigunPose() { return MINIGUN_POSE; }
+        public static HumanoidModel.ArmPose getM2Pose() { return M2_POSE; }
     }
 }

@@ -77,7 +77,7 @@ public class ContainerBlock extends BaseEntityBlock {
 
         if (canOpen(level, pos, containerBlockEntity.entityType)) {
             level.setBlockAndUpdate(pos, state.setValue(OPENED, true));
-            level.playSound(null, BlockPos.containing(pos.getX(), pos.getY(), pos.getZ()), ModSounds.OPEN.get(), SoundSource.BLOCKS, 1, 1);
+            level.playSound(null, BlockPos.containing(pos.getX(), pos.getY(), pos.getZ()), ModSounds.OPEN, SoundSource.BLOCKS, 1, 1);
 
             return ItemInteractionResult.SUCCESS;
         } else {
@@ -125,7 +125,7 @@ public class ContainerBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> pBlockEntityType) {
         if (!level.isClientSide) {
-            return createTickerHelper(pBlockEntityType, ModBlockEntities.CONTAINER.get(), ContainerBlockEntity::serverTick);
+            return createTickerHelper(pBlockEntityType, ModBlockEntities.CONTAINER, ContainerBlockEntity::serverTick);
         }
         return null;
     }
@@ -145,7 +145,7 @@ public class ContainerBlock extends BaseEntityBlock {
             var info = Component.translatableWithFallback("info." + location.getNamespace() + "." + location.getPath(), "");
             var hasDescription = !info.getString().isEmpty();
 
-            if (tooltipFlag.hasShiftDown() && hasDescription) {
+            if (net.minecraft.client.gui.screens.Screen.hasShiftDown() && hasDescription) {
                 // 详细描述
                 tooltipComponents.add(info.withStyle(ChatFormatting.GRAY));
                 tooltipComponents.add(Component.empty());
@@ -164,10 +164,6 @@ public class ContainerBlock extends BaseEntityBlock {
                 int h = 0;
 
                 Level level = null;
-                try {
-                    level = context.level();
-                } catch (Exception ignored) {
-                }
 
                 // N * N * N
                 if (level instanceof Level && tag.contains("Entity")) {
@@ -232,11 +228,10 @@ public class ContainerBlock extends BaseEntityBlock {
         return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite()).setValue(OPENED, false);
     }
 
-    @Override
     @ParametersAreNonnullByDefault
     public @NotNull ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
-        var itemStack = super.getCloneItemStack(state, target, level, pos, player);
-        level.getBlockEntity(pos, ModBlockEntities.CONTAINER.get()).ifPresent((blockEntity) -> blockEntity.saveToItem(itemStack, level.registryAccess()));
+        var itemStack = new ItemStack(this);
+        level.getBlockEntity(pos, ModBlockEntities.CONTAINER).ifPresent((blockEntity) -> blockEntity.saveToItem(itemStack, level.registryAccess()));
         return itemStack;
     }
 }

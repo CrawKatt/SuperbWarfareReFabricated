@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.client.tooltip;
 import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent;
 import com.atsuishio.superbwarfare.data.gun.FireMode;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.init.ModKeyMappings;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.perk.Perk;
@@ -16,7 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import org.jetbrains.annotations.NotNull;
 
 public class ClientGunImageTooltip implements ClientTooltipComponent {
@@ -79,7 +79,7 @@ public class ClientGunImageTooltip implements ClientTooltipComponent {
     }
 
     protected boolean shouldRenderEnergyTooltip() {
-        var cap = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
         return cap != null && cap.getMaxEnergyStored() > 0;
     }
 
@@ -239,7 +239,7 @@ public class ClientGunImageTooltip implements ClientTooltipComponent {
      * 获取武器能量文本组件
      */
     protected Component getEnergyComponent() {
-        var storage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var storage = ModCapabilities.ENERGY_ITEM.find(stack, null);
         assert storage != null;
 
         int energy = storage.getEnergyStored();
@@ -281,7 +281,7 @@ public class ClientGunImageTooltip implements ClientTooltipComponent {
      * 获取武器改装信息文本组件
      */
     protected Component getEditComponent() {
-        return Component.translatable("des.superbwarfare.guns.edit", "[" + ModKeyMappings.EDIT_MODE.getKey().getDisplayName().getString() + "]")
+        return Component.translatable("des.superbwarfare.guns.edit", "[" + ModKeyMappings.EDIT_MODE.getDefaultKey().getDisplayName().getString() + "]")
                 .withStyle(ChatFormatting.LIGHT_PURPLE).withStyle(ChatFormatting.ITALIC);
     }
 
@@ -299,7 +299,7 @@ public class ClientGunImageTooltip implements ClientTooltipComponent {
 
             xOffset += 20;
 
-            var ammoItem = perkInstance.perk().getItem().get();
+            var ammoItem = perkInstance.perk().getItem();
             ItemStack perkStack = ammoItem.getDefaultInstance();
 
             int level = perkInstance.level();
@@ -327,7 +327,7 @@ public class ClientGunImageTooltip implements ClientTooltipComponent {
 
             yOffset += 25;
 
-            var ammoItem = perkInstance.perk().getItem().get();
+            var ammoItem = perkInstance.perk().getItem();
             guiGraphics.renderItem(ammoItem.getDefaultInstance(), x, y + 4 + yOffset);
 
             var id = perkInstance.perk().descriptionId;

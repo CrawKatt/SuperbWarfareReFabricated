@@ -51,7 +51,7 @@ public class ReforgingTableMenu extends AbstractContainerMenu {
     }
 
     public ReforgingTableMenu(int pContainerId, Inventory inventory, Container container, ContainerLevelAccess pContainerLevelAccess) {
-        super(ModMenuTypes.REFORGING_TABLE_MENU.get(), pContainerId);
+        super(ModMenuTypes.REFORGING_TABLE_MENU, pContainerId);
 
         checkContainerSize(container, 5);
 

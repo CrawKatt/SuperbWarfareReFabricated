@@ -1,9 +1,12 @@
 package com.atsuishio.superbwarfare.client.screens;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
-import com.atsuishio.superbwarfare.item.curio.DogTagItem;
+import com.atsuishio.superbwarfare.item.trinket.DogTagItem;
 import com.atsuishio.superbwarfare.network.message.send.DogTagFinishEditMessage;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.GameNarrator;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,9 +23,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class DogTagEditorScreen extends Screen {
 
     private static final ResourceLocation TEXTURE = Mod.loc("textures/gui/dog_tag_editor.png");
@@ -90,7 +90,7 @@ public class DogTagEditorScreen extends Screen {
     public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         this.renderBackground(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         this.renderBg(pGuiGraphics);
-        for (Renderable renderable : this.renderables) {
+        for (Renderable renderable : ((com.atsuishio.superbwarfare.mixins.ScreenAccessor) this).getRenderables()) {
             renderable.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         }
         this.name.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
@@ -216,7 +216,7 @@ public class DogTagEditorScreen extends Screen {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     class ColorButton extends AbstractButton {
 
         short color;
@@ -252,7 +252,7 @@ public class DogTagEditorScreen extends Screen {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     class FinishButton extends AbstractButton {
 
         public FinishButton(int pX, int pY, int pWidth, int pHeight) {
@@ -274,7 +274,7 @@ public class DogTagEditorScreen extends Screen {
             }
 
             this.updateLocal(colors, DogTagEditorScreen.this.name.getValue());
-            PacketDistributor.sendToServer(new DogTagFinishEditMessage(colors, DogTagEditorScreen.this.name.getValue(),
+            ClientPlayNetworking.send(new DogTagFinishEditMessage(colors, DogTagEditorScreen.this.name.getValue(),
                     DogTagEditorScreen.this.hand == InteractionHand.MAIN_HAND));
         }
 

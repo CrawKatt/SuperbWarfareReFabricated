@@ -130,13 +130,13 @@ public class JumpPadBlock extends Block {
         }
 
         if (!level.isClientSide()) {
-            level.playSound(null, BlockPos.containing(pos.getX(), pos.getY(), pos.getZ()), ModSounds.JUMP.get(), SoundSource.BLOCKS, 1, 1);
+            level.playSound(null, BlockPos.containing(pos.getX(), pos.getY(), pos.getZ()), ModSounds.JUMP, SoundSource.BLOCKS, 1, 1);
         } else {
-            level.playLocalSound(pos.getX(), pos.getY(), pos.getZ(), ModSounds.JUMP.get(), SoundSource.BLOCKS, 1, 1, false);
+            level.playLocalSound(pos.getX(), pos.getY(), pos.getZ(), ModSounds.JUMP, SoundSource.BLOCKS, 1, 1, false);
         }
 
         // 谁说载具就不能二段跳了（）
-        entity.passengers.stream()
+        entity.getPassengers().stream()
                 .filter(e -> e instanceof Player player && player.level().isClientSide)
                 .findFirst()
                 .ifPresent(player -> Mod.queueClientWork(2, () -> ClientEventHandler.canDoubleJump = true));

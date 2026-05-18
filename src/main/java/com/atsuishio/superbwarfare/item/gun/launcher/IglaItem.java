@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.item.gun.launcher;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.client.renderer.gun.IglaItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -19,7 +20,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -90,12 +90,12 @@ public class IglaItem extends GunGeoItem {
                     30, 0.4, 0.4, 0.4, 0.005, true);
 
             if (shooter instanceof ServerPlayer serverPlayer) {
-                SoundTool.playLocalSound(serverPlayer, ModSounds.IGLA_FIRE_1P.get(), 2, 1);
-                PacketDistributor.sendToPlayer(serverPlayer, new ShootClientMessage(10));
+                SoundTool.playLocalSound(serverPlayer, ModSounds.IGLA_FIRE_1P, 2, 1);
+                ServerPlayNetworking.send(serverPlayer, new ShootClientMessage(10));
             }
 
-            SoundTool.playDistantSound(serverLevel, ModSounds.IGLA_FIRE_3P.get(), shooter.position(), 4, 1, shooter);
-            SoundTool.playDistantSound(serverLevel, ModSounds.IGLA_FAR.get(), shooter.position(), 10, 1, shooter);
+            SoundTool.playDistantSound(serverLevel, ModSounds.IGLA_FIRE_3P, shooter.position(), 4, 1, shooter);
+            SoundTool.playDistantSound(serverLevel, ModSounds.IGLA_FAR, shooter.position(), 10, 1, shooter);
         }
 
         data.ammo.set(data.ammo.get() - data.compute().ammoCostPerShoot);

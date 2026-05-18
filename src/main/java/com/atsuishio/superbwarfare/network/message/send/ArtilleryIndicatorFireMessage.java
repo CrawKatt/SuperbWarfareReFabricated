@@ -30,7 +30,7 @@ public enum ArtilleryIndicatorFireMessage implements CustomPacketPayload {
         Player player = context.player();
         ItemStack stack = player.getMainHandItem();
 
-        if (player.getMainHandItem().is(ModItems.MONITOR) && player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR.get())) {
+        if (player.getMainHandItem().is(ModItems.MONITOR) && player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR)) {
             stack = player.getOffhandItem();
         }
 

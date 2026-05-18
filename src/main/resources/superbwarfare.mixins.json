@@ -5,40 +5,40 @@
   "refmap": "superbwarfare.mixins.refmap.json",
   "mixins": [
     "BeastMixin",
-    "BlockStateMixin",
     "ClientboundSetPassengersPacketMixin",
-    "ClientLevelMixin",
     "EnchantedCountIncreaseFunctionMixin",
+    "EntityAccessor",
     "EntityMixin",
     "FishingHookMixin",
     "LevelMixin",
+    "LivingEntityAccessor",
     "LivingEntityMixin",
     "MobMixin",
     "PlayerMixin",
     "ProjectileUtilMixin",
+    "ReloadableServerResourcesMixin",
     "SteelPipeFallMixin",
-    "VillagerMixin"
+    "VillagerMixin",
+    "MobAccessor"
   ],
   "client": [
     "CameraMixin",
     "ClientPacketListenerMixin",
+    "ClientPacketListenerAccessor",
     "ClientPlayerEntityMixin",
     "EntityRenderDispatcherMixin",
     "GameRendererMixin",
-    "HumanoidModelMixin",
     "ItemInHandLayerMixin",
-    "ItemInHandRendererMixin",
     "KeyboardInputMixin",
     "KeymappingMixin",
     "LevelRendererMixin",
-    "LightTextureMixin",
     "LivingEntityRendererMixin",
     "MinecraftMixin",
     "MouseHandlerMixin",
     "MultiPlayerGameModeMixin",
-    "OverlayTextureMixin",
     "PlayerItemInHandLayerMixin",
-    "PlayerRendererMixin"
+    "PlayerModelMixin",
+    "ScreenAccessor"
   ],
   "minVersion": "0.8"
 }

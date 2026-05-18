@@ -74,7 +74,9 @@ public interface IItemExtension {
         return stack.getItem() instanceof ArmorItem && ((ArmorItem)stack.getItem()).getMaterial() == ArmorMaterials.GOLD;
     }
 
-    boolean isRepairable(ItemStack var1);
+    default boolean isRepairable(ItemStack stack) {
+        return true;
+    }
 
     default float getXpRepairRatio(ItemStack stack) {
         return 1.0F;

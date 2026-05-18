@@ -9,17 +9,10 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.SeededContainerLoot;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -29,11 +22,9 @@ import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.function.Supplier;
 
-@EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class SmallContainerBlockItem extends BlockItem implements GeoItem {
 
     public static final List<Supplier<ItemStack>> SMALL_CONTAINERS = List.of(
@@ -44,32 +35,14 @@ public class SmallContainerBlockItem extends BlockItem implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public SmallContainerBlockItem() {
-        super(ModBlocks.SMALL_CONTAINER.get(), new Properties().stacksTo(1).fireResistant());
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public boolean canBeHurtBy(ItemStack stack, DamageSource source) {
-        return super.canBeHurtBy(stack, source) && !source.is(DamageTypeTags.IS_EXPLOSION) && !source.is(DamageTypes.CACTUS);
+        super(ModBlocks.SMALL_CONTAINER, new Properties().stacksTo(1).fireResistant());
     }
 
     private PlayState predicate(AnimationState<SmallContainerBlockItem> event) {
         return PlayState.CONTINUE;
     }
 
-    @SubscribeEvent
-    private static void registerArmorExtensions(RegisterClientExtensionsEvent event) {
-        event.registerItem(new IClientItemExtensions() {
-
-            private final BlockEntityWithoutLevelRenderer renderer = new SmallContainerBlockItemRenderer();
-
-            @Override
-            public @NotNull BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return renderer;
-            }
-
-        }, ModItems.SMALL_CONTAINER);
-    }
+    
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
@@ -86,7 +59,7 @@ public class SmallContainerBlockItem extends BlockItem implements GeoItem {
     }
 
     public static ItemStack createInstance(ResourceKey<LootTable> lootTable, long lootTableSeed) {
-        ItemStack stack = new ItemStack(ModBlocks.SMALL_CONTAINER.get());
+        ItemStack stack = new ItemStack(ModBlocks.SMALL_CONTAINER);
         stack.set(DataComponents.CONTAINER_LOOT, new SeededContainerLoot(lootTable, lootTableSeed));
         return stack;
     }

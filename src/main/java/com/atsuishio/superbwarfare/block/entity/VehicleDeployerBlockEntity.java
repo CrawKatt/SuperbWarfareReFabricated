@@ -20,7 +20,7 @@ public class VehicleDeployerBlockEntity extends BlockEntity {
     public CompoundTag entityData = new CompoundTag();
 
     public VehicleDeployerBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.VEHICLE_DEPLOYER.get(), pPos, pBlockState);
+        super(ModBlockEntities.VEHICLE_DEPLOYER, pPos, pBlockState);
     }
 
     @Override

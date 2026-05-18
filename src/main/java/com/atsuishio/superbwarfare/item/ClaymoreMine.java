@@ -55,7 +55,7 @@ public class ClaymoreMine extends Item {
             Position position = DispenserBlock.getDispensePosition(blockSource);
             Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
 
-            var claymore = new ClaymoreEntity(ModEntities.CLAYMORE.get(), level);
+            var claymore = new ClaymoreEntity(ModEntities.CLAYMORE, level);
             claymore.setPos(position.x(), position.y(), position.z());
 
             var pX = direction.getStepX();

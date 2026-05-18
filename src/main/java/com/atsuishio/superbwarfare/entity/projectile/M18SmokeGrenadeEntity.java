@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -26,7 +27,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -54,7 +54,7 @@ public class M18SmokeGrenadeEntity extends FastThrowableProjectile implements Ge
     }
 
     public M18SmokeGrenadeEntity(LivingEntity entity, Level level, int fuse) {
-        super(ModEntities.M18_SMOKE_GRENADE.get(), entity, level);
+        super(ModEntities.M18_SMOKE_GRENADE, entity, level);
         this.noCulling = true;
         this.fuse = fuse;
     }
@@ -91,7 +91,7 @@ public class M18SmokeGrenadeEntity extends FastThrowableProjectile implements Ge
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.M18_SMOKE_GRENADE.get();
+        return ModItems.M18_SMOKE_GRENADE;
     }
 
     @Override
@@ -101,7 +101,7 @@ public class M18SmokeGrenadeEntity extends FastThrowableProjectile implements Ge
                 BlockHitResult blockResult = (BlockHitResult) result;
                 BlockPos resultPos = blockResult.getBlockPos();
                 BlockState state = this.level().getBlockState(resultPos);
-                SoundEvent event = state.getBlock().getSoundType(state, this.level(), resultPos, this).getBreakSound();
+                SoundEvent event = state.getSoundType().getBreakSound();
                 double speed = this.getDeltaMovement().length();
                 if (speed > 0.1) {
                     this.level().playSound(null, result.getLocation().x, result.getLocation().y, result.getLocation().z, event, SoundSource.AMBIENT, 1F, 1F);
@@ -121,8 +121,8 @@ public class M18SmokeGrenadeEntity extends FastThrowableProjectile implements Ge
                 if (speed_e > 0.1) {
                     if (this.getOwner() instanceof LivingEntity living) {
                         if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
-                            living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
-                            PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                            living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
+                            ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                         }
                     }
                     entity.hurt(entity.damageSources().thrown(this, this.getOwner()), 1);
@@ -166,7 +166,7 @@ public class M18SmokeGrenadeEntity extends FastThrowableProjectile implements Ge
         }
 
         if (fuse == 0) {
-            this.level().playSound(null, this, ModSounds.SM0KE_GRENADE_RELEASE.get(), this.getSoundSource(), 2, 1);
+            this.level().playSound(null, this, ModSounds.SM0KE_GRENADE_RELEASE, this.getSoundSource(), 2, 1);
         }
 
         if (fuse <= 0 && tickCount % 2 == 0) {
@@ -186,7 +186,7 @@ public class M18SmokeGrenadeEntity extends FastThrowableProjectile implements Ge
         var vec3 = new Vec3(1, 0.05, 0);
 
         for (int i = 0; i < this.count; i++) {
-            var decoy = new SmokeDecoyEntity(ModEntities.SMOKE_DECOY.get(), this.level(), false);
+            var decoy = new SmokeDecoyEntity(ModEntities.SMOKE_DECOY, this.level(), false);
             decoy.setPos(this.getX(), this.getY() + getBbHeight(), this.getZ());
             decoy.decoyShoot(this, vec3.yRot(i * (360f / this.count) * Mth.DEG_TO_RAD), 1.5f, 5);
             this.level().addFreshEntity(decoy);

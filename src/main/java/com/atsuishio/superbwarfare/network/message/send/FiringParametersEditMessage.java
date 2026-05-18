@@ -34,7 +34,7 @@ public record FiringParametersEditMessage(
         var player = context.player();
 
         ItemStack stack = message.mainHand ? player.getMainHandItem() : player.getOffhandItem();
-        if (!stack.is(ModItems.FIRING_PARAMETERS) && !stack.is(ModItems.ARTILLERY_INDICATOR.get())) return;
+        if (!stack.is(ModItems.FIRING_PARAMETERS) && !stack.is(ModItems.ARTILLERY_INDICATOR)) return;
 
         var parameters = new FiringParameters.Parameters(new BlockPos(message.x, message.y, message.z), message.radius, message.isDepressed);
         stack.set(ModDataComponents.FIRING_PARAMETERS, parameters);

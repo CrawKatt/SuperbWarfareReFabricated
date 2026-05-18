@@ -1,13 +1,14 @@
 package com.atsuishio.superbwarfare.block.entity;
 
 import com.atsuishio.superbwarfare.block.CreativeChargingStationBlock;
+import com.atsuishio.superbwarfare.capability.api.IEnergyStorage;
 import com.atsuishio.superbwarfare.capability.energy.InfinityEnergyStorage;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -16,8 +17,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,15 +44,8 @@ public class CreativeChargingStationBlockEntity extends BlockEntity {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    @Override
-    @ParametersAreNonnullByDefault
-    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider registries) {
-        super.onDataPacket(connection, packet, registries);
-        this.showRange = packet.getTag().getBoolean("ShowRange");
-    }
-
     public CreativeChargingStationBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.CREATIVE_CHARGING_STATION.get(), pos, state);
+        super(ModBlockEntities.CREATIVE_CHARGING_STATION, pos, state);
     }
 
     public static void serverTick(Level pLevel, BlockPos pPos, BlockState pState, CreativeChargingStationBlockEntity blockEntity) {
@@ -72,7 +64,7 @@ public class CreativeChargingStationBlockEntity extends BlockEntity {
 
         List<Entity> entities = this.level.getEntitiesOfClass(Entity.class, new AABB(this.getBlockPos()).inflate(CHARGE_RADIUS));
         entities.forEach(entity -> {
-            var cap = entity.getCapability(Capabilities.EnergyStorage.ENTITY, null);
+            var cap = ModCapabilities.ENERGY_ENTITY.find(entity, null);
             if (cap == null || !cap.canReceive()) return;
 
             cap.receiveEnergy(Integer.MAX_VALUE, false);
@@ -86,7 +78,7 @@ public class CreativeChargingStationBlockEntity extends BlockEntity {
             var blockEntity = this.level.getBlockEntity(this.getBlockPos().relative(direction));
             if (blockEntity == null) continue;
 
-            var energy = level.getCapability(Capabilities.EnergyStorage.BLOCK, blockEntity.getBlockPos(), direction);
+            var energy = ModCapabilities.ENERGY_BLOCK.find(level, blockEntity.getBlockPos(), direction);
             if (energy == null || blockEntity instanceof CreativeChargingStationBlockEntity) continue;
 
             if (energy.canReceive() && energy.getEnergyStored() < energy.getMaxEnergyStored()) {

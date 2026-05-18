@@ -1,10 +1,10 @@
 package com.atsuishio.superbwarfare.item;
 
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -20,7 +20,7 @@ public class BatteryItem extends Item implements EnergyStorageItem {
 
     @Override
     public boolean isBarVisible(ItemStack pStack) {
-        var cap = pStack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var cap = ModCapabilities.ENERGY_ITEM.find(pStack, null);
         if (cap == null) return false;
         return cap.getEnergyStored() != cap.getMaxEnergyStored();
     }
@@ -28,7 +28,7 @@ public class BatteryItem extends Item implements EnergyStorageItem {
     @Override
     public int getBarWidth(ItemStack pStack) {
         var energy = 0;
-        var cap = pStack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var cap = ModCapabilities.ENERGY_ITEM.find(pStack, null);
         if (cap != null) {
             energy = cap.getEnergyStored();
         }
@@ -48,7 +48,7 @@ public class BatteryItem extends Item implements EnergyStorageItem {
 
     public ItemStack makeFullEnergyStack() {
         ItemStack stack = new ItemStack(this);
-        var cap = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
         if (cap == null) return stack;
 
         cap.receiveEnergy(maxEnergy, false);

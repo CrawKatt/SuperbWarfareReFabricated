@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.entity.projectile;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig;
@@ -26,7 +27,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -46,7 +46,7 @@ public class Ru9m336MissileEntity extends MissileProjectile implements GeoEntity
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.MEDIUM_ANTI_AIR_MISSILE.get();
+        return ModItems.MEDIUM_ANTI_AIR_MISSILE;
     }
 
     @Override
@@ -60,9 +60,9 @@ public class Ru9m336MissileEntity extends MissileProjectile implements GeoEntity
                 return;
             if (this.getOwner() instanceof LivingEntity living) {
                 if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
-                    living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
+                    living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
 
-                    PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                    ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                 }
             }
 
@@ -84,13 +84,13 @@ public class Ru9m336MissileEntity extends MissileProjectile implements GeoEntity
             BlockPos resultPos = blockHitResult.getBlockPos();
             float hardness = this.level().getBlockState(resultPos).getBlock().defaultDestroyTime();
             if (hardness != -1) {
-                if (ExplosionConfig.EXPLOSION_DESTROY.get()) {
+                if (ExplosionConfig.EXPLOSION_DESTROY) {
                     if (firstHit) {
                         causeExplode(blockHitResult.getLocation());
                         firstHit = false;
                         Mod.queueServerWork(3, this::discard);
                     }
-                    if (ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+                    if (ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
                         this.level().destroyBlock(resultPos, true);
                     }
                 }
@@ -98,7 +98,7 @@ public class Ru9m336MissileEntity extends MissileProjectile implements GeoEntity
                 causeExplode(blockHitResult.getLocation());
                 this.discard();
             }
-            if (!ExplosionConfig.EXPLOSION_DESTROY.get()) {
+            if (!ExplosionConfig.EXPLOSION_DESTROY) {
                 causeExplode(blockHitResult.getLocation());
                 this.discard();
             }
@@ -124,7 +124,7 @@ public class Ru9m336MissileEntity extends MissileProjectile implements GeoEntity
 
         if (entity != null && !entityData.get(TARGET_UUID).equals("none")) {
             if ((!entity.getPassengers().isEmpty() || entity instanceof VehicleEntity) && entity.tickCount % ((int) Math.max(0.04 * this.distanceTo(entity), 2)) == 0) {
-                entity.level().playSound(null, entity.getOnPos(), entity instanceof Pig ? SoundEvents.PIG_HURT : ModSounds.MISSILE_WARNING.get(), SoundSource.PLAYERS, 2, 1f);
+                entity.level().playSound(null, entity.getOnPos(), entity instanceof Pig ? SoundEvents.PIG_HURT : ModSounds.MISSILE_WARNING, SoundSource.PLAYERS, 2, 1f);
             }
 
 
@@ -183,7 +183,7 @@ public class Ru9m336MissileEntity extends MissileProjectile implements GeoEntity
 
     @Override
     public @NotNull SoundEvent getSound() {
-        return ModSounds.ROCKET_FLY.get();
+        return ModSounds.ROCKET_FLY;
     }
 
     @Override

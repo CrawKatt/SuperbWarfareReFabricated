@@ -16,12 +16,10 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@OnlyIn(Dist.CLIENT)
+
 public class StaminaOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("stamina");
@@ -30,7 +28,7 @@ public class StaminaOverlay implements LayeredDraw.Layer {
     @ParametersAreNonnullByDefault
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         if (Minecraft.getInstance().options.hideGui) return;
-        if (!DisplayConfig.STAMINA_HUD.get()) return;
+        if (!DisplayConfig.STAMINA_HUD) return;
 
         Player player = Minecraft.getInstance().player;
         if (player == null) return;

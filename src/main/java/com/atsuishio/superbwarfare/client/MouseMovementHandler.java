@@ -7,19 +7,31 @@ import net.minecraft.world.phys.Vec2;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-/**
- * Codes from @getItemFromBlock's Create-Tweaked-Controllers
- */
 public class MouseMovementHandler {
 
-    public static Vec2 delta = null;
-    public static Vec2 lastPos = null;
-    public static Vec2 vel = null;
+    private static Vec2 delta = null;
+    private static Vec2 lastPos = null;
+    private static Vec2 vel = null;
     private static MouseHandler mouseHandler = null;
     private static boolean mouseLockActive = false;
     private static final Vector3f savedRot = new Vector3f();
+    private static boolean initialized = false;
+
+    private static void ensureInitialized() {
+        if (!initialized) {
+            initialized = true;
+            delta = new Vec2(0, 0);
+            vel = new Vec2(0, 0);
+            mouseHandler = Minecraft.getInstance().mouseHandler;
+            if (mouseHandler != null) {
+                lastPos = getMousePos();
+            }
+        }
+    }
 
     public static Vec2 getMousePos() {
+        ensureInitialized();
+        if (mouseHandler == null) return new Vec2(0, 0);
         if (mouseHandler.isMouseGrabbed()) {
             return new Vec2((float) mouseHandler.xpos(), (float) mouseHandler.ypos());
         } else {
@@ -32,20 +44,17 @@ public class MouseMovementHandler {
     }
 
     public static void resetCenter() {
+        ensureInitialized();
         delta = new Vec2(0, 0);
         vel = new Vec2(0, 0);
         lastPos = getMousePos();
     }
 
     public static void init() {
-        delta = new Vec2(0, 0);
-        vel = new Vec2(0, 0);
-        Minecraft mc = Minecraft.getInstance();
-        mouseHandler = mc.mouseHandler;
-        lastPos = getMousePos();
     }
 
     public static float getX(boolean useVelocity) {
+        ensureInitialized();
         if (useVelocity) {
             return vel.x;
         } else {
@@ -54,6 +63,7 @@ public class MouseMovementHandler {
     }
 
     public static float getY(boolean useVelocity) {
+        ensureInitialized();
         if (useVelocity) {
             return vel.y;
         } else {
@@ -62,6 +72,7 @@ public class MouseMovementHandler {
     }
 
     public static void activateMouseLock() {
+        ensureInitialized();
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
 
@@ -78,6 +89,7 @@ public class MouseMovementHandler {
 
     public static void cancelPlayerTurn() {
         if (!mouseLockActive) return;
+        ensureInitialized();
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
         player.turn((savedRot.y - player.getYRot()) / 0.15f, (savedRot.x - player.getXRot()) / 0.15f);

@@ -1,6 +1,8 @@
 package com.atsuishio.superbwarfare.block.entity;
 
 import com.atsuishio.superbwarfare.block.FuMO25Block;
+import com.atsuishio.superbwarfare.capability.api.EnergyStorage;
+import com.atsuishio.superbwarfare.capability.api.IEnergyStorage;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.menu.FuMO25Menu;
@@ -26,8 +28,6 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.energy.EnergyStorage;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -99,7 +99,7 @@ public class FuMO25BlockEntity extends BlockEntity implements MenuProvider, GeoB
     };
 
     public FuMO25BlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.FUMO_25.get(), pPos, pBlockState);
+        super(ModBlockEntities.FUMO_25, pPos, pBlockState);
         this.energyStorage = new EnergyStorage(MAX_ENERGY);
     }
 
@@ -128,7 +128,7 @@ public class FuMO25BlockEntity extends BlockEntity implements MenuProvider, GeoB
         if (energy < energyCost) {
             if (pState.getValue(FuMO25Block.POWERED)) {
                 pLevel.setBlockAndUpdate(pPos, pState.setValue(FuMO25Block.POWERED, false));
-                pLevel.playSound(null, pPos, ModSounds.RADAR_SEARCH_END.get(), SoundSource.BLOCKS, 1F, 1F);
+                pLevel.playSound(null, pPos, ModSounds.RADAR_SEARCH_END, SoundSource.BLOCKS, 1F, 1F);
                 blockEntity.powered = false;
                 setChanged(pLevel, pPos, pState);
             }
@@ -140,14 +140,14 @@ public class FuMO25BlockEntity extends BlockEntity implements MenuProvider, GeoB
             if (!pState.getValue(FuMO25Block.POWERED)) {
                 if (energy >= DEFAULT_MIN_ENERGY) {
                     pLevel.setBlockAndUpdate(pPos, pState.setValue(FuMO25Block.POWERED, true));
-                    pLevel.playSound(null, pPos, ModSounds.RADAR_SEARCH_START.get(), SoundSource.BLOCKS, 1F, 1F);
+                    pLevel.playSound(null, pPos, ModSounds.RADAR_SEARCH_START, SoundSource.BLOCKS, 1F, 1F);
                     blockEntity.powered = true;
                     setChanged(pLevel, pPos, pState);
                 }
             } else {
                 energyStorage.extractEnergy(energyCost, false);
                 if (blockEntity.tick == 200) {
-                    pLevel.playSound(null, pPos, ModSounds.RADAR_SEARCH_IDLE.get(), SoundSource.BLOCKS, 1F, 1F);
+                    pLevel.playSound(null, pPos, ModSounds.RADAR_SEARCH_IDLE, SoundSource.BLOCKS, 1F, 1F);
                 }
 
                 if (blockEntity.time > 0) {

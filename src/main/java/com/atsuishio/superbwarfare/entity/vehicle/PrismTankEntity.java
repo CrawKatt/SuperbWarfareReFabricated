@@ -21,9 +21,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import java.util.List;
 
@@ -93,9 +91,9 @@ public class PrismTankEntity extends GeoVehicleEntity {
                 DamageHandler.doDamage(e, ModDamageTypes.causeLaserDamage(this.level().registryAccess(), this, shooter), (float) (aoeDamage - Mth.clamp(dis / range, 0, 0.75) * aoeDamage));
 
                 if (shooter instanceof ServerPlayer player) {
-                    var holder = Holder.direct(ModSounds.INDICATION.get());
+                    var holder = Holder.direct(ModSounds.INDICATION);
                     player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1f, 1f, player.level().random.nextLong()));
-                    PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                    ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                 }
             }
         }
@@ -111,7 +109,7 @@ public class PrismTankEntity extends GeoVehicleEntity {
         return 150;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     @Override
     public Component firstPersonAmmoComponent(GunData data, Player player) {
         var name = data.compute().name;

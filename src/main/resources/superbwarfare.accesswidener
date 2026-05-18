@@ -2,35 +2,39 @@ accessWidener v2 named
 
 accessible field net/minecraft/world/entity/Entity passengers Lcom/google/common/collect/ImmutableList;
 accessible method net/minecraft/client/multiplayer/ClientLevel getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
+accessible method net/minecraft/server/level/ServerLevel getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
+accessible method net/minecraft/tags/BlockTags create (Ljava/lang/String;)Lnet/minecraft/tags/TagKey;
+accessible field net/minecraft/world/entity/LivingEntity jumping Z
 
-mutable field net/minecraft/world/entity/Entity passengers
+mutable field net/minecraft/world/entity/Entity passengers Lcom/google/common/collect/ImmutableList;
 
-accessible field net/minecraft/world/entity/Entity boardingCooldown
-mutable field net/minecraft/world/entity/Entity boardingCooldown
+accessible field net/minecraft/world/entity/Entity boardingCooldown I
+mutable field net/minecraft/world/entity/Entity boardingCooldown I
 
-accessible field net/minecraft/world/entity/Entity levelCallback
-mutable field net/minecraft/world/entity/Entity levelCallback
+accessible field net/minecraft/world/entity/Entity removalReason Lnet/minecraft/world/entity/Entity$RemovalReason;
+mutable field net/minecraft/world/entity/Entity removalReason Lnet/minecraft/world/entity/Entity$RemovalReason;
 
-accessible field net/minecraft/world/entity/Entity removalReason
-mutable field net/minecraft/world/entity/Entity removalReason
+accessible field net/minecraft/client/player/LocalPlayer handsBusy Z
+mutable field net/minecraft/client/player/LocalPlayer handsBusy Z
 
-accessible field net/minecraft/client/player/LocalPlayer handsBusy
-mutable field net/minecraft/client/player/LocalPlayer handsBusy
+mutable field net/minecraft/world/entity/LivingEntity jumping Z
 
-accessible field net/minecraft/world/entity/LivingEntity jumping
-mutable field net/minecraft/world/entity/LivingEntity jumping
+accessible field net/minecraft/world/entity/LivingEntity lastHurt F
+mutable field net/minecraft/world/entity/LivingEntity lastHurt F
 
-accessible field net/minecraft/world/entity/LivingEntity lastHurt
-mutable field net/minecraft/world/entity/LivingEntity lastHurt
+accessible field net/minecraft/world/entity/LivingEntity lastHurtByPlayerTime I
+mutable field net/minecraft/world/entity/LivingEntity lastHurtByPlayerTime I
 
-accessible field net/minecraft/world/entity/LivingEntity lastHurtByPlayerTime
-mutable field net/minecraft/world/entity/LivingEntity lastHurtByPlayerTime
+accessible field net/minecraft/world/entity/LivingEntity lastDamageSource Lnet/minecraft/world/damagesource/DamageSource;
+mutable field net/minecraft/world/entity/LivingEntity lastDamageSource Lnet/minecraft/world/damagesource/DamageSource;
 
-accessible field net/minecraft/world/entity/LivingEntity lastDamageSource
-mutable field net/minecraft/world/entity/LivingEntity lastDamageSource
+accessible field net/minecraft/world/entity/LivingEntity lastDamageStamp J
+mutable field net/minecraft/world/entity/LivingEntity lastDamageStamp J
 
-accessible field net/minecraft/world/entity/LivingEntity lastDamageStamp
-mutable field net/minecraft/world/entity/LivingEntity lastDamageStamp
+accessible field net/minecraft/client/multiplayer/ClientPacketListener serverSimulationDistance I
+mutable field net/minecraft/client/multiplayer/ClientPacketListener serverSimulationDistance I
 
-accessible field net/minecraft/client/multiplayer/ClientPacketListener serverSimulationDistance
-mutable field net/minecraft/client/multiplayer/ClientPacketListener serverSimulationDistance
+accessible field net/minecraft/client/gui/screens/Screen renderables Ljava/util/List;
+
+accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;
+mutable field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;

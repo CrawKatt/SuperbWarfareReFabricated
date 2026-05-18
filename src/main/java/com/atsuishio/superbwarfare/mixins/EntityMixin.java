@@ -1,10 +1,12 @@
 package com.atsuishio.superbwarfare.mixins;
 
+import com.atsuishio.superbwarfare.capability.PersistentDataAccessor;
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.OBB;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -23,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import static com.atsuishio.superbwarfare.event.ClientEventHandler.isProne;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements OBBHitter {
+public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
 
     /**
      * From Automobility
@@ -76,6 +78,17 @@ public abstract class EntityMixin implements OBBHitter {
     @Override
     public void sbw$setCurrentHitPart(OBB.Part part) {
         this.sbw$currentHitPart = part;
+    }
+
+    @Unique
+    private CompoundTag superbwarfare$persistentData;
+
+    @Override
+    public CompoundTag superbwarfare$getPersistentData() {
+        if (this.superbwarfare$persistentData == null) {
+            this.superbwarfare$persistentData = new CompoundTag();
+        }
+        return this.superbwarfare$persistentData;
     }
 
     @Inject(method = "turn(DD)V", at = @At("HEAD"), cancellable = true)

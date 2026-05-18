@@ -55,13 +55,13 @@ public class TargetDeployer extends Item {
             // 禁止堆叠
             if (!level.getEntities(
                     (Entity) null,
-                    ModEntities.TARGET.get().getSpawnAABB(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5),
+                    ModEntities.TARGET.getSpawnAABB(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5),
                     IS_TARGET
             ).isEmpty()) {
                 return InteractionResult.FAIL;
             }
 
-            if (ModEntities.TARGET.get().spawn((ServerLevel) level, itemstack, pContext.getPlayer(), pos, MobSpawnType.SPAWN_EGG, true, !Objects.equals(blockpos, pos) && direction == Direction.UP) != null) {
+            if (ModEntities.TARGET.spawn((ServerLevel) level, itemstack, pContext.getPlayer(), pos, MobSpawnType.SPAWN_EGG, true, !Objects.equals(blockpos, pos) && direction == Direction.UP) != null) {
                 itemstack.shrink(1);
                 level.gameEvent(pContext.getPlayer(), GameEvent.ENTITY_PLACE, blockpos);
             }
@@ -86,13 +86,13 @@ public class TargetDeployer extends Item {
                 // 禁止堆叠
                 if (!pLevel.getEntities(
                         (Entity) null,
-                        ModEntities.TARGET.get().getSpawnAABB(blockpos.getX() + 0.5, blockpos.getY() + 0.5, blockpos.getZ() + 0.5),
+                        ModEntities.TARGET.getSpawnAABB(blockpos.getX() + 0.5, blockpos.getY() + 0.5, blockpos.getZ() + 0.5),
                         IS_TARGET
                 ).isEmpty()) {
                     return InteractionResultHolder.fail(itemstack);
                 }
 
-                TargetEntity entity = ModEntities.TARGET.get().spawn((ServerLevel) pLevel, itemstack, pPlayer, blockpos, MobSpawnType.SPAWN_EGG, false, false);
+                TargetEntity entity = ModEntities.TARGET.spawn((ServerLevel) pLevel, itemstack, pPlayer, blockpos, MobSpawnType.SPAWN_EGG, false, false);
                 if (entity == null) {
                     return InteractionResultHolder.pass(itemstack);
                 } else {

@@ -12,8 +12,6 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
@@ -23,100 +21,90 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
-/**
- * Codes Based on @Create
- */
 public class ModAdvancementProvider implements DataProvider {
 
     private final PackOutput packOutput;
-    private final ExistingFileHelper existingFileHelper;
     private final CompletableFuture<HolderLookup.Provider> registries;
 
     public static final List<ModAdvancement> ADVANCEMENTS = new ArrayList<>();
 
     @SuppressWarnings("unused")
     public static ModAdvancement START = null,
-    /**
-     * Main
-     */
-    MAIN_ROOT = advancement("root", builder -> builder.icon(ModItems.TASER.get())
+    MAIN_ROOT = advancement("root", builder -> builder.icon(ModItems.TASER)
             .type(ModAdvancement.Type.SILENT)
             .awardedForFree()
             .rewardLootTable(Mod.loc("grant_manual"))),
 
-    BEST_FRIEND = advancement("best_friend", builder -> builder.icon(ModItems.CLAYMORE_MINE.get())
+    BEST_FRIEND = advancement("best_friend", builder -> builder.icon(ModItems.CLAYMORE_MINE)
             .whenIconCollected()
             .type(ModAdvancement.Type.SECRET)
             .parent(MAIN_ROOT)),
 
-    BANZAI = advancement("banzai", builder -> builder.icon(ModItems.LUNGE_MINE.get())
+    BANZAI = advancement("banzai", builder -> builder.icon(ModItems.LUNGE_MINE)
             .whenIconCollected()
             .parent(MAIN_ROOT)),
 
-    HAMMER = advancement("hammer", builder -> builder.icon(ModItems.HAMMER.get())
+    HAMMER = advancement("hammer", builder -> builder.icon(ModItems.HAMMER)
             .whenItemCollected(ModTags.Items.HAMMER)
             .parent(MAIN_ROOT)),
 
-    PHYSICS_EXCALIBUR = advancement("physics_excalibur", builder -> builder.icon(ModItems.CROWBAR.get())
+    PHYSICS_EXCALIBUR = advancement("physics_excalibur", builder -> builder.icon(ModItems.CROWBAR)
             .whenIconCollected()
             .parent(MAIN_ROOT)),
 
-    CLEAN_ENERGY = advancement("clean_energy", builder -> builder.icon(ModItems.CHARGING_STATION.get())
+    CLEAN_ENERGY = advancement("clean_energy", builder -> builder.icon(ModItems.CHARGING_STATION)
             .whenIconCollected()
             .parent(PHYSICS_EXCALIBUR)),
 
-    SUPER_CONTAINER = advancement("super_container", builder -> builder.icon(ModItems.CONTAINER.get())
+    SUPER_CONTAINER = advancement("super_container", builder -> builder.icon(ModItems.CONTAINER)
             .whenIconCollected()
             .parent(CLEAN_ENERGY)),
 
-    // 蓝图
-    BLUEPRINT = advancement("blueprint", builder -> builder.icon(ModItems.TRACHELIUM_BLUEPRINT.get())
+    BLUEPRINT = advancement("blueprint", builder -> builder.icon(ModItems.TRACHELIUM_BLUEPRINT)
             .whenItemCollected(ModTags.Items.BLUEPRINT)
             .parent(MAIN_ROOT)),
 
-    COMMON_BLUEPRINT = advancement("common_blueprint", builder -> builder.icon(ModItems.TRACHELIUM_BLUEPRINT.get())
+    COMMON_BLUEPRINT = advancement("common_blueprint", builder -> builder.icon(ModItems.TRACHELIUM_BLUEPRINT)
             .whenItemCollected(ModTags.Items.COMMON_BLUEPRINT)
             .parent(BLUEPRINT)),
 
-    RARE_BLUEPRINT = advancement("rare_blueprint", builder -> builder.icon(ModItems.TRACHELIUM_BLUEPRINT.get())
+    RARE_BLUEPRINT = advancement("rare_blueprint", builder -> builder.icon(ModItems.TRACHELIUM_BLUEPRINT)
             .whenItemCollected(ModTags.Items.RARE_BLUEPRINT)
             .parent(COMMON_BLUEPRINT)),
 
-    EPIC_BLUEPRINT = advancement("epic_blueprint", builder -> builder.icon(ModItems.TRACHELIUM_BLUEPRINT.get())
+    EPIC_BLUEPRINT = advancement("epic_blueprint", builder -> builder.icon(ModItems.TRACHELIUM_BLUEPRINT)
             .whenItemCollected(ModTags.Items.EPIC_BLUEPRINT)
             .parent(RARE_BLUEPRINT)),
 
-    LEGENDARY_BLUEPRINT = advancement("legendary_blueprint", builder -> builder.icon(ModItems.TRACHELIUM_BLUEPRINT.get())
+    LEGENDARY_BLUEPRINT = advancement("legendary_blueprint", builder -> builder.icon(ModItems.TRACHELIUM_BLUEPRINT)
             .whenItemCollected(ModTags.Items.LEGENDARY_BLUEPRINT)
             .parent(EPIC_BLUEPRINT)),
 
-    CANNON_BLUEPRINT = advancement("cannon_blueprint", builder -> builder.icon(ModItems.MK_42_BLUEPRINT.get())
+    CANNON_BLUEPRINT = advancement("cannon_blueprint", builder -> builder.icon(ModItems.MK_42_BLUEPRINT)
             .whenItemCollected(ModTags.Items.CANNON_BLUEPRINT)
             .parent(BLUEPRINT)),
 
-    // 古代芯片
-    ANCIENT_TECHNOLOGY = advancement("ancient_technology", builder -> builder.icon(ModItems.ANCIENT_CPU.get())
+    ANCIENT_TECHNOLOGY = advancement("ancient_technology", builder -> builder.icon(ModItems.ANCIENT_CPU)
             .whenIconCollected()
             .type(ModAdvancement.Type.GOAL)
             .parent(MAIN_ROOT)),
 
-    ENCLAVE = advancement("enclave", builder -> builder.icon(ModItems.REFORGING_TABLE.get())
+    ENCLAVE = advancement("enclave", builder -> builder.icon(ModItems.REFORGING_TABLE)
             .whenIconCollected()
             .type(ModAdvancement.Type.GOAL)
             .parent(ANCIENT_TECHNOLOGY)),
 
-    HANDSOME_FRAME = advancement("handsome_frame", builder -> builder.icon(ModItems.INTELLIGENT_CHIP.get())
+    HANDSOME_FRAME = advancement("handsome_frame", builder -> builder.icon(ModItems.INTELLIGENT_CHIP)
             .whenIconCollected()
             .type(ModAdvancement.Type.GOAL)
             .parent(ENCLAVE)),
 
-    // 哑弹棒（？）
-    BOOMSTICK_MELEE = advancement("boomstick_melee", builder -> builder.icon(ModItems.RPG_ROCKET_TBG.get())
+    BOOMSTICK_MELEE = advancement("boomstick_melee", builder -> builder.icon(ModItems.RPG_ROCKET_TBG)
             .externalTrigger(RPGMeleeExplosionTrigger.TriggerInstance.get())
             .type(ModAdvancement.Type.SECRET_CHALLENGE)
             .parent(MAIN_ROOT)),
 
-    RUSH_RUSH_RUN = advancement("rush_rush_run", builder -> builder.icon(ModItems.ELECTRIC_BATON.get())
+    RUSH_RUSH_RUN = advancement("rush_rush_run", builder -> builder.icon(ModItems.ELECTRIC_BATON)
             .externalTrigger(OttoSprintTrigger.TriggerInstance.get())
             .type(ModAdvancement.Type.SECRET_CHALLENGE)
             .parent(MAIN_ROOT)),
@@ -124,9 +112,8 @@ public class ModAdvancementProvider implements DataProvider {
     END = null;
 
 
-    public ModAdvancementProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
+    public ModAdvancementProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
         this.packOutput = output;
-        this.existingFileHelper = existingFileHelper;
         this.registries = lookupProvider;
     }
 
@@ -142,9 +129,6 @@ public class ModAdvancementProvider implements DataProvider {
         return this.registries.thenCompose(provider -> {
             Consumer<AdvancementHolder> consumer = advancementHolder -> {
                 ResourceLocation id = advancementHolder.id();
-                if (existingFileHelper.exists(id, PackType.SERVER_DATA, ".json", "advancement")) {
-                    throw new IllegalStateException("Duplicate advancement " + id);
-                }
                 Path path = pathProvider.json(advancementHolder.id());
                 futures.add(DataProvider.saveStable(output, provider, Advancement.CODEC, advancementHolder.value(), path));
             };

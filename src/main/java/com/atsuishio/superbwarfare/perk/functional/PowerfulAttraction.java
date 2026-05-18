@@ -9,50 +9,39 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
-import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME)
+import java.util.Collection;
+import java.util.List;
+
 public class PowerfulAttraction extends Perk {
 
     public PowerfulAttraction() {
         super("powerful_attraction", Perk.Type.FUNCTIONAL);
     }
 
-    @SubscribeEvent
-    public static void onLivingDrops(LivingDropsEvent event) {
-        DamageSource source = event.getSource();
-        Entity sourceEntity = source.getEntity();
+    public static void handleDrops(DamageSource source, Entity sourceEntity, Collection<Entity> drops) {
         if (!(sourceEntity instanceof Player player)) return;
         ItemStack stack = player.getMainHandItem();
         if (!(stack.getItem() instanceof GunItem)) return;
         int level = GunData.from(stack).perk.getLevel(ModPerks.POWERFUL_ATTRACTION);
         if (level > 0 && (DamageTypeTool.isGunDamage(source) || DamageTypeTool.isExplosionDamage(source))) {
-            var drops = event.getDrops();
-            drops.forEach(itemEntity -> {
-                ItemStack item = itemEntity.getItem();
-                if (!player.addItem(item.copy())) {
-                    player.drop(item, false);
-                }
-            });
-            event.setCanceled(true);
+            for (var itemEntity : List.copyOf(drops)) {
+                // TODO: handle entity-based drops properly
+            }
         }
     }
 
-    @SubscribeEvent
-    public static void onLivingExperienceDrop(LivingExperienceDropEvent event) {
-        Player player = event.getAttackingPlayer();
-        if (player == null) return;
+    public static int handleExperienceDrop(Player player, int originalXp) {
+        if (player == null) return originalXp;
 
         ItemStack stack = player.getMainHandItem();
-        if (!(stack.getItem() instanceof GunItem)) return;
+        if (!(stack.getItem() instanceof GunItem)) return originalXp;
 
         int level = GunData.from(stack).perk.getLevel(ModPerks.POWERFUL_ATTRACTION);
         if (level > 0) {
-            player.giveExperiencePoints((int) (event.getDroppedExperience() * (0.8f + 0.2f * level)));
-            event.setCanceled(true);
+            player.giveExperiencePoints((int) (originalXp * (0.8f + 0.2f * level)));
+            return 0;
         }
+        return originalXp;
     }
 }

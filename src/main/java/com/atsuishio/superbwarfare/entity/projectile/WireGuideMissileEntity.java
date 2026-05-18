@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.tools.DamageHandler;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,7 +24,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -45,7 +45,7 @@ public class WireGuideMissileEntity extends MissileProjectile implements GeoEnti
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.MEDIUM_ANTI_GROUND_MISSILE.get();
+        return ModItems.MEDIUM_ANTI_GROUND_MISSILE;
     }
 
     @Override
@@ -55,13 +55,13 @@ public class WireGuideMissileEntity extends MissileProjectile implements GeoEnti
             BlockPos resultPos = blockHitResult.getBlockPos();
             float hardness = this.level().getBlockState(resultPos).getBlock().defaultDestroyTime();
             if (hardness != -1) {
-                if (ExplosionConfig.EXPLOSION_DESTROY.get()) {
+                if (ExplosionConfig.EXPLOSION_DESTROY) {
                     if (firstHit) {
                         causeExplode(blockHitResult.getLocation());
                         firstHit = false;
                         Mod.queueServerWork(3, this::discard);
                     }
-                    if (ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+                    if (ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
                         this.level().destroyBlock(resultPos, true);
                     }
                 }
@@ -69,7 +69,7 @@ public class WireGuideMissileEntity extends MissileProjectile implements GeoEnti
                 causeExplode(blockHitResult.getLocation());
                 this.discard();
             }
-            if (!ExplosionConfig.EXPLOSION_DESTROY.get()) {
+            if (!ExplosionConfig.EXPLOSION_DESTROY) {
                 causeExplode(blockHitResult.getLocation());
                 this.discard();
             }
@@ -87,9 +87,9 @@ public class WireGuideMissileEntity extends MissileProjectile implements GeoEnti
                 return;
             if (this.getOwner() instanceof LivingEntity living) {
                 if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
-                    living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
+                    living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
 
-                    PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                    ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                 }
             }
 
@@ -153,7 +153,7 @@ public class WireGuideMissileEntity extends MissileProjectile implements GeoEnti
 
     @Override
     public @NotNull SoundEvent getSound() {
-        return ModSounds.ROCKET_FLY.get();
+        return ModSounds.ROCKET_FLY;
     }
 
     @Override

@@ -55,13 +55,13 @@ public class SuperbItemInterfaceBlock extends BaseEntityBlock {
     @Override
     @ParametersAreNonnullByDefault
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new SuperbItemInterfaceBlockEntity(ModBlockEntities.SUPERB_ITEM_INTERFACE.get(), pPos, pState);
+        return new SuperbItemInterfaceBlockEntity(ModBlockEntities.SUPERB_ITEM_INTERFACE, pPos, pState);
     }
 
     @Nullable
     @ParametersAreNonnullByDefault
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {
-        return pLevel.isClientSide ? null : createTickerHelper(pBlockEntityType, ModBlockEntities.SUPERB_ITEM_INTERFACE.get(), SuperbItemInterfaceBlockEntity::serverTick);
+        return pLevel.isClientSide ? null : createTickerHelper(pBlockEntityType, ModBlockEntities.SUPERB_ITEM_INTERFACE, SuperbItemInterfaceBlockEntity::serverTick);
     }
 
     @Nullable

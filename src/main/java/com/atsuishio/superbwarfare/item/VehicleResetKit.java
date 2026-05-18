@@ -18,16 +18,6 @@ public class VehicleResetKit extends Item {
     }
 
     @Override
-    public boolean hasCraftingRemainingItem(@NotNull ItemStack stack) {
-        return true;
-    }
-
-    @Override
-    public @NotNull ItemStack getCraftingRemainingItem(ItemStack itemstack) {
-        return itemstack.copy();
-    }
-
-    @Override
     @ParametersAreNonnullByDefault
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.translatable("des.superbwarfare.vehicle_reset_kit_1").withStyle(ChatFormatting.AQUA));

@@ -6,13 +6,12 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.neoforged.bus.api.Event;
-import net.neoforged.bus.api.ICancellableEvent;
 import org.jetbrains.annotations.ApiStatus;
 import software.bernie.geckolib.cache.object.GeoBone;
 
 @ApiStatus.AvailableSince("0.8.7.1")
-public class RenderPlayerArmEvent extends Event implements ICancellableEvent {
+public class RenderPlayerArmEvent {
+    private boolean cancelled = false;
     private final LocalPlayer localPlayer;
     private final ItemDisplayContext transformType;
     private final PoseStack stack;
@@ -71,5 +70,13 @@ public class RenderPlayerArmEvent extends Event implements ICancellableEvent {
 
     public boolean isUseOldHandRender() {
         return useOldHandRender;
+    }
+
+    public boolean isCanceled() {
+        return cancelled;
+    }
+
+    public void setCanceled(boolean cancel) {
+        this.cancelled = cancel;
     }
 }

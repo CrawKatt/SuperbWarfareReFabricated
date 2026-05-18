@@ -67,11 +67,11 @@ public class AmmoBoxExtractAmmoRecipe extends CustomRecipe {
 
         // 也许这边有更好的方案？
         return switch (type) {
-            case HANDGUN -> new ItemStack(ModItems.HANDGUN_AMMO.get());
-            case RIFLE -> new ItemStack(ModItems.RIFLE_AMMO.get());
-            case SHOTGUN -> new ItemStack(ModItems.SHOTGUN_AMMO.get());
-            case SNIPER -> new ItemStack(ModItems.SNIPER_AMMO.get());
-            case HEAVY -> new ItemStack(ModItems.HEAVY_AMMO.get());
+            case HANDGUN -> new ItemStack(ModItems.HANDGUN_AMMO);
+            case RIFLE -> new ItemStack(ModItems.RIFLE_AMMO);
+            case SHOTGUN -> new ItemStack(ModItems.SHOTGUN_AMMO);
+            case SNIPER -> new ItemStack(ModItems.SNIPER_AMMO);
+            case HEAVY -> new ItemStack(ModItems.HEAVY_AMMO);
         };
     }
 
@@ -106,6 +106,6 @@ public class AmmoBoxExtractAmmoRecipe extends CustomRecipe {
 
     @Override
     public @NotNull RecipeSerializer<?> getSerializer() {
-        return ModRecipes.AMMO_BOX_EXTRACT_AMMO_SERIALIZER.get();
+        return ModRecipes.AMMO_BOX_EXTRACT_AMMO_SERIALIZER;
     }
 }

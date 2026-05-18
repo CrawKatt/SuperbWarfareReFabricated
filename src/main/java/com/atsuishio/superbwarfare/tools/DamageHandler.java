@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.tools;
 
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.entity.mixin.DamageAccess;
+import com.atsuishio.superbwarfare.entity.mixin.DamageContainer;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier;
 import it.unimi.dsi.fastutil.doubles.DoubleDoubleImmutablePair;
@@ -23,8 +24,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.damagesource.DamageContainer;
 
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class DamageHandler {
         if (entity.hurt(source, damage)) {
             return true;
         } else if (entity instanceof LivingEntity living) {
-            if (!MiscConfig.ALLOW_FORCE_DAMAGE.get()) {
+            if (!MiscConfig.ALLOW_FORCE_DAMAGE) {
                 return false;
             }
             if (living.isInvulnerableTo(source)) {
@@ -51,9 +50,7 @@ public class DamageHandler {
                 DamageAccess damageAccess = DamageAccess.of(living);
 
                 damageAccess.superbwarfare$getDamageContainers().push(new DamageContainer(source, damage));
-                if (CommonHooks.onEntityIncomingDamage(living, damageAccess.superbwarfare$getDamageContainers().peek())) {
-                    return false;
-                } else {
+                {
                     if (living.isSleeping() && !living.level().isClientSide) {
                         living.stopSleeping();
                     }

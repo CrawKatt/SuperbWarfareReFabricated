@@ -43,7 +43,7 @@ public class RecipeButton extends Button {
 
         pGuiGraphics.renderItem(this.stack, this.getX() + 2, this.getY() + 1);
         Component hoverName;
-        if (this.stack.is(ModItems.CONTAINER.get())) {
+        if (this.stack.is(ModItems.CONTAINER)) {
             var data = this.stack.get(DataComponents.BLOCK_ENTITY_DATA);
             var tag = data != null ? data.copyTag() : null;
             if (tag != null && tag.contains("EntityType")) {

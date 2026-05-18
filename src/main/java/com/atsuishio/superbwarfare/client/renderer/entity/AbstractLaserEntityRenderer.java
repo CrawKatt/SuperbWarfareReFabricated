@@ -13,8 +13,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -23,7 +21,7 @@ import org.joml.Quaternionf;
 /**
  * Code based on @BobMowzie's MowziesMobs and @EEEAB's EEEABsMobs
  */
-@OnlyIn(Dist.CLIENT)
+
 public abstract class AbstractLaserEntityRenderer<T extends AbstractLaserEntity> extends EntityRenderer<T> {
 
     private static final float TEXTURE_WIDTH = 256;

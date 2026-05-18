@@ -71,7 +71,7 @@ public class FuMO25Block extends Block implements EntityBlock {
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, @NotNull BlockState pState, @NotNull BlockEntityType<T> pBlockEntityType) {
         if (!pLevel.isClientSide) {
-            return createTickerHelper(pBlockEntityType, ModBlockEntities.FUMO_25.get(), FuMO25BlockEntity::serverTick);
+            return createTickerHelper(pBlockEntityType, ModBlockEntities.FUMO_25, FuMO25BlockEntity::serverTick);
         }
         return null;
     }

@@ -60,7 +60,7 @@ public class M18SmokeGrenade extends Item implements ProjectileItem {
         ItemStack stack = playerIn.getItemInHand(handIn);
         playerIn.startUsingItem(handIn);
         if (playerIn instanceof ServerPlayer serverPlayer) {
-            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.GRENADE_PULL.get(), SoundSource.PLAYERS, 1, 1);
+            serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.GRENADE_PULL, SoundSource.PLAYERS, 1, 1);
         }
         return InteractionResultHolder.consume(stack);
     }
@@ -87,7 +87,7 @@ public class M18SmokeGrenade extends Item implements ProjectileItem {
                 worldIn.addFreshEntity(grenade);
 
                 if (player instanceof ServerPlayer serverPlayer) {
-                    serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.GRENADE_THROW.get(), SoundSource.PLAYERS, 1, 1);
+                    serverPlayer.level().playSound(null, serverPlayer.getOnPos(), ModSounds.GRENADE_THROW, SoundSource.PLAYERS, 1, 1);
                 }
 
                 if (!player.isCreative()) {
@@ -126,12 +126,12 @@ public class M18SmokeGrenade extends Item implements ProjectileItem {
 
     public static class SmokeGrenadeDispenserBehavior extends ProjectileDispenseBehavior {
         public SmokeGrenadeDispenserBehavior() {
-            super(ModItems.M18_SMOKE_GRENADE.get());
+            super(ModItems.M18_SMOKE_GRENADE);
         }
 
         @Override
         protected void playSound(BlockSource blockSource) {
-            blockSource.level().playSound(null, blockSource.pos(), ModSounds.GRENADE_THROW.get(), SoundSource.BLOCKS, 1F, 1F);
+            blockSource.level().playSound(null, blockSource.pos(), ModSounds.GRENADE_THROW, SoundSource.BLOCKS, 1F, 1F);
         }
     }
 
@@ -139,7 +139,7 @@ public class M18SmokeGrenade extends Item implements ProjectileItem {
     @ParametersAreNonnullByDefault
     public @NotNull Projectile asProjectile(Level level, Position pos, ItemStack stack, Direction direction) {
         int color = M18SmokeGrenade.this.getColor(stack);
-        return new M18SmokeGrenadeEntity(ModEntities.M18_SMOKE_GRENADE.get(), pos.x(), pos.y(), pos.z(), level)
+        return new M18SmokeGrenadeEntity(ModEntities.M18_SMOKE_GRENADE, pos.x(), pos.y(), pos.z(), level)
                 .setColor((color >> 16 & 255) / 255f, ((color >> 8) & 255) / 255f, (color & 255) / 255f);
     }
 }

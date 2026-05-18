@@ -20,7 +20,7 @@
 //import java.net.URL;
 //import java.util.concurrent.CompletableFuture;
 //
-//@OnlyIn(Dist.CLIENT)
+//
 //public class SBWCompatSoundInstance extends AbstractTickableSoundInstance {
 //
 //    private final VehicleEntity entity;

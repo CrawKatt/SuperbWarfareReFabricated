@@ -20,8 +20,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -41,7 +39,7 @@ public class AureliaSceptreItem extends GunGeoItem {
         return GunRendererBuilder.simple(AureliaSceptreItemModel::new);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     @Override
     public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
         if (!stack.isEmpty()) {
@@ -52,7 +50,7 @@ public class AureliaSceptreItem extends GunGeoItem {
         return HumanoidModel.ArmPose.EMPTY;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     private PlayState idlePredicate(AnimationState<AureliaSceptreItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -71,7 +69,7 @@ public class AureliaSceptreItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.aurelia_sceptre.idle"));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     private PlayState firePredicate(AnimationState<AureliaSceptreItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -89,7 +87,7 @@ public class AureliaSceptreItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.aurelia_sceptre.idle"));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     private PlayState meleePredicate(AnimationState<AureliaSceptreItem> event) {
         if (event.getData(DataTickets.ITEM_RENDER_PERSPECTIVE) != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
             return event.setAndContinue(RawAnimation.begin().thenLoop("animation.aurelia_sceptre.idle"));

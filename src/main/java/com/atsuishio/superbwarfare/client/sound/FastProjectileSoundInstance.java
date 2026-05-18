@@ -5,10 +5,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
+
 public abstract class FastProjectileSoundInstance extends AbstractTickableSoundInstance {
 
     private final Minecraft client;
@@ -69,7 +67,7 @@ public abstract class FastProjectileSoundInstance extends AbstractTickableSoundI
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     public static class FlySound extends FastProjectileSoundInstance {
 
         public FlySound(FastThrowableProjectile entity) {

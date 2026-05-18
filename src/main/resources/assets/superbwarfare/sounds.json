@@ -3992,5 +3992,13 @@
         "name": "superbwarfare:vehicle/common/pull_up"
       }
     ]
+  },
+  "mortar_shell_explode": {
+    "sounds": [
+      {
+        "name": "superbwarfare:explosion/explosion_close",
+        "stream": false
+      }
+    ]
   }
 }

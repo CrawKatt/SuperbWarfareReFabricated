@@ -42,7 +42,7 @@ public final class VehicleVecUtils {
     }
 
     public static double getSubmergedHeight(Entity entity) {
-        return entity.getFluidTypeHeight(entity.level().getFluidState(entity.blockPosition()).getFluidType());
+        return Math.max(entity.getFluidHeight(net.minecraft.tags.FluidTags.WATER), entity.getFluidHeight(net.minecraft.tags.FluidTags.LAVA));
     }
 
     public static Quaternionf eulerToQuaternion(float yaw, float pitch, float roll) {

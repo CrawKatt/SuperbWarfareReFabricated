@@ -45,7 +45,7 @@ public class MedicalKitItem extends Item {
         if (player.isShiftKeyDown()) {
             if (!level.isClientSide) {
                 float randomRot = (float) Mth.clamp((2 * Math.random() - 1) * 180, -180, 180);
-                MedicalKitEntity entity = new MedicalKitEntity(ModEntities.MEDICAL_KIT.get(), level);
+                MedicalKitEntity entity = new MedicalKitEntity(ModEntities.MEDICAL_KIT, level);
                 entity.moveTo(player.getX(), player.getEyeY() - 0.25, player.getZ(), randomRot, 0);
                 entity.setYBodyRot(randomRot);
                 entity.setYHeadRot(randomRot);

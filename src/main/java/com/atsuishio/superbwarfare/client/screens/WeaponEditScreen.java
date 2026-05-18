@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.network.message.send.EditMessage;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -19,12 +20,9 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
-@OnlyIn(Dist.CLIENT)
+
 public class WeaponEditScreen extends Screen {
 
     // 六个改装位置，大小128*128
@@ -64,7 +62,7 @@ public class WeaponEditScreen extends Screen {
     public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         this.renderEdit(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
 
-        for (Renderable renderable : this.renderables) {
+        for (Renderable renderable : ((com.atsuishio.superbwarfare.mixins.ScreenAccessor) this).getRenderables()) {
             renderable.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         }
     }
@@ -198,14 +196,14 @@ public class WeaponEditScreen extends Screen {
 
     @Override
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
-        if (pKeyCode == ModKeyMappings.EDIT_MODE.getKey().getValue()) {
+        if (pKeyCode == ModKeyMappings.EDIT_MODE.getDefaultKey().getValue()) {
             this.onClose();
             return true;
         }
         return super.keyPressed(pKeyCode, pScanCode, pModifiers);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     class EditButton extends AbstractButton {
 
         // 0 = barrel, 1 = scope, 2 = grip, 3 = stock, 4 = magazine, 5 = ammoType
@@ -248,7 +246,7 @@ public class WeaponEditScreen extends Screen {
         @Override
         public void onPress() {
             if (!this.isActive()) return;
-            PacketDistributor.sendToServer(new EditMessage(this.type, !this.left, false));
+            ClientPlayNetworking.send(new EditMessage(this.type, !this.left, false));
             ClientEventHandler.editModelShake();
         }
 

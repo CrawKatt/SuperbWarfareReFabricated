@@ -66,13 +66,13 @@ public class DPSGeneratorDeployer extends Item {
             // 禁止堆叠
             if (!level.getEntities(
                     (Entity) null,
-                    ModEntities.DPS_GENERATOR.get().getSpawnAABB(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5),
+                    ModEntities.DPS_GENERATOR.getSpawnAABB(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5),
                     IS_GENERATOR
             ).isEmpty()) {
                 return InteractionResult.FAIL;
             }
 
-            if (ModEntities.DPS_GENERATOR.get().spawn((ServerLevel) level, itemstack, pContext.getPlayer(), pos, MobSpawnType.SPAWN_EGG, true, !Objects.equals(blockpos, pos) && direction == Direction.UP) != null) {
+            if (ModEntities.DPS_GENERATOR.spawn((ServerLevel) level, itemstack, pContext.getPlayer(), pos, MobSpawnType.SPAWN_EGG, true, !Objects.equals(blockpos, pos) && direction == Direction.UP) != null) {
                 itemstack.shrink(1);
                 level.gameEvent(pContext.getPlayer(), GameEvent.ENTITY_PLACE, blockpos);
             }
@@ -97,13 +97,13 @@ public class DPSGeneratorDeployer extends Item {
                 // 禁止堆叠
                 if (!level.getEntities(
                         (Entity) null,
-                        ModEntities.DPS_GENERATOR.get().getSpawnAABB(blockpos.getX() + 0.5, blockpos.getY() + 0.5, blockpos.getZ() + 0.5),
+                        ModEntities.DPS_GENERATOR.getSpawnAABB(blockpos.getX() + 0.5, blockpos.getY() + 0.5, blockpos.getZ() + 0.5),
                         IS_GENERATOR
                 ).isEmpty()) {
                     return InteractionResultHolder.fail(itemstack);
                 }
 
-                DPSGeneratorEntity entity = ModEntities.DPS_GENERATOR.get().spawn((ServerLevel) level, itemstack, player, blockpos, MobSpawnType.SPAWN_EGG, false, false);
+                DPSGeneratorEntity entity = ModEntities.DPS_GENERATOR.spawn((ServerLevel) level, itemstack, player, blockpos, MobSpawnType.SPAWN_EGG, false, false);
                 if (entity == null) {
                     return InteractionResultHolder.pass(itemstack);
                 } else {

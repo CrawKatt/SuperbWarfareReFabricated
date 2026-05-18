@@ -67,7 +67,7 @@ public class MortarShellEntity extends FastThrowableProjectile implements GeoEnt
     }
 
     public MortarShellEntity(LivingEntity entity, Level level, float damage, float explosionDamage, float explosionRadius) {
-        super(ModEntities.MORTAR_SHELL.get(), entity, level);
+        super(ModEntities.MORTAR_SHELL, entity, level);
         this.noCulling = true;
         this.damage = damage;
         this.explosionDamage = explosionDamage;
@@ -75,14 +75,14 @@ public class MortarShellEntity extends FastThrowableProjectile implements GeoEnt
     }
 
     public void setEffectsFromItem(ItemStack stack) {
-        if (stack.is(ModItems.POTION_MORTAR_SHELL.get())) {
+        if (stack.is(ModItems.POTION_MORTAR_SHELL)) {
             var potionContents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
             this.potion = potionContents.potion().orElse(Potions.WATER).value();
 
             for (MobEffectInstance mobeffectinstance : potionContents.getAllEffects()) {
                 this.effects.add(new MobEffectInstance(mobeffectinstance));
             }
-        } else if (stack.is(ModItems.MORTAR_SHELL.get())) {
+        } else if (stack.is(ModItems.MORTAR_SHELL)) {
             this.potion = Potions.WATER.value();
             this.effects.clear();
         }
@@ -133,7 +133,7 @@ public class MortarShellEntity extends FastThrowableProjectile implements GeoEnt
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.MORTAR_SHELL.get();
+        return ModItems.MORTAR_SHELL;
     }
 
     @Override
@@ -156,7 +156,7 @@ public class MortarShellEntity extends FastThrowableProjectile implements GeoEnt
         BlockPos resultPos = blockHitResult.getBlockPos();
         BlockState state = this.level().getBlockState(resultPos);
 
-        if (this.level() instanceof ServerLevel && ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+        if (this.level() instanceof ServerLevel && ExplosionConfig.EXPLOSION_DESTROY && ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
             float hardness = this.level().getBlockState(resultPos).getBlock().defaultDestroyTime();
             if (hardness != -1) {
                 this.level().destroyBlock(resultPos, true);
@@ -221,7 +221,7 @@ public class MortarShellEntity extends FastThrowableProjectile implements GeoEnt
 
     @Override
     public @NotNull SoundEvent getSound() {
-        return ModSounds.SHELL_FLY.get();
+        return ModSounds.SHELL_FLY;
     }
 
     @Override

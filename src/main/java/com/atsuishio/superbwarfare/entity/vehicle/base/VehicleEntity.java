@@ -26,8 +26,11 @@ import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils;
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils;
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleWeaponUtils;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.common.container.ContainerBlockItem;
+import com.atsuishio.superbwarfare.mixins.EntityAccessor;
+import com.atsuishio.superbwarfare.capability.PersistentDataAccessor;
 import com.atsuishio.superbwarfare.menu.VehicleMenu;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.resource.vehicle.VehicleResource;
@@ -38,6 +41,7 @@ import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -792,7 +796,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
 //            if (menu == null) return null;
 //
 //            return new VehicleMenu(menu, pContainerId, pPlayerInventory, this, type.getRow(), type.getCol(), upgrade);
-            return new VehicleMenu(ModMenuTypes.VEHICLE_MENU_HUGE.get(), pContainerId, pPlayerInventory, this, 6, 17, false);
+            return new VehicleMenu(ModMenuTypes.VEHICLE_MENU_HUGE, pContainerId, pPlayerInventory, this, 6, 17, false);
         }
         return null;
     }
@@ -886,9 +890,9 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
 
         orderedPassengers.set(index, pPassenger);
 
-        pPassenger.getPersistentData().putInt(TAG_SEAT_INDEX, index);
+        ((PersistentDataAccessor) pPassenger).superbwarfare$getPersistentData().putInt(TAG_SEAT_INDEX, index);
 
-        this.passengers = ImmutableList.copyOf(orderedPassengers.stream().filter(Objects::nonNull).toList());
+        ((EntityAccessor) this).setPassengers(ImmutableList.copyOf(orderedPassengers.stream().filter(Objects::nonNull).toList()));
         this.gameEvent(GameEvent.ENTITY_MOUNT, pPassenger);
     }
 
@@ -903,9 +907,9 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         if (index == -1) return;
 
         orderedPassengers.set(index, null);
-        this.passengers = ImmutableList.copyOf(orderedPassengers.stream().filter(Objects::nonNull).toList());
+        ((EntityAccessor) this).setPassengers(ImmutableList.copyOf(orderedPassengers.stream().filter(Objects::nonNull).toList()));
 
-        pPassenger.boardingCooldown = 60;
+        ((EntityAccessor) pPassenger).setBoardingCooldown(60);
         this.gameEvent(GameEvent.ENTITY_DISMOUNT, pPassenger);
     }
 
@@ -961,7 +965,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         orderedPassengers.set(orderedPassengers.indexOf(entity), null);
         orderedPassengers.set(index, entity);
 
-        entity.getPersistentData().putInt(TAG_SEAT_INDEX, index);
+        ((PersistentDataAccessor) entity).superbwarfare$getPersistentData().putInt(TAG_SEAT_INDEX, index);
 
         // 在服务端运行时，向所有玩家同步载具座位信息
         if (this.level() instanceof ServerLevel serverLevel) {
@@ -990,7 +994,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
      * @return 座位索引
      */
     public int getTagSeatIndex(Entity entity) {
-        return entity.getPersistentData().getInt(TAG_SEAT_INDEX);
+        return ((PersistentDataAccessor) entity).superbwarfare$getPersistentData().getInt(TAG_SEAT_INDEX);
     }
 
     public Vec3 getThirdPersonCameraPosition() {
@@ -1629,14 +1633,14 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             }
 
             if (this.getFirstPassenger() == null) {
-                if (player instanceof FakePlayer) return InteractionResult.PASS;
+                if (!(player instanceof ServerPlayer)) return InteractionResult.PASS;
                 VehicleVecUtils.setDriverAngle(this, player);
                 player.setSprinting(false);
                 if (player.level() instanceof ServerLevel) {
                     return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
                 }
             } else if (!(this.getFirstPassenger() instanceof Player)) {
-                if (player instanceof FakePlayer) return InteractionResult.PASS;
+                if (!(player instanceof ServerPlayer)) return InteractionResult.PASS;
                 this.getFirstPassenger().stopRiding();
                 VehicleVecUtils.setDriverAngle(this, player);
                 player.setSprinting(false);
@@ -1645,7 +1649,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
                 }
             }
             if (this.canAddPassenger(player)) {
-                if (player instanceof FakePlayer) return InteractionResult.PASS;
+                if (!(player instanceof ServerPlayer)) return InteractionResult.PASS;
                 player.setSprinting(false);
                 if (player.level() instanceof ServerLevel) {
                     return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
@@ -1746,7 +1750,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             var holder = Holder.direct(ModSounds.INDICATION_VEHICLE);
             if (attacker instanceof ServerPlayer player && pHealAmount > 0 && this.getHealth() > 0 && send && !(this instanceof DroneEntity)) {
                 player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getEyeY(), player.getZ(), 0.25f + (2.75f * pHealAmount / getMaxHealth()), random.nextFloat() * 0.1f + 0.9f, player.level().random.nextLong()));
-                PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(3, 5));
+                ServerPlayNetworking.send(player, new ClientIndicatorMessage(3, 5));
             }
 
             if (pHealAmount > 0 && this.getHealth() > 0 && send) {
@@ -2105,15 +2109,16 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
                 int neededEnergy = this.getMaxEnergy() - this.getEnergy();
                 if (neededEnergy <= 0) break;
 
-                var energyCap = stack.getCapability(EnergyStorage.ITEM);
+                var energyCap = EnergyStorage.ITEM.find(stack, null);
                 if (energyCap == null) continue;
 
-                var stored = energyCap.getEnergyStored();
+                long stored = energyCap.getAmount();
                 if (stored <= 0) continue;
 
-                int energyToExtract = Math.min(stored, neededEnergy);
-                energyCap.extractEnergy(energyToExtract, false);
-                this.setEnergy(this.getEnergy() + energyToExtract);
+                long n = neededEnergy;
+                long energyToExtract = stored < n ? stored : n;
+                energyCap.extract(energyToExtract, null);
+                this.setEnergy(this.getEnergy() + (int) energyToExtract);
             }
         }
 
@@ -2337,7 +2342,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
 
     public void defaultPartDamageEffect(Vec3 pos) {
         if (level().isClientSide) {
-            addRandomParticle(ModParticleTypes.FIRE_STAR.get(), pos, 0, level(), 0.25f, 5);
+            addRandomParticle(ModParticleTypes.FIRE_STAR, pos, 0, level(), 0.25f, 5);
             addRandomParticle(ParticleTypes.LARGE_SMOKE, pos, 0.5f, level(), 0.001f, 1);
         }
     }
@@ -3316,7 +3321,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     }
 
     public void removeSeatIndexTag(Entity entity) {
-        entity.getPersistentData().remove(TAG_SEAT_INDEX);
+        ((PersistentDataAccessor) entity).superbwarfare$getPersistentData().remove(TAG_SEAT_INDEX);
     }
 
     public @NotNull Vec3 getEjectionMovement(LivingEntity entity, int index) {

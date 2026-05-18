@@ -11,7 +11,7 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
-import net.neoforged.neoforge.entity.PartEntity;
+import net.minecraft.world.entity.boss.EnderDragonPart;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -268,7 +268,7 @@ public class TraceTool {
         // 4. 遍历这些实体，进行精确的射线与碰撞箱相交测试
         for (Entity entity : entitiesInWorld) {
             // 忽略实体部件（如末影龙的各个部分，它们通常由父实体处理）
-            if (entity instanceof PartEntity) {
+            if (entity instanceof EnderDragonPart) {
                 continue;
             }
 

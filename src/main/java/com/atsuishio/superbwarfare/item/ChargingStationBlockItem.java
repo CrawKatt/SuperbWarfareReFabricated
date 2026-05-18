@@ -20,18 +20,18 @@ public class ChargingStationBlockItem extends BlockItem {
     public static final int MAX_ENERGY = 4000000;
 
     public ChargingStationBlockItem() {
-        super(ModBlocks.CHARGING_STATION.get(), new Properties().stacksTo(1));
+        super(ModBlocks.CHARGING_STATION, new Properties().stacksTo(1));
     }
 
     @Override
     public boolean isBarVisible(ItemStack stack) {
-        int energy = stack.getOrDefault(ModDataComponents.ENERGY.get(), 0);
+        int energy = stack.getOrDefault(ModDataComponents.ENERGY, 0);
         return energy != MAX_ENERGY && energy != 0;
     }
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        int energy = stack.getOrDefault(ModDataComponents.ENERGY.get(), 0);
+        int energy = stack.getOrDefault(ModDataComponents.ENERGY, 0);
         return Math.round(energy * 13F / MAX_ENERGY);
     }
 

@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.compat;
 
-import net.neoforged.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 
 public class CompatHolder {
 
@@ -21,7 +21,7 @@ public class CompatHolder {
 //    public static final EntityType<? extends Projectile> VRC_RAIN_SHOWER_BUTTERFLY = null;
 
     public static void hasMod(String modid, Runnable runnable) {
-        if (ModList.get().isLoaded(modid)) {
+        if (FabricLoader.getInstance().isModLoaded(modid)) {
             runnable.run();
         }
     }

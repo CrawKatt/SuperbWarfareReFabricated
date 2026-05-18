@@ -1,9 +1,11 @@
 package com.atsuishio.superbwarfare.item.gun.special;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.client.renderer.gun.RepairToolItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModParticleTypes;
 import com.atsuishio.superbwarfare.init.ModSounds;
@@ -32,8 +34,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -71,12 +71,12 @@ public class RepairToolItem extends GunGeoItem {
         if (entity instanceof Player player) {
             for (var cell : player.getInventory().items) {
                 if (cell.getItem() instanceof BatteryItem) {
-                    var stackStorage = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+                    var stackStorage = ModCapabilities.ENERGY_ITEM.find(stack, null);
                     if (stackStorage == null) continue;
                     int stackMaxEnergy = stackStorage.getMaxEnergyStored();
                     int stackEnergy = stackStorage.getEnergyStored();
 
-                    var cellStorage = cell.getCapability(Capabilities.EnergyStorage.ITEM);
+                    var cellStorage = ModCapabilities.ENERGY_ITEM.find(cell, null);
                     if (cellStorage == null) continue;
                     int cellEnergy = cellStorage.getEnergyStored();
 
@@ -93,12 +93,12 @@ public class RepairToolItem extends GunGeoItem {
 
     @Override
     public SoundEvent getRayHitBlockSound(GunData data) {
-        return ModSounds.REPAIRING.get();
+        return ModSounds.REPAIRING;
     }
 
     @Override
     public SoundEvent getRayHitEntitySound(GunData data) {
-        return ModSounds.REPAIRING.get();
+        return ModSounds.REPAIRING;
     }
 
     @Override
@@ -113,8 +113,8 @@ public class RepairToolItem extends GunGeoItem {
             if ((lastDriver != null && !SeekTool.IN_SAME_TEAM.test(shooter, lastDriver) && lastDriver.getTeam() != null) || shooter.isShiftKeyDown()) {
                 vehicle.hurt(ModDamageTypes.causeRepairToolDamage(level.registryAccess(), shooter), 0.5f);
                 if (shooter instanceof ServerPlayer player) {
-                    player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 0.1f, 1);
-                    PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                    player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 0.1f, 1);
+                    ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                 }
             } else {
                 vehicle.heal(0.5f + 0.0025f * vehicle.getMaxHealth());
@@ -134,8 +134,8 @@ public class RepairToolItem extends GunGeoItem {
                 iCustomKnockback.superbWarfare$resetKnockbackStrength();
 
                 if (shooter instanceof ServerPlayer player) {
-                    player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 0.1f, 1);
-                    PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                    player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 0.1f, 1);
+                    ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                 }
             }
             this.summonRayHitParticle(level, null, pos, shootDirection.scale(-1).normalize());
@@ -157,7 +157,7 @@ public class RepairToolItem extends GunGeoItem {
         }
         for (int i = 0; i < 2; i++) {
             Vec3 vec3 = this.randomVec(dir, 80);
-            sendParticle(serverLevel, ModParticleTypes.FIRE_STAR.get(), pos.x, pos.y, pos.z, 0, vec3.x, vec3.y, vec3.z, 0.2 + 0.1 * Math.random(), true);
+            sendParticle(serverLevel, ModParticleTypes.FIRE_STAR, pos.x, pos.y, pos.z, 0, vec3.x, vec3.y, vec3.z, 0.2 + 0.1 * Math.random(), true);
         }
     }
 }

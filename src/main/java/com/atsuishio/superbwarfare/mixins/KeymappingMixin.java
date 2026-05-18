@@ -27,7 +27,7 @@ public class KeymappingMixin {
         if (player == null || !(player.getVehicle() instanceof VehicleEntity vehicle)) return;
 
         for (int i = 0; i < 9; i++) {
-            if (Minecraft.getInstance().options.keyHotbarSlots[i].getKey() == key) {
+            if (Minecraft.getInstance().options.keyHotbarSlots[i].key == key) {
                 if (vehicle.getMaxPassengers() > 1
                         && Screen.hasShiftDown()
                         && i < vehicle.getMaxPassengers()

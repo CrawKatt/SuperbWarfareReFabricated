@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.client.renderer.gun;
 
 import com.atsuishio.superbwarfare.client.ItemModelHelper;
 import com.atsuishio.superbwarfare.client.animation.AnimationHelper;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.client.model.item.Ql1031ItemModel;
 import com.atsuishio.superbwarfare.client.renderer.CustomGunRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -18,7 +19,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.cache.object.GeoBone;
 
@@ -57,7 +57,7 @@ public class Ql1031ItemRenderer extends CustomGunRenderer<Ql1031Item> {
                 AnimationHelper.handleShootFlare(name, stack, itemStack, bone, buffer, packedLightIn);
                 ItemModelHelper.handleGunAttachments(bone, itemStack, name);
 
-                var cap = itemStack.getCapability(Capabilities.EnergyStorage.ITEM);
+                var cap = ModCapabilities.ENERGY_ITEM.find(itemStack, null);
                 var energy = cap != null ? cap.getEnergyStored() : 0;
 
                 if (name.equals("energy2_illuminated") || name.equals("energy3_illuminated") || name.equals("energy4_illuminated")) {

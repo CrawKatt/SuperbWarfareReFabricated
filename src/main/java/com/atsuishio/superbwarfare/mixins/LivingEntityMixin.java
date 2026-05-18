@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.mixin.DamageAccess;
+import com.atsuishio.superbwarfare.entity.mixin.DamageContainer;
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -9,7 +10,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -23,8 +23,8 @@ import java.util.Stack;
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin implements ICustomKnockback, DamageAccess {
 
-    @Shadow
-    protected Stack<DamageContainer> damageContainers;
+    @Unique
+    protected final Stack<DamageContainer> damageContainers = new Stack<>();
 
     @Shadow
     @Nullable

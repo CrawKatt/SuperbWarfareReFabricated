@@ -28,7 +28,7 @@ public class VehicleAssemblingResult {
     public JsonObject nbt;
 
     public static final Codec<VehicleAssemblingResult> CODEC = RecordCodecBuilder.<VehicleAssemblingResult>mapCodec(builder -> builder.group(
-            Codec.STRING.optionalFieldOf("item", BuiltInRegistries.ITEM.getKey(ModItems.CONTAINER.value()).toString()).forGetter(r -> r.itemString),
+            Codec.STRING.optionalFieldOf("item", BuiltInRegistries.ITEM.getKey(ModItems.CONTAINER).toString()).forGetter(r -> r.itemString),
             Codec.STRING.optionalFieldOf("entity", "").forGetter(r -> r.entityTypeString),
             Codec.INT.optionalFieldOf("count", 1).forGetter(r -> r.count)
     ).apply(builder, VehicleAssemblingResult::new)).codec();

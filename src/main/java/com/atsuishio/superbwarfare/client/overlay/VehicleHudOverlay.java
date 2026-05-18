@@ -28,10 +28,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Math;
-import top.theillusivec4.curios.api.CuriosApi;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,7 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 import static com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay.*;
 
-@OnlyIn(Dist.CLIENT)
+
 public class VehicleHudOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("vehicle_hud");
@@ -149,7 +146,7 @@ public class VehicleHudOverlay implements LayeredDraw.Layer {
         ItemStack stack = player.getItemBySlot(EquipmentSlot.CHEST);
         if (stack == ItemStack.EMPTY) return 0;
         if (!NBTTool.getTag(stack).contains("ArmorPlate")) return 0;
-        if (!DisplayConfig.ARMOR_PLATE_HUD.get()) return 0;
+        if (!DisplayConfig.ARMOR_PLATE_HUD) return 0;
         return 9;
     }
 
@@ -226,9 +223,9 @@ public class VehicleHudOverlay implements LayeredDraw.Layer {
             }
 
             if (passenger instanceof Player player) {
-                CuriosApi.getCuriosInventory(player)
-                        .flatMap(c -> c.findFirstCurio(ModItems.DOG_TAG.get()))
-                        .ifPresent(s -> name.set(s.stack().getHoverName().getString()));
+                dev.emi.trinkets.api.TrinketsApi.getTrinketComponent(player)
+                        .flatMap(c -> c.getEquipped(ModItems.DOG_TAG).stream().findFirst())
+                        .ifPresent(s -> name.set(s.getB().getHoverName().getString()));
             }
 
             guiGraphics.drawString(Minecraft.getInstance().font, name.get(), 42, y, 0x66ff00, true);
@@ -377,7 +374,7 @@ public class VehicleHudOverlay implements LayeredDraw.Layer {
             if (selected && size > 1) {
                 preciseBlit(guiGraphics, SWITCH_AMMO, w - 13 + xOffset, h - frameIndex * 18 - 20, 0, 0, 0, 16, 16, 16, 16);
 
-                String string = "[" + ModKeyMappings.FIRE_MODE.getKey().getDisplayName().getString() + "]";
+                String string = "[" + ModKeyMappings.FIRE_MODE.getDefaultKey().getDisplayName().getString() + "]";
                 int width = Minecraft.getInstance().font.width(string);
 
                 pose.pushPose();
@@ -395,8 +392,8 @@ public class VehicleHudOverlay implements LayeredDraw.Layer {
                     guiGraphics.drawString(
                             Minecraft.getInstance().font,
                             string,
-                            (xPos + 3f - width / 2f) / 0.6f,
-                            (h - frameIndex * 18 - 14f) / 0.6f,
+                            (int) ((xPos + 3f - width / 2f) / 0.6f),
+                            (int) ((h - frameIndex * 18 - 14f) / 0.6f),
                             0xFFFFFF,
                             false
                     );

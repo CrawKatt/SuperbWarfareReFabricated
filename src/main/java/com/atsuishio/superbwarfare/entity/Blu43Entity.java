@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier;
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.tools.CustomExplosion;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import net.minecraft.core.BlockPos;
@@ -28,7 +29,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -52,7 +52,7 @@ public class Blu43Entity extends Entity implements GeoEntity, OwnableEntity {
     }
 
     public Blu43Entity(LivingEntity owner, Level level) {
-        super(ModEntities.BLU_43.get(), level);
+        super(ModEntities.BLU_43, level);
         if (owner != null) {
             this.setOwnerUUID(owner.getUUID());
         }
@@ -153,7 +153,7 @@ public class Blu43Entity extends Entity implements GeoEntity, OwnableEntity {
             }
 
             if (!player.getAbilities().instabuild) {
-                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.BLU_43_MINE.get()));
+                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.BLU_43_MINE));
             }
         }
 
@@ -178,7 +178,7 @@ public class Blu43Entity extends Entity implements GeoEntity, OwnableEntity {
         float f = 0.98F;
         if (this.onGround()) {
             BlockPos pos = this.getBlockPosBelowThatAffectsMyMovement();
-            f = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98F;
+            f = this.level().getBlockState(pos).getBlock().getFriction() * 0.98F;
         }
 
         this.setDeltaMovement(this.getDeltaMovement().multiply(f, 0.98, f));

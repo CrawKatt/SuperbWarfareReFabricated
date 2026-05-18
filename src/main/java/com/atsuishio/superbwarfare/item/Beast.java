@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.item;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.entity.DPSGeneratorEntity;
@@ -9,7 +10,6 @@ import com.atsuishio.superbwarfare.init.ModEnumExtensions;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.network.message.receive.LivingGunKillMessage;
-import com.atsuishio.superbwarfare.tools.TraceTool;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
@@ -18,7 +18,6 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -28,8 +27,6 @@ import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,7 +39,6 @@ public class Beast extends SwordItem {
         super(Tiers.NETHERITE, new CustomDamageProperty(false)
                 .stacksTo(1)
                 .rarity(ModEnumExtensions.getLegendary())
-                .setNoRepair()
         );
     }
 
@@ -51,11 +47,6 @@ public class Beast extends SwordItem {
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         beastKill(attacker, target);
         return true;
-    }
-
-    @Override
-    public boolean isDamageable(@NotNull ItemStack stack) {
-        return false;
     }
 
     public static void beastKill(@Nullable Entity attacker, @NotNull Entity target) {
@@ -73,8 +64,8 @@ public class Beast extends SwordItem {
         }
 
         if (attacker instanceof ServerPlayer player) {
-            PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
-            var holder = Holder.direct(ModSounds.INDICATION.get());
+            ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
+            var holder = Holder.direct(ModSounds.INDICATION);
             player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1f, 1f, player.level().random.nextLong()));
 
             var box = target.getBoundingBox();
@@ -85,8 +76,8 @@ public class Beast extends SwordItem {
                     0
             );
 
-            if (MiscConfig.SEND_KILL_FEEDBACK.get()) {
-                PacketDistributor.sendToAllPlayers(new LivingGunKillMessage(player.getId(), target.getId(), false, ModDamageTypes.BEAST));
+            if (MiscConfig.SEND_KILL_FEEDBACK) {
+                // FIXME: sendToAllPlayers(new LivingGunKillMessage(player.getId(), target.getId(), false, ModDamageTypes.BEAST));
             }
         }
 
@@ -107,56 +98,14 @@ public class Beast extends SwordItem {
             }
             target.level().broadcastEntityEvent(target, (byte) 60);
 
-            target.removalReason = Entity.RemovalReason.KILLED;
             target.getPassengers().forEach(Entity::stopRiding);
             target.stopRiding();
-
-            target.levelCallback.onRemove(Entity.RemovalReason.KILLED);
+            target.remove(Entity.RemovalReason.KILLED);
 
             target.gameEvent(GameEvent.ENTITY_DIE);
         }
 
-        target.level().playSound(target, new BlockPos((int) target.getX(), (int) target.getY(), (int) target.getZ()), ModSounds.OUCH.get(), SoundSource.PLAYERS, 2, 1);
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public @NotNull AABB getSweepHitBox(ItemStack stack, Player player, Entity target) {
-        return super.getSweepHitBox(stack, player, target).inflate(3);
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public boolean canBeHurtBy(ItemStack stack, DamageSource source) {
-        return false;
-    }
-
-    @Override
-    public boolean isEnchantable(@NotNull ItemStack stack) {
-        return false;
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand) {
-        var target = TraceTool.findMeleeEntity(entity, 51.4);
-        if (target != null) {
-            beastKill(entity, target);
-        }
-        return super.onEntitySwing(stack, entity, hand);
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
-        beastKill(player, entity);
-        return super.onLeftClickEntity(stack, player, entity);
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
-        return true;
+        target.level().playSound(target, new BlockPos((int) target.getX(), (int) target.getY(), (int) target.getZ()), ModSounds.OUCH, SoundSource.PLAYERS, 2, 1);
     }
 
     @Override

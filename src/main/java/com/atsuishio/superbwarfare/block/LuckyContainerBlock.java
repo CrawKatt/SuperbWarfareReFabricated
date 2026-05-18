@@ -70,7 +70,7 @@ public class LuckyContainerBlock extends BaseEntityBlock {
         }
 
         level.setBlockAndUpdate(pos, state.setValue(OPENED, true));
-        level.playSound(null, BlockPos.containing(pos.getX(), pos.getY(), pos.getZ()), ModSounds.OPEN.get(), SoundSource.BLOCKS, 1, 1);
+        level.playSound(null, BlockPos.containing(pos.getX(), pos.getY(), pos.getZ()), ModSounds.OPEN, SoundSource.BLOCKS, 1, 1);
 
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
@@ -79,7 +79,7 @@ public class LuckyContainerBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, @NotNull BlockState pState, @NotNull BlockEntityType<T> pBlockEntityType) {
         if (!pLevel.isClientSide) {
-            return createTickerHelper(pBlockEntityType, ModBlockEntities.LUCKY_CONTAINER.get(), LuckyContainerBlockEntity::serverTick);
+            return createTickerHelper(pBlockEntityType, ModBlockEntities.LUCKY_CONTAINER, LuckyContainerBlockEntity::serverTick);
         }
         return null;
     }
@@ -137,7 +137,7 @@ public class LuckyContainerBlock extends BaseEntityBlock {
     @ParametersAreNonnullByDefault
     public @NotNull ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
         ItemStack itemstack = super.getCloneItemStack(level, pos, state);
-        level.getBlockEntity(pos, ModBlockEntities.LUCKY_CONTAINER.get()).ifPresent((blockEntity) -> blockEntity.saveToItem(itemstack, level.registryAccess()));
+        level.getBlockEntity(pos, ModBlockEntities.LUCKY_CONTAINER).ifPresent((blockEntity) -> blockEntity.saveToItem(itemstack, level.registryAccess()));
         return itemstack;
     }
 }

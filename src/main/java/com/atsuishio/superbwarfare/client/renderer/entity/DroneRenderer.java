@@ -54,7 +54,7 @@ public class DroneRenderer extends GeoEntityRenderer<DroneEntity> {
 
             boolean firstPerson = Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON || Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK;
 
-            if (!(stack.is(ModItems.MONITOR.get()) && tag.getBoolean("Using") && tag.getBoolean("Linked") && drone != null && drone.getUUID() == animatable.getUUID()) || !firstPerson) {
+            if (!(stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked") && drone != null && drone.getUUID() == animatable.getUUID()) || !firstPerson) {
                 renderAttachments(animatable, yaw, partialTick, poseStack, bufferSource, packedLight);
             }
         }

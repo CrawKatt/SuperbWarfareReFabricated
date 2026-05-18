@@ -1,4 +1,5 @@
 package com.atsuishio.superbwarfare.tools;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.network.message.receive.SoundClientMessage;
 import net.minecraft.core.Holder;
@@ -12,7 +13,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.UUID;
 
@@ -53,7 +53,7 @@ public class SoundTool {
         var players = serverLevel.getPlayers(p -> p.distanceToSqr(pos) < radius * radius * 256);
 
         for (var serverPlayer : players) {
-            PacketDistributor.sendToPlayer(serverPlayer,
+            ServerPlayNetworking.send(serverPlayer,
                     new SoundClientMessage(soundEvent.getLocation(), pos.toVector3f(), radius, pitch, sender == null ? UUID.randomUUID() : sender.getUUID()));
         }
     }

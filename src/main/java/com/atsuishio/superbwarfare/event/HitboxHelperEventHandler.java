@@ -1,24 +1,16 @@
 package com.atsuishio.superbwarfare.event;
 
 import com.atsuishio.superbwarfare.tools.HitboxHelper;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.minecraft.world.entity.player.Player;
 
-@EventBusSubscriber
 public class HitboxHelperEventHandler {
-    @SubscribeEvent(receiveCanceled = true)
-    public static void onPlayerTick(PlayerTickEvent.Post event) {
-        if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) {
-            HitboxHelper.onPlayerTick(event.getEntity());
+    public static void onPlayerTick(Player player) {
+        if (!player.level().isClientSide()) {
+            HitboxHelper.onPlayerTick(player);
         }
     }
 
-    @SubscribeEvent(receiveCanceled = true)
-    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        HitboxHelper.onPlayerLoggedOut(event.getEntity());
+    public static void onPlayerLoggedOut(Player player) {
+        HitboxHelper.onPlayerLoggedOut(player);
     }
 }

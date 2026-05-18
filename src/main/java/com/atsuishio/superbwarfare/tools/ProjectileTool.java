@@ -38,7 +38,7 @@ public class ProjectileTool {
         Vec3 pos = projectile.position().add(projectile.getDeltaMovement().scale(0.5));
 
         if (projectile.level() instanceof ServerLevel) {
-            projectile.level().explode(source == null ? null : source.getEntity(), pos.x, pos.y, pos.z, 0.5f * radius, ExplosionConfig.EXPLOSION_DESTROY.get() ? Level.ExplosionInteraction.BLOCK : Level.ExplosionInteraction.NONE);
+            projectile.level().explode(source == null ? null : source.getEntity(), pos.x, pos.y, pos.z, 0.5f * radius, ExplosionConfig.EXPLOSION_DESTROY ? Level.ExplosionInteraction.BLOCK : Level.ExplosionInteraction.NONE);
         }
 
         projectile.discard();

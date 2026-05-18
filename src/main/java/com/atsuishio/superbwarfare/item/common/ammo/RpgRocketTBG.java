@@ -29,10 +29,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ProjectileItem;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -43,7 +39,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
-@EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class RpgRocketTBG extends Item implements GeoItem, ProjectileItem {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -52,23 +47,7 @@ public class RpgRocketTBG extends Item implements GeoItem, ProjectileItem {
         super(new Item.Properties().stacksTo(16));
     }
 
-    @SubscribeEvent
-    private static void registerGunExtensions(RegisterClientExtensionsEvent event) {
-        event.registerItem(new IClientItemExtensions() {
-            private final BlockEntityWithoutLevelRenderer renderer = new RpgRocketTBGRenderer();
-
-            @Override
-            public @NotNull BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return renderer;
-            }
-
-            @Override
-            @ParametersAreNonnullByDefault
-            public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
-                return PoseTool.pose(entityLiving, hand, stack);
-            }
-        }, ModItems.RPG_ROCKET_TBG.get());
-    }
+    
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
@@ -80,8 +59,8 @@ public class RpgRocketTBG extends Item implements GeoItem, ProjectileItem {
     }
 
     @Override
-    public @NotNull ItemAttributeModifiers getDefaultAttributeModifiers(@NotNull ItemStack stack) {
-        var list = new ArrayList<>(super.getDefaultAttributeModifiers(stack).modifiers());
+    public @NotNull ItemAttributeModifiers getDefaultAttributeModifiers() {
+        var list = new ArrayList<>(super.getDefaultAttributeModifiers().modifiers());
 
         list.addAll(List.of(
                 new ItemAttributeModifiers.Entry(
@@ -111,7 +90,7 @@ public class RpgRocketTBG extends Item implements GeoItem, ProjectileItem {
             }
 
             if (source instanceof ServerPlayer player) {
-                ModCriteriaTriggers.RPG_MELEE_EXPLOSION.get().trigger(player);
+                ModCriteriaTriggers.RPG_MELEE_EXPLOSION.trigger(player);
                 if (!player.isCreative()) {
                     stack.shrink(1);
                 }
@@ -125,19 +104,19 @@ public class RpgRocketTBG extends Item implements GeoItem, ProjectileItem {
 
     public static class RocketDispenseBehavior extends ProjectileDispenseBehavior {
         public RocketDispenseBehavior() {
-            super(ModItems.RPG_ROCKET_TBG.get());
+            super(ModItems.RPG_ROCKET_TBG);
         }
 
         @Override
         protected void playSound(BlockSource blockSource) {
-            blockSource.level().playSound(null, blockSource.pos(), ModSounds.RPG_FIRE_3P.get(), SoundSource.BLOCKS, 1F, 1F);
+            blockSource.level().playSound(null, blockSource.pos(), ModSounds.RPG_FIRE_3P, SoundSource.BLOCKS, 1F, 1F);
         }
     }
 
     @Override
     @ParametersAreNonnullByDefault
     public @NotNull Projectile asProjectile(Level level, Position pos, ItemStack stack, Direction direction) {
-        return new RpgRocketTBGEntity(ModEntities.RPG_ROCKET_TBG.get(), pos.x(), pos.y(), pos.z(), level, 270, 130, 10);
+        return new RpgRocketTBGEntity(ModEntities.RPG_ROCKET_TBG, pos.x(), pos.y(), pos.z(), level, 270, 130, 10);
     }
 
     @Override

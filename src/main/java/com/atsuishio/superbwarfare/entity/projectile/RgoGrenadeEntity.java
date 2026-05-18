@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import com.atsuishio.superbwarfare.tools.ProjectileTool;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -24,7 +25,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -40,22 +40,22 @@ public class RgoGrenadeEntity extends FastThrowableProjectile implements GeoEnti
     public RgoGrenadeEntity(EntityType<? extends RgoGrenadeEntity> type, Level level) {
         super(type, level);
         this.noCulling = true;
-        this.explosionDamage = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE.get();
-        this.explosionRadius = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS.get();
+        this.explosionDamage = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE;
+        this.explosionRadius = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS;
     }
 
     public RgoGrenadeEntity(EntityType<? extends RgoGrenadeEntity> type, double x, double y, double z, Level level) {
         super(type, x, y, z, level);
         this.noCulling = true;
-        this.explosionDamage = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE.get();
-        this.explosionRadius = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS.get();
+        this.explosionDamage = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE;
+        this.explosionRadius = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS;
     }
 
     public RgoGrenadeEntity(LivingEntity entity, Level level, int fuse) {
-        super(ModEntities.RGO_GRENADE.get(), entity, level);
+        super(ModEntities.RGO_GRENADE, entity, level);
         this.noCulling = true;
-        this.explosionDamage = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE.get();
-        this.explosionRadius = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS.get();
+        this.explosionDamage = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE;
+        this.explosionRadius = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS;
         this.fuse = fuse;
     }
 
@@ -75,7 +75,7 @@ public class RgoGrenadeEntity extends FastThrowableProjectile implements GeoEnti
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.RGO_GRENADE.get();
+        return ModItems.RGO_GRENADE;
     }
 
     @Override
@@ -99,9 +99,9 @@ public class RgoGrenadeEntity extends FastThrowableProjectile implements GeoEnti
                         return;
                     if (this.getOwner() instanceof LivingEntity living) {
                         if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
-                            living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
+                            living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
 
-                            PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                            ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                         }
                     }
                     if (!(entity instanceof DroneEntity)) {

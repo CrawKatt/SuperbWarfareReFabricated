@@ -36,7 +36,7 @@ public record RadarSetTargetMessage(UUID target) implements CustomPacketPayload 
                 return;
             }
             fuMO25Menu.getSelfPos().ifPresent(pos -> {
-                var entities = StreamSupport.stream(EntityFindUtil.getEntities(player.level()).getAll().spliterator(), false)
+                var entities = StreamSupport.stream(EntityFindUtil.getEntities(player.level()).spliterator(), false)
                         .filter(e -> (e instanceof AutoAimableEntity autoAimableEntity && autoAimableEntity.getOwner() == player && autoAimableEntity.distanceTo(player) <= 24))
                         .toList();
                 entities.forEach(e -> e.getEntityData().set(TARGET_UUID, message.target.toString()));

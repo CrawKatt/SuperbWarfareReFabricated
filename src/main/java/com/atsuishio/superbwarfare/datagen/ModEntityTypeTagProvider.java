@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.datagen;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.init.ModEntities;
 import com.atsuishio.superbwarfare.init.ModTags;
 import net.minecraft.core.HolderLookup;
@@ -10,40 +9,38 @@ import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
 public class ModEntityTypeTagProvider extends EntityTypeTagsProvider {
 
-    public ModEntityTypeTagProvider(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pProvider, @Nullable ExistingFileHelper existingFileHelper) {
-        super(pOutput, pProvider, Mod.MODID, existingFileHelper);
+    public ModEntityTypeTagProvider(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pProvider) {
+        super(pOutput, pProvider);
     }
 
     @Override
     protected void addTags(HolderLookup.@NotNull Provider pProvider) {
         this.tag(ModTags.EntityTypes.AERIAL_BOMB).add(
-                ModEntities.MELON_BOMB.get(),
-                ModEntities.MK_82.get()
+                ModEntities.MELON_BOMB,
+                ModEntities.MK_82
         );
 
         this.tag(ModTags.EntityTypes.DESTROYABLE_PROJECTILE).add(
-                ModEntities.AGM_65.get(),
-                ModEntities.JAVELIN_MISSILE.get(),
-                ModEntities.MELON_BOMB.get(),
-                ModEntities.MK_82.get(),
-                ModEntities.SWARM_DRONE.get(),
-                ModEntities.WIRE_GUIDE_MISSILE.get()
+                ModEntities.AGM_65,
+                ModEntities.JAVELIN_MISSILE,
+                ModEntities.MELON_BOMB,
+                ModEntities.MK_82,
+                ModEntities.SWARM_DRONE,
+                ModEntities.WIRE_GUIDE_MISSILE
         );
 
         this.tag(ModTags.EntityTypes.DECOY).add(
-                ModEntities.SMOKE_DECOY.get(),
-                ModEntities.FLARE_DECOY.get()
+                ModEntities.SMOKE_DECOY,
+                ModEntities.FLARE_DECOY
         );
 
-        this.tag(ModTags.EntityTypes.NO_EXPERIENCE).add(ModEntities.TARGET.get(), ModEntities.DPS_GENERATOR.get())
+        this.tag(ModTags.EntityTypes.NO_EXPERIENCE).add(ModEntities.TARGET, ModEntities.DPS_GENERATOR)
                 .addOptional(ResourceLocation.fromNamespaceAndPath("dummmmmmy", "target_dummy"))
                 .addOptional(ResourceLocation.fromNamespaceAndPath("powerful_dummy", "test_dummy"));
 
@@ -52,16 +49,16 @@ public class ModEntityTypeTagProvider extends EntityTypeTagsProvider {
         ).addOptional(ResourceLocation.fromNamespaceAndPath("touhou_little_maid", "maid"));
 
         this.tag(ModTags.EntityTypes.MINE).add(
-                ModEntities.BLU_43.get(),
-                ModEntities.TM_62.get(),
-                ModEntities.PTKM_1R.get(),
-                ModEntities.CLAYMORE.get(),
-                ModEntities.PTKM_PROJECTILE.get()
+                ModEntities.BLU_43,
+                ModEntities.TM_62,
+                ModEntities.PTKM_1R,
+                ModEntities.CLAYMORE,
+                ModEntities.PTKM_PROJECTILE
         );
 
         this.tag(ModTags.EntityTypes.AT_ROCKET).add(
-                ModEntities.RPG_ROCKET_STANDARD.get(),
-                ModEntities.RPG_ROCKET_TBG.get()
+                ModEntities.RPG_ROCKET_STANDARD,
+                ModEntities.RPG_ROCKET_TBG
         );
 
         this.tag(ModTags.EntityTypes.SEEK_BLACKLIST).add(
@@ -74,8 +71,8 @@ public class ModEntityTypeTagProvider extends EntityTypeTagsProvider {
                         EntityType.FIREWORK_ROCKET,
                         EntityType.GLOW_ITEM_FRAME,
                         EntityType.AREA_EFFECT_CLOUD,
-                        ModEntities.CLAYMORE.get(),
-                        ModEntities.C4.get()
+                        ModEntities.CLAYMORE,
+                        ModEntities.C4
                 ).addOptional(ResourceLocation.fromNamespaceAndPath("touhou_little_maid", "power_point"))
                 .addOptional(ResourceLocation.fromNamespaceAndPath("evilcraft", "vengeance_spirit"))
                 .addOptional(ResourceLocation.fromNamespaceAndPath("mts", "builder_rendering"))

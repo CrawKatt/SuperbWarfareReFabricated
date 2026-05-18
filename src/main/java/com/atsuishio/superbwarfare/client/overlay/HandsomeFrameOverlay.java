@@ -23,13 +23,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
+
 public class HandsomeFrameOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("handsome_frame");

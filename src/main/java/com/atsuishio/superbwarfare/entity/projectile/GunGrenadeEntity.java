@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.tools.DamageHandler;
 import com.atsuishio.superbwarfare.tools.ProjectileTool;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,7 +21,6 @@ import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -38,7 +38,7 @@ public class GunGrenadeEntity extends FastThrowableProjectile implements GeoEnti
     }
 
     public GunGrenadeEntity(@Nullable Entity entity, Level level, float damage, float explosionDamage, float explosionRadius) {
-        super(ModEntities.GUN_GRENADE.get(), entity, level);
+        super(ModEntities.GUN_GRENADE, entity, level);
         this.noCulling = true;
         this.damage = damage;
         this.explosionDamage = explosionDamage;
@@ -47,7 +47,7 @@ public class GunGrenadeEntity extends FastThrowableProjectile implements GeoEnti
 
     @Override
     protected @NotNull Item getDefaultItem() {
-        return ModItems.GRENADE_40MM.get();
+        return ModItems.GRENADE_40MM;
     }
 
     @Override
@@ -59,9 +59,9 @@ public class GunGrenadeEntity extends FastThrowableProjectile implements GeoEnti
 
         if (this.getOwner() instanceof LivingEntity living) {
             if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
-                living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
+                living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
 
-                PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+                ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
             }
         }
 

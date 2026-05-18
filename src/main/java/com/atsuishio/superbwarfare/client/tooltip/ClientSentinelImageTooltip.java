@@ -1,10 +1,10 @@
 package com.atsuishio.superbwarfare.client.tooltip;
 
 import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.tools.FormatTool;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.neoforged.neoforge.capabilities.Capabilities;
 
 public class ClientSentinelImageTooltip extends ClientGunImageTooltip {
 
@@ -14,7 +14,7 @@ public class ClientSentinelImageTooltip extends ClientGunImageTooltip {
 
     @Override
     protected Component getDamageComponent() {
-        var cap = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
 
         if (cap != null && cap.getEnergyStored() > 0) {
             var computed = data.compute();

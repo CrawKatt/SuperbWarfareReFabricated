@@ -10,8 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -19,7 +17,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * 这个类的作用是在看不见的地方渲染一个第三人称的武器模型，别管为啥这么干
  * 反正删了这个绝对会出事
  */
-@OnlyIn(Dist.CLIENT)
+
 public class ItemRendererFixOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("item_renderer_fix");

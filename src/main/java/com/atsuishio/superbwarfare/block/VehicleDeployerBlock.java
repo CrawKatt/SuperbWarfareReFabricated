@@ -55,7 +55,7 @@ public class VehicleDeployerBlock extends BaseEntityBlock {
 
         if (!player.isCreative()) return ItemInteractionResult.FAIL;
 
-        if (stack.getItem() != ModItems.CONTAINER.get()) {
+        if (stack.getItem() != ModItems.CONTAINER) {
             player.displayClientMessage(Component.translatable("des.superbwarfare.vehicle_deployer.fail").withStyle(ChatFormatting.RED), true);
             return ItemInteractionResult.FAIL;
         }

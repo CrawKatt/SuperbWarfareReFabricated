@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.tools.CustomExplosion;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import com.atsuishio.superbwarfare.tools.SeekTool;
@@ -31,7 +32,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -61,7 +61,7 @@ public class Ptkm1rEntity extends Entity implements GeoEntity, OwnableEntity {
     public int aimingTime;
 
     public Ptkm1rEntity(LivingEntity owner, Level level) {
-        super(ModEntities.PTKM_1R.get(), level);
+        super(ModEntities.PTKM_1R, level);
         if (owner != null) {
             this.setOwnerUUID(owner.getUUID());
         }
@@ -167,7 +167,7 @@ public class Ptkm1rEntity extends Entity implements GeoEntity, OwnableEntity {
             }
 
             if (!player.getAbilities().instabuild) {
-                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.PTKM_1R.get()));
+                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.PTKM_1R));
             }
         }
 
@@ -188,7 +188,7 @@ public class Ptkm1rEntity extends Entity implements GeoEntity, OwnableEntity {
         float f = 0.98F;
         if (this.onGround()) {
             BlockPos pos = this.getBlockPosBelowThatAffectsMyMovement();
-            f = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98F;
+            f = this.level().getBlockState(pos).getBlock().getFriction() * 0.98F;
         }
 
         this.setDeltaMovement(this.getDeltaMovement().multiply(f, 0.98, f));
@@ -201,7 +201,7 @@ public class Ptkm1rEntity extends Entity implements GeoEntity, OwnableEntity {
         }
 
         if (tickCount == 1) {
-            level().playSound(null, BlockPos.containing(position()), ModSounds.PTKM_1R_DEPLOY.get(), SoundSource.PLAYERS, 1, 1);
+            level().playSound(null, BlockPos.containing(position()), ModSounds.PTKM_1R_DEPLOY, SoundSource.PLAYERS, 1, 1);
         }
 
         if (tickCount > 20 && onGround()) {

@@ -28,15 +28,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Team;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.atsuishio.superbwarfare.entity.vehicle.DroneEntity.CONTROLLER;
 import static com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity.ACTIVE;
 
-@OnlyIn(Dist.CLIENT)
+
 public class VehicleTeamOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("vehicle_team");
@@ -44,7 +42,7 @@ public class VehicleTeamOverlay implements LayeredDraw.Layer {
     @Override
     @ParametersAreNonnullByDefault
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        if (!DisplayConfig.VEHICLE_INFO.get()) return;
+        if (!DisplayConfig.VEHICLE_INFO) return;
 
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
@@ -64,7 +62,7 @@ public class VehicleTeamOverlay implements LayeredDraw.Layer {
         boolean lookAtEntity = false;
 
         double entityRange = 0;
-        Entity lookingEntity = TraceTool.camerafFindLookingEntity(player, cameraPos, viewVec, VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE.get());
+        Entity lookingEntity = TraceTool.camerafFindLookingEntity(player, cameraPos, viewVec, VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE);
 
         if (player.getVehicle() instanceof VehicleEntity vehicle) {
             lookingEntity = vehicle.getPlayerLookAtEntityOnVehicle(player, 512, partialTick);
@@ -84,11 +82,11 @@ public class VehicleTeamOverlay implements LayeredDraw.Layer {
 
         var tag = NBTTool.getTag(stack);
 
-        boolean usingDrone = stack.is(ModItems.MONITOR.get()) && tag.getBoolean("Using") && tag.getBoolean("Linked");
-        boolean outOfRange = entityRange > VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE.get();
+        boolean usingDrone = stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked");
+        boolean outOfRange = entityRange > VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE;
 
         if (lookAtEntity && lookingEntity instanceof VehicleEntity vehicle && !usingDrone && !outOfRange) {
-            if (entityRange > VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE.get()) return;
+            if (entityRange > VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE) return;
 
             Vec3 pos = VectorTool.lerpGetEntityBoundingBoxCenter(lookingEntity, partialTick)
                     .add(new Vec3(0, lookingEntity.getBbHeight() / 2 + 0.5, 0));

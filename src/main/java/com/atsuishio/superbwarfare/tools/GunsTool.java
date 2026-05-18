@@ -2,43 +2,33 @@ package com.atsuishio.superbwarfare.tools;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.network.message.receive.GunsDataMessage;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.OnDatapackSyncEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-@EventBusSubscriber(modid = Mod.MODID)
 public class GunsTool {
 
-    @SubscribeEvent
-    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            var server = player.getServer();
-            if (server != null && server.isSingleplayerOwner(player.getGameProfile())) {
-                return;
-            }
-
-            PacketDistributor.sendToPlayer(player, GunsDataMessage.create());
+    public static void onPlayerLogin(ServerPlayer player) {
+        var server = player.getServer();
+        if (server != null && server.isSingleplayerOwner(player.getGameProfile())) {
+            return;
         }
+
+        ServerPlayNetworking.send(player, GunsDataMessage.create());
     }
 
-    @SubscribeEvent
-    public static void onDataPackSync(OnDatapackSyncEvent event) {
-        var server = event.getPlayerList().getServer();
-
+    public static void onDataPackSync(MinecraftServer server) {
         var message = GunsDataMessage.create();
-        for (var player : event.getRelevantPlayers().toList()) {
+        for (var player : server.getPlayerList().getPlayers()) {
             if (server.isSingleplayerOwner(player.getGameProfile())) {
                 continue;
             }
 
-            PacketDistributor.sendToPlayer(player, message);
+            ServerPlayNetworking.send(player, message);
         }
     }
 

@@ -66,10 +66,10 @@ public class WheelChairEntity extends GeoVehicleEntity {
         super.addPassenger(pPassenger);
 
         if (pPassenger instanceof ServerPlayer player
-                && (player.getMainHandItem().getItem() == ModItems.ELECTRIC_BATON.get()
-                || player.getOffhandItem().getItem() == ModItems.ELECTRIC_BATON.get())
+                && (player.getMainHandItem().getItem() == ModItems.ELECTRIC_BATON
+                || player.getOffhandItem().getItem() == ModItems.ELECTRIC_BATON)
         ) {
-            ModCriteriaTriggers.OTTO_SPRINT.get().trigger(player);
+            ModCriteriaTriggers.OTTO_SPRINT.trigger(player);
         }
     }
 }

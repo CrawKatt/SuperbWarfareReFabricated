@@ -60,7 +60,7 @@ public class MortarEntity extends ArtilleryEntity {
     }
 
     public MortarEntity(Level level, float yRot) {
-        super(ModEntities.MORTAR.get(), level);
+        super(ModEntities.MORTAR, level);
         this.setYRot(yRot);
         this.entityData.set(TARGET_YAW, yRot);
     }
@@ -155,10 +155,10 @@ public class MortarEntity extends ArtilleryEntity {
             return InteractionResult.SUCCESS;
         }
 
-        if (player.getMainHandItem().getItem() == ModItems.FIRING_PARAMETERS.get()) {
+        if (player.getMainHandItem().getItem() == ModItems.FIRING_PARAMETERS) {
             setTarget(player.getMainHandItem(), player, "Main");
         }
-        if (player.getOffhandItem().getItem() == ModItems.FIRING_PARAMETERS.get()) {
+        if (player.getOffhandItem().getItem() == ModItems.FIRING_PARAMETERS) {
             setTarget(player.getOffhandItem(), player, "Main");
         }
 
@@ -173,9 +173,9 @@ public class MortarEntity extends ArtilleryEntity {
     public @NotNull List<ItemStack> getRetrieveItems() {
         var list = new ArrayList<ItemStack>();
 
-        list.add(new ItemStack(ModItems.MORTAR_DEPLOYER.get()));
+        list.add(new ItemStack(ModItems.MORTAR_DEPLOYER));
         if (entityData.get(INTELLIGENT)) {
-            list.add(new ItemStack(ModItems.MONITOR.get()));
+            list.add(new ItemStack(ModItems.MONITOR));
         }
 
         if (items.get(0) != ItemStack.EMPTY) {
@@ -312,11 +312,11 @@ public class MortarEntity extends ArtilleryEntity {
             var y = this.getY();
             var z = this.getZ();
             level.explode(null, x, y, z, 0, Level.ExplosionInteraction.NONE);
-            ItemEntity mortar = new ItemEntity(level, x, (y + 1), z, new ItemStack(ModItems.MORTAR_DEPLOYER.get()));
+            ItemEntity mortar = new ItemEntity(level, x, (y + 1), z, new ItemStack(ModItems.MORTAR_DEPLOYER));
             mortar.setPickUpDelay(10);
             level.addFreshEntity(mortar);
             if (entityData.get(INTELLIGENT)) {
-                ItemEntity monitor = new ItemEntity(level, x, (y + 1), z, new ItemStack(ModItems.MONITOR.get()));
+                ItemEntity monitor = new ItemEntity(level, x, (y + 1), z, new ItemStack(ModItems.MONITOR));
                 monitor.setPickUpDelay(10);
                 level.addFreshEntity(monitor);
             }
@@ -344,7 +344,7 @@ public class MortarEntity extends ArtilleryEntity {
     @Override
     @Nullable
     public ItemStack getPickResult() {
-        return new ItemStack(ModItems.MORTAR_DEPLOYER.get());
+        return new ItemStack(ModItems.MORTAR_DEPLOYER);
     }
 
     @Override

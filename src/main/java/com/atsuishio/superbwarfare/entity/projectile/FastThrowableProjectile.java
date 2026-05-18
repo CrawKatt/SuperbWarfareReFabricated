@@ -1,12 +1,12 @@
 package com.atsuishio.superbwarfare.entity.projectile;
 
-import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent;
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption;
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig;
 import com.atsuishio.superbwarfare.network.message.receive.ClientMotionSyncMessage;
 import com.atsuishio.superbwarfare.tools.ChunkLoadManager;
 import com.atsuishio.superbwarfare.tools.CustomExplosion;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -25,9 +25,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -38,7 +35,7 @@ import java.util.function.Consumer;
 
 import static com.atsuishio.superbwarfare.tools.TraceTool.getBlocksAlongRay;
 
-public abstract class FastThrowableProjectile extends ThrowableItemProjectile implements CustomSyncMotionEntity, IEntityWithComplexSpawn, ExplosiveProjectile {
+public abstract class FastThrowableProjectile extends ThrowableItemProjectile implements CustomSyncMotionEntity, ExplosiveProjectile {
 
     public static Consumer<FastThrowableProjectile> playFlySound = projectile -> {
     };
@@ -145,33 +142,15 @@ public abstract class FastThrowableProjectile extends ThrowableItemProjectile im
     @Override
     protected void onHitEntity(@NotNull EntityHitResult pResult) {
         super.onHitEntity(pResult);
-        NeoForge.EVENT_BUS.post(
-                new ProjectileHitEvent.HitEntity(
-                        this.getOwner(),
-                        this,
-                        pResult.getEntity(),
-                        pResult.getLocation()
-                )
-        );
     }
 
     @Override
     protected void onHitBlock(@NotNull BlockHitResult pResult) {
         super.onHitBlock(pResult);
-        NeoForge.EVENT_BUS.post(
-                new ProjectileHitEvent.HitBlock(
-                        pResult.getBlockPos(),
-                        this.level().getBlockState(pResult.getBlockPos()),
-                        pResult.getDirection(),
-                        this.getOwner(),
-                        this,
-                        pResult.getLocation()
-                )
-        );
     }
 
     public void destroyBlock() {
-        if (ExplosionConfig.EXPLOSION_DESTROY.get()) {
+        if (ExplosionConfig.EXPLOSION_DESTROY) {
             Vec3 posO = new Vec3(xo, yo, zo);
             List<BlockPos> blockList = getBlocksAlongRay(posO, getDeltaMovement(), getDeltaMovement().length());
             for (BlockPos pos : blockList) {
@@ -186,7 +165,7 @@ public abstract class FastThrowableProjectile extends ThrowableItemProjectile im
                         durability -= 10 + (int) (0.5 * hardness);
                     }
 
-                    if (hardness <= durability && hardness != -1 && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+                    if (hardness <= durability && hardness != -1 && ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
                         this.level().destroyBlock(pos, true);
                     }
                     if (hardness == -1 || hardness > durability || durability <= 0) {
@@ -289,7 +268,12 @@ public abstract class FastThrowableProjectile extends ThrowableItemProjectile im
         if (!shouldSyncMotion()) return;
 
         if (this.tickCount % this.getType().updateInterval() == 0) {
-            PacketDistributor.sendToPlayersTrackingEntity(this, new ClientMotionSyncMessage(this));
+            if (this.level() instanceof ServerLevel serverLevel) {
+                var packet = new ClientMotionSyncMessage(this);
+                for (var player : serverLevel.players()) {
+                    ServerPlayNetworking.send(player, packet);
+                }
+            }
         }
     }
 
@@ -301,7 +285,6 @@ public abstract class FastThrowableProjectile extends ThrowableItemProjectile im
         return false;
     }
 
-    @Override
     public void writeSpawnData(RegistryFriendlyByteBuf buffer) {
         var motion = this.getDeltaMovement();
         buffer.writeFloat((float) motion.x);
@@ -309,7 +292,6 @@ public abstract class FastThrowableProjectile extends ThrowableItemProjectile im
         buffer.writeFloat((float) motion.z);
     }
 
-    @Override
     public void readSpawnData(RegistryFriendlyByteBuf additionalData) {
         this.setDeltaMovement(additionalData.readFloat(), additionalData.readFloat(), additionalData.readFloat());
     }

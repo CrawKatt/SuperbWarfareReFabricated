@@ -1,22 +1,16 @@
 package com.atsuishio.superbwarfare.init;
 
 import com.atsuishio.superbwarfare.client.particle.*;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModParticles {
 
-    @SubscribeEvent
-    public static void registerParticles(RegisterParticleProvidersEvent event) {
-        event.registerSpriteSet(ModParticleTypes.FIRE_STAR.get(), FireStarParticle::provider);
-        event.registerSpriteSet(ModParticleTypes.RISING_SMOKE.get(), RisingSmokeParticle::provider);
-        event.registerSpecial(ModParticleTypes.BULLET_DECAL.get(), new BulletDecalParticle.Provider());
-        event.registerSpriteSet(ModParticleTypes.CUSTOM_CLOUD.get(), CustomCloudParticle.Provider::new);
-        event.registerSpriteSet(ModParticleTypes.CUSTOM_SMOKE.get(), CustomSmokeParticle.Provider::new);
-        event.registerSpriteSet(ModParticleTypes.CANNON_MUZZLE_FLARE.get(), CannonMuzzleFlareParticle.Provider::new);
+    public static void init() {
+        ParticleFactoryRegistry.getInstance().register(ModParticleTypes.FIRE_STAR, FireStarParticle::provider);
+        ParticleFactoryRegistry.getInstance().register(ModParticleTypes.RISING_SMOKE, RisingSmokeParticle::provider);
+        ParticleFactoryRegistry.getInstance().register(ModParticleTypes.BULLET_DECAL, new BulletDecalParticle.Provider());
+        ParticleFactoryRegistry.getInstance().register(ModParticleTypes.CUSTOM_CLOUD, CustomCloudParticle.Provider::new);
+        ParticleFactoryRegistry.getInstance().register(ModParticleTypes.CUSTOM_SMOKE, CustomSmokeParticle.Provider::new);
+        ParticleFactoryRegistry.getInstance().register(ModParticleTypes.CANNON_MUZZLE_FLARE, CannonMuzzleFlareParticle.Provider::new);
     }
 }
-

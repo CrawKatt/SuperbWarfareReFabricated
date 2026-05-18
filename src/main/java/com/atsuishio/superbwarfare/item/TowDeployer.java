@@ -57,7 +57,7 @@ public class TowDeployer extends Item {
                 pos = clickedPos.relative(direction);
             }
 
-            TowEntity towEntity = new TowEntity(ModEntities.TOW.get(), level);
+            TowEntity towEntity = new TowEntity(ModEntities.TOW, level);
             towEntity.setPos((double) pos.getX() + 0.5, pos.getY() + 1, (double) pos.getZ() + 0.5);
             double yOffset = this.getYOffset(level, pos, !Objects.equals(clickedPos, pos) && direction == Direction.UP, towEntity.getBoundingBox());
             towEntity.moveTo((double) pos.getX() + 0.5, pos.getY() + yOffset, (double) pos.getZ() + 0.5);
@@ -95,7 +95,7 @@ public class TowDeployer extends Item {
             if (!(pLevel.getBlockState(blockpos).getBlock() instanceof LiquidBlock)) {
                 return InteractionResultHolder.pass(itemstack);
             } else if (pLevel.mayInteract(pPlayer, blockpos) && pPlayer.mayUseItemAt(blockpos, blockhitresult.getDirection(), itemstack)) {
-                TowEntity towEntity = new TowEntity(ModEntities.TOW.get(), pLevel);
+                TowEntity towEntity = new TowEntity(ModEntities.TOW, pLevel);
                 towEntity.setPos((double) blockpos.getX() + 0.5, blockpos.getY(), (double) blockpos.getZ() + 0.5);
                 pLevel.addFreshEntity(towEntity);
 

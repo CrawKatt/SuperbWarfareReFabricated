@@ -14,7 +14,7 @@ import java.util.List;
 public class VehicleDeployerBlockItem extends BlockItem {
 
     public VehicleDeployerBlockItem() {
-        super(ModBlocks.VEHICLE_DEPLOYER.get(), new Properties().stacksTo(1).rarity(Rarity.EPIC));
+        super(ModBlocks.VEHICLE_DEPLOYER, new Properties().stacksTo(1).rarity(Rarity.EPIC));
     }
 
     @Override

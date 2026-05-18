@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
 import com.atsuishio.superbwarfare.client.RenderHelper;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.menu.FuMO25Menu;
+import com.atsuishio.superbwarfare.mixins.ScreenAccessor;
 import com.atsuishio.superbwarfare.network.message.send.RadarChangeModeMessage;
 import com.atsuishio.superbwarfare.network.message.send.RadarSetParametersMessage;
 import com.atsuishio.superbwarfare.network.message.send.RadarSetPosMessage;
@@ -20,20 +21,18 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@OnlyIn(Dist.CLIENT)
+
 public class FuMO25Screen extends AbstractContainerScreen<FuMO25Menu> {
 
     private static final ResourceLocation TEXTURE = Mod.loc("textures/gui/radar.png");
@@ -214,7 +213,7 @@ public class FuMO25Screen extends AbstractContainerScreen<FuMO25Menu> {
             double moveZ = (entity.getZ() - pos.getZ()) / range * 74;
 
             if (pMouseX >= centerX + moveX && pMouseX <= centerX + moveX + 4 && pMouseY >= centerY + moveZ && pMouseY <= centerY + moveZ + 4) {
-                PacketDistributor.sendToServer(new RadarSetPosMessage(entity.getOnPos()));
+                ClientPlayNetworking.send(new RadarSetPosMessage(entity.getOnPos()));
                 this.currentPos = entity.getOnPos();
                 this.currentTarget = entity;
                 return true;
@@ -281,7 +280,7 @@ public class FuMO25Screen extends AbstractContainerScreen<FuMO25Menu> {
         this.addRenderableWidget(guideButton);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     class LockButton extends AbstractButton {
 
         public LockButton(int pX, int pY) {
@@ -292,9 +291,9 @@ public class FuMO25Screen extends AbstractContainerScreen<FuMO25Menu> {
         public void onPress() {
             if (FuMO25Screen.this.menu.getFuncType() == 3 && FuMO25Screen.this.menu.getSlot(0).getItem().isEmpty()) {
                 if (FuMO25Screen.this.currentTarget == null) return;
-                PacketDistributor.sendToServer(new RadarSetTargetMessage(FuMO25Screen.this.currentTarget.getUUID()));
+                ClientPlayNetworking.send(new RadarSetTargetMessage(FuMO25Screen.this.currentTarget.getUUID()));
             } else {
-                PacketDistributor.sendToServer(new RadarSetParametersMessage((byte) 0));
+                ClientPlayNetworking.send(new RadarSetParametersMessage((byte) 0));
             }
         }
 
@@ -312,7 +311,7 @@ public class FuMO25Screen extends AbstractContainerScreen<FuMO25Menu> {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    
     static class ModeButton extends AbstractButton {
 
         private final int mode;
@@ -324,7 +323,7 @@ public class FuMO25Screen extends AbstractContainerScreen<FuMO25Menu> {
 
         @Override
         public void onPress() {
-            PacketDistributor.sendToServer(new RadarChangeModeMessage((byte) this.mode));
+            ClientPlayNetworking.send(new RadarChangeModeMessage((byte) this.mode));
         }
 
         @Override

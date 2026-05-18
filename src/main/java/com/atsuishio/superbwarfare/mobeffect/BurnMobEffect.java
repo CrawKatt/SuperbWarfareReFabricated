@@ -3,25 +3,17 @@ package com.atsuishio.superbwarfare.mobeffect;
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.init.ModSounds;
+import com.atsuishio.superbwarfare.capability.PersistentDataAccessor;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.tools.DamageHandler;
-import net.minecraft.core.registries.Registries;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME)
 public class BurnMobEffect extends MobEffect {
 
     public BurnMobEffect() {
@@ -30,19 +22,24 @@ public class BurnMobEffect extends MobEffect {
 
     @Override
     public boolean applyEffectTick(LivingEntity entity, int amplifier) {
-        Entity attacker;
-        if (!entity.getPersistentData().contains("BurnAttacker")) {
-            attacker = null;
-        } else {
-            attacker = entity.level().getEntity(entity.getPersistentData().getInt("BurnAttacker"));
+        if (entity.isInWater()) {
+            entity.removeEffect(ModMobEffects.BURN);
+            return true;
         }
+
+        entity.setRemainingFireTicks(40);
+
+        var data = ((PersistentDataAccessor) entity).superbwarfare$getPersistentData();
+        Entity attacker = data.contains("BurnAttacker")
+                ? entity.level().getEntity(data.getInt("BurnAttacker"))
+                : null;
 
         DamageHandler.doDamage(entity, ModDamageTypes.causeBurnDamage(entity.level().registryAccess(), attacker), 0.6f + (0.3f * amplifier));
         entity.invulnerableTime = 0;
 
         if (attacker instanceof ServerPlayer player) {
-            player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
-            PacketDistributor.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
+            player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1, 1);
+            ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
         }
         return true;
     }
@@ -50,64 +47,5 @@ public class BurnMobEffect extends MobEffect {
     @Override
     public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return duration % 20 == 0;
-    }
-
-    @SubscribeEvent
-    public static void onEffectAdded(MobEffectEvent.Added event) {
-        LivingEntity living = event.getEntity();
-
-        MobEffectInstance instance = event.getEffectInstance();
-        if (!instance.getEffect().value().equals(ModMobEffects.BURN.value())) {
-            return;
-        }
-
-        DamageHandler.doDamage(living, new DamageSource(living.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.IN_FIRE), event.getEffectSource()), 0.6f + (0.3f * instance.getAmplifier()));
-        living.invulnerableTime = 0;
-
-        if (event.getEffectSource() instanceof LivingEntity source) {
-            living.getPersistentData().putInt("BurnAttacker", source.getId());
-        }
-    }
-
-    @SubscribeEvent
-    public static void onEffectExpired(MobEffectEvent.Expired event) {
-        LivingEntity living = event.getEntity();
-
-        MobEffectInstance instance = event.getEffectInstance();
-        if (instance == null) {
-            return;
-        }
-
-        if (instance.getEffect().equals(ModMobEffects.BURN)) {
-            living.getPersistentData().remove("BurnAttacker");
-        }
-    }
-
-    @SubscribeEvent
-    public static void onEffectRemoved(MobEffectEvent.Remove event) {
-        LivingEntity living = event.getEntity();
-
-        MobEffectInstance instance = event.getEffectInstance();
-        if (instance == null) {
-            return;
-        }
-
-        if (instance.getEffect().equals(ModMobEffects.BURN)) {
-            living.getPersistentData().remove("BurnAttacker");
-        }
-    }
-
-    @SubscribeEvent
-    public static void onLivingTick(EntityTickEvent.Post event) {
-        var entity = event.getEntity();
-        if (!(entity instanceof LivingEntity living)) return;
-
-        if (living.hasEffect(ModMobEffects.BURN)) {
-            living.setRemainingFireTicks(2);
-        }
-
-        if (living.isInWater()) {
-            living.removeEffect(ModMobEffects.BURN);
-        }
     }
 }

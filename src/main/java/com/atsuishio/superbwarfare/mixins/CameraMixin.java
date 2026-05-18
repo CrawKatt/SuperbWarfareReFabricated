@@ -53,7 +53,7 @@ public abstract class CameraMixin implements ICustomCamera {
         ItemStack stack = player.getMainHandItem();
         var tag = NBTTool.getTag(stack);
 
-        if (stack.is(ModItems.MONITOR.get()) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
+        if (stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
             DroneEntity drone = EntityFindUtil.findDrone(player.level(), tag.getString("LinkedDrone"));
             if (drone != null) {
                 boolean firstPerson = Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON || Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK;

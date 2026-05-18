@@ -34,7 +34,7 @@ public class VehicleAssemblingMenu extends AbstractContainerMenu {
     }
 
     public VehicleAssemblingMenu(int pContainerId, Inventory inventory, ContainerLevelAccess access, boolean isVehicleMenu) {
-        super(ModMenuTypes.VEHICLE_ASSEMBLING_MENU.get(), pContainerId);
+        super(ModMenuTypes.VEHICLE_ASSEMBLING_MENU, pContainerId);
         this.isVehicleMenu = isVehicleMenu;
         this.access = access;
     }

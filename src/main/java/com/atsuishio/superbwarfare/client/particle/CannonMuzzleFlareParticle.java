@@ -3,17 +3,15 @@ package com.atsuishio.superbwarfare.client.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.util.Mth;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
-@OnlyIn(Dist.CLIENT)
+
 public class CannonMuzzleFlareParticle extends TextureSheetParticle {
     public float fade;
     public int animationSpeed;
     public float sizeAdd;
 
-    @OnlyIn(Dist.CLIENT)
+    
         public record Provider(SpriteSet spriteSet) implements ParticleProvider<CannonMuzzleFlareOption> {
 
         public Particle createParticle(CannonMuzzleFlareOption pType, @NotNull ClientLevel pLevel, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {

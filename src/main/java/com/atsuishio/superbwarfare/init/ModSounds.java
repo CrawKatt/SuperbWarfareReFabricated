@@ -166,6 +166,7 @@ public class ModSounds {
 
     public static final SoundEvent TERRAIN = register("terrain", SoundEvent.createVariableRangeEvent(Mod.loc("terrain")));
     public static final SoundEvent PULL_UP = register("pull_up", SoundEvent.createVariableRangeEvent(Mod.loc("pull_up")));
+    public static final SoundEvent MORTAR_SHELL_EXPLODE = register("mortar_shell_explode", SoundEvent.createVariableRangeEvent(Mod.loc("mortar_shell_explode")));
 
     private static SoundEvent register(String name, SoundEvent event) {
         return Registry.register(BuiltInRegistries.SOUND_EVENT, Mod.loc(name), event);

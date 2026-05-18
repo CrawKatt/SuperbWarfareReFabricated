@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.config.client.DisplayConfig;
 import com.atsuishio.superbwarfare.data.gun.AmmoConsumer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModKeyMappings;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
@@ -22,15 +23,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.capabilities.Capabilities;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-@OnlyIn(Dist.CLIENT)
+
 public class AmmoBarOverlay implements LayeredDraw.Layer {
     public static final ResourceLocation ID = Mod.loc("ammo_bar");
 
@@ -66,7 +64,7 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
 
     private static String getGunAmmoString(GunData data, Player player) {
         if (data.selectedAmmoConsumer().type == AmmoConsumer.AmmoConsumeType.ENERGY) {
-            var storage = data.stack.getCapability(Capabilities.EnergyStorage.ITEM);
+            var storage = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
             double energy = storage == null ? 0 : Mth.clamp((double) storage.getEnergyStored() / Math.max(1, storage.getMaxEnergyStored()), 0, 1);
             return FormatTool.format1DZZ(energy * 100) + "%";
         }
@@ -85,7 +83,7 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
     @Override
     @ParametersAreNonnullByDefault
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        if (!DisplayConfig.AMMO_HUD.get()) return;
+        if (!DisplayConfig.AMMO_HUD) return;
         if (Minecraft.getInstance().options.hideGui) return;
 
         int screenWidth = guiGraphics.guiWidth();
@@ -97,8 +95,8 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
 
         ItemStack stack = player.getMainHandItem();
         if (stack.getItem() instanceof GunItem gunItem && !(player.getVehicle() instanceof VehicleEntity vehicle && vehicle.banHand(player))) {
-            int x = screenWidth + DisplayConfig.WEAPON_HUD_X_OFFSET.get();
-            int y = screenHeight + DisplayConfig.WEAPON_HUD_Y_OFFSET.get();
+            int x = screenWidth + DisplayConfig.WEAPON_HUD_X_OFFSET;
+            int y = screenHeight + DisplayConfig.WEAPON_HUD_Y_OFFSET;
 
             PoseStack poseStack = guiGraphics.pose();
             var data = GunData.from(stack);
@@ -117,11 +115,11 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
             var font = Minecraft.getInstance().font;
 
             // 渲染开火模式切换按键
-            if (stack.getItem() != ModItems.MINIGUN.get()) {
+            if (stack.getItem() != ModItems.MINIGUN) {
                 guiGraphics.drawString(
                         font,
-                        "[" + ModKeyMappings.FIRE_MODE.getKey().getDisplayName().getString() + "]",
-                        x - 111.5f,
+                        "[" + ModKeyMappings.FIRE_MODE.getDefaultKey().getDisplayName().getString() + "]",
+                        (int) (x - 111.5f),
                         y - 20,
                         0xFFFFFF,
                         false
@@ -136,7 +134,7 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
             var fireModes = computed.availableFireModes();
 
             // 如果开火模式种类大于3，渲染开火模式信息
-            if (DisplayConfig.ADVANCED_AMMO_HUD.get() && fireModes.size() > 3) {
+            if (DisplayConfig.ADVANCED_AMMO_HUD && fireModes.size() > 3) {
                 guiGraphics.drawCenteredString(
                         font,
                         (selectedFireMode + 1) + "/" + fireModes.size(),
@@ -146,13 +144,13 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
                 );
             }
 
-            if (stack.getItem() == ModItems.MINIGUN.get()) {
+            if (stack.getItem() == ModItems.MINIGUN) {
                 fireMode = MOUSE;
                 // 渲染加特林射速
                 guiGraphics.drawString(
                         font,
                         computed.rpm + " RPM",
-                        x - 111f,
+                        (int) (x - 111f),
                         y - 20,
                         0xFFFFFF,
                         false
@@ -190,7 +188,7 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
 
             // 如果弹药种类大于1，渲染弹种信息
             int size = computed.getAmmoConsumers().size();
-            if (DisplayConfig.ADVANCED_AMMO_HUD.get()
+            if (DisplayConfig.ADVANCED_AMMO_HUD
                     && (size > 1 || size == 1 && data.selectedAmmoConsumer().type != AmmoConsumer.AmmoConsumeType.PLAYER_AMMO)
             ) {
                 // 如果当前弹药为物品，渲染备弹物品数量
@@ -219,11 +217,11 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
                     if (consumerType == AmmoConsumer.AmmoConsumeType.PLAYER_AMMO) {
                         var ammoType = ammoConsumer.getPlayerAmmoType();
                         ammoStack = switch (ammoType) {
-                            case HANDGUN -> new ItemStack(ModItems.HANDGUN_AMMO.get());
-                            case RIFLE -> new ItemStack(ModItems.RIFLE_AMMO.get());
-                            case SHOTGUN -> new ItemStack(ModItems.SHOTGUN_AMMO.get());
-                            case SNIPER -> new ItemStack(ModItems.SNIPER_AMMO.get());
-                            case HEAVY -> new ItemStack(ModItems.HEAVY_AMMO.get());
+                            case HANDGUN -> new ItemStack(ModItems.HANDGUN_AMMO);
+                            case RIFLE -> new ItemStack(ModItems.RIFLE_AMMO);
+                            case SHOTGUN -> new ItemStack(ModItems.SHOTGUN_AMMO);
+                            case SNIPER -> new ItemStack(ModItems.SNIPER_AMMO);
+                            case HEAVY -> new ItemStack(ModItems.HEAVY_AMMO);
                         };
                     } else {
                         ammoStack = ammoConsumer.stack();
@@ -310,8 +308,8 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
             guiGraphics.drawString(
                     font,
                     getGunAmmoString(data, player),
-                    x / 1.5f - 64 / 1.5f,
-                    gunAmmoY / 1.5F,
+                    (int) (x / 1.5f - 64 / 1.5f),
+                    (int) (gunAmmoY / 1.5F),
                     0xFFFFFF,
                     true
             );
@@ -323,7 +321,7 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
                 guiGraphics.drawString(
                         font,
                         "+" + data.virtualAmmo.get(),
-                        x - 62 + font.width(getGunAmmoString(data, player)) * 1.5f,
+                        (int) (x - 62 + font.width(getGunAmmoString(data, player)) * 1.5f),
                         y - 46,
                         0x55FFFF,
                         true
@@ -348,8 +346,8 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
             guiGraphics.drawString(
                     font,
                     gunName,
-                    x / 0.9f - (100 + font.width(gunName) / 2f) / 0.9f,
-                    y / 0.9f - 60 / 0.9f,
+                    (int) (x / 0.9f - (100 + font.width(gunName) / 2f) / 0.9f),
+                    (int) (y / 0.9f - 60 / 0.9f),
                     0xFFFFFF,
                     true
             );
@@ -360,8 +358,8 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
             guiGraphics.drawString(
                     font,
                     ammoName,
-                    x / 0.9f - (100 + font.width(ammoName) / 2f) / 0.9f,
-                    y / 0.9f - 51 / 0.9f,
+                    (int) (x / 0.9f - (100 + font.width(ammoName) / 2f) / 0.9f),
+                    (int) (y / 0.9f - 51 / 0.9f),
                     0xC8A679,
                     true
             );

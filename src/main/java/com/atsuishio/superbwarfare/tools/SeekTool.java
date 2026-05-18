@@ -23,7 +23,6 @@ import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.util.TriPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,7 +76,7 @@ public class SeekTool {
 
     @Deprecated(forRemoval = true)
     public static Entity seekCustomSizeEntity(Entity entity, Level level, double seekRange, double seekAngle, double size, boolean checkOnGround) {
-        return StreamSupport.stream(EntityFindUtil.getEntities(level).getAll().spliterator(), false)
+        return StreamSupport.stream(EntityFindUtil.getEntities(level).spliterator(), false)
                 .filter(e -> {
                     if (e.distanceTo(entity) <= seekRange && calculateAngle(e, entity) < seekAngle
                             && e != entity
@@ -132,7 +131,7 @@ public class SeekTool {
 
     @Deprecated(forRemoval = true)
     public static List<Entity> seekCustomSizeEntities(Entity entity, Level level, double seekRange, double seekAngle, double size, boolean checkOnGround) {
-        return StreamSupport.stream(EntityFindUtil.getEntities(level).getAll().spliterator(), false)
+        return StreamSupport.stream(EntityFindUtil.getEntities(level).spliterator(), false)
                 .filter(e -> {
                     if (e.distanceTo(entity) <= seekRange && calculateAngle(e, entity) < seekAngle
                             && e != entity
@@ -181,7 +180,7 @@ public class SeekTool {
     }
 
     public static List<Entity> getEntitiesWithinRange(BlockPos pos, Level level, double range) {
-        return StreamSupport.stream(EntityFindUtil.getEntities(level).getAll().spliterator(), false)
+        return StreamSupport.stream(EntityFindUtil.getEntities(level).spliterator(), false)
                 .filter(e -> e.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) <= range * range
                         && BASIC_FILTER.test(e)
                         && NOT_IN_SMOKE.test(e)
@@ -308,7 +307,7 @@ public class SeekTool {
         ItemStack stack = player.getMainHandItem();
         DroneEntity myDrone = null;
         var tag = NBTTool.getTag(stack);
-        if (stack.is(ModItems.MONITOR.get()) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
+        if (stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
             myDrone = EntityFindUtil.findDrone(player.level(), tag.getString("LinkedDrone"));
         }
 
@@ -406,7 +405,7 @@ public class SeekTool {
         }
 
         public List<Entity> build() {
-            return StreamSupport.stream(EntityFindUtil.getEntities(entity.level()).getAll().spliterator(), false)
+            return StreamSupport.stream(EntityFindUtil.getEntities(entity.level()).spliterator(), false)
                     .filter(e -> {
                         for (var f : this.filters) {
                             if (!f.test(e)) return false;
@@ -418,7 +417,7 @@ public class SeekTool {
 
         @Nullable
         public Entity buildWithClosest() {
-            return StreamSupport.stream(EntityFindUtil.getEntities(entity.level()).getAll().spliterator(), false)
+            return StreamSupport.stream(EntityFindUtil.getEntities(entity.level()).spliterator(), false)
                     .filter(e -> {
                         for (var f : this.filters) {
                             if (!f.test(e)) return false;
@@ -431,7 +430,7 @@ public class SeekTool {
 
         @Nullable
         public Entity buildWithClosest(Vec3 pos, Vec3 vec3) {
-            return StreamSupport.stream(EntityFindUtil.getEntities(entity.level()).getAll().spliterator(), false)
+            return StreamSupport.stream(EntityFindUtil.getEntities(entity.level()).spliterator(), false)
                     .filter(e -> {
                         for (var f : this.filters) {
                             if (!f.test(e)) return false;

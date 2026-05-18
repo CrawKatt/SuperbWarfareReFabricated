@@ -1,33 +1,34 @@
 package com.atsuishio.superbwarfare.tools;
 
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.entity.LevelEntityGetter;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
+import java.util.List;
 import java.util.UUID;
 
 public class EntityFindUtil {
 
     /**
-     * 获取世界里的所有实体，对ClientLevel和ServerLevel均有效
+     * 获取世界里的所有实体，对ServerLevel有效
      *
      * @param level 目标世界
      * @return 所有实体
      */
-    public static LevelEntityGetter<Entity> getEntities(Level level) {
+    public static Iterable<Entity> getEntities(Level level) {
         if (level instanceof ServerLevel serverLevel) {
-            return serverLevel.getEntities();
+            var bounds = AABB.ofSize(Vec3.ZERO, 3.0E7, 3.0E7, 3.0E7);
+            return serverLevel.getEntitiesOfClass(Entity.class, bounds, e -> true);
         }
-        var clientLevel = (ClientLevel) level;
-        return clientLevel.getEntities();
+        return List.of();
     }
 
     /**
-     * 查找当前已知实体，对ClientLevel和ServerLevel均有效
+     * 查找当前已知实体
      *
      * @param level      实体所在世界
      * @param uuidString 目标实体UUID字符串
@@ -36,15 +37,10 @@ public class EntityFindUtil {
     public static Entity findEntity(Level level, String uuidString) {
         try {
             var uuid = UUID.fromString(uuidString);
-            Entity target;
-
             if (level instanceof ServerLevel serverLevel) {
-                target = serverLevel.getEntity(uuid);
-            } else {
-                var clientLevel = (ClientLevel) level;
-                target = clientLevel.getEntities().get(uuid);
+                return serverLevel.getEntity(uuid);
             }
-            return target;
+            return null;
         } catch (Exception ignored) {
         }
 

@@ -2,11 +2,9 @@ package com.atsuishio.superbwarfare.client.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
-@OnlyIn(Dist.CLIENT)
+
 public class CustomSmokeParticle extends TextureSheetParticle {
 
     protected CustomSmokeParticle(ClientLevel level, double x, double y, double z, double vx, double vy, double vz, SpriteSet spriteSet, float rCol, float gCol, float bCol) {
@@ -28,7 +26,7 @@ public class CustomSmokeParticle extends TextureSheetParticle {
 
     private final SpriteSet spriteSet;
 
-    @OnlyIn(Dist.CLIENT)
+    
     public static class Provider implements ParticleProvider<CustomSmokeOption> {
         private final SpriteSet spriteSet;
 

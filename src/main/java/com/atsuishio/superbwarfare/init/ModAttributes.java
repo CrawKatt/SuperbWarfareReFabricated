@@ -1,23 +1,23 @@
 package com.atsuishio.superbwarfare.init;
 
 import com.atsuishio.superbwarfare.Mod;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class ModAttributes {
-    public static final DeferredRegister<Attribute> ATTRIBUTES = DeferredRegister.create(BuiltInRegistries.ATTRIBUTE, Mod.MODID);
+    public static final Attribute BULLET_RESISTANCE = Registry.register(
+            BuiltInRegistries.ATTRIBUTE,
+            Mod.loc("bullet_resistance"),
+            new RangedAttribute("attribute." + Mod.MODID + ".bullet_resistance", 0, 0, 1).setSyncable(true)
+    );
 
-    public static final DeferredHolder<Attribute, Attribute> BULLET_RESISTANCE = ATTRIBUTES.register("bullet_resistance", () -> (new RangedAttribute("attribute." + Mod.MODID + ".bullet_resistance", 0, 0, 1)).setSyncable(true));
+    public static Holder<Attribute> bulletResistanceHolder() {
+        return BuiltInRegistries.ATTRIBUTE.getHolder(BuiltInRegistries.ATTRIBUTE.getResourceKey(BULLET_RESISTANCE).orElseThrow()).orElseThrow();
+    }
 
-    @SubscribeEvent
-    public static void addAttributes(EntityAttributeModificationEvent event) {
-        event.getTypes().forEach((e) -> event.add(e, BULLET_RESISTANCE));
+    public static void init() {
     }
 }

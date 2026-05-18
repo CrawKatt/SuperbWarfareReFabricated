@@ -4,6 +4,9 @@ import com.atsuishio.superbwarfare.block.ChargingStationBlock;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
+import com.atsuishio.superbwarfare.capability.api.EnergyStorage;
+import com.atsuishio.superbwarfare.capability.api.IEnergyStorage;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.menu.ChargingStationMenu;
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData;
 import net.minecraft.core.BlockPos;
@@ -27,14 +30,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.EnergyStorage;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,11 +51,11 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
     public static final int MAX_DATA_COUNT = 4;
     protected NonNullList<ItemStack> items = NonNullList.withSize(2, ItemStack.EMPTY);
 
-    public static final int MAX_ENERGY = MiscConfig.CHARGING_STATION_MAX_ENERGY.get();
-    public static final int DEFAULT_FUEL_TIME = MiscConfig.CHARGING_STATION_DEFAULT_FUEL_TIME.get();
-    public static final int CHARGE_SPEED = MiscConfig.CHARGING_STATION_GENERATE_SPEED.get();
-    public static final int CHARGE_OTHER_SPEED = MiscConfig.CHARGING_STATION_TRANSFER_SPEED.get();
-    public static final int CHARGE_RADIUS = MiscConfig.CHARGING_STATION_CHARGE_RADIUS.get();
+    public static final int MAX_ENERGY = MiscConfig.CHARGING_STATION_MAX_ENERGY;
+    public static final int DEFAULT_FUEL_TIME = MiscConfig.CHARGING_STATION_DEFAULT_FUEL_TIME;
+    public static final int CHARGE_SPEED = MiscConfig.CHARGING_STATION_GENERATE_SPEED;
+    public static final int CHARGE_OTHER_SPEED = MiscConfig.CHARGING_STATION_TRANSFER_SPEED;
+    public static final int CHARGE_RADIUS = MiscConfig.CHARGING_STATION_CHARGE_RADIUS;
 
 
     public int fuelTick = 0;
@@ -71,7 +71,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
                     var level = ChargingStationBlockEntity.this.level;
                     if (level == null) yield 0;
 
-                    var cap = level.getCapability(Capabilities.EnergyStorage.BLOCK, ChargingStationBlockEntity.this.getBlockPos(), null);
+                    var cap = ModCapabilities.ENERGY_BLOCK.find(level, ChargingStationBlockEntity.this.getBlockPos(), null);
                     if (cap == null) yield 0;
 
                     yield cap.getEnergyStored();
@@ -93,7 +93,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
                     var level = ChargingStationBlockEntity.this.level;
                     if (level == null) return;
 
-                    var cap = level.getCapability(Capabilities.EnergyStorage.BLOCK, ChargingStationBlockEntity.this.getBlockPos(), null);
+                    var cap = ModCapabilities.ENERGY_BLOCK.find(level, ChargingStationBlockEntity.this.getBlockPos(), null);
                     if (cap == null) return;
 
                     cap.receiveEnergy(pValue, false);
@@ -110,7 +110,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
     };
 
     public ChargingStationBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.CHARGING_STATION.get(), pos, state);
+        super(ModBlockEntities.CHARGING_STATION, pos, state);
     }
 
     public static void serverTick(Level pLevel, BlockPos pPos, BlockState pState, ChargingStationBlockEntity blockEntity) {
@@ -142,9 +142,9 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
             if (handler.getEnergyStored() >= handler.getMaxEnergyStored()) return;
 
             ItemStack fuel = blockEntity.getItem(SLOT_FUEL);
-            int burnTime = fuel.getBurnTime(RecipeType.SMELTING);
+            int burnTime = AbstractFurnaceBlockEntity.getFuel().getOrDefault(fuel.getItem(), 0);
 
-            var fuelEnergy = fuel.getCapability(Capabilities.EnergyStorage.ITEM);
+            var fuelEnergy = ModCapabilities.ENERGY_ITEM.find(fuel, null);
 
             if (fuelEnergy != null) {
                 // 优先当作电池处理
@@ -159,11 +159,11 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
                 blockEntity.fuelTick = burnTime;
                 blockEntity.maxFuelTick = burnTime;
 
-                if (fuel.hasCraftingRemainingItem()) {
+                if (fuel.getItem().hasCraftingRemainingItem()) {
                     if (fuel.getCount() <= 1) {
-                        blockEntity.setItem(SLOT_FUEL, fuel.getCraftingRemainingItem());
+                        blockEntity.setItem(SLOT_FUEL, new ItemStack(fuel.getItem().getCraftingRemainingItem()));
                     } else {
-                        ItemStack copy = fuel.getCraftingRemainingItem().copy();
+                        ItemStack copy = new ItemStack(fuel.getItem().getCraftingRemainingItem());
                         copy.setCount(1);
 
                         ItemEntity itemEntity = new ItemEntity(pLevel,
@@ -189,7 +189,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
                 float saturation = foodComponent.saturation() * 2.0f * nutrition;
                 int tick = nutrition * 80 + (int) (saturation * 200);
 
-                if (fuel.hasCraftingRemainingItem()) {
+                if (fuel.getItem().hasCraftingRemainingItem()) {
                     tick += 400;
                 }
 
@@ -208,7 +208,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
 
         List<Entity> entities = this.level.getEntitiesOfClass(Entity.class, new AABB(this.getBlockPos()).inflate(CHARGE_RADIUS));
         entities.forEach(entity -> {
-            var cap = entity.getCapability(Capabilities.EnergyStorage.ENTITY, null);
+            var cap = ModCapabilities.ENERGY_ENTITY.find(entity, null);
             if (cap == null || !cap.canReceive()) return;
 
             int charged = cap.receiveEnergy(Math.min(handler.getEnergyStored(), CHARGE_OTHER_SPEED * 20), false);
@@ -221,7 +221,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
         ItemStack stack = this.getItem(SLOT_CHARGE);
         if (stack.isEmpty()) return;
 
-        var consumer = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var consumer = ModCapabilities.ENERGY_ITEM.find(stack, null);
         if (consumer != null) {
             if (consumer.getEnergyStored() < consumer.getMaxEnergyStored()) {
                 int charged = consumer.receiveEnergy(Math.min(CHARGE_OTHER_SPEED, handler.getEnergyStored()), false);
@@ -238,7 +238,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
             var blockEntity = this.level.getBlockEntity(this.getBlockPos().relative(direction));
             if (blockEntity == null) continue;
 
-            var energy = level.getCapability(Capabilities.EnergyStorage.BLOCK, blockEntity.getBlockPos(), direction);
+            var energy = ModCapabilities.ENERGY_BLOCK.find(level, blockEntity.getBlockPos(), direction);
             if (energy == null || blockEntity instanceof ChargingStationBlockEntity) continue;
 
             if (energy.canReceive() && energy.getEnergyStored() < energy.getMaxEnergyStored()) {

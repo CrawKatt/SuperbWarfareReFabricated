@@ -54,6 +54,6 @@ public class CustomSmokeOption implements ParticleOptions {
 
     @Override
     public @NotNull ParticleType<?> getType() {
-        return ModParticleTypes.CUSTOM_SMOKE.get();
+        return ModParticleTypes.CUSTOM_SMOKE;
     }
 }

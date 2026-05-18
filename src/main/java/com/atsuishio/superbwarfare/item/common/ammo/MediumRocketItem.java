@@ -40,7 +40,7 @@ public class MediumRocketItem extends Item implements ProjectileItem {
     }
 
     public MediumRocketEntity createProjectile(Level level, Position pos) {
-        return new MediumRocketEntity(ModEntities.MEDIUM_ROCKET.get(), pos.x(), pos.y(), pos.z(), level, damage, radius, explosionDamage, fireProbability, fireTime, type, spreadAmount, 15);
+        return new MediumRocketEntity(ModEntities.MEDIUM_ROCKET, pos.x(), pos.y(), pos.z(), level, damage, radius, explosionDamage, fireProbability, fireTime, type, spreadAmount, 15);
     }
 
     public static class MediumRocketDispenseBehavior extends ProjectileDispenseBehavior {
@@ -50,7 +50,7 @@ public class MediumRocketItem extends Item implements ProjectileItem {
 
         @Override
         protected void playSound(BlockSource blockSource) {
-            blockSource.level().playSound(null, blockSource.pos(), ModSounds.MEDIUM_ROCKET_FIRE.get(), SoundSource.BLOCKS, 2F, 1F);
+            blockSource.level().playSound(null, blockSource.pos(), ModSounds.MEDIUM_ROCKET_FIRE, SoundSource.BLOCKS, 2F, 1F);
         }
     }
 

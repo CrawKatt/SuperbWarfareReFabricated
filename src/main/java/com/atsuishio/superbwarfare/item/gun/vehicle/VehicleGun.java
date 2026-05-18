@@ -2,6 +2,8 @@ package com.atsuishio.superbwarfare.item.gun.vehicle;
 
 import com.atsuishio.superbwarfare.data.gun.DefaultGunData;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.capability.api.IEnergyStorage;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.entity.vehicle.PrismTankEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
@@ -14,8 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,7 +74,7 @@ public class VehicleGun extends GunItem {
     @Override
     public IEnergyStorage getEnergyProvider(@NotNull GunData data, @Nullable Entity ammoSupplier) {
         if (ammoSupplier != null) {
-            return ammoSupplier.getCapability(Capabilities.EnergyStorage.ENTITY, null);
+            return ModCapabilities.ENERGY_ENTITY.find(ammoSupplier, null);
         }
 
         return super.getEnergyProvider(data, null);

@@ -38,7 +38,7 @@ import java.util.UUID;
 import static com.atsuishio.superbwarfare.tools.RangeTool.calculateLaunchVector;
 
 public class ArtilleryEntity extends GeoVehicleEntity {
-    public static final EntityDataAccessor<List<Integer>> BARREL_ANIM = SynchedEntityData.defineId(ArtilleryEntity.class, ModSerializers.INT_LIST_SERIALIZER.get());
+    public static final EntityDataAccessor<List<Integer>> BARREL_ANIM = SynchedEntityData.defineId(ArtilleryEntity.class, ModSerializers.INT_LIST_SERIALIZER);
     public static final EntityDataAccessor<Vector3f> SHOOT_VEC = SynchedEntityData.defineId(ArtilleryEntity.class, EntityDataSerializers.VECTOR3);
     public static final EntityDataAccessor<Boolean> DEPRESSED = SynchedEntityData.defineId(ArtilleryEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Vector3f> TARGET_POS = SynchedEntityData.defineId(ArtilleryEntity.class, EntityDataSerializers.VECTOR3);
@@ -70,23 +70,17 @@ public class ArtilleryEntity extends GeoVehicleEntity {
             return InteractionResult.SUCCESS;
         }
 
-        if (player.getMainHandItem().getItem() == ModItems.FIRING_PARAMETERS.get() && player.isShiftKeyDown()) {
+        if (player.getMainHandItem().getItem() == ModItems.FIRING_PARAMETERS && player.isShiftKeyDown()) {
             setTarget(player.getMainHandItem(), player, "Main");
             return InteractionResult.SUCCESS;
         }
 
-        if (player.getOffhandItem().getItem() == ModItems.FIRING_PARAMETERS.get() && player.isShiftKeyDown()) {
+        if (player.getOffhandItem().getItem() == ModItems.FIRING_PARAMETERS && player.isShiftKeyDown()) {
             setTarget(player.getOffhandItem(), player, "Main");
             return InteractionResult.SUCCESS;
         }
 
         return super.interact(player, hand);
-    }
-
-    @Override
-    public void onAddedToLevel() {
-        super.onAddedToLevel();
-        this.entityData.set(SHOOT_VEC, getForward().toVector3f());
     }
 
     @Override
@@ -209,14 +203,6 @@ public class ArtilleryEntity extends GeoVehicleEntity {
     @Override
     public void baseTick() {
         super.baseTick();
-        for (int i = 0; i < getMaxBarrel(); i++) {
-            var animCounters = this.entityData.get(BARREL_ANIM);
-            if (i < animCounters.size() && animCounters.get(i) > 0) {
-                animCounters.set(i, animCounters.get(i) - 1);
-                entityData.set(BARREL_ANIM, animCounters, true);
-            }
-        }
-
         // TODO 替换装弹逻辑？
         var gunData = getGunData("Main");
         if (gunData != null && level() instanceof ServerLevel && getNthEntity(getTurretControllerIndex()) instanceof Player player) {

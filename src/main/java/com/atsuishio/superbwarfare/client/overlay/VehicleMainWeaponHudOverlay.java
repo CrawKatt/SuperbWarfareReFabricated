@@ -28,8 +28,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -37,7 +35,7 @@ import java.util.List;
 /**
  * 控制载具主武器的玩家显示的HUD
  */
-@OnlyIn(Dist.CLIENT)
+
 public class VehicleMainWeaponHudOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation ID = Mod.loc("vehicle_main_weapon_hud");
@@ -186,7 +184,7 @@ public class VehicleMainWeaponHudOverlay implements LayeredDraw.Layer {
                         if (ClientEventHandler.seekingTimeVehicle == 0) {
                             poseStack.pushPose();
                             poseStack.translate(x, y, 0);
-                            String string = "[" + ModKeyMappings.VEHICLE_SEEK.getKey().getDisplayName().getString() + "]";
+                            String string = "[" + ModKeyMappings.VEHICLE_SEEK.getDefaultKey().getDisplayName().getString() + "]";
                             int width = Minecraft.getInstance().font.width(string);
                             guiGraphics.drawString(
                                     mc.font,
@@ -227,7 +225,7 @@ public class VehicleMainWeaponHudOverlay implements LayeredDraw.Layer {
                     if (ClientEventHandler.seekingTimeVehicle == 0) {
                         poseStack.pushPose();
                         poseStack.translate(x, y, 0);
-                        String string = "[" + ModKeyMappings.VEHICLE_SEEK.getKey().getDisplayName().getString() + "]";
+                        String string = "[" + ModKeyMappings.VEHICLE_SEEK.getDefaultKey().getDisplayName().getString() + "]";
                         int width = Minecraft.getInstance().font.width(string);
                         guiGraphics.drawString(
                                 mc.font,

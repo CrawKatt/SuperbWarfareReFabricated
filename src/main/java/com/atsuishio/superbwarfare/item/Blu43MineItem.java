@@ -57,7 +57,7 @@ public class Blu43MineItem extends Item {
             Position position = DispenserBlock.getDispensePosition(blockSource);
             Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
 
-            var blu43 = new Blu43Entity(ModEntities.BLU_43.get(), level);
+            var blu43 = new Blu43Entity(ModEntities.BLU_43, level);
             blu43.setPos(position.x(), position.y(), position.z());
             float randomRot = (float) Mth.clamp((2 * Math.random() - 1) * 180, -180, 180);
 

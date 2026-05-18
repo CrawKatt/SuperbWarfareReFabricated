@@ -26,7 +26,7 @@ public abstract class KeyboardInputMixin extends Input {
         ItemStack stack = player.getMainHandItem();
         var tag = NBTTool.getTag(stack);
 
-        if (stack.is(ModItems.MONITOR.get()) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
+        if (stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
             this.up = false;
             this.down = false;
             this.left = false;

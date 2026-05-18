@@ -1,9 +1,11 @@
 package com.atsuishio.superbwarfare.tools;
 
+import com.atsuishio.superbwarfare.capability.api.IItemHandler;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.common.ammo.AmmoBoxItem;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.item.common.ammo.AmmoSupplierItem;
 import net.minecraft.core.NonNullList;
 import net.minecraft.tags.TagKey;
@@ -11,8 +13,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
@@ -66,7 +66,7 @@ public class InventoryTool {
      */
     public static int countItem(@Nullable Entity entity, @NotNull Item item) {
         if (entity == null) return 0;
-        var cap = entity.getCapability(Capabilities.ItemHandler.ENTITY);
+        var cap = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null);
         if (cap == null) return 0;
 
         return countItem(cap, item);
@@ -98,7 +98,7 @@ public class InventoryTool {
 
     public static int countAmmoItem(@Nullable Entity entity, @Nullable Ammo type) {
         if (entity == null || type == null) return 0;
-        var cap = entity.getCapability(Capabilities.ItemHandler.ENTITY);
+        var cap = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null);
         if (cap == null) return 0;
 
         return countAmmoItem(cap, type);
@@ -106,7 +106,7 @@ public class InventoryTool {
 
     public static int consumeAmmoItem(@Nullable Entity entity, @Nullable Ammo type, int count) {
         if (entity == null || type == null || count <= 0) return 0;
-        var cap = entity.getCapability(Capabilities.ItemHandler.ENTITY);
+        var cap = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null);
         if (cap == null) return 0;
 
         return consumeAmmoItem(cap, type, count);
@@ -169,7 +169,7 @@ public class InventoryTool {
     public static ItemStack findFirst(@Nullable Entity entity, @NotNull Item item) {
         if (entity == null) return ItemStack.EMPTY;
 
-        return findFirst(entity.getCapability(Capabilities.ItemHandler.ENTITY), stack -> stack.is(item));
+        return findFirst(ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null), stack -> stack.is(item));
     }
 
     public static ItemStack findFirst(@Nullable IItemHandler handler, @NotNull Item item) {
@@ -200,7 +200,7 @@ public class InventoryTool {
 
 
     public static boolean hasCreativeAmmoBox(@Nullable IItemHandler handler) {
-        return !findFirst(handler, ModItems.CREATIVE_AMMO_BOX.get()).isEmpty();
+        return !findFirst(handler, ModItems.CREATIVE_AMMO_BOX).isEmpty();
     }
 
     /**
@@ -209,7 +209,7 @@ public class InventoryTool {
      * @param itemList 物品列表
      */
     public static boolean hasCreativeAmmoBox(@Nullable NonNullList<ItemStack> itemList) {
-        return !findFirst(itemList, ModItems.CREATIVE_AMMO_BOX.get()).isEmpty();
+        return !findFirst(itemList, ModItems.CREATIVE_AMMO_BOX).isEmpty();
     }
 
     /**
@@ -221,14 +221,14 @@ public class InventoryTool {
         if (entity instanceof VehicleEntity vehicle) {
             return hasCreativeAmmoBoxForVehicle(vehicle);
         } else {
-            return hasItem(entity, ModItems.CREATIVE_AMMO_BOX.get());
+            return hasItem(entity, ModItems.CREATIVE_AMMO_BOX);
         }
     }
 
     public static boolean hasCreativeAmmoBoxForVehicle(@NotNull VehicleEntity vehicle) {
         var passengers = vehicle.getPassengers();
-        boolean flag = passengers.stream().anyMatch(e -> InventoryTool.hasItem(e, ModItems.CREATIVE_AMMO_BOX.get())) && vehicle.data().compute().usePassengerCreativeAmmoBox;
-        return flag || hasItem(vehicle, ModItems.CREATIVE_AMMO_BOX.get());
+        boolean flag = passengers.stream().anyMatch(e -> InventoryTool.hasItem(e, ModItems.CREATIVE_AMMO_BOX)) && vehicle.data().compute().usePassengerCreativeAmmoBox;
+        return flag || hasItem(vehicle, ModItems.CREATIVE_AMMO_BOX);
     }
 
     /**
@@ -250,7 +250,7 @@ public class InventoryTool {
      * @param count  要消耗的数量
      */
     public static void consumeItem(LivingEntity living, Item item, int count) {
-        var cap = living.getCapability(Capabilities.ItemHandler.ENTITY);
+        var cap = ModCapabilities.ITEM_HANDLER_ENTITY.find(living, null);
         if (cap == null) return;
 
         consumeItem(cap, item, count);
@@ -303,7 +303,7 @@ public class InventoryTool {
         if (itemList == null || count <= 0) return count;
 
         var defaultStack = new ItemStack(item);
-        maxStackSize = Math.min(maxStackSize, item.getMaxStackSize(defaultStack));
+        maxStackSize = Math.min(maxStackSize, defaultStack.getMaxStackSize());
 
         for (int i = 0; i < itemList.size(); i++) {
             var stack = itemList.get(i);
@@ -327,7 +327,7 @@ public class InventoryTool {
     public static int insertItem(@Nullable NonNullList<ItemStack> itemList, ItemStack stack) {
         if (itemList == null) return stack.getCount();
 
-        var maxStackSize = stack.getItem().getMaxStackSize(stack);
+        var maxStackSize = stack.getMaxStackSize();
         var originalCount = stack.getCount();
 
         for (int i = 0; i < itemList.size(); i++) {

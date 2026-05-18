@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.entity;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -10,6 +9,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -27,9 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -38,7 +35,6 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class SenpaiEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Boolean> RUNNER = SynchedEntityData.defineId(SenpaiEntity.class, EntityDataSerializers.BOOLEAN);
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -95,23 +91,23 @@ public class SenpaiEntity extends Monster implements GeoEntity {
 
     @Override
     public SoundEvent getAmbientSound() {
-        return ModSounds.IDLE.get();
+        return ModSounds.IDLE;
     }
 
     @Override
     @ParametersAreNonnullByDefault
     public void playStepSound(BlockPos pos, BlockState blockIn) {
-        this.playSound(ModSounds.STEP.get(), 0.25f, 1);
+        this.playSound(ModSounds.STEP, 0.25f, 1);
     }
 
     @Override
     public @NotNull SoundEvent getHurtSound(@NotNull DamageSource ds) {
-        return ModSounds.OUCH.get();
+        return ModSounds.OUCH;
     }
 
     @Override
     public @NotNull SoundEvent getDeathSound() {
-        return ModSounds.GROWL.get();
+        return ModSounds.GROWL;
     }
 
     @Override
@@ -172,9 +168,8 @@ public class SenpaiEntity extends Monster implements GeoEntity {
         return this.cache;
     }
 
-    @SubscribeEvent
-    public static void onFinalizeSpawn(FinalizeSpawnEvent event) {
-        if (!(event.getEntity() instanceof SenpaiEntity senpai)) return;
+    public static void onFinalizeSpawn(Entity entity) {
+        if (!(entity instanceof SenpaiEntity senpai)) return;
 
         if (senpai.entityData.get(RUNNER)) {
             var attribute = senpai.getAttribute(Attributes.MOVEMENT_SPEED);

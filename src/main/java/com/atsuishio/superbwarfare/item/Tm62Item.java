@@ -18,10 +18,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -31,7 +27,6 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@EventBusSubscriber(modid = Mod.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class Tm62Item extends Item implements GeoItem {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -40,18 +35,7 @@ public class Tm62Item extends Item implements GeoItem {
         super(new Properties().stacksTo(8));
     }
 
-    @SubscribeEvent
-    private static void registerItemExtensions(RegisterClientExtensionsEvent event) {
-        event.registerItem(new IClientItemExtensions() {
-
-            private final BlockEntityWithoutLevelRenderer renderer = new Tm62ItemRenderer();
-
-            @Override
-            public @NotNull BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return renderer;
-            }
-        }, ModItems.TM_62);
-    }
+    
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
@@ -94,7 +78,7 @@ public class Tm62Item extends Item implements GeoItem {
             Position position = DispenserBlock.getDispensePosition(blockSource);
             Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
 
-            var tm62 = new Tm62Entity(ModEntities.TM_62.get(), level);
+            var tm62 = new Tm62Entity(ModEntities.TM_62, level);
             tm62.setPos(position.x(), position.y(), position.z());
             float randomRot = (float) Mth.clamp((2 * Math.random() - 1) * 180, -180, 180);
 

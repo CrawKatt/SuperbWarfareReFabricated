@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.client.layer.block.VehicleAssemblingTableBloc
 import com.atsuishio.superbwarfare.client.model.block.VehicleAssemblingTableBlockModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -25,12 +26,10 @@ public class VehicleAssemblingTableBlockEntityRenderer extends GeoBlockRenderer<
         return RenderType.entityTranslucent(getTextureLocation(animatable));
     }
 
-    @Override
-    public boolean shouldRender(VehicleAssemblingTableBlockEntity blockEntity, @NotNull Vec3 cameraPos) {
+    public boolean shouldRender(VehicleAssemblingTableBlockEntity blockEntity, @NotNull Vec3 cameraPos, @NotNull BlockPos blockPos) {
         return blockEntity.getBlockState().getValue(VehicleAssemblingTableBlock.BLOCK_PART) == BlockPart.FLB;
     }
 
-    @Override
     public @NotNull AABB getRenderBoundingBox(@NotNull VehicleAssemblingTableBlockEntity blockEntity) {
         // 创建一个更大的边界框（示例：覆盖从方块底部到顶部上方2格的范围）
         double expansion = 2.0; // 根据模型实际大小调整

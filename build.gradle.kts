@@ -78,6 +78,7 @@ java {
 }
 
 loom {
+    accessWidenerPath = file("src/main/resources/superbwarfare.accesswidener")
     mods {
         create(project.property("mod_id") as String) {
             sourceSet(sourceSets.main.get())

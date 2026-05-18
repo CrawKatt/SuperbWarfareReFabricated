@@ -78,7 +78,7 @@ public class ChargingStationBlock extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, @NotNull BlockState pState, @NotNull BlockEntityType<T> pBlockEntityType) {
         if (!pLevel.isClientSide) {
-            return createTickerHelper(pBlockEntityType, ModBlockEntities.CHARGING_STATION.get(), ChargingStationBlockEntity::serverTick);
+            return createTickerHelper(pBlockEntityType, ModBlockEntities.CHARGING_STATION, ChargingStationBlockEntity::serverTick);
         }
         return null;
     }
@@ -109,11 +109,10 @@ public class ChargingStationBlock extends BaseEntityBlock {
         return this.defaultBlockState().setValue(FACING, pContext.getHorizontalDirection().getOpposite()).setValue(SHOW_RANGE, false);
     }
 
-    @Override
     @ParametersAreNonnullByDefault
     public @NotNull ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
-        ItemStack itemstack = super.getCloneItemStack(state, target, level, pos, player);
-        level.getBlockEntity(pos, ModBlockEntities.CHARGING_STATION.get()).ifPresent((blockEntity) ->
+        ItemStack itemstack = new ItemStack(this);
+        level.getBlockEntity(pos, ModBlockEntities.CHARGING_STATION).ifPresent((blockEntity) ->
                 blockEntity.saveToItem(itemstack, level.registryAccess())
         );
         return itemstack;
