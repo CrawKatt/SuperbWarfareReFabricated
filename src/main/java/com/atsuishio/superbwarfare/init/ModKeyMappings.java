@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.init;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
