@@ -67,15 +67,15 @@ public class ClickHandler {
 
         if (player.hasEffect(ModMobEffects.SHOCK)) return;
 
-        if (button == ModKeyMappings.FIRE.getDefaultKey().getValue()) {
+        if (ModKeyMappings.FIRE.matchesMouse(button)) {
             handleWeaponFireRelease();
         }
-        if (button == ModKeyMappings.HOLD_ZOOM.getDefaultKey().getValue()) {
+        if (ModKeyMappings.HOLD_ZOOM.matchesMouse(button)) {
             handleWeaponZoomRelease();
             return;
         }
 
-        if (button == ModKeyMappings.SWITCH_ZOOM.getDefaultKey().getValue() && !switchZoom) {
+        if (ModKeyMappings.SWITCH_ZOOM.matchesMouse(button) && !switchZoom) {
             handleWeaponZoomRelease();
         }
     }
@@ -90,6 +90,44 @@ public class ClickHandler {
                 || (player.getVehicle() instanceof VehicleEntity vehicle && vehicle.banHand(player) && !stack.has(DataComponents.FOOD));
     }
 
+    public static boolean shouldCancelMouseButton(int button) {
+        if (notInGame()) return false;
+
+        var mc = Minecraft.getInstance();
+        Player player = mc.player;
+        if (player == null || player.isSpectator()) return false;
+
+        ItemStack stack = player.getMainHandItem();
+
+        if (ModKeyMappings.FIRE.matchesMouse(button) && cancelFireKey(player, stack)) {
+            return true;
+        }
+
+        if ((ModKeyMappings.HOLD_ZOOM.matchesMouse(button) || ModKeyMappings.SWITCH_ZOOM.matchesMouse(button))
+                && cancelZoomKey(player, stack)) {
+            return true;
+        }
+
+        return button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE
+                && (player.hasEffect(ModMobEffects.SHOCK)
+                || stack.is(ModItems.ARTILLERY_INDICATOR)
+                || (stack.is(ModItems.MONITOR) && player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR)));
+    }
+
+    public static void releaseVanillaMouseButton(int button) {
+        var options = Minecraft.getInstance().options;
+
+        if (options.keyAttack.matchesMouse(button)) {
+            options.keyAttack.setDown(false);
+        }
+        if (options.keyUse.matchesMouse(button)) {
+            options.keyUse.setDown(false);
+        }
+        if (options.keyPickItem.matchesMouse(button)) {
+            options.keyPickItem.setDown(false);
+        }
+    }
+
     public static void onButtonPressed(int button, int action, int modifiers) {
         if (notInGame()) return;
         if (action != InputConstants.PRESS) return;
@@ -101,37 +139,9 @@ public class ClickHandler {
 
         ItemStack stack = player.getMainHandItem();
 
-        var fireKey = ModKeyMappings.FIRE.getDefaultKey();
-        if (fireKey.getType() == InputConstants.Type.MOUSE
-                && fireKey.getValue() == button
-                && cancelFireKey(player, stack)
-        ) {
-            return;
-        }
-
         if (player.hasEffect(ModMobEffects.SHOCK)) return;
 
-        var zoomKey = ModKeyMappings.HOLD_ZOOM.getDefaultKey();
-        if (zoomKey.getType() == InputConstants.Type.MOUSE
-                && zoomKey.getValue() == button
-                && cancelZoomKey(player, stack)
-        ) {
-            return;
-        }
-
-        if (button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE) {
-            if (player.hasEffect(ModMobEffects.SHOCK)) {
-                return;
-            }
-            if (stack.is(ModItems.ARTILLERY_INDICATOR)) {
-                return;
-            }
-            if (stack.is(ModItems.MONITOR) && player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR)) {
-                return;
-            }
-        }
-
-        if (button == ModKeyMappings.MARK.getDefaultKey().getValue()) {
+        if (ModKeyMappings.MARK.matchesMouse(button)) {
             if (stack.is(ModItems.ARTILLERY_INDICATOR)) {
                 ClientPlayNetworking.send(SetFiringParametersMessage.INSTANCE);
             }
@@ -147,24 +157,23 @@ public class ClickHandler {
                 || (stack.is(Items.SPYGLASS) && player.isScoping() && player.getOffhandItem().is(ModItems.FIRING_PARAMETERS))
                 || (stack.is(ModItems.ARTILLERY_INDICATOR))
         ) {
-            if (button == ModKeyMappings.FIRE.getDefaultKey().getValue()) {
+            if (ModKeyMappings.FIRE.matchesMouse(button)) {
                 handleWeaponFirePress(player, stack);
             }
 
-            if (button == ModKeyMappings.HOLD_ZOOM.getDefaultKey().getValue()) {
+            if (ModKeyMappings.HOLD_ZOOM.matchesMouse(button)) {
                 handleWeaponZoomPress(player, stack);
                 switchZoom = false;
                 return;
             }
 
-            if (button == ModKeyMappings.SWITCH_ZOOM.getDefaultKey().getValue()) {
+            if (ModKeyMappings.SWITCH_ZOOM.matchesMouse(button)) {
                 handleWeaponZoomPress(player, stack);
                 switchZoom = !switchZoom;
             }
         }
 
-        var fireModeKey = ModKeyMappings.FIRE_MODE.getDefaultKey();
-        if (fireModeKey.getType() == InputConstants.Type.MOUSE && button == fireModeKey.getValue()) {
+        if (ModKeyMappings.FIRE_MODE.matchesMouse(button)) {
             if (player.getVehicle() instanceof VehicleEntity vehicle) {
                 var data = vehicle.getGunData(player);
                 if (data != null && data.getDefault().getAmmoConsumers().size() > 1) {
@@ -185,22 +194,23 @@ public class ClickHandler {
         }
     }
 
-    public static void onMouseScrolling(double horizontalAmount, double verticalAmount) {
+    public static boolean onMouseScrolling(double horizontalAmount, double verticalAmount) {
         Player player = Minecraft.getInstance().player;
 
-        if (notInGame()) return;
-        if (player == null) return;
+        if (notInGame()) return false;
+        if (player == null) return false;
 
         ItemStack stack = player.getMainHandItem();
 
-        if (player.hasEffect(ModMobEffects.SHOCK)) return;
+        if (player.hasEffect(ModMobEffects.SHOCK)) return false;
 
         double scroll = verticalAmount;
+        boolean consumed = false;
 
         // 按下自由视角键时，为载具调整相机距离
         if (player.getVehicle() instanceof VehicleEntity vehicle && player == vehicle.getFirstPassenger() && ModKeyMappings.FREE_CAMERA.isDown()) {
             ClientMouseHandler.custom3pDistance = Mth.clamp(ClientMouseHandler.custom3pDistance - verticalAmount, -3, 8);
-            return;
+            return true;
         }
 
         // 未按下shift时，为有武器的载具切换武器
@@ -209,6 +219,7 @@ public class ClickHandler {
                 && vehicle.hasWeapon(vehicle.getSeatIndex(player))
                 && vehicle.banHand(player)
         ) {
+            consumed = true;
             if (switchVehicleWeaponCooldown <= 0) {
                 int index = vehicle.getSeatIndex(player);
                 ClientPlayNetworking.send(new SwitchVehicleWeaponMessage(index, -scroll, true));
@@ -222,23 +233,30 @@ public class ClickHandler {
             var data = GunData.from(stack);
             if (data.canSwitchScope()) {
                 ClientPlayNetworking.send(new SwitchScopeMessage(scroll));
+                consumed = true;
             } else if (data.canAdjustZoom() || stack.is(ModItems.MINIGUN)) {
                 ClientPlayNetworking.send(new AdjustZoomFovMessage(scroll));
+                consumed = true;
             }
         }
 
         if (stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
             ClientEventHandler.droneFov = Mth.clamp(ClientEventHandler.droneFov + 0.4 * scroll, 1, 6);
+            consumed = true;
         }
 
         if (player.isUsingItem() && player.getUseItem().is(ModItems.ARTILLERY_INDICATOR)) {
             artilleryIndicatorCustomZoom = Mth.clamp(artilleryIndicatorCustomZoom + 0.4 * scroll, -2, 6);
+            consumed = true;
         }
 
         Entity looking = TraceTool.findLookingEntity(player, 6);
         if (looking instanceof MortarEntity && player.isShiftKeyDown()) {
             ClientPlayNetworking.send(new AdjustMortarAngleMessage(scroll));
+            consumed = true;
         }
+
+        return consumed;
     }
 
     public static void onKeyPressed(int keyCode, int scanCode, int action, int modifiers) {
@@ -250,7 +268,7 @@ public class ClickHandler {
         int key = keyCode;
         if (key < 0) return;
 
-        if (key == ModKeyMappings.DISMOUNT.getDefaultKey().getValue()) {
+        if (action == GLFW.GLFW_PRESS && ModKeyMappings.DISMOUNT.matches(key, scanCode)) {
             handleDismountPress(player);
         }
 
@@ -261,16 +279,16 @@ public class ClickHandler {
         if (action == GLFW.GLFW_PRESS) {
             if (player.hasEffect(ModMobEffects.SHOCK)) return;
 
-            if (key == Minecraft.getInstance().options.keyJump.getDefaultKey().getValue()) {
+            if (Minecraft.getInstance().options.keyJump.matches(key, scanCode)) {
                 handleDoubleJump(player);
                 handleParachute();
             }
 
-            if (key == ModKeyMappings.CONFIG.getDefaultKey().getValue()) {
+            if (ModKeyMappings.CONFIG.matches(key, scanCode)) {
                 handleConfigScreen(player);
             }
 
-            if (key == ModKeyMappings.RELOAD.getDefaultKey().getValue()) {
+            if (ModKeyMappings.RELOAD.matches(key, scanCode)) {
                 burstFireAmount = 0;
                 isEditing = false;
                 seekingTime = 0;
@@ -280,15 +298,15 @@ public class ClickHandler {
                 lockingPos = null;
                 ClientPlayNetworking.send(ReloadMessage.INSTANCE);
             }
-            if (key == ModKeyMappings.FIRE_MODE.getDefaultKey().getValue() || key == ModKeyMappings.CHANGE_FIRE_MODE_BACKWARD.getDefaultKey().getValue()) {
+            if (ModKeyMappings.FIRE_MODE.matches(key, scanCode) || ModKeyMappings.CHANGE_FIRE_MODE_BACKWARD.matches(key, scanCode)) {
                 ClientPlayNetworking.send(new FireModeMessage(false));
                 burstFireAmount = 0;
             }
-            if (key == ModKeyMappings.CHANGE_FIRE_MODE_FORWARD.getDefaultKey().getValue()) {
+            if (ModKeyMappings.CHANGE_FIRE_MODE_FORWARD.matches(key, scanCode)) {
                 ClientPlayNetworking.send(new FireModeMessage(true));
                 burstFireAmount = 0;
             }
-            if (key == ModKeyMappings.INTERACT.getDefaultKey().getValue()) {
+            if (ModKeyMappings.INTERACT.matches(key, scanCode)) {
                 if (stack.getItem() instanceof GunItem) {
                     KeyMapping.click(mc.options.keyUse.getDefaultKey());
                 } else if (stack.is(ModItems.MONITOR)) {
@@ -299,16 +317,16 @@ public class ClickHandler {
             // 玩家手持枪械时，处理卸弹/切换弹种
             if (stack.getItem() instanceof GunItem) {
                 var data = GunData.from(stack);
-                if (key == ModKeyMappings.UNLOAD.getDefaultKey().getValue()) {
+                if (ModKeyMappings.UNLOAD.matches(key, scanCode)) {
                     if (data.useBackpackAmmo() || data.ammo.get() + data.virtualAmmo.get() <= 0) return;
                     ClientPlayNetworking.send(UnloadMessage.INSTANCE);
                     burstFireAmount = 0;
                 }
                 if (data.compute().getAmmoConsumers().size() > 1) {
-                    if (key == ModKeyMappings.CHANGE_AMMO_FORWARD.getDefaultKey().getValue()) {
+                    if (ModKeyMappings.CHANGE_AMMO_FORWARD.matches(key, scanCode)) {
                         ClientPlayNetworking.send(new EditMessage(5, false, false));
                         burstFireAmount = 0;
-                    } else if (key == ModKeyMappings.CHANGE_AMMO_BACKWARD.getDefaultKey().getValue()) {
+                    } else if (ModKeyMappings.CHANGE_AMMO_BACKWARD.matches(key, scanCode)) {
                         ClientPlayNetworking.send(new EditMessage(5, true, false));
                         burstFireAmount = 0;
                     }
@@ -319,19 +337,19 @@ public class ClickHandler {
             if (player.getVehicle() instanceof VehicleEntity vehicle) {
                 var data = vehicle.getGunData(player);
                 if (data != null && data.getDefault().getAmmoConsumers().size() > 1) {
-                    if (key == ModKeyMappings.CHANGE_AMMO_FORWARD.getDefaultKey().getValue()) {
+                    if (ModKeyMappings.CHANGE_AMMO_FORWARD.matches(key, scanCode)) {
                         ClientPlayNetworking.send(new EditMessage(5, false, true));
                         burstFireAmount = 0;
                     }
-                    if (key == ModKeyMappings.CHANGE_AMMO_BACKWARD.getDefaultKey().getValue() ||
-                            key == ModKeyMappings.FIRE_MODE.getDefaultKey().getValue()) {
+                    if (ModKeyMappings.CHANGE_AMMO_BACKWARD.matches(key, scanCode) ||
+                            ModKeyMappings.FIRE_MODE.matches(key, scanCode)) {
                         ClientPlayNetworking.send(new EditMessage(5, true, true));
                         burstFireAmount = 0;
                     }
                 }
             }
 
-            if (key == ModKeyMappings.EDIT_MODE.getDefaultKey().getValue()) {
+            if (ModKeyMappings.EDIT_MODE.matches(key, scanCode)) {
                 if (stack.getItem() instanceof ItemScreenProvider provider) {
                     var screen = provider.getItemScreen(stack, player, InteractionHand.MAIN_HAND);
                     if (screen != null) {
@@ -352,13 +370,13 @@ public class ClickHandler {
                 }
             }
 
-            if (key == ModKeyMappings.BREATH.getDefaultKey().getValue() && !exhaustion && zoom) {
+            if (ModKeyMappings.BREATH.matches(key, scanCode) && !exhaustion && zoom) {
                 breath = true;
             }
-            if (key == ModKeyMappings.SENSITIVITY_INCREASE.getDefaultKey().getValue()) {
+            if (ModKeyMappings.SENSITIVITY_INCREASE.matches(key, scanCode)) {
                 ClientPlayNetworking.send(new SensitivityMessage(true));
             }
-            if (key == ModKeyMappings.SENSITIVITY_REDUCE.getDefaultKey().getValue()) {
+            if (ModKeyMappings.SENSITIVITY_REDUCE.matches(key, scanCode)) {
                 ClientPlayNetworking.send(new SensitivityMessage(false));
             }
 
@@ -368,29 +386,23 @@ public class ClickHandler {
                     || (stack.is(Items.SPYGLASS) && player.isScoping() && player.getOffhandItem().is(ModItems.FIRING_PARAMETERS))
                     || (stack.is(ModItems.ARTILLERY_INDICATOR))
             ) {
-                if (key == ModKeyMappings.FIRE.getDefaultKey().getValue()) {
+                if (ModKeyMappings.FIRE.matches(key, scanCode)) {
                     handleWeaponFirePress(player, stack);
                 }
 
-                if (key == ModKeyMappings.HOLD_ZOOM.getDefaultKey().getValue()) {
+                if (ModKeyMappings.HOLD_ZOOM.matches(key, scanCode)) {
                     handleWeaponZoomPress(player, stack);
                     switchZoom = false;
                     return;
                 }
 
-                if (key == ModKeyMappings.SWITCH_ZOOM.getDefaultKey().getValue()) {
+                if (ModKeyMappings.SWITCH_ZOOM.matches(key, scanCode)) {
                     handleWeaponZoomPress(player, stack);
                     switchZoom = !switchZoom;
                 }
-
-                if (action == GLFW.GLFW_RELEASE) {
-                    if (key == ModKeyMappings.BREATH.getDefaultKey().getValue()) {
-                        breath = false;
-                    }
-                }
             }
 
-            if (key == ModKeyMappings.MARK.getDefaultKey().getValue()) {
+            if (ModKeyMappings.MARK.matches(key, scanCode)) {
                 if (stack.is(ModItems.ARTILLERY_INDICATOR)) {
                     ClientPlayNetworking.send(SetFiringParametersMessage.INSTANCE);
                 }
@@ -398,18 +410,22 @@ public class ClickHandler {
                     droneLeftClick(stack, player);
                 }
             }
-        } else {
+        } else if (action == GLFW.GLFW_RELEASE) {
             if (player.hasEffect(ModMobEffects.SHOCK)) return;
 
-            if (key == ModKeyMappings.FIRE.getDefaultKey().getValue()) {
+            if (ModKeyMappings.BREATH.matches(key, scanCode)) {
+                breath = false;
+            }
+
+            if (ModKeyMappings.FIRE.matches(key, scanCode)) {
                 handleWeaponFireRelease();
             }
-            if (key == ModKeyMappings.HOLD_ZOOM.getDefaultKey().getValue()) {
+            if (ModKeyMappings.HOLD_ZOOM.matches(key, scanCode)) {
                 handleWeaponZoomRelease();
                 return;
             }
 
-            if (key == ModKeyMappings.SWITCH_ZOOM.getDefaultKey().getValue() && !switchZoom) {
+            if (ModKeyMappings.SWITCH_ZOOM.matches(key, scanCode) && !switchZoom) {
                 handleWeaponZoomRelease();
             }
         }
