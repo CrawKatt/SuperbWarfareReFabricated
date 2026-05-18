@@ -18,9 +18,8 @@ import java.util.*;
 
 public class ContainerDataManager extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
 
-    public static ContainerDataManager INSTANCE = new ContainerDataManager();
-
     private static final Gson GSON = new Gson();
+    public static ContainerDataManager INSTANCE = new ContainerDataManager();
     private static final String DIRECTORY = "sbw/containers";
     private final Map<ResourceLocation, List<Pair<String, Integer>>> containerData = new HashMap<>();
 

@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.client;
 
+import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
 import com.atsuishio.superbwarfare.client.sound.ModSoundInstances;
@@ -17,6 +18,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         ModProperties.init();
         ModParticles.init();
 
+        ClientLanguageGetter.register();
         ClientRenderHandler.registerLayer();
         ClientRenderHandler.registerRenderers();
         ClientRenderHandler.registerOverlays();

@@ -11,23 +11,24 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Locale;
+import java.util.function.Supplier;
 
 public enum Ammo {
-    HANDGUN(ChatFormatting.GREEN, ModItems.HANDGUN_AMMO),
-    RIFLE(ChatFormatting.AQUA, ModItems.RIFLE_AMMO),
-    SHOTGUN(ChatFormatting.RED, ModItems.SHOTGUN_AMMO),
-    SNIPER(ChatFormatting.GOLD, ModItems.SNIPER_AMMO),
-    HEAVY(ChatFormatting.LIGHT_PURPLE, ModItems.HEAVY_AMMO);
+    HANDGUN(ChatFormatting.GREEN, () -> ModItems.HANDGUN_AMMO),
+    RIFLE(ChatFormatting.AQUA, () -> ModItems.RIFLE_AMMO),
+    SHOTGUN(ChatFormatting.RED, () -> ModItems.SHOTGUN_AMMO),
+    SNIPER(ChatFormatting.GOLD, () -> ModItems.SNIPER_AMMO),
+    HEAVY(ChatFormatting.LIGHT_PURPLE, () -> ModItems.HEAVY_AMMO);
 
     public final String translationKey;
     public final String serializationName;
     public final String name;
     public final String displayName;
-    public final Item defaultItem;
+    public final Supplier<Item> defaultItem;
     public final ChatFormatting color;
     public DataComponentType<Integer> dataComponent;
 
-    Ammo(ChatFormatting color, Item defaultItem) {
+    Ammo(ChatFormatting color, Supplier<Item> defaultItem) {
         this.color = color;
         this.defaultItem = defaultItem;
 
@@ -58,7 +59,7 @@ public enum Ammo {
     }
 
     public ItemStack getItemStack(int count) {
-        return new ItemStack(defaultItem, count);
+        return new ItemStack(defaultItem.get(), count);
     }
 
     public static Ammo getType(String name) {
@@ -100,6 +101,10 @@ public enum Ammo {
 
     // PlayerVariables
     public int get(PlayerVariable variable) {
+        if (variable == null) {
+            return 0;
+        }
+
         return variable.ammo.getOrDefault(this, 0);
     }
 
@@ -116,12 +121,23 @@ public enum Ammo {
 
     // Entity
     public int get(Entity entity) {
-        return get(entity.getAttached(ModAttachments.PLAYER_VARIABLE));
+        PlayerVariable variable = entity.getAttached(ModAttachments.PLAYER_VARIABLE);
+
+        if (variable == null) {
+            return 0;
+        }
+
+        return get(variable);
     }
 
     public void set(Entity entity, int count) {
         if (entity.level().isClientSide) return;
-        var cap = entity.getAttached(ModAttachments.PLAYER_VARIABLE).watch();
+        PlayerVariable variable = entity.getAttached(ModAttachments.PLAYER_VARIABLE);
+        if (variable == null) {
+            return;
+        }
+
+        var cap = variable.watch();
 
         set(cap, count);
         entity.setAttached(ModAttachments.PLAYER_VARIABLE, cap);

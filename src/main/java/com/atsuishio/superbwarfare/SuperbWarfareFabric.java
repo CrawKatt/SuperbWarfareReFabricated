@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare;
 
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
 import com.atsuishio.superbwarfare.command.CommandRegister;
+import com.atsuishio.superbwarfare.component.ModDataComponents;
 import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.config.CommonConfig;
 import com.atsuishio.superbwarfare.config.ServerConfig;
@@ -39,6 +40,8 @@ public class SuperbWarfareFabric implements ModInitializer {
         CommandRegister.register();
         ContainerDataManager.register();
         TDMSavedData.register();
+        ModCommandArguments.init();
+        ModDataComponents.init();
 
         ResourceOnceLogger.register();
         registerDataTickets();

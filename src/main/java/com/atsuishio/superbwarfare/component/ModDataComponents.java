@@ -50,5 +50,4 @@ public class ModDataComponents {
             type.dataComponent = register("ammo_" + type.name, Codec.INT);
         }
     }
-
 }
