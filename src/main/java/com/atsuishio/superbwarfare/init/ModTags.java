@@ -147,4 +147,7 @@ public class ModTags {
     private static TagKey<EntityType<?>> modEntityTag(String name) {
         return TagKey.create(Registries.ENTITY_TYPE, Mod.loc(name));
     }
+
+    public static void init() {
+    }
 }

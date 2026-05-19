@@ -81,6 +81,8 @@ public class SuperbWarfareFabric implements ModInitializer {
         ModSerializers.init();
         ModPerks.init();
         ModDamageTypes.init();
+        ModEventHandlers.init();
+        ModTags.init();
     }
 
     private void registerDataTickets() {
