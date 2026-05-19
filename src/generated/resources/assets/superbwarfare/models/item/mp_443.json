@@ -1,14 +1,5 @@
 {
-  "base": {
-    "parent": "superbwarfare:item/mp_443_base"
-  },
-  "gui_light": "front",
-  "loader": "neoforge:separate_transforms",
-  "perspectives": {
-    "gui": {
-      "parent": "superbwarfare:item/mp_443_icon"
-    }
-  },
+  "parent": "builtin/entity",
   "textures": {
     "particle": "superbwarfare:item/mp_443_icon"
   }
