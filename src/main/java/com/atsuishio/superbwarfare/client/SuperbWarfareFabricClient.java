@@ -1,12 +1,18 @@
 package com.atsuishio.superbwarfare.client;
 
 import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
+import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay;
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
+import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
 import com.atsuishio.superbwarfare.client.sound.ModSoundInstances;
 import com.atsuishio.superbwarfare.client.molang.MolangVariable;
+import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.ClientMouseHandler;
+import com.atsuishio.superbwarfare.event.KillMessageHandler;
 import com.atsuishio.superbwarfare.init.*;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
 public class SuperbWarfareFabricClient implements ClientModInitializer {
 
@@ -31,5 +37,20 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         MouseMovementHandler.init();
         MolangVariable.register();
         ModSoundInstances.init();
+
+        registerClientTicks();
+    }
+
+    private static void registerClientTicks() {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            ClientEventHandler.handleClientTick();
+            ClientEventHandler.handleWeaponBreathSway();
+            ClientEventHandler.handleWeaponFire();
+            ClientEventHandler.handleVehicleFire();
+            ClientMouseHandler.handleClientTick(client);
+            KillMessageHandler.onClientTick();
+            CrossHairOverlay.onClientTick();
+            FuMO25ScreenHelper.onClientTick();
+        });
     }
 }
