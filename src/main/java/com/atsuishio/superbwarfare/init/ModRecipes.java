@@ -46,4 +46,8 @@ public class ModRecipes {
     private static <T extends RecipeType<?>> T registerType(String name, T type) {
         return Registry.register(BuiltInRegistries.RECIPE_TYPE, Mod.loc(name), type);
     }
+
+    public static void init() {
+
+    }
 }

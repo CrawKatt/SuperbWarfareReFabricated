@@ -23,4 +23,8 @@ public class ModMobEffects {
         Registry.register(BuiltInRegistries.MOB_EFFECT, id, effect);
         return BuiltInRegistries.MOB_EFFECT.getHolder(ResourceKey.create(Registries.MOB_EFFECT, id)).orElseThrow();
     }
+
+    public static void init() {
+
+    }
 }

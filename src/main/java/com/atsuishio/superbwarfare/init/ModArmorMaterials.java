@@ -45,4 +45,8 @@ public class ModArmorMaterials {
     private static ArmorMaterial register(String name, ArmorMaterial material) {
         return Registry.register(BuiltInRegistries.ARMOR_MATERIAL, Mod.loc(name), material);
     }
+
+    public static void init() {
+
+    }
 }

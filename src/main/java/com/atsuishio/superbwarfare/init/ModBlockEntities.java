@@ -41,4 +41,8 @@ public class ModBlockEntities {
     private static <T extends BlockEntityType<?>> T register(String name, T type) {
         return Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Mod.loc(name), type);
     }
+
+    public static void init() {
+
+    }
 }

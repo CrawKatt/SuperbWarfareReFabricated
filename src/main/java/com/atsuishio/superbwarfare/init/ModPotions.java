@@ -18,4 +18,8 @@ public class ModPotions {
     private static Potion register(String name, Potion potion) {
         return Registry.register(BuiltInRegistries.POTION, Mod.loc(name), potion);
     }
+
+    public static void init() {
+
+    }
 }

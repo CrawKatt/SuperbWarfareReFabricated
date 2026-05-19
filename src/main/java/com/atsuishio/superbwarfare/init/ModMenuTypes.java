@@ -49,4 +49,8 @@ public class ModMenuTypes {
     private static <T extends MenuType<?>> T register(String name, T type) {
         return Registry.register(BuiltInRegistries.MENU, Mod.loc(name), type);
     }
+
+    public static void init() {
+
+    }
 }

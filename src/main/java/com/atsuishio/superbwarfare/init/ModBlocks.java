@@ -55,4 +55,8 @@ public class ModBlocks {
     private static <T extends Block> T register(String name, T block) {
         return Registry.register(BuiltInRegistries.BLOCK, Mod.loc(name), block);
     }
+
+    public static void init() {
+
+    }
 }

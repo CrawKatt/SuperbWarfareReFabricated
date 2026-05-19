@@ -62,25 +62,25 @@ public class SuperbWarfareFabric implements ModInitializer {
     }
 
     private void callInits() {
-        ModBlocks.GALENA_ORE.getDescriptionId();
-        ModBlockEntities.CONTAINER.toString();
-        ModEntities.TARGET.toString();
-        ModMenuTypes.REFORGING_TABLE_MENU.getClass();
-        ModSounds.MORTAR_SHELL_EXPLODE.getLocation();
-        ModMobEffects.SHOCK.value().getDescriptionId();
-        ModParticleTypes.BULLET_DECAL.toString();
-        ModPotions.SHOCK.toString();
-        ModRecipes.POTION_MORTAR_SHELL_SERIALIZER.getClass();
-        ModArmorMaterials.CEMENTED_CARBIDE.toString();
-        ModAttributes.BULLET_RESISTANCE.getDescriptionId();
-        ModCriteriaTriggers.RPG_MELEE_EXPLOSION.getClass();
-        ModAttachments.PLAYER_VARIABLE.getClass();
-        ModCommandArguments.LOWER_CAMEL_CASE_ENUM.getClass();
-        ModTabs.GUN_TAB.getDisplayName();
-        ModVillagers.ARMORY.name();
-        ModSerializers.INT_LIST_SERIALIZER.toString();
-        ModPerks.AP_BULLET.toString();
-        ModDamageTypes.GUN_FIRE.location();
+        ModBlocks.init();
+        ModBlockEntities.init();
+        ModEntities.init();
+        ModMenuTypes.init();
+        ModSounds.init();
+        ModMobEffects.init();
+        ModParticleTypes.init();
+        ModPotions.init();
+        ModRecipes.init();
+        ModArmorMaterials.init();
+        ModAttributes.init();
+        ModCriteriaTriggers.init();
+        ModAttachments.init();
+        ModCommandArguments.init();
+        ModTabs.init();
+        ModVillagers.init();
+        ModSerializers.init();
+        ModPerks.init();
+        ModDamageTypes.init();
     }
 
     private void registerDataTickets() {

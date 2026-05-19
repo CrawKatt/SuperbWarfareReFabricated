@@ -42,4 +42,8 @@ public class ModParticleTypes {
             }
         };
     }
+
+    public static void init() {
+
+    }
 }
