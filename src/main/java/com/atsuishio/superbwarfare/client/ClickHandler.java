@@ -17,6 +17,7 @@ import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.ItemScreenProvider;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.mixins.KeyMappingAccessor;
+import com.atsuishio.superbwarfare.mixins.MinecraftAccessor;
 import com.atsuishio.superbwarfare.network.message.send.*;
 import com.atsuishio.superbwarfare.resource.gun.GunResource;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
@@ -352,11 +353,13 @@ public class ClickHandler {
             }
             if (ModKeyMappings.INTERACT.matches(key, scanCode)) {
                 if (stack.getItem() instanceof GunItem) {
-                    KeyMapping.click(mc.options.keyUse.getDefaultKey());
+                    ((MinecraftAccessor) mc).superbwarfare$startUseItem();
+                    return true;
                 } else if (stack.is(ModItems.MONITOR)) {
                     ClientPlayNetworking.send(InteractMessage.INSTANCE);
+                    return true;
                 }
-                return true;
+                return false;
             }
 
             // 玩家手持枪械时，处理卸弹/切换弹种
