@@ -30,6 +30,7 @@
     "GameRendererMixin",
     "ItemInHandLayerMixin",
     "ItemInHandRendererMixin",
+    "KeyMappingAccessor",
     "KeyboardHandlerMixin",
     "KeyboardInputMixin",
     "KeymappingMixin",
