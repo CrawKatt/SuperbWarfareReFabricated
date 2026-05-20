@@ -1,8 +1,10 @@
 package com.atsuishio.superbwarfare.mixins;
 
+import com.atsuishio.superbwarfare.client.VehicleClientRenderState;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.InteractionHand;
@@ -16,6 +18,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemInHandRenderer.class)
 public class ItemInHandRendererMixin {
+
+    @Inject(method = "renderHandsWithItems", at = @At("HEAD"), cancellable = true)
+    private void superbWarfare$renderHandsWithItems(
+            float partialTick, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource,
+            LocalPlayer player, int packedLight, CallbackInfo ci
+    ) {
+        if (VehicleClientRenderState.shouldHideHandsAndHotbar(player)) {
+            ci.cancel();
+        }
+    }
 
     @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)
     private void superbWarfare$renderArmWithItem(

@@ -28,6 +28,7 @@
     "ClientPlayerEntityMixin",
     "EntityRenderDispatcherMixin",
     "GameRendererMixin",
+    "GuiMixin",
     "ItemInHandLayerMixin",
     "ItemInHandRendererMixin",
     "KeyMappingAccessor",
