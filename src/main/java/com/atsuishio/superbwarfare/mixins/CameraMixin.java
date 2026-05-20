@@ -135,6 +135,9 @@ public abstract class CameraMixin implements ICustomCamera {
 
     @Inject(method = "setup", at = @At("TAIL"))
     public void superbWarfare$setup(BlockGetter area, Entity entity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci) {
+        var position = ((Camera) (Object) this).getPosition();
+        ClientEventHandler.computeCameraAngles((Camera) (Object) this, tickDelta, position.x, position.y, position.z);
+        setRotation(ClientEventHandler.cameraYaw, ClientEventHandler.cameraPitch);
         if (Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK
                 && entity instanceof Player player
                 && player.getMainHandItem().getItem() instanceof GunItem

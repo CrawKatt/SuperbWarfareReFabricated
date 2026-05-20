@@ -29,6 +29,7 @@
     "EntityRenderDispatcherMixin",
     "GameRendererMixin",
     "ItemInHandLayerMixin",
+    "ItemInHandRendererMixin",
     "KeyboardHandlerMixin",
     "KeyboardInputMixin",
     "KeymappingMixin",
