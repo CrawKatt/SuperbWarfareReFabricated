@@ -22,6 +22,7 @@ import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 
 public class ModCapabilities {
 
@@ -79,8 +80,9 @@ public class ModCapabilities {
             ENERGY_ENTITY.registerForTypes((obj, ctx) ->
                     (obj instanceof VehicleEntity vehicle && vehicle.hasEnergyStorage()) ? vehicle.getEnergyStorage() : null, entity);
 
-            ITEM_HANDLER_ENTITY.registerForTypes((obj, ctx) ->
-                    (obj instanceof VehicleEntity vehicle && vehicle.hasContainer()) ? new InvWrapper(vehicle) : null, entity);
+            ITEM_HANDLER_ENTITY.registerForTypes((obj, ctx) -> obj instanceof Player player
+                    ? new InvWrapper(player.getInventory()) : obj instanceof VehicleEntity vehicle && vehicle.hasContainer()
+                    ? new InvWrapper(vehicle) : null, entity);
         }
 
     }
