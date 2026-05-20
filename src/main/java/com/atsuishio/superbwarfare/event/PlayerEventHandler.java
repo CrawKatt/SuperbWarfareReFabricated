@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.event;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.config.common.GameplayConfig;
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -132,7 +133,7 @@ public class PlayerEventHandler {
             attr.removeModifier(TACTICAL_SPRINT);
         }
 
-        if (MiscConfig.ALLOW_TACTICAL_SPRINT && player.getAttached(ModAttachments.PLAYER_VARIABLE).tacticalSprint) {
+        if (MiscConfig.ALLOW_TACTICAL_SPRINT && PlayerVariable.getOrDefault(player).tacticalSprint) {
             player.setSprinting(true);
             attr.addTransientModifier(new AttributeModifier(TACTICAL_SPRINT, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
         }

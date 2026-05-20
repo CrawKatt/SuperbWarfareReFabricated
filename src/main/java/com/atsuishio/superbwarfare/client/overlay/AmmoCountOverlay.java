@@ -1,13 +1,13 @@
 package com.atsuishio.superbwarfare.client.overlay;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves;
 import com.atsuishio.superbwarfare.client.animation.AnimationTimer;
 import com.atsuishio.superbwarfare.client.animation.ValueAnimator;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
-import com.atsuishio.superbwarfare.init.ModAttachments;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.common.ammo.AmmoSupplierItem;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -89,7 +89,7 @@ public class AmmoCountOverlay implements LayeredDraw.Layer {
         var yOffset = (-h - Ammo.values().length * fontHeight) / 2f;
 
         // 渲染总弹药数量
-        var cap = player.getAttached(ModAttachments.PLAYER_VARIABLE);
+        var cap = PlayerVariable.getOrDefault(player);
         var font = Minecraft.getInstance().font;
 
         for (var type : Ammo.values()) {

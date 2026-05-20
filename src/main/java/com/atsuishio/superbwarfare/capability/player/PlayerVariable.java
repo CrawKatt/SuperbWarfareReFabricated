@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.capability.player;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.atsuishio.superbwarfare.init.ModAttachments;
 import com.atsuishio.superbwarfare.network.message.receive.PlayerVariablesSyncMessage;
@@ -9,7 +8,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,9 +19,7 @@ public class PlayerVariable {
     public boolean tacticalSprint = false;
 
     public void sync(Entity entity) {
-        if (!entity.hasAttached(ModAttachments.PLAYER_VARIABLE)) return;
-
-        var newVariable = entity.getAttached(ModAttachments.PLAYER_VARIABLE);
+        var newVariable = getOrDefault(entity);
         if (old != null && old.equals(newVariable)) return;
 
         if (entity instanceof ServerPlayer serverPlayer) {
@@ -33,7 +29,7 @@ public class PlayerVariable {
 
 
     public static PlayerVariable getOrDefault(Entity entity) {
-        return entity.getAttached(ModAttachments.PLAYER_VARIABLE);
+        return entity.getAttachedOrCreate(ModAttachments.PLAYER_VARIABLE);
     }
 
     public static void onPlayerLogin(ServerPlayer player) {

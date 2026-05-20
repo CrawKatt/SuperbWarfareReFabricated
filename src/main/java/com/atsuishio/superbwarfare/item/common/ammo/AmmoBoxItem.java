@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.common.ammo;
 
+import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.atsuishio.superbwarfare.init.ModAttachments;
@@ -46,7 +47,7 @@ public class AmmoBoxItem extends Item {
         if (info == null) info = new AmmoBoxInfo("All", false);
         String selectedType = info.type();
 
-        var cap = player.getAttached(ModAttachments.PLAYER_VARIABLE).watch();
+        var cap = PlayerVariable.getOrDefault(player).watch();
         if (!level.isClientSide()) {
             var types = (selectedType.equals("All") || info.isDrop()) ? Ammo.values() : new Ammo[]{Ammo.getType(selectedType)};
 

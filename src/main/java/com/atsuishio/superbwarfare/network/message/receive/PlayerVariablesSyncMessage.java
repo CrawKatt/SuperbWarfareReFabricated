@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.network.message.receive;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.atsuishio.superbwarfare.init.ModAttachments;
 import io.netty.buffer.ByteBuf;
@@ -36,8 +37,7 @@ public record PlayerVariablesSyncMessage(int target, Map<Byte, Integer> data) im
         var entity = Minecraft.getInstance().player.level().getEntity(message.target());
         if (entity == null) return;
 
-        var variable = entity.getAttached(ModAttachments.PLAYER_VARIABLE);
-        if (variable == null) return;
+        var variable = PlayerVariable.getOrDefault(entity);
 
         var map = message.data();
 

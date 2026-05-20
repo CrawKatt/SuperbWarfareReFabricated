@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.event;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.api.event.ReloadEvent;
+import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.data.gun.AmmoConsumer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.ReloadType;
@@ -203,7 +204,7 @@ public class GunEventHandler {
             int count = ammoCount - magazine - (hasBulletInBarrel ? 1 : 0);
 
             if (shooter instanceof Player player) {
-                var capability = player.getAttached(ModAttachments.PLAYER_VARIABLE).watch();
+                var capability = PlayerVariable.getOrDefault(player).watch();
                 if (data.selectedAmmoConsumer().type == AmmoConsumer.AmmoConsumeType.PLAYER_AMMO) {
                     var ammoType = data.selectedAmmoConsumer().getPlayerAmmoType();
                     ammoType.add(capability, count);
@@ -467,7 +468,7 @@ public class GunEventHandler {
         data.ammo.add(available);
         if (!InventoryTool.hasCreativeAmmoBox(shooter)) {
             if (shooter != null) {
-                var cap = shooter.getAttached(ModAttachments.PLAYER_VARIABLE);
+                var cap = PlayerVariable.getOrDefault(shooter);
                 shooter.setAttached(ModAttachments.PLAYER_VARIABLE, cap);
             }
             data.consumeBackupAmmo(shooter, available);

@@ -1,13 +1,12 @@
 package com.atsuishio.superbwarfare.perk.functional;
 
+import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.GunType;
-import com.atsuishio.superbwarfare.init.ModAttachments;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.perk.PerkInstance;
 import com.atsuishio.superbwarfare.tools.DamageTypeTool;
 import com.atsuishio.superbwarfare.tools.InventoryTool;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -34,7 +33,7 @@ public class Subsistence extends Perk {
             var type = computed.gunType;
             float rate = instance.level() * (0.1f + (type == GunType.SMG || type == GunType.RIFLE ? 0.07f : 0f));
 
-            var cap = ((AttachmentTarget) attacker).getAttached(ModAttachments.PLAYER_VARIABLE).watch();
+            var cap = PlayerVariable.getOrDefault(attacker).watch();
 
             int mag = computed.magazine;
             int ammo = data.ammo.get();

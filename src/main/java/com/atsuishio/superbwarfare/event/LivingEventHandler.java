@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.event;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.api.event.PreKillEvent;
+import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
 import com.atsuishio.superbwarfare.config.common.GameplayConfig;
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
@@ -18,7 +19,6 @@ import com.atsuishio.superbwarfare.item.common.ammo.box.AmmoBoxInfo;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.network.message.receive.DrawClientMessage;
-import com.atsuishio.superbwarfare.network.message.receive.LivingGunKillMessage;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.tools.*;
 import net.minecraft.network.chat.Component;
@@ -155,17 +155,20 @@ public class LivingEventHandler {
             damage = Math.max(damage - armorValue, 0);
         }
 
+        var bulletResistAttr = entity.getAttribute(ModAttributes.bulletResistanceHolder());
+        double bulletResist = bulletResistAttr != null ? bulletResistAttr.getValue() : 0.0;
+
         if (source.is(ModTags.DamageTypes.PROJECTILE) || source.is(DamageTypes.MOB_PROJECTILE)) {
-            damage *= 1 - 0.8 * Mth.clamp(entity.getAttributeValue(ModAttributes.bulletResistanceHolder()), 0, 1);
+            damage *= 1 - 0.8 * Mth.clamp(bulletResist, 0, 1);
         }
 
         if (source.is(ModTags.DamageTypes.PROJECTILE_ABSOLUTE)) {
-            damage *= 1 - 0.2 * Mth.clamp(entity.getAttributeValue(ModAttributes.bulletResistanceHolder()), 0, 1);
+            damage *= 1 - 0.2 * Mth.clamp(bulletResist, 0, 1);
         }
 
         if (source.is(ModDamageTypes.PROJECTILE_EXPLOSION) || source.is(ModDamageTypes.MINE) || source.is(ModDamageTypes.PROJECTILE_HIT) || source.is(ModDamageTypes.CUSTOM_EXPLOSION)
                 || source.is(DamageTypes.EXPLOSION) || source.is(DamageTypes.PLAYER_EXPLOSION)) {
-            damage *= 1 - 0.3 * Mth.clamp(entity.getAttributeValue(ModAttributes.bulletResistanceHolder()), 0, 1);
+            damage *= 1 - 0.3 * Mth.clamp(bulletResist, 0, 1);
         }
 
         float result = (float) damage;
@@ -536,7 +539,7 @@ public class LivingEventHandler {
         if (!(entity instanceof Player player)) return;
         if (!MiscConfig.DROP_AMMO_BOX) return;
 
-        var cap = player.getAttached(ModAttachments.PLAYER_VARIABLE).watch();
+        var cap = PlayerVariable.getOrDefault(player).watch();
 
         boolean drop = Stream.of(Ammo.values())
                 .mapToInt(type -> type.get(cap))
