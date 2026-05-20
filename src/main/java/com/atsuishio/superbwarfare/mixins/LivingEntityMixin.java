@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.entity.mixin.DamageContainer;
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -15,7 +16,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
 import java.util.Stack;
@@ -40,7 +43,7 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
     protected abstract void actuallyHurt(DamageSource pDamageSource, float pDamageAmount);
 
     @Shadow
-    protected abstract void hurtHelmet(DamageSource pDamageSource, float pDamageAmount);
+    public abstract void hurtHelmet(DamageSource pDamageSource, float pDamageAmount);
 
     @Shadow
     protected abstract boolean checkTotemDeathProtection(DamageSource pDamageSource);
@@ -107,6 +110,20 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
         if (pVehicle instanceof VehicleEntity vehicle) {
             vehicle.removeSeatIndexTag(((LivingEntity) (Object) this));
         }
+    }
+
+    @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$onHurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+        LivingEntity self = (LivingEntity) (Object) this;
+        if (LivingEventHandler.onEntityAttacked(self, source, amount)) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @ModifyVariable(method = "hurt", at = @At("HEAD"), argsOnly = true)
+    private float superbwarfare$modifyHurtAmount(float amount, DamageSource source) {
+        LivingEntity self = (LivingEntity) (Object) this;
+        return LivingEventHandler.onEntityHurt(self, source, amount);
     }
 
     @Override
