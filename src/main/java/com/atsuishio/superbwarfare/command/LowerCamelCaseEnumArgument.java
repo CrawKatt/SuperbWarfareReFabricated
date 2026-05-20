@@ -13,6 +13,8 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+
+import static com.atsuishio.superbwarfare.Mod.MODID;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -31,7 +33,7 @@ import java.util.function.Function;
 public class LowerCamelCaseEnumArgument<T extends Enum<T>> implements ArgumentType<T> {
 
     private static final Dynamic2CommandExceptionType INVALID_ENUM =
-            new Dynamic2CommandExceptionType((found, constants) -> Component.translatable("commands.neoforge.arguments.enum.invalid", constants, found));
+            new Dynamic2CommandExceptionType((found, constants) -> Component.translatable("commands." + MODID + ".arguments.enum.invalid", constants, found));
 
     public final Function<T, String> valueMapper = e -> {
         var input = e.name();
