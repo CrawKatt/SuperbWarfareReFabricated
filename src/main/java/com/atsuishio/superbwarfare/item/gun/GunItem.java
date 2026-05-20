@@ -21,7 +21,6 @@ import com.atsuishio.superbwarfare.init.ModPerks;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.item.EnergyStorageItem;
 import com.atsuishio.superbwarfare.item.ItemScreenProvider;
-import com.atsuishio.superbwarfare.item.gun.neoforge.IItemExtension;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.resource.gun.GunResource;
@@ -77,7 +76,7 @@ import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.LASE
 import static com.atsuishio.superbwarfare.tools.EntityFindUtil.findEntity;
 import static com.atsuishio.superbwarfare.tools.ParticleTool.sendParticle;
 
-public abstract class GunItem extends Item implements ItemScreenProvider, GunPropertyModifier, EnergyStorageItem, IItemExtension {
+public abstract class GunItem extends Item implements ItemScreenProvider, GunPropertyModifier, EnergyStorageItem {
 
     protected static final ResourceLocation DEFAULT_ICON = Mod.loc("textures/gun_icon/default_icon.png");
 
@@ -252,13 +251,6 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         return false;
     }
 
-    @ParametersAreNonnullByDefault
-    @Override
-    public boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment) {
-        return false;
-    }
-
-    @Override
     public int getMaxDamage(@NotNull ItemStack stack) {
         var maxDurability = GunData.from(stack).compute().maxDurability;
 
