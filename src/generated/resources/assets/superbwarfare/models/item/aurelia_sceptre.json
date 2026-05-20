@@ -1,5 +1,5 @@
 {
-  "parent": "builtin/entity",
+  "parent": "superbwarfare:item/aurelia_sceptre_base",
   "textures": {
     "particle": "superbwarfare:item/aurelia_sceptre_icon"
   }

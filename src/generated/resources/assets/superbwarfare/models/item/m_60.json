@@ -1,5 +1,5 @@
 {
-  "parent": "builtin/entity",
+  "parent": "superbwarfare:item/m_60_base",
   "textures": {
     "particle": "superbwarfare:item/m_60_icon"
   }

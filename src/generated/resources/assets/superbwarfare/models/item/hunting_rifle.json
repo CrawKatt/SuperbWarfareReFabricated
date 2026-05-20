@@ -1,5 +1,5 @@
 {
-  "parent": "builtin/entity",
+  "parent": "superbwarfare:item/hunting_rifle_base",
   "textures": {
     "particle": "superbwarfare:item/hunting_rifle_icon"
   }

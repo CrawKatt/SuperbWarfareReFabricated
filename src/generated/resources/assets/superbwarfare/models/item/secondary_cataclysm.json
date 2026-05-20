@@ -1,5 +1,6 @@
 {
-  "parent": "builtin/entity",
+  "parent": "superbwarfare:item/secondary_cataclysm_base",
+  "gui_light": "front",
   "textures": {
     "particle": "superbwarfare:item/secondary_cataclysm_icon"
   }

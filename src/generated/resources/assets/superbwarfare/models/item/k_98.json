@@ -1,5 +1,5 @@
 {
-  "parent": "builtin/entity",
+  "parent": "superbwarfare:item/k_98_base",
   "textures": {
     "particle": "superbwarfare:item/k_98_icon"
   }

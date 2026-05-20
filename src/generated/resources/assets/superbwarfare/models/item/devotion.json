@@ -1,5 +1,5 @@
 {
-  "parent": "builtin/entity",
+  "parent": "superbwarfare:item/devotion_base",
   "textures": {
     "particle": "superbwarfare:item/devotion_icon"
   }
