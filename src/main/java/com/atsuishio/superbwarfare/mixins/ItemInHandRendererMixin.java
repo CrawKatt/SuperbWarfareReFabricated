@@ -36,22 +36,11 @@ public class ItemInHandRendererMixin {
 
         poseStack.pushPose();
         int side = rightHand ? 1 : -1;
-        poseStack.translate(side * 0.56F, -0.52F + equipProgress * -0.6F, -0.72F);
+        float stableEquipProgress = 0.0F;
+        poseStack.translate(side * 0.56F, -0.52F + stableEquipProgress * -0.6F, -0.72F);
 
         ((ItemInHandRenderer) (Object) this).renderItem(player, stack, displayContext, !rightHand, poseStack, bufferSource, packedLight);
         poseStack.popPose();
         ci.cancel();
-
-        /*
-        boolean mainHand = hand == InteractionHand.MAIN_HAND;
-        HumanoidArm arm = mainHand ? player.getMainArm() : player.getMainArm().getOpposite();
-        boolean rightHand = arm == HumanoidArm.RIGHT;
-        ItemDisplayContext displayContext = rightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
-
-        poseStack.pushPose();
-        ((ItemInHandRenderer) (Object) this).renderItem(player, stack, displayContext, !rightHand, poseStack, bufferSource, packedLight);
-        poseStack.popPose();
-        */
-        //ci.cancel();
     }
 }
