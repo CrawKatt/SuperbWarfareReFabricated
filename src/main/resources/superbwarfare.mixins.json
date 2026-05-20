@@ -36,6 +36,7 @@
     "KeymappingMixin",
     "LevelRendererMixin",
     "LivingEntityRendererMixin",
+    "MinecraftAccessor",
     "MinecraftMixin",
     "MouseHandlerMixin",
     "MultiPlayerGameModeMixin",
