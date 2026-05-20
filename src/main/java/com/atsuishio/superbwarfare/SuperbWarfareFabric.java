@@ -12,10 +12,13 @@ import com.atsuishio.superbwarfare.data.container.ContainerDataManager;
 import com.atsuishio.superbwarfare.data.vehicle.VehicleDataTool;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.common.container.ContainerBlockItem;
+import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
+import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger;
 import com.atsuishio.superbwarfare.world.TDMSavedData;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import software.bernie.geckolib.constant.dataticket.SerializableDataTicket;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
@@ -28,23 +31,32 @@ public class SuperbWarfareFabric implements ModInitializer {
         triggerInit();
         callInits();
 
-        NetworkRegistry.register();
+        NetworkRegistry.registerPayloads();
         VehicleDataTool.register();
         DataLoader.register();
 
         ContainerBlockItem.registerContainers();
-        ModTabs.init();
         ModCapabilities.init();
         CustomData.load();
 
         CommandRegister.register();
         ContainerDataManager.register();
         TDMSavedData.register();
-        ModCommandArguments.init();
         ModDataComponents.init();
 
         ResourceOnceLogger.register();
         registerDataTickets();
+        registerTicks();
+    }
+
+    private void registerTicks() {
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            Mod.tickServer();
+            for (var player : server.getPlayerList().getPlayers()) {
+                PlayerEventHandler.onPlayerTick(player);
+                HitboxHelperEventHandler.onPlayerTick(player);
+            }
+        });
     }
 
     private void triggerInit() {
@@ -52,9 +64,6 @@ public class SuperbWarfareFabric implements ModInitializer {
         ModItems.registerPerkItems();
         ModItems.registerSpawnEggs();
         ModItems.registerDispenserBehavior();
-
-        ModSerializers.init();
-        ModVillagers.init();
 
         CommonConfig.init();
         ServerConfig.init();
@@ -83,6 +92,9 @@ public class SuperbWarfareFabric implements ModInitializer {
         ModDamageTypes.init();
         ModEventHandlers.init();
         ModTags.init();
+
+        ModEntities.registerAttributes();
+        ModEntities.registerSpawnPlacements();
     }
 
     private void registerDataTickets() {
