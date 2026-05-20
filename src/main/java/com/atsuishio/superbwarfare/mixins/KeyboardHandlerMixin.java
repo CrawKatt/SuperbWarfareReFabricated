@@ -10,8 +10,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(KeyboardHandler.class)
 public class KeyboardHandlerMixin {
 
-    @Inject(method = "keyPress(JIIII)V", at = @At("HEAD"))
+    @Inject(method = "keyPress(JIIII)V", at = @At("HEAD"), cancellable = true)
     private void superbwarfare$onKeyPressed(long window, int keyCode, int scanCode, int action, int modifiers, CallbackInfo ci) {
-        ClickHandler.onKeyPressed(keyCode, scanCode, action, modifiers);
+        if (ClickHandler.onKeyPressed(keyCode, scanCode, action, modifiers)) {
+            ci.cancel();
+        }
     }
 }
