@@ -71,8 +71,8 @@ public class ClientRenderHandler {
             new VehicleTeamOverlay().render(guiGraphics, deltaTracker);
             new JavelinHudOverlay().render(guiGraphics, deltaTracker);
             new IglaHudOverlay().render(guiGraphics, deltaTracker);
-            new VehicleHudOverlay().render(guiGraphics, deltaTracker);
             new VehicleMainWeaponHudOverlay().render(guiGraphics, deltaTracker);
+            new VehicleHudOverlay().render(guiGraphics, deltaTracker);
             new VehicleCrosshairOverlay().render(guiGraphics, deltaTracker);
             new StaminaOverlay().render(guiGraphics, deltaTracker);
             new AmmoCountOverlay().render(guiGraphics, deltaTracker);
