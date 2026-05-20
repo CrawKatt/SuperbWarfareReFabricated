@@ -1973,6 +1973,7 @@ public class ClientEventHandler {
         float times = (float) Math.min(getDelta(), 1.6);
         Player player = minecraft.player;
         if (player == null) {
+            ClientEventHandler.fov = fov;
             return;
         }
 
@@ -2071,6 +2072,7 @@ public class ClientEventHandler {
             currentFov = currentFov / (float) droneFovLerp;
             ClientEventHandler.fov = currentFov;
         }
+        ClientEventHandler.fov = currentFov;
     }
 
     private static float lastX;

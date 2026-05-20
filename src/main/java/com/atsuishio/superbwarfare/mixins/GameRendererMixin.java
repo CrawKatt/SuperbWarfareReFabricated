@@ -27,9 +27,16 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
+
+    @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
+    private void superbWarfare$getFov(Camera camera, float partialTick, boolean changingFov, CallbackInfoReturnable<Double> cir) {
+        ClientEventHandler.onFovUpdate(Minecraft.getInstance(), cir.getReturnValue().floatValue(), partialTick);
+        cir.setReturnValue(ClientEventHandler.fov);
+    }
 
     @Inject(method = "bobView(Lcom/mojang/blaze3d/vertex/PoseStack;F)V", at = @At("HEAD"), cancellable = true)
     public void bobView(PoseStack p_109139_, float p_109140_, CallbackInfo ci) {
