@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.tools.VectorTool;
 import com.mojang.math.Axis;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -42,7 +43,7 @@ public final class VehicleVecUtils {
     }
 
     public static double getSubmergedHeight(Entity entity) {
-        return Math.max(entity.getFluidHeight(net.minecraft.tags.FluidTags.WATER), entity.getFluidHeight(net.minecraft.tags.FluidTags.LAVA));
+        return Math.max(entity.getFluidHeight(FluidTags.WATER), entity.getFluidHeight(FluidTags.LAVA));
     }
 
     public static Quaternionf eulerToQuaternion(float yaw, float pitch, float roll) {
