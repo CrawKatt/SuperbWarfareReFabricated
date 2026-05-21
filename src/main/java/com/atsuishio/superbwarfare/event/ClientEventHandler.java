@@ -1969,7 +1969,7 @@ public class ClientEventHandler {
         bowPullPos = 0.5 * Math.cos(Math.PI * Math.pow(Math.pow(Mth.clamp(bowPullTimer, 0, 1), 2) - 1, 2)) + 0.5;
     }
 
-    public static void onFovUpdate(Minecraft minecraft, float fov, float partialTick) {
+    public static void onFovUpdate(Minecraft minecraft, float fov, float partialTick, boolean usedConfiguredFov) {
         float times = (float) Math.min(getDelta(), 1.6);
         Player player = minecraft.player;
         if (player == null) {
@@ -2001,6 +2001,13 @@ public class ClientEventHandler {
         currentFov = currentFov / (float) artilleryIndicatorZoom;
 
         if (stack.getItem() instanceof GunItem) {
+            if (!usedConfiguredFov) {
+                lastX = player.getXRot();
+                lastY = player.getYRot();
+                ClientEventHandler.fov = currentFov;
+                return;
+            }
+
             double p;
             if (stack.is(ModItems.BOCEK)) {
                 p = bowPullPos * zoomTime;

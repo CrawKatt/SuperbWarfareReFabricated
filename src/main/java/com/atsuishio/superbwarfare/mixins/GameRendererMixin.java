@@ -34,7 +34,7 @@ public class GameRendererMixin {
 
     @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
     private void superbWarfare$getFov(Camera camera, float partialTick, boolean changingFov, CallbackInfoReturnable<Double> cir) {
-        ClientEventHandler.onFovUpdate(Minecraft.getInstance(), cir.getReturnValue().floatValue(), partialTick);
+        ClientEventHandler.onFovUpdate(Minecraft.getInstance(), cir.getReturnValue().floatValue(), partialTick, changingFov);
         cir.setReturnValue(ClientEventHandler.fov);
     }
 
