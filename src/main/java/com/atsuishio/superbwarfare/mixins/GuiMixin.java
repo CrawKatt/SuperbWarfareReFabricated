@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,6 +25,41 @@ public class GuiMixin {
 
     @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
     private void superbWarfare$renderSelectedItemName(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (VehicleClientRenderState.shouldHideHandsAndHotbar(Minecraft.getInstance().player)) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderHearts", at = @At("HEAD"), cancellable = true)
+    private void superbWarfare$renderHearts(
+            GuiGraphics guiGraphics, Player player,
+            int x, int y,
+            int height, int offsetHeartIndex,
+            float maxHealth, int currentHealth,
+            int displayHealth, int absorptionAmount,
+            boolean renderHighlight, CallbackInfo ci
+    ) {
+        if (VehicleClientRenderState.shouldHideHandsAndHotbar(Minecraft.getInstance().player)) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderFood", at = @At("HEAD"), cancellable = true)
+    private void superbWarfare$renderFood(GuiGraphics guiGraphics, Player player, int y, int x, CallbackInfo ci) {
+        if (VehicleClientRenderState.shouldHideHandsAndHotbar(Minecraft.getInstance().player)) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderExperienceLevel", at = @At("HEAD"), cancellable = true)
+    private void superbWarfare$renderExperienceLevel(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+        if (VehicleClientRenderState.shouldHideHandsAndHotbar(Minecraft.getInstance().player)) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
+    private void superbWarfare$renderExperienceBar(GuiGraphics guiGraphics, int x, CallbackInfo ci) {
         if (VehicleClientRenderState.shouldHideHandsAndHotbar(Minecraft.getInstance().player)) {
             ci.cancel();
         }
