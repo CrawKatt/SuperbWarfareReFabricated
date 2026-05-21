@@ -1,14 +1,13 @@
 package com.atsuishio.superbwarfare.tools;
 
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.entity.LevelEntityGetter;
 
-import java.util.List;
 import java.util.UUID;
 
 public class EntityFindUtil {
@@ -19,12 +18,12 @@ public class EntityFindUtil {
      * @param level 目标世界
      * @return 所有实体
      */
-    public static Iterable<Entity> getEntities(Level level) {
+    public static LevelEntityGetter<Entity> getEntities(Level level) {
         if (level instanceof ServerLevel serverLevel) {
-            var bounds = AABB.ofSize(Vec3.ZERO, 3.0E7, 3.0E7, 3.0E7);
-            return serverLevel.getEntitiesOfClass(Entity.class, bounds, e -> true);
+            return serverLevel.getEntities();
         }
-        return List.of();
+        var clientLevel = (ClientLevel) level;
+        return clientLevel.getEntities();
     }
 
     /**
@@ -37,10 +36,16 @@ public class EntityFindUtil {
     public static Entity findEntity(Level level, String uuidString) {
         try {
             var uuid = UUID.fromString(uuidString);
+            Entity target;
+
             if (level instanceof ServerLevel serverLevel) {
-                return serverLevel.getEntity(uuid);
+                target = serverLevel.getEntity(uuid);
+                //return serverLevel.getEntity(uuid);
+            } else {
+                var clientLevel = (ClientLevel) level;
+                target = clientLevel.getEntities().get(uuid);
             }
-            return null;
+            return target;
         } catch (Exception ignored) {
         }
 
