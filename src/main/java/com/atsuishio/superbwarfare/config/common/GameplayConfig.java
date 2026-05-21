@@ -1,56 +1,26 @@
 package com.atsuishio.superbwarfare.config.common;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.mojang.logging.LogUtils;
-import org.slf4j.Logger;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class GameplayConfig {
 
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private static final Path CONFIG_PATH = Path.of("config", "superbwarfare", "gameplay.json");
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static ModConfigSpec.BooleanValue RESPAWN_RELOAD;
+    public static ModConfigSpec.BooleanValue GLOBAL_INDICATION;
+    public static ModConfigSpec.BooleanValue RESPAWN_AUTO_ARMOR;
 
-    public static boolean RESPAWN_RELOAD = true;
-    public static boolean GLOBAL_INDICATION = true;
-    public static boolean RESPAWN_AUTO_ARMOR = true;
+    public static void init(ModConfigSpec.Builder builder) {
+        builder.push("gameplay");
 
-    public static void load() {
-        if (Files.notExists(CONFIG_PATH)) {
-            save();
-            return;
-        }
-        try {
-            var reader = Files.newBufferedReader(CONFIG_PATH);
-            var data = GSON.fromJson(reader, Data.class);
-            if (data != null) {
-                RESPAWN_RELOAD = data.respawnReload;
-                GLOBAL_INDICATION = data.globalIndication;
-                RESPAWN_AUTO_ARMOR = data.respawnAutoArmor;
-            }
-        } catch (IOException e) {
-            LOGGER.error("Failed to load gameplay config", e);
-        }
+        builder.comment("Set true if you want to reload all your guns when respawn");
+        RESPAWN_RELOAD = builder.define("respawn_reload", true);
+
+        builder.comment("Set false if you want to show kill indication ONLY while killing an entity with a gun");
+        GLOBAL_INDICATION = builder.define("global_indication", true);
+
+        builder.comment("Set true if you want to refill your armor plate when respawn");
+        RESPAWN_AUTO_ARMOR = builder.define("respawn_auto_armor", true);
+
+        builder.pop();
     }
 
-    public static void save() {
-        try {
-            Files.createDirectories(CONFIG_PATH.getParent());
-            var writer = Files.newBufferedWriter(CONFIG_PATH);
-            GSON.toJson(new Data(), writer);
-            writer.close();
-        } catch (IOException e) {
-            LOGGER.error("Failed to save gameplay config", e);
-        }
-    }
-
-    private static class Data {
-        public boolean respawnReload = RESPAWN_RELOAD;
-        public boolean globalIndication = GLOBAL_INDICATION;
-        public boolean respawnAutoArmor = RESPAWN_AUTO_ARMOR;
-    }
 }

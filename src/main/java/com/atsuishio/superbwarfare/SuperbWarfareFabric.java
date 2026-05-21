@@ -3,7 +3,6 @@ package com.atsuishio.superbwarfare;
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
 import com.atsuishio.superbwarfare.command.CommandRegister;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
-import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.config.CommonConfig;
 import com.atsuishio.superbwarfare.config.ServerConfig;
 import com.atsuishio.superbwarfare.data.CustomData;
@@ -17,8 +16,10 @@ import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger;
 import com.atsuishio.superbwarfare.world.TDMSavedData;
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.neoforged.fml.config.ModConfig;
 import software.bernie.geckolib.constant.dataticket.SerializableDataTicket;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
@@ -65,9 +66,8 @@ public class SuperbWarfareFabric implements ModInitializer {
         ModItems.registerSpawnEggs();
         ModItems.registerDispenserBehavior();
 
-        CommonConfig.init();
-        ServerConfig.init();
-        ClientConfig.init();
+        NeoForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.COMMON, CommonConfig.init());
+        NeoForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.SERVER, ServerConfig.init());
     }
 
     private void callInits() {

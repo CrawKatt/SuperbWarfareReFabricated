@@ -173,7 +173,7 @@ public class CustomExplosion extends Explosion {
                     double distance = Math.sqrt(xDistance * xDistance + yDistance * yDistance + zDistance * zDistance);
 
                     if (distance != 0) {
-                        double seenPercent = Mth.clamp(getSeenPercent(position, entity), 0.01 * ExplosionConfig.EXPLOSION_PENETRATION_RATIO, Double.POSITIVE_INFINITY);
+                        double seenPercent = Mth.clamp(getSeenPercent(position, entity), 0.01 * ExplosionConfig.EXPLOSION_PENETRATION_RATIO.get(), Double.POSITIVE_INFINITY);
                         double damagePercent = (1 - distanceRate) * seenPercent;
                         double damageFinal = (damagePercent * damagePercent + damagePercent) / 2 * damage;
 
@@ -228,7 +228,7 @@ public class CustomExplosion extends Explosion {
         private float damage;
         private float radius;
         private @Nullable ParticleTool.ParticleType particleType = ParticleTool.ParticleType.MINI;
-        private Supplier<BlockInteraction> destroyBlock = () -> ExplosionConfig.EXPLOSION_DESTROY ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP;
+        private Supplier<BlockInteraction> destroyBlock = () -> ExplosionConfig.EXPLOSION_DESTROY.get() ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.KEEP;
         private int fireTime = 0;
         private float damageMultiplier = 1;
         private DamageSource damageSource = null;

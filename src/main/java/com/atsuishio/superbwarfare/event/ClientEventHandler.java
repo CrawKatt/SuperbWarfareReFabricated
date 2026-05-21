@@ -749,7 +749,7 @@ public class ClientEventHandler {
             return;
         }
 
-        tacticalSprint = MiscConfig.ALLOW_TACTICAL_SPRINT
+        tacticalSprint = MiscConfig.ALLOW_TACTICAL_SPRINT.get()
                 && !exhaustion
                 && !zoom
                 && isMoving()
@@ -1179,7 +1179,7 @@ public class ClientEventHandler {
         int time2 = (int) (distance / 17);
 
         if (time2 == 0) {
-            float shakeStrength = (float) DisplayConfig.EXPLOSION_SCREEN_SHAKE / 100.0f;
+            float shakeStrength = (float) DisplayConfig.EXPLOSION_SCREEN_SHAKE.get() / 100.0f;
             if (shakeStrength <= 0.0f) return;
 
             shakeTime = time;
@@ -1191,7 +1191,7 @@ public class ClientEventHandler {
             shakeType = 2 * (Math.random() - 0.5);
         } else {
             Mod.queueClientWork(time2, () -> {
-                float shakeStrength = (float) DisplayConfig.EXPLOSION_SCREEN_SHAKE / 100.0f;
+                float shakeStrength = (float) DisplayConfig.EXPLOSION_SCREEN_SHAKE.get() / 100.0f;
                 if (shakeStrength <= 0.0f) return;
                 shakeTime = time;
                 shakeRadius = radius;
@@ -1695,7 +1695,7 @@ public class ClientEventHandler {
         float pitch = cameraPitch;
 
         if (0 < fireRotTimer) {
-            float shake = (float) (MathTool.decayingOscillation(0.5f, 2f, 0.75f, (float) fireRotTimer) * (1 + amplitude) * (float) (DisplayConfig.WEAPON_SCREEN_SHAKE / 100.0));
+            float shake = (float) (MathTool.decayingOscillation(0.5f, 2f, 0.75f, (float) fireRotTimer) * (1 + amplitude) * (float) (DisplayConfig.WEAPON_SCREEN_SHAKE.get() / 100.0));
             if (recoilY > 0) {
                 cameraYaw = yaw - 0.5f * shake;
                 cameraPitch = pitch + shake;
@@ -1882,7 +1882,7 @@ public class ClientEventHandler {
 
     private static void handleShockCamera(Camera camera, float partialTick, double x, double y, double z, LivingEntity entity) {
         if (entity.hasEffect(ModMobEffects.SHOCK) && Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON) {
-            float shakeStrength = (float) DisplayConfig.SHOCK_SCREEN_SHAKE / 100.0f;
+            float shakeStrength = (float) DisplayConfig.SHOCK_SCREEN_SHAKE.get() / 100.0f;
             if (shakeStrength <= 0.0f) return;
             cameraYaw = camera.getYRot() +
                     (float) Mth.nextDouble(RandomSource.create(), -3, 3) * shakeStrength;
@@ -1895,7 +1895,7 @@ public class ClientEventHandler {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null || player.isSpectator()) return;
 
-        float shakeStrength = (float) DisplayConfig.WEAPON_SCREEN_SHAKE / 100.0f;
+        float shakeStrength = (float) DisplayConfig.WEAPON_SCREEN_SHAKE.get() / 100.0f;
         if (shakeStrength <= 0.0f) return;
 
         cameraRot[0] = -boneRotX * shakeStrength;
@@ -1939,14 +1939,14 @@ public class ClientEventHandler {
             angle = Math.atan(Mth.abs((float) cameraLocation) / (lookDistance + 2.9)) * Mth.RAD_TO_DEG;
         }
 
-        cameraPitch = (float) (pitch + cameraRot[0] + (DisplayConfig.CAMERA_ROTATE ? 0.2 : 0) * turnRot[0] + 3 * velocityY);
+        cameraPitch = (float) (pitch + cameraRot[0] + (DisplayConfig.CAMERA_ROTATE.get() ? 0.2 : 0) * turnRot[0] + 3 * velocityY);
         if (Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK) {
-            cameraYaw = (float) (yaw + cameraRot[1] + (DisplayConfig.CAMERA_ROTATE ? 0.8 : 0) * turnRot[1] - (cameraLocation > 0 ? 1 : -1) * angle * zoomPos);
+            cameraYaw = (float) (yaw + cameraRot[1] + (DisplayConfig.CAMERA_ROTATE.get() ? 0.8 : 0) * turnRot[1] - (cameraLocation > 0 ? 1 : -1) * angle * zoomPos);
         } else {
-            cameraYaw = (float) (yaw + cameraRot[1] + (DisplayConfig.CAMERA_ROTATE ? 0.8 : 0) * turnRot[1]);
+            cameraYaw = (float) (yaw + cameraRot[1] + (DisplayConfig.CAMERA_ROTATE.get() ? 0.8 : 0) * turnRot[1]);
         }
 
-        cameraRoll = (float) (roll + cameraRot[2] + (DisplayConfig.CAMERA_ROTATE ? 0.35 : 0) * turnRot[2]);
+        cameraRoll = (float) (roll + cameraRot[2] + (DisplayConfig.CAMERA_ROTATE.get() ? 0.35 : 0) * turnRot[2]);
     }
 
     private static void handleBowPullAnimation(LivingEntity entity, ItemStack stack) {
@@ -2289,7 +2289,7 @@ public class ClientEventHandler {
     }
 
     public static void onPlayerLoggedIn(ServerPlayer player) {
-        if (!DisplayConfig.ENABLE_VERSION_CHECK_WARNING) return;
+        if (!DisplayConfig.ENABLE_VERSION_CHECK_WARNING.get()) return;
 
         if (ModVersionEventHandler.currentVersion == null || ModVersionEventHandler.previousVersion == null) return;
 

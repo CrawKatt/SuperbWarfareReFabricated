@@ -94,7 +94,7 @@ public class CrossHairOverlay implements LayeredDraw.Layer {
         float moveY = 0;
 
         // 平滑准星
-        if (DisplayConfig.FLOAT_CROSS_HAIR && player.getVehicle() == null) {
+        if (DisplayConfig.FLOAT_CROSS_HAIR.get() && player.getVehicle() == null) {
             moveX = (float) (-6 * ClientEventHandler.turnRot[1] - (player.isSprinting() ? 10 : 6) * ClientEventHandler.movePosX);
             moveY = (float) (-6 * ClientEventHandler.turnRot[0] + 6 * (float) ClientEventHandler.velocityY - (player.isSprinting() ? 10 : 6) * ClientEventHandler.movePosY - 0.25 * ClientEventHandler.firePos);
             // 判断RC是否加载，用于适配动态准星
@@ -138,7 +138,7 @@ public class CrossHairOverlay implements LayeredDraw.Layer {
         }
 
         // 在开启伤害指示器时才进行渲染
-        if (DisplayConfig.KILL_INDICATION && !(player.getVehicle() instanceof Ah6Entity ah6Entity && ah6Entity.getFirstPassenger() == player)) {
+        if (DisplayConfig.KILL_INDICATION.get() && !(player.getVehicle() instanceof Ah6Entity ah6Entity && ah6Entity.getFirstPassenger() == player)) {
             renderKillIndicatorDynamic(guiGraphics, screenWidth, screenHeight, moveX, moveY);
         }
 

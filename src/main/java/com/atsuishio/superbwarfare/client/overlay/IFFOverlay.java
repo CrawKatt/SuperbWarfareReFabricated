@@ -52,7 +52,7 @@ public class IFFOverlay implements LayeredDraw.Layer {
     @ParametersAreNonnullByDefault
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         if (Minecraft.getInstance().options.hideGui) return;
-        if (!DisplayConfig.VEHICLE_INFO) return;
+        if (!DisplayConfig.VEHICLE_INFO.get()) return;
 
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;

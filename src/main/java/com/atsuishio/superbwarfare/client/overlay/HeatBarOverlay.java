@@ -35,7 +35,7 @@ public class HeatBarOverlay implements LayeredDraw.Layer {
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, @NotNull DeltaTracker deltaTracker) {
         if (Minecraft.getInstance().options.hideGui) return;
-        if (!DisplayConfig.ENABLE_HEAT_BAR_HUD) return;
+        if (!DisplayConfig.ENABLE_HEAT_BAR_HUD.get()) return;
 
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
@@ -80,8 +80,8 @@ public class HeatBarOverlay implements LayeredDraw.Layer {
         int i = (screenWidth - width) / 2;
         int j = (screenHeight - height) / 2;
 
-        float posX = i + 64 + DisplayConfig.HEAT_BAR_HUD_X_OFFSET + ANIMATION_TIMER.lerp(0, 5, currentTime);
-        float posY = j + 6 + DisplayConfig.HEAT_BAR_HUD_Y_OFFSET;
+        float posX = i + 64 + DisplayConfig.HEAT_BAR_HUD_X_OFFSET.get() + ANIMATION_TIMER.lerp(0, 5, currentTime);
+        float posY = j + 6 + DisplayConfig.HEAT_BAR_HUD_Y_OFFSET.get();
 
         float alpha = ANIMATION_TIMER.lerp(1, 0, currentTime);
         RenderSystem.setShaderColor(1, 1, 1, alpha);

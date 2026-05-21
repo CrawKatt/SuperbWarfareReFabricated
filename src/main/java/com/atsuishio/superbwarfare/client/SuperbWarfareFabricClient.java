@@ -8,18 +8,22 @@ import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
 import com.atsuishio.superbwarfare.client.sound.ModSoundInstances;
 import com.atsuishio.superbwarfare.client.molang.MolangVariable;
+import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.neoforged.fml.config.ModConfig;
 
 public class SuperbWarfareFabricClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        NeoForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.CLIENT, ClientConfig.init());
         ModScreens.init();
         ModEntityRenderers.init();
         ModKeyMappings.init();

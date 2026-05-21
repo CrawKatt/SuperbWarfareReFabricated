@@ -42,7 +42,7 @@ public class MelonBombEntity extends DestroyableProjectile {
     public void onHitBlock(@NotNull BlockHitResult blockHitResult) {
         super.onHitBlock(blockHitResult);
         if (this.level() instanceof ServerLevel) {
-            if (ExplosionConfig.EXPLOSION_DESTROY && ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
+            if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
                 AABB aabb = new AABB(blockHitResult.getLocation(), blockHitResult.getLocation()).inflate(5);
                 BlockPos.betweenClosedStream(aabb).forEach((pos) -> {
                     float hard = this.level().getBlockState(pos).getBlock().defaultDestroyTime();

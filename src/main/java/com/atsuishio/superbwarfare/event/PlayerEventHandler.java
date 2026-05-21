@@ -68,7 +68,7 @@ public class PlayerEventHandler {
     }
 
     private static void handleRespawnReload(Player player) {
-        if (!GameplayConfig.RESPAWN_RELOAD) return;
+        if (!GameplayConfig.RESPAWN_RELOAD.get()) return;
 
         for (ItemStack stack : player.getInventory().items) {
             if (stack.getItem() instanceof GunItem) {
@@ -86,7 +86,7 @@ public class PlayerEventHandler {
     }
 
     private static void handleRespawnAutoArmor(Player player) {
-        if (!GameplayConfig.RESPAWN_AUTO_ARMOR) return;
+        if (!GameplayConfig.RESPAWN_AUTO_ARMOR.get()) return;
 
         ItemStack armor = player.getItemBySlot(EquipmentSlot.CHEST);
         if (armor == ItemStack.EMPTY) return;
@@ -94,25 +94,25 @@ public class PlayerEventHandler {
         var tag = NBTTool.getTag(armor);
         double armorPlate = tag.getDouble("ArmorPlate");
 
-        int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL;
+        int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL.get();
         if (armor.is(ModTags.Items.MILITARY_ARMOR)) {
-            armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL;
+            armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL.get();
         } else if (armor.is(ModTags.Items.MILITARY_ARMOR_HEAVY)) {
-            armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL;
+            armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL.get();
         }
 
-        if (armorPlate >= armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL) return;
+        if (armorPlate >= armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get()) return;
 
         for (var stack : player.getInventory().items) {
             if (stack.is(ModItems.ARMOR_PLATE)) {
                 var stackTag = NBTTool.getTag(stack);
                 if (stackTag.getBoolean("Infinite")) {
-                    tag.putDouble("ArmorPlate", armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL);
+                    tag.putDouble("ArmorPlate", armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get());
                     if (player instanceof ServerPlayer serverPlayer) {
                         serverPlayer.level().playSound(null, serverPlayer.getOnPos(), SoundEvents.ARMOR_EQUIP_IRON.value(), SoundSource.PLAYERS, 0.5f, 1);
                     }
                 } else {
-                    for (int index0 = 0; index0 < Math.ceil(((armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL) - armorPlate) / MiscConfig.ARMOR_POINT_PER_LEVEL); index0++) {
+                    for (int index0 = 0; index0 < Math.ceil(((armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get()) - armorPlate) / MiscConfig.ARMOR_POINT_PER_LEVEL.get()); index0++) {
                         stack.finishUsingItem(player.level(), player);
                     }
                 }
@@ -133,7 +133,7 @@ public class PlayerEventHandler {
             attr.removeModifier(TACTICAL_SPRINT);
         }
 
-        if (MiscConfig.ALLOW_TACTICAL_SPRINT && PlayerVariable.getOrDefault(player).tacticalSprint) {
+        if (MiscConfig.ALLOW_TACTICAL_SPRINT.get() && PlayerVariable.getOrDefault(player).tacticalSprint) {
             player.setSprinting(true);
             attr.addTransientModifier(new AttributeModifier(TACTICAL_SPRINT, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
         }

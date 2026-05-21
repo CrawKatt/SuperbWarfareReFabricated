@@ -1,53 +1,21 @@
 package com.atsuishio.superbwarfare.config.client;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.mojang.logging.LogUtils;
-import org.slf4j.Logger;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class ControlConfig {
 
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private static final Path CONFIG_PATH = Path.of("config", "superbwarfare", "control.json");
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static ModConfigSpec.BooleanValue INVERT_AIRCRAFT_CONTROL;
+    public static ModConfigSpec.IntValue MOUSE_SENSITIVITY;
 
-    public static boolean INVERT_AIRCRAFT_CONTROL = false;
-    public static int MOUSE_SENSITIVITY = 100;
+    public static void init(ModConfigSpec.Builder builder) {
+        builder.push("control");
 
-    public static void load() {
-        if (Files.notExists(CONFIG_PATH)) {
-            save();
-            return;
-        }
-        try {
-            var reader = Files.newBufferedReader(CONFIG_PATH);
-            var data = GSON.fromJson(reader, Data.class);
-            if (data != null) {
-                INVERT_AIRCRAFT_CONTROL = data.invertAircraftControl;
-                MOUSE_SENSITIVITY = data.mouseSensitivity;
-            }
-        } catch (IOException e) {
-            LOGGER.error("Failed to load control config", e);
-        }
-    }
+        builder.comment("Set true to invert aircraft control");
+        INVERT_AIRCRAFT_CONTROL = builder.define("invert_aircraft_control", false);
 
-    public static void save() {
-        try {
-            Files.createDirectories(CONFIG_PATH.getParent());
-            var writer = Files.newBufferedWriter(CONFIG_PATH);
-            GSON.toJson(new Data(), writer);
-            writer.close();
-        } catch (IOException e) {
-            LOGGER.error("Failed to save control config", e);
-        }
-    }
+        builder.comment("Sensitivity of mouse");
+        MOUSE_SENSITIVITY = builder.defineInRange("mouse_sensitivity", 100, 10, 200);
 
-    private static class Data {
-        public boolean invertAircraftControl = INVERT_AIRCRAFT_CONTROL;
-        public int mouseSensitivity = MOUSE_SENSITIVITY;
+        builder.pop();
     }
 }

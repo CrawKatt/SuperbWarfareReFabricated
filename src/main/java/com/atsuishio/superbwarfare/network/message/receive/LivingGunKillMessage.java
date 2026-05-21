@@ -99,7 +99,7 @@ public class LivingGunKillMessage implements CustomPacketPayload {
             if (attacker != null && target != null) {
                 var type = message.getDamageType();
 
-                if (KillMessageHandler.QUEUE.size() >= KillMessageConfig.KILL_MESSAGE_COUNT) {
+                if (KillMessageHandler.QUEUE.size() >= KillMessageConfig.KILL_MESSAGE_COUNT.get()) {
                     KillMessageHandler.QUEUE.poll();
                 }
                 KillMessageHandler.QUEUE.offer(new LivingKillRecord(attacker, target, attacker.getMainHandItem(), message.headshot, type));

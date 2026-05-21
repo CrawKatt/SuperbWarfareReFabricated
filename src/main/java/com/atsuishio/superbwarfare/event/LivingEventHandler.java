@@ -273,12 +273,12 @@ public class LivingEventHandler {
     }
 
     private static void killIndication(LivingEntity entity, DamageSource source) {
-        if (!MiscConfig.SEND_KILL_FEEDBACK) return;
+        if (!MiscConfig.SEND_KILL_FEEDBACK.get()) return;
 
         var sourceEntity = source.getEntity();
         if (sourceEntity == null) return;
 
-        if (!GameplayConfig.GLOBAL_INDICATION && !DamageTypeTool.isModDamage(source)) return;
+        if (!GameplayConfig.GLOBAL_INDICATION.get() && !DamageTypeTool.isModDamage(source)) return;
 
         if (!sourceEntity.level().isClientSide() && sourceEntity instanceof ServerPlayer player) {
             var preEvent = new PreKillEvent.Indicator(player, source, entity);
@@ -450,7 +450,7 @@ public class LivingEventHandler {
         onPreSendKillMessage(preEvent);
         if (preEvent.isCanceled()) return;
 
-        if (attacker != null && MiscConfig.SEND_KILL_FEEDBACK) {
+        if (attacker != null && MiscConfig.SEND_KILL_FEEDBACK.get()) {
             if (DamageTypeTool.isHeadshotDamage(source)) {
                 // FIXME: sendToAllPlayers(new LivingGunKillMessage(attacker.getId(), entity.getId(), true, damageTypeResourceKey));
             } else {
@@ -517,7 +517,7 @@ public class LivingEventHandler {
     }
 
     public static boolean onPickup(ItemEntity itemEntity, Player player) {
-        if (!VehicleConfig.VEHICLE_ITEM_PICKUP) return true;
+        if (!VehicleConfig.VEHICLE_ITEM_PICKUP.get()) return true;
         if (player.getVehicle() instanceof VehicleEntity vehicleEntity) {
             if (!vehicleEntity.level().isClientSide) {
                 HopperBlockEntity.addItem(vehicleEntity, itemEntity);
@@ -537,7 +537,7 @@ public class LivingEventHandler {
      */
     private static void playerDropAmmoBox(LivingEntity entity, DamageSource source, Collection<ItemEntity> drops) {
         if (!(entity instanceof Player player)) return;
-        if (!MiscConfig.DROP_AMMO_BOX) return;
+        if (!MiscConfig.DROP_AMMO_BOX.get()) return;
 
         var cap = PlayerVariable.getOrDefault(player).watch();
 
@@ -566,7 +566,7 @@ public class LivingEventHandler {
      * 载具撞死生物时自动收集掉落物
      */
     private static void vehicleCollectDrops(LivingEntity entity, DamageSource source, Collection<ItemEntity> drops) {
-        if (!VehicleConfig.COLLECT_DROPS_BY_CRASHING) return;
+        if (!VehicleConfig.COLLECT_DROPS_BY_CRASHING.get()) return;
 
         if (!source.is(ModDamageTypes.VEHICLE_STRIKE)) return;
 

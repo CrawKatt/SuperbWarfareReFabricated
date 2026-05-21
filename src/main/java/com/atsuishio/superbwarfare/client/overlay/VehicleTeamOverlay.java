@@ -42,7 +42,7 @@ public class VehicleTeamOverlay implements LayeredDraw.Layer {
     @Override
     @ParametersAreNonnullByDefault
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        if (!DisplayConfig.VEHICLE_INFO) return;
+        if (!DisplayConfig.VEHICLE_INFO.get()) return;
 
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui) return;
@@ -62,7 +62,7 @@ public class VehicleTeamOverlay implements LayeredDraw.Layer {
         boolean lookAtEntity = false;
 
         double entityRange = 0;
-        Entity lookingEntity = TraceTool.camerafFindLookingEntity(player, cameraPos, viewVec, VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE);
+        Entity lookingEntity = TraceTool.camerafFindLookingEntity(player, cameraPos, viewVec, VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE.get());
 
         if (player.getVehicle() instanceof VehicleEntity vehicle) {
             lookingEntity = vehicle.getPlayerLookAtEntityOnVehicle(player, 512, partialTick);
@@ -83,10 +83,10 @@ public class VehicleTeamOverlay implements LayeredDraw.Layer {
         var tag = NBTTool.getTag(stack);
 
         boolean usingDrone = stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked");
-        boolean outOfRange = entityRange > VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE;
+        boolean outOfRange = entityRange > VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE.get();
 
         if (lookAtEntity && lookingEntity instanceof VehicleEntity vehicle && !usingDrone && !outOfRange) {
-            if (entityRange > VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE) return;
+            if (entityRange > VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE.get()) return;
 
             Vec3 pos = VectorTool.lerpGetEntityBoundingBoxCenter(lookingEntity, partialTick)
                     .add(new Vec3(0, lookingEntity.getBbHeight() / 2 + 0.5, 0));

@@ -35,6 +35,10 @@ repositories {
         name = "Ladysnake"
     }
 
+    maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/") {
+        name = "Fuzs Mod Resources"
+    }
+
     maven("https://api.modrinth.com/maven") {
         name = "Modrinth"
     }
@@ -120,6 +124,7 @@ dependencies {
     modImplementation("maven.modrinth:playeranimator:2.0.4+1.21.1-fabric")
     modCompileOnly("curse.maven:real-camera-851574:${project.property("real_camera_id")}")
     modImplementation("curse.maven:net-music-978569:6838604")
+    modApi("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:21.1.6")
     modApi("teamreborn:energy:4.1.0")
 
     compileOnly("com.google.code.findbugs:jsr305:3.0.2")

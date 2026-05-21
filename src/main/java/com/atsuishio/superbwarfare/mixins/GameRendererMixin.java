@@ -64,7 +64,7 @@ public class GameRendererMixin {
         matrices.mulPose(Axis.ZP.rotationDegrees(ClientEventHandler.cameraRoll));
 
         if (entity instanceof Player player && !player.isSpectator() && player.hasEffect(ModMobEffects.SHOCK)) {
-            float shakeStrength = (float) DisplayConfig.SHOCK_SCREEN_SHAKE / 100.0f;
+            float shakeStrength = (float) DisplayConfig.SHOCK_SCREEN_SHAKE.get() / 100.0f;
             if (shakeStrength <= 0.0f) return;
             matrices.mulPose(Axis.ZP.rotationDegrees((float) Mth.nextDouble(RandomSource.create(), 8, 12) * shakeStrength));
         }

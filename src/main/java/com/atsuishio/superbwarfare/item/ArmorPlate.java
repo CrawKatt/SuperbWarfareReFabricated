@@ -47,14 +47,14 @@ public class ArmorPlate extends Item {
 
         if (armor == ItemStack.EMPTY) return InteractionResultHolder.fail(stack);
 
-        int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL;
+        int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL.get();
         if (armor.is(ModTags.Items.MILITARY_ARMOR)) {
-            armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL;
+            armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL.get();
         } else if (armor.is(ModTags.Items.MILITARY_ARMOR_HEAVY)) {
-            armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL;
+            armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL.get();
         }
 
-        if (NBTTool.getTag(armor).getDouble("ArmorPlate") < armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL) {
+        if (NBTTool.getTag(armor).getDouble("ArmorPlate") < armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get()) {
             playerIn.startUsingItem(handIn);
         }
 
@@ -72,15 +72,15 @@ public class ArmorPlate extends Item {
         if (!pLevel.isClientSide) {
             ItemStack armor = pLivingEntity.getItemBySlot(EquipmentSlot.CHEST);
 
-            int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL;
+            int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL.get();
             if (armor.is(ModTags.Items.MILITARY_ARMOR)) {
-                armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL;
+                armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL.get();
             } else if (armor.is(ModTags.Items.MILITARY_ARMOR_HEAVY)) {
-                armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL;
+                armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL.get();
             }
 
             var tag = NBTTool.getTag(armor);
-            tag.putDouble("ArmorPlate", Mth.clamp(tag.getDouble("ArmorPlate") + MiscConfig.ARMOR_POINT_PER_LEVEL, 0, armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL));
+            tag.putDouble("ArmorPlate", Mth.clamp(tag.getDouble("ArmorPlate") + MiscConfig.ARMOR_POINT_PER_LEVEL.get(), 0, armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get()));
             NBTTool.saveTag(armor, tag);
 
             if (pLivingEntity instanceof ServerPlayer serverPlayer) {

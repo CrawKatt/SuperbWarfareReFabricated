@@ -41,24 +41,24 @@ public class HandGrenadeEntity extends FastThrowableProjectile implements GeoEnt
         super(type, level);
         this.noCulling = true;
         this.damage = 1;
-        this.explosionDamage = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE;
-        this.explosionRadius = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS;
+        this.explosionDamage = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE.get();
+        this.explosionRadius = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS.get();
     }
 
     public HandGrenadeEntity(EntityType<? extends HandGrenadeEntity> type, double x, double y, double z, Level level) {
         super(type, x, y, z, level);
         this.noCulling = true;
         this.damage = 1;
-        this.explosionDamage = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE;
-        this.explosionRadius = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS;
+        this.explosionDamage = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE.get();
+        this.explosionRadius = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS.get();
     }
 
     public HandGrenadeEntity(LivingEntity entity, Level level, int fuse) {
         super(ModEntities.HAND_GRENADE, entity, level);
         this.noCulling = true;
         this.damage = 1;
-        this.explosionDamage = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE;
-        this.explosionRadius = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS;
+        this.explosionDamage = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE.get();
+        this.explosionRadius = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS.get();
         this.fuse = fuse;
     }
 

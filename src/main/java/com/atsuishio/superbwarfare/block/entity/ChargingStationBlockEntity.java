@@ -51,11 +51,11 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
     public static final int MAX_DATA_COUNT = 4;
     protected NonNullList<ItemStack> items = NonNullList.withSize(2, ItemStack.EMPTY);
 
-    public static final int MAX_ENERGY = MiscConfig.CHARGING_STATION_MAX_ENERGY;
-    public static final int DEFAULT_FUEL_TIME = MiscConfig.CHARGING_STATION_DEFAULT_FUEL_TIME;
-    public static final int CHARGE_SPEED = MiscConfig.CHARGING_STATION_GENERATE_SPEED;
-    public static final int CHARGE_OTHER_SPEED = MiscConfig.CHARGING_STATION_TRANSFER_SPEED;
-    public static final int CHARGE_RADIUS = MiscConfig.CHARGING_STATION_CHARGE_RADIUS;
+    public static final int MAX_ENERGY = MiscConfig.CHARGING_STATION_MAX_ENERGY.get();
+    public static final int DEFAULT_FUEL_TIME = MiscConfig.CHARGING_STATION_DEFAULT_FUEL_TIME.get();
+    public static final int CHARGE_SPEED = MiscConfig.CHARGING_STATION_GENERATE_SPEED.get();
+    public static final int CHARGE_OTHER_SPEED = MiscConfig.CHARGING_STATION_TRANSFER_SPEED.get();
+    public static final int CHARGE_RADIUS = MiscConfig.CHARGING_STATION_CHARGE_RADIUS.get();
 
 
     public int fuelTick = 0;

@@ -230,8 +230,8 @@ public class ClaymoreEntity extends Entity implements GeoEntity, OwnableEntity {
             Entity attacker = EntityFindUtil.findEntity(this.level(), this.entityData.get(LAST_ATTACKER_UUID));
 
             new CustomExplosion.Builder(attacker == null ? this : attacker)
-                    .damage((float) ExplosionConfig.CLAYMORE_EXPLOSION_DAMAGE / 5)
-                    .radius(ExplosionConfig.CLAYMORE_EXPLOSION_RADIUS)
+                    .damage((float) ExplosionConfig.CLAYMORE_EXPLOSION_DAMAGE.get() / 5)
+                    .radius(ExplosionConfig.CLAYMORE_EXPLOSION_RADIUS.get())
                     .position(this.position())
                     .withParticleType(ParticleTool.ParticleType.MEDIUM)
                     .explode();
@@ -243,8 +243,8 @@ public class ClaymoreEntity extends Entity implements GeoEntity, OwnableEntity {
     private void triggerExplode() {
         new CustomExplosion.Builder(this)
                 .attacker(this.getOwner())
-                .damage((float) ExplosionConfig.CLAYMORE_EXPLOSION_DAMAGE)
-                .radius(ExplosionConfig.CLAYMORE_EXPLOSION_RADIUS)
+                .damage((float) ExplosionConfig.CLAYMORE_EXPLOSION_DAMAGE.get())
+                .radius(ExplosionConfig.CLAYMORE_EXPLOSION_RADIUS.get())
                 .withParticleType(ParticleTool.ParticleType.MEDIUM)
                 .explode();
     }

@@ -2950,10 +2950,10 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     protected void crashPassengers() {
         for (var entity : this.getPassengers()) {
             if (entity instanceof LivingEntity living) {
-                for (int i = 0; i < VehicleConfig.AIR_CRASH_EXPLOSION_COUNT; i++) {
+                for (int i = 0; i < VehicleConfig.AIR_CRASH_EXPLOSION_COUNT.get(); i++) {
                     var tempAttacker = living == getLastAttacker() ? null : getLastAttacker();
                     living.invulnerableTime = 0;
-                    living.hurt(ModDamageTypes.causeAirCrashDamage(this.level().registryAccess(), null, tempAttacker), VehicleConfig.AIR_CRASH_EXPLOSION_DAMAGE);
+                    living.hurt(ModDamageTypes.causeAirCrashDamage(this.level().registryAccess(), null, tempAttacker), VehicleConfig.AIR_CRASH_EXPLOSION_DAMAGE.get());
                 }
             }
         }
@@ -2962,10 +2962,10 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     protected void explodePassengers() {
         for (var entity : this.getPassengers()) {
             if (entity instanceof LivingEntity living) {
-                for (int i = 0; i < VehicleConfig.SELF_EXPLOSION_COUNT; i++) {
+                for (int i = 0; i < VehicleConfig.SELF_EXPLOSION_COUNT.get(); i++) {
                     var tempAttacker = living == getLastAttacker() ? null : getLastAttacker();
                     living.invulnerableTime = 0;
-                    living.hurt(ModDamageTypes.causeVehicleExplosionDamage(this.level().registryAccess(), null, tempAttacker), VehicleConfig.SELF_EXPLOSION_DAMAGE);
+                    living.hurt(ModDamageTypes.causeVehicleExplosionDamage(this.level().registryAccess(), null, tempAttacker), VehicleConfig.SELF_EXPLOSION_DAMAGE.get());
                 }
             }
         }

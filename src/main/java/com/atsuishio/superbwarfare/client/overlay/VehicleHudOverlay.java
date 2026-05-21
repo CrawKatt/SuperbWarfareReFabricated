@@ -146,7 +146,7 @@ public class VehicleHudOverlay implements LayeredDraw.Layer {
         ItemStack stack = player.getItemBySlot(EquipmentSlot.CHEST);
         if (stack == ItemStack.EMPTY) return 0;
         if (!NBTTool.getTag(stack).contains("ArmorPlate")) return 0;
-        if (!DisplayConfig.ARMOR_PLATE_HUD) return 0;
+        if (!DisplayConfig.ARMOR_PLATE_HUD.get()) return 0;
         return 9;
     }
 

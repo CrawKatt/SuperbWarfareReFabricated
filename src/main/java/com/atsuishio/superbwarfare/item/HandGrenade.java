@@ -77,8 +77,8 @@ public class HandGrenade extends Item implements ProjectileItem {
 
             new CustomExplosion.Builder(handGrenade)
                     .attacker(pLivingEntity)
-                    .damage(ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE)
-                    .radius(ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS)
+                    .damage(ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE.get())
+                    .radius(ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS.get())
                     .damageMultiplier(1.25F)
                     .withParticleType(ParticleTool.ParticleType.MEDIUM)
                     .explode();

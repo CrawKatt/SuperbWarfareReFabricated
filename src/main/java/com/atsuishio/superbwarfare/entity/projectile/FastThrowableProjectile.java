@@ -150,7 +150,7 @@ public abstract class FastThrowableProjectile extends ThrowableItemProjectile im
     }
 
     public void destroyBlock() {
-        if (ExplosionConfig.EXPLOSION_DESTROY) {
+        if (ExplosionConfig.EXPLOSION_DESTROY.get()) {
             Vec3 posO = new Vec3(xo, yo, zo);
             List<BlockPos> blockList = getBlocksAlongRay(posO, getDeltaMovement(), getDeltaMovement().length());
             for (BlockPos pos : blockList) {
@@ -165,7 +165,7 @@ public abstract class FastThrowableProjectile extends ThrowableItemProjectile im
                         durability -= 10 + (int) (0.5 * hardness);
                     }
 
-                    if (hardness <= durability && hardness != -1 && ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
+                    if (hardness <= durability && hardness != -1 && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
                         this.level().destroyBlock(pos, true);
                     }
                     if (hardness == -1 || hardness > durability || durability <= 0) {

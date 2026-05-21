@@ -26,7 +26,7 @@ public class EntityRenderDispatcherMixin {
 
     @Inject(method = "renderHitbox", at = @At("HEAD"), cancellable = true)
     private static void onPreRenderHitbox(PoseStack poseStack, VertexConsumer buffer, Entity p_entity, float red, float green, float blue, float alpha, CallbackInfo ci) {
-        if (p_entity.getType().is(ModTags.EntityTypes.MINE) && MiscConfig.MINE_HITBOX_INVISIBLE) {
+        if (p_entity.getType().is(ModTags.EntityTypes.MINE) && MiscConfig.MINE_HITBOX_INVISIBLE.get()) {
             ci.cancel();
         }
     }

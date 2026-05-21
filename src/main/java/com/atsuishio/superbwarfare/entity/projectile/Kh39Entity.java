@@ -90,13 +90,13 @@ public class Kh39Entity extends MissileProjectile implements GeoEntity {
             BlockPos resultPos = blockHitResult.getBlockPos();
             float hardness = this.level().getBlockState(resultPos).getBlock().defaultDestroyTime();
             if (hardness != -1) {
-                if (ExplosionConfig.EXPLOSION_DESTROY) {
+                if (ExplosionConfig.EXPLOSION_DESTROY.get()) {
                     if (firstHit) {
                         causeExplode(blockHitResult.getLocation());
                         firstHit = false;
                         Mod.queueServerWork(3, this::discard);
                     }
-                    if (ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
+                    if (ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
                         this.level().destroyBlock(resultPos, true);
                     }
                 }
@@ -104,7 +104,7 @@ public class Kh39Entity extends MissileProjectile implements GeoEntity {
                 causeExplode(blockHitResult.getLocation());
                 this.discard();
             }
-            if (!ExplosionConfig.EXPLOSION_DESTROY) {
+            if (!ExplosionConfig.EXPLOSION_DESTROY.get()) {
                 causeExplode(blockHitResult.getLocation());
                 this.discard();
             }

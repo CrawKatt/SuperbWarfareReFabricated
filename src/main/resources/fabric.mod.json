@@ -34,7 +34,8 @@
     "java": ">=21",
     "fabric-api": "*",
     "geckolib": "*",
-    "cloth-config": "*"
+    "cloth-config": "*",
+    "forgeconfigapiport": "*"
   },
   "suggests": {
     "jei": "*",

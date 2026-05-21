@@ -76,7 +76,7 @@ public class Beast extends SwordItem {
                     0
             );
 
-            if (MiscConfig.SEND_KILL_FEEDBACK) {
+            if (MiscConfig.SEND_KILL_FEEDBACK.get()) {
                 // FIXME: sendToAllPlayers(new LivingGunKillMessage(player.getId(), target.getId(), false, ModDamageTypes.BEAST));
             }
         }

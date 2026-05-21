@@ -70,7 +70,7 @@ public class CustomGunRenderer<T extends GunGeoItem & GeoAnimatable> extends Geo
         var geoModel = getGeoModel();
 
         if (renderPerspective != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
-                && DisplayConfig.ENABLE_GUN_LOD
+                && DisplayConfig.ENABLE_GUN_LOD.get()
                 && geoModel instanceof CustomGunModel<T> gunModel
                 && !RenderHelper.isInGui()
         ) {
@@ -84,7 +84,7 @@ public class CustomGunRenderer<T extends GunGeoItem & GeoAnimatable> extends Geo
 //        var geoModel = getGeoModel();
 //
 //        if (renderPerspective != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
-//                && DisplayConfig.ENABLE_GUN_LOD
+//                && DisplayConfig.ENABLE_GUN_LOD.get()
 //                && geoModel instanceof CustomGunModel<T> gunModel
 //        ) {
 //            var player = Minecraft.getInstance().player;
@@ -130,7 +130,7 @@ public class CustomGunRenderer<T extends GunGeoItem & GeoAnimatable> extends Geo
         ResourceLocation modelLocation;
         var geoModel = getGeoModel();
         if (renderPerspective != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
-                && DisplayConfig.ENABLE_GUN_LOD
+                && DisplayConfig.ENABLE_GUN_LOD.get()
                 && geoModel instanceof CustomGunModel<T> gunModel
                 && !RenderHelper.isInGui()
         ) {

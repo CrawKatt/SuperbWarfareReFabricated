@@ -12,17 +12,17 @@ public class ControlClothConfig {
         ConfigCategory category = root.getOrCreateCategory(Component.translatable("config.superbwarfare.client.control"));
 
         category.addEntry(entryBuilder
-                .startBooleanToggle(Component.translatable("config.superbwarfare.client.control.invert_aircraft_control"), ControlConfig.INVERT_AIRCRAFT_CONTROL)
+                .startBooleanToggle(Component.translatable("config.superbwarfare.client.control.invert_aircraft_control"), ControlConfig.INVERT_AIRCRAFT_CONTROL.get())
                 .setDefaultValue(true)
-                .setSaveConsumer(v -> { ControlConfig.INVERT_AIRCRAFT_CONTROL = v; ControlConfig.save(); })
+                .setSaveConsumer(v -> { ControlConfig.INVERT_AIRCRAFT_CONTROL.set(v); ControlConfig.INVERT_AIRCRAFT_CONTROL.save(); })
                 .setTooltip(Component.translatable("config.superbwarfare.client.control.invert_aircraft_control.des")).build()
         );
 
         category.addEntry(entryBuilder
-                .startIntSlider(Component.translatable("config.superbwarfare.client.control.mouse_sensitivity"), ControlConfig.MOUSE_SENSITIVITY,
+                .startIntSlider(Component.translatable("config.superbwarfare.client.control.mouse_sensitivity"), ControlConfig.MOUSE_SENSITIVITY.get(),
                         10, 200)
                 .setDefaultValue(100)
-                .setSaveConsumer(v -> { ControlConfig.MOUSE_SENSITIVITY = v; ControlConfig.save(); })
+                .setSaveConsumer(v -> { ControlConfig.MOUSE_SENSITIVITY.set(v); ControlConfig.MOUSE_SENSITIVITY.save(); })
                 .setTooltip(Component.translatable("config.superbwarfare.client.control.mouse_sensitivity.des")).build()
         );
     }

@@ -1,53 +1,22 @@
 package com.atsuishio.superbwarfare.config.server;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.mojang.logging.LogUtils;
-import org.slf4j.Logger;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class SpawnConfig {
 
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private static final Path CONFIG_PATH = Path.of("config", "superbwarfare", "spawn.json");
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static ModConfigSpec.BooleanValue SPAWN_SENPAI;
+    public static ModConfigSpec.BooleanValue SPAWN_MOB_WITH_GUNS;
 
-    public static boolean SPAWN_SENPAI = false;
-    public static boolean SPAWN_MOB_WITH_GUNS = false;
+    public static void init(ModConfigSpec.Builder builder) {
+        builder.push("spawn");
 
-    public static void load() {
-        if (Files.notExists(CONFIG_PATH)) {
-            save();
-            return;
-        }
-        try {
-            var reader = Files.newBufferedReader(CONFIG_PATH);
-            var data = GSON.fromJson(reader, Data.class);
-            if (data != null) {
-                SPAWN_SENPAI = data.spawnSenpai;
-                SPAWN_MOB_WITH_GUNS = data.spawnMobWithGuns;
-            }
-        } catch (IOException e) {
-            LOGGER.error("Failed to load spawn config", e);
-        }
+        builder.comment("Set true to allow Senpai to spawn naturally");
+        SPAWN_SENPAI = builder.define("spawn_senpai", false);
+
+        builder.comment("this feature is under development, DO NOT TURN THIS ON!");
+        SPAWN_MOB_WITH_GUNS = builder.define("spawn_mob_with_guns", false);
+
+        builder.pop();
     }
 
-    public static void save() {
-        try {
-            Files.createDirectories(CONFIG_PATH.getParent());
-            var writer = Files.newBufferedWriter(CONFIG_PATH);
-            GSON.toJson(new Data(), writer);
-            writer.close();
-        } catch (IOException e) {
-            LOGGER.error("Failed to save spawn config", e);
-        }
-    }
-
-    private static class Data {
-        public boolean spawnSenpai = SPAWN_SENPAI;
-        public boolean spawnMobWithGuns = SPAWN_MOB_WITH_GUNS;
-    }
 }

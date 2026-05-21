@@ -57,7 +57,7 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
     @ParametersAreNonnullByDefault
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         if (Minecraft.getInstance().options.hideGui) return;
-        if (!KillMessageConfig.SHOW_KILL_MESSAGE) {
+        if (!KillMessageConfig.SHOW_KILL_MESSAGE.get()) {
             return;
         }
 
@@ -74,31 +74,31 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
         int screenWidth = guiGraphics.guiWidth();
         int screenHeight = guiGraphics.guiHeight();
 
-        var pos = KillMessageConfig.KILL_MESSAGE_POSITION;
+        var pos = KillMessageConfig.KILL_MESSAGE_POSITION.get();
         int posX = screenWidth;
-        float posY = KillMessageConfig.KILL_MESSAGE_MARGIN_Y;
+        float posY = KillMessageConfig.KILL_MESSAGE_MARGIN_Y.get();
         boolean left = false;
         boolean bottom = false;
 
         switch (pos) {
             case LEFT_TOP -> {
-                posX = KillMessageConfig.KILL_MESSAGE_MARGIN_X;
-                posY = KillMessageConfig.KILL_MESSAGE_MARGIN_Y;
+                posX = KillMessageConfig.KILL_MESSAGE_MARGIN_X.get();
+                posY = KillMessageConfig.KILL_MESSAGE_MARGIN_Y.get();
                 left = true;
             }
             case RIGHT_TOP -> {
-                posX = screenWidth - KillMessageConfig.KILL_MESSAGE_MARGIN_X;
-                posY = KillMessageConfig.KILL_MESSAGE_MARGIN_Y;
+                posX = screenWidth - KillMessageConfig.KILL_MESSAGE_MARGIN_X.get();
+                posY = KillMessageConfig.KILL_MESSAGE_MARGIN_Y.get();
             }
             case LEFT_BOTTOM -> {
-                posX = KillMessageConfig.KILL_MESSAGE_MARGIN_X;
-                posY = screenHeight - KillMessageConfig.KILL_MESSAGE_MARGIN_Y - 10;
+                posX = KillMessageConfig.KILL_MESSAGE_MARGIN_X.get();
+                posY = screenHeight - KillMessageConfig.KILL_MESSAGE_MARGIN_Y.get() - 10;
                 left = true;
                 bottom = true;
             }
             case RIGHT_BOTTOM -> {
-                posX = screenWidth - KillMessageConfig.KILL_MESSAGE_MARGIN_X;
-                posY = screenHeight - KillMessageConfig.KILL_MESSAGE_MARGIN_Y - 10;
+                posX = screenWidth - KillMessageConfig.KILL_MESSAGE_MARGIN_X.get();
+                posY = screenHeight - KillMessageConfig.KILL_MESSAGE_MARGIN_Y.get() - 10;
                 bottom = true;
             }
         }
@@ -363,7 +363,7 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
         String entityName = entity.getDisplayName().getString();
         String[] name = {entityName};
         if (entity instanceof LivingEntity living && living instanceof OwnableEntity ownableEntity && ownableEntity.getOwner() instanceof Player player) {
-            if (DisplayConfig.DOG_TAG_NAME_VISIBLE) {
+            if (DisplayConfig.DOG_TAG_NAME_VISIBLE.get()) {
                 name[0] = player.getDisplayName().getString() + " + " + entityName;
                 dev.emi.trinkets.api.TrinketsApi.getTrinketComponent(player)
                         .flatMap(c -> c.getEquipped(ModItems.DOG_TAG).stream().findFirst())
@@ -372,7 +372,7 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
                 name[0] = player.getDisplayName().getString() + " + " + entityName;
             }
         } else if (entity instanceof Player player) {
-            if (!DisplayConfig.DOG_TAG_NAME_VISIBLE) return name[0];
+            if (!DisplayConfig.DOG_TAG_NAME_VISIBLE.get()) return name[0];
             dev.emi.trinkets.api.TrinketsApi.getTrinketComponent(player)
                     .flatMap(c -> c.getEquipped(ModItems.DOG_TAG).stream().findFirst())
                     .ifPresent(s -> name[0] = s.getB().getHoverName().getString());
@@ -384,7 +384,7 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
         String entityName = entity.getDisplayName().getString();
         String[] name = {entityName};
         if (entity instanceof Player player) {
-            if (!DisplayConfig.DOG_TAG_NAME_VISIBLE) return name[0];
+            if (!DisplayConfig.DOG_TAG_NAME_VISIBLE.get()) return name[0];
             dev.emi.trinkets.api.TrinketsApi.getTrinketComponent(player)
                     .flatMap(c -> c.getEquipped(ModItems.DOG_TAG).stream().findFirst())
                     .ifPresent(s -> name[0] = s.getB().getHoverName().getString());
@@ -420,7 +420,7 @@ public class KillMessageOverlay implements LayeredDraw.Layer {
                 flag[0] = true;
             }
         });
-        return flag[0] && DisplayConfig.DOG_TAG_ICON_VISIBLE;
+        return flag[0] && DisplayConfig.DOG_TAG_ICON_VISIBLE.get();
     }
 
     public static void renderDogTagIcon(GuiGraphics guiGraphics, LivingEntity living, float x, float y) {

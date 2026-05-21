@@ -83,7 +83,7 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
     @Override
     @ParametersAreNonnullByDefault
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        if (!DisplayConfig.AMMO_HUD) return;
+        if (!DisplayConfig.AMMO_HUD.get()) return;
         if (Minecraft.getInstance().options.hideGui) return;
 
         int screenWidth = guiGraphics.guiWidth();
@@ -95,8 +95,8 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
 
         ItemStack stack = player.getMainHandItem();
         if (stack.getItem() instanceof GunItem gunItem && !(player.getVehicle() instanceof VehicleEntity vehicle && vehicle.banHand(player))) {
-            int x = screenWidth + DisplayConfig.WEAPON_HUD_X_OFFSET;
-            int y = screenHeight + DisplayConfig.WEAPON_HUD_Y_OFFSET;
+            int x = screenWidth + DisplayConfig.WEAPON_HUD_X_OFFSET.get();
+            int y = screenHeight + DisplayConfig.WEAPON_HUD_Y_OFFSET.get();
 
             PoseStack poseStack = guiGraphics.pose();
             var data = GunData.from(stack);
@@ -134,7 +134,7 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
             var fireModes = computed.availableFireModes();
 
             // 如果开火模式种类大于3，渲染开火模式信息
-            if (DisplayConfig.ADVANCED_AMMO_HUD && fireModes.size() > 3) {
+            if (DisplayConfig.ADVANCED_AMMO_HUD.get() && fireModes.size() > 3) {
                 guiGraphics.drawCenteredString(
                         font,
                         (selectedFireMode + 1) + "/" + fireModes.size(),
@@ -188,7 +188,7 @@ public class AmmoBarOverlay implements LayeredDraw.Layer {
 
             // 如果弹药种类大于1，渲染弹种信息
             int size = computed.getAmmoConsumers().size();
-            if (DisplayConfig.ADVANCED_AMMO_HUD
+            if (DisplayConfig.ADVANCED_AMMO_HUD.get()
                     && (size > 1 || size == 1 && data.selectedAmmoConsumer().type != AmmoConsumer.AmmoConsumeType.PLAYER_AMMO)
             ) {
                 // 如果当前弹药为物品，渲染备弹物品数量

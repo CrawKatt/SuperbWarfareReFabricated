@@ -559,7 +559,7 @@ public class ClickHandler {
             }
 
             if (!data.useBackpackAmmo() && !data.meleeOnly() && !data.hasEnoughAmmoToShoot(player) && data.reload.time() == 0) {
-                if (ReloadConfig.LEFT_CLICK_RELOAD) {
+                if (ReloadConfig.LEFT_CLICK_RELOAD.get()) {
                     ClientPlayNetworking.send(ReloadMessage.INSTANCE);
                     burstFireAmount = 0;
                     seekingTime = 0;

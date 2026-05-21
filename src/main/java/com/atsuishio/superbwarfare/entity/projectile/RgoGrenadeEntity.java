@@ -40,22 +40,22 @@ public class RgoGrenadeEntity extends FastThrowableProjectile implements GeoEnti
     public RgoGrenadeEntity(EntityType<? extends RgoGrenadeEntity> type, Level level) {
         super(type, level);
         this.noCulling = true;
-        this.explosionDamage = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE;
-        this.explosionRadius = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS;
+        this.explosionDamage = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE.get();
+        this.explosionRadius = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS.get();
     }
 
     public RgoGrenadeEntity(EntityType<? extends RgoGrenadeEntity> type, double x, double y, double z, Level level) {
         super(type, x, y, z, level);
         this.noCulling = true;
-        this.explosionDamage = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE;
-        this.explosionRadius = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS;
+        this.explosionDamage = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE.get();
+        this.explosionRadius = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS.get();
     }
 
     public RgoGrenadeEntity(LivingEntity entity, Level level, int fuse) {
         super(ModEntities.RGO_GRENADE, entity, level);
         this.noCulling = true;
-        this.explosionDamage = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE;
-        this.explosionRadius = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS;
+        this.explosionDamage = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE.get();
+        this.explosionRadius = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS.get();
         this.fuse = fuse;
     }
 

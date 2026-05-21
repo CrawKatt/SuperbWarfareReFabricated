@@ -185,11 +185,11 @@ public class C4Entity extends Entity implements GeoEntity, OwnableEntity {
         if (!this.entityData.get(IS_CONTROLLABLE)) {
             int bombTick = this.entityData.get(BOMB_TICK);
 
-            if (bombTick >= ExplosionConfig.C4_EXPLOSION_COUNTDOWN) {
+            if (bombTick >= ExplosionConfig.C4_EXPLOSION_COUNTDOWN.get()) {
                 this.explode();
             }
 
-            int countdown = ExplosionConfig.C4_EXPLOSION_COUNTDOWN;
+            int countdown = ExplosionConfig.C4_EXPLOSION_COUNTDOWN.get();
             if (countdown - bombTick > 39 && bombTick % ((20 * (countdown - bombTick)) / countdown + 1) == 0) {
                 this.level().playSound(null, this.getOnPos(), ModSounds.C4_BEEP, SoundSource.PLAYERS, 1, 1);
             }
@@ -419,7 +419,7 @@ public class C4Entity extends Entity implements GeoEntity, OwnableEntity {
             }
         }
 
-        if (this.level() instanceof ServerLevel && ExplosionConfig.EXPLOSION_DESTROY && ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
+        if (this.level() instanceof ServerLevel && ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
             AABB aabb = new AABB(pos, pos).inflate(2);
             BlockPos.betweenClosedStream(aabb).forEach((blockPos) -> {
                 float hard = this.level().getBlockState(blockPos).getBlock().defaultDestroyTime();
@@ -431,8 +431,8 @@ public class C4Entity extends Entity implements GeoEntity, OwnableEntity {
 
         new CustomExplosion.Builder(this)
                 .attacker(this.getOwner())
-                .damage(ExplosionConfig.C4_EXPLOSION_DAMAGE)
-                .radius(ExplosionConfig.C4_EXPLOSION_RADIUS)
+                .damage(ExplosionConfig.C4_EXPLOSION_DAMAGE.get())
+                .radius(ExplosionConfig.C4_EXPLOSION_RADIUS.get())
                 .position(pos)
                 .withParticleType(ParticleTool.ParticleType.HUGE)
                 .explode();

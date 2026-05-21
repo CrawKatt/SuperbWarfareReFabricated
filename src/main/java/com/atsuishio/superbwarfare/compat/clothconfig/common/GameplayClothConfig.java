@@ -12,25 +12,25 @@ public class GameplayClothConfig {
         ConfigCategory category = root.getOrCreateCategory(Component.translatable("config.superbwarfare.common.gameplay"));
 
         category.addEntry(entryBuilder
-                .startBooleanToggle(Component.translatable("config.superbwarfare.common.gameplay.respawn_reload"), GameplayConfig.RESPAWN_RELOAD)
+                .startBooleanToggle(Component.translatable("config.superbwarfare.common.gameplay.respawn_reload"), GameplayConfig.RESPAWN_RELOAD.get())
                 .setDefaultValue(true)
-                .setSaveConsumer(v -> { GameplayConfig.RESPAWN_RELOAD = v; GameplayConfig.save(); })
+                .setSaveConsumer(v -> { GameplayConfig.RESPAWN_RELOAD.set(v); GameplayConfig.RESPAWN_RELOAD.save(); })
                 .setTooltip(Component.translatable("config.superbwarfare.common.gameplay.respawn_reload.des"))
                 .build()
         );
 
         category.addEntry(entryBuilder
-                .startBooleanToggle(Component.translatable("config.superbwarfare.common.gameplay.global_indication"), GameplayConfig.GLOBAL_INDICATION)
+                .startBooleanToggle(Component.translatable("config.superbwarfare.common.gameplay.global_indication"), GameplayConfig.GLOBAL_INDICATION.get())
                 .setDefaultValue(false)
-                .setSaveConsumer(v -> { GameplayConfig.GLOBAL_INDICATION = v; GameplayConfig.save(); })
+                .setSaveConsumer(v -> { GameplayConfig.GLOBAL_INDICATION.set(v); GameplayConfig.GLOBAL_INDICATION.save(); })
                 .setTooltip(Component.translatable("config.superbwarfare.common.gameplay.global_indication.des"))
                 .build()
         );
 
         category.addEntry(entryBuilder
-                .startBooleanToggle(Component.translatable("config.superbwarfare.common.gameplay.respawn_auto_armor"), GameplayConfig.RESPAWN_AUTO_ARMOR)
+                .startBooleanToggle(Component.translatable("config.superbwarfare.common.gameplay.respawn_auto_armor"), GameplayConfig.RESPAWN_AUTO_ARMOR.get())
                 .setDefaultValue(true)
-                .setSaveConsumer(v -> { GameplayConfig.RESPAWN_AUTO_ARMOR = v; GameplayConfig.save(); })
+                .setSaveConsumer(v -> { GameplayConfig.RESPAWN_AUTO_ARMOR.set(v); GameplayConfig.RESPAWN_AUTO_ARMOR.save(); })
                 .setTooltip(Component.translatable("config.superbwarfare.common.gameplay.respawn_auto_armor.des"))
                 .build()
         );

@@ -86,7 +86,7 @@ public final class VehicleMotionUtils {
                 .stream().filter(entity -> {
                     if (entity.isAlive() && vehicle.isInObb(entity, vehicle.getDeltaMovement())) {
                                 var type = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
-                                return (entity instanceof VehicleEntity || entity instanceof Boat || entity instanceof Minecart || (entity instanceof LivingEntity living && !(living instanceof Player player && player.isSpectator()))) || VehicleConfig.COLLISION_ENTITY_WHITELIST.contains(type.toString());
+                                return (entity instanceof VehicleEntity || entity instanceof Boat || entity instanceof Minecart || (entity instanceof LivingEntity living && !(living instanceof Player player && player.isSpectator()))) || VehicleConfig.COLLISION_ENTITY_WHITELIST.get().contains(type.toString());
                             }
                             return false;
                         }
@@ -205,7 +205,7 @@ public final class VehicleMotionUtils {
                     .stream().filter(entity -> {
                         if (entity.isAlive() && vehicle.isInObb(entity, vec3)) {
                                     var type = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
-                                    return (entity instanceof VehicleEntity || entity instanceof Boat || entity instanceof Minecart || (entity instanceof LivingEntity living && !(living instanceof Player player && player.isSpectator()))) || VehicleConfig.COLLISION_ENTITY_WHITELIST.contains(type.toString());
+                                    return (entity instanceof VehicleEntity || entity instanceof Boat || entity instanceof Minecart || (entity instanceof LivingEntity living && !(living instanceof Player player && player.isSpectator()))) || VehicleConfig.COLLISION_ENTITY_WHITELIST.get().contains(type.toString());
                                 }
                                 return false;
                             }
@@ -220,7 +220,7 @@ public final class VehicleMotionUtils {
                                     var type = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
                                     return (entity instanceof VehicleEntity || entity instanceof Boat || entity instanceof Minecart
                                             || (entity instanceof LivingEntity living && !(living instanceof Player player && player.isSpectator())))
-                                            || VehicleConfig.COLLISION_ENTITY_WHITELIST.contains(type.toString());
+                                            || VehicleConfig.COLLISION_ENTITY_WHITELIST.get().contains(type.toString());
                                 }
                                 return false;
                             }
@@ -352,10 +352,10 @@ public final class VehicleMotionUtils {
         var motion = vehicle.getDeltaMovement().horizontalDistance();
 
         boolean[] flags = new boolean[]{
-                VehicleConfig.COLLISION_DESTROY_SOFT_BLOCKS && collisionLevel.level >= 1,
-                VehicleConfig.COLLISION_DESTROY_NORMAL_BLOCKS && collisionLevel.level >= 2,
-                VehicleConfig.COLLISION_DESTROY_HARD_BLOCKS && collisionLevel.level >= 3,
-                VehicleConfig.COLLISION_DESTROY_BLOCKS_BEASTLY && collisionLevel.level >= 4
+                VehicleConfig.COLLISION_DESTROY_SOFT_BLOCKS.get() && collisionLevel.level >= 1,
+                VehicleConfig.COLLISION_DESTROY_NORMAL_BLOCKS.get() && collisionLevel.level >= 2,
+                VehicleConfig.COLLISION_DESTROY_HARD_BLOCKS.get() && collisionLevel.level >= 3,
+                VehicleConfig.COLLISION_DESTROY_BLOCKS_BEASTLY.get() && collisionLevel.level >= 4
         };
 
         for (int i = 0; i < flags.length && i < limits.size(); i++) {

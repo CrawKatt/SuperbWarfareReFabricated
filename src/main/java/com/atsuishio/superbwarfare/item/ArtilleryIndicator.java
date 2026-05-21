@@ -92,7 +92,7 @@ public class ArtilleryIndicator extends Item implements ItemScreenProvider {
 
     public boolean checkFull(ItemStack stack) {
         ListTag tags = NBTTool.getTag(stack).getList(TAG_CANNON, Tag.TAG_COMPOUND);
-        return tags.size() >= MiscConfig.ARTILLERY_INDICATOR_LIST_SIZE;
+        return tags.size() >= MiscConfig.ARTILLERY_INDICATOR_LIST_SIZE.get();
     }
 
     public boolean addCannon(ItemStack stack, Entity entity) {

@@ -224,7 +224,7 @@ public class Tm62Entity extends Entity implements GeoEntity, OwnableEntity {
             if (trigger) {
                 this.triggerExplode();
 
-                if (this.level() instanceof ServerLevel && ExplosionConfig.EXPLOSION_DESTROY && ExplosionConfig.EXTRA_EXPLOSION_EFFECT) {
+                if (this.level() instanceof ServerLevel && ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
                     AABB aabb = new AABB(position(), position()).inflate(2);
                     BlockPos.betweenClosedStream(aabb).forEach((blockPos) -> {
                         float hard = this.level().getBlockState(blockPos).getBlock().defaultDestroyTime();

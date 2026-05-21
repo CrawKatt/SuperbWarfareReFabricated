@@ -75,8 +75,8 @@ public class ModSellWarningScreen extends WarningScreen {
     private AbstractButton createProceedButton(int pYOffset) {
         return Button.builder(CommonComponents.GUI_PROCEED, button -> {
             if (this.stopShowing != null && this.stopShowing.selected()) {
-                EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM = ENVIRONMENT_CHECKSUM;
-                EnvironmentChecksumConfig.save();
+                EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.set(ENVIRONMENT_CHECKSUM);
+                EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.save();
             }
             Minecraft.getInstance().setScreen(new JoinMultiplayerScreen(this.lastScreen));
         }).bounds(this.width / 2 - 155, 100 + pYOffset, 150, 20).build();
@@ -87,7 +87,7 @@ public class ModSellWarningScreen extends WarningScreen {
                 && Minecraft.getInstance().screen instanceof TitleScreen))
             return;
 
-        if (EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.equals(ENVIRONMENT_CHECKSUM)) return;
+        if (EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.get().equals(ENVIRONMENT_CHECKSUM)) return;
 
         Minecraft.getInstance().setScreen(new ModSellWarningScreen(Minecraft.getInstance().screen));
     }
@@ -97,8 +97,8 @@ public class ModSellWarningScreen extends WarningScreen {
         LinearLayout linearlayout = LinearLayout.horizontal().spacing(8);
         linearlayout.addChild(Button.builder(CommonComponents.GUI_PROCEED, p_280872_ -> {
             if (this.stopShowing != null && this.stopShowing.selected()) {
-                EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM = ENVIRONMENT_CHECKSUM;
-                EnvironmentChecksumConfig.save();
+                EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.set(ENVIRONMENT_CHECKSUM);
+                EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.save();
             }
 
             Minecraft.getInstance().setScreen(new JoinMultiplayerScreen(this.lastScreen));

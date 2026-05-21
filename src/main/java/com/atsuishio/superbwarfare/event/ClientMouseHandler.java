@@ -93,7 +93,7 @@ public class ClientMouseHandler {
 
             int y = 1;
 
-            if (ControlConfig.INVERT_AIRCRAFT_CONTROL) {
+            if (ControlConfig.INVERT_AIRCRAFT_CONTROL.get()) {
                 y = -1;
             }
 
@@ -184,7 +184,7 @@ public class ClientMouseHandler {
         if (player.getVehicle() instanceof VehicleEntity vehicle
                 && (vehicle.getVehicleType() == VehicleType.AIRPLANE || vehicle.getVehicleType() == VehicleType.HELICOPTER)
                 && vehicle.getFirstPassenger() == player) {
-            return ControlConfig.INVERT_AIRCRAFT_CONTROL ? -1 : 1;
+            return ControlConfig.INVERT_AIRCRAFT_CONTROL.get() ? -1 : 1;
         }
         return 1;
     }
@@ -205,7 +205,7 @@ public class ClientMouseHandler {
             float customSens = data.sensitivity.get();
 
             if (!player.getMainHandItem().isEmpty() && mc.options.getCameraType() == CameraType.FIRST_PERSON) {
-                return original / Math.max((1 + (0.2 * (data.zoom() - (0.3 * customSens)) * ClientEventHandler.zoomTime)), 0.1) * (ControlConfig.MOUSE_SENSITIVITY / 100f);
+                return original / Math.max((1 + (0.2 * (data.zoom() - (0.3 * customSens)) * ClientEventHandler.zoomTime)), 0.1) * (ControlConfig.MOUSE_SENSITIVITY.get() / 100f);
             }
         }
 
