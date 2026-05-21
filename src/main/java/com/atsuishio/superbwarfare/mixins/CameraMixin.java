@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.client.ICustomCamera;
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
@@ -42,7 +43,7 @@ public abstract class CameraMixin implements ICustomCamera {
     @Shadow
     protected abstract void setPosition(double x, double y, double z);
 
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FFF)V", ordinal = 0),
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0),
             method = "setup",
             cancellable = true)
     private void onSetup(BlockGetter level, Entity entity, boolean detached, boolean thirdPersonReverse, float partialTicks, CallbackInfo info) {
@@ -50,6 +51,7 @@ public abstract class CameraMixin implements ICustomCamera {
         LocalPlayer player = mc.player;
         if (player == null) return;
 
+        ClientMouseHandler.handleClientTick((Camera) (Object) this, partialTicks);
         ItemStack stack = player.getMainHandItem();
         var tag = NBTTool.getTag(stack);
 
