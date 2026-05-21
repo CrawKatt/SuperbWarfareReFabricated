@@ -19,6 +19,7 @@ import com.atsuishio.superbwarfare.item.common.ammo.box.AmmoBoxInfo;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.network.message.receive.DrawClientMessage;
+import com.atsuishio.superbwarfare.network.message.receive.LivingGunKillMessage;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.tools.*;
 import net.minecraft.network.chat.Component;
@@ -452,10 +453,19 @@ public class LivingEventHandler {
 
         if (attacker != null && MiscConfig.SEND_KILL_FEEDBACK.get()) {
             if (DamageTypeTool.isHeadshotDamage(source)) {
-                // FIXME: sendToAllPlayers(new LivingGunKillMessage(attacker.getId(), entity.getId(), true, damageTypeResourceKey));
+                sendToAllPlayers(entity, new LivingGunKillMessage(attacker.getId(), entity.getId(), true, damageTypeResourceKey));
             } else {
-                // FIXME: sendToAllPlayers(new LivingGunKillMessage(attacker.getId(), entity.getId(), false, damageTypeResourceKey));
+                sendToAllPlayers(entity, new LivingGunKillMessage(attacker.getId(), entity.getId(), false, damageTypeResourceKey));
             }
+        }
+    }
+
+    private static void sendToAllPlayers(Entity entity, LivingGunKillMessage message) {
+        var server = entity.getServer();
+        if (server == null) return;
+
+        for (var player : server.getPlayerList().getPlayers()) {
+            ServerPlayNetworking.send(player, message);
         }
     }
 
