@@ -35,7 +35,8 @@
     "fabric-api": "*",
     "geckolib": "*",
     "cloth-config": "*",
-    "forgeconfigapiport": "*"
+    "forgeconfigapiport": "*",
+    "extensibleenums": "*"
   },
   "suggests": {
     "jei": "*",

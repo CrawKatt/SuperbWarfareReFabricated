@@ -29,6 +29,7 @@
     "EntityRenderDispatcherMixin",
     "GameRendererMixin",
     "GuiMixin",
+    "HumanoidModelMixin",
     "ItemInHandLayerMixin",
     "ItemInHandRendererMixin",
     "KeyMappingAccessor",
@@ -42,6 +43,7 @@
     "MouseHandlerMixin",
     "MultiPlayerGameModeMixin",
     "PlayerItemInHandLayerMixin",
+    "PlayerRendererMixin",
     "PlayerModelMixin",
     "ScreenAccessor"
   ],

@@ -120,6 +120,7 @@ dependencies {
     modCompileOnly("vazkii.patchouli:Patchouli:1.21.1-93-FABRIC")
     modRuntimeOnly("vazkii.patchouli:Patchouli:1.21.1-93-FABRIC")
 
+    modImplementation("fuzs.extensibleenums:extensibleenums-fabric:${project.property("extensibleenums_version")}")
     modImplementation("curse.maven:better-combat-by-daedelus-639842:6532547")
     modImplementation("maven.modrinth:playeranimator:2.0.4+1.21.1-fabric")
     modCompileOnly("curse.maven:real-camera-851574:${project.property("real_camera_id")}")
