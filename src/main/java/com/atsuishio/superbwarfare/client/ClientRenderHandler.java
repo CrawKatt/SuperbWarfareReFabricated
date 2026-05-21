@@ -64,12 +64,12 @@ public class ClientRenderHandler {
 
     public static void registerOverlays() {
         HudRenderCallback.EVENT.register((guiGraphics, deltaTracker) -> {
+            new JavelinHudOverlay().render(guiGraphics, deltaTracker);
             new KillMessageOverlay().render(guiGraphics, deltaTracker);
             new ArmorPlateOverlay().render(guiGraphics, deltaTracker);
             new AmmoBarOverlay().render(guiGraphics, deltaTracker);
             new IFFOverlay().render(guiGraphics, deltaTracker);
             new VehicleTeamOverlay().render(guiGraphics, deltaTracker);
-            new JavelinHudOverlay().render(guiGraphics, deltaTracker);
             new IglaHudOverlay().render(guiGraphics, deltaTracker);
             new VehicleMainWeaponHudOverlay().render(guiGraphics, deltaTracker);
             new VehicleHudOverlay().render(guiGraphics, deltaTracker);
