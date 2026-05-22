@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.client.VehicleClientRenderState;
+import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -37,21 +38,36 @@ public class ItemInHandRendererMixin {
             MultiBufferSource bufferSource, int packedLight,
             CallbackInfo ci
     ) {
+        HumanoidArm mainArm = player.getMainArm();
+        InteractionHand rightInteractionHand = mainArm == HumanoidArm.RIGHT ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+        InteractionHand leftInteractionHand = mainArm == HumanoidArm.RIGHT ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+        ItemStack rightHandItem = player.getItemInHand(rightInteractionHand);
+
+        if (hand == leftInteractionHand && rightHandItem.getItem() instanceof GunItem) {
+            ci.cancel();
+            return;
+        }
+
+        if (hand == rightInteractionHand && rightHandItem.getItem() instanceof GunItem && ClientEventHandler.drawTime > 0.15) {
+            ci.cancel();
+            return;
+        }
+
         if (!(stack.getItem() instanceof GunItem)) {
             return;
         }
 
         boolean mainHand = hand == InteractionHand.MAIN_HAND;
-        HumanoidArm arm = mainHand ? player.getMainArm() : player.getMainArm().getOpposite();
-        boolean rightHand = arm == HumanoidArm.RIGHT;
-        ItemDisplayContext displayContext = rightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
+        HumanoidArm arm = mainHand ? mainArm : mainArm.getOpposite();
+        boolean rightArm = arm == HumanoidArm.RIGHT;
+        ItemDisplayContext displayContext = rightArm ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
 
         poseStack.pushPose();
-        int side = rightHand ? 1 : -1;
+        int side = rightArm ? 1 : -1;
         float stableEquipProgress = 0.0F;
         poseStack.translate(side * 0.56F, -0.52F + stableEquipProgress * -0.6F, -0.72F);
 
-        ((ItemInHandRenderer) (Object) this).renderItem(player, stack, displayContext, !rightHand, poseStack, bufferSource, packedLight);
+        ((ItemInHandRenderer) (Object) this).renderItem(player, stack, displayContext, !rightArm, poseStack, bufferSource, packedLight);
         poseStack.popPose();
         ci.cancel();
     }
