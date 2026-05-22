@@ -24,7 +24,8 @@ public class TDMCommand {
                             tdm.sync((ServerLevel) level);
 
                             if (entities.size() == 1) {
-                                context.getSource().sendSuccess(() -> Component.translatable("commands.tdm.add.single", entities.iterator().next()), true);
+                                var entity = entities.iterator().next();
+                                context.getSource().sendSuccess(() -> Component.translatable("commands.tdm.add.single", entity.getDisplayName()), true);
                             } else {
                                 context.getSource().sendSuccess(() -> Component.translatable("commands.tdm.add.multiple", entities.size()), true);
                             }
@@ -42,7 +43,8 @@ public class TDMCommand {
                             tdm.sync((ServerLevel) level);
 
                             if (entities.size() == 1) {
-                                context.getSource().sendSuccess(() -> Component.translatable("commands.tdm.remove.single", entities.iterator().next()), true);
+                                var entity = entities.iterator().next();
+                                context.getSource().sendSuccess(() -> Component.translatable("commands.tdm.remove.single", entity.getDisplayName()), true);
                             } else {
                                 context.getSource().sendSuccess(() -> Component.translatable("commands.tdm.remove.multiple", entities.size()), true);
                             }
