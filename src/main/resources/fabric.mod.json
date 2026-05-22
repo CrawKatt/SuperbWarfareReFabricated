@@ -36,7 +36,8 @@
     "geckolib": "*",
     "cloth-config": "*",
     "forgeconfigapiport": "*",
-    "extensibleenums": "*"
+    "extensibleenums": "*",
+    "trinkets": "*"
   },
   "suggests": {
     "jei": "*",

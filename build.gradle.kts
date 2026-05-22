@@ -120,13 +120,13 @@ dependencies {
     modCompileOnly("vazkii.patchouli:Patchouli:1.21.1-93-FABRIC")
     modRuntimeOnly("vazkii.patchouli:Patchouli:1.21.1-93-FABRIC")
 
-    modImplementation("fuzs.extensibleenums:extensibleenums-fabric:${project.property("extensibleenums_version")}")
+    include(modImplementation("fuzs.extensibleenums:extensibleenums-fabric:${project.property("extensibleenums_version")}")!!)
+    include(modApi("teamreborn:energy:4.1.0")!!)
     modImplementation("curse.maven:better-combat-by-daedelus-639842:6532547")
     modImplementation("maven.modrinth:playeranimator:2.0.4+1.21.1-fabric")
     modCompileOnly("curse.maven:real-camera-851574:${project.property("real_camera_id")}")
     modImplementation("curse.maven:net-music-978569:6838604")
     modApi("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:21.1.6")
-    modApi("teamreborn:energy:4.1.0")
 
     compileOnly("com.google.code.findbugs:jsr305:3.0.2")
 }
