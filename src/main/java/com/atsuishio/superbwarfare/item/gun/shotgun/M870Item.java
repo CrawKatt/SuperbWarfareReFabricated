@@ -1,5 +1,9 @@
 package com.atsuishio.superbwarfare.item.gun.shotgun;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
+
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.model.item.M870ItemModel;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -29,6 +33,7 @@ public class M870Item extends GunGeoItem {
         return GunRendererBuilder.simple(M870ItemModel::new);
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState fireAnimPredicate(AnimationState<M870Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -66,6 +71,7 @@ public class M870Item extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.m_870.idle"));
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState meleePredicate(AnimationState<M870Item> event) {
         if (event.getData(DataTickets.ITEM_RENDER_PERSPECTIVE) != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
             return event.setAndContinue(RawAnimation.begin().thenLoop("animation.m_870.idle"));
@@ -79,6 +85,7 @@ public class M870Item extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var fireAnimController = new AnimationController<>(this, "fireAnimController", 1, this::fireAnimPredicate);
         data.add(fireAnimController);
         var meleeController = new AnimationController<>(this, "meleeController", 0, this::meleePredicate);

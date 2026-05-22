@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.TooltipTool;
 import com.atsuishio.superbwarfare.client.screens.FiringParametersScreen;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
@@ -56,6 +59,7 @@ public class FiringParameters extends Item implements ItemScreenProvider {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
         TooltipTool.addScreenProviderText(tooltipComponents);
 
@@ -83,6 +87,7 @@ public class FiringParameters extends Item implements ItemScreenProvider {
 
     
     @Override
+    @Environment(EnvType.CLIENT)
     public @Nullable Screen getItemScreen(ItemStack stack, Player player, InteractionHand hand) {
         return new FiringParametersScreen(stack, hand);
     }

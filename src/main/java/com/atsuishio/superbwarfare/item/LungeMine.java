@@ -1,11 +1,15 @@
 package com.atsuishio.superbwarfare.item;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.client.ClientItemHooks;
 import com.atsuishio.superbwarfare.client.renderer.item.LungeMineRenderer;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.init.ModEnumExtensions;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.player.LocalPlayer;
@@ -45,6 +49,7 @@ public class LungeMine extends Item implements GeoItem {
         transformType = type;
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState idlePredicate(AnimationState<LungeMine> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -69,6 +74,7 @@ public class LungeMine extends Item implements GeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var idleController = new AnimationController<>(this, "idleController", 2, this::idlePredicate);
         data.add(idleController);
     }
@@ -95,7 +101,7 @@ public class LungeMine extends Item implements GeoItem {
         if (!playerIn.level().isClientSide()) {
             playerIn.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100, (playerIn.hasEffect(MobEffects.MOVEMENT_SPEED) ? playerIn.getEffect(MobEffects.MOVEMENT_SPEED).getAmplifier() : 0) + 2));
         } else {
-            ClientEventHandler.lungeSprint = 180;
+            ClientItemHooks.startLungeMineSprint();
         }
         playerIn.getCooldowns().addCooldown(stack.getItem(), 300);
         return InteractionResultHolder.consume(stack);

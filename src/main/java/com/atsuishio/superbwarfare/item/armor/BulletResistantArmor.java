@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item.armor;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.init.ModAttributes;
 import net.minecraft.client.model.HumanoidModel;
@@ -49,6 +52,7 @@ public abstract class BulletResistantArmor extends ArmorItem implements GeoItem 
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
             private GeoArmorRenderer<? extends Item> renderer;

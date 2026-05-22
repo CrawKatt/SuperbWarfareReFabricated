@@ -1,5 +1,9 @@
 package com.atsuishio.superbwarfare.item.gun.sniper;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
+
 import com.atsuishio.superbwarfare.client.TooltipTool;
 import com.atsuishio.superbwarfare.client.renderer.gun.Ql1031ItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -49,6 +53,7 @@ public class Ql1031Item extends GunGeoItem {
 
     @Override
     @ParametersAreNonnullByDefault
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.empty());
         tooltipComponents.add(Component.translatable("des.superbwarfare.ql_1031_1").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
@@ -59,6 +64,7 @@ public class Ql1031Item extends GunGeoItem {
     }
 
     
+    @Environment(EnvType.CLIENT)
     private PlayState editPredicate(AnimationState<Ql1031Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -75,6 +81,7 @@ public class Ql1031Item extends GunGeoItem {
     }
 
     
+    @Environment(EnvType.CLIENT)
     private PlayState chargePredicate(AnimationState<Ql1031Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -110,6 +117,7 @@ public class Ql1031Item extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var editController = new AnimationController<>(this, "editController", 1, this::editPredicate);
         var chargeController = new AnimationController<>(this, "chargeController", 1, this::chargePredicate);
         data.add(editController);

@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item.common.container;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.renderer.item.LuckyContainerBlockItemRenderer;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
@@ -73,6 +76,7 @@ public class LuckyContainerBlockItem extends BlockItem implements GeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
             private LuckyContainerBlockItemRenderer renderer;

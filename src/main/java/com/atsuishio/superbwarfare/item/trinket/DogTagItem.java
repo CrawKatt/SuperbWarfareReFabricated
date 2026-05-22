@@ -34,6 +34,7 @@ public class DogTagItem extends TrinketItem implements ItemScreenProvider {
 
     @Override
     @ParametersAreNonnullByDefault
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         TooltipTool.addScreenProviderText(tooltipComponents);
     }

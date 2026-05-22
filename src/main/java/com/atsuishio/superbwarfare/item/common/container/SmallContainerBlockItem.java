@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item.common.container;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.renderer.item.SmallContainerBlockItemRenderer;
 import com.atsuishio.superbwarfare.init.ModBlocks;
@@ -45,6 +48,7 @@ public class SmallContainerBlockItem extends BlockItem implements GeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
             private SmallContainerBlockItemRenderer renderer;

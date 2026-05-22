@@ -1,5 +1,9 @@
 package com.atsuishio.superbwarfare.item.gun.handgun;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
+
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.TooltipTool;
 import com.atsuishio.superbwarfare.client.model.item.AureliaSceptreItemModel;
@@ -41,6 +45,7 @@ public class AureliaSceptreItem extends GunGeoItem {
 
     
     @Override
+    @Environment(EnvType.CLIENT)
     public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
         if (!stack.isEmpty()) {
             if (entityLiving.getUsedItemHand() == hand) {
@@ -51,6 +56,7 @@ public class AureliaSceptreItem extends GunGeoItem {
     }
 
     
+    @Environment(EnvType.CLIENT)
     private PlayState idlePredicate(AnimationState<AureliaSceptreItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -70,6 +76,7 @@ public class AureliaSceptreItem extends GunGeoItem {
     }
 
     
+    @Environment(EnvType.CLIENT)
     private PlayState firePredicate(AnimationState<AureliaSceptreItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -88,6 +95,7 @@ public class AureliaSceptreItem extends GunGeoItem {
     }
 
     
+    @Environment(EnvType.CLIENT)
     private PlayState meleePredicate(AnimationState<AureliaSceptreItem> event) {
         if (event.getData(DataTickets.ITEM_RENDER_PERSPECTIVE) != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
             return event.setAndContinue(RawAnimation.begin().thenLoop("animation.aurelia_sceptre.idle"));
@@ -101,6 +109,7 @@ public class AureliaSceptreItem extends GunGeoItem {
 
     @Override
     @ParametersAreNonnullByDefault
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.empty());
         tooltipComponents.add(Component.translatable("des.superbwarfare.aurelia_sceptre_1").withStyle(ChatFormatting.GRAY));
@@ -113,6 +122,7 @@ public class AureliaSceptreItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var idleController = new AnimationController<>(this, "idleController", 6, this::idlePredicate);
         data.add(idleController);
         var fireController = new AnimationController<>(this, "fireController", 3, this::firePredicate);

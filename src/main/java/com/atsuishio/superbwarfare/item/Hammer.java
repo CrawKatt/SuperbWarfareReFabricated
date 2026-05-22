@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.TooltipTool;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.init.ModTags;
@@ -28,6 +31,7 @@ public class Hammer extends SwordItem {
 
     @Override
     @ParametersAreNonnullByDefault
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         TooltipTool.addHideText(tooltipComponents, Component.translatable("des.superbwarfare.hammer", NBTTool.getTag(stack).getInt("CraftCount")).withStyle(ChatFormatting.GRAY));
     }

@@ -32,7 +32,6 @@ import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-@net.fabricmc.api.Environment(net.fabricmc.api.EnvType.CLIENT)
 public class TaserBulletEntity extends AbstractArrow implements GeoEntity, CustomDamageProjectile {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);

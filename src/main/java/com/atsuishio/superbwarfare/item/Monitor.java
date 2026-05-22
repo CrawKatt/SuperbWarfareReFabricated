@@ -2,14 +2,15 @@ package com.atsuishio.superbwarfare.item;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
-import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.client.ClientItemHooks;
 import com.atsuishio.superbwarfare.network.message.receive.ResetCameraTypeMessage;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
 import com.atsuishio.superbwarfare.tools.FormatTool;
 import com.atsuishio.superbwarfare.tools.NBTTool;
 import com.atsuishio.superbwarfare.capability.PersistentDataAccessor;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.CameraType;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -81,15 +82,12 @@ public class Monitor extends Item {
         if (tag.getBoolean("Using")) {
             tag.putBoolean("Using", false);
             if (level.isClientSide) {
-                if (ClientEventHandler.lastCameraType != null) {
-                    Minecraft.getInstance().options.setCameraType(ClientEventHandler.lastCameraType);
-                }
+                ClientItemHooks.restoreMonitorCamera();
             }
         } else {
             tag.putBoolean("Using", true);
             if (level.isClientSide) {
-                ClientEventHandler.lastCameraType = Minecraft.getInstance().options.getCameraType();
-                Minecraft.getInstance().options.setCameraType(CameraType.THIRD_PERSON_BACK);
+                ClientItemHooks.enterMonitorCamera();
             }
         }
 
@@ -138,6 +136,7 @@ public class Monitor extends Item {
     
     @Override
     @ParametersAreNonnullByDefault
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         var tag = NBTTool.getTag(stack);
         if (!tag.contains(LINKED_DRONE) || tag.getString(LINKED_DRONE).equals("none"))
@@ -171,9 +170,7 @@ public class Monitor extends Item {
                 tag.putBoolean("Using", false);
                 NBTTool.saveTag(stack, tag);
                 if (entity.level().isClientSide) {
-                    if (ClientEventHandler.lastCameraType != null) {
-                        Minecraft.getInstance().options.setCameraType(ClientEventHandler.lastCameraType);
-                    }
+                    ClientItemHooks.restoreMonitorCamera();
                 }
             }
             this.resetDroneData(drone);
@@ -182,9 +179,7 @@ public class Monitor extends Item {
                 tag.putBoolean("Using", false);
                 NBTTool.saveTag(stack, tag);
                 if (entity.level().isClientSide) {
-                    if (ClientEventHandler.lastCameraType != null) {
-                        Minecraft.getInstance().options.setCameraType(ClientEventHandler.lastCameraType);
-                    }
+                    ClientItemHooks.restoreMonitorCamera();
                 }
             }
         }

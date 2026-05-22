@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item.gun.machinegun;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.renderer.gun.MinigunItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -38,6 +41,7 @@ public class MinigunItem extends GunGeoItem {
 
     
     @Override
+    @Environment(EnvType.CLIENT)
     public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
         if (!stack.isEmpty()) {
             if (entityLiving.getUsedItemHand() == hand) {

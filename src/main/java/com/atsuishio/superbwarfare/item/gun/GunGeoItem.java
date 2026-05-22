@@ -1,5 +1,9 @@
 package com.atsuishio.superbwarfare.item.gun;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
+
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.PoseTool;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -47,11 +51,13 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
     }
 
     
+    @Environment(EnvType.CLIENT)
     public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
         return PoseTool.pose(entityLiving, hand, stack);
     }
 
     
+    @Environment(EnvType.CLIENT)
     protected PlayState animationPredicate(AnimationState<GunGeoItem> event) {
         var player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -117,10 +123,12 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         controllers.add(new AnimationController<>(this, "animationController", 1, this::animationPredicate));
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
             private GeoItemRenderer<?> renderer;
@@ -128,7 +136,7 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
             @Override
             public GeoItemRenderer<?> getGeoItemRenderer() {
                 if (this.renderer == null) {
-                    this.renderer = GunGeoItem.this.getRenderer().get();
+                    this.renderer = (GeoItemRenderer<?>) GunGeoItem.this.getRenderer().get();
                 }
                 return this.renderer;
             }
