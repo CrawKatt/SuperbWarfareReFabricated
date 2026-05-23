@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.client.tooltip.*;
 import com.atsuishio.superbwarfare.client.tooltip.component.*;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
+import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.emi.trinkets.api.client.TrinketRendererRegistry;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -48,7 +49,7 @@ public class ClientRenderHandler {
 
     public static void registerTooltip() {
         TooltipComponentCallback.EVENT.register(component -> {
-            if (component instanceof GunImageComponent c) return new ClientGunImageTooltip(c);
+            if (component instanceof GunImageComponent c && c.stack.getItem() instanceof GunItem) return new ClientGunImageTooltip(c);
             if (component instanceof BocekImageComponent c) return new ClientBocekImageTooltip(c);
             if (component instanceof CellImageComponent c) return new ClientCellImageTooltip(c);
             if (component instanceof SentinelImageComponent c) return new ClientSentinelImageTooltip(c);
