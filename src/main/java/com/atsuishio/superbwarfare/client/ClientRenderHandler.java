@@ -18,13 +18,18 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 public class ClientRenderHandler {
 
     // TODO 正确赋值该变量
     public static Vec3 bulletRenderOffset = null;
+    private static final ContainerItemDecorator CONTAINER_DECORATOR = new ContainerItemDecorator();
+    private static final LuckyContainerItemDecorator LUCKY_CONTAINER_DECORATOR = new LuckyContainerItemDecorator();
 
     /**
      * 修改子弹类实体的虚拟渲染位置
@@ -90,6 +95,13 @@ public class ClientRenderHandler {
     }
 
     public static void registerItemDecorations() {
+    }
+
+    public static void renderItemDecorations(GuiGraphics guiGraphics, Font font, ItemStack stack, int x, int y) {
+        if (CONTAINER_DECORATOR.render(guiGraphics, font, stack, x, y)) {
+            return;
+        }
+        LUCKY_CONTAINER_DECORATOR.render(guiGraphics, font, stack, x, y);
     }
 
     public static void onClientSetup() {

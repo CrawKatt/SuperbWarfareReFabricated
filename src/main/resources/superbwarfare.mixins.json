@@ -28,6 +28,7 @@
     "ClientPlayerEntityMixin",
     "EntityRenderDispatcherMixin",
     "GameRendererMixin",
+    "GuiGraphicsMixin",
     "GuiMixin",
     "HumanoidModelMixin",
     "ItemInHandLayerMixin",
