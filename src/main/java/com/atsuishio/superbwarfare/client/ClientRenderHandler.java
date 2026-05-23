@@ -13,7 +13,7 @@ import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.emi.trinkets.api.client.TrinketRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
@@ -59,12 +59,12 @@ public class ClientRenderHandler {
     }
 
     public static void registerRenderers() {
-        BlockEntityRendererRegistry.register(ModBlockEntities.CONTAINER, context -> new ContainerBlockEntityRenderer());
-        BlockEntityRendererRegistry.register(ModBlockEntities.FUMO_25, context -> new FuMO25BlockEntityRenderer());
-        BlockEntityRendererRegistry.register(ModBlockEntities.CHARGING_STATION, context -> new ChargingStationBlockEntityRenderer());
-        BlockEntityRendererRegistry.register(ModBlockEntities.SMALL_CONTAINER, context -> new SmallContainerBlockEntityRenderer());
-        BlockEntityRendererRegistry.register(ModBlockEntities.LUCKY_CONTAINER, context -> new LuckyContainerBlockEntityRenderer());
-        BlockEntityRendererRegistry.register(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE, context -> new VehicleAssemblingTableBlockEntityRenderer());
+        BlockEntityRenderers.register(ModBlockEntities.CONTAINER, context -> new ContainerBlockEntityRenderer());
+        BlockEntityRenderers.register(ModBlockEntities.FUMO_25, context -> new FuMO25BlockEntityRenderer());
+        BlockEntityRenderers.register(ModBlockEntities.CHARGING_STATION, context -> new ChargingStationBlockEntityRenderer());
+        BlockEntityRenderers.register(ModBlockEntities.SMALL_CONTAINER, context -> new SmallContainerBlockEntityRenderer());
+        BlockEntityRenderers.register(ModBlockEntities.LUCKY_CONTAINER, context -> new LuckyContainerBlockEntityRenderer());
+        BlockEntityRenderers.register(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE, context -> new VehicleAssemblingTableBlockEntityRenderer());
     }
 
     public static void registerOverlays() {
