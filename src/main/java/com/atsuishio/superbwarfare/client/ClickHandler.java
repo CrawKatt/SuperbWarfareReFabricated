@@ -64,6 +64,8 @@ public class ClickHandler {
         if (notInGame()) return;
         if (action != InputConstants.RELEASE) return;
 
+        syncModMouseConflictState(button, action);
+
         Player player = Minecraft.getInstance().player;
         if (player == null) return;
 
@@ -146,7 +148,24 @@ public class ClickHandler {
                 || ModKeyMappings.HOLD_ZOOM.matchesMouse(button)
                 || ModKeyMappings.SWITCH_ZOOM.matchesMouse(button)
                 || ModKeyMappings.FIRE_MODE.matchesMouse(button)
+                || ModKeyMappings.MELEE.matchesMouse(button)
                 || ModKeyMappings.MARK.matchesMouse(button);
+    }
+
+    private static void syncModMouseConflictState(int button, int action) {
+        if (action != InputConstants.PRESS && action != InputConstants.RELEASE) {
+            return;
+        }
+
+        boolean down = action == InputConstants.PRESS;
+        syncMouseMapping(ModKeyMappings.MELEE, button, down);
+        syncMouseMapping(ModKeyMappings.RELEASE_DECOY, button, down);
+    }
+
+    private static void syncMouseMapping(KeyMapping keyMapping, int button, boolean down) {
+        if (keyMapping.matchesMouse(button)) {
+            keyMapping.setDown(down);
+        }
     }
 
     private static void forwardVanillaMouseButton(KeyMapping keyMapping, int button, int action) {
@@ -171,6 +190,8 @@ public class ClickHandler {
     public static void onButtonPressed(int button, int action, int modifiers) {
         if (notInGame()) return;
         if (action != InputConstants.PRESS) return;
+
+        syncModMouseConflictState(button, action);
 
         var mc = Minecraft.getInstance();
         Player player = mc.player;
@@ -214,15 +235,7 @@ public class ClickHandler {
         }
 
         if (ModKeyMappings.FIRE_MODE.matchesMouse(button)) {
-            if (player.getVehicle() instanceof VehicleEntity vehicle) {
-                var data = vehicle.getGunData(player);
-                if (data != null && data.getDefault().getAmmoConsumers().size() > 1) {
-                    ClientPlayNetworking.send(new EditMessage(5, true, true));
-                }
-            } else {
-                ClientPlayNetworking.send(new FireModeMessage(false));
-            }
-            burstFireAmount = 0;
+            handleFireModePress(player, false);
         }
     }
 
@@ -308,6 +321,8 @@ public class ClickHandler {
         int key = keyCode;
         if (key < 0) return false;
 
+        syncModKeyConflictState(key, scanCode, action);
+
         if (action == GLFW.GLFW_PRESS && ModKeyMappings.DISMOUNT.matches(key, scanCode)) {
             handleDismountPress(player);
             return true;
@@ -342,13 +357,11 @@ public class ClickHandler {
                 return true;
             }
             if (ModKeyMappings.FIRE_MODE.matches(key, scanCode) || ModKeyMappings.CHANGE_FIRE_MODE_BACKWARD.matches(key, scanCode)) {
-                ClientPlayNetworking.send(new FireModeMessage(false));
-                burstFireAmount = 0;
+                handleFireModePress(player, false);
                 return true;
             }
             if (ModKeyMappings.CHANGE_FIRE_MODE_FORWARD.matches(key, scanCode)) {
-                ClientPlayNetworking.send(new FireModeMessage(true));
-                burstFireAmount = 0;
+                handleFireModePress(player, true);
                 return true;
             }
             if (ModKeyMappings.INTERACT.matches(key, scanCode)) {
@@ -494,6 +507,36 @@ public class ClickHandler {
         }
 
         return false;
+    }
+
+    private static void syncModKeyConflictState(int key, int scanCode, int action) {
+        if (action != GLFW.GLFW_PRESS && action != GLFW.GLFW_RELEASE) {
+            return;
+        }
+
+        boolean down = action == GLFW.GLFW_PRESS;
+        syncKeyMapping(ModKeyMappings.MELEE, key, scanCode, down);
+        syncKeyMapping(ModKeyMappings.RELEASE_DECOY, key, scanCode, down);
+    }
+
+    private static void syncKeyMapping(KeyMapping keyMapping, int key, int scanCode, boolean down) {
+        if (keyMapping.matches(key, scanCode)) {
+            keyMapping.setDown(down);
+        }
+    }
+
+    private static void handleFireModePress(Player player, boolean forward) {
+        if (player.getVehicle() instanceof VehicleEntity vehicle) {
+            var data = vehicle.getGunData(player);
+            if (data != null && data.getDefault().getAmmoConsumers().size() > 1) {
+                ClientPlayNetworking.send(new EditMessage(5, !forward, true));
+                burstFireAmount = 0;
+                return;
+            }
+        }
+
+        ClientPlayNetworking.send(new FireModeMessage(forward));
+        burstFireAmount = 0;
     }
 
     public static void handleWeaponFirePress(Player player, ItemStack stack) {
