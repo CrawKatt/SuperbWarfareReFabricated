@@ -1,0 +1,10 @@
+{
+  "entities": [
+    "minecraft:player"
+  ],
+  "slots": [
+    "chest/back",
+    "chest/dog_tag",
+    "chest/iff"
+  ]
+}
