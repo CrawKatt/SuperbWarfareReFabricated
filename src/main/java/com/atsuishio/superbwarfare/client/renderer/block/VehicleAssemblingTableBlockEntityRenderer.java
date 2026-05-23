@@ -7,7 +7,6 @@ import com.atsuishio.superbwarfare.client.layer.block.VehicleAssemblingTableBloc
 import com.atsuishio.superbwarfare.client.model.block.VehicleAssemblingTableBlockModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -26,7 +25,8 @@ public class VehicleAssemblingTableBlockEntityRenderer extends GeoBlockRenderer<
         return RenderType.entityTranslucent(getTextureLocation(animatable));
     }
 
-    public boolean shouldRender(VehicleAssemblingTableBlockEntity blockEntity, @NotNull Vec3 cameraPos, @NotNull BlockPos blockPos) {
+    @Override
+    public boolean shouldRender(VehicleAssemblingTableBlockEntity blockEntity, @NotNull Vec3 cameraPos) {
         return blockEntity.getBlockState().getValue(VehicleAssemblingTableBlock.BLOCK_PART) == BlockPart.FLB;
     }
 

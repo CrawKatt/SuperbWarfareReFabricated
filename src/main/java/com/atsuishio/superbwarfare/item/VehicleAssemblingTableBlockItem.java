@@ -1,12 +1,11 @@
 package com.atsuishio.superbwarfare.item;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.block.VehicleAssemblingTableBlock;
 import com.atsuishio.superbwarfare.block.property.BlockPart;
 import com.atsuishio.superbwarfare.client.renderer.item.VehicleAssemblingTableBlockItemRenderer;
 import com.atsuishio.superbwarfare.init.ModBlocks;
-import com.atsuishio.superbwarfare.init.ModItems;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.BlockItem;
@@ -17,9 +16,13 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
+
+import java.util.function.Consumer;
 
 public class VehicleAssemblingTableBlockItem extends BlockItem implements GeoItem {
 
@@ -92,9 +95,25 @@ public class VehicleAssemblingTableBlockItem extends BlockItem implements GeoIte
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
+    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+        consumer.accept(new GeoRenderProvider() {
+            private VehicleAssemblingTableBlockItemRenderer renderer;
+
+            @Override
+            public GeoItemRenderer<?> getGeoItemRenderer() {
+                if (this.renderer == null) {
+                    this.renderer = new VehicleAssemblingTableBlockItemRenderer();
+                }
+                return this.renderer;
+            }
+        });
+    }
+
+    @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
     }
 
-    
+
 }
