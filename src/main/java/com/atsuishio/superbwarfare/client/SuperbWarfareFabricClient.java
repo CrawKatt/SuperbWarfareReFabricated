@@ -17,6 +17,7 @@ import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.neoforged.fml.config.ModConfig;
 
 public class SuperbWarfareFabricClient implements ClientModInitializer {
@@ -47,6 +48,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         NetworkRegistry.registerClientReceivers();
 
         registerClientTicks();
+        registerRenderFrames();
     }
 
     private static void registerClientTicks() {
@@ -54,12 +56,17 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
             Mod.tickClient();
             ClientEventHandler.handleClientTick();
             ClientEventHandler.handleWeaponBreathSway();
-            ClientEventHandler.handleWeaponFire();
-            ClientEventHandler.handleVehicleFire();
             ClientMouseHandler.handleClientTick(client);
             KillMessageHandler.onClientTick();
             CrossHairOverlay.onClientTick();
             FuMO25ScreenHelper.onClientTick();
+        });
+    }
+
+    private static void registerRenderFrames() {
+        WorldRenderEvents.START.register(context -> {
+            ClientEventHandler.handleWeaponFire();
+            ClientEventHandler.handleVehicleFire();
         });
     }
 }
