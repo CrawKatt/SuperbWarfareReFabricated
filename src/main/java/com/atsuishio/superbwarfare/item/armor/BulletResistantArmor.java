@@ -74,7 +74,7 @@ public abstract class BulletResistantArmor extends ArmorItem implements GeoItem 
     public @NotNull ItemAttributeModifiers getDefaultAttributeModifiers() {
         var modifiers = super.getDefaultAttributeModifiers();
         var list = new ArrayList<>(modifiers.modifiers());
-        list.add(new ItemAttributeModifiers.Entry(net.minecraft.core.Holder.direct(ModAttributes.BULLET_RESISTANCE), new AttributeModifier(Mod.ATTRIBUTE_MODIFIER,
+        list.add(new ItemAttributeModifiers.Entry(ModAttributes.bulletResistanceHolder(), new AttributeModifier(Mod.ATTRIBUTE_MODIFIER,
                 this.bulletResistance, AttributeModifier.Operation.ADD_VALUE),
                 EquipmentSlotGroup.bySlot(this.type.getSlot())));
         return new ItemAttributeModifiers(list, true);
