@@ -1,11 +1,10 @@
 package com.atsuishio.superbwarfare.item;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer;
 import com.atsuishio.superbwarfare.entity.Tm62Entity;
 import com.atsuishio.superbwarfare.init.ModEntities;
-import com.atsuishio.superbwarfare.init.ModItems;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.core.dispenser.BlockSource;
@@ -21,11 +20,14 @@ import net.minecraft.world.level.block.DispenserBlock;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Consumer;
 
 public class Tm62Item extends Item implements GeoItem {
 
@@ -35,7 +37,21 @@ public class Tm62Item extends Item implements GeoItem {
         super(new Properties().stacksTo(8));
     }
 
-    
+    @Override
+    @Environment(EnvType.CLIENT)
+    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+        consumer.accept(new GeoRenderProvider() {
+            private Tm62ItemRenderer renderer;
+
+            @Override
+            public GeoItemRenderer<?> getGeoItemRenderer() {
+                if (this.renderer == null) {
+                    this.renderer = new Tm62ItemRenderer();
+                }
+                return this.renderer;
+            }
+        });
+    }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {

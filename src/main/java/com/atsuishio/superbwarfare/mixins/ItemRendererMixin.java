@@ -13,11 +13,19 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
+import java.util.Set;
+
 @Mixin(ItemRenderer.class)
 public class ItemRendererMixin {
+    @Unique
+    private static final Set<ResourceLocation> CUSTOM_GUI_ICON_ITEMS = Set.of(
+            ResourceLocation.fromNamespaceAndPath("superbwarfare", "lunge_mine")
+    );
+
     @Shadow
     @Final
     private ItemModelShaper itemModelShaper;
@@ -28,12 +36,21 @@ public class ItemRendererMixin {
             argsOnly = true
     )
     public BakedModel renderItem(BakedModel bakedModel, @Local(argsOnly = true) ItemStack stack, @Local(argsOnly = true) ItemDisplayContext displayContext) {
-        if (stack.getItem() instanceof GunGeoItem && (displayContext == ItemDisplayContext.GUI || displayContext == ItemDisplayContext.GROUND || displayContext == ItemDisplayContext.FIXED)) {
+        if (usesGuiIconModel(stack) && (displayContext == ItemDisplayContext.GUI || displayContext == ItemDisplayContext.GROUND || displayContext == ItemDisplayContext.FIXED)) {
             ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
             ModelResourceLocation iconModelLocation = ModelResourceLocation.inventory(itemId.withPath(path -> path + "_icon"));
             return this.itemModelShaper.getModelManager().getModel(iconModelLocation);
         }
 
         return bakedModel;
+    }
+
+    @Unique
+    private static boolean usesGuiIconModel(ItemStack stack) {
+        if (stack.getItem() instanceof GunGeoItem) {
+            return true;
+        }
+
+        return CUSTOM_GUI_ICON_ITEMS.contains(BuiltInRegistries.ITEM.getKey(stack.getItem()));
     }
 }

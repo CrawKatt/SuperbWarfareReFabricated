@@ -30,9 +30,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
+import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
+
+import java.util.function.Consumer;
 
 public class LungeMine extends Item implements GeoItem {
 
@@ -43,7 +47,21 @@ public class LungeMine extends Item implements GeoItem {
         super(new Properties().stacksTo(4));
     }
 
-    
+    @Override
+    @Environment(EnvType.CLIENT)
+    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+        consumer.accept(new GeoRenderProvider() {
+            private LungeMineRenderer renderer;
+
+            @Override
+            public GeoItemRenderer<?> getGeoItemRenderer() {
+                if (this.renderer == null) {
+                    this.renderer = new LungeMineRenderer();
+                }
+                return this.renderer;
+            }
+        });
+    }
 
     public void getTransformType(ItemDisplayContext type) {
         transformType = type;

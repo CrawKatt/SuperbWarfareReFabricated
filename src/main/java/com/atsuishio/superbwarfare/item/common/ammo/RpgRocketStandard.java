@@ -1,7 +1,5 @@
 package com.atsuishio.superbwarfare.item.common.ammo;
 
-import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.client.PoseTool;
 import com.atsuishio.superbwarfare.client.renderer.item.RpgRocketStandardRenderer;
 import com.atsuishio.superbwarfare.entity.projectile.RpgRocketStandardEntity;
 import com.atsuishio.superbwarfare.init.ModCriteriaTriggers;
@@ -9,8 +7,8 @@ import com.atsuishio.superbwarfare.init.ModEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.core.dispenser.BlockSource;
@@ -18,7 +16,6 @@ import net.minecraft.core.dispenser.ProjectileDispenseBehavior;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -31,13 +28,16 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class RpgRocketStandard extends Item implements GeoItem, ProjectileItem {
 
@@ -47,7 +47,21 @@ public class RpgRocketStandard extends Item implements GeoItem, ProjectileItem {
         super(new Properties().stacksTo(16));
     }
 
-    
+    @Override
+    @Environment(EnvType.CLIENT)
+    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
+        consumer.accept(new GeoRenderProvider() {
+            private RpgRocketStandardRenderer renderer;
+
+            @Override
+            public GeoItemRenderer<?> getGeoItemRenderer() {
+                if (this.renderer == null) {
+                    this.renderer = new RpgRocketStandardRenderer();
+                }
+                return this.renderer;
+            }
+        });
+    }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {

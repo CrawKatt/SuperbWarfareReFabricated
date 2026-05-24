@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.mixins;
 
+import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -14,6 +15,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -21,9 +23,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 @Mixin(ModelBakery.class)
 public abstract class ModelBakeryMixin {
+    @Unique
+    private static final Set<ResourceLocation> CUSTOM_GUI_ICON_ITEMS = Set.of(
+            Mod.loc("lunge_mine")
+    );
 
     @Shadow
     protected abstract UnbakedModel getModel(ResourceLocation location);
@@ -40,7 +47,7 @@ public abstract class ModelBakeryMixin {
                                    Map<ResourceLocation, List<BlockStateModelLoader.LoadedJson>> blockStates,
                                    CallbackInfo ci) {
         for (Entry<ResourceKey<Item>, Item> entry : BuiltInRegistries.ITEM.entrySet()) {
-            if (entry.getValue() instanceof GunGeoItem) {
+            if (usesGuiIconModel(entry.getKey().location(), entry.getValue())) {
                 ResourceLocation itemId = entry.getKey().location();
                 ResourceLocation iconId = itemId.withPath(path -> path + "_icon");
                 ResourceLocation modelPath = iconId.withPrefix("item/");
@@ -49,5 +56,10 @@ public abstract class ModelBakeryMixin {
                 this.registerModelAndLoadDependencies(inventoryLocation, model);
             }
         }
+    }
+
+    @Unique
+    private static boolean usesGuiIconModel(ResourceLocation itemId, Item item) {
+        return item instanceof GunGeoItem || CUSTOM_GUI_ICON_ITEMS.contains(itemId);
     }
 }
