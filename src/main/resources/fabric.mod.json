@@ -44,6 +44,9 @@
     "jade": "*",
     "kubejs": "*",
     "patchouli": "*",
-    "realcamera": "*"
+    "realcamera": "*",
+    "thermoo": "*",
+    "scorchful": "*",
+    "frostiful": "*"
   }
 }

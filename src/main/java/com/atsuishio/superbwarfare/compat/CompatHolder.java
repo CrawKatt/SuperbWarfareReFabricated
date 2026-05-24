@@ -8,6 +8,9 @@ public class CompatHolder {
     public static final String VRC = "virtuarealcraft";
     public static final String CLOTH_CONFIG = "cloth_config";
     public static final String COLD_SWEAT = "cold_sweat";
+    public static final String THERMOO = "thermoo";
+    public static final String SCORCHFUL = "scorchful";
+    public static final String FROSTIFUL = "frostiful";
     public static final String REALCAMERA = "realcamera";
     public static final String NET_MUSIC = "netmusic";
 

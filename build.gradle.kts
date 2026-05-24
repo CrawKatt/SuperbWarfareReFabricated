@@ -120,6 +120,9 @@ dependencies {
     modCompileOnly("vazkii.patchouli:Patchouli:1.21.1-93-FABRIC")
     modRuntimeOnly("vazkii.patchouli:Patchouli:1.21.1-93-FABRIC")
 
+    modCompileOnly("com.github.thedeathlycow:thermoo:v4.8.0")
+    modRuntimeOnly("com.github.thedeathlycow:thermoo:v4.8.0")
+
     include(modImplementation("fuzs.extensibleenums:extensibleenums-fabric:${project.property("extensibleenums_version")}")!!)
     include(modApi("teamreborn:energy:4.1.0")!!)
     modImplementation("curse.maven:better-combat-by-daedelus-639842:6532547")

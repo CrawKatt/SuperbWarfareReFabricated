@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare;
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
 import com.atsuishio.superbwarfare.command.CommandRegister;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
+import com.atsuishio.superbwarfare.compat.thermoo.ThermooCompatHandler;
 import com.atsuishio.superbwarfare.config.CommonConfig;
 import com.atsuishio.superbwarfare.config.ServerConfig;
 import com.atsuishio.superbwarfare.data.CustomData;
@@ -46,11 +47,18 @@ public class SuperbWarfareFabric implements ModInitializer {
         ModDataComponents.init();
 
         ResourceOnceLogger.register();
+        ThermooCompatHandler.init();
         registerDataTickets();
         registerTicks();
     }
 
     private void registerTicks() {
+        ServerTickEvents.START_SERVER_TICK.register(server -> {
+            for (var player : server.getPlayerList().getPlayers()) {
+                ThermooCompatHandler.onPlayerInVehicle(player);
+            }
+        });
+
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             Mod.tickServer();
             for (var player : server.getPlayerList().getPlayers()) {
