@@ -26,8 +26,6 @@ public class ModDataComponents {
             )
     );
 
-    public static final DataComponentType<Integer> ENERGY = register("energy", Codec.INT);
-
     public static final DataComponentType<List<Pair<Integer, Double>>> TRANSCRIPT_SCORE = register(
             "transcript_score",
             Codec.pair(

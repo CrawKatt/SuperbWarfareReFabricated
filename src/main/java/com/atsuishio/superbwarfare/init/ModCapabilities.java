@@ -23,6 +23,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import team.reborn.energy.api.EnergyStorage;
 
 public class ModCapabilities {
 
@@ -47,6 +48,14 @@ public class ModCapabilities {
 
         ENERGY_ITEM.registerForItems((stack, ctx) -> ((CreativeChargingStationBlockItem) stack.getItem()).getEnergyStorage(), ModItems.CREATIVE_CHARGING_STATION);
 
+        // TeamReborn EnergyStorage API lookups (for external mod compatibility)
+        EnergyStorage.SIDED.registerForBlockEntity(
+                (ChargingStationBlockEntity be, Direction dir) -> (EnergyStorage) be.getEnergyStorage(dir), ModBlockEntities.CHARGING_STATION);
+        EnergyStorage.SIDED.registerForBlockEntity(
+                (CreativeChargingStationBlockEntity be, Direction dir) -> (EnergyStorage) be.getEnergyStorage(dir), ModBlockEntities.CREATIVE_CHARGING_STATION);
+        EnergyStorage.SIDED.registerForBlockEntity(
+                (FuMO25BlockEntity be, Direction dir) -> (EnergyStorage) be.getEnergyStorage(dir), ModBlockEntities.FUMO_25);
+
         ITEM_HANDLER_BLOCK.registerForBlockEntity((ChargingStationBlockEntity be, Direction ctx) -> {
             if (ctx == null || be.isRemoved()) return null;
 
@@ -69,9 +78,21 @@ public class ModCapabilities {
             if (item instanceof EnergyStorageItem energyItem) {
                 ENERGY_ITEM.registerForItems((stack, ctx) -> new ItemEnergyStorage(
                         stack,
-                        s -> energyItem.getMaxEnergy(s),
-                        s -> energyItem.getMaxReceiveEnergy(s),
-                        s -> energyItem.getMaxExtractEnergy(s)
+                        energyItem.getMaxEnergy(stack),
+                        energyItem.getMaxReceiveEnergy(stack),
+                        energyItem.getMaxExtractEnergy(stack)
+                ), item);
+            }
+        }
+
+        // Register TeamReborn ITEM lookup for all energy items (external compatibility)
+        for (var item : BuiltInRegistries.ITEM) {
+            if (item instanceof EnergyStorageItem energyItem) {
+                EnergyStorage.ITEM.registerForItems((stack, ctx) -> new ItemEnergyStorage(
+                        stack,
+                        energyItem.getMaxEnergy(stack),
+                        energyItem.getMaxReceiveEnergy(stack),
+                        energyItem.getMaxExtractEnergy(stack)
                 ), item);
             }
         }

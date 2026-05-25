@@ -1,20 +1,21 @@
 package com.atsuishio.superbwarfare.capability.energy;
 
 import com.atsuishio.superbwarfare.capability.api.EnergyStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import java.util.function.Supplier;
 
 public class DynamicEnergyStorage extends EnergyStorage {
 
-    protected final Supplier<Integer> maxStorageGetter;
-    protected final Supplier<Integer> maxReceiveGetter;
-    protected final Supplier<Integer> maxExtractGetter;
+    protected final Supplier<Long> maxStorageGetter;
+    protected final Supplier<Long> maxReceiveGetter;
+    protected final Supplier<Long> maxExtractGetter;
 
-    public DynamicEnergyStorage(Supplier<Integer> maxStorageGetter) {
+    public DynamicEnergyStorage(Supplier<Long> maxStorageGetter) {
         this(maxStorageGetter, maxStorageGetter, maxStorageGetter);
     }
 
-    public DynamicEnergyStorage(Supplier<Integer> maxStorageGetter, Supplier<Integer> maxReceiveGetter, Supplier<Integer> maxExtractGetter) {
+    public DynamicEnergyStorage(Supplier<Long> maxStorageGetter, Supplier<Long> maxReceiveGetter, Supplier<Long> maxExtractGetter) {
         super(Integer.MAX_VALUE);
 
         this.maxStorageGetter = maxStorageGetter;
@@ -35,6 +36,18 @@ public class DynamicEnergyStorage extends EnergyStorage {
     }
 
     @Override
+    public long insert(long maxAmount, TransactionContext transaction) {
+        updateProps();
+        return super.insert(maxAmount, transaction);
+    }
+
+    @Override
+    public long extract(long maxAmount, TransactionContext transaction) {
+        updateProps();
+        return super.extract(maxAmount, transaction);
+    }
+
+    @Override
     public boolean canReceive() {
         updateProps();
         return super.canReceive();
@@ -50,6 +63,12 @@ public class DynamicEnergyStorage extends EnergyStorage {
     public int getMaxEnergyStored() {
         updateProps();
         return super.getMaxEnergyStored();
+    }
+
+    @Override
+    public long getCapacity() {
+        updateProps();
+        return super.getCapacity();
     }
 
     protected void updateProps() {

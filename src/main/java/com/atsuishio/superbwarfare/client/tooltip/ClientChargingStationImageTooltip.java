@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.client.tooltip;
 
 import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent;
-import com.atsuishio.superbwarfare.component.ModDataComponents;
+import team.reborn.energy.api.EnergyStorage;
 import com.atsuishio.superbwarfare.item.ChargingStationBlockItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
@@ -38,8 +38,8 @@ public class ClientChargingStationImageTooltip implements ClientTooltipComponent
     }
 
     protected Component getEnergyComponent() {
-        int energy = stack.getOrDefault(ModDataComponents.ENERGY, 0);
-        int maxEnergy = ChargingStationBlockItem.MAX_ENERGY;
+        long energy = stack.getOrDefault(EnergyStorage.ENERGY_COMPONENT, 0L);
+        long maxEnergy = ChargingStationBlockItem.MAX_ENERGY;
         float percentage = Mth.clamp((float) energy / maxEnergy, 0, 1);
         MutableComponent component = Component.empty();
 

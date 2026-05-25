@@ -1,7 +1,8 @@
 package com.atsuishio.superbwarfare.capability.energy;
 
-import com.atsuishio.superbwarfare.component.ModDataComponents;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.world.item.ItemStack;
+import team.reborn.energy.api.EnergyStorage;
 
 import java.util.function.Function;
 
@@ -9,19 +10,19 @@ public class ItemEnergyStorage extends DynamicEnergyStorage {
 
     private final ItemStack stack;
 
-    public ItemEnergyStorage(ItemStack stack, int capacity) {
+    public ItemEnergyStorage(ItemStack stack, long capacity) {
         this(stack, capacity, capacity, capacity);
     }
 
-    public ItemEnergyStorage(ItemStack stack, int capacity, int maxReceive, int maxExtract) {
+    public ItemEnergyStorage(ItemStack stack, long capacity, long maxReceive, long maxExtract) {
         this(stack, s -> capacity, s -> maxReceive, s -> maxExtract);
     }
 
-    public ItemEnergyStorage(ItemStack stack, Function<ItemStack, Integer> capacityGetter, Function<ItemStack, Integer> maxReceiveGetter, Function<ItemStack, Integer> maxExtractGetter) {
+    public ItemEnergyStorage(ItemStack stack, Function<ItemStack, Long> capacityGetter, Function<ItemStack, Long> maxReceiveGetter, Function<ItemStack, Long> maxExtractGetter) {
         super(() -> capacityGetter.apply(stack), () -> maxReceiveGetter.apply(stack), () -> maxExtractGetter.apply(stack));
 
         this.stack = stack;
-        var component = stack.get(ModDataComponents.ENERGY);
+        var component = stack.get(EnergyStorage.ENERGY_COMPONENT);
         this.energy = component == null ? 0 : component;
     }
 
@@ -30,7 +31,7 @@ public class ItemEnergyStorage extends DynamicEnergyStorage {
         int received = super.receiveEnergy(maxReceive, simulate);
 
         if (received > 0 && !simulate) {
-            stack.set(ModDataComponents.ENERGY, getEnergyStored());
+            stack.set(EnergyStorage.ENERGY_COMPONENT, (long) getEnergyStored());
         }
 
         return received;
@@ -41,9 +42,35 @@ public class ItemEnergyStorage extends DynamicEnergyStorage {
         int extracted = super.extractEnergy(maxExtract, simulate);
 
         if (extracted > 0 && !simulate) {
-            stack.set(ModDataComponents.ENERGY, getEnergyStored());
+            stack.set(EnergyStorage.ENERGY_COMPONENT, (long) getEnergyStored());
         }
 
+        return extracted;
+    }
+
+    @Override
+    public long insert(long maxAmount, TransactionContext transaction) {
+        long inserted = super.insert(maxAmount, transaction);
+        if (inserted > 0) {
+            transaction.addCloseCallback((t, result) -> {
+                if (result == TransactionContext.Result.COMMITTED) {
+                    stack.set(EnergyStorage.ENERGY_COMPONENT, this.energy);
+                }
+            });
+        }
+        return inserted;
+    }
+
+    @Override
+    public long extract(long maxAmount, TransactionContext transaction) {
+        long extracted = super.extract(maxAmount, transaction);
+        if (extracted > 0) {
+            transaction.addCloseCallback((t, result) -> {
+                if (result == TransactionContext.Result.COMMITTED) {
+                    stack.set(EnergyStorage.ENERGY_COMPONENT, this.energy);
+                }
+            });
+        }
         return extracted;
     }
 }

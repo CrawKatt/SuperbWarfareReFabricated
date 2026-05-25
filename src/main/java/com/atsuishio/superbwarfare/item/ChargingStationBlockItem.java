@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.item;
 
 import com.atsuishio.superbwarfare.client.tooltip.component.ChargingStationImageComponent;
-import com.atsuishio.superbwarfare.component.ModDataComponents;
+import team.reborn.energy.api.EnergyStorage;
 import com.atsuishio.superbwarfare.init.ModBlocks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -25,13 +25,13 @@ public class ChargingStationBlockItem extends BlockItem {
 
     @Override
     public boolean isBarVisible(ItemStack stack) {
-        int energy = stack.getOrDefault(ModDataComponents.ENERGY, 0);
+        long energy = stack.getOrDefault(EnergyStorage.ENERGY_COMPONENT, 0L);
         return energy != MAX_ENERGY && energy != 0;
     }
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        int energy = stack.getOrDefault(ModDataComponents.ENERGY, 0);
+        long energy = stack.getOrDefault(EnergyStorage.ENERGY_COMPONENT, 0L);
         return Math.round(energy * 13F / MAX_ENERGY);
     }
 

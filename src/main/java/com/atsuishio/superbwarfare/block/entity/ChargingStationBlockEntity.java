@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.block.entity;
 
 import com.atsuishio.superbwarfare.block.ChargingStationBlock;
-import com.atsuishio.superbwarfare.component.ModDataComponents;
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.capability.api.EnergyStorage;
@@ -17,6 +16,7 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.LongTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Container;
@@ -260,7 +260,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
         super.applyImplicitComponents(componentInput);
 
         if (this.level != null) {
-            ((EnergyStorage) this.energyStorage).deserializeNBT(level.registryAccess(), IntTag.valueOf(componentInput.getOrDefault(ModDataComponents.ENERGY, 0)));
+            ((EnergyStorage) this.energyStorage).deserializeNBT(level.registryAccess(), LongTag.valueOf(componentInput.getOrDefault(EnergyStorage.ENERGY_COMPONENT, 0L)));
         }
     }
 
@@ -268,7 +268,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
     protected void collectImplicitComponents(DataComponentMap.@NotNull Builder components) {
         super.collectImplicitComponents(components);
 
-        components.set(ModDataComponents.ENERGY, this.energyStorage.getEnergyStored());
+        components.set(EnergyStorage.ENERGY_COMPONENT, (long) this.energyStorage.getEnergyStored());
     }
 
     @Override

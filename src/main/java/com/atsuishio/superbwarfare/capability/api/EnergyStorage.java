@@ -1,26 +1,27 @@
 package com.atsuishio.superbwarfare.capability.api;
 
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.LongTag;
 import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
 
-public class EnergyStorage implements IEnergyStorage {
+public class EnergyStorage implements IEnergyStorage, team.reborn.energy.api.EnergyStorage {
 
-    protected int energy;
-    protected int capacity;
-    protected int maxReceive;
-    protected int maxExtract;
+    protected long energy;
+    protected long capacity;
+    protected long maxReceive;
+    protected long maxExtract;
 
-    public EnergyStorage(int capacity) {
+    public EnergyStorage(long capacity) {
         this(capacity, capacity, capacity);
     }
 
-    public EnergyStorage(int capacity, int maxReceive, int maxExtract) {
+    public EnergyStorage(long capacity, long maxReceive, long maxExtract) {
         this(capacity, maxReceive, maxExtract, 0);
     }
 
-    public EnergyStorage(int capacity, int maxReceive, int maxExtract, int energy) {
+    public EnergyStorage(long capacity, long maxReceive, long maxExtract, long energy) {
         this.capacity = capacity;
         this.maxReceive = maxReceive;
         this.maxExtract = maxExtract;
@@ -28,45 +29,47 @@ public class EnergyStorage implements IEnergyStorage {
     }
 
     public Tag serializeNBT(HolderLookup.Provider provider) {
-        return IntTag.valueOf(this.energy);
+        return LongTag.valueOf(this.energy);
     }
 
     public void deserializeNBT(HolderLookup.Provider provider, @NotNull Tag nbt) {
-        if (nbt instanceof IntTag intTag) {
-            this.energy = intTag.getAsInt();
+        if (nbt instanceof LongTag longTag) {
+            this.energy = longTag.getAsLong();
         }
     }
 
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
-        if (!canReceive()) return 0;
-
-        int energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, maxReceive));
-        if (!simulate) {
-            energy += energyReceived;
+        if (simulate) {
+            return (int) Math.min(capacity - energy, Math.min(this.maxReceive, (long) maxReceive));
         }
-        return energyReceived;
+        try (var t = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+            long received = insert(maxReceive, t);
+            t.commit();
+            return (int) received;
+        }
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
-        if (!canExtract()) return 0;
-
-        int energyExtracted = Math.min(energy, Math.min(this.maxExtract, maxExtract));
-        if (!simulate) {
-            energy -= energyExtracted;
+        if (simulate) {
+            return (int) Math.min(energy, Math.min(this.maxExtract, (long) maxExtract));
         }
-        return energyExtracted;
+        try (var t = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+            long extracted = extract(maxExtract, t);
+            t.commit();
+            return (int) extracted;
+        }
     }
 
     @Override
     public int getEnergyStored() {
-        return energy;
+        return (int) energy;
     }
 
     @Override
     public int getMaxEnergyStored() {
-        return capacity;
+        return (int) capacity;
     }
 
     @Override
@@ -77,5 +80,61 @@ public class EnergyStorage implements IEnergyStorage {
     @Override
     public boolean canReceive() {
         return maxReceive > 0;
+    }
+
+    // TeamReborn EnergyStorage implementation
+
+    @Override
+    public long insert(long maxAmount, TransactionContext transaction) {
+        if (!supportsInsertion()) return 0;
+
+        long energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, maxAmount));
+        if (energyReceived > 0) {
+            final long prevEnergy = this.energy;
+            this.energy += energyReceived;
+            transaction.addCloseCallback((t, result) -> {
+                if (result != TransactionContext.Result.COMMITTED) {
+                    this.energy = prevEnergy;
+                }
+            });
+        }
+        return energyReceived;
+    }
+
+    @Override
+    public long extract(long maxAmount, TransactionContext transaction) {
+        if (!supportsExtraction()) return 0;
+
+        long energyExtracted = Math.min(energy, Math.min(this.maxExtract, maxAmount));
+        if (energyExtracted > 0) {
+            final long prevEnergy = this.energy;
+            this.energy -= energyExtracted;
+            transaction.addCloseCallback((t, result) -> {
+                if (result != TransactionContext.Result.COMMITTED) {
+                    this.energy = prevEnergy;
+                }
+            });
+        }
+        return energyExtracted;
+    }
+
+    @Override
+    public long getAmount() {
+        return energy;
+    }
+
+    @Override
+    public long getCapacity() {
+        return capacity;
+    }
+
+    @Override
+    public boolean supportsInsertion() {
+        return maxReceive > 0;
+    }
+
+    @Override
+    public boolean supportsExtraction() {
+        return maxExtract > 0;
     }
 }
