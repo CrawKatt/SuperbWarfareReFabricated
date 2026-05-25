@@ -23,6 +23,14 @@
     ],
     "fabric-datagen": [
       "com.atsuishio.superbwarfare.datagen.DataGenerators"
+    ],
+    "cardinal-components": [
+      "com.atsuishio.superbwarfare.init.ModComponents"
+    ]
+  },
+  "custom": {
+    "cardinal-components": [
+      "superbwarfare:player_variable"
     ]
   },
   "mixins": [

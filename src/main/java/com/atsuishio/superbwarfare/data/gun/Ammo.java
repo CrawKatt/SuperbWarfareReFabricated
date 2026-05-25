@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.data.gun;
 
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
+import com.atsuishio.superbwarfare.init.ModComponents;
 import com.atsuishio.superbwarfare.init.ModItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentType;
@@ -120,16 +121,17 @@ public enum Ammo {
 
     // Entity
     public int get(Entity entity) {
-        return entity == null ? 0 : get(PlayerVariable.getOrDefault(entity));
+        if (entity == null) return 0;
+        return ModComponents.PLAYER_VARIABLE.maybeGet(entity).map(cap -> get(cap)).orElse(0);
     }
 
     public void set(Entity entity, int count) {
         if (entity == null || entity.level().isClientSide) return;
 
-        var cap = PlayerVariable.getOrDefault(entity).watch();
+        var cap = ModComponents.PLAYER_VARIABLE.get(entity);
 
         set(cap, count);
-        cap.sync(entity);
+        ModComponents.PLAYER_VARIABLE.sync(entity);
     }
 
     public void add(Entity entity, int count) {

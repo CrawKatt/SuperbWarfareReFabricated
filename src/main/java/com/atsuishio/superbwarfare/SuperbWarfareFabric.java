@@ -91,7 +91,6 @@ public class SuperbWarfareFabric implements ModInitializer {
         ModArmorMaterials.init();
         ModAttributes.init();
         ModCriteriaTriggers.init();
-        ModAttachments.init();
         ModCommandArguments.init();
         ModTabs.init();
         ModVillagers.init();

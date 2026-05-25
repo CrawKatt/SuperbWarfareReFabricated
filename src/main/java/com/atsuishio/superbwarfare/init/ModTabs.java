@@ -333,7 +333,10 @@ public class ModTabs {
                 var charged = stack.copy();
                 storage = EnergyStorage.ITEM.find(charged, null);
                 if (storage != null) {
-                    storage.insert(Long.MAX_VALUE, Transaction.getCurrentUnsafe());
+                    try (var t = Transaction.openOuter()) {
+                        storage.insert(Long.MAX_VALUE, t);
+                        t.commit();
+                    }
                 }
                 output.accept(charged);
             }

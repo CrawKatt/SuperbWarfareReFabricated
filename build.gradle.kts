@@ -124,6 +124,8 @@ dependencies {
     modRuntimeOnly("com.github.thedeathlycow:thermoo:v4.8.0")
 
     include(modImplementation("fuzs.extensibleenums:extensibleenums-fabric:${project.property("extensibleenums_version")}")!!)
+    include(modImplementation("org.ladysnake.cardinal-components-api:cardinal-components-base:${property("cardinal_components_version")}")!!)
+    include(modImplementation("org.ladysnake.cardinal-components-api:cardinal-components-entity:${property("cardinal_components_version")}")!!)
     include(modApi("teamreborn:energy:4.1.0")!!)
     modImplementation("curse.maven:better-combat-by-daedelus-639842:6532547")
     modImplementation("maven.modrinth:playeranimator:2.0.4+1.21.1-fabric")

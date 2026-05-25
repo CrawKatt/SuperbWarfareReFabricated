@@ -1,6 +1,22 @@
 package com.atsuishio.superbwarfare.network;
 
-import com.atsuishio.superbwarfare.network.message.receive.*;
+import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
+import com.atsuishio.superbwarfare.network.message.receive.ClientMotionSyncMessage;
+import com.atsuishio.superbwarfare.network.message.receive.ClientSetMotionMessage;
+import com.atsuishio.superbwarfare.network.message.receive.ClientTacticalSprintSyncMessage;
+import com.atsuishio.superbwarfare.network.message.receive.ContainerDataMessage;
+import com.atsuishio.superbwarfare.network.message.receive.DrawClientMessage;
+import com.atsuishio.superbwarfare.network.message.receive.FinishAssemblingVehicleMessage;
+import com.atsuishio.superbwarfare.network.message.receive.GunsDataMessage;
+import com.atsuishio.superbwarfare.network.message.receive.LivingGunKillMessage;
+import com.atsuishio.superbwarfare.network.message.receive.RadarMenuCloseMessage;
+import com.atsuishio.superbwarfare.network.message.receive.RadarMenuOpenMessage;
+import com.atsuishio.superbwarfare.network.message.receive.ResetCameraTypeMessage;
+import com.atsuishio.superbwarfare.network.message.receive.ShakeClientMessage;
+import com.atsuishio.superbwarfare.network.message.receive.ShootClientMessage;
+import com.atsuishio.superbwarfare.network.message.receive.SoundClientMessage;
+import com.atsuishio.superbwarfare.network.message.receive.TDMSyncMessage;
+import com.atsuishio.superbwarfare.network.message.receive.VehiclesDataMessage;
 import com.atsuishio.superbwarfare.network.message.send.*;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -9,7 +25,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 public class NetworkRegistry {
 
     public static void registerPayloads() {
-        PayloadTypeRegistry.playS2C().register(PlayerVariablesSyncMessage.TYPE, PlayerVariablesSyncMessage.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(ShakeClientMessage.TYPE, ShakeClientMessage.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(ClientMotionSyncMessage.TYPE, ClientMotionSyncMessage.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(ClientIndicatorMessage.TYPE, ClientIndicatorMessage.STREAM_CODEC);
@@ -112,7 +127,6 @@ public class NetworkRegistry {
     }
 
     public static void registerClientReceivers() {
-        ClientPlayNetworking.registerGlobalReceiver(PlayerVariablesSyncMessage.TYPE, (msg, ctx) -> PlayerVariablesSyncMessage.handler(msg));
         ClientPlayNetworking.registerGlobalReceiver(ShakeClientMessage.TYPE, (msg, ctx) -> ShakeClientMessage.handler(msg));
         ClientPlayNetworking.registerGlobalReceiver(ClientMotionSyncMessage.TYPE, (msg, ctx) -> ClientMotionSyncMessage.handler(msg));
         ClientPlayNetworking.registerGlobalReceiver(ClientIndicatorMessage.TYPE, (msg, ctx) -> ClientIndicatorMessage.handler(msg));

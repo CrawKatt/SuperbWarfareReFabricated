@@ -1,9 +1,8 @@
 package com.atsuishio.superbwarfare.item.common.ammo;
 
-import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
-import com.atsuishio.superbwarfare.init.ModAttachments;
+import com.atsuishio.superbwarfare.init.ModComponents;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.item.common.ammo.box.AmmoBoxInfo;
 import com.atsuishio.superbwarfare.tools.FormatTool;
@@ -47,7 +46,7 @@ public class AmmoBoxItem extends Item {
         if (info == null) info = new AmmoBoxInfo("All", false);
         String selectedType = info.type();
 
-        var cap = PlayerVariable.getOrDefault(player).watch();
+        var cap = ModComponents.PLAYER_VARIABLE.get(player);
         if (!level.isClientSide()) {
             var types = (selectedType.equals("All") || info.isDrop()) ? Ammo.values() : new Ammo[]{Ammo.getType(selectedType)};
 
@@ -64,8 +63,7 @@ public class AmmoBoxItem extends Item {
                     type.set(stack, 0);
                 }
             }
-            player.setAttached(ModAttachments.PLAYER_VARIABLE, cap);
-            cap.sync(player);
+            ModComponents.PLAYER_VARIABLE.sync(player);
             level.playSound(null, player.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1, 1);
 
             // 取出弹药时，若弹药盒为掉落物版本，则移除弹药盒物品

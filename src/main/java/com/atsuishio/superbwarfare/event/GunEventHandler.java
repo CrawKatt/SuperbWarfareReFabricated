@@ -2,13 +2,12 @@ package com.atsuishio.superbwarfare.event;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.api.event.ReloadEvent;
-import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.data.gun.AmmoConsumer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.ReloadType;
 import com.atsuishio.superbwarfare.data.gun.value.ReloadState;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
-import com.atsuishio.superbwarfare.init.ModAttachments;
+import com.atsuishio.superbwarfare.init.ModComponents;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.perk.Perk;
@@ -204,13 +203,12 @@ public class GunEventHandler {
             int count = ammoCount - magazine - (hasBulletInBarrel ? 1 : 0);
 
             if (shooter instanceof Player player) {
-                var capability = PlayerVariable.getOrDefault(player).watch();
+                var capability = ModComponents.PLAYER_VARIABLE.get(player);
                 if (data.selectedAmmoConsumer().type == AmmoConsumer.AmmoConsumeType.PLAYER_AMMO) {
                     var ammoType = data.selectedAmmoConsumer().getPlayerAmmoType();
                     ammoType.add(capability, count);
                 }
-                player.setAttached(ModAttachments.PLAYER_VARIABLE, capability);
-                capability.sync(player);
+                ModComponents.PLAYER_VARIABLE.sync(player);
             }
 
             data.ammo.set(magazine + (hasBulletInBarrel ? 1 : 0));
@@ -467,10 +465,7 @@ public class GunEventHandler {
         var available = Math.min(required, data.countBackupAmmo(shooter));
         data.ammo.add(available);
         if (!InventoryTool.hasCreativeAmmoBox(shooter)) {
-            if (shooter != null) {
-                var cap = PlayerVariable.getOrDefault(shooter);
-                shooter.setAttached(ModAttachments.PLAYER_VARIABLE, cap);
-            }
+            ModComponents.PLAYER_VARIABLE.maybeGet(shooter);
             data.consumeBackupAmmo(shooter, available);
         }
     }

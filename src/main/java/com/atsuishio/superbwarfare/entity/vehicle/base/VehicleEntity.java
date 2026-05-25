@@ -52,7 +52,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
@@ -1510,7 +1510,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             this.entityData.set(SELECTED_WEAPON, IntList.of(selected));
         }
 
-        if (this.hasEnergyStorage() && compound.get("Energy") instanceof IntTag energyNBT) {
+        if (this.hasEnergyStorage() && compound.get("Energy") instanceof Tag energyNBT) {
             ((SyncedEntityEnergyStorage) energyStorage).deserializeNBT(level().registryAccess(), energyNBT);
         }
 

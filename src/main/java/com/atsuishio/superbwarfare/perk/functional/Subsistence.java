@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.perk.functional;
 
-import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
+import com.atsuishio.superbwarfare.init.ModComponents;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.GunType;
 import com.atsuishio.superbwarfare.perk.Perk;
@@ -33,7 +33,7 @@ public class Subsistence extends Perk {
             var type = computed.gunType;
             float rate = instance.level() * (0.1f + (type == GunType.SMG || type == GunType.RIFLE ? 0.07f : 0f));
 
-            var cap = PlayerVariable.getOrDefault(attacker).watch();
+            var cap = ModComponents.PLAYER_VARIABLE.get(attacker);
 
             int mag = computed.magazine;
             int ammo = data.ammo.get();
@@ -50,7 +50,7 @@ public class Subsistence extends Perk {
             }
             data.ammo.set(Math.min(mag, ammo + ammoFinal));
 
-            cap.sync(attacker);
+            ModComponents.PLAYER_VARIABLE.sync(attacker);
         }
     }
 }

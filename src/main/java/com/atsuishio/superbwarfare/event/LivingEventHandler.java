@@ -2,8 +2,8 @@ package com.atsuishio.superbwarfare.event;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.api.event.PreKillEvent;
-import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
+import com.atsuishio.superbwarfare.init.ModComponents;
 import com.atsuishio.superbwarfare.config.common.GameplayConfig;
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.config.server.VehicleConfig;
@@ -549,7 +549,7 @@ public class LivingEventHandler {
         if (!(entity instanceof Player player)) return;
         if (!MiscConfig.DROP_AMMO_BOX.get()) return;
 
-        var cap = PlayerVariable.getOrDefault(player).watch();
+        var cap = ModComponents.PLAYER_VARIABLE.get(player);
 
         boolean drop = Stream.of(Ammo.values())
                 .mapToInt(type -> type.get(cap))
@@ -566,8 +566,7 @@ public class LivingEventHandler {
         var info = new AmmoBoxInfo("All", true);
         stack.set(ModDataComponents.AMMO_BOX_INFO, info);
 
-        player.setAttached(ModAttachments.PLAYER_VARIABLE, cap);
-        cap.sync(player);
+        ModComponents.PLAYER_VARIABLE.sync(player);
 
         drops.add(new ItemEntity(player.level(), player.getX(), player.getY() + 1, player.getZ(), stack));
     }

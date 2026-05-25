@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
+import team.reborn.energy.api.EnergyStorage;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -79,8 +80,8 @@ public class SentinelItem extends GunGeoItem {
     @Override
     public double getCustomDamage(GunData data) {
         var stack = data.stack;
-        var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
-        if (cap != null && cap.getEnergyStored() > 0) {
+        long energy = stack.getOrDefault(EnergyStorage.ENERGY_COMPONENT, 0L);
+        if (energy > 0) {
             return 0.2857142857142857 * data.getDefault().damage;
         }
         return 0;
