@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.client.VehicleClientRenderState;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -15,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemInHandRenderer.class)
@@ -28,6 +30,21 @@ public class ItemInHandRendererMixin {
         if (VehicleClientRenderState.shouldHideHandsAndHotbar(player)) {
             ci.cancel();
         }
+    }
+
+    @Redirect(
+            method = "tick",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/item/ItemStack;matches(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"
+            )
+    )
+    private boolean superbWarfare$monitorMatchesForEquipAnimation(ItemStack oldStack, ItemStack newStack) {
+        if (oldStack.is(ModItems.MONITOR) && newStack.is(ModItems.MONITOR)) {
+            return true;
+        }
+
+        return ItemStack.matches(oldStack, newStack);
     }
 
     @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)
