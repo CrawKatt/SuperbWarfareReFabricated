@@ -69,6 +69,7 @@ public abstract class CameraMixin implements ICustomCamera {
 
                     setRotation(drone.getYaw(partialTicks), drone.getPitch(partialTicks));
                     setPosition(worldPosition.x, worldPosition.y, worldPosition.z);
+                    superbWarfare$applyComputedAngles(partialTicks, true);
                     info.cancel();
                 } else {
                     var rotation = drone.getCameraRotation(partialTicks, player, false, false);
@@ -81,6 +82,7 @@ public abstract class CameraMixin implements ICustomCamera {
                     }
 
                     if (rotation != null || position != null) {
+                        superbWarfare$applyComputedAngles(partialTicks, true);
                         info.cancel();
                     }
                 }
@@ -135,11 +137,30 @@ public abstract class CameraMixin implements ICustomCamera {
         return transform.transform(new Vector4d(x, y, z, 1));
     }
 
-    @Inject(method = "setup", at = @At("TAIL"))
-    public void superbWarfare$setup(BlockGetter area, Entity entity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci) {
+    @Unique
+    private void superbWarfare$applyComputedAngles(float tickDelta, boolean applyRollToCamera) {
         var position = ((Camera) (Object) this).getPosition();
         ClientEventHandler.computeCameraAngles((Camera) (Object) this, tickDelta, position.x, position.y, position.z);
-        setRotation(ClientEventHandler.cameraYaw, ClientEventHandler.cameraPitch);
+        if (applyRollToCamera) {
+            superbWarfare$setRotation(ClientEventHandler.cameraYaw, ClientEventHandler.cameraPitch, -ClientEventHandler.cameraRoll);
+        } else {
+            setRotation(ClientEventHandler.cameraYaw, ClientEventHandler.cameraPitch);
+        }
+    }
+
+    @Unique
+    private void superbWarfare$setRotation(float yRot, float xRot, float zRot) {
+        this.xRot = xRot;
+        this.yRot = yRot;
+        this.rotation.rotationYXZ(Mth.PI - yRot * Mth.DEG_TO_RAD, -xRot * Mth.DEG_TO_RAD, zRot * Mth.DEG_TO_RAD);
+        this.forwards.set(0.0F, 0.0F, 1.0F).rotate(this.rotation);
+        this.up.set(0.0F, 1.0F, 0.0F).rotate(this.rotation);
+        this.left.set(1.0F, 0.0F, 0.0F).rotate(this.rotation);
+    }
+
+    @Inject(method = "setup", at = @At("TAIL"))
+    public void superbWarfare$setup(BlockGetter area, Entity entity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci) {
+        superbWarfare$applyComputedAngles(tickDelta, false);
         if (Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK
                 && entity instanceof Player player
                 && player.getMainHandItem().getItem() instanceof GunItem
