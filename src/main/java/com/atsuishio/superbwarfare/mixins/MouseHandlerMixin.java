@@ -1,12 +1,18 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.client.ClickHandler;
+import com.atsuishio.superbwarfare.init.ModItems;
+import com.atsuishio.superbwarfare.tools.NBTTool;
 import net.minecraft.client.MouseHandler;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 /**
  * Author: MrCrayfish
@@ -47,6 +53,29 @@ public class MouseHandlerMixin {
         if (ClickHandler.onMouseScrolling(horizontalAmount, verticalAmount)) {
             ci.cancel();
         }
+    }
+
+    @ModifyArgs(
+            method = "turnPlayer(D)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;turn(DD)V")
+    )
+    private void superbwarfare$blockPlayerTurnWhileControllingDrone(Args args) {
+        if (superbwarfare$isControllingDrone()) {
+            args.set(0, 0.0D);
+            args.set(1, 0.0D);
+        }
+    }
+
+    @Unique
+    private static boolean superbwarfare$isControllingDrone() {
+        var player = Minecraft.getInstance().player;
+        if (player == null) return false;
+
+        var stack = player.getMainHandItem();
+        if (!stack.is(ModItems.MONITOR)) return false;
+
+        var tag = NBTTool.getTag(stack);
+        return tag.getBoolean("Using") && tag.getBoolean("Linked");
     }
 
 //    @Unique
