@@ -3,8 +3,10 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.client.VehicleClientRenderState;
 import com.atsuishio.superbwarfare.data.vehicle.VehicleData;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.util.Mth;
@@ -22,7 +24,11 @@ public class LivingEntityRendererMixin<T extends LivingEntity> {
     @Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
             at = @At("HEAD"), cancellable = true)
     public void render(T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, CallbackInfo ci) {
-        if (entity instanceof Player player && VehicleClientRenderState.shouldHideVehiclePassenger(player)) {
+        if (!(entity instanceof Player player)) return;
+
+        if (VehicleClientRenderState.shouldHideVehiclePassenger(player)) {
+            ci.cancel();
+        } else if (ClientEventHandler.zoomVehicle && player == Minecraft.getInstance().player) {
             ci.cancel();
         }
     }
