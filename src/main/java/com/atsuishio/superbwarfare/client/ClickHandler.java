@@ -515,6 +515,7 @@ public class ClickHandler {
         }
 
         boolean down = action == GLFW.GLFW_PRESS;
+        syncKeyMapping(ModKeyMappings.DISMOUNT, key, scanCode, down);
         syncKeyMapping(ModKeyMappings.MELEE, key, scanCode, down);
         syncKeyMapping(ModKeyMappings.RELEASE_DECOY, key, scanCode, down);
     }
