@@ -120,6 +120,10 @@ repositories {
             includeGroup("curse.maven")
         }
     }
+    maven {
+        name = "jitpack"
+        url = uri("https://jitpack.io")
+    }
 }
 
 //jarJar.enable()
@@ -135,6 +139,8 @@ dependencies {
     runtimeOnly(fg.deobf("top.theillusivec4.curios:curios-forge:5.4.2+1.20.1"))
     compileOnly(fg.deobf("top.theillusivec4.curios:curios-forge:5.4.2+1.20.1:api"))
 
+    implementation(fg.deobf("com.github.Lounode.EventWrapper:eventwrapper-common:1.20.1-SNAPSHOT"))
+    implementation(fg.deobf("com.github.Lounode.EventWrapper:eventwrapper-forge:1.20.1-SNAPSHOT"))
     implementation(fg.deobf("software.bernie.geckolib:geckolib-forge-1.20.1:4.4.6"))
     implementation(fg.deobf("com.eliotlash.mclib:mclib:20"))
 

@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.event;
 
-import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent;
-import com.atsuishio.superbwarfare.api.event.ReloadEvent;
+import com.atsuishio.superbwarfare.api.event.wrapper.ProjectileHitEventWrapper;
+import com.atsuishio.superbwarfare.api.event.wrapper.ReloadEventWrapper;
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.entity.projectile.GrapeshotEntity;
@@ -9,21 +9,22 @@ import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity;
 import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.perk.Perk;
+import io.github.lounode.eventwrapper.eventbus.api.EventBusSubscriberWrapper;
+import io.github.lounode.eventwrapper.eventbus.api.SubscribeEventWrapper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.BellBlock;
 import net.minecraft.world.level.block.TargetBlock;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
-@Mod.EventBusSubscriber
+@SuppressWarnings("unused")
+@EventBusSubscriberWrapper
 public class CustomEventHandler {
 
-    @SubscribeEvent
-    public static void onPreReload(ReloadEvent.Pre event) {
-        var shooter = event.shooter;
-        ItemStack stack = event.stack;
+    @SubscribeEventWrapper
+    public static void onPreReload(ReloadEventWrapper.Pre event) {
+        var shooter = event.getEntity();
+        ItemStack stack = event.getStack();
         if (shooter == null || !(stack.getItem() instanceof GunItem) || shooter.level().isClientSide) return;
 
         GunData data = GunData.from(stack);
@@ -35,10 +36,10 @@ public class CustomEventHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void onPostReload(ReloadEvent.Post event) {
-        var shooter = event.shooter;
-        ItemStack stack = event.stack;
+    @SubscribeEventWrapper
+    public static void onPostReload(ReloadEventWrapper.Post event) {
+        var shooter = event.getEntity();
+        ItemStack stack = event.getStack();
         if (shooter == null || !(stack.getItem() instanceof GunItem) || shooter.level().isClientSide) {
             return;
         }
@@ -52,8 +53,8 @@ public class CustomEventHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void onProjectileHitEntity(ProjectileHitEvent.HitEntity event) {
+    @SubscribeEventWrapper
+    public static void onProjectileHitEntity(ProjectileHitEventWrapper.HitEntity event) {
         var entity = event.getOwner();
         if (!(entity instanceof LivingEntity attacker)) return;
 
@@ -76,8 +77,8 @@ public class CustomEventHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void onProjectileHitBlock(ProjectileHitEvent.HitBlock event) {
+    @SubscribeEventWrapper
+    public static void onProjectileHitBlock(ProjectileHitEventWrapper.HitBlock event) {
         var projectile = event.getProjectile();
         var state = event.getState();
         var pos = event.getPos();

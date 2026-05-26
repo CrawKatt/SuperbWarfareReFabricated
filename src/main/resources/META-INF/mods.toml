@@ -58,3 +58,10 @@ mandatory = false
 versionRange = "[0.7.0-beta,)"
 ordering = "NONE"
 side = "CLIENT"
+
+[[dependencies.superbwarfare]]
+modId = "eventwrapper"
+mandatory = true
+versionRange = "[1,)"
+ordering = "NONE"
+side = "BOTH"

@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.compat.coldsweat.ColdSweatCompatHandler;
 import com.atsuishio.superbwarfare.compat.tacz.TACZGunEventHandler;
 import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.config.CommonConfig;
+import com.atsuishio.superbwarfare.api.event.converter.EventWrapperMappings;
 import com.atsuishio.superbwarfare.config.ServerConfig;
 import com.atsuishio.superbwarfare.data.CustomData;
 import com.atsuishio.superbwarfare.init.*;
@@ -44,6 +45,7 @@ public class Mod {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.init());
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfig.init());
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfig.init());
+        EventWrapperMappings.register();
 
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 

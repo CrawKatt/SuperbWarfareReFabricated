@@ -25,9 +25,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import io.github.lounode.eventwrapper.event.entity.living.LivingDeathEventWrapper;
+import io.github.lounode.eventwrapper.eventbus.api.EventBusSubscriberWrapper;
+import io.github.lounode.eventwrapper.eventbus.api.SubscribeEventWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -39,7 +39,7 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriberWrapper
 public class TargetEntity extends LivingEntity implements GeoEntity {
 
     public static final EntityDataAccessor<Integer> DOWN_TIME = SynchedEntityData.defineId(TargetEntity.class, EntityDataSerializers.INT);
@@ -111,8 +111,8 @@ public class TargetEntity extends LivingEntity implements GeoEntity {
         return super.hurt(source, amount);
     }
 
-    @SubscribeEvent
-    public static void onTargetDown(LivingDeathEvent event) {
+    @SubscribeEventWrapper
+    public static void onTargetDown(LivingDeathEventWrapper event) {
         var entity = event.getEntity();
         // 不处理/kill伤害
         if (event.getSource().is(DamageTypes.GENERIC_KILL)) return;
