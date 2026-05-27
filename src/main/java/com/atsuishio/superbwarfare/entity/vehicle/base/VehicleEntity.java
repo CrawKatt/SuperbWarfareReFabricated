@@ -46,7 +46,6 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
-import net.minecraft.nbt.IntTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -81,24 +80,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.*;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.wrapper.InvWrapper;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.PacketDistributor;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import team.reborn.energy.api.EnergyStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 import org.joml.*;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -558,7 +547,6 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     }
 
     // container start
-    private LazyOptional<?> itemHandler = LazyOptional.of(() -> new InvWrapper(this));
     protected NonNullList<ItemStack> items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
 
     protected void resizeItems() {
@@ -926,10 +914,12 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         return VehicleData.compute(this);
     }
 
+    /*
     @Override
     public float getStepHeight() {
         return computed().upStep;
     }
+    */
 
     @Override
     public @Nullable Entity getFirstPassenger() {
@@ -1052,7 +1042,6 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     }
 
     protected SyncedEntityEnergyStorage energyStorage = null;
-    protected LazyOptional<IEnergyStorage> energy = LazyOptional.of(() -> energyStorage);
 
     protected boolean isInitialized;
 
@@ -1136,7 +1125,10 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             return;
         }
         if (this.level() instanceof ServerLevel) {
-            this.energyStorage.extractEnergy(amount, false);
+            try (Transaction t = Transaction.openOuter()) {
+                this.energyStorage.extract(amount, t);
+                t.commit();
+            }
         }
     }
 
@@ -1153,11 +1145,11 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             Mod.LOGGER.warn("Trying to get energy of vehicle {}, but it has no energy storage", this.getName());
             return Integer.MAX_VALUE;
         }
-        return this.energyStorage.getEnergyStored();
+        return entityData.get(ENERGY);
     }
 
     @Nullable
-    public IEnergyStorage getEnergyStorage() {
+    public EnergyStorage getEnergyStorage() {
         if (!this.hasEnergyStorage()) {
             Mod.LOGGER.warn("Trying to get energy storage of vehicle {}, but it has no energy storage", this.getName());
         }
@@ -1170,12 +1162,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             return;
         }
         int targetEnergy = Mth.clamp(pEnergy, 0, this.getMaxEnergy());
-
-        if (targetEnergy > energyStorage.getEnergyStored()) {
-            energyStorage.receiveEnergy(targetEnergy - energyStorage.getEnergyStored(), false);
-        } else {
-            energyStorage.extractEnergy(energyStorage.getEnergyStored() - targetEnergy, false);
-        }
+        energyStorage.setEnergy(targetEnergy);
     }
 
     public int getMaxEnergy() {
@@ -1514,8 +1501,8 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             this.entityData.set(SELECTED_WEAPON, IntList.of(selected));
         }
 
-        if (this.hasEnergyStorage() && compound.get("Energy") instanceof IntTag energyNBT) {
-            energyStorage.deserializeNBT(energyNBT);
+        if (this.hasEnergyStorage() && compound.contains("Energy")) {
+            entityData.set(ENERGY, compound.getInt("Energy"));
         }
 
         this.resizeItems();
@@ -1583,7 +1570,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         }
 
         if (this.hasEnergyStorage()) {
-            compound.put("Energy", energyStorage.serializeNBT());
+            compound.putInt("Energy", entityData.get(ENERGY));
         }
 
         this.resizeItems();
@@ -1618,7 +1605,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
 
         if (player.isShiftKeyDown() && stack.is(ModTags.Items.TOOLS_CROWBAR) && this.getPassengers().isEmpty()) {
             for (var item : getRetrieveItems()) {
-                ItemHandlerHelper.giveItemToPlayer(player, item);
+                player.getInventory().placeItemBackInInventory(item);
             }
             this.remove(RemovalReason.DISCARDED);
             this.discard();
@@ -1636,14 +1623,14 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             }
 
             if (this.getFirstPassenger() == null) {
-                if (player instanceof FakePlayer) return InteractionResult.PASS;
+                // TODO Fabric: No FakePlayer equivalent
                 VehicleVecUtils.setDriverAngle(this, player);
                 player.setSprinting(false);
                 if (player.level() instanceof ServerLevel) {
                     return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
                 }
             } else if (!(this.getFirstPassenger() instanceof Player)) {
-                if (player instanceof FakePlayer) return InteractionResult.PASS;
+                // TODO Fabric: No FakePlayer equivalent
                 this.getFirstPassenger().stopRiding();
                 VehicleVecUtils.setDriverAngle(this, player);
                 player.setSprinting(false);
@@ -1652,7 +1639,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
                 }
             }
             if (this.canAddPassenger(player)) {
-                if (player instanceof FakePlayer) return InteractionResult.PASS;
+                // TODO Fabric: No FakePlayer equivalent
                 player.setSprinting(false);
                 if (player.level() instanceof ServerLevel) {
                     return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
@@ -1753,7 +1740,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             var holder = Holder.direct(ModSounds.INDICATION_VEHICLE.get());
             if (attacker instanceof ServerPlayer player && pHealAmount > 0 && this.getHealth() > 0 && send && !(this instanceof DroneEntity)) {
                 player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getEyeY(), player.getZ(), 0.25f + (2.75f * pHealAmount / getMaxHealth()), random.nextFloat() * 0.1f + 0.9f, player.level().random.nextLong()));
-                NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ClientIndicatorMessage(3, 5));
+                NetworkRegistry.sendToPlayer(player, new ClientIndicatorMessage(3, 5));
             }
 
             if (pHealAmount > 0 && this.getHealth() > 0 && send) {
@@ -1802,7 +1789,6 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     }
 
     @Override
-    @ParametersAreNonnullByDefault
     protected void playStepSound(BlockPos pPos, BlockState pState) {
         this.playSound(ModSounds.WHEEL_VEHICLE_STEP.get(), (float) (getDeltaMovement().length() * 0.1), random.nextFloat() * 0.15f + 1.05f);
     }
@@ -2113,16 +2099,12 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
                 int neededEnergy = this.getMaxEnergy() - this.getEnergy();
                 if (neededEnergy <= 0) break;
 
-                var energyCap = stack.getCapability(ForgeCapabilities.ENERGY).resolve();
-                if (energyCap.isEmpty()) continue;
-
-                var energyStorage = energyCap.get();
-                var stored = energyStorage.getEnergyStored();
+                var stored = ModEnergyApi.getEnergyStored(stack);
                 if (stored <= 0) continue;
 
                 int energyToExtract = Math.min(stored, neededEnergy);
-                energyStorage.extractEnergy(energyToExtract, false);
-                this.setEnergy(this.getEnergy() + energyToExtract);
+                int extracted = ModEnergyApi.extractEnergy(stack, energyToExtract, false);
+                this.setEnergy(this.getEnergy() + extracted);
             }
         }
 
@@ -2861,7 +2843,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             Vec3 targetVel = target.getDeltaMovement();
 
             if (target instanceof LivingEntity living) {
-                double gravity = living.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
+                double gravity = -0.08; // TODO Fabric: Replace with proper gravity attribute lookup
                 targetVel = targetVel.add(0, gravity, 0);
             }
 
@@ -3472,7 +3454,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
 
     @Override
     public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return new EntitySpawnS2CPacket(this);
     }
 
     public float getMass() {
@@ -3640,7 +3622,6 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
      * @param zoom          是否在载具上瞄准
      * @param isFirstPerson 是否是第一人称视角
      */
-    @OnlyIn(Dist.CLIENT)
     public @Nullable Vec2 getCameraRotation(float partialTicks, Player player, boolean zoom, boolean isFirstPerson) {
         int index = this.getSeatIndex(player);
         var seat = computed().seats().get(index);
@@ -3670,7 +3651,6 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
      * @param zoom          是否在载具上瞄准
      * @param isFirstPerson 是否是第一人称视角
      */
-    @OnlyIn(Dist.CLIENT)
     public Vec3 getCameraPosition(float partialTicks, Player player, boolean zoom, boolean isFirstPerson) {
         int index = this.getSeatIndex(player);
         var seat = computed().seats().get(index);
@@ -3702,7 +3682,6 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     /**
      * 是否使用载具固定视角
      */
-    @OnlyIn(Dist.CLIENT)
     public boolean useFixedCameraPos(Entity entity) {
         int index = this.getSeatIndex(entity);
         var seat = computed().seats().get(index);
@@ -3713,43 +3692,6 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             }
         }
         return false;
-    }
-
-    @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.ENERGY && this.hasEnergyStorage()) {
-            return energy.cast();
-        } else if (cap == ForgeCapabilities.ITEM_HANDLER && this.hasContainer()) {
-            return itemHandler.cast();
-        }
-        return super.getCapability(cap, side);
-    }
-
-    @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap) {
-        return this.getCapability(cap, null);
-    }
-
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-        if (this.hasContainer()) {
-            itemHandler.invalidate();
-        }
-        if (this.hasEnergyStorage()) {
-            energy.invalidate();
-        }
-    }
-
-    @Override
-    public void reviveCaps() {
-        super.reviveCaps();
-        if (this.hasContainer()) {
-            itemHandler = LazyOptional.of(() -> new InvWrapper(this));
-        }
-        if (this.hasEnergyStorage()) {
-            energy = LazyOptional.of(() -> new VehicleEnergyStorage(this));
-        }
     }
 
     /**
@@ -4113,7 +4055,6 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         return VehicleMiscUtils.isAmphibious(this);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public Component firstPersonAmmoComponent(GunData data, Player player) {
         var name = data.compute().name;
         if (name == null || name.isBlank()) return Component.empty();
@@ -4122,7 +4063,6 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         return Component.translatable(name, ammoCount == Integer.MAX_VALUE ? "∞" : ammoCount);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public Component thirdPersonAmmoComponent(GunData data, Player player) {
         return firstPersonAmmoComponent(data, player);
     }

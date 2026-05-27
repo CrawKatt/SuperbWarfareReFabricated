@@ -3,14 +3,13 @@ package com.atsuishio.superbwarfare.network.message.send;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public class ShootMessage {
 
@@ -57,21 +56,14 @@ public class ShootMessage {
         }
     }
 
-    public static void handler(ShootMessage message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            var player = context.getSender();
-            if (player != null) {
-                var stack = player.getMainHandItem();
-                if (!(stack.getItem() instanceof GunItem)) return;
+    public static void handler(ShootMessage message, ServerPlayer player) {
+        var stack = player.getMainHandItem();
+        if (!(stack.getItem() instanceof GunItem)) return;
 
-                if (message.targetPos == null) {
-                    GunData.from(stack).shoot(player, message.spread, message.zoom, message.uuid);
-                } else {
-                    GunData.from(stack).shoot(player, message.spread, message.zoom, message.uuid, new Vec3(message.targetPos));
-                }
-            }
-        });
-        context.setPacketHandled(true);
+        if (message.targetPos == null) {
+            GunData.from(stack).shoot(player, message.spread, message.zoom, message.uuid);
+        } else {
+            GunData.from(stack).shoot(player, message.spread, message.zoom, message.uuid, new Vec3(message.targetPos));
+        }
     }
 }

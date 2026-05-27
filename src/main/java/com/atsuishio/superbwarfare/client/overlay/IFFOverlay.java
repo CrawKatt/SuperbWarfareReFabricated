@@ -22,8 +22,6 @@ import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -32,7 +30,6 @@ import java.util.List;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 
-@OnlyIn(Dist.CLIENT)
 public class IFFOverlay implements IGuiOverlay {
 
     public static final String ID = Mod.MODID + "_iff";

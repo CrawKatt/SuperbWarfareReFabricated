@@ -6,22 +6,16 @@ import com.atsuishio.superbwarfare.data.mob_guns.MobGunData;
 import com.atsuishio.superbwarfare.entity.goal.GunShootGoal;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Mob;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = Mod.MODID)
 public class EntityUseGunEventHandler {
 
-    @SubscribeEvent
-    public static void entityJoin(EntityJoinLevelEvent event) {
-        if (event.loadedFromDisk() || !SpawnConfig.SPAWN_MOB_WITH_GUNS.get()) return;
-
-        var entity = event.getEntity();
-        if (!(entity instanceof Mob mob)) return;
+    // TODO: Register in Mod.java using Fabric event API
+    public static void entityJoin(Mob mob) {
+        if (!SpawnConfig.SPAWN_MOB_WITH_GUNS.get()) return;
 
         var data = MobGunData.from(mob);
 
-        if (data == null || data.probability() <= 0 || data.probability() < entity.level().random.nextDouble()) {
+        if (data == null || data.probability() <= 0 || data.probability() < mob.level().random.nextDouble()) {
             return;
         }
 
@@ -30,7 +24,6 @@ public class EntityUseGunEventHandler {
             return;
         }
 
-        // TODO 正确处理权重
         mob.goalSelector.addGoal(data.goalWeight(), new GunShootGoal<>(mob, data));
 
         if (data.backupAmmoCount() > 0) {

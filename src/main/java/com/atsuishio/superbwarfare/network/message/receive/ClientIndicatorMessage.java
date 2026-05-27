@@ -2,11 +2,6 @@ package com.atsuishio.superbwarfare.network.message.receive;
 
 import com.atsuishio.superbwarfare.network.ClientPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 public class ClientIndicatorMessage {
 
@@ -29,9 +24,7 @@ public class ClientIndicatorMessage {
         return new ClientIndicatorMessage(type, value);
     }
 
-    public static void handler(ClientIndicatorMessage message, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-                () -> () -> ClientPacketHandler.handleClientIndicatorMessage(message, ctx)));
-        ctx.get().setPacketHandled(true);
+    public static void handler(ClientIndicatorMessage message) {
+        ClientPacketHandler.handleClientIndicatorMessage(message);
     }
 }

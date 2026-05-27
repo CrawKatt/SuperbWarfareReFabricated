@@ -25,15 +25,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Team;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
 import static com.atsuishio.superbwarfare.entity.vehicle.DroneEntity.CONTROLLER;
 import static com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity.ACTIVE;
 
-@OnlyIn(Dist.CLIENT)
 public class VehicleTeamOverlay implements IGuiOverlay {
 
     public static final String ID = Mod.MODID + "_vehicle_team";

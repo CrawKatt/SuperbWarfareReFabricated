@@ -3,9 +3,7 @@ package com.atsuishio.superbwarfare.network.message.send;
 import com.atsuishio.superbwarfare.menu.VehicleAssemblingMenu;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.minecraft.server.level.ServerPlayer;
 
 public class AssembleVehicleMessage {
 
@@ -26,15 +24,11 @@ public class AssembleVehicleMessage {
         return new AssembleVehicleMessage(byteBuf.readResourceLocation(), byteBuf.readVarInt());
     }
 
-    public static void handler(AssembleVehicleMessage message, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            var player = ctx.get().getSender();
-            if (player == null) return;
-            if (player.containerMenu.containerId != message.containerId) return;
-            if (player.containerMenu instanceof VehicleAssemblingMenu menu) {
-                menu.assembleVehicle(message.id, player);
-            }
-        });
-        ctx.get().setPacketHandled(true);
+    public static void handler(AssembleVehicleMessage message, ServerPlayer player) {
+        if (player == null) return;
+        if (player.containerMenu.containerId != message.containerId) return;
+        if (player.containerMenu instanceof VehicleAssemblingMenu menu) {
+            menu.assembleVehicle(message.id, player);
+        }
     }
 }

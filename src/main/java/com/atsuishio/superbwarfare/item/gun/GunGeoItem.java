@@ -13,8 +13,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -57,7 +55,6 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
         consumer.accept(this.getClientExtensions());
     }
 
-    @OnlyIn(Dist.CLIENT)
     protected PlayState animationPredicate(AnimationState<GunGeoItem> event) {
         var player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -126,7 +123,6 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
         controllers.add(new AnimationController<>(this, "animationController", 1, this::animationPredicate));
     }
 
-    @OnlyIn(Dist.CLIENT)
     public IClientItemExtensions getClientExtensions() {
         return new IClientItemExtensions() {
             private final BlockEntityWithoutLevelRenderer renderer = GunGeoItem.this.getRenderer().get();

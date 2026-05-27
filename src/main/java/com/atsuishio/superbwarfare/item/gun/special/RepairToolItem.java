@@ -14,10 +14,9 @@ import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.tools.DamageHandler;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.tools.SeekTool;
 import com.atsuishio.superbwarfare.world.phys.EntityResult;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -25,10 +24,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -37,11 +33,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.network.PacketDistributor;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -63,35 +55,6 @@ public class RepairToolItem extends GunGeoItem {
         return RepairToolItemRenderer::new;
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public IClientItemExtensions getClientExtensions() {
-        return new IClientItemExtensions() {
-            private final BlockEntityWithoutLevelRenderer renderer = RepairToolItem.this.getRenderer().get();
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return renderer;
-            }
-
-            private static final HumanoidModel.ArmPose POSE = HumanoidModel.ArmPose.create("RepairTool", false, (model, entity, arm) -> {
-                if (arm != HumanoidArm.LEFT) {
-                    model.rightArm.xRot = -67.5f * Mth.DEG_TO_RAD + model.head.xRot + 0.05f * model.rightArm.xRot;
-                    model.rightArm.yRot = 5f * Mth.DEG_TO_RAD + model.head.yRot;
-                }
-            });
-
-            @Override
-            public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
-                if (!stack.isEmpty()) {
-                    if (entityLiving.getUsedItemHand() == hand) {
-                        return POSE;
-                    }
-                }
-                return HumanoidModel.ArmPose.EMPTY;
-            }
-        };
-    }
-
     @Override
     public void onRayHitBlock(Entity shooter, ServerLevel level, @Nullable Entity target, @NotNull GunData data, Vec3 shootDirection, BlockHitResult result, @NotNull Vec3 pos) {
         super.onRayHitBlock(shooter, level, target, data, shootDirection, result, pos);
@@ -108,25 +71,19 @@ public class RepairToolItem extends GunGeoItem {
         if (entity instanceof Player player) {
             for (var cell : player.getInventory().items) {
                 if (cell.getItem() instanceof BatteryItem) {
-                    assert stack.getCapability(ForgeCapabilities.ENERGY).resolve().isPresent();
-                    var stackStorage = stack.getCapability(ForgeCapabilities.ENERGY).resolve().get();
-                    int stackMaxEnergy = stackStorage.getMaxEnergyStored();
-                    int stackEnergy = stackStorage.getEnergyStored();
+                    assert ModEnergyApi.get(stack) != null;
+                    int stackMaxEnergy = ModEnergyApi.getMaxEnergyStored(stack);
+                    int stackEnergy = ModEnergyApi.getEnergyStored(stack);
 
-                    assert cell.getCapability(ForgeCapabilities.ENERGY).resolve().isPresent();
-                    var cellStorage = cell.getCapability(ForgeCapabilities.ENERGY).resolve().get();
-                    int cellEnergy = cellStorage.getEnergyStored();
+                    assert ModEnergyApi.get(cell) != null;
+                    int cellEnergy = ModEnergyApi.getEnergyStored(cell);
 
                     int stackEnergyNeed = Math.min(cellEnergy, stackMaxEnergy - stackEnergy);
 
                     if (cellEnergy > 0) {
-                        stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                                iEnergyStorage -> iEnergyStorage.receiveEnergy(stackEnergyNeed, false)
-                        );
+                        ModEnergyApi.receiveEnergy(stack, stackEnergyNeed, false);
                     }
-                    cell.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                            cEnergy -> cEnergy.extractEnergy(stackEnergyNeed, false)
-                    );
+                    ModEnergyApi.extractEnergy(cell, stackEnergyNeed, false);
                 }
             }
         }
@@ -155,7 +112,7 @@ public class RepairToolItem extends GunGeoItem {
                 vehicle.hurt(ModDamageTypes.causeRepairToolDamage(level.registryAccess(), shooter), 0.5f);
                 if (shooter instanceof ServerPlayer player) {
                     player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 0.1f, 1);
-                    NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ClientIndicatorMessage(0, 5));
+                    NetworkRegistry.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
                 }
             } else {
                 vehicle.heal(0.5f + 0.0025f * vehicle.getMaxHealth());
@@ -176,7 +133,7 @@ public class RepairToolItem extends GunGeoItem {
 
                 if (shooter instanceof ServerPlayer player) {
                     player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 0.1f, 1);
-                    NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ClientIndicatorMessage(0, 5));
+                    NetworkRegistry.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
                 }
             }
             this.summonRayHitParticle(level, null, pos, shootDirection.scale(-1).normalize());

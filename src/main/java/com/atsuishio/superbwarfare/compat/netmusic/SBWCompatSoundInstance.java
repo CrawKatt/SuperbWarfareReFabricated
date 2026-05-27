@@ -11,15 +11,12 @@
 //import net.minecraft.client.sounds.AudioStream;
 //import net.minecraft.client.sounds.SoundBufferLibrary;
 //import net.minecraft.sounds.SoundSource;
-//import net.minecraftforge.api.distmarker.Dist;
-//import net.minecraftforge.api.distmarker.OnlyIn;
 //
 //import javax.sound.sampled.UnsupportedAudioFileException;
 //import java.io.IOException;
 //import java.net.URL;
 //import java.util.concurrent.CompletableFuture;
 //
-//@OnlyIn(Dist.CLIENT)
 //public class SBWCompatSoundInstance extends AbstractTickableSoundInstance {
 //
 //    private final VehicleEntity entity;

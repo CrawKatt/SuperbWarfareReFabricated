@@ -15,6 +15,7 @@ import com.atsuishio.superbwarfare.tools.InventoryTool;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -23,16 +24,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.registries.RegistryManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -402,7 +398,7 @@ public class GunData implements DefaultDataSupplier<DefaultGunData> {
      *
      * 可选项：
      * 1. 使用GunData.virtualAmmo.set来设置虚拟弹药数量
-     * 2. 传入带有IItemHandler能力的任意Entity来提供额外弹药
+     * 2. 传入任意Entity来提供额外弹药
      *
      */
 
@@ -455,22 +451,8 @@ public class GunData implements DefaultDataSupplier<DefaultGunData> {
         return Math.toIntExact(Math.min((long) countBackupAmmoItem(entity) * this.selectedAmmoConsumer().loadAmount + this.virtualAmmo.get(), Integer.MAX_VALUE));
     }
 
-    /**
-     * 计算剩余弹药数量（不考虑枪内弹药）
-     */
-    public int countBackupAmmo(@Nullable IItemHandler handler) {
-        if (handler == null) return virtualAmmo.get();
-        if (InventoryTool.hasCreativeAmmoBox(handler)) return Integer.MAX_VALUE;
-
-        return Math.toIntExact(Math.min((long) countBackupAmmoItem(handler) * this.selectedAmmoConsumer().loadAmount + this.virtualAmmo.get(), Integer.MAX_VALUE));
-    }
-
     public int countBackupAmmoItem(@Nullable Entity entity) {
         return this.selectedAmmoConsumer().count(this, entity);
-    }
-
-    public int countBackupAmmoItem(@Nullable IItemHandler handler) {
-        return this.selectedAmmoConsumer().count(this, handler);
     }
 
     /**
@@ -501,37 +483,6 @@ public class GunData implements DefaultDataSupplier<DefaultGunData> {
             }
         } else {
             consumer.consume(this, entity, count / loadAmount);
-        }
-    }
-
-    /**
-     * 消耗额外弹药（不影响枪内弹药）
-     */
-    public void consumeBackupAmmo(@Nullable IItemHandler handler, int count) {
-        if (count <= 0 || InventoryTool.hasCreativeAmmoBox(handler)) return;
-
-        if (virtualAmmo.get() > 0) {
-            var consumed = Math.min(virtualAmmo.get(), count);
-            virtualAmmo.add(-consumed);
-            count -= consumed;
-            save();
-        }
-        if (count <= 0 || handler == null) return;
-
-        var consumer = selectedAmmoConsumer();
-        var loadAmount = consumer.loadAmount;
-
-        if (count % loadAmount != 0) {
-            var required = (count / loadAmount) + 1;
-            var consumed = consumer.consume(this, handler, required);
-            count -= consumed * loadAmount;
-
-            // 迫真过载装填
-            if (count <= 0) {
-                this.virtualAmmo.add(-count);
-            }
-        } else {
-            consumer.consume(this, handler, count / loadAmount);
         }
     }
 
@@ -651,19 +602,6 @@ public class GunData implements DefaultDataSupplier<DefaultGunData> {
         return (this.virtualAmmo.get() + this.ammo.get()) / selectedAmmoConsumer().loadAmount;
     }
 
-    /**
-     * 返还弹匣内弹药，在换弹和切换弹匣配件时调用
-     */
-    public void withdrawAmmo(@NotNull IItemHandler handler) {
-        var itemAmount = withdrawAmmoCount();
-
-        this.virtualAmmo.reset();
-        this.ammo.reset();
-
-        // 直接丢弃余数（恼）
-        selectedAmmoConsumer().withdraw(handler, itemAmount);
-    }
-
     private static int getPerkPriority(String s) {
         if (s == null || s.isEmpty()) return 2;
 
@@ -692,9 +630,9 @@ public class GunData implements DefaultDataSupplier<DefaultGunData> {
             }
         });
 
-        var perks = RegistryManager.ACTIVE.getRegistry(ModPerks.PERK_KEY).getEntries();
-        var perkValues = perks.stream().map(Map.Entry::getValue).toList();
-        var perkKeys = perks.stream().map(perk -> perk.getKey().location().toString()).toList();
+        Registry<Perk> perkRegistry = ModPerks.PERK_REGISTRY;
+        var perkValues = perkRegistry.stream().toList();
+        var perkKeys = perkRegistry.keySet().stream().map(Object::toString).toList();
 
         for (String name : sortedNames) {
             if (name.startsWith("@")) {
@@ -803,8 +741,8 @@ public class GunData implements DefaultDataSupplier<DefaultGunData> {
         return this.compute().shootPos.shootDirectionForHud;
     }
 
-    public LazyOptional<IEnergyStorage> getEnergyProvider(@Nullable Entity ammoSupplier) {
-        return this.item.getEnergyProvider(this, ammoSupplier);
+    public int getEnergyStored(@Nullable Entity ammoSupplier) {
+        return this.item.getEnergyStored(this, ammoSupplier);
     }
 
     public void shakePlayers(@Nullable Entity source) {

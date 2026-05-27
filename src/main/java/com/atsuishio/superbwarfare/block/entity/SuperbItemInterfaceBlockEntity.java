@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.block.SuperbItemInterfaceBlock;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.menu.SuperbItemInterfaceMenu;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -20,13 +19,8 @@ import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.wrapper.InvWrapper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import org.jetbrains.annotations.NotNull;
 public class SuperbItemInterfaceBlockEntity extends BaseContainerBlockEntity {
 
     public static final int TRANSFER_COOLDOWN = 20;
@@ -60,10 +54,11 @@ public class SuperbItemInterfaceBlockEntity extends BaseContainerBlockEntity {
         var list = level.getEntities(
                 (Entity) null,
                 new AABB(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y + 0.5, z + 0.5),
-                entity -> entity.getCapability(ForgeCapabilities.ITEM_HANDLER).isPresent()
+                entity -> entity instanceof Player
         );
         if (list.isEmpty()) return;
-        var target = list.get(level.random.nextInt(list.size()));
+        var target = (Player) list.get(level.random.nextInt(list.size()));
+        var inventory = target.getInventory();
 
         // item transfer
         for (int i = 0; i < blockEntity.items.size(); i++) {
@@ -72,23 +67,24 @@ public class SuperbItemInterfaceBlockEntity extends BaseContainerBlockEntity {
 
             var originalStack = stack.copy();
 
-            var itemHandler = target.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve().get();
-
             var totalInserted = 0;
-            for (int ii = 0; ii < itemHandler.getSlots(); ii++) {
-                int inserted;
-                for (inserted = stack.getCount(); inserted > 0; inserted--) {
-                    var insertedStack = itemHandler.insertItem(ii, stack.copyWithCount(inserted), true);
-                    if (insertedStack.getCount() != inserted || !ItemStack.isSameItemSameTags(insertedStack, stack)) {
-                        break;
-                    }
+            for (int ii = 0; ii < inventory.getContainerSize(); ii++) {
+                var existing = inventory.getItem(ii);
+
+                if (existing.isEmpty()) {
+                    var toInsert = Math.min(stack.getCount(), stack.getMaxStackSize());
+                    inventory.setItem(ii, stack.copyWithCount(toInsert));
+                    stack.shrink(toInsert);
+                    totalInserted += toInsert;
+                } else if (ItemStack.isSameItemSameTags(existing, stack) && existing.getCount() < existing.getMaxStackSize()) {
+                    var space = existing.getMaxStackSize() - existing.getCount();
+                    var toInsert = Math.min(space, stack.getCount());
+                    existing.grow(toInsert);
+                    stack.shrink(toInsert);
+                    totalInserted += toInsert;
                 }
 
-                if (inserted > 0) {
-                    itemHandler.insertItem(ii, stack.copyWithCount(inserted), false);
-                    stack.shrink(inserted);
-                    totalInserted += inserted;
-                }
+                if (stack.isEmpty()) break;
             }
 
             if (!blockEntity.isCreative()) {
@@ -183,10 +179,5 @@ public class SuperbItemInterfaceBlockEntity extends BaseContainerBlockEntity {
 
     private boolean isOnCooldown() {
         return this.cooldownTime > 0;
-    }
-
-    @Override
-    public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        return ForgeCapabilities.ITEM_HANDLER.orEmpty(cap, LazyOptional.of(() -> new InvWrapper(this)));
     }
 }

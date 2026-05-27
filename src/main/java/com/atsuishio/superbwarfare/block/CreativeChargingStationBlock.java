@@ -1,7 +1,9 @@
 package com.atsuishio.superbwarfare.block;
 
 import com.atsuishio.superbwarfare.block.entity.CreativeChargingStationBlockEntity;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,7 +24,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -45,17 +46,22 @@ public class CreativeChargingStationBlock extends BaseEntityBlock {
     @Override
     public InteractionResult use(BlockState pState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult pHit) {
         ItemStack stack = player.getItemInHand(hand);
-        var cap = stack.getCapability(ForgeCapabilities.ENERGY).resolve();
-        if (cap.isEmpty()) return InteractionResult.FAIL;
-        var energy = cap.get();
-        if (energy.canReceive() && energy.getEnergyStored() < energy.getMaxEnergyStored()) {
-            energy.receiveEnergy(Integer.MAX_VALUE, false);
+        var energy = ModEnergyApi.get(stack);
+        if (energy == null) return InteractionResult.FAIL;
+        if (energy.supportsInsertion() && energy.getAmount() < energy.getCapacity()) {
+            try (Transaction t = Transaction.openOuter()) {
+                energy.insert(Long.MAX_VALUE, t);
+                t.commit();
+            }
             if (!level.isClientSide) {
                 player.displayClientMessage(Component.translatable("des.superbwarfare.creative_charging_station.charge.success").withStyle(ChatFormatting.GREEN), true);
             }
             return InteractionResult.SUCCESS;
-        } else if (energy.canExtract()) {
-            energy.extractEnergy(Integer.MAX_VALUE, false);
+        } else if (energy.supportsExtraction()) {
+            try (Transaction t = Transaction.openOuter()) {
+                energy.extract(Long.MAX_VALUE, t);
+                t.commit();
+            }
             if (!level.isClientSide) {
                 player.displayClientMessage(Component.translatable("des.superbwarfare.creative_charging_station.extract.success").withStyle(ChatFormatting.GREEN), true);
             }

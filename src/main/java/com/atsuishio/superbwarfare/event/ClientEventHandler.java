@@ -11,6 +11,12 @@ import com.atsuishio.superbwarfare.data.gun.*;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.event.custom.ComputeCameraAnglesCallback;
+import com.atsuishio.superbwarfare.event.custom.ComputeFovCallback;
+import com.atsuishio.superbwarfare.event.custom.RenderHandCallback;
+import com.atsuishio.superbwarfare.event.custom.RenderGuiOverlayCallback;
+import com.atsuishio.superbwarfare.event.custom.RenderNameTagCallback;
+import com.atsuishio.superbwarfare.event.custom.RenderPlayerCallback;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
@@ -19,6 +25,9 @@ import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.resource.gun.GunResource;
 import com.atsuishio.superbwarfare.tools.*;
 import com.atsuishio.superbwarfare.world.TDMSavedData;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
@@ -49,17 +58,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.*;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.network.NetworkEvent;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
+
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
@@ -67,9 +67,7 @@ import software.bernie.geckolib.core.animation.AnimationProcessor;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Supplier;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientEventHandler {
 
     public static double zoomTime = 0;
@@ -245,8 +243,35 @@ public class ClientEventHandler {
 
     public static TDMSavedData tdmSavedData = new TDMSavedData();
 
-    @SubscribeEvent
-    public static void handleWeaponTurn(RenderHandEvent event) {
+    public static void registerEvents() {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> handleClientTick());
+
+        WorldRenderEvents.START.register(context -> {
+            handleWeaponFire();
+            handleVehicleFire();
+            handleWeaponBreathSway();
+        });
+
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            if (client.player != null) {
+                onPlayerLoggedIn(client.player);
+            }
+        });
+
+        ComputeCameraAnglesCallback.EVENT.register(ClientEventHandler::computeCameraAngles);
+        ComputeFovCallback.EVENT.register(ClientEventHandler::onFovUpdate);
+
+        RenderHandCallback.EVENT.register(event -> {
+            handleWeaponTurn(event);
+            onRenderHand(event);
+        });
+
+        RenderPlayerCallback.EVENT.register(ClientEventHandler::setPlayerInvisible);
+        RenderGuiOverlayCallback.EVENT.register(ClientEventHandler::handleRenderGuiOverlay);
+        RenderNameTagCallback.EVENT.register(ClientEventHandler::onRenderNameTag);
+    }
+
+    public static void handleWeaponTurn(RenderHandCallback.Event event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) {
             return;
@@ -282,13 +307,9 @@ public class ClientEventHandler {
                 || (player != null && player.isSprinting());
     }
 
-    @SubscribeEvent
-    public static void handleClientTick(TickEvent.ClientTickEvent event) {
+    public static void handleClientTick() {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) {
-            return;
-        }
-        if (event.phase == TickEvent.Phase.START) {
             return;
         }
 
@@ -377,7 +398,7 @@ public class ClientEventHandler {
         }
 
         if (keys != keysCache) {
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new VehicleMovementMessage(keys));
+            NetworkRegistry.sendToServer(new VehicleMovementMessage(keys));
             keysCache = keys;
         }
 
@@ -388,7 +409,7 @@ public class ClientEventHandler {
         if ((stack.is(ModItems.ARTILLERY_INDICATOR.get()) || (stack.is(ModItems.MONITOR.get()) && player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR.get()))) && holdingFireKey) {
             holdArtilleryIndicator = Mth.clamp(holdArtilleryIndicator + 1, 0, 20);
             if (holdArtilleryIndicator >= 19) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(ArtilleryIndicatorFireMessage.INSTANCE);
+                NetworkRegistry.sendToServer(ArtilleryIndicatorFireMessage.INSTANCE);
             }
         } else {
             holdArtilleryIndicator = 0;
@@ -397,7 +418,7 @@ public class ClientEventHandler {
         if (player.getVehicle() instanceof VehicleEntity vehicle && vehicle.allowEjection(vehicle.getSeatIndex(player)) && ModKeyMappings.DISMOUNT.isDown()) {
             holdToEjection = Mth.clamp(holdToEjection + 1, 0, 10);
             if (holdToEjection >= 10) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new PlayerStopRidingMessage(true));
+                NetworkRegistry.sendToServer(new PlayerStopRidingMessage(true));
                 stopVehicleReloadSound(player);
             }
         } else {
@@ -476,7 +497,7 @@ public class ClientEventHandler {
                         } else {
                             if (lockOn) {
                                 if (lockingPos != null) {
-                                    NetworkRegistry.PACKET_HANDLER.sendToServer(new ShootMessage(gunSpread, zoom, null, lockingPos.toVector3f()));
+                                    NetworkRegistry.sendToServer(new ShootMessage(gunSpread, zoom, null, lockingPos.toVector3f()));
                                 }
                                 lockOn = false;
                             }
@@ -504,14 +525,14 @@ public class ClientEventHandler {
                             if (nearestEntity != null && lockingPos == null) {
                                 seekingTime++;
                                 if ((!seekingEntity.getPassengers().isEmpty() || seekingEntity instanceof VehicleEntity) && player.tickCount % 3 == 0 && !lockOn) {
-                                    NetworkRegistry.PACKET_HANDLER.sendToServer(new SeekingWeaponWarningMessage(false, seekingEntity.getUUID()));
+                                    NetworkRegistry.sendToServer(new SeekingWeaponWarningMessage(false, seekingEntity.getUUID()));
                                 }
                                 guideType = 0;
                             }
                         } else {
                             if (lockOn) {
                                 if (lockingEntity != null) {
-                                    NetworkRegistry.PACKET_HANDLER.sendToServer(new ShootMessage(gunSpread, zoom, lockingEntity.getUUID(), lockingEntity.getEyePosition().toVector3f()));
+                                    NetworkRegistry.sendToServer(new ShootMessage(gunSpread, zoom, lockingEntity.getUUID(), lockingEntity.getEyePosition().toVector3f()));
                                 }
                                 lockOn = false;
                             }
@@ -539,7 +560,7 @@ public class ClientEventHandler {
                         if (nearestEntity != null && data.hasEnoughAmmoToShoot(player)) {
                             seekingTime++;
                             if ((!seekingEntity.getPassengers().isEmpty() || seekingEntity instanceof VehicleEntity) && player.tickCount % 3 == 0 && !lockOn) {
-                                NetworkRegistry.PACKET_HANDLER.sendToServer(new SeekingWeaponWarningMessage(false, seekingEntity.getUUID()));
+                                NetworkRegistry.sendToServer(new SeekingWeaponWarningMessage(false, seekingEntity.getUUID()));
                             }
                         }
                     } else {
@@ -547,7 +568,7 @@ public class ClientEventHandler {
                     }
 
                     if (lockOn && holdingFireKey && lockingEntity != null) {
-                        NetworkRegistry.PACKET_HANDLER.sendToServer(new ShootMessage(gunSpread, zoom, lockingEntity.getUUID(), lockingEntity.getEyePosition().toVector3f()));
+                        NetworkRegistry.sendToServer(new ShootMessage(gunSpread, zoom, lockingEntity.getUUID(), lockingEntity.getEyePosition().toVector3f()));
                         holdingFireKey = false;
                     }
                 }
@@ -570,7 +591,7 @@ public class ClientEventHandler {
             if (seekingTime > lockTime) {
                 playLockedSound(data, player);
                 if (guideType == 0 && lockingEntity != null && (!lockingEntity.getPassengers().isEmpty() || lockingEntity instanceof VehicleEntity) && player.tickCount % 2 == 0) {
-                    NetworkRegistry.PACKET_HANDLER.sendToServer(new SeekingWeaponWarningMessage(true, lockingEntity.getUUID()));
+                    NetworkRegistry.sendToServer(new SeekingWeaponWarningMessage(true, lockingEntity.getUUID()));
                 }
             }
         }
@@ -661,7 +682,7 @@ public class ClientEventHandler {
                 if (nearestEntityVehicle != null && lockingPosVehicle == null) {
                     seekingTimeVehicle++;
                     if ((!seekingEntityVehicle.getPassengers().isEmpty() || seekingEntityVehicle instanceof VehicleEntity) && player.tickCount % 3 == 0 && !lockOnVehicle) {
-                        NetworkRegistry.PACKET_HANDLER.sendToServer(new SeekingWeaponWarningMessage(false, seekingEntityVehicle.getUUID()));
+                        NetworkRegistry.sendToServer(new SeekingWeaponWarningMessage(false, seekingEntityVehicle.getUUID()));
                     }
                 }
             } else {
@@ -687,7 +708,7 @@ public class ClientEventHandler {
         if (seekingTimeVehicle > lockTime) {
             playLockedSound(data, player);
             if (seekWeaponInfo.onlyLockEntity && lockingEntityVehicle != null && (!lockingEntityVehicle.getPassengers().isEmpty() || lockingEntityVehicle instanceof VehicleEntity) && player.tickCount % 2 == 0) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new SeekingWeaponWarningMessage(true, lockingEntityVehicle.getUUID()));
+                NetworkRegistry.sendToServer(new SeekingWeaponWarningMessage(true, lockingEntityVehicle.getUUID()));
             }
         }
     }
@@ -737,7 +758,7 @@ public class ClientEventHandler {
 
     public static void weaponZooming(ItemStack stack) {
         if (stack.getItem() instanceof GunItem) {
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new WeaponZoomingMessage(zoomTime >= 0.7));
+            NetworkRegistry.sendToServer(new WeaponZoomingMessage(zoomTime >= 0.7));
         }
     }
 
@@ -799,9 +820,9 @@ public class ClientEventHandler {
         }
 
         if (tacticalSprint && (player.onGround() || player.jumping)) {
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new TacticalSprintMessage(true));
+            NetworkRegistry.sendToServer(new TacticalSprintMessage(true));
         } else {
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new TacticalSprintMessage(false));
+            NetworkRegistry.sendToServer(new TacticalSprintMessage(false));
         }
     }
 
@@ -887,9 +908,9 @@ public class ClientEventHandler {
 
     public static void doGunMeleeAttack(Player player) {
         player.playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1f, 1);
-        Entity lookingEntity = TraceTool.findMeleeEntity(player, player.getEntityReach());
+        Entity lookingEntity = TraceTool.findMeleeEntity(player, getEntityReach(player));
         if (lookingEntity != null) {
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new MeleeAttackMessage(lookingEntity.getUUID()));
+            NetworkRegistry.sendToServer(new MeleeAttackMessage(lookingEntity.getUUID()));
         }
     }
 
@@ -901,21 +922,21 @@ public class ClientEventHandler {
         }
 
         if (stack.is(ModItems.LUNGE_MINE.get()) && ((lungeAttack >= 9 && lungeAttack <= 10.5) || lungeSprint > 0)) {
-            Entity lookingEntity = TraceTool.findLookingEntity(player, player.getEntityReach() + 1.5);
+            Entity lookingEntity = TraceTool.findLookingEntity(player, getEntityReach(player) + 1.5);
 
-            BlockHitResult result = player.level().clip(new ClipContext(player.getEyePosition(), player.getEyePosition().add(player.getLookAngle().scale(player.getBlockReach() + 0.5)),
+            BlockHitResult result = player.level().clip(new ClipContext(player.getEyePosition(), player.getEyePosition().add(player.getLookAngle().scale(getBlockReach(player) + 0.5)),
                     ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
 
-            Vec3 looking = Vec3.atLowerCornerOf(player.level().clip(new ClipContext(player.getEyePosition(), player.getEyePosition().add(player.getLookAngle().scale(player.getBlockReach() + 0.5)), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player)).getBlockPos());
+            Vec3 looking = Vec3.atLowerCornerOf(player.level().clip(new ClipContext(player.getEyePosition(), player.getEyePosition().add(player.getLookAngle().scale(getBlockReach(player) + 0.5)), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player)).getBlockPos());
             BlockState blockState = player.level().getBlockState(BlockPos.containing(looking.x(), looking.y(), looking.z()));
 
             if (lookingEntity != null) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new LungeMineAttackMessage(0, lookingEntity.getUUID(), result.getLocation()));
+                NetworkRegistry.sendToServer(new LungeMineAttackMessage(0, lookingEntity.getUUID(), result.getLocation()));
                 lungeSprint = 0;
                 lungeAttack = 0;
                 lungeDraw = 15;
             } else if ((blockState.canOcclude() || blockState.getBlock() instanceof DoorBlock || blockState.getBlock() instanceof CrossCollisionBlock || blockState.getBlock() instanceof BellBlock) && lungeSprint == 0) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new LungeMineAttackMessage(1, player.getUUID(), result.getLocation()));
+                NetworkRegistry.sendToServer(new LungeMineAttackMessage(1, player.getUUID(), result.getLocation()));
                 lungeSprint = 0;
                 lungeAttack = 0;
                 lungeDraw = 15;
@@ -935,8 +956,7 @@ public class ClientEventHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void handleWeaponFire(TickEvent.RenderTickEvent event) {
+    public static void handleWeaponFire() {
         ClientLevel level = Minecraft.getInstance().level;
         Player player = Minecraft.getInstance().player;
 
@@ -1147,7 +1167,7 @@ public class ClientEventHandler {
         if (!(stack.getItem() instanceof GunItem)) return;
         var data = GunData.from(stack);
 
-        NetworkRegistry.PACKET_HANDLER.sendToServer(new ShootMessage(gunSpread, zoom, lockedEntity != null ? lockedEntity.getUUID() : null));
+        NetworkRegistry.sendToServer(new ShootMessage(gunSpread, zoom, lockedEntity != null ? lockedEntity.getUUID() : null));
         fireRecoilTime = 10;
 
         // 真实后坐（
@@ -1173,19 +1193,29 @@ public class ClientEventHandler {
         randomShell[2] = (0.7 + (Math.random() - 0.5));
     }
 
-    public static void handleShakeClient(double time, double radius, double amplitude, double x, double y, double z, Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-            Player player = Minecraft.getInstance().player;
-            if (player == null || player.isSpectator()) return;
+    public static void handleShakeClient(double time, double radius, double amplitude, double x, double y, double z) {
+        Player player = Minecraft.getInstance().player;
+        if (player == null || player.isSpectator()) return;
 
-            double distance = player.position().distanceTo(new Vec3(x, y, z));
+        double distance = player.position().distanceTo(new Vec3(x, y, z));
 
-            int time2 = (int) (distance / 17);
+        int time2 = (int) (distance / 17);
 
-            if (time2 == 0) {
+        if (time2 == 0) {
+            float shakeStrength = (float) DisplayConfig.EXPLOSION_SCREEN_SHAKE.get() / 100.0f;
+            if (shakeStrength <= 0.0f) return;
+
+            shakeTime = time;
+            shakeRadius = radius;
+            shakeAmplitude = amplitude * Mth.DEG_TO_RAD * shakeStrength;
+            shakePos[0] = x * shakeStrength;
+            shakePos[1] = y * shakeStrength;
+            shakePos[2] = z * shakeStrength;
+            shakeType = 2 * (Math.random() - 0.5);
+        } else {
+            Mod.queueClientWork(time2, () -> {
                 float shakeStrength = (float) DisplayConfig.EXPLOSION_SCREEN_SHAKE.get() / 100.0f;
                 if (shakeStrength <= 0.0f) return;
-
                 shakeTime = time;
                 shakeRadius = radius;
                 shakeAmplitude = amplitude * Mth.DEG_TO_RAD * shakeStrength;
@@ -1193,19 +1223,7 @@ public class ClientEventHandler {
                 shakePos[1] = y * shakeStrength;
                 shakePos[2] = z * shakeStrength;
                 shakeType = 2 * (Math.random() - 0.5);
-            } else {
-                Mod.queueClientWork(time2, () -> {
-                    float shakeStrength = (float) DisplayConfig.EXPLOSION_SCREEN_SHAKE.get() / 100.0f;
-                    if (shakeStrength <= 0.0f) return;
-                    shakeTime = time;
-                    shakeRadius = radius;
-                    shakeAmplitude = amplitude * Mth.DEG_TO_RAD * shakeStrength;
-                    shakePos[0] = x * shakeStrength;
-                    shakePos[1] = y * shakeStrength;
-                    shakePos[2] = z * shakeStrength;
-                    shakeType = 2 * (Math.random() - 0.5);
-                });
-            }
+            });
         }
     }
 
@@ -1218,9 +1236,7 @@ public class ClientEventHandler {
         if (stack.getItem() == ModItems.SENTINEL.get()) {
             boolean[] charged = {false};
 
-            stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                    e -> charged[0] = e.getEnergyStored() > 0
-            );
+            charged[0] = ModEnergyApi.getEnergyStored(stack) > 0;
 
             if (charged[0]) {
                 player.playSound(ModSounds.SENTINEL_CHARGE_FIRE_1P.get(), 2f, (float) ((2 * Math.random() - 1) * 0.05f + 1.0f));
@@ -1229,9 +1245,7 @@ public class ClientEventHandler {
         }
 
         if (stack.getItem() == ModItems.SECONDARY_CATACLYSM.get()) {
-            var hasEnoughEnergy = stack.getCapability(ForgeCapabilities.ENERGY)
-                    .map(storage -> storage.getEnergyStored() >= 3000)
-                    .orElse(false);
+            var hasEnoughEnergy = ModEnergyApi.getEnergyStored(stack) >= 3000;
 
             boolean isChargedFire = zoom && hasEnoughEnergy;
 
@@ -1281,8 +1295,7 @@ public class ClientEventHandler {
         });
     }
 
-    @SubscribeEvent
-    public static void handleVehicleFire(TickEvent.RenderTickEvent event) {
+    public static void handleVehicleFire() {
         ClientLevel level = Minecraft.getInstance().level;
         Player player = Minecraft.getInstance().player;
         if (player == null) return;
@@ -1322,7 +1335,7 @@ public class ClientEventHandler {
 
                     // 低帧率下的开火次数补偿
                     do {
-                        NetworkRegistry.PACKET_HANDLER.sendToServer(new VehicleFireMessage(lockingEntityVehicle != null ? lockingEntityVehicle.getUUID() : null, lockingPosVehicle != null ? lockingPosVehicle.toVector3f() : null));
+                        NetworkRegistry.sendToServer(new VehicleFireMessage(lockingEntityVehicle != null ? lockingEntityVehicle.getUUID() : null, lockingPosVehicle != null ? lockingPosVehicle.toVector3f() : null));
                         if (Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON || zoomVehicle) {
                             playVehicleClientSounds(player, vehicle);
                         }
@@ -1356,8 +1369,7 @@ public class ClientEventHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void handleWeaponBreathSway(TickEvent.RenderTickEvent event) {
+    public static void handleWeaponBreathSway() {
         Player player = Minecraft.getInstance().player;
         if (player == null) return;
         ItemStack stack = player.getMainHandItem();
@@ -1403,8 +1415,7 @@ public class ClientEventHandler {
         return Minecraft.getInstance().getDeltaFrameTime();
     }
 
-    @SubscribeEvent
-    public static void computeCameraAngles(ViewportEvent.ComputeCameraAngles event) {
+    public static void computeCameraAngles(ComputeCameraAnglesCallback.Event event) {
         ClientLevel level = Minecraft.getInstance().level;
         Entity entity = event.getCamera().getEntity();
 
@@ -1463,7 +1474,7 @@ public class ClientEventHandler {
         handleShockCamera(event, living);
     }
 
-    private static void handleDroneCamera(ViewportEvent.ComputeCameraAngles event, LivingEntity entity) {
+    private static void handleDroneCamera(ComputeCameraAnglesCallback.Event event, LivingEntity entity) {
         ItemStack stack = entity.getMainHandItem();
 
         DroneEntity drone = EntityFindUtil.findDrone(entity.level(), stack.getOrCreateTag().getString("LinkedDrone"));
@@ -1473,8 +1484,7 @@ public class ClientEventHandler {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onRenderHand(RenderHandEvent event) {
+    public static void onRenderHand(RenderHandCallback.Event event) {
         Player player = Minecraft.getInstance().player;
         if (player == null) return;
 
@@ -1699,7 +1709,7 @@ public class ClientEventHandler {
         zoomPosZ = AnimationCurves.PARABOLA.apply(zoomTime);
     }
 
-    private static void handleWeaponFire(ViewportEvent.ComputeCameraAngles event, LivingEntity entity) {
+    private static void handleWeaponFire(ComputeCameraAnglesCallback.Event event, LivingEntity entity) {
         float times = (float) (2f * customAnimSpeed * Math.min(Minecraft.getInstance().getDeltaFrameTime(), 0.48f));
         ItemStack stack = entity.getMainHandItem();
         var data = GunData.from(stack);
@@ -1934,7 +1944,7 @@ public class ClientEventHandler {
         if (recoilTime >= 2.5) recoilTime = 0;
     }
 
-    private static void handleShockCamera(ViewportEvent.ComputeCameraAngles event, LivingEntity entity) {
+    private static void handleShockCamera(ComputeCameraAnglesCallback.Event event, LivingEntity entity) {
         if (entity instanceof Player player && player.isSpectator()) return;
 
         if (entity.hasEffect(ModMobEffects.SHOCK.get()) && Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON) {
@@ -1959,7 +1969,7 @@ public class ClientEventHandler {
         cameraRot[2] = -boneRotZ * shakeStrength;
     }
 
-    private static void handlePlayerCamera(ViewportEvent.ComputeCameraAngles event) {
+    private static void handlePlayerCamera(ComputeCameraAnglesCallback.Event event) {
         double yaw = event.getYaw();
         double pitch = event.getPitch();
         double roll = event.getRoll();
@@ -2025,8 +2035,7 @@ public class ClientEventHandler {
         bowPullPos = 0.5 * Math.cos(Math.PI * Math.pow(Math.pow(Mth.clamp(bowPullTimer, 0, 1), 2) - 1, 2)) + 0.5;
     }
 
-    @SubscribeEvent
-    public static void onFovUpdate(ViewportEvent.ComputeFov event) {
+    public static void onFovUpdate(ComputeFovCallback.Event event) {
         Minecraft mc = Minecraft.getInstance();
         float times = (float) Math.min(getDelta(), 1.6);
         Player player = mc.player;
@@ -2083,7 +2092,7 @@ public class ClientEventHandler {
                 if (player.isShiftKeyDown()) {
                     lockedEntity = null;
                 } else {
-                    int intelligentChipLevel = GunData.from(stack).perk.getLevel(ModPerks.INTELLIGENT_CHIP);
+                    int intelligentChipLevel = GunData.from(stack).perk.getLevel(ModPerks.INTELLIGENT_CHIP.get());
                     double seekRange = 32 + 8 * (intelligentChipLevel - 1);
 
                     if (intelligentChipLevel > 0) {
@@ -2100,7 +2109,7 @@ public class ClientEventHandler {
                                     Mth.lerp(event.getPartialTick(), player.yo + player.getEyeHeight() - 0.1 * player.getViewVector(1).y, player.getEyeY() - 0.1 * player.getViewVector(1).y),
                                     Mth.lerp(event.getPartialTick(), player.zo - 0.1 * player.getViewVector(1).z, player.getZ() - 0.1 * player.getViewVector(1).z));
 
-                            var hasGravity = data.perk.getLevel(ModPerks.MICRO_MISSILE) <= 0;
+                            var hasGravity = data.perk.getLevel(ModPerks.MICRO_MISSILE.get()) <= 0;
                             double velocity;
 
                             if (stack.is(ModItems.BOCEK.get())) {
@@ -2154,8 +2163,7 @@ public class ClientEventHandler {
         player.setYRot(Mth.wrapDegrees(finalY));
     }
 
-    @SubscribeEvent
-    public static void setPlayerInvisible(RenderPlayerEvent.Pre event) {
+    public static void setPlayerInvisible(RenderPlayerCallback.Event event) {
         var player = Minecraft.getInstance().player;
         var otherPlayer = event.getEntity();
         if (otherPlayer.getVehicle() instanceof VehicleEntity vehicle && vehicle.hidePassenger(otherPlayer)) {
@@ -2166,12 +2174,17 @@ public class ClientEventHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void handleRenderCrossHair(RenderGuiOverlayEvent.Pre event) {
-        if (event.getOverlay() != VanillaGuiOverlay.CROSSHAIR.type()) {
-            return;
+    public static void handleRenderGuiOverlay(RenderGuiOverlayCallback.Event event) {
+        if (event.getOverlay() == RenderGuiOverlayCallback.Overlay.CROSSHAIR) {
+            handleRenderCrossHair(event);
         }
 
+        if (event.getOverlay() == RenderGuiOverlayCallback.Overlay.HOTBAR) {
+            handleAvoidRenderingHotbar(event);
+        }
+    }
+
+    public static void handleRenderCrossHair(RenderGuiOverlayCallback.Event event) {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player == null) {
@@ -2204,12 +2217,7 @@ public class ClientEventHandler {
     /**
      * 载具banHand时，禁用快捷栏渲染
      */
-    @SubscribeEvent
-    public static void handleAvoidRenderingHotbar(RenderGuiOverlayEvent.Pre event) {
-        if (event.getOverlay() != VanillaGuiOverlay.HOTBAR.type()) {
-            return;
-        }
-
+    public static void handleAvoidRenderingHotbar(RenderGuiOverlayCallback.Event event) {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player == null) {
@@ -2281,7 +2289,7 @@ public class ClientEventHandler {
                 List<Entity> entities = SeekTool.seekLivingEntities(villager, 16, 120);
                 for (var e : entities) {
                     if (e == player) {
-                        NetworkRegistry.PACKET_HANDLER.sendToServer(new AimVillagerMessage(villager.getId()));
+                        NetworkRegistry.sendToServer(new AimVillagerMessage(villager.getId()));
                         aimVillagerCountdown = 80;
                     }
                 }
@@ -2353,23 +2361,18 @@ public class ClientEventHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void onRenderNameTag(RenderNameTagEvent event) {
+    public static void onRenderNameTag(RenderNameTagCallback.Event event) {
         if (!(event.getEntity() instanceof Player player)) return;
         var self = Minecraft.getInstance().player;
         if (self == null || self == player) return;
         if (!(self.getVehicle() instanceof VehicleEntity)) return;
         if (self.isPassengerOfSameVehicle(player)) {
-            event.setResult(Event.Result.DENY);
+            event.setCanceled(true);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+    public static void onPlayerLoggedIn(Player player) {
         if (!DisplayConfig.ENABLE_VERSION_CHECK_WARNING.get()) return;
-
-        var player = event.getEntity();
-        if (player == null) return;
         if (ModVersionEventHandler.currentVersion == null || ModVersionEventHandler.previousVersion == null) return;
 
         player.displayClientMessage(Component.translatable("tips.superbwarfare.vehicle_reset_kit_1",
@@ -2380,5 +2383,15 @@ public class ClientEventHandler {
                 Component.literal("[").append(ModItems.VEHICLE_RESET_KIT.get().getDefaultInstance().getHoverName()).append("]").withStyle(ChatFormatting.GREEN)), false);
         player.displayClientMessage(Component.translatable("tips.superbwarfare.vehicle_reset_kit_3")
                 .withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.UNDERLINE), false);
+    }
+
+    // ToDo: Comprobar equivalente en Forge
+    private static double getEntityReach(Player player) {
+        return player.isCreative() ? 5.0D : 4.5D;
+    }
+
+    // ToDo: Comprobar equivalente en Forge
+    private static double getBlockReach(Player player) {
+        return player.isCreative() ? 5.0D : 4.5D;
     }
 }

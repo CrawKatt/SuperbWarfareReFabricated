@@ -1,10 +1,10 @@
 package com.atsuishio.superbwarfare.tools;
 
 import com.atsuishio.superbwarfare.Mod;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 // 仅在客户端资源重载时记录一次的Logger
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = Mod.MODID, bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD)
 public class ResourceOnceLogger {
     private static final ReloadListener INSTANCE = new ReloadListener();
     private static final List<ResourceOnceLogger> LOGGERS = new ArrayList<>();
@@ -33,9 +32,8 @@ public class ResourceOnceLogger {
         logger.accept(Mod.LOGGER);
     }
 
-    @SubscribeEvent
-    static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
-        event.registerReloadListener(INSTANCE);
+    public static void register() {
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
     }
 
     static class ReloadListener implements ResourceManagerReloadListener {

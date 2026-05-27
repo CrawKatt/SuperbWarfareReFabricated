@@ -16,12 +16,9 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
-@OnlyIn(Dist.CLIENT)
 public class HeatBarOverlay implements IGuiOverlay {
 
     public static final String ID = Mod.MODID + "_heat_bar";

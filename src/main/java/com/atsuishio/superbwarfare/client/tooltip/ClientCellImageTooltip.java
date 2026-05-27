@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import org.jetbrains.annotations.NotNull;
 
 public class ClientCellImageTooltip implements ClientTooltipComponent {
@@ -36,7 +36,7 @@ public class ClientCellImageTooltip implements ClientTooltipComponent {
     }
 
     protected boolean shouldRenderEnergyTooltip() {
-        return stack.getCapability(ForgeCapabilities.ENERGY).isPresent() && stack.getCapability(ForgeCapabilities.ENERGY).resolve().isPresent();
+        return ModEnergyApi.get(stack) != null;
     }
 
     protected void renderEnergyTooltip(Font font, GuiGraphics guiGraphics, int x, int y) {
@@ -44,10 +44,10 @@ public class ClientCellImageTooltip implements ClientTooltipComponent {
     }
 
     protected Component getEnergyComponent() {
-        assert stack.getCapability(ForgeCapabilities.ENERGY).resolve().isPresent();
-        var storage = stack.getCapability(ForgeCapabilities.ENERGY).resolve().get();
-        int energy = storage.getEnergyStored();
-        int maxEnergy = storage.getMaxEnergyStored();
+        var storage = ModEnergyApi.get(stack);
+        assert storage != null;
+        int energy = storage.getAmount();
+        int maxEnergy = storage.getCapacity();
         float percentage = Mth.clamp((float) energy / maxEnergy, 0, 1);
         MutableComponent component = Component.empty();
 

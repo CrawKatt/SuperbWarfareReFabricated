@@ -31,7 +31,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.network.PacketDistributor;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,7 +76,7 @@ public class Beast extends SwordItem {
         }
 
         if (attacker instanceof ServerPlayer player) {
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ClientIndicatorMessage(1, 5));
+            NetworkRegistry.sendToPlayer(player, new ClientIndicatorMessage(1, 5));
             var holder = Holder.direct(ModSounds.INDICATION.get());
             player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1f, 1f, player.level().random.nextLong()));
 
@@ -89,7 +89,7 @@ public class Beast extends SwordItem {
             );
 
             if (MiscConfig.SEND_KILL_FEEDBACK.get()) {
-                NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.ALL.noArg(), new LivingGunKillMessage(player.getId(), target.getId(), false, ModDamageTypes.BEAST));
+                NetworkRegistry.sendToAll(new LivingGunKillMessage(player.getId(), target.getId(), false, ModDamageTypes.BEAST));
             }
         }
 

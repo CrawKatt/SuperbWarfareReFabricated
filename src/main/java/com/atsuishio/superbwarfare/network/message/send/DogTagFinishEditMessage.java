@@ -7,9 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 public class DogTagFinishEditMessage {
 
@@ -58,28 +55,24 @@ public class DogTagFinishEditMessage {
         return new DogTagFinishEditMessage(colors, name, mainHand);
     }
 
-    public static void handler(DogTagFinishEditMessage message, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer serverPlayer = ctx.get().getSender();
-            if (serverPlayer == null) return;
+    public static void handler(DogTagFinishEditMessage message, ServerPlayer player) {
+        if (player == null) return;
 
-            ItemStack stack = message.mainHand ? serverPlayer.getMainHandItem() : serverPlayer.getOffhandItem();
-            if (!stack.is(ModItems.DOG_TAG.get())) return;
+        ItemStack stack = message.mainHand ? player.getMainHandItem() : player.getOffhandItem();
+        if (!stack.is(ModItems.DOG_TAG.get())) return;
 
-            CompoundTag colorsTag = new CompoundTag();
-            for (int i = 0; i < message.colors.length; i++) {
-                int[] color = new int[message.colors[i].length];
-                for (int j = 0; j < message.colors[i].length; j++) {
-                    color[j] = message.colors[i][j];
-                }
-                colorsTag.putIntArray("Color" + i, color);
+        CompoundTag colorsTag = new CompoundTag();
+        for (int i = 0; i < message.colors.length; i++) {
+            int[] color = new int[message.colors[i].length];
+            for (int j = 0; j < message.colors[i].length; j++) {
+                color[j] = message.colors[i][j];
             }
-            stack.getOrCreateTag().put("Colors", colorsTag);
+            colorsTag.putIntArray("Color" + i, color);
+        }
+        stack.getOrCreateTag().put("Colors", colorsTag);
 
-            if (!message.name.isEmpty()) {
-                stack.setHoverName(Component.literal(message.name));
-            }
-        });
-        ctx.get().setPacketHandled(true);
+        if (!message.name.isEmpty()) {
+            stack.setHoverName(Component.literal(message.name));
+        }
     }
 }

@@ -8,67 +8,51 @@ import com.atsuishio.superbwarfare.item.C4BombItem;
 import com.atsuishio.superbwarfare.item.ElectricBaton;
 import com.atsuishio.superbwarfare.item.common.container.LuckyContainerBlockItem;
 import com.atsuishio.superbwarfare.item.common.container.SmallContainerBlockItem;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraft.world.item.alchemy.Potions;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD)
 @SuppressWarnings("unused")
 public class ModTabs {
 
-    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Mod.MODID);
-
-    public static final RegistryObject<CreativeModeTab> GUN_TAB = TABS.register("guns",
+    public static final Supplier<CreativeModeTab> GUN_TAB = Registration.creativeTab("guns",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("item_group.superbwarfare.guns"))
                     .icon(() -> new ItemStack(ModItems.TASER.get()))
-                    .displayItems((param, output) -> ModItems.GUNS.getEntries().forEach(registryObject -> {
+                    .displayItems((param, output) -> ModItems.GUNS_LIST.forEach(registryObject -> {
                         if (registryObject == ModItems.VEHICLE_GUN) return;
 
                         output.accept(registryObject.get());
 
                         var stack = new ItemStack(registryObject.get());
-                        stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(energy -> {
-                            if (energy.getMaxEnergyStored() > 0) {
-                                energy.receiveEnergy(Integer.MAX_VALUE, false);
-                                output.accept(stack);
-                            }
-                        });
+                        // TODO: Replace ForgeCapabilities.ENERGY with TechReborn Energy API
+                        // stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(energy -> {
+                        //     if (energy.getMaxEnergyStored() > 0) {
+                        //         energy.receiveEnergy(Integer.MAX_VALUE, false);
+                        //         output.accept(stack);
+                        //     }
+                        // });
                     }))
                     .build());
 
-    public static final RegistryObject<CreativeModeTab> PERK_TAB = TABS.register("perk",
+    public static final Supplier<CreativeModeTab> PERK_TAB = Registration.creativeTab("perk",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("item_group.superbwarfare.perk"))
                     .icon(() -> new ItemStack(ModItems.AP_BULLET.get()))
-                    .withTabsBefore(GUN_TAB.getKey())
                     .displayItems((param, output) -> {
                         output.accept(ModItems.REFORGING_TABLE.get());
-                        ModItems.PERKS.getEntries().forEach(registryObject -> output.accept(registryObject.get()));
+                        ModItems.PERKS_LIST.forEach(registryObject -> output.accept(registryObject.get()));
                     })
                     .build());
 
-    public static final RegistryObject<CreativeModeTab> AMMO_TAB = TABS.register("ammo",
+    public static final Supplier<CreativeModeTab> AMMO_TAB = Registration.creativeTab("ammo",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("item_group.superbwarfare.ammo"))
                     .icon(() -> new ItemStack(ModItems.SHOTGUN_AMMO_BOX.get()))
-                    .withTabsBefore(PERK_TAB.getKey())
                     .displayItems((param, output) -> {
-                        ModItems.AMMO.getEntries().forEach(registryObject -> {
+                        ModItems.AMMO_LIST.forEach(registryObject -> {
                             if (registryObject.get() != ModItems.POTION_MORTAR_SHELL.get()) {
                                 output.accept(registryObject.get());
 
@@ -78,17 +62,16 @@ public class ModTabs {
                             }
                         });
 
-                        param.holders().lookup(Registries.POTION)
+                        param.holders().lookup(net.minecraft.core.registries.Registries.POTION)
                                 .ifPresent(potion -> generatePotionEffectTypes(output, potion, ModItems.POTION_MORTAR_SHELL.get()));
                     })
                     .build());
 
-    public static final RegistryObject<CreativeModeTab> ITEM_TAB = TABS.register("item",
+    public static final Supplier<CreativeModeTab> ITEM_TAB = Registration.creativeTab("item",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("item_group.superbwarfare.item"))
                     .icon(() -> new ItemStack(ModItems.TARGET_DEPLOYER.get()))
-                    .withTabsBefore(AMMO_TAB.getKey())
-                    .displayItems((param, output) -> ModItems.ITEMS.getEntries().forEach(registryObject -> {
+                    .displayItems((param, output) -> ModItems.ITEMS_LIST.forEach(registryObject -> {
                         output.accept(registryObject.get());
                         if (registryObject.get() == ModItems.ARMOR_PLATE.get()) {
                             output.accept(ArmorPlate.getInfiniteInstance());
@@ -102,19 +85,17 @@ public class ModTabs {
                     }))
                     .build());
 
-    public static final RegistryObject<CreativeModeTab> BLOCK_TAB = TABS.register("block",
+    public static final Supplier<CreativeModeTab> BLOCK_TAB = Registration.creativeTab("block",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("item_group.superbwarfare.block"))
                     .icon(() -> new ItemStack(ModItems.SANDBAG.get()))
-                    .withTabsBefore(ITEM_TAB.getKey())
-                    .displayItems((param, output) -> ModItems.BLOCKS.getEntries().forEach(registryObject -> output.accept(registryObject.get())))
+                    .displayItems((param, output) -> ModItems.BLOCKS_LIST.forEach(registryObject -> output.accept(registryObject.get())))
                     .build());
 
-    public static final RegistryObject<CreativeModeTab> VEHICLE_TAB = TABS.register("vehicle",
+    public static final Supplier<CreativeModeTab> VEHICLE_TAB = Registration.creativeTab("vehicle",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("item_group.superbwarfare.vehicle"))
                     .icon(() -> new ItemStack(ModItems.CONTAINER.get()))
-                    .withTabsBefore(BLOCK_TAB.getKey())
                     .displayItems((param, output) -> {
                         output.accept(ModItems.CROWBAR.get());
                         output.accept(ModItems.VEHICLE_ASSEMBLING_TABLE.get());
@@ -129,16 +110,13 @@ public class ModTabs {
                     })
                     .build());
 
-    @SubscribeEvent
-    public static void buildTabContentsVanilla(BuildCreativeModeTabContentsEvent tabData) {
-        if (tabData.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
-            tabData.accept(ModItems.SENPAI_SPAWN_EGG.get());
-        }
-    }
+    // TODO: Add SENPAI_SPAWN_EGG to vanilla spawn eggs tab via fabric ItemGroupEvents
+    // On Fabric, use ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS)
+    //   .register((entries) -> entries.accept(ModItems.SENPAI_SPAWN_EGG.get()));
 
-    private static void generatePotionEffectTypes(CreativeModeTab.Output output, HolderLookup<Potion> potions, Item potionItem) {
-        potions.listElements().filter(potion -> !potion.is(Potions.EMPTY_ID))
-                .map(potion -> PotionUtils.setPotion(new ItemStack(potionItem), potion.value()))
+    private static void generatePotionEffectTypes(CreativeModeTab.Output output, net.minecraft.core.HolderLookup.Provider potions, net.minecraft.world.item.Item potionItem) {
+        potions.listElements().filter(potion -> !potion.is(net.minecraft.world.item.alchemy.Potions.EMPTY_ID))
+                .map(potion -> net.minecraft.world.item.alchemy.PotionUtils.setPotion(new ItemStack(potionItem), potion.value()))
                 .forEach(output::accept);
     }
 }

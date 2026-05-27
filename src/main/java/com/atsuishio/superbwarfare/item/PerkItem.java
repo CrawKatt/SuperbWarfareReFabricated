@@ -11,7 +11,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -33,7 +32,6 @@ public class PerkItem extends Item {
     }
 
     @Override
-    @ParametersAreNonnullByDefault
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltips, TooltipFlag isAdvanced) {
         ChatFormatting chatFormatting = switch (this.getPerk().type) {
             case AMMO -> ChatFormatting.YELLOW;

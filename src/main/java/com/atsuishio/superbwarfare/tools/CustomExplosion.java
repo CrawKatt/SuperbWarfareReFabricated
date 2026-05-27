@@ -26,11 +26,9 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -151,7 +149,7 @@ public class CustomExplosion extends Explosion {
         int z0 = Mth.floor(this.z - (double) diameter - 1);
         int z1 = Mth.floor(this.z + (double) diameter + 1);
         List<Entity> list = this.level.getEntities(this.source, new AABB(x0, y0, z0, x1, y1, z1));
-        net.minecraftforge.event.ForgeEventFactory.onExplosionDetonate(this.level, this, list, diameter);
+        // TODO Fabric: No direct ExplosionEvent.Detonate equivalent
         Vec3 position = new Vec3(this.x, this.y, this.z);
 
         boolean hit = false;
@@ -204,7 +202,7 @@ public class CustomExplosion extends Explosion {
         if (hit) {
             if (this.damageSource.getEntity() instanceof ServerPlayer player) {
                 SoundTool.playLocalSound(player, ModSounds.INDICATION.get());
-                NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ClientIndicatorMessage(0, 5));
+                NetworkRegistry.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
             }
         }
     }
@@ -308,7 +306,7 @@ public class CustomExplosion extends Explosion {
                     .setFireTime(fireTime)
                     .setDamageMultiplier(damageMultiplier);
             customExplosion.explode();
-            ForgeEventFactory.onExplosionStart(directSource.level(), customExplosion);
+            // TODO Fabric: No direct ExplosionStart event equivalent
             customExplosion.finalizeExplosion(false);
 
             ParticleTool.spawnExplosionParticles(particleType, directSource.level(), particlePosition != null ? particlePosition : position);

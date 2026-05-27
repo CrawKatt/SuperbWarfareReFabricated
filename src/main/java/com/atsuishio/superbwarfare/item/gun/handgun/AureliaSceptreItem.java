@@ -24,8 +24,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.constant.DataTickets;
@@ -69,7 +67,6 @@ public class AureliaSceptreItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.aurelia_sceptre.idle"));
     }
 
-    @OnlyIn(Dist.CLIENT)
     private PlayState firePredicate(AnimationState<AureliaSceptreItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -120,7 +117,6 @@ public class AureliaSceptreItem extends GunGeoItem {
         data.add(meleeController);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public IClientItemExtensions getClientExtensions() {
         return new IClientItemExtensions() {
             private final BlockEntityWithoutLevelRenderer renderer = AureliaSceptreItem.this.getRenderer().get();

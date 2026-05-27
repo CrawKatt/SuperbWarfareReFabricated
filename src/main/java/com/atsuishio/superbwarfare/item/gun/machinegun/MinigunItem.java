@@ -12,8 +12,6 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -40,7 +38,6 @@ public class MinigunItem extends GunGeoItem {
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
     }
 
-    @OnlyIn(Dist.CLIENT)
     public IClientItemExtensions getClientExtensions() {
         return new IClientItemExtensions() {
             private final BlockEntityWithoutLevelRenderer renderer = MinigunItem.this.getRenderer().get();

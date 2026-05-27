@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.entity;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage;
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModItems;
@@ -8,12 +9,12 @@ import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.tools.FormatTool;
 import com.atsuishio.superbwarfare.tools.SoundTool;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -30,10 +31,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +43,7 @@ import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import team.reborn.energy.api.EnergyStorage;
 
 @net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = Mod.MODID)
 public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
@@ -55,8 +53,7 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
     public static final EntityDataAccessor<Integer> LEVEL = SynchedEntityData.defineId(DPSGeneratorEntity.class, EntityDataSerializers.INT);
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    protected final SyncedEntityEnergyStorage energyStorage = new SyncedEntityEnergyStorage(5120, 0, 2560, this.entityData, ENERGY);
-    protected final LazyOptional<IEnergyStorage> energy = LazyOptional.of(() -> energyStorage);
+    public final SyncedEntityEnergyStorage energyStorage = new SyncedEntityEnergyStorage(5120, 0, 2560, this.entityData, ENERGY);
 
     private float damageDealt = 0;
 
@@ -105,25 +102,28 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
-        pCompound.put("Energy", energyStorage.serializeNBT());
+        pCompound.putLong("Energy", energyStorage.getAmount());
         pCompound.putInt("Level", this.entityData.get(LEVEL));
     }
 
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
-        if (pCompound.get("Energy") instanceof IntTag energyNBT) {
-            energyStorage.deserializeNBT(energyNBT);
-        }
         this.entityData.set(LEVEL, pCompound.getInt("Level"));
 
         energyStorage.setCapacity(this.getMaxEnergy());
         energyStorage.setMaxExtract(this.getMaxTransfer());
+
+        if (pCompound.contains("Energy")) {
+            try (var t = Transaction.openOuter()) {
+                energyStorage.insert(pCompound.getLong("Energy"), t);
+                t.commit();
+            }
+        }
     }
 
     @Override
     public boolean hurt(@NotNull DamageSource source, float amount) {
-        // 不处理/kill伤害
         if (source.is(DamageTypes.GENERIC_KILL)) {
             this.remove(RemovalReason.KILLED);
             return super.hurt(source, amount);
@@ -146,7 +146,6 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
     @SubscribeEvent
     public static void onTargetDown(LivingDeathEvent event) {
         var entity = event.getEntity();
-        // 不处理/kill伤害
         if (event.getSource().is(DamageTypes.GENERIC_KILL)) return;
         var sourceEntity = event.getSource().getEntity();
 
@@ -199,13 +198,10 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
             this.entityData.set(DOWN_TIME, this.entityData.get(DOWN_TIME) - 1);
         }
 
-        // 每秒恢复生命并充能下方方块
         if (this.tickCount % 20 == 0) {
             var damage = this.getMaxHealth() - this.getHealth();
-            var entityCap = this.getEnergy();
 
-            if (damage > 0 && entityCap.isPresent()) {
-                // DPS显示
+            if (damage > 0) {
                 if (getLastDamageSource() != null) {
                     var attacker = getLastDamageSource().getEntity();
                     if (attacker instanceof Player player && !this.level().isClientSide) {
@@ -215,27 +211,17 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
                     }
                 }
 
-                // 发电
-                entityCap.ifPresent(cap -> {
-                    if (cap instanceof SyncedEntityEnergyStorage storage) {
-                        storage.setMaxReceive(getMaxEnergy());
-                        storage.receiveEnergy((int) Math.round(128d * Math.max(getGeneratorLevel(), 1) * Math.pow(2, getGeneratorLevel()) * damage), false);
-                        storage.setMaxReceive(0);
-                    }
-                });
+                energyStorage.setMaxReceive(getMaxEnergy());
+                ModEnergyApi.receiveEnergy(energyStorage, (int) Math.round(128d * Math.max(getGeneratorLevel(), 1) * Math.pow(2, getGeneratorLevel()) * damage), false);
+                energyStorage.setMaxReceive(0);
             }
 
-            // 充能底部方块
             this.chargeBlockBelow();
 
             if (this.getHealth() < 0.01) {
                 this.entityData.set(LEVEL, Math.min(this.entityData.get(LEVEL) + 1, 7));
-                entityCap.ifPresent(cap -> {
-                    if (cap instanceof SyncedEntityEnergyStorage storage) {
-                        storage.setCapacity(this.getMaxEnergy());
-                        storage.setMaxExtract(this.getMaxTransfer());
-                    }
-                });
+                energyStorage.setCapacity(this.getMaxEnergy());
+                energyStorage.setMaxExtract(this.getMaxTransfer());
 
                 if (!this.level().isClientSide()) {
                     this.level().playSound(null, BlockPos.containing(this.getX(), this.getY(), this.getZ()), ModSounds.DPS_GENERATOR_EVOLVE.get(), SoundSource.BLOCKS, 0.5f, 1);
@@ -321,47 +307,31 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
     }
 
     protected void chargeBlockBelow() {
-        var entityCap = this.getEnergy();
-        if (!entityCap.isPresent()) return;
+        if (!energyStorage.supportsExtraction() || energyStorage.getAmount() <= 0) return;
 
-        entityCap.ifPresent(cap -> {
-            if (!cap.canExtract() || cap.getEnergyStored() <= 0) return;
+        var blockPos = this.blockPosition().below();
+        var blockEntity = this.level().getBlockEntity(blockPos);
+        if (blockEntity == null) return;
 
-            var blockPos = this.blockPosition().below();
-            var blockEntity = this.level().getBlockEntity(blockPos);
-            if (blockEntity == null) return;
-            blockEntity.getCapability(ForgeCapabilities.ENERGY, Direction.UP).ifPresent(
-                    blockCap -> {
-                        if (!blockCap.canReceive()) return;
+        var blockEnergy = EnergyStorage.SIDED.get(blockEntity, Direction.UP);
+        if (blockEnergy == null || !blockEnergy.supportsInsertion()) return;
 
-                        var extract = cap.extractEnergy(cap.getEnergyStored(), true);
-                        var extracted = blockCap.receiveEnergy(extract, false);
-                        if (extracted <= 0) return;
-
-                        this.level().blockEntityChanged(blockPos);
-                        cap.extractEnergy(extracted, false);
-                    }
-            );
-        });
-    }
-
-    @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap) {
-        return ForgeCapabilities.ENERGY.orEmpty(cap, getEnergy());
-    }
-
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-        energy.invalidate();
+        try (var t = Transaction.openOuter()) {
+            long extracted = energyStorage.extract(energyStorage.getAmount(), t);
+            long inserted = blockEnergy.insert(extracted, t);
+            if (inserted > 0) {
+                t.commit();
+                this.level().blockEntityChanged(blockPos);
+            }
+        }
     }
 
     public int getGeneratorLevel() {
         return this.entityData.get(LEVEL);
     }
 
-    public LazyOptional<IEnergyStorage> getEnergy() {
-        return this.energy;
+    public SyncedEntityEnergyStorage getEnergy() {
+        return this.energyStorage;
     }
 
     public int getMaxEnergy() {
@@ -384,13 +354,9 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
     public void beastCharge() {
         if (this.entityData.get(LEVEL) < 7) {
             this.entityData.set(LEVEL, 7);
-            this.getEnergy().ifPresent(cap -> {
-                if (cap instanceof SyncedEntityEnergyStorage storage) {
-                    storage.setCapacity(this.getMaxEnergy());
-                    storage.setMaxExtract(this.getMaxTransfer());
-                    storage.setEnergy(this.getMaxEnergy());
-                }
-            });
+            energyStorage.setCapacity(this.getMaxEnergy());
+            energyStorage.setMaxExtract(this.getMaxTransfer());
+            energyStorage.setEnergy(this.getMaxEnergy());
         }
     }
 

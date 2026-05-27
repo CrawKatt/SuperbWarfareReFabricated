@@ -18,8 +18,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -108,7 +106,6 @@ public class M2HBItem extends GunGeoItem {
         behaviors.put(70, data -> data.hideBulletChain.reset());
     }
 
-    @OnlyIn(Dist.CLIENT)
     public IClientItemExtensions getClientExtensions() {
         return new IClientItemExtensions() {
             private final BlockEntityWithoutLevelRenderer renderer = M2HBItem.this.getRenderer().get();

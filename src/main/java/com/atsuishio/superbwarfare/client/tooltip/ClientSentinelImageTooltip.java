@@ -4,8 +4,7 @@ import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent;
 import com.atsuishio.superbwarfare.tools.FormatTool;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.energy.IEnergyStorage;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 
 public class ClientSentinelImageTooltip extends ClientGunImageTooltip {
 
@@ -15,7 +14,7 @@ public class ClientSentinelImageTooltip extends ClientGunImageTooltip {
 
     @Override
     protected Component getDamageComponent() {
-        int energy = stack.getCapability(ForgeCapabilities.ENERGY).map(IEnergyStorage::getEnergyStored).orElse(0);
+        int energy = ModEnergyApi.getEnergyStored(stack);
 
         if (energy > 0) {
             var computed = data.compute();

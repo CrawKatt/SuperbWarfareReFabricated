@@ -2,12 +2,8 @@ package com.atsuishio.superbwarfare.network.message.receive;
 
 import com.atsuishio.superbwarfare.network.ClientPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * Code based on @GoryMoon's Chargers
@@ -31,10 +27,8 @@ public class ContainerDataMessage {
         buf.writeCollection(message.data, (byteBuf, p) -> p.write(byteBuf));
     }
 
-    public static void handler(ContainerDataMessage message, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-                () -> () -> ClientPacketHandler.handleContainerDataMessage(message.containerId, message.data, ctx)));
-        ctx.get().setPacketHandled(true);
+    public static void handler(ContainerDataMessage message) {
+        ClientPacketHandler.handleContainerDataMessage(message.containerId, message.data);
     }
 
     public static class Pair {

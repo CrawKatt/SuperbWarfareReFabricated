@@ -1,14 +1,10 @@
 package com.atsuishio.superbwarfare.item;
 
-import com.atsuishio.superbwarfare.capability.energy.ItemEnergyProvider;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -27,23 +23,14 @@ public class BatteryItem extends Item {
 
     @Override
     public boolean isBarVisible(ItemStack pStack) {
-        return pStack.getCapability(ForgeCapabilities.ENERGY)
-                .map(IEnergyStorage::getEnergyStored)
-                .orElse(0) != maxEnergy;
+        return ModEnergyApi.getEnergyStored(pStack) != maxEnergy;
     }
 
     @Override
     public int getBarWidth(ItemStack pStack) {
-        var energy = pStack.getCapability(ForgeCapabilities.ENERGY)
-                .map(IEnergyStorage::getEnergyStored)
-                .orElse(0);
+        var energy = ModEnergyApi.getEnergyStored(pStack);
 
         return Math.round(energy * 13F / maxEnergy);
-    }
-
-    @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag tag) {
-        return new ItemEnergyProvider(stack, energyCapacity.get());
     }
 
     @Override
@@ -58,9 +45,7 @@ public class BatteryItem extends Item {
 
     public ItemStack makeFullEnergyStack() {
         ItemStack stack = new ItemStack(this);
-        stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                e -> e.receiveEnergy(maxEnergy, false)
-        );
+        ModEnergyApi.receiveEnergy(stack, maxEnergy, false);
         return stack;
     }
 }

@@ -9,12 +9,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.*;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.FORGE)
 public class ContainerDataManager extends SimpleJsonResourceReloadListener {
 
     public static ContainerDataManager INSTANCE = new ContainerDataManager();
@@ -27,10 +24,9 @@ public class ContainerDataManager extends SimpleJsonResourceReloadListener {
         super(GSON, DIRECTORY);
     }
 
-    @SubscribeEvent
-    public static void onAddReloadListeners(AddReloadListenerEvent event) {
+    // TODO: Register via Fabric ResourceManagerHelper in Mod.java
+    public static void register() {
         INSTANCE = new ContainerDataManager();
-        event.addListener(INSTANCE);
     }
 
     @Override

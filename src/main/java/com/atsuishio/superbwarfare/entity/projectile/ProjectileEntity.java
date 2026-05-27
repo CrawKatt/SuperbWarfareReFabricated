@@ -54,9 +54,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.entity.PartEntity;
-import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -384,7 +381,7 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
     @Override
     public void syncMotion() {
         if (!this.level().isClientSide) {
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new ClientMotionSyncMessage(this));
+            NetworkRegistry.sendToTracking(this, new ClientMotionSyncMessage(this));
         }
     }
 
@@ -460,7 +457,7 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
         if (!this.level().isClientSide() && this.shooter instanceof ServerPlayer serverPlayer) {
             var holder = score == 10 ? Holder.direct(ModSounds.HEADSHOT.get()) : Holder.direct(ModSounds.INDICATION.get());
             serverPlayer.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1f, 1f, player.level().random.nextLong()));
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new ClientIndicatorMessage(score == 10 ? 1 : 0, 5));
+            NetworkRegistry.sendToPlayer((ServerPlayer) player, new ClientIndicatorMessage(score == 10 ? 1 : 0, 5));
         }
 
         ItemStack stack = player.getOffhandItem();
@@ -544,8 +541,8 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
             Direction face = result.getDirection();
             BlockState state = level().getBlockState(pos);
 
-            if (MinecraftForge.EVENT_BUS.post(new ProjectileHitEvent.HitBlock(pos, state, face, this.shooter, this, result.getLocation())))
-                return;
+            // TODO Fabric: Replace with Fabric event API
+            // if (MinecraftForge.EVENT_BUS.post(new ProjectileHitEvent.HitBlock(pos, state, face, this.shooter, this, result.getLocation()))) return;
 
             double vx = face.getStepX();
             double vy = face.getStepY();
@@ -600,11 +597,11 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
         boolean headshot = result.isHeadshot();
         boolean legShot = result.isLegShot();
 
-        if (MinecraftForge.EVENT_BUS.post(new ProjectileHitEvent.HitEntity(this.shooter, this, result))) return;
+        // TODO Fabric: Replace with Fabric event API
+        // if (MinecraftForge.EVENT_BUS.post(new ProjectileHitEvent.HitEntity(this.shooter, this, result))) return;
 
-        if (entity instanceof PartEntity<?> part) {
-            entity = part.getParent();
-        }
+        // TODO Fabric: No PartEntity equivalent - handle multipart entities differently
+        // if (entity instanceof PartEntity) { entity = ((PartEntity) entity).getParent(); }
 
         if (entity instanceof LivingEntity living) {
             living.level().playSound(null, living.getOnPos(), ModSounds.MELEE_HIT.get(), SoundSource.PLAYERS, 1, (float) (2 * Math.random() - 1) * 0.1f + 1.0f);
@@ -621,14 +618,14 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
             if (!this.level().isClientSide() && this.shooter instanceof ServerPlayer player) {
                 var holder = Holder.direct(ModSounds.HEADSHOT.get());
                 player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1f, 1f, player.level().random.nextLong()));
-                NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ClientIndicatorMessage(1, 5));
+                NetworkRegistry.sendToPlayer(player, new ClientIndicatorMessage(1, 5));
             }
             performOnHit(entity, this.damage, true, this.knockback);
         } else {
             if (!this.level().isClientSide() && this.shooter instanceof ServerPlayer player) {
                 var holder = Holder.direct(ModSounds.INDICATION.get());
                 player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1f, 1f, player.level().random.nextLong()));
-                NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ClientIndicatorMessage(0, 5));
+                NetworkRegistry.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
             }
 
             if (legShot) {

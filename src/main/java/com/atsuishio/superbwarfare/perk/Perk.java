@@ -4,13 +4,11 @@ import com.atsuishio.superbwarfare.data.gun.DamageReduce;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.GunPropertyModifier;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.item.PerkItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
@@ -43,16 +41,14 @@ public class Perk implements GunPropertyModifier {
         this.name = builder.toString();
     }
 
-    public RegistryObject<Item> getItem() {
-        var result = ModItems.PERKS.getEntries().stream().filter(p -> {
-            if (p.get() instanceof PerkItem perkItem) {
-                return perkItem.getPerk() == this;
-            }
-            return false;
-        }).findFirst();
-        if (result.isEmpty()) throw new IllegalStateException("Perk " + this.name + " not found");
+    public Item getItem() {
+        var result = ModItems.PERK_ITEMS.entrySet().stream().filter(entry -> entry.getKey().get() == this).findFirst();
 
-        return result.get();
+        if (result.isEmpty()) {
+            throw new IllegalStateException("Perk " + this.name + " not found");
+        }
+
+        return result.get().getValue().get();
     }
 
     /**

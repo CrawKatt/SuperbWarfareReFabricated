@@ -1,6 +1,8 @@
 package com.atsuishio.superbwarfare.client.screens.modsell;
 
+import com.atsuishio.superbwarfare.client.screens.modsell.TranslationRecord;
 import com.atsuishio.superbwarfare.config.client.EnvironmentChecksumConfig;
+import com.atsuishio.superbwarfare.event.custom.ScreenOpeningCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -12,20 +14,11 @@ import net.minecraft.client.gui.screens.multiplayer.SafetyScreen;
 import net.minecraft.client.gui.screens.multiplayer.WarningScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-
 import java.net.InetAddress;
 import java.security.MessageDigest;
 import java.util.HexFormat;
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class ModSellWarningScreen extends WarningScreen {
 
     private static final String ENVIRONMENT_CHECKSUM = generateEnvironmentHash();
@@ -98,16 +91,18 @@ public class ModSellWarningScreen extends WarningScreen {
         }).bounds(this.width / 2 - 155, 100 + pYOffset, 150, 20).build();
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onGuiOpen(ScreenEvent.Opening event) {
-        if (!((event.getNewScreen() instanceof JoinMultiplayerScreen || event.getNewScreen() instanceof SafetyScreen)
-                && event.getCurrentScreen() instanceof TitleScreen))
-            return;
+    public static void registerEvents() {
+        ScreenOpeningCallback.EVENT.register((currentScreen, newScreen) -> {
+            if (!((newScreen instanceof JoinMultiplayerScreen || newScreen instanceof SafetyScreen)
+                    && currentScreen instanceof TitleScreen)) {
+                return newScreen;
+            }
 
-        if (EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.get().equals(ENVIRONMENT_CHECKSUM)) return;
+            if (EnvironmentChecksumConfig.ENVIRONMENT_CHECKSUM.get().equals(ENVIRONMENT_CHECKSUM)) {
+                return newScreen;
+            }
 
-        // 拦截多人游戏界面加载
-        event.setCanceled(true);
-        Minecraft.getInstance().setScreen(new ModSellWarningScreen(event.getCurrentScreen()));
+            return new ModSellWarningScreen(currentScreen);
+        });
     }
 }

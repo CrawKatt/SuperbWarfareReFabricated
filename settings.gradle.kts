@@ -1,9 +1,10 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        mavenCentral()
         maven {
-            name = "MinecraftForge"
-            url = uri("https://maven.minecraftforge.net/")
+            name = "Fabric"
+            url = uri("https://maven.fabricmc.net/")
         }
         maven {
             url = uri("https://maven.parchmentmc.org")
@@ -12,5 +13,5 @@ pluginManagement {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }

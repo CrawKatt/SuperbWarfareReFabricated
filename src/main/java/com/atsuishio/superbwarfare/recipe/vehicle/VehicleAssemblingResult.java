@@ -9,7 +9,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Items;
 
 public class VehicleAssemblingResult {
     @SerializedName("item")
@@ -35,22 +36,19 @@ public class VehicleAssemblingResult {
                 this.result = ContainerBlockItem.createInstance(type).copyWithCount(count);
             }
         } else if (!itemString.isEmpty()) {
-            var item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemString));
-            if (item == null) {
+            var item = BuiltInRegistries.ITEM.get(new ResourceLocation(itemString));
+            if (item == Items.AIR) {
                 Mod.LOGGER.warn("invalid item: {}", itemString);
                 this.result = ItemStack.EMPTY;
             } else {
                 if (nbt != null) {
                     var tag = TagDataParser.parse(nbt);
                     CompoundTag tmp = new CompoundTag();
-                    if (tag.contains("ForgeCaps")) {
-                        tmp.put("ForgeCaps", tag.get("ForgeCaps"));
-                        tag.remove("ForgeCaps");
-                    }
 
                     tmp.put("tag", tag);
                     tmp.putString("id", itemString);
                     tmp.putInt("Count", count);
+
                     this.result = ItemStack.of(tmp);
                 } else {
                     this.result = new ItemStack(item, count);

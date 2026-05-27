@@ -25,8 +25,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import org.joml.Math;
@@ -37,7 +35,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 import static com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay.*;
 
-@OnlyIn(Dist.CLIENT)
 public class VehicleHudOverlay implements IGuiOverlay {
 
     public static final String ID = Mod.MODID + "_vehicle_hud";

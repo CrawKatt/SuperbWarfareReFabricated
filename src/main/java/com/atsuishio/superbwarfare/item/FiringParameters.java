@@ -14,8 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,7 +58,6 @@ public class FiringParameters extends Item implements ItemScreenProvider {
         ).withStyle(ChatFormatting.GRAY));
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public @Nullable Screen getItemScreen(ItemStack stack, Player player, InteractionHand hand) {
         return new FiringParametersScreen(stack, hand);

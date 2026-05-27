@@ -25,15 +25,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@OnlyIn(Dist.CLIENT)
 public class FuMO25Screen extends AbstractContainerScreen<FuMO25Menu> {
 
     private static final ResourceLocation TEXTURE = Mod.loc("textures/gui/radar.png");
@@ -212,7 +209,7 @@ public class FuMO25Screen extends AbstractContainerScreen<FuMO25Menu> {
             double moveZ = (entity.getZ() - pos.getZ()) / range * 74;
 
             if (pMouseX >= centerX + moveX && pMouseX <= centerX + moveX + 4 && pMouseY >= centerY + moveZ && pMouseY <= centerY + moveZ + 4) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new RadarSetPosMessage(entity.getOnPos()));
+                NetworkRegistry.sendToServer(new RadarSetPosMessage(entity.getOnPos()));
                 this.currentPos = entity.getOnPos();
                 this.currentTarget = entity;
                 return true;
@@ -279,7 +276,6 @@ public class FuMO25Screen extends AbstractContainerScreen<FuMO25Menu> {
         this.addRenderableWidget(guideButton);
     }
 
-    @OnlyIn(Dist.CLIENT)
     class LockButton extends AbstractButton {
 
         public LockButton(int pX, int pY) {
@@ -290,9 +286,9 @@ public class FuMO25Screen extends AbstractContainerScreen<FuMO25Menu> {
         public void onPress() {
             if (FuMO25Screen.this.menu.getFuncType() == 3 && FuMO25Screen.this.menu.getSlot(0).getItem().isEmpty()) {
                 if (FuMO25Screen.this.currentTarget == null) return;
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new RadarSetTargetMessage(FuMO25Screen.this.currentTarget.getUUID()));
+                NetworkRegistry.sendToServer(new RadarSetTargetMessage(FuMO25Screen.this.currentTarget.getUUID()));
             } else {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new RadarSetParametersMessage((byte) 0));
+                NetworkRegistry.sendToServer(new RadarSetParametersMessage((byte) 0));
             }
         }
 
@@ -310,7 +306,6 @@ public class FuMO25Screen extends AbstractContainerScreen<FuMO25Menu> {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     static class ModeButton extends AbstractButton {
 
         private final int mode;
@@ -322,7 +317,7 @@ public class FuMO25Screen extends AbstractContainerScreen<FuMO25Menu> {
 
         @Override
         public void onPress() {
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new RadarChangeModeMessage((byte) this.mode));
+            NetworkRegistry.sendToServer(new RadarChangeModeMessage((byte) this.mode));
         }
 
         @Override

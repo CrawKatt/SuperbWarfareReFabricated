@@ -7,11 +7,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.IItemDecorator;
 
-@OnlyIn(Dist.CLIENT)
 public class LuckyContainerItemDecorator implements IItemDecorator {
 
     @Override

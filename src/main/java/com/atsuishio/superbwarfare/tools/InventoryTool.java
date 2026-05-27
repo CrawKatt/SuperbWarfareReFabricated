@@ -9,10 +9,9 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
@@ -21,27 +20,25 @@ import java.util.function.Predicate;
 
 public class InventoryTool {
 
-    public static int countItem(@Nullable IItemHandler handler, @NotNull Item item) {
-        return countItem(handler, stack -> stack.is(item));
+    public static int countItem(@Nullable Player player, @NotNull Item item) {
+        return countItem(player, stack -> stack.is(item));
     }
 
-    public static int countItem(@Nullable IItemHandler handler, @NotNull TagKey<Item> item) {
-        return countItem(handler, stack -> stack.is(item));
+    public static int countItem(@Nullable Player player, @NotNull TagKey<Item> item) {
+        return countItem(player, stack -> stack.is(item));
     }
 
-    public static int countItem(@Nullable IItemHandler handler, @NotNull Predicate<ItemStack> predicate) {
-        if (handler == null) return 0;
+    public static int countItem(@Nullable Player player, @NotNull Predicate<ItemStack> predicate) {
+        if (player == null) return 0;
 
         int count = 0;
-        for (int i = 0; i < handler.getSlots(); i++) {
-            var stack = handler.getStackInSlot(i);
+        for (var stack : player.getInventory().items) {
             if (predicate.test(stack)) {
                 count += stack.getCount();
             }
         }
         return count;
     }
-
 
     /**
      * 计算物品列表内指定物品的数量
@@ -65,20 +62,17 @@ public class InventoryTool {
      * @param item   物品类型
      */
     public static int countItem(@Nullable Entity entity, @NotNull Item item) {
-        if (entity == null) return 0;
-
-        return entity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-                .map(c -> countItem(c, item))
-                .orElse(0);
+        if (entity instanceof Player player) {
+            return countItem(player, item);
+        }
+        return 0;
     }
 
-    public static int countAmmoItem(@Nullable IItemHandler handler, @Nullable Ammo type) {
-        if (handler == null || type == null) return 0;
+    public static int countAmmoItem(@Nullable Player player, @Nullable Ammo type) {
+        if (player == null || type == null) return 0;
 
         int count = 0;
-        for (int i = 0; i < handler.getSlots(); i++) {
-            var stack = handler.getStackInSlot(i);
-
+        for (var stack : player.getInventory().items) {
             // AmmoSupplier Item
             if (stack.getItem() instanceof AmmoSupplierItem ammoSupplierItem && ammoSupplierItem.type == type) {
                 count += ammoSupplierItem.ammoToAdd * stack.getCount();
@@ -97,28 +91,24 @@ public class InventoryTool {
     }
 
     public static int countAmmoItem(@Nullable Entity entity, @Nullable Ammo type) {
-        if (entity == null || type == null) return 0;
-
-        return entity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-                .map(cap -> countAmmoItem(cap, type))
-                .orElse(0);
+        if (entity instanceof Player player) {
+            return countAmmoItem(player, type);
+        }
+        return 0;
     }
 
     public static int consumeAmmoItem(@Nullable Entity entity, @Nullable Ammo type, int count) {
-        if (entity == null || type == null || count <= 0) return 0;
-
-        return entity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-                .map(cap -> consumeAmmoItem(cap, type, count))
-                .orElse(0);
+        if (entity instanceof Player player) {
+            return consumeAmmoItem(player, type, count);
+        }
+        return 0;
     }
 
-    public static int consumeAmmoItem(@Nullable IItemHandler handler, @Nullable Ammo type, int count) {
-        if (handler == null || type == null) return 0;
+    public static int consumeAmmoItem(@Nullable Player player, @Nullable Ammo type, int count) {
+        if (player == null || type == null) return 0;
 
         int initialCount = count;
-        for (int i = 0; i < handler.getSlots(); i++) {
-            var stack = handler.getStackInSlot(i);
-
+        for (var stack : player.getInventory().items) {
             // AmmoBox
             if (stack.getItem() instanceof AmmoBoxItem) {
                 var stackAmmo = type.get(stack);
@@ -167,13 +157,14 @@ public class InventoryTool {
     }
 
     public static ItemStack findFirst(@Nullable Entity entity, @NotNull Item item) {
-        if (entity == null) return ItemStack.EMPTY;
-
-        return findFirst(entity.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve().orElse(null), stack -> stack.is(item));
+        if (entity instanceof Player player) {
+            return findFirst(player, item);
+        }
+        return ItemStack.EMPTY;
     }
 
-    public static ItemStack findFirst(@Nullable IItemHandler handler, @NotNull Item item) {
-        return findFirst(handler, stack -> stack.is(item));
+    public static ItemStack findFirst(@Nullable Player player, @NotNull Item item) {
+        return findFirst(player, stack -> stack.is(item));
     }
 
     public static ItemStack findFirst(@Nullable NonNullList<ItemStack> list, @NotNull Item item) {
@@ -186,11 +177,10 @@ public class InventoryTool {
         return list.stream().filter(predicate).findFirst().orElse(ItemStack.EMPTY);
     }
 
-    public static ItemStack findFirst(@Nullable IItemHandler handler, @NotNull Predicate<ItemStack> predicate) {
-        if (handler == null) return ItemStack.EMPTY;
+    public static ItemStack findFirst(@Nullable Player player, @NotNull Predicate<ItemStack> predicate) {
+        if (player == null) return ItemStack.EMPTY;
 
-        for (int i = 0; i < handler.getSlots(); i++) {
-            var stack = handler.getStackInSlot(i);
+        for (var stack : player.getInventory().items) {
             if (predicate.test(stack)) {
                 return stack;
             }
@@ -198,9 +188,8 @@ public class InventoryTool {
         return ItemStack.EMPTY;
     }
 
-
-    public static boolean hasCreativeAmmoBox(@Nullable IItemHandler handler) {
-        return !findFirst(handler, ModItems.CREATIVE_AMMO_BOX.get()).isEmpty();
+    public static boolean hasCreativeAmmoBox(@Nullable Player player) {
+        return !findFirst(player, ModItems.CREATIVE_AMMO_BOX.get()).isEmpty();
     }
 
     /**
@@ -220,9 +209,10 @@ public class InventoryTool {
     public static boolean hasCreativeAmmoBox(@Nullable Entity entity) {
         if (entity instanceof VehicleEntity vehicle) {
             return hasCreativeAmmoBoxForVehicle(vehicle);
-        } else {
-            return hasItem(entity, ModItems.CREATIVE_AMMO_BOX.get());
+        } else if (entity instanceof Player player) {
+            return hasCreativeAmmoBox(player);
         }
+        return false;
     }
 
     public static boolean hasCreativeAmmoBoxForVehicle(@NotNull VehicleEntity vehicle) {
@@ -250,11 +240,10 @@ public class InventoryTool {
      * @param count  要消耗的数量
      */
     public static void consumeItem(LivingEntity living, Item item, int count) {
-        living.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
-            InventoryTool.consumeItem(handler, item, count);
-        });
+        if (living instanceof Player player) {
+            InventoryTool.consumeItem(player, item, count);
+        }
     }
-
 
     public static int consumeItem(@Nullable NonNullList<ItemStack> itemList, Predicate<ItemStack> predicate, int count) {
         if (itemList == null || count <= 0) return 0;
@@ -270,16 +259,17 @@ public class InventoryTool {
         return initialCount - count;
     }
 
-    public static int consumeItem(@Nullable IItemHandler handler, Item item, int count) {
-        return consumeItem(handler, stack -> stack.is(item), count);
+    public static int consumeItem(@Nullable Player player, Item item, int count) {
+        return consumeItem(player, stack -> stack.is(item), count);
     }
 
-    public static int consumeItem(@Nullable IItemHandler handler, Predicate<ItemStack> predicate, int count) {
-        if (handler == null || count <= 0) return 0;
-        int initialCount = count;
+    public static int consumeItem(@Nullable Player player, Predicate<ItemStack> predicate, int count) {
+        if (player == null || count <= 0) return 0;
 
-        for (int i = 0; i < handler.getSlots(); i++) {
-            var stack = handler.getStackInSlot(i);
+        int initialCount = count;
+        var items = player.getInventory().items;
+        for (int i = 0; i < items.size(); i++) {
+            var stack = items.get(i);
             if (!predicate.test(stack)) continue;
 
             var countToShrink = Math.min(stack.getCount(), count);

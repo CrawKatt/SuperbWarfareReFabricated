@@ -1,0 +1,20 @@
+accessWidener v2 named
+
+accessible class net/minecraft/server/level/DistanceManager$PlayerTicketTracker
+
+accessible method net/minecraft/client/multiplayer/ClientLevel getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
+
+accessible field net/minecraft/client/player/LocalPlayer handsBusy Z
+
+accessible field net/minecraft/world/entity/Entity passengers Ljava/util/List;
+accessible field net/minecraft/world/entity/Entity boardingCooldown I
+accessible field net/minecraft/world/entity/Entity levelCallback Lnet/minecraft/world/level/entity/EntityInLevelCallback;
+accessible field net/minecraft/world/entity/Entity removalReason Lnet/minecraft/world/entity/Entity$RemovalReason;
+
+accessible field net/minecraft/world/entity/LivingEntity jumping Z
+accessible field net/minecraft/world/entity/LivingEntity lastHurt F
+accessible field net/minecraft/world/entity/LivingEntity lastHurtByPlayerTime I
+accessible field net/minecraft/world/entity/LivingEntity lastDamageSource Lnet/minecraft/world/damagesource/DamageSource;
+accessible field net/minecraft/world/entity/LivingEntity lastDamageStamp J
+
+accessible field net/minecraft/client/multiplayer/ClientPacketListener serverSimulationDistance I

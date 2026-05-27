@@ -24,8 +24,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import org.joml.Math;
@@ -35,7 +33,6 @@ import java.util.Map;
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 import static com.atsuishio.superbwarfare.client.overlay.weapon.LandVehicleHud.lerpRecoil;
 
-@OnlyIn(Dist.CLIENT)
 public class VehicleCrosshairOverlay implements IGuiOverlay {
 
     public static final String ID = Mod.MODID + "_vehicle_crosshair";

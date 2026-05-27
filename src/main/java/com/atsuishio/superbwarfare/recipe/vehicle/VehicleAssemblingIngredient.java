@@ -3,11 +3,11 @@ package com.atsuishio.superbwarfare.recipe.vehicle;
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.data.DeserializeFromString;
 import com.google.gson.annotations.SerializedName;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.regex.Pattern;
 
@@ -50,7 +50,7 @@ public class VehicleAssemblingIngredient implements DeserializeFromString {
         if (matcher.group("prefix").equals("#")) {
             ingredientObject = Ingredient.of(TagKey.create(Registries.ITEM, new ResourceLocation(id)));
         } else {
-            ingredientObject = Ingredient.of(ForgeRegistries.ITEMS.getValue(new ResourceLocation(id)));
+            ingredientObject = Ingredient.of(BuiltInRegistries.ITEM.get(new ResourceLocation(id)));
         }
     }
 }

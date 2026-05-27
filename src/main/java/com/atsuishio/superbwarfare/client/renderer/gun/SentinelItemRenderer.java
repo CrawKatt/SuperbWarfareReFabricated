@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.cache.object.GeoBone;
 
@@ -45,10 +45,7 @@ public class SentinelItemRenderer extends CustomGunRenderer<SentinelItem> {
         if (itemStack.getItem() instanceof GunItem && GeoItem.getId(itemStack) == this.getInstanceId(animatable)) {
             if (this.renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND || this.renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
 
-                boolean[] flag = {false};
-                itemStack.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                        iEnergyStorage -> flag[0] = iEnergyStorage.getEnergyStored() > 0
-                );
+                boolean[] flag = {ModEnergyApi.getEnergyStored(itemStack) > 0};
 
                 if (name.equals("charge_illuminated")) {
                     bone.setHidden(!flag[0]);

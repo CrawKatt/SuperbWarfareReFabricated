@@ -18,8 +18,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.network.PacketDistributor;
+
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,48 +61,48 @@ public class VehicleAssemblingMenu extends AbstractContainerMenu {
     public void assembleVehicle(ResourceLocation id, ServerPlayer player) {
         var recipe = this.getRecipeById(id, player.level().getRecipeManager());
         if (recipe == null) return;
-        player.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
-            if (!player.isCreative()) {
-                Int2IntArrayMap recordCount = new Int2IntArrayMap();
-                var ingredients = recipe.getInputs();
+        if (!player.isCreative()) {
+            Int2IntArrayMap recordCount = new Int2IntArrayMap();
+            var ingredients = recipe.getInputs();
+            var inv = player.getInventory();
 
-                for (var ingredient : ingredients) {
-                    int count = 0;
+            for (var ingredient : ingredients) {
+                int count = 0;
 
-                    for (int i = 0; i < handler.getSlots(); ++i) {
-                        ItemStack stack = handler.getStackInSlot(i);
-                        int stackCount = stack.getCount();
-                        if (!stack.isEmpty() && ingredient.getIngredient().test(stack)) {
-                            count += stackCount;
-                            if (count > ingredient.getCount()) {
-                                int remaining = count - ingredient.getCount();
-                                recordCount.put(i, stackCount - remaining);
-                                break;
-                            }
-                            recordCount.put(i, stackCount);
+                for (int i = 0; i < inv.getContainerSize(); ++i) {
+                    ItemStack stack = inv.getItem(i);
+                    int stackCount = stack.getCount();
+                    if (!stack.isEmpty() && ingredient.getIngredient().test(stack)) {
+                        count += stackCount;
+                        if (count > ingredient.getCount()) {
+                            int remaining = count - ingredient.getCount();
+                            recordCount.put(i, stackCount - remaining);
+                            break;
                         }
-                    }
-
-                    if (count < ingredient.getCount()) {
-                        return;
+                        recordCount.put(i, stackCount);
                     }
                 }
 
-                for (int slotIndex : recordCount.keySet()) {
-                    handler.extractItem(slotIndex, recordCount.get(slotIndex), false);
+                if (count < ingredient.getCount()) {
+                    return;
                 }
             }
 
-            Level level = player.level();
-            if (!level.isClientSide) {
-                ItemEntity itemEntity = new ItemEntity(level, player.getX(), player.getY() + 0.5, player.getZ(), recipe.getResultItem(player.level().registryAccess()).copy());
-                itemEntity.setPickUpDelay(0);
-                level.addFreshEntity(itemEntity);
+            for (int slotIndex : recordCount.keySet()) {
+                int toRemove = recordCount.get(slotIndex);
+                inv.getItem(slotIndex).shrink(toRemove);
             }
+        }
 
-            player.inventoryMenu.broadcastFullState();
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new FinishAssemblingVehicleMessage(this.containerId));
-        });
+        Level level = player.level();
+        if (!level.isClientSide) {
+            ItemEntity itemEntity = new ItemEntity(level, player.getX(), player.getY() + 0.5, player.getZ(), recipe.getResultItem(player.level().registryAccess()).copy());
+            itemEntity.setPickUpDelay(0);
+            level.addFreshEntity(itemEntity);
+        }
+
+        player.inventoryMenu.broadcastFullState();
+        NetworkRegistry.sendToPlayer(player, new FinishAssemblingVehicleMessage(this.containerId));
     }
 
     @Nullable

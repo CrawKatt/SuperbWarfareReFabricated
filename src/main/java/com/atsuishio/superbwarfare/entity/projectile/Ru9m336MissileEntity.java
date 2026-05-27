@@ -27,7 +27,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -67,7 +66,7 @@ public class Ru9m336MissileEntity extends MissileProjectile implements GeoEntity
                 if (!living.level().isClientSide() && living instanceof ServerPlayer player) {
                     living.level().playSound(null, living.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
 
-                    NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ClientIndicatorMessage(0, 5));
+                    NetworkRegistry.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
                 }
             }
 

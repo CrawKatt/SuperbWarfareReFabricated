@@ -12,14 +12,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.PacketDistributor;
 
 import java.util.Collection;
 import java.util.Set;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber
 public class TDMSavedData extends SavedData {
 
     public static final String FILE_ID = "superbwarfare_tdm";
@@ -81,7 +77,7 @@ public class TDMSavedData extends SavedData {
 
     public void sync() {
         this.setDirty();
-        NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.ALL.noArg(), new TDMSyncMessage(this));
+        NetworkRegistry.sendToAll(new TDMSyncMessage(this));
     }
 
     public static boolean enabledTDM(Entity entity) {
@@ -93,12 +89,12 @@ public class TDMSavedData extends SavedData {
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player && player.level() instanceof ServerLevel level)) return;
+    // TODO: Register in Mod.java using Fabric event API
+    public static void onPlayerLoggedIn(ServerPlayer player) {
+        if (!(player.level() instanceof ServerLevel level)) return;
 
         var data = level.getDataStorage().get(TDMSavedData::load, FILE_ID);
         if (data == null) return;
-        NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new TDMSyncMessage(data));
+        NetworkRegistry.sendToPlayer(player, new TDMSyncMessage(data));
     }
 }

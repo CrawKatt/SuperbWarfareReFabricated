@@ -3,12 +3,7 @@ package com.atsuishio.superbwarfare.network.message.receive;
 import com.atsuishio.superbwarfare.network.ClientPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
 import org.joml.Vector3f;
-
-import java.util.function.Supplier;
 
 public record ClientSetMotionMessage(Vec3 motion, Vec3 position) {
 
@@ -23,9 +18,7 @@ public record ClientSetMotionMessage(Vec3 motion, Vec3 position) {
         return new ClientSetMotionMessage(new Vec3(v), new Vec3(p));
     }
 
-    public static void handler(ClientSetMotionMessage message, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-                () -> () -> ClientPacketHandler.handleClientSetMotion(message, ctx)));
-        ctx.get().setPacketHandled(true);
+    public static void handler(ClientSetMotionMessage message) {
+        ClientPacketHandler.handleClientSetMotion(message);
     }
 }

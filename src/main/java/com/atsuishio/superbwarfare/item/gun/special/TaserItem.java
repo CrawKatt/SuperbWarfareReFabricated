@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.client.renderer.gun.TaserItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
 import com.atsuishio.superbwarfare.init.ModPerks;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.item.BatteryItem;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import net.minecraft.world.entity.Entity;
@@ -11,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -38,25 +38,19 @@ public class TaserItem extends GunGeoItem {
         if (entity instanceof Player player) {
             for (var cell : player.getInventory().items) {
                 if (cell.getItem() instanceof BatteryItem) {
-                    assert stack.getCapability(ForgeCapabilities.ENERGY).resolve().isPresent();
-                    var stackStorage = stack.getCapability(ForgeCapabilities.ENERGY).resolve().get();
-                    int stackMaxEnergy = stackStorage.getMaxEnergyStored();
-                    int stackEnergy = stackStorage.getEnergyStored();
+                    assert ModEnergyApi.get(stack) != null;
+                    int stackMaxEnergy = ModEnergyApi.getMaxEnergyStored(stack);
+                    int stackEnergy = ModEnergyApi.getEnergyStored(stack);
 
-                    assert cell.getCapability(ForgeCapabilities.ENERGY).resolve().isPresent();
-                    var cellStorage = cell.getCapability(ForgeCapabilities.ENERGY).resolve().get();
-                    int cellEnergy = cellStorage.getEnergyStored();
+                    assert ModEnergyApi.get(cell) != null;
+                    int cellEnergy = ModEnergyApi.getEnergyStored(cell);
 
                     int stackEnergyNeed = Math.min(cellEnergy, stackMaxEnergy - stackEnergy);
 
                     if (cellEnergy > 0) {
-                        stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                                iEnergyStorage -> iEnergyStorage.receiveEnergy(stackEnergyNeed, false)
-                        );
+                        ModEnergyApi.receiveEnergy(stack, stackEnergyNeed, false);
                     }
-                    cell.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                            cEnergy -> cEnergy.extractEnergy(stackEnergyNeed, false)
-                    );
+                    ModEnergyApi.extractEnergy(cell, stackEnergyNeed, false);
                 }
             }
         }
@@ -70,7 +64,7 @@ public class TaserItem extends GunGeoItem {
 
         var stack = data.stack;
         int perkLevel = data.perk.getLevel(ModPerks.VOLT_OVERLOAD);
-        stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(energy -> energy.extractEnergy(400 + 100 * perkLevel, false));
+        ModEnergyApi.extractEnergy(stack, 400 + 100 * perkLevel, false);
     }
 
     @Override
@@ -78,9 +72,7 @@ public class TaserItem extends GunGeoItem {
         var stack = data.stack;
 
         int perkLevel = data.perk.getLevel(ModPerks.VOLT_OVERLOAD);
-        var hasEnoughEnergy = stack.getCapability(ForgeCapabilities.ENERGY)
-                .map(storage -> storage.getEnergyStored() >= 400 + 100 * perkLevel)
-                .orElse(false);
+        var hasEnoughEnergy = ModEnergyApi.getEnergyStored(stack) >= 400 + 100 * perkLevel;
 
         if (!hasEnoughEnergy) return false;
 

@@ -5,9 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 public class RadarSetPosMessage {
 
@@ -25,19 +22,15 @@ public class RadarSetPosMessage {
         return new RadarSetPosMessage(buffer.readBlockPos());
     }
 
-    public static void handler(RadarSetPosMessage message, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer player = ctx.get().getSender();
-            if (player == null) return;
+    public static void handler(RadarSetPosMessage message, ServerPlayer player) {
+        if (player == null) return;
 
-            AbstractContainerMenu menu = player.containerMenu;
-            if (menu instanceof FuMO25Menu fuMO25Menu) {
-                if (!player.containerMenu.stillValid(player)) {
-                    return;
-                }
-                fuMO25Menu.setPos(message.pos.getX(), message.pos.getY(), message.pos.getZ());
+        AbstractContainerMenu menu = player.containerMenu;
+        if (menu instanceof FuMO25Menu fuMO25Menu) {
+            if (!player.containerMenu.stillValid(player)) {
+                return;
             }
-        });
-        ctx.get().setPacketHandled(true);
+            fuMO25Menu.setPos(message.pos.getX(), message.pos.getY(), message.pos.getZ());
+        }
     }
 }

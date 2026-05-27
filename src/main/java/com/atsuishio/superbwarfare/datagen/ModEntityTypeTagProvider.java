@@ -1,23 +1,8 @@
 package com.atsuishio.superbwarfare.datagen;
 
-import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.init.ModEntities;
-import com.atsuishio.superbwarfare.init.ModTags;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.EntityTypeTagsProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EntityType;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+public class ModEntityTypeTagProvider {
 
-import java.util.concurrent.CompletableFuture;
-
-public class ModEntityTypeTagProvider extends EntityTypeTagsProvider {
-
+    /*
     public ModEntityTypeTagProvider(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pProvider, @Nullable ExistingFileHelper existingFileHelper) {
         super(pOutput, pProvider, Mod.MODID, existingFileHelper);
     }
@@ -89,4 +74,5 @@ public class ModEntityTypeTagProvider extends EntityTypeTagsProvider {
     public static TagKey<EntityType<?>> forgeTag(String name) {
         return TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("forge", name));
     }
+    */
 }

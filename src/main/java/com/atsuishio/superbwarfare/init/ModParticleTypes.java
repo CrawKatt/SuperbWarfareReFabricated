@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.init;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.particle.BulletDecalOption;
 import com.atsuishio.superbwarfare.client.particle.CannonMuzzleFlareOption;
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption;
@@ -9,25 +8,26 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Supplier;
 
 public class ModParticleTypes {
 
-    public static final DeferredRegister<ParticleType<?>> REGISTRY = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, Mod.MODID);
+    public static final Supplier<SimpleParticleType> FIRE_STAR = Registration.particle("fire_star", () -> new SimpleParticleType(true));
 
-    public static final RegistryObject<SimpleParticleType> FIRE_STAR = REGISTRY.register("fire_star", () -> new SimpleParticleType(true));
-    public static final RegistryObject<SimpleParticleType> RISING_SMOKE = REGISTRY.register("rising_smoke", () -> new SimpleParticleType(true));
-    public static final RegistryObject<ParticleType<BulletDecalOption>> BULLET_DECAL = REGISTRY.register("bullet_decal",
+    public static final Supplier<SimpleParticleType> RISING_SMOKE = Registration.particle("rising_smoke", () -> new SimpleParticleType(true));
+
+    public static final Supplier<ParticleType<BulletDecalOption>> BULLET_DECAL = Registration.particle("bullet_decal",
             () -> createOptions(BulletDecalOption.CODEC, true, BulletDecalOption.DESERIALIZER));
-    public static final RegistryObject<ParticleType<CustomSmokeOption>> CUSTOM_SMOKE = REGISTRY.register("custom_smoke",
+
+    public static final Supplier<ParticleType<CustomSmokeOption>> CUSTOM_SMOKE = Registration.particle("custom_smoke",
             () -> createOptions(CustomSmokeOption.CODEC, true, CustomSmokeOption.DESERIALIZER));
-    public static final RegistryObject<ParticleType<CannonMuzzleFlareOption>> CANNON_MUZZLE_FLARE = REGISTRY.register("cannon_muzzle_flare",
+
+    public static final Supplier<ParticleType<CannonMuzzleFlareOption>> CANNON_MUZZLE_FLARE = Registration.particle("cannon_muzzle_flare",
             () -> createOptions(CannonMuzzleFlareOption.CODEC, true, CannonMuzzleFlareOption.DESERIALIZER));
 
-    public static final RegistryObject<ParticleType<CustomCloudOption>> CUSTOM_CLOUD = REGISTRY.register("custom_cloud",
+    public static final Supplier<ParticleType<CustomCloudOption>> CUSTOM_CLOUD = Registration.particle("custom_cloud",
             () -> createOptions(CustomCloudOption.CODEC, true, CustomCloudOption.DESERIALIZER));
 
     @SuppressWarnings("deprecation")
@@ -39,4 +39,3 @@ public class ModParticleTypes {
         };
     }
 }
-

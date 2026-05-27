@@ -1,41 +1,20 @@
 package com.atsuishio.superbwarfare.datagen;
 
-import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.advancement.criteria.OttoSprintTrigger;
-import com.atsuishio.superbwarfare.advancement.criteria.RPGMeleeExplosionTrigger;
-import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.init.ModTags;
-import net.minecraft.advancements.Advancement;
-import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataProvider;
-import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.NotNull;
-
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
-
 /**
  * Codes Based on @Create
  */
-public class ModAdvancementProvider implements DataProvider {
-
+public class ModAdvancementProvider {
+/*
     private final PackOutput packOutput;
     private final ExistingFileHelper existingFileHelper;
+*/
+    //public static final List<ModAdvancement> ADVANCEMENTS = new ArrayList<>();
 
-    public static final List<ModAdvancement> ADVANCEMENTS = new ArrayList<>();
-
-    @SuppressWarnings("unused")
-    public static ModAdvancement START = null,
+    //public static ModAdvancement START = null,
     /**
      * Main
      */
+    /*
     MAIN_ROOT = advancement("root", builder -> builder.icon(ModItems.TASER.get())
             .type(ModAdvancement.Type.SILENT)
             .awardedForFree()
@@ -155,4 +134,5 @@ public class ModAdvancementProvider implements DataProvider {
     public @NotNull String getName() {
         return "Superb Warfare Advancements";
     }
+    */
 }

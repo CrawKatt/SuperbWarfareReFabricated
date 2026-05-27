@@ -1,18 +1,8 @@
 package com.atsuishio.superbwarfare.datagen.builder;
 
-import com.google.common.base.Preconditions;
-import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraftforge.client.model.generators.CustomLoaderBuilder;
-import net.minecraftforge.client.model.generators.ModelBuilder;
-import net.minecraftforge.common.data.ExistingFileHelper;
+public class CustomSeparateModelBuilder {
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-public class CustomSeparateModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder<T> {
-
+    /*
     public static <T extends ModelBuilder<T>> CustomSeparateModelBuilder<T> begin(T parent, ExistingFileHelper existingFileHelper) {
         return new CustomSeparateModelBuilder<>(parent, existingFileHelper);
     }
@@ -71,4 +61,5 @@ public class CustomSeparateModelBuilder<T extends ModelBuilder<T>> extends Custo
 
         return json;
     }
+     */
 }

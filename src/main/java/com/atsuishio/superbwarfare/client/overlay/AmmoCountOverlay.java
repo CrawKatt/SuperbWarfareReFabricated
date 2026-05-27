@@ -15,12 +15,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
-@OnlyIn(Dist.CLIENT)
 public class AmmoCountOverlay implements IGuiOverlay {
 
     public static final String ID = Mod.MODID + "_ammo_count";

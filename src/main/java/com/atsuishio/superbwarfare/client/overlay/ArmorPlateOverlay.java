@@ -9,12 +9,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
-@OnlyIn(Dist.CLIENT)
 public class ArmorPlateOverlay implements IGuiOverlay {
 
     public static final String ID = Mod.MODID + "_armor_plate";

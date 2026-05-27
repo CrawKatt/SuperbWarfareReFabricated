@@ -13,21 +13,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.minecraft.server.level.ServerPlayer;
 
 public enum InteractMessage {
     INSTANCE;
 
-    public static void handler(Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            if (context.getSender() != null) {
-                handleInteract(context.getSender());
-            }
-        });
-        context.setPacketHandled(true);
+    public static void handler(ServerPlayer player) {
+        if (player != null) {
+            handleInteract(player);
+        }
     }
 
     public static void handleInteract(Player player) {

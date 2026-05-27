@@ -5,10 +5,8 @@ import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class PlayerVariablesSyncMessage {
     private final int target;
@@ -29,30 +27,24 @@ public class PlayerVariablesSyncMessage {
         buffer.writeMap(message.data, (buf, key) -> buf.writeByte(key), FriendlyByteBuf::writeVarInt);
     }
 
-    public static void handler(PlayerVariablesSyncMessage message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            context.setPacketHandled(true);
-            if (context.getDirection().getReceptionSide().isServer() || Minecraft.getInstance().player == null) {
-                return;
-            }
+    public static void handler(PlayerVariablesSyncMessage message) {
+        if (Minecraft.getInstance().player == null) return;
 
-            var entity = Minecraft.getInstance().player.level().getEntity(message.target);
-            if (entity == null) return;
+        var entity = Minecraft.getInstance().player.level().getEntity(message.target);
+        if (entity == null) return;
 
-            PlayerVariable variables = entity.getCapability(ModCapabilities.PLAYER_VARIABLE, null).orElse(new PlayerVariable());
+        PlayerVariable variables = entity.getCapability(ModCapabilities.PLAYER_VARIABLE, null).orElse(new PlayerVariable());
 
-            for (var entry : message.data.entrySet()) {
-                var type = entry.getKey();
-                if (type == -1) {
-                    variables.tacticalSprint = entry.getValue() == 1;
-                } else {
-                    var types = Ammo.values();
-                    if (type < types.length) {
-                        types[type].set(variables, entry.getValue());
-                    }
+        for (var entry : message.data.entrySet()) {
+            var type = entry.getKey();
+            if (type == -1) {
+                variables.tacticalSprint = entry.getValue() == 1;
+            } else {
+                var types = Ammo.values();
+                if (type < types.length) {
+                    types[type].set(variables, entry.getValue());
                 }
             }
-        });
+        }
     }
 }

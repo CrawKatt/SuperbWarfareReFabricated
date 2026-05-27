@@ -13,8 +13,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -55,7 +53,7 @@ public class SoundTool {
         List<ServerPlayer> players = serverLevel.getPlayers(p -> p.distanceToSqr(pos) < radius * radius * 256);
 
         for (var serverPlayer : players) {
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
+            NetworkRegistry.sendToPlayer(serverPlayer,
                     new SoundClientMessage(soundEvent.getLocation(), pos.x, pos.y, pos.z, radius, pitch, sender == null ? UUID.randomUUID() : sender.getUUID()));
         }
     }

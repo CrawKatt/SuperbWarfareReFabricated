@@ -13,8 +13,8 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.client.RenderProvider;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.renderer.GeoArmorRenderer;
@@ -22,23 +22,32 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class RuHelmet6b47 extends ArmorItem implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
 
     public RuHelmet6b47() {
         super(ModArmorMaterial.CEMENTED_CARBIDE, Type.HELMET, new Properties());
     }
 
     @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
+    public void createRenderer(Consumer<Object> consumer) {
+        consumer.accept(new RenderProvider() {
             private GeoArmorRenderer<?> renderer;
 
             @Override
-            public HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
-                if (this.renderer == null)
+            public HumanoidModel<LivingEntity> getHumanoidArmorModel(
+                    LivingEntity livingEntity,
+                    ItemStack itemStack,
+                    EquipmentSlot equipmentSlot,
+                    HumanoidModel<LivingEntity> original
+            ) {
+                if (this.renderer == null) {
                     this.renderer = new RuHelmet6b47ArmorRenderer();
+                }
+
                 this.renderer.prepForRender(livingEntity, itemStack, equipmentSlot, original);
                 return this.renderer;
             }
@@ -46,7 +55,12 @@ public class RuHelmet6b47 extends ArmorItem implements GeoItem {
     }
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+    public Supplier<Object> getRenderProvider() {
+        return this.renderProvider;
+    }
+
+    @Override
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
         Multimap<Attribute, AttributeModifier> map = super.getDefaultAttributeModifiers(slot);
         UUID uuid = new UUID(slot.toString().hashCode(), 0);
         if (slot == EquipmentSlot.HEAD) {

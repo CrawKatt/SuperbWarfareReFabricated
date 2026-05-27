@@ -1,21 +1,23 @@
 package com.atsuishio.superbwarfare.mobeffect;
 
+import com.atsuishio.superbwarfare.event.custom.LivingHealCallback;
+import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraftforge.event.entity.living.LivingHealEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.FORGE)
 public class TraumaMobEffect extends MobEffect {
 
     public TraumaMobEffect() {
         super(MobEffectCategory.HARMFUL, 0xF4ADB4);
     }
 
-    @SubscribeEvent
-    public static void onLivingHeal(LivingHealEvent event) {
+    public static void registerEvents() {
+        LivingHealCallback.EVENT.register(TraumaMobEffect::onLivingHeal);
+        LivingHurtCallback.EVENT.register(TraumaMobEffect::onLivingHurt);
+    }
+
+    public static void onLivingHeal(LivingHealCallback.Event event) {
         var entity = event.getEntity();
         var effect = entity.getEffect(ModMobEffects.TRAUMA.get());
         if (effect == null) return;
@@ -30,8 +32,7 @@ public class TraumaMobEffect extends MobEffect {
         event.setAmount(amount * (1 - amp * 0.1f));
     }
 
-    @SubscribeEvent
-    public static void onLivingHurt(LivingHurtEvent event) {
+    public static void onLivingHurt(LivingHurtCallback.Event event) {
         var entity = event.getEntity();
         var effect = entity.getEffect(ModMobEffects.TRAUMA.get());
         if (effect == null) return;

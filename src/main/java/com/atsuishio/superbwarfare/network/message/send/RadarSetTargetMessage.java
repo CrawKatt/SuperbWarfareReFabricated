@@ -6,10 +6,8 @@ import com.atsuishio.superbwarfare.tools.EntityFindUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
 import static com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity.TARGET_UUID;
@@ -30,24 +28,20 @@ public class RadarSetTargetMessage {
         return new RadarSetTargetMessage(buffer.readUUID());
     }
 
-    public static void handler(RadarSetTargetMessage message, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer player = ctx.get().getSender();
-            if (player == null) return;
+    public static void handler(RadarSetTargetMessage message, ServerPlayer player) {
+        if (player == null) return;
 
-            AbstractContainerMenu menu = player.containerMenu;
-            if (menu instanceof FuMO25Menu fuMO25Menu) {
-                if (!player.containerMenu.stillValid(player)) {
-                    return;
-                }
-                fuMO25Menu.getSelfPos().ifPresent(pos -> {
-                    var entities = StreamSupport.stream(EntityFindUtil.getEntities(player.level()).getAll().spliterator(), false)
-                            .filter(e -> (e instanceof AutoAimableEntity autoAimableEntity && autoAimableEntity.getOwner() == player && autoAimableEntity.distanceTo(player) <= 24))
-                            .toList();
-                    entities.forEach(e -> e.getEntityData().set(TARGET_UUID, message.targetUUID.toString()));
-                });
+        AbstractContainerMenu menu = player.containerMenu;
+        if (menu instanceof FuMO25Menu fuMO25Menu) {
+            if (!player.containerMenu.stillValid(player)) {
+                return;
             }
-        });
-        ctx.get().setPacketHandled(true);
+            fuMO25Menu.getSelfPos().ifPresent(pos -> {
+                var entities = StreamSupport.stream(EntityFindUtil.getEntities(player.level()).getAll().spliterator(), false)
+                        .filter(e -> (e instanceof AutoAimableEntity autoAimableEntity && autoAimableEntity.getOwner() == player && autoAimableEntity.distanceTo(player) <= 24))
+                        .toList();
+                entities.forEach(e -> e.getEntityData().set(TARGET_UUID, message.targetUUID.toString()));
+            });
+        }
     }
 }

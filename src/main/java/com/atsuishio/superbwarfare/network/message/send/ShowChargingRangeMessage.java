@@ -2,9 +2,7 @@ package com.atsuishio.superbwarfare.network.message.send;
 
 import com.atsuishio.superbwarfare.menu.ChargingStationMenu;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.minecraft.server.level.ServerPlayer;
 
 public class ShowChargingRangeMessage {
     private final boolean operation;
@@ -21,19 +19,14 @@ public class ShowChargingRangeMessage {
         buffer.writeBoolean(message.operation);
     }
 
-    public static void handler(ShowChargingRangeMessage message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            if (context.getSender() == null) return;
+    public static void handler(ShowChargingRangeMessage message, ServerPlayer player) {
+        if (player == null) return;
 
-            var player = context.getSender();
-            var menu = player.containerMenu;
-            if (menu instanceof ChargingStationMenu chargingStationMenu) {
-                if (!chargingStationMenu.stillValid(player)) return;
+        var menu = player.containerMenu;
+        if (menu instanceof ChargingStationMenu chargingStationMenu) {
+            if (!chargingStationMenu.stillValid(player)) return;
 
-                chargingStationMenu.setShowRange(message.operation);
-            }
-        });
-        context.setPacketHandled(true);
+            chargingStationMenu.setShowRange(message.operation);
+        }
     }
 }

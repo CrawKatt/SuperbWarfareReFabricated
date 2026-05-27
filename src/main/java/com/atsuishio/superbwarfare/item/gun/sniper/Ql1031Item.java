@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.item.BatteryItem;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.GunsTool;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -26,9 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.constant.DataTickets;
@@ -65,7 +63,6 @@ public class Ql1031Item extends GunGeoItem {
         TooltipTool.addHideText(list, Component.translatable("des.superbwarfare.ql_1031_2").withStyle(Style.EMPTY.withColor(0xFFECE7)));
     }
 
-    @OnlyIn(Dist.CLIENT)
     private PlayState editPredicate(AnimationState<Ql1031Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -81,7 +78,6 @@ public class Ql1031Item extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.ql_1031.idle"));
     }
 
-    @OnlyIn(Dist.CLIENT)
     private PlayState chargePredicate(AnimationState<Ql1031Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -131,25 +127,19 @@ public class Ql1031Item extends GunGeoItem {
         if (entity instanceof Player player) {
             for (var cell : player.getInventory().items) {
                 if (cell.getItem() instanceof BatteryItem) {
-                    assert stack.getCapability(ForgeCapabilities.ENERGY).resolve().isPresent();
-                    var stackStorage = stack.getCapability(ForgeCapabilities.ENERGY).resolve().get();
-                    int stackMaxEnergy = stackStorage.getMaxEnergyStored();
-                    int stackEnergy = stackStorage.getEnergyStored();
+                    assert ModEnergyApi.get(stack) != null;
+                    int stackMaxEnergy = ModEnergyApi.getMaxEnergyStored(stack);
+                    int stackEnergy = ModEnergyApi.getEnergyStored(stack);
 
-                    assert cell.getCapability(ForgeCapabilities.ENERGY).resolve().isPresent();
-                    var cellStorage = cell.getCapability(ForgeCapabilities.ENERGY).resolve().get();
-                    int cellEnergy = cellStorage.getEnergyStored();
+                    assert ModEnergyApi.get(cell) != null;
+                    int cellEnergy = ModEnergyApi.getEnergyStored(cell);
 
                     int stackEnergyNeed = Math.min(cellEnergy, stackMaxEnergy - stackEnergy);
 
                     if (cellEnergy > 0) {
-                        stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                                iEnergyStorage -> iEnergyStorage.receiveEnergy(stackEnergyNeed, false)
-                        );
+                        ModEnergyApi.receiveEnergy(stack, stackEnergyNeed, false);
                     }
-                    cell.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                            cEnergy -> cEnergy.extractEnergy(stackEnergyNeed, false)
-                    );
+                    ModEnergyApi.extractEnergy(cell, stackEnergyNeed, false);
                 }
             }
         }

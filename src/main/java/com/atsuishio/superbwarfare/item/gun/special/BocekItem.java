@@ -29,10 +29,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.network.PacketDistributor;
+
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -147,7 +145,7 @@ public class BocekItem extends GunGeoItem {
         if (player instanceof ServerPlayer serverPlayer) {
             SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_1P.getId(), SoundSource.PLAYERS);
             SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_3P.getId(), SoundSource.PLAYERS);
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new ShootClientMessage(10));
+            NetworkRegistry.sendToPlayer(serverPlayer, new ShootClientMessage(10));
         }
 
         if (power * 12 >= 6) {
@@ -222,7 +220,6 @@ public class BocekItem extends GunGeoItem {
         player.level().addFreshEntity(projectile);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public IClientItemExtensions getClientExtensions() {
         return new IClientItemExtensions() {
             private final BlockEntityWithoutLevelRenderer renderer = BocekItem.this.getRenderer().get();

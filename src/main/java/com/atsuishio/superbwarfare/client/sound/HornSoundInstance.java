@@ -5,12 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.HORN_VOLUME;
 
-@OnlyIn(Dist.CLIENT)
 public abstract class HornSoundInstance extends AbstractTickableSoundInstance {
 
     private final Minecraft client;
@@ -71,7 +68,6 @@ public abstract class HornSoundInstance extends AbstractTickableSoundInstance {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static class VehicleHornSound extends HornSoundInstance {
 
         public VehicleHornSound(VehicleEntity entity) {

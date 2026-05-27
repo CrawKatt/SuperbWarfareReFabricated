@@ -3,10 +3,7 @@ package com.atsuishio.superbwarfare.client.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
 public class FireStarParticle extends TextureSheetParticle {
     public static FireStarParticleProvider provider(SpriteSet spriteSet) {
         return new FireStarParticleProvider(spriteSet);

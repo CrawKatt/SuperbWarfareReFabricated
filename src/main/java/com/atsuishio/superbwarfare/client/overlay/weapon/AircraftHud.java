@@ -30,15 +30,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import org.joml.Math;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 
 // TODO 预制通用固定翼飞机HUD，提取准星
-@OnlyIn(Dist.CLIENT)
 public class AircraftHud {
 
     public static final String ID = "@Aircraft";

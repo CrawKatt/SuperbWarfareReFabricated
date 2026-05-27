@@ -17,14 +17,14 @@ import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Set;
 
-public class ModBlockLootProvider extends BlockLootSubProvider {
+public class ModBlockLootProvider {
 
+    /*
     public ModBlockLootProvider() {
         super(Set.of(), FeatureFlags.REGISTRY.allFlags());
     }
@@ -95,4 +95,5 @@ public class ModBlockLootProvider extends BlockLootSubProvider {
         }
         return LootTable.lootTable().withPool(this.applyExplosionCondition(pBlock, pool));
     }
+    */
 }

@@ -4,11 +4,9 @@ import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.event.GunEventHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 /**
  * 开火按键按下/松开时的处理
@@ -34,14 +32,10 @@ public class FireKeyMessage {
         buffer.writeBoolean(message.zoom);
     }
 
-    public static void handler(FireKeyMessage message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            if (context.getSender() != null) {
-                pressAction(context.getSender(), message.type, message.power, message.zoom);
-            }
-        });
-        context.setPacketHandled(true);
+    public static void handler(FireKeyMessage message, ServerPlayer player) {
+        if (player != null) {
+            pressAction(player, message.type, message.power, message.zoom);
+        }
     }
 
     public static void pressAction(Player player, int type, double power, boolean zoom) {

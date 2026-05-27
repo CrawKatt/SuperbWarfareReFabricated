@@ -42,10 +42,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
@@ -331,11 +328,18 @@ public class DroneEntity extends GeoVehicleEntity {
         } else if (player.isCrouching()) {
             if (stack.isEmpty() || stack.is(ModTags.Items.TOOLS_CROWBAR)) {
                 // 无人机拆除
-                ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(ModItems.DRONE.get()));
+                ItemStack droneStack = new ItemStack(ModItems.DRONE.get());
+                if (!player.addItem(droneStack)) {
+                    player.drop(droneStack, false);
+                }
 
                 // 返还弹药
                 for (int index0 = 0; index0 < this.entityData.get(AMMO); index0++) {
-                    ItemHandlerHelper.giveItemToPlayer(player, this.currentItem.copy());
+                    ItemStack ammoStack = this.currentItem.copy();
+
+                    if (!player.addItem(ammoStack)) {
+                        player.drop(ammoStack, false);
+                    }
                 }
 
                 player.getInventory().items.stream().filter(stack_ -> stack_.getItem() == ModItems.MONITOR.get())
@@ -354,8 +358,14 @@ public class DroneEntity extends GeoVehicleEntity {
                 // 返还单个弹药
                 int ammo = this.entityData.get(AMMO);
                 if (ammo > 0) {
-                    ItemHandlerHelper.giveItemToPlayer(player, this.currentItem.copy());
+                    ItemStack ammoStack = this.currentItem.copy();
+
+                    if (!player.addItem(ammoStack)) {
+                        player.drop(ammoStack, false);
+                    }
+
                     this.entityData.set(AMMO, ammo - 1);
+
                     if (ammo == 1) {
                         this.entityData.set(DISPLAY_ENTITY, "");
                         this.entityData.set(MAX_AMMO, 1);
@@ -592,7 +602,7 @@ public class DroneEntity extends GeoVehicleEntity {
     }
 
     static String getItemId(ItemStack stack) {
-        var key = ForgeRegistries.ITEMS.getKey(stack.getItem());
+        var key = BuiltInRegistries.ITEM.getKey(stack.getItem());
         if (key == null) return "";
         return key.toString();
     }
@@ -722,13 +732,11 @@ public class DroneEntity extends GeoVehicleEntity {
         return false;
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public @Nullable Vec2 getCameraRotation(float partialTicks, Player player, boolean zoom, boolean isFirstPerson) {
         return new Vec2((float) (getYaw(partialTicks) - freeCameraYaw), (float) (getPitch(partialTicks) + freeCameraPitch));
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public Vec3 getCameraPosition(float partialTicks, Player player, boolean zoom, boolean isFirstPerson) {
         Matrix4d transform = getClientVehicleTransform(partialTicks);

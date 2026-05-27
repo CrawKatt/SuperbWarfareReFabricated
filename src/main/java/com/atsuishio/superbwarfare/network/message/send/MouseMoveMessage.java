@@ -7,9 +7,6 @@ import com.atsuishio.superbwarfare.tools.EntityFindUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 public class MouseMoveMessage {
 
@@ -31,28 +28,24 @@ public class MouseMoveMessage {
         return new MouseMoveMessage(byteBuf.readDouble(), byteBuf.readDouble());
     }
 
-    public static void handler(MouseMoveMessage message, Supplier<NetworkEvent.Context> context) {
-        context.get().enqueueWork(() -> {
-            ServerPlayer player = context.get().getSender();
-            if (player == null) {
-                return;
+    public static void handler(MouseMoveMessage message, ServerPlayer player) {
+        if (player == null) {
+            return;
+        }
+
+        var entity = player.getVehicle();
+
+        if (entity instanceof VehicleEntity vehicle) {
+            vehicle.mouseInput(message.speedX, message.speedY);
+        }
+
+        ItemStack stack = player.getMainHandItem();
+
+        if (stack.is(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using") && stack.getOrCreateTag().getBoolean("Linked")) {
+            DroneEntity drone = EntityFindUtil.findDrone(player.level(), stack.getOrCreateTag().getString("LinkedDrone"));
+            if (drone != null) {
+                drone.mouseInput(message.speedX, message.speedY);
             }
-
-            var entity = player.getVehicle();
-
-            if (entity instanceof VehicleEntity vehicle) {
-                vehicle.mouseInput(message.speedX, message.speedY);
-            }
-
-            ItemStack stack = player.getMainHandItem();
-
-            if (stack.is(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using") && stack.getOrCreateTag().getBoolean("Linked")) {
-                DroneEntity drone = EntityFindUtil.findDrone(player.level(), stack.getOrCreateTag().getString("LinkedDrone"));
-                if (drone != null) {
-                    drone.mouseInput(message.speedX, message.speedY);
-                }
-            }
-        });
-        context.get().setPacketHandled(true);
+        }
     }
 }

@@ -5,9 +5,7 @@ import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.tools.SoundTool;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
 
-import java.util.function.Supplier;
 
 public class ZoomMessage {
 
@@ -25,28 +23,22 @@ public class ZoomMessage {
         buffer.writeInt(message.type);
     }
 
-    public static void handler(ZoomMessage message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            ServerPlayer player = context.getSender();
-            if (player == null) return;
+    public static void handler(ZoomMessage message, ServerPlayer player) {
+        if (player == null) return;
 
-            if (!(player.getVehicle() instanceof VehicleEntity vehicle)) return;
+        if (!(player.getVehicle() instanceof VehicleEntity vehicle)) return;
 
-            // 缩放音效播放条件: 载具是武器载具，且该位置有可用武器
-            if (message.type == 0) {
-                if (vehicle.hasWeapon(vehicle.getSeatIndex(player)) && vehicle.banHand(player)) {
-                    SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN.get(), 2, 1);
-                }
+        if (message.type == 0) {
+            if (vehicle.hasWeapon(vehicle.getSeatIndex(player)) && vehicle.banHand(player)) {
+                SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN.get(), 2, 1);
             }
+        }
 
-            if (message.type == 1) {
-                if (vehicle.hasWeapon(vehicle.getSeatIndex(player)) && vehicle.banHand(player)) {
-                    SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_OUT.get(), 2, 1);
-                }
+        if (message.type == 1) {
+            if (vehicle.hasWeapon(vehicle.getSeatIndex(player)) && vehicle.banHand(player)) {
+                SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_OUT.get(), 2, 1);
             }
-        });
-        context.setPacketHandled(true);
+        }
     }
 
 }

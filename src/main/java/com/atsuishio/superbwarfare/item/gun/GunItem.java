@@ -2,8 +2,7 @@ package com.atsuishio.superbwarfare.item.gun;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.api.event.ShootEvent;
-import com.atsuishio.superbwarfare.capability.energy.ItemEnergyProvider;
-import com.atsuishio.superbwarfare.capability.energy.ItemEnergyStorage;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.client.particle.BulletDecalOption;
 import com.atsuishio.superbwarfare.client.screens.WeaponEditScreen;
 import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent;
@@ -29,9 +28,11 @@ import com.atsuishio.superbwarfare.tools.*;
 import com.atsuishio.superbwarfare.world.phys.EntityResult;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import io.github.lounode.eventwrapper.eventbus.api.EventBusSubscriberWrapper;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -63,20 +64,12 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.network.PacketDistributor;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 import software.bernie.geckolib.animatable.GeoItem;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -86,7 +79,7 @@ import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.LASE
 import static com.atsuishio.superbwarfare.tools.EntityFindUtil.findEntity;
 import static com.atsuishio.superbwarfare.tools.ParticleTool.sendParticle;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber
+@EventBusSubscriberWrapper
 public abstract class GunItem extends Item implements ItemScreenProvider, GunPropertyModifier {
 
     protected static final ResourceLocation DEFAULT_ICON = Mod.loc("textures/gun_icon/default_icon.png");
@@ -121,24 +114,11 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
     }
 
     @Override
-    public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-        var cap = new ItemEnergyStorage(stack,
-                s -> GunData.compute(stack).maxEnergy,
-                s -> GunData.compute(stack).maxReceiveEnergy,
-                s -> GunData.compute(stack).maxExtractEnergy
-        );
-
-        return new ItemEnergyProvider(stack, LazyOptional.of(() -> cap));
-    }
-
-    @Override
     public boolean isBarVisible(@NotNull ItemStack stack) {
         var data = GunData.from(stack);
         if (data.compute().maxDurability > 0) return super.isBarVisible(stack);
 
-        return stack.getCapability(ForgeCapabilities.ENERGY)
-                .map(cap -> cap.getEnergyStored() > 0 && cap.getMaxEnergyStored() > 0)
-                .orElse(false);
+        return ModEnergyApi.getEnergyStored(stack) > 0 && ModEnergyApi.getMaxEnergyStored(stack) > 0;
     }
 
     @Override
@@ -149,9 +129,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         }
 
         if (GunData.compute(stack).maxEnergy > 0) {
-            var energy = stack.getCapability(ForgeCapabilities.ENERGY)
-                    .map(IEnergyStorage::getEnergyStored)
-                    .orElse(0);
+            var energy = ModEnergyApi.getEnergyStored(stack);
             return Math.round(energy * 13F / GunData.compute(stack).maxEnergy);
         }
 
@@ -189,13 +167,11 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
     }
 
     @Override
-    @ParametersAreNonnullByDefault
     public boolean canAttackBlock(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer) {
         return false;
     }
 
     @Override
-    @ParametersAreNonnullByDefault
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         if (!(stack.getItem() instanceof GunItem) || level.isClientSide) return;
 
@@ -215,8 +191,8 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
     }
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        Multimap<Attribute, AttributeModifier> map = super.getAttributeModifiers(slot, stack);
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
+        Multimap<Attribute, AttributeModifier> map = super.getAttributeModifiers(stack, slot);
         UUID uuid = new UUID(slot.toString().hashCode(), 0);
         if (slot != EquipmentSlot.MAINHAND) return map;
 
@@ -927,11 +903,11 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         if (uuid != null && zoom && (shooter != null && !shooter.isShiftKeyDown())) {
             Entity target = findEntity(level, String.valueOf(uuid));
             var gunData = GunData.from(stack);
-            int intelligentChipLevel = gunData.perk.getLevel(ModPerks.INTELLIGENT_CHIP);
+            int intelligentChipLevel = gunData.perk.getLevel(ModPerks.INTELLIGENT_CHIP.get());
             if (intelligentChipLevel > 0 && target != null) {
                 Vec3 targetVec = target.getEyePosition();
                 Vec3 playerVec = shooter.getEyePosition();
-                var hasGravity = gunData.perk.getLevel(ModPerks.MICRO_MISSILE) <= 0;
+                var hasGravity = gunData.perk.getLevel(ModPerks.MICRO_MISSILE.get()) <= 0;
                 Vec3 toVec = RangeTool.calculateFiringSolution(playerVec, targetVec, Vec3.ZERO, computed.velocity, hasGravity ? 0.03 : 0);
                 x = toVec.x;
                 y = toVec.y;
@@ -1130,7 +1106,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
 
         if (shooter instanceof ServerPlayer player) {
             player.level().playSound(null, player.blockPosition(), result.isHeadshot() ? ModSounds.HEADSHOT.get() : ModSounds.INDICATION.get(), SoundSource.VOICE, 0.1f, 1);
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ClientIndicatorMessage(type, 5));
+            NetworkRegistry.sendToPlayer(player, new ClientIndicatorMessage(type, 5));
         }
 
         level.playSound(null, result.getHitPos().x, result.getHitPos().y, result.getHitPos().z, this.getRayHitEntitySound(data), SoundSource.PLAYERS, 0.7F, (float) ((2 * Math.random() - 1) * 0.05f + 1.0f));
@@ -1157,7 +1133,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
     public @Nullable Screen getItemScreen(ItemStack stack, Player player, InteractionHand hand) {
         if (ClientEventHandler.canOpenEditScreen(stack, hand) && stack.getItem() instanceof GunItem && canEditAttachments(GunData.from(stack))) {
@@ -1170,7 +1146,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         return GunData.getDefault(data.id);
     }
 
-    public LazyOptional<IEnergyStorage> getEnergyProvider(@NotNull GunData data, @Nullable Entity ammoSupplier) {
-        return data.stack.getCapability(ForgeCapabilities.ENERGY);
+    public int getEnergyStored(@NotNull GunData data, @Nullable Entity ammoSupplier) {
+        return ModEnergyApi.getEnergyStored(data.stack);
     }
 }

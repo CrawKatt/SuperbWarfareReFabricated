@@ -1,123 +1,234 @@
 package com.atsuishio.superbwarfare.network;
 
 import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.api.event.RegisterContainersEvent;
 import com.atsuishio.superbwarfare.network.message.receive.*;
 import com.atsuishio.superbwarfare.network.message.send.*;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class NetworkRegistry {
 
-    private static final String PROTOCOL_VERSION = "1";
-    public static final SimpleChannel PACKET_HANDLER = net.minecraftforge.network.NetworkRegistry.newSimpleChannel(new ResourceLocation(Mod.MODID, Mod.MODID), () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
+    private static final Map<Class<?>, MessageEntry<?>> MESSAGES = new HashMap<>();
 
-    public static int messageID = 0;
+    private record MessageEntry<T>(ResourceLocation id, BiConsumer<T, FriendlyByteBuf> encoder) {
+    }
 
     public static void register() {
-        playToClient(PlayerVariablesSyncMessage.class, PlayerVariablesSyncMessage::buffer, PlayerVariablesSyncMessage::new, PlayerVariablesSyncMessage::handler);
-        playToClient(ShakeClientMessage.class, ShakeClientMessage::encode, ShakeClientMessage::decode, ShakeClientMessage::handler);
-        playToClient(ClientMotionSyncMessage.class, ClientMotionSyncMessage::encode, ClientMotionSyncMessage::decode, ClientMotionSyncMessage::handler);
-        playToClient(ClientIndicatorMessage.class, ClientIndicatorMessage::encode, ClientIndicatorMessage::decode, ClientIndicatorMessage::handler);
-        playToClient(LivingGunKillMessage.class, LivingGunKillMessage::encode, LivingGunKillMessage::decode, LivingGunKillMessage::handler);
-        playToClient(GunsDataMessage.class, GunsDataMessage::encode, GunsDataMessage::decode, (message, ctx) -> GunsDataMessage.handler(message));
-        playToClient(ContainerDataMessage.class, ContainerDataMessage::encode, ContainerDataMessage::decode, ContainerDataMessage::handler);
-        playToClient(ShootClientMessage.class, ShootClientMessage::encode, ShootClientMessage::decode, (message, context) -> ShootClientMessage.handler(context));
-        playToClient(DrawClientMessage.INSTANCE, DrawClientMessage::handler);
-        playToClient(ResetCameraTypeMessage.INSTANCE, ResetCameraTypeMessage::handler);
-        playToClient(RadarMenuOpenMessage.class, RadarMenuOpenMessage::encode, RadarMenuOpenMessage::decode, RadarMenuOpenMessage::handler);
-        playToClient(RadarMenuCloseMessage.INSTANCE, RadarMenuCloseMessage::handler);
-        playToClient(ClientTacticalSprintSyncMessage.class, ClientTacticalSprintSyncMessage::encode, ClientTacticalSprintSyncMessage::decode, ClientTacticalSprintSyncMessage::handler);
-        playToClient(VehiclesDataMessage.class, VehiclesDataMessage::encode, VehiclesDataMessage::decode, (msg, ctx) -> VehiclesDataMessage.handler(msg));
-        playToClient(ClientSetMotionMessage.class, ClientSetMotionMessage::encode, ClientSetMotionMessage::decode, ClientSetMotionMessage::handler);
-        playToClient(FinishAssemblingVehicleMessage.class, FinishAssemblingVehicleMessage::encode, FinishAssemblingVehicleMessage::decode, FinishAssemblingVehicleMessage::handler);
-        playToClient(TDMSyncMessage.class, TDMSyncMessage::encode, TDMSyncMessage::decode, TDMSyncMessage::handler);
-        playToClient(SoundClientMessage.class, SoundClientMessage::encode, SoundClientMessage::decode, SoundClientMessage::handler);
 
-        playToServer(LaserShootMessage.class, LaserShootMessage::encode, LaserShootMessage::decode, LaserShootMessage::handler);
-        playToServer(ShootMessage.class, ShootMessage::encode, ShootMessage::decode, ShootMessage::handler);
-        playToServer(SeekingWeaponWarningMessage.class, SeekingWeaponWarningMessage::encode, SeekingWeaponWarningMessage::decode, SeekingWeaponWarningMessage::handler);
-        playToServer(DoubleJumpMessage.INSTANCE, DoubleJumpMessage::handler);
-        playToServer(ParachuteMessage.INSTANCE, ParachuteMessage::handler);
-        playToServer(VehicleMovementMessage.class, VehicleMovementMessage::encode, VehicleMovementMessage::decode, VehicleMovementMessage::handler);
-        playToServer(MeleeAttackMessage.class, MeleeAttackMessage::encode, MeleeAttackMessage::decode, MeleeAttackMessage::handler);
-        playToServer(LungeMineAttackMessage.class, LungeMineAttackMessage::encode, LungeMineAttackMessage::decode, LungeMineAttackMessage::handler);
-        playToServer(VehicleFireMessage.class, VehicleFireMessage::encode, VehicleFireMessage::decode, VehicleFireMessage::handler);
-        playToServer(AimVillagerMessage.class, AimVillagerMessage::encode, AimVillagerMessage::decode, AimVillagerMessage::handler);
-        playToServer(RadarChangeModeMessage.class, RadarChangeModeMessage::encode, RadarChangeModeMessage::decode, RadarChangeModeMessage::handler);
-        playToServer(RadarSetParametersMessage.class, RadarSetParametersMessage::encode, RadarSetParametersMessage::decode, RadarSetParametersMessage::handler);
-        playToServer(RadarSetPosMessage.class, RadarSetPosMessage::encode, RadarSetPosMessage::decode, RadarSetPosMessage::handler);
-        playToServer(RadarSetTargetMessage.class, RadarSetTargetMessage::encode, RadarSetTargetMessage::decode, RadarSetTargetMessage::handler);
-        playToServer(GunReforgeMessage.INSTANCE, GunReforgeMessage::handler);
-        playToServer(SetPerkLevelMessage.class, SetPerkLevelMessage::encode, SetPerkLevelMessage::decode, SetPerkLevelMessage::handler);
-        playToServer(SwitchVehicleWeaponMessage.class, SwitchVehicleWeaponMessage::encode, SwitchVehicleWeaponMessage::decode, SwitchVehicleWeaponMessage::handler);
-        playToServer(AdjustZoomFovMessage.class, AdjustZoomFovMessage::encode, AdjustZoomFovMessage::decode, AdjustZoomFovMessage::handler);
-        playToServer(SwitchScopeMessage.class, SwitchScopeMessage::encode, SwitchScopeMessage::decode, SwitchScopeMessage::handler);
-        playToServer(FireKeyMessage.class, FireKeyMessage::encode, FireKeyMessage::decode, FireKeyMessage::handler);
-        playToServer(ReloadMessage.INSTANCE, ReloadMessage::handler);
-        playToServer(FireModeMessage.class, FireModeMessage::encode, FireModeMessage::decode, FireModeMessage::handler);
-        playToServer(PlayerStopRidingMessage.class, PlayerStopRidingMessage::encode, PlayerStopRidingMessage::decode, PlayerStopRidingMessage::handler);
-        playToServer(ZoomMessage.class, ZoomMessage::encode, ZoomMessage::decode, ZoomMessage::handler);
-        playToServer(DroneFireMessage.class, DroneFireMessage::encode, DroneFireMessage::decode, DroneFireMessage::handler);
-        playToServer(SetFiringParametersMessage.INSTANCE, SetFiringParametersMessage::handler);
-        playToServer(ArtilleryIndicatorFireMessage.INSTANCE, ArtilleryIndicatorFireMessage::handler);
-        playToServer(SensitivityMessage.class, SensitivityMessage::encode, SensitivityMessage::decode, SensitivityMessage::handler);
-        playToServer(EditMessage.class, EditMessage::encode, EditMessage::decode, EditMessage::handler);
-        playToServer(InteractMessage.INSTANCE, InteractMessage::handler);
-        playToServer(AdjustMortarAngleMessage.class, AdjustMortarAngleMessage::encode, AdjustMortarAngleMessage::decode, AdjustMortarAngleMessage::handler);
-        playToServer(ChangeVehicleSeatMessage.class, ChangeVehicleSeatMessage::encode, ChangeVehicleSeatMessage::decode, ChangeVehicleSeatMessage::handler);
-        playToServer(ShowChargingRangeMessage.class, ShowChargingRangeMessage::encode, ShowChargingRangeMessage::decode, ShowChargingRangeMessage::handler);
-        playToServer(TacticalSprintMessage.class, TacticalSprintMessage::encode, TacticalSprintMessage::decode, TacticalSprintMessage::handler);
-        playToServer(DogTagFinishEditMessage.class, DogTagFinishEditMessage::encode, DogTagFinishEditMessage::decode, DogTagFinishEditMessage::handler);
-        playToServer(MouseMoveMessage.class, MouseMoveMessage::encode, MouseMoveMessage::decode, MouseMoveMessage::handler);
-        playToServer(FiringParametersEditMessage.class, FiringParametersEditMessage::encode, FiringParametersEditMessage::decode, FiringParametersEditMessage::handler);
-        playToServer(UnloadMessage.INSTANCE, UnloadMessage::handler);
-        playToServer(AssembleVehicleMessage.class, AssembleVehicleMessage::encode, AssembleVehicleMessage::decode, AssembleVehicleMessage::handler);
-        playToServer(WeaponZoomingMessage.class, WeaponZoomingMessage::encode, WeaponZoomingMessage::decode, WeaponZoomingMessage::handler);
+        // ========== Client-bound (S2C) ==========
 
-        var registerContainerEvent = new RegisterContainersEvent();
-        FMLJavaModLoadingContext.get().getModEventBus().post(registerContainerEvent);
+        registerS2C(PlayerVariablesSyncMessage.class, PlayerVariablesSyncMessage::buffer,
+                PlayerVariablesSyncMessage::new, PlayerVariablesSyncMessage::handler);
+        registerS2C(ShakeClientMessage.class, ShakeClientMessage::encode,
+                ShakeClientMessage::decode, ShakeClientMessage::handler);
+        registerS2C(ClientMotionSyncMessage.class, ClientMotionSyncMessage::encode,
+                ClientMotionSyncMessage::decode, ClientMotionSyncMessage::handler);
+        registerS2C(ClientIndicatorMessage.class, ClientIndicatorMessage::encode,
+                ClientIndicatorMessage::decode, ClientIndicatorMessage::handler);
+        registerS2C(LivingGunKillMessage.class, LivingGunKillMessage::encode,
+                LivingGunKillMessage::decode, LivingGunKillMessage::handler);
+        registerS2C(GunsDataMessage.class, GunsDataMessage::encode,
+                GunsDataMessage::decode, GunsDataMessage::handler);
+        registerS2C(ContainerDataMessage.class, ContainerDataMessage::encode,
+                ContainerDataMessage::decode, ContainerDataMessage::handler);
+        registerS2C(ShootClientMessage.class, ShootClientMessage::encode,
+                ShootClientMessage::decode, msg -> ShootClientMessage.handler());
+        registerS2C(DrawClientMessage.INSTANCE, DrawClientMessage::handler);
+        registerS2C(ResetCameraTypeMessage.INSTANCE, ResetCameraTypeMessage::handler);
+        registerS2C(RadarMenuOpenMessage.class, RadarMenuOpenMessage::encode,
+                RadarMenuOpenMessage::decode, RadarMenuOpenMessage::handler);
+        registerS2C(RadarMenuCloseMessage.INSTANCE, RadarMenuCloseMessage::handler);
+        registerS2C(ClientTacticalSprintSyncMessage.class, ClientTacticalSprintSyncMessage::encode,
+                ClientTacticalSprintSyncMessage::decode, ClientTacticalSprintSyncMessage::handler);
+        registerS2C(VehiclesDataMessage.class, VehiclesDataMessage::encode,
+                VehiclesDataMessage::decode, VehiclesDataMessage::handler);
+        registerS2C(ClientSetMotionMessage.class, ClientSetMotionMessage::encode,
+                ClientSetMotionMessage::decode, ClientSetMotionMessage::handler);
+        registerS2C(FinishAssemblingVehicleMessage.class, FinishAssemblingVehicleMessage::encode,
+                FinishAssemblingVehicleMessage::decode, FinishAssemblingVehicleMessage::handler);
+        registerS2C(TDMSyncMessage.class, TDMSyncMessage::encode,
+                TDMSyncMessage::decode, TDMSyncMessage::handler);
+        registerS2C(SoundClientMessage.class, SoundClientMessage::encode,
+                SoundClientMessage::decode, SoundClientMessage::handler);
+
+        // ========== Server-bound (C2S) ==========
+
+        registerC2S(LaserShootMessage.class, LaserShootMessage::encode,
+                LaserShootMessage::decode, LaserShootMessage::handler);
+        registerC2S(ShootMessage.class, ShootMessage::encode,
+                ShootMessage::decode, ShootMessage::handler);
+        registerC2S(SeekingWeaponWarningMessage.class, SeekingWeaponWarningMessage::encode,
+                SeekingWeaponWarningMessage::decode, SeekingWeaponWarningMessage::handler);
+        registerC2S(DoubleJumpMessage.INSTANCE, DoubleJumpMessage::handler);
+        registerC2S(ParachuteMessage.INSTANCE, ParachuteMessage::handler);
+        registerC2S(VehicleMovementMessage.class, VehicleMovementMessage::encode,
+                VehicleMovementMessage::decode, VehicleMovementMessage::handler);
+        registerC2S(MeleeAttackMessage.class, MeleeAttackMessage::encode,
+                MeleeAttackMessage::decode, MeleeAttackMessage::handler);
+        registerC2S(LungeMineAttackMessage.class, LungeMineAttackMessage::encode,
+                LungeMineAttackMessage::decode, LungeMineAttackMessage::handler);
+        registerC2S(VehicleFireMessage.class, VehicleFireMessage::encode,
+                VehicleFireMessage::decode, VehicleFireMessage::handler);
+        registerC2S(AimVillagerMessage.class, AimVillagerMessage::encode,
+                AimVillagerMessage::decode, AimVillagerMessage::handler);
+        registerC2S(RadarChangeModeMessage.class, RadarChangeModeMessage::encode,
+                RadarChangeModeMessage::decode, RadarChangeModeMessage::handler);
+        registerC2S(RadarSetParametersMessage.class, RadarSetParametersMessage::encode,
+                RadarSetParametersMessage::decode, RadarSetParametersMessage::handler);
+        registerC2S(RadarSetPosMessage.class, RadarSetPosMessage::encode,
+                RadarSetPosMessage::decode, RadarSetPosMessage::handler);
+        registerC2S(RadarSetTargetMessage.class, RadarSetTargetMessage::encode,
+                RadarSetTargetMessage::decode, RadarSetTargetMessage::handler);
+        registerC2S(GunReforgeMessage.INSTANCE, GunReforgeMessage::handler);
+        registerC2S(SetPerkLevelMessage.class, SetPerkLevelMessage::encode,
+                SetPerkLevelMessage::decode, SetPerkLevelMessage::handler);
+        registerC2S(SwitchVehicleWeaponMessage.class, SwitchVehicleWeaponMessage::encode,
+                SwitchVehicleWeaponMessage::decode, SwitchVehicleWeaponMessage::handler);
+        registerC2S(AdjustZoomFovMessage.class, AdjustZoomFovMessage::encode,
+                AdjustZoomFovMessage::decode, AdjustZoomFovMessage::handler);
+        registerC2S(SwitchScopeMessage.class, SwitchScopeMessage::encode,
+                SwitchScopeMessage::decode, SwitchScopeMessage::handler);
+        registerC2S(FireKeyMessage.class, FireKeyMessage::encode,
+                FireKeyMessage::decode, FireKeyMessage::handler);
+        registerC2S(ReloadMessage.INSTANCE, ReloadMessage::handler);
+        registerC2S(FireModeMessage.class, FireModeMessage::encode,
+                FireModeMessage::decode, FireModeMessage::handler);
+        registerC2S(PlayerStopRidingMessage.class, PlayerStopRidingMessage::encode,
+                PlayerStopRidingMessage::decode, PlayerStopRidingMessage::handler);
+        registerC2S(ZoomMessage.class, ZoomMessage::encode,
+                ZoomMessage::decode, ZoomMessage::handler);
+        registerC2S(DroneFireMessage.class, DroneFireMessage::encode,
+                DroneFireMessage::decode, DroneFireMessage::handler);
+        registerC2S(SetFiringParametersMessage.INSTANCE, SetFiringParametersMessage::handler);
+        registerC2S(ArtilleryIndicatorFireMessage.INSTANCE, ArtilleryIndicatorFireMessage::handler);
+        registerC2S(SensitivityMessage.class, SensitivityMessage::encode,
+                SensitivityMessage::decode, SensitivityMessage::handler);
+        registerC2S(EditMessage.class, EditMessage::encode,
+                EditMessage::decode, EditMessage::handler);
+        registerC2S(InteractMessage.INSTANCE, InteractMessage::handler);
+        registerC2S(AdjustMortarAngleMessage.class, AdjustMortarAngleMessage::encode,
+                AdjustMortarAngleMessage::decode, AdjustMortarAngleMessage::handler);
+        registerC2S(ChangeVehicleSeatMessage.class, ChangeVehicleSeatMessage::encode,
+                ChangeVehicleSeatMessage::decode, ChangeVehicleSeatMessage::handler);
+        registerC2S(ShowChargingRangeMessage.class, ShowChargingRangeMessage::encode,
+                ShowChargingRangeMessage::decode, ShowChargingRangeMessage::handler);
+        registerC2S(TacticalSprintMessage.class, TacticalSprintMessage::encode,
+                TacticalSprintMessage::decode, TacticalSprintMessage::handler);
+        registerC2S(DogTagFinishEditMessage.class, DogTagFinishEditMessage::encode,
+                DogTagFinishEditMessage::decode, DogTagFinishEditMessage::handler);
+        registerC2S(MouseMoveMessage.class, MouseMoveMessage::encode,
+                MouseMoveMessage::decode, MouseMoveMessage::handler);
+        registerC2S(FiringParametersEditMessage.class, FiringParametersEditMessage::encode,
+                FiringParametersEditMessage::decode, FiringParametersEditMessage::handler);
+        registerC2S(UnloadMessage.INSTANCE, UnloadMessage::handler);
+        registerC2S(AssembleVehicleMessage.class, AssembleVehicleMessage::encode,
+                AssembleVehicleMessage::decode, AssembleVehicleMessage::handler);
+        registerC2S(WeaponZoomingMessage.class, WeaponZoomingMessage::encode,
+                WeaponZoomingMessage::decode, WeaponZoomingMessage::handler);
+
+        // TODO: Phase 4 — migrate RegisterContainersEvent (was posted here in Forge)
     }
 
-    public static <T> void playToClient(Class<T> messageType, BiConsumer<T, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, T> decoder, BiConsumer<T, Supplier<NetworkEvent.Context>> messageConsumer) {
-        PACKET_HANDLER.registerMessage(messageID, messageType, encoder, decoder, messageConsumer, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
-        messageID++;
+    // ========== S2C (Client-bound) Registration ==========
+
+    private static <T> void registerS2C(Class<T> type, BiConsumer<T, FriendlyByteBuf> encoder,
+                                         Function<FriendlyByteBuf, T> decoder, Consumer<T> handler) {
+        var id = new ResourceLocation(Mod.MODID, "s2c_" + type.getSimpleName().toLowerCase());
+        MESSAGES.put(type, new MessageEntry<>(id, encoder));
+        ClientPlayNetworking.registerGlobalReceiver(id, (client, handlerNet, buf, responseSender) -> {
+            T message = decoder.apply(buf);
+            client.execute(() -> handler.accept(message));
+        });
     }
 
-    /**
-     * 注册无参数、向客户端发送的消息
-     */
     @SuppressWarnings("unchecked")
-    public static <T> void playToClient(T instance, Consumer<Supplier<NetworkEvent.Context>> messageConsumer) {
+    private static <T> void registerS2C(T instance, Runnable handler) {
         var type = (Class<T>) instance.getClass();
-        PACKET_HANDLER.registerMessage(messageID, type, (msg, buf) -> {
-        }, (buf) -> instance, (msg, ctx) -> messageConsumer.accept(ctx), Optional.of(NetworkDirection.PLAY_TO_CLIENT));
-        messageID++;
+        var id = new ResourceLocation(Mod.MODID, "s2c_" + type.getSimpleName().toLowerCase());
+        MESSAGES.put(type, new MessageEntry<>(id, (msg, buf) -> {}));
+        ClientPlayNetworking.registerGlobalReceiver(id, (client, handlerNet, buf, responseSender) -> {
+            client.execute(handler);
+        });
     }
 
-    public static <T> void playToServer(Class<T> messageType, BiConsumer<T, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, T> decoder, BiConsumer<T, Supplier<NetworkEvent.Context>> messageConsumer) {
-        PACKET_HANDLER.registerMessage(messageID, messageType, encoder, decoder, messageConsumer, Optional.of(NetworkDirection.PLAY_TO_SERVER));
-        messageID++;
+    // ========== C2S (Server-bound) Registration ==========
+
+    private static <T> void registerC2S(Class<T> type, BiConsumer<T, FriendlyByteBuf> encoder,
+                                         Function<FriendlyByteBuf, T> decoder, BiConsumer<T, ServerPlayer> handler) {
+        var id = new ResourceLocation(Mod.MODID, "c2s_" + type.getSimpleName().toLowerCase());
+        MESSAGES.put(type, new MessageEntry<>(id, encoder));
+        ServerPlayNetworking.registerGlobalReceiver(id, (server, player, handlerNet, buf, responseSender) -> {
+            T message = decoder.apply(buf);
+            server.execute(() -> handler.accept(message, player));
+        });
     }
 
-    /**
-     * 注册无参数、向服务器发送的消息
-     */
     @SuppressWarnings("unchecked")
-    public static <T> void playToServer(T instance, Consumer<Supplier<NetworkEvent.Context>> messageConsumer) {
+    private static <T> void registerC2S(T instance, Consumer<ServerPlayer> handler) {
         var type = (Class<T>) instance.getClass();
-        PACKET_HANDLER.registerMessage(messageID, type, (msg, buf) -> {
-        }, (buf) -> instance, (msg, ctx) -> messageConsumer.accept(ctx), Optional.of(NetworkDirection.PLAY_TO_SERVER));
-        messageID++;
+        var id = new ResourceLocation(Mod.MODID, "c2s_" + type.getSimpleName().toLowerCase());
+        MESSAGES.put(type, new MessageEntry<>(id, (msg, buf) -> {}));
+        ServerPlayNetworking.registerGlobalReceiver(id, (server, player, handlerNet, buf, responseSender) -> {
+            server.execute(() -> handler.accept(player));
+        });
+    }
+
+    // ========== Send Helpers ==========
+
+    @SuppressWarnings("unchecked")
+    public static <T> void sendToServer(T message) {
+        var entry = (MessageEntry<T>) MESSAGES.get(message.getClass());
+        if (entry == null) throw new IllegalStateException("Unregistered message: " + message.getClass().getName());
+        var buf = PacketByteBufs.create();
+        entry.encoder.accept(message, buf);
+        ClientPlayNetworking.send(entry.id, buf);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> void sendToPlayer(ServerPlayer player, T message) {
+        var entry = (MessageEntry<T>) MESSAGES.get(message.getClass());
+        if (entry == null) throw new IllegalStateException("Unregistered message: " + message.getClass().getName());
+        var buf = PacketByteBufs.create();
+        entry.encoder.accept(message, buf);
+        ServerPlayNetworking.send(player, entry.id, buf);
+    }
+
+    public static <T> void sendToAll(T message) {
+        var server = Mod.getServer();
+        if (server != null) {
+            for (var player : server.getPlayerList().getPlayers()) {
+                sendToPlayer(player, message);
+            }
+        }
+    }
+
+    public static <T> void sendToTracking(Entity entity, T message) {
+        var server = Mod.getServer();
+        if (server != null) {
+            for (var player : server.getPlayerList().getPlayers()) {
+                if (player.distanceToSqr(entity) < 1024.0) {
+                    sendToPlayer(player, message);
+                }
+            }
+        }
+    }
+
+    public static <T> void sendToPlayers(List<ServerPlayer> players, T message) {
+        for (var player : players) {
+            sendToPlayer(player, message);
+        }
     }
 }

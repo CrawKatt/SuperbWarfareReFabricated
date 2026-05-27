@@ -11,11 +11,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 public record LivingGunKillMessage(int attackerId, int targetId, boolean headshot, ResourceKey<DamageType> damageType) {
 
@@ -34,30 +29,27 @@ public record LivingGunKillMessage(int attackerId, int targetId, boolean headsho
         return new LivingGunKillMessage(attackerId, targetId, headshot, damageType);
     }
 
-    public static void handler(LivingGunKillMessage message, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ClientLevel level = Minecraft.getInstance().level;
-            if (level != null) {
-                var entity = level.getEntity(message.attackerId);
-                LivingEntity attacker;
-                if (entity instanceof LivingEntity living) {
-                    if (living instanceof Player player) {
-                        attacker = player;
-                    } else if (living instanceof OwnableEntity ownableEntity && ownableEntity.getOwner() instanceof Player) {
-                        attacker = living;
-                    } else {
-                        attacker = null;
-                    }
+    public static void handler(LivingGunKillMessage message) {
+        ClientLevel level = Minecraft.getInstance().level;
+        if (level != null) {
+            var entity = level.getEntity(message.attackerId);
+            LivingEntity attacker;
+            if (entity instanceof LivingEntity living) {
+                if (living instanceof Player player) {
+                    attacker = player;
+                } else if (living instanceof OwnableEntity ownableEntity && ownableEntity.getOwner() instanceof Player) {
+                    attacker = living;
                 } else {
                     attacker = null;
                 }
-                Entity target = level.getEntity(message.targetId);
-
-                if (attacker != null && target != null) {
-                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandler.handleLivingKillMessage(attacker, target, message.headshot, message.damageType, ctx));
-                }
+            } else {
+                attacker = null;
             }
-        });
-        ctx.get().setPacketHandled(true);
+            Entity target = level.getEntity(message.targetId);
+
+            if (attacker != null && target != null) {
+                ClientPacketHandler.handleLivingKillMessage(attacker, target, message.headshot, message.damageType);
+            }
+        }
     }
 }

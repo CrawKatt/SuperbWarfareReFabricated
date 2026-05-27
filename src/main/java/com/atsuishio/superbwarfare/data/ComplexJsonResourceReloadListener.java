@@ -8,7 +8,6 @@ import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.Map;
 
@@ -22,7 +21,6 @@ public class ComplexJsonResourceReloadListener extends SimplePreparableReloadLis
 
     private static final Object NULL = new Object();
 
-    @ParametersAreNonnullByDefault
     protected @NotNull Object prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
         this.data.forEach((name, value) -> {
             var map = value.data();
@@ -59,7 +57,6 @@ public class ComplexJsonResourceReloadListener extends SimplePreparableReloadLis
     }
 
     @Override
-    @ParametersAreNonnullByDefault
     protected void apply(Object obj, ResourceManager resourceManager, ProfilerFiller profiler) {
     }
 

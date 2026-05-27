@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -16,7 +17,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -77,9 +77,9 @@ public class SentinelItem extends GunGeoItem {
     @Override
     public double getCustomDamage(GunData data) {
         var stack = data.stack;
-        return stack.getCapability(ForgeCapabilities.ENERGY)
-                .map(cap -> cap.getEnergyStored() > 0 ? 0.2857142857142857 * data.getDefault().damage : 0)
-                .orElse(0D);
+        var storage = ModEnergyApi.get(stack);
+        return storage != null && storage.getAmount() > 0
+                ? 0.2857142857142857 * data.getDefault().damage : 0D;
     }
 
     @Override
@@ -87,14 +87,10 @@ public class SentinelItem extends GunGeoItem {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, level, entity, slot, selected);
 
-        stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                energy -> {
-                    int energyStored = energy.getEnergyStored();
-                    if (energyStored > 0) {
-                        energy.extractEnergy(1, false);
-                    }
-                }
-        );
+        var storage = ModEnergyApi.get(stack);
+        if (storage != null && storage.getAmount() > 0) {
+            ModEnergyApi.extractEnergy(stack, 1, false);
+        }
     }
 
     @Override
@@ -118,14 +114,14 @@ public class SentinelItem extends GunGeoItem {
 
         var data = parameters.data();
 
-        data.stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(cap -> cap.extractEnergy(3000, false));
+        ModEnergyApi.extractEnergy(data.stack, 3000, false);
     }
 
     @Override
     public void playFireSounds(GunData data, Entity shooter, boolean zoom) {
-        var cap = data.stack.getCapability(ForgeCapabilities.ENERGY);
+        var storage = ModEnergyApi.get(data.stack);
 
-        if (cap.map(c -> c.getEnergyStored() > 0).orElse(false)) {
+        if (storage != null && storage.getAmount() > 0) {
             float soundRadius = (float) data.compute().soundRadius;
 
             shooter.playSound(ModSounds.SENTINEL_CHARGE_FAR.get(), soundRadius * 0.7f, 1f);

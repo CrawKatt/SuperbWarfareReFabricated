@@ -11,7 +11,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 public class VehicleAssemblingRecipe implements Recipe<Inventory> {
@@ -33,13 +32,11 @@ public class VehicleAssemblingRecipe implements Recipe<Inventory> {
     }
 
     @Override
-    @ParametersAreNonnullByDefault
     public boolean matches(Inventory pContainer, Level pLevel) {
         return false;
     }
 
     @Override
-    @ParametersAreNonnullByDefault
     public @NotNull ItemStack assemble(Inventory pContainer, RegistryAccess pRegistryAccess) {
         return ItemStack.EMPTY;
     }

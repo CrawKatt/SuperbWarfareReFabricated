@@ -11,8 +11,6 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @SuppressWarnings("unused")
 public class ParachuteModel extends HumanoidModel<LivingEntity> {
     // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
@@ -268,7 +266,6 @@ public class ParachuteModel extends HumanoidModel<LivingEntity> {
     }
 
     @Override
-    @ParametersAreNonnullByDefault
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         parachute.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
     }

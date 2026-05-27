@@ -1,13 +1,12 @@
 package com.atsuishio.superbwarfare.item;
 
-import com.atsuishio.superbwarfare.capability.energy.ItemEnergyProvider;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.tiers.ModItemTier;
 import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -20,9 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,11 +48,6 @@ public class ElectricBaton extends SwordItem {
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag tag) {
-        return new ItemEnergyProvider(stack, energyCapacity.get());
-    }
-
-    @Override
     @ParametersAreNonnullByDefault
     public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         ItemStack stack = pPlayer.getItemInHand(pUsedHand);
@@ -75,9 +66,7 @@ public class ElectricBaton extends SwordItem {
     @Override
     public int getBarWidth(ItemStack pStack) {
         if (pStack.getOrCreateTag().getBoolean(TAG_OPEN)) {
-            var energy = pStack.getCapability(ForgeCapabilities.ENERGY)
-                    .map(IEnergyStorage::getEnergyStored)
-                    .orElse(0);
+            var energy = ModEnergyApi.getEnergyStored(pStack);
 
             return Math.round(energy * 13F / MAX_ENERGY);
         } else {
@@ -94,9 +83,9 @@ public class ElectricBaton extends SwordItem {
     public boolean hurtEnemy(ItemStack pStack, LivingEntity pTarget, LivingEntity pAttacker) {
         pAttacker.level().playSound(null, pTarget.getOnPos(), ModSounds.MELEE_HIT.get(), SoundSource.PLAYERS, 1, (float) ((2 * org.joml.Math.random() - 1) * 0.1f + 1.0f));
         if (pStack.getOrCreateTag().getBoolean(TAG_OPEN)) {
-            var energy = pStack.getCapability(ForgeCapabilities.ENERGY).map(IEnergyStorage::getEnergyStored).orElse(0);
+            var energy = ModEnergyApi.getEnergyStored(pStack);
             if (energy >= ENERGY_COST) {
-                pStack.getCapability(ForgeCapabilities.ENERGY).ifPresent(e -> e.extractEnergy(ENERGY_COST, false));
+                ModEnergyApi.extractEnergy(pStack, ENERGY_COST, false);
                 if (!pTarget.level().isClientSide) {
                     pTarget.addEffect(new MobEffectInstance(ModMobEffects.SHOCK.get(), 30, 2), pAttacker);
                 }
@@ -112,9 +101,7 @@ public class ElectricBaton extends SwordItem {
 
     public static ItemStack makeFullEnergyStack() {
         ItemStack stack = new ItemStack(ModItems.ELECTRIC_BATON.get());
-        stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                e -> e.receiveEnergy(MAX_ENERGY, false)
-        );
+        ModEnergyApi.receiveEnergy(stack, MAX_ENERGY, false);
         stack.getOrCreateTag().putBoolean(TAG_OPEN, true);
         return stack;
     }

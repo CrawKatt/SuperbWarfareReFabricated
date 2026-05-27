@@ -4,9 +4,6 @@ import com.atsuishio.superbwarfare.menu.FuMO25Menu;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 public class RadarSetParametersMessage {
 
@@ -24,19 +21,15 @@ public class RadarSetParametersMessage {
         return new RadarSetParametersMessage(buffer.readByte());
     }
 
-    public static void handler(RadarSetParametersMessage message, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer player = ctx.get().getSender();
-            if (player == null) return;
+    public static void handler(RadarSetParametersMessage message, ServerPlayer player) {
+        if (player == null) return;
 
-            AbstractContainerMenu menu = player.containerMenu;
-            if (menu instanceof FuMO25Menu fuMO25Menu) {
-                if (!player.containerMenu.stillValid(player)) {
-                    return;
-                }
-                fuMO25Menu.setPosToParameters();
+        AbstractContainerMenu menu = player.containerMenu;
+        if (menu instanceof FuMO25Menu fuMO25Menu) {
+            if (!player.containerMenu.stillValid(player)) {
+                return;
             }
-        });
-        ctx.get().setPacketHandled(true);
+            fuMO25Menu.setPosToParameters();
+        }
     }
 }

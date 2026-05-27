@@ -1,58 +1,20 @@
 package com.atsuishio.superbwarfare.capability.player;
 
 import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.capability.ModCapabilities;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
-import com.atsuishio.superbwarfare.network.NetworkRegistry;
-import com.atsuishio.superbwarfare.network.message.receive.PlayerVariablesSyncMessage;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraftforge.common.capabilities.AutoRegisterCapability;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.network.PacketDistributor;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
-@AutoRegisterCapability
-public class PlayerVariable implements INBTSerializable<CompoundTag> {
+public class PlayerVariable {
 
     public static ResourceLocation ID = Mod.loc("player_variables");
     private PlayerVariable old = null;
 
     public Map<Ammo, Integer> ammo = new HashMap<>();
     public boolean tacticalSprint = false;
-
-    public void sync(Entity entity) {
-        if (!entity.getCapability(ModCapabilities.PLAYER_VARIABLE).isPresent()) return;
-
-        var newVariable = getOrDefault(entity);
-        if (old != null && old.equals(newVariable)) return;
-
-        if (entity instanceof ServerPlayer player) {
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new PlayerVariablesSyncMessage(entity.getId(), compareAndUpdate()));
-        }
-    }
-
-    public static PlayerVariable getOrDefault(Entity entity) {
-        return entity.getCapability(ModCapabilities.PLAYER_VARIABLE).orElse(new PlayerVariable());
-    }
-
-    /**
-     * 编辑并自动同步玩家变量
-     */
-    public static void modify(Entity entity, Consumer<PlayerVariable> consumer) {
-        if (entity.level().isClientSide) return;
-        var cap = entity.getCapability(ModCapabilities.PLAYER_VARIABLE).orElse(new PlayerVariable());
-
-        cap.watch();
-        consumer.accept(cap);
-        cap.sync(entity);
-    }
 
     public PlayerVariable watch() {
         this.old = this.copy();
@@ -134,13 +96,10 @@ public class PlayerVariable implements INBTSerializable<CompoundTag> {
         return tacticalSprint == other.tacticalSprint;
     }
 
-    @Override
     public CompoundTag serializeNBT() {
         return writeToNBT();
     }
 
-    @Override
-    @ParametersAreNonnullByDefault
     public void deserializeNBT(CompoundTag nbt) {
         readFromNBT(nbt);
     }

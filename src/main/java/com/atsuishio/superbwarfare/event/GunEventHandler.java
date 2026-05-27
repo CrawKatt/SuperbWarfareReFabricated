@@ -23,7 +23,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.MissingMappingsEvent;
 import org.jetbrains.annotations.NotNull;
@@ -592,34 +592,30 @@ public class GunEventHandler {
         data.charge.timer.reduce();
 
         if (data.charge.timer.get() == 17) {
-            var cap = entity.getCapability(ForgeCapabilities.ITEM_HANDLER);
-            if (cap.resolve().isEmpty()) return;
-            var itemHandler = cap.resolve().get();
+            if (!(entity instanceof Player player)) return;
+            var inv = player.getInventory();
 
-            for (int i = 0; i < itemHandler.getSlots(); i++) {
-                var cell = itemHandler.getStackInSlot(i);
+            for (int i = 0; i < inv.getContainerSize(); i++) {
+                var cell = inv.getItem(i);
 
                 if (cell.is(ModItems.CELL.get())) {
-                    var stackCap = data.stack().getCapability(ForgeCapabilities.ENERGY);
-                    if (!stackCap.isPresent()) continue;
+                    var stackStorage = ModEnergyApi.get(data.stack());
+                    if (stackStorage == null) continue;
 
-                    var stackStorage = stackCap.resolve().get();
+                    int stackMaxEnergy = (int) stackStorage.getCapacity();
+                    int stackEnergy = (int) stackStorage.getAmount();
 
-                    int stackMaxEnergy = stackStorage.getMaxEnergyStored();
-                    int stackEnergy = stackStorage.getEnergyStored();
+                    var cellStorage = ModEnergyApi.get(cell);
+                    if (cellStorage == null) continue;
 
-                    var cellCap = cell.getCapability(ForgeCapabilities.ENERGY);
-                    if (!cellCap.isPresent()) continue;
-
-                    var cellStorage = cellCap.resolve().get();
-                    int cellEnergy = cellStorage.getEnergyStored();
+                    int cellEnergy = (int) cellStorage.getAmount();
 
                     int stackEnergyNeed = Math.min(cellEnergy, stackMaxEnergy - stackEnergy);
 
                     if (cellEnergy > 0) {
-                        stackStorage.receiveEnergy(stackEnergyNeed, false);
+                        ModEnergyApi.receiveEnergy(stackStorage, stackEnergyNeed, false);
                     }
-                    cellStorage.extractEnergy(stackEnergyNeed, false);
+                    ModEnergyApi.extractEnergy(cellStorage, stackEnergyNeed, false);
                 }
             }
         }

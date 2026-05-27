@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.annotation.ServerOnly;
 import com.atsuishio.superbwarfare.data.DeserializeFromString;
 import com.atsuishio.superbwarfare.data.JsonPropertyModifier;
 import com.atsuishio.superbwarfare.data.StringToObject;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.tools.InventoryTool;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
@@ -16,11 +17,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,14 +91,14 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
             return 0;
         }
 
-        int consumed = 0;
+        int consumedFromPlayerAmmo = 0;
         if (type == AmmoConsumeType.PLAYER_AMMO) {
             if (shooter instanceof Player player) {
                 if (playerAmmoType != null) {
                     var current = playerAmmoType.get(player);
-                    consumed = Math.min(current, count);
-                    count -= consumed;
-                    playerAmmoType.add(player, -consumed);
+                    consumedFromPlayerAmmo = Math.min(current, count);
+                    count -= consumedFromPlayerAmmo;
+                    playerAmmoType.add(player, -consumedFromPlayerAmmo);
                 } else {
                     Mod.LOGGER.warn("consume player ammo failed: invalid player ammo type");
                 }
@@ -109,44 +106,26 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
         }
 
         if (type == AmmoConsumeType.ENERGY) {
-            int finalCount = count;
-            return data.getEnergyProvider(shooter)
-                    .map(cap -> cap.extractEnergy(finalCount, false))
-                    .orElse(0);
+            return ModEnergyApi.extractEnergy(data.stack, count, false);
         }
-
-        var handler = shooter.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve().orElse(null);
-        if (handler != null) {
-            return consumed + consume(data, handler, count);
-        } else {
-            Mod.LOGGER.warn("consume ammo failed: invalid item handler for entity {}", shooter);
-            return consumed;
-        }
-    }
-
-    /**
-     * 消耗指定弹药数量（原始数量，不包括虚拟弹药，不考虑count）
-     */
-    public int consume(@NotNull GunData data, @NotNull IItemHandler handler, int count) {
-        if (!initialized) init();
-        if (type == AmmoConsumeType.INVALID
-                || type == AmmoConsumeType.INFINITE
-                || type == AmmoConsumeType.EMPTY
-                || count <= 0
-        ) return 0;
 
         if (type == AmmoConsumeType.PLAYER_AMMO) {
-            var consumed = InventoryTool.consumeAmmoItem(handler, this.playerAmmoType, count);
-            var rest = consumed - count;
-            data.virtualAmmo.add(rest);
-            return count;
-        } else if (type == AmmoConsumeType.ENERGY) {
-            return data.stack.getCapability(ForgeCapabilities.ENERGY)
-                    .map(cap -> cap.extractEnergy(count, false))
-                    .orElse(0);
-        } else {
-            return InventoryTool.consumeItem(handler, this::isAmmoItem, count);
+            if (shooter instanceof Player player) {
+                var fromInventory = InventoryTool.consumeAmmoItem(player, this.playerAmmoType, count);
+                var rest = fromInventory - count;
+                data.virtualAmmo.add(rest);
+                return consumedFromPlayerAmmo + count;
+            }
+            Mod.LOGGER.warn("consume ammo failed: unsupported entity type {}", shooter);
+            return consumedFromPlayerAmmo;
         }
+
+        if (shooter instanceof Player player) {
+            return consumedFromPlayerAmmo + InventoryTool.consumeItem(player, this::isAmmoItem, count);
+        }
+
+        Mod.LOGGER.warn("consume ammo failed: unsupported entity type {}", shooter);
+        return consumedFromPlayerAmmo;
     }
 
     /**
@@ -161,31 +140,19 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
         if (type == AmmoConsumeType.PLAYER_AMMO && entity instanceof Player player) {
             playerAmmoCount = playerAmmoType.get(player);
         } else if (type == AmmoConsumeType.ENERGY) {
-            return data.getEnergyProvider(entity)
-                    .map(IEnergyStorage::getEnergyStored)
-                    .orElse(0);
+            return data.getEnergyStored(entity);
         }
 
-        return playerAmmoCount + count(data, entity.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve().orElse(null));
-    }
-
-    /**
-     * 清点不包括虚拟弹药在内的原始弹药数量
-     */
-    public int count(@NotNull GunData data, @Nullable IItemHandler handler) {
-        if (!initialized) init();
-        if (this.type == AmmoConsumeType.INFINITE) return Integer.MAX_VALUE;
-        if (handler == null || type == AmmoConsumeType.EMPTY) return 0;
-
-        if (type == AmmoConsumeType.ITEM) {
-            return InventoryTool.countItem(handler, this::isAmmoItem);
-        } else if (type == AmmoConsumeType.ENERGY) {
-            return data.stack.getCapability(ForgeCapabilities.ENERGY)
-                    .map(IEnergyStorage::getEnergyStored)
-                    .orElse(0);
+        if (entity instanceof Player player) {
+            if (type == AmmoConsumeType.ITEM) {
+                return playerAmmoCount + InventoryTool.countItem(player, this::isAmmoItem);
+            } else if (type == AmmoConsumeType.ENERGY) {
+                return ModEnergyApi.getEnergyStored(data.stack);
+            }
+            return playerAmmoCount + InventoryTool.countAmmoItem(player, this.playerAmmoType);
         }
 
-        return InventoryTool.countAmmoItem(handler, this.playerAmmoType);
+        return playerAmmoCount;
     }
 
     /**
@@ -215,68 +182,28 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
                     Mod.LOGGER.warn("withdraw player ammo failed: invalid player ammo type");
                 }
             } else {
-                var itemHandler = ammoSupplier.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve().orElse(null);
-                if (itemHandler != null) {
-                    return withdraw(itemHandler, count);
-                } else {
-                    Mod.LOGGER.warn("withdraw ammo failed: invalid item handler");
-                }
+                Mod.LOGGER.warn("withdraw ammo failed: unsupported entity type {}", ammoSupplier);
             }
-        } else {
-            if (ammoSupplier instanceof Player player) {
-                var limit = this.stack.getMaxStackSize();
-                while (count > 0) {
-                    var toInsert = Math.min(limit, count);
-                    ItemHandlerHelper.giveItemToPlayer(player, this.stack.copyWithCount(toInsert));
-                    count -= toInsert;
-                }
-                return count;
-            } else {
-                var itemHandler = ammoSupplier.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve().orElse(null);
-                if (itemHandler != null) {
-                    return withdraw(itemHandler, count);
-                } else {
-                    Mod.LOGGER.warn("withdraw ammo failed: invalid item handler");
-                }
-            }
-        }
-        return 0;
-    }
-
-    public int withdraw(@NotNull IItemHandler handler, int count) {
-        if (!initialized) init();
-        if (type == AmmoConsumeType.INVALID
-                || type == AmmoConsumeType.INFINITE
-                || type == AmmoConsumeType.EMPTY
-                || type == AmmoConsumeType.ENERGY
-                || count <= 0
-        ) {
             return 0;
         }
 
-        ItemStack stackToInsert;
-        if (type == AmmoConsumeType.PLAYER_AMMO) {
-            stackToInsert = getPlayerAmmoType().getItemStack();
-        } else {
-            stackToInsert = this.stack;
-        }
-
-        int inserted = 0;
-        while (count > 0) {
-            var limit = stackToInsert.getMaxStackSize();
-            var toInsert = Math.min(limit, count);
-            var result = ItemHandlerHelper.insertItemStacked(handler, stackToInsert.copyWithCount(toInsert), false);
-
-            count -= toInsert - result.getCount();
-            inserted += toInsert - result.getCount();
-
-            if (!result.isEmpty()) {
-                Mod.LOGGER.warn("trying to withdraw ammo {} with count {}, but only {} is inserted", stackToInsert, count, inserted);
-                break;
+        if (ammoSupplier instanceof Player player) {
+            var limit = this.stack.getMaxStackSize();
+            var inserted = 0;
+            while (count > 0) {
+                var toInsert = Math.min(limit, count);
+                var stackToGive = this.stack.copyWithCount(toInsert);
+                if (!player.addItem(stackToGive)) {
+                    player.drop(stackToGive, false);
+                }
+                inserted += toInsert;
+                count -= toInsert;
             }
+            return inserted;
         }
 
-        return inserted;
+        Mod.LOGGER.warn("withdraw ammo failed: unsupported entity type {}", ammoSupplier);
+        return 0;
     }
 
     private static final Pattern AMMO_PATTERN = Pattern.compile("^(?<count>(\\d+)?)\\s*(?<prefix>[@#]?)(?<id>\\w+(:\\w+)?)\\s*(?<data>(\\{.*})?)$");
@@ -341,7 +268,7 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
                 Mod.LOGGER.warn("invalid item id: {}", id);
                 return;
             }
-            var item = ForgeRegistries.ITEMS.getValue(location);
+            var item = BuiltInRegistries.ITEM.get(location);
             if (item == null || item == Items.AIR) {
                 Mod.LOGGER.warn("invalid item: {}", id);
                 return;

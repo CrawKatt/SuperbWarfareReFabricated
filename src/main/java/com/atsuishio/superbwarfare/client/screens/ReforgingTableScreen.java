@@ -15,13 +15,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@OnlyIn(Dist.CLIENT)
 public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTableMenu> {
 
     private static final ResourceLocation TEXTURE = Mod.loc("textures/gui/reforging_table.png");
@@ -104,7 +101,6 @@ public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTable
         this.addRenderableWidget(damageDowngrade);
     }
 
-    @OnlyIn(Dist.CLIENT)
     static class ReforgeButton extends AbstractButton {
 
         @Override
@@ -118,7 +114,7 @@ public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTable
 
         @Override
         public void onPress() {
-            NetworkRegistry.PACKET_HANDLER.sendToServer(GunReforgeMessage.INSTANCE);
+            NetworkRegistry.sendToServer(GunReforgeMessage.INSTANCE);
         }
 
         @Override
@@ -127,7 +123,6 @@ public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTable
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     class UpgradeButton extends AbstractButton {
         public Perk.Type type;
 
@@ -164,7 +159,7 @@ public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTable
                 }
             }
 
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new SetPerkLevelMessage(type.ordinal(), true));
+            NetworkRegistry.sendToServer(new SetPerkLevelMessage(type.ordinal(), true));
         }
 
         @Override
@@ -173,7 +168,6 @@ public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTable
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     class DowngradeButton extends AbstractButton {
         public Perk.Type type;
 
@@ -210,7 +204,7 @@ public class ReforgingTableScreen extends AbstractContainerScreen<ReforgingTable
                 }
             }
 
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new SetPerkLevelMessage(type.ordinal(), false));
+            NetworkRegistry.sendToServer(new SetPerkLevelMessage(type.ordinal(), false));
         }
 
         @Override

@@ -3,13 +3,12 @@ package com.atsuishio.superbwarfare.capability;
 import com.atsuishio.superbwarfare.Mod;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.INBTSerializable;
 
 public class LaserCapability {
 
     public static ResourceLocation ID = Mod.loc("laser_capability");
 
-    public interface ILaserCapability extends INBTSerializable<CompoundTag> {
+    public interface ILaserCapability {
 
         void init(LaserHandler handler);
 
@@ -21,6 +20,9 @@ public class LaserCapability {
 
         void end();
 
+        CompoundTag serializeNBT();
+
+        void deserializeNBT(CompoundTag nbt);
     }
 
     public static class LaserCapabilityImpl implements ILaserCapability {

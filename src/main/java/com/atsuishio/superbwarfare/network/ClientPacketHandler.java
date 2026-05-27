@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.network;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay;
 import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.screens.VehicleAssemblingScreen;
@@ -21,47 +20,38 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import static com.atsuishio.superbwarfare.event.ClientEventHandler.zoomVehicle;
 
 public class ClientPacketHandler {
 
-    public static void handleLivingKillMessage(LivingEntity attacker, Entity target, boolean headshot, ResourceKey<DamageType> damageType, Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-            if (KillMessageHandler.QUEUE.size() >= KillMessageConfig.KILL_MESSAGE_COUNT.get()) {
-                KillMessageHandler.QUEUE.poll();
-            }
-            KillMessageHandler.QUEUE.offer(new LivingKillRecord(attacker, target, attacker.getMainHandItem(), headshot, damageType));
+    public static void handleLivingKillMessage(LivingEntity attacker, Entity target, boolean headshot, ResourceKey<DamageType> damageType) {
+        if (KillMessageHandler.QUEUE.size() >= KillMessageConfig.KILL_MESSAGE_COUNT.get()) {
+            KillMessageHandler.QUEUE.poll();
+        }
+        KillMessageHandler.QUEUE.offer(new LivingKillRecord(attacker, target, attacker.getMainHandItem(), headshot, damageType));
+    }
+
+    public static void handleClientIndicatorMessage(ClientIndicatorMessage message) {
+        switch (message.type) {
+            case 1 -> CrossHairOverlay.headIndicator = message.value;
+            case 2 -> CrossHairOverlay.killIndicator = message.value;
+            case 3 -> CrossHairOverlay.vehicleIndicator = message.value;
+            default -> CrossHairOverlay.hitIndicator = message.value;
         }
     }
 
-    public static void handleClientIndicatorMessage(ClientIndicatorMessage message, Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-            switch (message.type) {
-                case 1 -> CrossHairOverlay.headIndicator = message.value;
-                case 2 -> CrossHairOverlay.killIndicator = message.value;
-                case 3 -> CrossHairOverlay.vehicleIndicator = message.value;
-                default -> CrossHairOverlay.hitIndicator = message.value;
-            }
+    public static void handleContainerDataMessage(int containerId, List<ContainerDataMessage.Pair> data) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null && mc.player.containerMenu.containerId == containerId) {
+            data.forEach(p -> ((EnergyMenu) mc.player.containerMenu).setData(p.id, p.data));
         }
     }
 
-    public static void handleContainerDataMessage(int containerId, List<ContainerDataMessage.Pair> data, Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.player != null && mc.player.containerMenu.containerId == containerId) {
-                data.forEach(p -> ((EnergyMenu) mc.player.containerMenu).setData(p.id, p.data));
-            }
-        }
-    }
-
-    public static void handleRadarMenuOpen(RadarMenuOpenMessage message, Supplier<NetworkEvent.Context> ctx) {
+    public static void handleRadarMenuOpen(RadarMenuOpenMessage message) {
         FuMO25ScreenHelper.resetEntities();
         FuMO25ScreenHelper.pos = message.pos;
     }
@@ -71,82 +61,68 @@ public class ClientPacketHandler {
         FuMO25ScreenHelper.pos = null;
     }
 
-    public static void handleResetCameraType(Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-            Minecraft minecraft = Minecraft.getInstance();
-            Player player = minecraft.player;
-            if (player == null) return;
+    public static void handleResetCameraType() {
+        Minecraft minecraft = Minecraft.getInstance();
+        Player player = minecraft.player;
+        if (player == null) return;
 
-            Minecraft.getInstance().options.setCameraType(Objects.requireNonNullElse(ClientEventHandler.lastCameraType, CameraType.FIRST_PERSON));
+        Minecraft.getInstance().options.setCameraType(Objects.requireNonNullElse(ClientEventHandler.lastCameraType, CameraType.FIRST_PERSON));
+    }
+
+    public static void handleClientSyncMotion(ClientMotionSyncMessage message) {
+        var level = Minecraft.getInstance().level;
+        if (level == null) return;
+        Entity entity = level.getEntity(message.id);
+        if (entity != null) {
+            entity.lerpMotion(message.x, message.y, message.z);
         }
     }
 
-    public static void handleClientSyncMotion(ClientMotionSyncMessage message, Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-            var level = Minecraft.getInstance().level;
-            if (level == null) return;
-            Entity entity = level.getEntity(message.id);
-            if (entity != null) {
-                entity.lerpMotion(message.x, message.y, message.z);
-            }
+    public static void handleClientTacticalSprintSync(boolean flag) {
+        MiscConfig.ALLOW_TACTICAL_SPRINT.set(flag);
+        MiscConfig.ALLOW_TACTICAL_SPRINT.save();
+    }
+
+    public static void handleClientSetMotion(ClientSetMotionMessage message) {
+        Minecraft minecraft = Minecraft.getInstance();
+        Player player = minecraft.player;
+        if (player != null) {
+            player.setPos(message.position().x, message.position().y, message.position().z);
+            player.setDeltaMovement(message.motion().x, message.motion().y, message.motion().z);
         }
     }
 
-    public static void handleClientTacticalSprintSync(boolean flag, Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-            MiscConfig.ALLOW_TACTICAL_SPRINT.set(flag);
-            MiscConfig.ALLOW_TACTICAL_SPRINT.save();
+    public static void handleFinishAssemblingVehicleMessage(FinishAssemblingVehicleMessage message) {
+        Minecraft minecraft = Minecraft.getInstance();
+        Player player = minecraft.player;
+        if (player == null) return;
+        if (player.containerMenu.containerId != message.containerId()) return;
+        if (minecraft.screen instanceof VehicleAssemblingScreen screen) {
+            screen.finishAssembling();
         }
     }
 
-    public static void handleClientSetMotion(ClientSetMotionMessage message, Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-            Minecraft minecraft = Minecraft.getInstance();
-            Player player = minecraft.player;
-            if (player != null) {
-                player.setPos(message.position().x, message.position().y, message.position().z);
-                player.setDeltaMovement(message.motion().x, message.motion().y, message.motion().z);
-            }
-        }
+    public static void handleTDMSyncMessage(TDMSyncMessage message) {
+        ClientEventHandler.tdmSavedData = message.data();
     }
 
-    public static void handleFinishAssemblingVehicleMessage(FinishAssemblingVehicleMessage message, Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-            Minecraft minecraft = Minecraft.getInstance();
-            Player player = minecraft.player;
-            if (player == null) return;
-            if (player.containerMenu.containerId != message.containerId()) return;
-            if (minecraft.screen instanceof VehicleAssemblingScreen screen) {
-                screen.finishAssembling();
-            }
-        }
-    }
+    public static void handleSoundClient(SoundClientMessage message) {
+        Player player = Minecraft.getInstance().player;
+        if (player == null) return;
+        if (player.getUUID().equals(message.sender())
+                && (Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON || zoomVehicle)
+        ) return;
 
-    public static void handleTDMSyncMessage(TDMSyncMessage message, Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-            ClientEventHandler.tdmSavedData = message.data();
-        }
-    }
+        SoundEvent sound = SoundEvent.createVariableRangeEvent(message.location());
 
-    public static void handleSoundClient(SoundClientMessage message, Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-            Player player = Minecraft.getInstance().player;
-            if (player == null) return;
-            if (player.getUUID().equals(message.sender())
-                    && (Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON || zoomVehicle)
-            ) return;
+        double distance = player.position().distanceTo(new Vec3(message.x(), message.y(), message.z()));
+        int time = (int) (distance / 17);
 
-            SoundEvent sound = SoundEvent.createVariableRangeEvent(message.location());
-
-            double distance = player.position().distanceTo(new Vec3(message.x(), message.y(), message.z()));
-            int time = (int) (distance / 17);
-
-            if (time == 0) {
-                player.level().playSound(player, message.x(), message.y(), message.z(), sound, SoundSource.BLOCKS, message.radius(), message.pitch());
-            } else {
-                Mod.queueClientWork(time,
-                        () -> player.level().playSound(player, message.x(), message.y(), message.z(), sound, SoundSource.BLOCKS, message.radius(), message.pitch()));
-            }
+        if (time == 0) {
+            player.level().playSound(player, message.x(), message.y(), message.z(), sound, SoundSource.BLOCKS, message.radius(), message.pitch());
+        } else {
+            Mod.queueClientWork(time,
+                    () -> player.level().playSound(player, message.x(), message.y(), message.z(), sound, SoundSource.BLOCKS, message.radius(), message.pitch()));
         }
     }
 }

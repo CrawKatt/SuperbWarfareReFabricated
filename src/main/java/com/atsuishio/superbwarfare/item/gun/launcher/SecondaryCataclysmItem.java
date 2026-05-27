@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.item.BatteryItem;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -25,7 +26,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.constant.DataTickets;
@@ -118,25 +118,19 @@ public class SecondaryCataclysmItem extends GunGeoItem {
         if (entity instanceof Player player) {
             for (var cell : player.getInventory().items) {
                 if (cell.getItem() instanceof BatteryItem) {
-                    assert stack.getCapability(ForgeCapabilities.ENERGY).resolve().isPresent();
-                    var stackStorage = stack.getCapability(ForgeCapabilities.ENERGY).resolve().get();
-                    int stackMaxEnergy = stackStorage.getMaxEnergyStored();
-                    int stackEnergy = stackStorage.getEnergyStored();
+                    assert ModEnergyApi.get(stack) != null;
+                    int stackMaxEnergy = ModEnergyApi.getMaxEnergyStored(stack);
+                    int stackEnergy = ModEnergyApi.getEnergyStored(stack);
 
-                    assert cell.getCapability(ForgeCapabilities.ENERGY).resolve().isPresent();
-                    var cellStorage = cell.getCapability(ForgeCapabilities.ENERGY).resolve().get();
-                    int cellEnergy = cellStorage.getEnergyStored();
+                    assert ModEnergyApi.get(cell) != null;
+                    int cellEnergy = ModEnergyApi.getEnergyStored(cell);
 
                     int stackEnergyNeed = Math.min(cellEnergy, stackMaxEnergy - stackEnergy);
 
                     if (cellEnergy > 0) {
-                        stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                                iEnergyStorage -> iEnergyStorage.receiveEnergy(stackEnergyNeed, false)
-                        );
+                        ModEnergyApi.receiveEnergy(stack, stackEnergyNeed, false);
                     }
-                    cell.getCapability(ForgeCapabilities.ENERGY).ifPresent(
-                            cEnergy -> cEnergy.extractEnergy(stackEnergyNeed, false)
-                    );
+                    ModEnergyApi.extractEnergy(cell, stackEnergyNeed, false);
                 }
             }
         }
@@ -152,9 +146,7 @@ public class SecondaryCataclysmItem extends GunGeoItem {
 
         var stack = data.stack;
 
-        var hasEnoughEnergy = stack.getCapability(ForgeCapabilities.ENERGY)
-                .map(storage -> storage.getEnergyStored() >= 3000)
-                .orElse(false);
+        var hasEnoughEnergy = ModEnergyApi.getEnergyStored(stack) >= 3000;
 
         boolean isChargedFire = zoom && hasEnoughEnergy;
 
@@ -174,7 +166,7 @@ public class SecondaryCataclysmItem extends GunGeoItem {
                 4, 0.1, 0.1, 0.1, 0.002, true);
 
         if (isChargedFire) {
-            stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(energy -> energy.extractEnergy(3000, false));
+            ModEnergyApi.extractEnergy(stack, 3000, false);
         }
 
         return true;
@@ -182,17 +174,16 @@ public class SecondaryCataclysmItem extends GunGeoItem {
 
     @Override
     public void playFireSounds(GunData data, Entity shooter, boolean zoom) {
-        data.stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(cap -> {
-            if (cap.getEnergyStored() > 3000 && zoom) {
-                float soundRadius = (float) data.compute().soundRadius;
+        var storage = ModEnergyApi.get(data.stack);
+        if (storage != null && storage.getAmount() > 3000 && zoom) {
+            float soundRadius = (float) data.compute().soundRadius;
 
-                shooter.playSound(ModSounds.SECONDARY_CATACLYSM_FIRE_3P_CHARGE.get(), soundRadius * 0.4f, 1f);
-                shooter.playSound(ModSounds.SECONDARY_CATACLYSM_FAR_CHARGE.get(), soundRadius * 0.7f, 1f);
-                shooter.playSound(ModSounds.SECONDARY_CATACLYSM_VERYFAR_CHARGE.get(), soundRadius, 1f);
-            } else {
-                super.playFireSounds(data, shooter, zoom);
-            }
-        });
+            shooter.playSound(ModSounds.SECONDARY_CATACLYSM_FIRE_3P_CHARGE.get(), soundRadius * 0.4f, 1f);
+            shooter.playSound(ModSounds.SECONDARY_CATACLYSM_FAR_CHARGE.get(), soundRadius * 0.7f, 1f);
+            shooter.playSound(ModSounds.SECONDARY_CATACLYSM_VERYFAR_CHARGE.get(), soundRadius, 1f);
+        } else {
+            super.playFireSounds(data, shooter, zoom);
+        }
     }
 
 }

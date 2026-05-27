@@ -15,9 +15,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.IEnergyStorage;
+import team.reborn.energy.api.EnergyStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,12 +71,15 @@ public class VehicleGun extends GunItem {
     }
 
     @Override
-    public LazyOptional<IEnergyStorage> getEnergyProvider(@NotNull GunData data, @Nullable Entity ammoSupplier) {
+    public int getEnergyStored(@NotNull GunData data, @Nullable Entity ammoSupplier) {
         if (ammoSupplier != null) {
-            return ammoSupplier.getCapability(ForgeCapabilities.ENERGY, null);
+            var storage = EnergyStorage.SIDED.get(ammoSupplier, null);
+            if (storage != null && storage.supportsExtraction()) {
+                return (int) storage.getAmount();
+            }
         }
 
-        return super.getEnergyProvider(data, null);
+        return super.getEnergyStored(data, null);
     }
 
     @Override

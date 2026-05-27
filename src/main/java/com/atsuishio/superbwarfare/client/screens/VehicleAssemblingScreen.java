@@ -52,8 +52,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.phys.Vec2;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,7 +62,6 @@ import java.util.Map;
 /**
  * Code based on TaC-Z
  */
-@OnlyIn(Dist.CLIENT)
 public class VehicleAssemblingScreen extends AbstractContainerScreen<VehicleAssemblingMenu> {
 
     public static final ResourceLocation TEXTURE = Mod.loc("textures/gui/vehicle_assembling_table.png");
@@ -410,7 +407,7 @@ public class VehicleAssemblingScreen extends AbstractContainerScreen<VehicleAsse
                     return;
                 }
             }
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new AssembleVehicleMessage(this.currentRecipe.getId(), this.menu.containerId));
+            NetworkRegistry.sendToServer(new AssembleVehicleMessage(this.currentRecipe.getId(), this.menu.containerId));
         }));
     }
 

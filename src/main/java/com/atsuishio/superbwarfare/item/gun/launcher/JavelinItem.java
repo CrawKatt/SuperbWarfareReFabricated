@@ -20,7 +20,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.PacketDistributor;
+
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -97,7 +97,7 @@ public class JavelinItem extends GunGeoItem {
 
             if (shooter instanceof ServerPlayer serverPlayer) {
                 SoundTool.playLocalSound(serverPlayer, ModSounds.JAVELIN_FIRE_1P.get(), 2, 1);
-                NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new ShootClientMessage(10));
+                NetworkRegistry.sendToPlayer(serverPlayer, new ShootClientMessage(10));
             }
 
             SoundTool.playDistantSound(serverLevel, ModSounds.JAVELIN_FIRE_3P.get(), shooter.position(), 4, 1, shooter);

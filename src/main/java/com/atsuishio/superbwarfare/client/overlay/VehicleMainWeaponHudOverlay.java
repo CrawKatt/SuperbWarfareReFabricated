@@ -26,8 +26,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
@@ -36,7 +34,6 @@ import java.util.List;
 /**
  * 控制载具主武器的玩家显示的HUD
  */
-@OnlyIn(Dist.CLIENT)
 public class VehicleMainWeaponHudOverlay implements IGuiOverlay {
 
     public static final String ID = Mod.MODID + "_vehicle_main_weapon_hud";

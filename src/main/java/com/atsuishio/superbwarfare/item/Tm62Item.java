@@ -25,7 +25,6 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 
 public class Tm62Item extends Item implements GeoItem, DispenserLaunchable {
@@ -86,7 +85,6 @@ public class Tm62Item extends Item implements GeoItem, DispenserLaunchable {
     public DispenseItemBehavior getLaunchBehavior() {
         return new DefaultDispenseItemBehavior() {
             @Override
-            @ParametersAreNonnullByDefault
             public @NotNull ItemStack execute(BlockSource pSource, ItemStack pStack) {
                 Level level = pSource.getLevel();
                 Position position = DispenserBlock.getDispensePosition(pSource);

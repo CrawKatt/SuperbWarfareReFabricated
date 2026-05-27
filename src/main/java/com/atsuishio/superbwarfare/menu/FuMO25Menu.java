@@ -18,15 +18,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.entity.player.PlayerContainerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.PacketDistributor;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Optional;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.FORGE)
 public class FuMO25Menu extends EnergyMenu {
 
     protected final Container container;
@@ -67,6 +64,10 @@ public class FuMO25Menu extends EnergyMenu {
 
         for (int k = 0; k < 9; ++k) {
             this.addSlot(new Slot(inventory, k, 8 + k * 18 + X_OFFSET, 142 + Y_OFFSET));
+        }
+
+        if (inventory.player instanceof ServerPlayer serverPlayer) {
+            this.getSelfPos().ifPresent(pos -> NetworkRegistry.sendToPlayer(serverPlayer, new RadarMenuOpenMessage(pos)));
         }
     }
 
@@ -157,6 +158,10 @@ public class FuMO25Menu extends EnergyMenu {
 
     @Override
     public void removed(@NotNull Player pPlayer) {
+        if (pPlayer instanceof ServerPlayer serverPlayer) {
+            NetworkRegistry.sendToPlayer(serverPlayer, RadarMenuCloseMessage.INSTANCE);
+        }
+
         this.access.execute((level, pos) -> {
             ItemStack para = this.container.getItem(0);
             if (!para.isEmpty()) {
@@ -202,21 +207,6 @@ public class FuMO25Menu extends EnergyMenu {
         @Override
         public boolean mayPlace(ItemStack pStack) {
             return pStack.is(ModItems.FIRING_PARAMETERS.get());
-        }
-    }
-
-    @SubscribeEvent
-    public static void onContainerOpened(PlayerContainerEvent.Open event) {
-        if (event.getContainer() instanceof FuMO25Menu fuMO25Menu && event.getEntity() instanceof ServerPlayer serverPlayer) {
-            fuMO25Menu.getSelfPos().ifPresent(pos ->
-                    NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new RadarMenuOpenMessage(pos)));
-        }
-    }
-
-    @SubscribeEvent
-    public static void onContainerClosed(PlayerContainerEvent.Close event) {
-        if (event.getContainer() instanceof FuMO25Menu && event.getEntity() instanceof ServerPlayer serverPlayer) {
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> serverPlayer), RadarMenuCloseMessage.INSTANCE);
         }
     }
 }

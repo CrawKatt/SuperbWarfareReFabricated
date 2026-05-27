@@ -10,10 +10,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.server.level.ServerPlayer;
 import org.joml.Vector3f;
-
-import java.util.function.Supplier;
 
 public class DroneFireMessage {
 
@@ -31,40 +29,35 @@ public class DroneFireMessage {
         buffer.writeVector3f(message.pos);
     }
 
-    public static void handler(DroneFireMessage message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            var player = context.getSender();
-            if (player == null) return;
+    public static void handler(DroneFireMessage message, ServerPlayer player) {
+        if (player == null) return;
 
-            ItemStack stack = player.getMainHandItem();
+        ItemStack stack = player.getMainHandItem();
 
-            if (stack.is(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using") && stack.getOrCreateTag().getBoolean("Linked")) {
-                DroneEntity drone = EntityFindUtil.findDrone(player.level(), stack.getOrCreateTag().getString("LinkedDrone"));
-                if (drone != null) {
-                    if (player.getOffhandItem().is(ModItems.FIRING_PARAMETERS.get()) || player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR.get())) {
-                        ItemStack offStack = player.getOffhandItem();
+        if (stack.is(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using") && stack.getOrCreateTag().getBoolean("Linked")) {
+            DroneEntity drone = EntityFindUtil.findDrone(player.level(), stack.getOrCreateTag().getString("LinkedDrone"));
+            if (drone != null) {
+                if (player.getOffhandItem().is(ModItems.FIRING_PARAMETERS.get()) || player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR.get())) {
+                    ItemStack offStack = player.getOffhandItem();
 
-                        offStack.getOrCreateTag().putDouble("TargetX", message.pos.x());
-                        offStack.getOrCreateTag().putDouble("TargetY", message.pos.y());
-                        offStack.getOrCreateTag().putDouble("TargetZ", message.pos.z());
+                    offStack.getOrCreateTag().putDouble("TargetX", message.pos.x());
+                    offStack.getOrCreateTag().putDouble("TargetY", message.pos.y());
+                    offStack.getOrCreateTag().putDouble("TargetZ", message.pos.z());
 
-                        player.displayClientMessage(Component.translatable("tips.superbwarfare.mortar.target_pos").withStyle(ChatFormatting.GRAY)
-                                .append(Component.literal("[" + offStack.getOrCreateTag().getInt("TargetX")
-                                        + "," + offStack.getOrCreateTag().getInt("TargetY")
-                                        + "," + offStack.getOrCreateTag().getInt("TargetZ") + "]")), true);
+                    player.displayClientMessage(Component.translatable("tips.superbwarfare.mortar.target_pos").withStyle(ChatFormatting.GRAY)
+                            .append(Component.literal("[" + offStack.getOrCreateTag().getInt("TargetX")
+                                    + "," + offStack.getOrCreateTag().getInt("TargetY")
+                                    + "," + offStack.getOrCreateTag().getInt("TargetZ") + "]")), true);
 
-                        SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN.get(), 2, 1);
+                    SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN.get(), 2, 1);
 
-                        if (offStack.getItem() instanceof ArtilleryIndicator indicator) {
-                            indicator.setTarget(offStack, player);
-                        }
-                    } else {
-                        drone.fire = true;
+                    if (offStack.getItem() instanceof ArtilleryIndicator indicator) {
+                        indicator.setTarget(offStack, player);
                     }
+                } else {
+                    drone.fire = true;
                 }
             }
-        });
-        context.setPacketHandled(true);
+        }
     }
 }

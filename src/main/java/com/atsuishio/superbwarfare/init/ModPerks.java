@@ -7,100 +7,118 @@ import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.perk.ammo.*;
 import com.atsuishio.superbwarfare.perk.damage.*;
 import com.atsuishio.superbwarfare.perk.functional.*;
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.NewRegistryEvent;
-import net.minecraftforge.registries.RegistryBuilder;
-import net.minecraftforge.registries.RegistryObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD)
 public class ModPerks {
-
-    public static final ResourceKey<Registry<Perk>> PERK_KEY = ResourceKey.createRegistryKey(Mod.loc("perk"));
-
-    @SubscribeEvent
-    public static void registry(NewRegistryEvent event) {
-        event.create(new RegistryBuilder<Perk>().setName(Mod.loc("perk")));
-    }
 
     /**
      * Ammo Perks
      */
-    public static final DeferredRegister<Perk> AMMO_PERKS = DeferredRegister.create(Mod.loc("perk"), Mod.MODID);
+    public static final List<NamedSupplier<Perk>> AMMO_PERKS = new ArrayList<>();
 
-    public static final RegistryObject<Perk> AP_BULLET = AMMO_PERKS.register("ap_bullet", APBullet::new);
-    public static final RegistryObject<Perk> JHP_BULLET = AMMO_PERKS.register("jhp_bullet", JHPBullet::new);
-    public static final RegistryObject<Perk> HE_BULLET = AMMO_PERKS.register("he_bullet", HEBullet::new);
-    public static final RegistryObject<Perk> SILVER_BULLET = AMMO_PERKS.register("silver_bullet", SilverBullet::new);
-    public static final RegistryObject<Perk> POISONOUS_BULLET = AMMO_PERKS.register("poisonous_bullet",
+    public static final Supplier<Perk> AP_BULLET = ammo("ap_bullet", APBullet::new);
+    public static final Supplier<Perk> JHP_BULLET = ammo("jhp_bullet", JHPBullet::new);
+    public static final Supplier<Perk> HE_BULLET = ammo("he_bullet", HEBullet::new);
+    public static final Supplier<Perk> SILVER_BULLET = ammo("silver_bullet", SilverBullet::new);
+    public static final Supplier<Perk> POISONOUS_BULLET = ammo("poisonous_bullet",
             () -> new AmmoPerk(new AmmoPerk.Builder("poisonous_bullet", Perk.Type.AMMO).bypassArmorRate(0.0f).damageRate(1.0f).speedRate(1.0f).rgb(48, 131, 6)
                     .mobEffect(() -> MobEffects.POISON)));
-    public static final RegistryObject<Perk> BEAST_BULLET = AMMO_PERKS.register("beast_bullet", BeastBullet::new);
-    public static final RegistryObject<Perk> LONGER_WIRE = AMMO_PERKS.register("longer_wire", LongerWire::new);
-    public static final RegistryObject<Perk> INCENDIARY_BULLET = AMMO_PERKS.register("incendiary_bullet", IncendiaryBullet::new);
-    public static final RegistryObject<Perk> MICRO_MISSILE = AMMO_PERKS.register("micro_missile", MicroMissile::new);
-    public static final RegistryObject<Perk> CUPID_ARROW = AMMO_PERKS.register("cupid_arrow", CupidArrow::new);
-    public static final RegistryObject<Perk> RIOT_BULLET = AMMO_PERKS.register("riot_bullet", RiotBullet::new);
-    public static final RegistryObject<Perk> PHASE_PENETRATING_BULLET = AMMO_PERKS.register("phase_penetrating_bullet", PhasePenetratingBullet::new);
-    public static final RegistryObject<Perk> BLADE_BULLET = AMMO_PERKS.register("blade_bullet", BladeBullet::new);
+    public static final Supplier<Perk> BEAST_BULLET = ammo("beast_bullet", BeastBullet::new);
+    public static final Supplier<Perk> LONGER_WIRE = ammo("longer_wire", LongerWire::new);
+    public static final Supplier<Perk> INCENDIARY_BULLET = ammo("incendiary_bullet", IncendiaryBullet::new);
+    public static final Supplier<Perk> MICRO_MISSILE = ammo("micro_missile", MicroMissile::new);
+    public static final Supplier<Perk> CUPID_ARROW = ammo("cupid_arrow", CupidArrow::new);
+    public static final Supplier<Perk> RIOT_BULLET = ammo("riot_bullet", RiotBullet::new);
+    public static final Supplier<Perk> PHASE_PENETRATING_BULLET = ammo("phase_penetrating_bullet", PhasePenetratingBullet::new);
+    public static final Supplier<Perk> BLADE_BULLET = ammo("blade_bullet", BladeBullet::new);
 
     /**
      * Functional Perks
      */
-    public static final DeferredRegister<Perk> FUNC_PERKS = DeferredRegister.create(Mod.loc("perk"), Mod.MODID);
+    public static final List<NamedSupplier<Perk>> FUNC_PERKS = new ArrayList<>();
 
-    public static final RegistryObject<Perk> HEAL_CLIP = FUNC_PERKS.register("heal_clip", HealClip::new);
-    public static final RegistryObject<Perk> FOURTH_TIMES_CHARM = FUNC_PERKS.register("fourth_times_charm", FourthTimesCharm::new);
-    public static final RegistryObject<Perk> SUBSISTENCE = FUNC_PERKS.register("subsistence", Subsistence::new);
-    public static final RegistryObject<Perk> FIELD_DOCTOR = FUNC_PERKS.register("field_doctor", FieldDoctor::new);
-    public static final RegistryObject<Perk> REGENERATION = FUNC_PERKS.register("regeneration", Regeneration::new);
-    public static final RegistryObject<Perk> TURBO_CHARGER = FUNC_PERKS.register("turbo_charger", TurboCharger::new);
-    public static final RegistryObject<Perk> POWERFUL_ATTRACTION = FUNC_PERKS.register("powerful_attraction", PowerfulAttraction::new);
-    public static final RegistryObject<Perk> INTELLIGENT_CHIP = FUNC_PERKS.register("intelligent_chip", () -> new Perk("intelligent_chip", Perk.Type.FUNCTIONAL));
-    public static final RegistryObject<Perk> BACKPACK_LINKED_MAGAZINE = FUNC_PERKS.register("backpack_linked_magazine", BackpackLinkedMagazine::new);
-    public static final RegistryObject<Perk> POWERFUL_COOLER = FUNC_PERKS.register("powerful_cooler", PowerfulCooler::new);
+    public static final Supplier<Perk> HEAL_CLIP = func("heal_clip", HealClip::new);
+    public static final Supplier<Perk> FOURTH_TIMES_CHARM = func("fourth_times_charm", FourthTimesCharm::new);
+    public static final Supplier<Perk> SUBSISTENCE = func("subsistence", Subsistence::new);
+    public static final Supplier<Perk> FIELD_DOCTOR = func("field_doctor", FieldDoctor::new);
+    public static final Supplier<Perk> REGENERATION = func("regeneration", Regeneration::new);
+    public static final Supplier<Perk> TURBO_CHARGER = func("turbo_charger", TurboCharger::new);
+    public static final Supplier<Perk> POWERFUL_ATTRACTION = func("powerful_attraction", PowerfulAttraction::new);
+    public static final Supplier<Perk> INTELLIGENT_CHIP = func("intelligent_chip", () -> new Perk("intelligent_chip", Perk.Type.FUNCTIONAL));
+    public static final Supplier<Perk> BACKPACK_LINKED_MAGAZINE = func("backpack_linked_magazine", BackpackLinkedMagazine::new);
+    public static final Supplier<Perk> POWERFUL_COOLER = func("powerful_cooler", PowerfulCooler::new);
 
     /**
      * Damage Perks
      */
-    public static final DeferredRegister<Perk> DAMAGE_PERKS = DeferredRegister.create(Mod.loc("perk"), Mod.MODID);
+    public static final List<NamedSupplier<Perk>> DAMAGE_PERKS = new ArrayList<>();
 
-    public static final RegistryObject<Perk> KILL_CLIP = DAMAGE_PERKS.register("kill_clip", KillClip::new);
-    public static final RegistryObject<Perk> GUTSHOT_STRAIGHT = DAMAGE_PERKS.register("gutshot_straight", GutshotStraight::new);
-    public static final RegistryObject<Perk> KILLING_TALLY = DAMAGE_PERKS.register("killing_tally", KillingTally::new);
-    public static final RegistryObject<Perk> HEAD_SEEKER = DAMAGE_PERKS.register("head_seeker", HeadSeeker::new);
-    public static final RegistryObject<Perk> MONSTER_HUNTER = DAMAGE_PERKS.register("monster_hunter", MonsterHunter::new);
-    public static final RegistryObject<Perk> VOLT_OVERLOAD = DAMAGE_PERKS.register("volt_overload", VoltOverload::new);
-    public static final RegistryObject<Perk> DESPERADO = DAMAGE_PERKS.register("desperado", Desperado::new);
-    public static final RegistryObject<Perk> VORPAL_WEAPON = DAMAGE_PERKS.register("vorpal_weapon", VorpalWeapon::new);
-    public static final RegistryObject<Perk> MAGNIFICENT_HOWL = DAMAGE_PERKS.register("magnificent_howl", MagnificentHowl::new);
-    public static final RegistryObject<Perk> FIREFLY = DAMAGE_PERKS.register("firefly", Firefly::new);
-    public static final RegistryObject<Perk> FAIR_MEANS = DAMAGE_PERKS.register("fair_means", FairMeans::new);
-    public static final RegistryObject<Perk> HIGH_IMPACT_RESERVES = DAMAGE_PERKS.register("high_impact_reserves", HighImpactReserves::new);
-    public static final RegistryObject<Perk> ONE_TWO_PUNCH = DAMAGE_PERKS.register("one_two_punch", OneTwoPunch::new);
+    public static final Supplier<Perk> KILL_CLIP = damage("kill_clip", KillClip::new);
+    public static final Supplier<Perk> GUTSHOT_STRAIGHT = damage("gutshot_straight", GutshotStraight::new);
+    public static final Supplier<Perk> KILLING_TALLY = damage("killing_tally", KillingTally::new);
+    public static final Supplier<Perk> HEAD_SEEKER = damage("head_seeker", HeadSeeker::new);
+    public static final Supplier<Perk> MONSTER_HUNTER = damage("monster_hunter", MonsterHunter::new);
+    public static final Supplier<Perk> VOLT_OVERLOAD = damage("volt_overload", VoltOverload::new);
+    public static final Supplier<Perk> DESPERADO = damage("desperado", Desperado::new);
+    public static final Supplier<Perk> VORPAL_WEAPON = damage("vorpal_weapon", VorpalWeapon::new);
+    public static final Supplier<Perk> MAGNIFICENT_HOWL = damage("magnificent_howl", MagnificentHowl::new);
+    public static final Supplier<Perk> FIREFLY = damage("firefly", Firefly::new);
+    public static final Supplier<Perk> FAIR_MEANS = damage("fair_means", FairMeans::new);
+    public static final Supplier<Perk> HIGH_IMPACT_RESERVES = damage("high_impact_reserves", HighImpactReserves::new);
+    public static final Supplier<Perk> ONE_TWO_PUNCH = damage("one_two_punch", OneTwoPunch::new);
+
+    public record NamedSupplier<T>(String name, Supplier<T> supplier) implements Supplier<T> {
+        @Override
+        public T get() {
+            return supplier.get();
+        }
+    }
+
+    private static <T extends Perk> Supplier<T> ammo(String name, Supplier<T> factory) {
+        NamedSupplier<T> holder = new NamedSupplier<>(name, factory);
+        AMMO_PERKS.add((NamedSupplier<Perk>) (Supplier<Perk>) holder);
+        return holder;
+    }
+
+    private static <T extends Perk> Supplier<T> func(String name, Supplier<T> factory) {
+        NamedSupplier<T> holder = new NamedSupplier<>(name, factory);
+        FUNC_PERKS.add((NamedSupplier<Perk>) (Supplier<Perk>) holder);
+        return holder;
+    }
+
+    private static <T extends Perk> Supplier<T> damage(String name, Supplier<T> factory) {
+        NamedSupplier<T> holder = new NamedSupplier<>(name, factory);
+        DAMAGE_PERKS.add((NamedSupplier<Perk>) (Supplier<Perk>) holder);
+        return holder;
+    }
 
     public static void registerCompatPerks() {
-        if (ModList.get().isLoaded(CompatHolder.DMV)) {
-            AMMO_PERKS.register("bread_bullet", BreadBullet::new);
+        if (FabricLoader.getInstance().isModLoaded(CompatHolder.DMV)) {
+            AMMO_PERKS.add(new NamedSupplier<>("bread_bullet", BreadBullet::new));
         }
-        if (ModList.get().isLoaded(CompatHolder.VRC)) {
-            AMMO_PERKS.register("curse_flame_bullet", () -> new AmmoPerk(new AmmoPerk.Builder("curse_flame_bullet", Perk.Type.AMMO)
-                    .bypassArmorRate(0.0f).damageRate(1.2f).speedRate(0.9f).rgb(0xB1, 0xC1, 0xF2).mobEffect(() -> CompatHolder.VRC_CURSE_FLAME)));
-            AMMO_PERKS.register("butterfly_bullet", () -> new AmmoPerk(new AmmoPerk.Builder("butterfly_bullet", Perk.Type.AMMO)
-                    .bypassArmorRate(0.0f)));
+        if (FabricLoader.getInstance().isModLoaded(CompatHolder.VRC)) {
+            AMMO_PERKS.add(new NamedSupplier<>("curse_flame_bullet",
+                    () -> new AmmoPerk(new AmmoPerk.Builder("curse_flame_bullet", Perk.Type.AMMO)
+                            .bypassArmorRate(0.0f).damageRate(1.2f).speedRate(0.9f).rgb(0xB1, 0xC1, 0xF2).mobEffect(() -> CompatHolder.VRC_CURSE_FLAME))));
+            AMMO_PERKS.add(new NamedSupplier<>("butterfly_bullet",
+                    () -> new AmmoPerk(new AmmoPerk.Builder("butterfly_bullet", Perk.Type.AMMO)
+                            .bypassArmorRate(0.0f))));
         }
     }
 
-    public static void register(IEventBus bus) {
-        registerCompatPerks();
-        AMMO_PERKS.register(bus);
-        FUNC_PERKS.register(bus);
-        DAMAGE_PERKS.register(bus);
-    }
+    public static final ResourceKey<Registry<Perk>> PERK_KEY =
+            ResourceKey.createRegistryKey(Mod.loc("perk"));
+
+    public static final Registry<Perk> PERK_REGISTRY =
+            FabricRegistryBuilder.createSimple(PERK_KEY).buildAndRegister();
 }

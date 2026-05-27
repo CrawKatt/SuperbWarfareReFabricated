@@ -4,9 +4,7 @@ import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.ArtilleryIndicator;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.minecraft.server.level.ServerPlayer;
 
 public class FiringParametersEditMessage {
 
@@ -39,24 +37,20 @@ public class FiringParametersEditMessage {
         return new FiringParametersEditMessage(buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readBoolean(), buffer.readBoolean());
     }
 
-    public static void handler(FiringParametersEditMessage message, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            var player = ctx.get().getSender();
-            if (player == null) return;
+    public static void handler(FiringParametersEditMessage message, ServerPlayer player) {
+        if (player == null) return;
 
-            ItemStack stack = message.mainHand ? player.getMainHandItem() : player.getOffhandItem();
-            if (!stack.is(ModItems.FIRING_PARAMETERS.get()) && !stack.is(ModItems.ARTILLERY_INDICATOR.get())) return;
+        ItemStack stack = message.mainHand ? player.getMainHandItem() : player.getOffhandItem();
+        if (!stack.is(ModItems.FIRING_PARAMETERS.get()) && !stack.is(ModItems.ARTILLERY_INDICATOR.get())) return;
 
-            stack.getOrCreateTag().putInt("TargetX", message.posX);
-            stack.getOrCreateTag().putInt("TargetY", message.posY);
-            stack.getOrCreateTag().putInt("TargetZ", message.posZ);
-            stack.getOrCreateTag().putInt("Radius", message.radius);
-            stack.getOrCreateTag().putBoolean("IsDepressed", message.isDepressed);
+        stack.getOrCreateTag().putInt("TargetX", message.posX);
+        stack.getOrCreateTag().putInt("TargetY", message.posY);
+        stack.getOrCreateTag().putInt("TargetZ", message.posZ);
+        stack.getOrCreateTag().putInt("Radius", message.radius);
+        stack.getOrCreateTag().putBoolean("IsDepressed", message.isDepressed);
 
-            if (stack.getItem() instanceof ArtilleryIndicator indicator) {
-                indicator.setTarget(stack, player);
-            }
-        });
-        ctx.get().setPacketHandled(true);
+        if (stack.getItem() instanceof ArtilleryIndicator indicator) {
+            indicator.setTarget(stack, player);
+        }
     }
 }

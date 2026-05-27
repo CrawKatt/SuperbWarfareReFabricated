@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.mobeffect;
 
+import com.atsuishio.superbwarfare.event.custom.LivingTickCallback;
+import com.atsuishio.superbwarfare.event.custom.MobEffectAddedCallback;
+import com.atsuishio.superbwarfare.event.custom.MobEffectRemovedCallback;
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.init.ModSounds;
@@ -16,16 +19,18 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.FORGE)
 public class BurnMobEffect extends MobEffect {
 
     public BurnMobEffect() {
         super(MobEffectCategory.HARMFUL, -12708330);
+    }
+
+    public static void registerEvents() {
+        MobEffectAddedCallback.EVENT.register(BurnMobEffect::onEffectAdded);
+        MobEffectRemovedCallback.EVENT.register(BurnMobEffect::onEffectRemoved);
+        LivingTickCallback.EVENT.register(BurnMobEffect::onLivingTick);
     }
 
     @Override
@@ -42,7 +47,7 @@ public class BurnMobEffect extends MobEffect {
 
         if (attacker instanceof ServerPlayer player) {
             player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ClientIndicatorMessage(0, 5));
+            NetworkRegistry.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
         }
 
     }
@@ -52,28 +57,20 @@ public class BurnMobEffect extends MobEffect {
         return duration % 20 == 0;
     }
 
-    @SubscribeEvent
-    public static void onEffectAdded(MobEffectEvent.Added event) {
-        LivingEntity living = event.getEntity();
-
-        MobEffectInstance instance = event.getEffectInstance();
+    public static void onEffectAdded(LivingEntity living, MobEffectInstance instance, @Nullable Entity source) {
         if (!instance.getEffect().equals(ModMobEffects.BURN.get())) {
             return;
         }
 
-        DamageHandler.doDamage(living, new DamageSource(living.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.IN_FIRE), event.getEffectSource()), 0.6f + (0.3f * instance.getAmplifier()));
+        DamageHandler.doDamage(living, new DamageSource(living.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.IN_FIRE), source), 0.6f + (0.3f * instance.getAmplifier()));
         living.invulnerableTime = 0;
 
-        if (event.getEffectSource() instanceof LivingEntity source) {
-            living.getPersistentData().putInt("BurnAttacker", source.getId());
+        if (source instanceof LivingEntity entitySource) {
+            living.getPersistentData().putInt("BurnAttacker", entitySource.getId());
         }
     }
 
-    @SubscribeEvent
-    public static void onEffectExpired(MobEffectEvent.Expired event) {
-        LivingEntity living = event.getEntity();
-
-        MobEffectInstance instance = event.getEffectInstance();
+    public static void onEffectRemoved(LivingEntity living, @Nullable MobEffectInstance instance) {
         if (instance == null) {
             return;
         }
@@ -83,24 +80,7 @@ public class BurnMobEffect extends MobEffect {
         }
     }
 
-    @SubscribeEvent
-    public static void onEffectRemoved(MobEffectEvent.Remove event) {
-        LivingEntity living = event.getEntity();
-
-        MobEffectInstance instance = event.getEffectInstance();
-        if (instance == null) {
-            return;
-        }
-
-        if (instance.getEffect().equals(ModMobEffects.BURN.get())) {
-            living.getPersistentData().remove("BurnAttacker");
-        }
-    }
-
-    @SubscribeEvent
-    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity living = event.getEntity();
-
+    public static void onLivingTick(LivingEntity living) {
         if (living.hasEffect(ModMobEffects.BURN.get())) {
             living.setRemainingFireTicks(2);
         }

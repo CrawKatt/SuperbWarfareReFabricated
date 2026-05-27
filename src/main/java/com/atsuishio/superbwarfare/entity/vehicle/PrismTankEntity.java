@@ -22,9 +22,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -96,7 +93,7 @@ public class PrismTankEntity extends GeoVehicleEntity {
                 if (shooter instanceof ServerPlayer player) {
                     var holder = Holder.direct(ModSounds.INDICATION.get());
                     player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1f, 1f, player.level().random.nextLong()));
-                    NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ClientIndicatorMessage(0, 5));
+                    NetworkRegistry.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
                 }
             }
         }
@@ -112,7 +109,6 @@ public class PrismTankEntity extends GeoVehicleEntity {
         return 150;
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public Component firstPersonAmmoComponent(GunData data, Player player) {
         var name = data.compute().name;

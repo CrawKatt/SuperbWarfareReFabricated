@@ -19,11 +19,8 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
-@OnlyIn(Dist.CLIENT)
 public class WeaponEditScreen extends Screen {
 
     // 六个改装位置，大小128*128
@@ -201,7 +198,6 @@ public class WeaponEditScreen extends Screen {
         return super.keyPressed(pKeyCode, pScanCode, pModifiers);
     }
 
-    @OnlyIn(Dist.CLIENT)
     class EditButton extends AbstractButton {
 
         // 0 = barrel, 1 = scope, 2 = grip, 3 = stock, 4 = magazine, 5 = ammoType
@@ -244,7 +240,7 @@ public class WeaponEditScreen extends Screen {
         @Override
         public void onPress() {
             if (!this.isActive()) return;
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new EditMessage(this.type, !this.left));
+            NetworkRegistry.sendToServer(new EditMessage(this.type, !this.left));
             ClientEventHandler.editModelShake();
         }
 

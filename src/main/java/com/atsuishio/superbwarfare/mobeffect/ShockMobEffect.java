@@ -1,5 +1,9 @@
 package com.atsuishio.superbwarfare.mobeffect;
 
+import com.atsuishio.superbwarfare.event.custom.LivingAttackCallback;
+import com.atsuishio.superbwarfare.event.custom.LivingTickCallback;
+import com.atsuishio.superbwarfare.event.custom.MobEffectAddedCallback;
+import com.atsuishio.superbwarfare.event.custom.MobEffectRemovedCallback;
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.init.ModSounds;
@@ -20,18 +24,20 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.FORGE)
 public class ShockMobEffect extends MobEffect {
 
     public ShockMobEffect() {
         super(MobEffectCategory.HARMFUL, -256);
         addAttributeModifier(Attributes.MOVEMENT_SPEED, "7107DE5E-7CE8-4030-940E-514C1F160890", -10F, AttributeModifier.Operation.ADDITION);
+    }
+
+    public static void registerEvents() {
+        MobEffectAddedCallback.EVENT.register(ShockMobEffect::onEffectAdded);
+        MobEffectRemovedCallback.EVENT.register(ShockMobEffect::onEffectRemoved);
+        LivingTickCallback.EVENT.register(ShockMobEffect::onLivingTick);
+        LivingAttackCallback.EVENT.register(ShockMobEffect::onEntityAttacked);
     }
 
     @Override
@@ -48,7 +54,7 @@ public class ShockMobEffect extends MobEffect {
 
         if (attacker instanceof ServerPlayer player) {
             player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1, 1);
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new ClientIndicatorMessage(0, 5));
+            NetworkRegistry.sendToPlayer(player, new ClientIndicatorMessage(0, 5));
         }
     }
 
@@ -57,11 +63,7 @@ public class ShockMobEffect extends MobEffect {
         return duration % 20 == 0;
     }
 
-    @SubscribeEvent
-    public static void onEffectAdded(MobEffectEvent.Added event) {
-        LivingEntity living = event.getEntity();
-
-        MobEffectInstance instance = event.getEffectInstance();
+    public static void onEffectAdded(LivingEntity living, MobEffectInstance instance, @Nullable Entity source) {
         if (!instance.getEffect().equals(ModMobEffects.SHOCK.get())) {
             return;
         }
@@ -74,19 +76,15 @@ public class ShockMobEffect extends MobEffect {
             }
         }
 
-        DamageHandler.doDamage(living, ModDamageTypes.causeShockDamage(living.level().registryAccess(),
-                event.getEffectSource()), 2 + (1.25f * instance.getAmplifier()));
+        DamageHandler.doDamage(living, ModDamageTypes.causeShockDamage(living.level().registryAccess(), source),
+                2 + (1.25f * instance.getAmplifier()));
 
-        if (event.getEffectSource() instanceof LivingEntity source) {
-            living.getPersistentData().putInt("TargetShockAttacker", source.getId());
+        if (source instanceof LivingEntity entitySource) {
+            living.getPersistentData().putInt("TargetShockAttacker", entitySource.getId());
         }
     }
 
-    @SubscribeEvent
-    public static void onEffectExpired(MobEffectEvent.Expired event) {
-        LivingEntity living = event.getEntity();
-
-        MobEffectInstance instance = event.getEffectInstance();
+    public static void onEffectRemoved(LivingEntity living, @Nullable MobEffectInstance instance) {
         if (instance == null) {
             return;
         }
@@ -96,42 +94,19 @@ public class ShockMobEffect extends MobEffect {
         }
     }
 
-    @SubscribeEvent
-    public static void onEffectRemoved(MobEffectEvent.Remove event) {
-        LivingEntity living = event.getEntity();
-
-        MobEffectInstance instance = event.getEffectInstance();
-        if (instance == null) {
-            return;
-        }
-
-        if (instance.getEffect().equals(ModMobEffects.SHOCK.get())) {
-            living.getPersistentData().remove("TargetShockAttacker");
-        }
-    }
-
-    @SubscribeEvent
-    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity living = event.getEntity();
-
+    public static void onLivingTick(LivingEntity living) {
         if (living.hasEffect(ModMobEffects.SHOCK.get())) {
             living.setXRot((float) Mth.nextDouble(RandomSource.create(), -23, -36));
             living.xRotO = living.getXRot();
         }
     }
 
-    @SubscribeEvent
-    public static void onEntityAttacked(LivingAttackEvent event) {
-        if (event == null || event.getEntity() == null) {
-            return;
-        }
-        DamageSource source = event.getSource();
+    public static boolean onEntityAttacked(LivingEntity attacked, DamageSource source, float amount) {
         Entity entity = source.getDirectEntity();
         if (entity == null) {
-            return;
+            return true;
         }
-        if (entity instanceof LivingEntity living && living.hasEffect(ModMobEffects.SHOCK.get())) {
-            event.setCanceled(true);
-        }
+
+        return !(entity instanceof LivingEntity living) || !living.hasEffect(ModMobEffects.SHOCK.get());
     }
 }

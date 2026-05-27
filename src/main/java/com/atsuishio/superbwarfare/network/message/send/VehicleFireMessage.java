@@ -2,14 +2,13 @@ package com.atsuishio.superbwarfare.network.message.send;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public class VehicleFireMessage {
     private final @Nullable UUID uuid;
@@ -45,18 +44,13 @@ public class VehicleFireMessage {
         }
     }
 
-    public static void handler(VehicleFireMessage message, Supplier<NetworkEvent.Context> contextSupplier) {
-        NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            var player = context.getSender();
-            if (player != null && player.getVehicle() instanceof VehicleEntity vehicle) {
-                if (message.targetPos != null) {
-                    vehicle.vehicleShoot(player, message.uuid, new Vec3(message.targetPos));
-                } else {
-                    vehicle.vehicleShoot(player, message.uuid, null);
-                }
+    public static void handler(VehicleFireMessage message, ServerPlayer player) {
+        if (player != null && player.getVehicle() instanceof VehicleEntity vehicle) {
+            if (message.targetPos != null) {
+                vehicle.vehicleShoot(player, message.uuid, new Vec3(message.targetPos));
+            } else {
+                vehicle.vehicleShoot(player, message.uuid, null);
             }
-        });
-        context.setPacketHandled(true);
+        }
     }
 }

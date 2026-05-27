@@ -9,15 +9,12 @@ import com.google.common.collect.Lists;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.event.entity.player.PlayerContainerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.PacketDistributor;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.FORGE)
 public abstract class EnergyMenu extends AbstractContainerMenu {
 
     private final List<ContainerEnergyDataSlot> containerEnergyDataSlots = Lists.newArrayList();
@@ -35,6 +32,30 @@ public abstract class EnergyMenu extends AbstractContainerMenu {
         }
     }
 
+    public void startUsing(ServerPlayer serverPlayer) {
+        this.usingPlayers.add(serverPlayer);
+
+        List<ContainerDataMessage.Pair> toSync = new ArrayList<>();
+        for (int i = 0; i < this.containerEnergyDataSlots.size(); ++i) {
+            toSync.add(new ContainerDataMessage.Pair(i, this.containerEnergyDataSlots.get(i).get()));
+        }
+
+        NetworkRegistry.sendToPlayer(serverPlayer, new ContainerDataMessage(this.containerId, toSync));
+    }
+
+    public void stopUsing(ServerPlayer serverPlayer) {
+        this.usingPlayers.remove(serverPlayer);
+    }
+
+    @Override
+    public void removed(net.minecraft.world.entity.player.Player player) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            this.stopUsing(serverPlayer);
+        }
+
+        super.removed(player);
+    }
+
     @Override
     public void broadcastChanges() {
         List<ContainerDataMessage.Pair> pairs = new ArrayList<>();
@@ -45,8 +66,7 @@ public abstract class EnergyMenu extends AbstractContainerMenu {
         }
 
         if (!pairs.isEmpty()) {
-            PacketDistributor.PacketTarget target = PacketDistributor.NMLIST.with(this.usingPlayers.stream().map(serverPlayer -> serverPlayer.connection.connection)::toList);
-            NetworkRegistry.PACKET_HANDLER.send(target, new ContainerDataMessage(this.containerId, pairs));
+            NetworkRegistry.sendToPlayers(this.usingPlayers, new ContainerDataMessage(this.containerId, pairs));
         }
 
         super.broadcastChanges();
@@ -66,25 +86,5 @@ public abstract class EnergyMenu extends AbstractContainerMenu {
             return;
         }
         this.containerEnergyDataSlots.get(id).set(data);
-    }
-
-    @SubscribeEvent
-    public static void onContainerOpened(PlayerContainerEvent.Open event) {
-        if (event.getContainer() instanceof EnergyMenu menu && event.getEntity() instanceof ServerPlayer serverPlayer) {
-            menu.usingPlayers.add(serverPlayer);
-
-            List<ContainerDataMessage.Pair> toSync = new ArrayList<>();
-            for (int i = 0; i < menu.containerEnergyDataSlots.size(); ++i) {
-                toSync.add(new ContainerDataMessage.Pair(i, menu.containerEnergyDataSlots.get(i).get()));
-            }
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new ContainerDataMessage(menu.containerId, toSync));
-        }
-    }
-
-    @SubscribeEvent
-    public static void onContainerClosed(PlayerContainerEvent.Close event) {
-        if (event.getContainer() instanceof EnergyMenu menu && event.getEntity() instanceof ServerPlayer serverPlayer) {
-            menu.usingPlayers.remove(serverPlayer);
-        }
     }
 }

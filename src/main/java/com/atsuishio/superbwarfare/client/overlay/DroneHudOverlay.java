@@ -25,8 +25,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
@@ -38,7 +36,6 @@ import static com.atsuishio.superbwarfare.client.overlay.IFFOverlay.FRIENDLY_IND
 import static com.atsuishio.superbwarfare.entity.vehicle.DroneEntity.*;
 import static com.atsuishio.superbwarfare.item.ArtilleryIndicator.TAG_CANNON;
 
-@OnlyIn(Dist.CLIENT)
 public class DroneHudOverlay implements IGuiOverlay {
 
     public static final String ID = Mod.MODID + "_drone_hud";

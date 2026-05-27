@@ -20,16 +20,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-@OnlyIn(Dist.CLIENT)
 public class AmmoBarOverlay implements IGuiOverlay {
 
     public static final String ID = Mod.MODID + "_ammo_bar";
@@ -66,9 +63,8 @@ public class AmmoBarOverlay implements IGuiOverlay {
 
     private static String getGunAmmoString(GunData data, Player player) {
         if (data.selectedAmmoConsumer().type == AmmoConsumer.AmmoConsumeType.ENERGY) {
-            double energy = data.stack.getCapability(ForgeCapabilities.ENERGY)
-                    .map(storage -> Mth.clamp((double) storage.getEnergyStored() / Math.max(1, storage.getMaxEnergyStored()), 0, 1))
-                    .orElse(0d);
+            double energy = ModEnergyApi.getEnergyStored(data.stack) > 0
+                    ? Mth.clamp((double) ModEnergyApi.getEnergyStored(data.stack) / Math.max(1, ModEnergyApi.getMaxEnergyStored(data.stack)), 0, 1) : 0d;
             return FormatTool.format1DZZ(energy * 100) + "%";
         }
         if (data.meleeOnly() || data.useBackpackAmmo() && data.hasInfiniteBackupAmmo(player)) return "∞";

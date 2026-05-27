@@ -17,9 +17,8 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 public class ReforgingTableMenu extends AbstractContainerMenu {
@@ -335,7 +334,7 @@ public class ReforgingTableMenu extends AbstractContainerMenu {
                     case DAMAGE -> this.damagePerkLevel.set(perkInstance.level());
                 }
 
-                var ammoPerkItem = perkInstance.perk().getItem().get();
+                var ammoPerkItem = perkInstance.perk().getItem();
 
                 this.container.setItem(switch (type) {
                     case AMMO -> AMMO_PERK_SLOT;
@@ -468,7 +467,6 @@ public class ReforgingTableMenu extends AbstractContainerMenu {
         }
 
         @Override
-        @ParametersAreNonnullByDefault
         public void onTake(Player pPlayer, ItemStack pStack) {
             onTakePerk(pStack);
             super.onTake(pPlayer, pStack);

@@ -25,34 +25,25 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.AnvilUpdateEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.UUID;
 
 import static com.atsuishio.superbwarfare.tools.ParticleTool.sendParticle;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber
 public class PlayerEventHandler {
 
     public static final UUID TACTICAL_SPRINT_UUID = UUID.fromString("fe8a1213-cf3d-4ec2-8ea8-29acca64b301");
 
-    @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        Player player = event.getEntity();
+    // TODO: Register in Mod.java using Fabric event API
+    public static void onPlayerLoggedIn(Player player) {
         ItemStack stack = player.getMainHandItem();
         if (stack.is(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")) {
             stack.getOrCreateTag().putBoolean("Using", false);
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerRespawned(PlayerEvent.PlayerRespawnEvent event) {
-        Player player = event.getEntity();
-
+    // TODO: Register in Mod.java using Fabric event API
+    public static void onPlayerRespawned(Player player) {
         if (player == null) {
             return;
         }
@@ -61,22 +52,20 @@ public class PlayerEventHandler {
         handleRespawnAutoArmor(player);
     }
 
-    @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        Player player = event.player;
-
+    // TODO: Register in Mod.java using Fabric event API
+    public static void onPlayerTick(Player player, boolean isEnd) {
         if (player == null) {
             return;
         }
 
         ItemStack stack = player.getMainHandItem();
 
-        if (event.phase == TickEvent.Phase.END) {
+        if (isEnd) {
             if (stack.getItem() instanceof GunItem) {
                 handleSpecialWeaponAmmo(player);
             }
 
-            if (event.side.isServer()) {
+            if (!player.level().isClientSide) {
                 handleTacticalAttribute(player);
             }
         }
@@ -159,11 +148,8 @@ public class PlayerEventHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void onAnvilUpdate(AnvilUpdateEvent event) {
-        ItemStack left = event.getLeft();
-        ItemStack right = event.getRight();
-
+    // TODO: Register in Mod.java using Fabric event API
+    public static void onAnvilUpdate(ItemStack left, ItemStack right, AnvilUpdateCallback callback) {
         if (left.getItem() instanceof GunItem && right.getItem() == ModItems.SHORTCUT_PACK.get()) {
             ItemStack output = left.copy();
 
@@ -171,17 +157,19 @@ public class PlayerEventHandler {
             data.level.add(1);
             data.save();
 
-            event.setOutput(output);
-            event.setCost(10);
-            event.setMaterialCost(1);
+            callback.accept(output, 10, 1);
         }
     }
 
-    @SubscribeEvent
-    public static void onAttackEntity(AttackEntityEvent event) {
-        var target = event.getTarget();
+    @FunctionalInterface
+    public interface AnvilUpdateCallback {
+        void accept(ItemStack output, int cost, int materialCost);
+    }
+
+    // TODO: Register in Mod.java using Fabric event API
+    public static boolean onAttackEntity(Player player, net.minecraft.world.entity.Entity target) {
         if (target instanceof VehicleEntity vehicle) {
-            Vec3 position = TraceTool.playerFindLookingPos(event.getEntity(), vehicle, event.getEntity().getEntityReach());
+            Vec3 position = TraceTool.playerFindLookingPos(player, vehicle, player.getEntityReach());
 
             if (position != null) {
                 if (vehicle.shouldSendHitSounds()) {
@@ -193,6 +181,8 @@ public class PlayerEventHandler {
                             2, 0, 0, 0, 0.2, false);
                 }
             }
+            return true;
         }
+        return false;
     }
 }

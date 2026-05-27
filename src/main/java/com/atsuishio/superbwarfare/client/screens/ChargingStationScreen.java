@@ -12,15 +12,12 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@OnlyIn(Dist.CLIENT)
 public class ChargingStationScreen extends AbstractContainerScreen<ChargingStationMenu> {
 
     private static final ResourceLocation TEXTURE = Mod.loc("textures/gui/charging_station.png");
@@ -78,7 +75,6 @@ public class ChargingStationScreen extends AbstractContainerScreen<ChargingStati
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     class ShowRangeButton extends AbstractButton {
 
         @Override
@@ -93,7 +89,7 @@ public class ChargingStationScreen extends AbstractContainerScreen<ChargingStati
 
         @Override
         public void onPress() {
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new ShowChargingRangeMessage(!ChargingStationScreen.this.menu.showRange()));
+            NetworkRegistry.sendToServer(new ShowChargingRangeMessage(!ChargingStationScreen.this.menu.showRange()));
         }
 
         @Override

@@ -1,24 +1,8 @@
 package com.atsuishio.superbwarfare.datagen;
 
-import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.init.ModTags;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.ItemTagsProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.NotNull;
+public class ModItemTagProvider {
 
-import javax.annotation.Nullable;
-import java.util.concurrent.CompletableFuture;
-
-import static com.atsuishio.superbwarfare.init.ModTags.commonItemTag;
-
-public class ModItemTagProvider extends ItemTagsProvider {
-
+    /*
     public ModItemTagProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> providerCompletableFuture,
                               CompletableFuture<TagLookup<Block>> tagLookupCompletableFuture, @Nullable ExistingFileHelper existingFileHelper) {
         super(packOutput, providerCompletableFuture, tagLookupCompletableFuture, Mod.MODID, existingFileHelper);
@@ -179,4 +163,5 @@ public class ModItemTagProvider extends ItemTagsProvider {
         this.tag(ModTags.Items.CANNON_BLUEPRINT).add(ModItems.MK_42_BLUEPRINT.get(), ModItems.MLE_1934_BLUEPRINT.get(), ModItems.ANNIHILATOR_BLUEPRINT.get(),
                 ModItems.HPJ_11_BLUEPRINT.get(), ModItems.BL_132_BLUEPRINT.get());
     }
+    */
 }

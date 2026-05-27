@@ -4,9 +4,6 @@ import com.atsuishio.superbwarfare.menu.FuMO25Menu;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 public class RadarChangeModeMessage {
 
@@ -24,22 +21,18 @@ public class RadarChangeModeMessage {
         return new RadarChangeModeMessage(buffer.readByte());
     }
 
-    public static void handler(RadarChangeModeMessage message, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            byte mode = message.mode;
-            if (mode < 1 || mode > 4) return;
+    public static void handler(RadarChangeModeMessage message, ServerPlayer player) {
+        byte mode = message.mode;
+        if (mode < 1 || mode > 4) return;
 
-            ServerPlayer player = ctx.get().getSender();
-            if (player == null) return;
+        if (player == null) return;
 
-            AbstractContainerMenu menu = player.containerMenu;
-            if (menu instanceof FuMO25Menu fuMO25Menu) {
-                if (!player.containerMenu.stillValid(player)) {
-                    return;
-                }
-                fuMO25Menu.setFuncTypeAndTime(mode);
+        AbstractContainerMenu menu = player.containerMenu;
+        if (menu instanceof FuMO25Menu fuMO25Menu) {
+            if (!player.containerMenu.stillValid(player)) {
+                return;
             }
-        });
-        ctx.get().setPacketHandled(true);
+            fuMO25Menu.setFuncTypeAndTime(mode);
+        }
     }
 }

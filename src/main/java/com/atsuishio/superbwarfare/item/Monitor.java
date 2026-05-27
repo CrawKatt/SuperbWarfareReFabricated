@@ -27,9 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.network.PacketDistributor;
+
 
 import java.util.List;
 
@@ -52,7 +50,7 @@ public class Monitor extends Item {
         ItemNBTTool.setBoolean(itemstack, LINKED, false);
         itemstack.getOrCreateTag().putString(LINKED_DRONE, "none");
         if (player instanceof ServerPlayer serverPlayer) {
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> serverPlayer), ResetCameraTypeMessage.INSTANCE);
+            NetworkRegistry.sendToPlayer(serverPlayer, ResetCameraTypeMessage.INSTANCE);
         }
     }
 
@@ -128,7 +126,6 @@ public class Monitor extends Item {
         itemstack.getOrCreateTag().putDouble("PosZ", vec3.z);
     }
 
-    @OnlyIn(Dist.CLIENT)
     @Override
     public void appendHoverText(ItemStack stack, Level world, List<Component> list, TooltipFlag flag) {
         if (!stack.getOrCreateTag().contains(LINKED_DRONE) || stack.getOrCreateTag().getString(LINKED_DRONE).equals("none"))

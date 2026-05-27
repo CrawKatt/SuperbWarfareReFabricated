@@ -13,8 +13,9 @@ import net.minecraft.world.level.block.Block;
 
 public class ModTags {
 
+    // TODO: Replace "forge" namespace with "c" (common) namespace when using Fabric convention tags
     public static TagKey<Item> commonItemTag(String name) {
-        return ItemTags.create(new ResourceLocation("forge", name));
+        return ItemTags.create(new ResourceLocation("c", name));
     }
 
     public static class Items {

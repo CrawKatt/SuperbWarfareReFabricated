@@ -145,7 +145,7 @@ public class ClickHandler {
 
         if (button == ModKeyMappings.MARK.getKey().getValue()) {
             if (stack.is(ModItems.ARTILLERY_INDICATOR.get())) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(SetFiringParametersMessage.INSTANCE);
+                NetworkRegistry.sendToServer(SetFiringParametersMessage.INSTANCE);
             }
             if (stack.is(ModItems.MONITOR.get()) && player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR.get())) {
                 droneLeftClick(stack, player);
@@ -180,10 +180,10 @@ public class ClickHandler {
             if (player.getVehicle() instanceof VehicleEntity vehicle) {
                 var data = vehicle.getGunData(player);
                 if (data != null && data.getDefault().getAmmoConsumers().size() > 1) {
-                    NetworkRegistry.PACKET_HANDLER.sendToServer(new EditMessage(5, true, true));
+                    NetworkRegistry.sendToServer(new EditMessage(5, true, true));
                 }
             } else {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new FireModeMessage(false));
+                NetworkRegistry.sendToServer(new FireModeMessage(false));
             }
             burstFireAmount = 0;
         }
@@ -228,7 +228,7 @@ public class ClickHandler {
         ) {
             if (switchVehicleWeaponCooldown <= 0) {
                 int index = vehicle.getSeatIndex(player);
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new SwitchVehicleWeaponMessage(index, -scroll, true));
+                NetworkRegistry.sendToServer(new SwitchVehicleWeaponMessage(index, -scroll, true));
                 switchVehicleWeaponCooldown = 3;
             }
             event.setCanceled(true);
@@ -237,9 +237,9 @@ public class ClickHandler {
         if (stack.getItem() instanceof GunItem && ClientEventHandler.zoom) {
             var data = GunData.from(stack);
             if (data.canSwitchScope()) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new SwitchScopeMessage(scroll));
+                NetworkRegistry.sendToServer(new SwitchScopeMessage(scroll));
             } else if (data.canAdjustZoom() || stack.is(ModItems.MINIGUN.get())) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new AdjustZoomFovMessage(scroll));
+                NetworkRegistry.sendToServer(new AdjustZoomFovMessage(scroll));
             }
             event.setCanceled(true);
         }
@@ -256,7 +256,7 @@ public class ClickHandler {
 
         Entity looking = TraceTool.findLookingEntity(player, 6);
         if (looking instanceof MortarEntity && player.isShiftKeyDown()) {
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new AdjustMortarAngleMessage(scroll));
+            NetworkRegistry.sendToServer(new AdjustMortarAngleMessage(scroll));
             event.setCanceled(true);
         }
     }
@@ -300,21 +300,21 @@ public class ClickHandler {
                 lockingEntity = null;
                 seekingEntity = null;
                 lockingPos = null;
-                NetworkRegistry.PACKET_HANDLER.sendToServer(ReloadMessage.INSTANCE);
+                NetworkRegistry.sendToServer(ReloadMessage.INSTANCE);
             }
             if (key == ModKeyMappings.FIRE_MODE.getKey().getValue() || key == ModKeyMappings.CHANGE_FIRE_MODE_BACKWARD.getKey().getValue()) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new FireModeMessage(false));
+                NetworkRegistry.sendToServer(new FireModeMessage(false));
                 burstFireAmount = 0;
             }
             if (key == ModKeyMappings.CHANGE_FIRE_MODE_FORWARD.getKey().getValue()) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new FireModeMessage(true));
+                NetworkRegistry.sendToServer(new FireModeMessage(true));
                 burstFireAmount = 0;
             }
             if (key == ModKeyMappings.INTERACT.getKey().getValue()) {
                 if (stack.getItem() instanceof GunItem) {
                     KeyMapping.click(mc.options.keyUse.getKey());
                 } else if (stack.is(ModItems.MONITOR.get())) {
-                    NetworkRegistry.PACKET_HANDLER.sendToServer(InteractMessage.INSTANCE);
+                    NetworkRegistry.sendToServer(InteractMessage.INSTANCE);
                 }
             }
 
@@ -323,16 +323,16 @@ public class ClickHandler {
                 var data = GunData.from(stack);
                 if (key == ModKeyMappings.UNLOAD.getKey().getValue()) {
                     if (data.useBackpackAmmo() || data.ammo.get() + data.virtualAmmo.get() <= 0) return;
-                    NetworkRegistry.PACKET_HANDLER.sendToServer(UnloadMessage.INSTANCE);
+                    NetworkRegistry.sendToServer(UnloadMessage.INSTANCE);
                     burstFireAmount = 0;
                 }
                 if (data.compute().getAmmoConsumers().size() > 1) {
                     if (key == ModKeyMappings.CHANGE_AMMO_FORWARD.getKey().getValue()) {
-                        NetworkRegistry.PACKET_HANDLER.sendToServer(new EditMessage(5, false));
+                        NetworkRegistry.sendToServer(new EditMessage(5, false));
                         burstFireAmount = 0;
                     }
                     if (key == ModKeyMappings.CHANGE_AMMO_BACKWARD.getKey().getValue()) {
-                        NetworkRegistry.PACKET_HANDLER.sendToServer(new EditMessage(5, true));
+                        NetworkRegistry.sendToServer(new EditMessage(5, true));
                         burstFireAmount = 0;
                     }
                 }
@@ -343,12 +343,12 @@ public class ClickHandler {
                 var data = vehicle.getGunData(player);
                 if (data != null && data.getDefault().getAmmoConsumers().size() > 1) {
                     if (key == ModKeyMappings.CHANGE_AMMO_FORWARD.getKey().getValue()) {
-                        NetworkRegistry.PACKET_HANDLER.sendToServer(new EditMessage(5, false, true));
+                        NetworkRegistry.sendToServer(new EditMessage(5, false, true));
                         burstFireAmount = 0;
                     }
                     if (key == ModKeyMappings.CHANGE_AMMO_BACKWARD.getKey().getValue() ||
                             key == ModKeyMappings.FIRE_MODE.getKey().getValue()) {
-                        NetworkRegistry.PACKET_HANDLER.sendToServer(new EditMessage(5, true, true));
+                        NetworkRegistry.sendToServer(new EditMessage(5, true, true));
                         burstFireAmount = 0;
                     }
                 }
@@ -379,10 +379,10 @@ public class ClickHandler {
                 breath = true;
             }
             if (key == ModKeyMappings.SENSITIVITY_INCREASE.getKey().getValue()) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new SensitivityMessage(true));
+                NetworkRegistry.sendToServer(new SensitivityMessage(true));
             }
             if (key == ModKeyMappings.SENSITIVITY_REDUCE.getKey().getValue()) {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new SensitivityMessage(false));
+                NetworkRegistry.sendToServer(new SensitivityMessage(false));
             }
 
             if (stack.getItem() instanceof GunItem
@@ -409,7 +409,7 @@ public class ClickHandler {
 
             if (key == ModKeyMappings.MARK.getKey().getValue()) {
                 if (stack.is(ModItems.ARTILLERY_INDICATOR.get())) {
-                    NetworkRegistry.PACKET_HANDLER.sendToServer(SetFiringParametersMessage.INSTANCE);
+                    NetworkRegistry.sendToServer(SetFiringParametersMessage.INSTANCE);
                 }
                 if (stack.is(ModItems.MONITOR.get()) && player.getOffhandItem().is(ModItems.ARTILLERY_INDICATOR.get())) {
                     droneLeftClick(stack, player);
@@ -458,7 +458,7 @@ public class ClickHandler {
         }
 
         if (stack.is(Items.SPYGLASS) && player.isScoping() && player.getOffhandItem().is(ModItems.FIRING_PARAMETERS.get())) {
-            NetworkRegistry.PACKET_HANDLER.sendToServer(SetFiringParametersMessage.INSTANCE);
+            NetworkRegistry.sendToServer(SetFiringParametersMessage.INSTANCE);
         }
 
         if (stack.is(ModItems.MONITOR.get())) {
@@ -506,7 +506,7 @@ public class ClickHandler {
 
             if (!data.useBackpackAmmo() && !data.meleeOnly() && !data.hasEnoughAmmoToShoot(player) && data.reload.time() == 0) {
                 if (ReloadConfig.LEFT_CLICK_RELOAD.get()) {
-                    NetworkRegistry.PACKET_HANDLER.sendToServer(ReloadMessage.INSTANCE);
+                    NetworkRegistry.sendToServer(ReloadMessage.INSTANCE);
                     burstFireAmount = 0;
                     seekingTime = 0;
                     lockOn = false;
@@ -515,7 +515,7 @@ public class ClickHandler {
                     lockingPos = null;
                 }
             } else {
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new FireKeyMessage(0, bowPower, zoom));
+                NetworkRegistry.sendToServer(new FireKeyMessage(0, bowPower, zoom));
                 if ((!data.reloading()
                         && !data.charging()
                         && !data.bolt.needed.get())
@@ -545,7 +545,7 @@ public class ClickHandler {
     }
 
     public static void handleWeaponFireRelease() {
-        NetworkRegistry.PACKET_HANDLER.sendToServer(new FireKeyMessage(1, bowPower, zoom));
+        NetworkRegistry.sendToServer(new FireKeyMessage(1, bowPower, zoom));
         bowPull = false;
         holdingFireKey = false;
         holdFireVehicle = false;
@@ -559,7 +559,7 @@ public class ClickHandler {
         ItemStack stack = player.getMainHandItem();
 
         if (stack.is(ModItems.BOCEK.get())) {
-            NetworkRegistry.PACKET_HANDLER.sendToServer(ReloadMessage.INSTANCE);
+            NetworkRegistry.sendToServer(ReloadMessage.INSTANCE);
         }
 
         if (stack.getItem() instanceof GunItem) {
@@ -572,7 +572,7 @@ public class ClickHandler {
     }
 
     public static void handleWeaponZoomPress(Player player, ItemStack stack) {
-        NetworkRegistry.PACKET_HANDLER.sendToServer(new ZoomMessage(0));
+        NetworkRegistry.sendToServer(new ZoomMessage(0));
 
         isEditing = false;
 
@@ -601,7 +601,7 @@ public class ClickHandler {
     }
 
     public static void handleWeaponZoomRelease() {
-        NetworkRegistry.PACKET_HANDLER.sendToServer(new ZoomMessage(1));
+        NetworkRegistry.sendToServer(new ZoomMessage(1));
         ClientEventHandler.zoom = false;
         ClientEventHandler.zoomVehicle = false;
         ClientEventHandler.lockedEntity = null;
@@ -622,13 +622,13 @@ public class ClickHandler {
         if (canDoubleJump) {
             player.setDeltaMovement(new Vec3(player.getLookAngle().x, 0.8, player.getLookAngle().z));
             level.playLocalSound(x, y, z, ModSounds.DOUBLE_JUMP.get(), SoundSource.BLOCKS, 1, 1, false);
-            NetworkRegistry.PACKET_HANDLER.sendToServer(DoubleJumpMessage.INSTANCE);
+            NetworkRegistry.sendToServer(DoubleJumpMessage.INSTANCE);
             canDoubleJump = false;
         }
     }
 
     private static void handleParachute() {
-        NetworkRegistry.PACKET_HANDLER.sendToServer(ParachuteMessage.INSTANCE);
+        NetworkRegistry.sendToServer(ParachuteMessage.INSTANCE);
     }
 
     private static void handleConfigScreen(Player player) {
@@ -651,7 +651,7 @@ public class ClickHandler {
                 ClientEventHandler.dismountCountdown = 20;
                 return;
             }
-            NetworkRegistry.PACKET_HANDLER.sendToServer(new PlayerStopRidingMessage(false));
+            NetworkRegistry.sendToServer(new PlayerStopRidingMessage(false));
             ClientEventHandler.stopVehicleReloadSound(player);
         }
 
@@ -677,7 +677,7 @@ public class ClickHandler {
                     pos = lookingEntity.position();
                 }
 
-                NetworkRegistry.PACKET_HANDLER.sendToServer(new DroneFireMessage(pos.toVector3f()));
+                NetworkRegistry.sendToServer(new DroneFireMessage(pos.toVector3f()));
             }
         }
     }

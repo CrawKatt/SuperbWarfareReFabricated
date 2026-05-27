@@ -1,38 +1,8 @@
 package com.atsuishio.superbwarfare.datagen;
 
-import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.datagen.builder.NBTShapedRecipeBuilder;
-import com.atsuishio.superbwarfare.datagen.builder.VehicleAssemblingRecipeBuilder;
-import com.atsuishio.superbwarfare.init.*;
-import com.atsuishio.superbwarfare.perk.Perk;
-import com.atsuishio.superbwarfare.recipe.vehicle.VehicleAssemblingRecipe;
-import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.*;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.crafting.StrictNBTIngredient;
-import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
-import net.minecraftforge.registries.RegistryObject;
-import org.jetbrains.annotations.NotNull;
+public class ModRecipeProvider {
 
-import java.util.function.Consumer;
-
-import static com.atsuishio.superbwarfare.init.ModTags.commonItemTag;
-
-public class ModRecipeProvider extends RecipeProvider implements IConditionBuilder {
-
+    /*
     public static final TagKey<Item> PLATES_COPPER = commonItemTag("plates/copper");
     public static final TagKey<Item> INGOTS_LEAD = commonItemTag("ingots/lead");
     public static final TagKey<Item> INGOTS_SILVER = commonItemTag("ingots/silver");
@@ -2013,4 +1983,5 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         PotionUtils.setPotion(stack, potion);
         return StrictNBTIngredient.of(stack);
     }
+    */
 }

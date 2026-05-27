@@ -16,8 +16,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
@@ -26,7 +24,6 @@ import static com.atsuishio.superbwarfare.entity.vehicle.Type63Entity.SHOOT_YAW;
 import static com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotFromVector;
 import static com.atsuishio.superbwarfare.tools.RangeTool.calculateLaunchVector;
 
-@OnlyIn(Dist.CLIENT)
 public class Type63InfoOverlay implements IGuiOverlay {
 
     public static final String ID = Mod.MODID + "_type_63_info";

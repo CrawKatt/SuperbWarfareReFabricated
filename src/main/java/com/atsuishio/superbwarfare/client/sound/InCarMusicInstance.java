@@ -5,10 +5,7 @@
 //import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 //import net.minecraft.sounds.SoundEvent;
 //import net.minecraft.sounds.SoundSource;
-//import net.minecraftforge.api.distmarker.Dist;
-//import net.minecraftforge.api.distmarker.OnlyIn;
 //
-//@OnlyIn(Dist.CLIENT)
 //public abstract class InCarMusicInstance extends AbstractTickableSoundInstance {
 //
 //    private final Minecraft client;
@@ -69,7 +66,6 @@
 //        }
 //    }
 //
-//    @OnlyIn(Dist.CLIENT)
 //    public static class InCarMusicSound extends InCarMusicInstance {
 //
 //        public InCarMusicSound(VehicleEntity entity) {

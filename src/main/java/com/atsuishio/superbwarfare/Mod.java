@@ -1,27 +1,27 @@
 package com.atsuishio.superbwarfare;
 
+import com.atsuishio.superbwarfare.api.event.converter.EventWrapperMappings;
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
-import com.atsuishio.superbwarfare.client.MouseMovementHandler;
-import com.atsuishio.superbwarfare.client.molang.MolangVariable;
-import com.atsuishio.superbwarfare.client.sound.ModSoundInstances;
+import com.atsuishio.superbwarfare.command.CommandRegister;
 import com.atsuishio.superbwarfare.compat.coldsweat.ColdSweatCompatHandler;
-import com.atsuishio.superbwarfare.compat.tacz.TACZGunEventHandler;
 import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.config.CommonConfig;
-import com.atsuishio.superbwarfare.api.event.converter.EventWrapperMappings;
 import com.atsuishio.superbwarfare.config.ServerConfig;
 import com.atsuishio.superbwarfare.data.CustomData;
 import com.atsuishio.superbwarfare.init.*;
+import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
+import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
+import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect;
+import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
+import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
+import com.atsuishio.superbwarfare.network.NetworkRegistry;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import software.bernie.geckolib.network.SerializableDataTicket;
@@ -33,74 +33,65 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-@net.minecraftforge.fml.common.Mod(Mod.MODID)
-public class Mod {
+public class Mod implements ModInitializer {
 
     public static final String MODID = "superbwarfare";
     public static final String ATTRIBUTE_MODIFIER = "superbwarfare_attribute_modifier";
 
     public static final Logger LOGGER = LogManager.getLogger(Mod.class);
 
-    public Mod() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.init());
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CommonConfig.init());
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfig.init());
+    private static MinecraftServer serverInstance;
+    private static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> SERVER_QUEUE = new ConcurrentLinkedQueue<>();
+    static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> CLIENT_QUEUE = new ConcurrentLinkedQueue<>();
+
+    @Override
+    public void onInitialize() {
+        ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.CLIENT, ClientConfig.init());
+        ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.COMMON, CommonConfig.init());
+        ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.SERVER, ServerConfig.init());
+
         EventWrapperMappings.register();
 
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        ModItems.register();
+        ModBlocks.register();
+        ModBlockEntities.register();
+        ModEntities.register();
+        ModSounds.register();
+        ModMobEffects.register();
+        ModParticleTypes.register();
+        ModPotions.register();
+        ModMenuTypes.register();
+        ModRecipes.register();
+        ModSerializers.register();
+        ModPerks.register();
+        ModTabs.register();
+        CommandRegister.registerEvents();
+        ModCommandArguments.register();
+        ModVillagers.register();
+        ModAttributes.register();
 
-        ModPerks.register(bus);
-        ModSerializers.REGISTRY.register(bus);
-        ModSounds.REGISTRY.register(bus);
-        ModBlocks.REGISTRY.register(bus);
-        ModBlockEntities.REGISTRY.register(bus);
-        ModItems.register(bus);
-        ModEntities.REGISTRY.register(bus);
-        ModTabs.TABS.register(bus);
-        ModMobEffects.REGISTRY.register(bus);
-        ModParticleTypes.REGISTRY.register(bus);
-        ModPotions.POTIONS.register(bus);
-        ModMenuTypes.REGISTRY.register(bus);
-        ModVillagers.register(bus);
-        ModRecipes.register(bus);
-        ModCommandArguments.COMMAND_ARGUMENT_TYPES.register(bus);
+        ShockMobEffect.registerEvents();
+        BurnMobEffect.registerEvents();
+        TraumaMobEffect.registerEvents();
+        PowerfulAttraction.registerEvents();
 
-        bus.addListener(this::onCommonSetup);
-        bus.addListener(this::onClientSetup);
-        bus.addListener(ModItems::registerDispenserBehavior);
+        ModItems.registerDispenserBehavior();
 
         registerDataTickets();
 
-        if (TACZGunEventHandler.compatCondition()) {
-            MinecraftForge.EVENT_BUS.addListener(TACZGunEventHandler::entityHurtByTACZGun);
+        NetworkRegistry.register();
+
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> serverInstance = server);
+        ServerLifecycleEvents.SERVER_STOPPING.register(server -> serverInstance = null);
+
+        if (FabricLoader.getInstance().isModLoaded("tacz")) {
+            ServerLifecycleEvents.SERVER_STARTING.register(server -> { });
         }
         if (ColdSweatCompatHandler.hasMod()) {
-            MinecraftForge.EVENT_BUS.addListener(ColdSweatCompatHandler::onPlayerInVehicle);
+            ServerTickEvents.END_SERVER_TICK.register(server -> { });
         }
 
-        MinecraftForge.EVENT_BUS.register(this);
-
-        CustomData.load();
-    }
-
-    public static ResourceLocation loc(String path) {
-        return new ResourceLocation(MODID, path);
-    }
-
-    private static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> SERVER_QUEUE = new ConcurrentLinkedQueue<>();
-    private static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> CLIENT_QUEUE = new ConcurrentLinkedQueue<>();
-
-    public static void queueServerWork(int tick, Runnable action) {
-        SERVER_QUEUE.add(new AbstractMap.SimpleEntry<>(action, tick));
-    }
-
-    public static void queueClientWork(int tick, Runnable action) {
-        CLIENT_QUEUE.add(new AbstractMap.SimpleEntry<>(action, tick));
-    }
-
-    @SubscribeEvent
-    public void tick(TickEvent.ServerTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
             List<AbstractMap.SimpleEntry<Runnable, Integer>> actions = new ArrayList<>();
             SERVER_QUEUE.forEach(work -> {
                 work.setValue(work.getValue() - 1);
@@ -109,31 +100,25 @@ public class Mod {
             });
             actions.forEach(e -> e.getKey().run());
             SERVER_QUEUE.removeAll(actions);
-        }
+        });
+
+        CustomData.load();
     }
 
-    @SubscribeEvent
-    public void tick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            List<AbstractMap.SimpleEntry<Runnable, Integer>> actions = new ArrayList<>();
-            CLIENT_QUEUE.forEach(work -> {
-                work.setValue(work.getValue() - 1);
-                if (work.getValue() == 0)
-                    actions.add(work);
-            });
-            actions.forEach(e -> e.getKey().run());
-            CLIENT_QUEUE.removeAll(actions);
-        }
+    public static ResourceLocation loc(String path) {
+        return new ResourceLocation(MODID, path);
     }
 
-    public void onCommonSetup(final FMLCommonSetupEvent event) {
-        com.atsuishio.superbwarfare.network.NetworkRegistry.register();
+    public static void queueServerWork(int tick, Runnable action) {
+        SERVER_QUEUE.add(new AbstractMap.SimpleEntry<>(action, tick));
     }
 
-    public void onClientSetup(final FMLClientSetupEvent event) {
-        MouseMovementHandler.init();
-        MolangVariable.register();
-        event.enqueueWork(ModSoundInstances::init);
+    public static MinecraftServer getServer() {
+        return serverInstance;
+    }
+
+    public static void queueClientWork(int tick, Runnable action) {
+        CLIENT_QUEUE.add(new AbstractMap.SimpleEntry<>(action, tick));
     }
 
     private void registerDataTickets() {

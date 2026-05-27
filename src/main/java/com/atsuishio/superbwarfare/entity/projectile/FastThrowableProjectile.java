@@ -14,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.EntitySpawnS2CPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -28,10 +29,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.entity.IEntityAdditionalSpawnData;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -42,7 +39,7 @@ import java.util.function.Consumer;
 
 import static com.atsuishio.superbwarfare.tools.TraceTool.getBlocksAlongRay;
 
-public abstract class FastThrowableProjectile extends ThrowableItemProjectile implements CustomSyncMotionEntity, IEntityAdditionalSpawnData, ExplosiveProjectile {
+public abstract class FastThrowableProjectile extends ThrowableItemProjectile implements CustomSyncMotionEntity, ExplosiveProjectile {
 
     public static Consumer<FastThrowableProjectile> playFlySound = projectile -> {
     };
@@ -152,29 +149,27 @@ public abstract class FastThrowableProjectile extends ThrowableItemProjectile im
     @Override
     protected void onHitEntity(@NotNull EntityHitResult pResult) {
         super.onHitEntity(pResult);
-        MinecraftForge.EVENT_BUS.post(
-                new ProjectileHitEvent.HitEntity(
+        // TODO Fabric: Replace with Fabric event API for projectile hit entity
+                /*new ProjectileHitEvent.HitEntity(
                         this.getOwner(),
                         this,
                         pResult.getEntity(),
                         pResult.getLocation()
-                )
-        );
+                )*/
     }
 
     @Override
     protected void onHitBlock(@NotNull BlockHitResult pResult) {
         super.onHitBlock(pResult);
-        MinecraftForge.EVENT_BUS.post(
-                new ProjectileHitEvent.HitBlock(
+        // TODO Fabric: Replace with Fabric event API for projectile hit block
+                /*new ProjectileHitEvent.HitBlock(
                         pResult.getBlockPos(),
                         this.level().getBlockState(pResult.getBlockPos()),
                         pResult.getDirection(),
                         this.getOwner(),
                         this,
                         pResult.getLocation()
-                )
-        );
+                )*/
     }
 
     public void destroyBlock() {
@@ -296,7 +291,7 @@ public abstract class FastThrowableProjectile extends ThrowableItemProjectile im
         if (!shouldSyncMotion()) return;
 
         if (this.tickCount % this.getType().updateInterval() == 0) {
-            NetworkRegistry.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new ClientMotionSyncMessage(this));
+            NetworkRegistry.sendToTracking(this, new ClientMotionSyncMessage(this));
         }
     }
 
@@ -336,7 +331,7 @@ public abstract class FastThrowableProjectile extends ThrowableItemProjectile im
 
     @Override
     public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return new EntitySpawnS2CPacket(this);
     }
 
     @Override

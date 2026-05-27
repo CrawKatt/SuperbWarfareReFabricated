@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.block.entity.ChargingStationBlockEntity;
 import com.atsuishio.superbwarfare.init.ModMenuTypes;
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData;
 import com.atsuishio.superbwarfare.network.dataslot.SimpleEnergyData;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,9 +13,8 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.NotNull;
+import team.reborn.energy.api.EnergyStorage;
 
 public class ChargingStationMenu extends EnergyMenu {
 
@@ -64,11 +64,11 @@ public class ChargingStationMenu extends EnergyMenu {
                     return ItemStack.EMPTY;
                 }
             } else if (pIndex != 0) {
-                if (itemstack1.getCapability(ForgeCapabilities.ENERGY).isPresent()) {
+                if (EnergyStorage.ITEM.get(itemstack1, ContainerItemContext.withConstant(itemstack1)) != null) {
                     if (!this.moveItemStackTo(itemstack1, 1, 2, true)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (ForgeHooks.getBurnTime(itemstack1, RecipeType.SMELTING) > 0 || itemstack1.getFoodProperties(null) != null) {
+                } else if (itemstack1.getBurnTime(RecipeType.SMELTING) > 0 || itemstack1.getFoodProperties(null) != null) {
                     if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
