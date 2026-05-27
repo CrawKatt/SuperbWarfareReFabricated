@@ -10,16 +10,14 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
-public class MortarInfoOverlay implements IGuiOverlay {
+
+public class MortarInfoOverlay {
 
     public static final String ID = Mod.MODID + "_mortar_info";
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Player player = gui.getMinecraft().player;
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        Player player = Minecraft.getInstance().player;
         Entity lookingEntity = null;
         if (player != null) {
             lookingEntity = TraceTool.findLookingEntity(player, 6);

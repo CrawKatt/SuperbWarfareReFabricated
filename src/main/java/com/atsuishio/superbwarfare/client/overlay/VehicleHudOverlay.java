@@ -25,17 +25,16 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
-import org.joml.Math;
-import top.theillusivec4.curios.api.CuriosApi;
+import dev.emi.trinkets.api.TrinketsApi;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 import static com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay.*;
 
-public class VehicleHudOverlay implements IGuiOverlay {
+public class VehicleHudOverlay {
 
     public static final String ID = Mod.MODID + "_vehicle_hud";
     public static final int ANIMATION_TIME = 300;
@@ -81,9 +80,8 @@ public class VehicleHudOverlay implements IGuiOverlay {
     private static int oldWeaponIndex = 0;
     private static int oldRenderWeaponIndex = 0;
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Player player = gui.getMinecraft().player;
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        Player player = Minecraft.getInstance().player;
 
         if (!shouldRenderHud(player)) {
             wasRenderingWeapons = false;
@@ -214,14 +212,14 @@ public class VehicleHudOverlay implements IGuiOverlay {
             }
 
             if (passenger instanceof Player player) {
-                CuriosApi.getCuriosInventory(player).ifPresent(
-                        c -> c.findFirstCurio(ModItems.DOG_TAG.get()).ifPresent(
-                                s -> {
-                                    if (s.stack().hasCustomHoverName()) {
-                                        name.set(s.stack().getHoverName().getString());
-                                    }
-                                }
-                        )
+                TrinketsApi.getTrinketComponent(player).flatMap(
+                        c -> c.getEquipped(ModItems.DOG_TAG.get()).stream().findFirst()
+                ).ifPresent(
+                        pair -> {
+                            if (pair.getB().hasCustomHoverName()) {
+                                name.set(pair.getB().getHoverName().getString());
+                            }
+                        }
                 );
             }
 

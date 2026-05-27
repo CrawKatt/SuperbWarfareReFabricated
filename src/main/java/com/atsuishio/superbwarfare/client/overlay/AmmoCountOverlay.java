@@ -15,10 +15,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
-public class AmmoCountOverlay implements IGuiOverlay {
+
+public class AmmoCountOverlay {
 
     public static final String ID = Mod.MODID + "_ammo_count";
 
@@ -39,10 +38,9 @@ public class AmmoCountOverlay implements IGuiOverlay {
     /**
      * 在手持弹药或弹药盒时，渲染玩家弹药总量信息
      */
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         boolean startRenderingAmmoInfo = false;
-        Player player = gui.getMinecraft().player;
+        Player player = Minecraft.getInstance().player;
         if (player == null || player.isSpectator()) return;
 
         boolean isAmmoBox = false;

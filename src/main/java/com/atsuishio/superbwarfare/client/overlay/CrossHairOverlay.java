@@ -27,12 +27,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 
-public class CrossHairOverlay implements IGuiOverlay {
+public class CrossHairOverlay {
 
     public static final String ID = Mod.MODID + "_cross_hair";
 
@@ -63,9 +62,8 @@ public class CrossHairOverlay implements IGuiOverlay {
     private static float scopeScale = 1f;
     public static float gunRot;
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Player player = gui.getMinecraft().player;
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        Player player = Minecraft.getInstance().player;
         if (player == null) return;
         if (player.isSpectator()) return;
 

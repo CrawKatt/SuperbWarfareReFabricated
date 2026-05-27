@@ -25,21 +25,19 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Team;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+
 
 import static com.atsuishio.superbwarfare.entity.vehicle.DroneEntity.CONTROLLER;
 import static com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity.ACTIVE;
 
-public class VehicleTeamOverlay implements IGuiOverlay {
+public class VehicleTeamOverlay {
 
     public static final String ID = Mod.MODID + "_vehicle_team";
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (!DisplayConfig.VEHICLE_INFO.get()) return;
 
-        Minecraft mc = gui.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         if (player == null) return;
 
@@ -93,7 +91,7 @@ public class VehicleTeamOverlay implements IGuiOverlay {
 
                 float size = (float) Mth.clamp((50 / VectorUtil.fov) * 0.9f * Math.max((512 - entityRange) / 512, 0.1), 0.4, 1);
                 poseStack.scale(size, size, size);
-                var font = gui.getMinecraft().font;
+                var font = Minecraft.getInstance().font;
 
                 int color = -1;
 
@@ -163,7 +161,7 @@ public class VehicleTeamOverlay implements IGuiOverlay {
                 poseStack.pushPose();
                 poseStack.translate(x, y - 12, 0);
 
-                var font = gui.getMinecraft().font;
+                var font = Minecraft.getInstance().font;
                 Entity entity = autoAimableEntity.getOwner();
 
                 if (entity != null) {

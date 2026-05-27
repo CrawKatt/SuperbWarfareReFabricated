@@ -7,23 +7,22 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
-public class StaminaOverlay implements IGuiOverlay {
+
+public class StaminaOverlay {
 
     public static final String ID = Mod.MODID + "_stamina";
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (!DisplayConfig.STAMINA_HUD.get()) return;
 
-        Player player = gui.getMinecraft().player;
+        Player player = Minecraft.getInstance().player;
         if (player == null) return;
         if (ClientEventHandler.isEditing) return;
         if (player.getVehicle() instanceof VehicleEntity vehicle && vehicle.banHand(player)) return;

@@ -21,12 +21,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+
 
 import java.util.List;
 
-public class HandsomeFrameOverlay implements IGuiOverlay {
+public class HandsomeFrameOverlay {
 
     public static final String ID = Mod.MODID + "_handsome_frame";
 
@@ -35,9 +34,8 @@ public class HandsomeFrameOverlay implements IGuiOverlay {
     private static final ResourceLocation FRAME_TARGET = Mod.loc("textures/overlay/frame/frame_target_triangle.png");
     private static final ResourceLocation FRAME_LOCK = Mod.loc("textures/overlay/frame/frame_lock.png");
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Player player = gui.getMinecraft().player;
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        Player player = Minecraft.getInstance().player;
         PoseStack poseStack = guiGraphics.pose();
 
         if (player == null) return;

@@ -27,12 +27,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
-import org.jetbrains.annotations.Nullable;
-import top.theillusivec4.curios.api.CuriosApi;
 
-public class KillMessageOverlay implements IGuiOverlay {
+import org.jetbrains.annotations.Nullable;
+import dev.emi.trinkets.api.TrinketsApi;
+
+public class KillMessageOverlay {
 
     public static final String ID = Mod.MODID + "_kill_message";
 
@@ -49,13 +48,12 @@ public class KillMessageOverlay implements IGuiOverlay {
     private static final ResourceLocation LASER = Mod.loc("textures/overlay/damage_types/laser.png");
     private static final ResourceLocation VEHICLE = Mod.loc("textures/overlay/damage_types/vehicle_strike.png");
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (!KillMessageConfig.SHOW_KILL_MESSAGE.get()) {
             return;
         }
 
-        Player player = gui.getMinecraft().player;
+        Player player = Minecraft.getInstance().player;
 
         if (player == null) {
             return;
@@ -359,28 +357,28 @@ public class KillMessageOverlay implements IGuiOverlay {
         if (entity instanceof LivingEntity living && living instanceof OwnableEntity ownableEntity && ownableEntity.getOwner() instanceof Player player) {
             if (DisplayConfig.DOG_TAG_NAME_VISIBLE.get()) {
                 name[0] = player.getDisplayName().getString() + " + " + entityName;
-                CuriosApi.getCuriosInventory(player).ifPresent(
-                        c -> c.findFirstCurio(ModItems.DOG_TAG.get()).ifPresent(
-                                s -> {
-                                    if (s.stack().hasCustomHoverName()) {
-                                        name[0] = s.stack().getHoverName().getString() + " + " + entityName;
-                                    }
-                                }
-                        )
+                TrinketsApi.getTrinketComponent(player).flatMap(
+                        c -> c.getEquipped(ModItems.DOG_TAG.get()).stream().findFirst()
+                ).ifPresent(
+                        pair -> {
+                            if (pair.getB().hasCustomHoverName()) {
+                                name[0] = pair.getB().getHoverName().getString() + " + " + entityName;
+                            }
+                        }
                 );
             } else {
                 name[0] = player.getDisplayName().getString() + " + " + entityName;
             }
         } else if (entity instanceof Player player) {
             if (!DisplayConfig.DOG_TAG_NAME_VISIBLE.get()) return name[0];
-            CuriosApi.getCuriosInventory(player).ifPresent(
-                    c -> c.findFirstCurio(ModItems.DOG_TAG.get()).ifPresent(
-                            s -> {
-                                if (s.stack().hasCustomHoverName()) {
-                                    name[0] = s.stack().getHoverName().getString();
-                                }
-                            }
-                    )
+            TrinketsApi.getTrinketComponent(player).flatMap(
+                    c -> c.getEquipped(ModItems.DOG_TAG.get()).stream().findFirst()
+            ).ifPresent(
+                    pair -> {
+                        if (pair.getB().hasCustomHoverName()) {
+                            name[0] = pair.getB().getHoverName().getString();
+                        }
+                    }
             );
         }
         return name[0];
@@ -391,14 +389,14 @@ public class KillMessageOverlay implements IGuiOverlay {
         String[] name = {entityName};
         if (entity instanceof Player player) {
             if (!DisplayConfig.DOG_TAG_NAME_VISIBLE.get()) return name[0];
-            CuriosApi.getCuriosInventory(player).ifPresent(
-                    c -> c.findFirstCurio(ModItems.DOG_TAG.get()).ifPresent(
-                            s -> {
-                                if (s.stack().hasCustomHoverName()) {
-                                    name[0] = s.stack().getHoverName().getString();
-                                }
-                            }
-                    )
+            TrinketsApi.getTrinketComponent(player).flatMap(
+                    c -> c.getEquipped(ModItems.DOG_TAG.get()).stream().findFirst()
+            ).ifPresent(
+                    pair -> {
+                        if (pair.getB().hasCustomHoverName()) {
+                            name[0] = pair.getB().getHoverName().getString();
+                        }
+                    }
             );
         }
         return name[0];
@@ -431,25 +429,26 @@ public class KillMessageOverlay implements IGuiOverlay {
 
     public static boolean shouldRenderDogTagIcon(LivingEntity living) {
         boolean[] flag = {false};
-        CuriosApi.getCuriosInventory(living).ifPresent(
-                c -> c.findFirstCurio(ModItems.DOG_TAG.get()).ifPresent(
-                        s -> {
-                            var stack = s.stack();
-                            if (ClientDogTagImageTooltip.shouldRenderIcon(stack)) {
-                                flag[0] = true;
-                            }
-                        }
-                )
+        TrinketsApi.getTrinketComponent(living).flatMap(
+                c -> c.getEquipped(ModItems.DOG_TAG.get()).stream().findFirst()
+        ).ifPresent(
+                pair -> {
+                    var stack = pair.getB();
+                    if (ClientDogTagImageTooltip.shouldRenderIcon(stack)) {
+                        flag[0] = true;
+                    }
+                }
         );
         return flag[0] && DisplayConfig.DOG_TAG_ICON_VISIBLE.get();
     }
 
     public static void renderDogTagIcon(GuiGraphics guiGraphics, LivingEntity living, float x, float y) {
-        CuriosApi.getCuriosInventory(living).ifPresent(
-                c -> c.findFirstCurio(ModItems.DOG_TAG.get()).ifPresent(
-                        s -> {
-                            var stack = s.stack();
-                            short[][] icon = DogTagItem.getColors(stack);
+        TrinketsApi.getTrinketComponent(living).flatMap(
+                c -> c.getEquipped(ModItems.DOG_TAG.get()).stream().findFirst()
+        ).ifPresent(
+                pair -> {
+                    var stack = pair.getB();
+                    short[][] icon = DogTagItem.getColors(stack);
 
                             guiGraphics.pose().pushPose();
 
@@ -464,7 +463,6 @@ public class KillMessageOverlay implements IGuiOverlay {
 
                             guiGraphics.pose().popPose();
                         }
-                )
         );
     }
 }

@@ -156,6 +156,7 @@ dependencies {
 
     // Event Wrapper
     implementation("com.github.Lounode.EventWrapper:eventwrapper-common:1.20.1-SNAPSHOT")
+    modImplementation("com.github.Lounode.EventWrapper:eventwrapper-forge:1.20.1-SNAPSHOT")
     modImplementation("com.github.Lounode.EventWrapper:eventwrapper-fabric:1.20.1-SNAPSHOT")
 
     // JSR-305 (javax.annotation @ParametersAreNonnullByDefault)

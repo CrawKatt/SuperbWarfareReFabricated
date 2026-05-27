@@ -20,14 +20,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+
 import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-public class AmmoBarOverlay implements IGuiOverlay {
+public class AmmoBarOverlay {
 
     public static final String ID = Mod.MODID + "_ammo_bar";
 
@@ -79,11 +78,10 @@ public class AmmoBarOverlay implements IGuiOverlay {
 
     private static final Pattern REPLACE_FORMAT_CODE = Pattern.compile("§.");
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (!DisplayConfig.AMMO_HUD.get()) return;
 
-        Player player = gui.getMinecraft().player;
+        Player player = Minecraft.getInstance().player;
 
         if (player == null) return;
         if (player.isSpectator()) return;

@@ -25,12 +25,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 
-public class IglaHudOverlay implements IGuiOverlay {
+public class IglaHudOverlay {
 
     public static final String ID = Mod.MODID + "_igla_9k38_hud";
 
@@ -46,11 +45,10 @@ public class IglaHudOverlay implements IGuiOverlay {
     private static float scopeScale = 1;
     private static float lerpSeeking = 1;
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Player player = gui.getMinecraft().player;
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        Player player = Minecraft.getInstance().player;
         PoseStack poseStack = guiGraphics.pose();
-        Camera camera = gui.getMinecraft().gameRenderer.getMainCamera();
+        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
 
         if (player == null) return;
         ItemStack stack = player.getMainHandItem();

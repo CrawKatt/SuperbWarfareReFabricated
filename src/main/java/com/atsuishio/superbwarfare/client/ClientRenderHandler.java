@@ -5,17 +5,17 @@ import com.atsuishio.superbwarfare.client.animation.AnimationCurves;
 import com.atsuishio.superbwarfare.client.model.curio.ParachuteModel;
 import com.atsuishio.superbwarfare.client.renderer.block.*;
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
+import com.atsuishio.superbwarfare.client.overlay.*;
 import com.atsuishio.superbwarfare.client.tooltip.*;
 import com.atsuishio.superbwarfare.client.tooltip.component.*;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
-import com.atsuishio.superbwarfare.init.ModItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
-import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
 public class ClientRenderHandler {
 
@@ -47,7 +47,34 @@ public class ClientRenderHandler {
     }
 
     public static void onClientSetup() {
-        CuriosRendererRegistry.register(ModItems.PARACHUTE.get(), ParachuteRenderer::new);
+        HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> {
+            var mc = Minecraft.getInstance();
+            if (mc.player == null) return;
+            int w = mc.getWindow().getGuiScaledWidth();
+            int h = mc.getWindow().getGuiScaledHeight();
+
+            AmmoBarOverlay.render(guiGraphics, tickDelta, w, h);
+            AmmoCountOverlay.render(guiGraphics, tickDelta, w, h);
+            ArmorPlateOverlay.render(guiGraphics, tickDelta, w, h);
+            CrossHairOverlay.render(guiGraphics, tickDelta, w, h);
+            DroneHudOverlay.render(guiGraphics, tickDelta, w, h);
+            HandsomeFrameOverlay.render(guiGraphics, tickDelta, w, h);
+            HeatBarOverlay.render(guiGraphics, tickDelta, w, h);
+            IFFOverlay.render(guiGraphics, tickDelta, w, h);
+            IglaHudOverlay.render(guiGraphics, tickDelta, w, h);
+            ItemRendererFixOverlay.render(guiGraphics, tickDelta, w, h);
+            JavelinHudOverlay.render(guiGraphics, tickDelta, w, h);
+            KillMessageOverlay.render(guiGraphics, tickDelta, w, h);
+            MortarInfoOverlay.render(guiGraphics, tickDelta, w, h);
+            RedTriangleOverlay.render(guiGraphics, tickDelta, w, h);
+            SpyglassRangeOverlay.render(guiGraphics, tickDelta, w, h);
+            StaminaOverlay.render(guiGraphics, tickDelta, w, h);
+            TowOverlay.render(guiGraphics, tickDelta, w, h);
+            Type63InfoOverlay.render(guiGraphics, tickDelta, w, h);
+            VehicleCrosshairOverlay.render(guiGraphics, tickDelta, w, h);
+            VehicleHudOverlay.render(guiGraphics, tickDelta, w, h);
+            VehicleTeamOverlay.render(guiGraphics, tickDelta, w, h);
+        });
     }
 
     public static void registerLayerDefinitions() {

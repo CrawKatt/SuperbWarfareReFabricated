@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.tools.VectorTool;
 import com.mojang.math.Axis;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -26,7 +27,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.joml.Math;
 import org.joml.Matrix4d;
 import org.joml.Vector3d;
@@ -84,7 +84,7 @@ public final class VehicleMotionUtils {
                         entity -> entity != vehicle && entity != vehicle.getFirstPassenger() && entity.getVehicle() == null)
                 .stream().filter(entity -> {
                             if (entity.isAlive() && vehicle.isInObb(entity, vehicle.getDeltaMovement())) {
-                                var type = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType());
+                                var type = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
                                 if (type == null) return false;
                                 return (entity instanceof VehicleEntity || entity instanceof Boat || entity instanceof Minecart || (entity instanceof LivingEntity living && !(living instanceof Player player && player.isSpectator()))) || VehicleConfig.COLLISION_ENTITY_WHITELIST.get().contains(type.toString());
                             }
@@ -204,7 +204,7 @@ public final class VehicleMotionUtils {
                             entity -> entity != vehicle && entity != vehicle.getFirstPassenger() && entity.getVehicle() == null)
                     .stream().filter(entity -> {
                                 if (entity.isAlive() && vehicle.isInObb(entity, vec3)) {
-                                    var type = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType());
+                                    var type = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
                                     if (type == null) return false;
                                     return (entity instanceof VehicleEntity || entity instanceof Boat || entity instanceof Minecart || (entity instanceof LivingEntity living && !(living instanceof Player player && player.isSpectator()))) || VehicleConfig.COLLISION_ENTITY_WHITELIST.get().contains(type.toString());
                                 }
@@ -218,7 +218,7 @@ public final class VehicleMotionUtils {
                             entity -> entity != vehicle && entity != vehicle.getFirstPassenger() && entity.getVehicle() == null)
                     .stream().filter(entity -> {
                                 if (entity.isAlive()) {
-                                    var type = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType());
+                                    var type = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType());
                                     if (type == null) return false;
                                     return (entity instanceof VehicleEntity || entity instanceof Boat || entity instanceof Minecart
                                             || (entity instanceof LivingEntity living && !(living instanceof Player player && player.isSpectator())))
@@ -465,7 +465,7 @@ public final class VehicleMotionUtils {
 
                 updateTerrainCompact(vehicle, p, heightY);
             }
-        } else if (vehicle.isInFluidType()) {
+        } else if (vehicle.isInWater() || vehicle.isInLava()) {
             vehicle.setXRot(vehicle.getXRot() * 0.9f);
             vehicle.setZRot(vehicle.getRoll() * 0.9f);
         }

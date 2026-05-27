@@ -25,8 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+
 
 import java.util.List;
 
@@ -36,7 +35,7 @@ import static com.atsuishio.superbwarfare.client.overlay.IFFOverlay.FRIENDLY_IND
 import static com.atsuishio.superbwarfare.entity.vehicle.DroneEntity.*;
 import static com.atsuishio.superbwarfare.item.ArtilleryIndicator.TAG_CANNON;
 
-public class DroneHudOverlay implements IGuiOverlay {
+public class DroneHudOverlay {
 
     public static final String ID = Mod.MODID + "_drone_hud";
 
@@ -53,9 +52,8 @@ public class DroneHudOverlay implements IGuiOverlay {
         return (connection == null ? 16 : connection.serverSimulationDistance) * 16;
     }
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Minecraft mc = gui.getMinecraft();
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         Camera camera = mc.gameRenderer.getMainCamera();
         Vec3 cameraPos = camera.getPosition();

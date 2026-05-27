@@ -24,14 +24,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 import static com.atsuishio.superbwarfare.client.overlay.IFFOverlay.FRIENDLY_ARTILLERY;
 import static com.atsuishio.superbwarfare.item.ArtilleryIndicator.TAG_CANNON;
 
-public class SpyglassRangeOverlay implements IGuiOverlay {
+public class SpyglassRangeOverlay {
 
     public static final String ID = Mod.MODID + "_spyglass_range";
 
@@ -41,11 +40,10 @@ public class SpyglassRangeOverlay implements IGuiOverlay {
     private static float scopeScale = 1;
     private static float lerpHoldArtilleryIndicator;
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Minecraft mc = gui.getMinecraft();
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        Minecraft mc = Minecraft.getInstance();
         PoseStack poseStack = guiGraphics.pose();
-        Player player = gui.getMinecraft().player;
+        Player player = Minecraft.getInstance().player;
 
         if (player == null) return;
 

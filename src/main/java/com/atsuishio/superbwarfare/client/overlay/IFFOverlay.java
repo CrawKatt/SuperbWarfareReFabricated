@@ -22,15 +22,14 @@ import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
-import top.theillusivec4.curios.api.CuriosApi;
+
+import dev.emi.trinkets.api.TrinketsApi;
 
 import java.util.List;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 
-public class IFFOverlay implements IGuiOverlay {
+public class IFFOverlay {
 
     public static final String ID = Mod.MODID + "_iff";
 
@@ -47,20 +46,20 @@ public class IFFOverlay implements IGuiOverlay {
     public static final ResourceLocation FRIENDLY_HELICOPTER = Mod.loc("textures/overlay/teammate/friendly_helicopter.png");
     public static final ResourceLocation FRIENDLY_MINE = Mod.loc("textures/overlay/teammate/friendly_mine.png");
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (!DisplayConfig.VEHICLE_INFO.get()) return;
 
-        Minecraft mc = gui.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         Camera camera = mc.gameRenderer.getMainCamera();
         Vec3 cameraPos = camera.getPosition();
 
         if (player == null) return;
 
-        CuriosApi.getCuriosInventory(player).ifPresent(
-                c -> c.findFirstCurio(ModItems.IFF.get()).ifPresent(
-                        s -> {
+        TrinketsApi.getTrinketComponent(player).flatMap(
+                c -> c.getEquipped(ModItems.IFF.get()).stream().findFirst()
+        ).ifPresent(
+                        pair -> {
                             List<Entity> entities = new SeekTool.Builder(player)
                                     .friendly()
                                     .build();
@@ -94,7 +93,6 @@ public class IFFOverlay implements IGuiOverlay {
                                 }
                             }
                         }
-                )
         );
     }
 

@@ -4,15 +4,15 @@ import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.config.client.DisplayConfig;
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.init.ModTags;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
-public class ArmorPlateOverlay implements IGuiOverlay {
+
+public class ArmorPlateOverlay {
 
     public static final String ID = Mod.MODID + "_armor_plate";
 
@@ -24,11 +24,10 @@ public class ArmorPlateOverlay implements IGuiOverlay {
     private static final ResourceLocation BAR_FRAME_2 = Mod.loc("textures/overlay/armor_plate/bar_frame_2.png");
     private static final ResourceLocation BAR_FRAME_3 = Mod.loc("textures/overlay/armor_plate/bar_frame_3.png");
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (!DisplayConfig.ARMOR_PLATE_HUD.get()) return;
 
-        var mc = gui.getMinecraft();
+        var mc = Minecraft.getInstance();
 
         Player player = mc.player;
         if (player == null) return;

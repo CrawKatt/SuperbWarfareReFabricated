@@ -15,6 +15,7 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -24,7 +25,6 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -67,7 +67,7 @@ public class SbwJEIPlugin implements IModPlugin {
         if (level == null) return;
         RecipeManager recipeManager = level.getRecipeManager();
 
-        var guns = ForgeRegistries.ITEMS.getValues().stream().filter(item -> item instanceof GunItem).map(Item::getDefaultInstance).toList();
+        var guns = BuiltInRegistries.ITEM.stream().filter(item -> item instanceof GunItem).map(Item::getDefaultInstance).toList();
         registration.addRecipes(GunPerksCategory.TYPE, guns);
         registration.addRecipes(VehicleAssemblingCategory.TYPE, recipeManager.getAllRecipesFor(ModRecipes.VEHICLE_ASSEMBLING_TYPE.get()));
 

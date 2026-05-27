@@ -11,15 +11,15 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
-public class HeatBarOverlay implements IGuiOverlay {
+
+public class HeatBarOverlay {
 
     public static final String ID = Mod.MODID + "_heat_bar";
 
@@ -28,11 +28,10 @@ public class HeatBarOverlay implements IGuiOverlay {
     private static final AnimationTimer ANIMATION_TIMER = new AnimationTimer(200)
             .animation(AnimationCurves.EASE_IN_QUART);
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (!DisplayConfig.ENABLE_HEAT_BAR_HUD.get()) return;
 
-        Player player = gui.getMinecraft().player;
+        Player player = Minecraft.getInstance().player;
         if (player == null) return;
 
         double heat;

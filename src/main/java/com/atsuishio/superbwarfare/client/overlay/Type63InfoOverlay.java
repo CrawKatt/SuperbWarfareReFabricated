@@ -16,15 +16,14 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+
 
 import static com.atsuishio.superbwarfare.entity.vehicle.Type63Entity.SHOOT_PITCH;
 import static com.atsuishio.superbwarfare.entity.vehicle.Type63Entity.SHOOT_YAW;
 import static com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotFromVector;
 import static com.atsuishio.superbwarfare.tools.RangeTool.calculateLaunchVector;
 
-public class Type63InfoOverlay implements IGuiOverlay {
+public class Type63InfoOverlay {
 
     public static final String ID = Mod.MODID + "_type_63_info";
 
@@ -32,9 +31,8 @@ public class Type63InfoOverlay implements IGuiOverlay {
     private static final ItemStack HE = new ItemStack(ModItems.MEDIUM_ROCKET_HE.get());
     private static final ItemStack CM = new ItemStack(ModItems.MEDIUM_ROCKET_CM.get());
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Minecraft mc = gui.getMinecraft();
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
         PoseStack poseStack = guiGraphics.pose();
 

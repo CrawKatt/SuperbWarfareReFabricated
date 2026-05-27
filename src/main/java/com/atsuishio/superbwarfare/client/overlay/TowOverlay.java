@@ -13,23 +13,21 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 
-public class TowOverlay implements IGuiOverlay {
+public class TowOverlay {
     public static final String ID = Mod.MODID + "_tow";
 
     private static final ResourceLocation SPYGLASS = Mod.loc("textures/overlay/spyglass/spyglass.png");
 
     private static float scopeScale = 1;
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Minecraft mc = gui.getMinecraft();
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        Minecraft mc = Minecraft.getInstance();
         PoseStack poseStack = guiGraphics.pose();
-        Player player = gui.getMinecraft().player;
+        Player player = Minecraft.getInstance().player;
 
         if (player == null) return;
 

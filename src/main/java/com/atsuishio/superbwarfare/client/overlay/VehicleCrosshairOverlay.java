@@ -24,8 +24,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+
 import org.joml.Math;
 
 import java.util.Map;
@@ -33,7 +32,7 @@ import java.util.Map;
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 import static com.atsuishio.superbwarfare.client.overlay.weapon.LandVehicleHud.lerpRecoil;
 
-public class VehicleCrosshairOverlay implements IGuiOverlay {
+public class VehicleCrosshairOverlay {
 
     public static final String ID = Mod.MODID + "_vehicle_crosshair";
 
@@ -60,9 +59,8 @@ public class VehicleCrosshairOverlay implements IGuiOverlay {
     private static final ResourceLocation CROSSHAIR_THIRD_CAMERA = Mod.loc("textures/overlay/vehicle/crosshair/third_camera.png");
     private static float scopeScale = 1;
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Minecraft mc = gui.getMinecraft();
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        Minecraft mc = Minecraft.getInstance();
         var player = mc.player;
         if (player == null || player.isSpectator()) {
             resetScale();
