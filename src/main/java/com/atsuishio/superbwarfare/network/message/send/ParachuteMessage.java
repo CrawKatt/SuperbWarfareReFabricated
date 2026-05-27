@@ -3,9 +3,9 @@ package com.atsuishio.superbwarfare.network.message.send;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.item.curio.ParachuteItem;
+import dev.emi.trinkets.api.TrinketsApi;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import top.theillusivec4.curios.api.CuriosApi;
 
 public enum ParachuteMessage {
     INSTANCE;
@@ -13,10 +13,10 @@ public enum ParachuteMessage {
     public static void handler(ServerPlayer player) {
         if (player == null) return;
 
-        CuriosApi.getCuriosInventory(player).ifPresent(
-                c -> c.findFirstCurio(ModItems.PARACHUTE.get()).ifPresent(
-                        s -> {
-                            var stack = s.stack();
+        TrinketsApi.getTrinketComponent(player).ifPresent(
+                c -> c.getEquipped(ModItems.PARACHUTE.get()).stream().findFirst().ifPresent(
+                        pair -> {
+                            var stack = pair.getB();
                             if (!player.getCooldowns().isOnCooldown(stack.getItem())) {
                                 if (!stack.getOrCreateTag().getBoolean(ParachuteItem.TAG_OPEN) && player.getDeltaMovement().y < -0.6 && player.fallDistance > 4) {
                                     stack.getOrCreateTag().putBoolean(ParachuteItem.TAG_OPEN, true);
