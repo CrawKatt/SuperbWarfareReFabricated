@@ -119,4 +119,8 @@ public class ModTabs {
                 .map(potion -> net.minecraft.world.item.alchemy.PotionUtils.setPotion(new ItemStack(potionItem), potion.value()))
                 .forEach(output::accept);
     }
+
+    public static void register() {
+
+    }
 }

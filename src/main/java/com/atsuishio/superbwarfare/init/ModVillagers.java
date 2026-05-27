@@ -35,4 +35,8 @@ public class ModVillagers {
     public static void addWandererTrade() {
         // Wanderer trades need different handling in Fabric
     }
+
+    public static void register() {
+
+    }
 }

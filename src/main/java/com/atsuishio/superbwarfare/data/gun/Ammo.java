@@ -115,13 +115,11 @@ public enum Ammo {
     }
 
     public int get(Player player) {
-        return player.getCapability(ModCapabilities.PLAYER_VARIABLE)
-                .map(this::get)
-                .orElse(0);
+        return get(ModCapabilities.PLAYER_VARIABLE.get(player));
     }
 
     public void set(Player player, int count) {
-        PlayerVariable.modify(player, c -> set(c, Math.max(0, count)));
+        set(ModCapabilities.PLAYER_VARIABLE.get(player), Math.max(0, count));
     }
 
     public void add(Player player, int count) {

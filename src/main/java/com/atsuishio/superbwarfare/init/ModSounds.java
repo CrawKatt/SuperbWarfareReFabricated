@@ -166,4 +166,8 @@ public class ModSounds {
 
     public static final Supplier<SoundEvent> TERRAIN = Registration.sound("terrain", () -> SoundEvent.createVariableRangeEvent(Mod.loc("terrain")));
     public static final Supplier<SoundEvent> PULL_UP = Registration.sound("pull_up", () -> SoundEvent.createVariableRangeEvent(Mod.loc("pull_up")));
+
+    public static void register() {
+
+    }
 }

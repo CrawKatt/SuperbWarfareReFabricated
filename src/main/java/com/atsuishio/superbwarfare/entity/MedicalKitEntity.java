@@ -76,7 +76,7 @@ public class MedicalKitEntity extends Entity implements GeoEntity {
         if (this.onGround()) {
             this.setXRot(-90);
             BlockPos pos = this.getBlockPosBelowThatAffectsMyMovement();
-            f = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98F;
+            f = this.level().getBlockState(pos).getBlock().getFriction() * 0.98F;
         } else {
             this.updateRotation();
         }

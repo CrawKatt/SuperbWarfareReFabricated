@@ -9,4 +9,8 @@ import java.util.function.Supplier;
 public class ModAttributes {
     public static final Supplier<Attribute> BULLET_RESISTANCE = Registration.attribute("bullet_resistance",
             () -> new RangedAttribute("attribute." + Mod.MODID + ".bullet_resistance", 0, 0, 1).setSyncable(true));
+
+    public static void register() {
+
+    }
 }

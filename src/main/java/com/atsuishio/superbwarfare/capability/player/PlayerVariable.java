@@ -2,13 +2,14 @@ package com.atsuishio.superbwarfare.capability.player;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerVariable {
+public class PlayerVariable implements Component {
 
     public static ResourceLocation ID = Mod.loc("player_variables");
     private PlayerVariable old = null;
@@ -53,24 +54,22 @@ public class PlayerVariable {
         return map;
     }
 
-    public CompoundTag writeToNBT() {
-        CompoundTag nbt = new CompoundTag();
-
+    @Override
+    public void writeToNbt(CompoundTag tag) {
         for (var type : Ammo.values()) {
-            type.set(nbt, type.get(this));
+            type.set(tag, type.get(this));
         }
 
-        nbt.putBoolean("TacticalSprint", tacticalSprint);
-
-        return nbt;
+        tag.putBoolean("TacticalSprint", this.tacticalSprint);
     }
 
-    public void readFromNBT(CompoundTag tag) {
+    @Override
+    public void readFromNbt(CompoundTag tag) {
         for (var type : Ammo.values()) {
             type.set(this, type.get(tag));
         }
 
-        tacticalSprint = tag.getBoolean("TacticalSprint");
+        this.tacticalSprint = tag.getBoolean("TacticalSprint");
     }
 
     public PlayerVariable copy() {
@@ -94,13 +93,5 @@ public class PlayerVariable {
         }
 
         return tacticalSprint == other.tacticalSprint;
-    }
-
-    public CompoundTag serializeNBT() {
-        return writeToNBT();
-    }
-
-    public void deserializeNBT(CompoundTag nbt) {
-        readFromNBT(nbt);
     }
 }

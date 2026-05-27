@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.capability;
 
 import com.atsuishio.superbwarfare.Mod;
+import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 
@@ -8,7 +9,7 @@ public class LaserCapability {
 
     public static ResourceLocation ID = Mod.loc("laser_capability");
 
-    public interface ILaserCapability {
+    public interface ILaserCapability extends Component {
 
         void init(LaserHandler handler);
 
@@ -19,10 +20,6 @@ public class LaserCapability {
         void stop();
 
         void end();
-
-        CompoundTag serializeNBT();
-
-        void deserializeNBT(CompoundTag nbt);
     }
 
     public static class LaserCapabilityImpl implements ILaserCapability {
@@ -58,16 +55,14 @@ public class LaserCapability {
         }
 
         @Override
-        public CompoundTag serializeNBT() {
-            CompoundTag tag = new CompoundTag();
+        public void writeToNbt(CompoundTag tag) {
             if (this.laserHandler != null) {
                 tag.put("Laser", this.laserHandler.writeNBT());
             }
-            return tag;
         }
 
         @Override
-        public void deserializeNBT(CompoundTag nbt) {
+        public void readFromNbt(CompoundTag nbt) {
             if (nbt.contains("Laser") && this.laserHandler != null) {
                 this.laserHandler.readNBT(nbt.getCompound("Laser"));
             }

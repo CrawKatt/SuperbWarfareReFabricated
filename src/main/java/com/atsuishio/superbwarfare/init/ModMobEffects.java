@@ -13,4 +13,8 @@ public class ModMobEffects {
     public static final Supplier<MobEffect> BURN = Registration.effect("burn", BurnMobEffect::new);
     public static final Supplier<MobEffect> STRIKE_PROTECTION = Registration.effect("strike_protection", StrikeProtectionMobEffect::new);
     public static final Supplier<MobEffect> TRAUMA = Registration.effect("trauma", TraumaMobEffect::new);
+
+    public static void register() {
+
+    }
 }

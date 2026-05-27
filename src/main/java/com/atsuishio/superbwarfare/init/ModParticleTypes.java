@@ -38,4 +38,8 @@ public class ModParticleTypes {
             }
         };
     }
+
+    public static void register() {
+
+    }
 }

@@ -3,8 +3,6 @@ package com.atsuishio.superbwarfare;
 import com.atsuishio.superbwarfare.api.event.converter.EventWrapperMappings;
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
 import com.atsuishio.superbwarfare.command.CommandRegister;
-import com.atsuishio.superbwarfare.compat.coldsweat.ColdSweatCompatHandler;
-import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.config.CommonConfig;
 import com.atsuishio.superbwarfare.config.ServerConfig;
 import com.atsuishio.superbwarfare.data.CustomData;
@@ -97,9 +95,11 @@ public class Mod implements ModInitializer {
         if (FabricLoader.getInstance().isModLoaded("tacz")) {
             ServerLifecycleEvents.SERVER_STARTING.register(server -> { });
         }
+        /*
         if (ColdSweatCompatHandler.hasMod()) {
             ServerTickEvents.END_SERVER_TICK.register(server -> { });
         }
+        */
 
         EntityTrackingEvents.START_TRACKING.register((entity, player) -> {
             if (entity instanceof CustomSpawnDataEntity) {

@@ -49,4 +49,8 @@ public class ModBlocks {
     public static final Supplier<Block> CREATIVE_SUPERB_ITEM_INTERFACE = Registration.block("creative_superb_item_interface", CreativeSuperbItemInterfaceBlock::new);
     public static final Supplier<Block> LUCKY_CONTAINER = Registration.block("lucky_container", LuckyContainerBlock::new);
     public static final Supplier<Block> VEHICLE_ASSEMBLING_TABLE = Registration.block("vehicle_assembling_table", VehicleAssemblingTableBlock::new);
+
+    public static void register() {
+
+    }
 }

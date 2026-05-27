@@ -13,4 +13,8 @@ public class ModPotions {
             () -> new Potion(new MobEffectInstance(ModMobEffects.SHOCK.get(), 100, 1)));
     public static final Supplier<Potion> LONG_SHOCK = Registration.potion("superbwarfare_long_shock",
             () -> new Potion(new MobEffectInstance(ModMobEffects.SHOCK.get(), 400, 0)));
+
+    public static void register() {
+
+    }
 }

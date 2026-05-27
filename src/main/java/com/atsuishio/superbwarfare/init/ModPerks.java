@@ -77,6 +77,10 @@ public class ModPerks {
     public static final Supplier<Perk> HIGH_IMPACT_RESERVES = damage("high_impact_reserves", HighImpactReserves::new);
     public static final Supplier<Perk> ONE_TWO_PUNCH = damage("one_two_punch", OneTwoPunch::new);
 
+    public static void register() {
+
+    }
+
     public record NamedSupplier<T>(String name, Supplier<T> supplier) implements Supplier<T> {
         @Override
         public T get() {

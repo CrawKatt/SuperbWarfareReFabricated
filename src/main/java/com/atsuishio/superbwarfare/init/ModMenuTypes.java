@@ -59,4 +59,8 @@ public class ModMenuTypes {
     public static final Supplier<MenuType<VehicleAssemblingMenu>> VEHICLE_ASSEMBLING_MENU =
             Registration.menu("vehicle_assembling_menu",
                     () -> new MenuType<>((windowId, inv) -> new VehicleAssemblingMenu(windowId, inv)));
+
+    public static void register() {
+
+    }
 }

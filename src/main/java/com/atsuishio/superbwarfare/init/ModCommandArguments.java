@@ -14,4 +14,8 @@ public class ModCommandArguments {
     public static final Supplier<ArgumentTypeInfo<?, ?>> LOWER_CAMEL_CASE_ENUM =
             Registration.custom((Registry) BuiltInRegistries.COMMAND_ARGUMENT_TYPE, "lower_camel_case_enum",
                     () -> ArgumentTypeInfos.registerByClass(LowerCamelCaseEnumArgument.class, new LowerCamelCaseEnumArgument.Info()));
+
+    public static void register() {
+
+    }
 }

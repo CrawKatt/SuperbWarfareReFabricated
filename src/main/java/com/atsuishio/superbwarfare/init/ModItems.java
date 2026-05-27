@@ -442,5 +442,7 @@ public class ModItems {
         }
     }
 
-    private ModItems() {}
+    public static void register() {
+
+    }
 }

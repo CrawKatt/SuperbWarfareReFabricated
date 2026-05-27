@@ -32,4 +32,8 @@ public class ModRecipes {
                     return Mod.MODID + ":vehicle_assembling";
                 }
             });
+
+    public static void register() {
+
+    }
 }

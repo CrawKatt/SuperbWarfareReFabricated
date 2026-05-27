@@ -167,6 +167,10 @@ public class ModEntities {
         return Registration.entity(name, () -> entityTypeBuilder.build(name));
     }
 
+    public static void register() {
+
+    }
+
     public static void registerAttributes() {
         ATTRIBUTES.put(TARGET, TargetEntity.createAttributes().build());
         ATTRIBUTES.put(DPS_GENERATOR, DPSGeneratorEntity.createAttributes().build());

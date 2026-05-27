@@ -2373,12 +2373,14 @@ public class ClientEventHandler {
 
     public static void onPlayerLoggedIn(Player player) {
         if (!DisplayConfig.ENABLE_VERSION_CHECK_WARNING.get()) return;
+        /*
         if (ModVersionEventHandler.currentVersion == null || ModVersionEventHandler.previousVersion == null) return;
 
         player.displayClientMessage(Component.translatable("tips.superbwarfare.vehicle_reset_kit_1",
                         Component.literal("" + ModVersionEventHandler.previousVersion).withStyle(ChatFormatting.YELLOW),
                         Component.literal("" + ModVersionEventHandler.currentVersion).withStyle(ChatFormatting.YELLOW))
                 .withStyle(ChatFormatting.RED), false);
+        */
         player.displayClientMessage(Component.translatable("tips.superbwarfare.vehicle_reset_kit_2",
                 Component.literal("[").append(ModItems.VEHICLE_RESET_KIT.get().getDefaultInstance().getHoverName()).append("]").withStyle(ChatFormatting.GREEN)), false);
         player.displayClientMessage(Component.translatable("tips.superbwarfare.vehicle_reset_kit_3")

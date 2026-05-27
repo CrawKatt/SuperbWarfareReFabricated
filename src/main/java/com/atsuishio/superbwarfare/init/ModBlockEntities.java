@@ -27,4 +27,8 @@ public class ModBlockEntities {
             () -> BlockEntityType.Builder.of(LuckyContainerBlockEntity::new, ModBlocks.LUCKY_CONTAINER.get()).build(null));
     public static final Supplier<BlockEntityType<VehicleAssemblingTableBlockEntity>> VEHICLE_ASSEMBLING_TABLE = Registration.blockEntity("vehicle_assembling_table",
             () -> BlockEntityType.Builder.of(VehicleAssemblingTableBlockEntity::new, ModBlocks.VEHICLE_ASSEMBLING_TABLE.get()).build(null));
+
+    public static void register() {
+
+    }
 }
