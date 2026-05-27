@@ -2,21 +2,17 @@ package com.atsuishio.superbwarfare.api.event;
 
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.ApiStatus;
 
-/**
- * 玩家击杀生物后，用于判断是否发送击杀播报/显示击杀指示
- */
-@Cancelable
 @ApiStatus.Internal
 @ApiStatus.AvailableSince("0.8.0")
-public class PreKillEvent extends Event {
+public class PreKillEvent {
 
     private final LivingEntity entity;
     private final DamageSource source;
     private final LivingEntity target;
+
+    private boolean canceled;
 
     private PreKillEvent(LivingEntity entity, DamageSource source, LivingEntity target) {
         this.entity = entity;
@@ -36,6 +32,14 @@ public class PreKillEvent extends Event {
         public Indicator(LivingEntity player, DamageSource source, LivingEntity target) {
             super(player, source, target);
         }
+    }
+
+    public boolean isCanceled() {
+        return this.canceled;
+    }
+
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
     }
 
     public LivingEntity getEntity() {

@@ -7,22 +7,17 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * 子弹等投射物在命中实体或方块时触发的事件
- */
-@Cancelable
 @ApiStatus.AvailableSince("0.8.7")
-public class ProjectileHitEvent extends Event {
+public class ProjectileHitEvent {
 
     @Nullable
     private final Entity owner;
     private final Projectile projectile;
     private final Vec3 hitVec;
+    private boolean canceled;
 
     private ProjectileHitEvent(@Nullable Entity owner, Projectile projectile, Vec3 hitVec) {
         this.owner = owner;
@@ -31,7 +26,6 @@ public class ProjectileHitEvent extends Event {
     }
 
     public static class HitEntity extends ProjectileHitEvent {
-
         private final Entity target;
         private final boolean isHeadshot;
         private final boolean isLegShot;
@@ -89,6 +83,15 @@ public class ProjectileHitEvent extends Event {
         }
     }
 
+    public boolean isCanceled() {
+        return this.canceled;
+    }
+
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
+
+    @Nullable
     public Entity getOwner() {
         return owner;
     }

@@ -7,12 +7,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.IItemDecorator;
 
-public class LuckyContainerItemDecorator implements IItemDecorator {
+public class LuckyContainerItemDecorator {
 
-    @Override
-    public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xOffset, int yOffset) {
+    public static boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xOffset, int yOffset) {
         if (!(stack.getItem() instanceof LuckyContainerBlockItem)) return false;
         var tag = BlockItem.getBlockEntityData(stack);
         if (tag == null) return false;

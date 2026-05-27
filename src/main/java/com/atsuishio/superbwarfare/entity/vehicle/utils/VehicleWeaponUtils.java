@@ -13,7 +13,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
 import org.joml.Matrix4d;
 import org.joml.Vector4d;
 
@@ -105,8 +104,9 @@ public final class VehicleWeaponUtils {
         Vec3 targetPos = target.getBoundingBox().getCenter();
         Vec3 targetVel = target.getDeltaMovement();
 
-        if (target instanceof LivingEntity living) {
-            double gravity = living.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
+        // ToDo: Comprobar 1:1 con Forge
+        if (target instanceof LivingEntity) {
+            double gravity = 0.08D;
             targetVel = targetVel.add(0, gravity, 0);
         }
 

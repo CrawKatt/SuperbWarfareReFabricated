@@ -15,6 +15,7 @@ import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
 import com.atsuishio.superbwarfare.entity.projectile.*;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.custom.ShootCallback;
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModPerks;
@@ -494,7 +495,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
     public void beforeShoot(@NotNull ShootParameters parameters) {
         var data = parameters.data();
         var ammoSupplier = parameters.ammoSupplier();
-        MinecraftForge.EVENT_BUS.post(new ShootEvent.Pre(parameters));
+        ShootCallback.PRE.invoker().onShoot(new ShootEvent.Pre(parameters));
 
         // 判断是否为栓动武器（BoltActionTime > 0），并在开火后给一个需要上膛的状态
         if (data.compute().boltActionTime > 0 && data.hasEnoughAmmoToShoot(ammoSupplier)) {
@@ -528,7 +529,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         var ammoSupplier = parameters.ammoSupplier();
         var level = parameters.level();
 
-        MinecraftForge.EVENT_BUS.post(new ShootEvent.Post(parameters));
+        ShootCallback.POST.invoker().onShoot(new ShootEvent.Post(parameters));
 
         var computed = data.compute();
         if (!data.useBackpackAmmo()) {

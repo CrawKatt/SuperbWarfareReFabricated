@@ -4,23 +4,19 @@ import com.atsuishio.superbwarfare.block.ContainerBlock;
 import com.atsuishio.superbwarfare.block.entity.ContainerBlockEntity;
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes;
 import com.atsuishio.superbwarfare.init.ModTags;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ContainerBlockPreview {
-    @SubscribeEvent
-    public static void render(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
-            return;
-        }
+    public static void registerEvents() {
+        WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> render(context.matrixStack()));
+    }
 
+    public static void render(PoseStack poseStack) {
         var player = Minecraft.getInstance().player;
         assert player != null;
 
@@ -62,7 +58,6 @@ public class ContainerBlockPreview {
         }
         if (w == 0 || h == 0) return;
 
-        var poseStack = event.getPoseStack();
         poseStack.pushPose();
         var pos = container.getBlockPos();
         var view = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();

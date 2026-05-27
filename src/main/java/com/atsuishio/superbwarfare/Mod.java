@@ -9,7 +9,10 @@ import com.atsuishio.superbwarfare.config.CommonConfig;
 import com.atsuishio.superbwarfare.config.ServerConfig;
 import com.atsuishio.superbwarfare.data.CustomData;
 import com.atsuishio.superbwarfare.entity.TargetEntity;
+import com.atsuishio.superbwarfare.event.CustomEventHandler;
+import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
 import com.atsuishio.superbwarfare.init.*;
+import com.atsuishio.superbwarfare.item.common.ammo.PotionMortarShell;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect;
@@ -78,6 +81,9 @@ public class Mod implements ModInitializer {
         TraumaMobEffect.registerEvents();
         PowerfulAttraction.registerEvents();
         TargetEntity.registerEvents();
+        CustomEventHandler.registerEvents();
+        HitboxHelperEventHandler.registerEvents();
+        PotionMortarShell.registerColorHandlers();
 
         ModItems.registerDispenserBehavior();
 

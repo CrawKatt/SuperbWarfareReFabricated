@@ -8,28 +8,23 @@ import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.ReloadType;
 import com.atsuishio.superbwarfare.data.gun.value.ReloadState;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.event.custom.ReloadCallback;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.tools.InventoryTool;
 import com.atsuishio.superbwarfare.tools.SoundTool;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
 import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.registries.MissingMappingsEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber
 public class GunEventHandler {
 
     /**
@@ -236,7 +231,7 @@ public class GunEventHandler {
 
             // 启动换弹
             if (data.reload.reloadStarter.start()) {
-                MinecraftForge.EVENT_BUS.post(new ReloadEvent.Pre(shooter, data));
+                ReloadCallback.PRE.invoker().onReload(new ReloadEvent.Pre(shooter, data));
                 startReload(shooter, data);
             }
 
@@ -314,12 +309,12 @@ public class GunEventHandler {
     public static void finishGunNormalReload(@Nullable Entity shooter, @NotNull GunData data) {
         var gunItem = data.item();
         data.reloadAmmo(shooter, gunItem.hasBulletInBarrel(data));
-        MinecraftForge.EVENT_BUS.post(new ReloadEvent.Post(shooter, data));
+        ReloadCallback.POST.invoker().onReload(new ReloadEvent.Post(shooter, data));
     }
 
     public static void finishGunEmptyReload(@Nullable Entity shooter, @NotNull GunData data) {
         data.reloadAmmo(shooter);
-        MinecraftForge.EVENT_BUS.post(new ReloadEvent.Post(shooter, data));
+        ReloadCallback.POST.invoker().onReload(new ReloadEvent.Post(shooter, data));
     }
 
     public static void playGunEmptyReloadSounds(@Nullable Entity shooter, @NotNull GunData data) {
@@ -360,7 +355,7 @@ public class GunEventHandler {
         // 一阶段
         var computed = data.compute();
         if (reload.singleReloadStarter.start()) {
-            MinecraftForge.EVENT_BUS.post(new ReloadEvent.Pre(shooter, data));
+            ReloadCallback.PRE.invoker().onReload(new ReloadEvent.Pre(shooter, data));
 
             if (computed.prepareLoadTime != 0 && (!data.hasEnoughAmmoToShoot(shooter) || stack.is(ModItems.SECONDARY_CATACLYSM.get()))) {
                 // 此处判断空仓换弹的时候，是否在准备阶段就需要装填一发，如M870
@@ -462,7 +457,7 @@ public class GunEventHandler {
             reload.setState(ReloadState.NOT_RELOADING);
             reload.singleReloadStarter.finish();
 
-            MinecraftForge.EVENT_BUS.post(new ReloadEvent.Post(shooter, data));
+            ReloadCallback.POST.invoker().onReload(new ReloadEvent.Post(shooter, data));
         }
     }
 
@@ -621,6 +616,7 @@ public class GunEventHandler {
         }
     }
 
+    /*
     @SubscribeEvent
     public static void onMissingMappings(MissingMappingsEvent event) {
         for (MissingMappingsEvent.Mapping<Item> mapping : event.getAllMappings(Registries.ITEM)) {
@@ -637,4 +633,5 @@ public class GunEventHandler {
             }
         }
     }
+    */
 }

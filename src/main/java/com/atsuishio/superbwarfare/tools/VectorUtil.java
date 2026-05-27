@@ -1,22 +1,24 @@
 package com.atsuishio.superbwarfare.tools;
 
+import com.atsuishio.superbwarfare.event.custom.ComputeFovCallback;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ViewportEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 import org.joml.Vector4d;
 
-@Mod.EventBusSubscriber(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class VectorUtil {
 
     public static double fov = 70;
     public static Matrix4f modelViewMatrix;
     public static Matrix4f projectionMatrix;
+
+    public static void registerEvents() {
+        ComputeFovCallback.EVENT.register(VectorUtil::captureFov);
+    }
 
     // 感谢 Minecraft-Ping-Wheel 开源
     // https://github.com/LukenSkyne/Minecraft-Ping-Wheel/blob/138295954dab9d2451ad19e16d8d413ef018a2d8/common/src/main/java/nx/pingwheel/common/helper/MathUtils.java#L15
@@ -41,8 +43,7 @@ public class VectorUtil {
         );
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void captureFov(ViewportEvent.ComputeFov event) {
+    public static void captureFov(ComputeFovCallback.Event event) {
         if (event.usedConfiguredFov()) {
             fov = event.getFOV();
         }

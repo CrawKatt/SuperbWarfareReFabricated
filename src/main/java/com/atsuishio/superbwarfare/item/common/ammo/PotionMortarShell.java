@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.init.ModEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.item.DispenserLaunchable;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Position;
 import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
@@ -17,17 +18,12 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterColorHandlersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class PotionMortarShell extends MortarShell implements DispenserLaunchable {
 
     public PotionMortarShell() {
@@ -45,9 +41,11 @@ public class PotionMortarShell extends MortarShell implements DispenserLaunchabl
         PotionUtils.addPotionTooltip(pStack, pTooltip, 0.125F);
     }
 
-    @SubscribeEvent
-    public static void onRegisterColorHandlers(final RegisterColorHandlersEvent.Item event) {
-        event.register((stack, layer) -> layer == 1 ? PotionUtils.getColor(stack) : -1, ModItems.POTION_MORTAR_SHELL.get());
+    public static void registerColorHandlers() {
+        ColorProviderRegistry.ITEM.register(
+                (stack, layer) -> layer == 1 ? PotionUtils.getColor(stack) : -1,
+                ModItems.POTION_MORTAR_SHELL.get()
+        );
     }
 
     @Override

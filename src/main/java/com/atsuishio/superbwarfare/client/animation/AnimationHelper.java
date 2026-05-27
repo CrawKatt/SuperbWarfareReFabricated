@@ -26,7 +26,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
+import com.atsuishio.superbwarfare.event.custom.RenderPlayerArmCallback;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import software.bernie.geckolib.cache.object.GeoBone;
@@ -197,9 +197,9 @@ public class AnimationHelper {
             RenderUtils.translateAwayFromPivotPoint(stack, bone);
 
             HumanoidArm arm = "Lefthand".equals(name) ? HumanoidArm.LEFT : HumanoidArm.RIGHT;
-            var renderPlayerArmEvent = new RenderPlayerArmEvent(localPlayer, transformType, stack, arm, bone, currentBuffer, renderType, packedLightIn, useOldHandRender);
-            if (MinecraftForge.EVENT_BUS.post(renderPlayerArmEvent)) {
-                currentBuffer.getBuffer(renderType); // 用来重置 Render Type，防止后续渲染出错
+            RenderPlayerArmEvent renderPlayerArmEvent = new RenderPlayerArmEvent(localPlayer, transformType, stack, arm, bone, currentBuffer, renderType, packedLightIn, useOldHandRender);
+            if (RenderPlayerArmCallback.post(renderPlayerArmEvent)) {
+                currentBuffer.getBuffer(renderType);
                 stack.popPose();
                 return;
             }

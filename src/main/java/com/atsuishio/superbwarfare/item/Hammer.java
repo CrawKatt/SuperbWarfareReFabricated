@@ -7,17 +7,15 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class Hammer extends SwordItem {
 
     public Hammer(Tier tier, int attackDamage, float attackSpeed, Item.Properties properties) {
@@ -30,23 +28,24 @@ public class Hammer extends SwordItem {
     }
 
     @Override
-    public boolean hasCraftingRemainingItem(ItemStack stack) {
+    public boolean hasCraftingRemainingItem() {
         return true;
     }
 
-    @Override
     public ItemStack getCraftingRemainingItem(ItemStack itemstack) {
         ItemStack stack = itemstack.copy();
         stack.hurt(1, RandomSource.create(), null);
         stack.getOrCreateTag().putInt("CraftCount", stack.getOrCreateTag().getInt("CraftCount") + 1);
+
         if (stack.isEmpty() || stack.getDamageValue() >= stack.getMaxDamage()) {
             return ItemStack.EMPTY;
         }
+
         return stack;
     }
 
     @Override
-    public boolean isRepairable(ItemStack itemstack) {
+    public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
         return true;
     }
 
@@ -56,11 +55,7 @@ public class Hammer extends SwordItem {
         return super.hurtEnemy(pStack, pTarget, pAttacker);
     }
 
-    @SubscribeEvent
-    public static void onItemCrafted(PlayerEvent.ItemCraftedEvent event) {
-        var item = event.getCrafting();
-        var container = event.getInventory();
-        var player = event.getEntity();
+    public static void onItemCrafted(ItemStack item, Container container, Player player) {
         if (player == null) return;
 
         if (player.level().isClientSide) return;

@@ -10,17 +10,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.IItemDecorator;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ContainerItemDecorator implements IItemDecorator {
+public class ContainerItemDecorator {
 
     private static final Map<String, ResourceLocation> icons = new HashMap<>();
 
-    @Override
-    public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xOffset, int yOffset) {
+    public static boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xOffset, int yOffset) {
         if (!(stack.getItem() instanceof ContainerBlockItem)) return false;
         var tag = BlockItem.getBlockEntityData(stack);
         if (tag == null) return false;

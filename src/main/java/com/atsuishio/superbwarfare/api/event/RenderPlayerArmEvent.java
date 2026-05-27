@@ -6,14 +6,12 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.ApiStatus;
 import software.bernie.geckolib.cache.object.GeoBone;
 
-@Cancelable
 @ApiStatus.AvailableSince("0.8.7.1")
-public class RenderPlayerArmEvent extends Event {
+public class RenderPlayerArmEvent {
+
     private final LocalPlayer localPlayer;
     private final ItemDisplayContext transformType;
     private final PoseStack stack;
@@ -23,6 +21,8 @@ public class RenderPlayerArmEvent extends Event {
     private final RenderType renderType;
     private final int packedLightIn;
     private final boolean useOldHandRender;
+
+    private boolean canceled;
 
     public RenderPlayerArmEvent(LocalPlayer localPlayer, ItemDisplayContext transformType, PoseStack stack,
                                 HumanoidArm arm, GeoBone bone, MultiBufferSource currentBuffer,
@@ -36,6 +36,14 @@ public class RenderPlayerArmEvent extends Event {
         this.renderType = renderType;
         this.packedLightIn = packedLightIn;
         this.useOldHandRender = useOldHandRender;
+    }
+
+    public boolean isCanceled() {
+        return this.canceled;
+    }
+
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
     }
 
     public LocalPlayer getLocalPlayer() {

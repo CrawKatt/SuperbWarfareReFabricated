@@ -12,6 +12,10 @@ import com.atsuishio.superbwarfare.entity.vehicle.MortarEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
+import com.atsuishio.superbwarfare.event.custom.InteractionKeyMappingTriggeredCallback;
+import com.atsuishio.superbwarfare.event.custom.KeyInputCallback;
+import com.atsuishio.superbwarfare.event.custom.MouseButtonCallback;
+import com.atsuishio.superbwarfare.event.custom.MouseScrollCallback;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.ItemScreenProvider;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
@@ -22,6 +26,7 @@ import com.atsuishio.superbwarfare.tools.EntityFindUtil;
 import com.atsuishio.superbwarfare.tools.SeekTool;
 import com.atsuishio.superbwarfare.tools.TraceTool;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -38,18 +43,23 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
 import org.lwjgl.glfw.GLFW;
 
 import static com.atsuishio.superbwarfare.event.ClientEventHandler.*;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClickHandler {
     public static boolean switchZoom = false;
+
+    public static void registerEvents() {
+        MouseButtonCallback.EVENT.register(event -> {
+            onButtonReleased(event);
+            onButtonPressed(event);
+        });
+
+        MouseScrollCallback.EVENT.register(ClickHandler::onMouseScrolling);
+        KeyInputCallback.EVENT.register(ClickHandler::onKeyPressed);
+        InteractionKeyMappingTriggeredCallback.EVENT.register(ClickHandler::stopSwing);
+    }
 
     private static boolean notInGame() {
         Minecraft mc = Minecraft.getInstance();
@@ -60,8 +70,7 @@ public class ClickHandler {
         return !mc.isWindowActive();
     }
 
-    @SubscribeEvent
-    public static void onButtonReleased(InputEvent.MouseButton.Pre event) {
+    public static void onButtonReleased(MouseButtonCallback.Event event) {
         if (notInGame()) return;
         if (event.getAction() != InputConstants.RELEASE) return;
 
@@ -73,15 +82,15 @@ public class ClickHandler {
         }
 
         int button = event.getButton();
-        if (button == ModKeyMappings.FIRE.getKey().getValue()) {
+        if (button == ModKeyMappings.FIRE.getDefaultKey().getValue()) {
             handleWeaponFireRelease();
         }
-        if (button == ModKeyMappings.HOLD_ZOOM.getKey().getValue()) {
+        if (button == ModKeyMappings.HOLD_ZOOM.getDefaultKey().getValue()) {
             handleWeaponZoomRelease();
             return;
         }
 
-        if (button == ModKeyMappings.SWITCH_ZOOM.getKey().getValue() && !switchZoom) {
+        if (button == ModKeyMappings.SWITCH_ZOOM.getDefaultKey().getValue() && !switchZoom) {
             handleWeaponZoomRelease();
         }
     }
@@ -96,8 +105,7 @@ public class ClickHandler {
                 || (player.getVehicle() instanceof VehicleEntity vehicle && vehicle.banHand(player) && !stack.getItem().isEdible());
     }
 
-    @SubscribeEvent
-    public static void onButtonPressed(InputEvent.MouseButton.Pre event) {
+    public static void onButtonPressed(MouseButtonCallback.Event event) {
         if (notInGame()) return;
         if (event.getAction() != InputConstants.PRESS) return;
 
@@ -110,7 +118,7 @@ public class ClickHandler {
 
         int button = event.getButton();
 
-        var fireKey = ModKeyMappings.FIRE.getKey();
+        var fireKey = ModKeyMappings.FIRE.getDefaultKey();
         if (fireKey.getType() == InputConstants.Type.MOUSE
                 && fireKey.getValue() == button
                 && cancelFireKey(player, stack)
@@ -122,7 +130,7 @@ public class ClickHandler {
             return;
         }
 
-        var zoomKey = ModKeyMappings.HOLD_ZOOM.getKey();
+        var zoomKey = ModKeyMappings.HOLD_ZOOM.getDefaultKey();
         if (zoomKey.getType() == InputConstants.Type.MOUSE
                 && zoomKey.getValue() == button
                 && cancelZoomKey(player, stack)
@@ -143,7 +151,7 @@ public class ClickHandler {
             }
         }
 
-        if (button == ModKeyMappings.MARK.getKey().getValue()) {
+        if (button == ModKeyMappings.MARK.getDefaultKey().getValue()) {
             if (stack.is(ModItems.ARTILLERY_INDICATOR.get())) {
                 NetworkRegistry.sendToServer(SetFiringParametersMessage.INSTANCE);
             }
@@ -159,23 +167,23 @@ public class ClickHandler {
                 || (stack.is(Items.SPYGLASS) && player.isScoping() && player.getOffhandItem().is(ModItems.FIRING_PARAMETERS.get()))
                 || (stack.is(ModItems.ARTILLERY_INDICATOR.get()))
         ) {
-            if (button == ModKeyMappings.FIRE.getKey().getValue()) {
+            if (button == ModKeyMappings.FIRE.getDefaultKey().getValue()) {
                 handleWeaponFirePress(player, stack);
             }
 
-            if (button == ModKeyMappings.HOLD_ZOOM.getKey().getValue()) {
+            if (button == ModKeyMappings.HOLD_ZOOM.getDefaultKey().getValue()) {
                 handleWeaponZoomPress(player, stack);
                 switchZoom = false;
                 return;
             }
 
-            if (button == ModKeyMappings.SWITCH_ZOOM.getKey().getValue()) {
+            if (button == ModKeyMappings.SWITCH_ZOOM.getDefaultKey().getValue()) {
                 handleWeaponZoomPress(player, stack);
                 switchZoom = !switchZoom;
             }
         }
 
-        var fireModeKey = ModKeyMappings.FIRE_MODE.getKey();
+        var fireModeKey = ModKeyMappings.FIRE_MODE.getDefaultKey();
         if (fireModeKey.getType() == InputConstants.Type.MOUSE && button == fireModeKey.getValue()) {
             if (player.getVehicle() instanceof VehicleEntity vehicle) {
                 var data = vehicle.getGunData(player);
@@ -190,16 +198,14 @@ public class ClickHandler {
     }
 
     // 枪械交互时禁止挥舞手臂
-    @SubscribeEvent
-    public static void stopSwing(InputEvent.InteractionKeyMappingTriggered event) {
+    public static void stopSwing(InteractionKeyMappingTriggeredCallback.Event event) {
         var player = Minecraft.getInstance().player;
         if (player != null && player.getItemInHand(event.getHand()).getItem() instanceof GunItem) {
             event.setSwingHand(false);
         }
     }
 
-    @SubscribeEvent
-    public static void onMouseScrolling(InputEvent.MouseScrollingEvent event) {
+    public static void onMouseScrolling(MouseScrollCallback.Event event) {
         Player player = Minecraft.getInstance().player;
 
         if (notInGame()) return;
@@ -261,8 +267,7 @@ public class ClickHandler {
         }
     }
 
-    @SubscribeEvent
-    public static void onKeyPressed(InputEvent.Key event) {
+    public static void onKeyPressed(KeyInputCallback.Event event) {
         if (notInGame()) return;
 
         var mc = Minecraft.getInstance();
@@ -271,7 +276,7 @@ public class ClickHandler {
         int key = event.getKey();
         if (key < 0) return;
 
-        if (key == ModKeyMappings.DISMOUNT.getKey().getValue()) {
+        if (ModKeyMappings.DISMOUNT.matches(key, event.getScanCode())) {
             handleDismountPress(player);
         }
 
@@ -284,15 +289,15 @@ public class ClickHandler {
                 return;
             }
 
-            if (key == Minecraft.getInstance().options.keyJump.getKey().getValue()) {
+            if (Minecraft.getInstance().options.keyJump.matches(key, event.getScanCode())) {
                 handleDoubleJump(player);
                 handleParachute();
             }
 
-            if (key == ModKeyMappings.CONFIG.getKey().getValue() && ModKeyMappings.CONFIG.getKeyModifier().isActive(KeyConflictContext.IN_GAME)) {
+            if (ModKeyMappings.CONFIG.matches(key, event.getScanCode())) { //&& ModKeyMappings.CONFIG.getKeyModifier().isActive(KeyConflictContext.IN_GAME)) {
                 handleConfigScreen(player);
             }
-            if (key == ModKeyMappings.RELOAD.getKey().getValue()) {
+            if (ModKeyMappings.RELOAD.matches(key, event.getScanCode())) {
                 burstFireAmount = 0;
                 isEditing = false;
                 seekingTime = 0;
@@ -302,17 +307,17 @@ public class ClickHandler {
                 lockingPos = null;
                 NetworkRegistry.sendToServer(ReloadMessage.INSTANCE);
             }
-            if (key == ModKeyMappings.FIRE_MODE.getKey().getValue() || key == ModKeyMappings.CHANGE_FIRE_MODE_BACKWARD.getKey().getValue()) {
+            if (ModKeyMappings.FIRE_MODE.matches(key, event.getScanCode()) || ModKeyMappings.CHANGE_FIRE_MODE_BACKWARD.matches(key, event.getScanCode())) {
                 NetworkRegistry.sendToServer(new FireModeMessage(false));
                 burstFireAmount = 0;
             }
-            if (key == ModKeyMappings.CHANGE_FIRE_MODE_FORWARD.getKey().getValue()) {
+            if (ModKeyMappings.CHANGE_FIRE_MODE_FORWARD.matches(key, event.getScanCode())) {
                 NetworkRegistry.sendToServer(new FireModeMessage(true));
                 burstFireAmount = 0;
             }
-            if (key == ModKeyMappings.INTERACT.getKey().getValue()) {
+            if (ModKeyMappings.INTERACT.matches(key, event.getScanCode())) {
                 if (stack.getItem() instanceof GunItem) {
-                    KeyMapping.click(mc.options.keyUse.getKey());
+                    KeyMapping.click(mc.options.keyUse.getDefaultKey());
                 } else if (stack.is(ModItems.MONITOR.get())) {
                     NetworkRegistry.sendToServer(InteractMessage.INSTANCE);
                 }
@@ -321,17 +326,17 @@ public class ClickHandler {
             // 玩家手持枪械时，处理卸弹/切换弹种
             if (stack.getItem() instanceof GunItem) {
                 var data = GunData.from(stack);
-                if (key == ModKeyMappings.UNLOAD.getKey().getValue()) {
+                if (ModKeyMappings.UNLOAD.matches(key, event.getScanCode())) {
                     if (data.useBackpackAmmo() || data.ammo.get() + data.virtualAmmo.get() <= 0) return;
                     NetworkRegistry.sendToServer(UnloadMessage.INSTANCE);
                     burstFireAmount = 0;
                 }
                 if (data.compute().getAmmoConsumers().size() > 1) {
-                    if (key == ModKeyMappings.CHANGE_AMMO_FORWARD.getKey().getValue()) {
+                    if (ModKeyMappings.CHANGE_AMMO_FORWARD.matches(key, event.getScanCode())) {
                         NetworkRegistry.sendToServer(new EditMessage(5, false));
                         burstFireAmount = 0;
                     }
-                    if (key == ModKeyMappings.CHANGE_AMMO_BACKWARD.getKey().getValue()) {
+                    if (ModKeyMappings.CHANGE_AMMO_BACKWARD.matches(key, event.getScanCode())) {
                         NetworkRegistry.sendToServer(new EditMessage(5, true));
                         burstFireAmount = 0;
                     }
@@ -342,19 +347,18 @@ public class ClickHandler {
             if (player.getVehicle() instanceof VehicleEntity vehicle) {
                 var data = vehicle.getGunData(player);
                 if (data != null && data.getDefault().getAmmoConsumers().size() > 1) {
-                    if (key == ModKeyMappings.CHANGE_AMMO_FORWARD.getKey().getValue()) {
+                    if (ModKeyMappings.CHANGE_AMMO_FORWARD.matches(key, event.getScanCode())) {
                         NetworkRegistry.sendToServer(new EditMessage(5, false, true));
                         burstFireAmount = 0;
                     }
-                    if (key == ModKeyMappings.CHANGE_AMMO_BACKWARD.getKey().getValue() ||
-                            key == ModKeyMappings.FIRE_MODE.getKey().getValue()) {
+                    if (ModKeyMappings.CHANGE_AMMO_BACKWARD.matches(key, event.getScanCode()) || ModKeyMappings.FIRE_MODE.matches(key, event.getScanCode())) {
                         NetworkRegistry.sendToServer(new EditMessage(5, true, true));
                         burstFireAmount = 0;
                     }
                 }
             }
 
-            if (key == ModKeyMappings.EDIT_MODE.getKey().getValue()) {
+            if (ModKeyMappings.EDIT_MODE.matches(key, event.getScanCode())) {
                 if (stack.getItem() instanceof ItemScreenProvider provider) {
                     var screen = provider.getItemScreen(stack, player, InteractionHand.MAIN_HAND);
                     if (screen != null) {
@@ -375,13 +379,13 @@ public class ClickHandler {
                 }
             }
 
-            if (key == ModKeyMappings.BREATH.getKey().getValue() && !exhaustion && zoom) {
+            if (ModKeyMappings.BREATH.matches(key, event.getScanCode()) && !exhaustion && zoom) {
                 breath = true;
             }
-            if (key == ModKeyMappings.SENSITIVITY_INCREASE.getKey().getValue()) {
+            if (ModKeyMappings.SENSITIVITY_INCREASE.matches(key, event.getScanCode())) {
                 NetworkRegistry.sendToServer(new SensitivityMessage(true));
             }
-            if (key == ModKeyMappings.SENSITIVITY_REDUCE.getKey().getValue()) {
+            if (ModKeyMappings.SENSITIVITY_REDUCE.matches(key, event.getScanCode())) {
                 NetworkRegistry.sendToServer(new SensitivityMessage(false));
             }
 
@@ -391,23 +395,23 @@ public class ClickHandler {
                     || (stack.is(Items.SPYGLASS) && player.isScoping() && player.getOffhandItem().is(ModItems.FIRING_PARAMETERS.get()))
                     || (stack.is(ModItems.ARTILLERY_INDICATOR.get()))
             ) {
-                if (key == ModKeyMappings.FIRE.getKey().getValue()) {
+                if (ModKeyMappings.FIRE.matches(key, event.getScanCode())) {
                     handleWeaponFirePress(player, stack);
                 }
 
-                if (key == ModKeyMappings.HOLD_ZOOM.getKey().getValue()) {
+                if (ModKeyMappings.HOLD_ZOOM.matches(key, event.getScanCode())) {
                     handleWeaponZoomPress(player, stack);
                     switchZoom = false;
                     return;
                 }
 
-                if (key == ModKeyMappings.SWITCH_ZOOM.getKey().getValue()) {
+                if (ModKeyMappings.SWITCH_ZOOM.matches(key, event.getScanCode())) {
                     handleWeaponZoomPress(player, stack);
                     switchZoom = !switchZoom;
                 }
             }
 
-            if (key == ModKeyMappings.MARK.getKey().getValue()) {
+            if (ModKeyMappings.MARK.matches(key, event.getScanCode())) {
                 if (stack.is(ModItems.ARTILLERY_INDICATOR.get())) {
                     NetworkRegistry.sendToServer(SetFiringParametersMessage.INSTANCE);
                 }
@@ -420,21 +424,21 @@ public class ClickHandler {
                 return;
             }
 
-            if (key == ModKeyMappings.FIRE.getKey().getValue()) {
+            if (ModKeyMappings.FIRE.matches(key, event.getScanCode())) {
                 handleWeaponFireRelease();
             }
 
-            if (key == ModKeyMappings.HOLD_ZOOM.getKey().getValue()) {
+            if (ModKeyMappings.HOLD_ZOOM.matches(key, event.getScanCode())) {
                 handleWeaponZoomRelease();
                 return;
             }
 
-            if (key == ModKeyMappings.SWITCH_ZOOM.getKey().getValue() && !switchZoom) {
+            if (ModKeyMappings.SWITCH_ZOOM.matches(key, event.getScanCode()) && !switchZoom) {
                 handleWeaponZoomRelease();
             }
 
             if (event.getAction() == GLFW.GLFW_RELEASE) {
-                if (key == ModKeyMappings.BREATH.getKey().getValue()) {
+                if (ModKeyMappings.BREATH.matches(key, event.getScanCode())) {
                     breath = false;
                 }
             }
@@ -632,7 +636,7 @@ public class ClickHandler {
     }
 
     private static void handleConfigScreen(Player player) {
-        if (ModList.get().isLoaded(CompatHolder.CLOTH_CONFIG)) {
+        if (FabricLoader.getInstance().isModLoaded(CompatHolder.CLOTH_CONFIG)) {
             CompatHolder.hasMod(CompatHolder.CLOTH_CONFIG, () -> Minecraft.getInstance().setScreen(ClothConfigHelper.getConfigScreen(null)));
         } else {
             player.displayClientMessage(Component.translatable("tips.superbwarfare.no_cloth_config").withStyle(ChatFormatting.RED), true);

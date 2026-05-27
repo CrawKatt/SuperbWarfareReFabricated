@@ -19,6 +19,7 @@
     "PlayerMixin",
     "ProjectileUtilMixin",
     "ReloadableServerResourcesMixin",
+    "ResultSlotMixin",
     "SteelPipeFallMixin",
     "VillagerMixin",
     "tacz.EntityUtilMixin"
@@ -29,6 +30,7 @@
     "ClientPlayerEntityMixin",
     "EntityRenderDispatcherMixin",
     "GameRendererMixin",
+    "GuiGraphicsMixin",
     "ItemInHandLayerMixin",
     "LivingEntitySwingMixin",
     "KeyboardInputMixin",

@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.compat;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.effect.MobEffect;
 
 public class CompatHolder {
@@ -13,4 +14,10 @@ public class CompatHolder {
 
     //@ObjectHolder(registryName = "minecraft:mob_effect", value = VRC + ":curse_flame")
     public static final MobEffect VRC_CURSE_FLAME = null;
+
+    public static void hasMod(String modId, Runnable runnable) {
+        if (FabricLoader.getInstance().isModLoaded(modId)) {
+            runnable.run();
+        }
+    }
 }

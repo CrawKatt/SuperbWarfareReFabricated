@@ -23,7 +23,6 @@ import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.TriPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -597,5 +596,10 @@ public class SeekTool {
             this.filters.add(e -> IN_HEIGHT_RANGE.test(e, min, max));
             return this;
         }
+    }
+
+    @FunctionalInterface
+    public interface TriPredicate<A, B, C> {
+        boolean test(A a, B b, C c);
     }
 }

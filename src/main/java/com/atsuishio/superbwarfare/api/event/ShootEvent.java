@@ -4,13 +4,12 @@ import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @ApiStatus.AvailableSince("0.8.8")
-public class ShootEvent extends Event {
+public class ShootEvent {
 
     private final ShootParameters parameters;
 
@@ -19,14 +18,12 @@ public class ShootEvent extends Event {
     }
 
     public static class Pre extends ShootEvent {
-
         public Pre(@NotNull ShootParameters parameters) {
             super(parameters);
         }
     }
 
     public static class Post extends ShootEvent {
-
         public Post(@NotNull ShootParameters parameters) {
             super(parameters);
         }
