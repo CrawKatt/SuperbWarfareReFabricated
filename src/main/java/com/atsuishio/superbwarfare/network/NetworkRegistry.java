@@ -63,6 +63,8 @@ public class NetworkRegistry {
                 TDMSyncMessage::decode, TDMSyncMessage::handler);
         registerS2C(SoundClientMessage.class, SoundClientMessage::encode,
                 SoundClientMessage::decode, SoundClientMessage::handler);
+        registerS2C(EntitySpawnDataMessage.class, EntitySpawnDataMessage::encode,
+                EntitySpawnDataMessage::decode, EntitySpawnDataMessage::handler);
 
         // ========== Server-bound (C2S) ==========
 

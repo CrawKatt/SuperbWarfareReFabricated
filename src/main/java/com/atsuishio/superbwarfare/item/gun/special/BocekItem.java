@@ -16,20 +16,15 @@ import com.atsuishio.superbwarfare.perk.AmmoPerk;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.tools.SoundTool;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.constant.DataTickets;
@@ -220,19 +215,4 @@ public class BocekItem extends GunGeoItem {
         player.level().addFreshEntity(projectile);
     }
 
-    public IClientItemExtensions getClientExtensions() {
-        return new IClientItemExtensions() {
-            private final BlockEntityWithoutLevelRenderer renderer = BocekItem.this.getRenderer().get();
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return renderer;
-            }
-
-            @Override
-            public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
-                return HumanoidModel.ArmPose.BOW_AND_ARROW;
-            }
-        };
-    }
 }

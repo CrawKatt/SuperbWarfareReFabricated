@@ -10,12 +10,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-public abstract class DestroyableProjectile extends FastThrowableProjectile implements CustomSyncMotionEntity, IEntityAdditionalSpawnData {
+public abstract class DestroyableProjectile extends FastThrowableProjectile implements CustomSyncMotionEntity {
 
     public static final EntityDataAccessor<Float> HEALTH = SynchedEntityData.defineId(DestroyableProjectile.class, EntityDataSerializers.FLOAT);
 

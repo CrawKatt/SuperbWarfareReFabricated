@@ -26,7 +26,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
 import org.joml.Math;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
@@ -50,9 +49,7 @@ public class LandVehicleHud {
 
     public static float lerpRecoil;
 
-    public static void render(VehicleEntity vehicle, Player player, ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Minecraft mc = gui.getMinecraft();
-
+    public static void render(VehicleEntity vehicle, Player player, Minecraft mc, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (vehicle.getSeatIndex(player) != vehicle.computed().turretControllerIndex) return;
 
         PoseStack poseStack = guiGraphics.pose();
@@ -147,7 +144,7 @@ public class LandVehicleHud {
             // 诱饵
             if (vehicle.hasDecoy() && player == vehicle.getFirstPassenger()) {
                 if (vehicle.getDecoyState().equals("READY")) {
-                    guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getKey().getDisplayName().getString() + "]")), screenWidth / 2 - 165, screenHeight / 2 - 36, color, false);
+                    guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getTranslatedKeyMessage().getString() + "]")), screenWidth / 2 - 165, screenHeight / 2 - 36, color, false);
                 } else {
                     guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.reloading"), screenWidth / 2 - 165, screenHeight / 2 - 36, 0xFF0000, false);
                 }

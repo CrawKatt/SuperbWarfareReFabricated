@@ -3,12 +3,16 @@ package com.atsuishio.superbwarfare;
 import com.atsuishio.superbwarfare.client.MouseMovementHandler;
 import com.atsuishio.superbwarfare.client.molang.MolangVariable;
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
+import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.screens.modsell.ModSellWarningScreen;
 import com.atsuishio.superbwarfare.client.sound.ModSoundInstances;
+import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
+import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraftforge.fml.config.ModConfig;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -25,7 +29,9 @@ public class ClientMod implements ClientModInitializer {
         ClientMouseHandler.registerEvents();
         ClientEventHandler.registerEvents();
         ParachuteRenderer.registerRenderer();
+        FuMO25ScreenHelper.registerEvents();
 
+        ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.CLIENT, ClientConfig.init());
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             List<AbstractMap.SimpleEntry<Runnable, Integer>> actions = new ArrayList<>();
             Mod.CLIENT_QUEUE.forEach(work -> {

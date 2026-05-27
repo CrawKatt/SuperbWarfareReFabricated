@@ -30,6 +30,7 @@
     "EntityRenderDispatcherMixin",
     "GameRendererMixin",
     "ItemInHandLayerMixin",
+    "LivingEntitySwingMixin",
     "KeyboardInputMixin",
     "KeymappingMixin",
     "LevelRendererMixin",

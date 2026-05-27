@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.entity;
 
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier;
+import com.atsuishio.superbwarfare.event.custom.LivingDeathCallback;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.init.ModTags;
@@ -25,9 +26,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import io.github.lounode.eventwrapper.event.entity.living.LivingDeathEventWrapper;
-import io.github.lounode.eventwrapper.eventbus.api.EventBusSubscriberWrapper;
-import io.github.lounode.eventwrapper.eventbus.api.SubscribeEventWrapper;
+import io.github.lounode.eventwrapper.event.entity.living.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -39,7 +38,6 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-@EventBusSubscriberWrapper
 public class TargetEntity extends LivingEntity implements GeoEntity {
 
     public static final EntityDataAccessor<Integer> DOWN_TIME = SynchedEntityData.defineId(TargetEntity.class, EntityDataSerializers.INT);
@@ -48,6 +46,10 @@ public class TargetEntity extends LivingEntity implements GeoEntity {
     public TargetEntity(EntityType<TargetEntity> type, Level world) {
         super(type, world);
         this.noCulling = true;
+    }
+
+    public static void registerEvents() {
+        LivingDeathCallback.EVENT.register(TargetEntity::onTargetDown);
     }
 
     @Override
@@ -111,8 +113,7 @@ public class TargetEntity extends LivingEntity implements GeoEntity {
         return super.hurt(source, amount);
     }
 
-    @SubscribeEventWrapper
-    public static void onTargetDown(LivingDeathEventWrapper event) {
+    public static void onTargetDown(LivingDeathCallback.Event event) {
         var entity = event.getEntity();
         // 不处理/kill伤害
         if (event.getSource().is(DamageTypes.GENERIC_KILL)) return;

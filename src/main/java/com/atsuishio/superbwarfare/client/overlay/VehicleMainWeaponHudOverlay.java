@@ -26,15 +26,13 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 
 import java.util.List;
 
 /**
  * 控制载具主武器的玩家显示的HUD
  */
-public class VehicleMainWeaponHudOverlay implements IGuiOverlay {
+public class VehicleMainWeaponHudOverlay {
 
     public static final String ID = Mod.MODID + "_vehicle_main_weapon_hud";
     public static final String EMPTY = "@Empty";
@@ -56,9 +54,9 @@ public class VehicleMainWeaponHudOverlay implements IGuiOverlay {
     private static final ResourceLocation SHOOT_INDICATOR = Mod.loc("textures/overlay/frame/frame_diamond.png");
     private static final ResourceLocation BLOCK = Mod.loc("textures/overlay/misc/block.png");
 
-    @Override
-    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        var player = gui.getMinecraft().player;
+    public static void render(GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+        Minecraft mc = Minecraft.getInstance();
+        var player = mc.player;
         if (player == null) return;
         if (!(player.getVehicle() instanceof VehicleEntity vehicle)) return;
         if (ClientEventHandler.isEditing) return;
@@ -81,13 +79,13 @@ public class VehicleMainWeaponHudOverlay implements IGuiOverlay {
 
         switch (type) {
             case LandVehicleHud.ID ->
-                    LandVehicleHud.render(vehicle, player, gui, guiGraphics, partialTick, screenWidth, screenHeight);
+                    LandVehicleHud.render(vehicle, player, mc, guiGraphics, partialTick, screenWidth, screenHeight);
             case HelicopterHud.ID ->
-                    HelicopterHud.render(vehicle, player, gui, guiGraphics, partialTick, screenWidth, screenHeight);
+                    HelicopterHud.render(vehicle, player, Minecraft.getInstance(), guiGraphics, partialTick, screenWidth, screenHeight);
             case ArtilleryHud.ID ->
-                    ArtilleryHud.render(vehicle, player, gui, guiGraphics, partialTick, screenWidth, screenHeight);
+                    ArtilleryHud.render(vehicle, player, mc, guiGraphics, partialTick, screenWidth, screenHeight);
             case AircraftHud.ID ->
-                    AircraftHud.render(vehicle, player, gui, guiGraphics, partialTick, screenWidth, screenHeight);
+                    AircraftHud.render(vehicle, player, mc, guiGraphics, partialTick, screenWidth, screenHeight);
         }
 
         var seekInfo = gunData.compute().seekWeaponInfo;
@@ -96,7 +94,6 @@ public class VehicleMainWeaponHudOverlay implements IGuiOverlay {
             return;
         }
 
-        Minecraft mc = Minecraft.getInstance();
         Camera camera = mc.gameRenderer.getMainCamera();
         Vec3 cameraPos = camera.getPosition();
         int seekTime = seekInfo.seekTime;
@@ -176,7 +173,7 @@ public class VehicleMainWeaponHudOverlay implements IGuiOverlay {
                         if (ClientEventHandler.seekingTimeVehicle == 0) {
                             poseStack.pushPose();
                             poseStack.translate(x, y, 0);
-                            String string = "[" + ModKeyMappings.VEHICLE_SEEK.getKey().getDisplayName().getString() + "]";
+                            String string = "[" + ModKeyMappings.VEHICLE_SEEK.getTranslatedKeyMessage().getString() + "]";
                             int width = Minecraft.getInstance().font.width(string);
                             guiGraphics.drawString(
                                     mc.font,
@@ -217,7 +214,7 @@ public class VehicleMainWeaponHudOverlay implements IGuiOverlay {
                     if (ClientEventHandler.seekingTimeVehicle == 0) {
                         poseStack.pushPose();
                         poseStack.translate(x, y, 0);
-                        String string = "[" + ModKeyMappings.VEHICLE_SEEK.getKey().getDisplayName().getString() + "]";
+                        String string = "[" + ModKeyMappings.VEHICLE_SEEK.getTranslatedKeyMessage().getString() + "]";
                         int width = Minecraft.getInstance().font.width(string);
                         guiGraphics.drawString(
                                 mc.font,

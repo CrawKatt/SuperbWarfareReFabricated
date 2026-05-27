@@ -10,21 +10,14 @@ import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -117,31 +110,4 @@ public class AureliaSceptreItem extends GunGeoItem {
         data.add(meleeController);
     }
 
-    public IClientItemExtensions getClientExtensions() {
-        return new IClientItemExtensions() {
-            private final BlockEntityWithoutLevelRenderer renderer = AureliaSceptreItem.this.getRenderer().get();
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return renderer;
-            }
-
-            private static final HumanoidModel.ArmPose POSE = HumanoidModel.ArmPose.create("AureliaSceptreItem", false, (model, entity, arm) -> {
-                if (arm != HumanoidArm.LEFT) {
-                    model.rightArm.xRot = -67.5f * Mth.DEG_TO_RAD + model.head.xRot + 0.05f * model.rightArm.xRot;
-                    model.rightArm.yRot = 5f * Mth.DEG_TO_RAD + model.head.yRot;
-                }
-            });
-
-            @Override
-            public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
-                if (!stack.isEmpty()) {
-                    if (entityLiving.getUsedItemHand() == hand) {
-                        return POSE;
-                    }
-                }
-                return HumanoidModel.ArmPose.EMPTY;
-            }
-        };
-    }
 }

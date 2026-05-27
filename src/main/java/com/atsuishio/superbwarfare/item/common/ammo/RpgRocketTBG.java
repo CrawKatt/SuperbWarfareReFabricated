@@ -25,34 +25,42 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.client.RenderProvider;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class RpgRocketTBG extends Item implements GeoItem, DispenserLaunchable {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
 
     public RpgRocketTBG() {
         super(new Item.Properties().stacksTo(16));
     }
 
     @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        super.initializeClient(consumer);
-        consumer.accept(new IClientItemExtensions() {
-            private final BlockEntityWithoutLevelRenderer renderer = new RpgRocketTBGRenderer();
+    public void createRenderer(Consumer<Object> consumer) {
+        consumer.accept(new RenderProvider() {
+            private BlockEntityWithoutLevelRenderer renderer;
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (renderer == null) {
+                    renderer = new RpgRocketTBGRenderer();
+                }
                 return renderer;
             }
         });
+    }
+
+    @Override
+    public Supplier<Object> getRenderProvider() {
+        return renderProvider;
     }
 
     @Override
@@ -65,8 +73,8 @@ public class RpgRocketTBG extends Item implements GeoItem, DispenserLaunchable {
     }
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        Multimap<Attribute, AttributeModifier> map = super.getAttributeModifiers(slot, stack);
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
+        Multimap<Attribute, AttributeModifier> map = super.getAttributeModifiers(stack, slot);
         if (slot == EquipmentSlot.MAINHAND) {
             map = HashMultimap.create(map);
             map.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Item modifier", 6d, AttributeModifier.Operation.ADDITION));
@@ -109,7 +117,6 @@ public class RpgRocketTBG extends Item implements GeoItem, DispenserLaunchable {
             }
 
             @Override
-            @ParametersAreNonnullByDefault
             protected @NotNull Projectile getProjectile(Level pLevel, Position pPosition, ItemStack pStack) {
                 return new RpgRocketTBGEntity(ModEntities.RPG_ROCKET_TBG.get(), pPosition.x(), pPosition.y(), pPosition.z(), pLevel, 270, 130, 10);
             }

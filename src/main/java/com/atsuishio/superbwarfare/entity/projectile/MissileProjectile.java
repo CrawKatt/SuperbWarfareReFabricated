@@ -10,12 +10,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-public abstract class MissileProjectile extends DestroyableProjectile implements CustomSyncMotionEntity, IEntityAdditionalSpawnData {
+public abstract class MissileProjectile extends DestroyableProjectile implements CustomSyncMotionEntity {
 
     public static final EntityDataAccessor<String> TARGET_UUID = SynchedEntityData.defineId(MissileProjectile.class, EntityDataSerializers.STRING);
 

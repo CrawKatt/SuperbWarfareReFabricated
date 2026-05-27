@@ -7,8 +7,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class CannonMuzzleFlareOption implements ParticleOptions {
 
@@ -106,6 +106,6 @@ public class CannonMuzzleFlareOption implements ParticleOptions {
 
     @Override
     public String writeToString() {
-        return ForgeRegistries.PARTICLE_TYPES.getKey(this.getType()) + " [" + this.color + ", " + this.life + ", " + this.fade + ", " + this.animation_speed + ", " + this.sizeAdd + "]";
+        return BuiltInRegistries.PARTICLE_TYPE.getKey(this.getType()) + " [" + this.color + ", " + this.life + ", " + this.fade + ", " + this.animation_speed + ", " + this.sizeAdd + "]";
     }
 }

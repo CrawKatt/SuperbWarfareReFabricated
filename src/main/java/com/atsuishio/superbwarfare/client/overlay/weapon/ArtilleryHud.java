@@ -18,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
 
@@ -30,8 +29,7 @@ public class ArtilleryHud {
     private static final ResourceLocation CANNON_PITCH = Mod.loc("textures/overlay/vehicle/cannon/cannon_pitch.png");
     private static final ResourceLocation CANNON_PITCH_IND = Mod.loc("textures/overlay/vehicle/cannon/cannon_pitch_ind.png");
 
-    public static void render(VehicleEntity vehicle, Player player, ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Minecraft mc = gui.getMinecraft();
+    public static void render(VehicleEntity vehicle, Player player, Minecraft mc, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
 
         if (vehicle.getSeatIndex(player) != vehicle.computed().turretControllerIndex) return;
 

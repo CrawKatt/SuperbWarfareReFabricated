@@ -36,7 +36,6 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.network.SerializableDataTicket;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 public class FuMO25BlockEntity extends BlockEntity implements MenuProvider, GeoBlockEntity {
@@ -217,7 +216,6 @@ public class FuMO25BlockEntity extends BlockEntity implements MenuProvider, GeoB
 
     @Nullable
     @Override
-    @ParametersAreNonnullByDefault
     public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
         if (this.level == null) return null;
         return new FuMO25Menu(pContainerId, pPlayerInventory, ContainerLevelAccess.create(this.level, this.getBlockPos()), this.dataAccess);

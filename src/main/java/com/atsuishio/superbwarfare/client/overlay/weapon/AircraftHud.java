@@ -30,7 +30,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
 import org.joml.Math;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
@@ -65,9 +64,8 @@ public class AircraftHud {
     private static final ResourceLocation CROSSHAIR_3P = Mod.loc("textures/overlay/vehicle/crosshair/third_camera.png");
     private static final ResourceLocation BOMB_RING = Mod.loc("textures/overlay/crosshair/rex_circle.png");
 
-    public static void render(VehicleEntity vehicle, Player player, ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
+    public static void render(VehicleEntity vehicle, Player player, Minecraft mc, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         if (player != vehicle.getFirstPassenger()) return;
-        Minecraft mc = gui.getMinecraft();
         Camera camera = mc.gameRenderer.getMainCamera();
         Vec3 cameraPos = camera.getPosition();
         PoseStack poseStack = guiGraphics.pose();
@@ -196,7 +194,7 @@ public class AircraftHud {
             // 热诱弹
             if (vehicle.hasDecoy()) {
                 if (vehicle.getDecoyState().equals("READY")) {
-                    guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getKey().getDisplayName().getString() + "]")), (int) x + 72, (int) y, color, false);
+                    guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getTranslatedKeyMessage().getString() + "]")), (int) x + 72, (int) y, color, false);
                 } else {
                     guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.reloading"), (int) x + 72, (int) y, 0xFF0000, false);
                 }
@@ -280,7 +278,7 @@ public class AircraftHud {
                 guiGraphics.drawString(mc.font, component, 25, -9, Mth.hsvToRgb(0F, heat, 1F), false);
                 if (vehicle.hasDecoy()) {
                     if (vehicle.getDecoyState().equals("READY")) {
-                        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getKey().getDisplayName().getString() + "]")), 25, 1, -1, false);
+                        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getTranslatedKeyMessage().getString() + "]")), 25, 1, -1, false);
                     } else {
                         guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.reloading"), 25, 1, 0xFF0000, false);
                     }

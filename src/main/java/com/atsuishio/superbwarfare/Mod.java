@@ -8,16 +8,20 @@ import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.config.CommonConfig;
 import com.atsuishio.superbwarfare.config.ServerConfig;
 import com.atsuishio.superbwarfare.data.CustomData;
+import com.atsuishio.superbwarfare.entity.TargetEntity;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect;
+import com.atsuishio.superbwarfare.network.CustomSpawnDataEntity;
+import com.atsuishio.superbwarfare.network.message.receive.EntitySpawnDataMessage;
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -46,7 +50,6 @@ public class Mod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.CLIENT, ClientConfig.init());
         ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.COMMON, CommonConfig.init());
         ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.SERVER, ServerConfig.init());
 
@@ -74,6 +77,7 @@ public class Mod implements ModInitializer {
         BurnMobEffect.registerEvents();
         TraumaMobEffect.registerEvents();
         PowerfulAttraction.registerEvents();
+        TargetEntity.registerEvents();
 
         ModItems.registerDispenserBehavior();
 
@@ -90,6 +94,12 @@ public class Mod implements ModInitializer {
         if (ColdSweatCompatHandler.hasMod()) {
             ServerTickEvents.END_SERVER_TICK.register(server -> { });
         }
+
+        EntityTrackingEvents.START_TRACKING.register((entity, player) -> {
+            if (entity instanceof CustomSpawnDataEntity) {
+                NetworkRegistry.sendToPlayer(player, new EntitySpawnDataMessage(entity));
+            }
+        });
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             List<AbstractMap.SimpleEntry<Runnable, Integer>> actions = new ArrayList<>();

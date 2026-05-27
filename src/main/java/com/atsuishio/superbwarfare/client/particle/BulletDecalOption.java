@@ -9,8 +9,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class BulletDecalOption implements ParticleOptions {
 
@@ -108,6 +108,6 @@ public class BulletDecalOption implements ParticleOptions {
 
     @Override
     public String writeToString() {
-        return ForgeRegistries.PARTICLE_TYPES.getKey(this.getType()) + " " + this.direction.getName();
+        return BuiltInRegistries.PARTICLE_TYPE.getKey(this.getType()) + " " + this.direction.getName();
     }
 }

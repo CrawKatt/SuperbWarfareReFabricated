@@ -25,11 +25,8 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.animatable.client.RenderProvider;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -38,11 +35,10 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-@Mod.EventBusSubscriber(modid = com.atsuishio.superbwarfare.Mod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ContainerBlockItem extends BlockItem implements GeoItem {
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
     public static void registerContainers(RegisterContainersEvent event) {
         event.add(ModEntities.WHEEL_CHAIR);
         event.add(ModEntities.TRUCK.get());
@@ -67,6 +63,7 @@ public class ContainerBlockItem extends BlockItem implements GeoItem {
     }
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
 
     public ContainerBlockItem() {
         super(ModBlocks.CONTAINER.get(), new Item.Properties().stacksTo(1).fireResistant());
@@ -118,16 +115,23 @@ public class ContainerBlockItem extends BlockItem implements GeoItem {
     }
 
     @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        super.initializeClient(consumer);
-        consumer.accept(new IClientItemExtensions() {
-            private final BlockEntityWithoutLevelRenderer renderer = new ContainerBlockItemRenderer();
+    public void createRenderer(Consumer<Object> consumer) {
+        consumer.accept(new RenderProvider() {
+            private BlockEntityWithoutLevelRenderer renderer;
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (renderer == null) {
+                    renderer = new ContainerBlockItemRenderer();
+                }
                 return renderer;
             }
         });
+    }
+
+    @Override
+    public Supplier<Object> getRenderProvider() {
+        return renderProvider;
     }
 
     @Override

@@ -158,6 +158,9 @@ dependencies {
     implementation("com.github.Lounode.EventWrapper:eventwrapper-common:1.20.1-SNAPSHOT")
     modImplementation("com.github.Lounode.EventWrapper:eventwrapper-fabric:1.20.1-SNAPSHOT")
 
+    // JSR-305 (javax.annotation @ParametersAreNonnullByDefault)
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
+
     // GeckoLib
     modImplementation("software.bernie.geckolib:geckolib-fabric-1.20.1:4.4.6")
     implementation("com.eliotlash.mclib:mclib:20")

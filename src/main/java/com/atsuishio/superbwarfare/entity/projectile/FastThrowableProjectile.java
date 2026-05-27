@@ -1,8 +1,8 @@
 package com.atsuishio.superbwarfare.entity.projectile;
 
-import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent;
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption;
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig;
+import com.atsuishio.superbwarfare.network.CustomSpawnDataEntity;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.network.message.receive.ClientMotionSyncMessage;
 import com.atsuishio.superbwarfare.tools.ChunkLoadManager;
@@ -14,7 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.EntitySpawnS2CPacket;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -39,7 +39,7 @@ import java.util.function.Consumer;
 
 import static com.atsuishio.superbwarfare.tools.TraceTool.getBlocksAlongRay;
 
-public abstract class FastThrowableProjectile extends ThrowableItemProjectile implements CustomSyncMotionEntity, ExplosiveProjectile {
+public abstract class FastThrowableProjectile extends ThrowableItemProjectile implements CustomSyncMotionEntity, ExplosiveProjectile, CustomSpawnDataEntity {
 
     public static Consumer<FastThrowableProjectile> playFlySound = projectile -> {
     };
@@ -331,7 +331,7 @@ public abstract class FastThrowableProjectile extends ThrowableItemProjectile im
 
     @Override
     public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new EntitySpawnS2CPacket(this);
+        return new ClientboundAddEntityPacket(this);
     }
 
     @Override

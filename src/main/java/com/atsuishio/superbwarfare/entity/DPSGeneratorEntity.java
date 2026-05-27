@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.entity;
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage;
+import com.atsuishio.superbwarfare.event.custom.LivingDeathCallback;
 import com.atsuishio.superbwarfare.init.ModDamageTypes;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
@@ -31,8 +32,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -45,7 +44,6 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber(modid = Mod.MODID)
 public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
 
     public static final EntityDataAccessor<Integer> DOWN_TIME = SynchedEntityData.defineId(DPSGeneratorEntity.class, EntityDataSerializers.INT);
@@ -60,6 +58,10 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
     public DPSGeneratorEntity(EntityType<DPSGeneratorEntity> type, Level world) {
         super(type, world);
         this.noCulling = true;
+    }
+
+    public static void registerEvents() {
+        LivingDeathCallback.EVENT.register(DPSGeneratorEntity::onTargetDown);
     }
 
     @Override
@@ -143,8 +145,7 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
         return super.hurt(source, (float) (amount / Math.pow(2, getGeneratorLevel())));
     }
 
-    @SubscribeEvent
-    public static void onTargetDown(LivingDeathEvent event) {
+    public static void onTargetDown(LivingDeathCallback.Event event) {
         var entity = event.getEntity();
         if (event.getSource().is(DamageTypes.GENERIC_KILL)) return;
         var sourceEntity = event.getSource().getEntity();

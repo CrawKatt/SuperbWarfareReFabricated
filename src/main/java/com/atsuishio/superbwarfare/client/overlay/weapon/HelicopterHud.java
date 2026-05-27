@@ -30,7 +30,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
 import org.joml.Math;
 
 import static com.atsuishio.superbwarfare.client.RenderHelper.preciseBlit;
@@ -58,8 +57,7 @@ public class HelicopterHud {
     private static float lerpVy = 1;
     private static float lerpPower = 1;
 
-    public static void render(VehicleEntity vehicle, Player player, ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
-        Minecraft mc = gui.getMinecraft();
+    public static void render(VehicleEntity vehicle, Player player, Minecraft mc, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
         PoseStack poseStack = guiGraphics.pose();
         int index = vehicle.getSeatIndex(player);
         var data = vehicle.getGunData(index);
@@ -211,7 +209,7 @@ public class HelicopterHud {
 
                 if (vehicle.hasDecoy()) {
                     if (vehicle.getDecoyState().equals("READY")) {
-                        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getKey().getDisplayName().getString() + "]")), screenWidth / 2 - 160, screenHeight / 2 - 50, color, false);
+                        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getTranslatedKeyMessage().getString() + "]")), screenWidth / 2 - 160, screenHeight / 2 - 50, color, false);
                     } else {
                         guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.reloading"), screenWidth / 2 - 160, screenHeight / 2 - 50, 0xFF0000, false);
                     }
@@ -241,7 +239,7 @@ public class HelicopterHud {
 
                 if (vehicle.hasDecoy()) {
                     if (vehicle.getDecoyState().equals("READY")) {
-                        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getKey().getDisplayName().getString() + "]")), 30, 1, -1, false);
+                        guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getTranslatedKeyMessage().getString() + "]")), 30, 1, -1, false);
                     } else {
                         guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.flare.reloading"), 30, 1, 0xFF0000, false);
                     }

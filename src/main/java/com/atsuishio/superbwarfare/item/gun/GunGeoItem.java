@@ -1,22 +1,18 @@
 package com.atsuishio.superbwarfare.item.gun;
 
-import com.atsuishio.superbwarfare.client.PoseTool;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.item.CustomRendererItem;
 import com.atsuishio.superbwarfare.resource.gun.GunResource;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
+import software.bernie.geckolib.animatable.client.RenderProvider;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -27,11 +23,12 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-@net.minecraftforge.fml.common.Mod.EventBusSubscriber
 public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRendererItem {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    private final Supplier<Object> renderProvider = GeoItem.makeRenderer(this);
     protected final RandomSource random = RandomSource.create();
 
     public GunGeoItem(Properties properties) {
@@ -50,9 +47,23 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
     }
 
     @Override
-    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
-        super.initializeClient(consumer);
-        consumer.accept(this.getClientExtensions());
+    public void createRenderer(Consumer<Object> consumer) {
+        consumer.accept(new RenderProvider() {
+            private BlockEntityWithoutLevelRenderer renderer;
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (renderer == null) {
+                    renderer = GunGeoItem.this.getRenderer().get();
+                }
+                return renderer;
+            }
+        });
+    }
+
+    @Override
+    public Supplier<Object> getRenderProvider() {
+        return renderProvider;
     }
 
     protected PlayState animationPredicate(AnimationState<GunGeoItem> event) {
@@ -121,21 +132,5 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "animationController", 1, this::animationPredicate));
-    }
-
-    public IClientItemExtensions getClientExtensions() {
-        return new IClientItemExtensions() {
-            private final BlockEntityWithoutLevelRenderer renderer = GunGeoItem.this.getRenderer().get();
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return renderer;
-            }
-
-            @Override
-            public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
-                return PoseTool.pose(entityLiving, hand, stack);
-            }
-        };
     }
 }

@@ -3,21 +3,16 @@ package com.atsuishio.superbwarfare.client.screens;
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
 import com.atsuishio.superbwarfare.menu.FuMO25Menu;
 import com.atsuishio.superbwarfare.tools.SeekTool;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class FuMO25ScreenHelper {
 
     public static BlockPos pos = null;
@@ -25,10 +20,11 @@ public class FuMO25ScreenHelper {
 
     public static final int TOLERANCE_DISTANCE = 16;
 
-    @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.side != LogicalSide.CLIENT) return;
-        if (event.phase != TickEvent.Phase.END) return;
+    public static void registerEvents() {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> onClientTick());
+    }
+
+    public static void onClientTick() {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         Camera camera = mc.gameRenderer.getMainCamera();

@@ -7,8 +7,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class CustomCloudOption implements ParticleOptions {
 
@@ -115,6 +115,6 @@ public class CustomCloudOption implements ParticleOptions {
 
     @Override
     public String writeToString() {
-        return ForgeRegistries.PARTICLE_TYPES.getKey(this.getType()) + " [" + this.color + ", " + this.life + ", " + this.size + ", " + this.gravity + ", " + this.cooldown + ", " + this.light + "]";
+        return BuiltInRegistries.PARTICLE_TYPE.getKey(this.getType()) + " [" + this.color + ", " + this.life + ", " + this.size + ", " + this.gravity + ", " + this.cooldown + ", " + this.light + "]";
     }
 }
