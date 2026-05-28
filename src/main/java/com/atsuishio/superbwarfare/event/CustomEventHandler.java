@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.event;
 
 import com.atsuishio.superbwarfare.api.event.ReloadEvent;
-import com.atsuishio.superbwarfare.api.event.wrapper.ProjectileHitEventWrapper;
+import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent;
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.entity.projectile.GrapeshotEntity;
@@ -56,7 +56,7 @@ public class CustomEventHandler {
         }
     }
 
-    public static void onProjectileHitEntity(ProjectileHitEventWrapper.HitEntity event) {
+    public static void onProjectileHitEntity(ProjectileHitEvent.HitEntity event) {
         var entity = event.getOwner();
         if (!(entity instanceof LivingEntity attacker)) return;
 
@@ -79,7 +79,7 @@ public class CustomEventHandler {
         }
     }
 
-    public static void onProjectileHitBlock(ProjectileHitEventWrapper.HitBlock event) {
+    public static void onProjectileHitBlock(ProjectileHitEvent.HitBlock event) {
         var projectile = event.getProjectile();
         var state = event.getState();
         var pos = event.getPos();

@@ -33,7 +33,7 @@ public class PlayerVariablesSyncMessage {
         var entity = Minecraft.getInstance().player.level().getEntity(message.target);
         if (entity == null) return;
 
-        PlayerVariable variables = entity.getCapability(ModCapabilities.PLAYER_VARIABLE, null).orElse(new PlayerVariable());
+        PlayerVariable variables = ModCapabilities.PLAYER_VARIABLE.maybeGet(entity).orElse(new PlayerVariable());
 
         for (var entry : message.data.entrySet()) {
             var type = entry.getKey();

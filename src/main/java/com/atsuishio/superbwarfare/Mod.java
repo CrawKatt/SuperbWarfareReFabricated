@@ -8,6 +8,8 @@ import com.atsuishio.superbwarfare.data.CustomData;
 import com.atsuishio.superbwarfare.entity.TargetEntity;
 import com.atsuishio.superbwarfare.event.CustomEventHandler;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
+import com.atsuishio.superbwarfare.event.LivingEventHandler;
+import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.common.ammo.PotionMortarShell;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
@@ -70,6 +72,7 @@ public class Mod implements ModInitializer {
         ModCommandArguments.register();
         ModVillagers.register();
         ModAttributes.register();
+        ModWorldgen.register();
 
         ShockMobEffect.registerEvents();
         BurnMobEffect.registerEvents();
@@ -78,9 +81,10 @@ public class Mod implements ModInitializer {
         TargetEntity.registerEvents();
         CustomEventHandler.registerEvents();
         HitboxHelperEventHandler.registerEvents();
+        LivingEventHandler.registerEvents();
+        PlayerEventHandler.registerEvents();
         PotionMortarShell.registerColorHandlers();
-
-        ModItems.registerDispenserBehavior();
+        ModLootModifier.register();
 
         registerDataTickets();
 

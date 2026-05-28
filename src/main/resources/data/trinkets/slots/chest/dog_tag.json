@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "icon": "trinkets:gui/slots/charm",
+  "order": -508,
+  "validator_predicates": [],
+  "quick_move_predicates": [],
+  "tooltip_predicates": []
+}

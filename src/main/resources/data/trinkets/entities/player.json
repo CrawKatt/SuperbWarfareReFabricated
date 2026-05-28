@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "slots": {
+    "back": 1,
+    "chest": 2
+  }
+}

@@ -8,7 +8,9 @@ import com.atsuishio.superbwarfare.item.C4BombItem;
 import com.atsuishio.superbwarfare.item.ElectricBaton;
 import com.atsuishio.superbwarfare.item.common.container.LuckyContainerBlockItem;
 import com.atsuishio.superbwarfare.item.common.container.SmallContainerBlockItem;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
@@ -27,13 +29,7 @@ public class ModTabs {
                         output.accept(registryObject.get());
 
                         var stack = new ItemStack(registryObject.get());
-                        // TODO: Replace ForgeCapabilities.ENERGY with TechReborn Energy API
-                        // stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(energy -> {
-                        //     if (energy.getMaxEnergyStored() > 0) {
-                        //         energy.receiveEnergy(Integer.MAX_VALUE, false);
-                        //         output.accept(stack);
-                        //     }
-                        // });
+                        // TechReborn Energy API: full-energy variants are provided via makeFullEnergyStack
                     }))
                     .build());
 
@@ -110,10 +106,6 @@ public class ModTabs {
                     })
                     .build());
 
-    // TODO: Add SENPAI_SPAWN_EGG to vanilla spawn eggs tab via fabric ItemGroupEvents
-    // On Fabric, use ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS)
-    //   .register((entries) -> entries.accept(ModItems.SENPAI_SPAWN_EGG.get()));
-
     private static void generatePotionEffectTypes(CreativeModeTab.Output output, net.minecraft.core.HolderLookup.Provider potions, net.minecraft.world.item.Item potionItem) {
         potions.listElements().filter(potion -> !potion.is(net.minecraft.world.item.alchemy.Potions.EMPTY_ID))
                 .map(potion -> net.minecraft.world.item.alchemy.PotionUtils.setPotion(new ItemStack(potionItem), potion.value()))
@@ -121,6 +113,7 @@ public class ModTabs {
     }
 
     public static void register() {
-
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS)
+                .register(entries -> entries.accept(ModItems.SENPAI_SPAWN_EGG.get()));
     }
 }

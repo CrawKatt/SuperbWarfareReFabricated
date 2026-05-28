@@ -15,6 +15,7 @@ import com.atsuishio.superbwarfare.entity.mixin.ExplosionAccess;
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.event.custom.*;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
@@ -56,7 +57,38 @@ import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.AI_T
 
 public class LivingEventHandler {
 
-    // TODO: Register in Mod.java using Fabric event API
+    public static void registerEvents() {
+        LivingAttackCallback.EVENT.register(LivingEventHandler::onEntityAttacked);
+
+        LivingHurtCallback.EVENT.register(event -> {
+            float modified = onEntityHurt(event.getEntity(), event.getSource(), event.getAmount());
+            event.setAmount(modified);
+        });
+
+        LivingDeathCallback.EVENT.register(event -> {
+            onEntityDeath(event.getEntity(), event.getSource());
+        });
+
+        LivingDropsCallback.EVENT.register(event -> {
+            onLivingDrops(event.getEntity(), event.getSource(), event.getDrops());
+        });
+
+        LivingExperienceDropCallback.EVENT.register(event -> {
+            if (event.getAttackingPlayer() != null) {
+                boolean handled = onLivingExperienceDrop(event.getAttackingPlayer(), event.getDroppedExperience());
+                if (handled) {
+                    event.setCanceled(true);
+                }
+            }
+        });
+
+        MobEffectAddedCallback.EVENT.register((entity, effect, source) -> {
+            if (onEffectApply(effect, entity)) {
+                entity.removeEffect(effect.getEffect());
+            }
+        });
+    }
+
     public static void onLivingChangeTargetEvent(Mob mob, LivingEntity newTarget) {
         if (mob.getVehicle() instanceof VehicleEntity vehicle) {
             if (mob == vehicle.getNthEntity(vehicle.getTurretControllerIndex())) {
@@ -327,7 +359,7 @@ public class LivingEventHandler {
         ItemStack oldStack = from;
         ItemStack newStack = to;
 
-        player.getCapability(ModCapabilities.LASER_CAPABILITY).ifPresent(LaserCapability.ILaserCapability::stop);
+        ModCapabilities.LASER_CAPABILITY.maybeGet(player).ifPresent(LaserCapability.ILaserCapability::stop);
 
         if (player instanceof ServerPlayer serverPlayer) {
             if (newStack.getItem() instanceof GunItem) {
@@ -561,7 +593,7 @@ public class LivingEventHandler {
         if (!(entity instanceof Player player)) return;
         if (!MiscConfig.DROP_AMMO_BOX.get()) return;
 
-        var cap = player.getCapability(ModCapabilities.PLAYER_VARIABLE).orElse(new PlayerVariable());
+        var cap = ModCapabilities.PLAYER_VARIABLE.maybeGet(player).orElse(new PlayerVariable());
         cap.watch();
 
         boolean drop = Stream.of(Ammo.values())
@@ -623,7 +655,7 @@ public class LivingEventHandler {
     }
 
     public static void handlePlayerBeamReset(Player player) {
-        player.getCapability(ModCapabilities.LASER_CAPABILITY).ifPresent(LaserCapability.ILaserCapability::end);
+        ModCapabilities.LASER_CAPABILITY.maybeGet(player).ifPresent(LaserCapability.ILaserCapability::end);
     }
 
     // TODO: Register in Mod.java using Fabric event API
