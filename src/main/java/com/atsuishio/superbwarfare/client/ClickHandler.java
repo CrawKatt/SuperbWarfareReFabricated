@@ -366,6 +366,7 @@ public class ClickHandler {
                         if (screen instanceof WeaponEditScreen) {
                             ClientEventHandler.onOpenEditScreen();
                         }
+                        event.setCanceled(true);
                         return;
                     }
                 }
@@ -374,6 +375,7 @@ public class ClickHandler {
                     var screen = provider.getItemScreen(offHand, player, InteractionHand.OFF_HAND);
                     if (screen != null) {
                         Minecraft.getInstance().setScreen(screen);
+                        event.setCanceled(true);
                         return;
                     }
                 }
