@@ -2585,7 +2585,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     public Vec3 bombHitPos(Entity entity) {
         var gunData = getGunData(entity);
         if (gunData != null) {
-            return ProjectileCalculator.calculatePreciseImpactPoint(level(), getShootPosForHud(entity, 1), getShootVec(entity, 1), getDeltaMovement().length() * gunData.compute().velocity, -getProjectileGravity(entity));
+            return ProjectileCalculator.calculatePreciseImpactPoint(level(), getShootPosForHud(entity, 1), getShootVec(entity, 1), getDeltaMovement().length() * gunData.compute().velocity, -getProjectileGravity(entity), entity);
         } else {
             return Vec3.ZERO;
         }

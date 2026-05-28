@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "superbwarfare:artillery_indicator"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "superbwarfare:artillery_indicator"
+  }
+}

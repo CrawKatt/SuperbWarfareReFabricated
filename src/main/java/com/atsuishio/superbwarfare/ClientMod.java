@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare;
 
+import com.atsuishio.superbwarfare.client.ClickHandler;
 import com.atsuishio.superbwarfare.client.ClientRenderHandler;
 import com.atsuishio.superbwarfare.client.MouseMovementHandler;
 import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
@@ -14,6 +15,7 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
 import com.atsuishio.superbwarfare.init.*;
+import com.atsuishio.superbwarfare.tools.ResourceOnceLogger;
 import com.atsuishio.superbwarfare.tools.VectorUtil;
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
@@ -49,6 +51,8 @@ public class ClientMod implements ClientModInitializer {
         ClientLanguageGetter.registerReloadListeners();
         KillMessageHandler.registerEvents();
         VectorUtil.registerEvents();
+        ClickHandler.registerEvents();
+        ResourceOnceLogger.register();
 
         ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.CLIENT, ClientConfig.init());
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

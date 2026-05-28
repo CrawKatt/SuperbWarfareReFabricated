@@ -5,14 +5,17 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.Pair;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.*;
 
-public class ContainerDataManager extends SimpleJsonResourceReloadListener {
+public class ContainerDataManager extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
 
     public static ContainerDataManager INSTANCE = new ContainerDataManager();
 
@@ -24,9 +27,14 @@ public class ContainerDataManager extends SimpleJsonResourceReloadListener {
         super(GSON, DIRECTORY);
     }
 
-    // TODO: Register via Fabric ResourceManagerHelper in Mod.java
+    @Override
+    public ResourceLocation getFabricId() {
+        return Mod.loc("container_data_manager");
+    }
+
     public static void register() {
         INSTANCE = new ContainerDataManager();
+        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(INSTANCE);
     }
 
     @Override

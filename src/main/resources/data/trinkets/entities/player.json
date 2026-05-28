@@ -1,7 +1,7 @@
 {
   "replace": false,
-  "slots": {
-    "back": 1,
-    "chest": 2
-  }
+  "slots": [
+    "back",
+    "chest"
+  ]
 }

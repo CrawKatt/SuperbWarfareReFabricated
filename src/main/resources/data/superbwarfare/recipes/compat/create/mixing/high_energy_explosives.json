@@ -8,7 +8,7 @@
       "item": "minecraft:gunpowder"
     },
     {
-      "tag": "forge:sand"
+      "tag": "c:sand"
     },
     {
       "item": "minecraft:sugar"
@@ -18,12 +18,6 @@
     {
       "item": "superbwarfare:high_energy_explosives",
       "count": 3
-    }
-  ],
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "create"
     }
   ]
 }

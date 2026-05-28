@@ -1,14 +1,5 @@
 {
-  "base": {
-    "parent": "superbwarfare:item/m_79_base"
-  },
-  "gui_light": "front",
-  "loader": "forge:separate_transforms",
-  "perspectives": {
-    "gui": {
-      "parent": "superbwarfare:item/m_79_icon"
-    }
-  },
+  "parent": "superbwarfare:item/m_79_base",
   "textures": {
     "particle": "superbwarfare:item/m_79_icon"
   }

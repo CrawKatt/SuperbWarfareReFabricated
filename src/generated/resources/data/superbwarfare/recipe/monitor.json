@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "minecraft:lightning_rod"
+    },
+    "b": {
+      "item": "minecraft:lever"
+    },
+    "c": {
+      "tag": "c:ingots/iron"
+    },
+    "d": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "e": {
+      "tag": "c:glass_panes"
+    }
+  },
+  "pattern": [
+    "a a",
+    "bcb",
+    "ded"
+  ],
+  "result": {
+    "count": 1,
+    "id": "superbwarfare:monitor"
+  }
+}

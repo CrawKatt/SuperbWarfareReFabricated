@@ -1,14 +1,6 @@
 {
-  "base": {
-    "parent": "superbwarfare:item/taser_base"
-  },
+  "parent": "superbwarfare:item/taser_base",
   "gui_light": "front",
-  "loader": "forge:separate_transforms",
-  "perspectives": {
-    "gui": {
-      "parent": "superbwarfare:item/taser_icon"
-    }
-  },
   "textures": {
     "particle": "superbwarfare:item/taser_icon"
   }

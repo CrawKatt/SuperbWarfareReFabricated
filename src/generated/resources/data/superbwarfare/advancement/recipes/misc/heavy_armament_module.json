@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_medium_armament_module": {
+      "conditions": {
+        "items": [
+          {
+            "items": "superbwarfare:medium_armament_module"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "superbwarfare:heavy_armament_module"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_medium_armament_module"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "superbwarfare:heavy_armament_module"
+    ]
+  }
+}

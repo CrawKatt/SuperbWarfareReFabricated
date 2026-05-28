@@ -1,11 +1,15 @@
 package com.atsuishio.superbwarfare;
 
+import com.atsuishio.superbwarfare.advancement.CriteriaRegister;
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
 import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.command.CommandRegister;
 import com.atsuishio.superbwarfare.config.CommonConfig;
 import com.atsuishio.superbwarfare.config.ServerConfig;
 import com.atsuishio.superbwarfare.data.CustomData;
+import com.atsuishio.superbwarfare.data.DataLoader;
+import com.atsuishio.superbwarfare.data.container.ContainerDataManager;
+import com.atsuishio.superbwarfare.entity.DPSGeneratorEntity;
 import com.atsuishio.superbwarfare.entity.TargetEntity;
 import com.atsuishio.superbwarfare.event.CustomEventHandler;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
@@ -13,12 +17,14 @@ import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.common.ammo.PotionMortarShell;
+import com.atsuishio.superbwarfare.item.common.container.ContainerBlockItem;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect;
 import com.atsuishio.superbwarfare.network.CustomSpawnDataEntity;
 import com.atsuishio.superbwarfare.network.message.receive.EntitySpawnDataMessage;
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
+import com.atsuishio.superbwarfare.recipe.ModPotionRecipes;
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import net.fabricmc.api.ModInitializer;
@@ -76,6 +82,15 @@ public class Mod implements ModInitializer {
         ModWorldgen.register();
         ModEnergyApi.register();
         ModTags.register();
+        ModEntities.registerAttributes();
+        ModItems.registerDispenserBehavior();
+        ModPerks.registerCompatPerks();
+        ModPotionRecipes.register();
+        CriteriaRegister.setup();
+        DataLoader.registerReloadListeners();
+        ContainerDataManager.register();
+        DPSGeneratorEntity.registerEvents();
+        ContainerBlockItem.registerContainers(new com.atsuishio.superbwarfare.api.event.RegisterContainersEvent());
 
         ShockMobEffect.registerEvents();
         BurnMobEffect.registerEvents();

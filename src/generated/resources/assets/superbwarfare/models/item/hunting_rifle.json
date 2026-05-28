@@ -1,14 +1,5 @@
 {
-  "base": {
-    "parent": "superbwarfare:item/hunting_rifle_base"
-  },
-  "gui_light": "front",
-  "loader": "forge:separate_transforms",
-  "perspectives": {
-    "gui": {
-      "parent": "superbwarfare:item/hunting_rifle_icon"
-    }
-  },
+  "parent": "superbwarfare:item/hunting_rifle_base",
   "textures": {
     "particle": "superbwarfare:item/hunting_rifle_icon"
   }

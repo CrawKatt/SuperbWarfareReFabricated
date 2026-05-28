@@ -11,11 +11,5 @@
       "count": 1,
       "item": "superbwarfare:iron_powder"
     }
-  ],
-  "conditions": [
-    {
-      "type": "forge:mod_loaded",
-      "modid": "create"
-    }
   ]
 }

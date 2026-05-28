@@ -1,23 +1,23 @@
 package com.atsuishio.superbwarfare.data.gun;
 
+import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.capability.ModCapabilities;
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
-import com.atsuishio.superbwarfare.init.ModItems;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Locale;
-import java.util.function.Supplier;
 
 public enum Ammo {
-    HANDGUN(ChatFormatting.GREEN, ModItems.HANDGUN_AMMO),
-    RIFLE(ChatFormatting.AQUA, ModItems.RIFLE_AMMO),
-    SHOTGUN(ChatFormatting.RED, ModItems.SHOTGUN_AMMO),
-    SNIPER(ChatFormatting.GOLD, ModItems.SNIPER_AMMO),
-    HEAVY(ChatFormatting.LIGHT_PURPLE, ModItems.HEAVY_AMMO);
+    HANDGUN(ChatFormatting.GREEN, Mod.loc("handgun_ammo")),
+    RIFLE(ChatFormatting.AQUA, Mod.loc("rifle_ammo")),
+    SHOTGUN(ChatFormatting.RED, Mod.loc("shotgun_ammo")),
+    SNIPER(ChatFormatting.GOLD, Mod.loc("sniper_ammo")),
+    HEAVY(ChatFormatting.LIGHT_PURPLE, Mod.loc("heavy_ammo"));
 
     /**
      * 翻译字段名称，如 item.superbwarfare.ammo.rifle
@@ -38,15 +38,15 @@ public enum Ammo {
     public final String displayName;
 
     /**
-     * 该类型弹药默认的Item
+     * 该类型弹药默认的Item ID
      */
-    public final Supplier<Item> defaultItemSupplier;
+    private final ResourceLocation itemId;
 
     public final ChatFormatting color;
 
-    Ammo(ChatFormatting color, Supplier<Item> defaultItemSupplier) {
+    Ammo(ChatFormatting color, ResourceLocation itemId) {
         this.color = color;
-        this.defaultItemSupplier = defaultItemSupplier;
+        this.itemId = itemId;
 
         var name = name().toLowerCase(Locale.ROOT);
         this.name = name;
@@ -75,7 +75,7 @@ public enum Ammo {
     }
 
     public ItemStack getItemStack(int count) {
-        return new ItemStack(defaultItemSupplier.get(), count);
+        return new ItemStack(BuiltInRegistries.ITEM.get(itemId), count);
     }
 
     public static Ammo getType(String name) {

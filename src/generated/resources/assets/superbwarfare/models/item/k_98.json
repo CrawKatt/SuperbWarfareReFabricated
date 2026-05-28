@@ -1,14 +1,5 @@
 {
-  "base": {
-    "parent": "superbwarfare:item/k_98_base"
-  },
-  "gui_light": "front",
-  "loader": "forge:separate_transforms",
-  "perspectives": {
-    "gui": {
-      "parent": "superbwarfare:item/k_98_icon"
-    }
-  },
+  "parent": "superbwarfare:item/k_98_base",
   "textures": {
     "particle": "superbwarfare:item/k_98_icon"
   }

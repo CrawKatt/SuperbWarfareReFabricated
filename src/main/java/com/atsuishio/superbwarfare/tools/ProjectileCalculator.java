@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.tools;
 
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -22,6 +23,10 @@ public class ProjectileCalculator {
      * @return 精确的落点位置（Vec3），如果没有碰撞则返回最后位置
      */
     public static Vec3 calculatePreciseImpactPoint(Level level, Vec3 startPos, Vec3 launchVector, double velocity, double gravity) {
+        return calculatePreciseImpactPoint(level, startPos, launchVector, velocity, gravity, null);
+    }
+
+    public static Vec3 calculatePreciseImpactPoint(Level level, Vec3 startPos, Vec3 launchVector, double velocity, double gravity, Entity entity) {
         Vec3 currentPos = startPos;
         Vec3 currentVelocity = launchVector.normalize().scale(velocity);
         Vec3 previousPos = startPos;
@@ -38,11 +43,11 @@ public class ProjectileCalculator {
             currentVelocity = currentVelocity.add(0, gravity * TIME_STEP, 0);
 
             // 检查碰撞
-            Optional<Vec3> collisionPoint = checkCollision(level, previousPos, nextPos);
+            Optional<Vec3> collisionPoint = checkCollision(level, previousPos, nextPos, entity);
 
             if (collisionPoint.isPresent()) {
                 // 精确计算碰撞点
-                return refineCollisionPoint(level, previousPos, collisionPoint.get());
+                return refineCollisionPoint(level, previousPos, collisionPoint.get(), entity);
             }
 
             // 边界检查
@@ -62,14 +67,14 @@ public class ProjectileCalculator {
     /**
      * 检查两点之间是否有碰撞
      */
-    private static Optional<Vec3> checkCollision(Level level, Vec3 start, Vec3 end) {
+    private static Optional<Vec3> checkCollision(Level level, Vec3 start, Vec3 end, Entity entity) {
         // 使用Minecraft内置的光线追踪进行碰撞检测
         BlockHitResult hitResult = level.clip(new ClipContext(
                 start,
                 end,
                 ClipContext.Block.COLLIDER, // 只检测碰撞方块
                 ClipContext.Fluid.ANY, // 忽略流体
-                null // 无实体
+                entity
         ));
 
         // 如果检测到碰撞，返回碰撞点
@@ -84,7 +89,7 @@ public class ProjectileCalculator {
     /**
      * 精确计算碰撞点（使用二分法提高精度）
      */
-    private static Vec3 refineCollisionPoint(Level level, Vec3 safePoint, Vec3 collisionPoint) {
+    private static Vec3 refineCollisionPoint(Level level, Vec3 safePoint, Vec3 collisionPoint, Entity entity) {
         Vec3 low = safePoint;
         Vec3 high = collisionPoint;
         Vec3 bestPoint = collisionPoint;
@@ -94,7 +99,7 @@ public class ProjectileCalculator {
             Vec3 mid = low.add(high.subtract(low).scale(0.5));
 
             // 检查从安全点到中点是否有碰撞
-            Optional<Vec3> collision = checkCollision(level, low, mid);
+            Optional<Vec3> collision = checkCollision(level, low, mid, entity);
 
             if (collision.isPresent()) {
                 // 有碰撞，将高点移动到中点

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": {
+      "item": "minecraft:string"
+    },
+    "b": {
+      "tag": "minecraft:wool_carpets"
+    },
+    "c": {
+      "item": "minecraft:golden_apple"
+    }
+  },
+  "pattern": [
+    "aba",
+    "bcb",
+    "aba"
+  ],
+  "result": {
+    "count": 4,
+    "id": "superbwarfare:medical_kit"
+  }
+}
