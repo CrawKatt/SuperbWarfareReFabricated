@@ -75,6 +75,7 @@ public class Mod implements ModInitializer {
         ModAttributes.register();
         ModWorldgen.register();
         ModEnergyApi.register();
+        ModTags.register();
 
         ShockMobEffect.registerEvents();
         BurnMobEffect.registerEvents();

@@ -443,6 +443,6 @@ public class ModItems {
     }
 
     public static void register() {
-
+        registerPerkItems();
     }
 }

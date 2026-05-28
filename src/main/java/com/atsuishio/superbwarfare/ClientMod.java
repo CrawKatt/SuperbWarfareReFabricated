@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare;
 
+import com.atsuishio.superbwarfare.client.ClientRenderHandler;
 import com.atsuishio.superbwarfare.client.MouseMovementHandler;
 import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
 import com.atsuishio.superbwarfare.client.molang.MolangVariable;
@@ -12,7 +13,7 @@ import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
-import com.atsuishio.superbwarfare.init.ModKeyMappings;
+import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.tools.VectorUtil;
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
@@ -31,12 +32,20 @@ public class ClientMod implements ClientModInitializer {
         MouseMovementHandler.init();
         MolangVariable.register();
         ModSoundInstances.init();
+        ModEntityRenderers.register();
+        ModScreens.register();
+        ModParticles.register();
+        ModProperties.register();
         ModSellWarningScreen.registerEvents();
         ClientMouseHandler.registerEvents();
         ClientEventHandler.registerEvents();
         ParachuteRenderer.registerRenderer();
         FuMO25ScreenHelper.registerEvents();
         ContainerBlockPreview.registerEvents();
+        ClientRenderHandler.registerTooltip();
+        ClientRenderHandler.onClientSetup();
+        ClientRenderHandler.registerBlockRenderers();
+        ClientRenderHandler.registerLayerDefinitions();
         ClientLanguageGetter.registerReloadListeners();
         KillMessageHandler.registerEvents();
         VectorUtil.registerEvents();

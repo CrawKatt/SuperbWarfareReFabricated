@@ -9,10 +9,12 @@ import com.atsuishio.superbwarfare.client.overlay.*;
 import com.atsuishio.superbwarfare.client.tooltip.*;
 import com.atsuishio.superbwarfare.client.tooltip.component.*;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
+import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -36,6 +38,18 @@ public class ClientRenderHandler {
         var rate = 1 - AnimationCurves.EASE_OUT_CIRC.apply(Math.min(1, (projectile.tickCount + partialTick) / 5.0));
         var offset = ClientRenderHandler.bulletRenderOffset.subtract(projectile.position()).multiply(rate, rate, rate);
         stack.translate(offset.x, offset.y, offset.z);
+    }
+
+    public static void registerTooltip() {
+        TooltipComponentCallback.EVENT.register(component -> {
+            if (component instanceof GunImageComponent c && c.stack.getItem() instanceof GunItem) return new ClientGunImageTooltip(c);
+            if (component instanceof BocekImageComponent c) return new ClientBocekImageTooltip(c);
+            if (component instanceof CellImageComponent c) return new ClientCellImageTooltip(c);
+            if (component instanceof SentinelImageComponent c) return new ClientSentinelImageTooltip(c);
+            if (component instanceof ChargingStationImageComponent c) return new ClientChargingStationImageTooltip(c);
+            if (component instanceof DogTagImageComponent c) return new ClientDogTagImageTooltip(c);
+            return null;
+        });
     }
 
     public static void registerBlockRenderers() {
