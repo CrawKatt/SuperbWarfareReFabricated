@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.capability.energy;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.BatteryItem;

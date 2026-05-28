@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
+import com.atsuishio.superbwarfare.init.ModKeyMappings;
 import com.atsuishio.superbwarfare.tools.VectorUtil;
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
@@ -26,6 +27,7 @@ public class ClientMod implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ModKeyMappings.register();
         MouseMovementHandler.init();
         MolangVariable.register();
         ModSoundInstances.init();

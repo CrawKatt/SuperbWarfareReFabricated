@@ -32,4 +32,8 @@ public class ModKeyMappings {
     public static final KeyMapping MELEE = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.superbwarfare.melee", GLFW.GLFW_KEY_V, "key.categories.superbwarfare"));
     public static final KeyMapping VEHICLE_SEEK = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.superbwarfare.vehicle_seek", GLFW.GLFW_KEY_X, "key.categories.superbwarfare"));
     public static final KeyMapping MARK = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.superbwarfare.mark", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_MIDDLE, "key.categories.superbwarfare"));
+
+    public static void register() {
+
+    }
 }

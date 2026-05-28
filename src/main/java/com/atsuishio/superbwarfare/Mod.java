@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare;
 
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.command.CommandRegister;
 import com.atsuishio.superbwarfare.config.CommonConfig;
 import com.atsuishio.superbwarfare.config.ServerConfig;
@@ -73,6 +74,7 @@ public class Mod implements ModInitializer {
         ModVillagers.register();
         ModAttributes.register();
         ModWorldgen.register();
+        ModEnergyApi.register();
 
         ShockMobEffect.registerEvents();
         BurnMobEffect.registerEvents();
