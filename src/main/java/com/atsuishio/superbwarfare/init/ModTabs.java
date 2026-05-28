@@ -68,15 +68,16 @@ public class ModTabs {
                     .title(Component.translatable("item_group.superbwarfare.item"))
                     .icon(() -> new ItemStack(ModItems.TARGET_DEPLOYER.get()))
                     .displayItems((param, output) -> ModItems.ITEMS_LIST.forEach(registryObject -> {
-                        output.accept(registryObject.get());
-                        if (registryObject.get() == ModItems.ARMOR_PLATE.get()) {
-                            output.accept(ArmorPlate.getInfiniteInstance());
-                        }
-                        if (registryObject.get() instanceof BatteryItem batteryItem) {
+                        var item = registryObject.get();
+                        if (item instanceof BatteryItem batteryItem) {
                             output.accept(batteryItem.makeFullEnergyStack());
-                        }
-                        if (registryObject.get() == ModItems.ELECTRIC_BATON.get()) {
+                        } else if (item == ModItems.ELECTRIC_BATON.get()) {
                             output.accept(ElectricBaton.makeFullEnergyStack());
+                        } else {
+                            output.accept(item);
+                        }
+                        if (item == ModItems.ARMOR_PLATE.get()) {
+                            output.accept(ArmorPlate.getInfiniteInstance());
                         }
                     }))
                     .build());

@@ -85,7 +85,11 @@ public class ModEnergyApi {
     }
 
     public static EnergyStorage get(ItemStack stack) {
-        return EnergyStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
+        var storage = EnergyStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
+        if (storage == null) {
+            return new SimpleEnergyStorage(0, 0, 0);
+        }
+        return storage;
     }
 
     public static int getEnergyStored(ItemStack stack) {
