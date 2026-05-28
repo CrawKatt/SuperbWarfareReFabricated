@@ -147,7 +147,7 @@ public class ModItems {
      */
     public static final List<Supplier<Item>> ITEMS_LIST = new ArrayList<>();
 
-    public static final Supplier<Item> SENPAI_SPAWN_EGG = item("senpai_spawn_egg", () -> new SpawnEggItem((EntityType<?>) ModEntities.SENPAI.get(), -11584987, -14014413, new Item.Properties()));
+    public static final Supplier<Item> SENPAI_SPAWN_EGG = item("senpai_spawn_egg", () -> new SpawnEggItem(ModEntities.SENPAI.get(), -11584987, -14014413, new Item.Properties()));
     public static final Supplier<Item> ANCIENT_CPU = item("ancient_cpu", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
     public static final Supplier<Item> PROPELLER = item("propeller", () -> new Item(new Item.Properties()));
     public static final Supplier<Item> LARGE_PROPELLER = item("large_propeller", () -> new Item(new Item.Properties()));

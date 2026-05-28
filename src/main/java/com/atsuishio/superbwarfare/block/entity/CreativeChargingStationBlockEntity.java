@@ -43,7 +43,7 @@ public class CreativeChargingStationBlockEntity extends BlockEntity {
                     || blockEntity instanceof CreativeChargingStationBlockEntity
             ) continue;
 
-            var targetEnergy = EnergyStorage.SIDED.get(blockEntity, direction.getOpposite());
+            var targetEnergy = EnergyStorage.SIDED.find(level, blockEntity.getBlockPos(), direction.getOpposite());
             if (targetEnergy != null && targetEnergy.supportsInsertion()) {
                 try (Transaction t = Transaction.openOuter()) {
                     targetEnergy.insert(Long.MAX_VALUE, t);

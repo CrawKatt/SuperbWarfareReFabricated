@@ -138,8 +138,8 @@ public class BocekItem extends GunGeoItem {
         var perk = data.perk.get(Perk.Type.AMMO);
 
         if (player instanceof ServerPlayer serverPlayer) {
-            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_1P.getId(), SoundSource.PLAYERS);
-            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_3P.getId(), SoundSource.PLAYERS);
+            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_1P.get().getLocation(), SoundSource.PLAYERS);
+            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_3P.get().getLocation(), SoundSource.PLAYERS);
             NetworkRegistry.sendToPlayer(serverPlayer, new ShootClientMessage(10));
         }
 

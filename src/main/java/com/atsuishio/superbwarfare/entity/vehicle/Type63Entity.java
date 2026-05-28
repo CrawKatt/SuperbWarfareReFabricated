@@ -42,7 +42,7 @@ public class Type63Entity extends GeoVehicleEntity {
     public static final EntityDataAccessor<Float> BODY_YAW = SynchedEntityData.defineId(Type63Entity.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Float> SHOOT_PITCH = SynchedEntityData.defineId(Type63Entity.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Float> SHOOT_YAW = SynchedEntityData.defineId(Type63Entity.class, EntityDataSerializers.FLOAT);
-    public static final EntityDataAccessor<IntList> LOADED_AMMO = SynchedEntityData.defineId(Type63Entity.class, ModSerializers.INT_LIST_SERIALIZER.get());
+    public static final EntityDataAccessor<IntList> LOADED_AMMO = SynchedEntityData.defineId(Type63Entity.class, ModSerializers.INT_LIST_SERIALIZER);
 
     public OBB[] barrel = new OBB[12];
     public OBB pitchController;
@@ -140,7 +140,7 @@ public class Type63Entity extends GeoVehicleEntity {
         if (result != InteractionResult.PASS) return result;
 
         var stack = player.getMainHandItem();
-        var lookingObb = OBB.getLookingObb(player, player.getEntityReach());
+        var lookingObb = OBB.getLookingObb(player, player.isCreative() ? 5.0 : 4.5);
 
         if (stack.isEmpty()) {
             if (player.isShiftKeyDown()) {
@@ -249,7 +249,7 @@ public class Type63Entity extends GeoVehicleEntity {
     }
 
     public boolean lookingAtBarrel(Player player) {
-        var lookingObb = OBB.getLookingObb(player, player.getEntityReach());
+        var lookingObb = OBB.getLookingObb(player, player.isCreative() ? 5.0 : 4.5);
 
         for (int i = 0; i < 12; i++) {
             if (lookingObb == barrel[i]) {

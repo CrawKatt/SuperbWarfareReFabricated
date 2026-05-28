@@ -9,6 +9,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -42,7 +43,8 @@ public final class VehicleVecUtils {
     }
 
     public static double getSubmergedHeight(Entity entity) {
-        return entity.getFluidTypeHeight(entity.level().getFluidState(entity.blockPosition()).getFluidType());
+        var fluidState = entity.level().getFluidState(entity.blockPosition());
+        return entity.getFluidHeight(FluidTags.WATER);
     }
 
     public static Quaternionf eulerToQuaternion(float yaw, float pitch, float roll) {

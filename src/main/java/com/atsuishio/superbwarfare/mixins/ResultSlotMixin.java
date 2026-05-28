@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.item.Hammer;
-import net.minecraft.world.Container;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.item.ItemStack;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ResultSlotMixin {
     @Shadow
     @Final
-    private Container craftSlots;
+    private CraftingContainer craftSlots;
 
     @Inject(method = "onTake", at = @At("HEAD"))
     private void superbwarfare$beforeTake(Player player, ItemStack stack, CallbackInfo ci) {

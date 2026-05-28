@@ -14,9 +14,9 @@ import java.util.function.Supplier;
 
 public class ModParticleTypes {
 
-    public static final Supplier<SimpleParticleType> FIRE_STAR = Registration.particle("fire_star", () -> new SimpleParticleType(true));
+    public static final Supplier<SimpleParticleType> FIRE_STAR = Registration.particle("fire_star", () -> new SimpleParticleType(true) {});
 
-    public static final Supplier<SimpleParticleType> RISING_SMOKE = Registration.particle("rising_smoke", () -> new SimpleParticleType(true));
+    public static final Supplier<SimpleParticleType> RISING_SMOKE = Registration.particle("rising_smoke", () -> new SimpleParticleType(true) {});
 
     public static final Supplier<ParticleType<BulletDecalOption>> BULLET_DECAL = Registration.particle("bullet_decal",
             () -> createOptions(BulletDecalOption.CODEC, true, BulletDecalOption.DESERIALIZER));

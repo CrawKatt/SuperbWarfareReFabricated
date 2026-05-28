@@ -28,10 +28,19 @@ public class ParachuteRenderer implements TrinketRenderer {
     private static ParachuteModel firstPersonModel;
     private static final ResourceLocation TEXTURE = Mod.loc("textures/curio/parachute.png");
 
-    private final ParachuteModel model;
+    private ParachuteModel model;
+
+    private ParachuteModel getModel() {
+        if (this.model == null) {
+            this.model = new ParachuteModel(
+                    Minecraft.getInstance().getEntityModels().bakeLayer(ParachuteModel.LAYER_LOCATION)
+            );
+        }
+
+        return this.model;
+    }
 
     public ParachuteRenderer() {
-        model = new ParachuteModel(Minecraft.getInstance().getEntityModels().bakeLayer(ParachuteModel.LAYER_LOCATION));
     }
 
     public static void registerRenderer() {
@@ -47,8 +56,10 @@ public class ParachuteRenderer implements TrinketRenderer {
         matrixStack.translate(0, 1.25, 0);
 
         if (stack.getOrCreateTag().getBoolean(ParachuteItem.TAG_OPEN)) {
-            this.model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTicks);
-            this.model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+            ParachuteModel model = this.getModel();
+
+            model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTicks);
+            model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 
             VertexConsumer vertexconsumer = ItemRenderer.getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(TEXTURE), false, stack.hasFoil());
 

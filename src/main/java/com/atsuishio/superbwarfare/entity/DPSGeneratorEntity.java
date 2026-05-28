@@ -314,7 +314,7 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
         var blockEntity = this.level().getBlockEntity(blockPos);
         if (blockEntity == null) return;
 
-        var blockEnergy = EnergyStorage.SIDED.get(blockEntity, Direction.UP);
+        var blockEnergy = EnergyStorage.SIDED.find(this.level(), blockPos, Direction.UP);
         if (blockEnergy == null || !blockEnergy.supportsInsertion()) return;
 
         try (var t = Transaction.openOuter()) {

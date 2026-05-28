@@ -39,13 +39,8 @@ public class PlayerEventHandler {
     public static final UUID TACTICAL_SPRINT_UUID = UUID.fromString("fe8a1213-cf3d-4ec2-8ea8-29acca64b301");
 
     public static void registerEvents() {
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            onPlayerLoggedIn(handler.player);
-        });
-
-        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
-            onPlayerRespawned(newPlayer);
-        });
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> onPlayerLoggedIn(handler.player));
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> onPlayerRespawned(newPlayer));
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             boolean isEnd = true;

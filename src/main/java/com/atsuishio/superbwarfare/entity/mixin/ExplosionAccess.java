@@ -9,4 +9,7 @@ public interface ExplosionAccess {
     }
 
     float superbwarfare$getRadius();
+    double superbwarfare$getX();
+    double superbwarfare$getY();
+    double superbwarfare$getZ();
 }

@@ -40,26 +40,26 @@ import java.util.function.Supplier;
 public class ContainerBlockItem extends BlockItem implements GeoItem {
 
     public static void registerContainers(RegisterContainersEvent event) {
-        event.add(ModEntities.WHEEL_CHAIR);
+        event.add(ModEntities.WHEEL_CHAIR.get());
         event.add(ModEntities.TRUCK.get());
-        event.add(ModEntities.TYPE_63);
-        event.add(ModEntities.MK_42);
-        event.add(ModEntities.MLE_1934);
-        event.add(ModEntities.BL_132);
-        event.add(ModEntities.HPJ_11);
-        event.add(ModEntities.LASER_TOWER);
-        event.add(ModEntities.WAVEFORCE_TOWER);
-        event.add(ModEntities.ANNIHILATOR);
-        event.add(ModEntities.SPEEDBOAT);
-        event.add(ModEntities.LAV_150);
-        event.add(ModEntities.BMP_2);
-        event.add(ModEntities.PRISM_TANK);
-        event.add(ModEntities.YX_100);
-        event.add(ModEntities.PLZ_05);
-        event.add(ModEntities.AH_6);
-        event.add(ModEntities.MI_28);
-        event.add(ModEntities.TOM_6);
-        event.add(ModEntities.A_10A);
+        event.add(ModEntities.TYPE_63.get());
+        event.add(ModEntities.MK_42.get());
+        event.add(ModEntities.MLE_1934.get());
+        event.add(ModEntities.BL_132.get());
+        event.add(ModEntities.HPJ_11.get());
+        event.add(ModEntities.LASER_TOWER.get());
+        event.add(ModEntities.WAVEFORCE_TOWER.get());
+        event.add(ModEntities.ANNIHILATOR.get());
+        event.add(ModEntities.SPEEDBOAT.get());
+        event.add(ModEntities.LAV_150.get());
+        event.add(ModEntities.BMP_2.get());
+        event.add(ModEntities.PRISM_TANK.get());
+        event.add(ModEntities.YX_100.get());
+        event.add(ModEntities.PLZ_05.get());
+        event.add(ModEntities.AH_6.get());
+        event.add(ModEntities.MI_28.get());
+        event.add(ModEntities.TOM_6.get());
+        event.add(ModEntities.A_10A.get());
     }
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -147,7 +147,7 @@ public class ContainerBlockItem extends BlockItem implements GeoItem {
     public static ItemStack createInstance(Entity entity) {
         ItemStack stack = new ItemStack(ModBlocks.CONTAINER.get());
         CompoundTag tag = new CompoundTag();
-        tag.put("Entity", entity.serializeNBT());
+        tag.put("Entity", entity.saveWithoutId(new CompoundTag()));
         tag.putString("EntityType", EntityType.getKey(entity.getType()).toString());
         BlockItem.setBlockEntityData(stack, ModBlockEntities.CONTAINER.get(), tag);
         return stack;

@@ -26,7 +26,12 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ShockMobEffect extends MobEffect {
+
+    private static final Map<Integer, Integer> SHOCK_ATTACKERS = new HashMap<>();
 
     public ShockMobEffect() {
         super(MobEffectCategory.HARMFUL, -256);
@@ -43,10 +48,10 @@ public class ShockMobEffect extends MobEffect {
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
         Entity attacker;
-        if (!entity.getPersistentData().contains("TargetShockAttacker")) {
+        if (!SHOCK_ATTACKERS.containsKey(entity.getId())) {
             attacker = null;
         } else {
-            attacker = entity.level().getEntity(entity.getPersistentData().getInt("TargetShockAttacker"));
+            attacker = entity.level().getEntity(SHOCK_ATTACKERS.get(entity.getId()));
         }
 
         DamageHandler.doDamage(entity, ModDamageTypes.causeShockDamage(entity.level().registryAccess(), attacker), 2 + (1.25f * amplifier));
@@ -80,7 +85,7 @@ public class ShockMobEffect extends MobEffect {
                 2 + (1.25f * instance.getAmplifier()));
 
         if (source instanceof LivingEntity entitySource) {
-            living.getPersistentData().putInt("TargetShockAttacker", entitySource.getId());
+            SHOCK_ATTACKERS.put(living.getId(), entitySource.getId());
         }
     }
 
@@ -90,7 +95,7 @@ public class ShockMobEffect extends MobEffect {
         }
 
         if (instance.getEffect().equals(ModMobEffects.SHOCK.get())) {
-            living.getPersistentData().remove("TargetShockAttacker");
+            SHOCK_ATTACKERS.remove(living.getId());
         }
     }
 

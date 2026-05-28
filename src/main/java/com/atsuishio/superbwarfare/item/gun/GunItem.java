@@ -30,7 +30,6 @@ import com.atsuishio.superbwarfare.tools.*;
 import com.atsuishio.superbwarfare.world.phys.EntityResult;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import io.github.lounode.eventwrapper.eventbus.api.EventBusSubscriberWrapper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.Screen;
@@ -80,7 +79,6 @@ import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.LASE
 import static com.atsuishio.superbwarfare.tools.EntityFindUtil.findEntity;
 import static com.atsuishio.superbwarfare.tools.ParticleTool.sendParticle;
 
-@EventBusSubscriberWrapper
 public abstract class GunItem extends Item implements ItemScreenProvider, GunPropertyModifier, ReequipAnimationHook {
 
     protected static final ResourceLocation DEFAULT_ICON = Mod.loc("textures/gun_icon/default_icon.png");

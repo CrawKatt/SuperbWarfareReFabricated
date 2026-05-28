@@ -57,12 +57,12 @@ public class Monitor extends Item implements ReequipAnimationHook {
     private void resetDroneData(DroneEntity drone) {
         if (drone == null) return;
 
-        drone.getPersistentData().putBoolean("left", false);
-        drone.getPersistentData().putBoolean("right", false);
-        drone.getPersistentData().putBoolean("forward", false);
-        drone.getPersistentData().putBoolean("backward", false);
-        drone.getPersistentData().putBoolean("up", false);
-        drone.getPersistentData().putBoolean("down", false);
+        drone.setLeftInputDown(false);
+        drone.setRightInputDown(false);
+        drone.setForwardInputDown(false);
+        drone.setBackInputDown(false);
+        drone.setUpInputDown(false);
+        drone.setDownInputDown(false);
     }
 
     @Override

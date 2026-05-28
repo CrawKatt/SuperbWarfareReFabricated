@@ -50,7 +50,6 @@ public class Crowbar extends SwordItem {
         }, 2, -2f, new Properties());
     }
 
-    @Override
     public boolean isRepairable(ItemStack itemstack) {
         return true;
     }
@@ -69,7 +68,7 @@ public class Crowbar extends SwordItem {
     }
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+    public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
         Multimap<Attribute, AttributeModifier> map = super.getDefaultAttributeModifiers(slot);
         return map;
     }

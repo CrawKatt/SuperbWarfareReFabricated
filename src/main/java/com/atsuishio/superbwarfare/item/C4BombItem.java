@@ -112,8 +112,4 @@ public class C4BombItem extends Item implements DispenserLaunchable {
         };
     }
 
-    @Override
-    public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
-        return 20000;
-    }
 }

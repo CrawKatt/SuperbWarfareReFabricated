@@ -15,7 +15,7 @@ public class ModTags {
 
     // TODO: Replace "forge" namespace with "c" (common) namespace when using Fabric convention tags
     public static TagKey<Item> commonItemTag(String name) {
-        return ItemTags.create(new ResourceLocation("c", name));
+        return TagKey.create(Registries.ITEM, new ResourceLocation("c", name));
     }
 
     public static class Items {
@@ -63,7 +63,7 @@ public class ModTags {
     }
 
     public static TagKey<Item> modItemTag(String name) {
-        return ItemTags.create(Mod.loc(name));
+        return TagKey.create(Registries.ITEM, Mod.loc(name));
     }
 
     public static class Blocks {
@@ -82,7 +82,7 @@ public class ModTags {
         public static final TagKey<Block> AUTO_LANDING = tag("auto_landing");
 
         private static TagKey<Block> tag(String name) {
-            return BlockTags.create(Mod.loc(name));
+            return TagKey.create(Registries.BLOCK, Mod.loc(name));
         }
     }
 

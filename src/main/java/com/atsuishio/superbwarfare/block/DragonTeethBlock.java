@@ -55,7 +55,6 @@ public class DragonTeethBlock extends Block {
         return Shapes.or(box(2, 0, 2, 14, 25, 14));
     }
 
-    @Override
     public BlockPathTypes getBlockPathType(BlockState state, BlockGetter world, BlockPos pos, Mob entity) {
         return BlockPathTypes.LAVA;
     }

@@ -26,7 +26,9 @@ public class SteelPipe extends SwordItem {
 //        stack.hurtAndBreak(1, attacker, (player) -> player.broadcastBreakEvent(player.getUsedItemHand()));
 
         if (stack.isEmpty()) {
-            attacker.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.STICK, 1, stack.getTag()));
+            var stick = new ItemStack(Items.STICK, 1);
+            stick.setTag(stack.getTag());
+            attacker.setItemSlot(EquipmentSlot.MAINHAND, stick);
         }
         return result;
     }

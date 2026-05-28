@@ -16,6 +16,15 @@
     ],
     "client": [
       "com.atsuishio.superbwarfare.ClientMod"
+    ],
+    "cardinal-components-entity": [
+      "com.atsuishio.superbwarfare.capability.ModCapabilities"
+    ]
+  },
+  "custom": {
+    "cardinal-components": [
+      "superbwarfare:laser_capability",
+      "superbwarfare:player_variables"
     ]
   },
   "mixins": [
@@ -28,7 +37,7 @@
     "minecraft": "~${minecraft_version}",
     "java": ">=17",
     "geckolib": ">=4.4.6",
-    "trinkets": ">=3.7.2"
+    "trinkets": ">=3.7.1"
   },
   "recommends": {
     "patchouli": "*",

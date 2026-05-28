@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.capability.energy;
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
+import com.atsuishio.superbwarfare.item.BatteryItem;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.world.item.ItemStack;
@@ -14,23 +15,23 @@ public class ModEnergyApi {
     public static void register() {
         EnergyStorage.SIDED.registerForBlockEntity(
                 (blockEntity, direction) -> blockEntity.energyStorage,
-                ModBlockEntities.CHARGING_STATION
+                ModBlockEntities.CHARGING_STATION.get()
         );
 
         EnergyStorage.SIDED.registerForBlockEntity(
                 (blockEntity, direction) -> blockEntity.energyStorage,
-                ModBlockEntities.CREATIVE_CHARGING_STATION
+                ModBlockEntities.CREATIVE_CHARGING_STATION.get()
         );
 
         EnergyStorage.SIDED.registerForBlockEntity(
                 (blockEntity, direction) -> blockEntity.energyStorage,
-                ModBlockEntities.FUMO_25
+                ModBlockEntities.FUMO_25.get()
         );
 
         EnergyStorage.ITEM.registerForItems((stack, context) -> {
             var nbt = stack.getTag();
-            var storage = new ItemEnergyStorage(stack, () -> {
-                if (stack.getItem() instanceof BatteryItem battery) {
+            var storage = new ItemEnergyStorage(stack, s -> {
+                if (s.getItem() instanceof BatteryItem battery) {
                     return (long) battery.maxEnergy;
                 }
                 return 0L;
@@ -43,7 +44,7 @@ public class ModEnergyApi {
 
         EnergyStorage.ITEM.registerForItems((stack, context) -> {
             var nbt = stack.getTag();
-            var storage = new ItemEnergyStorage(stack, () -> 0L, s -> 0L, s -> 0L);
+            var storage = new ItemEnergyStorage(stack, s -> 0L, s -> 0L, s -> 0L);
             return storage;
         }, ModItems.ELECTRIC_BATON.get());
     }
@@ -85,7 +86,7 @@ public class ModEnergyApi {
     }
 
     public static EnergyStorage get(ItemStack stack) {
-        return EnergyStorage.ITEM.get(stack, ContainerItemContext.withConstant(stack));
+        return EnergyStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
     }
 
     public static int getEnergyStored(ItemStack stack) {

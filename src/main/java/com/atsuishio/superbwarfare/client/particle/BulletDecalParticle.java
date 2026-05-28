@@ -73,7 +73,7 @@ public class BulletDecalParticle extends TextureSheetParticle {
         Level clientLevel = minecraft.level;
         if (clientLevel != null) {
             BlockState state = clientLevel.getBlockState(pos);
-            return Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getTexture(state, clientLevel, pos);
+            return Minecraft.getInstance().getBlockRenderer().getBlockModel(state).getParticleIcon();
         }
         return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(MissingTextureAtlasSprite.getLocation());
     }

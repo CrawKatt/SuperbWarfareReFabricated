@@ -292,7 +292,7 @@ public class InventoryTool {
         if (itemList == null || count <= 0) return count;
 
         var defaultStack = new ItemStack(item);
-        maxStackSize = Math.min(maxStackSize, item.getMaxStackSize(defaultStack));
+        maxStackSize = Math.min(maxStackSize, item.getMaxStackSize());
 
         for (int i = 0; i < itemList.size(); i++) {
             var stack = itemList.get(i);
@@ -316,7 +316,7 @@ public class InventoryTool {
     public static int insertItem(@Nullable NonNullList<ItemStack> itemList, ItemStack stack) {
         if (itemList == null) return stack.getCount();
 
-        var maxStackSize = stack.getItem().getMaxStackSize(stack);
+        var maxStackSize = stack.getMaxStackSize();
         var originalCount = stack.getCount();
 
         for (int i = 0; i < itemList.size(); i++) {

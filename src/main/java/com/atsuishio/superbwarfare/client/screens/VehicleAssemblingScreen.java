@@ -165,7 +165,7 @@ public class VehicleAssemblingScreen extends AbstractContainerScreen<VehicleAsse
             this.renderIngredients(guiGraphics, mouseX, mouseY);
         }
 
-        this.renderables.stream().filter(w -> w instanceof RecipeButton || w instanceof CategoryButton)
+        this.children().stream().filter(w -> w instanceof RecipeButton || w instanceof CategoryButton)
                 .forEach(w -> {
                     if (w instanceof RecipeButton recipeButton) {
                         recipeButton.renderTooltips(guiGraphics, mouseX, mouseY);
@@ -492,7 +492,7 @@ public class VehicleAssemblingScreen extends AbstractContainerScreen<VehicleAsse
         int scissorH = (int) (height * windowGuiScale);
         RenderSystem.enableScissor(scissorX, scissorY, scissorW, scissorH);
 
-        Minecraft.getInstance().textureManager.getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
+        Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
         RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);

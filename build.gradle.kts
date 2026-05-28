@@ -146,18 +146,13 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
     // CuriosAPI -> Trinkets
-    modImplementation("dev.emi:trinkets:3.7.2")
+    modImplementation("dev.emi:trinkets:3.7.1")
 
     // TechReborn Energy API
     modImplementation("teamreborn:energy:3.0.0")
 
-    // Cardinal Components API - TODO: Phase 3 - needs old group ID from JitPack
+    // Cardinal Components API
     modImplementation("com.github.OnyxStudios.Cardinal-Components-API:cardinal-components-api:5.2.3")
-
-    // Event Wrapper
-    implementation("com.github.Lounode.EventWrapper:eventwrapper-common:1.20.1-SNAPSHOT")
-    modImplementation("com.github.Lounode.EventWrapper:eventwrapper-forge:1.20.1-SNAPSHOT")
-    modImplementation("com.github.Lounode.EventWrapper:eventwrapper-fabric:1.20.1-SNAPSHOT")
 
     // JSR-305 (javax.annotation @ParametersAreNonnullByDefault)
     implementation("com.google.code.findbugs:jsr305:3.0.2")
@@ -196,6 +191,7 @@ dependencies {
 
 tasks.named<ProcessResources>("processResources") {
     val replaceProperties = mapOf(
+        "version" to project.version.toString(),
         "minecraft_version" to project.property("minecraft_version"),
         "loader_version" to project.property("loader_version"),
         "fabric_api_version" to project.property("fabric_api_version"),

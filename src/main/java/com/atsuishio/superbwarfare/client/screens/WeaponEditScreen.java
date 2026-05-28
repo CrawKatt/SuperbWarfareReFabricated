@@ -191,7 +191,7 @@ public class WeaponEditScreen extends Screen {
 
     @Override
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
-        if (pKeyCode == ModKeyMappings.EDIT_MODE.getKey().getValue()) {
+        if (ModKeyMappings.EDIT_MODE.matches(pKeyCode, pScanCode)) {
             this.onClose();
             return true;
         }

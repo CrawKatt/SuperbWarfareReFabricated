@@ -101,7 +101,7 @@ public class M18SmokeGrenadeEntity extends FastThrowableProjectile implements Ge
                 BlockHitResult blockResult = (BlockHitResult) result;
                 BlockPos resultPos = blockResult.getBlockPos();
                 BlockState state = this.level().getBlockState(resultPos);
-                SoundEvent event = state.getBlock().getSoundType(state, this.level(), resultPos, this).getBreakSound();
+                SoundEvent event = state.getSoundType().getBreakSound();
                 double speed = this.getDeltaMovement().length();
                 if (speed > 0.1) {
                     this.level().playSound(null, result.getLocation().x, result.getLocation().y, result.getLocation().z, event, SoundSource.AMBIENT, 1, 1);

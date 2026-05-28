@@ -44,14 +44,8 @@ public class Beast extends SwordItem {
         super(Tiers.NETHERITE, 0, 0, new Properties()
                 .stacksTo(1)
                 .rarity(ModRarities.LEGENDARY)
-                .setNoRepair()
                 .durability(114514)
         );
-    }
-
-    @Override
-    public boolean isDamageable(ItemStack stack) {
-        return false;
     }
 
     @Override
@@ -115,18 +109,10 @@ public class Beast extends SwordItem {
             target.stopRiding();
 
             target.levelCallback.onRemove(Entity.RemovalReason.KILLED);
-            target.invalidateCaps();
-
             target.gameEvent(GameEvent.ENTITY_DIE);
         }
 
         target.level().playSound(target, new BlockPos((int) target.getX(), (int) target.getY(), (int) target.getZ()), ModSounds.OUCH.get(), SoundSource.PLAYERS, 2, 1);
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public @NotNull AABB getSweepHitBox(ItemStack stack, Player player, Entity target) {
-        return super.getSweepHitBox(stack, player, target).inflate(3);
     }
 
     @Override
@@ -137,28 +123,6 @@ public class Beast extends SwordItem {
     @Override
     public boolean isEnchantable(@NotNull ItemStack stack) {
         return false;
-    }
-
-    @Override
-    public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
-        var target = TraceTool.findMeleeEntity(entity, 51.4);
-        if (target != null) {
-            beastKill(entity, target);
-        }
-        return super.onEntitySwing(stack, entity);
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
-        beastKill(player, entity);
-        return super.onLeftClickEntity(stack, player, entity);
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
-        return true;
     }
 
     @Override

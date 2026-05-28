@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -25,6 +26,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -129,7 +131,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
             if (blockEntity.energyStorage.getAmount() >= blockEntity.energyStorage.getCapacity()) return;
 
             ItemStack fuel = blockEntity.getItem(SLOT_FUEL);
-            int burnTime = fuel.getBurnTime(RecipeType.SMELTING);
+            int burnTime = AbstractFurnaceBlockEntity.getFuel().getOrDefault(fuel.getItem(), 0);
 
             if (ModEnergyApi.hasEnergy(fuel)) {
                 var itemEnergy = ModEnergyApi.get(fuel);
@@ -148,11 +150,11 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
                 blockEntity.fuelTick = burnTime;
                 blockEntity.maxFuelTick = burnTime;
 
-                if (fuel.hasCraftingRemainingItem()) {
+                if (fuel.getItem().getCraftingRemainingItem() != Items.AIR) {
                     if (fuel.getCount() <= 1) {
-                        blockEntity.setItem(SLOT_FUEL, fuel.getCraftingRemainingItem());
+                        blockEntity.setItem(SLOT_FUEL, new ItemStack(fuel.getItem().getCraftingRemainingItem()));
                     } else {
-                        ItemStack copy = fuel.getCraftingRemainingItem().copy();
+                        ItemStack copy = new ItemStack(fuel.getItem().getCraftingRemainingItem());
                         copy.setCount(1);
 
                         ItemEntity itemEntity = new ItemEntity(pLevel,
@@ -170,14 +172,14 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
 
                 blockEntity.setChanged();
             } else if (fuel.getItem().isEdible()) {
-                var properties = fuel.getFoodProperties(null);
+                var properties = fuel.getItem().getFoodProperties();
                 if (properties == null) return;
 
                 int nutrition = properties.getNutrition();
                 float saturation = properties.getSaturationModifier() * 2.0f * nutrition;
                 int tick = nutrition * 80 + (int) (saturation * 200);
 
-                if (fuel.hasCraftingRemainingItem()) {
+                if (fuel.getItem().getCraftingRemainingItem() != Items.AIR) {
                     tick += 400;
                 }
 
@@ -202,7 +204,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
         ItemStack stack = this.getItem(SLOT_CHARGE);
         if (stack.isEmpty()) return;
 
-        var consumer = EnergyStorage.ITEM.get(stack, ContainerItemContext.withConstant(stack));
+        var consumer = EnergyStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
         if (consumer != null && consumer.getAmount() < consumer.getCapacity()) {
             try (Transaction t = Transaction.openOuter()) {
                 long toTransfer = Math.min(CHARGE_OTHER_SPEED, energyStorage.getAmount());

@@ -814,6 +814,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
 
     // 自定义骑乘
     private final List<Entity> orderedPassengers = generatePassengersList();
+    private final Map<UUID, Integer> seatIndexMap = new HashMap<>();
 
     private ArrayList<Entity> generatePassengersList() {
         var list = new ArrayList<Entity>(this.getMaxPassengers());
@@ -883,11 +884,9 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         if (index >= getMaxPassengers() || index < 0) return;
 
         orderedPassengers.set(index, pPassenger);
+        seatIndexMap.put(pPassenger.getUUID(), index);
 
-        pPassenger.getPersistentData().putInt(TAG_SEAT_INDEX, index);
-
-        this.passengers = ImmutableList.copyOf(orderedPassengers.stream().filter(Objects::nonNull).toList());
-        this.gameEvent(GameEvent.ENTITY_MOUNT, pPassenger);
+        super.addPassenger(pPassenger);
     }
 
     @Override
@@ -901,10 +900,10 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         if (index == -1) return;
 
         orderedPassengers.set(index, null);
-        this.passengers = ImmutableList.copyOf(orderedPassengers.stream().filter(Objects::nonNull).toList());
+        seatIndexMap.remove(pPassenger.getUUID());
 
         pPassenger.boardingCooldown = 60;
-        this.gameEvent(GameEvent.ENTITY_DISMOUNT, pPassenger);
+        super.removePassenger(pPassenger);
     }
 
     public VehicleData data() {
@@ -961,7 +960,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         orderedPassengers.set(orderedPassengers.indexOf(entity), null);
         orderedPassengers.set(index, entity);
 
-        entity.getPersistentData().putInt(TAG_SEAT_INDEX, index);
+        seatIndexMap.put(entity.getUUID(), index);
 
         // 在服务端运行时，向所有玩家同步载具座位信息
         if (this.level() instanceof ServerLevel serverLevel) {
@@ -990,7 +989,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
      * @return 座位索引
      */
     public int getTagSeatIndex(Entity entity) {
-        return entity.getPersistentData().getInt(TAG_SEAT_INDEX);
+        return seatIndexMap.getOrDefault(entity.getUUID(), -1);
     }
 
     public Vec3 getThirdPersonCameraPosition() {
@@ -3306,7 +3305,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
     }
 
     public void removeSeatIndexTag(Entity entity) {
-        entity.getPersistentData().remove(TAG_SEAT_INDEX);
+        seatIndexMap.remove(entity.getUUID());
     }
 
     public @NotNull Vec3 getEjectionMovement(LivingEntity entity, int index) {

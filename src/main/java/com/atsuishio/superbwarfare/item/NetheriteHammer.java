@@ -10,8 +10,4 @@ public class NetheriteHammer extends Hammer {
         super(Tiers.NETHERITE, 13, -3.2f, new Item.Properties().durability(2800).fireResistant());
     }
 
-    @Override
-    public boolean isDamageable(ItemStack stack) {
-        return false;
-    }
 }

@@ -33,7 +33,7 @@ import java.util.UUID;
 import static com.atsuishio.superbwarfare.tools.RangeTool.calculateLaunchVector;
 
 public class ArtilleryEntity extends GeoVehicleEntity {
-    public static final EntityDataAccessor<IntList> BARREL_ANIM = SynchedEntityData.defineId(ArtilleryEntity.class, ModSerializers.INT_LIST_SERIALIZER.get());
+    public static final EntityDataAccessor<IntList> BARREL_ANIM = SynchedEntityData.defineId(ArtilleryEntity.class, ModSerializers.INT_LIST_SERIALIZER);
     public static final EntityDataAccessor<Vector3f> SHOOT_VEC = SynchedEntityData.defineId(ArtilleryEntity.class, EntityDataSerializers.VECTOR3);
     public static final EntityDataAccessor<Boolean> DEPRESSED = SynchedEntityData.defineId(ArtilleryEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Vector3f> TARGET_POS = SynchedEntityData.defineId(ArtilleryEntity.class, EntityDataSerializers.VECTOR3);
@@ -75,12 +75,6 @@ public class ArtilleryEntity extends GeoVehicleEntity {
         }
 
         return super.interact(player, hand);
-    }
-
-    @Override
-    public void onAddedToWorld() {
-        super.onAddedToWorld();
-        this.entityData.set(SHOOT_VEC, getForward().toVector3f());
     }
 
     @Override

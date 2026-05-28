@@ -21,7 +21,12 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BurnMobEffect extends MobEffect {
+
+    private static final Map<Integer, Integer> BURN_ATTACKERS = new HashMap<>();
 
     public BurnMobEffect() {
         super(MobEffectCategory.HARMFUL, -12708330);
@@ -36,10 +41,10 @@ public class BurnMobEffect extends MobEffect {
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
         Entity attacker;
-        if (!entity.getPersistentData().contains("BurnAttacker")) {
+        if (!BURN_ATTACKERS.containsKey(entity.getId())) {
             attacker = null;
         } else {
-            attacker = entity.level().getEntity(entity.getPersistentData().getInt("BurnAttacker"));
+            attacker = entity.level().getEntity(BURN_ATTACKERS.get(entity.getId()));
         }
 
         DamageHandler.doDamage(entity, ModDamageTypes.causeBurnDamage(entity.level().registryAccess(), attacker), 0.6f + (0.3f * amplifier));
@@ -66,7 +71,7 @@ public class BurnMobEffect extends MobEffect {
         living.invulnerableTime = 0;
 
         if (source instanceof LivingEntity entitySource) {
-            living.getPersistentData().putInt("BurnAttacker", entitySource.getId());
+            BURN_ATTACKERS.put(living.getId(), entitySource.getId());
         }
     }
 
@@ -76,7 +81,7 @@ public class BurnMobEffect extends MobEffect {
         }
 
         if (instance.getEffect().equals(ModMobEffects.BURN.get())) {
-            living.getPersistentData().remove("BurnAttacker");
+            BURN_ATTACKERS.remove(living.getId());
         }
     }
 

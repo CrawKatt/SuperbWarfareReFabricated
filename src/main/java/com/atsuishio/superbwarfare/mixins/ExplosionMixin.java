@@ -13,8 +13,35 @@ public class ExplosionMixin implements ExplosionAccess {
     @Final
     private float radius;
 
+    @Shadow
+    @Final
+    private double x;
+
+    @Shadow
+    @Final
+    private double y;
+
+    @Shadow
+    @Final
+    private double z;
+
     @Override
     public float superbwarfare$getRadius() {
         return this.radius;
+    }
+
+    @Override
+    public double superbwarfare$getX() {
+        return this.x;
+    }
+
+    @Override
+    public double superbwarfare$getY() {
+        return this.y;
+    }
+
+    @Override
+    public double superbwarfare$getZ() {
+        return this.z;
     }
 }

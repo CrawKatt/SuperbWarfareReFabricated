@@ -198,7 +198,7 @@ public class Ptkm1rEntity extends Entity implements GeoEntity, OwnableEntity {
         float f = 0.98F;
         if (this.onGround()) {
             BlockPos pos = this.getBlockPosBelowThatAffectsMyMovement();
-            f = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98F;
+            f = this.level().getBlockState(pos).getBlock().getFriction() * 0.98F;
         }
 
         this.setDeltaMovement(this.getDeltaMovement().multiply(f, 0.98, f));

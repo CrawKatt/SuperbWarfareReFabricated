@@ -110,7 +110,7 @@ public class ProjectileUtilMixin {
                     var vec = new Vector3d(optional.get());
                     double d1 = pStartVec.distanceToSqr(OBB.vector3dToVec3(vec));
                     if (d1 < pDistance || pDistance == 0) {
-                        if (entity.getRootVehicle() == pShooter.getRootVehicle() && !entity.canRiderInteract()) {
+                        if (entity.getRootVehicle() == pShooter.getRootVehicle()) {
                             if (pDistance == 0) {
                                 cir.setReturnValue(new EntityHitResult(entity, OBB.vector3dToVec3(vec)));
                                 return;

@@ -39,12 +39,12 @@ public class ClientRenderHandler {
     }
 
     public static void registerBlockRenderers() {
-        BlockEntityRenderers.register(ModBlockEntities.CONTAINER.get(), ContainerBlockEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntities.FUMO_25.get(), FuMO25BlockEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntities.CHARGING_STATION.get(), ChargingStationBlockEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntities.SMALL_CONTAINER.get(), SmallContainerBlockEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntities.LUCKY_CONTAINER.get(), LuckyContainerBlockEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE.get(), VehicleAssemblingTableBlockEntityRenderer::new);
+        BlockEntityRenderers.register(ModBlockEntities.CONTAINER.get(), c -> new ContainerBlockEntityRenderer());
+        BlockEntityRenderers.register(ModBlockEntities.FUMO_25.get(), c -> new FuMO25BlockEntityRenderer());
+        BlockEntityRenderers.register(ModBlockEntities.CHARGING_STATION.get(), c -> new ChargingStationBlockEntityRenderer());
+        BlockEntityRenderers.register(ModBlockEntities.SMALL_CONTAINER.get(), c -> new SmallContainerBlockEntityRenderer());
+        BlockEntityRenderers.register(ModBlockEntities.LUCKY_CONTAINER.get(), c -> new LuckyContainerBlockEntityRenderer());
+        BlockEntityRenderers.register(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE.get(), c -> new VehicleAssemblingTableBlockEntityRenderer());
     }
 
     public static void onClientSetup() {

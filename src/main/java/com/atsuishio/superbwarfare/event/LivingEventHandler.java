@@ -611,7 +611,7 @@ public class LivingEventHandler {
         stack.getOrCreateTag().putBoolean("All", true);
         stack.getOrCreateTag().putBoolean("IsDrop", true);
 
-        cap.sync(player);
+        ModCapabilities.PLAYER_VARIABLE.sync(player);
         drops.add(new ItemEntity(player.level(), player.getX(), player.getY() + 1, player.getZ(), stack));
     }
 
@@ -713,7 +713,8 @@ public class LivingEventHandler {
             if (entity instanceof VehicleEntity) {
                 iterator.remove();
 
-                Vec3 explosionPos = explosion.getPosition();
+                var explosionAccess = ExplosionAccess.of(explosion);
+                Vec3 explosionPos = new Vec3(explosionAccess.superbwarfare$getX(), explosionAccess.superbwarfare$getY(), explosionAccess.superbwarfare$getZ());
                 float explosionRadius = ((ExplosionAccess) explosion).superbwarfare$getRadius() * 2.0F;
                 if (!entity.ignoreExplosion()) {
                     double distanceRatio = Math.sqrt(entity.distanceToSqr(explosionPos)) / explosionRadius;

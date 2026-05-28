@@ -20,7 +20,7 @@ public class ModVillagers {
             () -> new PoiType(ImmutableSet.copyOf(ModBlocks.REFORGING_TABLE.get().getStateDefinition().getPossibleStates()), 1, 1));
 
     public static final Supplier<VillagerProfession> ARMORY = Registration.custom(net.minecraft.core.registries.BuiltInRegistries.VILLAGER_PROFESSION, "armory",
-            () -> new VillagerProfession("armory", holder -> holder.get() == ARMORY_POI.get(), holder -> holder.get() == ARMORY_POI.get(),
+            () -> new VillagerProfession("armory", holder -> holder.value() == ARMORY_POI.get(), holder -> holder.value() == ARMORY_POI.get(),
                     ImmutableSet.of(), ImmutableSet.of(), null));
 
     public static void addCustomTrades() {
@@ -61,7 +61,7 @@ public class ModVillagers {
     }
 
     public static void addWandererTrade() {
-        TradeOfferHelper.registerWandererOffers(1, factories -> {
+        TradeOfferHelper.registerWanderingTraderOffers(1, factories -> {
             factories.add((entity, random) -> new MerchantOffer(
                     new ItemStack(Items.EMERALD, 12),
                     new ItemStack(ModItems.SHORTCUT_PACK.get()),

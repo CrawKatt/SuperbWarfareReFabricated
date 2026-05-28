@@ -72,8 +72,8 @@ public class VehicleGun extends GunItem {
 
     @Override
     public int getEnergyStored(@NotNull GunData data, @Nullable Entity ammoSupplier) {
-        if (ammoSupplier != null) {
-            var storage = EnergyStorage.SIDED.get(ammoSupplier, null);
+        if (ammoSupplier instanceof VehicleEntity vehicle) {
+            var storage = vehicle.getEnergyStorage();
             if (storage != null && storage.supportsExtraction()) {
                 return (int) storage.getAmount();
             }
