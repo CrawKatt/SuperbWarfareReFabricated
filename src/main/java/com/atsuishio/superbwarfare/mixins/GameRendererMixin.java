@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.config.client.DisplayConfig;
 import com.atsuishio.superbwarfare.data.vehicle.VehicleData;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.custom.ComputeFovCallback;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -25,6 +26,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
@@ -108,5 +110,12 @@ public class GameRendererMixin {
                 matrices.mulPose(Axis.XP.rotationDegrees(-mainCamera.getXRot()));
             }
         }
+    }
+
+    @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
+    private void superbwarfare$onGetFov(Camera camera, float partialTick, boolean usedConfiguredFov, CallbackInfoReturnable<Double> cir) {
+        ComputeFovCallback.Event event = new ComputeFovCallback.Event(camera, partialTick, cir.getReturnValue(), usedConfiguredFov);
+        ComputeFovCallback.EVENT.invoker().onComputeFov(event);
+        cir.setReturnValue(event.getFOV());
     }
 }

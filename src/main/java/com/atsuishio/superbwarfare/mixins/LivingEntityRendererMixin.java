@@ -48,4 +48,5 @@ public class LivingEntityRendererMixin<T extends LivingEntity> {
             matrices.mulPose(Axis.ZP.rotationDegrees(r * vehicle.getRoll(tickDelta) + r2 * vehicle.getViewXRot(tickDelta)));
         }
     }
+
 }

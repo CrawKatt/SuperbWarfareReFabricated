@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.event;
 
 import com.atsuishio.superbwarfare.api.event.PreKillEvent;
 import com.atsuishio.superbwarfare.capability.LaserCapability;
+import com.atsuishio.superbwarfare.event.custom.PreKillCallback;
 import com.atsuishio.superbwarfare.capability.ModCapabilities;
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.config.common.GameplayConfig;
@@ -324,8 +325,9 @@ public class LivingEventHandler {
         }
 
         if (!sourceEntity.level().isClientSide() && sourceEntity instanceof ServerPlayer player) {
-            // TODO Fabric: Replace with Fabric event API for PreKillEvent
-            // if (MinecraftForge.EVENT_BUS.post(new PreKillEvent.Indicator(player, source, killedEntity))) { return; }
+            if (PreKillCallback.post(new PreKillEvent.Indicator(player, source, killedEntity))) {
+                return;
+            }
 
             SoundTool.playLocalSound(player, ModSounds.TARGET_DOWN.get(), 3f, 1f);
 
@@ -493,8 +495,9 @@ public class LivingEventHandler {
             }
         }
 
-        // TODO Fabric: Replace with Fabric event API for PreKillEvent
-        // if (MinecraftForge.EVENT_BUS.post(new PreKillEvent.SendKillMessage(attacker, source, entity))) { return; }
+        if (attacker != null && PreKillCallback.post(new PreKillEvent.SendKillMessage(attacker, source, entity))) {
+            return;
+        }
 
         if (attacker != null && MiscConfig.SEND_KILL_FEEDBACK.get()) {
             if (DamageTypeTool.isHeadshotDamage(source)) {

@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.client.ICustomCamera;
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.custom.ComputeCameraAnglesCallback;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
@@ -142,10 +143,22 @@ public abstract class CameraMixin implements ICustomCamera {
             return;
         }
 
-        if (!thirdPerson || !(entity.getVehicle() instanceof VehicleEntity vehicle)) return;
+        if (!thirdPerson || !(entity.getVehicle() instanceof VehicleEntity vehicle)) {
+            fireComputeCameraAngles(entity, tickDelta);
+            return;
+        }
 
         var cameraPosition = vehicle.getThirdPersonCameraPosition();
         move(-getMaxZoom(cameraPosition.x()), cameraPosition.y(), cameraPosition.z());
+        fireComputeCameraAngles(entity, tickDelta);
+    }
+
+    @Unique
+    private void fireComputeCameraAngles(Entity entity, float tickDelta) {
+        ComputeCameraAnglesCallback.Event event = new ComputeCameraAnglesCallback.Event(
+                (Camera) (Object) this, tickDelta, this.yRot, this.xRot, 0
+        );
+        ComputeCameraAnglesCallback.EVENT.invoker().onComputeCameraAngles(event);
     }
 
     @Shadow

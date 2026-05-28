@@ -2,6 +2,8 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
+import com.atsuishio.superbwarfare.event.custom.MouseButtonCallback;
+import com.atsuishio.superbwarfare.event.custom.MouseScrollCallback;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
@@ -11,7 +13,9 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * Author: MrCrayfish
@@ -76,5 +80,23 @@ public class MouseHandlerMixin {
         }
 
         return d;
+    }
+
+    @Inject(method = "onPress", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$onMouseButton(long window, int button, int action, int modifiers, CallbackInfo ci) {
+        MouseButtonCallback.Event event = new MouseButtonCallback.Event(window, button, action, modifiers);
+        MouseButtonCallback.EVENT.invoker().interact(event);
+        if (event.isCanceled()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "onScroll", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$onMouseScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
+        MouseScrollCallback.Event event = new MouseScrollCallback.Event(vertical);
+        MouseScrollCallback.EVENT.invoker().interact(event);
+        if (event.isCanceled()) {
+            ci.cancel();
+        }
     }
 }

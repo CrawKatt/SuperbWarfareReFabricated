@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.custom.RenderHandCallback;
 import com.atsuishio.superbwarfare.item.ReequipAnimationHook;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -47,6 +48,13 @@ public class ItemInHandRendererMixin {
             MultiBufferSource bufferSource, int packedLight,
             CallbackInfo ci
     ) {
+        RenderHandCallback.Event renderEvent = new RenderHandCallback.Event(hand, partialTick);
+        RenderHandCallback.EVENT.invoker().onRenderHand(renderEvent);
+        if (renderEvent.isCanceled()) {
+            ci.cancel();
+            return;
+        }
+
         HumanoidArm mainArm = player.getMainArm();
         InteractionHand rightInteractionHand = mainArm == HumanoidArm.RIGHT ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
         InteractionHand leftInteractionHand = mainArm == HumanoidArm.RIGHT ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
@@ -80,4 +88,5 @@ public class ItemInHandRendererMixin {
         poseStack.popPose();
         ci.cancel();
     }
+
 }

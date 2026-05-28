@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.entity.projectile;
 
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent;
 import com.atsuishio.superbwarfare.client.particle.BulletDecalOption;
+import com.atsuishio.superbwarfare.event.custom.ProjectileHitCallback;
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption;
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig;
 import com.atsuishio.superbwarfare.entity.DPSGeneratorEntity;
@@ -541,8 +542,7 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
             Direction face = result.getDirection();
             BlockState state = level().getBlockState(pos);
 
-            // TODO Fabric: Replace with Fabric event API
-            // if (MinecraftForge.EVENT_BUS.post(new ProjectileHitEvent.HitBlock(pos, state, face, this.shooter, this, result.getLocation()))) return;
+            if (ProjectileHitCallback.postHitBlock(new ProjectileHitEvent.HitBlock(pos, state, face, this.shooter, this, result.getLocation()))) return;
 
             double vx = face.getStepX();
             double vy = face.getStepY();
@@ -597,8 +597,7 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
         boolean headshot = result.isHeadshot();
         boolean legShot = result.isLegShot();
 
-        // TODO Fabric: Replace with Fabric event API
-        // if (MinecraftForge.EVENT_BUS.post(new ProjectileHitEvent.HitEntity(this.shooter, this, result))) return;
+        if (ProjectileHitCallback.postHitEntity(new ProjectileHitEvent.HitEntity(this.shooter, this, result))) return;
 
         // TODO Fabric: No PartEntity equivalent - handle multipart entities differently
         // if (entity instanceof PartEntity) { entity = ((PartEntity) entity).getParent(); }
