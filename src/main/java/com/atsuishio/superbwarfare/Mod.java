@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare;
 
 import com.atsuishio.superbwarfare.advancement.CriteriaRegister;
+import com.atsuishio.superbwarfare.api.event.RegisterContainersEvent;
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
 import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.command.CommandRegister;
@@ -90,7 +91,7 @@ public class Mod implements ModInitializer {
         DataLoader.registerReloadListeners();
         ContainerDataManager.register();
         DPSGeneratorEntity.registerEvents();
-        ContainerBlockItem.registerContainers(new com.atsuishio.superbwarfare.api.event.RegisterContainersEvent());
+        ContainerBlockItem.registerContainers(new RegisterContainersEvent());
 
         ShockMobEffect.registerEvents();
         BurnMobEffect.registerEvents();
