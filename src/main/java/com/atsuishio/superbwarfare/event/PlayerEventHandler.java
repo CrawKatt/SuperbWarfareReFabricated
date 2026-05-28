@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.event;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.capability.ModCapabilities;
-import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.config.common.GameplayConfig;
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -141,7 +140,7 @@ public class PlayerEventHandler {
             attr.removeModifier(TACTICAL_SPRINT_UUID);
         }
 
-        if (MiscConfig.ALLOW_TACTICAL_SPRINT.get() && player.getCapability(ModCapabilities.PLAYER_VARIABLE, null).orElse(new PlayerVariable()).tacticalSprint) {
+        if (MiscConfig.ALLOW_TACTICAL_SPRINT.get() && ModCapabilities.PLAYER_VARIABLE.get(player).tacticalSprint) {
             player.setSprinting(true);
             attr.addTransientModifier(new AttributeModifier(TACTICAL_SPRINT_UUID, Mod.ATTRIBUTE_MODIFIER,
                     0.25, AttributeModifier.Operation.MULTIPLY_BASE));
@@ -169,7 +168,12 @@ public class PlayerEventHandler {
     // TODO: Register in Mod.java using Fabric event API
     public static boolean onAttackEntity(Player player, net.minecraft.world.entity.Entity target) {
         if (target instanceof VehicleEntity vehicle) {
-            Vec3 position = TraceTool.playerFindLookingPos(player, vehicle, player.getEntityReach());
+            double reach = 4.5D;
+            if (player instanceof ServerPlayer serverPlayer) {
+                reach = serverPlayer.gameMode.getGameModeForPlayer().isCreative() ? 5.0D : 4.5D;
+            }
+
+            Vec3 position = TraceTool.playerFindLookingPos(player, vehicle, reach);
 
             if (position != null) {
                 if (vehicle.shouldSendHitSounds()) {

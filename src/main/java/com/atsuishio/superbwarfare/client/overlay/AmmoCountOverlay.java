@@ -132,8 +132,8 @@ public class AmmoCountOverlay {
             guiGraphics.drawString(
                     font,
                     ammoCountStr,
-                    ammoX + (30 - font.width(ammoCountStr)),
-                    screenHeight + yOffset,
+                    (int) (ammoX + (30 - font.width(ammoCountStr))),
+                    (int) (screenHeight + yOffset),
                     fontColor,
                     true
             );
@@ -142,8 +142,8 @@ public class AmmoCountOverlay {
             guiGraphics.drawString(
                     font,
                     Component.translatable(type.translationKey).getString(),
-                    ammoX + 35,
-                    screenHeight + yOffset,
+                    (int) (ammoX + 35),
+                    (int) (screenHeight + yOffset),
                     fontColor,
                     true
             );
@@ -170,11 +170,11 @@ public class AmmoCountOverlay {
             // 弹药盒内弹药数量
             guiGraphics.drawString(
                     Minecraft.getInstance().font,
-                    Integer.toString(
-                            Math.round(boxAnimator.lerp(boxAnimator.oldValue(), boxAmmoCount, currentTime))
+                    Integer.toString(Math.round(
+                            boxAnimator.lerp(boxAnimator.oldValue(), boxAmmoCount, currentTime))
                     ),
-                    ammoBoxX - 70,
-                    screenHeight + yOffset,
+                    (int) (ammoBoxX - 70),
+                    (int) (screenHeight + yOffset),
                     boxFontColor,
                     true
             );

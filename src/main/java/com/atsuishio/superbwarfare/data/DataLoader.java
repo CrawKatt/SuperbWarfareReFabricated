@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.data;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.data.vehicle.subdata.CollisionLevel;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

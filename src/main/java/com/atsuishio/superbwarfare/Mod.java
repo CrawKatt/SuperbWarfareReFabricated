@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare;
 
-import com.atsuishio.superbwarfare.api.event.converter.EventWrapperMappings;
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
 import com.atsuishio.superbwarfare.command.CommandRegister;
 import com.atsuishio.superbwarfare.config.CommonConfig;
@@ -53,8 +52,6 @@ public class Mod implements ModInitializer {
     public void onInitialize() {
         ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.COMMON, CommonConfig.init());
         ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.SERVER, ServerConfig.init());
-
-        EventWrapperMappings.register();
 
         ModItems.register();
         ModBlocks.register();

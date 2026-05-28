@@ -184,7 +184,7 @@ public class VehicleCrosshairOverlay {
                         String string = "[ " + FormatTool.format0D(vec3.x) + ", " + FormatTool.format0D(vec3.y) + ", " + FormatTool.format0D(vec3.z) + " ]";
                         int width = Minecraft.getInstance().font.width(string);
                         RenderHelper.blit(poseStack, texture, centerW, centerH, 0, 0, scaledMinWH, scaledMinWH, scaledMinWH, scaledMinWH, color);
-                        guiGraphics.drawString(Minecraft.getInstance().font, string, (float) screenWidth / 2 - (float) width / 2, (float) screenHeight - 73, color, false);
+                        guiGraphics.drawString(Minecraft.getInstance().font, string, (int) ((float) screenWidth / 2 - (float) width / 2), (int) ((float) screenHeight - 73), color, false);
                     }
                 } else {
                     RenderHelper.blit(poseStack, texture, centerW, centerH, 0, 0, scaledMinWH, scaledMinWH, scaledMinWH, scaledMinWH, color);
@@ -212,7 +212,7 @@ public class VehicleCrosshairOverlay {
                 if (player == vehicle.getFirstPassenger()) {
                     if (vehicle.hasDecoy()) {
                         if (vehicle.getDecoyState().equals("READY")) {
-                            guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getKey().getDisplayName().getString() + "]")), 30, 1, -1, false);
+                            guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getDefaultKey().getDisplayName().getString() + "]")), 30, 1, -1, false);
                         } else {
                             guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.reloading"), 30, 1, 0xFF0000, false);
                         }

@@ -11,8 +11,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import org.jetbrains.annotations.NotNull;
 import team.reborn.energy.api.EnergyStorage;
 
@@ -64,11 +64,11 @@ public class ChargingStationMenu extends EnergyMenu {
                     return ItemStack.EMPTY;
                 }
             } else if (pIndex != 0) {
-                if (EnergyStorage.ITEM.get(itemstack1, ContainerItemContext.withConstant(itemstack1)) != null) {
+                if (EnergyStorage.ITEM.find(itemstack1, ContainerItemContext.withConstant(itemstack1)) != null) {
                     if (!this.moveItemStackTo(itemstack1, 1, 2, true)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (itemstack1.getBurnTime(RecipeType.SMELTING) > 0 || itemstack1.getFoodProperties(null) != null) {
+                } else if (AbstractFurnaceBlockEntity.isFuel(itemstack1) || itemstack1.getItem().isEdible()) {
                     if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }

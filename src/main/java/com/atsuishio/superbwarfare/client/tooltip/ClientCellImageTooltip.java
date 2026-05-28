@@ -46,8 +46,8 @@ public class ClientCellImageTooltip implements ClientTooltipComponent {
     protected Component getEnergyComponent() {
         var storage = ModEnergyApi.get(stack);
         assert storage != null;
-        int energy = storage.getAmount();
-        int maxEnergy = storage.getCapacity();
+        int energy = Math.toIntExact(storage.getAmount());
+        int maxEnergy = Math.toIntExact(storage.getCapacity());
         float percentage = Mth.clamp((float) energy / maxEnergy, 0, 1);
         MutableComponent component = Component.empty();
 

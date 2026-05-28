@@ -34,22 +34,23 @@ public class Subsistence extends Perk {
             float rate = instance.level() * (0.1f + (type == GunType.SMG || type == GunType.RIFLE ? 0.07f : 0f));
 
             Player finalAttacker = attacker;
-            PlayerVariable.modify(attacker, cap -> {
-                int mag = computed.magazine;
-                int ammo = data.ammo.get();
-                int ammoReload = (int) Math.min(mag, mag * rate);
-                int ammoNeed = Math.min(mag - ammo, ammoReload);
 
-                boolean flag = finalAttacker.isCreative() || InventoryTool.hasCreativeAmmoBox(finalAttacker);
+            int mag = computed.magazine;
+            int ammo = data.ammo.get();
+            int ammoReload = (int) Math.min(mag, mag * rate);
+            int ammoNeed = Math.min(mag - ammo, ammoReload);
 
-                int ammoFinal = Math.min(data.countBackupAmmo(finalAttacker), ammoNeed);
-                if (flag) {
-                    ammoFinal = ammoNeed;
-                } else {
-                    data.consumeBackupAmmo(finalAttacker, ammoFinal);
-                }
-                data.ammo.set(Math.min(mag, ammo + ammoFinal));
-            });
+            boolean flag = finalAttacker.isCreative() || InventoryTool.hasCreativeAmmoBox(finalAttacker);
+
+            int ammoFinal = Math.min(data.countBackupAmmo(finalAttacker), ammoNeed);
+
+            if (flag) {
+                ammoFinal = ammoNeed;
+            } else {
+                data.consumeBackupAmmo(finalAttacker, ammoFinal);
+            }
+
+            data.ammo.set(Math.min(mag, ammo + ammoFinal));
         }
     }
 }

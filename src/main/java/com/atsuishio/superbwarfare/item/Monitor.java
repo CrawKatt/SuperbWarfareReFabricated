@@ -31,7 +31,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-public class Monitor extends Item {
+public class Monitor extends Item implements ReequipAnimationHook {
 
     public static final String LINKED = "Linked";
     public static final String LINKED_DRONE = "LinkedDrone";
@@ -103,16 +103,16 @@ public class Monitor extends Item {
     }
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
         if (slot == EquipmentSlot.MAINHAND) {
             ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-            builder.putAll(super.getAttributeModifiers(slot, stack));
+            builder.putAll(super.getAttributeModifiers(stack, slot));
             builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Item modifier", 2d, AttributeModifier.Operation.ADDITION));
             builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Item modifier", -2.4, AttributeModifier.Operation.ADDITION));
             return builder.build();
         }
 
-        return super.getAttributeModifiers(slot, stack);
+        return super.getAttributeModifiers(stack, slot);
     }
 
 //    @Override

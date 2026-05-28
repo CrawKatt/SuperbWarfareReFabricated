@@ -111,8 +111,8 @@ public class AmmoBarOverlay {
             if (stack.getItem() != ModItems.MINIGUN.get()) {
                 guiGraphics.drawString(
                         font,
-                        "[" + ModKeyMappings.FIRE_MODE.getKey().getDisplayName().getString() + "]",
-                        x - 111.5f,
+                        "[" + ModKeyMappings.FIRE_MODE.getDefaultKey().getDisplayName().getString() + "]",
+                        (int) (x - 111.5f),
                         y - 20,
                         0xFFFFFF,
                         false
@@ -143,7 +143,7 @@ public class AmmoBarOverlay {
                 guiGraphics.drawString(
                         font,
                         computed.rpm + " RPM",
-                        x - 111f,
+                        (int) (x - 111f),
                         y - 20,
                         0xFFFFFF,
                         false
@@ -301,8 +301,8 @@ public class AmmoBarOverlay {
             guiGraphics.drawString(
                     font,
                     getGunAmmoString(data, player),
-                    x / 1.5f - 64 / 1.5f,
-                    gunAmmoY / 1.5F,
+                    (int) (x / 1.5f - 64 / 1.5f),
+                    (int) (gunAmmoY / 1.5F),
                     0xFFFFFF,
                     true
             );
@@ -314,7 +314,7 @@ public class AmmoBarOverlay {
                 guiGraphics.drawString(
                         font,
                         "+" + data.virtualAmmo.get(),
-                        x - 62 + font.width(getGunAmmoString(data, player)) * 1.5f,
+                        (int) (x - 62 + font.width(getGunAmmoString(data, player)) * 1.5f),
                         y - 46,
                         0x55FFFF,
                         true
@@ -339,8 +339,8 @@ public class AmmoBarOverlay {
             guiGraphics.drawString(
                     font,
                     gunName,
-                    x / 0.9f - (100 + font.width(gunName) / 2f) / 0.9f,
-                    y / 0.9f - 60 / 0.9f,
+                    (int) (x / 0.9f - (100 + font.width(gunName) / 2f) / 0.9f),
+                    (int) (y / 0.9f - 60 / 0.9f),
                     0xFFFFFF,
                     true
             );
@@ -351,8 +351,8 @@ public class AmmoBarOverlay {
             guiGraphics.drawString(
                     font,
                     ammoName,
-                    x / 0.9f - (100 + font.width(ammoName) / 2f) / 0.9f,
-                    y / 0.9f - 51 / 0.9f,
+                    (int) (x / 0.9f - (100 + font.width(ammoName) / 2f) / 0.9f),
+                    (int) (y / 0.9f - 51 / 0.9f),
                     0xC8A679,
                     true
             );

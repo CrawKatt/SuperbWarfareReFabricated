@@ -51,7 +51,7 @@ public class ModAdvancement {
                 Component.translatable(description()), bg,
                 builtInBuilder.type.frame, builtInBuilder.type.toast, builtInBuilder.type.announce, builtInBuilder.type.hide);
 
-        ModAdvancementProvider.ADVANCEMENTS.add(this);
+        //ModAdvancementProvider.ADVANCEMENTS.add(this);
     }
 
     private String title() {

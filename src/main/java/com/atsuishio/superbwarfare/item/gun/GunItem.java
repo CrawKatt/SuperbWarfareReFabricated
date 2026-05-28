@@ -21,6 +21,7 @@ import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModPerks;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.item.ItemScreenProvider;
+import com.atsuishio.superbwarfare.item.ReequipAnimationHook;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.perk.Perk;
@@ -57,7 +58,6 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -81,7 +81,7 @@ import static com.atsuishio.superbwarfare.tools.EntityFindUtil.findEntity;
 import static com.atsuishio.superbwarfare.tools.ParticleTool.sendParticle;
 
 @EventBusSubscriberWrapper
-public abstract class GunItem extends Item implements ItemScreenProvider, GunPropertyModifier {
+public abstract class GunItem extends Item implements ItemScreenProvider, GunPropertyModifier, ReequipAnimationHook {
 
     protected static final ResourceLocation DEFAULT_ICON = Mod.loc("textures/gun_icon/default_icon.png");
 
@@ -243,19 +243,12 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
         return false;
     }
 
-    @Override
-    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return false;
-    }
-
-    @Override
     public int getMaxDamage(@NotNull ItemStack stack) {
         var maxDurability = GunData.compute(stack).maxDurability;
         isDamageable = maxDurability > 0;
         return maxDurability;
     }
 
-    @Override
     public boolean isDamageable(ItemStack stack) {
         return isDamageable;
     }

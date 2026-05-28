@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.RenderHelper;
 import com.atsuishio.superbwarfare.client.screens.DogTagEditorScreen;
 import com.atsuishio.superbwarfare.client.tooltip.ClientDogTagImageTooltip;
-import com.atsuishio.superbwarfare.compat.tacz.TACZGunEventHandler;
 import com.atsuishio.superbwarfare.config.client.DisplayConfig;
 import com.atsuishio.superbwarfare.config.client.KillMessageConfig;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
@@ -158,8 +157,8 @@ public class KillMessageOverlay {
             guiGraphics.drawString(
                     Minecraft.getInstance().font,
                     targetName,
-                    currentPosX,
-                    top,
+                    (int) currentPosX,
+                    (int) top,
                     record.target.getTeamColor(),
                     false
             );
@@ -211,8 +210,8 @@ public class KillMessageOverlay {
             guiGraphics.drawString(
                     Minecraft.getInstance().font,
                     attackerName,
-                    currentPosX,
-                    top,
+                    (int) currentPosX,
+                    (int) top,
                     record.attacker.getTeamColor(),
                     false
             );
@@ -236,8 +235,8 @@ public class KillMessageOverlay {
             guiGraphics.drawString(
                     Minecraft.getInstance().font,
                     attackerName,
-                    currentPosX,
-                    top,
+                    (int) currentPosX,
+                    (int) top,
                     record.attacker.getTeamColor(),
                     false
             );
@@ -288,8 +287,8 @@ public class KillMessageOverlay {
             guiGraphics.drawString(
                     Minecraft.getInstance().font,
                     targetName,
-                    currentPosX,
-                    top,
+                    (int) currentPosX,
+                    (int) top,
                     record.target.getTeamColor(),
                     false
             );
@@ -320,9 +319,11 @@ public class KillMessageOverlay {
                 } else if (record.damageType == ModDamageTypes.LASER || record.damageType == ModDamageTypes.LASER_HEADSHOT) {
                     icon = LASER;
                 }
+                /*
                 if (TACZGunEventHandler.hasMod() && !TACZGunEventHandler.compatCondition()) {
                     icon = GENERIC;
                 }
+                */
             } else {
                 // 如果是其他伤害，则渲染对应图标
                 if (record.damageType == DamageTypes.EXPLOSION || record.damageType == DamageTypes.PLAYER_EXPLOSION || record.damageType == ModDamageTypes.PROJECTILE_EXPLOSION || record.damageType == DamageTypes.FIREWORKS) {
@@ -412,17 +413,23 @@ public class KillMessageOverlay {
             } else {
                 if (record.stack.getItem() instanceof GunItem gunItem) {
                     return gunItem.getGunIcon(record.stack);
-                } else if (TACZGunEventHandler.compatCondition()) {
+                }
+                /*
+                else if (TACZGunEventHandler.compatCondition()) {
                     return TACZGunEventHandler.getTaczCompatIcon(record.stack);
                 }
+                */
             }
         } else {
             // 如果是枪械击杀，则渲染枪械图标
             if (record.stack.getItem() instanceof GunItem gunItem) {
                 return gunItem.getGunIcon(record.stack);
-            } else if (TACZGunEventHandler.compatCondition()) {
+            }
+            /*
+            else if (TACZGunEventHandler.compatCondition()) {
                 return TACZGunEventHandler.getTaczCompatIcon(record.stack);
             }
+            */
         }
         return null;
     }

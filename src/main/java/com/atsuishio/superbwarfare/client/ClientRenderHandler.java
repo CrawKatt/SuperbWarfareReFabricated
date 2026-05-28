@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
 
@@ -38,12 +39,12 @@ public class ClientRenderHandler {
     }
 
     public static void registerBlockRenderers() {
-        BlockEntityRendererRegistry.register(ModBlockEntities.CONTAINER.get(), ContainerBlockEntityRenderer::new);
-        BlockEntityRendererRegistry.register(ModBlockEntities.FUMO_25.get(), FuMO25BlockEntityRenderer::new);
-        BlockEntityRendererRegistry.register(ModBlockEntities.CHARGING_STATION.get(), ChargingStationBlockEntityRenderer::new);
-        BlockEntityRendererRegistry.register(ModBlockEntities.SMALL_CONTAINER.get(), SmallContainerBlockEntityRenderer::new);
-        BlockEntityRendererRegistry.register(ModBlockEntities.LUCKY_CONTAINER.get(), LuckyContainerBlockEntityRenderer::new);
-        BlockEntityRendererRegistry.register(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE.get(), VehicleAssemblingTableBlockEntityRenderer::new);
+        BlockEntityRenderers.register(ModBlockEntities.CONTAINER.get(), ContainerBlockEntityRenderer::new);
+        BlockEntityRenderers.register(ModBlockEntities.FUMO_25.get(), FuMO25BlockEntityRenderer::new);
+        BlockEntityRenderers.register(ModBlockEntities.CHARGING_STATION.get(), ChargingStationBlockEntityRenderer::new);
+        BlockEntityRenderers.register(ModBlockEntities.SMALL_CONTAINER.get(), SmallContainerBlockEntityRenderer::new);
+        BlockEntityRenderers.register(ModBlockEntities.LUCKY_CONTAINER.get(), LuckyContainerBlockEntityRenderer::new);
+        BlockEntityRenderers.register(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE.get(), VehicleAssemblingTableBlockEntityRenderer::new);
     }
 
     public static void onClientSetup() {

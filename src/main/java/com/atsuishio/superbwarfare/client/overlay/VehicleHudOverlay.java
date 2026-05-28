@@ -369,7 +369,7 @@ public class VehicleHudOverlay {
             if (selected && size > 1) {
                 preciseBlit(guiGraphics, SWITCH_AMMO, w - 13 + xOffset, h - frameIndex * 18 - 20, 0, 0, 0, 16, 16, 16, 16);
 
-                String string = "[" + ModKeyMappings.FIRE_MODE.getKey().getDisplayName().getString() + "]";
+                String string = "[" + ModKeyMappings.FIRE_MODE.getDefaultKey().getDisplayName().getString() + "]";
                 int width = Minecraft.getInstance().font.width(string);
 
                 pose.pushPose();
@@ -387,8 +387,8 @@ public class VehicleHudOverlay {
                     guiGraphics.drawString(
                             Minecraft.getInstance().font,
                             string,
-                            (xPos + 3f - width / 2f) / 0.6f,
-                            (h - frameIndex * 18 - 14f) / 0.6f,
+                            (int) ((xPos + 3f - width / 2f) / 0.6f),
+                            (int) ((h - frameIndex * 18 - 14f) / 0.6f),
                             0xFFFFFF,
                             false
                     );

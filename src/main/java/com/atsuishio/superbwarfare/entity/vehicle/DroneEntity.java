@@ -66,7 +66,7 @@ public class DroneEntity extends GeoVehicleEntity {
     public static final EntityDataAccessor<CompoundTag> DISPLAY_ENTITY_TAG = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.COMPOUND_TAG);
 
     // scale[3], offset[3], rotation[3], xLength, zLength, tickCount
-    public static final EntityDataAccessor<List<Float>> DISPLAY_DATA = SynchedEntityData.defineId(DroneEntity.class, ModSerializers.FLOAT_LIST_SERIALIZER.get());
+    public static final EntityDataAccessor<List<Float>> DISPLAY_DATA = SynchedEntityData.defineId(DroneEntity.class, ModSerializers.FLOAT_LIST_SERIALIZER);
     public static final EntityDataAccessor<Integer> MAX_AMMO = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.INT);
 
     public boolean fire;

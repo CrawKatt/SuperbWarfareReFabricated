@@ -33,6 +33,7 @@
     "GuiGraphicsMixin",
     "ItemInHandLayerMixin",
     "LivingEntitySwingMixin",
+    "ItemInHandRendererMixin",
     "KeyboardInputMixin",
     "KeymappingMixin",
     "LevelRendererMixin",

@@ -37,8 +37,11 @@ public class Type63InfoOverlay {
         PoseStack poseStack = guiGraphics.pose();
 
         if (player == null) return;
+        if (mc.gameMode == null) return;
 
-        Entity lookingEntity = TraceTool.findLookingEntity(player, player.getEntityReach());
+        // Entity lookingEntity = TraceTool.findLookingEntity(player, player.getEntityReach());
+        double reach = mc.gameMode.getPickRange();
+        Entity lookingEntity = TraceTool.findLookingEntity(player, reach);
 
         if (!(lookingEntity instanceof Type63Entity type63Entity)) return;
         guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.mortar.pitch")
@@ -53,7 +56,7 @@ public class Type63InfoOverlay {
 
         var items = type63Entity.getEntityData().get(Type63Entity.LOADED_AMMO);
         for (int i = 0; i < type63Entity.barrel.length; i++) {
-            if (OBB.getLookingObb(player, player.getEntityReach()) == type63Entity.barrel[i]) {
+            if (OBB.getLookingObb(player, reach) == type63Entity.barrel[i]) {
                 int type = items.getInt(i);
 
                 ItemStack stack = switch (type) {

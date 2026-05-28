@@ -11,7 +11,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
@@ -50,8 +49,9 @@ public class VehicleAssemblingTableBlockEntity extends BlockEntity implements Me
         return this.cache;
     }
 
+    /*
     @Override
-    public AABB getRenderBoundingBox() {
+    public AABB superbwarfare$getRenderBoundingBox() {
         // 创建一个更大的边界框（示例：覆盖从方块底部到顶部上方2格的范围）
         double expansion = 2.0; // 根据模型实际大小调整
         return new AABB(
@@ -63,4 +63,5 @@ public class VehicleAssemblingTableBlockEntity extends BlockEntity implements Me
                 worldPosition.getZ() + 2
         );
     }
+    */
 }
