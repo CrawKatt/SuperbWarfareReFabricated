@@ -35,6 +35,7 @@
         "GameRendererMixin",
         "GuiGraphicsMixin",
         "GuiMixin",
+        "ItemRendererMixin",
         "ItemInHandLayerMixin",
         "ItemInHandRendererMixin",
         "KeyboardHandlerMixin",

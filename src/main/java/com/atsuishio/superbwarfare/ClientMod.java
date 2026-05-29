@@ -15,21 +15,32 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
 import com.atsuishio.superbwarfare.init.*;
+import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger;
 import com.atsuishio.superbwarfare.tools.VectorUtil;
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ClientMod implements ClientModInitializer {
 
+    private static final Set<ResourceLocation> CUSTOM_GUI_ICON_ITEMS = Set.of(
+            new ResourceLocation(Mod.MODID, "lunge_mine")
+    );
+
     @Override
     public void onInitializeClient() {
+        registerGuiIconModels();
         ModKeyMappings.register();
         MouseMovementHandler.init();
         MolangVariable.register();
@@ -65,5 +76,14 @@ public class ClientMod implements ClientModInitializer {
             actions.forEach(e -> e.getKey().run());
             Mod.CLIENT_QUEUE.removeAll(actions);
         });
+    }
+
+    private static void registerGuiIconModels() {
+        ModelLoadingPlugin.register(context -> BuiltInRegistries.ITEM.forEach(item -> {
+            ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
+            if (item instanceof GunGeoItem || CUSTOM_GUI_ICON_ITEMS.contains(itemId)) {
+                context.addModels(new ModelResourceLocation(itemId.withPath(path -> path + "_icon"), "inventory"));
+            }
+        }));
     }
 }
