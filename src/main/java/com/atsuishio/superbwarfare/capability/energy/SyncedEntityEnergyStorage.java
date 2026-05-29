@@ -22,6 +22,7 @@ public class SyncedEntityEnergyStorage extends DynamicEnergyStorage {
 
     @Override
     public long insert(long maxAmount, TransactionContext transaction) {
+        this.amount = entityData.get(energyDataAccessor);
         long inserted = super.insert(maxAmount, transaction);
         if (inserted > 0) {
             entityData.set(energyDataAccessor, (int) this.amount);
@@ -31,6 +32,7 @@ public class SyncedEntityEnergyStorage extends DynamicEnergyStorage {
 
     @Override
     public long extract(long maxAmount, TransactionContext transaction) {
+        this.amount = entityData.get(energyDataAccessor);
         long extracted = super.extract(maxAmount, transaction);
         if (extracted > 0) {
             entityData.set(energyDataAccessor, (int) amount);

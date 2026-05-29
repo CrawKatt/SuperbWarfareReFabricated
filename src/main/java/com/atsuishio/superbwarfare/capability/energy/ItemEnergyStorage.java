@@ -33,7 +33,11 @@ public class ItemEnergyStorage extends DynamicEnergyStorage {
         long inserted = super.insert(maxAmount, transaction);
 
         if (inserted > 0) {
-            stack.getOrCreateTag().putLong(NBT_ENERGY, getAmount());
+            transaction.addCloseCallback((transactionContext, result) -> {
+                if (result.wasCommitted()) {
+                    stack.getOrCreateTag().putLong(NBT_ENERGY, getAmount());
+                }
+            });
         }
 
         return inserted;
@@ -44,7 +48,11 @@ public class ItemEnergyStorage extends DynamicEnergyStorage {
         long extracted = super.extract(maxAmount, transaction);
 
         if (extracted > 0) {
-            stack.getOrCreateTag().putLong(NBT_ENERGY, getAmount());
+            transaction.addCloseCallback((transactionContext, result) -> {
+                if (result.wasCommitted()) {
+                    stack.getOrCreateTag().putLong(NBT_ENERGY, getAmount());
+                }
+            });
         }
 
         return extracted;

@@ -3,6 +3,8 @@ package com.atsuishio.superbwarfare.block.entity;
 import com.atsuishio.superbwarfare.block.ChargingStationBlock;
 import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
+import com.atsuishio.superbwarfare.entity.DPSGeneratorEntity;
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.menu.ChargingStationMenu;
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData;
@@ -197,6 +199,28 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
         if (this.level.getGameTime() % 20 != 0) return;
 
         List<Entity> entities = this.level.getEntitiesOfClass(Entity.class, new AABB(this.getBlockPos()).inflate(CHARGE_RADIUS));
+        for (Entity entity : entities) {
+            EnergyStorage targetEnergy = null;
+            if (entity instanceof VehicleEntity vehicle && vehicle.hasEnergyStorage()) {
+                targetEnergy = vehicle.getEnergyStorage();
+            } else if (entity instanceof DPSGeneratorEntity generator) {
+                targetEnergy = generator.getEnergy();
+            }
+
+            if (targetEnergy == null || !targetEnergy.supportsInsertion() || targetEnergy.getAmount() >= targetEnergy.getCapacity()) {
+                continue;
+            }
+
+            try (Transaction t = Transaction.openOuter()) {
+                long toTransfer = Math.min(this.energyStorage.getAmount(), CHARGE_OTHER_SPEED * 20L);
+                long received = targetEnergy.insert(toTransfer, t);
+                this.energyStorage.extract(received, t);
+                if (received > 0) {
+                    t.commit();
+                    this.setChanged();
+                }
+            }
+        }
         this.setChanged();
     }
 

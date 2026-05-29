@@ -2,12 +2,19 @@ package com.atsuishio.superbwarfare.capability.energy;
 
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
+import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.item.BatteryItem;
+import com.atsuishio.superbwarfare.item.ElectricBaton;
+import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ModEnergyApi {
 
@@ -28,24 +35,54 @@ public class ModEnergyApi {
         );
 
         EnergyStorage.ITEM.registerForItems((stack, context) -> {
-            var nbt = stack.getTag();
-            var storage = new ItemEnergyStorage(stack, s -> {
-                if (s.getItem() instanceof BatteryItem battery) {
-                    return (long) battery.maxEnergy;
-                }
-                return 0L;
-            }, s -> 0L, s -> 0L);
-            if (nbt != null && nbt.contains("Energy")) {
-                storage.amount = nbt.getLong("Energy");
-            }
-            return storage;
-        }, ModItems.BATTERY.get());
+            return new ItemEnergyStorage(stack,
+                    ModEnergyApi::getBatteryCapacity,
+                    ModEnergyApi::getBatteryCapacity,
+                    ModEnergyApi::getBatteryCapacity);
+        }, batteryItems());
 
         EnergyStorage.ITEM.registerForItems((stack, context) -> {
-            var nbt = stack.getTag();
-            var storage = new ItemEnergyStorage(stack, s -> 0L, s -> 0L, s -> 0L);
-            return storage;
+            return new ItemEnergyStorage(stack,
+                    s -> (long) ElectricBaton.MAX_ENERGY,
+                    s -> (long) ElectricBaton.MAX_ENERGY,
+                    s -> (long) ElectricBaton.MAX_ENERGY);
         }, ModItems.ELECTRIC_BATON.get());
+
+        EnergyStorage.ITEM.registerForItems((stack, context) -> {
+            return new ItemEnergyStorage(stack,
+                    s -> (long) GunData.compute(s).maxEnergy,
+                    s -> (long) GunData.compute(s).maxReceiveEnergy,
+                    s -> (long) GunData.compute(s).maxExtractEnergy);
+        }, gunItems());
+    }
+
+    private static Item[] batteryItems() {
+        List<Item> items = new ArrayList<>();
+        for (var supplier : ModItems.ITEMS_LIST) {
+            Item item = supplier.get();
+            if (item instanceof BatteryItem) {
+                items.add(item);
+            }
+        }
+        return items.toArray(Item[]::new);
+    }
+
+    private static long getBatteryCapacity(ItemStack stack) {
+        if (stack.getItem() instanceof BatteryItem battery) {
+            return battery.maxEnergy;
+        }
+        return 0L;
+    }
+
+    private static Item[] gunItems() {
+        List<Item> items = new ArrayList<>();
+        for (var supplier : ModItems.GUNS_LIST) {
+            Item item = supplier.get();
+            if (item instanceof GunItem) {
+                items.add(item);
+            }
+        }
+        return items.toArray(Item[]::new);
     }
 
     public static EnergyStorage createSimple(long capacity) {

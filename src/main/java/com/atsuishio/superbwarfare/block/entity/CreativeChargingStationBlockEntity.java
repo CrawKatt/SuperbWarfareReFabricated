@@ -1,14 +1,20 @@
 package com.atsuishio.superbwarfare.block.entity;
 
+import com.atsuishio.superbwarfare.entity.DPSGeneratorEntity;
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
+
+import java.util.List;
 
 /**
  * Energy Data Slot Code based on @GoryMoon's Chargers
@@ -31,7 +37,32 @@ public class CreativeChargingStationBlockEntity extends BlockEntity {
     public static void serverTick(CreativeChargingStationBlockEntity blockEntity) {
         if (blockEntity.level == null) return;
 
+        blockEntity.chargeEntity();
         blockEntity.chargeBlock();
+    }
+
+    private void chargeEntity() {
+        if (this.level == null) return;
+        if (this.level.getGameTime() % 20 != 0) return;
+
+        List<Entity> entities = this.level.getEntitiesOfClass(Entity.class, new AABB(this.getBlockPos()).inflate(CHARGE_RADIUS));
+        for (Entity entity : entities) {
+            EnergyStorage targetEnergy = null;
+            if (entity instanceof VehicleEntity vehicle && vehicle.hasEnergyStorage()) {
+                targetEnergy = vehicle.getEnergyStorage();
+            } else if (entity instanceof DPSGeneratorEntity generator) {
+                targetEnergy = generator.getEnergy();
+            }
+
+            if (targetEnergy == null || !targetEnergy.supportsInsertion() || targetEnergy.getAmount() >= targetEnergy.getCapacity()) {
+                continue;
+            }
+
+            try (Transaction t = Transaction.openOuter()) {
+                targetEnergy.insert(Long.MAX_VALUE, t);
+                t.commit();
+            }
+        }
     }
 
     private void chargeBlock() {
