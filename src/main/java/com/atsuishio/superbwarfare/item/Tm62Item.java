@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer;
 import com.atsuishio.superbwarfare.entity.Tm62Entity;
 import com.atsuishio.superbwarfare.init.ModEntities;
@@ -38,6 +43,7 @@ public class Tm62Item extends Item implements GeoItem, DispenserLaunchable {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void createRenderer(Consumer<Object> consumer) {
         consumer.accept(new RenderProvider() {
             private BlockEntityWithoutLevelRenderer renderer;
@@ -59,6 +65,7 @@ public class Tm62Item extends Item implements GeoItem, DispenserLaunchable {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
     }
 
     @Override

@@ -40,7 +40,7 @@ loom {
             vmArg("-XX:+AllowEnhancedClassRedefinition")
 
             property("mixin.env.remapRefMap", "true")
-            property("geckolib.disable_examples", "true")
+            //property("geckolib.disable_examples", "true")
         }
 
         named("server") {
@@ -48,7 +48,7 @@ loom {
             configName = "SuperbWarfare Fabric Server"
             runDir = "run"
 
-            property("geckolib.disable_examples", "true")
+            //property("geckolib.disable_examples", "true")
         }
 
         create("data") {

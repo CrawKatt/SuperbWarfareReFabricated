@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item.common.ammo;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.entity.projectile.MortarShellEntity;
 import com.atsuishio.superbwarfare.init.ModEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
@@ -41,6 +44,7 @@ public class PotionMortarShell extends MortarShell implements DispenserLaunchabl
         PotionUtils.addPotionTooltip(pStack, pTooltip, 0.125F);
     }
 
+    @Environment(EnvType.CLIENT)
     public static void registerColorHandlers() {
         ColorProviderRegistry.ITEM.register(
                 (stack, layer) -> layer == 1 ? PotionUtils.getColor(stack) : -1,

@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun.rifle;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.model.item.MarlinItemModel;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -30,10 +35,12 @@ public class MarlinItem extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return GunRendererBuilder.simple(MarlinItemModel::new);
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState fireAnimPredicate(AnimationState<MarlinItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -69,6 +76,7 @@ public class MarlinItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         var fireAnimController = new AnimationController<>(this, "fireAnimController", 1, this::fireAnimPredicate);
         data.add(fireAnimController);
     }

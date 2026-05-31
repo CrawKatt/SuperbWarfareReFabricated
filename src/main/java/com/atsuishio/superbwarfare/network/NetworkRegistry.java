@@ -3,9 +3,10 @@ package com.atsuishio.superbwarfare.network;
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.network.message.receive.*;
 import com.atsuishio.superbwarfare.network.message.send.*;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -150,10 +151,9 @@ public class NetworkRegistry {
                                          Function<FriendlyByteBuf, T> decoder, Consumer<T> handler) {
         var id = new ResourceLocation(Mod.MODID, "s2c_" + type.getSimpleName().toLowerCase());
         MESSAGES.put(type, new MessageEntry<>(id, encoder));
-        ClientPlayNetworking.registerGlobalReceiver(id, (client, handlerNet, buf, responseSender) -> {
-            T message = decoder.apply(buf);
-            client.execute(() -> handler.accept(message));
-        });
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            ClientNetworkRegistry.registerS2C(id, decoder, handler);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -161,9 +161,9 @@ public class NetworkRegistry {
         var type = (Class<T>) instance.getClass();
         var id = new ResourceLocation(Mod.MODID, "s2c_" + type.getSimpleName().toLowerCase());
         MESSAGES.put(type, new MessageEntry<>(id, (msg, buf) -> {}));
-        ClientPlayNetworking.registerGlobalReceiver(id, (client, handlerNet, buf, responseSender) -> {
-            client.execute(handler);
-        });
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            ClientNetworkRegistry.registerS2C(id, handler);
+        }
     }
 
     // ========== C2S (Server-bound) Registration ==========
@@ -196,7 +196,10 @@ public class NetworkRegistry {
         if (entry == null) throw new IllegalStateException("Unregistered message: " + message.getClass().getName());
         var buf = PacketByteBufs.create();
         entry.encoder.accept(message, buf);
-        ClientPlayNetworking.send(entry.id, buf);
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) {
+            throw new IllegalStateException("Cannot send C2S packet from a dedicated server");
+        }
+        ClientNetworkRegistry.sendToServer(entry.id, buf);
     }
 
     @SuppressWarnings("unchecked")

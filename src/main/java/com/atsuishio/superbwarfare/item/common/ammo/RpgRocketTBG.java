@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.common.ammo;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.advancement.CriteriaRegister;
 import com.atsuishio.superbwarfare.client.renderer.item.RpgRocketTBGRenderer;
 import com.atsuishio.superbwarfare.entity.projectile.RpgRocketTBGEntity;
@@ -44,6 +49,7 @@ public class RpgRocketTBG extends Item implements GeoItem, DispenserLaunchable {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void createRenderer(Consumer<Object> consumer) {
         consumer.accept(new RenderProvider() {
             private BlockEntityWithoutLevelRenderer renderer;
@@ -65,6 +71,7 @@ public class RpgRocketTBG extends Item implements GeoItem, DispenserLaunchable {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
     }
 
     @Override

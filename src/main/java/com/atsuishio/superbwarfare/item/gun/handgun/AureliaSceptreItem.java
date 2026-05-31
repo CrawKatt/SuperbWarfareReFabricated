@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun.handgun;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.TooltipTool;
 import com.atsuishio.superbwarfare.client.model.item.AureliaSceptreItemModel;
@@ -38,10 +43,12 @@ public class AureliaSceptreItem extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return GunRendererBuilder.simple(AureliaSceptreItemModel::new);
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState idlePredicate(AnimationState<AureliaSceptreItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -60,6 +67,7 @@ public class AureliaSceptreItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.aurelia_sceptre.idle"));
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState firePredicate(AnimationState<AureliaSceptreItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -77,6 +85,7 @@ public class AureliaSceptreItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.aurelia_sceptre.idle"));
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState meleePredicate(AnimationState<AureliaSceptreItem> event) {
         if (event.getData(DataTickets.ITEM_RENDER_PERSPECTIVE) != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
             return event.setAndContinue(RawAnimation.begin().thenLoop("animation.aurelia_sceptre.idle"));
@@ -102,6 +111,7 @@ public class AureliaSceptreItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         var idleController = new AnimationController<>(this, "idleController", 6, this::idlePredicate);
         data.add(idleController);
         var fireController = new AnimationController<>(this, "fireController", 3, this::firePredicate);

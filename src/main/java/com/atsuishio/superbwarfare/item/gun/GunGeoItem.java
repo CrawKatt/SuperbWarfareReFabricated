@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.item.CustomRendererItem;
@@ -47,6 +52,7 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void createRenderer(Consumer<Object> consumer) {
         consumer.accept(new RenderProvider() {
             private BlockEntityWithoutLevelRenderer renderer;
@@ -66,6 +72,7 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
         return renderProvider;
     }
 
+    @Environment(EnvType.CLIENT)
     protected PlayState animationPredicate(AnimationState<GunGeoItem> event) {
         var player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -131,6 +138,7 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         controllers.add(new AnimationController<>(this, "animationController", 1, this::animationPredicate));
     }
 }

@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun.smg;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.renderer.gun.VectorItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
@@ -28,6 +33,7 @@ public class VectorItem extends GunGeoItem {
         super(new Item.Properties().rarity(Rarity.EPIC));
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState idlePredicate(AnimationState<VectorItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -57,6 +63,7 @@ public class VectorItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.vector.idle"));
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState editPredicate(AnimationState<VectorItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -74,6 +81,7 @@ public class VectorItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         AnimationController<VectorItem> idleController = new AnimationController<>(this, "idleController", 2, this::idlePredicate);
         data.add(idleController);
         var editController = new AnimationController<>(this, "editController", 1, this::editPredicate);
@@ -81,6 +89,7 @@ public class VectorItem extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return VectorItemRenderer::new;
     }

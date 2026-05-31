@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun.sniper;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.renderer.gun.SentinelItemRenderer;
 import com.atsuishio.superbwarfare.client.tooltip.component.SentinelImageComponent;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -37,10 +42,12 @@ public class SentinelItem extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return SentinelItemRenderer::new;
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState fireAnimPredicate(AnimationState<SentinelItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -70,6 +77,7 @@ public class SentinelItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         var fireAnimController = new AnimationController<>(this, "fireAnimController", 1, this::fireAnimPredicate);
         data.add(fireAnimController);
     }

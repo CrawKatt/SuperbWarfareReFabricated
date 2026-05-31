@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.renderer.item.Ptkm1rItemRenderer;
 import com.atsuishio.superbwarfare.entity.Ptkm1rEntity;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -46,6 +51,7 @@ public class Ptkm1rItem extends Item implements GeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void createRenderer(Consumer<Object> consumer) {
         consumer.accept(new RenderProvider() {
             private BlockEntityWithoutLevelRenderer renderer;
@@ -67,6 +73,7 @@ public class Ptkm1rItem extends Item implements GeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
     }
 
     @Override

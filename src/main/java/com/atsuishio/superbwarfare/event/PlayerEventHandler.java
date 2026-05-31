@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.capability.ModCapabilities;
 import com.atsuishio.superbwarfare.config.common.GameplayConfig;
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.data.vehicle.VehicleDataTool;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.custom.LivingAttackCallback;
 import com.atsuishio.superbwarfare.init.ModItems;
@@ -12,9 +13,12 @@ import com.atsuishio.superbwarfare.init.ModParticleTypes;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
+import com.atsuishio.superbwarfare.tools.GunsTool;
 import com.atsuishio.superbwarfare.tools.InventoryTool;
 import com.atsuishio.superbwarfare.tools.TraceTool;
+import com.atsuishio.superbwarfare.world.TDMSavedData;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.core.BlockPos;
@@ -39,7 +43,18 @@ public class PlayerEventHandler {
     public static final UUID TACTICAL_SPRINT_UUID = UUID.fromString("fe8a1213-cf3d-4ec2-8ea8-29acca64b301");
 
     public static void registerEvents() {
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> onPlayerLoggedIn(handler.player));
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            onPlayerLoggedIn(handler.player);
+            GunsTool.onPlayerLogin(handler.player);
+            VehicleDataTool.onPlayerLogin(handler.player);
+            TDMSavedData.onPlayerLoggedIn(handler.player);
+        });
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, serverResourceManager, success) -> {
+            if (success) {
+                GunsTool.onDataPackSync(server.getPlayerList());
+                VehicleDataTool.onDataPackSync(server.getPlayerList());
+            }
+        });
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> onPlayerRespawned(newPlayer));
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {

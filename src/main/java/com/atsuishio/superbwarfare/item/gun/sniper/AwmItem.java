@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun.sniper;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.renderer.gun.AwmItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
@@ -32,10 +37,12 @@ public class AwmItem extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return AwmItemRenderer::new;
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState fireAnimPredicate(AnimationState<AwmItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -61,6 +68,7 @@ public class AwmItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.awm.idle"));
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState editPredicate(AnimationState<AwmItem> event) {
         if (event.getData(DataTickets.ITEM_RENDER_PERSPECTIVE) != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
             return event.setAndContinue(RawAnimation.begin().thenLoop("animation.awm.idle"));
@@ -73,6 +81,7 @@ public class AwmItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         var fireAnimController = new AnimationController<>(this, "fireAnimController", 1, this::fireAnimPredicate);
         data.add(fireAnimController);
         var editController = new AnimationController<>(this, "editController", 1, this::editPredicate);

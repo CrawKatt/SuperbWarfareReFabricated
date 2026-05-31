@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.TooltipTool;
 import com.atsuishio.superbwarfare.client.screens.ArtilleryIndicatorScreen;
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
@@ -40,6 +43,7 @@ public class ArtilleryIndicator extends Item implements ItemScreenProvider {
 
     @Override
     @ParametersAreNonnullByDefault
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         TooltipTool.addScreenProviderText(pTooltipComponents);
         if (pStack.getTag() != null && pStack.getTag().contains(TAG_TYPE)) {
@@ -149,6 +153,7 @@ public class ArtilleryIndicator extends Item implements ItemScreenProvider {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public @Nullable Screen getItemScreen(ItemStack stack, Player player, InteractionHand hand) {
         return new ArtilleryIndicatorScreen(stack, hand);
     }

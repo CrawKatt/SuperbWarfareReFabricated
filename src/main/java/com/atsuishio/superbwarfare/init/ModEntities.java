@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.entity.*;
 import com.atsuishio.superbwarfare.entity.projectile.*;
 import com.atsuishio.superbwarfare.entity.vehicle.*;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 
@@ -172,8 +173,14 @@ public class ModEntities {
     }
 
     public static void registerAttributes() {
-        ATTRIBUTES.put(TARGET, TargetEntity.createAttributes().build());
-        ATTRIBUTES.put(DPS_GENERATOR, DPSGeneratorEntity.createAttributes().build());
-        ATTRIBUTES.put(SENPAI, SenpaiEntity.createAttributes().build());
+        registerAttribute(TARGET, TargetEntity.createAttributes());
+        registerAttribute(DPS_GENERATOR, DPSGeneratorEntity.createAttributes());
+        registerAttribute(SENPAI, SenpaiEntity.createAttributes());
+    }
+
+    private static <T extends LivingEntity> void registerAttribute(Supplier<EntityType<T>> type, AttributeSupplier.Builder builder) {
+        var attributes = builder.build();
+        ATTRIBUTES.put(type, attributes);
+        FabricDefaultAttributeRegistry.register(type.get(), attributes);
     }
 }

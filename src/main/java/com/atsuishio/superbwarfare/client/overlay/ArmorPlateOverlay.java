@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.client.overlay;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.config.ConfigValueHelper;
 import com.atsuishio.superbwarfare.config.client.DisplayConfig;
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.init.ModTags;
@@ -37,14 +38,14 @@ public class ArmorPlateOverlay {
         if (stack == ItemStack.EMPTY) return;
         if (stack.getTag() == null || !stack.getTag().contains("ArmorPlate")) return;
 
-        int armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL.get();
+        int armorLevel = ConfigValueHelper.getOrDefault(MiscConfig.DEFAULT_ARMOR_LEVEL);
         if (stack.is(ModTags.Items.MILITARY_ARMOR)) {
-            armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL.get();
+            armorLevel = ConfigValueHelper.getOrDefault(MiscConfig.MILITARY_ARMOR_LEVEL);
         } else if (stack.is(ModTags.Items.MILITARY_ARMOR_HEAVY)) {
-            armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL.get();
+            armorLevel = ConfigValueHelper.getOrDefault(MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL);
         }
 
-        var max = armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get();
+        var max = armorLevel * ConfigValueHelper.getOrDefault(MiscConfig.ARMOR_POINT_PER_LEVEL);
         double amount = 60 * (stack.getTag().getDouble("ArmorPlate") / max);
 
         ResourceLocation texture = switch (armorLevel) {

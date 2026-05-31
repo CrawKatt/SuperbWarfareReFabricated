@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item.curio;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.TooltipTool;
 import com.atsuishio.superbwarfare.client.screens.DogTagEditorScreen;
 import com.atsuishio.superbwarfare.client.tooltip.component.DogTagImageComponent;
@@ -32,6 +35,7 @@ public class DogTagItem extends Item implements Trinket, ItemScreenProvider {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, @NotNull List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
         TooltipTool.addScreenProviderText(pTooltipComponents);
     }
@@ -67,6 +71,7 @@ public class DogTagItem extends Item implements Trinket, ItemScreenProvider {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public @Nullable Screen getItemScreen(ItemStack stack, Player player, InteractionHand hand) {
         return new DogTagEditorScreen(stack, hand);
     }

@@ -15,6 +15,7 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
 import com.atsuishio.superbwarfare.init.*;
+import com.atsuishio.superbwarfare.item.common.ammo.PotionMortarShell;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger;
 import com.atsuishio.superbwarfare.tools.VectorUtil;
@@ -64,6 +65,7 @@ public class ClientMod implements ClientModInitializer {
         VectorUtil.registerEvents();
         ClickHandler.registerEvents();
         ResourceOnceLogger.register();
+        PotionMortarShell.registerColorHandlers();
 
         ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.CLIENT, ClientConfig.init());
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

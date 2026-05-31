@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun.machinegun;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.model.item.M2HBItemModel;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -31,10 +36,12 @@ public class M2HBItem extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return GunRendererBuilder.simple(M2HBItemModel::new);
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState fireAnimPredicate(AnimationState<M2HBItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -50,6 +57,7 @@ public class M2HBItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.m_2_hb.idle"));
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState idlePredicate(AnimationState<M2HBItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -71,6 +79,7 @@ public class M2HBItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         var fireAnimController = new AnimationController<>(this, "fireAnimController", 0, this::fireAnimPredicate);
         data.add(fireAnimController);
         var idleController = new AnimationController<>(this, "idleController", 4, this::idlePredicate);

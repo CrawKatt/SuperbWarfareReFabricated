@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun.special;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.renderer.gun.BocekItemRenderer;
 import com.atsuishio.superbwarfare.client.tooltip.component.BocekImageComponent;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -45,10 +50,12 @@ public class BocekItem extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return BocekItemRenderer::new;
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState idlePredicate(AnimationState<BocekItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -72,6 +79,7 @@ public class BocekItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.bocek.idle"));
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState firePredicate(AnimationState<BocekItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -89,6 +97,7 @@ public class BocekItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.bocek.idle"));
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState reloadPredicate(AnimationState<BocekItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -107,6 +116,7 @@ public class BocekItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         var idleController = new AnimationController<>(this, "idleController", 3, this::idlePredicate);
         data.add(idleController);
         var fireController = new AnimationController<>(this, "fireController", 0, this::firePredicate);

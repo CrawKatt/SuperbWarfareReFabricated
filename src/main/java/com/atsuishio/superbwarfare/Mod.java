@@ -13,11 +13,11 @@ import com.atsuishio.superbwarfare.data.container.ContainerDataManager;
 import com.atsuishio.superbwarfare.entity.DPSGeneratorEntity;
 import com.atsuishio.superbwarfare.entity.TargetEntity;
 import com.atsuishio.superbwarfare.event.CustomEventHandler;
+import com.atsuishio.superbwarfare.event.EntityUseGunEventHandler;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.init.*;
-import com.atsuishio.superbwarfare.item.common.ammo.PotionMortarShell;
 import com.atsuishio.superbwarfare.item.common.container.ContainerBlockItem;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
@@ -29,12 +29,14 @@ import com.atsuishio.superbwarfare.recipe.ModPotionRecipes;
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.Mob;
 import net.minecraftforge.fml.config.ModConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -102,7 +104,6 @@ public class Mod implements ModInitializer {
         HitboxHelperEventHandler.registerEvents();
         LivingEventHandler.registerEvents();
         PlayerEventHandler.registerEvents();
-        PotionMortarShell.registerColorHandlers();
         ModLootModifier.register();
 
         registerDataTickets();
@@ -124,6 +125,12 @@ public class Mod implements ModInitializer {
         EntityTrackingEvents.START_TRACKING.register((entity, player) -> {
             if (entity instanceof CustomSpawnDataEntity) {
                 NetworkRegistry.sendToPlayer(player, new EntitySpawnDataMessage(entity));
+            }
+        });
+
+        ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
+            if (entity instanceof Mob mob) {
+                EntityUseGunEventHandler.entityJoin(mob);
             }
         });
 

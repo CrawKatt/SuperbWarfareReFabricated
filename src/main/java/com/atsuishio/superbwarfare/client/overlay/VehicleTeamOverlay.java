@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.client.overlay;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.RenderHelper;
+import com.atsuishio.superbwarfare.config.ConfigValueHelper;
 import com.atsuishio.superbwarfare.config.client.DisplayConfig;
 import com.atsuishio.superbwarfare.config.server.VehicleConfig;
 import com.atsuishio.superbwarfare.entity.projectile.SmokeDecoyEntity;
@@ -51,7 +52,8 @@ public class VehicleTeamOverlay {
         boolean lookAtEntity = false;
 
         double entityRange = 0;
-        Entity lookingEntity = TraceTool.camerafFindLookingEntity(player, cameraPos, viewVec, VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE.get());
+        int displayDistance = ConfigValueHelper.getOrDefault(VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE);
+        Entity lookingEntity = TraceTool.camerafFindLookingEntity(player, cameraPos, viewVec, displayDistance);
 
         if (player.getVehicle() instanceof VehicleEntity vehicle) {
             lookingEntity = vehicle.getPlayerLookAtEntityOnVehicle(player, 512, partialTick);
@@ -70,10 +72,10 @@ public class VehicleTeamOverlay {
         }
 
         boolean usingDrone = stack.is(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using") && stack.getOrCreateTag().getBoolean("Linked");
-        boolean outOfRange = entityRange > VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE.get();
+        boolean outOfRange = entityRange > displayDistance;
 
         if (lookAtEntity && lookingEntity instanceof VehicleEntity vehicle && !usingDrone && !outOfRange) {
-            if (entityRange > VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE.get()) return;
+            if (entityRange > displayDistance) return;
 
             Vec3 pos = VectorTool.lerpGetEntityBoundingBoxCenter(lookingEntity, partialTick)
                     .add(new Vec3(0, lookingEntity.getBbHeight() / 2 + 0.5, 0));

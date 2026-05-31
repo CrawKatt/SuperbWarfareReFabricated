@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item.gun.launcher;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.model.item.M79ItemModel;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
@@ -20,6 +23,7 @@ public class M79Item extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return GunRendererBuilder.simple(M79ItemModel::new);
     }

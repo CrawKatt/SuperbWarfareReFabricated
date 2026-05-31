@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.block.VehicleAssemblingTableBlock;
 import com.atsuishio.superbwarfare.block.property.BlockPart;
 import com.atsuishio.superbwarfare.client.renderer.item.VehicleAssemblingTableBlockItemRenderer;
@@ -91,6 +96,7 @@ public class VehicleAssemblingTableBlockItem extends BlockItem implements GeoIte
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void createRenderer(Consumer<Object> consumer) {
         consumer.accept(new RenderProvider() {
             private BlockEntityWithoutLevelRenderer renderer;
@@ -112,6 +118,7 @@ public class VehicleAssemblingTableBlockItem extends BlockItem implements GeoIte
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
     }
 
     @Override

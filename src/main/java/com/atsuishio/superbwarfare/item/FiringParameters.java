@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.TooltipTool;
 import com.atsuishio.superbwarfare.client.screens.FiringParametersScreen;
 import net.minecraft.ChatFormatting;
@@ -43,6 +46,7 @@ public class FiringParameters extends Item implements ItemScreenProvider {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         TooltipTool.addScreenProviderText(pTooltipComponents);
         pTooltipComponents.add(Component.translatable("tips.superbwarfare.mortar.target_pos").withStyle(ChatFormatting.GRAY)
@@ -59,6 +63,7 @@ public class FiringParameters extends Item implements ItemScreenProvider {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public @Nullable Screen getItemScreen(ItemStack stack, Player player, InteractionHand hand) {
         return new FiringParametersScreen(stack, hand);
     }

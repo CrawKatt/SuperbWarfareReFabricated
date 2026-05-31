@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item.gun.sniper;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.model.item.HuntingRifleItemModel;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
@@ -16,6 +19,7 @@ public class HuntingRifleItem extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return GunRendererBuilder.simple(HuntingRifleItemModel::new);
     }

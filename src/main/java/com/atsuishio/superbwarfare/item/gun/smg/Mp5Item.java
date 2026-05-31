@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun.smg;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.renderer.gun.Mp5ItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
@@ -29,10 +34,12 @@ public class Mp5Item extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return Mp5ItemRenderer::new;
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState idlePredicate(AnimationState<Mp5Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -63,6 +70,7 @@ public class Mp5Item extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.mp5.idle"));
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState editPredicate(AnimationState<Mp5Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -80,6 +88,7 @@ public class Mp5Item extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         AnimationController<Mp5Item> idleController = new AnimationController<>(this, "idleController", 2, this::idlePredicate);
         data.add(idleController);
         var editController = new AnimationController<>(this, "editController", 1, this::editPredicate);

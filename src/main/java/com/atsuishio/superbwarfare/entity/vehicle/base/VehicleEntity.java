@@ -3506,7 +3506,8 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
      * @return 调整后的灵敏度
      */
     public double getSensitivity(double original, boolean zoom, int seatIndex, boolean isOnGround) {
-        var seat = computed().seats().get(seatIndex);
+        var seat = getSeat(seatIndex);
+        if (seat == null) return original;
         Vec3 sensitivity = seat.sensitivity;
         return zoom ? sensitivity.x * original : Minecraft.getInstance().options.getCameraType().isFirstPerson() ? sensitivity.y * original : sensitivity.z * original;
     }

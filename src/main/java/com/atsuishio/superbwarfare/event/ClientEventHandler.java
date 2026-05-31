@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.ClickHandler;
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves;
 import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay;
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay;
+import com.atsuishio.superbwarfare.config.ConfigValueHelper;
 import com.atsuishio.superbwarfare.config.client.DisplayConfig;
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.data.gun.*;
@@ -151,6 +152,7 @@ public class ClientEventHandler {
     public static boolean zoom = false;
     public static boolean breath = false;
     public static boolean tacticalSprint = false;
+    private static Boolean allowTacticalSprint = null;
     public static float stamina = 0;
     public static double switchTime = 0;
     public static double moveFadeTime = 0;
@@ -776,7 +778,7 @@ public class ClientEventHandler {
             return;
         }
 
-        tacticalSprint = MiscConfig.ALLOW_TACTICAL_SPRINT.get()
+        tacticalSprint = allowTacticalSprint()
                 && !exhaustion
                 && !zoom
                 && isMoving()
@@ -828,6 +830,14 @@ public class ClientEventHandler {
         } else {
             NetworkRegistry.sendToServer(new TacticalSprintMessage(false));
         }
+    }
+
+    public static void setAllowTacticalSprint(boolean flag) {
+        allowTacticalSprint = flag;
+    }
+
+    private static boolean allowTacticalSprint() {
+        return allowTacticalSprint != null ? allowTacticalSprint : ConfigValueHelper.getOrDefault(MiscConfig.ALLOW_TACTICAL_SPRINT);
     }
 
     /**

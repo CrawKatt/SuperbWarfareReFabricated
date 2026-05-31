@@ -5,7 +5,6 @@ import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay;
 import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.screens.VehicleAssemblingScreen;
 import com.atsuishio.superbwarfare.config.client.KillMessageConfig;
-import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
 import com.atsuishio.superbwarfare.menu.EnergyMenu;
@@ -80,8 +79,7 @@ public class ClientPacketHandler {
     }
 
     public static void handleClientTacticalSprintSync(boolean flag) {
-        MiscConfig.ALLOW_TACTICAL_SPRINT.set(flag);
-        MiscConfig.ALLOW_TACTICAL_SPRINT.save();
+        ClientEventHandler.setAllowTacticalSprint(flag);
     }
 
     public static void handleClientSetMotion(ClientSetMotionMessage message) {

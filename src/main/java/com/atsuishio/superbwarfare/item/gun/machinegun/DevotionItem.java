@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item.gun.machinegun;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.renderer.gun.DevotionItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
@@ -16,6 +19,7 @@ public class DevotionItem extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return DevotionItemRenderer::new;
     }

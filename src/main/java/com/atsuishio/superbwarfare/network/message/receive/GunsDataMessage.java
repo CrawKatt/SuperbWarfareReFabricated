@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.network.message.receive;
 
 import com.atsuishio.superbwarfare.data.CustomData;
 import com.atsuishio.superbwarfare.data.gun.DefaultGunData;
+import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.tools.BufferSerializer;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -45,5 +46,7 @@ public class GunsDataMessage {
             if (CustomData.GUN_DATA.containsKey(entry.id)) continue;
             CustomData.GUN_DATA.put(entry.id, entry);
         }
+
+        GunData.DATA_CACHE.invalidateAll();
     }
 }

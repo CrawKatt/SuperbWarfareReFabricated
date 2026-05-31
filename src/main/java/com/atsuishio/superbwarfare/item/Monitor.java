@@ -1,17 +1,16 @@
 package com.atsuishio.superbwarfare.item;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
-import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.client.item.MonitorClient;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.network.message.receive.ResetCameraTypeMessage;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
-import com.atsuishio.superbwarfare.tools.FormatTool;
 import com.atsuishio.superbwarfare.tools.ItemNBTTool;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.CameraType;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -76,15 +75,12 @@ public class Monitor extends Item implements ReequipAnimationHook {
         if (stack.getOrCreateTag().getBoolean("Using")) {
             stack.getOrCreateTag().putBoolean("Using", false);
             if (level.isClientSide) {
-                if (ClientEventHandler.lastCameraType != null) {
-                    Minecraft.getInstance().options.setCameraType(ClientEventHandler.lastCameraType);
-                }
+                MonitorClient.stopUsing();
             }
         } else {
             stack.getOrCreateTag().putBoolean("Using", true);
             if (level.isClientSide) {
-                ClientEventHandler.lastCameraType = Minecraft.getInstance().options.getCameraType();
-                Minecraft.getInstance().options.setCameraType(CameraType.THIRD_PERSON_BACK);
+                MonitorClient.startUsing();
             }
         }
 
@@ -127,24 +123,12 @@ public class Monitor extends Item implements ReequipAnimationHook {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack stack, Level world, List<Component> list, TooltipFlag flag) {
         if (!stack.getOrCreateTag().contains(LINKED_DRONE) || stack.getOrCreateTag().getString(LINKED_DRONE).equals("none"))
             return;
 
-        Player player = Minecraft.getInstance().player;
-        if (player == null) return;
-
-        if (!stack.getOrCreateTag().contains("PosX") || !stack.getOrCreateTag().contains("PosY") || !stack.getOrCreateTag().contains("PosZ"))
-            return;
-
-        Vec3 droneVec = new Vec3(stack.getOrCreateTag().getDouble("PosX"), stack.getOrCreateTag().getDouble("PosY"), stack.getOrCreateTag().getDouble("PosZ"));
-
-        list.add(Component.translatable("des.superbwarfare.monitor",
-                FormatTool.format1D(player.position().distanceTo(droneVec), "m")).withStyle(ChatFormatting.GRAY));
-        list.add(Component.literal("X: " + FormatTool.format1D(droneVec.x) +
-                " Y: " + FormatTool.format1D(droneVec.y) +
-                " Z: " + FormatTool.format1D(droneVec.z)
-        ));
+        MonitorClient.appendHoverText(stack, list);
     }
 
     @Override
@@ -161,9 +145,7 @@ public class Monitor extends Item implements ReequipAnimationHook {
             if (itemstack.getOrCreateTag().getBoolean("Using")) {
                 itemstack.getOrCreateTag().putBoolean("Using", false);
                 if (entity.level().isClientSide) {
-                    if (ClientEventHandler.lastCameraType != null) {
-                        Minecraft.getInstance().options.setCameraType(ClientEventHandler.lastCameraType);
-                    }
+                    MonitorClient.stopUsing();
                 }
             }
             this.resetDroneData(drone);
@@ -171,9 +153,7 @@ public class Monitor extends Item implements ReequipAnimationHook {
             if (itemstack.getOrCreateTag().getBoolean("Using")) {
                 itemstack.getOrCreateTag().putBoolean("Using", false);
                 if (entity.level().isClientSide) {
-                    if (ClientEventHandler.lastCameraType != null) {
-                        Minecraft.getInstance().options.setCameraType(ClientEventHandler.lastCameraType);
-                    }
+                    MonitorClient.stopUsing();
                 }
             }
         }

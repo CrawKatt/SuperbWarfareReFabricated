@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.renderer.item.LungeMineRenderer;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.init.ModSounds;
@@ -44,6 +49,7 @@ public class LungeMine extends Item implements GeoItem, EntitySwingHook, Reequip
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void createRenderer(Consumer<Object> consumer) {
         consumer.accept(new RenderProvider() {
             private BlockEntityWithoutLevelRenderer renderer;
@@ -67,6 +73,7 @@ public class LungeMine extends Item implements GeoItem, EntitySwingHook, Reequip
         transformType = type;
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState idlePredicate(AnimationState<LungeMine> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -91,6 +98,7 @@ public class LungeMine extends Item implements GeoItem, EntitySwingHook, Reequip
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         var idleController = new AnimationController<>(this, "idleController", 2, this::idlePredicate);
         data.add(idleController);
     }

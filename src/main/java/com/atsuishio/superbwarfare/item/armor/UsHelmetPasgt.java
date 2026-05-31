@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.armor;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.renderer.armor.UsHelmetPasgtArmorRenderer;
 import com.atsuishio.superbwarfare.init.ModAttributes;
@@ -33,6 +38,7 @@ public class UsHelmetPasgt extends ArmorItem implements GeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void createRenderer(Consumer<Object> consumer) {
         consumer.accept(new RenderProvider() {
             private GeoArmorRenderer<?> renderer;
@@ -68,6 +74,7 @@ public class UsHelmetPasgt extends ArmorItem implements GeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
     }
 
     @Override

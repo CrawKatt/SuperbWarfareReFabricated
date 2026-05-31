@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun.launcher;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.TooltipTool;
 import com.atsuishio.superbwarfare.client.model.item.SecondaryCataclysmItemModel;
@@ -58,10 +63,12 @@ public class SecondaryCataclysmItem extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return GunRendererBuilder.simple(SecondaryCataclysmItemModel::new);
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState reloadAnimPredicate(AnimationState<SecondaryCataclysmItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -91,6 +98,7 @@ public class SecondaryCataclysmItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.secondary_cataclysm.idle"));
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState meleePredicate(AnimationState<SecondaryCataclysmItem> event) {
         if (event.getData(DataTickets.ITEM_RENDER_PERSPECTIVE) != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
             return event.setAndContinue(RawAnimation.begin().thenLoop("animation.secondary_cataclysm.idle"));
@@ -104,6 +112,7 @@ public class SecondaryCataclysmItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         var reloadAnimController = new AnimationController<>(this, "reloadAnimController", 1, this::reloadAnimPredicate);
         data.add(reloadAnimController);
         var meleeController = new AnimationController<>(this, "meleeController", 0, this::meleePredicate);

@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.item.common.container;
 
+import net.fabricmc.loader.api.FabricLoader;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.api.event.RegisterContainersEvent;
 import com.atsuishio.superbwarfare.client.renderer.item.ContainerBlockItemRenderer;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
@@ -110,11 +115,13 @@ public class ContainerBlockItem extends BlockItem implements GeoItem {
         return res;
     }
 
+    @Environment(EnvType.CLIENT)
     private PlayState predicate(AnimationState<ContainerBlockItem> event) {
         return PlayState.CONTINUE;
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void createRenderer(Consumer<Object> consumer) {
         consumer.accept(new RenderProvider() {
             private BlockEntityWithoutLevelRenderer renderer;
@@ -136,6 +143,7 @@ public class ContainerBlockItem extends BlockItem implements GeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         data.add(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 

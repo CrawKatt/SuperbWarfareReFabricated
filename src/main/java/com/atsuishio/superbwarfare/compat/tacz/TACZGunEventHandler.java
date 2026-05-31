@@ -1,5 +1,7 @@
 package com.atsuishio.superbwarfare.compat.tacz;
 
+import net.fabricmc.loader.api.FabricLoader;
+
 public class TACZGunEventHandler {
 
     /*

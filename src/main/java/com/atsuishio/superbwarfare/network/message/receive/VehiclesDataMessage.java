@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.network.message.receive;
 
 import com.atsuishio.superbwarfare.data.CustomData;
 import com.atsuishio.superbwarfare.data.vehicle.DefaultVehicleData;
+import com.atsuishio.superbwarfare.data.vehicle.VehicleData;
 import com.atsuishio.superbwarfare.tools.BufferSerializer;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -39,5 +40,7 @@ public record VehiclesDataMessage(List<DefaultVehicleData> data) {
             if (CustomData.VEHICLE_DATA.containsKey(entry.id)) continue;
             CustomData.VEHICLE_DATA.put(entry.id, entry);
         }
+
+        VehicleData.dataCache.invalidateAll();
     }
 }

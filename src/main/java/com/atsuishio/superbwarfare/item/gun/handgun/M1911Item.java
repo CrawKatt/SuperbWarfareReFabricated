@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item.gun.handgun;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.model.item.M1911ItemModel;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -19,6 +22,7 @@ public class M1911Item extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return GunRendererBuilder.simple(M1911ItemModel::new);
     }

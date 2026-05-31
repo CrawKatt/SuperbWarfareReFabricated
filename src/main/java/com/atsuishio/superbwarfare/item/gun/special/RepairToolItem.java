@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.item.gun.special;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.atsuishio.superbwarfare.client.renderer.gun.RepairToolItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
@@ -51,6 +54,7 @@ public class RepairToolItem extends GunGeoItem {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return RepairToolItemRenderer::new;
     }
