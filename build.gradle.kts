@@ -190,6 +190,12 @@ dependencies {
 }
 
 tasks.named<ProcessResources>("processResources") {
+    val legacyTagPathSegments = mapOf(
+        "block" to "blocks",
+        "entity_type" to "entity_types",
+        "item" to "items"
+    )
+    val vehicleAssemblingRecipeType = "\"type\": \"superbwarfare:vehicle_assembling\""
     val replaceProperties = mapOf(
         "version" to project.version.toString(),
         "minecraft_version" to project.property("minecraft_version"),
@@ -204,6 +210,20 @@ tasks.named<ProcessResources>("processResources") {
     )
 
     inputs.properties(replaceProperties)
+
+    eachFile {
+        val parts = path.split("/")
+        if (parts.size > 3 && parts[0] == "data") {
+            if (parts[2] == "recipe" && file.isFile && file.readText().contains(vehicleAssemblingRecipeType)) {
+                path = (parts.take(2) + "recipes" + parts.drop(3)).joinToString("/")
+            } else if (parts[2] == "tags") {
+                val replacement = parts.getOrNull(3)?.let(legacyTagPathSegments::get)
+                if (replacement != null) {
+                    path = (parts.take(3) + replacement + parts.drop(4)).joinToString("/")
+                }
+            }
+        }
+    }
 
     filesMatching(listOf("fabric.mod.json", "pack.mcmeta")) {
         expand(replaceProperties + mapOf("project" to project))
