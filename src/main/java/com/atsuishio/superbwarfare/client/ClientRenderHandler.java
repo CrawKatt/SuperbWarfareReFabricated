@@ -1,17 +1,14 @@
 package com.atsuishio.superbwarfare.client;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves;
 import com.atsuishio.superbwarfare.client.model.curio.ParachuteModel;
 import com.atsuishio.superbwarfare.client.renderer.block.*;
-import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
 import com.atsuishio.superbwarfare.client.overlay.*;
 import com.atsuishio.superbwarfare.client.tooltip.*;
 import com.atsuishio.superbwarfare.client.tooltip.component.*;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
@@ -86,6 +83,7 @@ public class ClientRenderHandler {
             StaminaOverlay.render(guiGraphics, tickDelta, w, h);
             TowOverlay.render(guiGraphics, tickDelta, w, h);
             Type63InfoOverlay.render(guiGraphics, tickDelta, w, h);
+            VehicleMainWeaponHudOverlay.render(guiGraphics, tickDelta, w, h);
             VehicleCrosshairOverlay.render(guiGraphics, tickDelta, w, h);
             VehicleHudOverlay.render(guiGraphics, tickDelta, w, h);
             VehicleTeamOverlay.render(guiGraphics, tickDelta, w, h);
