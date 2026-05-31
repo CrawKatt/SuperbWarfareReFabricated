@@ -40,6 +40,7 @@
         "ItemInHandRendererMixin",
         "KeyboardHandlerMixin",
         "KeyboardInputMixin",
+        "accessor.KeyMappingAccessor",
         "KeymappingMixin",
         "LevelRendererMixin",
         "LivingEntityRendererMixin",

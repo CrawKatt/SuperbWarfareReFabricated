@@ -82,15 +82,15 @@ public class ClickHandler {
         }
 
         int button = event.getButton();
-        if (button == ModKeyMappings.FIRE.getDefaultKey().getValue()) {
+        if (ModKeyMappings.FIRE.matchesMouse(button)) {
             handleWeaponFireRelease();
         }
-        if (button == ModKeyMappings.HOLD_ZOOM.getDefaultKey().getValue()) {
+        if (ModKeyMappings.HOLD_ZOOM.matchesMouse(button)) {
             handleWeaponZoomRelease();
             return;
         }
 
-        if (button == ModKeyMappings.SWITCH_ZOOM.getDefaultKey().getValue() && !switchZoom) {
+        if (ModKeyMappings.SWITCH_ZOOM.matchesMouse(button) && !switchZoom) {
             handleWeaponZoomRelease();
         }
     }
@@ -118,9 +118,7 @@ public class ClickHandler {
 
         int button = event.getButton();
 
-        var fireKey = ModKeyMappings.FIRE.getDefaultKey();
-        if (fireKey.getType() == InputConstants.Type.MOUSE
-                && fireKey.getValue() == button
+        if (ModKeyMappings.FIRE.matchesMouse(button)
                 && cancelFireKey(player, stack)
         ) {
             event.setCanceled(true);
@@ -130,9 +128,7 @@ public class ClickHandler {
             return;
         }
 
-        var zoomKey = ModKeyMappings.HOLD_ZOOM.getDefaultKey();
-        if (zoomKey.getType() == InputConstants.Type.MOUSE
-                && zoomKey.getValue() == button
+        if (ModKeyMappings.HOLD_ZOOM.matchesMouse(button)
                 && cancelZoomKey(player, stack)
         ) {
             event.setCanceled(true);
@@ -151,7 +147,7 @@ public class ClickHandler {
             }
         }
 
-        if (button == ModKeyMappings.MARK.getDefaultKey().getValue()) {
+        if (ModKeyMappings.MARK.matchesMouse(button)) {
             if (stack.is(ModItems.ARTILLERY_INDICATOR.get())) {
                 NetworkRegistry.sendToServer(SetFiringParametersMessage.INSTANCE);
             }
@@ -167,24 +163,23 @@ public class ClickHandler {
                 || (stack.is(Items.SPYGLASS) && player.isScoping() && player.getOffhandItem().is(ModItems.FIRING_PARAMETERS.get()))
                 || (stack.is(ModItems.ARTILLERY_INDICATOR.get()))
         ) {
-            if (button == ModKeyMappings.FIRE.getDefaultKey().getValue()) {
+            if (ModKeyMappings.FIRE.matchesMouse(button)) {
                 handleWeaponFirePress(player, stack);
             }
 
-            if (button == ModKeyMappings.HOLD_ZOOM.getDefaultKey().getValue()) {
+            if (ModKeyMappings.HOLD_ZOOM.matchesMouse(button)) {
                 handleWeaponZoomPress(player, stack);
                 switchZoom = false;
                 return;
             }
 
-            if (button == ModKeyMappings.SWITCH_ZOOM.getDefaultKey().getValue()) {
+            if (ModKeyMappings.SWITCH_ZOOM.matchesMouse(button)) {
                 handleWeaponZoomPress(player, stack);
                 switchZoom = !switchZoom;
             }
         }
 
-        var fireModeKey = ModKeyMappings.FIRE_MODE.getDefaultKey();
-        if (fireModeKey.getType() == InputConstants.Type.MOUSE && button == fireModeKey.getValue()) {
+        if (ModKeyMappings.FIRE_MODE.matchesMouse(button)) {
             if (player.getVehicle() instanceof VehicleEntity vehicle) {
                 var data = vehicle.getGunData(player);
                 if (data != null && data.getDefault().getAmmoConsumers().size() > 1) {

@@ -34,6 +34,6 @@ public class ModKeyMappings {
     public static final KeyMapping MARK = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.superbwarfare.mark", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_MIDDLE, "key.categories.superbwarfare"));
 
     public static void register() {
-
+        KeyMapping.resetMapping();
     }
 }

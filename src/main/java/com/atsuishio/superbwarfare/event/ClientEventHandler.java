@@ -307,6 +307,10 @@ public class ClientEventHandler {
                 || (player != null && player.isSprinting());
     }
 
+    private static boolean isFireInputDown() {
+        return ModKeyMappings.FIRE.isDown() || holdingFireKey || holdFireVehicle;
+    }
+
     public static void handleClientTick() {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) {
@@ -1575,7 +1579,7 @@ public class ClientEventHandler {
                 } else {
                     moveRotZ = Mth.lerp(0.2f * times, moveRotZ, 0) * (1 - zoomTime);
                 }
-                if (entity.isSprinting() && !data.reloading() && firePosTimer == 0 && !ModKeyMappings.FIRE.isDown() && noSprintTicks == 0 && zoomTime < 0.1) {
+                if (entity.isSprinting() && !data.reloading() && firePosTimer == 0 && !isFireInputDown() && noSprintTicks == 0 && zoomTime < 0.1) {
                     sprintBasicRotX = Mth.clamp(Mth.lerp(0.3f * times / (customWeight + 4), sprintBasicRotX, 1), 0, 1);
                     sprintBasicRotY = Mth.clamp(Mth.lerp(0.18f * times / (customWeight + 4), sprintBasicRotY, 1), 0, 1);
                     sprintBasicRotZ = Mth.clamp(Mth.lerp(0.3f * times / (customWeight + 4), sprintBasicRotZ, 1), 0, 1);
@@ -1602,7 +1606,7 @@ public class ClientEventHandler {
                 moveFadeTime = Mth.lerp(0.1 * times, moveFadeTime, 0);
             }
 
-            if (entity.isSprinting() && !data.reloading() && firePosTimer == 0 && !ModKeyMappings.FIRE.isDown() && noSprintTicks == 0) {
+            if (entity.isSprinting() && !data.reloading() && firePosTimer == 0 && !isFireInputDown() && noSprintTicks == 0) {
                 if (entity.onGround()) {
                     sprintFadeTime = Mth.lerp(0.08 * times, sprintFadeTime, 1);
                 } else {
