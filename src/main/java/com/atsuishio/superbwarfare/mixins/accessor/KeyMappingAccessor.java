@@ -10,4 +10,10 @@ public interface KeyMappingAccessor {
 
     @Accessor("key")
     InputConstants.Key superbwarfare$getKey();
+
+    @Accessor("clickCount")
+    int superbwarfare$getClickCount();
+
+    @Accessor("clickCount")
+    void superbwarfare$setClickCount(int clickCount);
 }
