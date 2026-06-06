@@ -46,8 +46,8 @@ public class AmmoBoxItem extends Item {
         if (info == null) info = new AmmoBoxInfo("All", false);
         String selectedType = info.type();
 
-        var cap = ModComponents.PLAYER_VARIABLE.get(player);
         if (!level.isClientSide()) {
+            var cap = ModComponents.PLAYER_VARIABLE.get(player);
             var types = (selectedType.equals("All") || info.isDrop()) ? Ammo.values() : new Ammo[]{Ammo.getType(selectedType)};
 
             for (var type : types) {

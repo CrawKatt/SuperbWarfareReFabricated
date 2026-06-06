@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.item.common.ammo;
 
 import com.atsuishio.superbwarfare.data.gun.Ammo;
-import com.atsuishio.superbwarfare.init.ModComponents;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import net.minecraft.ChatFormatting;
@@ -40,6 +39,12 @@ public class AmmoSupplierItem extends Item {
         int count = stack.getCount();
         player.getCooldowns().addCooldown(this, 10);
 
+        if (level.isClientSide()) {
+            return InteractionResultHolder.success(stack);
+        }
+
+        int ammoAmount = ammoToAdd * count;
+
         if (!player.isCreative()) {
             stack.shrink(count);
         }
@@ -47,18 +52,13 @@ public class AmmoSupplierItem extends Item {
         ItemStack offhandItem = player.getOffhandItem();
 
         if (offhandItem.is(ModItems.AMMO_BOX)) {
-            this.type.add(offhandItem, ammoToAdd * count);
+            this.type.add(offhandItem, ammoAmount);
         } else {
-            var capability = ModComponents.PLAYER_VARIABLE.get(player);
-
-            this.type.add(capability, ammoToAdd * count);
-            ModComponents.PLAYER_VARIABLE.sync(player);
+            this.type.add(player, ammoAmount);
         }
 
-        if (!level.isClientSide()) {
-            player.displayClientMessage(Component.translatable("item.superbwarfare.ammo_supplier.supply", Component.translatable(this.type.translationKey), ammoToAdd * count), true);
-            level.playSound(null, player.blockPosition(), ModSounds.BULLET_SUPPLY, SoundSource.PLAYERS, 1, 1);
-        }
-        return InteractionResultHolder.success(stack);
+        player.displayClientMessage(Component.translatable("item.superbwarfare.ammo_supplier.supply", Component.translatable(this.type.translationKey), ammoAmount), true);
+        level.playSound(null, player.blockPosition(), ModSounds.BULLET_SUPPLY, SoundSource.PLAYERS, 1, 1);
+        return InteractionResultHolder.consume(stack);
     }
 }
