@@ -15,6 +15,7 @@ import com.atsuishio.superbwarfare.item.common.container.ContainerBlockItem;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
 import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
+import com.atsuishio.superbwarfare.tools.GunsTool;
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger;
 import com.atsuishio.superbwarfare.world.TDMSavedData;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
@@ -35,6 +36,7 @@ public class SuperbWarfareFabric implements ModInitializer {
 
         NetworkRegistry.registerPayloads();
         VehicleDataTool.register();
+        GunsTool.register();
         DataLoader.register();
 
         ContainerBlockItem.registerContainers();

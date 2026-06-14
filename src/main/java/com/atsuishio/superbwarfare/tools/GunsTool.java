@@ -2,6 +2,8 @@ package com.atsuishio.superbwarfare.tools;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.network.message.receive.GunsDataMessage;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
@@ -11,6 +13,11 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 public class GunsTool {
+
+    public static void register() {
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> onPlayerLogin(handler.getPlayer()));
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, serverResourceManager, success) -> onDataPackSync(server));
+    }
 
     public static void onPlayerLogin(ServerPlayer player) {
         var server = player.getServer();
