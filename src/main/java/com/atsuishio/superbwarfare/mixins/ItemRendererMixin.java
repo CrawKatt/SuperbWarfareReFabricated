@@ -36,7 +36,7 @@ public class ItemRendererMixin {
             argsOnly = true
     )
     public BakedModel renderItem(BakedModel bakedModel, @Local(argsOnly = true) ItemStack stack, @Local(argsOnly = true) ItemDisplayContext displayContext) {
-        if (usesGuiIconModel(stack) && (displayContext == ItemDisplayContext.GUI || displayContext == ItemDisplayContext.GROUND || displayContext == ItemDisplayContext.FIXED)) {
+        if (usesGuiIconModel(stack) && (displayContext == ItemDisplayContext.GUI || displayContext == ItemDisplayContext.GROUND)) {
             ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
             ModelResourceLocation iconModelLocation = ModelResourceLocation.inventory(itemId.withPath(path -> path + "_icon"));
             return this.itemModelShaper.getModelManager().getModel(iconModelLocation);
