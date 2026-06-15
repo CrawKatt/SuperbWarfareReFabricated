@@ -14,7 +14,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -36,10 +35,27 @@ public class Hammer extends SwordItem {
         TooltipTool.addHideText(tooltipComponents, Component.translatable("des.superbwarfare.hammer", NBTTool.getTag(stack).getInt("CraftCount")).withStyle(ChatFormatting.GRAY));
     }
 
+    public static ItemStack getCraftingRemainingStack(ItemStack itemstack) {
+        var stack = itemstack.copy();
+
+        var tag = NBTTool.getTag(stack);
+        tag.putInt("CraftCount", tag.getInt("CraftCount") + 1);
+        NBTTool.saveTag(stack, tag);
+
+        if (!itemstack.isDamageableItem()) return stack;
+
+        stack.setDamageValue(itemstack.getDamageValue() + 1);
+
+        if (stack.getDamageValue() >= stack.getMaxDamage()) {
+            return ItemStack.EMPTY;
+        }
+        return stack;
+    }
+
     @Override
     @ParametersAreNonnullByDefault
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        attacker.level().playSound(null, target.getOnPos(), ModSounds.MELEE_HIT, SoundSource.PLAYERS, 1, (float) ((2 * org.joml.Math.random() - 1) * 0.1f + 1.0f));
+        attacker.level().playSound(null, target.getOnPos(), ModSounds.MELEE_HIT, SoundSource.PLAYERS, 1, (float) ((2 * Math.random() - 1) * 0.1f + 1.0f));
         return super.hurtEnemy(stack, target, attacker);
     }
 
