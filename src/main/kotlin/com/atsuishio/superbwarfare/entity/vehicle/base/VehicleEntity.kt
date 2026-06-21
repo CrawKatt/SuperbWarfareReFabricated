@@ -93,6 +93,7 @@ import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.gameevent.GameEvent
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
@@ -233,6 +234,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     }
 
     private var obbCache: MutableList<OBB>? = null
+    private var combinedAabbCache: AABB? = null
+    private var combinedAabbCacheTick: Int = -1
     open var obb = listOf<OBBInfo>()
         protected set
 
@@ -357,6 +360,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open var lastDamageStamp: Long = 0
 
     private fun initOBB() {
+        this.obbCache = null
+        this.invalidateAABBCache()
         this.obb = data().getDefault().copy().obb.toList()
     }
 
@@ -2218,6 +2223,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             // 处理部件血量
             this.handlePartHealth()
             this.updateOBB()
+            this.refreshBoundingBoxFromOBBs()
         }
 
         if (level() is ServerLevel && VehicleConfig.VEHICLE_CHUNK_LOADING.get() && computed().keepChunkLoaded) {
@@ -2324,7 +2330,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     open val isFiring: Boolean
         get() {
-            for (seatIndex in 0..<computed().seats().size) {
+            for (seatIndex in computed().seats().indices) {
                 val gunData = getGunData(seatIndex) ?: continue
                 val instance = gunData.get(GunProp.SOUND_INFO).fireSoundInstances
                 if (instance != null && gunData.shootTimer.get() > 0) {
@@ -2335,7 +2341,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
 
     open fun shootingVolume(): Float {
-        for (seatIndex in 0..<computed().seats().size) {
+        for (seatIndex in computed().seats().indices) {
             val gunData = getGunData(seatIndex) ?: continue
             val instance = gunData.get(GunProp.SOUND_INFO).fireSoundInstances
             if (instance != null) {
@@ -2346,7 +2352,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     }
 
     open fun shootingPitch(): Float {
-        for (seatIndex in 0..<computed().seats().size) {
+        for (seatIndex in computed().seats().indices) {
             val gunData = getGunData(seatIndex) ?: continue
             val instance = gunData.get(GunProp.SOUND_INFO).fireSoundInstances
             if (instance != null) {
@@ -4092,6 +4098,43 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             this.obbCache = this.obb.asSequence().map { it.getOBB() }.toMutableList()
         }
         return this.obbCache!!
+    }
+
+    /**
+     * 获取当前tick缓存的组合AABB（所有OBB的最小外接AABB）
+     * 如果缓存未命中则实时计算
+     */
+    open fun getCombinedAABB(): AABB {
+        if (enableAABB()) {
+            return this.boundingBox
+        }
+        if (combinedAabbCache != null && combinedAabbCacheTick == this.tickCount) {
+            return combinedAabbCache!!
+        }
+        combinedAabbCache = VehicleMotionUtils.calculateCombinedAABBOptimized(this)
+        combinedAabbCacheTick = this.tickCount
+        return combinedAabbCache!!
+    }
+
+    /**
+     * 使AABB缓存失效，下次调用[getCombinedAABB]时将重新计算
+     */
+    open fun invalidateAABBCache() {
+        combinedAabbCache = null
+        combinedAabbCacheTick = -1
+    }
+
+    /**
+     * 根据当前OBB状态更新entity的boundingBox
+     * 应在 [updateOBB] 之后调用，使entity的碰撞箱与OBB保持一致
+     */
+    open fun refreshBoundingBoxFromOBBs() {
+        if (enableAABB()) return
+        invalidateAABBCache()
+        val aabb = getCombinedAABB()
+        if (!aabb.hasNaN() && aabb.getSize() > 0.0) {
+            this.boundingBox = aabb
+        }
     }
 
     /**
