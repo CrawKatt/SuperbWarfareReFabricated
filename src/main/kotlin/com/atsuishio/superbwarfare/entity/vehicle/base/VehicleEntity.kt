@@ -1143,7 +1143,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             listener = null
         } else {
             val shootGunData = getGunData(living)
-            listener = if (shootGunData != null && shootGunData === gunData) {
+            listener = if (shootGunData != null && shootGunData == gunData) {
                 living
             } else {
                 null
