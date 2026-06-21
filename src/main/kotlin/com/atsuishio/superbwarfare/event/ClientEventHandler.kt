@@ -1763,6 +1763,7 @@ object ClientEventHandler {
                 }
                 if (gunData.get(GunProp.DEFAULT_FIRE_MODE) == "Semi") {
                     holdFireVehicle = false
+                    clientTimerVehicle.stop()
                 }
             } else if (clientTimerVehicle.progress >= cooldown) {
                 clientTimerVehicle.stop()
