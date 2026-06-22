@@ -248,9 +248,9 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     protected var zO = 0.0
 
     open var roll = 0f
-
     open var prevRoll = 0f
     open var repairCoolDown = maxRepairCoolDown()
+    open var hurtWarnCoolDown = 0
 
     open var crash = false
 
@@ -1757,6 +1757,20 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
             this.health -= Math.min(pHealAmount, getMaxHealth() + 1)
         }
+
+        val driver = this.lastDriver
+        if (this.locked && driver is Player && attacker != driver && hurtWarnCoolDown > 0) {
+            driver.displayClientMessage(
+                Component.translatable(
+                    "tips.superbwarfare.vehicle.lock_hurt",
+                    FormatTool.format1D(this.x),
+                    FormatTool.format1D(this.y),
+                    FormatTool.format1D(this.z),
+                    this.displayName
+                ).withStyle(ChatFormatting.YELLOW), false
+            )
+            hurtWarnCoolDown = 60
+        }
     }
 
     open var health: Float
@@ -1950,6 +1964,10 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         if (repairCoolDown > 0) {
             repairCoolDown--
+        }
+
+        if (hurtWarnCoolDown > 0) {
+            hurtWarnCoolDown--
         }
 
         if (this.health >= this.getMaxHealth()) {
@@ -3042,6 +3060,19 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     }
 
     open fun destroy() {
+        val driver = this.lastDriver
+        if (this.locked && driver is Player) {
+            driver.displayClientMessage(
+                Component.translatable(
+                    "tips.superbwarfare.vehicle.lock_destroy",
+                    FormatTool.format1D(this.x),
+                    FormatTool.format1D(this.y),
+                    FormatTool.format1D(this.z),
+                    this.displayName
+                ).withStyle(ChatFormatting.RED), false
+            )
+        }
+
         VehicleDestroyUtils.destroy(this)
     }
 
