@@ -164,5 +164,8 @@ class HandsomeGogglesItem :
         tooltipComponents.add(
             Component.translatable("des.superbwarfare.handsome_goggles").withStyle(ChatFormatting.GRAY)
         )
+        pTooltipComponents.add(
+            Component.translatable("des.superbwarfare.handsome_goggles.warn").withStyle(ChatFormatting.RED)
+        )
     }
 }
