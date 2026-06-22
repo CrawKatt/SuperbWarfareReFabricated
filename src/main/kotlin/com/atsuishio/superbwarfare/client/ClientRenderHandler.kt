@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.client
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.decorator.ContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.LuckyContainerItemDecorator
+import com.atsuishio.superbwarfare.client.decorator.VehicleKeyItemDecorator
 import com.atsuishio.superbwarfare.client.model.curio.ParachuteModel
 import com.atsuishio.superbwarfare.client.model.curio.ThermalImagingGogglesModel
 import com.atsuishio.superbwarfare.client.overlay.*
@@ -107,6 +108,7 @@ object ClientRenderHandler {
     fun registerItemDecorations(event: RegisterItemDecorationsEvent) {
         event.register(ModItems.CONTAINER.get(), ContainerItemDecorator())
         event.register(ModItems.LUCKY_CONTAINER.get(), LuckyContainerItemDecorator())
+        event.register(ModItems.VEHICLE_KEY.get(), VehicleKeyItemDecorator())
     }
 
     @SubscribeEvent
