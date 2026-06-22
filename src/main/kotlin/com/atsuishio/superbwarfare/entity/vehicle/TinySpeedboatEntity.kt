@@ -15,8 +15,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.DyeItem
 import net.minecraft.world.level.Level
 
-open class TinySpeedboatEntity(type: EntityType<TinySpeedboatEntity>, world: Level) : VehicleEntity(type, world), BasicGeoVehicleEntity {
-
+open class TinySpeedboatEntity(type: EntityType<TinySpeedboatEntity>, world: Level) : VehicleEntity(type, world) {
     companion object {
         @JvmField
         val COLOR_ID: EntityDataAccessor<Int> =

@@ -27,7 +27,7 @@ import software.bernie.geckolib.model.GeoModel
 import software.bernie.geckolib.renderer.GeoEntityRenderer
 import software.bernie.geckolib.util.RenderUtil
 
-
+@Deprecated("Geckolib will be removed since 0.8.10", replaceWith = ReplaceWith("SbmVehicleRenderer"))
 abstract class VehicleRenderer<T>(renderManager: EntityRendererProvider.Context, model: GeoModel<T>) :
     GeoEntityRenderer<T>(renderManager, model) where T : VehicleEntity, T : GeoAnimatable {
 
