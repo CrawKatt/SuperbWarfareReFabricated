@@ -141,8 +141,8 @@ public final class VehicleMotionUtils {
             }
 
             if (obb.contains(eyePos)) {
-                double dx = entity.getX() - obb.center().x;
-                double dz = entity.getZ() - obb.center().z;
+                double dx = entity.getX() - obb.center.x;
+                double dz = entity.getZ() - obb.center.z;
                 double dMax = Mth.absMax(dx, dz);
                 if (dMax >= (double) 0.01F) {
                     dMax = Math.sqrt(dMax);
@@ -285,13 +285,13 @@ public final class VehicleMotionUtils {
                                 var obbList2 = mobileVehicle.getOBBs();
                                 for (var obb2 : obbList2) {
                                     if (OBB.isColliding(obb, obb2)) {
-                                        thisPos = OBB.vector3dToVec3(obb.center());
-                                        otherPos = OBB.vector3dToVec3(obb2.center());
+                                        thisPos = OBB.vector3dToVec3(obb.center);
+                                        otherPos = OBB.vector3dToVec3(obb2.center);
                                     }
                                 }
                             } else {
                                 if (OBB.isColliding(obb, entity.getBoundingBox())) {
-                                    thisPos = OBB.vector3dToVec3(obb.center());
+                                    thisPos = OBB.vector3dToVec3(obb.center);
                                 }
                             }
                         }

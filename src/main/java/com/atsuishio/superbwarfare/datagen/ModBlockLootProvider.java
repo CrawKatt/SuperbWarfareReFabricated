@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.datagen;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.block.VehicleAssemblingTableBlock;
-import com.atsuishio.superbwarfare.block.property.BlockPart;
 import team.reborn.energy.api.EnergyStorage;
 import com.atsuishio.superbwarfare.init.ModBlocks;
 import com.atsuishio.superbwarfare.init.ModItems;

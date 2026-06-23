@@ -39,7 +39,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.UUID;
-
+/*
 public class Tm62Entity extends Entity implements GeoEntity, OwnableEntity {
 
     protected static final EntityDataAccessor<Optional<UUID>> OWNER_UUID = SynchedEntityData.defineId(Tm62Entity.class, EntityDataSerializers.OPTIONAL_UUID);
@@ -262,3 +262,4 @@ public class Tm62Entity extends Entity implements GeoEntity, OwnableEntity {
         this.setDeltaMovement(vec3);
     }
 }
+*/

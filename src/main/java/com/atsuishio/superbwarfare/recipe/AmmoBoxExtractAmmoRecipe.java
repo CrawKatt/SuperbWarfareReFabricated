@@ -3,7 +3,6 @@ package com.atsuishio.superbwarfare.recipe;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.init.ModRecipes;
 import com.atsuishio.superbwarfare.item.common.ammo.AmmoBoxItem;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;

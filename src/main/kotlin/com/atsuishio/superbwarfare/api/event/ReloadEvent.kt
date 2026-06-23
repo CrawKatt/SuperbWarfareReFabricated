@@ -8,13 +8,9 @@ import org.jetbrains.annotations.ApiStatus
 @ApiStatus.Internal
 @ApiStatus.AvailableSince("0.8.0")
 open class ReloadEvent private constructor(val entity: Entity?, val data: GunData) {
-    @JvmField
-    val shooter: Entity? = entity
-
     var isCanceled: Boolean = false
 
-    @JvmField
-    val stack: ItemStack? = data.stack
+    val stack: ItemStack = data.stack
 
     class Pre(shooter: Entity?, data: GunData) : ReloadEvent(shooter, data)
 

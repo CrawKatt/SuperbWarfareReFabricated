@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.client.renderer.block;
 
-import com.atsuishio.superbwarfare.block.entity.LuckyContainerBlockEntity;
 import com.atsuishio.superbwarfare.client.model.block.LuckyContainerBlockModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;

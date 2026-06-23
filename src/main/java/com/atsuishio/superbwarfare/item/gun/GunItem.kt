@@ -1,606 +1,582 @@
-package com.atsuishio.superbwarfare.item.gun;
+package com.atsuishio.superbwarfare.item.gun
 
-import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage;
-import com.atsuishio.superbwarfare.client.particle.BulletDecalOption;
-import com.atsuishio.superbwarfare.client.screens.WeaponEditScreen;
-import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent;
-import com.atsuishio.superbwarfare.data.CustomData;
-import com.atsuishio.superbwarfare.data.gun.*;
-import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
-import com.atsuishio.superbwarfare.data.launchable.LaunchableEntityTool;
-import com.atsuishio.superbwarfare.data.launchable.ShootData;
-import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
-import com.atsuishio.superbwarfare.entity.projectile.*;
-import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
-import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.init.ModCapabilities;
-import com.atsuishio.superbwarfare.init.ModDamageTypes;
-import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.init.ModPerks;
-import com.atsuishio.superbwarfare.init.ModSounds;
-import com.atsuishio.superbwarfare.item.EnergyStorageItem;
-import com.atsuishio.superbwarfare.item.ItemScreenProvider;
-import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
-import com.atsuishio.superbwarfare.perk.Perk;
-import com.atsuishio.superbwarfare.resource.gun.GunResource;
-import com.atsuishio.superbwarfare.tools.*;
-import com.atsuishio.superbwarfare.world.phys.EntityResult;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.inventory.tooltip.TooltipComponent;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Math;
-import software.bernie.geckolib.animatable.GeoItem;
+import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
+import com.atsuishio.superbwarfare.init.ModCapabilities
+import com.atsuishio.superbwarfare.api.event.ShootEvent
+import com.atsuishio.superbwarfare.client.particle.BulletDecalOption
+import com.atsuishio.superbwarfare.client.screens.WeaponEditScreen
+import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent
+import com.atsuishio.superbwarfare.data.CustomData
+import com.atsuishio.superbwarfare.data.PMC
+import com.atsuishio.superbwarfare.data.PropertyModifier
+import com.atsuishio.superbwarfare.data.gun.*
+import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
+import com.atsuishio.superbwarfare.data.gun.GunData.Companion.getDefault
+import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
+import com.atsuishio.superbwarfare.data.launchable.LaunchableEntityTool
+import com.atsuishio.superbwarfare.data.launchable.ShootData
+import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback
+import com.atsuishio.superbwarfare.entity.projectile.*
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.event.ClientEventHandler
+import com.atsuishio.superbwarfare.init.ModDamageTypes
+import com.atsuishio.superbwarfare.init.ModItems
+import com.atsuishio.superbwarfare.init.ModPerks
+import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.item.EnergyStorageItem
+import com.atsuishio.superbwarfare.item.ItemScreenProvider
+import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
+import com.atsuishio.superbwarfare.perk.Perk
+import com.atsuishio.superbwarfare.resource.gun.GunResource
+import com.atsuishio.superbwarfare.tools.*
+import com.atsuishio.superbwarfare.tools.VectorTool.isInLiquid
+import com.atsuishio.superbwarfare.world.phys.EntityResult
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Holder
+import net.minecraft.core.component.DataComponents
+import net.minecraft.network.protocol.game.ClientboundStopSoundPacket
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.util.Mth
+import net.minecraft.util.RandomSource
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.*
+import net.minecraft.world.entity.ai.attributes.AttributeModifier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.Projectile
+import net.minecraft.world.entity.projectile.ProjectileUtil
+import net.minecraft.world.inventory.tooltip.TooltipComponent
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.component.ItemAttributeModifiers
+import net.minecraft.world.item.enchantment.Enchantment
+import net.minecraft.world.level.ClipContext
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.Vec3
+import org.joml.Math
+import software.bernie.geckolib.animatable.GeoItem
+import java.util.*
+import java.util.concurrent.atomic.AtomicReference
+import java.util.function.Consumer
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
+abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), ItemScreenProvider,
+    EnergyStorageItem, PropertyModifier<GunData, DefaultGunData> {
 
-import static com.atsuishio.superbwarfare.entity.vehicle.PrismTankEntity.LASER_LENGTH;
-import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.LASER_SCALE;
-import static com.atsuishio.superbwarfare.tools.EntityFindUtil.findEntity;
-import static com.atsuishio.superbwarfare.tools.ParticleTool.sendParticle;
+    protected val random: RandomSource = RandomSource.create()
 
-public abstract class GunItem extends Item implements ItemScreenProvider, GunPropertyModifier, EnergyStorageItem {
-
-    protected static final ResourceLocation DEFAULT_ICON = Mod.loc("textures/gun_icon/default_icon.png");
-
-    protected final RandomSource random = RandomSource.create();
-
-    @Override
-    public int getMaxEnergy(ItemStack stack) {
-        return stack.getItem() instanceof GunItem ? GunData.compute(stack).maxEnergy : 0;
+    override fun getMaxEnergy(stack: ItemStack): Int {
+        return if (stack.item is GunItem) GunData.get(stack, GunProp.MAX_ENERGY) else 0
     }
 
-    @Override
-    public int getMaxReceiveEnergy(ItemStack stack) {
-        return stack.getItem() instanceof GunItem ? GunData.compute(stack).maxReceiveEnergy : -1;
+    override fun getMaxReceiveEnergy(stack: ItemStack): Int {
+        return if (stack.item is GunItem) GunData.get(stack, GunProp.MAX_RECEIVE_ENERGY) else -1
     }
 
-    @Override
-    public int getMaxExtractEnergy(ItemStack stack) {
-        return stack.getItem() instanceof GunItem ? GunData.compute(stack).maxExtractEnergy : -1;
+    override fun getMaxExtractEnergy(stack: ItemStack): Int {
+        return if (stack.item is GunItem) GunData.get(stack, GunProp.MAX_EXTRACT_ENERGY) else -1
     }
 
-    public final Map<Integer, Consumer<GunData>> reloadTimeBehaviors = new HashMap<>();
-    public final Map<Integer, Consumer<GunData>> boltTimeBehaviors = new HashMap<>();
+    @JvmField
+    val reloadTimeBehaviors = mutableMapOf<Int, Consumer<GunData>?>()
 
-    public GunItem(Properties properties) {
-        super(properties.stacksTo(1));
+    @JvmField
+    val boltTimeBehaviors = mutableMapOf<Int, Consumer<GunData>?>()
 
-        addReloadTimeBehavior(this.reloadTimeBehaviors);
-        addBoltTimeBehavior(this.boltTimeBehaviors);
+    init {
+        addReloadTimeBehavior(this.reloadTimeBehaviors)
+        addBoltTimeBehavior(this.boltTimeBehaviors)
     }
 
-    @Override
-    public DefaultGunData computeProperties(GunData gunData, DefaultGunData rawData) {
-        rawData.damage += getCustomDamage(gunData);
-        rawData.headshot += getCustomHeadshot(gunData);
-        rawData.bypassesArmor += getCustomBypassArmor(gunData);
-        rawData.magazine += getCustomMagazine(gunData);
-        rawData.defaultZoom += getCustomZoom(gunData);
-        rawData.rpm += getCustomRPM(gunData);
-        rawData.weight += getCustomWeight(gunData);
-        rawData.velocity += getCustomVelocity(gunData);
-        rawData.soundRadius += getCustomSoundRadius(gunData);
+    override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) = with(GunProp) {
+        val data = modifier.data
 
-        return rawData;
+        modifier[DAMAGE] += getCustomDamage(data)
+        modifier[HEADSHOT] += getCustomHeadshot(data)
+        modifier[BYPASSES_ARMOR] += getCustomBypassArmor(data)
+        modifier[MAGAZINE] += getCustomMagazine(data)
+        modifier[DEFAULT_ZOOM] += getCustomZoom(data)
+        modifier[RPM] += getCustomRPM(data)
+        modifier[WEIGHT] += getCustomWeight(data)
+        modifier[VELOCITY] += getCustomVelocity(data)
+        modifier[SOUND_RADIUS] += getCustomSoundRadius(data)
+        modifier[BOLT_ACTION_TIME] += getCustomBoltActionTime(data)
     }
 
-    @Override
-    public boolean isBarVisible(@NotNull ItemStack stack) {
-        var data = GunData.from(stack);
-        if (data.compute().maxDurability > 0) return super.isBarVisible(stack);
+    override fun isBarVisible(stack: ItemStack): Boolean {
+        val data = from(stack)
+        if (data.get(GunProp.MAX_DURABILITY) > 0) return super.isBarVisible(stack)
 
-        var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
-        return cap != null && cap.getEnergyStored() > 0 && cap.getMaxEnergyStored() > 0;
+        val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
+        return cap != null && cap.energyStored > 0 && cap.maxEnergyStored > 0
     }
 
-    @Override
-    public int getBarWidth(@NotNull ItemStack stack) {
-        var data = GunData.from(stack);
-        if (data.compute().maxDurability > 0) {
-            return super.getBarWidth(stack);
+    override fun getBarWidth(stack: ItemStack): Int {
+        val data = from(stack)
+        if (data.get(GunProp.MAX_DURABILITY) > 0) {
+            return super.getBarWidth(stack)
         }
 
-        if (data.compute().maxEnergy > 0) {
-            var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
-            return Math.round((float) (cap != null ? cap.getEnergyStored() : 0) * 13F / GunData.compute(stack).maxEnergy);
+        if (data.get(GunProp.MAX_ENERGY) > 0) {
+            val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
+            return Math.round((cap?.energyStored ?: 0).toFloat() * 13f / GunData.get(stack, GunProp.MAX_ENERGY))
         }
 
-        return super.getBarWidth(stack);
+        return super.getBarWidth(stack)
     }
 
-    @Override
-    public int getBarColor(@NotNull ItemStack stack) {
-        var data = GunData.from(stack);
-        if (data.compute().maxDurability > 0) {
-            return super.getBarColor(stack);
+    override fun getBarColor(stack: ItemStack): Int {
+        val data = from(stack)
+        if (data.get(GunProp.MAX_DURABILITY) > 0) {
+            return super.getBarColor(stack)
         }
 
-        var resource = GunResource.from(stack);
-        if (data.compute().maxEnergy > 0) {
-            return this.getEnergyBarColor(resource);
+        val resource = GunResource.from(stack)
+        if (data.get(GunProp.MAX_ENERGY) > 0) {
+            return this.getEnergyBarColor(resource)
         }
 
-        return super.getBarColor(stack);
+        return super.getBarColor(stack)
     }
 
-    public int getEnergyBarColor(GunResource resource) {
-        return resource.compute().energyBarColor.get();
+    open fun getEnergyBarColor(resource: GunResource): Int {
+        return resource.compute().energyBarColor.get()
     }
 
-    public void init(GunData data) {
-        if (isInitialized(data)) return;
+    open fun init(data: GunData) {
+        if (isInitialized(data)) return
 
-        data.gunDataTag.putUUID("UUID", UUID.randomUUID());
+        data.gunDataTag.putUUID("UUID", UUID.randomUUID())
     }
 
-    public boolean isInitialized(GunData data) {
-        return data.gunDataTag.hasUUID("UUID");
-    }
+    open fun isInitialized(data: GunData) = data.gunDataTag.hasUUID("UUID")
 
-    @Override
-    @ParametersAreNonnullByDefault
-    public boolean canAttackBlock(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer) {
-        return false;
-    }
+    override fun canAttackBlock(pState: BlockState, pLevel: Level, pPos: BlockPos, pPlayer: Player) = false
 
-    @Override
-    @ParametersAreNonnullByDefault
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        if (!(stack.getItem() instanceof GunItem) || level.isClientSide) return;
+    override fun inventoryTick(stack: ItemStack, level: Level, entity: Entity, slot: Int, selected: Boolean) {
+        if (stack.item !is GunItem || level.isClientSide) return
 
-        if (level instanceof ServerLevel serverLevel) {
-            GeoItem.getOrAssignId(stack, serverLevel);
+        if (level is ServerLevel) {
+            GeoItem.getOrAssignId(stack, level)
         }
 
-        var data = GunData.from(stack);
+        val data = from(stack)
 
-        var inMainHand = entity instanceof LivingEntity living && living.getMainHandItem() == stack;
-        data.tick(entity, inMainHand);
+        val inMainHand = entity is LivingEntity && entity.mainHandItem == stack
+        data.tick(entity, inMainHand)
     }
 
-    private static final ResourceLocation SPEED_ID = Mod.loc("gun_movement_speed");
+    /*
+    override fun shouldCauseReequipAnimation(oldStack: ItemStack, newStack: ItemStack, slotChanged: Boolean) = false
 
-    @Override
-    @NotNull
-    public ItemAttributeModifiers getDefaultAttributeModifiers() {
-        var stack = new ItemStack(this);
-        var list = new ArrayList<>(super.getDefaultAttributeModifiers().modifiers());
-        var data = GunData.from(stack);
+    override fun getDefaultAttributeModifiers(stack: ItemStack): ItemAttributeModifiers {
+        val list = ArrayList<ItemAttributeModifiers.Entry?>(super.getDefaultAttributeModifiers(stack).modifiers())
+        val data = from(stack)
 
         // 移速
-        list.add(new ItemAttributeModifiers.Entry(
+        list.add(
+            ItemAttributeModifiers.Entry(
                 Attributes.MOVEMENT_SPEED,
-                new AttributeModifier(SPEED_ID,
-                        -0.01f - 0.005f * data.compute().weight,
-                        AttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                AttributeModifier(
+                    SPEED_ID,
+                    -0.01f - 0.005f * data.get(GunProp.WEIGHT),
+                    AttributeModifier.Operation.ADD_MULTIPLIED_BASE
                 ),
                 EquipmentSlotGroup.MAINHAND
-        ));
+            )
+        )
 
         // 近战伤害
-        if (data.compute().meleeDamage > 0) {
-            list.add(new ItemAttributeModifiers.Entry(
+        if (data.get(GunProp.MELEE_DAMAGE) > 0) {
+            list.add(
+                ItemAttributeModifiers.Entry(
                     Attributes.ATTACK_DAMAGE,
-                    new AttributeModifier(BASE_ATTACK_DAMAGE_ID, data.compute().meleeDamage, AttributeModifier.Operation.ADD_VALUE),
+                    AttributeModifier(
+                        BASE_ATTACK_DAMAGE_ID,
+                        data.get(GunProp.MELEE_DAMAGE),
+                        AttributeModifier.Operation.ADD_VALUE
+                    ),
                     EquipmentSlotGroup.MAINHAND
-            ));
+                )
+            )
         }
 
-        return new ItemAttributeModifiers(list, true);
+        return ItemAttributeModifiers(list, true)
+    }
+    */
+
+    override fun getTooltipImage(pStack: ItemStack): Optional<TooltipComponent> {
+        return Optional.of(GunImageComponent(pStack))
     }
 
-    @Override
-    public @NotNull Optional<TooltipComponent> getTooltipImage(@NotNull ItemStack pStack) {
-        return Optional.of(new GunImageComponent(pStack));
-    }
+    open fun getGunIcon(stack: ItemStack) = getGunIcon(from(stack))
 
-    public ResourceLocation getGunIcon(ItemStack stack) {
-        return getGunIcon(GunData.from(stack));
-    }
+    open fun getGunIcon(data: GunData) = data.get(GunProp.ICON)
 
-    public ResourceLocation getGunIcon(GunData data) {
-        var icon = data.compute().icon;
-        return icon == null ? DEFAULT_ICON : icon;
-    }
+    override fun isFoil(stack: ItemStack) = false
 
-    @Override
-    public boolean isFoil(@NotNull ItemStack stack) {
-        return false;
-    }
+    override fun isEnchantable(stack: ItemStack) = false
 
-    @Override
-    public boolean isEnchantable(@NotNull ItemStack stack) {
-        return false;
-    }
+    /*
+    override fun supportsEnchantment(stack: ItemStack, enchantment: Holder<Enchantment?>) = false
 
-    public int getMaxDamage(@NotNull ItemStack stack) {
-        var maxDurability = GunData.from(stack).compute().maxDurability;
+    override fun getMaxDamage(stack: ItemStack): Int {
+        val maxDurability = from(stack).get(GunProp.MAX_DURABILITY)
 
         if (maxDurability > 0) {
             if (!stack.has(DataComponents.MAX_DAMAGE) || !stack.has(DataComponents.DAMAGE)) {
-                stack.set(DataComponents.MAX_DAMAGE, maxDurability);
-                stack.set(DataComponents.DAMAGE, 0);
+                stack.set(DataComponents.MAX_DAMAGE, maxDurability)
+                stack.set(DataComponents.DAMAGE, 0)
             }
         } else {
-            stack.remove(DataComponents.MAX_DAMAGE);
+            stack.remove(DataComponents.MAX_DAMAGE)
         }
-        return maxDurability;
+        return maxDurability
     }
+    */
 
     /**
      * 开膛待击
      */
-    public boolean isOpenBolt(GunData data) {
-        return false;
-    }
+    open fun isOpenBolt(data: GunData) = false
 
     /**
      * 是否允许额外往枪管里塞入一发子弹
      */
-    public boolean hasBulletInBarrel(GunData data) {
-        return false;
-    }
+    open fun hasBulletInBarrel(data: GunData) = false
 
     /**
      * 武器是否能更换枪管配件
      */
-    public boolean hasCustomBarrel(GunData data) {
-        return false;
-    }
+    open fun hasCustomBarrel(data: GunData) = false
 
-    public int[] getValidBarrels() {
-        return new int[]{0, 1, 2};
-    }
+    open val validBarrels: IntArray
+        get() = intArrayOf(0, 1, 2)
 
     /**
      * 武器是否能更换枪托配件
      */
-    public boolean hasCustomGrip(GunData data) {
-        return false;
-    }
+    open fun hasCustomGrip(data: GunData) = false
 
-    public int[] getValidGrips() {
-        return new int[]{0, 1, 2, 3};
-    }
+    open val validGrips: IntArray
+        get() = intArrayOf(0, 1, 2, 3)
 
     /**
      * 武器是否能更换弹匣配件
      */
-    public boolean hasCustomMagazine(GunData data) {
-        return false;
-    }
+    open fun hasCustomMagazine(data: GunData) = false
 
-    public int[] getValidMagazines() {
-        return new int[]{0, 1, 2};
-    }
+    open val validMagazines: IntArray
+        get() = intArrayOf(0, 1, 2)
 
     /**
      * 武器是否能更换瞄具配件
      */
-    public boolean hasCustomScope(GunData data) {
-        return false;
-    }
+    open fun hasCustomScope(data: GunData) = false
 
-    public int[] getValidScopes() {
-        return new int[]{0, 1, 2, 3};
-    }
+    open val validScopes: IntArray
+        get() = intArrayOf(0, 1, 2, 3)
 
     /**
      * 武器是否能更换枪托配件
      */
-    public boolean hasCustomStock(GunData data) {
-        return false;
-    }
+    open fun hasCustomStock(data: GunData) = false
 
-    public int[] getValidStocks() {
-        return new int[]{0, 1, 2};
-    }
+    open val validStocks: IntArray
+        get() = intArrayOf(0, 1, 2)
 
     /**
      * 武器是否有脚架
      */
-    public boolean hasBipod(GunData data) {
-        return false;
-    }
+    open fun hasBipod(data: GunData) = false
 
     /**
      * 武器是否能进行近战攻击
      */
-    public boolean hasMeleeAttack(GunData data) {
-        return data.compute().meleeDamage > 0;
-    }
+    open fun hasMeleeAttack(data: GunData) = data.get(GunProp.MELEE_DAMAGE) > 0
 
     /**
      * 获取额外伤害加成
      */
-    public double getCustomDamage(GunData data) {
-        return 0;
-    }
+    open fun getCustomDamage(data: GunData) = 0.0
 
     /**
      * 获取额外爆头伤害加成
      */
-    public double getCustomHeadshot(GunData data) {
-        return 0;
-    }
+    open fun getCustomHeadshot(data: GunData) = 0.0
 
     /**
      * 获取额外护甲穿透加成
      */
-    public double getCustomBypassArmor(GunData data) {
-        return 0;
-    }
+    open fun getCustomBypassArmor(data: GunData) = 0.0
 
     /**
      * 获取额外弹匣容量加成
      */
-    public int getCustomMagazine(GunData data) {
-        return 0;
-    }
+    open fun getCustomMagazine(data: GunData) = 0
+
+    /**
+     * 获取额外拉栓时间加成
+     */
+    open fun getCustomBoltActionTime(data: GunData) = 0
 
     /**
      * 获取额外缩放倍率加成
      */
-    public double getCustomZoom(GunData data) {
-        return 0;
-    }
+    open fun getCustomZoom(data: GunData) = 0.0
 
     /**
      * 获取额外RPM加成
      */
-    public int getCustomRPM(GunData data) {
-        return 0;
-    }
+    open fun getCustomRPM(data: GunData) = 0
 
     /**
      * 获取额外总重量加成
      */
-    public double getCustomWeight(GunData data) {
-        var attachment = data.attachment;
+    open fun getCustomWeight(data: GunData): Double {
+        val attachment = data.attachment
 
-        double scopeWeight = switch (attachment.get(AttachmentType.SCOPE)) {
-            case 1 -> 0.5;
-            case 2 -> 1;
-            case 3 -> 1.5;
-            default -> 0;
-        };
+        val scopeWeight = when (attachment.get(AttachmentType.SCOPE)) {
+            1 -> 0.5
+            2 -> 1.0
+            3 -> 1.5
+            else -> 0.0
+        }
 
-        double barrelWeight = switch (attachment.get(AttachmentType.BARREL)) {
-            case 1 -> 0.5;
-            case 2 -> 1;
-            default -> 0;
-        };
+        val barrelWeight = when (attachment.get(AttachmentType.BARREL)) {
+            1 -> 0.5
+            2 -> 1.0
+            else -> 0.0
+        }
 
-        double magazineWeight = switch (attachment.get(AttachmentType.MAGAZINE)) {
-            case 1 -> 1;
-            case 2 -> 2;
-            default -> 0;
-        };
+        val magazineWeight = when (attachment.get(AttachmentType.MAGAZINE)) {
+            1 -> 1.0
+            2 -> 2.0
+            else -> 0.0
+        }
 
-        double stockWeight = switch (attachment.get(AttachmentType.STOCK)) {
-            case 1 -> -2;
-            case 2 -> 1.5;
-            default -> 0;
-        };
+        val stockWeight = when (attachment.get(AttachmentType.STOCK)) {
+            1 -> -2.0
+            2 -> 1.5
+            else -> 0.0
+        }
 
-        double gripWeight = switch (attachment.get(AttachmentType.GRIP)) {
-            case 1, 2 -> 0.25;
-            case 3 -> 1;
-            default -> 0;
-        };
+        val gripWeight = when (attachment.get(AttachmentType.GRIP)) {
+            1, 2 -> 0.25
+            3 -> 1.0
+            else -> 0.0
+        }
 
-        return scopeWeight + barrelWeight + magazineWeight + stockWeight + gripWeight;
+        return scopeWeight + barrelWeight + magazineWeight + stockWeight + gripWeight
     }
 
     /**
      * 获取额外弹速加成
      */
-    public double getCustomVelocity(GunData data) {
-        return 0;
-    }
+    open fun getCustomVelocity(data: GunData) = 0.0
 
     /**
      * 获取额外音效半径加成
      */
-    public double getCustomSoundRadius(GunData data) {
-        return data.attachment.get(AttachmentType.BARREL) == 2 ? 0.6 : 1;
-    }
+    open fun getCustomSoundRadius(data: GunData) = if (data.attachment.get(AttachmentType.BARREL) == 2) 0.6 else 1.0
 
     /**
      * 是否允许缩放
      */
-    public boolean canAdjustZoom(GunData data) {
-        return false;
-    }
+    open fun canAdjustZoom(data: GunData) = false
 
     /**
      * 是否允许切换瞄具
      */
-    public boolean canSwitchScope(GunData data) {
-        return false;
-    }
+    open fun canSwitchScope(data: GunData) = false
 
     /**
      * 添加达到指定换弹时间时的额外行为
      */
-    public void addReloadTimeBehavior(Map<Integer, Consumer<GunData>> behaviors) {
-    }
+    open fun addReloadTimeBehavior(behaviors: MutableMap<Int, Consumer<GunData>?>?) {}
 
     /**
      * 添加达到指定拉栓/泵动时间时的额外行为
      */
-    public void addBoltTimeBehavior(Map<Integer, Consumer<GunData>> behaviors) {
-    }
+    open fun addBoltTimeBehavior(behaviors: MutableMap<Int, Consumer<GunData>?>?) {}
 
     /**
      * 判断武器能否开火
      */
-    public boolean canShoot(GunData data, @Nullable Entity shooter) {
-        return data.compute().projectileAmount > 0
+    open fun canShoot(data: GunData, shooter: Entity?): Boolean {
+        return data.get(GunProp.PROJECTILE_AMOUNT) > 0
                 && !data.overHeat.get()
-                && data.compute().heatPerShoot <= (100 + data.compute().heatPerShoot - data.heat.get())
+                && data.get(GunProp.HEAT_PER_SHOOT) <= (100 + data.get(GunProp.HEAT_PER_SHOOT) - data.heat.get())
                 && !data.reloading()
                 && !data.charging()
                 && !data.bolt.needed.get()
-                && data.hasEnoughAmmoToShoot(shooter);
+                && data.hasEnoughAmmoToShoot(shooter)
     }
 
-    public boolean useSpecialFireProcedure(GunData data) {
-        return false;
-    }
-
-    public int hideBulletChainBelowShots() {
-        return -1;
-    }
-
-    public void whenNoAmmo(GunData data) {
-    }
+    open fun useSpecialFireProcedure(data: GunData) = false
+    open fun hideBulletChainBelowShots() = -1
+    open fun whenNoAmmo(data: GunData) {}
 
     /**
      * 服务端在开火前的额外行为
      */
-    public void beforeShoot(@NotNull ShootParameters parameters) {
-        var data = parameters.data;
-        var ammoSupplier = parameters.ammoSupplier;
+    open fun beforeShoot(parameters: ShootParameters) {
+        val data = parameters.data
+        val ammoSupplier = parameters.ammoSupplier
+
+        postEvent(ShootEvent.Pre(parameters))
 
         // 判断是否为栓动武器（BoltActionTime > 0），并在开火后给一个需要上膛的状态
-        if (data.compute().boltActionTime > 0 && data.hasEnoughAmmoToShoot(ammoSupplier)) {
-            data.bolt.needed.set(true);
+        if (data.get(GunProp.BOLT_ACTION_TIME) > 0 && data.hasEnoughAmmoToShoot(ammoSupplier)) {
+            data.bolt.needed.set(true)
         }
 
         if (data.currentAvailableShots(ammoSupplier) <= hideBulletChainBelowShots()) {
-            data.hideBulletChain.set(true);
+            data.hideBulletChain.set(true)
         }
     }
 
-    @Deprecated(forRemoval = true)
-    @SuppressWarnings("unused")
-    public void beforeShoot(
-            @Nullable Entity shooter,
-            @NotNull ServerLevel level,
-            @NotNull Vec3 shootPosition,
-            @NotNull Vec3 shootDirection,
-            @NotNull GunData data,
-            double spread,
-            boolean zoom
+    @Deprecated("")
+    @Suppress("unused")
+    fun beforeShoot(
+        shooter: Entity?,
+        level: ServerLevel,
+        shootPosition: Vec3,
+        shootDirection: Vec3,
+        data: GunData,
+        spread: Double,
+        zoom: Boolean
     ) {
     }
 
     /**
      * 服务端在开火后的额外行为
      */
-    public void afterShoot(@NotNull ShootParameters parameters) {
-        var data = parameters.data;
-        var shooter = parameters.shooter;
-        var ammoSupplier = parameters.ammoSupplier;
-        var level = parameters.level;
+    open fun afterShoot(parameters: ShootParameters) {
+        val data = parameters.data
+        val shooter = parameters.shooter
+        val ammoSupplier = parameters.ammoSupplier
+        val level = parameters.level
 
-        var computed = data.compute();
+        postEvent(ShootEvent.Post(parameters))
+
         if (!data.useBackpackAmmo()) {
-            data.ammo.set(data.ammo.get() - computed.ammoCostPerShoot);
-//            data.item.whenNoAmmo(data);
+            data.ammo.set(data.ammo.get() - data.get(GunProp.AMMO_COST_PER_SHOOT))
+            //            data.item.whenNoAmmo(data);
         } else {
-            data.consumeBackupAmmo(ammoSupplier, computed.ammoCostPerShoot);
+            data.consumeBackupAmmo(ammoSupplier, data.get(GunProp.AMMO_COST_PER_SHOOT))
         }
 
         if (!data.hasEnoughAmmoToShoot(ammoSupplier)) {
-            data.burstAmount.reset();
+            data.burstAmount.reset()
         }
 
-        var stack = data.stack();
-        if (computed.maxDurability > 0) {
-            if (shooter instanceof LivingEntity living) {
-                stack.hurtAndBreak(computed.durabilityPerShoot, living, EquipmentSlot.MAINHAND);
+        val stack = data.stack()
+        if (this.getMaxDamage(stack) > 0) {
+            if (shooter is LivingEntity) {
+                stack.hurtAndBreak(data.get(GunProp.DURABILITY_PER_SHOOT), shooter, EquipmentSlot.MAINHAND)
             } else {
-                stack.hurtAndBreak(computed.durabilityPerShoot, level, null, item -> {
-                });
+                stack.hurtAndBreak(
+                    data.get(GunProp.DURABILITY_PER_SHOOT),
+                    level,
+                    null as LivingEntity?
+                ) { }
             }
         }
 
-        data.closeStrike.set(true);
+        data.closeStrike.set(true)
 
         // 真实后坐（
-        if (shooter != null && computed.recoil != 0) {
-            shooter.setDeltaMovement(shooter.getDeltaMovement().add(shooter.getViewVector(1).scale(-computed.recoil)));
+        if (shooter != null && data.get(GunProp.RECOIL) != 0.0) {
+            shooter.deltaMovement =
+                shooter.deltaMovement.add(shooter.getViewVector(1f).scale(-data.get(GunProp.RECOIL)))
         }
 
-        int size = computed.shootPos.positions.size();
-        if (size > 0 && !computed.shootPos.boundUpWithAmmoAmount) {
-            data.fireIndex.set((data.fireIndex.get() + 1) % size);
+        val size = data.get(GunProp.SHOOT_POS).positions.size
+        if (size > 0 && !data.get(GunProp.SHOOT_POS).boundUpWithAmmoAmount) {
+            data.fireIndex.set((data.fireIndex.get() + 1) % size)
         } else {
-            data.fireIndex.reset();
+            data.fireIndex.reset()
         }
 
         // TODO 这样搞会在远程遥控火炮的时候，无论隔多远都会摇晃屏幕（恼
 //        data.shakePlayers(shooter);
-
-        data.clearTempModifications();
+        data.clearTempModifications()
     }
 
-    @Deprecated(forRemoval = true)
-    @SuppressWarnings("unused")
-    public void afterShoot(
-            @Nullable Entity shooter,
-            @NotNull ServerLevel level,
-            @NotNull Vec3 shootPosition,
-            @NotNull Vec3 shootDirection,
-            @NotNull GunData data,
-            double spread,
-            boolean zoom,
-            @Nullable UUID uuid
+    @Deprecated("")
+    @Suppress("unused")
+    fun afterShoot(
+        shooter: Entity?,
+        level: ServerLevel,
+        shootPosition: Vec3,
+        shootDirection: Vec3,
+        data: GunData,
+        spread: Double,
+        zoom: Boolean,
+        uuid: UUID?
     ) {
     }
 
-    public void shoot(@NotNull ServerLevel level, @NotNull Vec3 shootPosition, @NotNull Vec3 shootDirection, @NotNull GunData data, double spread, boolean zoom, @Nullable UUID uuid) {
-        shoot(new ShootParameters(null, null, level, shootPosition, shootDirection, data, spread, zoom, uuid, null));
+    fun shoot(
+        level: ServerLevel,
+        shootPosition: Vec3,
+        shootDirection: Vec3,
+        data: GunData,
+        spread: Double,
+        zoom: Boolean,
+        uuid: UUID?
+    ) {
+        shoot(ShootParameters(null, null, level, shootPosition, shootDirection, data, spread, zoom, uuid, null))
     }
 
-    public void shoot(@NotNull GunData data, @NotNull Entity shooter, double spread, boolean zoom, UUID uuid) {
-        if (shooter.level() instanceof ServerLevel server) {
-            shoot(new ShootParameters(shooter, shooter, server, new Vec3(shooter.getX(), shooter.getEyeY(), shooter.getZ()), shooter.getLookAngle(), data, spread, zoom, uuid, null));
-        }
+    fun shoot(data: GunData, shooter: Entity, spread: Double, zoom: Boolean, uuid: UUID?) {
+        val server = shooter.level() as? ServerLevel ?: return
+
+        shoot(
+            ShootParameters(
+                shooter,
+                shooter,
+                server,
+                Vec3(shooter.x, shooter.eyeY, shooter.z),
+                shooter.lookAngle,
+                data,
+                spread,
+                zoom,
+                uuid,
+                null
+            )
+        )
     }
 
-    public void shoot(@NotNull GunData data, @NotNull Entity shooter, double spread, boolean zoom, UUID uuid, Vec3 pos) {
-        if (shooter.level() instanceof ServerLevel server) {
-            shoot(new ShootParameters(shooter, shooter, server, new Vec3(shooter.getX(), shooter.getEyeY(), shooter.getZ()), shooter.getLookAngle(), data, spread, zoom, uuid, pos));
-        }
+    fun shoot(data: GunData, shooter: Entity, spread: Double, zoom: Boolean, uuid: UUID?, pos: Vec3?) {
+        val server = shooter.level() as? ServerLevel ?: return
+
+        shoot(
+            ShootParameters(
+                shooter,
+                shooter,
+                server,
+                Vec3(shooter.x, shooter.eyeY, shooter.z),
+                shooter.lookAngle,
+                data,
+                spread,
+                zoom,
+                uuid,
+                pos
+            )
+        )
     }
 
     /**
@@ -608,544 +584,667 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
      *
      * @param parameters 开火参数
      */
-    public void shoot(@NotNull ShootParameters parameters) {
-        var data = parameters.data;
-        var shooter = parameters.shooter;
-        var ammoSupplier = parameters.ammoSupplier;
-        var zoom = parameters.zoom;
+    open fun shoot(parameters: ShootParameters) {
+        val data = parameters.data
+        val shooter = parameters.shooter
+        val ammoSupplier = parameters.ammoSupplier
+        val zoom = parameters.zoom
 
-        if (!data.canShoot(ammoSupplier)) return;
+        if (!data.canShoot(ammoSupplier)) return
 
         // 开火前事件
-        data.item.beforeShoot(parameters);
+        data.item.beforeShoot(parameters)
 
-        int projectileAmount = data.compute().projectileAmount;
+        val projectileAmount = data.get(GunProp.PROJECTILE_AMOUNT)
 
         // 生成所有子弹
-        for (int index0 = 0; index0 < projectileAmount; index0++) {
-            if (!shootBullet(parameters)) return;
+        repeat(projectileAmount) {
+            if (!shootBullet(parameters)) return
         }
 
         // n连发模式开火数据设置
         if (data.selectedFireModeInfo().mode == FireMode.BURST) {
-            var amount = data.burstAmount.get();
-            data.burstAmount.set(amount == 0 ? data.compute().burstAmount - 1 : Math.max(0, amount - 1));
+            val amount = data.burstAmount.get()
+            data.burstAmount.set(if (amount == 0) data.get(GunProp.BURST_AMOUNT) - 1 else Math.max(0, amount - 1))
         }
 
         // 添加热量
-        data.heat.set(Math.max(data.heat.get() + data.compute().heatPerShoot, 0));
+        data.heat.set(Math.max(data.heat.get() + data.get(GunProp.HEAT_PER_SHOOT), 0.0))
 
         if (data.item.enableShootTimer()) {
             // 射击动画时长
-            data.shootAnimationTimer.set(data.compute().shootAnimationTime);
+            data.shootAnimationTimer.set(data.get(GunProp.SHOOT_ANIMATION_TIME))
             // 载具射击后的一个特殊记时器
-            data.shootTimer.set(Math.min(data.shootTimer.get() + 3, 5));
+            data.shootTimer.set(Math.min(data.shootTimer.get() + 3, 5))
         }
 
         // 过热
         if (data.heat.get() >= 100 && !data.overHeat.get()) {
-            data.overHeat.set(true);
-            if (shooter instanceof ServerPlayer serverPlayer) {
-                SoundTool.playLocalSound(serverPlayer, ModSounds.OVERHEAT, 2f, 1f);
+            data.overHeat.set(true)
+            if (shooter is ServerPlayer) {
+                SoundTool.playLocalSound(shooter, ModSounds.OVERHEAT, 2f, 1f)
             }
         }
 
-        playFireSounds(data, shooter, zoom);
+        playFireSounds(data, shooter, zoom)
 
         // 开火后事件
-        data.item.afterShoot(parameters);
+        data.item.afterShoot(parameters)
 
-        data.save();
+        data.save()
     }
 
-    @Deprecated(forRemoval = true)
-    @SuppressWarnings("unused")
-    public void shoot(
-            @Nullable Entity shooter,
-            @NotNull ServerLevel level,
-            @NotNull Vec3 shootPosition,
-            @NotNull Vec3 shootDirection,
-            @NotNull GunData data,
-            double spread,
-            boolean zoom,
-            @Nullable UUID uuid
+    @Deprecated("")
+    @Suppress("unused")
+    fun shoot(
+        shooter: Entity?,
+        level: ServerLevel,
+        shootPosition: Vec3,
+        shootDirection: Vec3,
+        data: GunData,
+        spread: Double,
+        zoom: Boolean,
+        uuid: UUID?
     ) {
     }
 
     /**
      * 播放开火音效
      */
-    public void playFireSounds(GunData data, @Nullable Entity shooter, boolean zoom) {
-        if (shooter == null) return;
+    open fun playFireSounds(data: GunData, shooter: Entity?, zoom: Boolean) {
+        if (shooter == null) return
 
-        float pitch = data.heat.get() <= 75 ? 1 : (float) (1 - 0.02 * Math.abs(75 - data.heat.get()));
+        val pitch = if (data.heat.get() <= 75) 1f else (1 - 0.02 * Math.abs(75 - data.heat.get())).toFloat()
 
-        var perk = data.perk.get(Perk.Type.AMMO);
-        if (perk == ModPerks.BEAST_BULLET) {
-            shooter.playSound(ModSounds.HENG, 4f, pitch);
+        val perk = data.perk.get(Perk.Type.AMMO)
+        if (perk === ModPerks.BEAST_BULLET) {
+            shooter.playSound(ModSounds.HENG, 4f, pitch)
         }
 
-        float soundRadius = (float) data.compute().soundRadius;
-        var soundInfo = data.compute().soundInfo;
-        boolean isSilent = data.attachment.get(AttachmentType.BARREL) == 2;
+        val soundRadius = data.get(GunProp.SOUND_RADIUS).toFloat()
+        val soundInfo = data.get(GunProp.SOUND_INFO)
+        val isSilent = data.attachment.get(AttachmentType.BARREL) == 2
 
-        SoundEvent sound3p = isSilent ? soundInfo.fire3PSilent : soundInfo.fire3P;
+        val sound3p = if (isSilent) soundInfo.fire3PSilent else soundInfo.fire3P
         if (sound3p != null) {
-            shooter.playSound(sound3p, soundRadius * 0.4f, pitch);
+            shooter.playSound(sound3p, soundRadius * 0.4f, pitch)
         }
 
-        SoundEvent soundFar = isSilent ? soundInfo.fire3PFarSilent : soundInfo.fire3PFar;
+        val soundFar = if (isSilent) soundInfo.fire3PFarSilent else soundInfo.fire3PFar
         if (soundFar != null) {
-            shooter.playSound(soundFar, soundRadius * 0.7f, pitch);
+            shooter.playSound(soundFar, soundRadius * 0.7f, pitch)
         }
 
-        SoundEvent soundVeryFar = isSilent ? soundInfo.fire3PVeryFarSilent : soundInfo.fire3PVeryFar;
+        val soundVeryFar = if (isSilent) soundInfo.fire3PVeryFarSilent else soundInfo.fire3PVeryFar
         if (soundVeryFar != null) {
-            shooter.playSound(soundVeryFar, soundRadius, pitch);
+            shooter.playSound(soundVeryFar, soundRadius, pitch)
         }
     }
 
     /**
      * 服务端处理按下开火按键时的额外行为
      */
-    public void onFireKeyPress(final GunData data, Player player, boolean zoom) {
+    fun onFireKeyPress(data: GunData, player: Player, zoom: Boolean) {
         if (data.reload.prepareTimer.get() == 0 && data.reloading() && data.hasEnoughAmmoToShoot(player)) {
-            data.forceStop.set(true);
+            data.forceStop.set(true)
         }
-        if (player instanceof ServerPlayer serverPlayer && data.stack.is(ModItems.QL_1031) && data.selectedFireModeInfo().name.equals("Hold")) {
-            var clientboundstopsoundpacket = new ClientboundStopSoundPacket(Mod.loc("ql_1031_discharge"), SoundSource.PLAYERS);
-            serverPlayer.connection.send(clientboundstopsoundpacket);
+        if (player is ServerPlayer && data.stack.`is`(ModItems.QL_1031) && data.selectedFireModeInfo().name == "Hold") {
+            player.connection.send(ClientboundStopSoundPacket(loc("ql_1031_discharge"), SoundSource.PLAYERS))
         }
     }
 
     /**
      * 服务端处理松开开火按键时的额外行为
      */
-    public void onFireKeyRelease(final GunData data, Player player, double power, boolean zoom) {
-        if (player instanceof ServerPlayer serverPlayer && data.compute().seekType == SeekType.HOLD_FIRE) {
-            ItemStack stack = data.stack;
-            String origin = stack.getItem().getDescriptionId();
-            String name = origin.substring(origin.lastIndexOf(".") + 1);
-            var clientboundstopsoundpacket = new ClientboundStopSoundPacket(Mod.loc(name + "_lock"), SoundSource.PLAYERS);
-            serverPlayer.connection.send(clientboundstopsoundpacket);
+    open fun onFireKeyRelease(data: GunData, player: Player, power: Double, zoom: Boolean) {
+        if (player is ServerPlayer && data.get(GunProp.SEEK_TYPE) == SeekType.HOLD_FIRE) {
+            val stack = data.stack
+            val origin = stack.item.descriptionId
+            val name = origin.substring(origin.lastIndexOf(".") + 1)
+            player.connection.send(ClientboundStopSoundPacket(loc(name + "_lock"), SoundSource.PLAYERS))
         }
-        if (player instanceof ServerPlayer serverPlayer && data.stack.is(ModItems.QL_1031) && data.selectedFireModeInfo().name.equals("Hold")) {
-            var clientboundstopsoundpacket = new ClientboundStopSoundPacket(Mod.loc("ql_1031_charge"), SoundSource.PLAYERS);
-            serverPlayer.connection.send(clientboundstopsoundpacket);
+        if (player is ServerPlayer && data.stack.`is`(ModItems.QL_1031) && data.selectedFireModeInfo().name == "Hold") {
+            player.connection.send(ClientboundStopSoundPacket(loc("ql_1031_charge"), SoundSource.PLAYERS))
         }
     }
 
     /**
      * 服务端发射单发子弹
      */
-    public boolean shootBullet(@NotNull ShootParameters parameters) {
-        var data = parameters.data;
-        var level = parameters.level;
-        var shootPosition = parameters.shootPosition;
-        var shootDirection = parameters.shootDirection;
-        var shooter = parameters.shooter;
-        var zoom = parameters.zoom;
-        var spread = parameters.spread;
-        var uuid = parameters.targetEntityUUID;
-        Vec3 targetPos = parameters.targetPos;
+    open fun shootBullet(parameters: ShootParameters): Boolean {
+        val data = parameters.data
+        val level = parameters.level
+        val shootPosition = parameters.shootPosition
+        val shootDirection = parameters.shootDirection
+        val shooter = parameters.shooter
+        val zoom = parameters.zoom
+        val spread = parameters.spread
+        val uuid = parameters.targetEntityUUID
+        val targetPos = parameters.targetPos
 
-        var stack = data.stack;
+        val stack = data.stack
 
-        var computed = data.compute();
-        var projectileInfo = computed.projectile();
-        var projectileType = projectileInfo.type;
-        var projectileTypeStr = projectileType.trim().toLowerCase(Locale.ROOT);
+        val projectileInfo = data.get(GunProp.PROJECTILE)
+        val projectileType = projectileInfo.itemId
+        val projectileTypeStr = projectileType.trim { it <= ' ' }.lowercase()
 
-        if (projectileTypeStr.equals("empty")) {
-            return true;
-        } else if (projectileTypeStr.equals("ray")) {
-            return this.shootRay(parameters);
+        if (projectileTypeStr == "empty") {
+            return true
+        } else if (projectileTypeStr == "ray") {
+            return this.shootRay(parameters)
         }
 
-        var headshot = computed.headshot;
-        var damage = computed.damage;
-        float velocity = (float) computed.velocity;
-        var bypassArmorRate = computed.bypassesArmor;
+        val headshot = data.get(GunProp.HEADSHOT)
+        val damage = data.get(GunProp.DAMAGE)
+        var velocity = data.get(GunProp.VELOCITY).toFloat()
+        val bypassArmorRate = data.get(GunProp.BYPASSES_ARMOR)
 
-        if (VectorTool.isInLiquid(level, shootPosition)) {
-            velocity = 2 + 0.05f * velocity;
+        if (isInLiquid(level, shootPosition)) {
+            velocity = 2 + 0.05f * velocity
         }
 
-        float finalVelocity = velocity;
+        val finalVelocity = velocity
 
-        AtomicReference<Entity> entityHolder = new AtomicReference<>();
+        val entityHolder = AtomicReference<Entity?>()
 
-        EntityType.byString(projectileType).ifPresent(entityType -> {
-            var entity = entityType.create(level);
+        EntityType.byString(projectileType).ifPresent { entityType ->
+            val entity = entityType.create(level)
             if (entity == null) {
-                Mod.LOGGER.warn("Failed to create projectile entity {}", projectileType);
-                return;
+                Mod.LOGGER.warn("Failed to create projectile entity {}", projectileType)
+                return@ifPresent
             }
 
-            if (entity instanceof Projectile projectileEntity) {
-                projectileEntity.setOwner(shooter);
+            if (entity is Projectile) {
+                entity.owner = shooter
             }
 
             // SBW子弹弹射物专属属性
-            if (entity instanceof ProjectileEntity projectile) {
-                projectile.shooter(shooter)
-                        .damage((float) damage)
-                        .headShot((float) headshot)
-                        .zoom(zoom)
-                        .bypassArmorRate((float) bypassArmorRate)
-                        .setGunItemId(stack)
-                        .velocity(finalVelocity);
+            if (entity is ProjectileEntity) {
+                entity.shooter(shooter)
+                    .damage(damage.toFloat())
+                    .headShot(headshot.toFloat())
+                    .zoom(zoom)
+                    .bypassArmorRate(bypassArmorRate.toFloat())
+                    .setGunItemId(stack)
+                    .velocity(finalVelocity)
             }
 
             // SBW弹射物专属属性
-            if (entity instanceof CustomDamageProjectile customDamageProjectile) {
-                customDamageProjectile.setDamage((float) damage);
+            if (entity is CustomDamageProjectile) {
+                entity.setDamage(damage.toFloat())
             }
 
-            if (entity instanceof CustomGravityEntity customGravityEntity) {
-                customGravityEntity.setGravity((float) computed.gravity);
+            if (entity is CustomGravityEntity) {
+                entity.setGravity(data.get(GunProp.GRAVITY).toFloat())
             }
 
-            if (entity instanceof ExplosiveProjectile explosive) {
-                explosive.setExplosionDamage((float) computed.explosionDamage);
-                explosive.setExplosionRadius((float) computed.explosionRadius);
+            if (entity is ExplosiveProjectile) {
+                entity.setExplosionDamage(data.get(GunProp.EXPLOSION_DAMAGE).toFloat())
+                entity.setExplosionRadius(data.get(GunProp.EXPLOSION_RADIUS).toFloat())
+                entity.setLife(data.get(GunProp.PROJECTILE_LIFE))
             }
 
-            if (entity instanceof WireGuideMissileEntity wireGuideMissileEntity && shooter != null && shooter.getVehicle() != null) {
-                wireGuideMissileEntity.setLauncherVehicle(shooter.getVehicle().getUUID());
+            if (entity is WireGuideMissileEntity && shooter != null && shooter.vehicle != null) {
+                entity.setLauncherVehicle(shooter.vehicle!!.getUUID())
             }
 
-            if (entity instanceof SmallCannonShellEntity smallCannonShell && computed.isAntiAirProjectile) {
-                smallCannonShell.antiAir(true);
+            if (entity is SmallCannonShellEntity && data.get(GunProp.SHELL_TYPE) == "AA") {
+                entity.antiAir(true)
             }
 
-            if (entity instanceof CannonShellEntity cannonShell) {
-                if (computed.isArmorPiercingProjectile) {
-                    cannonShell.setType(CannonShellEntity.Type.AP);
-                    cannonShell.durability(100);
-                } else if (computed.isHighExplosiveProjectile) {
-                    cannonShell.setType(CannonShellEntity.Type.HE);
-                } else if (computed.isClusterMunitionsProjectile) {
-                    cannonShell.setType(CannonShellEntity.Type.CM);
-                    cannonShell.setSpreadAmount(computed.spreadAmount);
-                    cannonShell.setSpreadAngle(computed.spreadAngle);
-                } else if (computed.isGrapeShotProjectile) {
-                    cannonShell.setType(CannonShellEntity.Type.GRAPE);
-                    cannonShell.setSpreadAmount(computed.spreadAmount);
-                    cannonShell.setSpreadAngle(computed.spreadAngle);
+            if (entity is CannonShellEntity) {
+                val type = data.get(GunProp.SHELL_TYPE)
+                when (type) {
+                    "AP" -> {
+                        entity.setType(CannonShellEntity.Type.AP)
+                        entity.durability(data.get(GunProp.AP_DURABILITY))
+                    }
+
+                    "HE" -> {
+                        entity.setType(CannonShellEntity.Type.HE)
+                    }
+
+                    "CM" -> {
+                        entity.setType(CannonShellEntity.Type.CM)
+                        entity.setSpreadAmount(data.get(GunProp.SPREAD_AMOUNT))
+                        entity.setSpreadAngle(data.get(GunProp.SPREAD_ANGLE))
+                    }
+
+                    "WP" -> {
+                        entity.setType(CannonShellEntity.Type.WP)
+                        entity.setSpreadAmount(data.get(GunProp.SPREAD_AMOUNT))
+                        entity.setSpreadAngle(data.get(GunProp.SPREAD_ANGLE))
+                    }
                 }
             }
 
-            if (entity instanceof MissileProjectile missileProjectile && shooter != null) {
-                Entity target = EntityFindUtil.findEntity(shooter.level(), String.valueOf(uuid));
+            if (entity is MediumRocketEntity) {
+                val type = data.get(GunProp.SHELL_TYPE)
+                when (type) {
+                    "AP" -> {
+                        entity.setType(MediumRocketEntity.Type.AP)
+                        entity.durability(data.get(GunProp.AP_DURABILITY))
+                    }
+
+                    "HE" -> {
+                        entity.setType(MediumRocketEntity.Type.HE)
+                    }
+
+                    "CM" -> {
+                        entity.setType(MediumRocketEntity.Type.CM)
+                        entity.setSpreadAmount(data.get(GunProp.SPREAD_AMOUNT))
+                        entity.setSpreadAngle(data.get(GunProp.SPREAD_ANGLE))
+                    }
+                }
+            }
+
+            if (entity is MissileProjectile && shooter != null) {
+                val target = EntityFindUtil.findEntity(shooter.level(), uuid.toString())
                 if (target != null) {
-                    missileProjectile.setGuideType(0);
-                    missileProjectile.setTargetUuid(String.valueOf(uuid));
+                    entity.setGuideType(0)
+                    entity.setTargetUuid(uuid.toString())
                 } else if (targetPos != null) {
-                    missileProjectile.setGuideType(1);
-                    missileProjectile.setTargetVec(targetPos);
+                    entity.setGuideType(1)
+                    entity.setTargetVec(targetPos)
                 }
             }
 
-            if (entity instanceof SwarmDroneEntity swarmDrone && shooter != null && shooter.getVehicle() instanceof VehicleEntity vehicle) {
-                swarmDrone.setRotate(vehicle.getTurretVector(1));
+            val vehicle = shooter?.vehicle as? VehicleEntity
+            if (entity is SwarmDroneEntity && vehicle != null) {
+                entity.setRotate(vehicle.getTurretVector(1f))
             }
 
             // 填充其他自定义NBT数据
             if (projectileInfo.data != null) {
-                var tag = LaunchableEntityTool.getModifiedTag(projectileInfo,
-                        new ShootData(shooter != null ? shooter.getUUID() : null, damage, computed.explosionDamage, computed.explosionRadius, computed.spread)
-                );
+                val tag = LaunchableEntityTool.getModifiedTag(
+                    projectileInfo,
+                    ShootData(
+                        shooter?.getUUID(),
+                        damage,
+                        data.get(GunProp.EXPLOSION_DAMAGE),
+                        data.get(GunProp.EXPLOSION_RADIUS),
+                        data.get(GunProp.SPREAD)
+                    )
+                )
                 if (tag != null) {
-                    entity.load(tag);
+                    entity.load(tag)
                 }
             } else if (CustomData.LAUNCHABLE_ENTITY.containsKey(projectileType)) {
-                var newInfo = new ProjectileInfo();
-                newInfo.data = CustomData.LAUNCHABLE_ENTITY.get(projectileType).data;
-                newInfo.type = projectileType;
+                val newInfo = ProjectileInfo()
+                newInfo.data = CustomData.LAUNCHABLE_ENTITY[projectileType]!!.data
+                newInfo.itemId = projectileType
 
-                var tag = LaunchableEntityTool.getModifiedTag(
-                        newInfo,
-                        new ShootData(shooter != null ? shooter.getUUID() : null, damage, computed.explosionDamage, computed.explosionRadius, computed.spread)
-                );
+                val tag = LaunchableEntityTool.getModifiedTag(
+                    newInfo,
+                    ShootData(
+                        shooter?.uuid,
+                        damage,
+                        data.get(GunProp.EXPLOSION_DAMAGE),
+                        data.get(GunProp.EXPLOSION_RADIUS),
+                        data.get(GunProp.SPREAD)
+                    )
+                )
                 if (tag != null) {
-                    entity.load(tag);
+                    entity.load(tag)
                 }
             }
-
-            entityHolder.set(entity);
-        });
-
-        var entity = entityHolder.get();
-        if (entity == null) {
-            Mod.LOGGER.warn("Failed to create projectile entity {}", projectileType);
-            return false;
+            entityHolder.set(entity)
         }
 
-        for (Perk.Type type : Perk.Type.values()) {
-            var instance = data.perk.getInstance(type);
-            if (instance != null) {
-                instance.perk().modifyProjectile(data, instance, entity);
+        val entity = entityHolder.get()
+        if (entity == null) {
+            Mod.LOGGER.warn("Failed to create projectile entity {}", projectileType)
+            return false
+        }
+
+        for (type in Perk.Type.entries.toTypedArray()) {
+            val instance = data.perk.getInstances(type)
+            instance.forEach {
+                it.perk.modifyProjectile(data, it, entity)
             }
         }
 
-        if (shooter != null && shooter.getVehicle() instanceof VehicleEntity vehicle && computed.addShooterDeltaMovement) {
-            velocity = (float) (vehicle.getDeltaMovement().length() * computed.velocity);
+        val vehicle = shooter?.rootVehicle
+        if (vehicle != null && data.get(GunProp.ADD_SHOOTER_DELTA_MOVEMENT)) {
+            velocity = (vehicle.deltaMovement.length() * data.get(GunProp.VELOCITY)).toFloat()
         }
 
         // 发射任意实体
-        entity.setPos(shootPosition.x - 0.1 * shootDirection.x, shootPosition.y - 0.1 - 0.1 * shootDirection.y, shootPosition.z + -0.1 * shootDirection.z);
+        entity.setPos(
+            shootPosition.x,
+            shootPosition.y,
+            shootPosition.z
+        )
 
-        var x = shootDirection.x;
-        var y = shootDirection.y + 0.001f;
-        var z = shootDirection.z;
+        val x = shootDirection.x
+        val y = shootDirection.y
+        val z = shootDirection.z
 
-        if (uuid != null && zoom && (shooter != null && !shooter.isShiftKeyDown())) {
-            Entity target = findEntity(level, String.valueOf(uuid));
-            var gunData = GunData.from(stack);
-            int intelligentChipLevel = gunData.perk.getLevel(ModPerks.INTELLIGENT_CHIP);
-            if (intelligentChipLevel > 0 && target != null) {
-                Vec3 targetVec = target.getEyePosition();
-                Vec3 playerVec = shooter.getEyePosition();
-                var hasGravity = gunData.perk.getLevel(ModPerks.MICRO_MISSILE) <= 0;
-                Vec3 toVec = RangeTool.calculateFiringSolution(playerVec, targetVec, Vec3.ZERO, computed.velocity, hasGravity ? 0.03 : 0);
-                x = toVec.x;
-                y = toVec.y;
-                z = toVec.z;
-            }
-        }
-
-        if (entity instanceof Projectile projectile) {
-            projectile.shoot(x, y, z, velocity, (float) spread);
+        if (entity is Projectile) {
+            entity.shoot(x, y, z, velocity, spread.toFloat())
         } else {
-            Vec3 vec3 = new Vec3(x, y, z)
-                    .normalize()
-                    .add(
-                            entity.getRandom().triangle(0, 0.0172275 * spread),
-                            entity.getRandom().triangle(0, 0.0172275 * spread),
-                            entity.getRandom().triangle(0, 0.0172275 * spread)
-                    )
-                    .scale(velocity);
+            val random = RandomSource.create()
+            val vec3 = Vec3(x, y, z)
+                .normalize()
+                .add(
+                    random.triangle(0.0, 0.0172275 * spread),
+                    random.triangle(0.0, 0.0172275 * spread),
+                    random.triangle(0.0, 0.0172275 * spread)
+                )
+                .scale(velocity.toDouble())
 
-            entity.setDeltaMovement(vec3);
-            entity.hasImpulse = true;
-            double d0 = vec3.horizontalDistance();
-            entity.setYRot((float) (Mth.atan2(vec3.x, vec3.z) * 180F / (float) Math.PI));
-            entity.setXRot((float) (Mth.atan2(vec3.y, d0) * 180F / (float) Math.PI));
-            entity.yRotO = entity.getYRot();
-            entity.xRotO = entity.getXRot();
+            entity.deltaMovement = vec3
+            entity.hasImpulse = true
+            val d0 = vec3.horizontalDistance()
+            entity.yRot = (Mth.atan2(vec3.x, vec3.z) * 180f / Math.PI.toFloat()).toFloat()
+            entity.xRot = (Mth.atan2(vec3.y, d0) * 180f / Math.PI.toFloat()).toFloat()
+            entity.yRotO = entity.yRot
+            entity.xRotO = entity.xRot
         }
 
-        level.addFreshEntity(entity);
-        return true;
+        level.addFreshEntity(entity)
+        return true
     }
 
-    @Deprecated(forRemoval = true)
-    @SuppressWarnings("unused")
-    public boolean shootBullet(
-            @Nullable Entity shooter,
-            @NotNull ServerLevel level,
-            @NotNull Vec3 shootPosition,
-            @NotNull Vec3 shootDirection,
-            @NotNull GunData data,
-            double spread,
-            boolean zoom,
-            @Nullable UUID uuid
-    ) {
-        return false;
+    @Deprecated("")
+    @Suppress("unused")
+    fun shootBullet(
+        shooter: Entity?,
+        level: ServerLevel,
+        shootPosition: Vec3,
+        shootDirection: Vec3,
+        data: GunData,
+        spread: Double,
+        zoom: Boolean,
+        uuid: UUID?
+    ): Boolean {
+        return false
     }
 
-    public boolean shootRay(@NotNull ShootParameters parameters) {
-        var shooter = parameters.shooter;
-        var level = parameters.level;
-        var data = parameters.data;
-        var shootPosition = parameters.shootPosition;
-        var shootDirection = parameters.shootDirection;
+    open fun shootRay(parameters: ShootParameters): Boolean {
+        val shooter = parameters.shooter
+        val level = parameters.level
+        val data = parameters.data
+        val shootPosition = parameters.shootPosition
+        val shootDirection = parameters.shootDirection
 
         if (shooter == null) {
-            return false;
+            return false
         }
 
-        int range = data.compute().range;
+        val range = data.get(GunProp.RANGE)
 
-        Entity target = null;
+        var target: Entity? = null
 
-        double distance = range * range;
+        val distance = (range * range).toDouble()
 
-        BlockHitResult blockHitResult = shooter.level().clip(new ClipContext(shootPosition, shootPosition.add(shootDirection.scale(range)),
-                ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, shooter));
+        val blockHitResult = shooter.level().clip(
+            ClipContext(
+                shootPosition, shootPosition.add(shootDirection.scale(range.toDouble())),
+                ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, shooter
+            )
+        )
 
-        BlockPos blockPos = blockHitResult.getBlockPos();
-        BlockState state = level.getBlockState(blockPos);
+        val blockPos = blockHitResult.blockPos
+        val state = level.getBlockState(blockPos)
 
-        Vec3 pos = null;
+        var pos: Vec3? = null
 
         if (state.canOcclude()) {
-            pos = blockHitResult.getLocation();
+            pos = blockHitResult.getLocation()
         }
 
-        Vec3 toVec = shootPosition.add(shootDirection.x * range, shootDirection.y * range, shootDirection.z * range);
-        AABB aabb = shooter.getBoundingBox().expandTowards(shootDirection.scale(range)).inflate(1);
-        EntityHitResult entityHitResult = ProjectileUtil.getEntityHitResult(shooter, shootPosition, toVec, aabb, p -> !p.isSpectator() && p.isAlive(), distance);
+        val toVec = shootPosition.add(shootDirection.x * range, shootDirection.y * range, shootDirection.z * range)
+        val aabb = shooter.boundingBox.expandTowards(shootDirection.scale(range.toDouble())).inflate(1.0)
+        val entityHitResult = ProjectileUtil.getEntityHitResult(
+            shooter,
+            shootPosition,
+            toVec,
+            aabb,
+            { p -> !p.isSpectator && p.isAlive },
+            distance
+        )
 
-        Vec3 hitPos = null;
+        var hitPos: Vec3? = null
 
         if (entityHitResult != null) {
-            hitPos = entityHitResult.getLocation();
-            target = entityHitResult.getEntity();
+            hitPos = entityHitResult.getLocation()
+            target = entityHitResult.entity
         }
 
         if (pos != null && hitPos != null) {
             if (shootPosition.distanceToSqr(pos) < shootPosition.distanceToSqr(hitPos)) {
-                this.onRayHitBlock(shooter, level, target, data, shootDirection, blockHitResult, pos);
+                this.onRayHitBlock(shooter, level, target, data, shootDirection, blockHitResult, pos)
             } else {
-                this.rayHitEntity(shooter, target, level, data, hitPos, shootPosition, shootDirection);
+                this.rayHitEntity(shooter, target, level, data, hitPos, shootPosition, shootDirection)
             }
-            return true;
-        } else if (shooter.getVehicle() instanceof VehicleEntity vehicle) {
-            vehicle.getEntityData().set(LASER_LENGTH, (float) range);
-            vehicle.getEntityData().set(LASER_SCALE, (float) data.compute().shootAnimationTime);
+            return true
+        } else {
+            val vehicle = shooter.vehicle as? VehicleEntity
+            if (vehicle != null) {
+                vehicle.laserLength = range.toFloat()
+                vehicle.laserScale = data.get(GunProp.SHOOT_ANIMATION_TIME).toFloat()
+            }
         }
 
         if (hitPos != null) {
-            this.rayHitEntity(shooter, target, level, data, hitPos, shootPosition, shootDirection);
-            return true;
+            this.rayHitEntity(shooter, target, level, data, hitPos, shootPosition, shootDirection)
+            return true
         }
 
         if (pos != null) {
-            this.onRayHitBlock(shooter, level, target, data, shootDirection, blockHitResult, pos);
-            return true;
+            this.onRayHitBlock(shooter, level, target, data, shootDirection, blockHitResult, pos)
+            return true
         }
 
-
-        return true;
+        return true
     }
 
-    protected void rayHitEntity(Entity shooter, Entity target, ServerLevel level, @NotNull GunData data, Vec3 hitPos, Vec3 shootPosition, Vec3 shootDirection) {
-        if (target != null && target.isAlive()) {
-            var hitBoxPos = hitPos.subtract(target.position());
-            var res = getEntityResult(target, hitBoxPos, hitPos);
-            this.onRayHitEntity(shooter, level, data, res, shootPosition, shootDirection);
+    protected fun rayHitEntity(
+        shooter: Entity?,
+        target: Entity?,
+        level: ServerLevel,
+        data: GunData,
+        hitPos: Vec3,
+        shootPosition: Vec3?,
+        shootDirection: Vec3?
+    ) {
+        if (target != null && target.isAlive) {
+            val hitBoxPos = hitPos.subtract(target.position())
+            val res: EntityResult = getEntityResult(target, hitBoxPos, hitPos)
+            this.onRayHitEntity(shooter, level, data, res, shootPosition, shootDirection)
         }
     }
 
-    protected static EntityResult getEntityResult(Entity target, Vec3 hitBoxPos, Vec3 hitPos) {
-        boolean headshot = false;
-        boolean legShot = false;
-        float eyeHeight = target.getEyeHeight();
-        float bodyHeight = target.getBbHeight();
-
-        if (target instanceof LivingEntity) {
-            if (eyeHeight - 0.25 < hitBoxPos.y && hitBoxPos.y < eyeHeight + 0.3) {
-                headshot = true;
-            }
-            if (hitBoxPos.y < 0.33 * bodyHeight) {
-                legShot = true;
-            }
-        }
-
-        return new EntityResult(target, hitPos, headshot, legShot);
-    }
-
-    public void onRayHitBlock(Entity shooter, ServerLevel level, @Nullable Entity target, @NotNull GunData data, Vec3 shootDirection, BlockHitResult result, @NotNull Vec3 pos) {
-        BlockPos blockPos = result.getBlockPos();
+    open fun onRayHitBlock(
+        shooter: Entity?,
+        level: ServerLevel,
+        target: Entity?,
+        data: GunData,
+        shootDirection: Vec3?,
+        result: BlockHitResult,
+        pos: Vec3
+    ) {
+        val blockPos = result.blockPos
         if (target == null) {
-            BulletDecalOption bulletDecalOption = new BulletDecalOption(result.getDirection(), blockPos);
-            sendParticle(level, bulletDecalOption, pos.x, pos.y, pos.z, 1, 0, 0, 0, 0, true);
+            val bulletDecalOption = BulletDecalOption(result.direction, blockPos)
+            ParticleTool.sendParticle(
+                level,
+                bulletDecalOption,
+                pos.x,
+                pos.y,
+                pos.z,
+                1,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                true
+            )
         }
-        level.playSound(null, pos.x, pos.y, pos.z, this.getRayHitBlockSound(data), SoundSource.BLOCKS, 0.7F, (float) ((2 * Math.random() - 1) * 0.05f + 1.0f));
+        level.playSound(
+            null,
+            pos.x,
+            pos.y,
+            pos.z,
+            this.getRayHitBlockSound(data),
+            SoundSource.BLOCKS,
+            0.7f,
+            ((2 * Math.random() - 1) * 0.05f + 1.0f).toFloat()
+        )
     }
 
-    public SoundEvent getRayHitBlockSound(GunData data) {
-        return SoundEvents.EMPTY;
-    }
+    open fun getRayHitBlockSound(data: GunData): SoundEvent = SoundEvents.EMPTY
 
-    public SoundEvent getRayHitEntitySound(GunData data) {
-        return SoundEvents.EMPTY;
-    }
+    open fun getRayHitEntitySound(data: GunData): SoundEvent = SoundEvents.EMPTY
 
-    public void onRayHitEntity(Entity shooter, ServerLevel level, @NotNull GunData data, EntityResult result, Vec3 shootPosition, Vec3 shootDirection) {
-        var target = result.entity;
+    open fun onRayHitEntity(
+        shooter: Entity?,
+        level: ServerLevel,
+        data: GunData,
+        result: EntityResult,
+        shootPosition: Vec3?,
+        shootDirection: Vec3?
+    ) {
+        val target = result.entity
 
-        float damage = (float) data.compute().damage;
-        float headshot = (float) data.compute().headshot;
+        val damage = data.get(GunProp.DAMAGE).toFloat()
+        val headshot = data.get(GunProp.HEADSHOT).toFloat()
 
-        int type = 0;
+        var type = 0
 
-        if (target instanceof LivingEntity living) {
-            ICustomKnockback iCustomKnockback = ICustomKnockback.getInstance(living);
-            iCustomKnockback.superbWarfare$setKnockbackStrength(0);
+        if (target is LivingEntity) {
+            val iCustomKnockback = ICustomKnockback.getInstance(target)
+            iCustomKnockback.`superbWarfare$setKnockbackStrength`(0.0)
 
-            if (result.isHeadshot()) {
-                DamageHandler.doDamage(living, ModDamageTypes.causeLaserHeadshotDamage(level.registryAccess(), null, shooter), damage * headshot);
-                type = 1;
-            } else if (result.isLegShot()) {
-                DamageHandler.doDamage(living, ModDamageTypes.causeLaserDamage(level.registryAccess(), null, shooter), damage * 0.5f);
+            if (result.headshot) {
+                target.forceHurt(
+                    ModDamageTypes.causeLaserHeadshotDamage(level.registryAccess(), null, shooter),
+                    damage * headshot
+                )
+                type = 1
+            } else if (result.legShot) {
+                target.forceHurt(
+                    ModDamageTypes.causeLaserDamage(level.registryAccess(), null, shooter),
+                    damage * 0.5f
+                )
             } else {
-                DamageHandler.doDamage(living, ModDamageTypes.causeLaserDamage(level.registryAccess(), null, shooter), damage);
+                target.forceHurt(
+                    ModDamageTypes.causeLaserDamage(level.registryAccess(), null, shooter),
+                    damage
+                )
             }
 
-            target.invulnerableTime = 0;
+            target.invulnerableTime = 0
 
-            iCustomKnockback.superbWarfare$resetKnockbackStrength();
+            iCustomKnockback.`superbWarfare$resetKnockbackStrength`()
         } else {
-            if (result.isHeadshot()) {
-                DamageHandler.doDamage(target, ModDamageTypes.causeLaserHeadshotDamage(level.registryAccess(), null, shooter), damage * headshot);
-                type = 1;
-            } else if (result.isLegShot()) {
-                DamageHandler.doDamage(target, ModDamageTypes.causeLaserDamage(level.registryAccess(), null, shooter), damage * 0.5f);
+            if (result.headshot) {
+                target.forceHurt(
+                    ModDamageTypes.causeLaserHeadshotDamage(level.registryAccess(), null, shooter),
+                    damage * headshot
+                )
+                type = 1
+            } else if (result.legShot) {
+                target.forceHurt(
+                    ModDamageTypes.causeLaserDamage(level.registryAccess(), null, shooter),
+                    damage * 0.5f
+                )
             } else {
-                DamageHandler.doDamage(target, ModDamageTypes.causeLaserDamage(level.registryAccess(), null, shooter), damage);
+                target.forceHurt(
+                    ModDamageTypes.causeLaserDamage(level.registryAccess(), null, shooter),
+                    damage
+                )
             }
 
-            if (target instanceof VehicleEntity) {
-                type = 3;
+            if (target is VehicleEntity) {
+                type = 3
             }
         }
 
-        if (shooter instanceof ServerPlayer player) {
-            player.level().playSound(null, player.blockPosition(), result.isHeadshot() ? ModSounds.HEADSHOT : ModSounds.INDICATION, SoundSource.VOICE, 0.1f, 1);
-            ServerPlayNetworking.send(player, new ClientIndicatorMessage(type, 5));
+        if (shooter is ServerPlayer) {
+            shooter.level().playSound(
+                null,
+                shooter.blockPosition(),
+                if (result.headshot) ModSounds.HEADSHOT else ModSounds.INDICATION,
+                SoundSource.VOICE,
+                0.1f,
+                1f
+            )
+            ServerPlayNetworking.send(shooter, ClientIndicatorMessage(type, 5))
         }
 
-        level.playSound(null, result.getHitPos().x, result.getHitPos().y, result.getHitPos().z, this.getRayHitEntitySound(data), SoundSource.PLAYERS, 0.7F, (float) ((2 * Math.random() - 1) * 0.05f + 1.0f));
+        level.playSound(
+            null,
+            result.hitVec.x,
+            result.hitVec.y,
+            result.hitVec.z,
+            this.getRayHitEntitySound(data),
+            SoundSource.PLAYERS,
+            0.7f,
+            ((2 * Math.random() - 1) * 0.05f + 1.0f).toFloat()
+        )
     }
 
-    protected Vec3 randomVec(Vec3 vec3, double spread) {
-        return vec3.normalize().add(random.triangle(0, 0.0172275 * spread), this.random.triangle(0, 0.0172275 * spread), this.random.triangle(0, 0.0172275 * spread));
+    protected fun randomVec(vec3: Vec3, spread: Double): Vec3 {
+        return vec3.normalize().add(
+            random.triangle(0.0, 0.0172275 * spread),
+            this.random.triangle(0.0, 0.0172275 * spread),
+            this.random.triangle(0.0, 0.0172275 * spread)
+        )
     }
 
-    public boolean canEditAttachments(GunData data) {
-        return data.compute().getAmmoConsumers().size() > 1;
-    }
+    open fun canEditAttachments(data: GunData) = data.get(GunProp.AMMO_CONSUMER).size > 1
 
-    public boolean enableShootTimer() {
-        return false;
-    }
+    open fun enableShootTimer() = false
 
     /**
      * 在切枪之后触发
      */
-    public void onChangeSlot(GunData data, Entity ammoSupplier) {
-        if (data.compute().withdrawAmmoWhenChangeSlot) {
-            data.withdrawAmmo(ammoSupplier);
+    open fun onChangeSlot(data: GunData, ammoSupplier: Entity) {
+        if (data.get(GunProp.WITHDRAW_AMMO_WHEN_CHANGE_SLOT)) {
+            data.withdrawAmmo(ammoSupplier)
         }
     }
 
     @Environment(EnvType.CLIENT)
-    @Override
-    public @Nullable Screen getItemScreen(ItemStack stack, Player player, InteractionHand hand) {
-        if (ClientEventHandler.canOpenEditScreen(stack, hand) && stack.getItem() instanceof GunItem && canEditAttachments(GunData.from(stack))) {
-            return new WeaponEditScreen(stack);
+    override fun getItemScreen(stack: ItemStack, player: Player, hand: InteractionHand): Screen? {
+        if (ClientEventHandler.canOpenEditScreen(stack, hand)
+            && stack.item is GunItem
+            && canEditAttachments(from(stack))
+        ) {
+            return WeaponEditScreen(stack)
         }
-        return null;
+        return null
     }
 
-    public DefaultGunData getDefaultData(GunData data) {
-        return GunData.getDefault(data.id);
+    open fun tick(shooter: Entity?, data: GunData, inMainHand: Boolean) {}
+
+    open fun getDefaultData(data: GunData) = getDefault(data.id)
+
+    open fun getEnergyProvider(data: GunData, ammoSupplier: Entity?): IEnergyStorage? {
+        return data.ModCapabilities.ENERGY_ITEM.find(stack, null)
     }
 
-    public IEnergyStorage getEnergyProvider(@NotNull GunData data, @Nullable Entity ammoSupplier) {
-        return ModCapabilities.ENERGY_ITEM.find(data.stack, null);
+    companion object {
+        private val SPEED_ID = loc("gun_movement_speed")
+
+        protected fun getEntityResult(target: Entity, hitBoxPos: Vec3, hitPos: Vec3): EntityResult {
+            var headshot = false
+            var legShot = false
+            val eyeHeight = target.eyeHeight
+            val bodyHeight = target.bbHeight
+
+            if (target is LivingEntity) {
+                if (eyeHeight - 0.25 < hitBoxPos.y && hitBoxPos.y < eyeHeight + 0.3) {
+                    headshot = true
+                }
+                if (hitBoxPos.y < 0.33 * bodyHeight) {
+                    legShot = true
+                }
+            }
+
+            return EntityResult(target, hitPos, headshot, legShot)
+        }
     }
 }

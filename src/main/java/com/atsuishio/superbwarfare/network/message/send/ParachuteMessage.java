@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.network.message.send;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.item.trinket.ParachuteItem;
 import com.atsuishio.superbwarfare.tools.NBTTool;
 import io.netty.buffer.ByteBuf;

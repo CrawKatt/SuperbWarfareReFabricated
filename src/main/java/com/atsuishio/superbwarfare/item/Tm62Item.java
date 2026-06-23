@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.item;
 
 import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer;
-import com.atsuishio.superbwarfare.entity.Tm62Entity;
+import com.atsuishio.superbwarfare.entity.projectile.Tm62Entity;
 import com.atsuishio.superbwarfare.init.ModEntities;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

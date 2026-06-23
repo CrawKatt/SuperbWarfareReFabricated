@@ -1,0 +1,100 @@
+package com.atsuishio.superbwarfare.init
+
+import com.atsuishio.superbwarfare.client.renderer.entity.*
+import com.atsuishio.superbwarfare.client.renderer.projectile.*
+import net.neoforged.api.distmarker.Dist
+import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.neoforge.client.event.EntityRenderersEvent
+
+@EventBusSubscriber(Dist.CLIENT)
+object ModEntityRenderers {
+    @SubscribeEvent
+    fun registerEntityRenderers(event: EntityRenderersEvent.RegisterRenderers) {
+        with(event) {
+            registerEntityRenderer(ModEntities.MORTAR.get(), ::MortarRenderer)
+            registerEntityRenderer(ModEntities.SENPAI.get(), ::SenpaiRenderer)
+            registerEntityRenderer(ModEntities.CLAYMORE.get(), ::ClaymoreRenderer)
+            registerEntityRenderer(ModEntities.C4.get(), ::C4Renderer)
+            registerEntityRenderer(ModEntities.TASER_BULLET.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.GUN_GRENADE.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.TARGET.get(), ::TargetRenderer)
+            registerEntityRenderer(ModEntities.DPS_GENERATOR.get(), ::DPSGeneratorRenderer)
+            registerEntityRenderer(ModEntities.RPG_ROCKET_TBG.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.RPG_ROCKET_STANDARD.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.SMALL_ROCKET.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.MEDIUM_ROCKET.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.MORTAR_SHELL.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.CANNON_SHELL.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.PROJECTILE.get(), ::ProjectileEntityRenderer)
+            registerEntityRenderer(ModEntities.MK_42.get(), ::Mk42Renderer)
+            registerEntityRenderer(ModEntities.DRONE.get(), ::DroneRenderer)
+            registerEntityRenderer(ModEntities.HAND_GRENADE.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.RGO_GRENADE.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.M18_SMOKE_GRENADE.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.MLE_1934.get(), ::Mle1934Renderer)
+            registerEntityRenderer(ModEntities.JAVELIN_MISSILE.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.ANNIHILATOR.get(), ::AnnihilatorRenderer)
+            registerEntityRenderer(ModEntities.SPEEDBOAT.get(), ::SpeedboatRenderer)
+            registerEntityRenderer(ModEntities.TINY_SPEEDBOAT.get(), ::TinySpeedboatRenderer)
+            registerEntityRenderer(ModEntities.WHEEL_CHAIR.get(), ::WheelChairRenderer)
+            registerEntityRenderer(ModEntities.AH_6.get(), ::Ah6Renderer)
+            registerEntityRenderer(ModEntities.FLARE_DECOY.get(), ::FlareDecoyEntityRenderer)
+            registerEntityRenderer(
+                ModEntities.WHITE_PHOSPHORUS_PROJECTILE.get(),
+                ::WhitePhosphorusProjectileEntityRenderer
+            )
+            registerEntityRenderer(ModEntities.PRISMATIC_BOLT.get(), ::PrismaticBoltEntityRenderer)
+            registerEntityRenderer(ModEntities.SMOKE_DECOY.get(), ::SmokeDecoyEntityRenderer)
+            registerEntityRenderer(ModEntities.LAV_150.get(), ::Lav150Renderer)
+            registerEntityRenderer(ModEntities.SMALL_CANNON_SHELL.get(), ::SmallCannonShellEntityRenderer)
+            registerEntityRenderer(ModEntities.TOM_6.get(), ::Tom6Renderer)
+            registerEntityRenderer(ModEntities.MELON_BOMB.get(), ::MelonBombEntityRenderer)
+            registerEntityRenderer(ModEntities.BMP_2.get(), ::Bmp2Renderer)
+            registerEntityRenderer(ModEntities.WIRE_GUIDE_MISSILE.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.LASER_TOWER.get(), ::LaserTowerRenderer)
+            registerEntityRenderer(ModEntities.YX_100.get(), ::Yx100Renderer)
+            registerEntityRenderer(ModEntities.PRISM_TANK.get(), ::PrismTankRenderer)
+            registerEntityRenderer(ModEntities.SWARM_DRONE.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.HPJ_11.get(), ::Hpj11Renderer)
+            registerEntityRenderer(ModEntities.A_10A.get(), ::A10Renderer)
+            registerEntityRenderer(ModEntities.MK_82.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.SC_50.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.SC_250.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.AGM_65.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.BLU_43.get(), ::Blu43Renderer)
+            registerEntityRenderer(ModEntities.TM_62.get(), ::Tm62Renderer)
+            registerEntityRenderer(ModEntities.PTKM_1R.get(), ::Ptkm1rRenderer)
+            registerEntityRenderer(ModEntities.PTKM_PROJECTILE.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.TYPE_63.get(), ::Type63Renderer)
+            registerEntityRenderer(ModEntities.MEDICAL_KIT.get(), ::MedicalKitEntityRenderer)
+            registerEntityRenderer(ModEntities.BL_132.get(), ::Bl132Renderer)
+            registerEntityRenderer(ModEntities.GRAPESHOT.get(), ::GrapeshotRenderer)
+            registerEntityRenderer(ModEntities.SUPER_STAR_PROJECTILE.get(), ::SuperStarProjectileRenderer)
+            registerEntityRenderer(ModEntities.VEHICLE_ASSEMBLING_TABLE.get(), ::VehicleAssemblingTableVehicleRenderer)
+            registerEntityRenderer(ModEntities.WAVEFORCE_TOWER.get(), ::WaveforceTowerRenderer)
+            registerEntityRenderer(ModEntities.IGLA_MISSILE.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.RU_9M336_MISSILE.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.TRUCK.get(), ::TruckRenderer)
+            registerEntityRenderer(ModEntities.SODAYO_PICK_UP.get(), ::SodayoPickUpRenderer)
+            registerEntityRenderer(ModEntities.SODAYO_PICK_UP_HMG.get(), ::SodayoPickUpHmgRenderer)
+            registerEntityRenderer(ModEntities.SODAYO_PICK_UP_ROCKET.get(), ::SodayoPickUpRocketRenderer)
+            registerEntityRenderer(ModEntities.SODAYO_PICK_UP_TOW.get(), ::SodayoPickUpTowRenderer)
+            registerEntityRenderer(ModEntities.TOW.get(), ::TowRenderer)
+            registerEntityRenderer(ModEntities.STEEL_COIL.get(), ::SteelCoilRenderer)
+            registerEntityRenderer(ModEntities.MI_28.get(), ::Mi28Renderer)
+            registerEntityRenderer(ModEntities.KH_39.get(), ::BasicProjectileRenderer)
+            registerEntityRenderer(ModEntities.PLZ_05.get(), ::Plz05Renderer)
+            registerEntityRenderer(ModEntities.LAV_AD.get(), ::LavAdRenderer)
+            registerEntityRenderer(ModEntities.KV_16.get(), ::Kv16Renderer)
+            registerEntityRenderer(ModEntities.JU_87.get(), ::Ju87Renderer)
+            registerEntityRenderer(ModEntities.T_90A.get(), ::T90aRenderer)
+            registerEntityRenderer(ModEntities.M_1A_2.get(), ::M1A2Renderer)
+            registerEntityRenderer(ModEntities.BRADLEY.get(), ::BradleyRenderer)
+            registerEntityRenderer(ModEntities.TURRET_WRECK.get(), ::TurretWreckRenderer)
+            registerEntityRenderer(ModEntities.LAV_25.get(), ::Lav25Renderer)
+            registerEntityRenderer(ModEntities.ZTZ_99A.get(), ::Ztz99aRenderer)
+            registerEntityRenderer(ModEntities.EDD.get(), ::EDDRenderer)
+        }
+    }
+}

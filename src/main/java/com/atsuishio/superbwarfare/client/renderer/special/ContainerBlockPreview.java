@@ -1,7 +1,5 @@
 package com.atsuishio.superbwarfare.client.renderer.special;
 
-import com.atsuishio.superbwarfare.block.ContainerBlock;
-import com.atsuishio.superbwarfare.block.entity.ContainerBlockEntity;
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes;
 import com.atsuishio.superbwarfare.init.ModTags;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;

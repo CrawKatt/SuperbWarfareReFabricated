@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.item;
 
 import com.atsuishio.superbwarfare.block.VehicleAssemblingTableBlock;
-import com.atsuishio.superbwarfare.block.property.BlockPart;
 import com.atsuishio.superbwarfare.client.renderer.item.VehicleAssemblingTableBlockItemRenderer;
 import com.atsuishio.superbwarfare.init.ModBlocks;
 import net.fabricmc.api.EnvType;

@@ -22,10 +22,10 @@ public class OBBRenderer {
     public void render(VehicleEntity entity, List<OBB> obbList, PoseStack poseStack, VertexConsumer buffer, float red, float green, float blue, float alpha, float pPartialTicks) {
         Vec3 position = entity.position();
         for (OBB obb : obbList) {
-            Vector3d center = obb.center();
-            Vector3d halfExtents = obb.extents();
-            Quaterniond rotation = obb.rotation();
-            if (obb.part().equals(OBB.Part.INTERACTIVE)) {
+            Vector3d center = obb.center;
+            Vector3d halfExtents = obb.extents;
+            Quaterniond rotation = obb.rotation;
+            if (obb.part.equals(OBB.Part.INTERACTIVE)) {
                 renderOBB(
                         poseStack, buffer,
                         center.x() - position.x(), center.y() - position.y(), center.z() - position.z(),

@@ -1,8 +1,6 @@
 package com.atsuishio.superbwarfare.compat.jade.providers;
 
 import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.block.ContainerBlock;
-import com.atsuishio.superbwarfare.block.entity.VehicleDeployerBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

@@ -5,7 +5,6 @@ import com.atsuishio.superbwarfare.entity.projectile.RpgRocketTBGEntity;
 import com.atsuishio.superbwarfare.init.ModCriteriaTriggers;
 import com.atsuishio.superbwarfare.init.ModEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile;
 
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.tools.ProjectileTool;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;

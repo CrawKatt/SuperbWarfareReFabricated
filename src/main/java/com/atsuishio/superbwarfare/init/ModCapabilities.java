@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.init;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.block.entity.ChargingStationBlockEntity;
-import com.atsuishio.superbwarfare.block.entity.CreativeChargingStationBlockEntity;
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
 import com.atsuishio.superbwarfare.block.entity.SuperbItemInterfaceBlockEntity;
 import com.atsuishio.superbwarfare.capability.api.IEnergyStorage;

@@ -1,8 +1,5 @@
 package com.atsuishio.superbwarfare.item;
 
-import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.tiers.ModItemTier;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundSource;

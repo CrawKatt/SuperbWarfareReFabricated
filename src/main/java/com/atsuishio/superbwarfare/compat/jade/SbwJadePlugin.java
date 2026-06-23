@@ -1,8 +1,5 @@
 package com.atsuishio.superbwarfare.compat.jade;
 
-import com.atsuishio.superbwarfare.block.ContainerBlock;
-import com.atsuishio.superbwarfare.block.VehicleDeployerBlock;
-import com.atsuishio.superbwarfare.block.entity.VehicleDeployerBlockEntity;
 import com.atsuishio.superbwarfare.compat.jade.providers.*;
 import com.atsuishio.superbwarfare.entity.DPSGeneratorEntity;
 import com.atsuishio.superbwarfare.entity.projectile.C4Entity;

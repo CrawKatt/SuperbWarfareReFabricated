@@ -1,8 +1,6 @@
 package com.atsuishio.superbwarfare.client.renderer.block;
 
 import com.atsuishio.superbwarfare.block.VehicleAssemblingTableBlock;
-import com.atsuishio.superbwarfare.block.entity.VehicleAssemblingTableBlockEntity;
-import com.atsuishio.superbwarfare.block.property.BlockPart;
 import com.atsuishio.superbwarfare.client.layer.block.VehicleAssemblingTableBlockLayer;
 import com.atsuishio.superbwarfare.client.model.block.VehicleAssemblingTableBlockModel;
 import net.minecraft.client.renderer.MultiBufferSource;

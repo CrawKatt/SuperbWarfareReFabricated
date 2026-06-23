@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.client.screens;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.block.ContainerBlock;
 import com.atsuishio.superbwarfare.client.RenderHelper;
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves;
 import com.atsuishio.superbwarfare.client.animation.ValueAnimator;
@@ -10,7 +9,6 @@ import com.atsuishio.superbwarfare.client.screens.component.*;
 import com.atsuishio.superbwarfare.compat.jei.JeiCompatHolder;
 import com.atsuishio.superbwarfare.compat.jei.SbwJEIPlugin;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.init.ModRecipes;
 import com.atsuishio.superbwarfare.menu.VehicleAssemblingMenu;
 import com.atsuishio.superbwarfare.network.message.send.AssembleVehicleMessage;
 import com.atsuishio.superbwarfare.recipe.vehicle.VehicleAssemblingRecipe;

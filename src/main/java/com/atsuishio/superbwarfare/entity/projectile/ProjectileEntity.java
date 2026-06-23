@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile;
 
 import com.atsuishio.superbwarfare.client.particle.BulletDecalOption;
-import com.atsuishio.superbwarfare.client.particle.CustomCloudOption;
 import com.atsuishio.superbwarfare.component.ModDataComponents;
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig;
 import com.atsuishio.superbwarfare.entity.DPSGeneratorEntity;
@@ -213,7 +212,7 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
                     }
 
                     var acc = OBBHitter.getInstance(this);
-                    acc.sbw$setCurrentHitPart(obb.part());
+                    acc.sbw$setCurrentHitPart(obb.part);
                 }
             }
         } else {

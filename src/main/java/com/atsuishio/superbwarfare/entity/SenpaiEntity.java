@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.entity;
 
-import com.atsuishio.superbwarfare.init.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;

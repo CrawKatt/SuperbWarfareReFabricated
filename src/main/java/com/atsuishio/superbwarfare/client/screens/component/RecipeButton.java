@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.client.screens.component;
 
-import com.atsuishio.superbwarfare.block.ContainerBlock;
 import com.atsuishio.superbwarfare.client.screens.VehicleAssemblingScreen;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.mojang.blaze3d.systems.RenderSystem;

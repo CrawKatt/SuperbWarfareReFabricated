@@ -3,7 +3,6 @@ package com.atsuishio.superbwarfare.item;
 import com.atsuishio.superbwarfare.entity.projectile.M18SmokeGrenadeEntity;
 import com.atsuishio.superbwarfare.init.ModEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.tools.NBTTool;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;

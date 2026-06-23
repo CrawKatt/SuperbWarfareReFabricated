@@ -3,7 +3,6 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.entity.OBBEntity;
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter;
 import com.atsuishio.superbwarfare.init.ModParticleTypes;
-import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.tools.OBB;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -49,7 +48,7 @@ public class ProjectileUtilMixin {
                         if (pDistance >= 0) {
                             EntityHitResult hitResult = new EntityHitResult(entity, OBB.vector3dToVec3(optional.orElse(startVec)));
                             var acc = OBBHitter.getInstance(pProjectile);
-                            acc.sbw$setCurrentHitPart(obb.part());
+                            acc.sbw$setCurrentHitPart(obb.part);
                             cir.setReturnValue(hitResult);
                             if (pLevel instanceof ServerLevel serverLevel && pProjectile.getDeltaMovement().lengthSqr() > 0.01 && pProjectile instanceof Projectile) {
                                 Vec3 hitPos = hitResult.getLocation();
@@ -65,7 +64,7 @@ public class ProjectileUtilMixin {
                         if (d1 < pDistance || pDistance == 0) {
                             EntityHitResult hitResult = new EntityHitResult(entity, OBB.vector3dToVec3(vec));
                             var acc = OBBHitter.getInstance(pProjectile);
-                            acc.sbw$setCurrentHitPart(obb.part());
+                            acc.sbw$setCurrentHitPart(obb.part);
                             cir.setReturnValue(hitResult);
                             if (pLevel instanceof ServerLevel serverLevel && pProjectile.getDeltaMovement().lengthSqr() > 0.01 && pProjectile instanceof Projectile) {
                                 Vec3 hitPos = hitResult.getLocation();

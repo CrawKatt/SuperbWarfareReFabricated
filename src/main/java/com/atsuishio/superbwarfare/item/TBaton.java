@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.item;
 
-import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.tiers.ModItemTier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;

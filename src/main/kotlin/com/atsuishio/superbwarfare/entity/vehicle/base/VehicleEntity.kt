@@ -2,6 +2,8 @@ package com.atsuishio.superbwarfare.entity.vehicle.base
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.queueServerWork
+import com.atsuishio.superbwarfare.capability.PersistentDataAccessor
+import com.atsuishio.superbwarfare.mixins.EntityAccessor
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage
 import com.atsuishio.superbwarfare.capability.energy.VehicleEnergyStorage
 import com.atsuishio.superbwarfare.client.particle.CannonMuzzleFlareOption
@@ -38,7 +40,6 @@ import com.atsuishio.superbwarfare.event.ClientMouseHandler
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.inventory.handler.VehicleContainerHandler
 import com.atsuishio.superbwarfare.inventory.menu.*
-import com.atsuishio.superbwarfare.item.common.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.item.curio.DogTagItem
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
@@ -109,12 +110,10 @@ import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.neoforge.capabilities.Capabilities
-import net.neoforged.neoforge.common.util.FakePlayer
-import net.neoforged.neoforge.energy.IEnergyStorage
-import net.neoforged.neoforge.items.ItemHandlerHelper
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import org.joml.*
 import java.util.*
 import java.util.function.Consumer
@@ -548,7 +547,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
                     { containerId, inv, player -> createMenu(containerId, inv, player) },
                     Component.translatable(this.type.descriptionId)
                 )
-            ) { buf -> buf.writeInt(this.id) }
+            )
         }
     }
 
@@ -638,10 +637,11 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
 
         orderedPassengers[index] = pPassenger
 
-        pPassenger.persistentData.putInt(TAG_SEAT_INDEX, index)
+        (pPassenger as PersistentDataAccessor).`superbwarfare$getPersistentData`().putInt(TAG_SEAT_INDEX, index)
 
-        this.passengers =
+        (this as EntityAccessor).setPassengers(
             ImmutableList.copyOf(orderedPassengers.stream().filter { obj: Entity? -> Objects.nonNull(obj) }.toList())
+        )
         this.gameEvent(GameEvent.ENTITY_MOUNT, pPassenger)
 
         this.setChanged()
@@ -655,11 +655,12 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
         if (index == -1) return
 
         orderedPassengers[index] = null
-        this.passengers =
+        (this as EntityAccessor).setPassengers(
             ImmutableList.copyOf(orderedPassengers.stream().filter { obj: Entity? -> Objects.nonNull(obj) }
                 .toList())
+        )
 
-        pPassenger.boardingCooldown = 60
+        (pPassenger as EntityAccessor).setBoardingCooldown(60)
         this.gameEvent(GameEvent.ENTITY_DISMOUNT, pPassenger)
     }
 
@@ -706,7 +707,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
         orderedPassengers[orderedPassengers.indexOf(entity)] = null
         orderedPassengers[index] = entity
 
-        entity.persistentData.putInt(TAG_SEAT_INDEX, index)
+        (entity as PersistentDataAccessor).`superbwarfare$getPersistentData`().putInt(TAG_SEAT_INDEX, index)
 
         // 在服务端运行时，向所有玩家同步载具座位信息
         val level = this.level()
@@ -736,7 +737,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
      * @param entity 乘客
      * @return 座位索引
      */
-    open fun getTagSeatIndex(entity: Entity) = entity.persistentData.getInt(TAG_SEAT_INDEX)
+    open fun getTagSeatIndex(entity: Entity) = (entity as PersistentDataAccessor).`superbwarfare$getPersistentData`().getInt(TAG_SEAT_INDEX)
 
     open val thirdPersonCameraPosition: Vec3
         get() {
@@ -1478,14 +1479,12 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
             }
 
             if (this.getFirstPassenger() == null) {
-                if (player is FakePlayer) return InteractionResult.PASS
                 VehicleVecUtils.setDriverAngle(this, player)
                 player.isSprinting = false
                 if (player.level() is ServerLevel) {
                     return if (player.startRiding(this)) InteractionResult.CONSUME else InteractionResult.PASS
                 }
             } else if (this.getFirstPassenger() !is Player) {
-                if (player is FakePlayer) return InteractionResult.PASS
                 this.getFirstPassenger()!!.stopRiding()
                 VehicleVecUtils.setDriverAngle(this, player)
                 player.isSprinting = false
@@ -1494,7 +1493,6 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
                 }
             }
             if (this.canAddPassenger(player)) {
-                if (player is FakePlayer) return InteractionResult.PASS
                 player.isSprinting = false
                 if (player.level() is ServerLevel) {
                     return if (player.startRiding(this)) InteractionResult.CONSUME else InteractionResult.PASS
@@ -1866,7 +1864,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
         }
 
         if (isWreck) {
-            if ((vehicleType == VehicleType.AIRPLANE || vehicleType == VehicleType.HELICOPTER) && (onGround() || isInFluidType) && !sympatheticDetonated) {
+            if ((vehicleType == VehicleType.AIRPLANE || vehicleType == VehicleType.HELICOPTER) && (onGround() || isInLiquid) && !sympatheticDetonated) {
                 sympatheticDetonated = true
                 val destroyInfo = computed().destroyInfo
                 if (destroyInfo.explodePassengers) {
@@ -1989,7 +1987,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
 
                 val index: Int = getSeatIndex(mob)
                 val seat: SeatInfo = computed().seats()[index]
-                if (mob.getData(ModAttachments.PLAYER_VARIABLE).activeThermalImaging && seat.hasThermalImaging) {
+                if (ModComponents.PLAYER_VARIABLE.get(mob).activeThermalImaging && seat.hasThermalImaging) {
                     mob.addEffect(MobEffectInstance(MobEffects.NIGHT_VISION, 5, 0, false, false))
                 }
 
@@ -2047,7 +2045,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
                 val neededEnergy: Int = this.maxEnergy - this.energy
                 if (neededEnergy <= 0) break
 
-                val energyCap = stack.getCapability(Capabilities.EnergyStorage.ITEM) ?: continue
+                val energyCap = ModCapabilities.ENERGY_ITEM.find(stack, null) ?: continue
 
                 val stored = energyCap.energyStored
                 if (stored <= 0) continue
@@ -2950,7 +2948,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
 
             val worldPosition = transformPosition(
                 this.getTransformFromString(data.get(GunProp.SHOOT_POS).transform, ticks),
-                vec3.x, vec3.y, vec3.z
+                vec3!!.x, vec3.y, vec3.z
             )
 
             return Vec3(worldPosition.x, worldPosition.y, worldPosition.z)
@@ -2965,7 +2963,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
 
             val worldPosition = transformPosition(
                 this.getTransformFromString(data.get(GunProp.SHOOT_POS).transform, ticks),
-                vec3.x, vec3.y, vec3.z
+                vec3!!.x, vec3.y, vec3.z
             )
 
             return Vec3(worldPosition.x, worldPosition.y, worldPosition.z)
@@ -2984,7 +2982,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
 
             val worldPosition = transformPosition(
                 this.getTransformFromString(data.get(GunProp.SHOOT_POS).transform, ticks),
-                vec3.x, vec3.y, vec3.z
+                vec3!!.x, vec3.y, vec3.z
             )
 
             return Vec3(worldPosition.x, worldPosition.y, worldPosition.z)
@@ -3726,7 +3724,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
         computed().seats().getOrNull(seatIndex)?.dismountInfo?.canEject ?: false
 
     open fun removeSeatIndexTag(entity: Entity) {
-        entity.persistentData.remove(TAG_SEAT_INDEX)
+        (entity as PersistentDataAccessor).`superbwarfare$getPersistentData`().remove(TAG_SEAT_INDEX)
     }
 
     open fun getEjectionMovement(entity: LivingEntity?, index: Int): Vec3 {
@@ -3999,7 +3997,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
      * @param zoom          是否在载具上瞄准
      * @param isFirstPerson 是否是第一人称视角
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     open fun getCameraRotation(partialTicks: Float, player: Player, zoom: Boolean, isFirstPerson: Boolean): Vec2? {
         val index = this.getSeatIndex(player)
         val seat = computed().seats().getOrNull(index)
@@ -4038,7 +4036,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
      * @param zoom          是否在载具上瞄准
      * @param isFirstPerson 是否是第一人称视角
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     open fun getCameraPosition(partialTicks: Float, player: Player, zoom: Boolean, isFirstPerson: Boolean): Vec3? {
         val index = this.getSeatIndex(player)
         val seat = computed().seats().getOrNull(index)
@@ -4075,7 +4073,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
     /**
      * 是否使用载具固定视角
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     open fun useFixedCameraPos(entity: Entity?): Boolean {
         val index = this.getSeatIndex(entity)
         val seat = computed().seats().getOrNull(index)
@@ -4482,7 +4480,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
     open val isAmphibious: Boolean
         get() = VehicleMiscUtils.isAmphibious(this)
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     open fun firstPersonAmmoComponent(data: GunData, player: Player?): Component {
         val name = data.get(GunProp.NAME)
         if (name.isNullOrBlank()) return Component.empty()
@@ -4491,7 +4489,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
         return Component.translatable(name, if (ammoCount == Int.MAX_VALUE) "∞" else ammoCount)
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     open fun thirdPersonAmmoComponent(data: GunData, player: Player?): Component {
         return firstPersonAmmoComponent(data, player)
     }

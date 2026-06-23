@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.compat.jei;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.init.ModRecipes;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.NBTTool;
 import mezz.jei.api.IModPlugin;
