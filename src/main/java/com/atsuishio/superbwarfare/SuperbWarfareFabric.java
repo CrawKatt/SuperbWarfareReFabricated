@@ -21,6 +21,10 @@ import com.atsuishio.superbwarfare.world.TDMSavedData;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.network.chat.Component;
 import net.neoforged.fml.config.ModConfig;
 import software.bernie.geckolib.constant.dataticket.SerializableDataTicket;
 import software.bernie.geckolib.util.GeckoLibUtil;
@@ -50,6 +54,7 @@ public class SuperbWarfareFabric implements ModInitializer {
 
         ResourceOnceLogger.register();
         ThermooCompatHandler.init();
+        registerBuiltinResourcePacks();
         registerDataTickets();
         registerTicks();
     }
@@ -108,5 +113,16 @@ public class SuperbWarfareFabric implements ModInitializer {
 
     private void registerDataTickets() {
         FuMO25BlockEntity.FUMO25_TICK = GeckoLibUtil.addDataTicket(SerializableDataTicket.ofInt(Mod.loc("fumo25_tick")));
+    }
+
+    private void registerBuiltinResourcePacks() {
+        FabricLoader.getInstance().getModContainer(Mod.MODID).ifPresent(container ->
+                ResourceManagerHelper.registerBuiltinResourcePack(
+                        Mod.loc("sbw_legacy"),
+                        container,
+                        Component.translatable("pack.superbwarfare.sbw_legacy"),
+                        ResourcePackActivationType.NORMAL
+                )
+        );
     }
 }

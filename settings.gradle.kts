@@ -8,6 +8,10 @@ pluginManagement {
     }
     plugins {
         id("fabric-loom") version "1.13.6"
-        id("org.jetbrains.kotlin.jvm") version "2.2.0"
+        id("org.jetbrains.kotlin.jvm") version "2.1.20"
+        id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
+        id("com.google.devtools.ksp") version "2.1.20-2.0.1"
     }
 }
+
+include(":ksp")

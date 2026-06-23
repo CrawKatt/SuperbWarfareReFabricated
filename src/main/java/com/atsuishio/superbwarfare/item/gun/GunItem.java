@@ -84,17 +84,17 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
 
     @Override
     public int getMaxEnergy(ItemStack stack) {
-        return GunData.compute(stack).maxEnergy;
+        return stack.getItem() instanceof GunItem ? GunData.compute(stack).maxEnergy : 0;
     }
 
     @Override
     public int getMaxReceiveEnergy(ItemStack stack) {
-        return GunData.compute(stack).maxReceiveEnergy;
+        return stack.getItem() instanceof GunItem ? GunData.compute(stack).maxReceiveEnergy : -1;
     }
 
     @Override
     public int getMaxExtractEnergy(ItemStack stack) {
-        return GunData.compute(stack).maxExtractEnergy;
+        return stack.getItem() instanceof GunItem ? GunData.compute(stack).maxExtractEnergy : -1;
     }
 
     public final Map<Integer, Consumer<GunData>> reloadTimeBehaviors = new HashMap<>();

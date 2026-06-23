@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile;
 
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -86,6 +87,7 @@ public abstract class MissileProjectile extends DestroyableProjectile implements
         float diffY = Mth.wrapDegrees(targetAngleY - this.getYRot());
         float diffX = Mth.wrapDegrees(targetAngleX - this.getXRot());
 
+        this.setDeltaMovement(this.getDeltaMovement().scale(1 - 0.0004 * VehicleVecUtils.calculateAngle(vec3, v0)));
         this.setYRot(this.getYRot() + Mth.clamp(0.95f * diffY, -turnSpeed, turnSpeed));
         this.setXRot(this.getXRot() + Mth.clamp(0.95f * diffX, -turnSpeed, turnSpeed));
     }

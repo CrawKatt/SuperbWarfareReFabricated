@@ -109,6 +109,25 @@ public class ChargingStationBlock extends BaseEntityBlock {
         return this.defaultBlockState().setValue(FACING, pContext.getHorizontalDirection().getOpposite()).setValue(SHOW_RANGE, false);
     }
 
+    @Override
+    public boolean hasAnalogOutputSignal(@NotNull BlockState state) {
+        return true;
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof ChargingStationBlockEntity chargingStation) {
+            var energy = chargingStation.getEnergyStorage(null);
+            if (energy == null || energy.getMaxEnergyStored() <= 0) {
+                return 0;
+            }
+            return (int) (15 * energy.getEnergyStored() / (double) energy.getMaxEnergyStored());
+        }
+        return super.getAnalogOutputSignal(state, level, pos);
+    }
+
     @ParametersAreNonnullByDefault
     public @NotNull ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
         ItemStack itemstack = new ItemStack(this);

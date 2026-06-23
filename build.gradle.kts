@@ -1,7 +1,10 @@
 plugins {
     idea
     id("java-library")
-    id("fabric-loom") version "1.13.6"
+    id("fabric-loom")
+    id("org.jetbrains.kotlin.jvm")
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.devtools.ksp")
     `maven-publish`
 }
 
@@ -99,6 +102,9 @@ sourceSets {
 }
 
 dependencies {
+    add("ksp", project(":ksp"))
+    implementation(project(":ksp"))
+
     minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
 
     mappings(loom.layered {
@@ -108,9 +114,12 @@ dependencies {
 
     modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
+    modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("fabric_kotlin_version")}")
     modImplementation("software.bernie.geckolib:geckolib-fabric-1.21.1:4.7.5")
     modImplementation("dev.emi:trinkets:${project.property("trinkets_version")}")
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:15.0.140")
+
+    include(modImplementation("com.github.Sh1roCu:SimpleBedrockModel-Fabric:${project.property("simple_bedrock_model_version")}")!!)
 
     modCompileOnly("mezz.jei:jei-1.21.1-fabric-api:${project.property("jei_version")}")
     modRuntimeOnly("mezz.jei:jei-1.21.1-fabric:${project.property("jei_version")}")
@@ -173,6 +182,15 @@ publishing {
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.release.set(21)
+}
+
+kotlin {
+    jvmToolchain(21)
+    sourceSets {
+        named("main") {
+            kotlin.srcDirs("src/main/kotlin", "src/main/java")
+        }
+    }
 }
 
 idea {

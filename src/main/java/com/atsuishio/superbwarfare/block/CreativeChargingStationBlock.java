@@ -142,4 +142,15 @@ public class CreativeChargingStationBlock extends BaseEntityBlock {
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         return this.defaultBlockState().setValue(FACING, pContext.getHorizontalDirection().getOpposite()).setValue(SHOW_RANGE, false);
     }
+
+    @Override
+    public boolean hasAnalogOutputSignal(@NotNull BlockState state) {
+        return true;
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        return 15;
+    }
 }
