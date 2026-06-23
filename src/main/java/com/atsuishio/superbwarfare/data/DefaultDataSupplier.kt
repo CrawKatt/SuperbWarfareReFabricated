@@ -1,5 +1,5 @@
-package com.atsuishio.superbwarfare.data;
+package com.atsuishio.superbwarfare.data
 
-public interface DefaultDataSupplier<T> {
-    T getDefault();
+interface DefaultDataSupplier<T> {
+    fun getDefault(): T
 }

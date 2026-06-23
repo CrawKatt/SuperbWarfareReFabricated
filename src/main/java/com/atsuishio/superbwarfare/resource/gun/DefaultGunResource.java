@@ -21,6 +21,11 @@ public class DefaultGunResource implements IDBasedData<DefaultGunResource> {
         return this.id;
     }
 
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @SerializedName("Icon")
     public String icon = Mod.loc("textures/gun_icon/default_icon.png").toString();
 

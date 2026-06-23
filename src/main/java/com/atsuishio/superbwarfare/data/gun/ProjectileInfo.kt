@@ -1,25 +1,40 @@
-package com.atsuishio.superbwarfare.data.gun;
+package com.atsuishio.superbwarfare.data.gun
 
-import com.atsuishio.superbwarfare.data.DeserializeFromString;
-import com.atsuishio.superbwarfare.data.IDBasedData;
-import com.google.gson.JsonObject;
-import com.google.gson.annotations.SerializedName;
+import com.atsuishio.superbwarfare.data.DeserializeFromString
+import com.atsuishio.superbwarfare.data.IDBasedData
+import com.atsuishio.superbwarfare.data.STOFactory
+import com.atsuishio.superbwarfare.data.StringInstanceBuilder
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedGsonObject
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-public class ProjectileInfo implements IDBasedData<ProjectileInfo>, DeserializeFromString {
-
+@STOFactory(ProjectileInfo.ProjectileInfoInstanceBuilder::class)
+@Serializable
+class ProjectileInfo : IDBasedData<ProjectileInfo>, DeserializeFromString {
+    @JvmField
     @SerializedName("Type")
-    public String type = "superbwarfare:projectile";
+    @SerialName("Type")
+    var type: String = "superbwarfare:projectile"
 
-    @SerializedName("Data")
-    public JsonObject data;
+    override fun getId() = type
 
-    @Override
-    public String getId() {
-        return type;
+    override fun setId(id: String) {
+        this.type = id
     }
 
-    @Override
-    public void deserializeFromString(String str) {
-        this.type = str;
+    @JvmField
+    @SerializedName("Data")
+    @SerialName("Data")
+    var data: SerializedGsonObject? = null
+
+    override fun deserializeFromString(str: String) {
+        this.type = str
+    }
+
+    object ProjectileInfoInstanceBuilder : StringInstanceBuilder<ProjectileInfo> {
+        override fun fromString(value: String) = ProjectileInfo().apply {
+            this.type = value
+        }
     }
 }

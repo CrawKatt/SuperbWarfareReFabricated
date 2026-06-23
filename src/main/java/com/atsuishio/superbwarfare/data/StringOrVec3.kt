@@ -1,83 +1,114 @@
-package com.atsuishio.superbwarfare.data;
+package com.atsuishio.superbwarfare.data
 
-import com.atsuishio.superbwarfare.Mod;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
-import net.minecraft.world.phys.Vec3;
+import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVec3
+import com.atsuishio.superbwarfare.serialization.kserializer.Vec3Serializer
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.element
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonPrimitive
+import net.minecraft.world.phys.Vec3
+import java.io.IOException
 
-import java.io.IOException;
+@Serializable(StringOrVec3Serializer::class)
+class StringOrVec3 {
+    @JvmField
+    val string: String?
+    @JvmField
+    val vec3: Vec3?
 
-public class StringOrVec3 {
-    public final String string;
-    public final Vec3 vec3;
-
-    public StringOrVec3(String string) {
-        this.string = string;
-        this.vec3 = null;
+    constructor(string: String?) {
+        this.string = string
+        this.vec3 = null
     }
 
-    public StringOrVec3() {
-        this(Vec3.ZERO);
+    @JvmOverloads
+    constructor(vec3: Vec3? = Vec3.ZERO) {
+        this.vec3 = vec3
+        this.string = null
     }
 
-    public StringOrVec3(Vec3 vec3) {
-        this.vec3 = vec3;
-        this.string = null;
-    }
+    val isString get() = string != null
+    val isVec3 get() = vec3 != null
 
-    public boolean isString() {
-        return string != null;
-    }
-
-    public boolean isVec3() {
-        return vec3 != null;
-    }
-
-    static class StringOrVec3Adapter extends TypeAdapter<StringOrVec3> {
-
-        @Override
-        public void write(JsonWriter out, StringOrVec3 value) throws IOException {
+    internal class StringOrVec3Adapter : TypeAdapter<StringOrVec3?>() {
+        @Throws(IOException::class)
+        override fun write(out: JsonWriter, value: StringOrVec3?) {
             if (value == null) {
-                out.nullValue();
-                return;
+                out.nullValue()
+                return
             }
 
             if (value.string != null) {
-                out.value(value.string);
+                out.value(value.string)
             } else {
-                out.beginArray();
-                assert value.vec3 != null;
-                out.value(value.vec3.x);
-                out.value(value.vec3.y);
-                out.value(value.vec3.z);
-                out.endArray();
+                out.beginArray()
+                checkNotNull(value.vec3)
+                out.value(value.vec3.x)
+                out.value(value.vec3.y)
+                out.value(value.vec3.z)
+                out.endArray()
             }
         }
 
-        @Override
-        public StringOrVec3 read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                Mod.LOGGER.warn("null StringOrVec3 value!");
-                in.nextNull();
-                return new StringOrVec3();
+        @Throws(IOException::class)
+        override fun read(`in`: JsonReader): StringOrVec3 {
+            if (`in`.peek() == JsonToken.NULL) {
+                Mod.LOGGER.warn("null StringOrVec3 value!")
+                `in`.nextNull()
+                return StringOrVec3()
             }
 
-            if (in.peek() == JsonToken.STRING) {
-                return new StringOrVec3(in.nextString());
+            if (`in`.peek() == JsonToken.STRING) {
+                return StringOrVec3(`in`.nextString())
             }
 
-            if (in.peek() == JsonToken.BEGIN_ARRAY) {
-                in.beginArray();
-                var x = in.nextDouble();
-                var y = in.nextDouble();
-                var z = in.nextDouble();
-                in.endArray();
-                return new StringOrVec3(new Vec3(x, y, z));
+            if (`in`.peek() == JsonToken.BEGIN_ARRAY) {
+                `in`.beginArray()
+                val x = `in`.nextDouble()
+                val y = `in`.nextDouble()
+                val z = `in`.nextDouble()
+                `in`.endArray()
+                return StringOrVec3(Vec3(x, y, z))
             }
 
-            throw new IllegalStateException("invalid StringOrVec3 value!");
+            throw IllegalStateException("invalid StringOrVec3 value!")
+        }
+    }
+}
+
+object StringOrVec3Serializer : KSerializer<StringOrVec3> {
+    override val descriptor = buildClassSerialDescriptor("StringOrVec3") {
+        element<String?>("string")
+        element<SerializedVec3?>("vec3")
+    }
+
+    override fun serialize(encoder: Encoder, value: StringOrVec3) {
+        if (value.string != null) {
+            encoder.encodeString(value.string)
+        } else {
+            encoder.encodeSerializableValue(Vec3Serializer, value.vec3!!)
+        }
+    }
+
+    override fun deserialize(decoder: Decoder): StringOrVec3 {
+        require(decoder is JsonDecoder) { "only JsonDecoder is supported!" }
+
+        val element = decoder.decodeJsonElement()
+
+        return if (element is JsonPrimitive) {
+            StringOrVec3(element.jsonPrimitive.content)
+        } else {
+            StringOrVec3(decoder.decodeSerializableValue(Vec3Serializer))
         }
     }
 }

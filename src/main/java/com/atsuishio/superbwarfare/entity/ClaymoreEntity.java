@@ -9,7 +9,7 @@ import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.tools.CustomExplosion;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
-import com.atsuishio.superbwarfare.world.TDMSavedData;
+import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;

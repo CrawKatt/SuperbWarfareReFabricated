@@ -1,40 +1,51 @@
-package com.atsuishio.superbwarfare.data.vehicle.subdata;
+package com.atsuishio.superbwarfare.data.vehicle.subdata
 
-import com.atsuishio.superbwarfare.tools.OBB;
-import com.google.gson.annotations.SerializedName;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Quaterniond;
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVec3
+import com.atsuishio.superbwarfare.tools.OBB
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import net.minecraft.world.phys.Vec3
+import org.joml.Quaterniond
 
-public class OBBInfo {
+@Serializable
+class OBBInfo {
+    @JvmField
+    @SerialName("Size")
+    var size: SerializedVec3 = Vec3.ZERO
 
-    @SerializedName("Size")
-    public Vec3 size;
+    @JvmField
+    @SerialName("Position")
+    var position: SerializedVec3 = Vec3.ZERO
 
-    @SerializedName("Position")
-    public Vec3 position;
+    @JvmField
+    @SerialName("Transform")
+    var transform: String? = "Default"
 
-    @SerializedName("Transform")
-    public String transform = "Default";
+    @JvmField
+    @SerialName("Rotation")
+    var rotation: String = "Default"
 
-    @SerializedName("Rotation")
-    public String rotation = "Default";
+    @JvmField
+    @SerialName("Part")
+    var part: OBB.Part = OBB.Part.BODY
 
-    @SerializedName("Part")
-    public OBB.Part part = OBB.Part.BODY;
+    @Transient
+    @kotlinx.serialization.Transient
+    private var obb: OBB? = null
 
-    private transient OBB obb;
-
-    public OBB getOBB() {
+    fun getOBB(): OBB {
         if (this.obb == null) {
-            this.obb = new OBB(OBB.vec3ToVector3d(Vec3.ZERO), OBB.vec3ToVector3d(this.size), new Quaterniond(), this.part);
+            this.obb = OBB(
+                OBB.vec3ToVector3d(Vec3.ZERO),
+                OBB.vec3ToVector3d(this.size),
+                Quaterniond(),
+                this.part
+            )
         }
-        return this.obb;
+        return this.obb!!
     }
 
-    public void limit() {
-        if (this.size == null) this.size = Vec3.ZERO;
-        if (this.position == null) this.position = Vec3.ZERO;
-        if (this.transform == null || this.transform.isBlank()) this.transform = "Vehicle";
-        if (this.part == null) this.part = OBB.Part.BODY;
+    fun limit() {
+        if (this.transform == null || this.transform!!.isBlank()) this.transform = "Vehicle"
     }
 }

@@ -447,6 +447,7 @@ public class LivingEventHandler {
             }
         }
 
+        if (attacker == null) return;
         var preEvent = new PreKillEvent.SendKillMessage(attacker, source, entity);
         onPreSendKillMessage(preEvent);
         if (preEvent.isCanceled()) return;

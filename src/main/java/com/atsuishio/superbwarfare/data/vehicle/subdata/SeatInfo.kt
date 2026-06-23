@@ -1,64 +1,85 @@
-package com.atsuishio.superbwarfare.data.vehicle.subdata;
+package com.atsuishio.superbwarfare.data.vehicle.subdata
 
-import com.atsuishio.superbwarfare.annotation.ServerOnly;
-import com.atsuishio.superbwarfare.data.ObjectToList;
-import com.google.gson.annotations.SerializedName;
-import net.minecraft.world.phys.Vec3;
+import com.atsuishio.superbwarfare.annotation.ServerOnly
+import com.atsuishio.superbwarfare.data.ObjectToList
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVec3
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import net.minecraft.world.phys.Vec3
 
-import java.util.List;
+@Serializable
+class SeatInfo {
+    @JvmField
+    @SerialName("HidePassenger")
+    var hidePassenger: Boolean = false
 
-public class SeatInfo {
-    @SerializedName("HidePassenger")
-    public boolean hidePassenger = false;
-
-    @SerializedName("IsEnclosed")
+    @JvmField
+    @SerialName("IsEnclosed")
     @ServerOnly
-    public Boolean isEnclosed = null;
+    var isEnclosed: Boolean? = null
 
-    @SerializedName("Transform")
-    public String transform = "Default";
+    @JvmField
+    @SerialName("Transform")
+    var transform: String = "Default"
 
-    @SerializedName("Position")
-    public Vec3 position = Vec3.ZERO;
+    @JvmField
+    @SerialName("Pose")
+    var pose: String = "Default"
 
-    @SerializedName("Orientation")
-    public float orientation = 0;
+    @JvmField
+    @SerialName("Position")
+    var position: SerializedVec3 = Vec3.ZERO
 
-    @SerializedName("CanRotateBody")
-    public Boolean canRotateBody = false;
+    @JvmField
+    @SerialName("Orientation")
+    var orientation: Float = 0f
 
-    @SerializedName("CanRotateHead")
-    public Boolean canRotateHead = true;
+    @JvmField
+    @SerialName("CanRotateBody")
+    var canRotateBody: Boolean = false
 
-    @SerializedName("MinPitch")
-    public float minPitch = -90;
+    @JvmField
+    @SerialName("CanRotateHead")
+    var canRotateHead: Boolean = true
 
-    @SerializedName("MaxPitch")
-    public float maxPitch = 90;
+    @JvmField
+    @SerialName("HasThermalImaging")
+    var hasThermalImaging: Boolean = false
 
-    @SerializedName("MinYaw")
-    public float minYaw = -514;
+    @JvmField
+    @SerialName("MinPitch")
+    var minPitch: Float = -90f
 
-    @SerializedName("MaxYaw")
-    public float maxYaw = 514;
+    @JvmField
+    @SerialName("MaxPitch")
+    var maxPitch: Float = 90f
 
-    @SerializedName("Weapons")
-    protected ObjectToList<String> weapons = new ObjectToList<>();
+    @JvmField
+    @SerialName("MinYaw")
+    var minYaw: Float = -514f
 
-    public List<String> weapons() {
-        if (weapons == null || weapons.list == null) return List.of();
-        return weapons.list;
-    }
+    @JvmField
+    @SerialName("MaxYaw")
+    var maxYaw: Float = 514f
 
-    @SerializedName("CameraPos")
-    public CameraPos cameraPos = null;
+    @SerialName("Weapons")
+    private var weapons: ObjectToList<String>? = ObjectToList()
 
-    @SerializedName("BanHand")
-    public Boolean banHand = false;
+    fun weapons() = weapons?.list ?: mutableListOf()
 
-    @SerializedName("Sensitivity")
-    public Vec3 sensitivity = new Vec3(1, 1, 1);
+    @JvmField
+    @SerialName("CameraPos")
+    var cameraPos: CameraPos? = null
 
-    @SerializedName("DismountInfo")
-    public DismountInfo dismountInfo = null;
+    @JvmField
+    @SerialName("BanHand")
+    var banHand: Boolean = false
+
+    @JvmField
+    @SerialName("Sensitivity")
+    var sensitivity: SerializedVec3 = Vec3(1.0, 1.0, 1.0)
+
+    @JvmField
+    @SerialName("DismountInfo")
+    var dismountInfo: DismountInfo? = null
 }

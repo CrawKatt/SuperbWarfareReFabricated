@@ -1,24 +1,31 @@
-package com.atsuishio.superbwarfare.data.vehicle.subdata;
+package com.atsuishio.superbwarfare.data.vehicle.subdata
 
-import com.google.gson.annotations.SerializedName;
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-public class SeekInfo {
+@Serializable
+class SeekInfo {
+    @JvmField
+    @SerialName("MaxSeekRange")
+    var maxSeekRange: Double = 64.0
 
-    @SerializedName("MaxSeekRange")
-    public double maxSeekRange = 64;
+    @JvmField
+    @SerialName("MinSeekRange")
+    var minSeekRange: Double = 1.0
 
-    @SerializedName("MinSeekRange")
-    public double minSeekRange = 1;
+    @JvmField
+    @SerialName("ChangeTargetTime")
+    var changeTargetTime: Int = 60
 
-    @SerializedName("ChangeTargetTime")
-    public int changeTargetTime = 60;
+    @JvmField
+    @SerialName("SeekIterative")
+    var seekIterative: Int = 20
 
-    @SerializedName("SeekIterative")
-    public int seekIterative = 20;
+    @JvmField
+    @SerialName("MinTargetSize")
+    var minTargetSize: Double = 0.25
 
-    @SerializedName("MinTargetSize")
-    public double minTargetSize = 0.25;
-
-    @SerializedName("SeekEnergyCost")
-    public int seekEnergyCost = 1000;
+    @JvmField
+    @SerialName("SeekEnergyCost")
+    var seekEnergyCost: Int = 1000
 }

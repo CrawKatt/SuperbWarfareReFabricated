@@ -1,102 +1,69 @@
-package com.atsuishio.superbwarfare.data;
+package com.atsuishio.superbwarfare.data
 
-import com.atsuishio.superbwarfare.Mod;
-import com.google.gson.annotations.SerializedName;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import java.lang.reflect.Type
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.javaType
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.function.Function;
-import java.util.function.Supplier;
+@OptIn(ExperimentalStdlibApi::class)
+abstract class Prop<DATA : DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA, FIELD, RESULT, SELF : Prop<DATA, DEFAULT_DATA, FIELD, RESULT, SELF>> protected constructor(
+    val prop: KMutableProperty1<DEFAULT_DATA, FIELD>,
+    val transform: (FIELD) -> RESULT,
+) {
+    protected val type: Type = prop.returnType.javaType
 
-@Deprecated(forRemoval = true)
-@SuppressWarnings("removal")
-public abstract class Prop<DATA extends DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA, FIELD> {
-    public static final List<Prop<?, ?, ?>> props = new ArrayList<>();
+    val serializer by lazy { prop.serializer() }
 
-    public final Class<DEFAULT_DATA> rawDataType;
-    public final String name;
-    protected final Field field;
+    override fun toString() = "Prop[$serializationName]"
 
-    protected Prop(Class<DEFAULT_DATA> rawDataType, String name) {
-        this.rawDataType = rawDataType;
-        this.name = name;
+    val serializationName = prop.annotations.filterIsInstance<SerialName>().singleOrNull()?.value
+        ?: prop.annotations.filterIsInstance<SerializedName>().singleOrNull()?.value
+        ?: prop.name
 
-        try {
-            var findResult = Arrays.stream(this.rawDataType.getFields())
-                    .filter(f -> {
-                        var annotation = f.getAnnotation(SerializedName.class);
-                        return annotation != null && annotation.value().equals(this.name);
-                    })
-                    .findFirst();
-
-            if (findResult.isEmpty()) {
-                throw new NoSuchElementException("Could not find field " + name + " in " + rawDataType.getName() + "!");
-            }
-
-            this.field = findResult.get();
-            this.field.setAccessible(true);
-        } catch (Exception exception) {
-            Mod.LOGGER.error("Could not find field {} in RAW_DATA!", name);
-            throw new RuntimeException(exception);
-        }
-
-        props.add(this);
+    init {
+        props.add(this)
     }
 
-    public Function<DEFAULT_DATA, FIELD> specialSupplier;
-    public PropModifyContext<DATA, DEFAULT_DATA, FIELD> limiter;
-
-    @SuppressWarnings("unchecked")
-    protected <T extends Prop<DATA, DEFAULT_DATA, FIELD>> T withSupplier(Function<DEFAULT_DATA, FIELD> supplier) {
-        this.specialSupplier = supplier;
-        return (T) this;
+    fun getDefault(data: DEFAULT_DATA): RESULT {
+        return transform(prop.get(data))
     }
 
-    @SuppressWarnings("unchecked")
-    protected <T extends Prop<DATA, DEFAULT_DATA, FIELD>> T withLimiter(Prop.PropModifyContext<DATA, DEFAULT_DATA, FIELD> limiter) {
-        this.limiter = limiter;
-        return (T) this;
+    fun deserialize(element: JsonElement): RESULT {
+        return transform(Json.decodeFromJsonElement(serializer, element))
     }
 
-    protected <T extends Prop<DATA, DEFAULT_DATA, FIELD>> T whenNull(FIELD value) {
-        return whenNull(() -> value);
+    companion object {
+        @JvmField
+        val props = mutableListOf<Prop<*, *, *, *, *>>()
+    }
+}
+
+// TODO
+// 属性修改上下文，可以视为针对当前类型属性的所有属性值的临时map
+class PMC<DATA : DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA>(val data: DATA) {
+
+    private val currentProps = mutableMapOf<Prop<DATA, *, *, *, *>, Any?>()
+
+    @Suppress("UNCHECKED_CAST")
+    operator fun <T : Prop<DATA, DEFAULT_DATA, *, RESULT, *>, RESULT> get(prop: T) = currentProps.getOrPut(prop) {
+        prop.getDefault(data.getDefault()) as Any?
+    } as RESULT
+
+    operator fun <T : Prop<DATA, DEFAULT_DATA, *, RESULT, *>, RESULT> set(prop: T, value: RESULT) {
+        currentProps[prop] = value
     }
 
-    protected <T extends Prop<DATA, DEFAULT_DATA, FIELD>> T whenNull(Supplier<FIELD> supplier) {
-        return withLimiter((prop, data, value) -> value == null ? supplier.get() : value);
+    fun reset() {
+        currentProps.clear()
     }
 
-    protected <T extends Prop<DATA, DEFAULT_DATA, FIELD>> T withLimiter(Function<FIELD, FIELD> limiter) {
-        return withLimiter((prop, data, value) -> limiter.apply(value));
+    fun <T : Prop<DATA, DEFAULT_DATA, *, RESULT, *>, RESULT : Any> modify(
+        prop: T,
+        modifier: (RESULT) -> RESULT
+    ) {
+        this[prop] = modifier(this[prop])
     }
-
-    @SuppressWarnings("unchecked")
-    public FIELD getDefault(DEFAULT_DATA data) {
-        if (this.specialSupplier != null) {
-            return specialSupplier.apply(data);
-        }
-
-        try {
-            return (FIELD) DataLoader.processValue(field.get(data));
-        } catch (Exception exception) {
-            Mod.LOGGER.error("Could not get field {} in RAW_DATA!", name);
-            throw new RuntimeException(exception);
-        }
-    }
-
-    public PropModifier<DATA, DEFAULT_DATA, FIELD> asModifier(DATA data) {
-        return new PropModifier<>(this, data);
-    }
-
-
-    @FunctionalInterface
-    public interface PropModifyContext<DATA extends DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA, FIELD> {
-        FIELD apply(@NotNull PropModifier<DATA, DEFAULT_DATA, FIELD> modifier, @NotNull DATA data, @Nullable FIELD value);
-    }
-
 }

@@ -1,216 +1,185 @@
-package com.atsuishio.superbwarfare.data;
+package com.atsuishio.superbwarfare.data
 
-import com.atsuishio.superbwarfare.data.vehicle.subdata.CollisionLevel;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.atsuishio.superbwarfare.data.ModColor.ModColorAdapter
+import com.atsuishio.superbwarfare.data.StringOrVec3.StringOrVec3Adapter
+import com.atsuishio.superbwarfare.data.vehicle.subdata.CollisionLevel
+import com.atsuishio.superbwarfare.data.vehicle.subdata.CollisionLevel.LimitAdapter
+import com.atsuishio.superbwarfare.network.message.receive.DataSyncMessage
+import com.atsuishio.superbwarfare.tools.sendPacket
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
+import com.google.common.cache.LoadingCache
+import com.google.gson.FieldNamingPolicy
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.packs.PackType
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.world.phys.Vec2
+import net.minecraft.world.phys.Vec3
+import java.util.function.Consumer
 
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+object DataLoader {
 
-public class DataLoader {
+    @JvmField
+    val GSON: Gson = createCommonBuilder().create()
 
-    public static final Gson GSON = createCommonBuilder().create();
+    @OptIn(ExperimentalSerializationApi::class)
+    val JSON = Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+        serializersModule = com.atsuishio.superbwarfare.serialization.serializersModule
+        allowTrailingComma = true
+        allowSpecialFloatingPointValues = true
+    }
 
-    public static final LoadingCache<Object, JsonObject> JSON_OBJECT_CACHE = CacheBuilder.newBuilder()
-            .weakKeys()
-            .build(new CacheLoader<>() {
-                public @NotNull JsonObject load(@NotNull Object object) {
-                    return DataLoader.GSON.toJsonTree(object).getAsJsonObject();
-                }
-            });
+    @JvmField
+    val JSON_OBJECT_CACHE: LoadingCache<Any, JsonObject> = CacheBuilder.newBuilder()
+        .weakKeys()
+        .build(object : CacheLoader<Any, JsonObject>() {
+            override fun load(obj: Any): JsonObject {
+                return GSON.toJsonTree(obj).asJsonObject
+            }
+        })
 
-    private static final Map<String, GeneralData<?>> LOADED_DATA = new HashMap<>();
-    private static final Map<String, GeneralData<?>> LOADED_RESOURCE = new HashMap<>();
+    val LOADED_DATA = mutableMapOf<String, GeneralData<*>>()
+    val LOADED_RESOURCE = mutableMapOf<String, GeneralData<*>>()
 
-    public record GeneralData<T>(
-            Class<?> type, DataMap<T> proxyMap,
-            HashMap<String, Object> data,
-            @Nullable Consumer<Map<String, Object>> onReload
+    val SERVER_LISTENER: ComplexJsonResourceReloadListener = ComplexJsonResourceReloadListener(LOADED_DATA)
+    val CLIENT_LISTENER: ComplexJsonResourceReloadListener = ComplexJsonResourceReloadListener(LOADED_RESOURCE)
+
+    @JvmStatic
+    fun register() {
+        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(SERVER_LISTENER)
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(CLIENT_LISTENER)
+
+        ServerPlayConnectionEvents.JOIN.register { handler, _, server ->
+            val player = handler.player
+
+            LOADED_DATA.filter { it.value.synced }.forEach { (key, data) ->
+                if (server.isSingleplayerOwner(player.gameProfile)) return@forEach
+
+                val packet = DataSyncMessage(key, data.serializeToString())
+                player.sendPacket(packet)
+            }
+        }
+    }
+
+    @Suppress("unchecked_cast")
+    @JvmStatic
+    @JvmOverloads
+    fun <T> createData(
+        directory: String,
+        clazz: Class<T>,
+        synced: Boolean = false,
+        isKtData: Boolean = false,
+        onReload: Consumer<Map<String, Any>>? = null
+    ): DataMap<T> {
+        val data = LOADED_DATA[directory]
+
+        return if (data != null) {
+            data.proxyMap as DataMap<T>
+        } else {
+            val proxyMap = DataMap<T>(directory, LOADED_DATA)
+            LOADED_DATA[directory] = GeneralData(clazz, proxyMap, HashMap(), synced, isKtData, onReload)
+            proxyMap
+        }
+    }
+
+    @JvmStatic
+    fun <T> createData(
+        directory: String,
+        clazz: Class<T>,
+        onReload: Consumer<Map<String, Any>>
+    ): DataMap<T> {
+        return createData(directory, clazz, false, false, onReload)
+    }
+
+    @Suppress("unchecked_cast")
+    @JvmStatic
+    @JvmOverloads
+    fun <T> createResource(
+        directory: String,
+        clazz: Class<T>,
+        isKtData: Boolean = false,
+        onReload: Consumer<Map<String, Any>>? = null
+    ): DataMap<T> {
+        val resource = LOADED_RESOURCE[directory]
+
+        return if (resource != null) {
+            resource.proxyMap as DataMap<T>
+        } else {
+            val proxyMap = DataMap<T>(directory, LOADED_RESOURCE)
+            LOADED_RESOURCE[directory] = GeneralData(clazz, proxyMap, HashMap(), false, isKtData, onReload)
+            proxyMap
+        }
+    }
+
+    @JvmStatic
+    fun <T> createResource(
+        directory: String,
+        clazz: Class<T>,
+        onReload: Consumer<Map<String, Any>>
+    ): DataMap<T> {
+        return createResource(directory, clazz, false, onReload)
+    }
+
+    @JvmStatic
+    fun createCommonBuilder(): GsonBuilder {
+        return GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+            .setLenient()
+            .serializeSpecialFloatingPointValues()
+            .registerTypeAdapter(Vec2::class.java, Vec2Adapter())
+            .registerTypeAdapter(Vec3::class.java, Vec3Adapter())
+            .registerTypeAdapter(ResourceLocation::class.java, ResourceLocationAdapter())
+            .registerTypeAdapter(SoundEvent::class.java, SoundEventAdapter())
+            .registerTypeAdapter(ModColor::class.java, ModColorAdapter())
+            .registerTypeAdapter(StringOrVec3::class.java, StringOrVec3Adapter())
+            .registerTypeAdapter(CollisionLevel.Limit::class.java, LimitAdapter())
+            .registerTypeAdapterFactory(ObjectToList.AdapterFactory())
+            .registerTypeAdapterFactory(StringToObject.AdapterFactory())
+    }
+
+    @JvmStatic
+    fun processValue(value: Any?): Any? {
+        return when (value) {
+            is ObjectToList<*> -> value.list.map { processValue(it) }
+            is StringToObject<*> -> processValue(value.value)
+            else -> value
+        }
+    }
+
+    data class GeneralData<T>(
+        @JvmField val type: Class<*>,
+        @JvmField val proxyMap: DataMap<T>,
+        @JvmField val dataMap: HashMap<String, Any>,
+        @JvmField val synced: Boolean,
+        @JvmField val isKtData: Boolean = false,
+        @JvmField val onReload: Consumer<Map<String, Any>>?
     ) {
-    }
+        @JvmField
+        val data: HashMap<String, Any> = dataMap
 
-    public static final ComplexJsonResourceReloadListener SERVER_LISTENER = new ComplexJsonResourceReloadListener(LOADED_DATA);
-    public static final ComplexJsonResourceReloadListener CLIENT_LISTENER = new ComplexJsonResourceReloadListener(LOADED_RESOURCE);
+        fun getDataMap(): HashMap<String, Any> = dataMap
 
-    public static void register() {
-        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(SERVER_LISTENER);
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(CLIENT_LISTENER);
-    }
-
-    public static <T> DataMap<T> createData(String directory, Class<T> clazz) {
-        return createData(directory, clazz, null);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> DataMap<T> createData(String directory, Class<T> clazz, @Nullable Consumer<Map<String, Object>> onReload) {
-        if (LOADED_DATA.containsKey(directory)) {
-            return (DataMap<T>) LOADED_DATA.get(directory).proxyMap;
-        } else {
-            var proxyMap = new DataMap<T>(directory, LOADED_DATA);
-            LOADED_DATA.put(directory, new GeneralData<>(clazz, proxyMap, new HashMap<>(), onReload));
-            return proxyMap;
-        }
-    }
-
-    public static <T> DataMap<T> createResource(String directory, Class<T> clazz) {
-        return createResource(directory, clazz, null);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> DataMap<T> createResource(String directory, Class<T> clazz, @Nullable Consumer<Map<String, Object>> onReload) {
-        if (LOADED_RESOURCE.containsKey(directory)) {
-            return (DataMap<T>) LOADED_RESOURCE.get(directory).proxyMap;
-        } else {
-            var proxyMap = new DataMap<T>(directory, LOADED_RESOURCE);
-            LOADED_RESOURCE.put(directory, new GeneralData<>(clazz, proxyMap, new HashMap<>(), onReload));
-            return proxyMap;
-        }
-    }
-
-    // 务必在所有需要序列化GSON数据的地方调用，避免报错
-    public static GsonBuilder createCommonBuilder() {
-        return new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                .setLenient()
-                .serializeSpecialFloatingPointValues()
-                .registerTypeAdapter(Vec2.class, new Vec2Adapter())
-                .registerTypeAdapter(Vec3.class, new Vec3Adapter())
-                .registerTypeAdapter(ResourceLocation.class, new ResourceLocationAdapter())
-                .registerTypeAdapter(SoundEvent.class, new SoundEventAdapter())
-                .registerTypeAdapter(ModColor.class, new ModColor.ModColorAdapter())
-                .registerTypeAdapter(StringOrVec3.class, new StringOrVec3.StringOrVec3Adapter())
-                .registerTypeAdapter(CollisionLevel.Limit.class, new CollisionLevel.LimitAdapter())
-                .registerTypeAdapterFactory(new ObjectToList.AdapterFactory())
-                .registerTypeAdapterFactory(new StringToObject.AdapterFactory());
-    }
-
-
-    /**
-     * 将StringToObject和ObjectToList转换为原始值
-     */
-    public static Object processValue(Object value) {
-        if (value instanceof ObjectToList<?> otl) {
-            return otl.list.stream().map(DataLoader::processValue).toList();
-        } else if (value instanceof StringToObject<?> sto) {
-            return processValue(sto.value);
-        }
-        return value;
-    }
-
-    // read-only custom data map
-
-    public static class DataMap<T> extends HashMap<String, T> {
-        private final String directory;
-        private final Map<String, GeneralData<?>> loadedData;
-
-        private DataMap(String directory, Map<String, GeneralData<?>> loadedData) {
-            this.directory = directory;
-            this.loadedData = loadedData;
+        val mapType by lazy {
+            TypeToken.getParameterized(HashMap::class.java, String::class.java, type)!!
         }
 
-        @Override
-        public int size() {
-            if (!this.loadedData.containsKey(directory)) return 0;
-            return this.loadedData.get(directory).data.size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-            if (!this.loadedData.containsKey(directory)) return true;
-            return this.loadedData.get(directory).data.isEmpty();
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public T get(Object key) {
-            if (!this.loadedData.containsKey(directory)) return null;
-            return (T) this.loadedData.get(directory).data.get(key);
-        }
-
-        @Override
-        public T getOrDefault(Object key, T defaultValue) {
-            var value = get(key);
-            return value == null ? defaultValue : value;
-        }
-
-        public T getOrElseGet(Object key, Supplier<T> supplier) {
-            var value = get(key);
-            return value == null ? supplier.get() : value;
-        }
-
-        @Override
-        public boolean containsKey(Object key) {
-            if (!this.loadedData.containsKey(directory)) return false;
-            return this.loadedData.get(directory).data.containsKey(key);
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public T put(String key, T value) {
-            return (T) this.loadedData.get(directory).data.put(key, value);
-        }
-
-        @Override
-        public void putAll(Map<? extends String, ? extends T> m) {
-            this.loadedData.get(directory).data.putAll(m);
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public T remove(Object key) {
-            return (T) this.loadedData.get(directory).data.remove(key);
-        }
-
-        @Override
-        public void clear() {
-            this.loadedData.get(directory).data.clear();
-        }
-
-        @Override
-        public boolean containsValue(Object value) {
-            if (!this.loadedData.containsKey(directory)) return false;
-            return this.loadedData.get(directory).data.containsValue(value);
-        }
-
-        @Override
-        public @NotNull Set<String> keySet() {
-            if (!this.loadedData.containsKey(directory)) return Set.of();
-            return this.loadedData.get(directory).data.keySet();
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public @NotNull Collection<T> values() {
-            if (!this.loadedData.containsKey(directory)) return Set.of();
-            return this.loadedData.get(directory).data.values().stream().map(v -> (T) v).toList();
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public @NotNull Set<Entry<String, T>> entrySet() {
-            if (!this.loadedData.containsKey(directory)) return Set.of();
-            return this.loadedData.get(directory).data.entrySet().stream()
-                    .map(e -> new AbstractMap.SimpleImmutableEntry<>(e.getKey(), (T) e.getValue()))
-                    .collect(Collectors.toCollection(HashSet::new));
-        }
-
-        public String getDirectory() {
-            return directory;
+        fun serializeToString(): String {
+            return if (isKtData) {
+                JSON.encodeToString(serializer(mapType.type), dataMap)
+            } else {
+                GSON.toJson(dataMap)!!
+            }
         }
     }
 }

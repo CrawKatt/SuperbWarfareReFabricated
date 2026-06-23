@@ -143,6 +143,7 @@ dependencies {
     modApi("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:21.1.6")
 
     compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+    runtimeOnly("com.google.code.findbugs:jsr305:3.0.2")
 }
 
 tasks.withType<ProcessResources> {

@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.data.gun;
 
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
+import com.atsuishio.superbwarfare.config.server.AmmoConfigKt;
 import com.atsuishio.superbwarfare.init.ModComponents;
 import com.atsuishio.superbwarfare.init.ModItems;
 import net.minecraft.ChatFormatting;
@@ -60,6 +61,14 @@ public enum Ammo {
 
     public ItemStack getItemStack(int count) {
         return new ItemStack(defaultItem.get(), count);
+    }
+
+    public int getLimit() {
+        return AmmoConfigKt.limit(this);
+    }
+
+    public int getAmmoBoxLimit() {
+        return AmmoConfigKt.ammoBoxLimit(this);
     }
 
     public static Ammo getType(String name) {

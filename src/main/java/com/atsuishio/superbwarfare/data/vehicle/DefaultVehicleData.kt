@@ -1,186 +1,244 @@
-package com.atsuishio.superbwarfare.data.vehicle;
+package com.atsuishio.superbwarfare.data.vehicle
 
-import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.annotation.ServerOnly;
-import com.atsuishio.superbwarfare.config.server.VehicleConfig;
-import com.atsuishio.superbwarfare.data.*;
-import com.atsuishio.superbwarfare.data.gun.DefaultGunData;
-import com.atsuishio.superbwarfare.data.vehicle.subdata.*;
-import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModify;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.annotations.SerializedName;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ModConfigSpec;
+import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.annotation.ServerOnly
+import com.atsuishio.superbwarfare.config.server.VehicleConfig
+import com.atsuishio.superbwarfare.data.*
+import com.atsuishio.superbwarfare.data.gun.DefaultGunData
+import com.atsuishio.superbwarfare.data.vehicle.subdata.*
+import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModify
+import com.atsuishio.superbwarfare.serialization.kserializer.*
+import com.atsuishio.superbwarfare.tools.toKxJson
+import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.phys.Vec2
+import net.minecraft.world.phys.Vec3
+import net.neoforged.neoforge.common.ModConfigSpec
+import java.util.*
+import kotlin.math.max
 
-import java.util.*;
-
-@SuppressWarnings("unused")
-public class DefaultVehicleData implements IDBasedData<DefaultVehicleData> {
+@Suppress("unused")
+@Serializable
+class DefaultVehicleData : IDBasedData<DefaultVehicleData> {
+    @JvmField
     @SerializedName("ID")
-    public String id = "";
+    @SerialName("ID")
+    var id = ""
 
-    public transient boolean isDefaultData = true;
+    @JvmField
+    @Transient
+    @kotlinx.serialization.Transient
+    var isDefaultData: Boolean = true
 
-    @Override
-    public String getId() {
-        return this.id;
+    override fun getId(): String {
+        return this.id
     }
 
-    @SerializedName("MaxHealth")
-    public float maxHealth = 50;
-
-    @ServerOnly
-    @SerializedName("RepairCooldown")
-    public int repairCooldown = getConfigOrDefault(VehicleConfig.REPAIR_COOLDOWN);
-
-    @ServerOnly
-    @SerializedName("RepairAmount")
-    public float repairAmount = getConfigOrDefault(VehicleConfig.REPAIR_AMOUNT).floatValue();
-
-    private static <T> T getConfigOrDefault(ModConfigSpec.ConfigValue<T> config) {
-        try {
-            return config.get();
-        } catch (Exception exception) {
-            return config.getDefault();
-        }
+    override fun setId(id: String) {
+        this.id = id
     }
+
+    @JvmField
+    @SerialName("MaxHealth")
+    var maxHealth: Float = 50f
+
+    @JvmField
+    @ServerOnly
+    @SerialName("RepairCooldown")
+    var repairCooldown: Int = getConfigOrDefault(VehicleConfig.REPAIR_COOLDOWN)
+
+    @JvmField
+    @ServerOnly
+    @SerialName("RepairAmount")
+    var repairAmount: Float = getConfigOrDefault(VehicleConfig.REPAIR_AMOUNT).toFloat()
 
     /**
      * 开始自动扣血时的血量比例
      */
+    @JvmField
     @ServerOnly
-    @SerializedName("SelfHurtPercent")
-    public float selfHurtPercent = 0.1F;
+    @SerialName("SelfHurtPercent")
+    var selfHurtPercent: Float = 0.1f
 
     /**
      * 自动扣血每tick扣血量
      */
+    @JvmField
     @ServerOnly
-    @SerializedName("SelfHurtAmount")
-    public float selfHurtAmount = 0.1F;
+    @SerialName("SelfHurtAmount")
+    var selfHurtAmount: Float = 0.1f
 
-    @SerializedName("MaxEnergy")
-    public int maxEnergy = 100000;
+    @JvmField
+    @SerialName("MaxEnergy")
+    var maxEnergy: Int = Int.MAX_VALUE
 
-    @SerializedName("OBB")
-    public List<OBBInfo> obb = List.of();
+    @JvmField
+    @SerialName("OBB")
+    var obb: MutableList<OBBInfo> = mutableListOf()
 
-    @SerializedName("Seats")
-    protected ObjectToList<SeatInfo> seats = new ObjectToList<>();
+    @SerialName("Seats")
+    private var seats: ObjectToList<SeatInfo>? = ObjectToList()
 
-    public List<SeatInfo> seats() {
-        if (seats == null) return List.of();
-        return Collections.unmodifiableList(seats.list);
+    fun seats(): MutableList<SeatInfo> {
+        if (seats == null) return mutableListOf()
+        return Collections.unmodifiableList(seats!!.list)
     }
 
-    @SerializedName("UpStep")
-    public float upStep = 0;
+    @JvmField
+    @SerialName("UpStep")
+    var upStep: Float = 0f
 
-    @SerializedName("AllowFreeCam")
-    public boolean allowFreeCam = false;
+    @JvmField
+    @SerialName("TrackDistanceMultiply")
+    var trackDistanceMultiply: Double = 1.0
 
-    @SerializedName("HasDecoy")
-    public boolean hasDecoy = false;
+    @JvmField
+    @SerialName("KeepChunkLoaded")
+    var keepChunkLoaded: Boolean = true
 
+    @JvmField
+    @SerialName("MouseSensitivity")
+    var mouseSensitivity: Double = 0.4
+
+    @JvmField
+    @SerialName("PassengerRenderScale")
+    var passengerRenderScale: Float = 1f
+
+    @JvmField
+    @SerialName("AllowFreeCam")
+    var allowFreeCam: Boolean = false
+
+    @JvmField
+    @SerialName("HasDecoy")
+    var hasDecoy: Boolean = false
+
+    @JvmField
     @ServerOnly
-    @SerializedName("ApplyDefaultDamageModifiers")
-    public boolean applyDefaultDamageModifiers = true;
+    @SerialName("ApplyDefaultDamageModifiers")
+    var applyDefaultDamageModifiers: Boolean = true
 
+    @JvmField
     @ServerOnly
-    @SerializedName("SendHitParticles")
-    public boolean sendHitParticles = true;
+    @SerialName("SendHitParticles")
+    var sendHitParticles: Boolean = true
 
+    @JvmField
     @ServerOnly
-    @SerializedName("DamageModifiers")
-    public ObjectToList<StringToObject<DamageModify>> damageModifiers = new ObjectToList<>();
+    @SerialName("DamageModifiers")
+    var damageModifiers: ObjectToList<StringToObject<DamageModify>> = ObjectToList()
 
+    @JvmField
     @ServerOnly
-    @SerializedName("Mass")
-    public float mass = 1;
+    @SerialName("Mass")
+    var mass: Float = 1f
 
+    @JvmField
     @ServerOnly
-    @SerializedName("DestroyInfo")
-    public DestroyInfo destroyInfo = new DestroyInfo();
+    @SerialName("DestroyInfo")
+    var destroyInfo: DestroyInfo = DestroyInfo()
 
-    @SerializedName("SeekInfo")
-    public SeekInfo seekInfo = null;
+    @JvmField
+    @SerialName("SeekInfo")
+    var seekInfo: SeekInfo? = null
 
-    @SerializedName("VehicleContainerType")
-    public VehicleContainerType vehicleContainerType = VehicleContainerType.MEDIUM;
+    @JvmField
+    @SerialName("VehicleContainerType")
+    var vehicleContainerType: VehicleContainerType = VehicleContainerType.MEDIUM
 
-    @SerializedName("HasUpgradeSlots")
-    public boolean hasUpgradeSlots = false;
+    @JvmField
+    @SerialName("HasUpgradeSlots")
+    var hasUpgradeSlots: Boolean = false
 
-    @SerializedName("VehicleIcon")
-    public ResourceLocation vehicleIcon = Mod.loc("textures/gun_icon/default_icon.png");
+    @JvmField
+    @SerialName("VehicleIcon")
+    var vehicleIcon: SerializedResourceLocation = loc("textures/gun_icon/default_icon.png")
 
-    @SerializedName("ContainerIcon")
-    public ResourceLocation containerIcon = null;
+    @JvmField
+    @SerialName("ContainerIcon")
+    var containerIcon: SerializedResourceLocation? = null
 
-    @SerializedName("HUDColor")
-    public ModColor hudColor = new ModColor(0x66FF00);
+    @JvmField
+    @SerialName("HUDColor")
+    var hudColor: ModColor = ModColor(0x66FF00)
 
-    @SerializedName("Type")
-    public VehicleType type = VehicleType.EMPTY;
+    @JvmField
+    @SerialName("Type")
+    var type: VehicleType = VehicleType.EMPTY
 
-    @SerializedName("EngineType")
-    public EngineType engineType = EngineType.EMPTY;
-    @SerializedName("EngineInfo")
-    public JsonObject engineInfo = new JsonObject();
+    @JvmField
+    @SerialName("EngineType")
+    var engineType: EngineType = EngineType.EMPTY
+
+    @JvmField
+    @SerialName("EngineInfo")
+    var engineInfo: SerializedGsonObject = JsonObject()
+
     // 引擎音效
-    @SerializedName("EngineSound")
-    public SoundEvent engineSound = SoundEvents.EMPTY;
+    @JvmField
+    @SerialName("EngineSound")
+    var engineSound: SerializedSoundEvent = SoundEvents.EMPTY
+
     // 喇叭音效
-    @SerializedName("HornSound")
-    public SoundEvent hornSound = SoundEvents.EMPTY;
+    @JvmField
+    @SerialName("HornSound")
+    var hornSound: SerializedSoundEvent = SoundEvents.EMPTY
+
     // 第三人称视角
-    @SerializedName("ThirdPersonCameraPos")
-    public Vec3 thirdPersonCameraPos = new Vec3(0, 1, 3);
+    @JvmField
+    @SerialName("ThirdPersonCameraPos")
+    var thirdPersonCameraPos: SerializedVec3 = Vec3(0.0, 1.0, 3.0)
 
-    @SerializedName("HasLowHealthWarning")
-    public boolean hasLowHealthWarning = true;
+    @JvmField
+    @SerialName("HasLowHealthWarning")
+    var hasLowHealthWarning: Boolean = true
 
-    @SerializedName("RotateOffsetHeight")
-    public float rotateOffsetHeight = 0;
+    @JvmField
+    @SerialName("RotateOffsetHeight")
+    var rotateOffsetHeight: Float = 0f
 
-    @SerializedName("Weapons")
-    protected Map<String, JsonObject> weapons = Map.of();
+    @SerialName("Weapons")
+    private var weapons: MutableMap<String, SerializedGsonObject> = mutableMapOf()
 
-    private transient Map<String, DefaultGunData> processedWeapons;
+    @Transient
+    @kotlinx.serialization.Transient
+    private var processedWeapons: MutableMap<String, DefaultGunData>? = null
 
-    public Map<String, DefaultGunData> weapons() {
-        if (processedWeapons != null) return processedWeapons;
+    fun weapons(): MutableMap<String, DefaultGunData> {
+        if (processedWeapons != null) return processedWeapons!!
 
-        var map = new HashMap<String, DefaultGunData>();
+        val map = hashMapOf<String, DefaultGunData>()
 
-        for (var entry : weapons.entrySet()) {
-            var value = entry.getValue();
-            if (value == null) continue;
-            value = value.deepCopy();
+        for (entry in weapons.entries) {
+            var value = entry.value
+            value = value.deepCopy()
 
-            if (value.get("Template") instanceof JsonPrimitive primitive && primitive.isString()) {
-                value.remove("Template");
-                var templateValue = weapons.get(primitive.getAsString());
+            val primitive = value.get("Template")
+
+            if (primitive is JsonPrimitive && primitive.isString) {
+                value.remove("Template")
+                val templateValue = weapons[primitive.getAsString()]
                 if (templateValue != null) {
-                    var newValue = templateValue.deepCopy();
-                    for (var kv : value.entrySet()) {
-                        newValue.add(kv.getKey(), kv.getValue());
+                    val newValue = templateValue.deepCopy()
+                    for (kv in value.entrySet()) {
+                        newValue.add(kv.key, kv.value)
                     }
-                    value = newValue;
+                    value = newValue
                 }
             }
 
-            map.put(entry.getKey(), DataLoader.GSON.fromJson(value, DefaultGunData.class));
+            map[entry.key] =
+                DataLoader.JSON.decodeFromJsonElement(
+                    DefaultGunData.serializer(),
+                    value.asJsonObject.toKxJson()
+                )
         }
 
-        processedWeapons = Collections.unmodifiableMap(map);
-        return processedWeapons;
+        processedWeapons = Collections.unmodifiableMap(map)
+        return processedWeapons!!
     }
 
     /**
@@ -191,65 +249,108 @@ public class DefaultVehicleData implements IDBasedData<DefaultVehicleData> {
      * 3 - 允许撞坏硬方块
      * 4 - 允许野兽撞击模式
      */
-    @SerializedName("CollisionLevel")
-    public CollisionLevel collisionLevel = new CollisionLevel();
+    @JvmField
+    @SerialName("CollisionLevel")
+    var collisionLevel: CollisionLevel = CollisionLevel()
 
     // 主武器位
-    @SerializedName("TurretPos")
-    public Vec3 turretPos = null;
-    @SerializedName("TurretTurnSpeed")
-    public Vec2 turretTurnSpeed = new Vec2(5, 5);
-    @SerializedName("TurretYawRange")
-    public Vec2 turretYawRange = new Vec2(-514, 514);
-    @SerializedName("TurretPitchRange")
-    public Vec2 turretPitchRange = new Vec2(-10, 30);
-    @SerializedName("TurretControllerIndex")
-    public int turretControllerIndex = 0;
+    @JvmField
+    @SerialName("TurretPos")
+    var turretPos: SerializedVec3? = null
 
-    @SerializedName("HudType")
-    public String hudType = "@Empty";
-    @SerializedName("BarrelPos")
-    public Vec3 barrelPos = Vec3.ZERO;
+    @JvmField
+    @SerialName("TurretTurnSpeed")
+    var turretTurnSpeed: SerializedVec2 = Vec2(5f, 5f)
+
+    @JvmField
+    @SerialName("TurretYawRange")
+    var turretYawRange: SerializedVec2 = Vec2(-514f, 514f)
+
+    @JvmField
+    @SerialName("TurretPitchRange")
+    var turretPitchRange: SerializedVec2 = Vec2(-10f, 30f)
+
+    @JvmField
+    @SerialName("TurretControllerIndex")
+    var turretControllerIndex: Int = 0
+
+    @JvmField
+    @SerialName("TurretCustomPitch")
+    var turretCustomPitch: Float = 0f
+
+    @JvmField
+    @SerialName("HudType")
+    var hudType: String = "@Empty"
+
+    @JvmField
+    @SerialName("BarrelPos")
+    var barrelPos: SerializedVec3 = Vec3.ZERO
 
     // 乘客位武器
-    @SerializedName("PassengerWeaponStationPos")
-    public Vec3 passengerWeaponStationPos = null;
-    @SerializedName("PassengerWeaponStationBarrelPos")
-    public Vec3 passengerWeaponStationBarrelPos = Vec3.ZERO;
-    @SerializedName("PassengerWeaponStationTurnSpeed")
-    public Vec2 passengerWeaponStationTurnSpeed = new Vec2(5, 5);
-    @SerializedName("PassengerWeaponStationYawRange")
-    public Vec2 passengerWeaponStationYawRange = new Vec2(-514, 514);
-    @SerializedName("PassengerWeaponStationPitchRange")
-    public Vec2 passengerWeaponStationPitchRange = new Vec2(-10, 30);
-    @SerializedName("PassengerWeaponStationControllerIndex")
-    public int passengerWeaponStationControllerIndex = 1;
+    @JvmField
+    @SerialName("PassengerWeaponStationPos")
+    var passengerWeaponStationPos: SerializedVec3? = null
 
-    @SerializedName("UsePassengerCreativeAmmoBox")
-    public boolean usePassengerCreativeAmmoBox = true;
+    @JvmField
+    @SerialName("PassengerWeaponStationBarrelPos")
+    var passengerWeaponStationBarrelPos: SerializedVec3 = Vec3.ZERO
 
-    @SerializedName("Gravity")
-    public double gravity = 0.06;
-    @SerializedName("TerrainCompat")
-    public List<Vec3> terrainCompat = null;
-    @SerializedName("TerrainCompatRotateRate")
-    public float terrainCompatRotateRate = 1;
+    @JvmField
+    @SerialName("PassengerWeaponStationTurnSpeed")
+    var passengerWeaponStationTurnSpeed: SerializedVec2 = Vec2(5f, 5f)
+
+    @JvmField
+    @SerialName("PassengerWeaponStationYawRange")
+    var passengerWeaponStationYawRange: SerializedVec2 = Vec2(-514f, 514f)
+
+    @JvmField
+    @SerialName("PassengerWeaponStationPitchRange")
+    var passengerWeaponStationPitchRange: SerializedVec2 = Vec2(-10f, 30f)
+
+    @JvmField
+    @SerialName("PassengerWeaponStationControllerIndex")
+    var passengerWeaponStationControllerIndex: Int = 1
+
+    @JvmField
+    @SerialName("UsePassengerCreativeAmmoBox")
+    var usePassengerCreativeAmmoBox: Boolean = true
+
+    @JvmField
+    @SerialName("Gravity")
+    var gravity: Double = 0.06
+
+    @JvmField
+    @SerialName("TerrainCompat")
+    var terrainCompat: MutableList<SerializedVec3> = mutableListOf()
+
+    @JvmField
+    @SerialName("TerrainCompatRotateRate")
+    var terrainCompatRotateRate: Float = 1f
+
     // 受惯性影响的旋转幅度
-    @SerializedName("InertiaRotateRate")
-    public float inertiaRotateRate = 0f;
+    @JvmField
+    @SerialName("InertiaRotateRate")
+    var inertiaRotateRate: Float = 0f
 
-    @Override
-    public void limit() {
-        this.maxHealth = Math.max(this.maxHealth, 0);
-        this.repairCooldown = Math.max(this.repairCooldown, 0);
-        this.maxEnergy = Math.max(this.maxEnergy, 0);
-        this.weapons = weapons == null ? Map.of() : weapons;
+    override fun limit() {
+        this.maxHealth = max(this.maxHealth, 0f)
+        this.repairCooldown = max(this.repairCooldown, 0)
+        this.maxEnergy = max(this.maxEnergy, 0)
+        this.obb = this.obb.map {
+            it.limit()
+            it
+        }.toMutableList()
 
-        this.obb = this.obb == null ? List.of() : this.obb;
-        this.obb = this.obb.stream().filter(Objects::nonNull).peek(OBBInfo::limit).toList();
+        this.collisionLevel.level = this.collisionLevel.level.coerceIn(0, 4)
+    }
 
-        this.collisionLevel = this.collisionLevel == null ? new CollisionLevel() : this.collisionLevel;
-        this.collisionLevel.level = Mth.clamp(this.collisionLevel.level, 0, 4);
-        this.collisionLevel.powerLimits = this.collisionLevel.powerLimits == null ? List.of() : this.collisionLevel.powerLimits;
+    companion object {
+        private fun <T> getConfigOrDefault(config: ModConfigSpec.ConfigValue<T>): T {
+            return try {
+                config.get()
+            } catch (exception: Exception) {
+                config.getDefault()
+            }
+        }
     }
 }

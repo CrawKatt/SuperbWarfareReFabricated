@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import org.jetbrains.annotations.ApiStatus;
 import software.bernie.geckolib.cache.object.GeoBone;
 
+/*
 @ApiStatus.AvailableSince("0.8.7.1")
 public class RenderPlayerArmEvent {
     private boolean cancelled = false;
@@ -80,3 +81,4 @@ public class RenderPlayerArmEvent {
         this.cancelled = cancel;
     }
 }
+*/

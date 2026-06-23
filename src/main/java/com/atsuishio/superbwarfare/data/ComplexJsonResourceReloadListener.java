@@ -27,7 +27,7 @@ public class ComplexJsonResourceReloadListener extends SimplePreparableReloadLis
     @ParametersAreNonnullByDefault
     protected @NotNull Object prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
         this.data.forEach((name, value) -> {
-            var map = value.data();
+            var map = value.data;
             map.clear();
 
             var converter = FileToIdConverter.json(name);
@@ -36,7 +36,7 @@ public class ComplexJsonResourceReloadListener extends SimplePreparableReloadLis
                 var pathLocation = converter.fileToId(resourcelocation);
 
                 try (var reader = entry.getValue().openAsReader()) {
-                    var data = DataLoader.GSON.fromJson(reader, value.type());
+                    var data = DataLoader.GSON.fromJson(reader, value.type);
 
                     String id;
                     if (data instanceof IDBasedData<?> IDData && !IDData.getId().isEmpty()) {
@@ -52,8 +52,8 @@ public class ComplexJsonResourceReloadListener extends SimplePreparableReloadLis
                 }
             }
 
-            if (value.onReload() != null) {
-                value.onReload().accept(map);
+            if (value.onReload != null) {
+                value.onReload.accept(map);
             }
         });
 

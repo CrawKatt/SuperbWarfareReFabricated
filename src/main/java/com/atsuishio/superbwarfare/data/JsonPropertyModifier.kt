@@ -1,39 +1,62 @@
-package com.atsuishio.superbwarfare.data;
+package com.atsuishio.superbwarfare.data
 
-import com.atsuishio.superbwarfare.Mod;
-import com.google.gson.JsonObject;
+import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.tools.toKxJson
+import com.google.gson.JsonObject
 
 // TODO 取代StringPropModifier
-public class JsonPropertyModifier<DATA extends DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA> implements PropertyModifier<DATA, DEFAULT_DATA> {
-    private JsonObject obj;
-    private String str;
+class JsonPropertyModifier<DATA : DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA>(
+    // TODO 实现VehicleProp后禁止该项为空
+    val props: List<Prop<DATA, DEFAULT_DATA, *, *, *>>? = null
+) : OldPropertyModifier<DATA, DEFAULT_DATA>, PropertyModifier<DATA, DEFAULT_DATA> {
+    private var obj: JsonObject? = null
+    private var str: String? = null
 
-    public void update(JsonObject object) {
-        this.obj = object;
-        this.str = null;
+    fun update(`object`: JsonObject?) {
+        this.obj = `object`
+        this.str = null
     }
 
-    public void update(String string) {
-        if (string == null || string.isEmpty() || string.equals(this.str)) return;
-        this.str = string;
+    fun update(string: String?) {
+        if (string.isNullOrEmpty() || string == this.str) return
+        this.str = string
 
         try {
-            update(DataLoader.GSON.fromJson(string, JsonObject.class));
-        } catch (Exception exception) {
-            Mod.LOGGER.error("Failed to parse string prop modifier: {}", string, exception);
+            update(DataLoader.GSON.fromJson(string, JsonObject::class.java))
+        } catch (exception: Exception) {
+            Mod.LOGGER.error("Failed to parse string prop modifier: {}", string, exception)
         }
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public DEFAULT_DATA computeProperties(DATA data, DEFAULT_DATA rawData) {
-        if (obj == null || obj.isEmpty()) return rawData;
+    override fun computeProperties(data: DATA, rawData: DEFAULT_DATA): DEFAULT_DATA {
+        if (obj == null || obj!!.isEmpty) return rawData
 
-        var dataJson = DataLoader.GSON.toJsonTree(rawData).getAsJsonObject();
-        for (var entry : obj.entrySet()) {
-            dataJson.add(entry.getKey(), entry.getValue());
+        val dataJson = DataLoader.GSON.toJsonTree(rawData).getAsJsonObject()
+        for (entry in obj!!.entrySet()) {
+            dataJson.add(entry.key, entry.value)
         }
 
-        return (DEFAULT_DATA) DataLoader.GSON.fromJson(dataJson, rawData.getClass());
+        return DataLoader.GSON.fromJson(dataJson, rawData!!.javaClass)
+    }
+
+    private val propsMap by lazy {
+        props?.associateBy { it.serializationName } ?: emptyMap()
+    }
+
+    override fun modifyProperty(modifier: PMC<DATA, DEFAULT_DATA>) {
+        val element = obj?.toKxJson() as? kotlinx.serialization.json.JsonObject ?: return
+
+        for ((key, value) in element) {
+            val prop = propsMap[key] ?: continue
+
+            val deserialized = try {
+                prop.deserialize(value)!!
+            } catch (exception: Exception) {
+                Mod.LOGGER.error("Failed to deserialize prop: {}", value, exception)
+                continue
+            }
+            @Suppress("UNCHECKED_CAST")
+            modifier[prop as Prop<DATA, DEFAULT_DATA, *, Any, *>] = deserialized
+        }
     }
 }

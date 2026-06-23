@@ -1,85 +1,141 @@
-package com.atsuishio.superbwarfare.data.gun;
+package com.atsuishio.superbwarfare.data.gun
 
-import com.atsuishio.superbwarfare.annotation.ServerOnly;
-import com.atsuishio.superbwarfare.data.ObjectToList;
-import com.google.gson.annotations.SerializedName;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
+import com.atsuishio.superbwarfare.annotation.ServerOnly
+import com.atsuishio.superbwarfare.data.ObjectToList
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedSoundEvent
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import net.minecraft.sounds.SoundEvents
 
-public class SoundInfo {
-
+@Serializable
+class SoundInfo {
     // 正常的开火音效
+    @JvmField
     @SerializedName("Fire1P")
-    public SoundEvent fire1P;
+    @SerialName("Fire1P")
+    var fire1P: SerializedSoundEvent? = null
 
+    @JvmField
     @ServerOnly
     @SerializedName("Fire3P")
-    public SoundEvent fire3P;
+    @SerialName("Fire3P")
+    var fire3P: SerializedSoundEvent? = null
+
+    @JvmField
     @ServerOnly
     @SerializedName("Fire3PFar")
-    public SoundEvent fire3PFar;
+    @SerialName("Fire3PFar")
+    var fire3PFar: SerializedSoundEvent? = null
+
+    @JvmField
     @ServerOnly
     @SerializedName("Fire3PVeryFar")
-    public SoundEvent fire3PVeryFar;
+    @SerialName("Fire3PVeryFar")
+    var fire3PVeryFar: SerializedSoundEvent? = null
 
     // 装备消音器时的开火音效
+    @JvmField
     @SerializedName("Fire1PSilent")
-    public SoundEvent fire1PSilent;
+    @SerialName("Fire1PSilent")
+    var fire1PSilent: SerializedSoundEvent? = null
 
+    @JvmField
     @ServerOnly
     @SerializedName("Fire3PSilent")
-    public SoundEvent fire3PSilent;
+    @SerialName("Fire3PSilent")
+    var fire3PSilent: SerializedSoundEvent? = null
+
+    @JvmField
     @ServerOnly
     @SerializedName("Fire3PFarSilent")
-    public SoundEvent fire3PFarSilent;
+    @SerialName("Fire3PFarSilent")
+    var fire3PFarSilent: SerializedSoundEvent? = null
+
+    @JvmField
     @ServerOnly
     @SerializedName("Fire3PVeryFarSilent")
-    public SoundEvent fire3PVeryFarSilent;
+    @SerialName("Fire3PVeryFarSilent")
+    var fire3PVeryFarSilent: SerializedSoundEvent? = null
 
     // 换弹音效
+    @JvmField
     @SerializedName("ReloadNormal")
-    public SoundEvent reloadNormal;
+    @SerialName("ReloadNormal")
+    var reloadNormal: SerializedSoundEvent? = null
+
+    @JvmField
     @SerializedName("ReloadEmpty")
-    public SoundEvent reloadEmpty;
+    @SerialName("ReloadEmpty")
+    var reloadEmpty: SerializedSoundEvent? = null
 
+    @JvmField
     @SerializedName("VehicleReload")
-    public SoundEvent vehicleReload = SoundEvents.EMPTY;
-    ;
+    @SerialName("VehicleReload")
+    var vehicleReload: SerializedSoundEvent = SoundEvents.EMPTY
 
+    @JvmField
     @SerializedName("VehicleReload3p")
-    public SoundEvent vehicleReload3p = SoundEvents.EMPTY;
-    ;
+    @SerialName("VehicleReload3p")
+    var vehicleReload3p: SerializedSoundEvent = SoundEvents.EMPTY
 
+    @JvmField
     @SerializedName("VehicleReloadSoundTime")
-    public int vehicleReloadSoundTime = 0;
+    var vehicleReloadSoundTime: Int = 0
 
+    @JvmField
     @SerializedName("ReloadPrepare")
-    public SoundEvent reloadPrepare;
+    @SerialName("ReloadPrepare")
+    var reloadPrepare: SerializedSoundEvent? = null
+
+    @JvmField
     @SerializedName("ReloadPrepareEmpty")
-    public SoundEvent reloadPrepareEmpty;
+    @SerialName("ReloadPrepareEmpty")
+    var reloadPrepareEmpty: SerializedSoundEvent? = null
+
+    @JvmField
     @SerializedName("ReloadPrepareLoad")
-    public SoundEvent reloadPrepareLoad;
+    @SerialName("ReloadPrepareLoad")
+    var reloadPrepareLoad: SerializedSoundEvent? = null
+
+    @JvmField
     @SerializedName("ReloadLoop")
-    public SoundEvent reloadLoop;
+    @SerialName("ReloadLoop")
+    var reloadLoop: SerializedSoundEvent? = null
+
+    @JvmField
     @SerializedName("ReloadEnd")
-    public SoundEvent reloadEnd;
+    @SerialName("ReloadEnd")
+    var reloadEnd: SerializedSoundEvent? = null
 
+    @JvmField
     @SerializedName("Bolt")
-    public SoundEvent bolt;
+    @SerialName("Bolt")
+    var bolt: SerializedSoundEvent? = null
 
+    @JvmField
     @SerializedName("Change")
-    public SoundEvent change;
+    @SerialName("Change")
+    var change: SerializedSoundEvent? = null
 
+    @JvmField
     @SerializedName("Locking")
-    public SoundEvent locking = SoundEvents.EMPTY;
-    @SerializedName("Locked")
-    public SoundEvent locked = SoundEvents.EMPTY;
+    @SerialName("Locking")
+    var locking: SerializedSoundEvent = SoundEvents.EMPTY
 
+    @JvmField
+    @SerializedName("Locked")
+    @SerialName("Locked")
+    var locked: SerializedSoundEvent = SoundEvents.EMPTY
+
+    @JvmField
     @SerializedName("FireSoundInstances")
-    public SoundEvent fireSoundInstances;
+    @SerialName("FireSoundInstances")
+    var fireSoundInstances: SerializedSoundEvent? = null
 
     // 切枪时应该被中止播放的音效
+    @JvmField
     @SerializedName("CancellableSounds")
-    public ObjectToList<String> cancellableSounds = new ObjectToList<>();
-
+    @SerialName("CancellableSounds")
+    var cancellableSounds: ObjectToList<String> = ObjectToList()
 }

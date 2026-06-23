@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * 子弹等投射物在命中实体或方块时触发的事件
  */
+/*
 @ApiStatus.AvailableSince("0.8.7")
 public class ProjectileHitEvent {
 
@@ -108,3 +109,4 @@ public class ProjectileHitEvent {
         this.cancelled = cancel;
     }
 }
+*/

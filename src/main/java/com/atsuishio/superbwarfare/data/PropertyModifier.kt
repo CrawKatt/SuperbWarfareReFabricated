@@ -1,7 +1,7 @@
-package com.atsuishio.superbwarfare.data;
+package com.atsuishio.superbwarfare.data
 
-public interface PropertyModifier<DATA extends DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA> {
-    default DEFAULT_DATA computeProperties(DATA data, DEFAULT_DATA rawData) {
-        return rawData;
-    }
+// TODO 替换旧版modifier
+// 新版kt PropertyModifier
+fun interface PropertyModifier<DATA : DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA> {
+    fun modifyProperty(modifier: PMC<DATA, DEFAULT_DATA>)
 }

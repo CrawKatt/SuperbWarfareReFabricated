@@ -5,9 +5,10 @@ import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModTags;
-import com.atsuishio.superbwarfare.world.TDMSavedData;
+import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.OwnableEntity;
@@ -218,7 +219,7 @@ public class SeekTool {
      * 判断实体的类型是否属于被排除的默认类型
      */
     public static final Predicate<Entity> BASIC_TYPE_FILTER =
-            e -> !(e instanceof HangingEntity || (e instanceof Projectile && !e.getType().is(ModTags.EntityTypes.DESTROYABLE_PROJECTILE)));
+            e -> !(e instanceof HangingEntity || e instanceof Display || (e instanceof Projectile && !e.getType().is(ModTags.EntityTypes.DESTROYABLE_PROJECTILE)));
 
     /**
      * 基础实体过滤判断

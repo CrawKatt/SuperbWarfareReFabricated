@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
+/*
 public class RPGMeleeExplosionTrigger extends SimpleCriterionTrigger<RPGMeleeExplosionTrigger.TriggerInstance> {
 
     public void trigger(ServerPlayer pPlayer) {
@@ -40,3 +41,4 @@ public class RPGMeleeExplosionTrigger extends SimpleCriterionTrigger<RPGMeleeExp
         }
     }
 }
+*/

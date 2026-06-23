@@ -122,6 +122,7 @@ public class GunEventHandler {
     }
 
     public static void autoReload(@Nullable Entity shooter, GunData data, boolean inMainHand) {
+        if (data.compute().autoReload == null) return;
         if (inMainHand && data.compute().autoReload && !data.hasEnoughAmmoToShoot(shooter)) {
             tryStartReload(shooter, data);
         }

@@ -1,18 +1,43 @@
-package com.atsuishio.superbwarfare.data.vehicle.subdata;
+package com.atsuishio.superbwarfare.data.vehicle.subdata
 
-import com.google.gson.annotations.SerializedName;
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-public enum VehicleType {
-    @SerializedName("Empty") EMPTY,
-    @SerializedName("Tank") TANK,
-    @SerializedName("APC") APC,
-    @SerializedName("AA") AA,
-    @SerializedName("Airplane") AIRPLANE,
-    @SerializedName("Helicopter") HELICOPTER,
-    @SerializedName("Car") CAR,
-    @SerializedName("Artillery") ARTILLERY,
-    @SerializedName("Defense") DEFENSE,
-    @SerializedName("Boat") BOAT,
-    @SerializedName("Drone") DRONE,
-    @SerializedName("Special") SPECIAL,
+@Serializable
+enum class VehicleType {
+    @SerialName("Empty")
+    EMPTY,
+
+    @SerialName("Tank")
+    TANK,
+
+    @SerialName("APC")
+    APC,
+
+    @SerialName("AA")
+    AA,
+
+    @SerialName("Airplane")
+    AIRPLANE,
+
+    @SerialName("Helicopter")
+    HELICOPTER,
+
+    @SerialName("Car")
+    CAR,
+
+    @SerialName("Artillery")
+    ARTILLERY,
+
+    @SerialName("Defense")
+    DEFENSE,
+
+    @SerialName("Boat")
+    BOAT,
+
+    @SerialName("Drone")
+    DRONE,
+
+    @SerialName("Special")
+    SPECIAL,
 }

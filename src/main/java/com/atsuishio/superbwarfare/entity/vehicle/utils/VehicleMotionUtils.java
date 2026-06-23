@@ -360,7 +360,7 @@ public final class VehicleMotionUtils {
 
         for (int i = 0; i < flags.length && i < limits.size(); i++) {
             var limit = limits.get(i);
-            flags[i] &= limit.equals() ? power >= limit.power() || motion >= limit.motion() : power > limit.power() || motion > limit.motion();
+            flags[i] &= limit.equals ? power >= limit.power || motion >= limit.motion : power > limit.power || motion > limit.motion;
         }
 
         if (!vehicle.enableAABB()) {

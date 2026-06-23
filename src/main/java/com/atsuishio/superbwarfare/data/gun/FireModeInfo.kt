@@ -1,36 +1,52 @@
-package com.atsuishio.superbwarfare.data.gun;
+package com.atsuishio.superbwarfare.data.gun
 
-import com.atsuishio.superbwarfare.data.DeserializeFromString;
-import com.atsuishio.superbwarfare.data.JsonPropertyModifier;
-import com.google.gson.JsonObject;
-import com.google.gson.annotations.SerializedName;
+import com.atsuishio.superbwarfare.data.*
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedGsonObject
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-public class FireModeInfo implements DeserializeFromString, GunPropertyModifier {
+@STOFactory(FireModeInfo.FireModeInfoInstanceBuilder::class)
+@Serializable
+class FireModeInfo : DeserializeFromString, PropertyModifier<GunData, DefaultGunData> {
+    @JvmField
     @SerializedName("Mode")
-    public FireMode mode = FireMode.SEMI;
+    @SerialName("Mode")
+    var mode: FireMode? = FireMode.SEMI
 
+    @JvmField
     @SerializedName("Name")
-    public String name = "Semi";
+    @SerialName("Name")
+    var name: String = "Semi"
 
     @SerializedName("Override")
-    public JsonObject override = null;
+    @SerialName("Override")
+    var override: SerializedGsonObject? = null
 
-    private final transient JsonPropertyModifier<GunData, DefaultGunData> jsonPropModifier = new JsonPropertyModifier<>();
+    @Transient
+    @kotlinx.serialization.Transient
+    private val jsonPropModifier = JsonPropertyModifier(GunProp.entries)
 
-    @Override
-    public DefaultGunData computeProperties(GunData gunData, DefaultGunData rawData) {
-        jsonPropModifier.update(override);
-        return jsonPropModifier.computeProperties(gunData, rawData);
+    override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) {
+        jsonPropModifier.update(override)
+        jsonPropModifier.modifyProperty(modifier)
     }
 
-    public void init() {
+    fun init() {
     }
 
-    @Override
-    public void deserializeFromString(String str) {
-        init();
+    override fun deserializeFromString(str: String) {
+        init()
 
-        this.mode = FireMode.tryParse(str);
-        this.name = str;
+        this.mode = FireMode.tryParse(str)
+        this.name = str
+    }
+
+    object FireModeInfoInstanceBuilder : StringInstanceBuilder<FireModeInfo> {
+        override fun fromString(value: String) = FireModeInfo().apply {
+            init()
+            this.mode = FireMode.tryParse(value)
+            this.name = value
+        }
     }
 }

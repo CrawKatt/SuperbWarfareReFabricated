@@ -1,35 +1,74 @@
-package com.atsuishio.superbwarfare.data.gun;
+package com.atsuishio.superbwarfare.data.gun
 
-import com.atsuishio.superbwarfare.data.StringOrVec3;
-import com.google.gson.annotations.SerializedName;
+import com.atsuishio.superbwarfare.data.StringOrVec3
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-public class SeekWeaponInfo {
+@Serializable
+class SeekWeaponInfo {
+    @JvmField
     @SerializedName("SeekDirection")
-    public StringOrVec3 seekDirection = new StringOrVec3("Default");
+    @SerialName("SeekDirection")
+    var seekDirection: StringOrVec3 = StringOrVec3("Default")
+
+    @JvmField
     @SerializedName("SeekRange")
-    public double seekRange = 384;
+    @SerialName("SeekRange")
+    var seekRange = 384.0
 
+    @JvmField
     @SerializedName("SeekAngle")
-    public double seekAngle = 20;
+    @SerialName("SeekAngle")
+    var seekAngle = 20.0
 
+    @JvmField
     @SerializedName("MinTargetHeight")
-    public double minTargetHeight = 0;
+    @SerialName("MinTargetHeight")
+    var minTargetHeight = 0.0
 
+    @JvmField
     @SerializedName("MaxTargetHeight")
-    public double maxTargetHeight = 114514;
+    @SerialName("MaxTargetHeight")
+    var maxTargetHeight = 114514.0
 
+    @JvmField
     @SerializedName("SeekTime")
-    public int seekTime = 10;
+    @SerialName("SeekTime")
+    var seekTime = 10
 
+    @JvmField
     @SerializedName("MinTargetSize")
-    public double minTargetSize = 0;
+    @SerialName("MinTargetSize")
+    var minTargetSize = 0.0
 
+    @JvmField
     @SerializedName("CalculateTrajectory")
-    public boolean calculateTrajectory = false;
+    @SerialName("CalculateTrajectory")
+    var calculateTrajectory = false
 
+    @JvmField
     @SerializedName("OnlyLockBlock")
-    public boolean onlyLockBlock = false;
+    @SerialName("OnlyLockBlock")
+    var onlyLockBlock = false
 
+    @JvmField
     @SerializedName("OnlyLockEntity")
-    public boolean onlyLockEntity = false;
+    @SerialName("OnlyLockEntity")
+    var onlyLockEntity = false
+
+    @JvmField
+    @SerializedName("MaxGuidedRange")
+    @SerialName("MaxGuidedRange")
+    var maxGuidedRange = 2048.0
+
+    @JvmField
+    @SerializedName("CanGuidedByRadar")
+    @SerialName("CanGuidedByRadar")
+    var canGuidedByRadar = true
+
+    @JvmField
+    @SerializedName("AffectedByStealthTarget")
+    @SerialName("AffectedByStealthTarget")
+    var affectedByStealthTarget = true
 }

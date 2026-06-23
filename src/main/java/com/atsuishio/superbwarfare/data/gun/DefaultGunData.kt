@@ -1,347 +1,511 @@
-package com.atsuishio.superbwarfare.data.gun;
+package com.atsuishio.superbwarfare.data.gun
 
-import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.annotation.ServerOnly;
-import com.atsuishio.superbwarfare.data.IDBasedData;
-import com.atsuishio.superbwarfare.data.ModColor;
-import com.atsuishio.superbwarfare.data.ObjectToList;
-import com.atsuishio.superbwarfare.data.StringToObject;
-import com.google.gson.annotations.SerializedName;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
+import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.annotation.ServerOnly
+import com.atsuishio.superbwarfare.data.IDBasedData
+import com.atsuishio.superbwarfare.data.ModColor
+import com.atsuishio.superbwarfare.data.ObjectToList
+import com.atsuishio.superbwarfare.data.StringToObject
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedResourceLocation
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVec3
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import net.minecraft.resources.ResourceLocation
+import kotlin.math.max
+import kotlin.math.min
 
-import java.util.List;
-import java.util.Set;
-
-@SuppressWarnings("unused")
-public class DefaultGunData implements IDBasedData<DefaultGunData> {
+@Suppress("unused")
+@Serializable
+class DefaultGunData : IDBasedData<DefaultGunData> {
+    @JvmField
     @SerializedName("ID")
-    public String id = "";
+    @SerialName("ID")
+    var id: String = ""
 
-    public transient boolean isDefaultData = true;
+    override fun getId() = id
 
-    @Override
-    public String getId() {
-        return this.id;
+    override fun setId(id: String) {
+        this.id = id
     }
+
+    @JvmField
+    @Transient
+    @kotlinx.serialization.Transient
+    var isDefaultData = true
 
     // 不要动态修改这玩意，很容易出问题
-    @SerializedName("MaxDurability")
-    public int maxDurability = 0;
+    @JvmField
+    @SerialName("MaxDurability")
+    var maxDurability = 0
 
+    @JvmField
     @ServerOnly
-    @SerializedName("DurabilityPerShoot")
-    public int durabilityPerShoot = 1;
+    @SerialName("DurabilityPerShoot")
+    var durabilityPerShoot = 1
 
-    @SerializedName("MaxEnergy")
-    public int maxEnergy = 0;
+    @JvmField
+    @SerialName("MaxEnergy")
+    var maxEnergy = 0
 
+    @JvmField
     @ServerOnly
-    @SerializedName("MaxReceiveEnergy")
-    public int maxReceiveEnergy = -1;
-    @ServerOnly
-    @SerializedName("MaxExtractEnergy")
-    public int maxExtractEnergy = -1;
+    @SerialName("MaxReceiveEnergy")
+    var maxReceiveEnergy = -1
 
-    @SerializedName("RecoilX")
-    public double recoilX;
-    @SerializedName("RecoilY")
-    public double recoilY;
-    @SerializedName("Recoil")
-    public double recoil;
-    @SerializedName("RecoilTime")
-    public int recoilTime = 0;
-    @SerializedName("RecoilForce")
-    public float recoilForce = 0f;
+    @JvmField
+    @ServerOnly
+    @SerialName("MaxExtractEnergy")
+    var maxExtractEnergy = -1
+
+    @JvmField
+    @SerialName("RecoilX")
+    var recoilX = 0.0
+
+    @JvmField
+    @SerialName("RecoilY")
+    var recoilY = 0.0
+
+    @JvmField
+    @SerialName("Recoil")
+    var recoil = 0.0
+
+    @JvmField
+    @SerialName("RecoilTime")
+    var recoilTime = 0
+
+    @JvmField
+    @SerialName("RecoilForce")
+    var recoilForce = 0f
 
     // x:范围，y：振动时长，z：振幅
+    @JvmField
     @ServerOnly
-    @SerializedName("ShootShake")
-    public Vec3 shootShake = null;
+    @SerialName("ShootShake")
+    var shootShake: SerializedVec3? = null
 
-    @SerializedName("DefaultZoom")
-    public double defaultZoom = 1.25;
-    @SerializedName("MinZoom")
-    public double minZoom = defaultZoom;
-    @SerializedName("MaxZoom")
-    public double maxZoom = defaultZoom;
+    @JvmField
+    @SerialName("DefaultZoom")
+    var defaultZoom = 1.25
 
-    @SerializedName("Spread")
-    public double spread;
-    @SerializedName("Damage")
-    public double damage;
-    @SerializedName("Headshot")
-    public double headshot = 1.5;
-    @SerializedName("Velocity")
-    public double velocity;
-    @SerializedName("Magazine")
-    public int magazine;
+    @JvmField
+    @SerialName("MinZoom")
+    var minZoom = defaultZoom
 
-    @SerializedName("Range")
-    public int range = 128;
+    @JvmField
+    @SerialName("MaxZoom")
+    var maxZoom = defaultZoom
 
-    @SerializedName("MeleeDamage")
-    public double meleeDamage;
-    @SerializedName("MeleeDuration")
-    public int meleeDuration = 16;
-    @SerializedName("MeleeDamageTime")
-    public int meleeDamageTime = 6;
+    @JvmField
+    @SerialName("Spread")
+    var spread = 0.0
 
+    @JvmField
+    @SerialName("Damage")
+    var damage = 0.0
+
+    @JvmField
+    @SerialName("Headshot")
+    var headshot = 1.5
+
+    @JvmField
+    @SerialName("Velocity")
+    var velocity = 0.0
+
+    @JvmField
+    @SerialName("Magazine")
+    var magazine = 0
+
+    @JvmField
+    @SerialName("Range")
+    var range = 128
+
+    @JvmField
+    @SerialName("MeleeDamage")
+    var meleeDamage = 0.0
+
+    @JvmField
+    @SerialName("MeleeDuration")
+    var meleeDuration = 16
+
+    @JvmField
+    @SerialName("MeleeDamageTime")
+    var meleeDamageTime = 6
+
+    @JvmField
+    @SerialName("MeleeAngle")
+    var meleeAngle = 30
+
+    @JvmField
+    @SerialName("MeleeRange")
+    var meleeRange = 0.0
+
+    @JvmField
     @ServerOnly
-    @SerializedName("Projectile")
-    public StringToObject<ProjectileInfo> projectile = new StringToObject<>(new ProjectileInfo());
+    @SerialName("Projectile")
+    var projectile: StringToObject<ProjectileInfo> = StringToObject(ProjectileInfo())
 
-    public ProjectileInfo projectile() {
-        return projectile.value;
+    fun projectile(): ProjectileInfo {
+        return projectile.value
     }
 
+    @JvmField
     @ServerOnly
-    @SerializedName("ShootPos")
-    public ShootPos shootPos = new ShootPos();
+    @SerialName("ShootPos")
+    var shootPos = ShootPos()
 
-    @SerializedName("SeekWeaponInfo")
-    public SeekWeaponInfo seekWeaponInfo = null;
+    @JvmField
+    @SerialName("SeekWeaponInfo")
+    var seekWeaponInfo: SeekWeaponInfo? = null
 
-    @SerializedName("AmmoCostPerShoot")
-    public int ammoCostPerShoot = 1;
-    @SerializedName("ProjectileAmount")
-    public int projectileAmount = 1;
-    @SerializedName("Weight")
-    public double weight = 1;
+    @JvmField
+    @SerialName("AmmoCostPerShoot")
+    var ammoCostPerShoot = 1
 
-    @SerializedName("DefaultFireMode")
-    public String defaultFireMode = FireMode.SEMI.name;
-    @SerializedName("AvailableFireModes")
-    public ObjectToList<StringToObject<FireModeInfo>> availableFireModes = new ObjectToList<>(new StringToObject<>(new FireModeInfo()));
+    @JvmField
+    @SerialName("ProjectileAmount")
+    var projectileAmount = 1
 
-    public List<FireModeInfo> availableFireModes() {
-        return availableFireModes.list.stream().map(m -> m.value).toList();
-    }
+    @JvmField
+    @SerialName("Weight")
+    var weight = 1.0
 
-    @SerializedName("ReloadTypes")
-    public Set<ReloadType> reloadTypes = Set.of(ReloadType.MAGAZINE);
+    @JvmField
+    @SerialName("DefaultFireMode")
+    var defaultFireMode: String = FireMode.SEMI.typeName
 
-    @SerializedName("SeekType")
-    public SeekType seekType = SeekType.NONE;
+    @JvmField
+    @SerialName("AvailableFireModes")
+    var availableFireModes = ObjectToList(StringToObject(FireModeInfo()))
 
-    @SerializedName("GunType")
-    public GunType gunType = GunType.SPECIAL;
+    fun availableFireModes() = availableFireModes.list.map { it.value }
 
-    @SerializedName("AutoReload")
-    public boolean autoReload = false;
+    @JvmField
+    @SerialName("ReloadTypes")
+    var reloadTypes = setOf(ReloadType.MAGAZINE)
 
-    @SerializedName("WithdrawAmmoWhenChangeSlot")
-    public boolean withdrawAmmoWhenChangeSlot = false;
+    @JvmField
+    @SerialName("SeekType")
+    var seekType: SeekType? = SeekType.NONE
 
-    @SerializedName("ZoomReload")
-    public boolean zoomReload = true;
+    @JvmField
+    @SerialName("GunType")
+    var gunType = GunType.SPECIAL
 
-    @SerializedName("ClearHoldProgressAfterShoot")
-    public boolean clearHoldProgressAfterShoot = false;
+    // Nullable!!!
+    @JvmField
+    @SerialName("AutoReload")
+    var autoReload: Boolean? = null
 
-    @SerializedName("BurstAmount")
-    public int burstAmount;
-    @SerializedName("BypassesArmor")
-    public double bypassesArmor;
+    @JvmField
+    @SerialName("WithdrawAmmoWhenChangeSlot")
+    var withdrawAmmoWhenChangeSlot = false
 
-    @SerializedName("AmmoType")
-    public ObjectToList<StringToObject<AmmoConsumer>> ammoConsumers = new ObjectToList<>();
+    @JvmField
+    @SerialName("ZoomReload")
+    var zoomReload = true
 
-    private transient List<AmmoConsumer> ammoConsumersCache;
+    @JvmField
+    @SerialName("ClearHoldProgressAfterShoot")
+    var clearHoldProgressAfterShoot = false
 
-    public List<AmmoConsumer> getAmmoConsumers() {
+    @JvmField
+    @SerialName("BurstAmount")
+    var burstAmount = 0
+
+    @JvmField
+    @SerialName("BypassesArmor")
+    var bypassesArmor = 0.0
+
+    @JvmField
+    @SerialName("AmmoType")
+    var ammoConsumers: ObjectToList<StringToObject<AmmoConsumer>> = ObjectToList()
+
+    @Transient
+    @kotlinx.serialization.Transient
+    private var ammoConsumersCache: List<AmmoConsumer>? = null
+
+    fun getProcessedAmmoConsumers(): List<AmmoConsumer> {
         if (ammoConsumersCache == null) {
-            this.ammoConsumersCache = this.ammoConsumers.list.stream()
-                    .map(c -> {
-                        if (!c.value.initialized()) {
-                            c.value.init();
-                        }
-                        return c.value;
-                    })
-                    .filter(c -> {
-                        if (c.type == AmmoConsumer.AmmoConsumeType.INVALID) {
-                            Mod.LOGGER.warn("invalid ammo string {} for {}", c.ammo, this.id);
-                            return false;
-                        }
-                        return true;
-                    })
-                    .toList();
+            this.ammoConsumersCache = this.ammoConsumers.list
+                .map { c ->
+                    if (!c.value.initialized()) {
+                        c.value.init()
+                    }
+                    c.value
+                }
+                .filter { c ->
+                    if (c.type == AmmoConsumer.AmmoConsumeType.INVALID) {
+                        Mod.LOGGER.warn("invalid ammo string {} for {}", c.ammo, this.id)
+                        return@filter false
+                    }
+                    true
+                }
         }
 
-        return this.ammoConsumersCache;
+        return this.ammoConsumersCache!!
     }
 
-    private transient List<FireModeInfo> fireModesCache;
+    fun getAmmoConsumers(): List<AmmoConsumer> = getProcessedAmmoConsumers()
 
-    public List<FireModeInfo> getFireModes() {
-        if (fireModesCache == null) {
-            this.fireModesCache = this.availableFireModes.list.stream()
-                    .map(c -> {
-                        c.value.init();
-                        return c.value;
-                    })
-                    .toList();
+    @Transient
+    @kotlinx.serialization.Transient
+    private var fireModesCache: List<FireModeInfo>? = null
+
+    val fireModes: List<FireModeInfo>
+        get() {
+            if (fireModesCache == null) {
+                this.fireModesCache = this.availableFireModes.list
+                    .map { c ->
+                        c.value.init()
+                        c.value
+                    }
+            }
+
+            return this.fireModesCache!!
         }
 
-        return this.fireModesCache;
-    }
+    @JvmField
+    @SerialName("NormalReloadTime")
+    var normalReloadTime = 0
 
-    @SerializedName("NormalReloadTime")
-    public int normalReloadTime;
-    @SerializedName("EmptyReloadTime")
-    public int emptyReloadTime;
-    @SerializedName("BoltActionTime")
-    public int boltActionTime;
-    @SerializedName("PrepareTime")
-    public int prepareTime;
-    @SerializedName("PrepareLoadTime")
-    public int prepareLoadTime;
+    @JvmField
+    @SerialName("EmptyReloadTime")
+    var emptyReloadTime = 0
+
+    @JvmField
+    @SerialName("BoltActionTime")
+    var boltActionTime = 0
+
+    @JvmField
+    @SerialName("PrepareTime")
+    var prepareTime = 0
+
+    @JvmField
+    @SerialName("PrepareLoadTime")
+    var prepareLoadTime = 0
 
     // 单发装填时的上弹时间
-    @SerializedName("PrepareAmmoLoadTime")
-    public int prepareAmmoLoadTime = 1;
-    @SerializedName("PrepareEmptyTime")
-    public int prepareEmptyTime;
+    @JvmField
+    @SerialName("PrepareAmmoLoadTime")
+    var prepareAmmoLoadTime = 1
+
+    @JvmField
+    @SerialName("PrepareEmptyTime")
+    var prepareEmptyTime = 0
 
     // 每次单发装填用时的
-    @SerializedName("IterativeTime")
-    public int iterativeTime;
+    @JvmField
+    @SerialName("IterativeTime")
+    var iterativeTime = 0
 
     // 单发装填时的上弹时间，在reload.iterativeLoadTimer等于该值时上弹
-    @SerializedName("IterativeAmmoLoadTime")
-    public int iterativeAmmoLoadTime = 1;
+    @JvmField
+    @SerialName("IterativeAmmoLoadTime")
+    var iterativeAmmoLoadTime = 1
 
     // 单次单发装填上弹数量
-    @SerializedName("IterativeLoadAmount")
-    public int iterativeLoadAmount = 1;
+    @JvmField
+    @SerialName("IterativeLoadAmount")
+    var iterativeLoadAmount = 1
 
-    @SerializedName("FinishTime")
-    public int finishTime;
+    @JvmField
+    @SerialName("FinishTime")
+    var finishTime = 0
 
     // 连发模式下的射击间隔时间
-    @SerializedName("BurstCooldown")
-    public int burstCooldown = 30;
+    @JvmField
+    @SerialName("BurstCooldown")
+    var burstCooldown = 30
 
+    @JvmField
     @ServerOnly
-    @SerializedName("SoundRadius")
-    public double soundRadius;
-    @SerializedName("RPM")
-    public int rpm = 600;
+    @SerialName("SoundRadius")
+    var soundRadius = 0.0
 
-    @SerializedName("ExplosionDamage")
-    public double explosionDamage;
-    @SerializedName("ExplosionRadius")
-    public double explosionRadius;
-    @SerializedName("Gravity")
-    public double gravity = 0.05;
+    @JvmField
+    @SerialName("RPM")
+    var rpm = 600
 
-    @SerializedName("ShootDelay")
-    public int shootDelay = 0;
+    @JvmField
+    @SerialName("ExplosionDamage")
+    var explosionDamage = 0.0
 
+    @JvmField
+    @SerialName("ExplosionRadius")
+    var explosionRadius = 0.0
+
+    @JvmField
     @ServerOnly
-    @SerializedName("HeatPerShoot")
-    public double heatPerShoot = 0;
+    @SerialName("IsAntiAirProjectile")
+    var isAntiAirProjectile = false
 
-    @SerializedName("AvailablePerks")
-    public ObjectToList<String> availablePerks = new ObjectToList<>(
-            "@Ammo",
-            "superbwarfare:field_doctor",
-            "superbwarfare:powerful_attraction",
-            "superbwarfare:intelligent_chip",
-            "superbwarfare:monster_hunter",
-            "superbwarfare:vorpal_weapon",
-            "!superbwarfare:micro_missile",
-            "!superbwarfare:longer_wire",
-            "!superbwarfare:cupid_arrow"
-    );
+    @JvmField
+    @ServerOnly
+    @SerialName("IsClusterMunitionsProjectile")
+    var isClusterMunitionsProjectile = false
 
-    public List<String> availablePerks() {
-        return availablePerks.list;
+    @JvmField
+    @ServerOnly
+    @SerialName("IsArmorPiercingProjectile")
+    var isArmorPiercingProjectile = false
+
+    @JvmField
+    @ServerOnly
+    @SerialName("IsHighExplosiveProjectile")
+    var isHighExplosiveProjectile = false
+
+    @JvmField
+    @ServerOnly
+    @SerialName("IsGrapeShotProjectile")
+    var isGrapeShotProjectile = false
+
+    @JvmField
+    @SerialName("Gravity")
+    var gravity = 0.05
+
+    @JvmField
+    @SerialName("ShootDelay")
+    var shootDelay = 0
+
+    @JvmField
+    @ServerOnly
+    @SerialName("HeatPerShoot")
+    var heatPerShoot = 0.0
+
+    @JvmField
+    @SerialName("AvailablePerks")
+    var availablePerks = ObjectToList(
+        "@Ammo",
+        "superbwarfare:field_doctor",
+        "superbwarfare:powerful_attraction",
+        "superbwarfare:intelligent_chip",
+        "superbwarfare:monster_hunter",
+        "superbwarfare:vorpal_weapon",
+        "!superbwarfare:micro_missile",
+        "!superbwarfare:longer_wire",
+        "!superbwarfare:cupid_arrow"
+    )
+
+    fun availablePerks(): List<String> {
+        return availablePerks.list
     }
 
+    @JvmField
     @ServerOnly
-    @SerializedName("DamageReduce")
-    public DamageReduce damageReduce = new DamageReduce();
+    @SerialName("DamageReduce")
+    var damageReduce: DamageReduce = DamageReduce()
 
     // 自然情况下每tick减少的热量
+    @JvmField
     @ServerOnly
-    @SerializedName("NaturalCooldown")
-    public double naturalCooldown = 0.25;
+    @SerialName("NaturalCooldown")
+    var naturalCooldown = 0.25
+
     // 在水中或雨中时的散热比例
+    @JvmField
     @ServerOnly
-    @SerializedName("InWaterCooldownRate")
-    public double inWaterCooldownRate = 1.1;
+    @SerialName("InWaterCooldownRate")
+    var inWaterCooldownRate = 1.1
+
     // 在细雪中时的散热比例
+    @JvmField
     @ServerOnly
-    @SerializedName("InSnowCooldownRate")
-    public double inSnowCooldownRate = 1.5;
+    @SerialName("InSnowCooldownRate")
+    var inSnowCooldownRate = 1.5
+
     // 在火焰中时的散热比例
+    @JvmField
     @ServerOnly
-    @SerializedName("InFireCooldownRate")
-    public double inFireCooldownRate = 0.6;
+    @SerialName("InFireCooldownRate")
+    var inFireCooldownRate = 0.6
+
     // 在岩浆中时的散热比例
+    @JvmField
     @ServerOnly
-    @SerializedName("InLavaCooldownRate")
-    public double inLavaCooldownRate = 0.2;
+    @SerialName("InLavaCooldownRate")
+    var inLavaCooldownRate = 0.2
 
     // 瞄准时的扩散比例
-    @SerializedName("ZoomSpreadRate")
-    public double zoomSpreadRate = 0.1;
+    @JvmField
+    @SerialName("ZoomSpreadRate")
+    var zoomSpreadRate = 0.1
 
-    @SerializedName("SeekTime")
-    public int seekTime = 20;
-    @SerializedName("SeekAngle")
-    public double seekAngle = 10;
-    @SerializedName("SeekRange")
-    public double seekRange = 384;
+    @JvmField
+    @SerialName("SeekTime")
+    var seekTime = 20
 
-    @SerializedName("MinTargetHeight")
-    public double minTargetHeight = 0;
+    @JvmField
+    @SerialName("SeekAngle")
+    var seekAngle = 10.0
 
-    @SerializedName("MaxTargetHeight")
-    public double maxTargetHeight = 114514;
+    @JvmField
+    @SerialName("SeekRange")
+    var seekRange = 384.0
 
-    @SerializedName("SoundInfo")
-    public SoundInfo soundInfo = new SoundInfo();
+    @JvmField
+    @SerialName("MaxGuidedRange")
+    var maxGuidedRange = 1024.0
 
+    @JvmField
+    @SerialName("CanGuidedByRadar")
+    var canGuidedByRadar = true
+
+    @JvmField
+    @SerialName("AffectedByStealthTarget")
+    var affectedByStealthTarget = true
+
+    @JvmField
+    @SerialName("MinTargetHeight")
+    var minTargetHeight = 0.0
+
+    @JvmField
+    @SerialName("MaxTargetHeight")
+    var maxTargetHeight = 114514.0
+
+    @JvmField
+    @SerialName("SoundInfo")
+    var soundInfo: SoundInfo = SoundInfo()
+
+    @JvmField
     @ServerOnly
-    @SerializedName("ShootAnimationTime")
-    public int shootAnimationTime = 0;
+    @SerialName("ShootAnimationTime")
+    var shootAnimationTime = 0
 
+    @JvmField
     @ServerOnly
-    @SerializedName("IsAntiAirProjectile")
-    public boolean isAntiAirProjectile = false;
+    @SerialName("SpreadAmount")
+    var spreadAmount = 10
 
+    @JvmField
     @ServerOnly
-    @SerializedName("IsClusterMunitionsProjectile")
-    public boolean isClusterMunitionsProjectile = false;
+    @SerialName("ApDurability")
+    var apDurability = 50
 
+    @JvmField
     @ServerOnly
-    @SerializedName("SpreadAmount")
-    public int spreadAmount = 10;
+    @SerialName("SpreadAngle")
+    var spreadAngle = 15
 
+    @JvmField
     @ServerOnly
-    @SerializedName("SpreadAngle")
-    public int spreadAngle = 15;
+    @SerialName("ShellType")
+    var shellType: String = "Default"
 
+    @JvmField
     @ServerOnly
-    @SerializedName("IsArmorPiercingProjectile")
-    public boolean isArmorPiercingProjectile = false;
+    @SerialName("ProjectileLife")
+    var projectileLife = 400
 
-    @ServerOnly
-    @SerializedName("IsHighExplosiveProjectile")
-    public boolean isHighExplosiveProjectile = false;
+    @JvmField
+    @SerialName("AddShooterDeltaMovement")
+    var addShooterDeltaMovement = false
 
-    @ServerOnly
-    @SerializedName("IsGrapeShotProjectile")
-    public boolean isGrapeShotProjectile = false;
+    @JvmField
+    @SerialName("Icon")
+    var icon: SerializedResourceLocation = DEFAULT_ICON
 
-    @SerializedName("AddShooterDeltaMovement")
-    public boolean addShooterDeltaMovement = false;
-
-    @SerializedName("Icon")
-    public ResourceLocation icon = Mod.loc("textures/gun_icon/default_icon.png");
     /*
      * 准星类型
      * 预制的字段有：
@@ -350,53 +514,63 @@ public class DefaultGunData implements IDBasedData<DefaultGunData> {
      * @GunDefault - 默认枪械准星
      * @VehicleDefault - 默认载具准星
      */
-    @SerializedName("Crosshair")
-    public String crosshair = "@GunDefault";
+    @JvmField
+    @SerialName("Crosshair")
+    var crosshair = "@GunDefault"
+
     // 瞄准时的准星，默认为空，仅用于部分载具
-    @SerializedName("CrosshairZooming")
-    public String crosshairZooming = "@Empty";
-    @SerializedName("CrosshairColor")
-    public ModColor crosshairColor = new ModColor();
-    @SerializedName("Name")
-    public String name;
+    @JvmField
+    @SerialName("CrosshairZooming")
+    var crosshairZooming = "@Empty"
 
-    @Override
-    public void limit() {
-        maxDurability = Math.max(0, maxDurability);
-        durabilityPerShoot = Math.max(0, durabilityPerShoot);
-        maxEnergy = Math.max(0, maxEnergy);
+    @JvmField
+    @SerialName("CrosshairColor")
+    var crosshairColor: ModColor = ModColor()
 
-        var temp = Mth.clamp(maxReceiveEnergy, -1, maxEnergy);
-        maxReceiveEnergy = temp < 0 ? maxEnergy : temp;
+    @JvmField
+    @SerialName("Name")
+    var name: String? = null
 
-        temp = Mth.clamp(maxExtractEnergy, -1, maxEnergy);
-        maxExtractEnergy = temp < 0 ? maxEnergy : temp;
+    override fun limit() {
+        maxDurability = max(0, maxDurability)
+        durabilityPerShoot = max(0, durabilityPerShoot)
+        maxEnergy = max(0, maxEnergy)
 
-        meleeDuration = Math.max(1, meleeDuration);
-        zoomSpreadRate = Mth.clamp(zoomSpreadRate, 0, 1);
-        range = Math.max(1, range);
+        var temp = maxReceiveEnergy.coerceIn(-1, maxEnergy)
+        maxReceiveEnergy = if (temp < 0) maxEnergy else temp
 
-        meleeDamageTime = Math.min(meleeDuration - 1, meleeDamageTime);
+        temp = maxExtractEnergy.coerceIn(-1, maxEnergy)
+        maxExtractEnergy = if (temp < 0) maxEnergy else temp
 
-        ammoCostPerShoot = Math.max(0, ammoCostPerShoot);
-        projectileAmount = Math.max(0, projectileAmount);
-        weight = Math.max(1, weight);
+        meleeDuration = max(1, meleeDuration)
 
-        if (projectileAmount == 0 && meleeDamage > 0) {
-            magazine = 0;
+        meleeAngle = meleeAngle.coerceIn(1, 180)
+
+        zoomSpreadRate = zoomSpreadRate.coerceIn(0.0, 1.0)
+        range = max(1, range)
+
+        meleeDamageTime = min(meleeDuration - 1, meleeDamageTime)
+
+        ammoCostPerShoot = max(0, ammoCostPerShoot)
+        projectileAmount = max(0, projectileAmount)
+        weight = max(1.0, weight)
+
+        magazine = if (projectileAmount == 0 && meleeDamage > 0) {
+            0
         } else {
-            magazine = Math.max(0, magazine);
-        }
-
-        if (reloadTypes == null) {
-            reloadTypes = Set.of();
+            max(0, magazine)
         }
 
         if (seekType == null) {
-            seekType = SeekType.NONE;
+            seekType = SeekType.NONE
         }
 
-        burstAmount = Math.max(0, burstAmount);
-        rpm = Mth.clamp(rpm, 1, 114514);
+        burstAmount = max(0, burstAmount)
+        rpm = rpm.coerceIn(1, 114514)
+    }
+
+    companion object {
+        val DEFAULT_ICON: ResourceLocation = loc("textures/gun_icon/default_icon.png")
+
     }
 }

@@ -17,7 +17,7 @@ import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.tools.GunsTool;
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger;
-import com.atsuishio.superbwarfare.world.TDMSavedData;
+import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;

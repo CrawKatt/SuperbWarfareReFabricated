@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+/*
 @ApiStatus.Internal
 @ApiStatus.AvailableSince("0.8.0")
 public class ReloadEvent {
@@ -50,3 +51,4 @@ public class ReloadEvent {
         this.cancelled = cancel;
     }
 }
+*/

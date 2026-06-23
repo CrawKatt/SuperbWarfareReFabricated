@@ -1,39 +1,52 @@
-package com.atsuishio.superbwarfare.data.vehicle.subdata;
+package com.atsuishio.superbwarfare.data.vehicle.subdata
 
-import com.atsuishio.superbwarfare.data.StringOrVec3;
-import com.google.gson.annotations.SerializedName;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
+import com.atsuishio.superbwarfare.data.StringOrVec3
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVec2
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVec3
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import net.minecraft.world.phys.Vec2
+import net.minecraft.world.phys.Vec3
 
-public class CameraPos {
+@Serializable
+class CameraPos {
+    @JvmField
+    @SerialName("Transform")
+    var transform: String = "Default"
 
-    @SerializedName("Transform")
-    public String transform = "Default";
+    @JvmField
+    @SerialName("Position")
+    var position: SerializedVec3 = Vec3.ZERO
 
-    @SerializedName("Position")
-    public Vec3 position = Vec3.ZERO;
+    @JvmField
+    @SerialName("Direction")
+    var direction: StringOrVec3 = StringOrVec3("Default")
 
-    @SerializedName("Direction")
-    public StringOrVec3 direction = new StringOrVec3("Default");
+    @JvmField
+    @SerialName("ZoomPosition")
+    var zoomPosition: SerializedVec3? = null
 
-    @SerializedName("ZoomPosition")
-    public Vec3 zoomPosition = null;
+    @JvmField
+    @SerialName("ZoomDirection")
+    var zoomDirection: StringOrVec3? = null
 
-    @SerializedName("ZoomDirection")
-    public StringOrVec3 zoomDirection = null;
+    @JvmField
+    @SerialName("UseFixedCameraPos")
+    var useFixedCameraPos: Boolean = false
 
-    @SerializedName("UseFixedCameraPos")
-    public boolean useFixedCameraPos = false;
+    @JvmField
+    @SerialName("UseSimulate3P")
+    var useSimulate3P: Boolean = false
 
-    @SerializedName("UseSimulate3P")
-    public boolean useSimulate3P = false;
+    @JvmField
+    @SerialName("Simulate3PPos")
+    var simulate3PPos: SerializedVec2 = Vec2(6f, 1f)
 
-    @SerializedName("Simulate3PPos")
-    public Vec2 simulate3PPos = new Vec2(6, 1);
+    @JvmField
+    @SerialName("UseAircraftCamera")
+    var useAircraftCamera: Boolean = false
 
-    @SerializedName("UseAircraftCamera")
-    public boolean useAircraftCamera = false;
-
-    @SerializedName("AircraftCameraPos")
-    public Vec3 aircraftCameraPos = new Vec3(0, 3, -10);
+    @JvmField
+    @SerialName("AircraftCameraPos")
+    var aircraftCameraPos: SerializedVec3 = Vec3(0.0, 3.0, -10.0)
 }

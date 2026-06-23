@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
+/*
 public class OttoSprintTrigger extends SimpleCriterionTrigger<OttoSprintTrigger.TriggerInstance> {
 
     public void trigger(ServerPlayer pPlayer) {
@@ -39,3 +40,4 @@ public class OttoSprintTrigger extends SimpleCriterionTrigger<OttoSprintTrigger.
         }
     }
 }
+*/

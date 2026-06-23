@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.List;
 
 public final class Perks {
 
@@ -97,6 +98,15 @@ public final class Perks {
         if (perk == null) return null;
 
         return new PerkInstance(perk, getLevel(type));
+    }
+
+    public List<PerkInstance> getInstances(Perk.Type type) {
+        var instance = getInstance(type);
+        var instances = new ArrayList<PerkInstance>();
+        if (instance != null) {
+            instances.add(instance);
+        }
+        return instances;
     }
 
     public void reduceCooldown(Perk perk, String name) {

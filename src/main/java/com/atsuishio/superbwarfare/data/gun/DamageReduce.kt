@@ -1,79 +1,89 @@
-package com.atsuishio.superbwarfare.data.gun;
+package com.atsuishio.superbwarfare.data.gun
 
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-public class DamageReduce {
-
+@Serializable
+class DamageReduce {
+    @JvmField
     @SerializedName("Type")
-    public ReduceType type = null;
+    @SerialName("Type")
+    var type: ReduceType? = null
 
     @SerializedName("Rate")
-    private double rate;
+    @SerialName("Rate")
+    @get:JvmName("getRawRate")
+    @set:JvmName("setRawRate")
+    var rate: Double = 0.0
 
     @SerializedName("MinDistance")
-    private double minDistance;
+    @SerialName("MinDistance")
+    @get:JvmName("getRawMinDistance")
+    @set:JvmName("setRawMinDistance")
+    var minDistance: Double = 0.0
 
-    public DamageReduce() {
-        this(ReduceType.EMPTY);
+    @JvmOverloads
+    constructor(type: ReduceType = ReduceType.EMPTY) {
+        this.type = type
+        this.rate = type.rate
+        this.minDistance = type.minDistance
     }
 
-    public DamageReduce(ReduceType type) {
-        this.type = type;
-        this.rate = type.rate;
-        this.minDistance = type.minDistance;
+    constructor(rate: Double, minDistance: Double) {
+        this.rate = rate
+        this.minDistance = minDistance
     }
 
-    public DamageReduce(double rate, double minDistance) {
-        this.rate = rate;
-        this.minDistance = minDistance;
+    fun getRate(): Double {
+        return if (this.type == null) this.rate else this.type!!.rate
     }
 
-    public double getRate() {
-        return this.type == null ? this.rate : this.type.rate;
+    fun setRate(rate: Double) {
+        this.rate = rate
     }
 
-    public void setRate(double rate) {
-        this.rate = rate;
+    fun getMinDistance(): Double {
+        return if (this.type == null) this.minDistance else this.type!!.minDistance
     }
 
-    public double getMinDistance() {
-        return this.type == null ? this.minDistance : this.type.minDistance;
+    fun setMinDistance(minDistance: Double) {
+        this.minDistance = minDistance
     }
 
-    public void setMinDistance(double minDistance) {
-        this.minDistance = minDistance;
-    }
-
-    public enum ReduceType {
+    @Serializable
+    enum class ReduceType(val typeName: String, val rate: Double, val minDistance: Double) {
         @SerializedName("Shotgun")
-        SHOTGUN("Shotgun", 0.05, 15),
+        @SerialName("Shotgun")
+        SHOTGUN("Shotgun", 0.05, 15.0),
+
         @SerializedName("Sniper")
-        SNIPER("Sniper", 0.001, 150),
+        @SerialName("Sniper")
+        SNIPER("Sniper", 0.001, 150.0),
+
         @SerializedName("Heavy")
-        HEAVY("Heavy", 0.0007, 250),
+        @SerialName("Heavy")
+        HEAVY("Heavy", 0.0007, 250.0),
+
         @SerializedName("Handgun")
-        HANDGUN("Handgun", 0.03, 40),
+        @SerialName("Handgun")
+        HANDGUN("Handgun", 0.03, 40.0),
+
         @SerializedName("Rifle")
-        RIFLE("Rifle", 0.007, 100),
+        @SerialName("Rifle")
+        RIFLE("Rifle", 0.007, 100.0),
+
         @SerializedName("Smg")
-        SMG("Smg", 0.02, 50),
+        @SerialName("Smg")
+        SMG("Smg", 0.02, 50.0),
+
         @SerializedName("Empty")
-        EMPTY("Empty", 0, 0),
+        @SerialName("Empty")
+        EMPTY("Empty", 0.0, 0.0),
         ;
 
-        public final double rate;
-        public final double minDistance;
-        public final String name;
-
-        ReduceType(String name, double rate, double minDistance) {
-            this.name = name;
-            this.rate = rate;
-            this.minDistance = minDistance;
-        }
-
-        @Override
-        public String toString() {
-            return this.name;
+        override fun toString(): String {
+            return this.typeName
         }
     }
 }

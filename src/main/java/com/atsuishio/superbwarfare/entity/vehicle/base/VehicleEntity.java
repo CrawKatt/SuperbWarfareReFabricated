@@ -35,7 +35,7 @@ import com.atsuishio.superbwarfare.menu.VehicleMenu;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.resource.vehicle.VehicleResource;
 import com.atsuishio.superbwarfare.tools.*;
-import com.atsuishio.superbwarfare.world.TDMSavedData;
+import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -2728,7 +2728,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         Vec3 toVec = eye.add(viewVec.x * entityReach, viewVec.y * entityReach, viewVec.z * entityReach);
         AABB aabb = getBoundingBox().expandTowards(viewVec.scale(entityReach)).inflate(1);
         EntityHitResult entityhitresult = ProjectileUtil.getEntityHitResult(this, eye, toVec, aabb,
-                p -> !p.isSpectator() && p.isAlive() && SeekTool.BASIC_FILTER.test(p) && !p.getType().is(ModTags.EntityTypes.DECOY) && SeekTool.NOT_IN_SMOKE.test(p) && p != shooter && !(p instanceof Projectile), distance);
+                p -> !p.isSpectator() && p.isAlive() && SeekTool.BASIC_FILTER.test(p) && !p.getType().is(ModTags.EntityTypes.DECOY) && SeekTool.NOT_IN_SMOKE.test(p) && p != shooter && p.getVehicle() != shooter.getVehicle() && !(p instanceof Projectile), distance);
         if (entityhitresult != null) {
             hitResult = entityhitresult;
         }

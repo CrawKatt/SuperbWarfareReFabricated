@@ -1,24 +1,41 @@
-package com.atsuishio.superbwarfare.data.gun;
+package com.atsuishio.superbwarfare.data.gun
 
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.SerializedName
 
-public enum GunType {
+enum class GunType {
     // 步枪
-    @SerializedName("Rifle") RIFLE,
+    @SerializedName("Rifle")
+    RIFLE,
+
     // 霰弹枪
-    @SerializedName("Shotgun") SHOTGUN,
+    @SerializedName("Shotgun")
+    SHOTGUN,
+
     // 狙击枪
-    @SerializedName("Sniper") SNIPER,
+    @SerializedName("Sniper")
+    SNIPER,
+
     // 机枪
-    @SerializedName("MachineGun") MACHINE_GUN,
+    @SerializedName("MachineGun")
+    MACHINE_GUN,
+
     // 手枪
-    @SerializedName("Handgun") HANDGUN,
+    @SerializedName("Handgun")
+    HANDGUN,
+
     // 冲锋枪
-    @SerializedName("Smg") SMG,
+    @SerializedName("Smg")
+    SMG,
+
     // 直射发射器（例如火箭等）
-    @SerializedName("DirectLauncher") DIRECT_LAUNCHER,
+    @SerializedName("DirectLauncher")
+    DIRECT_LAUNCHER,
+
     // 曲射发射器（例如榴弹等）
-    @SerializedName("CurvedLauncher") CURVED_LAUNCHER,
+    @SerializedName("CurvedLauncher")
+    CURVED_LAUNCHER,
+
     // 特殊武器
-    @SerializedName("Special") SPECIAL
+    @SerializedName("Special")
+    SPECIAL
 }

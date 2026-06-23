@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.command;
 
-import com.atsuishio.superbwarfare.world.TDMSavedData;
+import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

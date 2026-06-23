@@ -1,39 +1,38 @@
-package com.atsuishio.superbwarfare.data.vehicle.subdata;
+package com.atsuishio.superbwarfare.data.vehicle.subdata
 
-import com.google.gson.annotations.SerializedName;
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-public enum VehicleContainerType {
-    @SerializedName("Empty") EMPTY(0, 0, false),
-    @SerializedName("One") ONE(1, 1, false),
-    @SerializedName("Mini") MINI(1, 9, true),
-    @SerializedName("Small") SMALL(3, 9, true),
-    @SerializedName("Medium") MEDIUM(6, 9, true),
-    @SerializedName("Large") LARGE(6, 13, true),
-    @SerializedName("Huge") HUGE(6, 17, true),
-    @SerializedName("Special") SPECIAL(3, 4, false);
+@Serializable
+enum class VehicleContainerType(val row: Int, val col: Int, private val hasMenu: Boolean) {
+    @SerialName("Empty")
+    EMPTY(0, 0, false),
 
-    private final int row, col;
-    private final boolean hasMenu;
+    @SerialName("One")
+    ONE(1, 1, false),
 
-    VehicleContainerType(int row, int col, boolean hasMenu) {
-        this.row = row;
-        this.col = col;
-        this.hasMenu = hasMenu;
+    @SerialName("Mini")
+    MINI(1, 9, true),
+
+    @SerialName("Small")
+    SMALL(3, 9, true),
+
+    @SerialName("Medium")
+    MEDIUM(6, 9, true),
+
+    @SerialName("Large")
+    LARGE(6, 13, true),
+
+    @SerialName("Huge")
+    HUGE(6, 17, true),
+
+    @SerialName("Special")
+    SPECIAL(3, 4, false);
+
+    fun hasMenu(): Boolean {
+        return hasMenu
     }
 
-    public int getRow() {
-        return row;
-    }
-
-    public int getCol() {
-        return col;
-    }
-
-    public boolean hasMenu() {
-        return hasMenu;
-    }
-
-    public int getSize() {
-        return row * col;
-    }
+    val size: Int
+        get() = row * col
 }

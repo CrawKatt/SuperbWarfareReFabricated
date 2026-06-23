@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.network.message.receive.ClientMotionSyncMessa
 import com.atsuishio.superbwarfare.network.message.receive.ClientSetMotionMessage;
 import com.atsuishio.superbwarfare.network.message.receive.ClientTacticalSprintSyncMessage;
 import com.atsuishio.superbwarfare.network.message.receive.ContainerDataMessage;
+import com.atsuishio.superbwarfare.network.message.receive.DataSyncMessage;
 import com.atsuishio.superbwarfare.network.message.receive.DrawClientMessage;
 import com.atsuishio.superbwarfare.network.message.receive.FinishAssemblingVehicleMessage;
 import com.atsuishio.superbwarfare.network.message.receive.GunsDataMessage;
@@ -42,6 +43,7 @@ public class NetworkRegistry {
         PayloadTypeRegistry.playS2C().register(FinishAssemblingVehicleMessage.TYPE, FinishAssemblingVehicleMessage.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(TDMSyncMessage.TYPE, TDMSyncMessage.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(SoundClientMessage.TYPE, SoundClientMessage.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(DataSyncMessage.TYPE, DataSyncMessage.STREAM_CODEC);
 
         PayloadTypeRegistry.playC2S().register(LaserShootMessage.TYPE, LaserShootMessage.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(ShootMessage.TYPE, ShootMessage.STREAM_CODEC);
@@ -144,5 +146,6 @@ public class NetworkRegistry {
         ClientPlayNetworking.registerGlobalReceiver(FinishAssemblingVehicleMessage.TYPE, (message3, context3) -> FinishAssemblingVehicleMessage.handler(message3));
         ClientPlayNetworking.registerGlobalReceiver(TDMSyncMessage.TYPE, (message3, context3) -> TDMSyncMessage.handler(message3));
         ClientPlayNetworking.registerGlobalReceiver(SoundClientMessage.TYPE, (message3, context3) -> SoundClientMessage.handler(message3));
+        ClientPlayNetworking.registerGlobalReceiver(DataSyncMessage.TYPE, (message, context) -> DataSyncMessage.handler(message));
     }
 }

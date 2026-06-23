@@ -1,26 +1,34 @@
-package com.atsuishio.superbwarfare.data.vehicle.subdata;
+package com.atsuishio.superbwarfare.data.vehicle.subdata
 
-import com.atsuishio.superbwarfare.data.StringOrVec3;
-import com.google.gson.annotations.SerializedName;
-import net.minecraft.world.phys.Vec3;
+import com.atsuishio.superbwarfare.data.StringOrVec3
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVec3
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-public class DismountInfo {
+@Serializable
+class DismountInfo {
+    @JvmField
+    @SerialName("Transform")
+    var transform: String = "Default"
 
-    @SerializedName("Transform")
-    public String transform = "Default";
-
-    @SerializedName("Position")
-    public Vec3 position = null;
+    @JvmField
+    @SerialName("Position")
+    var position: SerializedVec3? = null
 
     // 能否弹射成员
-    @SerializedName("CanEject")
-    public boolean canEject;
-    @SerializedName("EjectPosition")
-    public Vec3 ejectPosition = null;
+    @JvmField
+    @SerialName("CanEject")
+    var canEject: Boolean = false
 
-    @SerializedName("EjectDirection")
-    public StringOrVec3 ejectDirection = new StringOrVec3("Up");
+    @JvmField
+    @SerialName("EjectPosition")
+    var ejectPosition: SerializedVec3? = null
 
-    @SerializedName("EjectForce")
-    public double ejectForce = 2;
+    @JvmField
+    @SerialName("EjectDirection")
+    var ejectDirection: StringOrVec3? = StringOrVec3("Up")
+
+    @JvmField
+    @SerialName("EjectForce")
+    var ejectForce: Double = 2.0
 }

@@ -1,385 +1,377 @@
-package com.atsuishio.superbwarfare.data.gun;
+package com.atsuishio.superbwarfare.data.gun
 
-import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.annotation.ServerOnly;
-import com.atsuishio.superbwarfare.capability.api.IItemHandler;
-import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
-import com.atsuishio.superbwarfare.data.DeserializeFromString;
-import com.atsuishio.superbwarfare.data.JsonPropertyModifier;
-import com.atsuishio.superbwarfare.init.ModCapabilities;
-import com.atsuishio.superbwarfare.data.StringToObject;
-import com.atsuishio.superbwarfare.tools.InventoryTool;
-import com.google.gson.JsonObject;
-import com.google.gson.annotations.SerializedName;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.annotation.ServerOnly
+import com.atsuishio.superbwarfare.capability.api.IItemHandler
+import com.atsuishio.superbwarfare.data.*
+import com.atsuishio.superbwarfare.init.ModCapabilities
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedGsonObject
+import com.atsuishio.superbwarfare.tools.InventoryTool
+import com.atsuishio.superbwarfare.tools.isSameItemStack
+import com.google.gson.annotations.SerializedName
+import com.mojang.brigadier.exceptions.CommandSyntaxException
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import net.minecraft.core.RegistryAccess
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.nbt.NbtUtils
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.Mth
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import java.util.function.Consumer
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import kotlin.math.min
 
-import java.util.Locale;
-import java.util.regex.Pattern;
-
-public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier {
+@STOFactory(AmmoConsumer.AmmoConsumerInstanceBuilder::class)
+@Serializable
+class AmmoConsumer : DeserializeFromString, PropertyModifier<GunData, DefaultGunData> {
+    @JvmField
     @SerializedName("Ammo")
-    public String ammo;
+    @SerialName("Ammo")
+    var ammo: String? = null
 
+    @JvmField
     @SerializedName("AmmoSlot")
-    public String ammoSlot = "Default";
+    @SerialName("AmmoSlot")
+    var ammoSlot: String = "Default"
 
+    @JvmField
     @ServerOnly
     @SerializedName("Projectile")
-    public StringToObject<ProjectileInfo> projectile = null;
+    @SerialName("Projectile")
+    var projectile: StringToObject<ProjectileInfo>? = null
 
+    @JvmField
     @SerializedName("Override")
-    public JsonObject override = null;
+    @SerialName("Override")
+    var override: SerializedGsonObject? = null
 
+    @JvmField
     @SerializedName("Icon")
-    public String icon = Mod.loc("textures/overlay/vehicle/weapon/icons/empty.png").toString();
+    @SerialName("Icon")
+    var icon: String = Mod.loc("textures/overlay/vehicle/weapon/icons/empty.png").toString()
 
+    @JvmField
     @SerializedName("ShouldUnload")
-    public boolean shouldUnload = true;
+    @SerialName("ShouldUnload")
+    var shouldUnload: Boolean = true
 
-    public transient AmmoConsumeType type = AmmoConsumeType.EMPTY;
-    public transient int loadAmount = 1;
+    @JvmField
+    @Transient
+    @kotlinx.serialization.Transient
+    var type: AmmoConsumeType = AmmoConsumeType.EMPTY
 
-    public static final AmmoConsumer INVALID = new AmmoConsumer();
+    @JvmField
+    @Transient
+    @kotlinx.serialization.Transient
+    var loadAmount: Int = 1
 
-    private transient boolean initialized = false;
-    private transient Ammo playerAmmoType;
-    private transient ItemStack stack = ItemStack.EMPTY;
+    @Transient
+    @kotlinx.serialization.Transient
+    private var initialized = false
 
-    public ItemStack stack() {
-        return this.stack;
-    }
+    @Transient
+    @kotlinx.serialization.Transient
+    var playerAmmoType: Ammo? = null
+        private set
 
-    public boolean initialized() {
-        return this.initialized;
-    }
+    @Transient
+    @kotlinx.serialization.Transient
+    private var stack: ItemStack = ItemStack.EMPTY
 
-    // TODO 整合弹药处理
-    public enum AmmoConsumeType {
+    fun stack(): ItemStack = this.stack
+
+    fun initialized(): Boolean = this.initialized
+
+    enum class AmmoConsumeType {
         INVALID,
         EMPTY,
         INFINITE,
-
         PLAYER_AMMO,
         ITEM,
         ENERGY,
     }
 
-    public boolean isAmmoItem(ItemStack stack) {
-        return ItemStack.isSameItemSameComponents(stack, this.stack);
+    fun isAmmoItem(stack: ItemStack): Boolean {
+        return isSameItemStack(stack, this.stack)
     }
 
-    /**
-     * 消耗指定弹药数量（原始数量，不包括虚拟弹药，不考虑count）
-     */
-    public int consume(@NotNull GunData data, @NotNull Entity shooter, int count) {
-        if (!initialized) init();
-        if (count <= 0
-                || this.type == AmmoConsumeType.INFINITE
-                || shooter instanceof Player player && player.isCreative()
-        ) return 0;
+    fun consume(data: GunData, shooter: Entity, count: Int): Int {
+        var count = count
+        if (!initialized) init()
+        if (count <= 0 || this.type == AmmoConsumeType.INFINITE || shooter is Player && shooter.isCreative) return 0
 
         if (type == AmmoConsumeType.INVALID) {
-            Mod.LOGGER.warn("consume ammo failed: invalid AmmoConsumeType");
-            return 0;
+            Mod.LOGGER.warn("consume ammo failed: invalid AmmoConsumeType")
+            return 0
         }
 
-        int consumed = 0;
+        var consumed = 0
+
         if (type == AmmoConsumeType.PLAYER_AMMO) {
-            if (shooter instanceof Player player) {
+            if (shooter is Player) {
                 if (playerAmmoType != null) {
-                    var current = playerAmmoType.get(player);
-                    consumed = Math.min(current, count);
-                    count -= consumed;
-                    playerAmmoType.add(player, -consumed);
+                    val current = playerAmmoType!!.get(shooter)
+                    consumed = min(current, count)
+                    count -= consumed
+                    playerAmmoType!!.add(shooter, -consumed)
                 } else {
-                    Mod.LOGGER.warn("consume player ammo failed: invalid player ammo type");
+                    Mod.LOGGER.warn("consume player ammo failed: invalid player ammo type")
                 }
             }
         }
 
         if (type == AmmoConsumeType.ENERGY) {
-            var energyStorage = data.getEnergyProvider(shooter);
-            if (energyStorage == null) {
-                return 0;
-            }
-            return energyStorage.extractEnergy(count, false);
+            val energyStorage = data.getEnergyProvider(shooter) ?: return 0
+            return energyStorage.extractEnergy(count, false)
         }
 
-        var handler = ModCapabilities.ITEM_HANDLER_ENTITY.find(shooter, null);
+        val handler = ModCapabilities.ITEM_HANDLER_ENTITY.find(shooter, null)
+
         if (handler != null) {
-            return consumed + consume(data, handler, count);
+            return consumed + consume(data, handler, count)
         } else {
-            Mod.LOGGER.warn("consume ammo failed: invalid item handler for entity {}", shooter);
-            return consumed;
+            Mod.LOGGER.warn("consume ammo failed: invalid item handler for entity {}", shooter)
+            return consumed
         }
     }
 
-    /**
-     * 消耗指定弹药数量（原始数量，不包括虚拟弹药，不考虑count）
-     */
-    public int consume(@NotNull GunData data, @NotNull IItemHandler handler, int count) {
-        if (!initialized) init();
-        if (type == AmmoConsumeType.INVALID
-                || type == AmmoConsumeType.INFINITE
-                || type == AmmoConsumeType.EMPTY
-                || count <= 0
-        ) return 0;
+    fun consume(data: GunData, handler: IItemHandler, count: Int): Int {
+        if (!initialized) init()
+        if (type == AmmoConsumeType.INVALID || type == AmmoConsumeType.INFINITE || type == AmmoConsumeType.EMPTY || count <= 0) {
+            return 0
+        }
 
-        if (type == AmmoConsumeType.PLAYER_AMMO) {
-            var consumed = InventoryTool.consumeAmmoItem(handler, this.playerAmmoType, count);
-            var rest = consumed - count;
-            data.virtualAmmo.add(rest);
-            return count;
-        } else if (type == AmmoConsumeType.ENERGY) {
-            var energyStorage = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
-            if (energyStorage == null) {
-                return 0;
+        return when (type) {
+            AmmoConsumeType.PLAYER_AMMO -> {
+                val consumed = InventoryTool.consumeAmmoItem(handler, this.playerAmmoType, count)
+                val rest = consumed - count
+                data.virtualAmmo.add(rest)
+                count
             }
-            return energyStorage.extractEnergy(count, false);
-        } else {
-            return InventoryTool.consumeItem(handler, this::isAmmoItem, count);
-        }
-    }
 
-    /**
-     * 清点不包括虚拟弹药在内的原始弹药数量
-     */
-    public int count(@NotNull GunData data, @Nullable Entity entity) {
-        if (!initialized) init();
-        if (this.type == AmmoConsumeType.INFINITE) return Integer.MAX_VALUE;
-        if (entity == null || type == AmmoConsumeType.EMPTY) return 0;
-
-        int playerAmmoCount = 0;
-        if (type == AmmoConsumeType.PLAYER_AMMO && entity instanceof Player player) {
-            playerAmmoCount = playerAmmoType.get(player);
-        } else if (type == AmmoConsumeType.ENERGY) {
-            var energyStorage = data.getEnergyProvider(entity);
-            if (energyStorage == null) {
-                return 0;
+            AmmoConsumeType.ENERGY -> {
+                val energyStorage = ModCapabilities.ENERGY_ITEM.find(data.stack, null) ?: return 0
+                energyStorage.extractEnergy(count, false)
             }
-            return energyStorage.getEnergyStored();
-        }
 
-        return playerAmmoCount + count(data, ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null));
+            else -> {
+                InventoryTool.consumeItem(
+                    handler,
+                    { stack -> this.isAmmoItem(stack) },
+                    count
+                )
+            }
+        }
     }
 
-    /**
-     * 清点不包括虚拟弹药在内的原始弹药数量
-     */
-    public int count(@NotNull GunData data, @Nullable IItemHandler handler) {
-        if (!initialized) init();
-        if (this.type == AmmoConsumeType.INFINITE) return Integer.MAX_VALUE;
-        if (handler == null || type == AmmoConsumeType.EMPTY) return 0;
+    fun count(data: GunData, entity: Entity?): Int {
+        if (!initialized) init()
+        if (this.type == AmmoConsumeType.INFINITE) return Int.MAX_VALUE
+        if (entity == null || type == AmmoConsumeType.EMPTY) return 0
+
+        var playerAmmoCount = 0
+
+        if (type == AmmoConsumeType.PLAYER_AMMO && entity is Player) {
+            playerAmmoCount = playerAmmoType!!.get(entity)
+        } else if (type == AmmoConsumeType.ENERGY) {
+            val energyStorage = data.getEnergyProvider(entity) ?: return 0
+            return energyStorage.energyStored
+        }
+
+        return playerAmmoCount + count(data, ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null))
+    }
+
+    fun count(data: GunData, handler: IItemHandler?): Int {
+        if (!initialized) init()
+        if (this.type == AmmoConsumeType.INFINITE) return Int.MAX_VALUE
+        if (handler == null || type == AmmoConsumeType.EMPTY) return 0
 
         if (type == AmmoConsumeType.ITEM) {
-            return InventoryTool.countItem(handler, this::isAmmoItem);
+            return InventoryTool.countItem(handler) { stack -> this.isAmmoItem(stack) }
         } else if (type == AmmoConsumeType.ENERGY) {
-            var energyStorage = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
-            if (energyStorage == null) {
-                return 0;
-            }
-            return energyStorage.getEnergyStored();
+            val energyStorage = ModCapabilities.ENERGY_ITEM.find(data.stack, null) ?: return 0
+            return energyStorage.energyStored
         }
 
-        return InventoryTool.countAmmoItem(handler, this.playerAmmoType);
+        return InventoryTool.countAmmoItem(handler, this.playerAmmoType)
     }
 
-    /**
-     * 返还指定数量的弹药
-     * <br>
-     * 注：不会实际消耗枪内弹药
-     *
-     * @return 成功返还的弹药数量
-     */
-    public int withdraw(@NotNull Entity ammoSupplier, int count) {
-        if (!initialized) init();
-        if (type == AmmoConsumeType.INVALID
-                || type == AmmoConsumeType.INFINITE
-                || type == AmmoConsumeType.EMPTY
-                || type == AmmoConsumeType.ENERGY
-                || count <= 0
+    fun withdraw(ammoSupplier: Entity, count: Int): Int {
+        if (!initialized) init()
+        if (type == AmmoConsumeType.INVALID ||
+            type == AmmoConsumeType.INFINITE ||
+            type == AmmoConsumeType.EMPTY ||
+            type == AmmoConsumeType.ENERGY ||
+            count <= 0
         ) {
-            return 0;
+            return 0
         }
 
         if (type == AmmoConsumeType.PLAYER_AMMO) {
-            if (ammoSupplier instanceof Player player) {
+            if (ammoSupplier is Player) {
                 if (playerAmmoType != null) {
-                    playerAmmoType.add(player, count);
-                    return count;
+                    val countToWithdraw = min(count, playerAmmoType!!.limit - playerAmmoType!!.get(ammoSupplier))
+                    playerAmmoType!!.add(ammoSupplier, countToWithdraw)
+
+                    val restItemCount = count - countToWithdraw
+                    if (restItemCount > 0) {
+                        InventoryTool.insertItem(ammoSupplier, playerAmmoType!!.itemStack, restItemCount)
+                    }
+
+                    return count
                 } else {
-                    Mod.LOGGER.warn("withdraw player ammo failed: invalid player ammo type");
+                    Mod.LOGGER.warn("withdraw player ammo failed: invalid player ammo type")
                 }
             } else {
-                var itemHandler = ModCapabilities.ITEM_HANDLER_ENTITY.find(ammoSupplier, null);
+                val itemHandler = ModCapabilities.ITEM_HANDLER_ENTITY.find(ammoSupplier, null)
                 if (itemHandler != null) {
-                    return withdraw(itemHandler, count);
+                    return withdraw(itemHandler, count)
                 } else {
-                    Mod.LOGGER.warn("withdraw ammo failed: invalid item handler");
+                    Mod.LOGGER.warn("withdraw ammo failed: invalid item handler")
                 }
             }
         } else {
-            if (ammoSupplier instanceof Player player) {
-                var limit = this.stack.getMaxStackSize();
-                while (count > 0) {
-                    var toInsert = Math.min(limit, count);
-                    ItemHandlerHelper.giveItemToPlayer(player, this.stack.copyWithCount(toInsert));
-                    count -= toInsert;
-                }
-                return count;
+            if (ammoSupplier is Player) {
+                InventoryTool.insertItem(ammoSupplier, this.stack, count)
+                return count
             } else {
-                var itemHandler = ModCapabilities.ITEM_HANDLER_ENTITY.find(ammoSupplier, null);
+                val itemHandler = ModCapabilities.ITEM_HANDLER_ENTITY.find(ammoSupplier, null)
                 if (itemHandler != null) {
-                    return withdraw(itemHandler, count);
+                    return withdraw(itemHandler, count)
                 } else {
-                    Mod.LOGGER.warn("withdraw ammo failed: invalid item handler");
+                    Mod.LOGGER.warn("withdraw ammo failed: invalid item handler")
                 }
             }
         }
-        return 0;
+
+        return 0
     }
 
-    public int withdraw(@NotNull IItemHandler handler, int count) {
-        if (!initialized) init();
-        if (type == AmmoConsumeType.INVALID
-                || type == AmmoConsumeType.INFINITE
-                || type == AmmoConsumeType.EMPTY
-                || type == AmmoConsumeType.ENERGY
-                || count <= 0
+    fun withdraw(handler: IItemHandler, count: Int): Int {
+        if (!initialized) init()
+        if (type == AmmoConsumeType.INVALID ||
+            type == AmmoConsumeType.INFINITE ||
+            type == AmmoConsumeType.EMPTY ||
+            type == AmmoConsumeType.ENERGY ||
+            count <= 0
         ) {
-            return 0;
+            return 0
         }
 
-        ItemStack stackToInsert;
-        if (type == AmmoConsumeType.PLAYER_AMMO) {
-            stackToInsert = getPlayerAmmoType().getItemStack();
+        val stackToInsert = if (type == AmmoConsumeType.PLAYER_AMMO) {
+            this.playerAmmoType!!.itemStack
         } else {
-            stackToInsert = this.stack;
+            this.stack
         }
 
-        int inserted = 0;
-        while (count > 0) {
-            var limit = stackToInsert.getMaxStackSize();
-            var toInsert = Math.min(limit, count);
-            var result = ItemHandlerHelper.insertItemStacked(handler, stackToInsert.copyWithCount(toInsert), false);
-
-            count -= toInsert - result.getCount();
-            inserted += toInsert - result.getCount();
-
-            if (!result.isEmpty()) {
-                Mod.LOGGER.warn("trying to withdraw ammo {} with count {}, but only {} is inserted", stackToInsert, count, inserted);
-                break;
-            }
-        }
-
-        return inserted;
+        return InventoryTool.insertItem(handler, stackToInsert, count)
     }
 
-    private static final Pattern AMMO_PATTERN = Pattern.compile("^(?<count>(\\d+)?)\\s*(?<prefix>[@#]?)(?<id>\\w+(:\\w+)?)\\s*(?<data>(\\{.*})?)$");
+    @Transient
+    @kotlinx.serialization.Transient
+    private val jsonPropModifier = JsonPropertyModifier(GunProp.entries)
 
-    private final transient JsonPropertyModifier<GunData, DefaultGunData> jsonPropModifier = new JsonPropertyModifier<>();
-
-    @Override
-    public DefaultGunData computeProperties(GunData gunData, DefaultGunData rawData) {
+    override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) {
         if (this.projectile != null) {
-            rawData.projectile = projectile;
+            modifier[GunProp.PROJECTILE] = projectile!!.value
         }
 
-        if (override != null) {
-            jsonPropModifier.update(override);
-            rawData = jsonPropModifier.computeProperties(gunData, rawData);
-        }
-
-        return rawData;
+        jsonPropModifier.update(override)
+        jsonPropModifier.modifyProperty(modifier)
     }
 
-    @SuppressWarnings("invalid")
-    public void init() {
-        if (ammo == null) return;
+    fun init() {
+        if (ammo == null) return
 
-        var matcher = AMMO_PATTERN.matcher(ammo.trim());
+        val matcher: Matcher = AMMO_PATTERN.matcher(ammo!!.trim { it <= ' ' })
         if (!matcher.matches()) {
-            Mod.LOGGER.warn("invalid ammo value: {}", ammo);
-            return;
+            Mod.LOGGER.warn("invalid ammo value: {}", ammo)
+            return
         }
 
-        var numStr = matcher.group("count").trim();
-        this.loadAmount = Mth.clamp(numStr.isEmpty() ? 1 : Integer.parseInt(numStr), 1, Integer.MAX_VALUE);
+        val numStr = matcher.group("count").trim { it <= ' ' }
+        this.loadAmount = Mth.clamp(if (numStr.isEmpty()) 1 else numStr.toInt(), 1, Int.MAX_VALUE)
 
-        var prefix = matcher.group("prefix");
-        var id = matcher.group("id");
-        var data = matcher.group("data");
+        val prefix = matcher.group("prefix")
+        val id = matcher.group("id")
+        val data = matcher.group("data")
 
         if (prefix.isBlank()) {
-            this.type = switch (id.toLowerCase(Locale.ROOT)) {
-                case "infinity", "infinite" -> AmmoConsumeType.INFINITE;
-                case "empty" -> AmmoConsumeType.EMPTY;
-                case "fe", "rf", "energy" -> AmmoConsumeType.ENERGY;
-                default -> AmmoConsumeType.INVALID;
-            };
+            this.type = when (id.lowercase()) {
+                "infinity", "infinite" -> AmmoConsumeType.INFINITE
+                "empty" -> AmmoConsumeType.EMPTY
+                "fe", "rf", "energy" -> AmmoConsumeType.ENERGY
+                else -> AmmoConsumeType.INVALID
+            }
 
-            if (this.type != AmmoConsumeType.INVALID) return;
+            if (this.type != AmmoConsumeType.INVALID) return
         }
 
-        // Player Ammo
-        if ("@".equals(prefix)) {
-            this.playerAmmoType = Ammo.getType(id);
+        if ("@" == prefix) {
+            this.playerAmmoType = Ammo.getType(id)
             if (this.playerAmmoType == null) {
-                Mod.LOGGER.warn("invalid player ammo type: {}", id);
-                return;
-            }
-            this.type = AmmoConsumeType.PLAYER_AMMO;
-            this.stack = this.playerAmmoType.getItemStack();
-        } else {
-            // Item
-            var location = ResourceLocation.tryParse(id);
-            if (location == null) {
-                Mod.LOGGER.warn("invalid item id: {}", id);
-                return;
-            }
-            var item = BuiltInRegistries.ITEM.get(location);
-            if (item == Items.AIR) {
-                Mod.LOGGER.warn("invalid item: {}", id);
-                return;
+                Mod.LOGGER.warn("invalid player ammo type: {}", id)
+                return
             }
 
-            this.stack = new ItemStack(item);
-            if (!data.isEmpty()) {
+            this.type = AmmoConsumeType.PLAYER_AMMO
+            this.stack = this.playerAmmoType!!.itemStack
+        } else {
+            val location = ResourceLocation.tryParse(id)
+            if (location == null) {
+                Mod.LOGGER.warn("invalid item id: {}", id)
+                return
+            }
+
+            val item = BuiltInRegistries.ITEM.get(location)
+            if (item === Items.AIR) {
+                Mod.LOGGER.warn("invalid item: {}", id)
+                return
+            }
+
+            this.stack = ItemStack(item)
+
+            if (data.isNotEmpty()) {
                 try {
-                    var tag = NbtUtils.snbtToStructure(data);
-                    tag.putString("id", location.toString());
-                    tag.putInt("count", 1);
-                    ItemStack.parse(RegistryAccess.EMPTY, tag).ifPresent(stack -> this.stack = stack);
-                } catch (CommandSyntaxException exception) {
-                    Mod.LOGGER.warn("invalid item data {}: {}", data, exception.getMessage());
-                    return;
+                    val tag = NbtUtils.snbtToStructure(data)
+                    tag.putString("id", location.toString())
+                    tag.putInt("count", 1)
+
+                    ItemStack.parse(RegistryAccess.EMPTY, tag)
+                        .ifPresent(Consumer { stack: ItemStack? -> this.stack = stack!! })
+                } catch (exception: CommandSyntaxException) {
+                    Mod.LOGGER.warn("invalid item data {}: {}", data, exception.message)
+                    return
                 }
             }
 
-            this.type = AmmoConsumeType.ITEM;
+            this.type = AmmoConsumeType.ITEM
         }
 
-        this.initialized = true;
+        this.initialized = true
     }
 
-    @Override
-    public void deserializeFromString(String str) {
-        this.ammo = str;
-        init();
+    override fun deserializeFromString(str: String?) {
+        this.ammo = str
+        init()
     }
 
-    public Ammo getPlayerAmmoType() {
-        return playerAmmoType;
+    object AmmoConsumerInstanceBuilder : StringInstanceBuilder<AmmoConsumer> {
+        override fun fromString(value: String) = AmmoConsumer().apply {
+            this.ammo = value
+            init()
+        }
+    }
+
+    companion object {
+        val INVALID: AmmoConsumer = AmmoConsumer()
+
+        private val AMMO_PATTERN: Pattern =
+            Pattern.compile("^(?<count>(\\d+)?)\\s*(?<prefix>[@#]?)(?<id>\\w+(:\\w+)?)\\s*(?<data>(\\{.*})?)$")
     }
 }

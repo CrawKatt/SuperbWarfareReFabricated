@@ -8,6 +8,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/*
 @ApiStatus.AvailableSince("0.8.8")
 public class ShootEvent {
 
@@ -55,3 +56,4 @@ public class ShootEvent {
         return parameters.zoom();
     }
 }
+*/

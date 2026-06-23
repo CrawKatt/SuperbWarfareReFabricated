@@ -498,8 +498,8 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
      * 服务端在开火前的额外行为
      */
     public void beforeShoot(@NotNull ShootParameters parameters) {
-        var data = parameters.data();
-        var ammoSupplier = parameters.ammoSupplier();
+        var data = parameters.data;
+        var ammoSupplier = parameters.ammoSupplier;
 
         // 判断是否为栓动武器（BoltActionTime > 0），并在开火后给一个需要上膛的状态
         if (data.compute().boltActionTime > 0 && data.hasEnoughAmmoToShoot(ammoSupplier)) {
@@ -528,10 +528,10 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
      * 服务端在开火后的额外行为
      */
     public void afterShoot(@NotNull ShootParameters parameters) {
-        var data = parameters.data();
-        var shooter = parameters.shooter();
-        var ammoSupplier = parameters.ammoSupplier();
-        var level = parameters.level();
+        var data = parameters.data;
+        var shooter = parameters.shooter;
+        var ammoSupplier = parameters.ammoSupplier;
+        var level = parameters.level;
 
         var computed = data.compute();
         if (!data.useBackpackAmmo()) {
@@ -611,10 +611,10 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
      * @param parameters 开火参数
      */
     public void shoot(@NotNull ShootParameters parameters) {
-        var data = parameters.data();
-        var shooter = parameters.shooter();
-        var ammoSupplier = parameters.ammoSupplier();
-        var zoom = parameters.zoom();
+        var data = parameters.data;
+        var shooter = parameters.shooter;
+        var ammoSupplier = parameters.ammoSupplier;
+        var zoom = parameters.zoom;
 
         if (!data.canShoot(ammoSupplier)) return;
 
@@ -741,15 +741,15 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
      * 服务端发射单发子弹
      */
     public boolean shootBullet(@NotNull ShootParameters parameters) {
-        var data = parameters.data();
-        var level = parameters.level();
-        var shootPosition = parameters.shootPosition();
-        var shootDirection = parameters.shootDirection();
-        var shooter = parameters.shooter();
-        var zoom = parameters.zoom();
-        var spread = parameters.spread();
-        var uuid = parameters.targetEntityUUID();
-        Vec3 targetPos = parameters.targetPos();
+        var data = parameters.data;
+        var level = parameters.level;
+        var shootPosition = parameters.shootPosition;
+        var shootDirection = parameters.shootDirection;
+        var shooter = parameters.shooter;
+        var zoom = parameters.zoom;
+        var spread = parameters.spread;
+        var uuid = parameters.targetEntityUUID;
+        Vec3 targetPos = parameters.targetPos;
 
         var stack = data.stack;
 
@@ -958,11 +958,11 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
     }
 
     public boolean shootRay(@NotNull ShootParameters parameters) {
-        var shooter = parameters.shooter();
-        var level = parameters.level();
-        var data = parameters.data();
-        var shootPosition = parameters.shootPosition();
-        var shootDirection = parameters.shootDirection();
+        var shooter = parameters.shooter;
+        var level = parameters.level;
+        var data = parameters.data;
+        var shootPosition = parameters.shootPosition;
+        var shootDirection = parameters.shootDirection;
 
         if (shooter == null) {
             return false;
@@ -1067,7 +1067,7 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
     }
 
     public void onRayHitEntity(Entity shooter, ServerLevel level, @NotNull GunData data, EntityResult result, Vec3 shootPosition, Vec3 shootDirection) {
-        var target = result.getEntity();
+        var target = result.entity;
 
         float damage = (float) data.compute().damage;
         float headshot = (float) data.compute().headshot;

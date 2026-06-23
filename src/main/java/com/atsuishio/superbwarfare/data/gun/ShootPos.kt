@@ -1,38 +1,57 @@
-package com.atsuishio.superbwarfare.data.gun;
+package com.atsuishio.superbwarfare.data.gun
 
-import com.atsuishio.superbwarfare.data.StringOrVec3;
-import com.google.gson.annotations.SerializedName;
-import net.minecraft.world.phys.Vec3;
+import com.atsuishio.superbwarfare.data.StringOrVec3
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVec3
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import net.minecraft.world.phys.Vec3
 
-import java.util.List;
-
-public class ShootPos {
-
+@Serializable
+class ShootPos {
+    @JvmField
     @SerializedName("Transform")
-    public String transform = "Default";
+    @SerialName("Transform")
+    var transform: String = "Default"
+
+    // TODO 后续替换成kt序列化和kt List
 
     // 注意这个是复数
     // TODO 允许普通枪使用Positions
+    @JvmField
     @SerializedName("Positions")
-    public List<Vec3> positions = List.of(Vec3.ZERO);
+    @SerialName("Positions")
+    var positions: java.util.ArrayList<SerializedVec3> = arrayListOf(Vec3.ZERO)
 
     // TODO 允许普通枪使用Directions
+    @JvmField
     @SerializedName("Directions")
-    public List<StringOrVec3> directions = List.of(new StringOrVec3("Default"));
+    @SerialName("Directions")
+    var directions: java.util.ArrayList<StringOrVec3> = arrayListOf(StringOrVec3("Default"))
 
+    @JvmField
     @SerializedName("ShootPositionForHud")
-    public Vec3 shootPositionForHud = null;
+    @SerialName("ShootPositionForHud")
+    var shootPositionForHud: SerializedVec3? = null
 
+    @JvmField
     @SerializedName("ShootDirectionForHud")
-    public StringOrVec3 shootDirectionForHud = null;
+    @SerialName("ShootDirectionForHud")
+    var shootDirectionForHud: StringOrVec3? = null
 
+    @JvmField
     @SerializedName("BoundUpWithAmmoAmount")
-    public boolean boundUpWithAmmoAmount = false;
+    @SerialName("BoundUpWithAmmoAmount")
+    var boundUpWithAmmoAmount = false
 
 
+    @JvmField
     @SerializedName("ViewPosition")
-    public Vec3 viewPosition = null;
+    @SerialName("ViewPosition")
+    var viewPosition: SerializedVec3? = null
 
+    @JvmField
     @SerializedName("ViewDirection")
-    public StringOrVec3 viewDirection = null;
+    @SerialName("ViewDirection")
+    var viewDirection: StringOrVec3? = null
 }

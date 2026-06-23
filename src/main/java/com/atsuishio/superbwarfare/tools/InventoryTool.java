@@ -1,6 +1,8 @@
 package com.atsuishio.superbwarfare.tools;
 
+import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.capability.api.IItemHandler;
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.init.ModItems;
@@ -11,6 +13,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -138,7 +141,7 @@ public class InventoryTool {
             var required = (count % supplyCount == 0) ? count / supplyCount : count / supplyCount + 1;
 
             var countToShrink = Math.min(stack.getCount(), required);
-            stack.shrink(countToShrink);
+            handler.extractItem(i, countToShrink, false);
             count -= countToShrink * supplyCount;
             if (count <= 0) break;
         }
@@ -284,7 +287,7 @@ public class InventoryTool {
             if (!predicate.test(stack)) continue;
 
             var countToShrink = Math.min(stack.getCount(), count);
-            stack.shrink(countToShrink);
+            handler.extractItem(i, countToShrink, false);
             count -= countToShrink;
             if (count <= 0) break;
         }
@@ -346,5 +349,37 @@ public class InventoryTool {
         }
 
         return originalCount - stack.getCount();
+    }
+
+    public static int insertItem(IItemHandler handler, ItemStack stack, int count) {
+        int inserted = 0;
+        while (count > 0) {
+            var limit = stack.getMaxStackSize();
+            var toInsert = java.lang.Math.min(limit, count);
+            var result = ItemHandlerHelper.insertItemStacked(handler, stack.copyWithCount(toInsert), false);
+
+            count -= toInsert - result.getCount();
+            inserted += toInsert - result.getCount();
+
+            if (!result.isEmpty()) {
+                Mod.LOGGER.warn("trying to withdraw ammo {} with count {}, but only {} is inserted", stack, count, inserted);
+                break;
+            }
+        }
+
+        return inserted;
+    }
+
+    public static int insertItem(Player player, ItemStack stack, int count) {
+        int inserted = 0;
+        while (count > 0) {
+            var limit = stack.getMaxStackSize();
+            var toInsert = java.lang.Math.min(limit, count);
+            ItemHandlerHelper.giveItemToPlayer(player, stack.copyWithCount(toInsert));
+            count -= toInsert;
+            inserted += toInsert;
+        }
+
+        return inserted;
     }
 }

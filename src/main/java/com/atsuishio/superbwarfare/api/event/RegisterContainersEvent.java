@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
 public class RegisterContainersEvent {
     public static final List<ItemStack> CONTAINERS = new ArrayList<>();
 
@@ -15,3 +16,4 @@ public class RegisterContainersEvent {
         CONTAINERS.add(ContainerBlockItem.createInstance(type));
     }
 }
+*/

@@ -1,43 +1,48 @@
-package com.atsuishio.superbwarfare.data.gun;
+package com.atsuishio.superbwarfare.data.gun
 
-import com.atsuishio.superbwarfare.Mod;
-import com.google.gson.annotations.SerializedName;
+import com.atsuishio.superbwarfare.Mod
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-public enum FireMode {
+@Serializable
+enum class FireMode(name: String) {
     @SerializedName("Semi")
+    @SerialName("Semi")
     SEMI("Semi"),
+
     @SerializedName("Burst")
+    @SerialName("Burst")
     BURST("Burst"),
+
     @SerializedName("Auto")
+    @SerialName("Auto")
     AUTO("Auto");
 
-    public final String name;
+    val typeName: String = name
 
-    FireMode(String name) {
-        this.name = name;
+    override fun toString(): String {
+        return this.typeName
     }
 
-    public static FireMode fromValue(String value) {
-        for (var enumConstant : FireMode.values()) {
-            if (enumConstant.toString().equals(value)) {
-                return enumConstant;
+    companion object {
+        fun fromValue(value: String?): FireMode {
+            for (enumConstant in entries) {
+                if (enumConstant.toString() == value) {
+                    return enumConstant
+                }
             }
+            Mod.LOGGER.warn("No FireMode with value {}", value)
+            return SEMI
         }
-        Mod.LOGGER.warn("No FireMode with value {}", value);
-        return FireMode.SEMI;
-    }
 
-    public static FireMode tryParse(String value) {
-        for (var enumConstant : FireMode.values()) {
-            if (enumConstant.toString().equals(value)) {
-                return enumConstant;
+        fun tryParse(value: String?): FireMode {
+            for (enumConstant in entries) {
+                if (enumConstant.toString() == value) {
+                    return enumConstant
+                }
             }
+            return SEMI
         }
-        return FireMode.SEMI;
-    }
-
-    @Override
-    public String toString() {
-        return this.name;
     }
 }
