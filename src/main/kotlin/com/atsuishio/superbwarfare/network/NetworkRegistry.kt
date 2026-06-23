@@ -134,4 +134,5 @@ private fun registerPayloads() {
     playToServer<ZoomMessage>()
     playToServer<BlueprintCraftMessage>()
     playToServer<BlueprintSetIndexMessage>()
+    playToServer<LoiterConfigMessage>()
 }
