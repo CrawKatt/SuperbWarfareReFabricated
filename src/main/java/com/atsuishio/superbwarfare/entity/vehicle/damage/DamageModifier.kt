@@ -1,48 +1,30 @@
-package com.atsuishio.superbwarfare.entity.vehicle.damage;
+package com.atsuishio.superbwarfare.entity.vehicle.damage
 
-import com.atsuishio.superbwarfare.tools.FormatTool;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageType;
-import net.minecraft.world.damagesource.DamageTypes;
-import net.minecraft.world.entity.EntityType;
-import org.jetbrains.annotations.Nullable;
+import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModify.SourceType
+import com.atsuishio.superbwarfare.tools.FormatTool.format2D
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.resources.ResourceKey
+import net.minecraft.tags.TagKey
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.damagesource.DamageType
+import net.minecraft.world.damagesource.DamageTypes
+import net.minecraft.world.entity.EntityType
+import java.util.function.Function
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
-public class DamageModifier {
-
-    private final List<DamageModify> immuneList = new ArrayList<>();
-    private final List<DamageModify> reduceList = new ArrayList<>();
-    private final List<DamageModify> multiplyList = new ArrayList<>();
-    private final List<BiFunction<DamageSource, Float, Float>> customList = new ArrayList<>();
-
-    public static DamageModifier createDefaultModifier() {
-        return new DamageModifier()
-                .immuneTo(EntityType.POTION)
-                .immuneTo(EntityType.AREA_EFFECT_CLOUD)
-                .immuneTo(DamageTypes.FALL)
-                .immuneTo(DamageTypes.CACTUS)
-                .immuneTo(DamageTypes.DROWN)
-                .immuneTo(DamageTypes.DRAGON_BREATH)
-                .immuneTo(DamageTypes.WITHER)
-                .immuneTo(DamageTypes.WITHER_SKULL);
-    }
+class DamageModifier {
+    private val immuneList = mutableListOf<DamageModify>()
+    private val modifyList = mutableListOf<DamageModify>()
+    private val customList = mutableListOf<(DamageSource, Float) -> Float>()
 
     /**
      * 免疫所有伤害
      */
-    public DamageModifier immuneTo() {
-        immuneList.add(new DamageModify(DamageModify.ModifyType.IMMUNITY, 0));
-        return this;
+    fun immuneTo(): DamageModifier {
+        immuneList.add(DamageModify(DamageModify.ModifyType.IMMUNITY, 0f))
+        return this
     }
 
     /**
@@ -50,9 +32,9 @@ public class DamageModifier {
      *
      * @param sourceTagKey 伤害类型
      */
-    public DamageModifier immuneTo(TagKey<DamageType> sourceTagKey) {
-        immuneList.add(new DamageModify(DamageModify.ModifyType.IMMUNITY, 0, sourceTagKey));
-        return this;
+    fun immuneTo(sourceTagKey: TagKey<DamageType>): DamageModifier {
+        immuneList.add(DamageModify(DamageModify.ModifyType.IMMUNITY, 0f, sourceTagKey))
+        return this
     }
 
     /**
@@ -60,9 +42,9 @@ public class DamageModifier {
      *
      * @param sourceKey 伤害类型
      */
-    public DamageModifier immuneTo(ResourceKey<DamageType> sourceKey) {
-        immuneList.add(new DamageModify(DamageModify.ModifyType.IMMUNITY, 0, sourceKey));
-        return this;
+    fun immuneTo(sourceKey: ResourceKey<DamageType>): DamageModifier {
+        immuneList.add(DamageModify(DamageModify.ModifyType.IMMUNITY, 0f, sourceKey))
+        return this
     }
 
     /**
@@ -70,9 +52,9 @@ public class DamageModifier {
      *
      * @param condition 伤害来源判定条件
      */
-    public DamageModifier immuneTo(Function<DamageSource, Boolean> condition) {
-        immuneList.add(new DamageModify(DamageModify.ModifyType.IMMUNITY, 0, condition));
-        return this;
+    fun immuneTo(condition: Function<DamageSource, Boolean>): DamageModifier {
+        immuneList.add(DamageModify(DamageModify.ModifyType.IMMUNITY, 0f, condition))
+        return this
     }
 
     /**
@@ -80,9 +62,9 @@ public class DamageModifier {
      *
      * @param entityId 伤害来源实体ID
      */
-    public DamageModifier immuneTo(String entityId) {
-        immuneList.add(new DamageModify(DamageModify.ModifyType.IMMUNITY, 0, entityId));
-        return this;
+    fun immuneTo(entityId: String): DamageModifier {
+        immuneList.add(DamageModify(DamageModify.ModifyType.IMMUNITY, 0f, entityId))
+        return this
     }
 
     /**
@@ -90,18 +72,16 @@ public class DamageModifier {
      *
      * @param type 伤害来源实体类型
      */
-    public DamageModifier immuneTo(EntityType<?> type) {
-        return immuneTo(EntityType.getKey(type).toString());
-    }
+    fun immuneTo(type: EntityType<*>) = immuneTo(EntityType.getKey(type).toString())
 
     /**
      * 固定减少所有伤害一定数值
      *
      * @param value 要减少的数值
      */
-    public DamageModifier reduce(float value) {
-        reduceList.add(new DamageModify(DamageModify.ModifyType.REDUCE, value));
-        return this;
+    fun reduce(value: Float): DamageModifier {
+        modifyList.add(DamageModify(DamageModify.ModifyType.REDUCE, value))
+        return this
     }
 
     /**
@@ -110,9 +90,9 @@ public class DamageModifier {
      * @param value        要减少的数值
      * @param sourceTagKey 伤害类型
      */
-    public DamageModifier reduce(float value, TagKey<DamageType> sourceTagKey) {
-        reduceList.add(new DamageModify(DamageModify.ModifyType.REDUCE, value, sourceTagKey));
-        return this;
+    fun reduce(value: Float, sourceTagKey: TagKey<DamageType>): DamageModifier {
+        modifyList.add(DamageModify(DamageModify.ModifyType.REDUCE, value, sourceTagKey))
+        return this
     }
 
     /**
@@ -121,9 +101,9 @@ public class DamageModifier {
      * @param value     要减少的数值
      * @param sourceKey 伤害类型
      */
-    public DamageModifier reduce(float value, ResourceKey<DamageType> sourceKey) {
-        reduceList.add(new DamageModify(DamageModify.ModifyType.REDUCE, value, sourceKey));
-        return this;
+    fun reduce(value: Float, sourceKey: ResourceKey<DamageType>): DamageModifier {
+        modifyList.add(DamageModify(DamageModify.ModifyType.REDUCE, value, sourceKey))
+        return this
     }
 
     /**
@@ -132,9 +112,9 @@ public class DamageModifier {
      * @param value     要减少的数值
      * @param condition 伤害来源判定条件
      */
-    public DamageModifier reduce(float value, Function<DamageSource, Boolean> condition) {
-        reduceList.add(new DamageModify(DamageModify.ModifyType.REDUCE, value, condition));
-        return this;
+    fun reduce(value: Float, condition: Function<DamageSource, Boolean>): DamageModifier {
+        modifyList.add(DamageModify(DamageModify.ModifyType.REDUCE, value, condition))
+        return this
     }
 
     /**
@@ -143,9 +123,9 @@ public class DamageModifier {
      * @param value    要减少的数值
      * @param entityId 伤害来源实体ID
      */
-    public DamageModifier reduce(float value, String entityId) {
-        reduceList.add(new DamageModify(DamageModify.ModifyType.REDUCE, value, entityId));
-        return this;
+    fun reduce(value: Float, entityId: String): DamageModifier {
+        modifyList.add(DamageModify(DamageModify.ModifyType.REDUCE, value, entityId))
+        return this
     }
 
     /**
@@ -154,8 +134,8 @@ public class DamageModifier {
      * @param value 要减少的数值
      * @param type  伤害来源实体类型
      */
-    public DamageModifier reduce(float value, EntityType<?> type) {
-        return reduce(value, EntityType.getKey(type).toString());
+    fun reduce(value: Float, type: EntityType<*>): DamageModifier {
+        return reduce(value, EntityType.getKey(type).toString())
     }
 
     /**
@@ -163,9 +143,9 @@ public class DamageModifier {
      *
      * @param value 要乘以的数值
      */
-    public DamageModifier multiply(float value) {
-        multiplyList.add(new DamageModify(DamageModify.ModifyType.MULTIPLY, value));
-        return this;
+    fun multiply(value: Float): DamageModifier {
+        modifyList.add(DamageModify(DamageModify.ModifyType.MULTIPLY, value))
+        return this
     }
 
     /**
@@ -174,9 +154,9 @@ public class DamageModifier {
      * @param value        要乘以的数值
      * @param sourceTagKey 伤害类型
      */
-    public DamageModifier multiply(float value, TagKey<DamageType> sourceTagKey) {
-        multiplyList.add(new DamageModify(DamageModify.ModifyType.MULTIPLY, value, sourceTagKey));
-        return this;
+    fun multiply(value: Float, sourceTagKey: TagKey<DamageType>): DamageModifier {
+        modifyList.add(DamageModify(DamageModify.ModifyType.MULTIPLY, value, sourceTagKey))
+        return this
     }
 
     /**
@@ -185,9 +165,9 @@ public class DamageModifier {
      * @param value     要乘以的数值
      * @param sourceKey 伤害类型
      */
-    public DamageModifier multiply(float value, ResourceKey<DamageType> sourceKey) {
-        multiplyList.add(new DamageModify(DamageModify.ModifyType.MULTIPLY, value, sourceKey));
-        return this;
+    fun multiply(value: Float, sourceKey: ResourceKey<DamageType>): DamageModifier {
+        modifyList.add(DamageModify(DamageModify.ModifyType.MULTIPLY, value, sourceKey))
+        return this
     }
 
     /**
@@ -196,9 +176,9 @@ public class DamageModifier {
      * @param value     要乘以的数值
      * @param condition 伤害来源判定条件
      */
-    public DamageModifier multiply(float value, Function<DamageSource, Boolean> condition) {
-        multiplyList.add(new DamageModify(DamageModify.ModifyType.MULTIPLY, value, condition));
-        return this;
+    fun multiply(value: Float, condition: Function<DamageSource, Boolean>): DamageModifier {
+        modifyList.add(DamageModify(DamageModify.ModifyType.MULTIPLY, value, condition))
+        return this
     }
 
     /**
@@ -207,9 +187,9 @@ public class DamageModifier {
      * @param value    要乘以的数值
      * @param entityId 伤害来源实体ID
      */
-    public DamageModifier multiply(float value, String entityId) {
-        multiplyList.add(new DamageModify(DamageModify.ModifyType.MULTIPLY, value, entityId));
-        return this;
+    fun multiply(value: Float, entityId: String): DamageModifier {
+        modifyList.add(DamageModify(DamageModify.ModifyType.MULTIPLY, value, entityId))
+        return this
     }
 
     /**
@@ -218,8 +198,8 @@ public class DamageModifier {
      * @param value 要乘以的数值
      * @param type  伤害来源实体类型
      */
-    public DamageModifier multiply(float value, EntityType<?> type) {
-        return multiply(value, EntityType.getKey(type).toString());
+    fun multiply(value: Float, type: EntityType<*>): DamageModifier {
+        return multiply(value, EntityType.getKey(type).toString())
     }
 
     /**
@@ -227,109 +207,122 @@ public class DamageModifier {
      *
      * @param damageModifyFunction 自定义伤害值计算函数
      */
-    public DamageModifier custom(BiFunction<DamageSource, Float, Float> damageModifyFunction) {
-        customList.add(damageModifyFunction);
-        return this;
+    fun custom(damageModifyFunction: (DamageSource, Float) -> Float): DamageModifier {
+        customList.add(damageModifyFunction)
+        return this
     }
 
-    public DamageModifier addAll(List<DamageModify> list) {
-        for (var damageModify : list) {
-            switch (damageModify.type) {
-                case IMMUNITY -> immuneList.add(damageModify);
-                case REDUCE -> reduceList.add(damageModify);
-                case MULTIPLY -> multiplyList.add(damageModify);
+    fun addAll(list: MutableList<DamageModify>): DamageModifier {
+        for (damageModify in list) {
+            when (damageModify.type) {
+                DamageModify.ModifyType.IMMUNITY -> immuneList.add(damageModify)
+                DamageModify.ModifyType.REDUCE -> modifyList.add(damageModify)
+                DamageModify.ModifyType.MULTIPLY -> modifyList.add(damageModify)
+                else -> Mod.LOGGER.error("unknown modify type ${damageModify.type}")
             }
         }
-        return this;
+        return this
     }
 
-    public List<DamageModify> toList() {
-        var list = new ArrayList<DamageModify>();
-
-        // 计算优先级 免疫 > 固定减伤 > 乘
-        list.addAll(immuneList);
-        list.addAll(reduceList);
-        list.addAll(multiplyList);
-
-        return list;
+    // 计算优先级 免疫 > 固定减伤/乘算 > 自定义减伤
+    fun toList(): List<DamageModify> = buildList {
+        addAll(immuneList)
+        addAll(modifyList)
     }
 
-    public List<DamageModify> match(DamageSource source) {
-        return toList().stream().filter(m -> m.match(source)).toList();
+    fun match(source: DamageSource): List<DamageModify> {
+        return toList().filter { it.match(source) }
     }
 
-    public record ModifyResult(@Nullable DamageModify modify, float damage) {
-
-        public MutableComponent getDamageInfo() {
+    @JvmRecord
+    data class ModifyResult(val modify: DamageModify?, val damage: Float) {
+        fun getDamageInfo(): MutableComponent {
             if (modify == null) {
-                return Component.translatable("tips.superbwarfare.modify_result.function").withStyle(style -> style.withColor(0xe1ff6b))
-                        .append(Component.literal(" " + FormatTool.format2D(damage)).withStyle(ChatFormatting.WHITE));
+                return Component.translatable("tips.superbwarfare.modify_result.function")
+                    .withStyle { style -> style.withColor(0xe1ff6b) }
+                    .append(
+                        Component.literal(" " + format2D(damage.toDouble()))
+                            .withStyle(ChatFormatting.WHITE)
+                    )
             }
-            int color;
-            var sourceString = switch (modify.sourceType) {
-                case TAG_KEY -> {
-                    color = 0xff987e;
-                    yield modify.sourceTagKey.location().toString();
+            val color: Int
+            val sourceString = when (modify.sourceType) {
+                SourceType.TAG_KEY -> {
+                    color = 0xff987e
+                    modify.sourceTagKey!!.location().toString()
                 }
-                case ENTITY_TAG -> {
-                    color = 0xffd07e;
-                    yield modify.entityTag.location().toString();
+
+                SourceType.ENTITY_TAG -> {
+                    color = 0xffd07e
+                    modify.entityTag!!.location().toString()
                 }
-                case FUNCTION -> {
-                    color = 0xe1ff6b;
-                    yield "";
+
+                SourceType.FUNCTION -> {
+                    color = 0xe1ff6b
+                    ""
                 }
-                case ENTITY_ID -> {
-                    color = 0x6be6ff;
-                    yield modify.entityId;
+
+                SourceType.ENTITY_ID -> {
+                    color = 0x6be6ff
+                    modify.entityId
                 }
-                case RESOURCE_KEY -> {
-                    color = 0x6b7aff;
-                    yield modify.sourceKey.location().toString();
+
+                SourceType.RESOURCE_KEY -> {
+                    color = 0x6b7aff
+                    modify.sourceKey!!.location().toString()
                 }
-                case ALL -> {
-                    color = 0xff6bdf;
-                    yield "";
+
+                else -> {
+                    color = 0xff6bdf
+                    ""
                 }
-            };
-            MutableComponent typeString = switch (modify.type) {
-                case IMMUNITY -> Component.literal(" 0").withStyle(ChatFormatting.GRAY);
-                case REDUCE -> Component.literal(" - ").withStyle(ChatFormatting.GREEN)
-                        .append(Component.literal("" + modify.value).withStyle(ChatFormatting.RESET))
-                        .append(Component.literal(" = " + FormatTool.format2D(damage)).withStyle(ChatFormatting.WHITE));
-                case MULTIPLY -> Component.literal(" * ").withStyle(ChatFormatting.YELLOW)
-                        .append(Component.literal("" + modify.value).withStyle(ChatFormatting.RESET))
-                        .append(Component.literal(" = " + FormatTool.format2D(damage)).withStyle(ChatFormatting.WHITE));
-                case INVALID -> Component.literal("INVALID!").withStyle(ChatFormatting.RED);
-            };
-            var component = Component.translatable("tips.superbwarfare.modify_result." + modify.sourceType.name().toLowerCase(Locale.ROOT), sourceString)
-                    .withStyle(style -> style.withColor(color));
-            return component.append(typeString);
+            }
+            val typeString = when (modify.type) {
+                DamageModify.ModifyType.IMMUNITY -> Component.literal(" 0").withStyle(ChatFormatting.GRAY)
+
+                DamageModify.ModifyType.REDUCE -> Component.literal(" - ")
+                    .withStyle(ChatFormatting.GREEN)
+                    .append(Component.literal("" + modify.value).withStyle(ChatFormatting.RESET))
+                    .append(Component.literal(" = " + format2D(damage.toDouble())).withStyle(ChatFormatting.WHITE))
+
+                DamageModify.ModifyType.MULTIPLY -> Component.literal(" * ")
+                    .withStyle(ChatFormatting.YELLOW)
+                    .append(Component.literal("" + modify.value).withStyle(ChatFormatting.RESET))
+                    .append(Component.literal(" = " + format2D(damage.toDouble())).withStyle(ChatFormatting.WHITE))
+
+                else -> Component.literal("INVALID!").withStyle(ChatFormatting.RED)
+            }
+            val component = Component.translatable(
+                "tips.superbwarfare.modify_result." + modify.sourceType!!.name.lowercase(),
+                sourceString
+            ).withStyle { style -> style.withColor(color) }
+            return component.append(typeString)
         }
     }
 
     /**
      * 获取调试用的详细减伤结果
      */
-    public List<ModifyResult> matchResult(DamageSource source, float damage) {
-        var matchList = match(source);
-        var list = new ArrayList<ModifyResult>();
+    fun matchResult(source: DamageSource, damage: Float): MutableList<ModifyResult> {
+        var damage = damage
+        val matchList = match(source)
+        val list = ArrayList<ModifyResult>()
 
-        for (var damageModify : matchList) {
-            damage = damageModify.compute(damage);
-            list.add(new ModifyResult(damageModify, damage));
+        for (damageModify in matchList) {
+            damage = damageModify.compute(damage)
+            list.add(ModifyResult(damageModify, damage))
 
-            if (damage <= 0) return list;
+            if (damage <= 0) return list
         }
 
-        for (var func : customList) {
-            damage = func.apply(source, damage);
-            list.add(new ModifyResult(null, damage));
+        for (func in customList) {
+            damage = func(source, damage)
+            list.add(ModifyResult(null, damage))
 
-            if (damage <= 0) break;
+            if (damage <= 0) break
         }
 
-        return list;
+        return list
     }
 
     /**
@@ -339,20 +332,36 @@ public class DamageModifier {
      * @param damage 原伤害值
      * @return 减伤后的伤害值
      */
-    public float compute(DamageSource source, float damage) {
-        var matchList = match(source);
+    fun compute(source: DamageSource, damage: Float): Float {
+        var damage = damage
+        val matchList = match(source)
 
-        for (var damageModify : matchList) {
-            damage = damageModify.compute(damage);
-            if (damage <= 0) return 0;
+        for (damageModify in matchList) {
+            damage = damageModify.compute(damage)
+            if (damage <= 0) return 0f
         }
 
         // 最后计算自定义伤害
-        for (var func : customList) {
-            damage = func.apply(source, damage);
-            if (damage <= 0) return 0;
+        for (func in customList) {
+            damage = func(source, damage)
+            if (damage <= 0) return 0f
         }
 
-        return damage;
+        return damage
+    }
+
+    companion object {
+        @JvmStatic
+        fun createDefaultModifier(): DamageModifier {
+            return DamageModifier()
+                .immuneTo(EntityType.POTION)
+                .immuneTo(EntityType.AREA_EFFECT_CLOUD)
+                .immuneTo(DamageTypes.FALL)
+                .immuneTo(DamageTypes.CACTUS)
+                .immuneTo(DamageTypes.DROWN)
+                .immuneTo(DamageTypes.DRAGON_BREATH)
+                .immuneTo(DamageTypes.WITHER)
+                .immuneTo(DamageTypes.WITHER_SKULL)
+        }
     }
 }
