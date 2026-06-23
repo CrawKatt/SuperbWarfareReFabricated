@@ -89,7 +89,7 @@ object Type63InfoOverlay : CommonOverlay("type_63_info") {
         val items = lookingEntity.getEntityData().get(Type63Entity.LOADED_AMMO)
         for (i in lookingEntity.barrel.indices) {
             if (OBB.getLookingObb(player, player.entityInteractionRange()) === lookingEntity.barrel[i]) {
-                val type: Int = items[i]!!
+                val type: Int = items[i]
 
                 val stack = when (type) {
                     0 -> AP
