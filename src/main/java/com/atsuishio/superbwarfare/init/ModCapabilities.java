@@ -12,7 +12,6 @@ import com.atsuishio.superbwarfare.capability.api.SidedInvWrapper;
 import com.atsuishio.superbwarfare.capability.energy.ItemEnergyStorage;
 import com.atsuishio.superbwarfare.capability.laser.LaserCapability;
 import com.atsuishio.superbwarfare.capability.laser.LaserCapabilityProvider;
-import com.atsuishio.superbwarfare.entity.DPSGeneratorEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.CreativeChargingStationBlockItem;
 import com.atsuishio.superbwarfare.item.EnergyStorageItem;

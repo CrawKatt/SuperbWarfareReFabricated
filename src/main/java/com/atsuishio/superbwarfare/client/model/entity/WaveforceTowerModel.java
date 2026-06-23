@@ -6,8 +6,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
 
-import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.*;
-
 public class WaveforceTowerModel extends VehicleModel<WaveforceTowerEntity> {
     float energy0 = 0;
     private final Pattern LIGHT_PATTERN = Pattern.compile("^light_(?<type>on|off)(?<id>\\d+)");

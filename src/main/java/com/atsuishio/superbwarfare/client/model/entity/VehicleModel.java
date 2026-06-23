@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.*;
-
 public class VehicleModel<T extends VehicleEntity & GeoAnimatable> extends GeoModel<T> {
 
     protected float pitch;
@@ -224,7 +222,7 @@ public class VehicleModel<T extends VehicleEntity & GeoAnimatable> extends GeoMo
 
             // turret上的成员武器站Yaw
             case "passengerWeaponStationYaw" -> {
-                return (bone, vehicle, state) -> bone.setRotY(Mth.lerp(state.getPartialTick(), vehicle.gunYRotO, vehicle.getGunYRot()) * Mth.DEG_TO_RAD - turretYRot * Mth.DEG_TO_RAD);
+                return (bone, vehicle, state) -> bone.setRotY(Mth.lerp(state.getPartialTick(), vehicle.gunYRotO, vehicle.gunYRot) * Mth.DEG_TO_RAD - turretYRot * Mth.DEG_TO_RAD);
             }
 
             // turret上的成员武器站Pitch
@@ -246,7 +244,7 @@ public class VehicleModel<T extends VehicleEntity & GeoAnimatable> extends GeoMo
                     }
 
                     bone.setRotX(Mth.clamp(
-                            -Mth.lerp(state.getPartialTick(), vehicle.gunXRotO, vehicle.getGunXRot()) * Mth.DEG_TO_RAD
+                            -Mth.lerp(state.getPartialTick(), vehicle.gunXRotO, vehicle.gunXRot) * Mth.DEG_TO_RAD
                                     - r * pitch * Mth.DEG_TO_RAD
                                     - r2 * roll * Mth.DEG_TO_RAD,
                             -10 * Mth.DEG_TO_RAD, 60 * Mth.DEG_TO_RAD)
@@ -298,7 +296,7 @@ public class VehicleModel<T extends VehicleEntity & GeoAnimatable> extends GeoMo
             if (boneName.endsWith("Turn")) {
                 return (bone, vehicle, state) -> {
                     bone.setRotX(1.5f * (isL ? leftWheelRot : rightWheelRot));
-                    bone.setRotY(Mth.lerp(state.getPartialTick(), vehicle.rudderRotO, vehicle.getRudderRot()));
+                    bone.setRotY(Mth.lerp(state.getPartialTick(), vehicle.rudderRotO, vehicle.rudderRot));
                 };
             } else {
                 return (bone, vehicle, state) -> bone.setRotX(1.5f * (isL ? leftWheelRot : rightWheelRot));
@@ -331,18 +329,18 @@ public class VehicleModel<T extends VehicleEntity & GeoAnimatable> extends GeoMo
         yaw = vehicle.getYaw(partialTick);
         roll = vehicle.getRoll(partialTick);
 
-        leftWheelRot = Mth.lerp(partialTick, vehicle.leftWheelRotO, vehicle.getLeftWheelRot());
-        rightWheelRot = Mth.lerp(partialTick, vehicle.rightWheelRotO, vehicle.getRightWheelRot());
+        leftWheelRot = Mth.lerp(partialTick, vehicle.leftWheelRotO, vehicle.leftWheelRot);
+        rightWheelRot = Mth.lerp(partialTick, vehicle.rightWheelRotO, vehicle.rightWheelRot);
 
-        leftTrack = Mth.lerp(partialTick, vehicle.leftTrackO, vehicle.getLeftTrack());
-        rightTrack = Mth.lerp(partialTick, vehicle.rightTrackO, vehicle.getRightTrack());
+        leftTrack = Mth.lerp(partialTick, vehicle.leftTrackO, vehicle.leftTrack);
+        rightTrack = Mth.lerp(partialTick, vehicle.rightTrackO, vehicle.rightTrack);
 
-        turretYRot = Mth.lerp(partialTick, vehicle.turretYRotO, vehicle.getTurretYRot());
-        turretXRot = Mth.lerp(partialTick, vehicle.turretXRotO, vehicle.getTurretXRot());
+        turretYRot = Mth.lerp(partialTick, vehicle.turretYRotO, vehicle.turretYRot);
+        turretXRot = Mth.lerp(partialTick, vehicle.turretXRotO, vehicle.turretXRot);
 
         turretYaw = vehicle.getTurretYaw(partialTick);
 
-        recoilShake = Mth.lerp(partialTick, (float) vehicle.recoilShakeO, (float) vehicle.getRecoilShake());
+        recoilShake = Mth.lerp(partialTick, (float) vehicle.recoilShakeO, (float) vehicle.recoilShake);
 
         hideForTurretControllerWhileZooming = ClientEventHandler.zoomVehicle && vehicle.getNthEntity(vehicle.getTurretControllerIndex()) == Minecraft.getInstance().player;
         hideForPassengerWeaponStationControllerWhileZooming = ClientEventHandler.zoomVehicle && vehicle.getNthEntity(vehicle.getPassengerWeaponStationControllerIndex()) == Minecraft.getInstance().player;

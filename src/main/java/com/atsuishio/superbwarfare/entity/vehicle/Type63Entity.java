@@ -328,10 +328,10 @@ public class Type63Entity extends GeoVehicleEntity {
 
     @Override
     public void baseTick() {
-        turretYRotO = this.getTurretYRot();
-        turretXRotO = this.getTurretXRot();
-        leftWheelRotO = this.getLeftWheelRot();
-        rightWheelRotO = this.getRightWheelRot();
+        turretYRotO = this.turretYRot;
+        turretXRotO = this.turretXRot;
+        leftWheelRotO = this.leftWheelRot;
+        rightWheelRotO = this.rightWheelRot;
 
         super.baseTick();
 
@@ -371,16 +371,16 @@ public class Type63Entity extends GeoVehicleEntity {
 
     @Override
     public void travel() {
-        float diffY = entityData.get(TARGET_YAW) - getTurretYRot();
-        this.setTurretYRot(Mth.clamp(this.getTurretYRot() + 0.1f * diffY, -getTurretMaxYaw(), -getTurretMinYaw()));
+        float diffY = entityData.get(TARGET_YAW) - turretYRot;
+        this.turretYRot = Mth.clamp(this.turretYRot + 0.1f * diffY, -getTurretMaxYaw(), -getTurretMinYaw());
 
-        float diffX = entityData.get(TARGET_PITCH) - getTurretXRot();
-        this.setTurretXRot(Mth.clamp(this.getTurretXRot() + 0.1f * diffX, -getTurretMaxPitch(), -getTurretMinPitch()));
+        float diffX = entityData.get(TARGET_PITCH) - turretXRot;
+        this.turretXRot = Mth.clamp(this.turretXRot + 0.1f * diffX, -getTurretMaxPitch(), -getTurretMinPitch());
 
         double s0 = getDeltaMovement().dot(this.getViewVector(1));
 
-        this.setLeftWheelRot((float) (this.getLeftWheelRot() - 1.167 * s0));
-        this.setRightWheelRot((float) (this.getRightWheelRot() - 1.167 * s0));
+        this.leftWheelRot = (float) (this.leftWheelRot - 1.167 * s0);
+        this.rightWheelRot = (float) (this.rightWheelRot - 1.167 * s0);
     }
 
     public Vec3 getShootPos(float pPartialTicks) {

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.*;
 import static com.atsuishio.superbwarfare.tools.ParticleTool.sendParticle;
 
 public final class VehicleEngineUtils {
@@ -123,11 +122,11 @@ public final class VehicleEngineUtils {
 
         double s0 = vehicle.getDeltaMovement().dot(vehicle.getViewVector(1));
 
-        vehicle.setLeftWheelRot((float) ((vehicle.getLeftWheelRot() - wheelRotSpeed * s0) + Mth.clamp(wheelDifferential * vehicle.getEntityData().get(DELTA_ROT), -5f, 5f)));
-        vehicle.setRightWheelRot((float) ((vehicle.getRightWheelRot() - wheelRotSpeed * s0) - Mth.clamp(wheelDifferential * vehicle.getEntityData().get(DELTA_ROT), -5f, 5f)));
+        vehicle.leftWheelRot = (float) ((vehicle.leftWheelRot - wheelRotSpeed * s0) + Mth.clamp(wheelDifferential * vehicle.getEntityData().get(DELTA_ROT), -5f, 5f));
+        vehicle.rightWheelRot = (float) ((vehicle.rightWheelRot - wheelRotSpeed * s0) - Mth.clamp(wheelDifferential * vehicle.getEntityData().get(DELTA_ROT), -5f, 5f));
 
-        vehicle.setLeftTrack((float) ((vehicle.getLeftTrack() - trackSpeed * Math.PI * s0) + Mth.clamp(trackDifferential * Math.PI * vehicle.getEntityData().get(DELTA_ROT), -5f, 5f)));
-        vehicle.setRightTrack((float) ((vehicle.getRightTrack() - trackSpeed * Math.PI * s0) - Mth.clamp(trackDifferential * Math.PI * vehicle.getEntityData().get(DELTA_ROT), -5f, 5f)));
+        vehicle.leftTrack = (float) ((vehicle.leftTrack - trackSpeed * Math.PI * s0) + Mth.clamp(trackDifferential * Math.PI * vehicle.getEntityData().get(DELTA_ROT), -5f, 5f));
+        vehicle.rightTrack = (float) ((vehicle.rightTrack - trackSpeed * Math.PI * s0) - Mth.clamp(trackDifferential * Math.PI * vehicle.getEntityData().get(DELTA_ROT), -5f, 5f));
 
         int i;
         if (vehicle.getEntityData().get(L_WHEEL_DAMAGED) && vehicle.getEntityData().get(R_WHEEL_DAMAGED)) {
@@ -261,12 +260,12 @@ public final class VehicleEngineUtils {
 
         double s0 = vehicle.getDeltaMovement().dot(vehicle.getViewVector(1));
 
-        vehicle.setLeftWheelRot((float) ((vehicle.getLeftWheelRot() - wheelRotSpeed * s0) - Mth.clamp(wheelDifferential * vehicle.getEntityData().get(DELTA_ROT), -5f, 5f) * vehicle.getDeltaMovement().length()));
-        vehicle.setRightWheelRot((float) ((vehicle.getRightWheelRot() - wheelRotSpeed * s0) + Mth.clamp(wheelDifferential * vehicle.getEntityData().get(DELTA_ROT), -5f, 5f) * vehicle.getDeltaMovement().length()));
+        vehicle.leftWheelRot = (float) ((vehicle.leftWheelRot - wheelRotSpeed * s0) - Mth.clamp(wheelDifferential * vehicle.getEntityData().get(DELTA_ROT), -5f, 5f) * vehicle.getDeltaMovement().length());
+        vehicle.rightWheelRot = (float) ((vehicle.rightWheelRot - wheelRotSpeed * s0) + Mth.clamp(wheelDifferential * vehicle.getEntityData().get(DELTA_ROT), -5f, 5f) * vehicle.getDeltaMovement().length());
 
-        vehicle.setRudderRot(Mth.clamp(vehicle.getRudderRot() - vehicle.getEntityData().get(DELTA_ROT), -0.8f, 0.8f) * 0.75f);
+        vehicle.rudderRot = Mth.clamp(vehicle.rudderRot - vehicle.getEntityData().get(DELTA_ROT), -0.8f, 0.8f) * 0.75f;
 
-        vehicle.setYRot((float) (vehicle.getYRot() - Math.max(((vehicle.isInWater() || vehicle.isInLava()) && !vehicle.onGround() ? 6 : 12) * vehicle.getDeltaMovement().horizontalDistance(), 0) * vehicle.getRudderRot() * (vehicle.getEntityData().get(POWER) > 0 ? 1 : -1) - i * s0));
+        vehicle.setYRot((float) (vehicle.getYRot() - Math.max(((vehicle.isInWater() || vehicle.isInLava()) && !vehicle.onGround() ? 6 : 12) * vehicle.getDeltaMovement().horizontalDistance(), 0) * vehicle.rudderRot * (vehicle.getEntityData().get(POWER) > 0 ? 1 : -1) - i * s0));
 
         if ((vehicle.isInWater() || vehicle.isInLava()) || vehicle.onGround()) {
             double water = (!(vehicle.isInWater() || vehicle.isInLava()) && !vehicle.onGround() ? 0.05f : ((vehicle.isInWater() || vehicle.isInLava()) && !vehicle.onGround() ? 0.3f : 1));
@@ -360,8 +359,8 @@ public final class VehicleEngineUtils {
 
         vehicle.getEntityData().set(DELTA_ROT, vehicle.getEntityData().get(DELTA_ROT) * (float) Math.max(0.78f - 0.25f * vehicle.getDeltaMovement().horizontalDistance(), 0.1));
 
-        vehicle.setPropellerRot(vehicle.getPropellerRot() + 2 * vehicle.getEntityData().get(POWER));
-        vehicle.setRudderRot(Mth.clamp(vehicle.getRudderRot() - vehicle.getEntityData().get(DELTA_ROT), -0.8f, 0.8f) * 0.75f);
+        vehicle.propellerRot = vehicle.propellerRot + 2 * vehicle.getEntityData().get(POWER);
+        vehicle.rudderRot = Mth.clamp(vehicle.rudderRot - vehicle.getEntityData().get(DELTA_ROT), -0.8f, 0.8f) * 0.75f;
 
         if ((vehicle.isInWater() || vehicle.isInLava()) || vehicle.isUnderWater()) {
             vehicle.setXRot(vehicle.getXRot() * 0.85f);
@@ -520,7 +519,7 @@ public final class VehicleEngineUtils {
 
         vehicle.getEntityData().set(DELTA_ROT, vehicle.getEntityData().get(DELTA_ROT) * 0.9f);
         vehicle.getEntityData().set(PROPELLER_ROT, Mth.lerp(0.18f, vehicle.getEntityData().get(PROPELLER_ROT), vehicle.getEntityData().get(POWER)));
-        vehicle.setPropellerRot(vehicle.getPropellerRot() + 30 * vehicle.getEntityData().get(PROPELLER_ROT));
+        vehicle.propellerRot = vehicle.propellerRot + 30 * vehicle.getEntityData().get(PROPELLER_ROT);
         vehicle.getEntityData().set(PROPELLER_ROT, vehicle.getEntityData().get(PROPELLER_ROT) * 0.9995f);
 
         if (vehicle.engineStart) {
@@ -654,7 +653,7 @@ public final class VehicleEngineUtils {
                 }
             }
 
-            vehicle.setPropellerRot(vehicle.getPropellerRot() + 30 * vehicle.getEntityData().get(POWER));
+            vehicle.propellerRot = vehicle.propellerRot + 30 * vehicle.getEntityData().get(POWER);
 
             // 起落架
             if (engineInfo.hasGear) {
@@ -677,21 +676,21 @@ public final class VehicleEngineUtils {
                     vehicle.getEntityData().set(GEAR_ROT, Math.max(vehicle.getEntityData().get(GEAR_ROT) - 0.05f, 0));
                 }
 
-                vehicle.setGearRot(vehicle.getEntityData().get(GEAR_ROT) * gearRotateAngle);
+                vehicle.gearRot = vehicle.getEntityData().get(GEAR_ROT) * gearRotateAngle;
             }
 
             float flapX = (1 - (Mth.abs(vehicle.getRoll())) / 90) * Mth.clamp(vehicle.getMouseMoveSpeedY(), -22.5f, 22.5f) - VectorTool.calculateY(vehicle.getRoll()) * Mth.clamp(vehicle.getMouseMoveSpeedX(), -22.5f, 22.5f);
 
-            vehicle.setFlap1LRot(Mth.clamp(-flapX - 4 * addZ - vehicle.getEntityData().get(PLANE_BREAK), -22.5f, 22.5f));
-            vehicle.setFlap1RRot(Mth.clamp(-flapX + 4 * addZ - vehicle.getEntityData().get(PLANE_BREAK), -22.5f, 22.5f));
-            vehicle.setFlap1L2Rot(Mth.clamp(-flapX - 4 * addZ + vehicle.getEntityData().get(PLANE_BREAK), -22.5f, 22.5f));
-            vehicle.setFlap1R2Rot(Mth.clamp(-flapX + 4 * addZ + vehicle.getEntityData().get(PLANE_BREAK), -22.5f, 22.5f));
+            vehicle.flap1LRot = Mth.clamp(-flapX - 4 * addZ - vehicle.getEntityData().get(PLANE_BREAK), -22.5f, 22.5f);
+            vehicle.flap1RRot = Mth.clamp(-flapX + 4 * addZ - vehicle.getEntityData().get(PLANE_BREAK), -22.5f, 22.5f);
+            vehicle.flap1L2Rot = Mth.clamp(-flapX - 4 * addZ + vehicle.getEntityData().get(PLANE_BREAK), -22.5f, 22.5f);
+            vehicle.flap1R2Rot = Mth.clamp(-flapX + 4 * addZ + vehicle.getEntityData().get(PLANE_BREAK), -22.5f, 22.5f);
 
-            vehicle.setFlap2LRot(Mth.clamp(flapX - 4 * addZ, -22.5f, 22.5f));
-            vehicle.setFlap2RRot(Mth.clamp(flapX + 4 * addZ, -22.5f, 22.5f));
+            vehicle.flap2LRot = Mth.clamp(flapX - 4 * addZ, -22.5f, 22.5f);
+            vehicle.flap2RRot = Mth.clamp(flapX + 4 * addZ, -22.5f, 22.5f);
 
             float flapY = (1 - (Mth.abs(vehicle.getRoll())) / 90) * Mth.clamp(vehicle.getMouseMoveSpeedX(), -22.5f, 22.5f) + VectorTool.calculateY(vehicle.getRoll()) * Mth.clamp(vehicle.getMouseMoveSpeedY(), -22.5f, 22.5f);
-            vehicle.setFlap3Rot(flapY * 5);
+            vehicle.flap3Rot = flapY * 5;
         } else if (!vehicle.onGround()) {
             float diffX;
             vehicle.getEntityData().set(POWER, Math.max(vehicle.getEntityData().get(POWER) - 0.0003f, 0.02f));
@@ -717,7 +716,7 @@ public final class VehicleEngineUtils {
             vehicle.getEntityData().set(POWER, vehicle.getEntityData().get(POWER) * 0.96f);
         }
 
-        double flapAngle = (vehicle.getFlap1LRot() + vehicle.getFlap1RRot() + vehicle.getFlap1L2Rot() + vehicle.getFlap1R2Rot()) / 4;
+        double flapAngle = (vehicle.flap1LRot + vehicle.flap1RRot + vehicle.flap1L2Rot + vehicle.flap1R2Rot) / 4;
         vehicle.setDeltaMovement(vehicle.getDeltaMovement().add(vehicle.getUpVec(1).scale(vehicle.getDeltaMovement().dot(vehicle.getViewVector(1)) * 0.022 * lift * (1 + Math.sin((vehicle.onGround() ? 25 : flapAngle + 25) * Mth.DEG_TO_RAD)))));
         vehicle.setDeltaMovement(vehicle.getDeltaMovement().add(vehicle.getViewVector(1).scale(0.03 * speedRate * vehicle.getEntityData().get(POWER) * (vehicle.sprintInputDown() ? 2.2 : 1))));
 
@@ -930,8 +929,8 @@ public final class VehicleEngineUtils {
         }
 
         double s0 = vehicle.getDeltaMovement().dot(vehicle.getViewVector(1));
-        vehicle.setLeftWheelRot((float) (vehicle.getLeftWheelRot() - 1.25 * wheelRotSpeed * s0) - 0.015f * wheelDifferential * Mth.clamp(0.4f * diffY, -5f, 5f));
-        vehicle.setRightWheelRot((float) (vehicle.getRightWheelRot() - 1.25 * wheelRotSpeed * s0) + 0.015f * wheelDifferential * Mth.clamp(0.4f * diffY, -5f, 5f));
+        vehicle.leftWheelRot = (float) (vehicle.leftWheelRot - 1.25 * wheelRotSpeed * s0) - 0.015f * wheelDifferential * Mth.clamp(0.4f * diffY, -5f, 5f);
+        vehicle.rightWheelRot = (float) (vehicle.rightWheelRot - 1.25 * wheelRotSpeed * s0) + 0.015f * wheelDifferential * Mth.clamp(0.4f * diffY, -5f, 5f);
 
         if ((vehicle.isInWater() || vehicle.isInLava()) || vehicle.onGround()) {
             double water = (!(vehicle.isInWater() || vehicle.isInLava()) && !vehicle.onGround() ? 0.05f : ((vehicle.isInWater() || vehicle.isInLava()) && !vehicle.onGround() ? 0.3f : 1));

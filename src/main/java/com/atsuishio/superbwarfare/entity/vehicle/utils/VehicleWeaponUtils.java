@@ -41,8 +41,8 @@ public final class VehicleWeaponUtils {
         } else {
             float turretAngle = -Mth.wrapDegrees(driver.getYHeadRot() - vehicle.getYRot());
 
-            float diffY = Mth.wrapDegrees(turretAngle - vehicle.getTurretYRot());
-            float diffX = Mth.wrapDegrees(driver.getXRot() - vehicle.getTurretXRot());
+            float diffY = Mth.wrapDegrees(turretAngle - vehicle.turretYRot);
+            float diffX = Mth.wrapDegrees(driver.getXRot() - vehicle.turretXRot);
 
             vehicle.turretTurnSound(diffX, diffY, 0.95f);
 
@@ -54,8 +54,8 @@ public final class VehicleWeaponUtils {
             float min = -ySpeed;
             float max = ySpeed;
 
-            vehicle.setTurretXRot(Mth.clamp(vehicle.getTurretXRot() + Mth.clamp(0.95f * diffX, -xSpeed, xSpeed), -89.5f, 89.5f));
-            vehicle.setTurretYRot(vehicle.getTurretYRot() + Mth.clamp(0.9f * diffY, min, max));
+            vehicle.turretXRot = Mth.clamp(vehicle.turretXRot + Mth.clamp(0.95f * diffX, -xSpeed, xSpeed), -89.5f, 89.5f);
+            vehicle.turretYRot = vehicle.turretYRot + Mth.clamp(0.9f * diffY, min, max);
             vehicle.turretYRotLock = Mth.clamp(0.9f * diffY, min, max);
         }
     }
@@ -83,8 +83,8 @@ public final class VehicleWeaponUtils {
         float min = -ySpeed;
         float max = ySpeed;
 
-        vehicle.setTurretXRot(Mth.clamp(vehicle.getTurretXRot() + Mth.clamp(0.99f * diffX, -xSpeed, xSpeed), -vehicle.getTurretMaxPitch(), -vehicle.getTurretMinPitch()));
-        vehicle.setTurretYRot(Mth.clamp(vehicle.getTurretYRot() - Mth.clamp(0.99f * diffY, min, max), -vehicle.getTurretMaxYaw(), -vehicle.getTurretMinYaw()));
+        vehicle.turretXRot = Mth.clamp(vehicle.turretXRot + Mth.clamp(0.99f * diffX, -xSpeed, xSpeed), -vehicle.getTurretMaxPitch(), -vehicle.getTurretMinPitch());
+        vehicle.turretYRot = Mth.clamp(vehicle.turretYRot - Mth.clamp(0.99f * diffY, min, max), -vehicle.getTurretMaxYaw(), -vehicle.getTurretMinYaw());
         vehicle.turretYRotLock = Mth.clamp(0.9f * diffY, min, max);
     }
 

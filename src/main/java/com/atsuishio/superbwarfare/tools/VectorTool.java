@@ -57,7 +57,7 @@ public class VectorTool {
     }
 
     public static Quaterniond combineRotationsTurret(float partialTicks, VehicleEntity entity) {
-        Quaternionf turretYawRot = Axis.YP.rotationDegrees(Mth.lerp(partialTicks, entity.turretYRotO, entity.getTurretYRot()));
+        Quaternionf turretYawRot = Axis.YP.rotationDegrees(Mth.lerp(partialTicks, entity.turretYRotO, entity.turretYRot));
         Quaterniond combined = combineRotations(partialTicks, entity);
         combined.mul(new Quaterniond(turretYawRot));
 
@@ -65,7 +65,7 @@ public class VectorTool {
     }
 
     public static Quaterniond combineRotationsBarrel(float partialTicks, VehicleEntity entity) {
-        Quaternionf turretPitchRot = Axis.XP.rotationDegrees(Mth.lerp(partialTicks, entity.turretXRotO, entity.getTurretXRot()));
+        Quaternionf turretPitchRot = Axis.XP.rotationDegrees(Mth.lerp(partialTicks, entity.turretXRotO, entity.turretXRot));
         Quaterniond combined = combineRotationsTurret(partialTicks, entity);
         combined.mul(new Quaterniond(turretPitchRot));
 

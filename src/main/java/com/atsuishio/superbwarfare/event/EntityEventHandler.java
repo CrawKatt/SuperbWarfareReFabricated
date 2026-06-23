@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.event;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;

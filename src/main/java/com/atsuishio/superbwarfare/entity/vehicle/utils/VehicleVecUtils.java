@@ -619,7 +619,7 @@ public final class VehicleVecUtils {
         );
 
         transformV.translate(worldPosition.x, worldPosition.y, worldPosition.z);
-        transformV.rotate(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, vehicle.turretYRotO, vehicle.getTurretYRot())));
+        transformV.rotate(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, vehicle.turretYRotO, vehicle.turretYRot)));
         return transformV;
     }
 
@@ -665,7 +665,7 @@ public final class VehicleVecUtils {
             }
         }
 
-        float x = Mth.lerp(partialTicks, vehicle.turretXRotO, vehicle.getTurretXRot());
+        float x = Mth.lerp(partialTicks, vehicle.turretXRotO, vehicle.turretXRot);
         float xV = Mth.lerp(partialTicks, vehicle.xRotO, vehicle.getXRot());
         float z = Mth.lerp(partialTicks, vehicle.prevRoll, vehicle.getRoll());
 
@@ -686,7 +686,7 @@ public final class VehicleVecUtils {
         );
 
         transformT.translate(worldPosition.x, worldPosition.y, worldPosition.z);
-        transformT.rotate(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, vehicle.gunYRotO, vehicle.getGunYRot()) - Mth.lerp(partialTicks, vehicle.turretYRotO, vehicle.getTurretYRot())));
+        transformT.rotate(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, vehicle.gunYRotO, vehicle.gunYRot) - Mth.lerp(partialTicks, vehicle.turretYRotO, vehicle.turretYRot)));
         return transformT;
     }
 
@@ -718,7 +718,7 @@ public final class VehicleVecUtils {
             }
         }
 
-        float x = Mth.lerp(partialTicks, vehicle.gunXRotO, vehicle.getGunXRot());
+        float x = Mth.lerp(partialTicks, vehicle.gunXRotO, vehicle.gunXRot);
         float xV = Mth.lerp(partialTicks, vehicle.xRotO, vehicle.getXRot());
         float z = Mth.lerp(partialTicks, vehicle.prevRoll, vehicle.getRoll());
 

@@ -5,7 +5,6 @@ import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
 import com.atsuishio.superbwarfare.client.RenderHelper;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.menu.FuMO25Menu;
-import com.atsuishio.superbwarfare.mixins.ScreenAccessor;
 import com.atsuishio.superbwarfare.network.message.send.RadarChangeModeMessage;
 import com.atsuishio.superbwarfare.network.message.send.RadarSetParametersMessage;
 import com.atsuishio.superbwarfare.network.message.send.RadarSetPosMessage;

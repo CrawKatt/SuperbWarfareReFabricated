@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.entity.projectile;
 
-import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent;
 import com.atsuishio.superbwarfare.client.particle.BulletDecalOption;
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption;
 import com.atsuishio.superbwarfare.component.ModDataComponents;

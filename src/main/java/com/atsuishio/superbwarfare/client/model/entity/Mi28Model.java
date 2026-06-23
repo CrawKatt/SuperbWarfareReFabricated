@@ -14,11 +14,11 @@ public class Mi28Model extends VehicleModel<Mi28Entity> {
     @Override
     public @Nullable TransformContext<Mi28Entity> collectTransform(String boneName) {
         if (boneName.equals("propeller")) {
-            return (bone, vehicle, state) -> bone.setRotY(Mth.lerp(state.getPartialTick(), vehicle.propellerRotO, vehicle.getPropellerRot()));
+            return (bone, vehicle, state) -> bone.setRotY(Mth.lerp(state.getPartialTick(), vehicle.propellerRotO, vehicle.propellerRot));
         }
 
         if (boneName.equals("tailPropeller")) {
-            return (bone, vehicle, state) -> bone.setRotX(-6 * Mth.lerp(state.getPartialTick(), vehicle.propellerRotO, vehicle.getPropellerRot()));
+            return (bone, vehicle, state) -> bone.setRotX(-6 * Mth.lerp(state.getPartialTick(), vehicle.propellerRotO, vehicle.propellerRot));
         }
 
         if (boneName.equals("missile1")) {
