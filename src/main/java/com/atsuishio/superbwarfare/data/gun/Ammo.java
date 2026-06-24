@@ -4,11 +4,11 @@ import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.config.server.AmmoConfigKt;
 import com.atsuishio.superbwarfare.init.ModComponents;
 import com.atsuishio.superbwarfare.init.ModItems;
+import com.atsuishio.superbwarfare.item.ammo.AmmoSupplierItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Locale;
@@ -25,13 +25,15 @@ public enum Ammo {
     public final String serializationName;
     public final String name;
     public final String displayName;
-    public final Supplier<Item> defaultItem;
+
+    public final Supplier<AmmoSupplierItem> defaultItemSupplier;
+
     public final ChatFormatting color;
     public DataComponentType<Integer> dataComponent;
 
-    Ammo(ChatFormatting color, Supplier<Item> defaultItem) {
+    Ammo(ChatFormatting color, Supplier<AmmoSupplierItem> defaultItemSupplier) {
         this.color = color;
-        this.defaultItem = defaultItem;
+        this.defaultItemSupplier = defaultItemSupplier;
 
         var name = name().toLowerCase(Locale.ROOT);
         this.name = name;
@@ -55,20 +57,24 @@ public enum Ammo {
         this.serializationName = builder + "Ammo";
     }
 
-    public ItemStack getItemStack() {
-        return getItemStack(1);
-    }
-
-    public ItemStack getItemStack(int count) {
-        return new ItemStack(defaultItem.get(), count);
-    }
-
     public int getLimit() {
         return AmmoConfigKt.limit(this);
     }
 
     public int getAmmoBoxLimit() {
         return AmmoConfigKt.ammoBoxLimit(this);
+    }
+
+    public ItemStack getItemStack() {
+        return getItemStack(1);
+    }
+
+    public ItemStack getItemStack(int count) {
+        return new ItemStack(getItem(), count);
+    }
+
+    public AmmoSupplierItem getItem() {
+        return defaultItemSupplier.get();
     }
 
     public static Ammo getType(String name) {
@@ -86,26 +92,49 @@ public enum Ammo {
         return count == null ? 0 : count;
     }
 
-    public void set(ItemStack stack, int count) {
-        stack.set(this.dataComponent, count);
+    public boolean set(ItemStack stack, int count) {
+        if (count > getAmmoBoxLimit()) {
+            return false;
+        }
+
+        if (count <= 0) {
+            stack.remove(this.dataComponent);
+        } else {
+            stack.set(this.dataComponent, count);
+        }
+
+        return true;
     }
 
-    public void add(ItemStack stack, int count) {
-        set(stack, safeAdd(get(stack), count));
+    public boolean add(ItemStack stack, int count) {
+        return set(stack, safeAdd(get(stack), count));
     }
 
-    // NBTTag
+    // NBT
     public int get(CompoundTag tag) {
         return tag.getInt(this.serializationName);
     }
 
-    public void set(CompoundTag tag, int count) {
-        if (count < 0) count = 0;
-        tag.putInt(this.serializationName, count);
+    public boolean set(CompoundTag tag, int count) {
+        if (count < 0) {
+            count = 0;
+        }
+
+        if (count > getAmmoBoxLimit()) {
+            return false;
+        }
+
+        if (count == 0) {
+            tag.remove(this.serializationName);
+        } else {
+            tag.putInt(this.serializationName, count);
+        }
+
+        return true;
     }
 
-    public void add(CompoundTag tag, int count) {
-        set(tag, safeAdd(get(tag), count));
+    public boolean add(CompoundTag tag, int count) {
+        return set(tag, safeAdd(get(tag), count));
     }
 
     // PlayerVariables
@@ -117,36 +146,66 @@ public enum Ammo {
         return variable.ammo.getOrDefault(this, 0);
     }
 
-    public void set(PlayerVariable variable, int count) {
-        if (count < 0) count = 0;
+    public boolean set(PlayerVariable variable, int count) {
+        if (variable == null) {
+            return false;
+        }
+
+        if (count < 0) {
+            count = 0;
+        }
+
+        if (count > getLimit()) {
+            return false;
+        }
 
         variable.ammo.put(this, count);
+        return true;
     }
 
-    public void add(PlayerVariable variable, int count) {
-        set(variable, safeAdd(get(variable), count));
+    public boolean add(PlayerVariable variable, int count) {
+        return set(variable, safeAdd(get(variable), count));
     }
-
 
     // Entity
     public int get(Entity entity) {
-        if (entity == null) return 0;
-        return ModComponents.PLAYER_VARIABLE.maybeGet(entity).map(cap -> get(cap)).orElse(0);
+        if (entity == null) {
+            return 0;
+        }
+
+        return ModComponents.PLAYER_VARIABLE
+                .maybeGet(entity)
+                .map(this::get)
+                .orElse(0);
     }
 
-    public void set(Entity entity, int count) {
-        if (entity == null || entity.level().isClientSide) return;
+    public boolean set(Entity entity, int count) {
+        if (entity == null || entity.level().isClientSide) {
+            return false;
+        }
 
-        var cap = ModComponents.PLAYER_VARIABLE.get(entity);
+        if (count > getLimit()) {
+            return false;
+        }
 
-        set(cap, count);
-        ModComponents.PLAYER_VARIABLE.sync(entity);
+        return ModComponents.PLAYER_VARIABLE
+                .maybeGet(entity)
+                .map(cap -> {
+                    var watched = cap.watch();
+                    boolean success = set(watched, count);
+
+                    if (success) {
+                        watched.sync(entity);
+                    }
+
+                    return success;
+                })
+                .orElse(false);
     }
 
-    public void add(Entity entity, int count) {
-        set(entity, safeAdd(get(entity), count));
+    public boolean add(Entity entity, int count) {
+        return set(entity, safeAdd(get(entity), count));
     }
-
 
     private int safeAdd(int a, int b) {
         var newCount = (long) a + (long) b;

@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.item.ammo
 
 import com.atsuishio.superbwarfare.data.gun.Ammo
-import com.atsuishio.superbwarfare.init.ModAttachments
+import com.atsuishio.superbwarfare.init.ModComponents
 import com.atsuishio.superbwarfare.init.ModDataComponents
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.tools.FormatTool.format0D
@@ -30,14 +30,14 @@ var ItemStack.ammoBoxData: AmmoBoxItem.AmmoBoxData
         val info = get(ModDataComponents.AMMO_BOX_INFO) ?: AmmoBoxInfo("All", false)
 
         val map = Ammo.entries.mapNotNull {
-            val count = this@ammoBoxData.get(it.dataComponent.get()) ?: return@mapNotNull null
+            val count = this@ammoBoxData.get(it.dataComponent) ?: return@mapNotNull null
             it to count
         }.toMap()
 
         return AmmoBoxItem.AmmoBoxData(Ammo.getType(info.type), info.isDrop, map)
     }
     set(value) {
-        if (value == this) return
+        if (value == this.ammoBoxData) return
 
         val info = AmmoBoxInfo(value.type?.toString() ?: "All", value.isDrop)
         this@ammoBoxData.set(ModDataComponents.AMMO_BOX_INFO, info)
@@ -57,46 +57,51 @@ open class AmmoBoxItem : Item(Properties().stacksTo(1)) {
         val selectedTypes get() = if (type == null) Ammo.entries.toTypedArray() else arrayOf(type)
 
         val selectedAmmoCount get() = storedAmmo[type] ?: 0
-        fun restCount(type: Ammo) = type.ammoBoxLimit - (storedAmmo[type] ?: 0)
+
+        fun restCount(type: Ammo): Int {
+            return type.ammoBoxLimit - (storedAmmo[type] ?: 0)
+        }
 
         fun switchToNextType(): AmmoBoxData {
             if (isDrop) return this
 
             if (type == null) {
-                return this.copy(selectedType = Ammo.entries[0])
+                return copy(selectedType = Ammo.entries[0])
             }
 
             if (type.ordinal == Ammo.entries.size - 1) {
-                return this.copy(selectedType = null)
+                return copy(selectedType = null)
             }
 
-            return this.copy(selectedType = Ammo.entries[type.ordinal + 1])
+            return copy(selectedType = Ammo.entries[type.ordinal + 1])
         }
 
-        fun asDrop(): AmmoBoxData = copy(selectedType = null, isDrop = true)
+        fun asDrop(): AmmoBoxData {
+            return copy(selectedType = null, isDrop = true)
+        }
     }
 
     override fun use(level: Level, player: Player, hand: InteractionHand): InteractionResultHolder<ItemStack> {
         val stack = player.getItemInHand(hand)
 
-        if (hand == InteractionHand.OFF_HAND) return InteractionResultHolder.fail(stack)
+        if (hand == InteractionHand.OFF_HAND) {
+            return InteractionResultHolder.fail(stack)
+        }
 
         player.cooldowns.addCooldown(this, 10)
 
         val info = stack.ammoBoxData
+        val cap = ModComponents.PLAYER_VARIABLE.get(player).watch()
 
-        val cap = player.getData(ModAttachments.PLAYER_VARIABLE).watch()
-        if (!level.isClientSide()) {
+        if (!level.isClientSide) {
             for (type in info.selectedTypes) {
                 if (player.isCrouching && !info.isDrop) {
-                    // 存入弹药
                     val storedCount = type.get(cap)
                     val countToStore = min(storedCount, type.ammoBoxLimit - type.get(stack)).coerceAtLeast(0)
 
                     type.add(stack, countToStore)
                     type.add(cap, -countToStore)
                 } else {
-                    // 取出弹药
                     val storedCount = type.get(stack)
                     val countToStore = min(storedCount, type.limit - type.get(cap)).coerceAtLeast(0)
 
@@ -104,27 +109,39 @@ open class AmmoBoxItem : Item(Properties().stacksTo(1)) {
                     type.add(stack, -countToStore)
                 }
             }
-            player.setData(ModAttachments.PLAYER_VARIABLE, cap)
-            cap.sync(player)
-            level.playSound(null, player.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1f, 1f)
 
-            // 取出弹药时，若弹药盒为掉落物版本，则移除弹药盒物品
+            cap.sync(player)
+
+            level.playSound(
+                null,
+                player.blockPosition(),
+                SoundEvents.ARROW_HIT_PLAYER,
+                SoundSource.PLAYERS,
+                1f,
+                1f
+            )
+
             if (info.isDrop && Ammo.entries.all { it.get(stack) <= 0 }) {
                 stack.shrink(1)
             }
         }
+
         return InteractionResultHolder.consume(stack)
     }
 
-    override fun onEntitySwing(stack: ItemStack, entity: LivingEntity, hand: InteractionHand): Boolean {
+    // ToDo: Usar luego en evento custom o Mixin
+    fun onEntitySwing(stack: ItemStack, entity: LivingEntity, hand: InteractionHand): Boolean {
         if (entity.isCrouching && entity is ServerPlayer) {
             stack.ammoBoxData = stack.ammoBoxData.switchToNextType()
 
-            SoundTool.playLocalSound(entity, ModSounds.FIRE_RATE.get(), SoundSource.PLAYERS, 1f, 1f)
+            SoundTool.playLocalSound(entity, ModSounds.FIRE_RATE, SoundSource.PLAYERS, 1f, 1f)
+
             val type = stack.ammoBoxData.type
+
             if (type == null) {
                 entity.displayClientMessage(
-                    Component.translatable("des.superbwarfare.ammo_box.type.all").withStyle(ChatFormatting.WHITE), true
+                    Component.translatable("des.superbwarfare.ammo_box.type.all").withStyle(ChatFormatting.WHITE),
+                    true
                 )
                 return true
             }
@@ -153,16 +170,12 @@ open class AmmoBoxItem : Item(Properties().stacksTo(1)) {
                 Component.translatable("des.superbwarfare.ammo_box." + ammo.name).withStyle(ammo.color)
                         + Component.empty().withStyle(ChatFormatting.RESET)
                         + Component.literal(
-                    format0D(
-                        ammo.get(stack).toDouble()
-                    ) + (if (type != null && type != ammo) " " else " ←-")
-                )
-                    .withStyle(ChatFormatting.BOLD)
+                    format0D(ammo.get(stack).toDouble()) + if (type != null && type != ammo) " " else " ←-"
+                ).withStyle(ChatFormatting.BOLD)
             )
         }
     }
 
-    // 直接在物品栏右键时切换选中的弹种
     override fun overrideOtherStackedOnMe(
         stack: ItemStack,
         other: ItemStack,
@@ -172,11 +185,13 @@ open class AmmoBoxItem : Item(Properties().stacksTo(1)) {
         access: SlotAccess
     ): Boolean {
         val info = stack.ammoBoxData
+
         if (!info.isDrop && other.isEmpty && action == ClickAction.SECONDARY) {
             stack.ammoBoxData = stack.ammoBoxData.switchToNextType()
-            player.playSound(ModSounds.FIRE_RATE.get())
+            player.playSound(ModSounds.FIRE_RATE)
             return true
         }
+
         return super.overrideOtherStackedOnMe(stack, other, slot, action, player, access)
     }
 
@@ -186,8 +201,8 @@ open class AmmoBoxItem : Item(Properties().stacksTo(1)) {
         val info = stack.ammoBoxData
         val count = min(slotStack.maxStackSize, slotStack.count)
 
-        // 右键放弹药
-        if (action == ClickAction.SECONDARY &&
+        if (
+            action == ClickAction.SECONDARY &&
             (slotStack.isEmpty || slotItem is AmmoSupplierItem && (slotItem.type == info.type || info.type == null))
         ) {
             val type = info.type ?: (slotItem as? AmmoSupplierItem)?.type ?: return false
@@ -202,21 +217,23 @@ open class AmmoBoxItem : Item(Properties().stacksTo(1)) {
                 slot.safeInsert(newStack.copyWithCount(countToStore))
                 type.add(stack, -countToStore * newItem.ammoToAdd)
 
-                player.playSound(ModSounds.FIRE_RATE.get())
+                player.playSound(ModSounds.FIRE_RATE)
                 return true
             }
         }
 
-        // 左键收弹药
         if (!info.isDrop && action == ClickAction.PRIMARY && slotItem is AmmoSupplierItem) {
             val type = slotItem.type
             val addCount = (info.restCount(type) / slotItem.ammoToAdd).coerceAtMost(count)
-            if (addCount < 0) return true
+
+            if (addCount < 0) {
+                return true
+            }
 
             type.add(stack, addCount * slotItem.ammoToAdd)
             slot.safeTake(count, addCount, player)
 
-            player.playSound(ModSounds.BULLET_SUPPLY.get())
+            player.playSound(ModSounds.BULLET_SUPPLY)
             return true
         }
 

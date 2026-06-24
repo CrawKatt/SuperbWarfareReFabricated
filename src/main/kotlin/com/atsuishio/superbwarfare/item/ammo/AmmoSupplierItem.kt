@@ -36,7 +36,7 @@ open class AmmoSupplierItem(val type: Ammo, val ammoToAdd: Int, properties: Prop
 
         val offhandItem = player.offhandItem
 
-        val addedCount = if (offhandItem.`is`(ModItems.AMMO_BOX.get())) {
+        val addedCount = if (offhandItem.`is`(ModItems.AMMO_BOX)) {
             val canAddAmount = type.ammoBoxLimit - type.get(offhandItem)
             val toAddCount = (canAddAmount / ammoToAdd).coerceAtMost(count)
             if (toAddCount <= 0) {
@@ -50,7 +50,7 @@ open class AmmoSupplierItem(val type: Ammo, val ammoToAdd: Int, properties: Prop
 
             toAddCount
         } else {
-            val capability = player.getData(ModAttachments.PLAYER_VARIABLE).watch()
+            val capability = ModAttachments.PLAYER_VARIABLE.get(player).watch()
 
             val canAddAmount = type.limit - type.get(capability)
             val toAddCount = (canAddAmount / ammoToAdd).coerceAtMost(count)
@@ -62,7 +62,6 @@ open class AmmoSupplierItem(val type: Ammo, val ammoToAdd: Int, properties: Prop
             }
 
             this.type.add(capability, ammoToAdd * toAddCount)
-            player.setData(ModAttachments.PLAYER_VARIABLE, capability)
             capability.sync(player)
 
             toAddCount
@@ -82,7 +81,7 @@ open class AmmoSupplierItem(val type: Ammo, val ammoToAdd: Int, properties: Prop
                     ammoToAdd * count
                 ), true
             )
-            level.playSound(null, player.blockPosition(), ModSounds.BULLET_SUPPLY.get(), SoundSource.PLAYERS, 1f, 1f)
+            level.playSound(null, player.blockPosition(), ModSounds.BULLET_SUPPLY, SoundSource.PLAYERS, 1f, 1f)
         }
 
         return InteractionResultHolder.success(stack)
