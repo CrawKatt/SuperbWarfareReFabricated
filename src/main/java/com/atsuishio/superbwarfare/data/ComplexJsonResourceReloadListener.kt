@@ -1,72 +1,97 @@
-package com.atsuishio.superbwarfare.data;
+package com.atsuishio.superbwarfare.data
 
-import com.atsuishio.superbwarfare.Mod;
-import com.google.gson.JsonParseException;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.minecraft.resources.FileToIdConverter;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
-import net.minecraft.util.profiling.ProfilerFiller;
-import org.jetbrains.annotations.NotNull;
+import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.api.event.LoadingDataEvent
+import com.atsuishio.superbwarfare.api.event.LoadingJsonEvent
+import com.atsuishio.superbwarfare.data.gun.DefaultGunData
+import com.atsuishio.superbwarfare.data.vehicle.DefaultVehicleData
+import com.atsuishio.superbwarfare.tools.postEvent
+import kotlinx.serialization.serializer
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
+import net.minecraft.resources.FileToIdConverter
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.packs.resources.ResourceManager
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener
+import net.minecraft.util.profiling.ProfilerFiller
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.io.IOException;
-import java.util.Map;
+class ComplexJsonResourceReloadListener(
+    private val id: ResourceLocation,
+    private val data: MutableMap<String, DataLoader.GeneralData<*>>
+) : SimplePreparableReloadListener<Any>(), IdentifiableResourceReloadListener {
 
-public class ComplexJsonResourceReloadListener extends SimplePreparableReloadListener<Object> implements IdentifiableResourceReloadListener {
-
-    private final Map<String, DataLoader.GeneralData<?>> data;
-
-    public ComplexJsonResourceReloadListener(Map<String, DataLoader.GeneralData<?>> data) {
-        this.data = data;
+    override fun getFabricId(): ResourceLocation {
+        return id
     }
 
-    private static final Object NULL = new Object();
+    override fun prepare(resourceManager: ResourceManager, profiler: ProfilerFiller): Any {
+        this.data.forEach { (name, value) ->
+            val map = value.dataMap
+            map.clear()
 
-    @ParametersAreNonnullByDefault
-    protected @NotNull Object prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
-        this.data.forEach((name, value) -> {
-            var map = value.data;
-            map.clear();
+            val converter = FileToIdConverter.json(name)
 
-            var converter = FileToIdConverter.json(name);
-            for (var entry : converter.listMatchingResources(resourceManager).entrySet()) {
-                var resourcelocation = entry.getKey();
-                var pathLocation = converter.fileToId(resourcelocation);
+            for (entry in converter.listMatchingResources(resourceManager).entries) {
+                val location = entry.key
+                val pathLocation = converter.fileToId(location)
 
-                try (var reader = entry.getValue().openAsReader()) {
-                    var data = DataLoader.GSON.fromJson(reader, value.type);
+                try {
+                    entry.value.openAsReader().use { reader ->
+                        val id = pathLocation.toString()
 
-                    String id;
-                    if (data instanceof IDBasedData<?> IDData && !IDData.getId().isEmpty()) {
-                        id = IDData.getId();
-                    } else {
-                        id = pathLocation.toString();
-                        Mod.LOGGER.warn("{} ID for {} is empty, try using {} as id", name, id, pathLocation);
+                        var jsonStr = reader.lineSequence().joinToString("\n")
+
+                        val jsonEvent = LoadingJsonEvent(id, jsonStr)
+                        postEvent(jsonEvent)
+
+                        if (!jsonEvent.isCanceled) {
+                            jsonStr = jsonEvent.jsonStr
+                        }
+
+                        var loaded = if (value.isKtData) {
+                            DataLoader.JSON.decodeFromString(serializer(value.type), jsonStr)
+                        } else {
+                            DataLoader.GSON.fromJson(jsonStr, value.type)
+                        }
+
+                        if (loaded is IDBasedData<*>) {
+                            loaded.id = id
+                        }
+
+                        if (loaded is DefaultGunData) {
+                            val event = LoadingDataEvent.Gun(id, loaded)
+                            postEvent(event)
+
+                            if (!event.isCanceled) {
+                                loaded = event.data
+                            }
+                        }
+
+                        if (loaded is DefaultVehicleData) {
+                            val event = LoadingDataEvent.Vehicle(id, loaded)
+                            postEvent(event)
+
+                            if (!event.isCanceled) {
+                                loaded = event.data
+                            }
+                        }
+
+                        map[id] = loaded
                     }
-
-                    map.put(id, data);
-                } catch (IllegalArgumentException | IOException | JsonParseException exception) {
-                    Mod.LOGGER.error("Couldn't parse data file {} from {}", pathLocation, resourcelocation, exception);
+                } catch (exception: Exception) {
+                    Mod.LOGGER.error("Couldn't parse data file {} from {}", pathLocation, location, exception)
                 }
             }
 
-            if (value.onReload != null) {
-                value.onReload.accept(map);
-            }
-        });
+            value.onReload?.accept(map)
+        }
 
-        return NULL;
+        return NULL
     }
 
-    @Override
-    @ParametersAreNonnullByDefault
-    protected void apply(Object obj, ResourceManager resourceManager, ProfilerFiller profiler) {
+    override fun apply(obj: Any, resourceManager: ResourceManager, profiler: ProfilerFiller) {
     }
 
-    @Override
-    public ResourceLocation getFabricId() {
-        return Mod.loc("complex_json_data");
+    companion object {
+        private val NULL = Any()
     }
 }

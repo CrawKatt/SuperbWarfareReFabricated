@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.data
 
+import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.data.ModColor.ModColorAdapter
 import com.atsuishio.superbwarfare.data.StringOrVec3.StringOrVec3Adapter
 import com.atsuishio.superbwarfare.data.vehicle.subdata.CollisionLevel
@@ -17,9 +18,12 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.packs.PackType
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.phys.Vec2
@@ -27,7 +31,6 @@ import net.minecraft.world.phys.Vec3
 import java.util.function.Consumer
 
 object DataLoader {
-
     @JvmField
     val GSON: Gson = createCommonBuilder().create()
 
@@ -52,23 +55,40 @@ object DataLoader {
     val LOADED_DATA = mutableMapOf<String, GeneralData<*>>()
     val LOADED_RESOURCE = mutableMapOf<String, GeneralData<*>>()
 
-    val SERVER_LISTENER: ComplexJsonResourceReloadListener = ComplexJsonResourceReloadListener(LOADED_DATA)
-    val CLIENT_LISTENER: ComplexJsonResourceReloadListener = ComplexJsonResourceReloadListener(LOADED_RESOURCE)
+    val SERVER_LISTENER: ComplexJsonResourceReloadListener =
+        ComplexJsonResourceReloadListener(Mod.loc("server_data_loader"), LOADED_DATA)
+
+    val CLIENT_LISTENER: ComplexJsonResourceReloadListener =
+        ComplexJsonResourceReloadListener(Mod.loc("client_resource_loader"), LOADED_RESOURCE)
 
     @JvmStatic
     fun register() {
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(SERVER_LISTENER)
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(CLIENT_LISTENER)
 
         ServerPlayConnectionEvents.JOIN.register { handler, _, server ->
-            val player = handler.player
+            syncDataToPlayer(server, handler.player)
+        }
 
-            LOADED_DATA.filter { it.value.synced }.forEach { (key, data) ->
-                if (server.isSingleplayerOwner(player.gameProfile)) return@forEach
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register { server, _, success ->
+            if (!success) return@register
 
-                val packet = DataSyncMessage(key, data.serializeToString())
-                player.sendPacket(packet)
+            for (player in server.playerList.players) {
+                syncDataToPlayer(server, player)
             }
+        }
+    }
+
+    @JvmStatic
+    fun registerClient() {
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(CLIENT_LISTENER)
+    }
+
+    private fun syncDataToPlayer(server: MinecraftServer, player: ServerPlayer) {
+        if (server.isSingleplayerOwner(player.gameProfile)) return
+
+        LOADED_DATA.filter { it.value.synced }.forEach { (key, data) ->
+            val packet = DataSyncMessage(key, data.serializeToString())
+            player.sendPacket(packet)
         }
     }
 
