@@ -9,20 +9,25 @@ import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
+import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -53,6 +58,9 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
 
     @Shadow
     protected abstract boolean checkTotemDeathProtection(DamageSource pDamageSource);
+
+    @Unique
+    private DamageSource superbwarfare$dropSource;
 
     @Unique
     private double superbwarfare$knockbackStrength = -1;
@@ -177,7 +185,9 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
             CallbackInfoReturnable<Boolean> cir
     ) {
         LivingEntity self = (LivingEntity) (Object) this;
+
         BurnMobEffect.onBurnRemoved(self, self.getEffect(effect));
+        PhosphorusFireMobEffect.onPhosphorusFireRemoved(self, self.getEffect(effect));
         ShockMobEffect.onShockRemoved(self, self.getEffect(effect));
     }
 
@@ -209,5 +219,43 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
         BurnMobEffect.onLivingTick(self);
         PhosphorusFireMobEffect.onLivingTick(self);
         ShockMobEffect.onLivingTick(self);
+    }
+
+    @Inject(
+            method = "dropAllDeathLoot(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;)V",
+            at = @At("HEAD")
+    )
+    private void superbwarfare$beginPowerfulAttractionDrops(ServerLevel level, DamageSource source, CallbackInfo ci) {
+        PowerfulAttraction.beginDropCapture(source);
+    }
+
+    @Inject(
+            method = "dropAllDeathLoot(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;)V",
+            at = @At("RETURN")
+    )
+    private void superbwarfare$endPowerfulAttractionDrops(ServerLevel level, DamageSource source, CallbackInfo ci) {
+        PowerfulAttraction.endDropCapture();
+    }
+
+    @Inject(
+            method = "getExperienceReward(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;)I",
+            at = @At("RETURN"),
+            cancellable = true
+    )
+    private void superbwarfare$powerfulAttractionExperience(
+            ServerLevel level,
+            Entity attackingEntity,
+            CallbackInfoReturnable<Integer> cir
+    ) {
+        if (!(attackingEntity instanceof Player player)) return;
+
+        LivingEntity self = (LivingEntity) (Object) this;
+        int result = PowerfulAttraction.handleExperienceDrop(
+                player,
+                self.getLastDamageSource(),
+                cir.getReturnValue()
+        );
+
+        cir.setReturnValue(result);
     }
 }

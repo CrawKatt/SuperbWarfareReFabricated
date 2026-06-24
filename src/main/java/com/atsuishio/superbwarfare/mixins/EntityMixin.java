@@ -4,12 +4,15 @@ import com.atsuishio.superbwarfare.capability.PersistentDataAccessor;
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
+import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import com.atsuishio.superbwarfare.tools.OBB;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -116,6 +119,21 @@ public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
             if (player.getVehicle() != null) {
                 player.getVehicle().onPassengerTurned(player);
             }
+        }
+    }
+
+    @Inject(
+            method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void superbwarfare$powerfulAttractionDrop(
+            ItemStack stack,
+            float yOffset,
+            CallbackInfoReturnable<ItemEntity> cir
+    ) {
+        if (PowerfulAttraction.tryMoveCurrentDropToPlayer(stack)) {
+            cir.setReturnValue(null);
         }
     }
 }

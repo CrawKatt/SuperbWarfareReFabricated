@@ -4,48 +4,67 @@ import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.tools.DamageTypeTool
+import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.entity.player.Player
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.event.entity.living.LivingDropsEvent
-import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent
+import net.minecraft.world.item.ItemStack
 
-@EventBusSubscriber
 object PowerfulAttraction : Perk("powerful_attraction", Type.FUNCTIONAL) {
-    @SubscribeEvent
-    fun onLivingDrops(event: LivingDropsEvent) {
-        val source = event.source ?: return
-        val sourceEntity = source.entity
-        if (sourceEntity !is Player) return
-        val stack = sourceEntity.mainHandItem
-        if (stack.item !is GunItem) return
+    private val CURRENT_DROP_SOURCE = ThreadLocal<DamageSource?>()
 
-        val level = GunData.from(stack).perk.getLevel(this)
-        if (level > 0 && (DamageTypeTool.isGunDamage(source) || source.`is`(DamageTypes.PLAYER_ATTACK))) {
-            val drops = event.drops
-            drops.forEach {
-                val item = it.item
-                if (!sourceEntity.addItem(item.copy())) {
-                    sourceEntity.drop(item, false)
-                }
-            }
-            event.isCanceled = true
-        }
+    @JvmStatic
+    fun beginDropCapture(source: DamageSource?) {
+        CURRENT_DROP_SOURCE.set(source)
     }
 
-    @SubscribeEvent
-    fun onLivingExperienceDrop(event: LivingExperienceDropEvent) {
-        val player = event.attackingPlayer ?: return
-        val source = event.entity.lastDamageSource
+    @JvmStatic
+    fun endDropCapture() {
+        CURRENT_DROP_SOURCE.remove()
+    }
 
+    @JvmStatic
+    fun tryMoveCurrentDropToPlayer(drop: ItemStack): Boolean {
+        return tryMoveDropToPlayer(CURRENT_DROP_SOURCE.get(), drop)
+    }
+
+    @JvmStatic
+    fun tryMoveDropToPlayer(source: DamageSource?, drop: ItemStack): Boolean {
+        if (source == null || drop.isEmpty) return false
+
+        val player = source.entity as? Player ?: return false
         val stack = player.mainHandItem
-        if (stack.item !is GunItem) return
+
+        if (stack.item !is GunItem) return false
 
         val level = GunData.from(stack).perk.getLevel(this)
-        if (source != null && level > 0 && (DamageTypeTool.isGunDamage(source) || source.`is`(DamageTypes.PLAYER_ATTACK))) {
-            player.giveExperiencePoints((event.droppedExperience * (0.8f + 0.2f * level)).toInt())
-            event.isCanceled = true
+
+        if (level <= 0) return false
+        if (!DamageTypeTool.isGunDamage(source) && !source.`is`(DamageTypes.PLAYER_ATTACK)) return false
+
+        val copy = drop.copy()
+
+        if (!player.addItem(copy)) {
+            player.drop(copy, false)
         }
+
+        return true
+    }
+
+    @JvmStatic
+    fun handleExperienceDrop(player: Player?, source: DamageSource?, originalXp: Int): Int {
+        if (player == null || source == null) return originalXp
+
+        val stack = player.mainHandItem
+
+        if (stack.item !is GunItem) return originalXp
+
+        val level = GunData.from(stack).perk.getLevel(this)
+
+        if (level <= 0) return originalXp
+        if (!DamageTypeTool.isGunDamage(source) && !source.`is`(DamageTypes.PLAYER_ATTACK)) return originalXp
+
+        player.giveExperiencePoints((originalXp * (0.8f + 0.2f * level)).toInt())
+
+        return 0
     }
 }
