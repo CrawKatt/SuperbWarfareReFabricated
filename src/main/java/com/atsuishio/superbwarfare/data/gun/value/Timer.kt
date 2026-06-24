@@ -1,40 +1,34 @@
-package com.atsuishio.superbwarfare.data.gun.value;
+package com.atsuishio.superbwarfare.data.gun.value
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.CompoundTag
 
 /**
  * 针对一种状态的计时器
  */
-public class Timer {
-    private final CompoundTag tag;
-    public final String name;
+class Timer(private val tag: CompoundTag, name: String) {
+    val name: String = name + "Time"
 
-    public Timer(CompoundTag tag, String name) {
-        this.tag = tag;
-        this.name = name + "Time";
+    fun get(): Int {
+        return tag.getInt(name)
     }
 
-    public int get() {
-        return tag.getInt(name);
-    }
-
-    public void set(int time) {
+    fun set(time: Int) {
         if (time <= 0) {
-            tag.remove(name);
+            tag.remove(name)
         } else {
-            tag.putInt(name, time);
+            tag.putInt(name, time)
         }
     }
 
-    public void add(int time) {
-        set(get() + time);
+    fun add(time: Int) {
+        set(get() + time)
     }
 
-    public void reduce() {
-        add(-1);
+    fun reduce() {
+        add(-1)
     }
 
-    public void reset() {
-        set(0);
+    fun reset() {
+        set(0)
     }
 }

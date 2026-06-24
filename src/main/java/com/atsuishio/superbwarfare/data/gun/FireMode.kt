@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.data.gun
 
-import com.atsuishio.superbwarfare.Mod
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -26,18 +25,8 @@ enum class FireMode(name: String) {
     }
 
     companion object {
-        fun fromValue(value: String?): FireMode {
-            for (enumConstant in entries) {
-                if (enumConstant.toString() == value) {
-                    return enumConstant
-                }
-            }
-            Mod.LOGGER.warn("No FireMode with value {}", value)
-            return SEMI
-        }
-
         fun tryParse(value: String?): FireMode {
-            for (enumConstant in entries) {
+            for (enumConstant in FireMode.entries) {
                 if (enumConstant.toString() == value) {
                     return enumConstant
                 }

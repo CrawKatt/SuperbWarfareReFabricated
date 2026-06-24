@@ -1,50 +1,43 @@
-package com.atsuishio.superbwarfare.data.gun.value;
+package com.atsuishio.superbwarfare.data.gun.value
 
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import com.atsuishio.superbwarfare.data.gun.value.base.TagValue
+import com.atsuishio.superbwarfare.tools.sameWith
+import net.minecraft.core.RegistryAccess
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.item.ItemStack
 
-public class ItemStackValue {
-    private final CompoundTag tag;
-    private final String name;
-    private final ItemStack defaultValue;
+class ItemStackValue(
+    private val tag: CompoundTag,
+    private val name: String,
+    defaultValue: ItemStack = ItemStack.EMPTY
+) : TagValue<ItemStack> {
 
-    private ItemStack cache;
+    override val defaultValue: ItemStack = defaultValue.copy()
 
-    public ItemStackValue(CompoundTag tag, String name, ItemStack defaultValue) {
-        this.tag = tag;
-        this.name = name;
-        this.defaultValue = defaultValue.copy();
-        this.cache = defaultValue.copy();
+    private var cache: ItemStack
+
+    init {
+        this.cache = defaultValue.copy()
     }
 
-    public ItemStackValue(CompoundTag tag, String name) {
-        this(tag, name, ItemStack.EMPTY);
-    }
-
-    public ItemStack get() {
-        if (!this.cache.isEmpty()) {
-            return this.cache;
+    override fun get(): ItemStack {
+        if (!this.cache.isEmpty) {
+            return this.cache
         }
 
         if (tag.contains(name)) {
-            return ItemStack.parseOptional(RegistryAccess.EMPTY, tag.getCompound(name));
+            return ItemStack.parseOptional(RegistryAccess.EMPTY, tag.getCompound(name))
         }
-        return defaultValue;
+        return defaultValue
     }
 
-    public void set(@NotNull ItemStack value) {
-        if (ItemStack.isSameItemSameComponents(value, defaultValue)) {
-            tag.remove(name);
+    override fun set(value: ItemStack) {
+        if (value sameWith defaultValue) {
+            tag.remove(name)
         } else {
-            tag.put(name, value.save(RegistryAccess.EMPTY));
+            tag.put(name, value.save(RegistryAccess.EMPTY))
         }
 
-        this.cache = value.copy();
-    }
-
-    public void reset() {
-        set(defaultValue);
+        this.cache = value.copy()
     }
 }

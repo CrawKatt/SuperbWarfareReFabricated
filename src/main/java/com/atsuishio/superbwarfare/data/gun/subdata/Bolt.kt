@@ -1,16 +1,14 @@
-package com.atsuishio.superbwarfare.data.gun.subdata;
+package com.atsuishio.superbwarfare.data.gun.subdata
 
-import com.atsuishio.superbwarfare.data.gun.GunData;
-import com.atsuishio.superbwarfare.data.gun.value.BooleanValue;
-import com.atsuishio.superbwarfare.data.gun.value.Timer;
+import com.atsuishio.superbwarfare.data.gun.GunData
+import com.atsuishio.superbwarfare.data.gun.value.BooleanValue
+import com.atsuishio.superbwarfare.data.gun.value.Timer
 
-public final class Bolt {
+class Bolt(data: GunData) {
 
-    public Bolt(GunData data) {
-        needed = new BooleanValue(data.data(), "NeedBoltAction");
-        actionTimer = new Timer(data.data(), "BoltActionTime");
-    }
+    @JvmField
+    val needed: BooleanValue = BooleanValue(data.data(), "NeedBoltAction", false)
 
-    public final BooleanValue needed;
-    public final Timer actionTimer;
+    @JvmField
+    val actionTimer: Timer = Timer(data.data(), "BoltActionTime")
 }

@@ -12,15 +12,14 @@ import kotlinx.serialization.Serializable
 @STOFactory(ProjectileInfo.ProjectileInfoInstanceBuilder::class)
 @Serializable
 class ProjectileInfo : IDBasedData<ProjectileInfo>, DeserializeFromString {
-    @JvmField
     @SerializedName("Type")
     @SerialName("Type")
-    var type: String = "superbwarfare:projectile"
+    var itemId: String = "superbwarfare:projectile"
 
-    override fun getId() = type
+    override fun getId() = itemId
 
     override fun setId(id: String) {
-        this.type = id
+        this.itemId = id
     }
 
     @JvmField
@@ -29,12 +28,12 @@ class ProjectileInfo : IDBasedData<ProjectileInfo>, DeserializeFromString {
     var data: SerializedGsonObject? = null
 
     override fun deserializeFromString(str: String) {
-        this.type = str
+        this.itemId = str
     }
 
     object ProjectileInfoInstanceBuilder : StringInstanceBuilder<ProjectileInfo> {
         override fun fromString(value: String) = ProjectileInfo().apply {
-            this.type = value
+            this.itemId = value
         }
     }
 }

@@ -1,85 +1,71 @@
-package com.atsuishio.superbwarfare.data.gun.subdata;
+package com.atsuishio.superbwarfare.data.gun.subdata
 
-import com.atsuishio.superbwarfare.data.gun.GunData;
-import com.atsuishio.superbwarfare.data.gun.value.IntValue;
-import com.atsuishio.superbwarfare.data.gun.value.ReloadState;
-import com.atsuishio.superbwarfare.data.gun.value.Starter;
-import com.atsuishio.superbwarfare.data.gun.value.Timer;
-import net.minecraft.nbt.CompoundTag;
+import com.atsuishio.superbwarfare.data.gun.GunData
+import com.atsuishio.superbwarfare.data.gun.value.IntValue
+import com.atsuishio.superbwarfare.data.gun.value.ReloadState
+import com.atsuishio.superbwarfare.data.gun.value.Starter
+import com.atsuishio.superbwarfare.data.gun.value.Timer
 
-public final class Reload {
-    private final CompoundTag data;
+class Reload(data: GunData) {
+    private val data = data.data()
 
-    public final Timer reloadTimer;
-    public final Timer prepareTimer;
-    public final Timer prepareLoadTimer;
-    public final Timer iterativeLoadTimer;
-    public final Timer finishTimer;
+    @JvmField
+    val reloadTimer = Timer(this.data, "Reload")
 
-    public final Starter reloadStarter;
-    public final Starter singleReloadStarter;
-    public final Starter stage3Starter;
+    @JvmField
+    val prepareTimer = Timer(this.data, "Prepare")
 
-    public Reload(GunData data) {
-        this.data = data.data();
+    @JvmField
+    val prepareLoadTimer = Timer(this.data, "PrepareLoad")
 
-        reloadTimer = new Timer(this.data, "Reload");
-        prepareTimer = new Timer(this.data, "Prepare");
-        prepareLoadTimer = new Timer(this.data, "PrepareLoad");
-        iterativeLoadTimer = new Timer(this.data, "IterativeLoad");
-        finishTimer = new Timer(this.data, "Finish");
+    @JvmField
+    val iterativeLoadTimer = Timer(this.data, "IterativeLoad")
 
-        reloadStarter = new Starter(this.data, "Reload");
-        singleReloadStarter = new Starter(this.data, "SingleReload");
-        stage3Starter = new Starter(this.data, "Stage3Forcefully");
+    @JvmField
+    val finishTimer = Timer(this.data, "Finish")
 
-        stage = new IntValue(this.data, "ReloadStage");
+    @JvmField
+    val reloadStarter = Starter(this.data, "Reload")
+
+    @JvmField
+    val singleReloadStarter = Starter(this.data, "SingleReload")
+
+    @JvmField
+    val stage3Starter = Starter(this.data, "Stage3Forcefully")
+
+    fun state() = when (data.getInt("ReloadState")) {
+        1 -> ReloadState.NORMAL_RELOADING
+        2 -> ReloadState.EMPTY_RELOADING
+        else -> ReloadState.NOT_RELOADING
     }
 
-    public ReloadState state() {
-        return switch (data.getInt("ReloadState")) {
-            case 1 -> ReloadState.NORMAL_RELOADING;
-            case 2 -> ReloadState.EMPTY_RELOADING;
-            default -> ReloadState.NOT_RELOADING;
-        };
-    }
+    fun normal() = state() == ReloadState.NORMAL_RELOADING
 
-    public boolean normal() {
-        return state() == ReloadState.NORMAL_RELOADING;
-    }
+    fun empty() = state() == ReloadState.EMPTY_RELOADING
 
-    public boolean empty() {
-        return state() == ReloadState.EMPTY_RELOADING;
-    }
-
-    public void setState(ReloadState state) {
+    fun setState(state: ReloadState) {
         if (state == ReloadState.NOT_RELOADING) {
-            data.remove("ReloadState");
+            data.remove("ReloadState")
         } else {
-            data.putInt("ReloadState", state.ordinal());
+            data.putInt("ReloadState", state.ordinal)
         }
     }
 
-    public final IntValue stage;
+    val stage = IntValue(this.data, "ReloadStage", 0)
 
-    public int stage() {
-        return stage.get();
+    fun stage() = stage.get()
+
+    fun setStage(stage: Int) {
+        this.stage.set(stage)
     }
 
-    public void setStage(int stage) {
-        this.stage.set(stage);
+    fun time() = reloadTimer.get()
+
+    fun setTime(time: Int) {
+        reloadTimer.set(time)
     }
 
-
-    public int time() {
-        return reloadTimer.get();
-    }
-
-    public void setTime(int time) {
-        reloadTimer.set(time);
-    }
-
-    public void reduce() {
-        reloadTimer.reduce();
+    fun reduce() {
+        reloadTimer.reduce()
     }
 }

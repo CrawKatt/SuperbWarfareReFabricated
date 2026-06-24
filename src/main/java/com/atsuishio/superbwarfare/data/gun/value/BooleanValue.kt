@@ -1,38 +1,30 @@
-package com.atsuishio.superbwarfare.data.gun.value;
+package com.atsuishio.superbwarfare.data.gun.value
 
-import net.minecraft.nbt.CompoundTag;
+import com.atsuishio.superbwarfare.data.gun.value.base.TagValue
+import net.minecraft.nbt.CompoundTag
 
-public class BooleanValue {
-    private final CompoundTag tag;
-    private final String name;
-    private final boolean defaultValue;
+class BooleanValue(
+    private val tag: CompoundTag,
+    private val name: String,
+    override val defaultValue: Boolean = false
+) : TagValue<Boolean> {
 
-    public BooleanValue(CompoundTag tag, String name, boolean defaultValue) {
-        this.tag = tag;
-        this.name = name;
-        this.defaultValue = defaultValue;
-    }
-
-    public BooleanValue(CompoundTag tag, String name) {
-        this(tag, name, false);
-    }
-
-    public boolean get() {
+    override fun get(): Boolean {
         if (tag.contains(name)) {
-            return tag.getBoolean(name);
+            return tag.getBoolean(name)
         }
-        return defaultValue;
+        return defaultValue
     }
 
-    public void set(boolean value) {
+    override fun set(value: Boolean) {
         if (value == defaultValue) {
-            tag.remove(name);
+            tag.remove(name)
         } else {
-            tag.putBoolean(name, value);
+            tag.putBoolean(name, value)
         }
     }
 
-    public void reset() {
-        set(defaultValue);
+    override fun reset() {
+        set(defaultValue)
     }
 }

@@ -1,19 +1,11 @@
-package com.atsuishio.superbwarfare.data.gun.value;
+package com.atsuishio.superbwarfare.data.gun.value
 
-public enum AttachmentType {
+enum class AttachmentType(typeName: String) {
     SCOPE("Scope"),
     MAGAZINE("Magazine"),
     BARREL("Barrel"),
     STOCK("Stock"),
     GRIP("Grip");
 
-    private final String name;
-
-    AttachmentType(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+    val attachmentName: String = typeName
 }

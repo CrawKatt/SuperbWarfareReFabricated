@@ -1,42 +1,32 @@
-package com.atsuishio.superbwarfare.data.gun.value;
+package com.atsuishio.superbwarfare.data.gun.value
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.CompoundTag
 
-public class DoubleValue {
-    private final CompoundTag tag;
-    private final String name;
-    private final double defaultValue;
-
-    public DoubleValue(CompoundTag tag, String name, double defaultValue) {
-        this.tag = tag;
-        this.name = name;
-        this.defaultValue = defaultValue;
-    }
-
-    public DoubleValue(CompoundTag tag, String name) {
-        this(tag, name, 0);
-    }
-
-    public double get() {
+class DoubleValue(
+    private val tag: CompoundTag,
+    private val name: String,
+    var defaultValue: Double = 0.0
+) {
+    fun get(): Double {
         if (tag.contains(name)) {
-            return tag.getDouble(name);
+            return tag.getDouble(name)
         }
-        return defaultValue;
+        return defaultValue
     }
 
-    public void set(double value) {
+    fun set(value: Double) {
         if (value == defaultValue) {
-            tag.remove(name);
+            tag.remove(name)
         } else {
-            tag.putDouble(name, value);
+            tag.putDouble(name, value)
         }
     }
 
-    public void add(double value) {
-        set(get() + value);
+    fun add(value: Double) {
+        set(get() + value)
     }
 
-    public void reset() {
-        set(defaultValue);
+    fun reset() {
+        set(defaultValue)
     }
 }

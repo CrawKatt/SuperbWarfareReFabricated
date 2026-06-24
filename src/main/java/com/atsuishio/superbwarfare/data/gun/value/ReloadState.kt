@@ -1,6 +1,6 @@
-package com.atsuishio.superbwarfare.data.gun.value;
+package com.atsuishio.superbwarfare.data.gun.value
 
-public enum ReloadState {
+enum class ReloadState {
     NOT_RELOADING,
     NORMAL_RELOADING,
     EMPTY_RELOADING,

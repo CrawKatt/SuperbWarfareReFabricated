@@ -1,21 +1,15 @@
-package com.atsuishio.superbwarfare.data.gun.subdata;
+package com.atsuishio.superbwarfare.data.gun.subdata
 
-import com.atsuishio.superbwarfare.data.gun.GunData;
-import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
-import net.minecraft.nbt.CompoundTag;
+import com.atsuishio.superbwarfare.data.gun.GunData
+import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 
-public final class Attachment {
-    private final CompoundTag attachment;
+class Attachment(gun: GunData) {
 
-    public Attachment(GunData gun) {
-        this.attachment = gun.attachment();
-    }
+    private val attachment = gun.attachment()
 
-    public int get(AttachmentType type) {
-        return attachment.getInt(type.getName());
-    }
+    fun get(type: AttachmentType) = attachment.getInt(type.attachmentName)
 
-    public void set(AttachmentType type, int value) {
-        attachment.putInt(type.getName(), value);
+    fun set(type: AttachmentType, value: Int) {
+        attachment.putInt(type.attachmentName, value)
     }
 }

@@ -9,7 +9,6 @@ import net.minecraft.world.phys.Vec3
 
 @Serializable
 class ShootPos {
-    @JvmField
     @SerializedName("Transform")
     @SerialName("Transform")
     var transform: String = "Default"
@@ -18,39 +17,32 @@ class ShootPos {
 
     // 注意这个是复数
     // TODO 允许普通枪使用Positions
-    @JvmField
     @SerializedName("Positions")
     @SerialName("Positions")
     var positions: java.util.ArrayList<SerializedVec3> = arrayListOf(Vec3.ZERO)
 
     // TODO 允许普通枪使用Directions
-    @JvmField
     @SerializedName("Directions")
     @SerialName("Directions")
     var directions: java.util.ArrayList<StringOrVec3> = arrayListOf(StringOrVec3("Default"))
 
-    @JvmField
     @SerializedName("ShootPositionForHud")
     @SerialName("ShootPositionForHud")
     var shootPositionForHud: SerializedVec3? = null
 
-    @JvmField
     @SerializedName("ShootDirectionForHud")
     @SerialName("ShootDirectionForHud")
     var shootDirectionForHud: StringOrVec3? = null
 
-    @JvmField
     @SerializedName("BoundUpWithAmmoAmount")
     @SerialName("BoundUpWithAmmoAmount")
     var boundUpWithAmmoAmount = false
 
 
-    @JvmField
     @SerializedName("ViewPosition")
     @SerialName("ViewPosition")
     var viewPosition: SerializedVec3? = null
 
-    @JvmField
     @SerializedName("ViewDirection")
     @SerialName("ViewDirection")
     var viewDirection: StringOrVec3? = null

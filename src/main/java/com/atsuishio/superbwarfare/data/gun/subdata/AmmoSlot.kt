@@ -1,55 +1,52 @@
-package com.atsuishio.superbwarfare.data.gun.subdata;
+package com.atsuishio.superbwarfare.data.gun.subdata
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.CompoundTag
 
-public final class AmmoSlot {
-    public static final String AMMO_SLOT = "AmmoSlot";
-    private final CompoundTag tag;
+class AmmoSlot(private val tag: CompoundTag) {
 
-    public AmmoSlot(CompoundTag data) {
-        this.tag = data;
-    }
+    private val slot: CompoundTag
+        get() = tag.getCompound(AMMO_SLOT)
 
-    private CompoundTag getSlot() {
-        return tag.getCompound(AMMO_SLOT);
-    }
-
-    private CompoundTag getOrCreateSlot() {
+    private fun getOrCreateSlot(): CompoundTag {
         if (!tag.contains(AMMO_SLOT)) {
-            tag.put(AMMO_SLOT, new CompoundTag());
+            tag.put(AMMO_SLOT, CompoundTag())
         }
-        return getSlot();
+        return this.slot
     }
 
-    public int getAmmo(String slot) {
-        var arr = getSlot().getIntArray(slot);
-        return arr.length > 0 ? arr[0] : 0;
+    fun getAmmo(slot: String): Int {
+        val arr = this.slot.getIntArray(slot)
+        return if (arr.size > 0) arr[0] else 0
     }
 
-    public int getVirtualAmmo(String slot) {
-        var arr = getSlot().getIntArray(slot);
-        return arr.length > 1 ? arr[1] : 0;
+    fun getVirtualAmmo(slot: String): Int {
+        val arr = this.slot.getIntArray(slot)
+        return if (arr.size > 1) arr[1] else 0
     }
 
-    public void set(String slot, int ammo, int virtualAmmo) {
+    fun set(slot: String, ammo: Int, virtualAmmo: Int) {
         if (ammo <= 0 && virtualAmmo <= 0) {
-            reset(slot);
+            reset(slot)
         } else {
-            var arr = new int[]{ammo, virtualAmmo};
-            getOrCreateSlot().putIntArray(slot, arr);
+            val arr = intArrayOf(ammo, virtualAmmo)
+            this.getOrCreateSlot().putIntArray(slot, arr)
         }
     }
 
-    public void reset(String slot) {
-        var slotTag = getSlot();
-        slotTag.remove(slot);
+    fun reset(slot: String) {
+        val slotTag = this.slot
+        slotTag.remove(slot)
 
-        if (slotTag.isEmpty()) {
-            tag.remove(AMMO_SLOT);
+        if (slotTag.isEmpty) {
+            tag.remove(AMMO_SLOT)
         }
     }
 
-    public void reset() {
-        tag.remove(AMMO_SLOT);
+    fun reset() {
+        tag.remove(AMMO_SLOT)
+    }
+
+    companion object {
+        const val AMMO_SLOT: String = "AmmoSlot"
     }
 }

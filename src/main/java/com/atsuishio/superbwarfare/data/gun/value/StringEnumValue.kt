@@ -1,42 +1,30 @@
-package com.atsuishio.superbwarfare.data.gun.value;
+package com.atsuishio.superbwarfare.data.gun.value
 
-import net.minecraft.nbt.CompoundTag;
+import com.atsuishio.superbwarfare.data.gun.value.base.TagValue
+import net.minecraft.nbt.CompoundTag
+import java.util.function.Function
 
-import java.util.function.Function;
+open class StringEnumValue<T : Enum<T>>(
+    private val tag: CompoundTag,
+    private val name: String,
+    override val defaultValue: T,
+    private val toEnum: Function<String, T>
+) : TagValue<T> {
 
-public class StringEnumValue<T> {
-    private final CompoundTag tag;
-    private final String name;
-    private final T defaultValue;
-    private final Function<String, T> toEnum;
-
-    public StringEnumValue(CompoundTag tag, String name, T defaultValue, Function<String, T> toEnum) {
-        this.tag = tag;
-        this.name = name;
-        this.defaultValue = defaultValue;
-        this.toEnum = toEnum;
-    }
-
-    public T get() {
-        String value;
-        if (tag.contains(name)) {
-            value = tag.getString(name);
+    override fun get(): T {
+        val value = if (tag.contains(name)) {
+            tag.getString(name)
         } else {
-            value = defaultValue.toString();
+            defaultValue.toString()
         }
-        return toEnum.apply(value);
+        return toEnum.apply(value)
     }
 
-    public void set(T value) {
-        if (value == defaultValue) {
-            tag.remove(name);
+    override fun set(value: T) {
+        if (value === defaultValue) {
+            tag.remove(name)
         } else {
-            tag.putString(name, value.toString());
+            tag.putString(name, value.toString())
         }
     }
-
-    public void reset() {
-        set(defaultValue);
-    }
-
 }

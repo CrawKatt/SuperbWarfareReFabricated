@@ -6,21 +6,16 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class DamageReduce {
-    @JvmField
     @SerializedName("Type")
     @SerialName("Type")
     var type: ReduceType? = null
 
     @SerializedName("Rate")
     @SerialName("Rate")
-    @get:JvmName("getRawRate")
-    @set:JvmName("setRawRate")
     var rate: Double = 0.0
 
     @SerializedName("MinDistance")
     @SerialName("MinDistance")
-    @get:JvmName("getRawMinDistance")
-    @set:JvmName("setRawMinDistance")
     var minDistance: Double = 0.0
 
     @JvmOverloads
@@ -35,21 +30,21 @@ class DamageReduce {
         this.minDistance = minDistance
     }
 
-    fun getRate(): Double {
+    fun getDamageRate(): Double {
         return if (this.type == null) this.rate else this.type!!.rate
     }
 
-    fun setRate(rate: Double) {
-        this.rate = rate
-    }
-
-    fun getMinDistance(): Double {
-        return if (this.type == null) this.minDistance else this.type!!.minDistance
-    }
-
-    fun setMinDistance(minDistance: Double) {
-        this.minDistance = minDistance
-    }
+//    fun setDamageRate(rate: Double) {
+//        this.rate = rate
+//    }
+//
+//    fun getMinDistance(): Double {
+//        return if (this.type == null) this.minDistance else this.type!!.minDistance
+//    }
+//
+//    fun setMinDistance(minDistance: Double) {
+//        this.minDistance = minDistance
+//    }
 
     @Serializable
     enum class ReduceType(val typeName: String, val rate: Double, val minDistance: Double) {
@@ -82,8 +77,6 @@ class DamageReduce {
         EMPTY("Empty", 0.0, 0.0),
         ;
 
-        override fun toString(): String {
-            return this.typeName
-        }
+        override fun toString() = this.typeName
     }
 }
