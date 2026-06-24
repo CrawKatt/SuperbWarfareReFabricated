@@ -27,7 +27,7 @@ class BulletDecalOption @JvmOverloads constructor(
         Direction.entries[dir], BlockPos.of(pos), r, g, b
     )
 
-    override fun getType(): ParticleType<BulletDecalOption> = ModParticleTypes.BULLET_DECAL.get()
+    override fun getType(): ParticleType<BulletDecalOption> = ModParticleTypes.BULLET_DECAL
 
     companion object {
         val CODEC: MapCodec<BulletDecalOption> = RecordCodecBuilder.mapCodec { builder ->

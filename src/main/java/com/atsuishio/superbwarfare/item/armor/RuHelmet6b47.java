@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.item.armor;
 
 import com.atsuishio.superbwarfare.client.renderer.armor.RuHelmet6b47ArmorRenderer;
+import com.atsuishio.superbwarfare.tiers.ModArmorMaterials;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import software.bernie.geckolib.renderer.GeoArmorRenderer;

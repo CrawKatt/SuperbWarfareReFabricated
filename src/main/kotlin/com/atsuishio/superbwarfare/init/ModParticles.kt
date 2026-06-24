@@ -10,8 +10,8 @@ object ModParticles {
         ParticleFactoryRegistry.getInstance().register(ModParticleTypes.WHITE_STAR, WhiteStarParticle::provider)
         ParticleFactoryRegistry.getInstance().register(ModParticleTypes.RISING_SMOKE, RisingSmokeParticle::provider)
         ParticleFactoryRegistry.getInstance().register(ModParticleTypes.BULLET_DECAL, BulletDecalParticle.Provider())
-        ParticleFactoryRegistry.getInstance().register(ModParticleTypes.CUSTOM_CLOUD, ::CustomCloudParticle.Provider)
-        ParticleFactoryRegistry.getInstance().register(ModParticleTypes.CUSTOM_SMOKE, ::CustomSmokeParticle.Provider)
-        ParticleFactoryRegistry.getInstance().register(ModParticleTypes.CANNON_MUZZLE_FLARE, ::CannonMuzzleFlareParticle.Provider)
+        ParticleFactoryRegistry.getInstance().register(ModParticleTypes.CUSTOM_CLOUD, CustomCloudParticle::Provider)
+        ParticleFactoryRegistry.getInstance().register(ModParticleTypes.CUSTOM_SMOKE, CustomSmokeParticle::Provider)
+        ParticleFactoryRegistry.getInstance().register(ModParticleTypes.CANNON_MUZZLE_FLARE, CannonMuzzleFlareParticle::Provider)
     }
 }

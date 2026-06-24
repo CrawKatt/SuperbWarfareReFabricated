@@ -10,7 +10,7 @@ import net.minecraft.world.item.ArmorMaterial
 import net.minecraft.world.item.crafting.Ingredient
 import java.util.EnumMap
 
-object ModArmorMaterial {
+object ModArmorMaterials {
     private fun register(
         id: String,
         material: () -> ArmorMaterial

@@ -3,11 +3,8 @@ package com.atsuishio.superbwarfare.client.particle
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
 import net.minecraft.core.particles.SimpleParticleType
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import kotlin.math.min
 
-@OnlyIn(Dist.CLIENT)
 class RisingSmokeParticle protected constructor(
     world: ClientLevel,
     x: Double,

@@ -4,33 +4,32 @@ import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.perk.Perk
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.tags.BlockTags
-import net.minecraft.tags.ItemTags
 import net.minecraft.tags.TagKey
 import net.minecraft.world.damagesource.DamageType
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
 
+@Suppress("unused")
 object ModTags {
     @JvmStatic
     fun commonItemTag(name: String): TagKey<Item> {
-        return ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", name))
+        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", name))
     }
 
     @JvmStatic
     fun commonBlockTag(name: String): TagKey<Block> {
-        return BlockTags.create(ResourceLocation.fromNamespaceAndPath("c", name))
+        return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", name))
     }
 
     @JvmStatic
     fun modItemTag(name: String): TagKey<Item> {
-        return ItemTags.create(Mod.loc(name))
+        return TagKey.create(Registries.ITEM, Mod.loc(name))
     }
 
     @JvmStatic
     fun modBlockTag(name: String): TagKey<Block> {
-        return BlockTags.create(Mod.loc(name))
+        return TagKey.create(Registries.BLOCK, Mod.loc(name))
     }
 
     @JvmStatic
@@ -44,7 +43,6 @@ object ModTags {
     }
 
     object Items {
-        // @formatter:off
         @JvmField val GUN = modItemTag("gun")
         @JvmField val SMG = modItemTag("smg")
         @JvmField val RIFLE = modItemTag("rifle")
@@ -71,13 +69,11 @@ object ModTags {
         @JvmField val VIRTUAL_BLUEPRINT = modItemTag("blueprint/virtual")
         @JvmField val CANNON_BLUEPRINT = modItemTag("blueprint/cannon")
 
-        // 用于研究台跨级配方的 tag
         @JvmField val ENLARGED_COMMON_BLUEPRINT = modItemTag("blueprint/enlarged/common")
         @JvmField val ENLARGED_RARE_BLUEPRINT = modItemTag("blueprint/enlarged/rare")
         @JvmField val ENLARGED_EPIC_BLUEPRINT = modItemTag("blueprint/enlarged/epic")
         @JvmField val ENLARGED_LEGENDARY_BLUEPRINT = modItemTag("blueprint/enlarged/legendary")
 
-        // Perk tag
         @JvmField val AMMO_PERK = modItemTag("perk/ammo")
         @JvmField val FUNCTIONAL_PERK = modItemTag("perk/functional")
         @JvmField val DAMAGE_PERK = modItemTag("perk/damage")
@@ -94,7 +90,6 @@ object ModTags {
 
         @JvmField val RESEARCH_FUEL = modItemTag("research_fuel")
 
-        // 专门给其他模组添加动画用的枪械武器分类 tag
         @JvmField val ANIMATED_PISTOL = modItemTag("animated/pistol")
         @JvmField val ANIMATED_SNIPER = modItemTag("animated/sniper")
         @JvmField val ANIMATED_RIFLE = modItemTag("animated/rifle")
@@ -103,107 +98,80 @@ object ModTags {
         @JvmField val ANIMATED_RPG = modItemTag("animated/rpg")
         @JvmField val ANIMATED_MG = modItemTag("animated/mg")
         @JvmField val ANIMATED_MINIGUN = modItemTag("animated/minigun")
-        // @formatter:on
+
+        // Common/convention tags
+        @JvmField val INGOTS_GOLD = commonItemTag("ingots/gold")
+        @JvmField val INGOTS_IRON = commonItemTag("ingots/iron")
+        @JvmField val INGOTS_COPPER = commonItemTag("ingots/copper")
+        @JvmField val INGOTS_NETHERITE = commonItemTag("ingots/netherite")
+        @JvmField val STORAGE_BLOCKS_IRON = commonItemTag("storage_blocks/iron")
+        @JvmField val STORAGE_BLOCKS_GOLD = commonItemTag("storage_blocks/gold")
+        @JvmField val STORAGE_BLOCKS_DIAMOND = commonItemTag("storage_blocks/diamond")
+        @JvmField val STORAGE_BLOCKS_NETHERITE = commonItemTag("storage_blocks/netherite")
+        @JvmField val STORAGE_BLOCKS_LAPIS = commonItemTag("storage_blocks/lapis")
+        @JvmField val STORAGE_BLOCKS_COPPER = commonItemTag("storage_blocks/copper")
+        @JvmField val STORAGE_BLOCKS_REDSTONE = commonItemTag("storage_blocks/redstone")
+        @JvmField val NUGGETS_IRON = commonItemTag("nuggets/iron")
+        @JvmField val NUGGETS_GOLD = commonItemTag("nuggets/gold")
+        @JvmField val GEMS_DIAMOND = commonItemTag("gems/diamond")
+        @JvmField val GEMS_LAPIS = commonItemTag("gems/lapis")
+        @JvmField val GEMS_QUARTZ = commonItemTag("gems/quartz")
+        @JvmField val DUSTS_REDSTONE = commonItemTag("dusts/redstone")
+        @JvmField val GLASS_PANES = commonItemTag("glass_panes")
+        @JvmField val SANDS = commonItemTag("sands")
+        @JvmField val DYES_BLACK = commonItemTag("dyes/black")
+        @JvmField val DYES_GREEN = commonItemTag("dyes/green")
+        @JvmField val ORES_NETHERITE_SCRAP = commonItemTag("ores/netherite_scrap")
+        @JvmField val CHESTS_ENDER = commonItemTag("chests/ender")
+        @JvmField val CHESTS_WOODEN = commonItemTag("chests/wooden")
+        @JvmField val ENDER_PEARLS = commonItemTag("ender_pearls")
     }
 
     object Blocks {
-        @JvmField
-        val SOFT_COLLISION = modBlockTag("soft_collision")
+        @JvmField val SOFT_COLLISION = modBlockTag("soft_collision")
+        @JvmField val NORMAL_COLLISION = modBlockTag("normal_collision")
+        @JvmField val HARD_COLLISION = modBlockTag("hard_collision")
 
-        @JvmField
-        val NORMAL_COLLISION = modBlockTag("normal_collision")
+        @JvmField val BULLET_IGNORE = modBlockTag("bullet_ignore")
+        @JvmField val BULLET_CAN_DESTROY = modBlockTag("bullet_can_destroy")
+        @JvmField val CANNON_SHOT_CAN_DESTROY = modBlockTag("cannon_shot_can_destroy")
 
-        @JvmField
-        val HARD_COLLISION = modBlockTag("hard_collision")
-
-        // 子弹会穿过的方块
-        @JvmField
-        val BULLET_IGNORE = modBlockTag("bullet_ignore")
-
-        // 子弹会破坏的方块
-        @JvmField
-        val BULLET_CAN_DESTROY = modBlockTag("bullet_can_destroy")
-
-        // 炮射霰弹会破坏的反馈过
-        @JvmField
-        val CANNON_SHOT_CAN_DESTROY = modBlockTag("cannon_shot_can_destroy")
-
-        // 辅助降落可识别的方块
-        @JvmField
-        val AUTO_LANDING = modBlockTag("auto_landing")
-
-        // 载具可以穿过的方块
-        @JvmField
-        val VEHICLE_PASS_THROUGH = modBlockTag("vehicle_pass_through")
-
-        // TODO 如何移除这个
-        // 工兵铲可以挖掘的方块
-        @JvmField
-        val MINEABLE_WITH_MILITARY_SHOVEL = modBlockTag("mineable/military_shovel")
+        @JvmField val AUTO_LANDING = modBlockTag("auto_landing")
+        @JvmField val VEHICLE_PASS_THROUGH = modBlockTag("vehicle_pass_through")
+        @JvmField val MINEABLE_WITH_MILITARY_SHOVEL = modBlockTag("mineable/military_shovel")
     }
 
     object DamageTypes {
-        @JvmField
-        val PROJECTILE = modDamageTag("projectile")
+        @JvmField val PROJECTILE = modDamageTag("projectile")
+        @JvmField val PROJECTILE_ABSOLUTE = modDamageTag("projectile_absolute")
 
-        @JvmField
-        val PROJECTILE_ABSOLUTE = modDamageTag("projectile_absolute")
+        @JvmField val VEHICLE_IGNORE = modDamageTag("vehicle_ignore")
+        @JvmField val VEHICLE_NOT_ABSORB = modDamageTag("vehicle_not_absorb")
+        @JvmField val VEHICLE_IMMUNE = modDamageTag("vehicle_immune")
 
-        // 在载具上的实体受到带有此标签的伤害类型的伤害时，不会将伤害转移到载具上
-        @JvmField
-        val VEHICLE_IGNORE = modDamageTag("vehicle_ignore")
-
-        // 在载具上的实体受到带有此标签的伤害类型的伤害时，只会受到伤害减免，而不会转移到载具上
-        @JvmField
-        val VEHICLE_NOT_ABSORB = modDamageTag("vehicle_not_absorb")
-
-        // 载具直接免疫的伤害类型
-        @JvmField
-        val VEHICLE_IMMUNE = modDamageTag("vehicle_immune")
-
-        // 能够由枪械造成的伤害，可用于perk效果判定
-        @JvmField
-        val GUN_DAMAGE = modDamageTag("gun_damage")
-
-        // 载具减伤不会计算的伤害类型
-        @JvmField
-        val BYPASSES_VEHICLE = modDamageTag("bypasses_vehicle")
+        @JvmField val GUN_DAMAGE = modDamageTag("gun_damage")
+        @JvmField val BYPASSES_VEHICLE = modDamageTag("bypasses_vehicle")
     }
 
     object EntityTypes {
-        @JvmField
-        val AERIAL_BOMB = modEntityTag("aerial_bomb")
-
-        @JvmField
-        val DESTROYABLE_PROJECTILE = modEntityTag("destroyable_projectile")
-
-        @JvmField
-        val DECOY = modEntityTag("decoy")
-
-        @JvmField
-        val NO_EXPERIENCE = modEntityTag("no_experience")
-
-        @JvmField
-        val CAN_REPAIR = modEntityTag("can_repair")
-
-        @JvmField
-        val MINE = modEntityTag("mine")
-
-        @JvmField
-        val AT_ROCKET = modEntityTag("at_rocket")
-
-        @JvmField
-        val AA_MISSILE = modEntityTag("aa_missile")
-
-        @JvmField
-        val SEEK_BLACKLIST = modEntityTag("seek_blacklist")
-
-        @JvmField
-        val BIOGAS_GENERATOR_WHITELIST = modEntityTag("biogas_generator_whitelist")
+        @JvmField val AERIAL_BOMB = modEntityTag("aerial_bomb")
+        @JvmField val DESTROYABLE_PROJECTILE = modEntityTag("destroyable_projectile")
+        @JvmField val DECOY = modEntityTag("decoy")
+        @JvmField val NO_EXPERIENCE = modEntityTag("no_experience")
+        @JvmField val CAN_REPAIR = modEntityTag("can_repair")
+        @JvmField val MINE = modEntityTag("mine")
+        @JvmField val AT_ROCKET = modEntityTag("at_rocket")
+        @JvmField val AA_MISSILE = modEntityTag("aa_missile")
+        @JvmField val SEEK_BLACKLIST = modEntityTag("seek_blacklist")
+        @JvmField val BIOGAS_GENERATOR_WHITELIST = modEntityTag("biogas_generator_whitelist")
     }
 
     object Perks {
         @JvmField
         val TEST: TagKey<Perk> = TagKey.create(ModPerks.PERK_KEY, Mod.loc("test"))
+    }
+
+    @JvmStatic
+    fun init() {
     }
 }

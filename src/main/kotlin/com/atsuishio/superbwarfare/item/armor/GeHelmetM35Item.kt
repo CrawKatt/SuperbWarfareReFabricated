@@ -5,7 +5,7 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.init.ModAttributes
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.resource.BedrockModelLoader
-import com.atsuishio.superbwarfare.tiers.ModArmorMaterial
+import com.atsuishio.superbwarfare.tiers.ModArmorMaterials
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.GeoArmorRenderer
 import net.minecraft.client.model.HumanoidModel
 import net.minecraft.world.entity.EquipmentSlot
@@ -22,7 +22,7 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import kotlin.math.max
 
 class GeHelmetM35Item :
-    ArmorItem(ModArmorMaterial.STEEL, Type.HELMET, Properties().durability(Type.HELMET.getDurability(35))) {
+    ArmorItem(ModArmorMaterials.STEEL, Type.HELMET, Properties().durability(Type.HELMET.getDurability(35))) {
     @EventBusSubscriber
     companion object {
         val TEXTURE = loc("textures/bedrock/armor/ge_helmet_m_35.png")
