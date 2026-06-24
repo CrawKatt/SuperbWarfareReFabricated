@@ -54,7 +54,7 @@ open class RpgRocketStandardItem : Item(Properties().stacksTo(16)), DispenserLau
             }
 
             if (source is ServerPlayer) {
-                ModCriteriaTriggers.RPG_MELEE_EXPLOSION.get().trigger(source)
+                ModCriteriaTriggers.RPG_MELEE_EXPLOSION.trigger(source)
                 if (!source.isCreative) {
                     stack.shrink(1)
                 }
@@ -74,7 +74,7 @@ open class RpgRocketStandardItem : Item(Properties().stacksTo(16)), DispenserLau
 
             override fun getProjectile(level: Level, position: Position, stack: ItemStack): Projectile {
                 return RpgRocketStandardEntity(
-                    ModEntities.RPG_ROCKET_STANDARD.get(),
+                    ModEntities.RPG_ROCKET_STANDARD,
                     position.x(),
                     position.y(),
                     position.z(),
@@ -86,7 +86,7 @@ open class RpgRocketStandardItem : Item(Properties().stacksTo(16)), DispenserLau
             }
 
             override fun playSound(source: BlockSource) {
-                source.level.playSound(null, source.pos, ModSounds.RPG_FIRE_3P.get(), SoundSource.BLOCKS, 1f, 1f)
+                source.level.playSound(null, source.pos, ModSounds.RPG_FIRE_3P, SoundSource.BLOCKS, 1f, 1f)
             }
         }
     }

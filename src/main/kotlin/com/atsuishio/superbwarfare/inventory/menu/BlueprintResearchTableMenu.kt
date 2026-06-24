@@ -18,7 +18,7 @@ class BlueprintResearchTableMenu(
     playerInventory: Inventory,
     private val container: Container,
     private val containerData: ContainerData = SimpleContainerData(BlueprintResearchTableBlockEntity.MAX_DATA_COUNT)
-) : AbstractContainerMenu(ModMenuTypes.BLUEPRINT_RESEARCH_TABLE.get(), containerId) {
+) : AbstractContainerMenu(ModMenuTypes.BLUEPRINT_RESEARCH_TABLE, containerId) {
     constructor(containerId: Int, playerInventory: Inventory) : this(
         containerId,
         playerInventory,

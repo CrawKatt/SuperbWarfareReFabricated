@@ -113,7 +113,7 @@ open class ArmorPlateItem : Item(Properties()) {
 
     companion object {
         fun getInfiniteInstance(): ItemStack {
-            val stack = ItemStack(ModItems.ARMOR_PLATE.get())
+            val stack = ItemStack(ModItems.ARMOR_PLATE)
             val tag = NBTTool.getTag(stack)
             tag.putBoolean("Infinite", true)
             NBTTool.saveTag(stack, tag)

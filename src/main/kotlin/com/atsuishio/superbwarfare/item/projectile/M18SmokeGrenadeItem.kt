@@ -57,7 +57,7 @@ open class M18SmokeGrenadeItem : Item(Properties().rarity(Rarity.UNCOMMON)), Dis
         val stack = playerIn.getItemInHand(handIn)
         playerIn.startUsingItem(handIn)
         if (playerIn is ServerPlayer) {
-            playerIn.level().playSound(null, playerIn.onPos, ModSounds.GRENADE_PULL.get(), SoundSource.PLAYERS, 1f, 1f)
+            playerIn.level().playSound(null, playerIn.onPos, ModSounds.GRENADE_PULL, SoundSource.PLAYERS, 1f, 1f)
         }
         return InteractionResultHolder.consume(stack)
     }
@@ -81,7 +81,7 @@ open class M18SmokeGrenadeItem : Item(Properties().rarity(Rarity.UNCOMMON)), Dis
                 level.addFreshEntity(grenade)
 
                 if (level is ServerLevel) {
-                    level.playSound(null, living.onPos, ModSounds.GRENADE_THROW.get(), SoundSource.PLAYERS, 1f, 1f)
+                    level.playSound(null, living.onPos, ModSounds.GRENADE_THROW, SoundSource.PLAYERS, 1f, 1f)
                 }
 
                 if (!living.isCreative) {
@@ -119,7 +119,7 @@ open class M18SmokeGrenadeItem : Item(Properties().rarity(Rarity.UNCOMMON)), Dis
             override fun getProjectile(level: Level, position: Position, stack: ItemStack): Projectile {
                 val color = this@M18SmokeGrenadeItem.getColor(stack)
                 return M18SmokeGrenadeEntity(
-                    ModEntities.M18_SMOKE_GRENADE.get(),
+                    ModEntities.M18_SMOKE_GRENADE,
                     position.x(),
                     position.y(),
                     position.z(),
@@ -128,7 +128,7 @@ open class M18SmokeGrenadeItem : Item(Properties().rarity(Rarity.UNCOMMON)), Dis
             }
 
             override fun playSound(source: BlockSource) {
-                source.level.playSound(null, source.pos, ModSounds.GRENADE_THROW.get(), SoundSource.BLOCKS, 1f, 1f)
+                source.level.playSound(null, source.pos, ModSounds.GRENADE_THROW, SoundSource.BLOCKS, 1f, 1f)
             }
         }
     }

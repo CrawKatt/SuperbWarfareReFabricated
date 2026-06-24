@@ -25,7 +25,7 @@ open class ReforgingTableMenu(
     inventory: Inventory,
     container: Container,
     pContainerLevelAccess: ContainerLevelAccess
-) : AbstractContainerMenu(ModMenuTypes.REFORGING_TABLE_MENU.get(), pContainerId) {
+) : AbstractContainerMenu(ModMenuTypes.REFORGING_TABLE_MENU, pContainerId) {
     protected val container: Container
     protected val access: ContainerLevelAccess
 
@@ -146,7 +146,7 @@ open class ReforgingTableMenu(
 
     override fun stillValid(pPlayer: Player): Boolean {
         return this.access.evaluate({ level, pos ->
-            level.getBlockState(pos).`is`(ModBlocks.REFORGING_TABLE.get())
+            level.getBlockState(pos).`is`(ModBlocks.REFORGING_TABLE)
                     && pPlayer.distanceToSqr(
                 pos.x.toDouble() + 0.5,
                 pos.y.toDouble() + 0.5,
@@ -357,7 +357,7 @@ open class ReforgingTableMenu(
                     Perk.Type.DAMAGE -> this.damagePerkLevel.set(perkInstance.level.toInt())
                 }
 
-                val ammoPerkItem = perkInstance.perk.getItem().get()
+                val ammoPerkItem = perkInstance.perk.getItem()
                 this.container.setItem(
                     when (type) {
                         Perk.Type.AMMO -> AMMO_PERK_SLOT

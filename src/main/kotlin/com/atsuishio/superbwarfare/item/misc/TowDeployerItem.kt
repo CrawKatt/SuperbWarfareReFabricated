@@ -9,6 +9,6 @@ import net.minecraft.world.level.Level
 
 class TowDeployerItem : AbstractDeployerItem(Properties().rarity(Rarity.EPIC)) {
     override fun spawnDeployedEntity(level: Level, player: Player): Entity {
-        return TowEntity(ModEntities.TOW.get(), level)
+        return TowEntity(ModEntities.TOW, level)
     }
 }

@@ -42,7 +42,7 @@ open class MedicalKitItem : Item(Properties().stacksTo(16)) {
 
             if (!level.isClientSide) {
                 val randomRot = ((2 * Math.random() - 1) * 180).coerceIn(-180.0, 180.0).toFloat()
-                val entity = MedicalKitEntity(ModEntities.MEDICAL_KIT.get(), level)
+                val entity = MedicalKitEntity(ModEntities.MEDICAL_KIT, level)
                 entity.moveTo(player.x, player.eyeY - 0.25, player.z, randomRot, 0f)
                 entity.setYBodyRot(randomRot)
                 entity.setYHeadRot(randomRot)

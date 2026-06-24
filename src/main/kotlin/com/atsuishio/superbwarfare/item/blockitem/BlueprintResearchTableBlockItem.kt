@@ -36,7 +36,7 @@ class BlueprintResearchTableBlockItem : BlockItem(ModBlocks.BLUEPRINT_RESEARCH_T
                     }
                     return renderer!!
                 }
-            }, ModItems.BLUEPRINT_RESEARCH_TABLE.get())
+            }, ModItems.BLUEPRINT_RESEARCH_TABLE)
         }
     }
 }

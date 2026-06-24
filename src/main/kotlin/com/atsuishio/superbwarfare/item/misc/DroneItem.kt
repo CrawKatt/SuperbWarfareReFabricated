@@ -12,6 +12,6 @@ class DroneItem : AbstractDeployerItem(Properties().rarity(Rarity.UNCOMMON)) {
         level: Level,
         player: Player
     ): Entity {
-        return DroneEntity(ModEntities.DRONE.get(), level)
+        return DroneEntity(ModEntities.DRONE, level)
     }
 }

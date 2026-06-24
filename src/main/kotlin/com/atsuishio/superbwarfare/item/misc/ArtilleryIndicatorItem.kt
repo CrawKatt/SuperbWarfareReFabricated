@@ -24,8 +24,6 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.*
 import net.minecraft.world.level.Level
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 
 open class ArtilleryIndicatorItem : Item(Properties().stacksTo(1).rarity(Rarity.UNCOMMON)), ItemScreenProvider {
     override fun appendHoverText(
@@ -154,7 +152,6 @@ open class ArtilleryIndicatorItem : Item(Properties().stacksTo(1).rarity(Rarity.
         return flag
     }
 
-    @OnlyIn(Dist.CLIENT)
     override fun getItemScreen(stack: ItemStack, player: Player, hand: InteractionHand): Screen {
         return ArtilleryIndicatorScreen(stack, hand)
     }

@@ -54,7 +54,7 @@ open class RpgRocketTBGItem : Item(Properties().stacksTo(16)), DispenserLaunchab
             }
 
             if (source is ServerPlayer) {
-                ModCriteriaTriggers.RPG_MELEE_EXPLOSION.get().trigger(source)
+                ModCriteriaTriggers.RPG_MELEE_EXPLOSION.trigger(source)
                 if (!source.isCreative) {
                     stack.shrink(1)
                 }
@@ -74,7 +74,7 @@ open class RpgRocketTBGItem : Item(Properties().stacksTo(16)), DispenserLaunchab
 
             override fun getProjectile(level: Level, position: Position, stack: ItemStack): Projectile {
                 return RpgRocketTBGEntity(
-                    ModEntities.RPG_ROCKET_TBG.get(),
+                    ModEntities.RPG_ROCKET_TBG,
                     position.x(),
                     position.y(),
                     position.z(),
@@ -86,7 +86,7 @@ open class RpgRocketTBGItem : Item(Properties().stacksTo(16)), DispenserLaunchab
             }
 
             override fun playSound(source: BlockSource) {
-                source.level.playSound(null, source.pos, ModSounds.RPG_FIRE_3P.get(), SoundSource.BLOCKS, 1f, 1f)
+                source.level.playSound(null, source.pos, ModSounds.RPG_FIRE_3P, SoundSource.BLOCKS, 1f, 1f)
             }
         }
     }

@@ -50,7 +50,7 @@ open class ClaymoreMineItem : Item(Properties()), DispenserLaunchable {
                 val position = DispenserBlock.getDispensePosition(pSource)
                 val direction = pSource.state.getValue(DispenserBlock.FACING)
 
-                val claymore = ClaymoreEntity(ModEntities.CLAYMORE.get(), level)
+                val claymore = ClaymoreEntity(ModEntities.CLAYMORE, level)
                 claymore.setPos(position.x(), position.y(), position.z())
 
                 val pX = direction.stepX

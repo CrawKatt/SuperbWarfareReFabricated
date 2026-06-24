@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack
 
 class SuperbItemInterfaceMenu @JvmOverloads constructor(
     containerId: Int, playerInventory: Inventory, private val container: Container = SimpleContainer(CONTAINER_SIZE)
-) : AbstractContainerMenu(ModMenuTypes.SUPERB_ITEM_INTERFACE_MENU.get(), containerId) {
+) : AbstractContainerMenu(ModMenuTypes.SUPERB_ITEM_INTERFACE_MENU, containerId) {
     init {
         checkContainerSize(container, CONTAINER_SIZE)
         container.startOpen(playerInventory.player)

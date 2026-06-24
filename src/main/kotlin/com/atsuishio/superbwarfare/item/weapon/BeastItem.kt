@@ -120,7 +120,7 @@ open class BeastItem : SwordItem(
 
             if (attacker is ServerPlayer) {
                 attacker.sendPacket(ClientIndicatorMessage(0, 5))
-                val holder = Holder.direct(ModSounds.INDICATION.get())
+                val holder = Holder.direct(ModSounds.INDICATION)
                 attacker.connection.send(
                     ClientboundSoundPacket(
                         holder,
@@ -185,7 +185,7 @@ open class BeastItem : SwordItem(
             target.level().playSound(
                 target,
                 BlockPos(target.x.toInt(), target.y.toInt(), target.z.toInt()),
-                ModSounds.OUCH.get(),
+                ModSounds.OUCH,
                 SoundSource.PLAYERS,
                 2f,
                 1f

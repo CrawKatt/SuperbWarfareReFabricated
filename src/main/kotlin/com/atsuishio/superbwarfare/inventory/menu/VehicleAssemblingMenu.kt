@@ -23,7 +23,7 @@ open class VehicleAssemblingMenu @JvmOverloads constructor(
     inventory: Inventory,
     protected val access: ContainerLevelAccess = ContainerLevelAccess.NULL,
     private val isVehicleMenu: Boolean = false
-) : AbstractContainerMenu(ModMenuTypes.VEHICLE_ASSEMBLING_MENU.get(), pContainerId) {
+) : AbstractContainerMenu(ModMenuTypes.VEHICLE_ASSEMBLING_MENU, pContainerId) {
     override fun quickMoveStack(pPlayer: Player, pIndex: Int): ItemStack {
         return ItemStack.EMPTY
     }
@@ -31,7 +31,7 @@ open class VehicleAssemblingMenu @JvmOverloads constructor(
     override fun stillValid(pPlayer: Player): Boolean {
         return (pPlayer.isAlive && !this.isVehicleMenu &&
                 this.access.evaluate({ level, pos ->
-                    level.getBlockState(pos).`is`(ModBlocks.VEHICLE_ASSEMBLING_TABLE.get())
+                    level.getBlockState(pos).`is`(ModBlocks.VEHICLE_ASSEMBLING_TABLE)
                             && pPlayer.distanceToSqr(
                         pos.x.toDouble() + 0.5,
                         pos.y.toDouble() + 0.5,

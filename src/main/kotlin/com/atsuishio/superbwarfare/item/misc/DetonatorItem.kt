@@ -20,7 +20,7 @@ open class DetonatorItem : Item(Properties().stacksTo(1)) {
 
         if (player is ServerPlayer) {
             player.level()
-                .playSound(null, player.onPos, ModSounds.C4_DETONATOR_CLICK.get(), SoundSource.PLAYERS, 1f, 1f)
+                .playSound(null, player.onPos, ModSounds.C4_DETONATOR_CLICK, SoundSource.PLAYERS, 1f, 1f)
         }
 
         this.releaseUsing(stack, player.level(), player, 1)

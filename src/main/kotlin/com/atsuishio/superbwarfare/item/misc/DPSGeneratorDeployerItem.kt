@@ -59,14 +59,14 @@ class DPSGeneratorDeployerItem : Item(Properties()) {
             // 禁止堆叠
             if (!level.getEntities(
                     null as Entity?,
-                    ModEntities.DPS_GENERATOR.get().getSpawnAABB(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5),
+                    ModEntities.DPS_GENERATOR.getSpawnAABB(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5),
                     IS_GENERATOR
                 ).isEmpty()
             ) {
                 return InteractionResult.FAIL
             }
 
-            if (ModEntities.DPS_GENERATOR.get().spawn(
+            if (ModEntities.DPS_GENERATOR.spawn(
                     level,
                     itemstack,
                     pContext.player,
@@ -104,7 +104,7 @@ class DPSGeneratorDeployerItem : Item(Properties()) {
                 // 禁止堆叠
                 if (!level.getEntities(
                         null as Entity?,
-                        ModEntities.DPS_GENERATOR.get()
+                        ModEntities.DPS_GENERATOR
                             .getSpawnAABB(blockpos.x + 0.5, blockpos.y + 0.5, blockpos.z + 0.5),
                         IS_GENERATOR
                     ).isEmpty()
@@ -112,7 +112,7 @@ class DPSGeneratorDeployerItem : Item(Properties()) {
                     return InteractionResultHolder.fail(itemstack)
                 }
 
-                val entity = ModEntities.DPS_GENERATOR.get()
+                val entity = ModEntities.DPS_GENERATOR
                     .spawn(level, itemstack, player, blockpos, MobSpawnType.SPAWN_EGG, false, false)
                 if (entity == null) {
                     return InteractionResultHolder.pass<ItemStack?>(itemstack)

@@ -25,7 +25,7 @@ class MediumRocketItem(
 ), DispenserLaunchable {
     fun createProjectile(level: Level, pos: Position): MediumRocketEntity {
         return MediumRocketEntity(
-            ModEntities.MEDIUM_ROCKET.get(),
+            ModEntities.MEDIUM_ROCKET,
             pos.x(),
             pos.y(),
             pos.z(),
@@ -53,7 +53,7 @@ class MediumRocketItem(
 
             override fun playSound(source: BlockSource) {
                 source.level
-                    .playSound(null, source.pos, ModSounds.MEDIUM_ROCKET_FIRE.get(), SoundSource.BLOCKS, 4f, 1f)
+                    .playSound(null, source.pos, ModSounds.MEDIUM_ROCKET_FIRE, SoundSource.BLOCKS, 4f, 1f)
             }
         }
     }

@@ -42,14 +42,14 @@ class TargetDeployerItem : Item(Properties()) {
             // 禁止堆叠
             if (!level.getEntities(
                     null as Entity?,
-                    ModEntities.TARGET.get().getSpawnAABB(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5),
+                    ModEntities.TARGET.getSpawnAABB(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5),
                     IS_TARGET
                 ).isEmpty()
             ) {
                 return InteractionResult.FAIL
             }
 
-            if (ModEntities.TARGET.get().spawn(
+            if (ModEntities.TARGET.spawn(
                     level,
                     itemstack,
                     pContext.player,
@@ -87,7 +87,7 @@ class TargetDeployerItem : Item(Properties()) {
                 // 禁止堆叠
                 if (!pLevel.getEntities(
                         null as Entity?,
-                        ModEntities.TARGET.get()
+                        ModEntities.TARGET
                             .getSpawnAABB(blockpos.x + 0.5, blockpos.y + 0.5, blockpos.z + 0.5),
                         IS_TARGET
                     ).isEmpty()
@@ -95,7 +95,7 @@ class TargetDeployerItem : Item(Properties()) {
                     return InteractionResultHolder.fail(itemstack)
                 }
 
-                val entity = ModEntities.TARGET.get()
+                val entity = ModEntities.TARGET
                     .spawn(pLevel, itemstack, pPlayer, blockpos, MobSpawnType.SPAWN_EGG, false, false)
                 if (entity == null) {
                     return InteractionResultHolder.pass<ItemStack?>(itemstack)

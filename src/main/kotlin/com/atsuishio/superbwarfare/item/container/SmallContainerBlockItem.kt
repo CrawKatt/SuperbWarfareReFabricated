@@ -29,7 +29,7 @@ import software.bernie.geckolib.animation.AnimationState
 import software.bernie.geckolib.animation.PlayState
 import software.bernie.geckolib.util.GeckoLibUtil
 
-class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER.get(), Properties().stacksTo(1).fireResistant()),
+class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER, Properties().stacksTo(1).fireResistant()),
     GeoItem {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
 

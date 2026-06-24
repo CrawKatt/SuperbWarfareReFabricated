@@ -19,7 +19,7 @@ class SteelPipeItem : SwordItem(
         attacker.level().playSound(
             null,
             target.onPos,
-            ModSounds.STEEL_PIPE_HIT.get(),
+            ModSounds.STEEL_PIPE_HIT,
             SoundSource.PLAYERS,
             1f,
             ((2 * Math.random() - 1) * 0.1f + 1.0f).toFloat()

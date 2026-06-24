@@ -24,7 +24,7 @@ open class FuMO25Menu(
     container: Container,
     access: ContainerLevelAccess,
     containerData: ContainerEnergyData
-) : EnergyMenu(ModMenuTypes.FUMO_25_MENU.get(), pContainerId, containerData) {
+) : EnergyMenu(ModMenuTypes.FUMO_25_MENU, pContainerId, containerData) {
     protected val container: Container
     protected val access: ContainerLevelAccess
     protected val containerData: ContainerEnergyData
@@ -149,7 +149,7 @@ open class FuMO25Menu(
     override fun stillValid(pPlayer: Player): Boolean {
         return this.access.evaluate({ level, pos ->
             level.getBlockState(pos).`is`(
-                ModBlocks.FUMO_25.get()
+                ModBlocks.FUMO_25
             ) && pPlayer.distanceToSqr(
                 pos!!.x.toDouble() + 0.5,
                 pos.y.toDouble() + 0.5,
@@ -184,7 +184,7 @@ open class FuMO25Menu(
 
     internal class ParaSlot(pContainer: Container, pSlot: Int, pX: Int, pY: Int) : Slot(pContainer, pSlot, pX, pY) {
         override fun mayPlace(pStack: ItemStack): Boolean {
-            return pStack.`is`(ModItems.FIRING_PARAMETERS.get())
+            return pStack.`is`(ModItems.FIRING_PARAMETERS)
         }
     }
 

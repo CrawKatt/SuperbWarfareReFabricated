@@ -30,7 +30,7 @@ open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLa
         val stack = playerIn.getItemInHand(handIn)
         playerIn.startUsingItem(handIn)
         if (playerIn is ServerPlayer) {
-            playerIn.level().playSound(null, playerIn.onPos, ModSounds.GRENADE_PULL.get(), SoundSource.PLAYERS, 1f, 1f)
+            playerIn.level().playSound(null, playerIn.onPos, ModSounds.GRENADE_PULL, SoundSource.PLAYERS, 1f, 1f)
         }
         return InteractionResultHolder.consume(stack)
     }
@@ -63,7 +63,7 @@ open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLa
                         level.playSound(
                             null,
                             living.onPos,
-                            ModSounds.GRENADE_THROW.get(),
+                            ModSounds.GRENADE_THROW,
                             SoundSource.PLAYERS,
                             1f,
                             1f
@@ -110,7 +110,7 @@ open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLa
         return object : AbstractProjectileDispenseBehavior() {
             override fun getProjectile(level: Level, position: Position, stack: ItemStack): Projectile {
                 return HandGrenadeEntity(
-                    ModEntities.HAND_GRENADE.get(),
+                    ModEntities.HAND_GRENADE,
                     position.x(),
                     position.y(),
                     position.z(),
@@ -119,7 +119,7 @@ open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLa
             }
 
             override fun playSound(source: BlockSource) {
-                source.level.playSound(null, source.pos, ModSounds.GRENADE_THROW.get(), SoundSource.BLOCKS, 1f, 1f)
+                source.level.playSound(null, source.pos, ModSounds.GRENADE_THROW, SoundSource.BLOCKS, 1f, 1f)
             }
         }
     }
