@@ -41,6 +41,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.phys.Vec3
+import org.jetbrains.annotations.ApiStatus
 import java.util.*
 import java.util.function.Function
 import kotlin.math.max
@@ -598,7 +599,7 @@ class GunData private constructor(
                 return this.perk.getInstances(type)
                     .minOfOrNull { it.perk.getModifiedDamageReduceRate(this.rawDamageReduce) } ?: continue
             }
-            return this.rawDamageReduce.getRate()
+            return this.rawDamageReduce.rate
         }
 
     val damageReduceMinDistance: Double
@@ -607,7 +608,7 @@ class GunData private constructor(
                 return this.perk.getInstances(type)
                     .minOfOrNull { it.perk.getModifiedDamageReduceMinDistance(this.rawDamageReduce) } ?: continue
             }
-            return this.rawDamageReduce.getMinDistance()
+            return this.rawDamageReduce.minDistance
         }
 
     fun meleeOnly(): Boolean {
@@ -806,8 +807,19 @@ class GunData private constructor(
     }
 
     // TODO 删了这个，这个是为了临时适配女仆mod用的
-    @Deprecated("")
-    val fireMode: StringEnumValue<FireMode?> = FireModeGetter()
+    @Deprecated("use selectedFireModeInfo() instead", ReplaceWith("selectedFireModeInfo"))
+    @Suppress("unused")
+    @JvmField
+    val fireMode: StringEnumValue<FireMode> = object : StringEnumValue<FireMode>(
+        CompoundTag(),
+        "DeprecatedFireMode",
+        FireMode.SEMI,
+        { _ -> FireMode.SEMI}) {
+
+        override fun get(): FireMode {
+            return this@GunData.selectedFireModeInfo().mode ?: FireMode.SEMI
+        }
+    }
 
     init {
         require(stack.item is GunItem) { "stack is not GunItem!" }
@@ -873,17 +885,6 @@ class GunData private constructor(
         }
     }
 
-    @Deprecated("")
-    inner class FireModeGetter : StringEnumValue<FireMode?>(
-        CompoundTag(),
-        "DeprecatedFireMode",
-        FireMode.SEMI,
-        Function { str: String? -> FireMode.SEMI }) {
-        override fun get(): FireMode? {
-            return this@GunData.selectedFireModeInfo().mode
-        }
-    }
-
     companion object {
         private val itemStackDefaultDataSupplier = mutableMapOf<ItemStack, () -> DefaultGunData>()
 
@@ -938,8 +939,11 @@ class GunData private constructor(
         }
 
         @JvmStatic
+        @Suppress("unused")
+        @Deprecated("use get() instead", level = DeprecationLevel.ERROR)
+        @ApiStatus.ScheduledForRemoval
         fun compute(stack: ItemStack): DefaultGunData {
-            return from(stack).compute()
+            error("use get() instead!")
         }
 
         fun getPerkPriority(s: String): Int {
@@ -958,7 +962,7 @@ class GunData private constructor(
                 override fun decode(buf: RegistryFriendlyByteBuf): GunData {
                     val stack = ItemStack(ModItems.VEHICLE_GUN, 1)
                     val patch = DataComponentPatch.STREAM_CODEC.decode(buf)
-                    if (!patch.isEmpty()) {
+                    if (!patch.isEmpty) {
                         stack.applyComponents(patch)
                     }
                     return from(stack)

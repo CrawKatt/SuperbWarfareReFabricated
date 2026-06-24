@@ -21,7 +21,7 @@ data class AdjustZoomFovMessage(val scroll: Double) : ServerPacketPayload() {
         val gun = stack.toGunData() ?: return
         val data = gun.data()
 
-        if (stack.`is`(ModItems.MINIGUN.get())) {
+        if (stack.`is`(ModItems.MINIGUN)) {
             val minRpm = (300 - 1200).toDouble()
             val maxRpm = (2400 - 1200).toDouble()
 
@@ -38,7 +38,7 @@ data class AdjustZoomFovMessage(val scroll: Double) : ServerPacketPayload() {
 
             player.displayClientMessage(Component.literal("RPM: " + format0D((customRPM + 1200).toDouble())), true)
             if (customRPM > minRpm && customRPM < maxRpm) {
-                SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV.get(), 1f, 0.7f)
+                SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV, 1f, 0.7f)
             }
         } else {
             val minZoom = gun.minZoom() - 1.25
@@ -47,7 +47,7 @@ data class AdjustZoomFovMessage(val scroll: Double) : ServerPacketPayload() {
             data.putDouble("CustomZoom", Mth.clamp(customZoom + 0.5 * scroll, minZoom, maxZoom))
 
             if (customZoom > minZoom && customZoom < maxZoom) {
-                SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV.get(), 1f, 0.7f)
+                SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV, 1f, 0.7f)
             }
         }
 

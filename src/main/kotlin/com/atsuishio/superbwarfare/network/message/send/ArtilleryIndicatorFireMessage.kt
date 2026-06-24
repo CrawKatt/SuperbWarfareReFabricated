@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.network.message.send
 
-import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
+import com.atsuishio.superbwarfare.Mod.queueServerWork
 import com.atsuishio.superbwarfare.entity.vehicle.MortarEntity
 import com.atsuishio.superbwarfare.entity.vehicle.SodayoPickUpRocketEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity
@@ -18,11 +18,11 @@ object ArtilleryIndicatorFireMessage : ServerPacketPayload() {
         val player = sender()
         var stack = player.mainHandItem
 
-        if (player.mainHandItem.`is`(ModItems.MONITOR.get()) && player.offhandItem.`is`(ModItems.ARTILLERY_INDICATOR.get())) {
+        if (player.mainHandItem.`is`(ModItems.MONITOR) && player.offhandItem.`is`(ModItems.ARTILLERY_INDICATOR)) {
             stack = player.offhandItem
         }
 
-        if (!stack.`is`(ModItems.ARTILLERY_INDICATOR.get())) return
+        if (!stack.`is`(ModItems.ARTILLERY_INDICATOR)) return
 
         val mainTag = NBTTool.getTag(stack)
         val tags = mainTag.getList(ArtilleryIndicatorItem.TAG_CANNON, Tag.TAG_COMPOUND.toInt())

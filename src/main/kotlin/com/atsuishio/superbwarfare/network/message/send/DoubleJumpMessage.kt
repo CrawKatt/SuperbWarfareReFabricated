@@ -17,7 +17,7 @@ object DoubleJumpMessage : ServerPacketPayload() {
         val y = player.y
         val z = player.z
 
-        level.playSound(null, BlockPos.containing(x, y, z), ModSounds.DOUBLE_JUMP.get(), SoundSource.BLOCKS, 1f, 1f)
+        level.playSound(null, BlockPos.containing(x, y, z), ModSounds.DOUBLE_JUMP, SoundSource.BLOCKS, 1f, 1f)
 
         val vehicle = player.getRootVehicle()
         if (vehicle !== player) {

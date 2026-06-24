@@ -108,7 +108,7 @@ data class MeleeAttackMessage(val uuidList: List<SerializedUUID>) : ServerPacket
                     attacker.level().playSound(
                         null,
                         target,
-                        ModSounds.MELEE_HIT.get(),
+                        ModSounds.MELEE_HIT,
                         SoundSource.PLAYERS,
                         1f,
                         ((2 * Random.nextDouble() - 1) * 0.1f + 1.0f).toFloat()

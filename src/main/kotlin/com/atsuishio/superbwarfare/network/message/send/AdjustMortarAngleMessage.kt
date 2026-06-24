@@ -20,6 +20,6 @@ data class AdjustMortarAngleMessage(val scroll: Double) : ServerPacketPayload() 
             Mth.clamp(looking.getEntityData().get(MortarEntity.TARGET_PITCH) + 0.5 * scroll, -89.0, -20.0).toFloat()
         )
 
-        SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV.get(), 1f, 0.7f)
+        SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV, 1f, 0.7f)
     }
 }

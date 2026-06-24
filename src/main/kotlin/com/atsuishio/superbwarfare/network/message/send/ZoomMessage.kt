@@ -18,9 +18,9 @@ data class ZoomMessage(val msgType: Int) : ServerPacketPayload() {
         // 缩放音效播放条件: 载具是武器载具，且该位置有可用武器
         if (vehicle.hasWeapon(vehicle.getSeatIndex(player)) && vehicle.banHand(player)) {
             if (msgType == 0) {
-                SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN.get(), 2f, 1f)
+                SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN, 2f, 1f)
             } else if (msgType == 1) {
-                SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_OUT.get(), 2f, 1f)
+                SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_OUT, 2f, 1f)
             }
         }
     }

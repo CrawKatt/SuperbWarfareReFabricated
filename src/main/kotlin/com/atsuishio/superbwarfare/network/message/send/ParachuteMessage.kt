@@ -14,7 +14,7 @@ object ParachuteMessage : ServerPacketPayload() {
         val player = sender()
 
         CuriosApi.getCuriosInventory(player)
-            .flatMap { c -> c.findFirstCurio(ModItems.PARACHUTE.get()) }
+            .flatMap { c -> c.findFirstCurio(ModItems.PARACHUTE) }
             .ifPresent { s ->
                 val stack = s.stack()
                 if (player.cooldowns.isOnCooldown(stack.item)) return@ifPresent
@@ -29,7 +29,7 @@ object ParachuteMessage : ServerPacketPayload() {
                         player.x,
                         player.y,
                         player.z,
-                        ModSounds.PARACHUTE_OPEN.get(),
+                        ModSounds.PARACHUTE_OPEN,
                         SoundSource.PLAYERS,
                         1f,
                         1f
@@ -43,7 +43,7 @@ object ParachuteMessage : ServerPacketPayload() {
                         player.x,
                         player.y,
                         player.z,
-                        ModSounds.PARACHUTE_CLOSE.get(),
+                        ModSounds.PARACHUTE_CLOSE,
                         SoundSource.PLAYERS,
                         1f,
                         1f

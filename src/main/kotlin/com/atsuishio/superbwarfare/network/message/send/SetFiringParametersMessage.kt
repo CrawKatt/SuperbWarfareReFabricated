@@ -34,7 +34,7 @@ object SetFiringParametersMessage : ServerPacketPayload() {
         if (lookingEntity != null && !player.isShiftKeyDown) {
             lookAtEntity = true
         }
-        if (stack.`is`(ModItems.FIRING_PARAMETERS.get())) {
+        if (stack.`is`(ModItems.FIRING_PARAMETERS)) {
             val parameters = stack.firingParameters
             val isDepressed = parameters.isDepressed
             val radius = parameters.radius
@@ -77,7 +77,7 @@ object SetFiringParametersMessage : ServerPacketPayload() {
                         Component.literal(("[" + pos.x + "," + pos.y + "," + pos.z + "]"))
                     ), true
             )
-            SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN.get(), 2f, 1f)
+            SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_IN, 2f, 1f)
 
             item.setTarget(mainStack, player)
         }

@@ -19,7 +19,7 @@ data class DogTagFinishEditMessage(
         val serverPlayer = sender()
 
         val stack = if (mainHand) serverPlayer.mainHandItem else serverPlayer.offhandItem
-        if (!stack.`is`(ModItems.DOG_TAG.get())) return
+        if (!stack.`is`(ModItems.DOG_TAG)) return
 
         val colors = colors.map { it.toList() }
         stack.set(ModDataComponents.DOG_TAG_IMAGE, colors)

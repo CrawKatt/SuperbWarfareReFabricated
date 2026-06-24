@@ -18,7 +18,7 @@ data class SeekingWeaponWarningMessage(val lockOn: Boolean, val uuid: Serialized
 
         entity.level().playSound(
             null, entity.onPos,
-            if (entity is Pig) SoundEvents.PIG_HURT else if (lockOn) ModSounds.LOCKED_WARNING.get() else ModSounds.LOCKING_WARNING.get(),
+            if (entity is Pig) SoundEvents.PIG_HURT else if (lockOn) ModSounds.LOCKED_WARNING else ModSounds.LOCKING_WARNING,
             SoundSource.PLAYERS,
             2f, 1f
         )

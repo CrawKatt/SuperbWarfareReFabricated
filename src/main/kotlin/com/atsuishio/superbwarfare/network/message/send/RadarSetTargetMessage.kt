@@ -20,7 +20,7 @@ data class RadarSetTargetMessage(val target: SerializedUUID) : ServerPacketPaylo
             EntityFindUtil.getEntities(player.level()).getAll()
                 .asSequence()
                 .filterIsInstance<AutoAimableEntity>()
-                .filter { it.getOwner() === player && it.distanceTo(player) <= 24 }
+                .filter { it.owner === player && it.distanceTo(player) <= 24 }
                 .forEach { it.targetUUID = target.toString() }
         }
     }

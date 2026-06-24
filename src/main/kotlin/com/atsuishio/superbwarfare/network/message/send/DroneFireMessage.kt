@@ -24,7 +24,7 @@ data class DroneFireMessage(val pos: SerializedVector3f) : ServerPacketPayload()
         val stack = player.mainHandItem
         val mainTag = NBTTool.getTag(stack)
 
-        if (stack.`is`(ModItems.MONITOR.get()) && mainTag.getBoolean("Using") && mainTag.getBoolean("Linked")) {
+        if (stack.`is`(ModItems.MONITOR) && mainTag.getBoolean("Using") && mainTag.getBoolean("Linked")) {
             val drone = EntityFindUtil.findDrone(player.level(), mainTag.getString("LinkedDrone")) ?: return
             if (player.offhandItem.`is`(ModItems.FIRING_PARAMETERS, ModItems.ARTILLERY_INDICATOR)) {
                 val offStack = player.offhandItem
@@ -47,7 +47,7 @@ data class DroneFireMessage(val pos: SerializedVector3f) : ServerPacketPayload()
                         ), true
                 )
 
-                player.playLocalSound(ModSounds.CANNON_ZOOM_IN.get(), 2f, 1f)
+                player.playLocalSound(ModSounds.CANNON_ZOOM_IN, 2f, 1f)
 
                 val item = offStack.item
                 if (item is ArtilleryIndicatorItem) {

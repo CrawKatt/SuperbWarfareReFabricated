@@ -26,18 +26,18 @@ data class FireModeMessage(val forward: Boolean) : ServerPacketPayload() {
         if (fireModes.size > 1) {
             val mode = (selectedFireMode + (if (forward) -1 else 1) + fireModes.size) % fireModes.size
             data.selectedFireMode.set(mode)
-            SoundTool.playLocalSound(player, ModSounds.FIRE_RATE.get())
+            SoundTool.playLocalSound(player, ModSounds.FIRE_RATE)
             return
         }
 
-        if (stack.item === ModItems.SENTINEL.get()
+        if (stack.item === ModItems.SENTINEL
             && !player.isSpectator
             && !(player.cooldowns.isOnCooldown(stack.item))
             && data.reload.time() == 0
             && !data.charging()
         ) {
             for (cell in player.getInventory().items) {
-                if (cell.`is`(ModItems.CELL.get())) {
+                if (cell.`is`(ModItems.CELL)) {
                     val cap = cell.getCapability(Capabilities.EnergyStorage.ITEM)
                     if (cap != null && cap.energyStored > 0) {
                         data.charge.starter.markStart()
@@ -46,8 +46,8 @@ data class FireModeMessage(val forward: Boolean) : ServerPacketPayload() {
             }
         }
 
-        if (stack.item === ModItems.JAVELIN.get()) {
-            SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_OUT.get())
+        if (stack.item === ModItems.JAVELIN) {
+            SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_OUT)
         }
         data.save()
     }

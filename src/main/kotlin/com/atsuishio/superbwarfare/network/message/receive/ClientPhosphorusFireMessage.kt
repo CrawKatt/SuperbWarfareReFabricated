@@ -18,6 +18,6 @@ data class ClientPhosphorusFireMessage(
         val entity = clientLevel?.getEntity(id) as? LivingEntity ?: return
         val data = PhosphorusFireCapability.of(entity)
         data.isOnFire = flag
-        entity.setData(ModAttachments.PHOSPHORUS_FIRE, data)
+        ModAttachments.PHOSPHORUS_FIRE.sync(entity)
     }
 }

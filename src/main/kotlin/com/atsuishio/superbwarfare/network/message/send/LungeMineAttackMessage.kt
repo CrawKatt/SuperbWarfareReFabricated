@@ -26,7 +26,7 @@ data class LungeMineAttackMessage(
         val player = sender()
         val stack = player.mainHandItem
 
-        if (stack.`is`(ModItems.LUNGE_MINE.get())) {
+        if (stack.`is`(ModItems.LUNGE_MINE)) {
             if (type == 0) {
                 if (!player.isCreative) {
                     stack.shrink(1)

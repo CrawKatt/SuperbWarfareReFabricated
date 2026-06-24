@@ -1,19 +1,17 @@
 package com.atsuishio.superbwarfare.network
 
-import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.Mod.loc
 import com.atsuishio.superbwarfare.network.message.receive.*
 import com.atsuishio.superbwarfare.network.message.send.*
 import com.atsuishio.superbwarfare.serialization.ByteBufDecoder
 import com.atsuishio.superbwarfare.serialization.ByteBufEncoder
 import com.atsuishio.superbwarfare.tools.createStreamCodec
 import kotlinx.serialization.serializer
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.network.FriendlyByteBuf
-import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
-import net.neoforged.neoforge.network.handling.IPayloadHandler
-import net.neoforged.neoforge.network.registration.PayloadRegistrar
 
 val payloadTypeMap = mutableMapOf<Class<*>, CustomPacketPayload.Type<*>>()
 
@@ -25,8 +23,12 @@ inline fun <reified T> decodeFrom(input: FriendlyByteBuf): T {
     return ByteBufDecoder(input).decodeSerializableValue(serializer())
 }
 
-private inline fun <reified T : PacketPayload> playTo(reg: (CustomPacketPayload.Type<T>, StreamCodec<in RegistryFriendlyByteBuf, T>, IPayloadHandler<T>) -> Unit) {
-
+/**
+ * Builds the [CustomPacketPayload.Type] for [T] (deriving its id from the class name, mirroring the
+ * NeoForge 0.8.9 naming scheme) together with its stream codec, and stores the type in
+ * [payloadTypeMap].
+ */
+private inline fun <reified T : PacketPayload> buildType(): Pair<CustomPacketPayload.Type<T>, StreamCodec<FriendlyByteBuf, T>> {
     val codec = createStreamCodec<T>()
     val className = T::class.java.simpleName.substringBefore("Message")
 
@@ -44,30 +46,70 @@ private inline fun <reified T : PacketPayload> playTo(reg: (CustomPacketPayload.
 
     val type = CustomPacketPayload.Type<T>(loc(name))
     payloadTypeMap[T::class.java] = type
-
-    reg(type, codec) { msg, context -> with(msg) { context.handler() } }
+    return type to codec
 }
 
+/**
+ * Registers a server-bound (C2S) payload: the stream codec with the [PayloadTypeRegistry] and the
+ * global receiver that runs the payload's [PacketPayload.handler] on the server thread.
+ */
 private inline fun <reified T : ServerPacketPayload> playToServer() {
-    playTo<T> { type, codec, handler ->
-        registrar!!.playToServer<T>(type, codec, handler)
+    val (type, codec) = buildType<T>()
+    PayloadTypeRegistry.playC2S().register(type, codec)
+    ServerPlayNetworking.registerGlobalReceiver(type) { msg, context ->
+        with(msg) { PayloadContext(context.player()).handler() }
     }
 }
 
+/**
+ * Registers a client-bound (S2C) payload's stream codec with the [PayloadTypeRegistry]. The client
+ * receiver is wired up separately in [registerClientReceivers] to avoid loading client-only classes
+ * on a dedicated server.
+ */
 private inline fun <reified T : ClientPacketPayload> playToClient() {
-    playTo<T> { type, codec, handler ->
-        registrar!!.playToClient<T>(type, codec, handler)
+    val (type, codec) = buildType<T>()
+    PayloadTypeRegistry.playS2C().register(type, codec)
+}
+
+/**
+ * Wires up the global client receiver for a single client-bound payload type. Kept inline so the
+ * reified [T] is preserved for the handler receiver dispatch.
+ */
+private inline fun <reified T : ClientPacketPayload> clientReceiver() {
+    val type = payloadTypeMap[T::class.java] as CustomPacketPayload.Type<T>
+    net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.registerGlobalReceiver(type) { msg, context ->
+        with(msg) { PayloadContext(context.player()).handler() }
     }
 }
 
-private var registrar: PayloadRegistrar? = null
-
-fun initializeNetwork(event: RegisterPayloadHandlersEvent) {
-    registrar = event.registrar("1")
-    registerPayloads()
+/**
+ * Registers the global client receivers for every client-bound payload. Must only be called from
+ * the client entrypoint ([net.fabricmc.api.ClientModInitializer]).
+ */
+fun registerClientReceivers() {
+    clientReceiver<ClientIndicatorMessage>()
+    clientReceiver<ClientSetMotionMessage>()
+    clientReceiver<DataSyncMessage>()
+    clientReceiver<ClientMotionSyncMessage>()
+    clientReceiver<ClientPhosphorusFireMessage>()
+    clientReceiver<ContainerDataMessage>()
+    clientReceiver<DrawClientMessage>()
+    clientReceiver<FinishAssemblingVehicleMessage>()
+    clientReceiver<LivingGunKillMessage>()
+    clientReceiver<PlayerVariablesSyncMessage>()
+    clientReceiver<RadarMenuCloseMessage>()
+    clientReceiver<RadarMenuOpenMessage>()
+    clientReceiver<ResetCameraTypeMessage>()
+    clientReceiver<ShakeClientMessage>()
+    clientReceiver<ShootClientMessage>()
+    clientReceiver<SoundClientMessage>()
+    clientReceiver<TDMSyncMessage>()
+    clientReceiver<EntitySyncMessage>()
+    clientReceiver<PlayerInfoSyncMessage>()
+    clientReceiver<ClientVehicleItemMessage>()
 }
 
-private fun registerPayloads() {
+fun registerPayloads() {
     playToClient<ClientIndicatorMessage>()
     playToClient<ClientSetMotionMessage>()
     playToClient<DataSyncMessage>()

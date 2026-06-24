@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.capability.living
 
-import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.Mod.loc
 import com.atsuishio.superbwarfare.init.ModComponents
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
@@ -22,6 +22,7 @@ class PhosphorusFireCapability : Component {
     }
 
     companion object {
+        @JvmField
         val ID: ResourceLocation = loc("phosphorus_fire_capability")
         const val TAG_PHOSPHORUS_FIRE: String = "SbwPhosphorusFire"
 

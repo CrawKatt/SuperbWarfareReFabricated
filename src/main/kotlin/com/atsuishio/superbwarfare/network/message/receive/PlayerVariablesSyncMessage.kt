@@ -16,7 +16,7 @@ data class PlayerVariablesSyncMessage(
     override fun PayloadContext.handler() {
         val entity = clientLevel?.getEntity(target) ?: return
 
-        val variables = entity.getData(ModAttachments.PLAYER_VARIABLE)
+        val variables = ModAttachments.PLAYER_VARIABLE.get(entity)
 
         for ((type, value) in data) {
             if (type == (-1).toByte()) {
@@ -29,6 +29,6 @@ data class PlayerVariablesSyncMessage(
             }
         }
 
-        entity.setData(ModAttachments.PLAYER_VARIABLE, variables)
+        variables.sync(entity)
     }
 }

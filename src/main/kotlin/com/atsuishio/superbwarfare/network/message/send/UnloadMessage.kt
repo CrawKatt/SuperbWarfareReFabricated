@@ -16,6 +16,6 @@ object UnloadMessage : ServerPacketPayload() {
         val data = from(stack)
         data.withdrawAmmo(player)
         data.save()
-        SoundTool.playLocalSound(player, ModSounds.EDIT.get(), 1f, 1f)
+        SoundTool.playLocalSound(player, ModSounds.EDIT, 1f, 1f)
     }
 }

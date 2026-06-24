@@ -10,7 +10,7 @@ data class ActiveThermalImagingMessage(val active: Boolean) : ServerPacketPayloa
     override fun PayloadContext.handler() {
         val player = sender()
 
-        val cap = player.getData(ModAttachments.PLAYER_VARIABLE).watch()
+        val cap = ModAttachments.PLAYER_VARIABLE.get(player).watch()
         cap.activeThermalImaging = active
         cap.sync(player)
     }

@@ -20,7 +20,7 @@ object InteractMessage : ServerPacketPayload() {
         val stack = player.mainHandItem
         val tag = NBTTool.getTag(stack)
 
-        if (stack.`is`(ModItems.MONITOR.get())
+        if (stack.`is`(ModItems.MONITOR)
             && tag.getBoolean("Using")
             && tag.getBoolean("Linked")
             && !player.cooldowns.isOnCooldown(stack.item)

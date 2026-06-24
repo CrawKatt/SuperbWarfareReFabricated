@@ -18,7 +18,7 @@ data class VehicleMovementMessage(val keys: Short) : ServerPacketPayload() {
 
         val vehicle = if (entity is VehicleEntity && entity.getFirstPassenger() === player) {
             entity
-        } else if (stack.`is`(ModItems.MONITOR.get())
+        } else if (stack.`is`(ModItems.MONITOR)
             && tag.getBoolean("Using")
             && tag.getBoolean("Linked")
         ) {

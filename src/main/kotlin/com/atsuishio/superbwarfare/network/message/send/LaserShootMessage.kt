@@ -30,7 +30,7 @@ data class LaserShootMessage(
                 (2 * damage).toFloat()
             )
             player.level()
-                .playSound(null, player.blockPosition(), ModSounds.HEADSHOT.get(), SoundSource.VOICE, 0.1f, 1f)
+                .playSound(null, player.blockPosition(), ModSounds.HEADSHOT, SoundSource.VOICE, 0.1f, 1f)
             sendPacketTo(player, ClientIndicatorMessage(1, 5))
         } else {
             entity.forceHurt(
@@ -38,7 +38,7 @@ data class LaserShootMessage(
                 damage.toFloat()
             )
             player.level()
-                .playSound(null, player.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 0.1f, 1f)
+                .playSound(null, player.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 0.1f, 1f)
             sendPacketTo(player, ClientIndicatorMessage(0, 5))
         }
         entity.invulnerableTime = 0

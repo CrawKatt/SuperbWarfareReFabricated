@@ -79,7 +79,7 @@ data class EditMessage(val type: Int, val add: Boolean, val isVehicle: Boolean) 
                 }
             }
             data.save()
-            player.playLocalSound(ModSounds.EDIT.get(), 1f, 1f)
+            player.playLocalSound(ModSounds.EDIT, 1f, 1f)
         }
     }
 
