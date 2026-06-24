@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.client.renderer.curio
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
-import com.atsuishio.superbwarfare.client.model.curio.ThermalImagingGogglesModel
+import com.atsuishio.superbwarfare.client.model.trinket.ThermalImagingGogglesModel
 import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.model.EntityModel

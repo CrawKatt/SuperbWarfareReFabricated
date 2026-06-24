@@ -3,8 +3,8 @@ package com.atsuishio.superbwarfare.client
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.decorator.ContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.LuckyContainerItemDecorator
-import com.atsuishio.superbwarfare.client.model.curio.ParachuteModel
-import com.atsuishio.superbwarfare.client.model.curio.ThermalImagingGogglesModel
+import com.atsuishio.superbwarfare.client.model.trinket.ParachuteModel
+import com.atsuishio.superbwarfare.client.model.trinket.ThermalImagingGogglesModel
 import com.atsuishio.superbwarfare.client.overlay.*
 import com.atsuishio.superbwarfare.client.renderer.block.*
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer

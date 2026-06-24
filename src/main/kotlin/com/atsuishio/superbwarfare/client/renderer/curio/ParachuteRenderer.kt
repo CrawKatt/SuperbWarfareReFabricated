@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.client.renderer.curio
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
-import com.atsuishio.superbwarfare.client.model.curio.ParachuteModel
+import com.atsuishio.superbwarfare.client.model.trinket.ParachuteModel
 import com.atsuishio.superbwarfare.item.trinket.ParachuteItem
 import com.atsuishio.superbwarfare.tools.getOrCreateTag
 import com.atsuishio.superbwarfare.tools.localPlayer
