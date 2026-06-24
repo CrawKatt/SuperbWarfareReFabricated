@@ -7,6 +7,8 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
+import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect;
+import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -119,6 +121,13 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
     @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
     private void superbwarfare$onHurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
+        Entity directEntity = source.getDirectEntity();
+
+        if (directEntity instanceof LivingEntity attacker && ShockMobEffect.shouldCancelDamage(attacker)) {
+            cir.setReturnValue(false);
+            return;
+        }
+
         if (LivingEventHandler.onEntityAttacked(self, source, amount)) {
             cir.setReturnValue(false);
         }
@@ -148,6 +157,18 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
                 effectInstance,
                 source
         );
+
+        PhosphorusFireMobEffect.onPhosphorusFireAdded(
+                (LivingEntity) (Object) this,
+                effectInstance,
+                source
+        );
+
+        ShockMobEffect.onShockAdded(
+                (LivingEntity) (Object) this,
+                effectInstance,
+                source
+        );
     }
 
     @Inject(method = "removeEffect", at = @At("HEAD"))
@@ -157,6 +178,7 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
     ) {
         LivingEntity self = (LivingEntity) (Object) this;
         BurnMobEffect.onBurnRemoved(self, self.getEffect(effect));
+        ShockMobEffect.onShockRemoved(self, self.getEffect(effect));
     }
 
     @Inject(method = "onEffectRemoved", at = @At("HEAD"))
@@ -168,10 +190,24 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
                 (LivingEntity) (Object) this,
                 effectInstance
         );
+
+        PhosphorusFireMobEffect.onPhosphorusFireRemoved(
+                (LivingEntity) (Object) this,
+                effectInstance
+        );
+
+        ShockMobEffect.onShockRemoved(
+                (LivingEntity) (Object) this,
+                effectInstance
+        );
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
-    private void superbwarfare$burnTick(CallbackInfo ci) {
-        BurnMobEffect.onLivingTick((LivingEntity) (Object) this);
+    private void superbwarfare$mobEffectTick(CallbackInfo ci) {
+        LivingEntity self = (LivingEntity) (Object) this;
+
+        BurnMobEffect.onLivingTick(self);
+        PhosphorusFireMobEffect.onLivingTick(self);
+        ShockMobEffect.onLivingTick(self);
     }
 }
