@@ -16,8 +16,6 @@ import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.DEFAULT_ZOOM
 import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.MAGAZINE
 import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.MELEE_DAMAGE
 import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.PROJECTILE_AMOUNT
-import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.SHOOT_POS
-import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.SHOOT_SHAKE
 import com.atsuishio.superbwarfare.data.gun.subdata.*
 import com.atsuishio.superbwarfare.data.gun.value.*
 import com.atsuishio.superbwarfare.event.GunEventHandler
@@ -134,21 +132,27 @@ class GunData private constructor(
     fun compute(useCache: Boolean = true): DefaultGunData {
         if (cache != null && useCache) return cache!!
 
-        var rawData = getDefault().copy()
+        val modifier = PMC(this)
 
-        // property override tag
         jsonPropModifier.update(propertyOverrideString.get())
-        rawData = jsonPropModifier.computeProperties(this, rawData)
+        jsonPropModifier.modifyProperty(modifier)
 
-        // gun modifiers
-        rawData = item.computeProperties(this, rawData)
+        item.modifyProperty(modifier)
 
-        for (type in Perk.Type.entries.toTypedArray()) {
-            val instance = perk.getInstance(type) ?: continue
-            rawData = instance.perk().computeProperties(this, rawData)
+        for (type in Perk.Type.entries) {
+            for (instance in perk.getInstances(type)) {
+                instance.perk.modifyProperty(modifier)
+            }
         }
 
-        // 临时属性修改
+        GunProp.modifyProperty(modifier)
+
+        var rawData = getDefault().copy()
+
+        for (prop in GunProp.entries) {
+            prop.writeTo(rawData, modifier[prop])
+        }
+
         if (tempModifications != null) {
             rawData = tempModifications!!.apply(rawData)
         }
@@ -192,7 +196,7 @@ class GunData private constructor(
 
         for (type in Perk.Type.entries.toTypedArray()) {
             for (instance in perk.getInstances(type)) {
-                instance.perk().modifyProperty(modifier)
+                instance.perk.modifyProperty(modifier)
             }
         }
 
@@ -202,7 +206,7 @@ class GunData private constructor(
     }
 
     fun hasInfiniteBackupAmmo(shooter: Entity?): Boolean {
-        return shooter is Player && shooter.isCreative() || selectedAmmoConsumer().type == AmmoConsumeType.INFINITE || meleeOnly()
+        return shooter is Player && shooter.isCreative || selectedAmmoConsumer().type == AmmoConsumeType.INFINITE || meleeOnly()
                 || InventoryTool.hasCreativeAmmoBox(shooter)
     }
 
@@ -233,7 +237,7 @@ class GunData private constructor(
     @JvmOverloads
     fun selectedAmmoConsumer(consumers: List<AmmoConsumer>? = compute().getProcessedAmmoConsumers()): AmmoConsumer {
         if (consumers.isNullOrEmpty()) {
-            return AmmoConsumer.Companion.INVALID
+            return AmmoConsumer.INVALID
         }
         return consumers[Mth.clamp(this.selectedAmmoType.get(), 0, consumers.size - 1)]
     }
@@ -243,9 +247,9 @@ class GunData private constructor(
         val targetIndex = Mth.clamp(index, 0, consumers.size - 1)
         if (targetIndex == selectedAmmoType.get()) return
 
-        if (!(ammoSupplier is Player && ammoSupplier.isCreative())) {
+        if (!(ammoSupplier is Player && ammoSupplier.isCreative)) {
             val currentConsumer = selectedAmmoConsumer()
-            val targetConsumer = consumers.get(selectedAmmoType.get())
+            val targetConsumer = consumers[selectedAmmoType.get()]
 
             var currentSlot = currentConsumer.ammoSlot
             var targetSlot = targetConsumer.ammoSlot
@@ -592,7 +596,7 @@ class GunData private constructor(
         get() {
             for (type in Perk.Type.entries.toTypedArray()) {
                 return this.perk.getInstances(type)
-                    .minOfOrNull { it.perk().getModifiedDamageReduceRate(this.rawDamageReduce) } ?: continue
+                    .minOfOrNull { it.perk.getModifiedDamageReduceRate(this.rawDamageReduce) } ?: continue
             }
             return this.rawDamageReduce.getRate()
         }
@@ -601,7 +605,7 @@ class GunData private constructor(
         get() {
             for (type in Perk.Type.entries.toTypedArray()) {
                 return this.perk.getInstances(type)
-                    .minOfOrNull { it.perk().getModifiedDamageReduceMinDistance(this.rawDamageReduce) } ?: continue
+                    .minOfOrNull { it.perk.getModifiedDamageReduceMinDistance(this.rawDamageReduce) } ?: continue
             }
             return this.rawDamageReduce.getMinDistance()
         }
@@ -625,9 +629,9 @@ class GunData private constructor(
         }
 
         if (this.compute().shootPos.boundUpWithAmmoAmount) {
-            return list.get(Mth.clamp(this.ammo.get() - 1, 0, size))
+            return list[Mth.clamp(this.ammo.get() - 1, 0, size)]
         } else {
-            return list.get(this.fireIndex.get() % size)
+            return list[this.fireIndex.get() % size]
         }
     }
 
@@ -639,14 +643,14 @@ class GunData private constructor(
         }
     }
 
-    fun fireDirection(): StringOrVec3? {
+    fun fireDirection(): StringOrVec3 {
         val list = this.compute().shootPos.directions
         val size = list.size
         if (size == 0) {
             return StringOrVec3("Default")
         }
 
-        return list.get(this.fireIndex.get() % size)
+        return list[this.fireIndex.get() % size]
     }
 
     fun fireDirectionForHud(): StringOrVec3? {
@@ -660,8 +664,7 @@ class GunData private constructor(
     fun shakePlayers(source: Entity?) {
         if (source == null) return
 
-        val shootShake = compute().shootShake
-        if (shootShake == null) return
+        val shootShake = compute().shootShake ?: return
 
         ShakeClientMessage.sendToNearbyPlayers(source, shootShake.x, shootShake.y, shootShake.z)
     }
@@ -761,7 +764,7 @@ class GunData private constructor(
 
     fun save() {
         val keysToRemove = ArrayList<String?>()
-        for (key in perkTag.getAllKeys()) {
+        for (key in perkTag.allKeys) {
             val compoundTag = perkTag.get(key) as? CompoundTag
             if (compoundTag?.isEmpty == true) {
                 keysToRemove.add(key)
@@ -771,15 +774,15 @@ class GunData private constructor(
 
         val cleanedTag = tag.copy()
 
-        if (perkTag.isEmpty()) {
+        if (perkTag.isEmpty) {
             cleanedTag.remove("Perks")
         }
 
-        if (attachmentTag.isEmpty()) {
+        if (attachmentTag.isEmpty) {
             cleanedTag.remove("Attachments")
         }
 
-        if (gunDataTag.isEmpty()) {
+        if (gunDataTag.isEmpty) {
             cleanedTag.remove("GunData")
         }
 
@@ -807,16 +810,16 @@ class GunData private constructor(
     val fireMode: StringEnumValue<FireMode?> = FireModeGetter()
 
     init {
-        require(stack.getItem() is GunItem) { "stack is not GunItem!" }
+        require(stack.item is GunItem) { "stack is not GunItem!" }
 
         val gunItem = stack.item as GunItem
         this.item = gunItem
         this.stack = stack
-        this.id = getRegistryId(stack.getItem())
+        this.id = getRegistryId(stack.item)
 
         this.defaultDataSupplier = initialDefaultDataSupplier ?: { gunItem.getDefaultData(this) }
 
-        val customData = stack.get<CustomData?>(DataComponents.CUSTOM_DATA)
+        val customData = stack.get(DataComponents.CUSTOM_DATA)
         this.tag = if (customData != null) customData.copyTag() else CompoundTag()
 
         gunDataTag = getOrPut("GunData")
@@ -921,7 +924,7 @@ class GunData private constructor(
         }
 
         fun getDefault(stack: ItemStack): DefaultGunData {
-            return getDefault(stack.getItem())
+            return getDefault(stack.item)
         }
 
         fun getDefault(item: Item): DefaultGunData {
@@ -929,7 +932,7 @@ class GunData private constructor(
         }
 
         fun getRegistryId(item: Item): String {
-            var id = item.getDescriptionId()
+            var id = item.descriptionId
             id = id.substring(id.indexOf(".") + 1).replace('.', ':')
             return id
         }

@@ -483,14 +483,14 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         }
 
         val stack = data.stack()
-        if (this.getMaxDamage(stack) > 0) {
+        if (this.getGunMaxDamage(stack) > 0) {
             if (shooter is LivingEntity) {
                 stack.hurtAndBreak(data.get(GunProp.DURABILITY_PER_SHOOT), shooter, EquipmentSlot.MAINHAND)
             } else {
                 stack.hurtAndBreak(
                     data.get(GunProp.DURABILITY_PER_SHOOT),
                     level,
-                    null as LivingEntity?
+                    null as ServerPlayer?
                 ) { }
             }
         }
@@ -725,7 +725,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         val stack = data.stack
 
         val projectileInfo = data.get(GunProp.PROJECTILE)
-        val projectileType = projectileInfo.itemId
+        val projectileType = projectileInfo.type
         val projectileTypeStr = projectileType.trim { it <= ' ' }.lowercase()
 
         if (projectileTypeStr == "empty") {
@@ -872,7 +872,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             } else if (CustomData.LAUNCHABLE_ENTITY.containsKey(projectileType)) {
                 val newInfo = ProjectileInfo()
                 newInfo.data = CustomData.LAUNCHABLE_ENTITY[projectileType]!!.data
-                newInfo.itemId = projectileType
+                newInfo.type = projectileType
 
                 val tag = LaunchableEntityTool.getModifiedTag(
                     newInfo,
@@ -1223,7 +1223,22 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     open fun getDefaultData(data: GunData) = getDefault(data.id)
 
     open fun getEnergyProvider(data: GunData, ammoSupplier: Entity?): IEnergyStorage? {
-        return data.ModCapabilities.ENERGY_ITEM.find(stack, null)
+        return ModCapabilities.ENERGY_ITEM.find(data.stack, null)
+    }
+
+    open fun getGunMaxDamage(stack: ItemStack): Int {
+        val maxDurability = from(stack).get(GunProp.MAX_DURABILITY)
+
+        if (maxDurability > 0) {
+            if (!stack.has(DataComponents.MAX_DAMAGE) || !stack.has(DataComponents.DAMAGE)) {
+                stack.set(DataComponents.MAX_DAMAGE, maxDurability)
+                stack.set(DataComponents.DAMAGE, 0)
+            }
+        } else {
+            stack.remove(DataComponents.MAX_DAMAGE)
+        }
+
+        return maxDurability
     }
 
     companion object {

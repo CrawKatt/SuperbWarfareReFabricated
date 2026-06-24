@@ -9,23 +9,18 @@ import org.joml.Quaterniond
 
 @Serializable
 class OBBInfo {
-    @JvmField
     @SerialName("Size")
     var size: SerializedVec3 = Vec3.ZERO
 
-    @JvmField
     @SerialName("Position")
     var position: SerializedVec3 = Vec3.ZERO
 
-    @JvmField
     @SerialName("Transform")
     var transform: String? = "Default"
 
-    @JvmField
     @SerialName("Rotation")
     var rotation: String = "Default"
 
-    @JvmField
     @SerialName("Part")
     var part: OBB.Part = OBB.Part.BODY
 

@@ -25,20 +25,15 @@ class CollisionLevel {
      * 3 - 允许撞坏硬方块
      * 4 - 允许野兽撞击模式
      */
-    @JvmField
     @SerialName("Level")
     var level: Int = 2
 
-    @JvmField
     @SerialName("PowerLimits")
     var powerLimits: MutableList<Limit> = mutableListOf()
 
     @Serializable(LimitSerializer::class)
-    data class Limit(
-        @JvmField val power: Float,
-        @JvmField val motion: Float,
-        @JvmField val equals: Boolean
-    ) {
+    @JvmRecord
+    data class Limit(val power: Float, val motion: Float, val equals: Boolean) {
         override fun toString(): String {
             return "[$power, $motion, $equals]"
         }

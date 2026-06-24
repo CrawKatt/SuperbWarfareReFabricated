@@ -92,7 +92,7 @@ open class Perk(val descriptionId: String, val type: Type) : PropertyModifier<Gu
     private val perkKey = ResourceKey.create(ModPerks.PERK_KEY, ResourceLocation.parse(this.descriptionId))
 
     open fun `is`(tag: TagKey<Perk>): Boolean {
-        return ModPerks.PERK_REGISTRY.getHolder(perkKey).map { it.`is`(tag) }.orElse(false)
+        return ModPerks.PERK_REGISTRY.getHolder(perkKey).map { it.`is`(tag) }.orElse(false)!!
     }
 
     enum class Type(val typeName: String, val color: ChatFormatting) {
