@@ -7,21 +7,14 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
-import net.neoforged.neoforge.registries.DeferredHolder
-import javax.annotation.ParametersAreNonnullByDefault
 
-open class PerkItem<T : Perk>(private val perkSupplier: DeferredHolder<Perk, T>) : Item(Properties()) {
-    val perk: Perk
-        get() = this.perkSupplier.get()
-
-    @ParametersAreNonnullByDefault
+open class PerkItem<T : Perk>(val perk: T) : Item(Properties()) {
     override fun appendHoverText(
         stack: ItemStack,
         context: TooltipContext,
         tooltipComponents: MutableList<Component>,
         tooltipFlag: TooltipFlag
     ) {
-        val perk = this.perk
         val chatFormatting = when (perk.type) {
             Perk.Type.AMMO -> ChatFormatting.YELLOW
             Perk.Type.FUNCTIONAL -> ChatFormatting.GREEN
@@ -39,6 +32,7 @@ open class PerkItem<T : Perk>(private val perkSupplier: DeferredHolder<Perk, T>)
                         .withStyle(chatFormatting)
                 )
         )
+
         if (perk is AmmoPerk) {
             if (perk.damageRate < 1) {
                 tooltipComponents.add(

@@ -172,7 +172,7 @@ object ModCapabilities {
                 { obj, _ ->
                     when {
                         obj is Player -> InvWrapper(obj.inventory)
-                        obj is VehicleEntity && obj.hasContainer() -> InvWrapper(obj)
+                        obj is VehicleEntity && obj.hasContainer() -> obj.inventory
                         else -> null
                     }
                 },

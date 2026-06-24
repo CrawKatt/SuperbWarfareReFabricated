@@ -144,6 +144,12 @@ dependencies {
 
     compileOnly("com.google.code.findbugs:jsr305:3.0.2")
     runtimeOnly("com.google.code.findbugs:jsr305:3.0.2")
+
+    compileOnly("com.maydaymemory:mae:1.1.2") {
+        exclude("com.google.code.findbugs", "jsr305")
+        exclude("it.unimi.dsi", "fastutil")
+        exclude("org.joml", "joml")
+    }
 }
 
 tasks.withType<ProcessResources> {

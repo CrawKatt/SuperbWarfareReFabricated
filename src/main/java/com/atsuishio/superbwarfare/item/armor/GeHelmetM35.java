@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.item.armor;
 
 import com.atsuishio.superbwarfare.client.renderer.armor.GeHelmetM35ArmorRenderer;
-import com.atsuishio.superbwarfare.init.ModArmorMaterials;
 import net.minecraft.world.item.Item;
 import software.bernie.geckolib.renderer.GeoArmorRenderer;
 

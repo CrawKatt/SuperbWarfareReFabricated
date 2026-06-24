@@ -1,16 +1,10 @@
 package com.atsuishio.superbwarfare.init
 
 import com.mojang.blaze3d.platform.InputConstants
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.minecraft.client.KeyMapping
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent
-import net.neoforged.neoforge.client.settings.KeyConflictContext
-import net.neoforged.neoforge.client.settings.KeyModifier
 import org.lwjgl.glfw.GLFW
 
-@EventBusSubscriber(Dist.CLIENT)
 object ModKeyMappings {
     const val CATEGORY = "key.categories.superbwarfare"
     private val KEYS = mutableListOf<KeyMapping>()
@@ -58,12 +52,12 @@ object ModKeyMappings {
     val BREATH = registerKey("breath", GLFW.GLFW_KEY_LEFT_CONTROL)
 
     @JvmField
-    val CONFIG = registerKey(
-        "config",
+    val CONFIG = KeyBindingHelper.registerKeyBinding(KeyMapping(
+        "key.superbwarfare.config",
+        InputConstants.Type.KEYSYM,
         GLFW.GLFW_KEY_O,
-        KeyConflictContext.IN_GAME,
-        KeyModifier.ALT
-    )
+        CATEGORY
+    ))
 
     @JvmField
     val EDIT_MODE = registerKey("edit_mode", GLFW.GLFW_KEY_H)
@@ -113,14 +107,10 @@ object ModKeyMappings {
     private fun registerKey(
         name: String,
         code: Int,
-        conflictContext: KeyConflictContext = KeyConflictContext.IN_GAME,
-        modifier: KeyModifier = KeyModifier.NONE,
         type: InputConstants.Type = InputConstants.Type.KEYSYM
     ): KeyMapping {
         val key = KeyMapping(
             "key.superbwarfare.$name",
-            conflictContext,
-            modifier,
             type,
             code,
             CATEGORY
@@ -129,8 +119,7 @@ object ModKeyMappings {
         return key
     }
 
-    @SubscribeEvent
-    fun registerKeyMappings(event: RegisterKeyMappingsEvent) {
-        KEYS.forEach { event.register(it) }
+    fun init() {
+        KEYS.forEach { KeyBindingHelper.registerKeyBinding(it) }
     }
 }

@@ -34,8 +34,12 @@ import com.atsuishio.superbwarfare.item.gun.special.TaserItem
 import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGun
 import com.atsuishio.superbwarfare.item.material.*
 import com.atsuishio.superbwarfare.item.misc.*
+import com.atsuishio.superbwarfare.item.misc.PerkItem
 import com.atsuishio.superbwarfare.item.projectile.*
+import com.atsuishio.superbwarfare.item.projectile.C4BombItem
 import com.atsuishio.superbwarfare.item.projectile.Blu43MineItem
+import com.atsuishio.superbwarfare.item.projectile.Ptkm1rItem
+import com.atsuishio.superbwarfare.item.projectile.Tm62Item
 import com.atsuishio.superbwarfare.item.weapon.*
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.tiers.ModItemTier
@@ -54,6 +58,11 @@ object ModItems {
     val VIRTUAL: Rarity by lazy { ModRarities.VIRTUAL }
 
     private val REGISTERED_ITEMS = mutableListOf<Item>()
+    val GUNS = mutableListOf<Item>()
+    val AMMO = mutableListOf<Item>()
+    val ITEMS = mutableListOf<Item>()
+    val BLOCKS = mutableListOf<Item>()
+    val PERKS = mutableListOf<Item>()
 
     private fun <T : Item> register(id: String, item: T): T {
         val registered = Registry.register(BuiltInRegistries.ITEM, Mod.loc(id), item)
@@ -65,7 +74,9 @@ object ModItems {
      * guns
      */
     private fun <T : GunItem> registerGun(id: String, gun: () -> T): T {
-        return register(id, gun())
+        val item = register(id, gun())
+        GUNS.add(item)
+        return item
     }
 
     // @formatter:off
@@ -122,7 +133,9 @@ object ModItems {
     private fun registerAmmo(id: String) = registerAmmo(id) { Item(Properties()) }
 
     private fun <T : Item> registerAmmo(id: String, ammo: () -> T): T {
-        return register(id, ammo())
+        val item = register(id, ammo())
+        AMMO.add(item)
+        return item
     }
 
     // @formatter:off
@@ -166,12 +179,9 @@ object ModItems {
     @JvmField val BLU_43_MINE = registerAmmo("blu_43_mine") { Blu43MineItem() }
     @JvmField val EDD = registerAmmo("edd") { EDDItem() }
     @JvmField val SMALL_ROCKET = registerAmmo("small_rocket") { Item(Properties().stacksTo(16)) }
-    @JvmField val MEDIUM_ROCKET_AP =
-        registerAmmo("medium_rocket_ap") { MediumRocketItem(500f, 6f, 100f, 0f, 0, MediumRocketEntity.Type.AP, 0) }
-    @JvmField val MEDIUM_ROCKET_HE =
-        registerAmmo("medium_rocket_he") { MediumRocketItem(200f, 12f, 200f, 0.2f, 40, MediumRocketEntity.Type.HE, 0) }
-    @JvmField val MEDIUM_ROCKET_CM =
-        registerAmmo("medium_rocket_cm") { MediumRocketItem(300f, 12f, 300f, 0f, 0, MediumRocketEntity.Type.CM, 20) }
+    @JvmField val MEDIUM_ROCKET_AP = registerAmmo("medium_rocket_ap") { MediumRocketItem(500f, 6f, 100f, 0f, 0, MediumRocketEntity.Type.AP, 0) }
+    @JvmField val MEDIUM_ROCKET_HE = registerAmmo("medium_rocket_he") { MediumRocketItem(200f, 12f, 200f, 0.2f, 40, MediumRocketEntity.Type.HE, 0) }
+    @JvmField val MEDIUM_ROCKET_CM = registerAmmo("medium_rocket_cm") { MediumRocketItem(300f, 12f, 300f, 0f, 0, MediumRocketEntity.Type.CM, 20) }
     @JvmField val MEDIUM_ANTI_AIR_MISSILE = registerAmmo("medium_anti_air_missile") { Item(Properties().stacksTo(4)) }
     @JvmField val MEDIUM_ANTI_GROUND_MISSILE = registerAmmo("medium_anti_ground_missile") { Item(Properties().stacksTo(4)) }
     @JvmField val LARGE_ANTI_GROUND_MISSILE = registerAmmo("large_anti_ground_missile") { Item(Properties().stacksTo(2)) }
@@ -186,7 +196,9 @@ object ModItems {
     private fun registerItem(id: String) = registerItem(id) { Item(Properties()) }
 
     private fun <T : Item> registerItem(id: String, item: () -> T): T {
-        return register(id, item())
+        val registered = register(id, item())
+        ITEMS.add(registered)
+        return registered
     }
 
     private fun registerBlueprint(id: String, rarity: Rarity) = registerItem(id) { BlueprintItem(rarity) }
@@ -384,7 +396,9 @@ object ModItems {
     }
 
     private fun registerBlock(id: String, block: () -> BlockItem): BlockItem {
-        return register(id, block())
+        val item = register(id, block())
+        BLOCKS.add(item)
+        return item
     }
 
     // @formatter:off
@@ -462,7 +476,9 @@ object ModItems {
      */
 
     private fun <T : Item> registerPerkItem(id: String, item: () -> T): T {
-        return register(id, item())
+        val registered = register(id, item())
+        PERKS.add(registered)
+        return registered
     }
 
     @JvmField

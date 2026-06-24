@@ -1,7 +1,8 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
 import com.atsuishio.superbwarfare.Mod
-import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
+import com.atsuishio.superbwarfare.Mod.queueServerWork
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
@@ -27,11 +28,10 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
-import net.neoforged.neoforge.items.ItemHandlerHelper
 import java.util.*
 
 open class ClaymoreEntity(type: EntityType<ClaymoreEntity>, level: Level) : Entity(type, level), OwnableEntity {
-    constructor(owner: LivingEntity?, level: Level) : this(ModEntities.CLAYMORE.get(), level) {
+    constructor(owner: LivingEntity?, level: Level) : this(ModEntities.CLAYMORE, level) {
         if (owner != null) {
             this.setOwnerUUID(owner.getUUID())
         }
@@ -63,7 +63,7 @@ open class ClaymoreEntity(type: EntityType<ClaymoreEntity>, level: Level) : Enti
         if (level is ServerLevel) {
             ParticleTool.sendParticle(
                 level,
-                ModParticleTypes.FIRE_STAR.get(),
+                ModParticleTypes.FIRE_STAR,
                 this.x,
                 this.y + 0.2,
                 this.z,
@@ -75,7 +75,7 @@ open class ClaymoreEntity(type: EntityType<ClaymoreEntity>, level: Level) : Enti
                 false
             )
         }
-        level.playSound(null, this.onPos, ModSounds.HIT.get(), SoundSource.PLAYERS, 1f, 1f)
+        level.playSound(null, this.onPos, ModSounds.HIT, SoundSource.PLAYERS, 1f, 1f)
         this.entityData.set(HEALTH, this.entityData.get(HEALTH) - amount)
 
         return super.hurt(source, amount)
@@ -143,7 +143,7 @@ open class ClaymoreEntity(type: EntityType<ClaymoreEntity>, level: Level) : Enti
             }
 
             if (!player.abilities.instabuild) {
-                ItemHandlerHelper.giveItemToPlayer(player, ItemStack(ModItems.CLAYMORE_MINE.get()))
+                ItemHandlerHelper.giveItemToPlayer(player, ItemStack(ModItems.CLAYMORE_MINE))
             }
         }
 
@@ -206,7 +206,7 @@ open class ClaymoreEntity(type: EntityType<ClaymoreEntity>, level: Level) : Enti
         var f = 0.98f
         if (this.onGround()) {
             val pos = this.blockPosBelowThatAffectsMyMovement
-            f = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98f
+            f = level.getBlockState(pos).block.friction * 0.98f
         }
 
         this.deltaMovement = this.deltaMovement.multiply(f.toDouble(), 0.98, f.toDouble())

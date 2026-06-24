@@ -1,122 +1,115 @@
 package com.atsuishio.superbwarfare.init
 
+import com.atsuishio.superbwarfare.Mod
+import fuzs.extensibleenums.api.v2.BuiltInEnumFactories
+import fuzs.extensibleenums.api.v2.core.EnumAppender
 import net.minecraft.ChatFormatting
+import net.minecraft.client.model.HumanoidModel
 import net.minecraft.client.model.HumanoidModel.ArmPose
-import net.minecraft.network.chat.Style
+import net.minecraft.network.chat.TextColor
 import net.minecraft.util.Mth
-import net.minecraft.world.entity.HumanoidArm
 import net.minecraft.world.item.Rarity
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.fml.common.asm.enumextension.EnumProxy
-import net.neoforged.neoforge.client.IArmPoseTransformer
-import java.util.function.UnaryOperator
 
 object ModEnumExtensions {
     @JvmField
-    val SUPERBWARFARE_LEGENDARY: EnumProxy<Rarity> = EnumProxy(
-        Rarity::class.java,
-        -1,
-        "superbwarfare:legendary",
+    val SUPERBWARFARE_LEGENDARY: Rarity = BuiltInEnumFactories.INSTANCE.createRarity(
+        Mod.loc("superbwarfare_legendary"),
         ChatFormatting.GOLD
     )
 
-    val legendary: Rarity
-        get() = SUPERBWARFARE_LEGENDARY.getValue()
-
     @JvmField
-    val SUPERBWARFARE_SUPERB: EnumProxy<Rarity> = EnumProxy(
-        Rarity::class.java,
-        -1,
-        "superbwarfare:superb",
+    val SUPERBWARFARE_SUPERB: Rarity = BuiltInEnumFactories.INSTANCE.createRarity(
+        Mod.loc("superbwarfare_superb"),
         ChatFormatting.RED
     )
 
-    val superb: Rarity
-        get() = SUPERBWARFARE_SUPERB.getValue()
-
     @JvmField
-    val SUPERBWARFARE_VIRTUAL: EnumProxy<Rarity> = EnumProxy(
-        Rarity::class.java,
-        -1,
-        "superbwarfare:virtual",
-        UnaryOperator { style: Style -> style.withColor(0xFF9AAF) }
+    val SUPERBWARFARE_VIRTUAL: Rarity = BuiltInEnumFactories.INSTANCE.createRarity(
+        Mod.loc("superbwarfare_virtual"),
+        ChatFormatting.WHITE // ToDo: Cambiar después
     )
 
-    val virtual: Rarity
-        get() = SUPERBWARFARE_VIRTUAL.getValue()
+    @JvmStatic
+    val legendary: Rarity get() = SUPERBWARFARE_LEGENDARY
 
-    @OnlyIn(Dist.CLIENT)
+    @JvmStatic
+    val superb: Rarity get() = SUPERBWARFARE_SUPERB
+
+    @JvmStatic
+    val virtual: Rarity get() = SUPERBWARFARE_VIRTUAL
+
     object Client {
         @JvmField
-        val SUPERBWARFARE_LUNGE_MINE_POSE: EnumProxy<ArmPose> = EnumProxy(
-            ArmPose::class.java,
-            false,
-            IArmPoseTransformer { model, _, arm ->
-                if (arm != HumanoidArm.LEFT) {
+        val SUPERBWARFARE_LUNGE_MINE_POSE: ArmPose = createArmPose("SUPERBWARFARE_LUNGE_MINE_POSE")
+
+        @JvmField
+        val SUPERBWARFARE_MINIGUN_POSE: ArmPose = createArmPose("SUPERBWARFARE_MINIGUN_POSE")
+
+        @JvmField
+        val SUPERBWARFARE_M2_POSE: ArmPose = createArmPose("SUPERBWARFARE_M2_POSE")
+
+        @JvmField
+        val SUPERBWARFARE_SUPER_STAR_SHOOTER_POSE: ArmPose = createArmPose("SUPERBWARFARE_SUPER_STAR_SHOOTER_POSE")
+
+        private fun createArmPose(name: String): ArmPose {
+            EnumAppender.create(ArmPose::class.java, Boolean::class.java)
+                .addEnumConstant(name, false)
+                .applyTo(HumanoidModel::class.java)
+            return ArmPose.valueOf(name)
+        }
+
+        @JvmStatic
+        val lungeMinePose: ArmPose get() = SUPERBWARFARE_LUNGE_MINE_POSE
+
+        @JvmStatic
+        val minigunPose: ArmPose get() = SUPERBWARFARE_MINIGUN_POSE
+
+        @JvmStatic
+        val m2Pose: ArmPose get() = SUPERBWARFARE_M2_POSE
+
+        @JvmStatic
+        val superStarShooterPose: ArmPose get() = SUPERBWARFARE_SUPER_STAR_SHOOTER_POSE
+
+        @JvmStatic
+        fun applyArmPose(model: HumanoidModel<*>) {
+            val pose = model.rightArmPose
+
+            when (pose) {
+                SUPERBWARFARE_LUNGE_MINE_POSE -> {
                     model.rightArm.xRot = 20f * Mth.DEG_TO_RAD + model.head.xRot
                     model.rightArm.yRot = -12f * Mth.DEG_TO_RAD
                     model.leftArm.xRot = -45f * Mth.DEG_TO_RAD + model.head.xRot
                     model.leftArm.yRot = 40f * Mth.DEG_TO_RAD
                 }
-            }
-        )
-
-        val lungeMinePose: ArmPose
-            get() = SUPERBWARFARE_LUNGE_MINE_POSE.getValue()
-
-        @JvmField
-        val SUPERBWARFARE_MINIGUN_POSE: EnumProxy<ArmPose> = EnumProxy(
-            ArmPose::class.java,
-            false,
-            IArmPoseTransformer { model, _, arm ->
-                if (arm != HumanoidArm.LEFT) {
+                SUPERBWARFARE_MINIGUN_POSE -> {
                     model.rightArm.xRot = 22.5f * Mth.DEG_TO_RAD + model.head.xRot
                     model.rightArm.yRot = model.head.yRot
                     model.leftArm.xRot = Mth.clamp(
                         -45f * Mth.DEG_TO_RAD + model.head.xRot,
                         -67.5f * Mth.DEG_TO_RAD,
-                        0f * Mth.DEG_TO_RAD
+                        0f
                     )
-                    model.leftArm.yRot =
-                        Mth.clamp(45f * Mth.DEG_TO_RAD + model.head.yRot, 45f * Mth.DEG_TO_RAD, 80f * Mth.DEG_TO_RAD)
+                    model.leftArm.yRot = Mth.clamp(
+                        45f * Mth.DEG_TO_RAD + model.head.yRot,
+                        45f * Mth.DEG_TO_RAD,
+                        80f * Mth.DEG_TO_RAD
+                    )
                 }
-            }
-        )
-
-        @JvmStatic
-        val minigunPose: ArmPose
-            get() = SUPERBWARFARE_MINIGUN_POSE.getValue()
-
-        @JvmField
-        val SUPERBWARFARE_M2_POSE: EnumProxy<ArmPose> = EnumProxy(
-            ArmPose::class.java,
-            false,
-            IArmPoseTransformer { model, _, arm ->
-                if (arm != HumanoidArm.LEFT) {
+                SUPERBWARFARE_M2_POSE -> {
                     model.rightArm.xRot = 45f * Mth.DEG_TO_RAD + model.head.xRot
                     model.rightArm.yRot = model.head.yRot
                     model.leftArm.xRot = Mth.clamp(
                         -45f * Mth.DEG_TO_RAD + model.head.xRot,
                         -67.5f * Mth.DEG_TO_RAD,
-                        0f * Mth.DEG_TO_RAD
+                        0f
                     )
-                    model.leftArm.yRot =
-                        Mth.clamp(45f * Mth.DEG_TO_RAD + model.head.yRot, 45f * Mth.DEG_TO_RAD, 80f * Mth.DEG_TO_RAD)
+                    model.leftArm.yRot = Mth.clamp(
+                        45f * Mth.DEG_TO_RAD + model.head.yRot,
+                        45f * Mth.DEG_TO_RAD,
+                        80f * Mth.DEG_TO_RAD
+                    )
                 }
-            }
-        )
-
-        @JvmStatic
-        val m2Pose: ArmPose
-            get() = SUPERBWARFARE_M2_POSE.getValue()
-
-        @JvmField
-        val SUPERBWARFARE_SUPER_STAR_SHOOTER_POSE: EnumProxy<ArmPose> = EnumProxy(
-            ArmPose::class.java,
-            false,
-            IArmPoseTransformer { model, _, arm ->
-                if (arm != HumanoidArm.LEFT) {
+                SUPERBWARFARE_SUPER_STAR_SHOOTER_POSE -> {
                     model.rightArm.xRot = -70f * Mth.DEG_TO_RAD + model.head.xRot
                     model.rightArm.yRot = 0f
                     model.rightArm.zRot = 0f
@@ -124,10 +117,9 @@ object ModEnumExtensions {
                     model.leftArm.yRot = 0f
                     model.leftArm.zRot = 0f
                 }
-            }
-        )
 
-        val superStarShooterPose: ArmPose
-            get() = SUPERBWARFARE_SUPER_STAR_SHOOTER_POSE.getValue()
+                else -> {}
+            }
+        }
     }
 }

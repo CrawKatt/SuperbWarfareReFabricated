@@ -15,14 +15,14 @@ import javax.annotation.ParametersAreNonnullByDefault
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-class ChargingStationBlockItem : BlockItem(ModBlocks.CHARGING_STATION.get(), Properties().stacksTo(1)) {
+class ChargingStationBlockItem : BlockItem(ModBlocks.CHARGING_STATION, Properties().stacksTo(1)) {
     override fun isBarVisible(stack: ItemStack): Boolean {
-        val energy = stack.getOrDefault(ModDataComponents.ENERGY.get(), 0)
+        val energy = stack.getOrDefault(ModDataComponents.ENERGY, 0)
         return energy != MiscConfig.CHARGING_STATION_MAX_ENERGY.get() && energy != 0
     }
 
     override fun getBarWidth(stack: ItemStack): Int {
-        val energy = stack.getOrDefault(ModDataComponents.ENERGY.get(), 0)
+        val energy = stack.getOrDefault(ModDataComponents.ENERGY, 0)
         return (energy * 13f / max(1, MiscConfig.CHARGING_STATION_MAX_ENERGY.get())).roundToInt()
     }
 

@@ -1,28 +1,24 @@
 package com.atsuishio.superbwarfare.capability.living
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
-import com.atsuishio.superbwarfare.init.ModAttachments
+import com.atsuishio.superbwarfare.init.ModComponents
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.LivingEntity
-import net.neoforged.neoforge.common.util.INBTSerializable
-import javax.annotation.ParametersAreNonnullByDefault
+import org.ladysnake.cca.api.v3.component.Component
 
-class PhosphorusFireCapability : INBTSerializable<CompoundTag> {
+class PhosphorusFireCapability : Component {
     var isOnFire: Boolean = false
 
-    override fun serializeNBT(provider: HolderLookup.Provider): CompoundTag {
-        val tag = CompoundTag()
-        tag.putBoolean(TAG_PHOSPHORUS_FIRE, this.isOnFire)
-        return tag
+    override fun readFromNbt(tag: CompoundTag, registryLookup: HolderLookup.Provider) {
+        if (tag.contains(TAG_PHOSPHORUS_FIRE)) {
+            this.isOnFire = tag.getBoolean(TAG_PHOSPHORUS_FIRE)
+        }
     }
 
-    @ParametersAreNonnullByDefault
-    override fun deserializeNBT(provider: HolderLookup.Provider, nbt: CompoundTag) {
-        if (nbt.contains(TAG_PHOSPHORUS_FIRE)) {
-            this.isOnFire = nbt.getBoolean(TAG_PHOSPHORUS_FIRE)
-        }
+    override fun writeToNbt(tag: CompoundTag, registryLookup: HolderLookup.Provider) {
+        tag.putBoolean(TAG_PHOSPHORUS_FIRE, this.isOnFire)
     }
 
     companion object {
@@ -31,7 +27,7 @@ class PhosphorusFireCapability : INBTSerializable<CompoundTag> {
 
         @JvmStatic
         fun of(living: LivingEntity): PhosphorusFireCapability {
-            return living.getData(ModAttachments.PHOSPHORUS_FIRE)
+            return ModComponents.PHOSPHORUS_FIRE.get(living)
         }
     }
 }

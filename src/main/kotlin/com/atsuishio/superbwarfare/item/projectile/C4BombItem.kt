@@ -21,7 +21,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
-import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.DispenserBlock
 import net.minecraft.world.phys.Vec3
@@ -50,7 +49,7 @@ open class C4BombItem : Item(Properties()), DispenserLaunchable {
         }
 
         if (player is ServerPlayer) {
-            player.level().playSound(null, player.onPos, ModSounds.C4_THROW.get(), SoundSource.PLAYERS, 1f, 1f)
+            player.level().playSound(null, player.onPos, ModSounds.C4_THROW, SoundSource.PLAYERS, 1f, 1f)
         }
 
         player.cooldowns.addCooldown(this, 20)
@@ -87,7 +86,7 @@ open class C4BombItem : Item(Properties()), DispenserLaunchable {
                 val position = DispenserBlock.getDispensePosition(pSource)
                 val direction = pSource.state().getValue(DispenserBlock.FACING)
 
-                val entity = C4Entity(ModEntities.C4.get(), level)
+                val entity = C4Entity(ModEntities.C4, level)
                 entity.setPos(position.x(), position.y(), position.z())
 
                 val pX = direction.stepX
@@ -108,15 +107,17 @@ open class C4BombItem : Item(Properties()), DispenserLaunchable {
         }
     }
 
+    /*
     override fun getBurnTime(itemStack: ItemStack, recipeType: RecipeType<*>?): Int {
         return 20000
     }
+    */
 
     companion object {
         const val TAG_CONTROL: String = "Control"
 
         fun makeInstance(): ItemStack {
-            val stack = ItemStack(ModItems.C4_BOMB.get())
+            val stack = ItemStack(ModItems.C4_BOMB)
             val tag = NBTTool.getTag(stack)
             tag.putBoolean(TAG_CONTROL, true)
             NBTTool.saveTag(stack, tag)

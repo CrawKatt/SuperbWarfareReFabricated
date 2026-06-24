@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.init
 
+import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.api.event.RegisterContainersEvent
 import com.atsuishio.superbwarfare.item.container.LuckyContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
@@ -7,188 +8,170 @@ import com.atsuishio.superbwarfare.item.material.BatteryItem
 import com.atsuishio.superbwarfare.item.misc.ArmorPlateItem
 import com.atsuishio.superbwarfare.item.projectile.C4BombItem
 import com.atsuishio.superbwarfare.item.weapon.ElectricBatonItem
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.minecraft.core.HolderLookup
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.world.flag.FeatureFlagSet
 import net.minecraft.world.item.CreativeModeTab
-import net.minecraft.world.item.CreativeModeTab.*
 import net.minecraft.world.item.CreativeModeTabs
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.alchemy.Potion
 import net.minecraft.world.item.alchemy.PotionContents
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.capabilities.Capabilities
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent
-import net.neoforged.neoforge.registries.DeferredHolder
-import net.neoforged.neoforge.registries.DeferredRegister
-import java.util.function.Supplier
+import team.reborn.energy.api.EnergyStorage
 
-@EventBusSubscriber
 @Suppress("unused")
 object ModTabs {
 
     @JvmField
-    val TABS: DeferredRegister<CreativeModeTab> =
-        DeferredRegister.create(Registries.CREATIVE_MODE_TAB, com.atsuishio.superbwarfare.Mod.MODID)
-
-    @JvmStatic
-    val GUN_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = TABS.register(
+    val GUN_TAB: CreativeModeTab = register(
         "guns",
-        Supplier {
-            builder()
-                .title(Component.translatable("item_group.superbwarfare.guns"))
-                .icon { ItemStack(ModItems.TASER.get()) }
-                .displayItems { param, output ->
-                    ModItems.GUNS.getEntries().forEach { registryObject ->
-                        if (registryObject === ModItems.VEHICLE_GUN) return@forEach
+        FabricItemGroup.builder()
+            .title(Component.translatable("item_group.superbwarfare.guns"))
+            .icon { ItemStack(ModItems.TASER) }
+            .displayItems { _, output ->
+                ModItems.GUNS.forEach { item ->
+                    if (item === ModItems.VEHICLE_GUN) return@forEach
 
-                        // 普通枪械
-                        val stack = ItemStack(registryObject.get())
-                        output.accept(stack)
+                    output.accept(ItemStack(item))
 
-                        // 充电后枪械
-                        val newStack = stack.copy()
-                        val cap = newStack.getCapability(Capabilities.EnergyStorage.ITEM)
-                        if (cap != null && cap.maxEnergyStored > 0) {
-                            cap.receiveEnergy(Int.MAX_VALUE, false)
-                            output.accept(newStack)
+                    val charged = ItemStack(item)
+                    val storage = EnergyStorage.ITEM.find(charged, null)
+                    if (storage != null && storage.capacity > 0) {
+                        Transaction.openOuter().use { t ->
+                            storage.insert(Long.MAX_VALUE, t)
                         }
+                        output.accept(charged)
                     }
                 }
-                .build()
-        })
+            }
+            .build()
+    )
 
-    @JvmStatic
-    val PERK_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = TABS.register(
+    @JvmField
+    val PERK_TAB: CreativeModeTab = register(
         "perk",
-        Supplier {
-            builder()
-                .title(Component.translatable("item_group.superbwarfare.perk"))
-                .icon { ItemStack(ModItems.AP_BULLET!!.get()) }
-                .withTabsBefore(GUN_TAB.getKey())
-                .displayItems { param, output ->
-                    output.accept(ModItems.REFORGING_TABLE.get())
+        FabricItemGroup.builder()
+            .title(Component.translatable("item_group.superbwarfare.perk"))
+            .icon { ItemStack(ModItems.AP_BULLET) }
+            .displayItems { _, output ->
+                output.accept(ModItems.REFORGING_TABLE)
+                ModItems.PERK_ITEMS.values.forEach(output::accept)
+            }
+            .build()
+    )
 
-                    ModItems.PERKS.getEntries().forEach { registryObject ->
-                        output.accept(registryObject.get())
-                    }
-                }
-                .build()
-        })
-
-    @JvmStatic
-    val AMMO_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = TABS.register(
+    @JvmField
+    val AMMO_TAB: CreativeModeTab = register(
         "ammo",
-        Supplier {
-            builder()
-                .title(Component.translatable("item_group.superbwarfare.ammo"))
-                .icon { ItemStack(ModItems.SHOTGUN_AMMO_BOX.get()) }
-                .withTabsBefore(PERK_TAB.getKey())
-                .displayItems { param, output ->
-                    ModItems.AMMO.getEntries().forEach { registryObject ->
-                        if (registryObject.get() !== ModItems.POTION_MORTAR_SHELL.get()) {
-                            output.accept(registryObject.get())
-
-                            if (registryObject.get() === ModItems.C4_BOMB.get()) {
-                                output.accept(C4BombItem.makeInstance())
-                            }
-                        }
-                    }
-
-                    param.holders().lookup(Registries.POTION).ifPresent { potion ->
-                        generatePotionEffectTypes(
-                            output, potion, ModItems.POTION_MORTAR_SHELL.get(),
-                            TabVisibility.PARENT_AND_SEARCH_TABS,
-                            param.enabledFeatures()
-                        )
-                    }
-                }
-                .build()
-        })
-
-    @JvmStatic
-    val ITEM_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = TABS.register("item", Supplier {
-        builder()
-            .title(Component.translatable("item_group.superbwarfare.item"))
-            .icon { ItemStack(ModItems.TARGET_DEPLOYER.get()) }
-            .withTabsBefore(AMMO_TAB.getKey())
+        FabricItemGroup.builder()
+            .title(Component.translatable("item_group.superbwarfare.ammo"))
+            .icon { ItemStack(ModItems.SHOTGUN_AMMO_BOX) }
             .displayItems { param, output ->
-                ModItems.ITEMS.getEntries().forEach { registryObject ->
-                    val item = registryObject.get()
+                ModItems.AMMO.forEach { item ->
+                    if (item === ModItems.POTION_MORTAR_SHELL) return@forEach
+
                     output.accept(item)
 
-                    if (item === ModItems.ARMOR_PLATE.get()) {
+                    if (item === ModItems.C4_BOMB) {
+                        output.accept(C4BombItem.makeInstance())
+                    }
+                }
+
+                param.holders().lookup(Registries.POTION).ifPresent { potion ->
+                    generatePotionEffectTypes(
+                        output, potion, ModItems.POTION_MORTAR_SHELL,
+                        CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS,
+                        param.enabledFeatures()
+                    )
+                }
+            }
+            .build()
+    )
+
+    @JvmField
+    val ITEM_TAB: CreativeModeTab = register(
+        "item",
+        FabricItemGroup.builder()
+            .title(Component.translatable("item_group.superbwarfare.item"))
+            .icon { ItemStack(ModItems.TARGET_DEPLOYER) }
+            .displayItems { _, output ->
+                ModItems.ITEMS.forEach { item ->
+                    output.accept(item)
+
+                    if (item === ModItems.ARMOR_PLATE) {
                         output.accept(ArmorPlateItem.getInfiniteInstance())
                     }
                     if (item is BatteryItem) {
                         output.accept(item.makeFullEnergyStack())
                     }
-                    if (item === ModItems.ELECTRIC_BATON.get()) {
+                    if (item === ModItems.ELECTRIC_BATON) {
                         output.accept(ElectricBatonItem.makeFullEnergyStack())
                     }
                 }
             }
             .build()
-    })
+    )
 
-    @JvmStatic
-    val BLOCK_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = TABS.register(
+    @JvmField
+    val BLOCK_TAB: CreativeModeTab = register(
         "block",
-        Supplier {
-            builder()
-                .title(Component.translatable("item_group.superbwarfare.block"))
-                .icon { ItemStack(ModItems.SANDBAG.get()) }
-                .withTabsBefore(ITEM_TAB.getKey())
-                .displayItems { param, output ->
-                    ModItems.BLOCKS.getEntries().forEach { output.accept(it.get()) }
-                }
-                .build()
-        })
+        FabricItemGroup.builder()
+            .title(Component.translatable("item_group.superbwarfare.block"))
+            .icon { ItemStack(ModItems.SANDBAG) }
+            .displayItems { _, output ->
+                ModItems.BLOCKS.forEach { output.accept(it) }
+            }
+            .build()
+    )
+
+    @JvmField
+    val VEHICLE_TAB: CreativeModeTab = register(
+        "vehicle",
+        FabricItemGroup.builder()
+            .title(Component.translatable("item_group.superbwarfare.vehicle"))
+            .icon { ItemStack(ModItems.CONTAINER) }
+            .displayItems { _, output ->
+                output.accept(ModItems.CROWBAR)
+                output.accept(ModItems.VEHICLE_ASSEMBLING_TABLE)
+
+                RegisterContainersEvent.CONTAINERS.forEach { output.accept(it) }
+
+                output.accept(ModItems.LUCKY_CONTAINER)
+                LuckyContainerBlockItem.LUCKY_CONTAINERS.stream()
+                    .map { it() }
+                    .forEach { output.accept(it) }
+
+                output.accept(ModItems.SMALL_CONTAINER)
+                SmallContainerBlockItem.SMALL_CONTAINERS.stream()
+                    .map { it() }
+                    .forEach { output.accept(it) }
+            }
+            .build()
+    )
 
     @JvmStatic
-    val VEHICLE_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = TABS.register(
-        "vehicle",
-        Supplier {
-            builder()
-                .title(Component.translatable("item_group.superbwarfare.vehicle"))
-                .icon { ItemStack(ModItems.CONTAINER.get()) }
-                .withTabsBefore(BLOCK_TAB.getKey())
-                .displayItems { param, output ->
-                    output.accept(ModItems.CROWBAR.get())
-                    output.accept(ModItems.VEHICLE_ASSEMBLING_TABLE.get())
-
-                    RegisterContainersEvent.CONTAINERS.forEach { output.accept(it) }
-
-                    output.accept(ModItems.LUCKY_CONTAINER.get())
-                    LuckyContainerBlockItem.LUCKY_CONTAINERS.stream()
-                        .map { it() }
-                        .forEach { output.accept(it) }
-
-                    output.accept(ModItems.SMALL_CONTAINER.get())
-                    SmallContainerBlockItem.SMALL_CONTAINERS.stream()
-                        .map { it() }
-                        .forEach { output.accept(it) }
-                }
-                .build()
-        })
-
-
-    @SubscribeEvent
-    fun buildTabContentsVanilla(tabData: BuildCreativeModeTabContentsEvent) {
-        if (tabData.tabKey === CreativeModeTabs.SPAWN_EGGS) {
-            tabData.accept(ModItems.SENPAI_SPAWN_EGG.get())
-            tabData.accept(ModItems.STEEL_COIL_SPAWN_EGG.get())
+    fun init() {
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register { entries ->
+            entries.accept(ModItems.SENPAI_SPAWN_EGG)
+            entries.accept(ModItems.STEEL_COIL_SPAWN_EGG)
         }
     }
 
+    private fun register(name: String, tab: CreativeModeTab): CreativeModeTab {
+        return Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Mod.loc(name), tab)
+    }
+
     private fun generatePotionEffectTypes(
-        output: Output,
+        output: CreativeModeTab.Output,
         potions: HolderLookup<Potion>,
         item: Item,
-        visibility: TabVisibility,
+        visibility: CreativeModeTab.TabVisibility,
         requiredFeatures: FeatureFlagSet
     ) {
         potions.listElements()

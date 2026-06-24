@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.tiers
 
-import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.loc
 import com.atsuishio.superbwarfare.init.ModItems
 import net.minecraft.core.Registry
@@ -18,7 +17,7 @@ object ModArmorMaterial {
     ): ArmorMaterial {
         return Registry.register(
             BuiltInRegistries.ARMOR_MATERIAL,
-            Mod.loc(id),
+            loc(id),
             material()
         )
     }
