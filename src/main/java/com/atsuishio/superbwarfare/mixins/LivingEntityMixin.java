@@ -6,8 +6,12 @@ import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
+import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -129,5 +133,45 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
     @Override
     public Stack<DamageContainer> superbwarfare$getDamageContainers() {
         return this.damageContainers;
+    }
+
+    @Inject(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z", at = @At("TAIL"))
+    private void superbwarfare$onAddEffect(
+            MobEffectInstance effectInstance,
+            @Nullable Entity source,
+            CallbackInfoReturnable<Boolean> cir
+    ) {
+        if (!cir.getReturnValue()) return;
+
+        BurnMobEffect.onBurnAdded(
+                (LivingEntity) (Object) this,
+                effectInstance,
+                source
+        );
+    }
+
+    @Inject(method = "removeEffect", at = @At("HEAD"))
+    private void superbwarfare$onRemoveEffect(
+            Holder<MobEffect> effect,
+            CallbackInfoReturnable<Boolean> cir
+    ) {
+        LivingEntity self = (LivingEntity) (Object) this;
+        BurnMobEffect.onBurnRemoved(self, self.getEffect(effect));
+    }
+
+    @Inject(method = "onEffectRemoved", at = @At("HEAD"))
+    private void superbwarfare$onEffectRemoved(
+            MobEffectInstance effectInstance,
+            CallbackInfo ci
+    ) {
+        BurnMobEffect.onBurnRemoved(
+                (LivingEntity) (Object) this,
+                effectInstance
+        );
+    }
+
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void superbwarfare$burnTick(CallbackInfo ci) {
+        BurnMobEffect.onLivingTick((LivingEntity) (Object) this);
     }
 }

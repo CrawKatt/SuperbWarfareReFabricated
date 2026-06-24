@@ -3,35 +3,24 @@ package com.atsuishio.superbwarfare.mobeffect
 import com.atsuishio.superbwarfare.init.ModMobEffects
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.event.entity.living.LivingHealEvent
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent
+import net.minecraft.world.entity.LivingEntity
 
-@EventBusSubscriber
-object TraumaMobEffect : MobEffect(MobEffectCategory.HARMFUL, 0xF4ADB4) {
-    @SubscribeEvent
-    fun onLivingHeal(event: LivingHealEvent) {
-        val entity = event.entity
-        val effect = entity.getEffect(ModMobEffects.TRAUMA) ?: return
+open class TraumaMobEffect : MobEffect(MobEffectCategory.HARMFUL, 0xF4ADB4) {
 
-        val amp = effect.amplifier + 1
-        if (amp >= 10) {
-            event.isCanceled = true
-            return
+    companion object {
+        @JvmStatic
+        fun modifyHeal(entity: LivingEntity, amount: Float): Float {
+            val effect = entity.getEffect(ModMobEffects.TRAUMA) ?: return amount
+            val amp = effect.amplifier + 1
+            if (amp >= 10) return 0f
+            return amount * (1 - amp * 0.1f)
         }
 
-        val amount = event.amount
-        event.amount = amount * (1 - amp * 0.1f)
-    }
-
-    @SubscribeEvent
-    fun onLivingHurt(event: LivingIncomingDamageEvent) {
-        val entity = event.entity
-        val effect = entity.getEffect(ModMobEffects.TRAUMA) ?: return
-
-        val amp = effect.amplifier + 1
-        val amount = event.amount
-        event.amount = amount * (1 + amp * 0.15f)
+        @JvmStatic
+        fun modifyIncomingDamage(entity: LivingEntity, amount: Float): Float {
+            val effect = entity.getEffect(ModMobEffects.TRAUMA) ?: return amount
+            val amp = effect.amplifier + 1
+            return amount * (1 + amp * 0.15f)
+        }
     }
 }
