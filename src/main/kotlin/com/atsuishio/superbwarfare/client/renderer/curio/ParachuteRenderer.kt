@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.client.renderer.curio
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.model.curio.ParachuteModel
-import com.atsuishio.superbwarfare.item.curio.ParachuteItem
+import com.atsuishio.superbwarfare.item.trinket.ParachuteItem
 import com.atsuishio.superbwarfare.tools.getOrCreateTag
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.mc
@@ -68,7 +68,7 @@ class ParachuteRenderer : ICurioRenderer {
     @EventBusSubscriber(Dist.CLIENT)
     companion object {
         private var parachuteModel: ParachuteModel? = null
-        private val TEXTURE = loc("textures/curio/parachute.png")
+        private val TEXTURE = loc("textures/trinket/parachute.png")
 
         @SubscribeEvent
         fun onRenderLevelStage(event: RenderLevelStageEvent) {

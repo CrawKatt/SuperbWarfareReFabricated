@@ -1,43 +1,44 @@
-package com.atsuishio.superbwarfare.item.curio
+package com.atsuishio.superbwarfare.item.trinket
 
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.tools.NBTTool
+import dev.emi.trinkets.api.SlotReference
+import dev.emi.trinkets.api.TrinketItem
+import dev.emi.trinkets.api.TrinketsApi
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.phys.Vec3
-import top.theillusivec4.curios.api.CuriosApi
-import top.theillusivec4.curios.api.SlotContext
-import top.theillusivec4.curios.api.type.capability.ICurioItem
 
-class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), ICurioItem {
-    override fun isValidRepairItem(pStack: ItemStack, pRepairCandidate: ItemStack): Boolean {
-        return pRepairCandidate.`is`(Items.PHANTOM_MEMBRANE)
+class ParachuteItem : TrinketItem(Properties().stacksTo(1).durability(600)) {
+    override fun isValidRepairItem(stack: ItemStack, repairCandidate: ItemStack): Boolean {
+        return repairCandidate.`is`(Items.PHANTOM_MEMBRANE)
     }
 
-    override fun canEquip(slotContext: SlotContext, stack: ItemStack?): Boolean {
-        return CuriosApi.getCuriosInventory(slotContext.entity)
-            .map { it.findFirstCurio(this).isEmpty }
-            .orElse(false)
+    override fun canEquip(stack: ItemStack, slot: SlotReference, entity: LivingEntity): Boolean {
+        return TrinketsApi.getTrinketComponent(entity)
+            .map { component -> !component.isEquipped(this) }
+            .orElse(false)!!
     }
 
-    override fun curioTick(slotContext: SlotContext, stack: ItemStack) {
-        val entity = slotContext.entity()
+    override fun tick(stack: ItemStack, slot: SlotReference, entity: LivingEntity) {
         val tag = NBTTool.getTag(stack)
+
         if (entity !is Player) {
             if (!tag.getBoolean(TAG_OPEN) && entity.deltaMovement.y < -0.6 && entity.fallDistance > 4) {
                 tag.putBoolean(TAG_OPEN, true)
+
                 entity.level().playSound(
                     null,
                     entity.x,
                     entity.y,
                     entity.z,
-                    ModSounds.PARACHUTE_OPEN.get(),
+                    ModSounds.PARACHUTE_OPEN,
                     SoundSource.PLAYERS,
                     1f,
                     1f
@@ -47,29 +48,38 @@ class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), ICurioItem
 
         if (tag.getBoolean(TAG_OPEN)) {
             val level = entity.level()
-            if ((entity.onGround() || entity.isInWater) || entity.isFallFlying || entity.vehicle != null || (entity is Player && entity.abilities.flying)) {
+
+            if (
+                entity.onGround() ||
+                entity.isInWater ||
+                entity.isFallFlying ||
+                entity.vehicle != null ||
+                entity is Player && entity.abilities.flying
+            ) {
                 tag.putBoolean(TAG_OPEN, false)
                 NBTTool.saveTag(stack, tag)
+
                 level.playSound(
                     null,
                     entity.x,
                     entity.y,
                     entity.z,
-                    ModSounds.PARACHUTE_CLOSE.get(),
+                    ModSounds.PARACHUTE_CLOSE,
                     SoundSource.PLAYERS,
                     1f,
                     1f
                 )
             }
+
             if (entity is Player) {
-                if (entity.level().isClientSide) {
+                if (level.isClientSide) {
                     entity.addDeltaMovement(
                         Vec3(entity.lookAngle.x, 0.0, entity.lookAngle.z).normalize().scale(0.05)
                     )
                     entity.deltaMovement = entity.deltaMovement.multiply(1.03, 0.75, 1.03)
                 }
             } else {
-                if (!entity.level().isClientSide) {
+                if (!level.isClientSide) {
                     entity.addDeltaMovement(
                         Vec3(entity.lookAngle.x, 0.0, entity.lookAngle.z).normalize().scale(0.05)
                     )
@@ -78,8 +88,9 @@ class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), ICurioItem
             }
 
             if (entity.tickCount % 40 == 0 && level is ServerLevel) {
-                stack.hurtAndBreak(1, level, entity) { }
+                stack.hurtAndBreak(1, level, entity as ServerPlayer?) { }
             }
+
             entity.resetFallDistance()
         }
     }
@@ -89,16 +100,27 @@ class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), ICurioItem
 
         @JvmStatic
         fun isParachuteOpen(entity: LivingEntity?): Boolean {
-            return CuriosApi.getCuriosInventory(entity).map {
-                it.findFirstCurio(ModItems.PARACHUTE.get())
-                    .map { c -> NBTTool.getTag(c.stack).getBoolean(TAG_OPEN) }.orElse(false)
-            }.orElse(false)
+            if (entity == null) return false
+
+            return TrinketsApi.getTrinketComponent(entity)
+                .map { component ->
+                    component.getEquipped(ModItems.PARACHUTE)
+                        .any { pair ->
+                            NBTTool.getTag(pair.b).getBoolean(TAG_OPEN)
+                        }
+                }
+                .orElse(false)!!
         }
 
+        @JvmStatic
         fun isParachuteVisible(entity: LivingEntity?): Boolean {
-            return CuriosApi.getCuriosInventory(entity).map {
-                it.findFirstCurio(ModItems.PARACHUTE.get()).map { c -> c.slotContext().visible() }.orElse(false)
-            }.orElse(false)
+            if (entity == null) return false
+
+            return TrinketsApi.getTrinketComponent(entity)
+                .map { component ->
+                    component.isEquipped(ModItems.PARACHUTE)
+                }
+                .orElse(false)!!
         }
     }
 }

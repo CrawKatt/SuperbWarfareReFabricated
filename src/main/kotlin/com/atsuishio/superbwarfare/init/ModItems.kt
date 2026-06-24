@@ -13,10 +13,10 @@ import com.atsuishio.superbwarfare.item.blockitem.VehicleAssemblingTableBlockIte
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.LuckyContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
-import com.atsuishio.superbwarfare.item.curio.DogTagItem
-import com.atsuishio.superbwarfare.item.curio.IffItem
-import com.atsuishio.superbwarfare.item.curio.ParachuteItem
-import com.atsuishio.superbwarfare.item.curio.ThermalImagingGogglesItem
+import com.atsuishio.superbwarfare.item.trinket.DogTagItem
+import com.atsuishio.superbwarfare.item.trinket.IffItem
+import com.atsuishio.superbwarfare.item.trinket.ParachuteItem
+import com.atsuishio.superbwarfare.item.trinket.ThermalImagingGogglesItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.item.gun.handgun.*
 import com.atsuishio.superbwarfare.item.gun.launcher.*

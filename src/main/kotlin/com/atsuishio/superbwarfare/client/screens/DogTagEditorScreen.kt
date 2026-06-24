@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.client.screens
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.init.ModDataComponents
-import com.atsuishio.superbwarfare.item.curio.DogTagItem.Companion.getColors
+import com.atsuishio.superbwarfare.item.trinket.DogTagItem.Companion.getColors
 import com.atsuishio.superbwarfare.network.message.send.DogTagFinishEditMessage
 import com.atsuishio.superbwarfare.tools.hasCustomHoverName
 import com.atsuishio.superbwarfare.tools.localPlayer

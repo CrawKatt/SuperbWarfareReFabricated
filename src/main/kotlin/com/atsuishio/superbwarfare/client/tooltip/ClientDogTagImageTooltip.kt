@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.client.tooltip
 
 import com.atsuishio.superbwarfare.client.screens.DogTagEditorScreen
 import com.atsuishio.superbwarfare.client.tooltip.component.DogTagImageComponent
-import com.atsuishio.superbwarfare.item.curio.DogTagItem.Companion.getColors
+import com.atsuishio.superbwarfare.item.trinket.DogTagItem.Companion.getColors
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent

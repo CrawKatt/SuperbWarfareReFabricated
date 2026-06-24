@@ -41,7 +41,7 @@ import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.inventory.handler.VehicleContainerHandler
 import com.atsuishio.superbwarfare.inventory.menu.*
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
-import com.atsuishio.superbwarfare.item.curio.DogTagItem
+import com.atsuishio.superbwarfare.item.trinket.DogTagItem
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
 import com.atsuishio.superbwarfare.network.message.receive.ClientVehicleItemMessage
 import com.atsuishio.superbwarfare.network.message.receive.EntitySyncMessage

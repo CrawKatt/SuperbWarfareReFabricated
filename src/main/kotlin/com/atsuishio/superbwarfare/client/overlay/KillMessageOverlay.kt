@@ -11,7 +11,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.KillMessageHandler
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModItems
-import com.atsuishio.superbwarfare.item.curio.DogTagItem
+import com.atsuishio.superbwarfare.item.trinket.DogTagItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.tools.DamageTypeTool
 import com.atsuishio.superbwarfare.tools.LivingKillRecord

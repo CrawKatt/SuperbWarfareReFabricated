@@ -1,4 +1,4 @@
-package com.atsuishio.superbwarfare.item.curio
+package com.atsuishio.superbwarfare.item.trinket
 
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects

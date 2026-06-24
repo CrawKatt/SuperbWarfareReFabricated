@@ -49,6 +49,6 @@ class ThermalImagingGogglesRenderer : ICurioRenderer {
     }
 
     companion object {
-        private val TEXTURE = loc("textures/curio/thermal_imaging_goggles.png")
+        private val TEXTURE = loc("textures/trinket/thermal_imaging_goggles.png")
     }
 }
