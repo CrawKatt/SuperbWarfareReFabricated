@@ -12,8 +12,6 @@ import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import org.joml.Quaterniond
 import org.joml.Vector3d
 import org.joml.Vector3f
@@ -22,7 +20,6 @@ import org.joml.Vector4d
 import java.lang.Math
 import kotlin.math.acos
 import kotlin.math.sqrt
-
 
 operator fun Vec3.plus(other: Vec3): Vec3 = add(other)
 operator fun Vec3.minus(other: Vec3): Vec3 = subtract(other)
@@ -41,7 +38,6 @@ fun Vec3.toBlockPos() = BlockPos(x.toInt(), y.toInt(), z.toInt())
  *
  * https://github.com/LukenSkyne/Minecraft-Ping-Wheel/blob/138295954dab9d2451ad19e16d8d413ef018a2d8/common/src/main/java/nx/pingwheel/common/helper/MathUtils.java#L15>
  */
-@OnlyIn(Dist.CLIENT)
 fun Vec3.worldToScreen(): Vec3 {
     val window = mc.window
     val camera = mc.gameRenderer.mainCamera
@@ -62,7 +58,6 @@ fun Vec3.worldToScreen(): Vec3 {
     )
 }
 
-@OnlyIn(Dist.CLIENT)
 @JvmName("canSee")
 fun Vec3.canBeSeen(): Boolean {
     val camera = mc.gameRenderer.mainCamera

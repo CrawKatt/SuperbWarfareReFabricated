@@ -23,12 +23,12 @@ class VehicleResetRecipe(pCategory: CraftingBookCategory) : CustomRecipe(pCatego
         for (i in 0..<input.size()) {
             val stack = input.getItem(i)
             if (!stack.isEmpty) {
-                if (stack.`is`(ModItems.VEHICLE_RESET_KIT.get())) {
+                if (stack.`is`(ModItems.VEHICLE_RESET_KIT)) {
                     if (!kit.isEmpty) {
                         return false
                     }
                     kit = stack
-                } else if (stack.`is`(ModItems.CONTAINER.get())) {
+                } else if (stack.`is`(ModItems.CONTAINER)) {
                     if (!container.isEmpty) {
                         return false
                     }
@@ -47,12 +47,12 @@ class VehicleResetRecipe(pCategory: CraftingBookCategory) : CustomRecipe(pCatego
         for (i in 0..<input.size()) {
             val stack = input.getItem(i)
             if (!stack.isEmpty) {
-                if (stack.`is`(ModItems.VEHICLE_RESET_KIT.get())) {
+                if (stack.`is`(ModItems.VEHICLE_RESET_KIT)) {
                     if (!kit.isEmpty) {
                         return ItemStack.EMPTY
                     }
                     kit = stack.copy()
-                } else if (stack.`is`(ModItems.CONTAINER.get())) {
+                } else if (stack.`is`(ModItems.CONTAINER)) {
                     if (!container.isEmpty) {
                         return ItemStack.EMPTY
                     }
@@ -80,6 +80,6 @@ class VehicleResetRecipe(pCategory: CraftingBookCategory) : CustomRecipe(pCatego
     }
 
     override fun getSerializer(): RecipeSerializer<*> {
-        return ModRecipes.VEHICLE_RESET_SERIALIZER.get()
+        return ModRecipes.VEHICLE_RESET_SERIALIZER
     }
 }

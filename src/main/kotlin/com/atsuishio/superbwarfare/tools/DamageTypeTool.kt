@@ -38,7 +38,7 @@ object DamageTypeTool {
         it.location().namespace.equals(
             Mod.MODID
         )
-    }.orElse(false)
+    }.orElse(false)!!
 
     @JvmStatic
     fun isCompatGunDamage(damageType: ResourceKey<DamageType>, registryAccess: RegistryAccess) =

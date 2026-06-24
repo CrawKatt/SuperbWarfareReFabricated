@@ -319,7 +319,7 @@ class CustomExplosion @JvmOverloads constructor(
             if (hit) {
                 val player = this.damageSource.entity
                 if (player is ServerPlayer) {
-                    SoundTool.playLocalSound(player, ModSounds.INDICATION.get())
+                    SoundTool.playLocalSound(player, ModSounds.INDICATION)
                     player.sendPacket(ClientIndicatorMessage(0, 5))
                 }
             }

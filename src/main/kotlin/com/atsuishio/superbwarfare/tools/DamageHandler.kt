@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.tools
 
 import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.entity.mixin.DamageAccess
+import com.atsuishio.superbwarfare.entity.mixin.DamageContainer
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier.ModifyResult
 import com.atsuishio.superbwarfare.tools.DamageHandler.doDamage

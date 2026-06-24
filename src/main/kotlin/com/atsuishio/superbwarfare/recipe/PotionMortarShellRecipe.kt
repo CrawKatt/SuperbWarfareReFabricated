@@ -31,7 +31,7 @@ class PotionMortarShellRecipe(pCategory: CraftingBookCategory) : CustomRecipe(pC
                         } else if (!stack.isEmpty) {
                             return false
                         }
-                    } else if (!stack.`is`(ModItems.MORTAR_SHELL.get())) {
+                    } else if (!stack.`is`(ModItems.MORTAR_SHELL)) {
                         return false
                     }
                 }
@@ -48,7 +48,7 @@ class PotionMortarShellRecipe(pCategory: CraftingBookCategory) : CustomRecipe(pC
         if (!stack.`is`(Items.LINGERING_POTION)) {
             return ItemStack.EMPTY
         } else {
-            val res = ItemStack(ModItems.POTION_MORTAR_SHELL.get(), 4)
+            val res = ItemStack(ModItems.POTION_MORTAR_SHELL, 4)
             res.set(
                 DataComponents.POTION_CONTENTS,
                 stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
@@ -63,6 +63,6 @@ class PotionMortarShellRecipe(pCategory: CraftingBookCategory) : CustomRecipe(pC
     }
 
     override fun getSerializer(): RecipeSerializer<*> {
-        return ModRecipes.POTION_MORTAR_SHELL_SERIALIZER.get()
+        return ModRecipes.POTION_MORTAR_SHELL_SERIALIZER
     }
 }

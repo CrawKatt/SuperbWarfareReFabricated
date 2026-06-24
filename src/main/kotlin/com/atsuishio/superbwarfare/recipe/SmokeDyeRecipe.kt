@@ -22,7 +22,7 @@ class SmokeDyeRecipe(pCategory: CraftingBookCategory) : CustomRecipe(pCategory) 
 
         for (stack in input.items()) {
             if (stack.isEmpty) continue
-            if (stack.`is`(ModItems.M18_SMOKE_GRENADE.get())) {
+            if (stack.`is`(ModItems.M18_SMOKE_GRENADE)) {
                 if (!itemStack.isEmpty) {
                     return false
                 }
@@ -47,7 +47,7 @@ class SmokeDyeRecipe(pCategory: CraftingBookCategory) : CustomRecipe(pCategory) 
         for (stack in input.items()) {
             if (!stack.isEmpty) {
                 val item = stack.item
-                if (stack.`is`(ModItems.M18_SMOKE_GRENADE.get())) {
+                if (stack.`is`(ModItems.M18_SMOKE_GRENADE)) {
                     if (!itemStack.isEmpty) {
                         return ItemStack.EMPTY
                     }
@@ -69,7 +69,7 @@ class SmokeDyeRecipe(pCategory: CraftingBookCategory) : CustomRecipe(pCategory) 
     }
 
     override fun getSerializer(): RecipeSerializer<*> {
-        return ModRecipes.SMOKE_DYE_SERIALIZER.get()
+        return ModRecipes.SMOKE_DYE_SERIALIZER
     }
 
     companion object {
