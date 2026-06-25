@@ -40,6 +40,8 @@ import com.atsuishio.superbwarfare.client.renderer.block.SmallContainerBlockEnti
 import com.atsuishio.superbwarfare.client.renderer.block.VehicleAssemblingTableBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
+import com.atsuishio.superbwarfare.client.renderer.item.BlueprintResearchingTableBlockItemRenderer
+import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
 import com.atsuishio.superbwarfare.client.tooltip.ClientBocekImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
@@ -55,12 +57,18 @@ import com.atsuishio.superbwarfare.client.tooltip.component.SentinelImageCompone
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.item.gun.GunItem
+import com.atsuishio.superbwarfare.item.armor.GeHelmetM35Item
+import com.atsuishio.superbwarfare.item.armor.RuChest6b43Item
+import com.atsuishio.superbwarfare.item.armor.RuHelmet6b47Item
+import com.atsuishio.superbwarfare.item.armor.UsChestIotvItem
+import com.atsuishio.superbwarfare.item.armor.UsHelmetPasgtItem
 import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.emi.trinkets.api.client.TrinketRendererRegistry
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
@@ -170,8 +178,37 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun onClientSetup() {
+        val tm62Renderer = Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
+        BuiltinItemRendererRegistry.INSTANCE.register(
+            ModItems.TM_62,
+            BuiltinItemRendererRegistry.DynamicItemRenderer { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
+                tm62Renderer.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
+            }
+        )
+
+        val blueprintResearchTableRenderer =
+            BlueprintResearchingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
+        BuiltinItemRendererRegistry.INSTANCE.register(
+            ModItems.BLUEPRINT_RESEARCH_TABLE,
+            BuiltinItemRendererRegistry.DynamicItemRenderer { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
+                blueprintResearchTableRenderer.renderByItem(
+                    stack,
+                    displayContext,
+                    poseStack,
+                    buffer,
+                    packedLight,
+                    packedOverlay
+                )
+            }
+        )
+
         TrinketRendererRegistry.registerRenderer(ModItems.PARACHUTE, ParachuteRenderer())
         TrinketRendererRegistry.registerRenderer(ModItems.THERMAL_IMAGING_GOGGLES, ThermalImagingGogglesRenderer())
+        GeHelmetM35Item.registerRenderer()
+        RuChest6b43Item.registerRenderer()
+        RuHelmet6b47Item.registerRenderer()
+        UsChestIotvItem.registerRenderer()
+        UsHelmetPasgtItem.registerRenderer()
     }
 
     @JvmStatic

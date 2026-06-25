@@ -1,13 +1,8 @@
 package com.atsuishio.superbwarfare.item.projectile
 
-import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
 import com.atsuishio.superbwarfare.entity.projectile.Tm62Entity
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.item.DispenserLaunchable
-import com.atsuishio.superbwarfare.tools.mc
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.Direction
 import net.minecraft.core.Position
 import net.minecraft.core.dispenser.BlockSource
@@ -22,37 +17,8 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.DispenserBlock
 import org.joml.Math
-import software.bernie.geckolib.animatable.GeoItem
-import software.bernie.geckolib.animatable.client.GeoRenderProvider
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.util.GeckoLibUtil
-import java.util.function.Consumer
 
-open class Tm62Item : Item(Properties().stacksTo(8)), GeoItem, DispenserLaunchable {
-    private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
-
-    @Environment(EnvType.CLIENT)
-    override fun createGeoRenderer(consumer: Consumer<GeoRenderProvider>) {
-        consumer.accept(object : GeoRenderProvider {
-            private var renderer: Tm62ItemRenderer? = null
-
-            override fun getGeoItemRenderer(): BlockEntityWithoutLevelRenderer {
-                if (this.renderer == null) {
-                    this.renderer = Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                }
-                return this.renderer!!
-            }
-        })
-    }
-
-    override fun registerControllers(data: AnimatableManager.ControllerRegistrar) {
-    }
-
-    override fun getAnimatableInstanceCache(): AnimatableInstanceCache {
-        return this.cache
-    }
-
+open class Tm62Item : Item(Properties().stacksTo(8)), DispenserLaunchable {
     override fun use(level: Level, player: Player, hand: InteractionHand): InteractionResultHolder<ItemStack> {
         val stack = player.getItemInHand(hand)
 
