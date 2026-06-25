@@ -114,4 +114,9 @@ object ModBlockEntities {
             ModBlocks.BIOGAS_GENERATOR
         ).build(null)
     }
+
+    @JvmStatic
+    fun init() {
+
+    }
 }

@@ -45,6 +45,7 @@ object ModSerializers {
             ByteBufCodecs.SHORT.apply(ByteBufCodecs.list()).apply(ByteBufCodecs.list())
         )
 
+    @JvmStatic
     fun init() {
         EntityDataSerializers.registerSerializer(INT_LIST_SERIALIZER)
         EntityDataSerializers.registerSerializer(FLOAT_LIST_SERIALIZER)

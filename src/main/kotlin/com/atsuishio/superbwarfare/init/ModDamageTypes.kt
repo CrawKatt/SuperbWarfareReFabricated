@@ -180,6 +180,11 @@ object ModDamageTypes {
         return ResourceKey.create(Registries.DAMAGE_TYPE, Mod.loc(name))
     }
 
+    @JvmStatic
+    fun init() {
+
+    }
+
     private class DamageMessages : DamageSource {
         constructor(typeReference: Holder.Reference<DamageType>) : super(typeReference)
 
