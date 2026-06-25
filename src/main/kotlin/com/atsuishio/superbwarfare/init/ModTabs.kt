@@ -45,6 +45,7 @@ object ModTabs {
                     if (storage != null && storage.capacity > 0) {
                         Transaction.openOuter().use { t ->
                             storage.insert(Long.MAX_VALUE, t)
+                            t.commit()
                         }
                         output.accept(charged)
                     }

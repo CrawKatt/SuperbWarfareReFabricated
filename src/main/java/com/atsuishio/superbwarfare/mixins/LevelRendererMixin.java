@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.mixins;
 
+import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.tools.VectorUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
@@ -23,5 +24,7 @@ public class LevelRendererMixin {
     private void onStartRenderLevel(DeltaTracker deltaTracker, boolean bl, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci) {
         VectorUtil.modelViewMatrix = RenderSystem.getModelViewMatrix();
         VectorUtil.projectionMatrix = RenderSystem.getProjectionMatrix();
+        ClientEventHandler.modelViewMatrix = VectorUtil.modelViewMatrix;
+        ClientEventHandler.projectionMatrix = VectorUtil.projectionMatrix;
     }
 }

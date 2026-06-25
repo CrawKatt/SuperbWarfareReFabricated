@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
 import com.atsuishio.superbwarfare.client.molang.MolangVariable;
 import com.atsuishio.superbwarfare.config.ClientConfig;
+import com.atsuishio.superbwarfare.data.DataLoader;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
@@ -31,6 +32,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         ModProperties.init();
         ModParticles.init();
         BedrockModelLoader.init();
+        DataLoader.registerClient();
 
         ClientLanguageGetter.register();
         ClientRenderHandler.registerLayer();
