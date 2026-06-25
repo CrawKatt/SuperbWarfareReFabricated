@@ -15,12 +15,9 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.level.block.BellBlock
 import net.minecraft.world.level.block.TargetBlock
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
 
-@EventBusSubscriber
 object CustomEventHandler {
-    @SubscribeEvent
+    @JvmStatic
     fun onPreReload(event: ReloadEvent.Pre) {
         val shooter = event.entity ?: return
         val stack = event.stack
@@ -33,7 +30,7 @@ object CustomEventHandler {
         }
     }
 
-    @SubscribeEvent
+    @JvmStatic
     fun onPostReload(event: ReloadEvent.Post) {
         val shooter = event.entity ?: return
         val stack = event.stack
@@ -46,7 +43,7 @@ object CustomEventHandler {
         }
     }
 
-    @SubscribeEvent
+    @JvmStatic
     fun onProjectileHitEntity(event: ProjectileHitEvent.HitEntity) {
         val entity = event.owner
         if (entity !is LivingEntity) return
@@ -66,15 +63,15 @@ object CustomEventHandler {
         }
     }
 
-    @SubscribeEvent
+    @JvmStatic
     fun onProjectileHitBlock(event: ProjectileHitEvent.HitBlock) {
         val projectile = event.projectile
-        val state = event.state
-        val pos = event.pos
+        val state = event.state ?: return
+        val pos = event.pos ?: return
         val face = event.face
         val block = state.block
 
-        if (block is BellBlock) {
+        if (block is BellBlock && face != null) {
             if (projectile is ProjectileEntity || projectile is GrapeshotEntity || projectile is SuperStarProjectileEntity) {
                 block.attemptToRing(projectile.level(), pos, face)
             }
@@ -85,7 +82,7 @@ object CustomEventHandler {
                 projectile.level().destroyBlock(pos, false, projectile.shooter)
             }
 
-            if (block is TargetBlock) {
+            if (block is TargetBlock && face != null && event.hitVec != null) {
                 projectile.recordHitScore(face, event.hitVec)
             }
         }

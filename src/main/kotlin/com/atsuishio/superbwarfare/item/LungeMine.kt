@@ -100,7 +100,7 @@ open class LungeMine : Item(Properties().stacksTo(4)), GeoItem {
         val stack = playerIn.getItemInHand(handIn)
         if (playerIn is ServerPlayer) {
             playerIn.level()
-                .playSound(null, playerIn.onPos, ModSounds.LUNGE_MINE_GROWL.get(), SoundSource.PLAYERS, 2f, 1f)
+                .playSound(null, playerIn.onPos, ModSounds.LUNGE_MINE_GROWL, SoundSource.PLAYERS, 2f, 1f)
         }
         if (!playerIn.level().isClientSide()) {
             playerIn.addEffect(

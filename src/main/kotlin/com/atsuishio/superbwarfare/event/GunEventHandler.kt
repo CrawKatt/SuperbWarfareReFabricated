@@ -4,14 +4,13 @@ import com.atsuishio.superbwarfare.api.event.ReloadEvent
 import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.gun.value.ReloadState
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
-import com.atsuishio.superbwarfare.init.ModAttachments
 import com.atsuishio.superbwarfare.init.ModCapabilities
+import com.atsuishio.superbwarfare.init.ModComponents
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.tools.InventoryTool
 import com.atsuishio.superbwarfare.tools.SoundTool
-import com.atsuishio.superbwarfare.tools.postEvent
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.Mth
@@ -22,7 +21,6 @@ import net.minecraft.world.phys.Vec3
 import kotlin.math.max
 import kotlin.math.min
 
-//@EventBusSubscriber
 object GunEventHandler {
     /**
      * 拉大栓
@@ -43,6 +41,7 @@ object GunEventHandler {
     /**
      * 播放拉栓音效
      */
+    @JvmStatic
     fun playGunBoltSounds(shooter: Entity?, data: GunData) {
         if (shooter !is ServerPlayer) return
 
@@ -70,21 +69,21 @@ object GunEventHandler {
                 when (ammoType) {
                     Ammo.SHOTGUN -> SoundTool.playLocalSound(
                         shooter,
-                        ModSounds.SHELL_CASING_SHOTGUN.get(),
+                        ModSounds.SHELL_CASING_SHOTGUN,
                         max(0.75 - 0.12 * shooterHeight, 0.0).toFloat(),
                         1f
                     )
 
                     Ammo.SNIPER, Ammo.HEAVY -> SoundTool.playLocalSound(
                         shooter,
-                        ModSounds.SHELL_CASING_50CAL.get(),
+                        ModSounds.SHELL_CASING_50CAL,
                         max(1 - 0.15 * shooterHeight, 0.0).toFloat(),
                         1f
                     )
 
                     else -> SoundTool.playLocalSound(
                         shooter,
-                        ModSounds.SHELL_CASING_NORMAL.get(),
+                        ModSounds.SHELL_CASING_NORMAL,
                         max(1.5 - 0.2 * shooterHeight, 0.0).toFloat(),
                         1f
                     )
@@ -92,7 +91,7 @@ object GunEventHandler {
             } else {
                 SoundTool.playLocalSound(
                     shooter,
-                    ModSounds.SHELL_CASING_NORMAL.get(),
+                    ModSounds.SHELL_CASING_NORMAL,
                     max(1.5 - 0.2 * shooterHeight, 0.0).toFloat(),
                     1f
                 )
@@ -122,6 +121,7 @@ object GunEventHandler {
     /**
      * 初始化枪械ID和弹药数量
      */
+    @JvmStatic
     fun init(shooter: Entity?, data: GunData) {
         if (!data.initialized()) {
             data.initialize()
@@ -134,6 +134,7 @@ object GunEventHandler {
     /**
      * 更新perk相关属性
      */
+    @JvmStatic
     fun tickPerk(shooter: Entity?, data: GunData) {
         for (type in Perk.Type.entries.toTypedArray()) {
             val instance = data.perk.getInstances(type)
@@ -143,6 +144,7 @@ object GunEventHandler {
         }
     }
 
+    @JvmStatic
     fun autoReload(shooter: Entity?, data: GunData, inMainHand: Boolean) {
         val autoReload = data.get(GunProp.AUTO_RELOAD) ?: return
 
@@ -151,6 +153,7 @@ object GunEventHandler {
         }
     }
 
+    @JvmStatic
     fun tryStartReload(shooter: Entity?, data: GunData) {
         if (data.useBackpackAmmo() || data.meleeOnly()) return
 
@@ -188,6 +191,7 @@ object GunEventHandler {
     /**
      * 减少过热值
      */
+    @JvmStatic
     fun handleCooldown(shooter: Entity?, data: GunData) {
         var rate = 1.0
 
@@ -213,6 +217,7 @@ object GunEventHandler {
     /**
      * 返还多余弹药
      */
+    @JvmStatic
     fun redrawExtraAmmo(shooter: Entity?, data: GunData) {
         val hasBulletInBarrel = data.item.hasBulletInBarrel(data)
         val ammoCount = data.ammo.get()
@@ -223,19 +228,19 @@ object GunEventHandler {
             val count = ammoCount - magazine - (if (hasBulletInBarrel) 1 else 0)
 
             if (shooter is Player) {
-                val capability = shooter.getData(ModAttachments.PLAYER_VARIABLE).watch()
+                val capability = ModComponents.PLAYER_VARIABLE.get(shooter)
                 if (data.selectedAmmoConsumer().type == AmmoConsumer.AmmoConsumeType.PLAYER_AMMO) {
                     val ammoType = data.selectedAmmoConsumer().playerAmmoType
                     ammoType?.add(capability, count)
                 }
-                shooter.setData(ModAttachments.PLAYER_VARIABLE, capability)
-                capability.sync(shooter)
+                ModComponents.PLAYER_VARIABLE.sync(shooter)
             }
 
             data.ammo.set(magazine + (if (hasBulletInBarrel) 1 else 0))
         }
     }
 
+    @JvmStatic
     fun gunTick(shooter: Entity?, data: GunData, inMainHand: Boolean) {
         init(shooter, data)
         autoReload(shooter, data, inMainHand)
@@ -251,7 +256,7 @@ object GunEventHandler {
 
             // 启动换弹
             if (data.reload.reloadStarter.start()) {
-                postEvent(ReloadEvent.Pre(shooter, data))
+                CustomEventHandler.onPreReload(ReloadEvent.Pre(shooter, data))
                 startReload(shooter, data)
             }
 
@@ -325,16 +330,19 @@ object GunEventHandler {
         }
     }
 
+    @JvmStatic
     fun finishGunNormalReload(shooter: Entity?, data: GunData) {
         data.reloadAmmo(shooter, data.item().hasBulletInBarrel(data))
-        postEvent(ReloadEvent.Post(shooter, data))
+        CustomEventHandler.onPostReload(ReloadEvent.Post(shooter, data))
     }
 
+    @JvmStatic
     fun finishGunEmptyReload(shooter: Entity?, data: GunData) {
         data.reloadAmmo(shooter)
-        postEvent(ReloadEvent.Post(shooter, data))
+        CustomEventHandler.onPostReload(ReloadEvent.Post(shooter, data))
     }
 
+    @JvmStatic
     fun playGunEmptyReloadSounds(shooter: Entity?, data: GunData) {
         if (shooter !is ServerPlayer) return
 
@@ -346,6 +354,7 @@ object GunEventHandler {
         }
     }
 
+    @JvmStatic
     fun playGunNormalReloadSounds(shooter: Entity?, data: GunData) {
         if (shooter !is ServerPlayer) return
 
@@ -372,10 +381,10 @@ object GunEventHandler {
 
         // 一阶段
         if (reload.singleReloadStarter.start()) {
-            postEvent(ReloadEvent.Pre(shooter, data))
+            CustomEventHandler.onPreReload(ReloadEvent.Pre(shooter, data))
 
             if (data.get(GunProp.PREPARE_LOAD_TIME) != 0 && (!data.hasEnoughAmmoToShoot(shooter) || stack.`is`(
-                    ModItems.SECONDARY_CATACLYSM.get()
+                    ModItems.SECONDARY_CATACLYSM
                 ))
             ) {
                 // 此处判断空仓换弹的时候，是否在准备阶段就需要装填一发，如M870
@@ -462,7 +471,7 @@ object GunEventHandler {
             playGunEndReloadSounds(shooter, data)
         }
 
-        if (stack.item === ModItems.MARLIN.get() && reload.finishTimer.get() == 10) {
+        if (stack.item === ModItems.MARLIN && reload.finishTimer.get() == 10) {
             data.isEmpty.set(false)
             data.closeStrike.set(false)
         }
@@ -476,10 +485,11 @@ object GunEventHandler {
             reload.setState(ReloadState.NOT_RELOADING)
             reload.singleReloadStarter.finish()
 
-            postEvent(ReloadEvent.Post(shooter, data))
+            CustomEventHandler.onPostReload(ReloadEvent.Post(shooter, data))
         }
     }
 
+    @JvmStatic
     fun prepareLoad(shooter: Entity?, data: GunData) {
         val required = min(data.get(GunProp.MAGAZINE) - data.ammo.get(), 1)
         val available = min(required, data.countBackupAmmo(shooter))
@@ -490,6 +500,7 @@ object GunEventHandler {
         }
     }
 
+    @JvmStatic
     fun iterativeLoad(shooter: Entity?, data: GunData) {
         val required = min(
             data.get(GunProp.MAGAZINE) - data.ammo.get(),
@@ -499,14 +510,11 @@ object GunEventHandler {
         data.ammo.add(available)
 
         if (!InventoryTool.hasCreativeAmmoBox(shooter)) {
-            if (shooter != null) {
-                val cap = shooter.getData(ModAttachments.PLAYER_VARIABLE)
-                shooter.setData(ModAttachments.PLAYER_VARIABLE, cap)
-            }
             data.consumeBackupAmmo(shooter, available)
         }
     }
 
+    @JvmStatic
     fun playGunPrepareReloadSounds(shooter: Entity?, data: GunData) {
         if (shooter !is ServerPlayer) return
 
@@ -518,6 +526,7 @@ object GunEventHandler {
         }
     }
 
+    @JvmStatic
     fun playGunEmptyPrepareSounds(shooter: Entity?, data: GunData) {
         if (shooter !is ServerPlayer) return
 
@@ -545,21 +554,21 @@ object GunEventHandler {
                 when (ammoType) {
                     Ammo.SHOTGUN -> SoundTool.playLocalSound(
                         shooter,
-                        ModSounds.SHELL_CASING_SHOTGUN.get(),
+                        ModSounds.SHELL_CASING_SHOTGUN,
                         max(0.75 - 0.12 * shooterHeight, 0.0).toFloat(),
                         1f
                     )
 
                     Ammo.SNIPER, Ammo.HEAVY -> SoundTool.playLocalSound(
                         shooter,
-                        ModSounds.SHELL_CASING_50CAL.get(),
+                        ModSounds.SHELL_CASING_50CAL,
                         max(1 - 0.15 * shooterHeight, 0.0).toFloat(),
                         1f
                     )
 
                     else -> SoundTool.playLocalSound(
                         shooter,
-                        ModSounds.SHELL_CASING_NORMAL.get(),
+                        ModSounds.SHELL_CASING_NORMAL,
                         max(1.5 - 0.2 * shooterHeight, 0.0).toFloat(),
                         1f
                     )
@@ -567,7 +576,7 @@ object GunEventHandler {
             } else {
                 SoundTool.playLocalSound(
                     shooter,
-                    ModSounds.SHELL_CASING_NORMAL.get(),
+                    ModSounds.SHELL_CASING_NORMAL,
                     max(1.5 - 0.2 * shooterHeight, 0.0).toFloat(),
                     1f
                 )
@@ -575,6 +584,7 @@ object GunEventHandler {
         }
     }
 
+    @JvmStatic
     fun playGunPrepareLoadReloadSounds(shooter: Entity?, data: GunData) {
         if (shooter !is ServerPlayer) return
 
@@ -602,21 +612,21 @@ object GunEventHandler {
                 when (ammoType) {
                     Ammo.SHOTGUN -> SoundTool.playLocalSound(
                         shooter,
-                        ModSounds.SHELL_CASING_SHOTGUN.get(),
+                        ModSounds.SHELL_CASING_SHOTGUN,
                         max(0.75 - 0.12 * shooterHeight, 0.0).toFloat(),
                         1f
                     )
 
                     Ammo.SNIPER, Ammo.HEAVY -> SoundTool.playLocalSound(
                         shooter,
-                        ModSounds.SHELL_CASING_50CAL.get(),
+                        ModSounds.SHELL_CASING_50CAL,
                         max(1 - 0.15 * shooterHeight, 0.0).toFloat(),
                         1f
                     )
 
                     else -> SoundTool.playLocalSound(
                         shooter,
-                        ModSounds.SHELL_CASING_NORMAL.get(),
+                        ModSounds.SHELL_CASING_NORMAL,
                         max(1.5 - 0.2 * shooterHeight, 0.0).toFloat(),
                         1f
                     )
@@ -624,7 +634,7 @@ object GunEventHandler {
             } else {
                 SoundTool.playLocalSound(
                     shooter,
-                    ModSounds.SHELL_CASING_NORMAL.get(),
+                    ModSounds.SHELL_CASING_NORMAL,
                     max(1.5 - 0.2 * shooterHeight, 0.0).toFloat(),
                     1f
                 )
@@ -632,6 +642,7 @@ object GunEventHandler {
         }
     }
 
+    @JvmStatic
     fun playGunLoopReloadSounds(shooter: Entity?, data: GunData) {
         if (shooter !is ServerPlayer) return
 
@@ -643,6 +654,7 @@ object GunEventHandler {
         }
     }
 
+    @JvmStatic
     fun playGunEndReloadSounds(shooter: Entity?, data: GunData) {
         if (shooter !is ServerPlayer) return
 
@@ -665,11 +677,11 @@ object GunEventHandler {
         )
 
         // TODO 为什么要特判这个
-        if (data.stack.`is`(ModItems.MARLIN.get())) {
+        if (data.stack.`is`(ModItems.MARLIN)) {
             com.atsuishio.superbwarfare.Mod.queueServerWork((5 + 1.5 * shooterHeight).toInt()) {
                 SoundTool.playLocalSound(
                     shooter,
-                    ModSounds.SHELL_CASING_NORMAL.get(),
+                    ModSounds.SHELL_CASING_NORMAL,
                     max(1.5 - 0.2 * shooterHeight, 0.0).toFloat(),
                     1f
                 )
@@ -686,7 +698,7 @@ object GunEventHandler {
             data.charge.timer.set(127)
 
             if (entity is ServerPlayer) {
-                SoundTool.playLocalSound(entity, ModSounds.SENTINEL_CHARGE.get(), 2f, 1f)
+                SoundTool.playLocalSound(entity, ModSounds.SENTINEL_CHARGE, 2f, 1f)
             }
         }
 
@@ -697,7 +709,7 @@ object GunEventHandler {
 
         for (i in 0..<itemHandler.slots) {
             val cell = itemHandler.getStackInSlot(i)
-            if (!cell.`is`(ModItems.CELL.get())) continue
+            if (!cell.`is`(ModItems.CELL)) continue
 
             val stackStorage = ModCapabilities.ENERGY_ITEM.find(data.stack(), null) ?: continue
 

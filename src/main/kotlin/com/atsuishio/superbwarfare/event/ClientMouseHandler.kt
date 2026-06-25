@@ -11,17 +11,13 @@ import com.atsuishio.superbwarfare.init.ModMobEffects
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.network.message.send.MouseMoveMessage
 import com.atsuishio.superbwarfare.tools.*
+import net.minecraft.client.Camera
 import net.minecraft.client.CameraType
+import net.minecraft.client.Minecraft
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec2
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.ClientTickEvent
-import net.neoforged.neoforge.client.event.ViewportEvent
 import kotlin.math.abs
 
-@EventBusSubscriber(Dist.CLIENT)
 object ClientMouseHandler {
     @JvmField
     var posO: Vec2 = Vec2(0f, 0f)
@@ -59,8 +55,8 @@ object ClientMouseHandler {
     @JvmField
     var mouseYMoveTick: Double = 0.0
 
-    @SubscribeEvent
-    fun handleClientTick(event: ClientTickEvent.Post) {
+    @JvmStatic
+    fun handleClientTick(minecraft: Minecraft) {
         val player = localPlayer ?: return
 
         posO = posN
@@ -71,7 +67,7 @@ object ClientMouseHandler {
 
         val stack = player.mainHandItem
 
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")
+        if (stack.`is`(ModItems.MONITOR) && stack.getOrCreateTag().getBoolean("Using")
             && stack.getOrCreateTag().getBoolean("Linked")
         ) {
             val drone =
@@ -153,8 +149,8 @@ object ClientMouseHandler {
     }
 
     @Suppress("unused")
-    @SubscribeEvent
-    fun handleClientTick(event: ViewportEvent.ComputeCameraAngles) {
+    @JvmStatic
+    fun handleClientTick(camera: Camera, partialTick: Float) {
         val player = localPlayer ?: return
 
         if (notInGame) {
@@ -222,7 +218,7 @@ object ClientMouseHandler {
         val stack = player.mainHandItem
         val tag = NBTTool.getTag(stack)
 
-        if (stack.`is`(ModItems.MONITOR.get()) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
+        if (stack.`is`(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
             return 0.0
         }
 
@@ -230,7 +226,7 @@ object ClientMouseHandler {
             return 0.0
         }
 
-        if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR.get()) && mc.options.cameraType == CameraType.FIRST_PERSON) {
+        if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR) && mc.options.cameraType == CameraType.FIRST_PERSON) {
             return original / (1 + 0.2 * ClientEventHandler.artilleryIndicatorZoom).coerceAtLeast(0.1)
         }
 
