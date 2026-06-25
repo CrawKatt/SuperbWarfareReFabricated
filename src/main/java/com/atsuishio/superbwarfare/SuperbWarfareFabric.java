@@ -28,6 +28,7 @@ import net.neoforged.fml.config.ModConfig;
 import software.bernie.geckolib.constant.dataticket.SerializableDataTicket;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+/*
 public class SuperbWarfareFabric implements ModInitializer {
 
     @Override
@@ -125,3 +126,4 @@ public class SuperbWarfareFabric implements ModInitializer {
         );
     }
 }
+*/

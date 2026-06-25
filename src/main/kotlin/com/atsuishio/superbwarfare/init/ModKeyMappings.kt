@@ -119,6 +119,7 @@ object ModKeyMappings {
         return key
     }
 
+    @JvmStatic
     fun init() {
         KEYS.forEach { KeyBindingHelper.registerKeyBinding(it) }
     }

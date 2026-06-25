@@ -44,14 +44,12 @@ import net.minecraft.world.level.block.CrossCollisionBlock
 import net.minecraft.world.level.block.DoorBlock
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.EventPriority
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.*
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers
-import net.neoforged.neoforge.common.util.TriState
-import net.neoforged.neoforge.event.entity.player.PlayerEvent
+import com.atsuishio.superbwarfare.config.server.MiscConfig
+import com.atsuishio.superbwarfare.mixins.LivingEntityAccessor
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
+import net.minecraft.client.Camera
 import org.joml.Matrix4f
 import org.lwjgl.glfw.GLFW
 import software.bernie.geckolib.animation.AnimationProcessor
@@ -61,8 +59,40 @@ import java.util.*
 import kotlin.experimental.or
 import kotlin.math.*
 
-@EventBusSubscriber(Dist.CLIENT)
 object ClientEventHandler {
+    class CameraAnglesContext(
+        val camera: Camera,
+        val partialTick: Double,
+        var yaw: Float,
+        var pitch: Float,
+        var roll: Float
+    )
+
+    class FovContext(
+        var fov: Double,
+        val partialTick: Double,
+        private val configuredFov: Boolean
+    ) {
+        fun usedConfiguredFov(): Boolean = configuredFov
+    }
+
+    @JvmStatic
+    fun register() {
+        ClientTickEvents.END_CLIENT_TICK.register {
+            handleClientTick()
+        }
+
+        WorldRenderEvents.START.register {
+            handleWeaponFire()
+            handleVehicleFire()
+            handleWeaponBreathSway()
+        }
+
+        ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
+            onPlayerLoggedIn()
+        }
+    }
+
     @JvmField
     var zoomTime: Double = 0.0
 
@@ -235,6 +265,9 @@ object ClientEventHandler {
 
     @JvmField
     var breath: Boolean = false
+
+    @JvmField
+    var tacticalSprint: Boolean = false
 
     @JvmField
     var stamina: Float = 0f
@@ -430,14 +463,13 @@ object ClientEventHandler {
 
     @JvmField
     var bombHitPos: Vec3 = Vec3.ZERO
-
-    @SubscribeEvent
-    fun handleWeaponTurn(event: RenderHandEvent) {
+    @JvmStatic
+    fun handleWeaponTurn(partialTick: Float) {
         val player = localPlayer ?: return
-        val xRotOffset = Mth.lerp(event.partialTick, player.xBobO, player.xBob)
-        val yRotOffset = Mth.lerp(event.partialTick, player.yBobO, player.yBob)
-        val xRot = player.getViewXRot(event.partialTick) - xRotOffset
-        val yRot = player.getViewYRot(event.partialTick) - yRotOffset
+        val xRotOffset = Mth.lerp(partialTick, player.xBobO, player.xBob)
+        val yRotOffset = Mth.lerp(partialTick, player.yBobO, player.yBob)
+        val xRot = player.getViewXRot(partialTick) - xRotOffset
+        val yRot = player.getViewYRot(partialTick) - yRotOffset
         turnRot[0] = (0.05 * xRot).coerceIn(-5.0, 5.0) * (1 - 0.75 * zoomTime)
         turnRot[1] = (0.05 * yRot).coerceIn(-10.0, 10.0) * (1 - 0.75 * zoomTime)
         turnRot[2] = (0.1 * yRot).coerceIn(-10.0, 10.0) * (1 - zoomTime)
@@ -457,9 +489,8 @@ object ClientEventHandler {
                 || mc.options.keyDown.isDown()
                 || player.isSprinting
     }
-
-    @SubscribeEvent
-    fun handleClientTick(event: ClientTickEvent.Post) {
+    @JvmStatic
+    fun handleClientTick() {
         val player = localPlayer ?: return
 
         val stack = player.mainHandItem
@@ -522,7 +553,7 @@ object ClientEventHandler {
             turnOnThermalImaging()
         }
 
-        val active = player.getData(ModAttachments.PLAYER_VARIABLE).activeThermalImaging
+        val active = ModComponents.PLAYER_VARIABLE.get(player).activeThermalImaging
 
         if (activeThermalImaging && !active) {
             sendPacketToServer(ActiveThermalImagingMessage(true))
@@ -570,17 +601,17 @@ object ClientEventHandler {
             }
             lastOperatingGunUUID = uuid
 
-            if ((holdingFireKey || (zoom && stack.`is`(ModItems.MINIGUN.get()))) && item.canShoot(data, player)) {
+            if ((holdingFireKey || (zoom && stack.`is`(ModItems.MINIGUN))) && item.canShoot(data, player)) {
                 holdingFireKeyTicks = (holdingFireKeyTicks + 1).coerceAtMost(data.get(GunProp.SHOOT_DELAY) + 1)
 
                 // 加特林特有的旋转音效
-                if (stack.`is`(ModItems.MINIGUN.get())) {
+                if (stack.`is`(ModItems.MINIGUN)) {
                     val rpm = data.get(GunProp.RPM) / 3600F
-                    player.playSound(ModSounds.MINIGUN_ROTATE.get(), 1f, 0.7f + rpm)
+                    player.playSound(ModSounds.MINIGUN_ROTATE, 1f, 0.7f + rpm)
                 }
 
                 // QL特有的樱花特效
-                if (stack.`is`(ModItems.QL_1031.get()) && player.tickCount % 5 == 0) {
+                if (stack.`is`(ModItems.QL_1031) && player.tickCount % 5 == 0) {
                     val random = (Math.random() - 0.5) * 2
                     player.level().addParticle(
                         ParticleTypes.CHERRY_LEAVES,
@@ -599,8 +630,8 @@ object ClientEventHandler {
     }
 
     fun handleArtilleryIndicator(player: Player, stack: ItemStack) {
-        if ((stack.`is`(ModItems.ARTILLERY_INDICATOR.get()) || (stack.`is`(ModItems.MONITOR.get())
-                    && player.offhandItem.`is`(ModItems.ARTILLERY_INDICATOR.get()))) && holdingFireKey
+        if ((stack.`is`(ModItems.ARTILLERY_INDICATOR) || (stack.`is`(ModItems.MONITOR)
+                    && player.offhandItem.`is`(ModItems.ARTILLERY_INDICATOR))) && holdingFireKey
         ) {
             holdArtilleryIndicator = (holdArtilleryIndicator + 1).coerceIn(0, 20)
             if (holdArtilleryIndicator >= 19 && shootCoolDown == 0) {
@@ -636,7 +667,7 @@ object ClientEventHandler {
 
         // 正在游戏内控制载具或无人机
         if (!notInGame && (vehicle is VehicleEntity && vehicle.firstPassenger == player) ||
-            (stack.`is`(ModItems.MONITOR.get()) && tag != null
+            (stack.`is`(ModItems.MONITOR) && tag != null
                     && tag.getBoolean(MonitorItem.USING)
                     && tag.getBoolean(MonitorItem.LINKED))
         ) {
@@ -1111,12 +1142,32 @@ object ClientEventHandler {
     }
 
     // 耐力
+    // 耐力
     fun staminaSystem() {
         if (mc.isPaused) return
-        if (localPlayer == null) return
+        val player = localPlayer ?: return
+
+        tacticalSprint = MiscConfig.ALLOW_TACTICAL_SPRINT.get()
+                && !exhaustion
+                && !zoom
+                && isMoving()
+                && player.isSprinting
+                && player.vehicle == null
+                && !player.abilities.flying
+
+        val stack = player.mainHandItem
+
+        val sprintCost: Float = if (stack.item is GunItem) {
+            val data = GunData.from(stack)
+            (0.5 + 0.02 * data.get(GunProp.WEIGHT)).toFloat()
+        } else {
+            0.5f
+        }
 
         if (breath) {
             stamina += 0.5f
+        } else if (tacticalSprint) {
+            stamina += sprintCost
         } else if (stamina > 0) {
             stamina = (stamina - 0.5f).coerceAtLeast(0f)
         }
@@ -1124,18 +1175,30 @@ object ClientEventHandler {
         if (stamina >= 100) {
             exhaustion = true
             breath = false
+            tacticalSprint = false
         }
 
         if (exhaustion && stamina <= 0) {
             exhaustion = false
         }
 
-        if ((ModKeyMappings.BREATH.isDown() && zoom)) {
+        if ((ModKeyMappings.BREATH.isDown() && zoom) || tacticalSprint) {
             switchTime = (switchTime + 0.65).coerceAtMost(5.0)
         } else if (switchTime > 0 && stamina == 0f) {
             switchTime = (switchTime - 0.15).coerceAtLeast(0.0)
         }
+
+        if (zoom) {
+            tacticalSprint = false
+        }
+
+        if (tacticalSprint && (player.onGround() || (player as LivingEntityAccessor).isJumping)) {
+            sendPacketToServer(TacticalSprintMessage(true))
+        } else {
+            sendPacketToServer(TacticalSprintMessage(false))
+        }
     }
+
 
     /**
      * 禁止玩家奔跑
@@ -1255,13 +1318,13 @@ object ClientEventHandler {
     }
 
     fun handleLungeAttack(player: Player, stack: ItemStack) {
-        if (stack.`is`(ModItems.LUNGE_MINE.get()) && lungeAttack == 0 && lungeDraw == 0 && usingLunge) {
+        if (stack.`is`(ModItems.LUNGE_MINE) && lungeAttack == 0 && lungeDraw == 0 && usingLunge) {
             lungeAttack = 18
             usingLunge = false
             player.playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1f, 1f)
         }
 
-        if (stack.`is`(ModItems.LUNGE_MINE.get()) && ((lungeAttack >= 9 && lungeAttack <= 10.5) || lungeSprint > 0)) {
+        if (stack.`is`(ModItems.LUNGE_MINE) && ((lungeAttack >= 9 && lungeAttack <= 10.5) || lungeSprint > 0)) {
             val lookingEntity = TraceTool.findLookingEntity(player, player.getEntityReach() + 1.5)
 
             val result = player.level().clip(
@@ -1320,9 +1383,8 @@ object ClientEventHandler {
             lungeDraw--
         }
     }
-
-    @SubscribeEvent
-    fun handleWeaponFire(@Suppress("unused") event: RenderFrameEvent.Pre) {
+    @JvmStatic
+    fun handleWeaponFire() {
         if (clientLevel == null) return
         val player = localPlayer ?: return
 
@@ -1383,7 +1445,7 @@ object ClientEventHandler {
 
         val zoomSpread = 1 - (1 - data.get(GunProp.ZOOM_SPREAD_RATE)) * zoomTime
         val spread =
-            if (data.isShotgun || stack.`is`(ModItems.MINIGUN.get())) 1.2 * zoomSpread * (basicDev + 0.2 * (walk + sprint + crouching + prone + jump + ride) + fireSpread)
+            if (data.isShotgun || stack.`is`(ModItems.MINIGUN)) 1.2 * zoomSpread * (basicDev + 0.2 * (walk + sprint + crouching + prone + jump + ride) + fireSpread)
             else zoomSpread * (0.7 * basicDev + walk + sprint + crouching + prone + jump + ride + 0.8 * fireSpread)
 
         gunSpread = Mth.lerp(0.14 * times, gunSpread, spread)
@@ -1405,7 +1467,7 @@ object ClientEventHandler {
         val cooldown = (1000 / rps).roundToInt()
 
         //左轮类
-        if (clientTimer.progress == 0L && stack.`is`(ModItems.TRACHELIUM.get()) && holdingFireKey) {
+        if (clientTimer.progress == 0L && stack.`is`(ModItems.TRACHELIUM) && holdingFireKey) {
             revolverPreTime = (revolverPreTime + 0.3 * times).coerceIn(0.0, 1.0)
             revolverWheelPreTime =
                 (revolverWheelPreTime + 0.32 * times).coerceIn(0.0, if (revolverPreTime > 0.7) 1.0 else 0.55)
@@ -1501,7 +1563,7 @@ object ClientEventHandler {
             customRpm = instance.maxOfOrNull { it.perk.getModifiedCustomRPM(customRpm, data, it) } ?: customRpm
         }
 
-        if (stack.`is`(ModItems.DEVOTION.get())) {
+        if (stack.`is`(ModItems.DEVOTION)) {
             customRpm = (customRpm + 15).coerceAtMost(500)
         }
 
@@ -1559,13 +1621,13 @@ object ClientEventHandler {
         val item = stack.item
         if (item !is GunItem) return
 
-        if (item == ModItems.SENTINEL.get()) {
+        if (item == ModItems.SENTINEL) {
             val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
             val charged = cap != null && cap.energyStored > 0
 
             if (charged) {
                 player.playSound(
-                    ModSounds.SENTINEL_CHARGE_FIRE_1P.get(),
+                    ModSounds.SENTINEL_CHARGE_FIRE_1P,
                     2f,
                     ((2 * Math.random() - 1) * 0.05f + 1.0f).toFloat()
                 )
@@ -1573,7 +1635,7 @@ object ClientEventHandler {
             }
         }
 
-        if (item == ModItems.SECONDARY_CATACLYSM.get()) {
+        if (item == ModItems.SECONDARY_CATACLYSM) {
             val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
             val hasEnoughEnergy = cap != null && cap.energyStored > 3000
 
@@ -1581,7 +1643,7 @@ object ClientEventHandler {
 
             if (isChargedFire) {
                 player.playSound(
-                    ModSounds.SECONDARY_CATACLYSM_FIRE_1P_CHARGE.get(),
+                    ModSounds.SECONDARY_CATACLYSM_FIRE_1P_CHARGE,
                     2f,
                     ((2 * Math.random() - 1) * 0.05f + 1.0f).toFloat()
                 )
@@ -1595,8 +1657,8 @@ object ClientEventHandler {
 
         val pitch = if (data.heat.get() <= 75) 1f else (1 - 0.02 * abs(75 - data.heat.get())).toFloat()
 
-        if (perk == ModPerks.BEAST_BULLET.get()) {
-            player.playSound(ModSounds.HENG.get(), 1f, ((2 * Math.random() - 1) * 0.1f + pitch).toFloat())
+        if (perk == ModPerks.BEAST_BULLET) {
+            player.playSound(ModSounds.HENG, 1f, ((2 * Math.random() - 1) * 0.1f + pitch).toFloat())
         }
 
         val isSilent = data.attachment.get(AttachmentType.BARREL) == 2
@@ -1627,28 +1689,28 @@ object ClientEventHandler {
                     when (ammoType) {
                         Ammo.SHOTGUN ->
                             player.playSound(
-                                ModSounds.SHELL_CASING_SHOTGUN.get(),
+                                ModSounds.SHELL_CASING_SHOTGUN,
                                 (0.75 - 0.12 * shooterHeight).coerceAtLeast(0.0).toFloat(),
                                 ((2 * Math.random() - 1) * 0.05f + 1.0f).toFloat()
                             )
 
                         Ammo.SNIPER, Ammo.HEAVY ->
                             player.playSound(
-                                ModSounds.SHELL_CASING_50CAL.get(),
+                                ModSounds.SHELL_CASING_50CAL,
                                 (1 - 0.15 * shooterHeight).coerceAtLeast(0.0).toFloat(),
                                 ((2 * Math.random() - 1) * 0.05f + 1.0f).toFloat()
                             )
 
                         else ->
                             player.playSound(
-                                ModSounds.SHELL_CASING_NORMAL.get(),
+                                ModSounds.SHELL_CASING_NORMAL,
                                 (1.5 - 0.2 * shooterHeight).coerceAtLeast(0.0).toFloat(),
                                 ((2 * Math.random() - 1) * 0.05f + 1.0f).toFloat()
                             )
                     }
                 } else {
                     player.playSound(
-                        ModSounds.SHELL_CASING_NORMAL.get(),
+                        ModSounds.SHELL_CASING_NORMAL,
                         (1.5 - 0.2 * shooterHeight).coerceAtLeast(0.0).toFloat(),
                         ((2 * Math.random() - 1) * 0.05f + 1.0f).toFloat()
                     )
@@ -1656,9 +1718,8 @@ object ClientEventHandler {
             }
         }
     }
-
-    @SubscribeEvent
-    fun handleVehicleFire(@Suppress("unused") event: RenderFrameEvent.Pre) {
+    @JvmStatic
+    fun handleVehicleFire() {
         if (clientLevel == null) return
         val player = localPlayer ?: return
 
@@ -1731,9 +1792,8 @@ object ClientEventHandler {
             if (vehicle.getWeaponHeat(player) <= 60) 1f else (1 - 0.011 * abs(60 - vehicle.getWeaponHeat(player))).toFloat()
         player.playSound(sound, 1f, pitch)
     }
-
-    @SubscribeEvent
-    fun handleWeaponBreathSway(@Suppress("unused") event: RenderFrameEvent.Pre) {
+    @JvmStatic
+    fun handleWeaponBreathSway() {
         val player = localPlayer ?: return
         val stack = player.mainHandItem
         val item = stack.item as? GunItem ?: return
@@ -1788,16 +1848,15 @@ object ClientEventHandler {
     private fun getDelta(): Float {
         return mc.deltaFrameTime
     }
-
-    @SubscribeEvent
-    fun computeCameraAngles(event: ViewportEvent.ComputeCameraAngles) {
+    @JvmStatic
+    fun computeCameraAngles(event: CameraAnglesContext) {
         if (clientLevel == null) return
         val entity = event.camera.entity as? LivingEntity ?: return
         val player = localPlayer ?: return
         val stack = entity.mainHandItem
 
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
+        if (stack.`is`(ModItems.MONITOR) && NBTTool.getTag(stack).getBoolean("Using")
+            && NBTTool.getTag(stack).getBoolean("Linked")
         ) {
             handleDroneCamera(event, entity)
         }
@@ -1859,16 +1918,16 @@ object ClientEventHandler {
         handleShockCamera(event, entity)
     }
 
-    private fun handleDroneCamera(event: ViewportEvent.ComputeCameraAngles, entity: LivingEntity) {
+    private fun handleDroneCamera(event: CameraAnglesContext, entity: LivingEntity) {
         val stack = entity.mainHandItem
-        val drone = EntityFindUtil.findDrone(entity.level(), stack.getOrCreateTag().getString("LinkedDrone")) ?: return
+        val drone = EntityFindUtil.findDrone(entity.level(), NBTTool.getTag(stack).getString("LinkedDrone")) ?: return
         cameraRoll =
             drone.getRoll(event.partialTick.toFloat() * (1 - (drone.getPitch(event.partialTick.toFloat()) / 90)))
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onRenderHand(event: RenderHandEvent) {
-        val player = localPlayer ?: return
+    @JvmStatic
+    fun shouldCancelHandRender(hand: InteractionHand): Boolean {
+        val player = localPlayer ?: return false
 
         val leftHand = if (mc.options.mainHand().get() == HumanoidArm.RIGHT)
             InteractionHand.OFF_HAND else InteractionHand.MAIN_HAND
@@ -1878,33 +1937,34 @@ object ClientEventHandler {
 
         val rightHandItem = player.getItemInHand(rightHand)
 
-        if (event.hand == leftHand) {
+        if (hand == leftHand) {
             if (rightHandItem.item is GunItem) {
-                event.isCanceled = true
+                return true
             }
-            if (rightHandItem.`is`(ModItems.LUNGE_MINE.get())) {
-                event.isCanceled = true
+            if (rightHandItem.`is`(ModItems.LUNGE_MINE)) {
+                return true
             }
-            if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR.get())) {
-                event.isCanceled = true
+            if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR)) {
+                return true
             }
         }
 
-        if (event.hand == rightHand) {
+        if (hand == rightHand) {
             if (rightHandItem.item is GunItem && drawTime > 0.15) {
-                event.isCanceled = true
+                return true
             }
-            if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR.get())) {
-                event.isCanceled = true
+            if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR)) {
+                return true
             }
         }
 
         val stack = player.mainHandItem
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
+        val tag = NBTTool.getTag(stack)
+        if (stack.`is`(ModItems.MONITOR) && tag.getBoolean("Using")
+            && tag.getBoolean("Linked")
         ) {
-            if (EntityFindUtil.findDrone(player.level(), stack.getOrCreateTag().getString("LinkedDrone")) != null) {
-                event.isCanceled = true
+            if (EntityFindUtil.findDrone(player.level(), tag.getString("LinkedDrone")) != null) {
+                return true
             }
         }
 
@@ -1912,9 +1972,12 @@ object ClientEventHandler {
         if (vehicle is VehicleEntity && (vehicle.banHand(player) ||
                     (!zoom && mc.options.cameraType == CameraType.FIRST_PERSON && ModKeyMappings.FREE_CAMERA.isDown()))
         ) {
-            event.isCanceled = true
+            return true
         }
+
+        return false
     }
+
 
     private fun handleWeaponSway(entity: LivingEntity) {
         val stack = entity.mainHandItem
@@ -2109,7 +2172,7 @@ object ClientEventHandler {
         zoomPosZ = AnimationCurves.PARABOLA.apply(zoomTime)
     }
 
-    private fun handleWeaponFire(event: ViewportEvent.ComputeCameraAngles, entity: LivingEntity) {
+    private fun handleWeaponFire(event: CameraAnglesContext, entity: LivingEntity) {
         val times = (1.65f * customAnimSpeed * mc.deltaFrameTime.coerceAtMost(0.48f)).toFloat()
         val stack = entity.mainHandItem
         val data = GunData.from(stack)
@@ -2421,7 +2484,7 @@ object ClientEventHandler {
         }
     }
 
-    private fun handleShockCamera(event: ViewportEvent.ComputeCameraAngles, entity: LivingEntity) {
+    private fun handleShockCamera(event: CameraAnglesContext, entity: LivingEntity) {
         val player = entity as? Player ?: return
         if (player.isSpectator) return
 
@@ -2448,7 +2511,7 @@ object ClientEventHandler {
         cameraRot[2] = -boneRotZ * shakeStrength
     }
 
-    private fun handlePlayerCamera(event: ViewportEvent.ComputeCameraAngles) {
+    private fun handlePlayerCamera(event: CameraAnglesContext) {
         val yaw = event.yaw
         val pitch = event.pitch
         val roll = event.roll
@@ -2518,8 +2581,8 @@ object ClientEventHandler {
         val times = 4 * getDelta().coerceAtMost(0.8f)
         val data = GunData.from(stack)
 
-        if (holdingFireKey && data.hasEnoughAmmoToShoot(entity) && !bowPull && stack.`is`(ModItems.BOCEK.get())) {
-            entity.playSound(ModSounds.BOCEK_PULL_1P.get(), 1f, 1f)
+        if (holdingFireKey && data.hasEnoughAmmoToShoot(entity) && !bowPull && stack.`is`(ModItems.BOCEK)) {
+            entity.playSound(ModSounds.BOCEK_PULL_1P, 1f, 1f)
             bowPull = true
         }
 
@@ -2532,16 +2595,14 @@ object ClientEventHandler {
         }
         bowPullPos = 0.5 * cos(PI * (bowPullTimer.coerceIn(0.0, 1.0).pow(2) - 1).pow(2)) + 0.5
     }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun captureFov(event: ViewportEvent.ComputeFov) {
+    @JvmStatic
+    fun captureFov(event: FovContext) {
         if (event.usedConfiguredFov()) {
             fov = event.fov
         }
     }
-
-    @SubscribeEvent
-    fun onFovUpdate(event: ViewportEvent.ComputeFov) {
+    @JvmStatic
+    fun onFovUpdate(event: FovContext) {
         val player = localPlayer ?: return
         val times = getDelta().coerceAtMost(1.6f)
 
@@ -2555,7 +2616,7 @@ object ClientEventHandler {
         val stack = player.mainHandItem
 
         val factor: Double =
-            if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR.get())
+            if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR)
                 && mc.options.cameraType == CameraType.FIRST_PERSON
             ) {
                 4.0 + artilleryIndicatorCustomZoom
@@ -2574,7 +2635,7 @@ object ClientEventHandler {
                 return
             }
 
-            val p = if (stack.`is`(ModItems.BOCEK.get())) {
+            val p = if (stack.`is`(ModItems.BOCEK)) {
                 bowPullPos * zoomTime
             } else {
                 zoomPos
@@ -2600,8 +2661,8 @@ object ClientEventHandler {
 
                     if (intelligentChipLevel > 0) {
                         if (lockedEntity == null || !lockedEntity!!.isAlive) {
-                            lockedEntity = if (data.perk.has(ModPerks.PHASE_PENETRATING_BULLET.get())
-                                || data.perk.has(ModPerks.BEAST_BULLET.get())
+                            lockedEntity = if (data.perk.has(ModPerks.PHASE_PENETRATING_BULLET)
+                                || data.perk.has(ModPerks.BEAST_BULLET)
                             ) {
                                 SeekTool.seekEntityThroughWall(player, seekRange, 16 / customZoom)
                             } else {
@@ -2614,7 +2675,7 @@ object ClientEventHandler {
 
                             val hasGravity = data.perk.getLevel(ModPerks.MICRO_MISSILE) <= 0
                             val velocity =
-                                if (stack.`is`(ModItems.BOCEK.get())) {
+                                if (stack.`is`(ModItems.BOCEK)) {
                                     zoomTime * 24
                                 } else {
                                     data.get(GunProp.VELOCITY)
@@ -2644,8 +2705,8 @@ object ClientEventHandler {
             lastY = player.yRot
         }
 
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
+        if (stack.`is`(ModItems.MONITOR) && NBTTool.getTag(stack).getBoolean("Using")
+            && NBTTool.getTag(stack).getBoolean("Linked")
         ) {
             droneFovLerp = Mth.lerp(0.1 * getDelta(), droneFovLerp, droneFov)
             event.fov /= droneFovLerp
@@ -2671,54 +2732,62 @@ object ClientEventHandler {
         player.yRot = Mth.wrapDegrees(finalY)
     }
 
-    @SubscribeEvent
-    fun setPlayerInvisible(event: RenderPlayerEvent.Pre) {
-        val otherPlayer = event.entity
+    @JvmStatic
+    fun shouldCancelPlayerRender(otherPlayer: Player): Boolean {
         val vehicle = otherPlayer.vehicle
         if (vehicle is VehicleEntity && vehicle.hidePassenger(otherPlayer)) {
-            event.isCanceled = true
+            return true
         }
+        return false
     }
 
-    @SubscribeEvent
-    fun handleRenderCrossHair(event: RenderGuiLayerEvent.Pre) {
-        if (event.name != VanillaGuiLayers.CROSSHAIR) return
-        val player = localPlayer ?: return
-        if (!mc.options.cameraType.isFirstPerson) return
 
-        if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR.get())) {
-            event.isCanceled = true
+    @JvmStatic
+    fun shouldCancelCrossHair(): Boolean {
+        val player = localPlayer ?: return false
+        if (!mc.options.cameraType.isFirstPerson) return false
+
+        if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR)) {
+            return true
         }
 
         val stack = player.mainHandItem
         if (stack.item is GunItem) {
-            event.isCanceled = true
+            return true
         }
 
         val vehicle = player.vehicle
         if (vehicle is VehicleEntity && vehicle.hasWeapon(vehicle.getSeatIndex(player))) {
-            event.isCanceled = true
+            return true
         }
 
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
+        val tag = NBTTool.getTag(stack)
+        if (stack.`is`(ModItems.MONITOR) && tag.getBoolean("Using")
+            && tag.getBoolean("Linked")
         ) {
-            event.isCanceled = true
+            return true
         }
+
+        return false
     }
+
 
     /**
      * 载具banHand时，禁用快捷栏渲染
      */
-    @SubscribeEvent
-    fun handleAvoidRenderingHotbar(event: RenderGuiLayerEvent.Pre) {
-        if (event.name != VanillaGuiLayers.HOTBAR) return
-        val player = localPlayer ?: return
+    /**
+     * 载具banHand时，禁用快捷栏渲染
+     */
+    @JvmStatic
+    fun shouldCancelHotbar(): Boolean {
+        val player = localPlayer ?: return false
         val vehicle = player.vehicle
         if (vehicle is VehicleEntity && vehicle.banHand(player)) {
-            event.isCanceled = true
+            return true
         }
+        return false
     }
+
 
     fun resetGunStatus() {
         drawTime = 1.0
@@ -2803,7 +2872,7 @@ object ClientEventHandler {
         val player = localPlayer ?: return
         isEditing = true
         holdingFireKey = false
-        player.playSound(ModSounds.EDIT_MODE.get(), 1f, 1f)
+        player.playSound(ModSounds.EDIT_MODE, 1f, 1f)
     }
 
     @JvmStatic
@@ -2854,21 +2923,23 @@ object ClientEventHandler {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderNameTag(event: RenderNameTagEvent) {
-        val entity = event.entity as? Player ?: return
-        val self = localPlayer ?: return
-        if (self == entity) return
-        if (self.vehicle !is VehicleEntity) return
-        if (self.isPassengerOfSameVehicle(entity)) {
-            event.setCanRender(TriState.FALSE)
+    @JvmStatic
+    fun shouldRenderNameTag(entity: Entity): Boolean {
+        val player = entity as? Player ?: return true
+        val self = localPlayer ?: return true
+        if (self == player) return true
+        if (self.vehicle !is VehicleEntity) return true
+        if (self.isPassengerOfSameVehicle(player)) {
+            return false
         }
+        return true
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onPlayerLoggedIn(event: PlayerEvent.PlayerLoggedInEvent) {
+
+    @JvmStatic
+    fun onPlayerLoggedIn() {
         if (!DisplayConfig.ENABLE_VERSION_CHECK_WARNING.get()) return
-        val player = event.entity ?: return
+        val player = localPlayer ?: return
         if (ModVersionEventHandler.currentVersion == null || ModVersionEventHandler.previousVersion == null) return
 
         player.displayClientMessage(
@@ -2882,7 +2953,7 @@ object ClientEventHandler {
         player.displayClientMessage(
             Component.translatable(
                 "tips.superbwarfare.vehicle_reset_kit_2",
-                Component.literal("[").append(ModItems.VEHICLE_RESET_KIT.get().defaultInstance.hoverName)
+                Component.literal("[").append(ModItems.VEHICLE_RESET_KIT.defaultInstance.hoverName)
                     .append("]").withStyle(ChatFormatting.GREEN)
             ), false
         )
@@ -2892,12 +2963,14 @@ object ClientEventHandler {
         )
     }
 
-    @SubscribeEvent
-    fun onFogColor(event: ViewportEvent.ComputeFogColor) {
-        if (activeThermalImaging) {
-            event.red = 0.1F
-            event.green = 0.1F
-            event.blue = 0.1F
+
+    @JvmStatic
+    fun modifyFogColor(red: Float, green: Float, blue: Float): FloatArray {
+        return if (activeThermalImaging) {
+            floatArrayOf(0.1F, 0.1F, 0.1F)
+        } else {
+            floatArrayOf(red, green, blue)
         }
     }
+
 }

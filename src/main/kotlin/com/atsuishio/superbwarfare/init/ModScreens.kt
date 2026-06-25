@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screens.MenuScreens
 
 object ModScreens {
 
+    @JvmStatic
     fun init() {
         MenuScreens.register(ModMenuTypes.MINI_VEHICLE_CONTAINER_MENU, ::MiniVehicleContainerScreen)
         MenuScreens.register(ModMenuTypes.SMALL_VEHICLE_CONTAINER_MENU, ::SmallVehicleContainerScreen)

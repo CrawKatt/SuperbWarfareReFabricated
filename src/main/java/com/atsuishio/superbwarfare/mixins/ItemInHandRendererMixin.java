@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.client.VehicleClientRenderState;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
+import com.atsuishio.superbwarfare.item.misc.MonitorItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
@@ -40,7 +41,7 @@ public class ItemInHandRendererMixin {
             )
     )
     private boolean superbWarfare$monitorMatchesForEquipAnimation(ItemStack oldStack, ItemStack newStack) {
-        if (oldStack.is(ModItems.MONITOR) && newStack.is(ModItems.MONITOR)) {
+        if (oldStack.getItem() instanceof MonitorItem && newStack.getItem() instanceof MonitorItem) {
             return true;
         }
 

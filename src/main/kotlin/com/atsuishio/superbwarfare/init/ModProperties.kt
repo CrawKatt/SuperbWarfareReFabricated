@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.item.ItemProperties
 
 object ModProperties {
 
+    @JvmStatic
     fun init() {
         ItemProperties.register(ModItems.MONITOR, loc("monitor_linked")) { itemStack, _, _, _ ->
             if (itemStack.tag?.getBoolean("Linked") == true) 1f else 0f

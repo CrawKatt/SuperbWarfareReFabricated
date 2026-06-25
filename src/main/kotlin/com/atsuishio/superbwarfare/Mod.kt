@@ -1,133 +1,157 @@
 package com.atsuishio.superbwarfare
 
-/*
-import com.atsuishio.superbwarfare.api.event.RegisterContainersEvent
-import com.atsuishio.superbwarfare.client.MouseMovementHandler
-import com.atsuishio.superbwarfare.client.renderer.molang.MolangVariable
-import com.atsuishio.superbwarfare.compat.CompatHolder
-import com.atsuishio.superbwarfare.compat.clothconfig.ClothConfigHelper
-import com.atsuishio.superbwarfare.compat.coldsweat.ColdSweatCompatHandler
-import com.atsuishio.superbwarfare.config.CLIENT_CONFIG
-import com.atsuishio.superbwarfare.config.COMMON_CONFIG
-import com.atsuishio.superbwarfare.config.SERVER_CONFIG
+import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
+import com.atsuishio.superbwarfare.command.CommandRegister
+import com.atsuishio.superbwarfare.compat.thermoo.ThermooCompatHandler
+import com.atsuishio.superbwarfare.config.CommonConfig
+import com.atsuishio.superbwarfare.config.ServerConfig
 import com.atsuishio.superbwarfare.data.CustomData
-import com.atsuishio.superbwarfare.init.*
-import com.atsuishio.superbwarfare.network.initializeNetwork
-import com.atsuishio.superbwarfare.tiers.ModArmorMaterial
+import com.atsuishio.superbwarfare.data.DataLoader
+import com.atsuishio.superbwarfare.data.container.ContainerDataManager
+import com.atsuishio.superbwarfare.data.vehicle.VehicleDataTool
+import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
+import com.atsuishio.superbwarfare.event.PlayerEventHandler
+import com.atsuishio.superbwarfare.init.ModAttributes
+import com.atsuishio.superbwarfare.init.ModBlockEntities
+import com.atsuishio.superbwarfare.init.ModBlocks
+import com.atsuishio.superbwarfare.init.ModCapabilities
+import com.atsuishio.superbwarfare.init.ModCommandArguments
+import com.atsuishio.superbwarfare.init.ModCriteriaTriggers
+import com.atsuishio.superbwarfare.init.ModDamageTypes
+import com.atsuishio.superbwarfare.init.ModDataComponents
+import com.atsuishio.superbwarfare.init.ModEntities
+import com.atsuishio.superbwarfare.init.ModEventHandlers
+import com.atsuishio.superbwarfare.init.ModGameRules
+import com.atsuishio.superbwarfare.init.ModItems
+import com.atsuishio.superbwarfare.init.ModMenuTypes
+import com.atsuishio.superbwarfare.init.ModMobEffects
+import com.atsuishio.superbwarfare.init.ModParticleTypes
+import com.atsuishio.superbwarfare.init.ModPerks
+import com.atsuishio.superbwarfare.init.ModPotions
+import com.atsuishio.superbwarfare.init.ModRecipes
+import com.atsuishio.superbwarfare.init.ModSerializers
+import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.init.ModTabs
+import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.init.ModVillagers
+import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
+import com.atsuishio.superbwarfare.network.registerPayloads
+import com.atsuishio.superbwarfare.tiers.ModArmorMaterials
+import com.atsuishio.superbwarfare.tools.GunsTool
+import com.atsuishio.superbwarfare.tools.ResourceOnceLogger
+import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry
+import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.server.packs.PackType
-import net.minecraft.server.packs.repository.Pack
-import net.minecraft.server.packs.repository.PackSource
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.IEventBus
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.ModContainer
-import net.neoforged.fml.common.Mod
 import net.neoforged.fml.config.ModConfig
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
-import net.neoforged.fml.loading.FMLEnvironment
-import net.neoforged.neoforge.client.event.ClientTickEvent
-import net.neoforged.neoforge.common.NeoForge
-import net.neoforged.neoforge.event.AddPackFindersEvent
-import net.neoforged.neoforge.event.tick.ServerTickEvent
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import java.util.*
+import software.bernie.geckolib.constant.dataticket.SerializableDataTicket
+import software.bernie.geckolib.util.GeckoLibUtil
+import java.util.AbstractMap
 import java.util.concurrent.ConcurrentLinkedQueue
 
 private typealias Task = AbstractMap.SimpleEntry<Runnable, Int>
 
-@Mod(com.atsuishio.superbwarfare.Mod.MODID)
-class Mod(bus: IEventBus, container: ModContainer) {
-    init {
-        with(container) {
-            registerConfig(ModConfig.Type.CLIENT, CLIENT_CONFIG)
-            registerConfig(ModConfig.Type.COMMON, COMMON_CONFIG)
-            registerConfig(ModConfig.Type.SERVER, SERVER_CONFIG)
-        }
+class Mod : ModInitializer {
+    override fun onInitialize() {
+        LOGGER.info("Initializing Superb Warfare (Fabric)")
 
-        ModPerks.register(bus)
-        ModSerializers.REGISTRY.register(bus)
-        ModSounds.REGISTRY.register(bus)
-        ModBlocks.REGISTRY.register(bus)
-        ModBlockEntities.REGISTRY.register(bus)
-        ModItems.register(bus)
-        ModDataComponents.register(bus)
-        ModTabs.TABS.register(bus)
-        ModEntities.REGISTRY.register(bus)
-        ModMobEffects.REGISTRY.register(bus)
-        ModParticleTypes.REGISTRY.register(bus)
-        ModPotions.register(bus)
-        ModMenuTypes.REGISTRY.register(bus)
-        ModVillagers.register(bus)
-        ModRecipes.register(bus)
-        ModArmorMaterial.MATERIALS.register(bus)
-        ModAttributes.ATTRIBUTES.register(bus)
-        ModCriteriaTriggers.REGISTRY.register(bus)
-        ModAttachments.ATTACHMENT_TYPES.register(bus)
-        ModCommandArguments.COMMAND_ARGUMENT_TYPES.register(bus)
+        triggerInit()
+        callInits()
 
-        bus.addListener<FMLClientSetupEvent> { onClientSetup(it) }
-        bus.addListener<FMLCommonSetupEvent> { onCommonSetup(bus, it) }
-        bus.addListener<FMLCommonSetupEvent> { ModItems.registerDispenserBehavior() }
+        registerPayloads()
+        VehicleDataTool.register()
+        GunsTool.register()
+        DataLoader.register()
 
-        bus.addListener<RegisterPayloadHandlersEvent> { initializeNetwork(it) }
-        bus.addListener<AddPackFindersEvent> { onRegisterBuiltInResourcePacks(it) }
-
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            CompatHolder.hasMod(CompatHolder.CLOTH_CONFIG) { ClothConfigHelper.registerScreen() }
-        }
-
-        if (ColdSweatCompatHandler.hasMod()) {
-            NeoForge.EVENT_BUS.addListener(ColdSweatCompatHandler::onPlayerInVehicle)
-        }
-
-        NeoForge.EVENT_BUS.register(this)
-
+        ContainerBlockItem.registerContainers()
+        ModCapabilities.init()
         CustomData.load()
+
+        CommandRegister.register()
+        ContainerDataManager.register()
+        TDMSavedData.register()
+        ModDataComponents.init()
+
+        ResourceOnceLogger.register()
+        ThermooCompatHandler.init()
+        registerBuiltinResourcePacks()
+        registerDataTickets()
+        registerTicks()
     }
 
-    @SubscribeEvent
-    @Suppress("unused")
-    private fun tick(event: ServerTickEvent.Post) = executeWork(SERVER_QUEUE)
+    private fun triggerInit() {
+        ModItems.registerDispenserBehavior()
 
-    @SubscribeEvent
-    @Suppress("unused")
-    private fun tick(event: ClientTickEvent.Post) = executeWork(CLIENT_QUEUE)
+        NeoForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.COMMON, CommonConfig.init())
+        NeoForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.SERVER, ServerConfig.init())
+    }
 
-    private fun executeWork(workQueueC: MutableCollection<Task>) {
-        workQueueC.removeAll(
-            workQueueC
-                .onEach { it.setValue(it.value - 1) }
-                .filter { it.value <= 0 }
-                .onEach { it.key.run() }
-                .toSet()
+    private fun callInits() {
+        ModBlocks.init()
+        ModBlockEntities.init()
+        ModEntities.init()
+        ModMenuTypes.init()
+        ModSounds.init()
+        ModMobEffects.init()
+        ModParticleTypes.init()
+        ModPotions.init()
+        ModRecipes.init()
+        ModArmorMaterials.register()
+        ModAttributes.init()
+        ModCriteriaTriggers.init()
+        ModCommandArguments.init()
+        ModTabs.init()
+        ModVillagers.init()
+        ModSerializers.init()
+        ModPerks.init()
+        ModDamageTypes.init()
+        ModEventHandlers.init()
+        ModTags.init()
+        ModGameRules.bootstrap()
+
+        ModEntities.registerAttributes()
+        ModEntities.registerSpawnPlacements()
+    }
+
+    private fun registerTicks() {
+        ServerTickEvents.START_SERVER_TICK.register { server ->
+            for (player in server.playerList.players) {
+                ThermooCompatHandler.onPlayerInVehicle(player)
+            }
+        }
+
+        ServerTickEvents.END_SERVER_TICK.register { server ->
+            tickServer()
+
+            for (player in server.playerList.players) {
+                PlayerEventHandler.onPlayerTick(player)
+                HitboxHelperEventHandler.onPlayerTick(player)
+            }
+        }
+    }
+
+    private fun registerDataTickets() {
+        FuMO25BlockEntity.FUMO25_TICK = GeckoLibUtil.addDataTicket(
+            SerializableDataTicket.ofInt(loc("fumo25_tick"))
         )
     }
 
-    private fun onCommonSetup(bus: IEventBus, event: FMLCommonSetupEvent) {
-        bus.post(RegisterContainersEvent())
-        event.enqueueWork { ModGameRules.bootstrap() }
-    }
-
-    private fun onClientSetup(event: FMLClientSetupEvent) {
-        MouseMovementHandler.init()
-        MolangVariable.register()
-        event.enqueueWork { ModSoundInstances.init() }
-    }
-
-    private fun onRegisterBuiltInResourcePacks(event: AddPackFindersEvent) {
-        event.addPackFinders(
-            loc("resourcepacks/sbw_legacy"),
-            PackType.CLIENT_RESOURCES,
-            Component.translatable("pack.superbwarfare.sbw_legacy"),
-            PackSource.BUILT_IN,
-            false,
-            Pack.Position.TOP
-        )
+    private fun registerBuiltinResourcePacks() {
+        FabricLoader.getInstance().getModContainer(MODID).ifPresent { container ->
+            ResourceManagerHelper.registerBuiltinResourcePack(
+                loc("sbw_legacy"),
+                container,
+                Component.translatable("pack.superbwarfare.sbw_legacy"),
+                ResourcePackActivationType.NORMAL
+            )
+        }
     }
 
     companion object {
@@ -140,16 +164,41 @@ class Mod(bus: IEventBus, container: ModContainer) {
         val LOGGER: Logger = LogManager.getLogger(Mod::class.java)
 
         @JvmStatic
-        fun loc(path: String): ResourceLocation = ResourceLocation.fromNamespaceAndPath(MODID, path)
+        fun loc(path: String): ResourceLocation {
+            return ResourceLocation.fromNamespaceAndPath(MODID, path)
+        }
 
         private val SERVER_QUEUE: MutableCollection<Task> = ConcurrentLinkedQueue()
         private val CLIENT_QUEUE: MutableCollection<Task> = ConcurrentLinkedQueue()
 
         @JvmStatic
-        fun queueServerWork(tick: Int, action: Runnable) = SERVER_QUEUE.add(AbstractMap.SimpleEntry(action, tick))
+        fun queueServerWork(tick: Int, action: Runnable) {
+            SERVER_QUEUE.add(AbstractMap.SimpleEntry(action, tick))
+        }
 
         @JvmStatic
-        fun queueClientWork(tick: Int, action: Runnable) = CLIENT_QUEUE.add(AbstractMap.SimpleEntry(action, tick))
+        fun queueClientWork(tick: Int, action: Runnable) {
+            CLIENT_QUEUE.add(AbstractMap.SimpleEntry(action, tick))
+        }
+
+        @JvmStatic
+        fun tickServer() {
+            executeWork(SERVER_QUEUE)
+        }
+
+        @JvmStatic
+        fun tickClient() {
+            executeWork(CLIENT_QUEUE)
+        }
+
+        private fun executeWork(workQueue: MutableCollection<Task>) {
+            val actions = workQueue
+                .onEach { it.setValue(it.value - 1) }
+                .filter { it.value <= 0 }
+                .toSet()
+
+            actions.forEach { it.key.run() }
+            workQueue.removeAll(actions)
+        }
     }
 }
-*/

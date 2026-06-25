@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/*
 public class Mod {
 
     public static final String MODID = "superbwarfare";
@@ -51,3 +52,4 @@ public class Mod {
         workQueue.removeAll(actions);
     }
 }
+*/

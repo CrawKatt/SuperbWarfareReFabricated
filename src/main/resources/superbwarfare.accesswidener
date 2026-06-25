@@ -45,3 +45,4 @@ accessible field net/minecraft/world/item/ShovelItem FLATTENABLES Ljava/util/Map
 accessible field net/minecraft/world/item/HoeItem TILLABLES Ljava/util/Map;
 accessible method net/minecraft/world/entity/Entity getEncodeId ()Ljava/lang/String;
 accessible field net/minecraft/world/entity/Entity levelCallback Lnet/minecraft/world/level/entity/EntityInLevelCallback;
+accessible method net/minecraft/client/renderer/GameRenderer loadEffect (Lnet/minecraft/resources/ResourceLocation;)V

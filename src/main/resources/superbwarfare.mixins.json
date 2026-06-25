@@ -52,6 +52,7 @@
     "PlayerItemInHandLayerMixin",
     "PlayerModelMixin",
     "PlayerRendererMixin",
+    "RenderTargetMixin",
     "ScreenAccessor"
   ],
   "minVersion": "0.8"

@@ -16,7 +16,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.atsuishio.superbwarfare.SuperbWarfareFabric"
+      "com.atsuishio.superbwarfare.Mod"
     ],
     "client": [
       "com.atsuishio.superbwarfare.client.SuperbWarfareFabricClient"

@@ -14,7 +14,7 @@ import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.projectile.PotionMortarShellItem;
-import com.atsuishio.superbwarfare.network.NetworkRegistry;
+import com.atsuishio.superbwarfare.network.NetworkRegistryKt;
 import com.atsuishio.superbwarfare.resource.BedrockModelLoader;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
@@ -49,7 +49,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         MolangVariable.register();
         ModSoundInstances.init();
         ModEventHandlers.initClient();
-        NetworkRegistry.registerClientReceivers();
+        NetworkRegistryKt.registerClientReceivers();
 
         registerClientTicks();
         registerRenderFrames();

@@ -33,12 +33,12 @@ open class MonitorItem : Item(Properties().stacksTo(1)) {
     private fun resetDroneData(drone: DroneEntity?) {
         if (drone == null) return
 
-        drone.getPersistentData().putBoolean("left", false)
-        drone.getPersistentData().putBoolean("right", false)
-        drone.getPersistentData().putBoolean("forward", false)
-        drone.getPersistentData().putBoolean("backward", false)
-        drone.getPersistentData().putBoolean("up", false)
-        drone.getPersistentData().putBoolean("down", false)
+        drone.leftInputDown = false
+        drone.rightInputDown = false
+        drone.forwardInputDown = false
+        drone.backInputDown = false
+        drone.upInputDown = false
+        drone.downInputDown = false
     }
 
     @ParametersAreNonnullByDefault
@@ -127,14 +127,6 @@ open class MonitorItem : Item(Properties().stacksTo(1)) {
                         " Z: " + format1D(droneVec.z)
             )
         )
-    }
-
-    override fun shouldCauseReequipAnimation(
-        oldStack: ItemStack,
-        newStack: ItemStack,
-        slotChanged: Boolean
-    ): Boolean {
-        return false
     }
 
     @ParametersAreNonnullByDefault

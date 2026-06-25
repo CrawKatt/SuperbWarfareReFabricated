@@ -61,7 +61,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
+/*
 public class ClientEventHandler {
 
     public static double zoomTime = 0;
@@ -805,6 +805,7 @@ public class ClientEventHandler {
     /**
      * 禁止玩家奔跑
      */
+/*
     private static void handlePlayerSprint() {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) {
@@ -2141,6 +2142,7 @@ public class ClientEventHandler {
     /**
      * 载具banHand时，禁用快捷栏渲染
      */
+/*
     public static void handleAvoidRenderingHotbar(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
@@ -2227,6 +2229,7 @@ public class ClientEventHandler {
      * @param hand  持有武器的手
      * @return 能否成功打开GUI
      */
+/*
     public static boolean canOpenEditScreen(ItemStack stack, InteractionHand hand) {
         return burstFireAmount == 0 && stack.getItem() instanceof GunItem && hand == InteractionHand.MAIN_HAND;
     }
@@ -2309,3 +2312,4 @@ public class ClientEventHandler {
                 .withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.UNDERLINE), false);
     }
 }
+*/
