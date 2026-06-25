@@ -4,14 +4,10 @@ import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.inventory.menu.FuMO25Menu
 import com.atsuishio.superbwarfare.tools.SeekTool
 import com.atsuishio.superbwarfare.tools.mc
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.Entity
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.ClientTickEvent
 
-@EventBusSubscriber(Dist.CLIENT)
 object FuMO25ScreenHelper {
     const val TOLERANCE_DISTANCE_SQR = 256
 
@@ -21,9 +17,16 @@ object FuMO25ScreenHelper {
     @JvmStatic
     var entities: List<Entity>? = null
 
-    @SubscribeEvent
+    @JvmStatic
+    fun register() {
+        ClientTickEvents.END_CLIENT_TICK.register {
+            onClientTick()
+        }
+    }
+
+    @JvmStatic
     @Suppress("unused")
-    fun onClientTick(event: ClientTickEvent.Post) {
+    fun onClientTick() {
         val player = mc.player ?: return
         val camera = mc.gameRenderer.mainCamera
         val cameraPos = camera.position

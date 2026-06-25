@@ -13,7 +13,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotF
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
-import com.atsuishio.superbwarfare.item.common.container.ContainerBlockItem
+import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
 import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.tools.RangeTool.calculateFiringSolution
@@ -118,7 +118,7 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : GeoVehicleEnti
 
         compound.putBoolean("Active", active)
         if (optionalOwnerUUID.isPresent) {
-            compound.putUUID("Owner", optionalOwnerUUID)
+            compound.putUUID("Owner", optionalOwnerUUID.get())
         }
     }
 

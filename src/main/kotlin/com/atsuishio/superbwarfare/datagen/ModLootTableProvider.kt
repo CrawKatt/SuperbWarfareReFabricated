@@ -13,7 +13,7 @@ object ModLootTableProvider {
             output, mutableSetOf(), listOf(
                 SubProviderEntry({ provider -> ModBlockLootProvider(provider) }, LootContextParamSets.BLOCK),
                 SubProviderEntry({ _ -> ModCustomLootProvider() }, LootContextParamSets.CHEST),
-                SubProviderEntry({ registries -> ModEntityLootProvider(registries) }, LootContextParamSets.ENTITY)
+                SubProviderEntry({ _ -> ModEntityLootProvider() }, LootContextParamSets.ENTITY)
             ), registries
         )
     }

@@ -34,12 +34,8 @@ import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.function.Consumer
 
 class LuckyContainerBlockItem :
-    BlockItem(ModBlocks.LUCKY_CONTAINER.get(), Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()), GeoItem {
+    BlockItem(ModBlocks.LUCKY_CONTAINER, Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()), GeoItem {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
-
-    override fun canBeHurtBy(stack: ItemStack, source: DamageSource) = super.canBeHurtBy(stack, source)
-            && !source.`is`(DamageTypeTags.IS_EXPLOSION)
-            && !source.`is`(DamageTypes.CACTUS)
 
     override fun useOn(context: UseOnContext): InteractionResult {
         return InteractionResult.PASS
@@ -94,13 +90,13 @@ class LuckyContainerBlockItem :
 
         @JvmOverloads
         fun createInstance(location: ResourceLocation, icon: ResourceLocation? = null): ItemStack {
-            val stack = ItemStack(ModBlocks.LUCKY_CONTAINER.get())
+            val stack = ItemStack(ModBlocks.LUCKY_CONTAINER)
             val tag = CompoundTag()
             tag.putString("Location", location.toString())
             if (icon != null) {
                 tag.putString("Icon", icon.toString())
             }
-            setBlockEntityData(stack, ModBlockEntities.LUCKY_CONTAINER.get(), tag)
+            setBlockEntityData(stack, ModBlockEntities.LUCKY_CONTAINER, tag)
             return stack
         }
     }

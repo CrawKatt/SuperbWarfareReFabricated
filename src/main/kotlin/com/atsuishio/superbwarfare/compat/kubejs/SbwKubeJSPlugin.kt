@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.compat.kubejs
 
+/*
 import com.atsuishio.superbwarfare.compat.kubejs.event.SbwKJSEventHandler
 import dev.latvian.mods.kubejs.event.EventGroupRegistry
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin
@@ -11,3 +12,4 @@ class SbwKubeJSPlugin : KubeJSPlugin {
         FORGE_BUS.register(SbwKJSEventHandler)
     }
 }
+*/

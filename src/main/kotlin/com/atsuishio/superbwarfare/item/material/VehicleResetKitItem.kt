@@ -9,12 +9,8 @@ import net.minecraft.world.item.TooltipFlag
 import javax.annotation.ParametersAreNonnullByDefault
 
 class VehicleResetKitItem : Item(Properties().rarity(Rarity.UNCOMMON).stacksTo(1)) {
-    override fun hasCraftingRemainingItem(stack: ItemStack): Boolean {
+    override fun hasCraftingRemainingItem(): Boolean {
         return true
-    }
-
-    override fun getCraftingRemainingItem(itemstack: ItemStack): ItemStack {
-        return itemstack.copy()
     }
 
     @ParametersAreNonnullByDefault
@@ -30,5 +26,12 @@ class VehicleResetKitItem : Item(Properties().rarity(Rarity.UNCOMMON).stacksTo(1
         tooltipComponents.add(
             Component.translatable("des.superbwarfare.vehicle_reset_kit_2").withStyle(ChatFormatting.GRAY)
         )
+    }
+
+    companion object {
+        @JvmStatic
+        fun getCraftingRemainingItem(itemstack: ItemStack): ItemStack {
+            return itemstack.copy()
+        }
     }
 }

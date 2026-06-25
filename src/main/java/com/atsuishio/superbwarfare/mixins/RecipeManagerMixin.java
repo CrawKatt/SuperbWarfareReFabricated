@@ -1,7 +1,9 @@
 package com.atsuishio.superbwarfare.mixins;
 
+import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModTags;
-import com.atsuishio.superbwarfare.item.Hammer;
+import com.atsuishio.superbwarfare.item.material.VehicleResetKitItem;
+import com.atsuishio.superbwarfare.item.weapon.HammerItem;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
@@ -18,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class RecipeManagerMixin {
 
     @Inject(method = "getRemainingItemsFor", at = @At("RETURN"), cancellable = true)
-    private <I extends RecipeInput, T extends Recipe<I>> void superbwarfare$damageHammerRecipeRemainders(
+    private <I extends RecipeInput, T extends Recipe<I>> void superbwarfare$recipeRemainders(
             RecipeType<T> recipeType,
             I recipeInput,
             Level level,
@@ -31,10 +33,16 @@ public abstract class RecipeManagerMixin {
 
         for (int i = 0; i < recipeInput.size() && i < remainingItems.size(); i++) {
             var itemStack = recipeInput.getItem(i);
-            if (!itemStack.is(ModTags.Items.HAMMER) || !remainingItems.get(i).isEmpty()) continue;
 
-            remainingItems.set(i, Hammer.getCraftingRemainingStack(itemStack));
-            changed = true;
+            if (itemStack.is(ModTags.Items.HAMMER) && remainingItems.get(i).isEmpty()) {
+                remainingItems.set(i, HammerItem.getCraftingRemainingStack(itemStack));
+                changed = true;
+            }
+
+            if (itemStack.is(ModItems.VEHICLE_RESET_KIT) && remainingItems.get(i).isEmpty()) {
+                remainingItems.set(i, VehicleResetKitItem.getCraftingRemainingItem(itemStack));
+                changed = true;
+            }
         }
 
         if (changed) {

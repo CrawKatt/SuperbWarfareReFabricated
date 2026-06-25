@@ -1,6 +1,11 @@
 package com.atsuishio.superbwarfare.client.screens
 
+import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.tools.mc
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.AbstractButton
@@ -9,17 +14,8 @@ import net.minecraft.client.gui.components.MultiLineLabel
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.TitleScreen
 import net.minecraft.network.chat.Component
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.bus.api.EventPriority
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.fml.loading.FMLEnvironment
-import net.neoforged.fml.loading.LoadingModList
-import net.neoforged.neoforge.client.event.ScreenEvent
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 class SnapshotWarningScreen(val lastScreen: Screen) : Screen(
     Component.translatable("warning.superbwarfare.title.snapshot").withStyle(ChatFormatting.BOLD)
 ) {
@@ -88,24 +84,30 @@ class SnapshotWarningScreen(val lastScreen: Screen) : Screen(
         mc.setScreen(this.lastScreen)
     }
 
-    @EventBusSubscriber(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     companion object {
         var firstTimeStart = false
 
-        @SubscribeEvent(priority = EventPriority.HIGH)
-        fun onTitleScreenOpen(event: ScreenEvent.Init.Post) {
-            if (!FMLEnvironment.production) return
-            if (firstTimeStart || event.screen !is TitleScreen) return
-            val version = getVersion() ?: return
-            if (!version.toString().lowercase().contains("snapshot")) return
+        @JvmStatic
+        fun register() {
+            ScreenEvents.AFTER_INIT.register { _, screen, _, _ ->
+                onTitleScreenOpen(screen)
+            }
+        }
 
-            mc.setScreen(SnapshotWarningScreen(event.screen))
+        fun onTitleScreenOpen(screen: Screen) {
+            if (FabricLoader.getInstance().isDevelopmentEnvironment) return
+            if (firstTimeStart || screen !is TitleScreen) return
+            val version = getVersion() ?: return
+            if (!version.lowercase().contains("snapshot")) return
+
+            mc.setScreen(SnapshotWarningScreen(screen))
             firstTimeStart = true
         }
 
-        fun getVersion(): DefaultArtifactVersion? {
-            val modFile = LoadingModList.get().getModFileById(com.atsuishio.superbwarfare.Mod.MODID) ?: return null
-            return DefaultArtifactVersion(modFile.versionString())
+        fun getVersion(): String? {
+            val modContainer = FabricLoader.getInstance().getModContainer(Mod.MODID).orElse(null) ?: return null
+            return modContainer.metadata.version.friendlyString
         }
     }
 }

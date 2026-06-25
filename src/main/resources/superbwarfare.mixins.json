@@ -11,6 +11,7 @@
     "EntityAccessor",
     "EntityMixin",
     "FishingHookMixin",
+    "ItemEntityMixin",
     "LevelMixin",
     "LivingEntityAccessor",
     "LivingEntityMixin",

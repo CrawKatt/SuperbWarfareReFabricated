@@ -17,7 +17,7 @@ open class PrismaticBoltEntity : Entity {
 
     constructor(type: EntityType<out PrismaticBoltEntity>, world: Level) : super(type, world)
 
-    constructor(level: Level) : super(ModEntities.PRISMATIC_BOLT.get(), level)
+    constructor(level: Level) : super(ModEntities.PRISMATIC_BOLT, level)
 
     override fun readAdditionalSaveData(compoundTag: CompoundTag) {
     }

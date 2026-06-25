@@ -31,10 +31,6 @@ class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER, Properties(
     GeoItem {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
 
-    override fun canBeHurtBy(stack: ItemStack, source: DamageSource) = super.canBeHurtBy(stack, source)
-            && !source.`is`(DamageTypeTags.IS_EXPLOSION)
-            && !source.`is`(DamageTypes.CACTUS)
-
     private fun predicate(event: AnimationState<SmallContainerBlockItem>): PlayState {
         return PlayState.CONTINUE
     }
@@ -77,7 +73,7 @@ class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER, Properties(
 
         @JvmOverloads
         fun createInstance(lootTable: ResourceKey<LootTable>, lootTableSeed: Long = 0L): ItemStack {
-            val stack = ItemStack(ModBlocks.SMALL_CONTAINER.get())
+            val stack = ItemStack(ModBlocks.SMALL_CONTAINER)
             stack.set(
                 DataComponents.CONTAINER_LOOT,
                 SeededContainerLoot(lootTable, lootTableSeed)

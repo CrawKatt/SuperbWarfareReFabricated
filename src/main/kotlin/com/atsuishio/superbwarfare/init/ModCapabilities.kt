@@ -12,8 +12,8 @@ import com.atsuishio.superbwarfare.capability.api.SidedInvWrapper
 import com.atsuishio.superbwarfare.capability.energy.ItemEnergyStorage
 import com.atsuishio.superbwarfare.capability.laser.LaserCapability
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
-import com.atsuishio.superbwarfare.item.CreativeChargingStationBlockItem
 import com.atsuishio.superbwarfare.item.EnergyStorageItem
+import com.atsuishio.superbwarfare.item.blockitem.CreativeChargingStationBlockItem
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
 import net.fabricmc.fabric.api.lookup.v1.entity.EntityApiLookup
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup

@@ -10,6 +10,7 @@ import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.tools.mc
 import java.util.function.Consumer
+
 object ModSoundInstances {
     fun init() {
         VehicleEntity.playTrackSound =

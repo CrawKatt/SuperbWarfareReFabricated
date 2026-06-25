@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.network.message.receive
 
 import com.atsuishio.superbwarfare.data.gun.Ammo
-import com.atsuishio.superbwarfare.init.ModAttachments
+import com.atsuishio.superbwarfare.init.ModComponents
 import com.atsuishio.superbwarfare.network.ClientPacketPayload
 import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.tools.clientLevel
@@ -16,15 +16,23 @@ data class PlayerVariablesSyncMessage(
     override fun PayloadContext.handler() {
         val entity = clientLevel?.getEntity(target) ?: return
 
-        val variables = ModAttachments.PLAYER_VARIABLE.get(entity)
+        val variables = ModComponents.PLAYER_VARIABLE.get(entity)
 
         for ((type, value) in data) {
-            if (type == (-1).toByte()) {
-                variables.activeThermalImaging = value == 1
-            } else {
-                val types = Ammo.entries.toTypedArray()
-                if (type < types.size) {
-                    types[type.toInt()].set(variables, value)
+            when (type) {
+                (-1).toByte() -> {
+                    variables.activeThermalImaging = value == 1
+                }
+
+                (-2).toByte() -> {
+                    variables.tacticalSprint = value == 1
+                }
+
+                else -> {
+                    val types = Ammo.entries.toTypedArray()
+                    if (type >= 0 && type < types.size) {
+                        types[type.toInt()].set(variables, value)
+                    }
                 }
             }
         }

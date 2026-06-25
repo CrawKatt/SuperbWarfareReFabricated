@@ -10,12 +10,9 @@ import net.fabricmc.api.Environment
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
-import net.minecraft.tags.DamageTypeTags
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.InteractionResultHolder
-import net.minecraft.world.damagesource.DamageSource
-import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.player.Player
@@ -36,12 +33,8 @@ import software.bernie.geckolib.renderer.GeoItemRenderer
 import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.function.Consumer
 
-class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER.get(), Properties().stacksTo(1).fireResistant()), GeoItem {
+class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(1).fireResistant()), GeoItem {
     private val cache = GeckoLibUtil.createInstanceCache(this)
-
-    override fun canBeHurtBy(stack: ItemStack, source: DamageSource) = super.canBeHurtBy(stack, source)
-            && !source.`is`(DamageTypeTags.IS_EXPLOSION)
-            && !source.`is`(DamageTypes.CACTUS)
 
     override fun useOn(context: UseOnContext) = InteractionResult.PASS
 
@@ -148,13 +141,13 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER.get(), Properties().sta
 
         @JvmStatic
         fun createInstance(entity: Entity): ItemStack {
-            val stack = ItemStack(ModBlocks.CONTAINER.get())
+            val stack = ItemStack(ModBlocks.CONTAINER)
 
             val data = stack.get(DataComponents.BLOCK_ENTITY_DATA)
             val tag = if (data != null) data.copyTag() else CompoundTag()
 
             val entityTag = CompoundTag()
-            val encodedId = entity.getEncodeId()
+            val encodedId = entity.encodeId
             if (encodedId != null) {
                 entityTag.putString("id", encodedId)
             }
@@ -162,18 +155,18 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER.get(), Properties().sta
             tag.put("Entity", entityTag)
 
             tag.putString("EntityType", EntityType.getKey(entity.type).toString())
-            setBlockEntityData(stack, ModBlockEntities.CONTAINER.get(), tag)
+            setBlockEntityData(stack, ModBlockEntities.CONTAINER, tag)
             return stack
         }
 
         @JvmStatic
         fun createInstance(entityType: EntityType<*>): ItemStack {
-            val stack = ItemStack(ModBlocks.CONTAINER.get())
+            val stack = ItemStack(ModBlocks.CONTAINER)
             val data = stack.get(DataComponents.BLOCK_ENTITY_DATA)
             val tag = if (data != null) data.copyTag() else CompoundTag()
 
             tag.putString("EntityType", EntityType.getKey(entityType).toString())
-            setBlockEntityData(stack, ModBlockEntities.CONTAINER.get(), tag)
+            setBlockEntityData(stack, ModBlockEntities.CONTAINER, tag)
             return stack
         }
     }

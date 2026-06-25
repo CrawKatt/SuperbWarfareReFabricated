@@ -1,16 +1,17 @@
 package com.atsuishio.superbwarfare.client.sound;
 
+import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo;
+import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType;
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
-import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.tools.EntityFindUtil;
-import com.atsuishio.superbwarfare.tools.NBTTool;
+import com.atsuishio.superbwarfare.init.ModSounds;
+import com.atsuishio.superbwarfare.tools.VectorTool;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class VehicleSoundInstance extends AbstractTickableSoundInstance {
 
@@ -61,9 +62,10 @@ public abstract class VehicleSoundInstance extends AbstractTickableSoundInstance
         this.z = this.mobileVehicle.getZ();
 
         this.pitch = this.getPitch(this.mobileVehicle);
+        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
 
         if (player.getVehicle() != this.mobileVehicle) {
-            double distance = this.mobileVehicle.position().subtract(player.position()).length();
+            double distance = this.mobileVehicle.position().subtract(cameraPos).length();
             this.pitch += (float) (0.16 * java.lang.Math.atan(lastDistance - distance));
 
             this.lastDistance = distance;
@@ -71,12 +73,8 @@ public abstract class VehicleSoundInstance extends AbstractTickableSoundInstance
             this.lastDistance = 0;
         }
 
-        ItemStack stack = player.getMainHandItem();
-        if (stack.is(ModItems.MONITOR) && NBTTool.getTag(stack).getBoolean("Using")) {
-            DroneEntity drone = EntityFindUtil.findDrone(player.level(), NBTTool.getTag(stack).getString("LinkedDrone"));
-            if (this.mobileVehicle == drone) {
-                pitch = 1;
-            }
+        if (this.mobileVehicle instanceof DroneEntity drone && Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().distanceToSqr(drone.position()) < 0.0625) {
+            pitch = 1;
         }
     }
 
@@ -93,7 +91,17 @@ public abstract class VehicleSoundInstance extends AbstractTickableSoundInstance
 
         @Override
         protected float getPitch(VehicleEntity mobileVehicle) {
-            return 1;
+            if (mobileVehicle.getVehicleType() == VehicleType.HELICOPTER) return 1;
+            float power = mobileVehicle.getPower();
+            float pitch;
+            if (power < 0.5) {
+                pitch = 0.6f + power * 0.4f;
+            } else if (power <= 1) {
+                pitch = 0.8f + ((power - 0.5f) * 0.4f);
+            } else {
+                pitch = Math.min(power, 1.5f);
+            }
+            return pitch;
         }
 
         @Override
@@ -120,7 +128,7 @@ public abstract class VehicleSoundInstance extends AbstractTickableSoundInstance
 
         @Override
         protected float getVolume(VehicleEntity mobileVehicle) {
-            return (float) Mth.lerp(Mth.clamp(mobileVehicle.getDeltaMovement().length(), 0F, 0.3F), 0, 0.3F) * (mobileVehicle.onGround() ? 1 : 0.5f);
+            return (float) Mth.lerp(Mth.clamp(mobileVehicle.getDeltaMovement().horizontalDistance(), 0F, 0.3F), 0F, 0.3F) * 1.4f;
         }
     }
 
@@ -143,6 +151,74 @@ public abstract class VehicleSoundInstance extends AbstractTickableSoundInstance
         @Override
         protected float getVolume(VehicleEntity mobileVehicle) {
             return (float) Mth.lerp(Mth.clamp(mobileVehicle.getDeltaMovement().horizontalDistance() * (mobileVehicle.isInWater() ? 1.2 : 0), 0F, 0.6F), 0, 0.6F);
+        }
+    }
+
+    public static class StukaSound extends VehicleSoundInstance {
+
+        public StukaSound(VehicleEntity mobileVehicle) {
+            super(ModSounds.STUKA, Minecraft.getInstance(), mobileVehicle);
+        }
+
+        @Override
+        protected boolean canPlay(VehicleEntity mobileVehicle) {
+            return mobileVehicle.engineRunning() && mobileVehicle.stuka();
+        }
+
+        @Override
+        protected float getPitch(VehicleEntity mobileVehicle) {
+            return 1;
+        }
+
+        @Override
+        protected float getVolume(VehicleEntity mobileVehicle) {
+            float angle = Math.max((float) VectorTool.calculateAngle(mobileVehicle.getLookAngle(), new Vec3(0, 1, 0)) - 95, 0) / 85;
+
+            return (float) Mth.clamp((-mobileVehicle.getDeltaMovement().y - 0.4) * angle * 0.2, 0F, 5F);
+        }
+    }
+
+    public static class HeliCrashSound extends VehicleSoundInstance {
+
+        public HeliCrashSound(VehicleEntity mobileVehicle) {
+            super(ModSounds.HELI_CRASH, Minecraft.getInstance(), mobileVehicle);
+        }
+
+        @Override
+        protected boolean canPlay(VehicleEntity mobileVehicle) {
+            return mobileVehicle.engineRunning() && mobileVehicle.heliCrash();
+        }
+
+        @Override
+        protected float getPitch(VehicleEntity mobileVehicle) {
+            return 0.85f + (float) Mth.clamp((mobileVehicle.getDeltaMovement().y + 0.3) * -0.5f, 0F, 0.5F);
+        }
+
+        @Override
+        protected float getVolume(VehicleEntity mobileVehicle) {
+            return (float) Mth.clamp((mobileVehicle.getDeltaMovement().y + 0.3) * -0.25f, 0F, 5F);
+        }
+    }
+
+    public static class SkipSound extends VehicleSoundInstance {
+
+        public SkipSound(VehicleEntity mobileVehicle) {
+            super(mobileVehicle.getEngineInfo() instanceof EngineInfo.Track ? ModSounds.TRACK_VEHICLE_SKIP : ModSounds.WHEEL_VEHICLE_SKIP, Minecraft.getInstance(), mobileVehicle);
+        }
+
+        @Override
+        protected boolean canPlay(VehicleEntity mobileVehicle) {
+            return mobileVehicle.engineRunning() && mobileVehicle.vehicleSkip();
+        }
+
+        @Override
+        protected float getPitch(VehicleEntity mobileVehicle) {
+            return 1;
+        }
+
+        @Override
+        protected float getVolume(VehicleEntity mobileVehicle) {
+            return (float) Mth.clamp(mobileVehicle.getDeltaMovement().length(), 0F, 1F);
         }
     }
 }

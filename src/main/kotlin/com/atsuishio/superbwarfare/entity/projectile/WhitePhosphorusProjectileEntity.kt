@@ -29,7 +29,7 @@ import kotlin.math.max
 open class WhitePhosphorusProjectileEntity : FastThrowableProjectile {
     constructor(type: EntityType<out WhitePhosphorusProjectileEntity>, world: Level) : super(type, world)
 
-    constructor(entity: Entity?, level: Level) : super(ModEntities.WHITE_PHOSPHORUS_PROJECTILE.get(), entity, level) {
+    constructor(entity: Entity?, level: Level) : super(ModEntities.WHITE_PHOSPHORUS_PROJECTILE, entity, level) {
         this.noCulling = true
     }
 
@@ -43,7 +43,7 @@ open class WhitePhosphorusProjectileEntity : FastThrowableProjectile {
         val owner = this.owner
         if (owner is ServerPlayer) {
             owner.level()
-                .playSound(null, owner.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1f, 1f)
+                .playSound(null, owner.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1f, 1f)
             sendPacketTo(owner, ClientIndicatorMessage(0, 5))
         }
         if (entity is LivingEntity) {
@@ -105,7 +105,7 @@ open class WhitePhosphorusProjectileEntity : FastThrowableProjectile {
                         owner.level().playSound(
                             null,
                             owner.blockPosition(),
-                            ModSounds.INDICATION.get(),
+                            ModSounds.INDICATION,
                             SoundSource.VOICE,
                             1f,
                             1f

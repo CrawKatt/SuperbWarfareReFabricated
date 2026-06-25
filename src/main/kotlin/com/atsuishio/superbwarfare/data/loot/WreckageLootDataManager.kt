@@ -6,18 +6,17 @@ import com.google.gson.Gson
 import com.google.gson.JsonElement
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.packs.PackType
 import net.minecraft.server.packs.resources.ResourceManager
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener
 import net.minecraft.util.profiling.ProfilerFiller
 import net.minecraft.world.entity.EntityType
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.event.AddReloadListenerEvent
 
-@EventBusSubscriber
-object WreckageLootDataManager : SimpleJsonResourceReloadListener(Gson(), "sbw/loot") {
+object WreckageLootDataManager : SimpleJsonResourceReloadListener(Gson(), "sbw/loot"), IdentifiableResourceReloadListener {
     private val data: MutableMap<ResourceLocation, WreckageLootData> = mutableMapOf()
 
     override fun apply(
@@ -37,6 +36,10 @@ object WreckageLootDataManager : SimpleJsonResourceReloadListener(Gson(), "sbw/l
         }
     }
 
+    override fun getFabricId(): ResourceLocation {
+        return Mod.loc("wreckage_loot")
+    }
+
     fun getLootData(id: ResourceLocation): WreckageLootData? {
         return data[id]
     }
@@ -45,8 +48,8 @@ object WreckageLootDataManager : SimpleJsonResourceReloadListener(Gson(), "sbw/l
         return data[BuiltInRegistries.ENTITY_TYPE.getKey(type)]
     }
 
-    @SubscribeEvent
-    fun onAddReloadListeners(event: AddReloadListenerEvent) {
-        event.addListener(this)
+    @JvmStatic
+    fun register() {
+        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(this)
     }
 }

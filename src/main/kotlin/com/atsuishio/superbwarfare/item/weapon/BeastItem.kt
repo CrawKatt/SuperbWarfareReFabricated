@@ -15,6 +15,7 @@ import com.atsuishio.superbwarfare.tools.sendPacket
 import com.atsuishio.superbwarfare.tools.sendPacketToAll
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
+import net.minecraft.core.component.DataComponents
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.core.particles.SimpleParticleType
 import net.minecraft.network.chat.Component
@@ -23,7 +24,6 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
-import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
@@ -31,59 +31,27 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.SwordItem
 import net.minecraft.world.item.Tiers
 import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.item.component.Unbreakable
 import net.minecraft.world.level.gameevent.GameEvent
-import net.minecraft.world.phys.AABB
-import java.util.function.Consumer
 import javax.annotation.ParametersAreNonnullByDefault
 
 open class BeastItem : SwordItem(
     Tiers.NETHERITE, CustomDamageProperty(false)
         .stacksTo(1)
         .rarity(ModRarities.LEGENDARY)
-        .setNoRepair()
+        .component(DataComponents.UNBREAKABLE, Unbreakable(false))
 ) {
-    override fun isDamageable(stack: ItemStack): Boolean {
-        return false
-    }
-
     override fun hurtEnemy(stack: ItemStack, target: LivingEntity, attacker: LivingEntity): Boolean {
         beastKill(attacker, target)
         return true
-    }
-
-    override fun getSweepHitBox(stack: ItemStack, player: Player, target: Entity): AABB {
-        return super.getSweepHitBox(stack, player, target).inflate(3.0)
-    }
-
-    override fun canBeHurtBy(stack: ItemStack, source: DamageSource): Boolean {
-        return false
     }
 
     override fun isEnchantable(stack: ItemStack): Boolean {
         return false
     }
 
-    @ParametersAreNonnullByDefault
-    override fun onEntitySwing(stack: ItemStack, entity: LivingEntity, hand: InteractionHand): Boolean {
-        val target = TraceTool.findMeleeEntity(entity, 51.4)
-        if (target != null) {
-            beastKill(entity, target)
-        }
-        return super.onEntitySwing(stack, entity, hand)
-    }
-
-    override fun onLeftClickEntity(stack: ItemStack, player: Player, entity: Entity): Boolean {
-        beastKill(player, entity)
-        return super.onLeftClickEntity(stack, player, entity)
-    }
-
-    override fun canDisableShield(
-        stack: ItemStack,
-        shield: ItemStack,
-        entity: LivingEntity,
-        attacker: LivingEntity
-    ): Boolean {
-        return true
+    override fun isValidRepairItem(stack: ItemStack, repairCandidate: ItemStack): Boolean {
+        return false
     }
 
     @ParametersAreNonnullByDefault
@@ -97,6 +65,21 @@ open class BeastItem : SwordItem(
     }
 
     companion object {
+        @JvmStatic
+        fun onEntitySwing(stack: ItemStack, entity: LivingEntity, hand: InteractionHand): Boolean {
+            val target = TraceTool.findMeleeEntity(entity, 51.4)
+            if (target != null) {
+                beastKill(entity, target)
+            }
+            return false
+        }
+
+        @JvmStatic
+        fun onLeftClickEntity(stack: ItemStack, player: Player, entity: Entity): Boolean {
+            beastKill(player, entity)
+            return false
+        }
+
         @JvmStatic
         fun beastKill(attacker: Entity?, target: Entity) {
             if (target.level().isClientSide) return
@@ -174,7 +157,7 @@ open class BeastItem : SwordItem(
                 target.level().broadcastEntityEvent(target, 60.toByte())
 
                 target.removalReason = Entity.RemovalReason.KILLED
-                target.getPassengers().forEach(Consumer { obj: Entity? -> obj!!.stopRiding() })
+                target.getPassengers().forEach { obj: Entity? -> obj!!.stopRiding() }
                 target.stopRiding()
 
                 target.levelCallback.onRemove(Entity.RemovalReason.KILLED)

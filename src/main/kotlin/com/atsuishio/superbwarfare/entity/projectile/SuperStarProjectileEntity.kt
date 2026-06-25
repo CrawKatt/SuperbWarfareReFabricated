@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
-import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
+import com.atsuishio.superbwarfare.Mod.queueServerWork
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModParticleTypes
@@ -18,6 +18,7 @@ import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.boss.EnderDragonPart
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ClipContext
@@ -28,7 +29,6 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
-import net.neoforged.neoforge.entity.PartEntity
 import kotlin.math.min
 
 open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEntity>, world: Level) :
@@ -51,8 +51,8 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         val entity = result.entity
         if (entity === this.owner?.vehicle) return
 
-        if (entity is PartEntity<*>) {
-            this.currentTarget = entity.getParent()
+        if (entity is EnderDragonPart) {
+            this.currentTarget = entity.parentMob
         } else {
             this.currentTarget = entity
         }
@@ -86,13 +86,13 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
                 ModDamageTypes.causeSuperStarSlashDamage(level.registryAccess(), this, this.owner),
                 explosionDamageValue
             )
-            level.playSound(null, entity.onPos, ModSounds.KNIFE_FLESH.get(), SoundSource.PLAYERS, 2f, 1f)
+            level.playSound(null, entity.onPos, ModSounds.KNIFE_FLESH, SoundSource.PLAYERS, 2f, 1f)
 
             entity.invulnerableTime = 0
 
             val player = this.owner
             if (player is ServerPlayer) {
-                level.playSound(null, player.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1f, 1f)
+                level.playSound(null, player.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1f, 1f)
                 player.sendPacket(ClientIndicatorMessage(0, 5))
             }
         }
@@ -105,7 +105,7 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         val level = this.level()
         val state = level.getBlockState(resultPos)
 
-        val event = state.block.getSoundType(state, level, resultPos, this).breakSound
+        val event = state.soundType.breakSound
         val volume = min(4f, deltaMovement.length().toFloat() / 4f + 0.5f)
         level.playSound(
             null,
@@ -140,7 +140,7 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         level.playSound(
             null,
             BlockPos(location.x.toInt(), location.y.toInt(), location.z.toInt()),
-            ModSounds.LAND.get(),
+            ModSounds.LAND,
             SoundSource.BLOCKS,
             1f,
             1f
@@ -152,7 +152,7 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
             val vec3 = randomVec(dir, 80.0)
             ParticleTool.sendParticle(
                 serverLevel,
-                ModParticleTypes.WHITE_STAR.get(),
+                ModParticleTypes.WHITE_STAR,
                 pos.x,
                 pos.y,
                 pos.z,
@@ -165,9 +165,9 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
             )
         }
 
-        val soundType = state.getSoundType(serverLevel, BlockPos.containing(pos.x, pos.y, pos.z), null)
+        val soundType = state.soundType
         if (soundType === SoundType.METAL || soundType === SoundType.ANVIL || soundType === SoundType.CHAIN || soundType === SoundType.COPPER || soundType === SoundType.NETHERITE_BLOCK) {
-            serverLevel.playSound(null, pos.x, pos.y, pos.z, ModSounds.HIT.get(), SoundSource.BLOCKS, 2f, 1f)
+            serverLevel.playSound(null, pos.x, pos.y, pos.z, ModSounds.HIT, SoundSource.BLOCKS, 2f, 1f)
         }
     }
 
@@ -207,7 +207,7 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
             serverLevel.playSound(
                 null,
                 BlockPos(location.x.toInt(), location.y.toInt(), location.z.toInt()),
-                ModSounds.HIT_WATER.get(),
+                ModSounds.HIT_WATER,
                 SoundSource.BLOCKS,
                 1f,
                 1f
@@ -243,7 +243,7 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         } else if (tickCount > 1 && tickCount % 3 == 0) {
             val vec3 = randomVec(deltaMovement, 30.0).normalize().scale(0.4 + 0.05 * Math.random())
             level.addAlwaysVisibleParticle(
-                ModParticleTypes.WHITE_STAR.get(),
+                ModParticleTypes.WHITE_STAR,
                 true,
                 xo,
                 yo,

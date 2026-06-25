@@ -80,10 +80,13 @@ open class ArtilleryEntity(type: EntityType<*>, world: Level) : GeoVehicleEntity
         return super.interact(player, hand)
     }
 
+    /*
+    // ToDo: Portear?
     override fun onAddedToLevel() {
         super.onAddedToLevel()
         shootVec = forward.toVector3f()
     }
+    */
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
         super.defineSynchedData(builder)

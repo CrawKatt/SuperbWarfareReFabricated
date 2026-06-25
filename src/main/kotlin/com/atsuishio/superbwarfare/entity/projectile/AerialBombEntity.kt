@@ -16,11 +16,11 @@ import net.minecraft.world.phys.Vec3
 
 open class AerialBombEntity(type: EntityType<out AerialBombEntity>, level: Level) : DestroyableProjectile(type, level) {
     override fun getDefaultItem(): Item {
-        return ModItems.MEDIUM_AERIAL_BOMB.get()
+        return ModItems.MEDIUM_AERIAL_BOMB
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.SHELL_FLY.get()
+        return ModSounds.SHELL_FLY
     }
 
     override fun getVolume(): Float {

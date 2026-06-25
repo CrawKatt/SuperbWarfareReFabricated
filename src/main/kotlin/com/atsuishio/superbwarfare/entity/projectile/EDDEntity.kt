@@ -48,7 +48,7 @@ open class EDDEntity : HangingEntity, OwnableEntity {
 
     @JvmOverloads
     constructor(
-        type: EntityType<out EDDEntity> = ModEntities.EDD.get(),
+        type: EntityType<out EDDEntity> = ModEntities.EDD,
         level: Level,
         corner: Int = 0
     ) : super(type, level) {
@@ -57,7 +57,7 @@ open class EDDEntity : HangingEntity, OwnableEntity {
 
     @JvmOverloads
     constructor(
-        type: EntityType<out EDDEntity> = ModEntities.EDD.get(),
+        type: EntityType<out EDDEntity> = ModEntities.EDD,
         owner: LivingEntity?,
         level: Level,
         corner: Int = 0
@@ -70,7 +70,7 @@ open class EDDEntity : HangingEntity, OwnableEntity {
 
     @JvmOverloads
     constructor(
-        type: EntityType<out EDDEntity> = ModEntities.EDD.get(),
+        type: EntityType<out EDDEntity> = ModEntities.EDD,
         owner: LivingEntity?,
         level: Level,
         pos: BlockPos,
@@ -308,7 +308,7 @@ open class EDDEntity : HangingEntity, OwnableEntity {
             }
 
             if (!player.abilities.instabuild) {
-                ItemHandlerHelper.giveItemToPlayer(player, ItemStack(ModItems.EDD.get()))
+                ItemHandlerHelper.giveItemToPlayer(player, ItemStack(ModItems.EDD))
             }
         }
 

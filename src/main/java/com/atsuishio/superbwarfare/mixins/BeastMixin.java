@@ -1,8 +1,11 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.mixin.BeastEntityKiller;
+import com.atsuishio.superbwarfare.item.weapon.BeastItem;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,6 +44,16 @@ public abstract class BeastMixin implements BeastEntityKiller {
     public void onRemove(Entity.RemovalReason reason, CallbackInfo ci) {
         if (this.sbw$beastKilled) {
             ((LivingEntity) (Object) this).setRemoved(reason);
+        }
+    }
+
+    @Inject(method = "swing(Lnet/minecraft/world/InteractionHand;Z)V", at = @At("HEAD"))
+    public void superbwarfare$beastOnEntitySwing(InteractionHand hand, boolean updateSelf, CallbackInfo ci) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        ItemStack stack = entity.getItemInHand(hand);
+
+        if (stack.getItem() instanceof BeastItem) {
+            BeastItem.onEntitySwing(stack, entity, hand);
         }
     }
 }

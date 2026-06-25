@@ -9,17 +9,14 @@ import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.perk.PerkInstance
 import com.atsuishio.superbwarfare.tools.FormatTool
 import com.atsuishio.superbwarfare.tools.playLocalSound
+import net.fabricmc.fabric.api.message.v1.ServerMessageEvents
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.event.ServerChatEvent
 
-@EventBusSubscriber
 object BattleOfWits : Perk("battle_of_wits", Type.DAMAGE) {
     override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) {
         super.modifyProperty(modifier)
@@ -61,13 +58,17 @@ object BattleOfWits : Perk("battle_of_wits", Type.DAMAGE) {
         }
     }
 
-    @SubscribeEvent
-    fun onChatEvent(event: ServerChatEvent) {
-        val player = event.player
+    @JvmStatic
+    fun register() {
+        ServerMessageEvents.CHAT_MESSAGE.register { message, player, _ ->
+            onChatEvent(player, message.signedContent())
+        }
+    }
+
+    fun onChatEvent(player: ServerPlayer, text: String) {
         val stack = player.mainHandItem
         if (stack.item !is GunItem) return
 
-        val text = event.rawText
         if (text.isEmpty()) return
 
         val data = GunData.from(stack)

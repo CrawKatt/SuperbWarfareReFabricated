@@ -16,7 +16,7 @@ import net.minecraft.world.effect.MobEffect
 @Suppress("unused")
 object ModMobEffects {
     @JvmField
-    val SHOCK: Holder<MobEffect> = register("shock", ShockMobEffect)
+    val SHOCK: Holder<MobEffect> = register("shock", ShockMobEffect())
 
     @JvmField
     val BURN: Holder<MobEffect> = register("burn", BurnMobEffect)
@@ -25,7 +25,7 @@ object ModMobEffects {
     val STRIKE_PROTECTION: Holder<MobEffect> = register("strike_protection", StrikeProtectionMobEffect)
 
     @JvmField
-    val TRAUMA: Holder<MobEffect> = register("trauma", TraumaMobEffect)
+    val TRAUMA: Holder<MobEffect> = register("trauma", TraumaMobEffect())
 
     @JvmField
     val PHOSPHORUS_FIRE: Holder<MobEffect> = register("phosphorus_fire", PhosphorusFireMobEffect)
