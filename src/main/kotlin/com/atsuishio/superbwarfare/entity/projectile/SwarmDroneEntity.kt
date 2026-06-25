@@ -46,7 +46,7 @@ open class SwarmDroneEntity(type: EntityType<out SwarmDroneEntity>, level: Level
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.SWARM_DRONE.get()
+        return ModItems.SWARM_DRONE
     }
 
     override fun onHitEntity(result: EntityHitResult) {
@@ -164,7 +164,7 @@ open class SwarmDroneEntity(type: EntityType<out SwarmDroneEntity>, level: Level
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.DRONE_ENGINE.get()
+        return ModSounds.DRONE_ENGINE
     }
 
     override fun getVolume(): Float {

@@ -37,7 +37,7 @@ open class Kh39Entity(type: EntityType<out Kh39Entity>, level: Level) : MissileP
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.LARGE_ANTI_GROUND_MISSILE.get()
+        return ModItems.LARGE_ANTI_GROUND_MISSILE
     }
 
     override fun tick() {
@@ -69,7 +69,7 @@ open class Kh39Entity(type: EntityType<out Kh39Entity>, level: Level) : MissileP
                             level.playSound(
                                 null,
                                 entity.onPos,
-                                if (entity is Pig) SoundEvents.PIG_HURT else ModSounds.MISSILE_WARNING.get(),
+                                if (entity is Pig) SoundEvents.PIG_HURT else ModSounds.MISSILE_WARNING,
                                 SoundSource.PLAYERS,
                                 2f,
                                 1f
@@ -117,7 +117,7 @@ open class Kh39Entity(type: EntityType<out Kh39Entity>, level: Level) : MissileP
             level.playSound(
                 null,
                 BlockPos.containing(position()),
-                ModSounds.MISSILE_START.get(),
+                ModSounds.MISSILE_START,
                 SoundSource.PLAYERS,
                 4f,
                 1f
@@ -158,7 +158,7 @@ open class Kh39Entity(type: EntityType<out Kh39Entity>, level: Level) : MissileP
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.ROCKET_FLY.get()
+        return ModSounds.ROCKET_FLY
     }
 
     override fun getVolume(): Float {

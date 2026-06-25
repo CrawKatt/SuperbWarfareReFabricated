@@ -36,7 +36,7 @@ open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : Missil
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.LARGE_ANTI_GROUND_MISSILE.get()
+        return ModItems.LARGE_ANTI_GROUND_MISSILE
     }
 
     override fun tick() {
@@ -68,7 +68,7 @@ open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : Missil
                             level.playSound(
                                 null,
                                 entity.onPos,
-                                if (entity is Pig) SoundEvents.PIG_HURT else ModSounds.MISSILE_WARNING.get(),
+                                if (entity is Pig) SoundEvents.PIG_HURT else ModSounds.MISSILE_WARNING,
                                 SoundSource.PLAYERS,
                                 2f,
                                 1f
@@ -116,7 +116,7 @@ open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : Missil
             level.playSound(
                 null,
                 BlockPos.containing(position()),
-                ModSounds.MISSILE_START.get(),
+                ModSounds.MISSILE_START,
                 SoundSource.PLAYERS,
                 4f,
                 1f
@@ -157,7 +157,7 @@ open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : Missil
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.ROCKET_FLY.get()
+        return ModSounds.ROCKET_FLY
     }
 
     override fun getVolume(): Float {

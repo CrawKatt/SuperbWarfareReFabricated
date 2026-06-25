@@ -36,13 +36,13 @@ open class GrapeshotEntity : FastThrowableProjectile {
         this.noCulling = true
     }
 
-    constructor(entity: Entity?, level: Level, damage: Float) : super(ModEntities.GRAPESHOT.get(), entity, level) {
+    constructor(entity: Entity?, level: Level, damage: Float) : super(ModEntities.GRAPESHOT, entity, level) {
         this.noCulling = true
         this.damageValue = damage
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.LARGE_SHELL_GS.get()
+        return ModItems.LARGE_SHELL_GS
     }
 
     override fun onHitEntity(result: EntityHitResult) {
@@ -54,7 +54,7 @@ open class GrapeshotEntity : FastThrowableProjectile {
         if (this.level() is ServerLevel) {
             if (owner is ServerPlayer) {
                 owner.level()
-                    .playSound(null, owner.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1f, 1f)
+                    .playSound(null, owner.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1f, 1f)
                 sendPacketTo(owner, ClientIndicatorMessage(0, 5))
             }
 
@@ -72,7 +72,7 @@ open class GrapeshotEntity : FastThrowableProjectile {
         val resultPos = result.blockPos
         val state = this.level().getBlockState(resultPos)
 
-        val event = state.block.getSoundType(state, this.level(), resultPos, this).breakSound
+        val event = state.soundType.breakSound
         val volume = min(4f, deltaMovement.length().toFloat() / 4f + 0.5f)
         this.level().playSound(
             null,
@@ -107,7 +107,7 @@ open class GrapeshotEntity : FastThrowableProjectile {
             level.playSound(
                 null,
                 BlockPos(location.x.toInt(), location.y.toInt(), location.z.toInt()),
-                ModSounds.LAND.get(),
+                ModSounds.LAND,
                 SoundSource.BLOCKS,
                 1f,
                 1f
@@ -152,12 +152,12 @@ open class GrapeshotEntity : FastThrowableProjectile {
         }
         val soundType = state.soundType
         if (soundType === SoundType.METAL || soundType === SoundType.ANVIL || soundType === SoundType.CHAIN || soundType === SoundType.COPPER || soundType === SoundType.NETHERITE_BLOCK) {
-            serverLevel.playSound(null, pos.x, pos.y, pos.z, ModSounds.HIT.get(), SoundSource.BLOCKS, 2f, 1f)
+            serverLevel.playSound(null, pos.x, pos.y, pos.z, ModSounds.HIT, SoundSource.BLOCKS, 2f, 1f)
             repeat(2) {
                 val vec3 = randomVec(dir, 80.0)
                 ParticleTool.sendParticle(
                     serverLevel,
-                    ModParticleTypes.FIRE_STAR.get(),
+                    ModParticleTypes.FIRE_STAR,
                     pos.x,
                     pos.y,
                     pos.z,
@@ -224,7 +224,7 @@ open class GrapeshotEntity : FastThrowableProjectile {
                     level.playSound(
                         null,
                         BlockPos(location.x.toInt(), location.y.toInt(), location.z.toInt()),
-                        ModSounds.HIT_WATER.get(),
+                        ModSounds.HIT_WATER,
                         SoundSource.BLOCKS,
                         1f,
                         1f

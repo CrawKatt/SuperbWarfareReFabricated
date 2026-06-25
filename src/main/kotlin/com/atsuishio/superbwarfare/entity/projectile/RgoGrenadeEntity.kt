@@ -37,7 +37,7 @@ open class RgoGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity 
         this.explosionRadiusValue = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS.get().toFloat()
     }
 
-    constructor(entity: LivingEntity?, level: Level) : super(ModEntities.RGO_GRENADE.get(), entity, level) {
+    constructor(entity: LivingEntity?, level: Level) : super(ModEntities.RGO_GRENADE, entity, level) {
         this.noCulling = true
         this.explosionDamageValue = ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE.get().toFloat()
         this.explosionRadiusValue = ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS.get().toFloat()
@@ -48,7 +48,7 @@ open class RgoGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity 
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.RGO_GRENADE.get()
+        return ModItems.RGO_GRENADE
     }
 
     override fun onHit(result: HitResult) {
@@ -88,7 +88,7 @@ open class RgoGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity 
             1, 0.0, 0.0, 0.0, 0.01, true
         )
 
-        if (isInFluidType) {
+        if (this.isInWater || this.isInLava) {
             deltaMovement = deltaMovement.scale(0.75)
         }
     }

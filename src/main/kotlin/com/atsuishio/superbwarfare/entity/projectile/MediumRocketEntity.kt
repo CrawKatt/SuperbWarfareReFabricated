@@ -97,7 +97,7 @@ open class MediumRocketEntity : FastThrowableProjectile, BasicGeoProjectileEntit
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.SMALL_ROCKET.get()
+        return ModItems.SMALL_ROCKET
     }
 
     @Suppress("DEPRECATION")
@@ -139,7 +139,7 @@ open class MediumRocketEntity : FastThrowableProjectile, BasicGeoProjectileEntit
                     discard()
                 } else {
                     ParticleTool.cannonHitParticles(level, result.getLocation())
-                    val mediumRocket = MediumRocketEntity(ModEntities.MEDIUM_ROCKET.get(), level)
+                    val mediumRocket = MediumRocketEntity(ModEntities.MEDIUM_ROCKET, level)
                     mediumRocket.setPos(result.getLocation().add(deltaMovement.normalize().scale(0.99)))
                     mediumRocket.shoot(
                         deltaMovement.x,
@@ -273,7 +273,7 @@ open class MediumRocketEntity : FastThrowableProjectile, BasicGeoProjectileEntit
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.ROCKET_FLY.get()
+        return ModSounds.ROCKET_FLY
     }
 
     override fun getVolume(): Float {

@@ -48,7 +48,7 @@ open class JavelinMissileEntity : MissileProjectile, BasicGeoProjectileEntity {
         guideType: Int,
         targetPos: Vec3?
     ) : super(
-        ModEntities.JAVELIN_MISSILE.get(), entity, level
+        ModEntities.JAVELIN_MISSILE, entity, level
     ) {
         this.noCulling = true
         this.damageValue = damage
@@ -62,7 +62,7 @@ open class JavelinMissileEntity : MissileProjectile, BasicGeoProjectileEntity {
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.JAVELIN_MISSILE.get()
+        return ModItems.JAVELIN_MISSILE
     }
 
     fun setAttackMode(mode: Boolean) {
@@ -143,7 +143,7 @@ open class JavelinMissileEntity : MissileProjectile, BasicGeoProjectileEntity {
                     entity.level().playSound(
                         null,
                         entity.onPos,
-                        if (entity is Pig) SoundEvents.PIG_HURT else ModSounds.MISSILE_WARNING.get(),
+                        if (entity is Pig) SoundEvents.PIG_HURT else ModSounds.MISSILE_WARNING,
                         SoundSource.PLAYERS,
                         2f,
                         1f
@@ -208,7 +208,7 @@ open class JavelinMissileEntity : MissileProjectile, BasicGeoProjectileEntity {
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.ROCKET_FLY.get()
+        return ModSounds.ROCKET_FLY
     }
 
     override fun getVolume(): Float {

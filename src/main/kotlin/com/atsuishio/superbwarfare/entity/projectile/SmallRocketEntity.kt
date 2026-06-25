@@ -33,7 +33,7 @@ open class SmallRocketEntity(type: EntityType<out SmallRocketEntity>, level: Lev
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.SMALL_ROCKET.get()
+        return ModItems.SMALL_ROCKET
     }
 
     override fun onHitEntity(result: EntityHitResult) {
@@ -44,7 +44,7 @@ open class SmallRocketEntity(type: EntityType<out SmallRocketEntity>, level: Lev
         if (this.level() is ServerLevel) {
             if (owner is ServerPlayer) {
                 this.level()
-                    .playSound(null, owner.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1f, 1f)
+                    .playSound(null, owner.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1f, 1f)
                 sendPacketTo(owner, ClientIndicatorMessage(0, 5))
             }
 
@@ -107,7 +107,7 @@ open class SmallRocketEntity(type: EntityType<out SmallRocketEntity>, level: Lev
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.ROCKET_FLY.get()
+        return ModSounds.ROCKET_FLY
     }
 
     override fun getVolume(): Float {

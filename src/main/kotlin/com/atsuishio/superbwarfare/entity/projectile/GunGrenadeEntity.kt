@@ -21,7 +21,7 @@ open class GunGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity 
     }
 
     constructor(entity: Entity?, level: Level, damage: Float, explosionDamage: Float, explosionRadius: Float) : super(
-        ModEntities.GUN_GRENADE.get(), entity, level
+        ModEntities.GUN_GRENADE, entity, level
     ) {
         this.noCulling = true
         this.damageValue = damage
@@ -30,7 +30,7 @@ open class GunGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity 
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.GRENADE_40MM.get()
+        return ModItems.GRENADE_40MM
     }
 
     override fun onHitEntity(result: EntityHitResult) {

@@ -32,7 +32,7 @@ open class IglaMissileEntity : MissileProjectile, BasicGeoProjectileEntity {
     }
 
     constructor(entity: Entity?, level: Level, damage: Float, explosionDamage: Float, explosionRadius: Float) : super(
-        ModEntities.IGLA_MISSILE.get(), entity, level
+        ModEntities.IGLA_MISSILE, entity, level
     ) {
         this.noCulling = true
         this.damageValue = damage
@@ -42,7 +42,7 @@ open class IglaMissileEntity : MissileProjectile, BasicGeoProjectileEntity {
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.MEDIUM_ANTI_AIR_MISSILE.get()
+        return ModItems.MEDIUM_ANTI_AIR_MISSILE
     }
 
     override fun tick() {
@@ -68,7 +68,7 @@ open class IglaMissileEntity : MissileProjectile, BasicGeoProjectileEntity {
                 entity.level().playSound(
                     null,
                     entity.onPos,
-                    if (entity is Pig) SoundEvents.PIG_HURT else ModSounds.MISSILE_WARNING.get(),
+                    if (entity is Pig) SoundEvents.PIG_HURT else ModSounds.MISSILE_WARNING,
                     SoundSource.PLAYERS,
                     2f,
                     1f
@@ -92,7 +92,7 @@ open class IglaMissileEntity : MissileProjectile, BasicGeoProjectileEntity {
                 lostTarget = deltaMovement.angleTo(toVec) > 120 && !lostTarget
 
                 val owner = this.owner
-                if (owner is Player && owner.mainHandItem.`is`(ModItems.IGLA_9K38.get()) && !lost) {
+                if (owner is Player && owner.mainHandItem.`is`(ModItems.IGLA_9K38) && !lost) {
                     val handItem = owner.mainHandItem
                     val data = from(handItem)
                     lost = !data.zooming.get() || !checkNoClip(owner.eyePosition, targetPos, this.level())
@@ -116,7 +116,7 @@ open class IglaMissileEntity : MissileProjectile, BasicGeoProjectileEntity {
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.ROCKET_FLY.get()
+        return ModSounds.ROCKET_FLY
     }
 
     override fun getVolume(): Float {

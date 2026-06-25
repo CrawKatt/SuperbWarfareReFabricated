@@ -37,7 +37,7 @@ class A10Entity(type: EntityType<A10Entity>, world: Level) : GeoVehicleEntity(ty
     override fun onEngine1Damaged(pos: Vec3) {
         if (level().isClientSide) {
             val random = 2 * (this.random.nextFloat() - 0.5f)
-            addRandomParticle(ModParticleTypes.FIRE_STAR.get(), pos, 0f, level(), 0.25f, 5)
+            addRandomParticle(ModParticleTypes.FIRE_STAR, pos, 0f, level(), 0.25f, 5)
             addRandomParticle(ParticleTypes.LARGE_SMOKE, pos, 0.5f, level(), 0.001f, 1)
             addRandomParticle(
                 CustomCloudOption(
@@ -57,7 +57,7 @@ class A10Entity(type: EntityType<A10Entity>, world: Level) : GeoVehicleEntity(ty
     override fun onEngine2Damaged(pos: Vec3) {
         if (level().isClientSide) {
             val random = 2 * (this.random.nextFloat() - 0.5f)
-            addRandomParticle(ModParticleTypes.FIRE_STAR.get(), pos, 0f, level(), 0.25f, 5)
+            addRandomParticle(ModParticleTypes.FIRE_STAR, pos, 0f, level(), 0.25f, 5)
             addRandomParticle(ParticleTypes.LARGE_SMOKE, pos, 0.5f, level(), 0.001f, 1)
             addRandomParticle(
                 CustomCloudOption(

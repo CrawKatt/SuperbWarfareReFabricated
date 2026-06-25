@@ -51,7 +51,7 @@ open class M18SmokeGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEn
     }
 
     constructor(entity: LivingEntity?, level: Level, fuse: Int) : super(
-        ModEntities.M18_SMOKE_GRENADE.get(),
+        ModEntities.M18_SMOKE_GRENADE,
         entity,
         level
     ) {
@@ -88,7 +88,7 @@ open class M18SmokeGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEn
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.M18_SMOKE_GRENADE.get()
+        return ModItems.M18_SMOKE_GRENADE
     }
 
     override fun onHit(result: HitResult) {
@@ -99,7 +99,7 @@ open class M18SmokeGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEn
                 val resultPos = blockResult.blockPos
                 val state = this.level().getBlockState(resultPos)
                 val block = state.block
-                val event = block.getSoundType(state, this.level(), resultPos, this).breakSound
+                val event = state.soundType.breakSound
                 val speed = this.deltaMovement.length()
                 if (speed > 0.1) {
                     val volume = min(4f, speed.toFloat() / 4f + 0.5f)
@@ -133,7 +133,7 @@ open class M18SmokeGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEn
                             owner.level().playSound(
                                 null,
                                 owner.blockPosition(),
-                                ModSounds.INDICATION.get(),
+                                ModSounds.INDICATION,
                                 SoundSource.VOICE,
                                 1f,
                                 1f
@@ -186,7 +186,7 @@ open class M18SmokeGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEn
 
         val level = this.level()
         if (fuse == 0) {
-            level.playSound(null, this, ModSounds.SM0KE_GRENADE_RELEASE.get(), this.soundSource, 2f, 1f)
+            level.playSound(null, this, ModSounds.SM0KE_GRENADE_RELEASE, this.soundSource, 2f, 1f)
         }
 
         if (fuse <= 0 && tickCount % 2 == 0) {
@@ -207,7 +207,7 @@ open class M18SmokeGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEn
             }
         }
 
-        if (isInFluidType) {
+        if (this.isInWater || this.isInLava) {
             deltaMovement = deltaMovement.scale(0.75)
         }
 
@@ -223,7 +223,7 @@ open class M18SmokeGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEn
         val vec3 = Vec3(1.0, 0.05, 0.0)
 
         for (i in 0..<this.count) {
-            val decoy = SmokeDecoyEntity(ModEntities.SMOKE_DECOY.get(), this.level(), false)
+            val decoy = SmokeDecoyEntity(ModEntities.SMOKE_DECOY, this.level(), false)
             decoy.setPos(this.x, this.y + bbHeight, this.z)
             decoy.decoyShoot(this, vec3.yRot(i * (360f / this.count) * Mth.DEG_TO_RAD), 1.5f, 5f)
             this.level().addFreshEntity(decoy)

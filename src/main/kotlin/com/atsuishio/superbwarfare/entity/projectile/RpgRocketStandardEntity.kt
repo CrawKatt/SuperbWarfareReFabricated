@@ -46,7 +46,7 @@ open class RpgRocketStandardEntity : FastThrowableProjectile, BasicGeoProjectile
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.RPG_ROCKET_STANDARD.get()
+        return ModItems.RPG_ROCKET_STANDARD
     }
 
     public override fun onHitBlock(result: BlockHitResult) {
@@ -117,7 +117,7 @@ open class RpgRocketStandardEntity : FastThrowableProjectile, BasicGeoProjectile
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.ROCKET_FLY.get()
+        return ModSounds.ROCKET_FLY
     }
 
     override fun getVolume(): Float {

@@ -45,7 +45,7 @@ open class Ptkm1rEntity : Entity, OwnableEntity {
 
     constructor(type: EntityType<Ptkm1rEntity>, world: Level) : super(type, world)
 
-    constructor(owner: LivingEntity?, level: Level) : super(ModEntities.PTKM_1R.get(), level) {
+    constructor(owner: LivingEntity?, level: Level) : super(ModEntities.PTKM_1R, level) {
         if (owner != null) {
             this.setOwnerUUID(owner.getUUID())
         }
@@ -140,7 +140,7 @@ open class Ptkm1rEntity : Entity, OwnableEntity {
             }
 
             if (!player.abilities.instabuild) {
-                ItemHandlerHelper.giveItemToPlayer(player, ItemStack(ModItems.PTKM_1R.get()))
+                ItemHandlerHelper.giveItemToPlayer(player, ItemStack(ModItems.PTKM_1R))
             }
         }
 
@@ -164,7 +164,7 @@ open class Ptkm1rEntity : Entity, OwnableEntity {
         var f = 0.98f
         if (this.onGround()) {
             val pos = this.blockPosBelowThatAffectsMyMovement
-            f = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98f
+            f = level().getBlockState(pos).block.friction * 0.98f
         }
 
         this.deltaMovement = this.deltaMovement.multiply(f.toDouble(), 0.98, f.toDouble())
@@ -180,7 +180,7 @@ open class Ptkm1rEntity : Entity, OwnableEntity {
             level().playSound(
                 null,
                 BlockPos.containing(position()),
-                ModSounds.PTKM_1R_DEPLOY.get(),
+                ModSounds.PTKM_1R_DEPLOY,
                 SoundSource.PLAYERS,
                 1f,
                 1f

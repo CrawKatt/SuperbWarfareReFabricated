@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitBlock
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitEntity
 import com.atsuishio.superbwarfare.client.particle.BulletDecalOption
@@ -27,6 +28,8 @@ import com.atsuishio.superbwarfare.tools.VectorTool.isInLiquid
 import com.atsuishio.superbwarfare.world.phys.EntityResult
 import com.atsuishio.superbwarfare.world.phys.ExtendedEntityRayTraceResult
 import com.mojang.datafixers.util.Pair
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.core.BlockPos
 import net.minecraft.core.BlockPos.MutableBlockPos
 import net.minecraft.core.Direction
@@ -48,6 +51,7 @@ import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.boss.EnderDragonPart
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
@@ -62,10 +66,6 @@ import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.VoxelShape
-import net.neoforged.neoforge.common.NeoForge
-import net.neoforged.neoforge.entity.PartEntity
-import net.neoforged.neoforge.event.EventHooks
-import net.neoforged.neoforge.network.PacketDistributor
 import java.util.*
 import java.util.function.*
 import java.util.function.Function
@@ -143,7 +143,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         this.noCulling = true
     }
 
-    constructor(level: Level) : this(ModEntities.PROJECTILE.get(), level)
+    constructor(level: Level) : this(ModEntities.PROJECTILE, level)
 
     protected fun findEntityOnPath(startVec: Vec3, endVec: Vec3): EntityResult? {
         var hitVec: Vec3? = null
@@ -218,14 +218,14 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
                         level.playSound(
                             null,
                             BlockPos.containing(hitPos),
-                            ModSounds.HIT.get(),
+                            ModSounds.HIT,
                             SoundSource.PLAYERS,
                             1f,
                             1f
                         )
                         ParticleTool.sendParticle(
                             level,
-                            ModParticleTypes.FIRE_STAR.get(),
+                            ModParticleTypes.FIRE_STAR,
                             hitPos.x,
                             hitPos.y,
                             hitPos.z,
@@ -374,8 +374,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
                     }
                 }
                 if (result != null) {
-                    if (!EventHooks.onProjectileImpact(this, result)) this.onHit(result)
-                    else continue  // 命中事件被取消则检查下一个命中结果
+                    this.onHit(result)
                 }
 
                 if (!this.beast) {
@@ -448,7 +447,10 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
 
     override fun syncMotion() {
         if (!this.level().isClientSide) {
-            PacketDistributor.sendToPlayersTrackingEntity(this, ClientMotionSyncMessage(this))
+            val packet = ClientMotionSyncMessage(this)
+            for (player in PlayerLookup.tracking(this)) {
+                ServerPlayNetworking.send(player, packet)
+            }
         }
     }
 
@@ -460,7 +462,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
             }
             val resultPos = result.blockPos
             val state = level.getBlockState(resultPos)
-            val event = state.block.getSoundType(state, level, resultPos, this).breakSound
+            val event = state.soundType.breakSound
             level.playSound(
                 null,
                 result.getLocation().x,
@@ -537,8 +539,8 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         )
 
         if (shooter is ServerPlayer) {
-            val holder = if (score == 10) Holder.direct(ModSounds.HEADSHOT.get())
-            else Holder.direct(ModSounds.INDICATION.get())
+            val holder = if (score == 10) Holder.direct(ModSounds.HEADSHOT)
+            else Holder.direct(ModSounds.INDICATION)
 
             sendPacketTo(
                 shooter,
@@ -557,7 +559,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         }
 
         val stack = shooter.offhandItem
-        if (stack.`is`(ModItems.TRANSCRIPT.get())) {
+        if (stack.`is`(ModItems.TRANSCRIPT)) {
             val size = 10
 
             var scores = stack.get(ModDataComponents.TRANSCRIPT_SCORE)
@@ -613,7 +615,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
                     level.playSound(
                         null,
                         BlockPos(location.x.toInt(), location.y.toInt(), location.z.toInt()),
-                        ModSounds.HIT_WATER.get(),
+                        ModSounds.HIT_WATER,
                         SoundSource.BLOCKS,
                         1f,
                         1f
@@ -677,18 +679,6 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
             val face = result.direction
             val state = level().getBlockState(pos)
 
-            if (NeoForge.EVENT_BUS.post(
-                    HitBlock(
-                        pos,
-                        state,
-                        face,
-                        this.shooter,
-                        this,
-                        result.getLocation()
-                    )
-                ).isCanceled
-            ) return
-
             val vx = face.stepX.toDouble()
             val vy = face.stepY.toDouble()
             val vz = face.stepZ.toDouble()
@@ -744,7 +734,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
             level.playSound(
                 null,
                 BlockPos(location.x.toInt(), location.y.toInt(), location.z.toInt()),
-                ModSounds.LAND.get(),
+                ModSounds.LAND,
                 SoundSource.BLOCKS,
                 1f,
                 1f
@@ -787,14 +777,14 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
             )
         }
         val blockPos = BlockPos.containing(pos)
-        val soundType = state.getSoundType(serverLevel, blockPos, null)
+        val soundType = state.soundType
         if (soundType === SoundType.METAL || soundType === SoundType.ANVIL || soundType === SoundType.CHAIN || soundType === SoundType.COPPER || soundType === SoundType.NETHERITE_BLOCK) {
-            serverLevel.playSound(null, pos.x, pos.y, pos.z, ModSounds.HIT.get(), SoundSource.BLOCKS, 2f, 1f)
+            serverLevel.playSound(null, pos.x, pos.y, pos.z, ModSounds.HIT, SoundSource.BLOCKS, 2f, 1f)
             for (i in 0..2) {
                 val vec3 = randomVec(dir, 80.0)
                 ParticleTool.sendParticle(
                     serverLevel,
-                    ModParticleTypes.FIRE_STAR.get(),
+                    ModParticleTypes.FIRE_STAR,
                     pos.x,
                     pos.y,
                     pos.z,
@@ -823,17 +813,15 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         val headshot = result.headshot
         val legShot = result.legShot
 
-        if (NeoForge.EVENT_BUS.post(HitEntity(this.shooter, this, result)).isCanceled()) return
-
-        if (entity is PartEntity<*>) {
-            entity = entity.getParent()
+        if (entity is EnderDragonPart) {
+            entity = entity.parentMob
         }
 
         if (entity is LivingEntity) {
             entity.level().playSound(
                 null,
                 entity.onPos,
-                ModSounds.MELEE_HIT.get(),
+                ModSounds.MELEE_HIT,
                 SoundSource.PLAYERS,
                 1f,
                 (2 * Math.random() - 1).toFloat() * 0.1f + 1.0f
@@ -850,7 +838,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         val shooter = this.shooter
         if (headshot) {
             if (shooter is ServerPlayer) {
-                val holder = Holder.direct(ModSounds.HEADSHOT.get())
+                val holder = Holder.direct(ModSounds.HEADSHOT)
                 sendPacketTo(
                     shooter, ClientboundSoundPacket(
                         holder,
@@ -868,7 +856,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
             performOnHit(entity, this.damage, true, this.knockback.toDouble())
         } else {
             if (shooter is ServerPlayer) {
-                val holder = Holder.direct(ModSounds.INDICATION.get())
+                val holder = Holder.direct(ModSounds.INDICATION)
                 sendPacketTo(
                     shooter, ClientboundSoundPacket(
                         holder,

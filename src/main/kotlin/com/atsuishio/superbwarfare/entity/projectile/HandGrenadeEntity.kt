@@ -46,7 +46,7 @@ open class HandGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity
         this.explosionRadiusValue = ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS.get().toFloat()
     }
 
-    constructor(entity: LivingEntity?, level: Level) : super(ModEntities.HAND_GRENADE.get(), entity, level) {
+    constructor(entity: LivingEntity?, level: Level) : super(ModEntities.HAND_GRENADE, entity, level) {
         this.noCulling = true
         this.damageValue = 1f
         this.explosionDamageValue = ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE.get().toFloat()
@@ -54,7 +54,7 @@ open class HandGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.HAND_GRENADE.get()
+        return ModItems.HAND_GRENADE
     }
 
     override fun onHit(result: HitResult) {
@@ -64,7 +64,7 @@ open class HandGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity
                 val resultPos = blockResult.blockPos
                 val state = this.level().getBlockState(resultPos)
                 val block = state.block
-                val event = block.getSoundType(state, this.level(), resultPos, this).breakSound
+                val event = state.soundType.breakSound
                 val speed = this.deltaMovement.length()
                 if (speed > 0.1) {
                     val volume = min(4f, speed.toFloat() / 4f + 0.5f)
@@ -98,7 +98,7 @@ open class HandGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity
                             owner.level().playSound(
                                 null,
                                 owner.blockPosition(),
-                                ModSounds.INDICATION.get(),
+                                ModSounds.INDICATION,
                                 SoundSource.VOICE,
                                 1f,
                                 1f
@@ -146,7 +146,7 @@ open class HandGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity
                 1, 0.0, 0.0, 0.0, 0.01, true
             )
         }
-        if (isInFluidType) {
+        if (this.isInWater || this.isInLava) {
             deltaMovement = deltaMovement.scale(0.75)
         }
     }

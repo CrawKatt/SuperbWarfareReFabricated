@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.event.ClientMouseHandler
 import com.atsuishio.superbwarfare.tools.angleTo
 import com.mojang.math.Axis
+import net.minecraft.tags.FluidTags
 import net.minecraft.util.Mth
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
@@ -33,8 +34,15 @@ object VehicleVecUtils {
         Mth.atan2(vec3.y, vec3.horizontalDistance()) * (180f / Math.PI)
 
     @JvmStatic
-    fun getSubmergedHeight(entity: Entity) =
-        entity.getFluidTypeHeight(entity.level().getFluidState(entity.blockPosition()).fluidType)
+    fun getSubmergedHeight(entity: Entity): Double {
+        val fluidState = entity.level().getFluidState(entity.blockPosition())
+
+        return when {
+            fluidState.`is`(FluidTags.WATER) -> entity.getFluidHeight(FluidTags.WATER)
+            fluidState.`is`(FluidTags.LAVA) -> entity.getFluidHeight(FluidTags.LAVA)
+            else -> 0.0
+        }
+    }
 
     fun eulerToQuaternion(yaw: Float, pitch: Float, roll: Float): Quaternionf {
         val cy = Math.cos(yaw * 0.5 * Mth.DEG_TO_RAD)
@@ -262,7 +270,7 @@ object VehicleVecUtils {
 
             val worldPosition = transformPosition(
                 vehicle.getTransformFromString(data.get(GunProp.SHOOT_POS).transform, partialTicks),
-                vec3.x + stringOrVec3.vec3!!.x,
+                vec3!!.x + stringOrVec3.vec3!!.x,
                 vec3.y + stringOrVec3.vec3.y,
                 vec3.z + stringOrVec3.vec3.z
             )
@@ -292,7 +300,7 @@ object VehicleVecUtils {
 
             val worldPosition = transformPosition(
                 vehicle.getTransformFromString(data.get(GunProp.SHOOT_POS).transform, partialTicks),
-                vec3.x + stringOrVec3.vec3!!.x,
+                vec3!!.x + stringOrVec3.vec3!!.x,
                 vec3.y + stringOrVec3.vec3.y,
                 vec3.z + stringOrVec3.vec3.z
             )

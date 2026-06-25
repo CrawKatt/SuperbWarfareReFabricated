@@ -1,14 +1,15 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
-import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
-import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitBlock
-import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitEntity
+import com.atsuishio.superbwarfare.Mod.queueServerWork
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig
 import com.atsuishio.superbwarfare.network.message.receive.ClientMotionSyncMessage
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.ParticleTool
+import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.core.BlockPos
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.nbt.CompoundTag
@@ -28,13 +29,9 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
-import net.neoforged.neoforge.common.NeoForge
-import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
-import net.neoforged.neoforge.network.PacketDistributor
 import java.util.function.Consumer
 
-abstract class FastThrowableProjectile : ThrowableItemProjectile, CustomSyncMotionEntity, IEntityWithComplexSpawn,
-    ExplosiveProjectile {
+abstract class FastThrowableProjectile : ThrowableItemProjectile, CustomSyncMotionEntity, ExplosiveProjectile {
     var damageValue: Float = 0f
     var explosionDamageValue: Float = 0f
     var explosionRadiusValue: Float = 0f
@@ -64,6 +61,14 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, CustomSyncMoti
         this.owner = pShooter
         if (pShooter != null) {
             this.setPos(pShooter.x, pShooter.eyeY - 0.1, pShooter.z)
+        }
+    }
+
+    fun init() {
+        EntityTrackingEvents.START_TRACKING.register { entity, player ->
+            if (entity is FastThrowableProjectile) {
+                ServerPlayNetworking.send(player, ClientMotionSyncMessage(entity))
+            }
         }
     }
 
@@ -165,28 +170,10 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, CustomSyncMoti
 
     override fun onHitEntity(result: EntityHitResult) {
         super.onHitEntity(result)
-        NeoForge.EVENT_BUS.post(
-            HitEntity(
-                this.owner,
-                this,
-                result.entity,
-                result.getLocation()
-            )
-        )
     }
 
     override fun onHitBlock(result: BlockHitResult) {
         super.onHitBlock(result)
-        NeoForge.EVENT_BUS.post(
-            HitBlock(
-                result.blockPos,
-                this.level().getBlockState(result.blockPos),
-                result.direction,
-                this.owner,
-                this,
-                result.getLocation()
-            )
-        )
     }
 
     open fun destroyBlock(blockHitResult: BlockHitResult) {
@@ -263,7 +250,10 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, CustomSyncMoti
         if (!shouldSyncMotion()) return
 
         if (this.tickCount % this.type.updateInterval() == 0) {
-            PacketDistributor.sendToPlayersTrackingEntity(this, ClientMotionSyncMessage(this))
+            val packet = ClientMotionSyncMessage(this)
+            for (player in PlayerLookup.tracking(this)) {
+                ServerPlayNetworking.send(player, packet)
+            }
         }
     }
 
@@ -273,21 +263,6 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, CustomSyncMoti
 
     open fun shouldSyncMotion(): Boolean {
         return true
-    }
-
-    override fun writeSpawnData(buffer: RegistryFriendlyByteBuf) {
-        val motion = this.deltaMovement
-        buffer.writeFloat(motion.x.toFloat())
-        buffer.writeFloat(motion.y.toFloat())
-        buffer.writeFloat(motion.z.toFloat())
-    }
-
-    override fun readSpawnData(additionalData: RegistryFriendlyByteBuf) {
-        this.setDeltaMovement(
-            additionalData.readFloat().toDouble(),
-            additionalData.readFloat().toDouble(),
-            additionalData.readFloat().toDouble()
-        )
     }
 
     open fun getSound(): SoundEvent = SoundEvents.EMPTY

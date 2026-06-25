@@ -77,7 +77,7 @@ open class CannonShellEntity(type: EntityType<out CannonShellEntity>, level: Lev
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.LARGE_SHELL_HE.get()
+        return ModItems.LARGE_SHELL_HE
     }
 
     @Suppress("DEPRECATION")
@@ -123,7 +123,7 @@ open class CannonShellEntity(type: EntityType<out CannonShellEntity>, level: Lev
                         discard()
                     } else {
                         ParticleTool.cannonHitParticles(level, result.location)
-                        val cannonShell = CannonShellEntity(ModEntities.CANNON_SHELL.get(), level)
+                        val cannonShell = CannonShellEntity(ModEntities.CANNON_SHELL, level)
                         cannonShell.setPos(result.location.add(deltaMovement.normalize().scale(0.99)))
                         cannonShell.shoot(
                             deltaMovement.x,
@@ -334,7 +334,7 @@ open class CannonShellEntity(type: EntityType<out CannonShellEntity>, level: Lev
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.SHELL_FLY.get()
+        return ModSounds.SHELL_FLY
     }
 
     override fun getVolume(): Float {

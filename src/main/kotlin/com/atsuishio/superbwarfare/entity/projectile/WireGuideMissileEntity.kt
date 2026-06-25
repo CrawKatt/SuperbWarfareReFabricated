@@ -21,7 +21,7 @@ open class WireGuideMissileEntity(type: EntityType<out WireGuideMissileEntity>, 
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.MEDIUM_ANTI_GROUND_MISSILE.get()
+        return ModItems.MEDIUM_ANTI_GROUND_MISSILE
     }
 
     override fun tick() {
@@ -52,7 +52,7 @@ open class WireGuideMissileEntity(type: EntityType<out WireGuideMissileEntity>, 
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.ROCKET_FLY.get()
+        return ModSounds.ROCKET_FLY
     }
 
     override fun getVolume(): Float {

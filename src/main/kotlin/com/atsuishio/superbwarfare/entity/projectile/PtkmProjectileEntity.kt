@@ -37,14 +37,14 @@ open class PtkmProjectileEntity : FastThrowableProjectile, BasicGeoProjectileEnt
         this.explosionRadiusValue = ExplosionConfig.PTKM_1R_PROJECTILE_EXPLOSION_RADIUS.get().toFloat()
     }
 
-    constructor(entity: LivingEntity?, level: Level) : super(ModEntities.PTKM_PROJECTILE.get(), entity, level) {
+    constructor(entity: LivingEntity?, level: Level) : super(ModEntities.PTKM_PROJECTILE, entity, level) {
         this.damageValue = ExplosionConfig.PTKM_1R_PROJECTILE_HIT_DAMAGE.get().toFloat()
         this.explosionDamageValue = ExplosionConfig.PTKM_1R_PROJECTILE_EXPLOSION_DAMAGE.get().toFloat()
         this.explosionRadiusValue = ExplosionConfig.PTKM_1R_PROJECTILE_EXPLOSION_RADIUS.get().toFloat()
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.PTKM_1R.get()
+        return ModItems.PTKM_1R
     }
 
     override fun isPickable(): Boolean {
@@ -98,7 +98,7 @@ open class PtkmProjectileEntity : FastThrowableProjectile, BasicGeoProjectileEnt
                     level.playSound(
                         null,
                         BlockPos.containing(position()),
-                        ModSounds.EXPLOSION_AIR.get(),
+                        ModSounds.EXPLOSION_AIR,
                         SoundSource.BLOCKS,
                         8f,
                         1f

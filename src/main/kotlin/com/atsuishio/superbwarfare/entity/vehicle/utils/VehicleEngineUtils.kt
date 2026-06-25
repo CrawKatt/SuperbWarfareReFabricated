@@ -20,6 +20,9 @@ import org.joml.Math
 import kotlin.math.min
 
 object VehicleEngineUtils {
+    private val VehicleEntity.isInFluidType: Boolean
+        get() = this.isInLiquid
+
     @JvmStatic
     fun VehicleEntity.trackEngine(engineInfo: EngineInfo.Track) {
         val buoyancy = engineInfo.buoyancy
@@ -1310,7 +1313,7 @@ object VehicleEngineUtils {
                 passenger0.level().playSound(
                     null,
                     passenger0.onPos,
-                    ModSounds.WHEEL_CHAIR_JUMP.get(),
+                    ModSounds.WHEEL_CHAIR_JUMP,
                     SoundSource.PLAYERS,
                     1f,
                     1f

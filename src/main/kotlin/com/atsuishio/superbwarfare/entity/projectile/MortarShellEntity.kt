@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import com.atsuishio.superbwarfare.tools.SeekTool
 import com.atsuishio.superbwarfare.tools.forceHurt
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
@@ -38,7 +39,6 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
-import net.neoforged.neoforge.network.PacketDistributor
 import java.util.*
 import kotlin.math.max
 
@@ -81,7 +81,7 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
         explosionDamage: Float,
         explosionRadius: Float
     ) : super(
-        ModEntities.MORTAR_SHELL.get(), entity, level
+        ModEntities.MORTAR_SHELL, entity, level
     ) {
         this.noCulling = true
         this.damageValue = damage
@@ -91,7 +91,7 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
     }
 
     fun setEffectsFromItem(stack: ItemStack) {
-        if (stack.`is`(ModItems.POTION_MORTAR_SHELL.get())) {
+        if (stack.`is`(ModItems.POTION_MORTAR_SHELL)) {
             val potionContents =
                 stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
             this.potion = potionContents.potion().orElse(Potions.WATER).value()
@@ -99,7 +99,7 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
             for (instance in potionContents.allEffects) {
                 this.effects.add(MobEffectInstance(instance))
             }
-        } else if (stack.`is`(ModItems.MORTAR_SHELL.get())) {
+        } else if (stack.`is`(ModItems.MORTAR_SHELL)) {
             this.potion = Potions.WATER.value()
             this.effects.clear()
         }
@@ -150,7 +150,7 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.MORTAR_SHELL.get()
+        return ModItems.MORTAR_SHELL
     }
 
     public override fun onHitEntity(result: EntityHitResult) {
@@ -162,9 +162,9 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
             if (owner is LivingEntity) {
                 if (owner is ServerPlayer) {
                     owner.level()
-                        .playSound(null, owner.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1f, 1f)
+                        .playSound(null, owner.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1f, 1f)
 
-                    PacketDistributor.sendToPlayer(owner, ClientIndicatorMessage(0, 5))
+                    ClientPlayNetworking.send(ClientIndicatorMessage(0, 5))
                 }
             }
 
@@ -310,7 +310,7 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.SHELL_FLY.get()
+        return ModSounds.SHELL_FLY
     }
 
     override fun getVolume(): Float {

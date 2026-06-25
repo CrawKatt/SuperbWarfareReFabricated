@@ -62,7 +62,7 @@ open class TaserBulletEntity(type: EntityType<out TaserBulletEntity>, level: Lev
         if (owner != null && owner.vehicle != null && entity == owner.vehicle) return
         if (owner is ServerPlayer) {
             owner.level()
-                .playSound(null, owner.blockPosition(), ModSounds.INDICATION.get(), SoundSource.VOICE, 1f, 1f)
+                .playSound(null, owner.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1f, 1f)
             sendPacketTo(owner, ClientIndicatorMessage(0, 5))
         }
         if (entity is LivingEntity) {

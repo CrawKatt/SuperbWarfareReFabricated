@@ -35,7 +35,7 @@ open class SmallCannonShellEntity(type: EntityType<out SmallCannonShellEntity>, 
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.SMALL_SHELL_AP.get()
+        return ModItems.SMALL_SHELL_AP
     }
 
     override fun onHitEntity(result: EntityHitResult) {
@@ -129,7 +129,7 @@ open class SmallCannonShellEntity(type: EntityType<out SmallCannonShellEntity>, 
                             owner.level().playSound(
                                 null,
                                 owner.blockPosition(),
-                                ModSounds.INDICATION.get(),
+                                ModSounds.INDICATION,
                                 SoundSource.VOICE,
                                 1f,
                                 1f

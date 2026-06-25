@@ -24,9 +24,8 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
-import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
 
-abstract class MissileProjectile : DestroyableProjectile, CustomSyncMotionEntity, IEntityWithComplexSpawn {
+abstract class MissileProjectile : DestroyableProjectile, CustomSyncMotionEntity {
     @JvmField
     var targetPos: Vec3? = null
 
@@ -113,6 +112,10 @@ abstract class MissileProjectile : DestroyableProjectile, CustomSyncMotionEntity
     }
 
     override fun updateRotation() {
+    }
+
+    override fun shouldSyncMotion(): Boolean {
+        return true
     }
 
     fun turn(vec3: Vec3, turnSpeed: Float) {

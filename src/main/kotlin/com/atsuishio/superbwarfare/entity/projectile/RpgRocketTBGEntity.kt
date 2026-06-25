@@ -46,7 +46,7 @@ open class RpgRocketTBGEntity : FastThrowableProjectile, BasicGeoProjectileEntit
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.RPG_ROCKET_TBG.get()
+        return ModItems.RPG_ROCKET_TBG
     }
 
     public override fun onHitBlock(result: BlockHitResult) {
@@ -117,7 +117,7 @@ open class RpgRocketTBGEntity : FastThrowableProjectile, BasicGeoProjectileEntit
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.ROCKET_FLY.get()
+        return ModSounds.ROCKET_FLY
     }
 
     override fun getModel() = BedrockModelLoader.RPG_ROCKET_TBG_MODEL

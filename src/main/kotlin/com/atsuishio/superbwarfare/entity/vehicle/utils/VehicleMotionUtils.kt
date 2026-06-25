@@ -39,7 +39,6 @@ import org.joml.Math
 import org.joml.Matrix4d
 import org.joml.Vector3d
 
-
 /**
  * 处理载具运动相关方法的工具类
  */
@@ -285,7 +284,7 @@ object VehicleMotionUtils {
                 continue
             }
 
-            vehicle.level().playSound(null, vehicle, ModSounds.VEHICLE_STRIKE.get(), vehicle.soundSource, 1f, 1f)
+            vehicle.level().playSound(null, vehicle, ModSounds.VEHICLE_STRIKE, vehicle.soundSource, 1f, 1f)
 
             if (entity is LivingEntity) {
                 entity.forceHurt(
@@ -462,7 +461,7 @@ object VehicleMotionUtils {
         val pos = vehicle.level().findSupportingBlock(vehicle, aabb1).orElse(null) ?: return
 
         val state = vehicle.level().getBlockState(pos)
-        if (state.`is`(ModBlocks.DRAGON_TEETH.get())) {
+        if (state.`is`(ModBlocks.DRAGON_TEETH)) {
             vehicle.power *= 0.8f
             vehicle.setDeltaMovement(vehicle.deltaMovement.multiply(-0.1, 0.0, -0.1))
         }
@@ -478,7 +477,7 @@ object VehicleMotionUtils {
 
     fun bounceVertical(vehicle: VehicleEntity, direction: Direction) {
         if (!vehicle.level().isClientSide) {
-            vehicle.level().playSound(null, vehicle, ModSounds.VEHICLE_STRIKE.get(), vehicle.soundSource, 1f, 1f)
+            vehicle.level().playSound(null, vehicle, ModSounds.VEHICLE_STRIKE, vehicle.soundSource, 1f, 1f)
         }
         vehicle.collisionCoolDown = 4
         vehicle.crash = true
@@ -543,7 +542,7 @@ object VehicleMotionUtils {
                             )
                         ) {
                             vehicle.addRandomParticle(
-                                ModParticleTypes.FIRE_STAR.get(),
+                                ModParticleTypes.FIRE_STAR,
                                 p.add(0.0, 0.1, 0.0),
                                 0.25f,
                                 vehicle.level(),
@@ -564,7 +563,7 @@ object VehicleMotionUtils {
 
                 updateTerrainCompact(vehicle, p, heightY)
             }
-        } else if (vehicle.isInFluidType) {
+        } else if (vehicle.isInLiquid) {
             vehicle.xRot *= 0.9f
             vehicle.setZRot(vehicle.roll * 0.9f)
         }

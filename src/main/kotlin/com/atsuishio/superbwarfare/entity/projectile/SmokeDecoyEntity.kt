@@ -27,7 +27,7 @@ open class SmokeDecoyEntity : Entity {
         releaseSmoke = release
     }
 
-    constructor(level: Level) : super(ModEntities.SMOKE_DECOY.get(), level)
+    constructor(level: Level) : super(ModEntities.SMOKE_DECOY, level)
 
     override fun readAdditionalSaveData(compoundTag: CompoundTag) {
         if (compoundTag.contains("IgniteTime")) {
@@ -71,7 +71,7 @@ open class SmokeDecoyEntity : Entity {
                     )
                     ParticleTool.sendParticle(
                         level,
-                        ModParticleTypes.FIRE_STAR.get(),
+                        ModParticleTypes.FIRE_STAR,
                         this.xo,
                         this.yo,
                         this.zo,
@@ -86,7 +86,7 @@ open class SmokeDecoyEntity : Entity {
                 level.playSound(
                     null,
                     this,
-                    ModSounds.SMOKE_FIRE.get(),
+                    ModSounds.SMOKE_FIRE,
                     this.soundSource,
                     2f,
                     random.nextFloat() * 0.05f + 1

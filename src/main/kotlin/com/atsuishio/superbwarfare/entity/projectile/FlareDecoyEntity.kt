@@ -14,7 +14,7 @@ import net.minecraft.world.phys.Vec3
 open class FlareDecoyEntity : Entity {
     constructor(type: EntityType<out FlareDecoyEntity>, world: Level) : super(type, world)
 
-    constructor(level: Level) : super(ModEntities.FLARE_DECOY.get(), level)
+    constructor(level: Level) : super(ModEntities.FLARE_DECOY, level)
 
     override fun readAdditionalSaveData(compoundTag: CompoundTag) {
     }

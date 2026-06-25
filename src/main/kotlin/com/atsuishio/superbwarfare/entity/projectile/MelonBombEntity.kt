@@ -80,7 +80,7 @@ open class MelonBombEntity(type: EntityType<out MelonBombEntity>, level: Level) 
         get() = 15f
 
     override fun getSound(): SoundEvent {
-        return ModSounds.SHELL_FLY.get()
+        return ModSounds.SHELL_FLY
     }
 
     override fun getVolume(): Float {
