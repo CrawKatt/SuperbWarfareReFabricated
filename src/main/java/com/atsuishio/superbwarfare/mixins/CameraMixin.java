@@ -202,12 +202,22 @@ public abstract class CameraMixin implements ICustomCamera {
 
     @Unique
     private void superbWarfare$applyComputedAngles(float tickDelta, boolean applyRollToCamera) {
-        var position = ((Camera) (Object) this).getPosition();
-        ClientEventHandler.computeCameraAngles((Camera) (Object) this, tickDelta, position.x, position.y, position.z);
+        Camera camera = (Camera) (Object) this;
+
+        ClientEventHandler.CameraAnglesContext context = new ClientEventHandler.CameraAnglesContext(
+                camera,
+                tickDelta,
+                camera.getYRot(),
+                camera.getXRot(),
+                ClientEventHandler.cameraRoll
+        );
+
+        ClientEventHandler.computeCameraAngles(context);
+
         if (applyRollToCamera) {
-            superbWarfare$setRotation(ClientEventHandler.cameraYaw, ClientEventHandler.cameraPitch, -ClientEventHandler.cameraRoll);
+            superbWarfare$setRotation(context.getYaw(), context.getPitch(), -ClientEventHandler.cameraRoll);
         } else {
-            setRotation(ClientEventHandler.cameraYaw, ClientEventHandler.cameraPitch);
+            setRotation(context.getYaw(), context.getPitch());
         }
     }
 

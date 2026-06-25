@@ -1,4 +1,4 @@
-package com.atsuishio.superbwarfare.mixins;
+package com.atsuishio.superbwarfare.accessor;
 
 public interface RenderTargetStencilAccessor {
 

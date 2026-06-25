@@ -37,8 +37,16 @@ public class GameRendererMixin {
 
     @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
     private void superbWarfare$getFov(Camera camera, float partialTick, boolean changingFov, CallbackInfoReturnable<Double> cir) {
-        ClientEventHandler.onFovUpdate(Minecraft.getInstance(), cir.getReturnValue().floatValue(), partialTick, changingFov);
-        cir.setReturnValue(ClientEventHandler.fov);
+        ClientEventHandler.FovContext context = new ClientEventHandler.FovContext(
+                cir.getReturnValue(),
+                partialTick,
+                changingFov
+        );
+
+        ClientEventHandler.captureFov(context);
+        ClientEventHandler.onFovUpdate(context);
+
+        cir.setReturnValue(context.getFov());
     }
 
     @Inject(method = "bobView(Lcom/mojang/blaze3d/vertex/PoseStack;F)V", at = @At("HEAD"), cancellable = true)
