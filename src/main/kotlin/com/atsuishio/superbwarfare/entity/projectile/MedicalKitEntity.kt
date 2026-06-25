@@ -37,7 +37,7 @@ open class MedicalKitEntity(type: EntityType<MedicalKitEntity>, level: Level) : 
             }
 
             if (!player.abilities.instabuild) {
-                ItemHandlerHelper.giveItemToPlayer(player, ItemStack(ModItems.MEDICAL_KIT.get()))
+                ItemHandlerHelper.giveItemToPlayer(player, ItemStack(ModItems.MEDICAL_KIT))
             }
         }
 
@@ -62,7 +62,7 @@ open class MedicalKitEntity(type: EntityType<MedicalKitEntity>, level: Level) : 
         if (this.onGround()) {
             this.xRot = -90f
             val pos = this.blockPosBelowThatAffectsMyMovement
-            f = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98f
+            f = level().getBlockState(pos).block.friction * 0.98f
         } else {
             this.updateRotation()
         }
@@ -72,7 +72,7 @@ open class MedicalKitEntity(type: EntityType<MedicalKitEntity>, level: Level) : 
             this.deltaMovement = this.deltaMovement.multiply(1.0, -0.9, 1.0)
         }
 
-        if (isInFluidType) {
+        if (isInLiquid) {
             deltaMovement = deltaMovement.scale(0.75)
         }
 

@@ -38,7 +38,7 @@ open class VehicleAssemblingTableVehicleEntity(type: EntityType<*>, level: Level
     var deltaY: Float = 0f
     var jumpCooldown: Int = 0
 
-    constructor(level: Level) : this(ModEntities.VEHICLE_ASSEMBLING_TABLE.get(), level)
+    constructor(level: Level) : this(ModEntities.VEHICLE_ASSEMBLING_TABLE, level)
 
     // 变回方块
     override fun interact(player: Player, hand: InteractionHand): InteractionResult {
@@ -68,7 +68,7 @@ open class VehicleAssemblingTableVehicleEntity(type: EntityType<*>, level: Level
                 if (canPlace) {
                     for (part in BlockPart.entries) {
                         val blockPos = part.relative(targetBlockPos, facing)
-                        val state = ModBlocks.VEHICLE_ASSEMBLING_TABLE.get().defaultBlockState()
+                        val state = ModBlocks.VEHICLE_ASSEMBLING_TABLE.defaultBlockState()
                             .setValue(VehicleAssemblingTableBlock.FACING, facing)
                             .setValue(VehicleAssemblingTableBlock.BLOCK_PART, part)
 
@@ -170,7 +170,7 @@ open class VehicleAssemblingTableVehicleEntity(type: EntityType<*>, level: Level
                     level.playSound(
                         null,
                         this.onPos,
-                        ModSounds.WHEEL_CHAIR_JUMP.get(),
+                        ModSounds.WHEEL_CHAIR_JUMP,
                         SoundSource.PLAYERS,
                         2f,
                         1f
@@ -218,7 +218,7 @@ open class VehicleAssemblingTableVehicleEntity(type: EntityType<*>, level: Level
                 this.x,
                 this.y,
                 this.z,
-                ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE.get())
+                ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE)
             )
             item.setPickUpDelay(50)
             this.level().addFreshEntity(item)
@@ -227,7 +227,7 @@ open class VehicleAssemblingTableVehicleEntity(type: EntityType<*>, level: Level
     }
 
     override fun getRetrieveItems(): MutableList<ItemStack> {
-        return mutableListOf(ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE.get()))
+        return mutableListOf(ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE))
     }
 
     override fun openCustomInventoryScreen(player: Player) {

@@ -210,7 +210,7 @@ class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : GeoVehi
             )
 
             if (shooter is ServerPlayer) {
-                val holder = Holder.direct(ModSounds.INDICATION.get())
+                val holder = Holder.direct(ModSounds.INDICATION)
                 shooter.connection.send(
                     ClientboundSoundPacket(
                         holder,

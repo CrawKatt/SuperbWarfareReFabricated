@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.entity.vehicle
 
-import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
+import com.atsuishio.superbwarfare.Mod.queueServerWork
 import com.atsuishio.superbwarfare.entity.vehicle.base.GeoVehicleEntity
 import com.atsuishio.superbwarfare.init.ModCriteriaTriggers
 import com.atsuishio.superbwarfare.init.ModItems
@@ -69,10 +69,10 @@ open class WheelChairEntity(type: EntityType<WheelChairEntity>, level: Level) : 
         super.addPassenger(pPassenger)
 
         if (pPassenger is ServerPlayer
-            && (pPassenger.mainHandItem.item == ModItems.ELECTRIC_BATON.get()
-                    || pPassenger.offhandItem.item == ModItems.ELECTRIC_BATON.get())
+            && (pPassenger.mainHandItem.item == ModItems.ELECTRIC_BATON
+                    || pPassenger.offhandItem.item == ModItems.ELECTRIC_BATON)
         ) {
-            ModCriteriaTriggers.OTTO_SPRINT.get().trigger(pPassenger)
+            ModCriteriaTriggers.OTTO_SPRINT.trigger(pPassenger)
         }
     }
 

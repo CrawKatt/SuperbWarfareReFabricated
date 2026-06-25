@@ -1,20 +1,20 @@
 package com.atsuishio.superbwarfare.entity.vehicle;
 
-import com.atsuishio.superbwarfare.component.ModDataComponents;
+import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.entity.projectile.MortarShellEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils;
 import com.atsuishio.superbwarfare.init.ModEntities;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModTags;
-import com.atsuishio.superbwarfare.item.ArtilleryIndicator;
-import com.atsuishio.superbwarfare.item.FiringParameters;
-import com.atsuishio.superbwarfare.item.Monitor;
-import com.atsuishio.superbwarfare.item.common.ammo.MortarShell;
+import com.atsuishio.superbwarfare.item.misc.ArtilleryIndicatorItem;
+import com.atsuishio.superbwarfare.item.misc.FiringParametersItemKt;
+import com.atsuishio.superbwarfare.item.misc.MonitorItem;
+import com.atsuishio.superbwarfare.item.projectile.MortarShellItem;
 import com.atsuishio.superbwarfare.tools.FormatTool;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import com.atsuishio.superbwarfare.tools.SoundTool;
-import com.atsuishio.superbwarfare.tools.VectorTool;
+import com.atsuishio.superbwarfare.tools.VectorToolKt;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
@@ -39,19 +39,19 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 import software.bernie.geckolib.animation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.atsuishio.superbwarfare.tools.RangeTool.calculateLaunchVector;
+import static com.atsuishio.superbwarfare.tools.TrajectoryCalculator.calculateLaunchVector;
 
 public class MortarEntity extends ArtilleryEntity {
     public static final EntityDataAccessor<Integer> FIRE_TIME = SynchedEntityData.defineId(MortarEntity.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Float> TARGET_PITCH = SynchedEntityData.defineId(MortarEntity.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Float> TARGET_YAW = SynchedEntityData.defineId(MortarEntity.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Boolean> INTELLIGENT = SynchedEntityData.defineId(MortarEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> NEED_RESET_TARGET = SynchedEntityData.defineId(MortarEntity.class, EntityDataSerializers.BOOLEAN);
 
     private LivingEntity shooter = null;
 
@@ -66,16 +66,17 @@ public class MortarEntity extends ArtilleryEntity {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    protected void defineSynchedData(SynchedEntityData.@NotNull Builder builder) {
         super.defineSynchedData(builder);
         builder.define(INTELLIGENT, false)
                 .define(TARGET_PITCH, -70f)
                 .define(TARGET_YAW, this.getYRot())
-                .define(FIRE_TIME, 0);
+                .define(FIRE_TIME, 0)
+                .define(NEED_RESET_TARGET, true);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(@NotNull CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putFloat("TargetPitch", this.entityData.get(TARGET_PITCH));
         compound.putFloat("TargetYaw", this.entityData.get(TARGET_YAW));
@@ -83,7 +84,7 @@ public class MortarEntity extends ArtilleryEntity {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(@NotNull CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         if (compound.contains("TargetPitch")) {
             this.entityData.set(TARGET_PITCH, compound.getFloat("TargetPitch"));
@@ -97,12 +98,12 @@ public class MortarEntity extends ArtilleryEntity {
     }
 
     @Override
-    public void vehicleShoot(@Nullable LivingEntity living, String weaponName) {
-        if (!(this.items.getFirst().getItem() instanceof MortarShell)) return;
+    public void vehicleShoot(LivingEntity living, @NotNull String weaponName) {
+        if (!(this.getItems().getFirst().getItem() instanceof MortarShellItem)) return;
         var gunData = getGunData(weaponName);
         if (gunData == null) return;
         if (entityData.get(FIRE_TIME) != 0) return;
-        var soundInfo = gunData.compute().soundInfo;
+        var soundInfo = gunData.get(GunProp.SOUND_INFO);
 
         this.shooter = living;
         this.entityData.set(FIRE_TIME, 25);
@@ -112,23 +113,23 @@ public class MortarEntity extends ArtilleryEntity {
         }
 
         if (level() instanceof ServerLevel serverLevel) {
-            SoundTool.playDistantSound(serverLevel, soundInfo.fire3P, position(), (float) (0.25f * gunData.compute().soundRadius), random.nextFloat() * 0.1f + 1, null);
-            SoundTool.playDistantSound(serverLevel, soundInfo.fire3PFar, position(), (float) gunData.compute().soundRadius, random.nextFloat() * 0.1f + 1, null);
+            SoundTool.playDistantSound(serverLevel, soundInfo.fire3P, position(), (float) (0.25f * gunData.get(GunProp.SOUND_RADIUS)), random.nextFloat() * 0.1f + 1, null);
+            SoundTool.playDistantSound(serverLevel, soundInfo.fire3PFar, position(), gunData.get(GunProp.SOUND_RADIUS).floatValue(), random.nextFloat() * 0.1f + 1, null);
         }
     }
 
     @Override
-    public @NotNull InteractionResult interact(Player player, @NotNull InteractionHand hand) {
+    public @NotNull InteractionResult interact(@NotNull Player player, @NotNull InteractionHand hand) {
         var result = super.interact(player, hand);
         if (result != InteractionResult.PASS) return result;
 
         ItemStack mainHandItem = player.getMainHandItem();
 
-        if (mainHandItem.getItem() instanceof ArtilleryIndicator indicator && this.entityData.get(INTELLIGENT)) {
+        if (mainHandItem.getItem() instanceof ArtilleryIndicatorItem indicator && this.entityData.get(INTELLIGENT)) {
             return indicator.bind(mainHandItem, player, this);
         }
 
-        if (mainHandItem.getItem() instanceof Monitor && !this.entityData.get(INTELLIGENT)) {
+        if (mainHandItem.getItem() instanceof MonitorItem && !this.entityData.get(INTELLIGENT)) {
             entityData.set(INTELLIGENT, true);
             if (player instanceof ServerPlayer serverPlayer) {
                 serverPlayer.level().playSound(null, serverPlayer.getOnPos(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 0.5F, 1);
@@ -140,18 +141,19 @@ public class MortarEntity extends ArtilleryEntity {
         }
 
         if (mainHandItem.is(ModTags.Items.TOOLS_CROWBAR)) {
-            if (this.items.getFirst().getItem() instanceof MortarShell && this.entityData.get(FIRE_TIME) == 0 && level() instanceof ServerLevel) {
+            if (this.getItems().getFirst().getItem() instanceof MortarShellItem && this.entityData.get(FIRE_TIME) == 0 && level() instanceof ServerLevel) {
                 vehicleShoot(player, "Main");
             }
             return InteractionResult.SUCCESS;
         }
 
-        if (mainHandItem.getItem() instanceof MortarShell && !player.isShiftKeyDown() && this.entityData.get(FIRE_TIME) == 0 && this.items.getFirst().isEmpty()) {
-            this.items.set(0, mainHandItem.copyWithCount(1));
+        if (mainHandItem.getItem() instanceof MortarShellItem && !player.isShiftKeyDown() && this.entityData.get(FIRE_TIME) == 0 && this.getItems().getFirst().isEmpty()) {
+            this.getItems().set(0, mainHandItem.copyWithCount(1));
             if (!player.isCreative()) {
                 mainHandItem.shrink(1);
             }
             vehicleShoot(player, "Main");
+            entityData.set(NEED_RESET_TARGET, false);
             return InteractionResult.SUCCESS;
         }
 
@@ -178,8 +180,8 @@ public class MortarEntity extends ArtilleryEntity {
             list.add(new ItemStack(ModItems.MONITOR));
         }
 
-        if (items.get(0) != ItemStack.EMPTY) {
-            list.add(items.get(0));
+        if (getItems().getFirst() != ItemStack.EMPTY) {
+            list.add(getItems().getFirst());
         }
 
         return list;
@@ -192,22 +194,25 @@ public class MortarEntity extends ArtilleryEntity {
             entityData.set(FIRE_TIME, entityData.get(FIRE_TIME) - 1);
         }
 
-        if (entityData.get(FIRE_TIME) == 5 && this.items.getFirst().getItem() instanceof MortarShell) {
+        if (entityData.get(FIRE_TIME) == 5 && this.getItems().getFirst().getItem() instanceof MortarShellItem) {
             Level level = this.level();
             var gunData = getGunData("Main");
             if (level instanceof ServerLevel server && gunData != null) {
-                MortarShellEntity entityToSpawn = MortarShell.createShell(shooter, level, this.items.get(0), getProjectileGravity("Main"), (float) gunData.compute().damage, (float) gunData.compute().explosionDamage, (float) gunData.compute().explosionRadius);
+                MortarShellEntity entityToSpawn = MortarShellItem.createShell(shooter, level, this.getItems().getFirst(), getProjectileGravity("Main"), gunData.get(GunProp.DAMAGE).floatValue(), gunData.get(GunProp.EXPLOSION_DAMAGE).floatValue(), gunData.get(GunProp.EXPLOSION_RADIUS).floatValue());
                 entityToSpawn.setPos(this.getX(), this.getEyeY(), this.getZ());
                 entityToSpawn.shoot(this.getLookAngle().x, this.getLookAngle().y, this.getLookAngle().z, getProjectileVelocity("Main"), getProjectileSpread("Main"));
+                entityToSpawn.setLife(gunData.get(GunProp.PROJECTILE_LIFE));
                 level.addFreshEntity(entityToSpawn);
 
                 ParticleTool.spawnMediumCannonMuzzleParticles(getLookAngle(), new Vec3(this.getX(), this.getEyeY(), this.getZ()).add(getLookAngle().scale(1.5)), server, this);
 
                 this.clearContent();
 
-                if (this.entityData.get(INTELLIGENT)) {
+                if (this.entityData.get(INTELLIGENT) && entityData.get(NEED_RESET_TARGET)) {
                     this.resetTarget("Main");
                 }
+
+                entityData.set(NEED_RESET_TARGET, true);
 
                 gunData.shakePlayers(this);
             }
@@ -215,31 +220,28 @@ public class MortarEntity extends ArtilleryEntity {
     }
 
     @Override
-    public void setTarget(ItemStack stack, Entity entity, String weaponName) {
-        var parameters = stack.getOrDefault(ModDataComponents.FIRING_PARAMETERS, new FiringParameters.Parameters());
-        double targetX = parameters.pos().getX();
-        double targetY = parameters.pos().getY() - 1;
-        double targetZ = parameters.pos().getZ();
+    public void setTarget(@NotNull ItemStack stack, Entity entity, @NotNull String weaponName) {
+        var parameters = FiringParametersItemKt.getFiringParameters(stack);
         boolean canAim = true;
 
-        entityData.set(TARGET_POS, new Vector3f((float) targetX, (float) targetY, (float) targetZ));
-        entityData.set(DEPRESSED, parameters.isDepressed());
-        entityData.set(RADIUS, parameters.radius());
-        Vec3 randomPos = VectorTool.randomPos(new Vec3(entityData.get(TARGET_POS)), entityData.get(RADIUS));
-        Vec3 launchVector = calculateLaunchVector(getEyePosition(), randomPos, getProjectileVelocity(weaponName), getProjectileGravity(weaponName), entityData.get(DEPRESSED));
-        Vec3 launchVector2 = calculateLaunchVector(getEyePosition(), randomPos, getProjectileVelocity(weaponName), getProjectileGravity(weaponName), !entityData.get(DEPRESSED));
+        setTargetPos(parameters.pos());
+        setDepressed(!parameters.isDepressed());
+        setRadius(parameters.radius());
+        Vec3 randomPos = VectorToolKt.randomPos(getTargetPos().getCenter(), getRadius()).add(0, -1, 0);
+        Vec3 flatTrajectory = calculateLaunchVector(getEyePosition(), randomPos, getProjectileVelocity(weaponName), getProjectileGravity(weaponName), getDepressed());
+        Vec3 highTrajectory = calculateLaunchVector(getEyePosition(), randomPos, getProjectileVelocity(weaponName), getProjectileGravity(weaponName), !getDepressed());
 
         Component component = Component.literal("");
         Component location = Component.translatable("tips.superbwarfare.mortar.position", this.getDisplayName())
                 .append(Component.literal(" X:" + FormatTool.format0D(getX()) + " Y:" + FormatTool.format0D(getY()) + " Z:" + FormatTool.format0D(getZ()) + " "));
         float angle = getXRot();
 
-        if (launchVector == null || launchVector2 == null) {
+        if (flatTrajectory == null || highTrajectory == null) {
             canAim = false;
             component = Component.translatable("tips.superbwarfare.mortar.out_of_range");
         } else {
-            angle = (float) -VehicleVecUtils.getXRotFromVector(launchVector);
-            float angle2 = (float) -VehicleVecUtils.getXRotFromVector(launchVector2);
+            angle = (float) -VehicleVecUtils.getXRotFromVector(flatTrajectory);
+            float angle2 = (float) -VehicleVecUtils.getXRotFromVector(highTrajectory);
             if (angle < -getTurretMaxPitch() || angle > -getTurretMinPitch()) {
                 if (angle2 > -getTurretMaxPitch() && angle2 < -getTurretMinPitch()) {
                     component = Component.translatable("tips.superbwarfare.ballistics.warn2");
@@ -268,9 +270,9 @@ public class MortarEntity extends ArtilleryEntity {
     }
 
     @Override
-    public void resetTarget(String weaponName) {
-        Vec3 randomPos = VectorTool.randomPos(new Vec3(entityData.get(TARGET_POS)), entityData.get(RADIUS));
-        Vec3 launchVector = calculateLaunchVector(getEyePosition(), randomPos, getProjectileVelocity(weaponName), getProjectileGravity(weaponName), entityData.get(DEPRESSED));
+    public void resetTarget(@NotNull String weaponName) {
+        Vec3 randomPos = VectorToolKt.randomPos(getTargetPos().getCenter(), getRadius()).add(0, -1, 0);
+        Vec3 launchVector = calculateLaunchVector(getEyePosition(), randomPos, getProjectileVelocity(weaponName), getProjectileGravity(weaponName), getDepressed());
         this.look(randomPos);
 
         if (launchVector == null) {
@@ -295,7 +297,7 @@ public class MortarEntity extends ArtilleryEntity {
         float diffX = Mth.wrapDegrees(entityData.get(TARGET_PITCH) - this.getXRot());
 
         this.setYRot(this.getYRot() + Mth.clamp(0.5f * diffY, -20f, 20f));
-        this.setXRot(Mth.clamp(this.getXRot() + Mth.clamp(0.5f * diffX, -20f, 20f), -89, -20));
+        this.setXRot(Mth.clamp(this.getXRot() + Mth.clamp(0.5f * diffX, -20f, 20f), -getTurretMaxPitch(), -getTurretMinPitch()));
     }
 
     private PlayState movementPredicate(AnimationState<MortarEntity> event) {
@@ -322,6 +324,7 @@ public class MortarEntity extends ArtilleryEntity {
             }
         }
         super.destroy();
+        discard();
     }
 
     @Override
@@ -336,6 +339,7 @@ public class MortarEntity extends ArtilleryEntity {
 
     @Override
     public void setChanged() {
+        super.setChanged();
         if (!entityData.get(INTELLIGENT)) {
             vehicleShoot(null, "Main");
         }
@@ -349,7 +353,7 @@ public class MortarEntity extends ArtilleryEntity {
 
     @Override
     public boolean canPlaceItem(int slot, @NotNull ItemStack stack) {
-        return super.canPlaceItem(slot, stack) && this.entityData.get(FIRE_TIME) == 0 && stack.getItem() instanceof MortarShell;
+        return super.canPlaceItem(slot, stack) && this.entityData.get(FIRE_TIME) == 0 && stack.getItem() instanceof MortarShellItem;
     }
 
     @Override

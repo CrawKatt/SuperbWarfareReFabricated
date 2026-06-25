@@ -81,7 +81,7 @@ class TowEntity(type: EntityType<TowEntity>, world: Level) : GeoVehicleEntity(ty
                 level.playSound(
                     null,
                     onPos,
-                    ModSounds.TYPE_63_RELOAD.get(),
+                    ModSounds.TYPE_63_RELOAD,
                     SoundSource.PLAYERS,
                     1f,
                     random.nextFloat() * 0.1f + 0.9f
@@ -110,7 +110,7 @@ class TowEntity(type: EntityType<TowEntity>, world: Level) : GeoVehicleEntity(ty
 
     override fun getRetrieveItems(): List<ItemStack> {
         val list = arrayListOf<ItemStack>()
-        list.add(ItemStack(ModItems.TOW_DEPLOYER.get()))
+        list.add(ItemStack(ModItems.TOW_DEPLOYER))
 
         val data = getGunData(0)
         if (loaded && data != null) {
@@ -161,7 +161,7 @@ class TowEntity(type: EntityType<TowEntity>, world: Level) : GeoVehicleEntity(ty
             val y = this.y
             val z = this.z
             level.explode(null, x, y, z, 0f, Level.ExplosionInteraction.NONE)
-            val mortar = ItemEntity(level, x, (y + 1), z, ItemStack(ModItems.MORTAR_BARREL.get()))
+            val mortar = ItemEntity(level, x, (y + 1), z, ItemStack(ModItems.MORTAR_BARREL))
             mortar.setPickUpDelay(10)
             level.addFreshEntity(mortar)
         }
