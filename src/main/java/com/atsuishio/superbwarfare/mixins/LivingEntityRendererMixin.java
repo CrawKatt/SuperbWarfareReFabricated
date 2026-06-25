@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.client.VehicleClientRenderState;
+import com.atsuishio.superbwarfare.client.renderer.special.PhosphorusFireRenderer;
 import com.atsuishio.superbwarfare.data.vehicle.VehicleData;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -24,6 +25,8 @@ public class LivingEntityRendererMixin<T extends LivingEntity> {
     @Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
             at = @At("HEAD"), cancellable = true)
     public void render(T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, CallbackInfo ci) {
+        PhosphorusFireRenderer.render(entity, poseStack, bufferSource);
+
         if (!(entity instanceof Player player)) return;
 
         if (VehicleClientRenderState.shouldHideVehiclePassenger(player)) {

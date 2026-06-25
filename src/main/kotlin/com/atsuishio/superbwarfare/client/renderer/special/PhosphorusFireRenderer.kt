@@ -4,32 +4,22 @@ import com.atsuishio.superbwarfare.capability.living.PhosphorusFireCapability
 import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
-import net.minecraft.client.model.EntityModel
+import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.Sheets
 import net.minecraft.client.renderer.texture.TextureAtlas
 import net.minecraft.client.resources.model.Material
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.LivingEntity
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.RenderLivingEvent
 import org.joml.Quaternionf
 
-@EventBusSubscriber(Dist.CLIENT)
 object PhosphorusFireRenderer {
+    @JvmStatic
     @Suppress("DEPRECATION")
-    @SubscribeEvent
-    fun onRenderCurseFlame(event: RenderLivingEvent.Pre<LivingEntity, out EntityModel<LivingEntity>>) {
-        val entity = event.entity
+    fun render(entity: LivingEntity, stack: PoseStack, multiBufferSource: MultiBufferSource) {
         if (!PhosphorusFireCapability.of(entity).isOnFire) return
 
-        val stack = event.poseStack
-
-        val sprite1 =
-            Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation.withDefaultNamespace("block/soul_fire_0")).sprite()
-        val sprite2 =
-            Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation.withDefaultNamespace("block/soul_fire_1")).sprite()
+        val sprite1 = Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation.withDefaultNamespace("block/soul_fire_0")).sprite()
+        val sprite2 = Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation.withDefaultNamespace("block/soul_fire_1")).sprite()
 
         stack.pushPose()
         val size = entity.bbWidth * 1.6f
@@ -45,7 +35,7 @@ object PhosphorusFireRenderer {
         stack.translate(0.0f, 0.0f, 0.3f - (hwRatio.toInt()).toFloat() * 0.02f)
 
         var i = 0
-        val vertexConsumer = event.multiBufferSource.getBuffer(Sheets.cutoutBlockSheet())
+        val vertexConsumer = multiBufferSource.getBuffer(Sheets.cutoutBlockSheet())
 
         val pose = stack.last()
         while (hwRatio > 0.0f) {
