@@ -133,26 +133,7 @@ class GunData private constructor(
     fun compute(useCache: Boolean = true): DefaultGunData {
         if (cache != null && useCache) return cache!!
 
-        val modifier = PMC(this)
-
-        jsonPropModifier.update(propertyOverrideString.get())
-        jsonPropModifier.modifyProperty(modifier)
-
-        item.modifyProperty(modifier)
-
-        for (type in Perk.Type.entries) {
-            for (instance in perk.getInstances(type)) {
-                instance.perk.modifyProperty(modifier)
-            }
-        }
-
-        GunProp.modifyProperty(modifier)
-
         var rawData = getDefault().copy()
-
-        for (prop in GunProp.entries) {
-            prop.writeTo(rawData, modifier[prop])
-        }
 
         if (tempModifications != null) {
             rawData = tempModifications!!.apply(rawData)

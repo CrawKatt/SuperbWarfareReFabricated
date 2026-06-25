@@ -178,20 +178,20 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun onClientSetup() {
-        val tm62Renderer = Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
+        val tm62Renderer = lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
         BuiltinItemRendererRegistry.INSTANCE.register(
             ModItems.TM_62,
             BuiltinItemRendererRegistry.DynamicItemRenderer { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
-                tm62Renderer.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
+                tm62Renderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
             }
         )
 
         val blueprintResearchTableRenderer =
-            BlueprintResearchingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
+            lazy { BlueprintResearchingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
         BuiltinItemRendererRegistry.INSTANCE.register(
             ModItems.BLUEPRINT_RESEARCH_TABLE,
             BuiltinItemRendererRegistry.DynamicItemRenderer { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
-                blueprintResearchTableRenderer.renderByItem(
+                blueprintResearchTableRenderer.value.renderByItem(
                     stack,
                     displayContext,
                     poseStack,

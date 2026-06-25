@@ -87,6 +87,7 @@ class Mod : ModInitializer {
     }
 
     private fun triggerInit() {
+        ModItems.init()
         ModItems.registerDispenserBehavior()
 
         NeoForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.COMMON, CommonConfig.init())
@@ -108,16 +109,13 @@ class Mod : ModInitializer {
         ModCriteriaTriggers.init()
         ModCommandArguments.init()
         ModTabs.init()
+        ModPerks.init()
         ModVillagers.init()
         ModSerializers.init()
-        ModPerks.init()
         ModDamageTypes.init()
         ModEventHandlers.init()
         ModTags.init()
         ModGameRules.bootstrap()
-
-        ModEntities.registerAttributes()
-        ModEntities.registerSpawnPlacements()
     }
 
     private fun registerTicks() {

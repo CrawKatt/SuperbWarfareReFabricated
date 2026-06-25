@@ -30,7 +30,8 @@
   },
   "custom": {
     "cardinal-components": [
-      "superbwarfare:player_variable"
+      "superbwarfare:player_variable",
+      "superbwarfare:phosphorus_fire_capability"
     ]
   },
   "mixins": [
