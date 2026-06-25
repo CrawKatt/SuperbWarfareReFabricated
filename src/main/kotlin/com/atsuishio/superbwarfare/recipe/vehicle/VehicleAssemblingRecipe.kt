@@ -8,12 +8,12 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.Recipe
+import net.minecraft.world.item.crafting.RecipeInput
 import net.minecraft.world.item.crafting.RecipeSerializer
 import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.level.Level
-import net.neoforged.neoforge.items.wrapper.RecipeWrapper
 
-class VehicleAssemblingRecipe : Recipe<RecipeWrapper> {
+class VehicleAssemblingRecipe : Recipe<RecipeInput> {
     @JvmField
     val category: Category
     @JvmField
@@ -41,11 +41,11 @@ class VehicleAssemblingRecipe : Recipe<RecipeWrapper> {
         this.inputs = inputs
     }
 
-    override fun matches(pContainer: RecipeWrapper, pLevel: Level): Boolean {
+    override fun matches(pContainer: RecipeInput, pLevel: Level): Boolean {
         return false
     }
 
-    override fun assemble(recipeWrapper: RecipeWrapper, provider: HolderLookup.Provider): ItemStack {
+    override fun assemble(recipeWrapper: RecipeInput, provider: HolderLookup.Provider): ItemStack {
         return ItemStack.EMPTY
     }
 
@@ -96,7 +96,7 @@ class VehicleAssemblingRecipe : Recipe<RecipeWrapper> {
                 inputs.add(VehicleAssemblingIngredient(entry.key, entry.value))
             }
             val result = VehicleAssemblingResult(
-                ModItems.CONTAINER.id.toString(),
+                ModItems.CONTAINER.toString(),
                 BuiltInRegistries.ENTITY_TYPE.getKey(type).toString(),
                 1
             )

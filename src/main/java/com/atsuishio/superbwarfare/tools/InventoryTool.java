@@ -6,9 +6,9 @@ import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.item.common.ammo.AmmoBoxItem;
 import com.atsuishio.superbwarfare.init.ModCapabilities;
-import com.atsuishio.superbwarfare.item.common.ammo.AmmoSupplierItem;
+import com.atsuishio.superbwarfare.item.ammo.AmmoBoxItem;
+import com.atsuishio.superbwarfare.item.ammo.AmmoSupplierItem;
 import net.minecraft.core.NonNullList;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
@@ -83,8 +83,8 @@ public class InventoryTool {
             var stack = handler.getStackInSlot(i);
 
             // AmmoSupplier Item
-            if (stack.getItem() instanceof AmmoSupplierItem ammoSupplierItem && ammoSupplierItem.type == type) {
-                count += ammoSupplierItem.ammoToAdd * stack.getCount();
+            if (stack.getItem() instanceof AmmoSupplierItem ammoSupplierItem && ammoSupplierItem.getType() == type) {
+                count += ammoSupplierItem.getAmmoToAdd() * stack.getCount();
             }
 
             // AmmoBox
@@ -134,10 +134,10 @@ public class InventoryTool {
             }
 
             // AmmoSupplier Item
-            if (!(stack.getItem() instanceof AmmoSupplierItem ammoSupplierItem && ammoSupplierItem.type == type))
+            if (!(stack.getItem() instanceof AmmoSupplierItem ammoSupplierItem && ammoSupplierItem.getType() == type))
                 continue;
 
-            var supplyCount = ammoSupplierItem.ammoToAdd;
+            var supplyCount = ammoSupplierItem.getAmmoToAdd();
             var required = (count % supplyCount == 0) ? count / supplyCount : count / supplyCount + 1;
 
             var countToShrink = Math.min(stack.getCount(), required);

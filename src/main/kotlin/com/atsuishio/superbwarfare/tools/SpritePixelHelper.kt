@@ -29,7 +29,8 @@ object SpritePixelHelper {
         val y = RANDOM.nextInt(height)
 
         // 获取像素值
-        val colors = sprite.getPixelRGBA(frame, x, y)
+        val image = sprite.contents().originalImage
+        val colors = image.getPixelRGBA(x, y + frame * height)
 
         // 提取分量
         val blue = (colors shr 16) and 0xFF

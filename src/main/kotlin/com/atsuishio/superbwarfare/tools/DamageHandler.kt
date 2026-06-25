@@ -24,8 +24,6 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.TamableAnimal
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.Projectile
-import net.neoforged.neoforge.common.CommonHooks
-import net.neoforged.neoforge.common.damagesource.DamageContainer
 
 fun Entity?.forceHurt(source: DamageSource, damage: Float): Boolean {
     return if (this == null) false
@@ -62,9 +60,7 @@ object DamageHandler {
                 val container = damageAccess.`superbwarfare$getDamageContainers`() ?: return false
                 container.push(DamageContainer(source, damage))
 
-                if (CommonHooks.onEntityIncomingDamage(entity, container.peek())) {
-                    return false
-                } else {
+                run {
                     if (entity.isSleeping && !entity.level().isClientSide) {
                         entity.stopSleeping()
                     }

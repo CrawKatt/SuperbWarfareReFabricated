@@ -5,6 +5,7 @@
   "refmap": "superbwarfare.mixins.refmap.json",
   "mixins": [
     "BeastMixin",
+    "BlockStateMixin",
     "ClientboundSetPassengersPacketMixin",
     "EnchantedCountIncreaseFunctionMixin",
     "EntityAccessor",
@@ -37,7 +38,6 @@
     "ItemInHandRendererMixin",
     "ItemRendererMixin",
     "KeyboardHandlerMixin",
-    "ModelBakeryMixin",
     "KeyboardInputMixin",
     "KeyMappingAccessor",
     "KeymappingMixin",
@@ -45,6 +45,7 @@
     "LivingEntityRendererMixin",
     "MinecraftAccessor",
     "MinecraftMixin",
+    "ModelBakeryMixin",
     "MouseHandlerMixin",
     "MultiPlayerGameModeMixin",
     "PlayerItemInHandLayerMixin",

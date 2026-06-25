@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.client.ICustomCamera;
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
@@ -43,6 +42,69 @@ public abstract class CameraMixin implements ICustomCamera {
     @Shadow
     protected abstract void setPosition(double x, double y, double z);
 
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0),
+            method = "setup",
+            cancellable = true)
+    private void onSetup(BlockGetter level, Entity entity, boolean detached, boolean thirdPersonReverse, float partialTicks, CallbackInfo info) {
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        if (player == null) return;
+
+        ItemStack stack = player.getMainHandItem();
+        var tag = NBTTool.getTag(stack);
+
+        if (stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
+            DroneEntity drone = EntityFindUtil.findDrone(player.level(), tag.getString("LinkedDrone"));
+            if (drone != null) {
+                boolean firstPerson = Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON || Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK;
+                if (firstPerson) {
+                    Matrix4d transform = superbWarfare$getDroneTransform(drone, partialTicks);
+                    double x0 = 0;
+                    double y0 = 0.075;
+                    double z0 = 0.18;
+
+                    Vector4d worldPosition = superbWarfare$transformPosition(transform, x0, y0, z0);
+
+                    setRotation(drone.getYaw(partialTicks), drone.getPitch(partialTicks));
+                    setPosition(worldPosition.x, worldPosition.y, worldPosition.z);
+                    info.cancel();
+                } else {
+                    var rotation = drone.getCameraRotation(partialTicks, player, false, false);
+                    if (rotation != null) {
+                        setRotation(rotation.x, rotation.y);
+                    }
+                    var position = drone.getCameraPosition(partialTicks, player, false, false);
+                    if (position != null) {
+                        setPosition(position.x, position.y, position.z);
+                    }
+
+                    if (rotation != null || position != null) {
+                        info.cancel();
+                    }
+                }
+            }
+            return;
+        }
+
+        if (player.getVehicle() instanceof VehicleEntity vehicle) {
+            var rotation = vehicle.getCameraRotation(partialTicks, player, ClientEventHandler.zoomVehicle, Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON);
+            if (rotation != null) {
+                setRotation(rotation.x, rotation.y);
+            }
+            var position = vehicle.getCameraPosition(partialTicks, player, ClientEventHandler.zoomVehicle, Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON);
+            if (position != null) {
+                setPosition(position.x, position.y, position.z);
+            }
+
+            if (rotation != null || position != null) {
+                info.cancel();
+            }
+
+        }
+    }
+
+    /*
+    /// * 0.8.8 ReFabricated
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0),
             method = "setup",
             cancellable = true)
@@ -121,6 +183,7 @@ public abstract class CameraMixin implements ICustomCamera {
 
         }
     }
+    */
 
     @Unique
     private static Matrix4d superbWarfare$getDroneTransform(DroneEntity vehicle, float ticks) {
