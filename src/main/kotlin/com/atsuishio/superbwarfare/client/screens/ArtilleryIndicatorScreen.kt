@@ -13,11 +13,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import kotlin.math.max
-
-@OnlyIn(Dist.CLIENT)
 open class ArtilleryIndicatorScreen(private val stack: ItemStack, private val hand: InteractionHand) :
     Screen(Component.translatable("item.superbwarfare.artillery_indicator")) {
     lateinit var posX: EditBox
@@ -145,8 +141,6 @@ open class ArtilleryIndicatorScreen(private val stack: ItemStack, private val ha
         editBox.setEditable(true)
         editBox.setFilter { it.matches("-?\\d*".toRegex()) }
     }
-
-    @OnlyIn(Dist.CLIENT)
     internal inner class ModeButton(pX: Int, pY: Int, pWidth: Int, pHeight: Int) :
         AbstractButton(pX, pY, pWidth, pHeight, Component.empty()) {
         override fun onPress() {
@@ -171,8 +165,6 @@ open class ArtilleryIndicatorScreen(private val stack: ItemStack, private val ha
         override fun updateWidgetNarration(pNarrationElementOutput: NarrationElementOutput) {
         }
     }
-
-    @OnlyIn(Dist.CLIENT)
     internal inner class DoneButton(pX: Int, pY: Int, pWidth: Int, pHeight: Int) :
         AbstractButton(pX, pY, pWidth, pHeight, Component.empty()) {
         override fun onPress() {

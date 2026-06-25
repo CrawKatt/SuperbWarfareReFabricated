@@ -1,14 +1,11 @@
 package com.atsuishio.superbwarfare.item
 
-import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.client.renderer.item.LungeMineRenderer
 import com.atsuishio.superbwarfare.event.ClientEventHandler
-import com.atsuishio.superbwarfare.init.ModEnumExtensions
-import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.tools.localPlayer
-import net.minecraft.client.model.HumanoidModel.ArmPose
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
@@ -23,18 +20,17 @@ import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent
 import software.bernie.geckolib.animatable.GeoItem
+import software.bernie.geckolib.animatable.client.GeoRenderProvider
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar
 import software.bernie.geckolib.animation.AnimationController
 import software.bernie.geckolib.animation.AnimationState
 import software.bernie.geckolib.animation.PlayState
 import software.bernie.geckolib.animation.RawAnimation
+import software.bernie.geckolib.renderer.GeoItemRenderer
 import software.bernie.geckolib.util.GeckoLibUtil
+import java.util.function.Consumer
 
 // 不要改这个东西，会肘击 YSM
 open class LungeMine : Item(Properties().stacksTo(4)), GeoItem {
@@ -72,6 +68,20 @@ open class LungeMine : Item(Properties().stacksTo(4)), GeoItem {
             2
         ) { this.idlePredicate(it) }
         data.add(idleController)
+    }
+
+    @Environment(EnvType.CLIENT)
+    override fun createGeoRenderer(consumer: Consumer<GeoRenderProvider>) {
+        consumer.accept(object : GeoRenderProvider {
+            private var renderer: LungeMineRenderer? = null
+
+            override fun getGeoItemRenderer(): GeoItemRenderer<*> {
+                if (this.renderer == null) {
+                    this.renderer = LungeMineRenderer()
+                }
+                return this.renderer!!
+            }
+        })
     }
 
     override fun getAnimatableInstanceCache(): AnimatableInstanceCache? {
@@ -117,32 +127,7 @@ open class LungeMine : Item(Properties().stacksTo(4)), GeoItem {
         return false
     }
 
-    @EventBusSubscriber(modid = Mod.MODID)
     companion object {
         var transformType: ItemDisplayContext? = null
-
-        @SubscribeEvent
-        private fun registerItemExtensions(event: RegisterClientExtensionsEvent) {
-            event.registerItem(object : IClientItemExtensions {
-                private val renderer: BlockEntityWithoutLevelRenderer = LungeMineRenderer()
-
-                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                    return renderer
-                }
-
-                override fun getArmPose(
-                    entityLiving: LivingEntity,
-                    hand: InteractionHand,
-                    itemStack: ItemStack
-                ): ArmPose {
-                    if (!itemStack.isEmpty) {
-                        if (entityLiving.usedItemHand == hand) {
-                            return ModEnumExtensions.Client.lungeMinePose
-                        }
-                    }
-                    return ArmPose.EMPTY
-                }
-            }, ModItems.LUNGE_MINE)
-        }
     }
 }

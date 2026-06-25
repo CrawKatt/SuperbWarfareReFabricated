@@ -87,7 +87,6 @@ import net.minecraft.util.RandomSource
 import net.minecraft.world.ContainerHelper
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
-import net.minecraft.world.SimpleMenuProvider
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
@@ -112,6 +111,7 @@ import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory
 import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
 import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import org.joml.*
@@ -543,10 +543,15 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
     open fun openMenu(player: Player) {
         if (player is ServerPlayer) {
             player.openMenu(
-                SimpleMenuProvider(
-                    { containerId, inv, player -> createMenu(containerId, inv, player) },
-                    Component.translatable(this.type.descriptionId)
-                )
+                object : ExtendedScreenHandlerFactory<Int> {
+                    override fun getScreenOpeningData(player: ServerPlayer): Int = this@VehicleEntity.id
+
+                    override fun getDisplayName(): Component = Component.translatable(this@VehicleEntity.type.descriptionId)
+
+                    override fun createMenu(containerId: Int, inv: Inventory, player: Player): AbstractContainerMenu? {
+                        return this@VehicleEntity.createMenu(containerId, inv, player)
+                    }
+                }
             )
         }
     }

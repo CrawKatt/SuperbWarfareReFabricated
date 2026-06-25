@@ -1,13 +1,13 @@
 package com.atsuishio.superbwarfare.item.weapon
 
 import com.atsuishio.superbwarfare.client.renderer.item.MilitaryShovelRenderer
-import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.item.CustomDamageProperty
 import com.atsuishio.superbwarfare.tiers.ModItemTier
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.ChatFormatting
 import net.minecraft.advancements.CriteriaTriggers
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
@@ -19,20 +19,20 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.*
 import net.minecraft.world.item.component.Tool
 import net.minecraft.world.item.context.UseOnContext
+import net.minecraft.world.level.block.CampfireBlock
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.LevelEvent
+import net.minecraft.world.level.block.RotatedPillarBlock
+import net.minecraft.world.level.block.WeatheringCopper
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.gameevent.GameEvent
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent
-import net.neoforged.neoforge.common.ItemAbilities
-import net.neoforged.neoforge.common.ItemAbility
 import software.bernie.geckolib.animatable.GeoItem
+import software.bernie.geckolib.animatable.client.GeoRenderProvider
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager
+import software.bernie.geckolib.renderer.GeoItemRenderer
 import software.bernie.geckolib.util.GeckoLibUtil
+import java.util.function.Consumer
 
 open class MilitaryShovelItem :
     DiggerItem(
@@ -66,13 +66,6 @@ open class MilitaryShovelItem :
         )
     }
 
-    override fun canPerformAction(
-        stack: ItemStack,
-        itemAbility: ItemAbility
-    ): Boolean {
-        return TOOL_ACTIONS.contains(itemAbility)
-    }
-
     /**
      * Code Based on Mekanism-Tools
      */
@@ -86,25 +79,28 @@ open class MilitaryShovelItem :
 
         if (resultToSet == null) {
             if (player.isShiftKeyDown) {
-                val hoeRes = level.getBlockState(blockpos).getToolModifiedState(context, ItemAbilities.HOE_TILL, false)
-                    ?: return InteractionResult.PASS
+                val tillable = HoeItem.TILLABLES[blockstate.block] ?: return InteractionResult.PASS
+                if (!tillable.first.test(context)) return InteractionResult.PASS
 
                 level.playSound(player, blockpos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1.0f, 1.0f)
                 if (!level.isClientSide) {
-                    HoeItem.changeIntoState(hoeRes).accept(context)
+                    tillable.second.accept(context)
                 }
             } else {
                 if (context.clickedFace == Direction.DOWN) {
                     return InteractionResult.PASS
                 }
-                val foundResult = blockstate.getToolModifiedState(context, ItemAbilities.SHOVEL_FLATTEN, false)
+                val foundResult = ShovelItem.FLATTENABLES[blockstate.block]
                 if (foundResult != null && level.isEmptyBlock(blockpos.above())) {
                     level.playSound(player, blockpos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F)
                     resultToSet = foundResult
                 } else {
-                    resultToSet = blockstate.getToolModifiedState(context, ItemAbilities.SHOVEL_DOUSE, false)
-                    if (resultToSet != null && !level.isClientSide) {
-                        level.levelEvent(null, LevelEvent.SOUND_EXTINGUISH_FIRE, blockpos, 0)
+                    if (blockstate.block is CampfireBlock && blockstate.getValue(CampfireBlock.LIT)) {
+                        if (!level.isClientSide) {
+                            CampfireBlock.dowse(player, level, blockpos, blockstate)
+                            level.levelEvent(null, LevelEvent.SOUND_EXTINGUISH_FIRE, blockpos, 0)
+                        }
+                        resultToSet = blockstate.setValue(CampfireBlock.LIT, false)
                     }
                 }
 
@@ -131,22 +127,26 @@ open class MilitaryShovelItem :
         val level = context.level
         val pos = context.clickedPos
         val player = context.player
-        var resultToSet = state.getToolModifiedState(context, ItemAbilities.AXE_STRIP, false)
-        if (resultToSet != null) {
+
+        val stripped = AxeItem.STRIPPABLES[state.block]?.defaultBlockState()
+            ?.setValue(RotatedPillarBlock.AXIS, state.getValue(RotatedPillarBlock.AXIS))
+        if (stripped != null) {
             level.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F)
-            return resultToSet
+            return stripped
         }
-        resultToSet = state.getToolModifiedState(context, ItemAbilities.AXE_SCRAPE, false)
-        if (resultToSet != null) {
+
+        val previous = WeatheringCopper.getPrevious(state)
+        if (previous.isPresent) {
             level.playSound(player, pos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1.0F, 1.0F)
             level.levelEvent(player, LevelEvent.PARTICLES_SCRAPE, pos, 0)
-            return resultToSet
+            return previous.get()
         }
-        resultToSet = state.getToolModifiedState(context, ItemAbilities.AXE_WAX_OFF, false)
-        if (resultToSet != null) {
+
+        val waxedOff = HoneycombItem.WAX_OFF_BY_BLOCK.get()[state.block]?.withPropertiesOf(state)
+        if (waxedOff != null) {
             level.playSound(player, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0F, 1.0F)
             level.levelEvent(player, LevelEvent.PARTICLES_WAX_OFF, pos, 0)
-            return resultToSet
+            return waxedOff
         }
         return null
     }
@@ -157,26 +157,19 @@ open class MilitaryShovelItem :
 
     override fun registerControllers(data: AnimatableManager.ControllerRegistrar) {}
 
-    override fun getAnimatableInstanceCache() = this.cache
+    @Environment(EnvType.CLIENT)
+    override fun createGeoRenderer(consumer: Consumer<GeoRenderProvider>) {
+        consumer.accept(object : GeoRenderProvider {
+            private var renderer: MilitaryShovelRenderer? = null
 
-    @EventBusSubscriber
-    companion object {
-        @SubscribeEvent
-        fun registerRenderer(event: RegisterClientExtensionsEvent) {
-            event.registerItem(object : IClientItemExtensions {
-                private val renderer: BlockEntityWithoutLevelRenderer = MilitaryShovelRenderer()
-
-                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                    return renderer
+            override fun getGeoItemRenderer(): GeoItemRenderer<*> {
+                if (this.renderer == null) {
+                    this.renderer = MilitaryShovelRenderer()
                 }
-            }, ModItems.MILITARY_SHOVEL.get())
-        }
-
-        private val TOOL_ACTIONS = buildSet {
-            addAll(ItemAbilities.DEFAULT_HOE_ACTIONS)
-            addAll(ItemAbilities.DEFAULT_SHOVEL_ACTIONS)
-            addAll(ItemAbilities.DEFAULT_AXE_ACTIONS)
-            add(ItemAbilities.SWORD_SWEEP)
-        }
+                return this.renderer!!
+            }
+        })
     }
+
+    override fun getAnimatableInstanceCache() = this.cache
 }

@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.inventory.menu
 
 import com.atsuishio.superbwarfare.entity.vehicle.VehicleAssemblingTableVehicleEntity
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModMenuTypes
 import com.atsuishio.superbwarfare.network.message.receive.FinishAssemblingVehicleMessage
@@ -16,7 +17,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ContainerLevelAccess
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.RecipeManager
-import net.neoforged.neoforge.capabilities.Capabilities
 
 open class VehicleAssemblingMenu @JvmOverloads constructor(
     pContainerId: Int,
@@ -46,7 +46,7 @@ open class VehicleAssemblingMenu @JvmOverloads constructor(
      */
     fun assembleVehicle(id: ResourceLocation, player: ServerPlayer) {
         val recipe = this.getRecipeById(id, player.level().recipeManager) ?: return
-        val handler = player.getCapability(Capabilities.ItemHandler.ENTITY)
+        val handler = ModCapabilities.ITEM_HANDLER_ENTITY.find(player, null)
         if (handler != null) {
             if (!player.isCreative) {
                 val recordCount = Int2IntArrayMap()

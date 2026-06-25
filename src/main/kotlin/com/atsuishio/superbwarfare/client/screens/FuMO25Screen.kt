@@ -24,11 +24,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Inventory
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import java.util.*
-
-@OnlyIn(Dist.CLIENT)
 class FuMO25Screen(pMenu: FuMO25Menu, pPlayerInventory: Inventory, pTitle: Component) :
     AbstractContainerScreen<FuMO25Menu>(pMenu, pPlayerInventory, pTitle) {
     private var currentPos: BlockPos? = null
@@ -284,8 +280,6 @@ class FuMO25Screen(pMenu: FuMO25Menu, pPlayerInventory: Inventory, pTitle: Compo
         val guideButton = ModeButton(i + 231, j + 61, 3)
         this.addRenderableWidget(guideButton)
     }
-
-    @OnlyIn(Dist.CLIENT)
     internal inner class LockButton(pX: Int, pY: Int) : AbstractButton(pX, pY, 29, 15, Component.empty()) {
         override fun onPress() {
             if (this@FuMO25Screen.menu.funcType == 3L && this@FuMO25Screen.menu.getSlot(0).item.isEmpty) {
@@ -327,8 +321,6 @@ class FuMO25Screen(pMenu: FuMO25Menu, pPlayerInventory: Inventory, pTitle: Compo
         override fun updateWidgetNarration(pNarrationElementOutput: NarrationElementOutput) {
         }
     }
-
-    @OnlyIn(Dist.CLIENT)
     internal class ModeButton(pX: Int, pY: Int, private val mode: Int) :
         AbstractButton(pX, pY, 29, 15, Component.empty()) {
         override fun onPress() {

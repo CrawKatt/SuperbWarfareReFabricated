@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import com.atsuishio.superbwarfare.client.animation.entity.Ptkm1rAnimationInstance
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.living.SenpaiEntity
@@ -34,7 +35,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
-import net.neoforged.neoforge.items.ItemHandlerHelper
 import java.util.*
 
 open class Ptkm1rEntity : Entity, OwnableEntity {

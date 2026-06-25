@@ -1,13 +1,13 @@
 package com.atsuishio.superbwarfare.inventory.menu
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.MenuType
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
-import net.neoforged.neoforge.items.SlotItemHandler
 
 abstract class AbstractVehicleContainerMenu(type: MenuType<*>?, id: Int, inventory: Inventory, entityId: Int) :
     AbstractContainerMenu(type, id) {
@@ -78,7 +78,36 @@ abstract class AbstractVehicleContainerMenu(type: MenuType<*>?, id: Int, invento
         @get:JvmName("slotIndex") val slotIndex: Int,
         x: Int,
         y: Int
-    ) : SlotItemHandler(vehicle?.inventory, slotIndex, x, y) {
+    ) : Slot(SimpleContainer(0), slotIndex, x, y) {
+        override fun getItem(): ItemStack {
+            return this.vehicle?.inventory?.getStackInSlot(slotIndex) ?: ItemStack.EMPTY
+        }
+
+        override fun set(stack: ItemStack) {
+            this.vehicle?.inventory?.setStackInSlot(slotIndex, stack)
+            this.setChanged()
+        }
+
+        override fun setChanged() {
+            this.vehicle?.setChanged()
+        }
+
+        override fun mayPlace(stack: ItemStack): Boolean {
+            return this.vehicle?.canPlaceItem(slotIndex, stack) ?: false
+        }
+
+        override fun remove(amount: Int): ItemStack {
+            return this.vehicle?.inventory?.extractItem(slotIndex, amount, false) ?: ItemStack.EMPTY
+        }
+
+        override fun getMaxStackSize(): Int {
+            return this.vehicle?.inventory?.getSlotLimit(slotIndex) ?: 0
+        }
+
+        override fun getMaxStackSize(stack: ItemStack): Int {
+            return minOf(this.maxStackSize, stack.maxStackSize)
+        }
+
         override fun mayPickup(playerIn: Player): Boolean {
             return this.vehicle?.canTakeItem(slotIndex) ?: false
         }

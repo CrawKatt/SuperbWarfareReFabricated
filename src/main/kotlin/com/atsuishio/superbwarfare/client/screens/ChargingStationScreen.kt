@@ -11,11 +11,8 @@ import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Inventory
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import java.util.*
 
-@OnlyIn(Dist.CLIENT)
 class ChargingStationScreen(pMenu: ChargingStationMenu, pPlayerInventory: Inventory, pTitle: Component) :
     AbstractContainerScreen<ChargingStationMenu>(pMenu, pPlayerInventory, pTitle) {
     init {
@@ -81,7 +78,6 @@ class ChargingStationScreen(pMenu: ChargingStationMenu, pPlayerInventory: Invent
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     internal inner class ShowRangeButton(pX: Int, pY: Int) : AbstractButton(
         pX + 7,
         pY + 55,

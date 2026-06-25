@@ -20,11 +20,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import kotlin.math.min
-
-@OnlyIn(Dist.CLIENT)
 class WeaponEditScreen(private val stack: ItemStack) : Screen(Component.empty()) {
     override fun isPauseScreen(): Boolean {
         return false
@@ -253,8 +249,6 @@ class WeaponEditScreen(private val stack: ItemStack) : Screen(Component.empty())
         }
         return super.keyPressed(pKeyCode, pScanCode, pModifiers)
     }
-
-    @OnlyIn(Dist.CLIENT)
     internal inner class EditButton(
         pX: Int,
         pY: Int,

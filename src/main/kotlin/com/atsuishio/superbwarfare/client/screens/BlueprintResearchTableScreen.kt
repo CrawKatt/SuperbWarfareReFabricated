@@ -21,14 +21,10 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.RecipeHolder
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.neoforge.items.ItemStackHandler
-import net.neoforged.neoforge.items.wrapper.RecipeWrapper
+import net.minecraft.world.item.crafting.RecipeInput
 import kotlin.jvm.optionals.getOrNull
-
-@OnlyIn(Dist.CLIENT)
 class BlueprintResearchTableScreen(
     menu: BlueprintResearchTableMenu, playerInventory: Inventory, title: Component
 ) : AbstractContainerScreen<BlueprintResearchTableMenu>(menu, playerInventory, title) {
@@ -220,15 +216,23 @@ class BlueprintResearchTableScreen(
         val level = clientLevel ?: return null
         val manager = level.recipeManager
 
-        val inventory = ItemStackHandler(4)
-        inventory.setStackInSlot(0, this.menu.getSlot(SLOT_INPUT).item)
-        inventory.setStackInSlot(1, this.menu.getSlot(SLOT_BASE).item)
-        inventory.setStackInSlot(2, this.menu.getSlot(SLOT_ADDITION).item)
-        inventory.setStackInSlot(3, this.menu.getSlot(SLOT_SPECIAL).item)
+        val inventory: RecipeInput = object : RecipeInput {
+            override fun getItem(index: Int): ItemStack {
+                return when (index) {
+                    0 -> this@BlueprintResearchTableScreen.menu.getSlot(SLOT_INPUT).item
+                    1 -> this@BlueprintResearchTableScreen.menu.getSlot(SLOT_BASE).item
+                    2 -> this@BlueprintResearchTableScreen.menu.getSlot(SLOT_ADDITION).item
+                    3 -> this@BlueprintResearchTableScreen.menu.getSlot(SLOT_SPECIAL).item
+                    else -> ItemStack.EMPTY
+                }
+            }
+
+            override fun size(): Int = 4
+        }
 
         val optionalRecipe = manager.getRecipeFor(
             ModRecipes.RESEARCHING_TYPE.get(),
-            RecipeWrapper(inventory),
+            inventory,
             level
         )
         return optionalRecipe.getOrNull()

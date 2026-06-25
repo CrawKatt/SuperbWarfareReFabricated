@@ -28,9 +28,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent
 
 open class TargetEntity(type: EntityType<TargetEntity>, level: Level) : LivingEntity(type, level) {
     open val animationInstance: TargetAnimationInstance? =
@@ -160,7 +157,6 @@ open class TargetEntity(type: EntityType<TargetEntity>, level: Level) : LivingEn
         return ItemStack(ModItems.TARGET_DEPLOYER.get())
     }
 
-    @EventBusSubscriber
     companion object {
         @JvmField
         val DOWN_TIME: EntityDataAccessor<Int> =
@@ -170,16 +166,16 @@ open class TargetEntity(type: EntityType<TargetEntity>, level: Level) : LivingEn
             .immuneTo(DamageTypes.FALLING_ANVIL)
             .immuneTo(DamageTypes.MAGIC)
 
-        @SubscribeEvent
-        fun onTargetDown(event: LivingDeathEvent) {
-            val entity = event.entity
+        @JvmStatic
+        fun onTargetDown(entity: LivingEntity, source: DamageSource, amount: Float): Boolean {
             // 不处理/kill伤害
-            if (event.source.`is`(DamageTypes.GENERIC_KILL)) return
-            val sourceEntity = event.source.entity
+            if (source.`is`(DamageTypes.GENERIC_KILL)) return true
+            val sourceEntity = source.entity
 
             if (entity is TargetEntity) {
-                event.setCanceled(true)
                 entity.health = entity.maxHealth
+
+                if (sourceEntity == null) return false
 
                 if (sourceEntity is Player) {
                     sourceEntity.displayClientMessage(
@@ -191,7 +187,9 @@ open class TargetEntity(type: EntityType<TargetEntity>, level: Level) : LivingEn
                     SoundTool.playLocalSound(sourceEntity, ModSounds.TARGET_DOWN.get(), 1f, 1f)
                     entity.downTime = 40
                 }
+                return false
             }
+            return true
         }
 
         fun createAttributes(): AttributeSupplier.Builder {

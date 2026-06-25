@@ -5,18 +5,14 @@ import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyDataSlot
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyDataSlot.Companion.forContainer
 import com.atsuishio.superbwarfare.network.message.receive.ContainerDataMessage
-import com.atsuishio.superbwarfare.network.message.receive.RadarMenuCloseMessage
-import com.atsuishio.superbwarfare.network.message.receive.RadarMenuOpenMessage
 import com.atsuishio.superbwarfare.tools.sendPacket
 import com.google.common.collect.Lists
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ContainerListener
 import net.minecraft.world.inventory.DataSlot
 import net.minecraft.world.inventory.MenuType
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.event.entity.player.PlayerContainerEvent.Close
-import net.neoforged.neoforge.event.entity.player.PlayerContainerEvent.Open
 
 abstract class EnergyMenu(pMenuType: MenuType<*>?, id: Int, containerData: ContainerEnergyData) :
     AbstractContainerMenu(pMenuType, id) {
@@ -28,6 +24,34 @@ abstract class EnergyMenu(pMenuType: MenuType<*>?, id: Int, containerData: Conta
             addDataSlot(DataSlot.standalone())
             this.containerEnergyDataSlots.add(forContainer(containerData, i))
         }
+    }
+
+    override fun addSlotListener(listener: ContainerListener) {
+        super.addSlotListener(listener)
+        if (listener is ServerPlayer) {
+            onOpened(listener)
+        }
+    }
+
+    protected open fun onOpened(player: ServerPlayer) {
+        this.usingPlayers.add(player)
+
+        val toSync: MutableList<ContainerDataMessage.Pair> = ArrayList()
+        for (i in this.containerEnergyDataSlots.indices) {
+            toSync.add(ContainerDataMessage.Pair(i, this.containerEnergyDataSlots[i].get()))
+        }
+        player.sendPacket(ContainerDataMessage(this.containerId, toSync))
+    }
+
+    override fun removed(player: Player) {
+        super.removed(player)
+        if (player is ServerPlayer) {
+            onClosed(player)
+        }
+    }
+
+    protected open fun onClosed(player: ServerPlayer) {
+        this.usingPlayers.remove(player)
     }
 
     override fun broadcastChanges() {
@@ -53,53 +77,5 @@ abstract class EnergyMenu(pMenuType: MenuType<*>?, id: Int, containerData: Conta
             return
         }
         this.containerEnergyDataSlots[id].set(data.toLong())
-    }
-
-    @EventBusSubscriber
-    companion object {
-        @SubscribeEvent
-        fun onContainerOpened(event: Open) {
-            val menu = event.container
-            val player = event.entity
-            if (menu is EnergyMenu && player is ServerPlayer) {
-                menu.usingPlayers.add(player)
-
-                val toSync: MutableList<ContainerDataMessage.Pair> = ArrayList()
-                for (i in menu.containerEnergyDataSlots.indices) {
-                    toSync.add(ContainerDataMessage.Pair(i, menu.containerEnergyDataSlots[i].get()))
-                }
-                player.sendPacket(ContainerDataMessage(menu.containerId, toSync))
-            }
-        }
-
-        @SubscribeEvent
-        fun onContainerClosed(event: Close) {
-            val menu = event.container
-            val player = event.entity
-            if (menu is EnergyMenu && player is ServerPlayer) {
-                menu.usingPlayers.remove(player)
-            }
-        }
-
-
-        @SubscribeEvent
-        fun onFuMO25Opened(event: Open) {
-            val menu = event.container
-            val player = event.entity
-            if (menu is FuMO25Menu && player is ServerPlayer) {
-                menu.selfPos.ifPresent { pos ->
-                    player.sendPacket(RadarMenuOpenMessage(pos))
-                }
-            }
-        }
-
-        @SubscribeEvent
-        fun onFuMO25Closed(event: Close) {
-            val menu = event.container
-            val player = event.entity
-            if (menu is FuMO25Menu && player is ServerPlayer) {
-                player.sendPacket(RadarMenuCloseMessage)
-            }
-        }
     }
 }

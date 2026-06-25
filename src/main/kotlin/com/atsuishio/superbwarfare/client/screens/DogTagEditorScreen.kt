@@ -20,13 +20,9 @@ import net.minecraft.network.protocol.game.ServerboundRenameItemPacket
 import net.minecraft.util.StringUtil
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.floor
-
-@OnlyIn(Dist.CLIENT)
 open class DogTagEditorScreen(var stack: ItemStack, private val hand: InteractionHand) : Screen(GameNarrator.NO_TITLE) {
     lateinit var name: EditBox
     private var currentColor: Short = 0
@@ -190,8 +186,6 @@ open class DogTagEditorScreen(var stack: ItemStack, private val hand: Interactio
             return false
         }
     }
-
-    @OnlyIn(Dist.CLIENT)
     internal inner class ColorButton(var color: Short, pX: Int, pY: Int, pWidth: Int, pHeight: Int) :
         AbstractButton(pX, pY, pWidth, pHeight, Component.empty()) {
         override fun onPress() {
@@ -220,8 +214,6 @@ open class DogTagEditorScreen(var stack: ItemStack, private val hand: Interactio
             }
         }
     }
-
-    @OnlyIn(Dist.CLIENT)
     internal open inner class FinishButton(pX: Int, pY: Int, pWidth: Int, pHeight: Int) :
         AbstractButton(pX, pY, pWidth, pHeight, Component.empty()) {
         override fun onPress() {

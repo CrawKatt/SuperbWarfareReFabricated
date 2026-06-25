@@ -45,15 +45,12 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.RecipeHolder
 import net.minecraft.world.phys.Vec2
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import kotlin.math.max
 import kotlin.math.min
 
 /**
  * Code based on TaC-Z
  */
-@OnlyIn(Dist.CLIENT)
 class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: Inventory, pTitle: Component) :
     AbstractContainerScreen<VehicleAssemblingMenu>(pMenu, pPlayerInventory, pTitle) {
 

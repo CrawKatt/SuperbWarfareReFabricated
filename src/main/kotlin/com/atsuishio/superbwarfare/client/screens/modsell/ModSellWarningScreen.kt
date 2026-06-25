@@ -12,13 +12,9 @@ import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen
 import net.minecraft.client.gui.screens.multiplayer.WarningScreen
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import java.net.InetAddress
 import java.security.MessageDigest
 import java.util.*
-
-@OnlyIn(Dist.CLIENT)
 class ModSellWarningScreen(val lastScreen: Screen) : WarningScreen(
     Component.literal(TranslationRecord.get(TranslationRecord.TITLE)).withStyle(ChatFormatting.BOLD),
     Component.literal(TranslationRecord.get(TranslationRecord.CONTENT)),
@@ -27,7 +23,6 @@ class ModSellWarningScreen(val lastScreen: Screen) : WarningScreen(
         .append(Component.literal(TranslationRecord.get(TranslationRecord.CONTENT)))
 ) {
 
-//    @EventBusSubscriber(value = [Dist.CLIENT])
     companion object {
         val ENVIRONMENT_CHECKSUM = generateEnvironmentHash()
 

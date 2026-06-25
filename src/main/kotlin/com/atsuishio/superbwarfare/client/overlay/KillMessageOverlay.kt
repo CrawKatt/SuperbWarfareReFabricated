@@ -28,6 +28,7 @@ import net.minecraft.world.entity.OwnableEntity
 import net.minecraft.world.entity.player.Player
 import dev.emi.trinkets.api.TrinketsApi
 import kotlin.math.pow
+import kotlin.math.roundToInt
 
 object KillMessageOverlay : CommonOverlay("kill_message") {
     private val HEADSHOT = loc("textures/overlay/damage_types/headshot.png")
@@ -165,8 +166,8 @@ object KillMessageOverlay : CommonOverlay("kill_message") {
             guiGraphics.drawString(
                 Minecraft.getInstance().font,
                 targetName,
-                currentPosX,
-                top,
+                currentPosX.roundToInt(),
+                top.roundToInt(),
                 target.getTeamColor(),
                 false
             )
@@ -220,8 +221,8 @@ object KillMessageOverlay : CommonOverlay("kill_message") {
             guiGraphics.drawString(
                 Minecraft.getInstance().font,
                 attackerName,
-                currentPosX,
-                top,
+                currentPosX.roundToInt(),
+                top.roundToInt(),
                 record.attacker.getTeamColor(),
                 false
             )
@@ -245,8 +246,8 @@ object KillMessageOverlay : CommonOverlay("kill_message") {
             guiGraphics.drawString(
                 Minecraft.getInstance().font,
                 attackerName,
-                currentPosX,
-                top,
+                currentPosX.roundToInt(),
+                top.roundToInt(),
                 record.attacker.getTeamColor(),
                 false
             )
@@ -299,8 +300,8 @@ object KillMessageOverlay : CommonOverlay("kill_message") {
             guiGraphics.drawString(
                 Minecraft.getInstance().font,
                 targetName,
-                currentPosX,
-                top,
+                currentPosX.roundToInt(),
+                top.roundToInt(),
                 target.getTeamColor(),
                 false
             )

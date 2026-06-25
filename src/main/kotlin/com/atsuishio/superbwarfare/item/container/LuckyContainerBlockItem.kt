@@ -1,12 +1,11 @@
 package com.atsuishio.superbwarfare.item.container
 
-import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.loc
 import com.atsuishio.superbwarfare.client.renderer.item.LuckyContainerBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModBlocks
-import com.atsuishio.superbwarfare.init.ModItems
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.DamageTypeTags
@@ -23,17 +22,16 @@ import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.HitResult
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent
 import software.bernie.geckolib.animatable.GeoItem
+import software.bernie.geckolib.animatable.client.GeoRenderProvider
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager
 import software.bernie.geckolib.animation.AnimationController
 import software.bernie.geckolib.animation.AnimationState
 import software.bernie.geckolib.animation.PlayState
+import software.bernie.geckolib.renderer.GeoItemRenderer
 import software.bernie.geckolib.util.GeckoLibUtil
+import java.util.function.Consumer
 
 class LuckyContainerBlockItem :
     BlockItem(ModBlocks.LUCKY_CONTAINER.get(), Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()), GeoItem {
@@ -61,6 +59,20 @@ class LuckyContainerBlockItem :
         return PlayState.CONTINUE
     }
 
+    @Environment(EnvType.CLIENT)
+    override fun createGeoRenderer(consumer: Consumer<GeoRenderProvider>) {
+        consumer.accept(object : GeoRenderProvider {
+            private var renderer: LuckyContainerBlockItemRenderer? = null
+
+            override fun getGeoItemRenderer(): GeoItemRenderer<*> {
+                if (this.renderer == null) {
+                    this.renderer = LuckyContainerBlockItemRenderer()
+                }
+                return this.renderer!!
+            }
+        })
+    }
+
     override fun registerControllers(data: AnimatableManager.ControllerRegistrar) {
         data.add(
             AnimationController(this, "controller", 0) { this.predicate(it) }
@@ -71,7 +83,6 @@ class LuckyContainerBlockItem :
         return this.cache
     }
 
-    @EventBusSubscriber(modid = Mod.MODID)
     companion object {
         @JvmField
         val LUCKY_CONTAINERS: MutableList<() -> ItemStack> = mutableListOf(
@@ -91,18 +102,6 @@ class LuckyContainerBlockItem :
             }
             setBlockEntityData(stack, ModBlockEntities.LUCKY_CONTAINER.get(), tag)
             return stack
-        }
-
-
-        @SubscribeEvent
-        private fun registerItemExtensions(event: RegisterClientExtensionsEvent) {
-            event.registerItem(object : IClientItemExtensions {
-                private val renderer = LuckyContainerBlockItemRenderer()
-
-                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                    return renderer
-                }
-            }, ModItems.LUCKY_CONTAINER)
         }
     }
 }

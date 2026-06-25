@@ -24,10 +24,6 @@ import net.minecraft.world.level.block.BellBlock
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-
-@OnlyIn(value = Dist.CLIENT, _interface = ItemSupplier::class)
 open class TaserBulletEntity(type: EntityType<out TaserBulletEntity>, level: Level) : AbstractArrow(type, level),
     BasicGeoProjectileEntity, CustomDamageProjectile {
 

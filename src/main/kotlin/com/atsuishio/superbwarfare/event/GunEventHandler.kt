@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.gun.value.ReloadState
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModAttachments
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.perk.Perk
@@ -18,7 +19,6 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.Vec3
-import net.neoforged.neoforge.capabilities.Capabilities
 import kotlin.math.max
 import kotlin.math.min
 
@@ -693,18 +693,18 @@ object GunEventHandler {
         data.charge.timer.reduce()
         if (data.charge.timer.get() != 17) return
 
-        val itemHandler = entity.getCapability(Capabilities.ItemHandler.ENTITY) ?: return
+        val itemHandler = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null) ?: return
 
         for (i in 0..<itemHandler.slots) {
             val cell = itemHandler.getStackInSlot(i)
             if (!cell.`is`(ModItems.CELL.get())) continue
 
-            val stackStorage = data.stack().getCapability(Capabilities.EnergyStorage.ITEM) ?: continue
+            val stackStorage = ModCapabilities.ENERGY_ITEM.find(data.stack(), null) ?: continue
 
             val stackMaxEnergy = stackStorage.maxEnergyStored
             val stackEnergy = stackStorage.energyStored
 
-            val cellStorage = cell.getCapability(Capabilities.EnergyStorage.ITEM) ?: continue
+            val cellStorage = ModCapabilities.ENERGY_ITEM.find(cell, null) ?: continue
             val cellEnergy = cellStorage.energyStored
 
             val stackEnergyNeed = min(cellEnergy, stackMaxEnergy - stackEnergy)

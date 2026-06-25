@@ -24,6 +24,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import java.util.regex.Pattern
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 object AmmoBarOverlay : CommonOverlay("ammo_bar") {
 
@@ -70,8 +71,8 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
                 guiGraphics.drawString(
                     font,
                     str,
-                    (x - 100f) - font.width(str),
-                    (y - 20).toFloat(),
+                    x - 100 - font.width(str),
+                    y - 20,
                     0xFFFFFF,
                     false
                 )
@@ -100,8 +101,8 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
                 guiGraphics.drawString(
                     font,
                     data.get(GunProp.RPM).toString() + " RPM",
-                    x - 111f,
-                    (y - 20).toFloat(),
+                    x - 111,
+                    y - 20,
                     0xFFFFFF,
                     false
                 )
@@ -275,8 +276,8 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
             guiGraphics.drawString(
                 font,
                 getGunAmmoString(data, player),
-                x / 1.5f - 64 / 1.5f,
-                gunAmmoY / 1.5f,
+                (x / 1.5f - 64 / 1.5f).roundToInt(),
+                (gunAmmoY / 1.5f).roundToInt(),
                 0xFFFFFF,
                 true
             )
@@ -288,8 +289,8 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
                 guiGraphics.drawString(
                     font,
                     "+" + data.virtualAmmo.get(),
-                    x - 62 + font.width(getGunAmmoString(data, player)) * 1.5f,
-                    (y - 46).toFloat(),
+                    (x - 62 + font.width(getGunAmmoString(data, player)) * 1.5f).roundToInt(),
+                    y - 46,
                     0x55FFFF,
                     true
                 )
@@ -313,8 +314,8 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
             guiGraphics.drawString(
                 font,
                 gunName,
-                x / 0.9f - (100 + font.width(gunName) / 2f) / 0.9f,
-                y / 0.9f - 60 / 0.9f,
+                (x / 0.9f - (100 + font.width(gunName) / 2f) / 0.9f).roundToInt(),
+                (y / 0.9f - 60 / 0.9f).roundToInt(),
                 0xFFFFFF,
                 true
             )
@@ -325,8 +326,8 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
             guiGraphics.drawString(
                 font,
                 ammoName,
-                x / 0.9f - (100 + font.width(ammoName) / 2f) / 0.9f,
-                y / 0.9f - 51 / 0.9f,
+                (x / 0.9f - (100 + font.width(ammoName) / 2f) / 0.9f).roundToInt(),
+                (y / 0.9f - 51 / 0.9f).roundToInt(),
                 0xC8A679,
                 true
             )

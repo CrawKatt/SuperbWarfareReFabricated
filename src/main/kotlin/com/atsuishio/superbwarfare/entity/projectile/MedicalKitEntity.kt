@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.init.ModItems
 import net.minecraft.nbt.CompoundTag
@@ -20,7 +21,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.entity.EntityTypeTest
-import net.neoforged.neoforge.items.ItemHandlerHelper
 
 open class MedicalKitEntity(type: EntityType<MedicalKitEntity>, level: Level) : Entity(type, level) {
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {

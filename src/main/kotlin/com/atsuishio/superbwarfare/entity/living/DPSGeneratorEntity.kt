@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.animation.entity.DPSGeneratorAnimation
 import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.setValue
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier.Companion.createDefaultModifier
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
@@ -32,9 +33,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.neoforge.capabilities.Capabilities
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -75,7 +73,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
         super.addAdditionalSaveData(compound)
         compound.putInt("Level", generatorLevel)
 
-        val entityCap = this.getCapability(Capabilities.EnergyStorage.ENTITY, Direction.DOWN) ?: return
+        val entityCap = this.energyStorage
 
         compound.putInt("Energy", entityCap.energyStored)
     }
@@ -84,9 +82,9 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
         super.readAdditionalSaveData(compound)
         generatorLevel = compound.getInt("Level")
 
-        val entityCap = this.getCapability(Capabilities.EnergyStorage.ENTITY, Direction.DOWN) ?: return
+        val entityCap = this.energyStorage
 
-        (entityCap as SyncedEntityEnergyStorage).setEnergy(compound.getInt("Energy"))
+        entityCap.setEnergy(compound.getInt("Energy"))
         entityCap.setCapacity(this.maxEnergy)
         entityCap.setMaxExtract(this.maxTransfer)
     }
@@ -163,7 +161,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
         // 每秒恢复生命并充能下方方块
         if (this.tickCount % 20 == 0) {
             val damage = this.maxHealth - this.health
-            val entityCap = this.getCapability(Capabilities.EnergyStorage.ENTITY, Direction.DOWN) ?: return
+            val entityCap = this.energyStorage
 
             if (damage > 0) {
                 // DPS显示
@@ -182,7 +180,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
                 }
 
                 // 发电
-                (entityCap as SyncedEntityEnergyStorage).setMaxReceive(entityCap.maxEnergyStored)
+                entityCap.setMaxReceive(entityCap.maxEnergyStored)
                 entityCap.receiveEnergy(
                     (128.0 * max(this.generatorLevel, 1) * 2.0.pow(
                         this.generatorLevel.toDouble()
@@ -196,7 +194,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
 
             if (this.health < 0.01) {
                 generatorLevel = min(generatorLevel + 1, 7)
-                (entityCap as SyncedEntityEnergyStorage).setCapacity(this.maxEnergy)
+                entityCap.setCapacity(this.maxEnergy)
                 entityCap.setMaxExtract(this.maxTransfer)
 
 
@@ -256,11 +254,11 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
     }
 
     protected fun chargeBlockBelow() {
-        val entityCap = this.getCapability(Capabilities.EnergyStorage.ENTITY, Direction.DOWN) ?: return
+        val entityCap = this.energyStorage
 
         if (!entityCap.canExtract() || entityCap.energyStored <= 0) return
         val blockPos = this.blockPosition().below()
-        val cap = this.level().getCapability(Capabilities.EnergyStorage.BLOCK, blockPos, Direction.UP)
+        val cap = ModCapabilities.ENERGY_BLOCK.find(this.level(), blockPos, Direction.UP)
         if (cap == null || !cap.canReceive()) return
 
         val extract = entityCap.extractEnergy(entityCap.energyStored, true)
@@ -296,12 +294,10 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
     fun beastCharge() {
         if (generatorLevel < 7) {
             generatorLevel = 7
-            val storage = this.getCapability(Capabilities.EnergyStorage.ENTITY, Direction.DOWN)
-            if (storage is SyncedEntityEnergyStorage) {
-                storage.setCapacity(this.maxEnergy)
-                storage.setMaxExtract(this.maxTransfer)
-                storage.setEnergy(this.maxEnergy)
-            }
+            val storage = this.energyStorage
+            storage.setCapacity(this.maxEnergy)
+            storage.setMaxExtract(this.maxTransfer)
+            storage.setEnergy(this.maxEnergy)
         }
     }
 
@@ -316,20 +312,20 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
         val LEVEL: EntityDataAccessor<Int> =
             SynchedEntityData.defineId(DPSGeneratorEntity::class.java, EntityDataSerializers.INT)
 
-        @SubscribeEvent
-        fun onDPSGeneratorDown(event: LivingDeathEvent) {
-            val entity = event.entity as? DPSGeneratorEntity ?: return
+        @JvmStatic
+        fun onDPSGeneratorDown(entity: LivingEntity, source: DamageSource, amount: Float): Boolean {
+            val dpsGenerator = entity as? DPSGeneratorEntity ?: return true
             // 不处理/kill伤害
-            if (event.source.`is`(DamageTypes.GENERIC_KILL)) return
-            val sourceEntity = event.source.entity
+            if (source.`is`(DamageTypes.GENERIC_KILL)) return true
+            val sourceEntity = source.entity
 
-            event.setCanceled(true)
-            entity.health = 0.00001f
+            dpsGenerator.health = 0.00001f
 
             if (sourceEntity is Player) {
                 sourceEntity.playLocalSound(ModSounds.TARGET_DOWN.get(), 1f, 1f)
-                entity.downTime = 40
+                dpsGenerator.downTime = 40
             }
+            return false
         }
 
         fun createAttributes(): AttributeSupplier.Builder {

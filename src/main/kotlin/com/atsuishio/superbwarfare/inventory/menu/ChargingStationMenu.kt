@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.inventory.menu
 
 import com.atsuishio.superbwarfare.block.entity.ChargingStationBlockEntity
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModMenuTypes
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData
 import com.atsuishio.superbwarfare.network.dataslot.SimpleEnergyData
@@ -12,7 +13,6 @@ import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.level.Level
-import net.neoforged.neoforge.capabilities.Capabilities
 
 open class ChargingStationMenu @JvmOverloads constructor(
     id: Int,
@@ -56,7 +56,7 @@ open class ChargingStationMenu @JvmOverloads constructor(
                     return ItemStack.EMPTY
                 }
             } else if (pIndex != 0) {
-                val cap = itemstack1.getCapability(Capabilities.EnergyStorage.ITEM)
+                val cap = ModCapabilities.ENERGY_ITEM.find(itemstack1, null)
                 if (cap != null) {
                     if (!this.moveItemStackTo(itemstack1, 1, 2, true)) {
                         return ItemStack.EMPTY

@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
@@ -32,7 +33,6 @@ import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.*
-import net.neoforged.neoforge.items.ItemHandlerHelper
 import java.util.*
 import kotlin.math.min
 import kotlin.math.sqrt

@@ -26,6 +26,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import net.minecraft.world.level.ClipContext
 import org.joml.Math
+import kotlin.math.roundToInt
 
 object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
 
@@ -294,8 +295,8 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                         guiGraphics.drawString(
                             Minecraft.getInstance().font,
                             string,
-                            screenWidth.toFloat() / 2 - width.toFloat() / 2,
-                            screenHeight.toFloat() - 73,
+                            (screenWidth.toFloat() / 2 - width.toFloat() / 2).roundToInt(),
+                            screenHeight - 73,
                             color,
                             false
                         )

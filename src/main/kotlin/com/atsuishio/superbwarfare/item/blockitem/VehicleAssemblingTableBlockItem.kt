@@ -1,12 +1,11 @@
 package com.atsuishio.superbwarfare.item.blockitem
 
-import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.block.VehicleAssemblingTableBlock
 import com.atsuishio.superbwarfare.block.property.BlockPart
 import com.atsuishio.superbwarfare.client.renderer.item.VehicleAssemblingTableBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlocks
-import com.atsuishio.superbwarfare.init.ModItems
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.item.BlockItem
@@ -14,14 +13,13 @@ import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.shapes.CollisionContext
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent
 import software.bernie.geckolib.animatable.GeoItem
+import software.bernie.geckolib.animatable.client.GeoRenderProvider
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager
+import software.bernie.geckolib.renderer.GeoItemRenderer
 import software.bernie.geckolib.util.GeckoLibUtil
+import java.util.function.Consumer
 
 class VehicleAssemblingTableBlockItem : BlockItem(ModBlocks.VEHICLE_ASSEMBLING_TABLE.get(), Properties()), GeoItem {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
@@ -47,24 +45,25 @@ class VehicleAssemblingTableBlockItem : BlockItem(ModBlocks.VEHICLE_ASSEMBLING_T
 
     override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {}
 
+    @Environment(EnvType.CLIENT)
+    override fun createGeoRenderer(consumer: Consumer<GeoRenderProvider>) {
+        consumer.accept(object : GeoRenderProvider {
+            private var renderer: VehicleAssemblingTableBlockItemRenderer? = null
+
+            override fun getGeoItemRenderer(): GeoItemRenderer<*> {
+                if (this.renderer == null) {
+                    this.renderer = VehicleAssemblingTableBlockItemRenderer()
+                }
+                return this.renderer!!
+            }
+        })
+    }
+
     override fun getAnimatableInstanceCache(): AnimatableInstanceCache {
         return this.cache
     }
 
-    @EventBusSubscriber(modid = Mod.MODID)
     companion object {
-        @SubscribeEvent
-        private fun registerItemExtensions(event: RegisterClientExtensionsEvent) {
-            event.registerItem(object : IClientItemExtensions {
-                private val renderer: BlockEntityWithoutLevelRenderer = VehicleAssemblingTableBlockItemRenderer()
-
-                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                    return renderer
-                }
-            }, ModItems.VEHICLE_ASSEMBLING_TABLE)
-        }
-
-
         // 根据当前状态尝试找到合适的初始放置位置
         fun findInitialPos(context: BlockPlaceContext, currentPos: BlockPos, facing: Direction): BlockPos? {
             var availablePart: BlockPart? = null

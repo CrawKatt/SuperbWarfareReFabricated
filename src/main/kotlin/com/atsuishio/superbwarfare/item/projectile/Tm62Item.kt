@@ -4,8 +4,10 @@ import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
 import com.atsuishio.superbwarfare.entity.projectile.Tm62Entity
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.item.DispenserLaunchable
+import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.Direction
 import net.minecraft.core.Position
 import net.minecraft.core.dispenser.BlockSource
@@ -24,7 +26,6 @@ import software.bernie.geckolib.animatable.GeoItem
 import software.bernie.geckolib.animatable.client.GeoRenderProvider
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.renderer.GeoItemRenderer
 import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.function.Consumer
 
@@ -36,9 +37,9 @@ open class Tm62Item : Item(Properties().stacksTo(8)), GeoItem, DispenserLaunchab
         consumer.accept(object : GeoRenderProvider {
             private var renderer: Tm62ItemRenderer? = null
 
-            override fun getGeoItemRenderer(): GeoItemRenderer<*> {
+            override fun getGeoItemRenderer(): BlockEntityWithoutLevelRenderer {
                 if (this.renderer == null) {
-                    this.renderer = Tm62ItemRenderer()
+                    this.renderer = Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
                 }
                 return this.renderer!!
             }

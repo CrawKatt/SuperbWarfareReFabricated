@@ -8,7 +8,11 @@ import com.atsuishio.superbwarfare.item.misc.FiringParametersItem
 import com.atsuishio.superbwarfare.item.misc.firingParameters
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData
 import com.atsuishio.superbwarfare.network.dataslot.SimpleEnergyData
+import com.atsuishio.superbwarfare.network.message.receive.RadarMenuCloseMessage
+import com.atsuishio.superbwarfare.network.message.receive.RadarMenuOpenMessage
+import com.atsuishio.superbwarfare.tools.sendPacket
 import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.Container
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
@@ -156,6 +160,18 @@ open class FuMO25Menu(
                 pos.z.toDouble() + 0.5
             ) <= 64
         }, true)
+    }
+
+    override fun onOpened(player: ServerPlayer) {
+        super.onOpened(player)
+        this.selfPos.ifPresent { pos ->
+            player.sendPacket(RadarMenuOpenMessage(pos))
+        }
+    }
+
+    override fun onClosed(player: ServerPlayer) {
+        super.onClosed(player)
+        player.sendPacket(RadarMenuCloseMessage)
     }
 
     override fun removed(pPlayer: Player) {

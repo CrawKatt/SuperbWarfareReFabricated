@@ -32,6 +32,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import org.joml.Math
 import dev.emi.trinkets.api.TrinketsApi
+import kotlin.math.roundToInt
 
 object VehicleHudOverlay : CommonOverlay("vehicle_hud") {
     const val ANIMATION_TIME = 300
@@ -701,8 +702,8 @@ object VehicleHudOverlay : CommonOverlay("vehicle_hud") {
                 guiGraphics.drawString(
                     Minecraft.getInstance().font,
                     component.string,
-                    (w - 85 + xOffset) / 0.6f,
-                    (h - frameIndex * 18 + height) / 0.6f,
+                    ((w - 85 + xOffset) / 0.6f).roundToInt(),
+                    ((h - frameIndex * 18 + height) / 0.6f).roundToInt(),
                     0xFFFFFF,
                     false
                 )

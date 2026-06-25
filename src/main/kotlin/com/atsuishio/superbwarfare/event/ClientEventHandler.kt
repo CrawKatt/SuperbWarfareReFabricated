@@ -48,7 +48,6 @@ import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.client.event.*
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers
 import net.neoforged.neoforge.common.util.TriState
@@ -1561,7 +1560,7 @@ object ClientEventHandler {
         if (item !is GunItem) return
 
         if (item == ModItems.SENTINEL.get()) {
-            val cap = stack.getCapability(Capabilities.EnergyStorage.ITEM)
+            val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
             val charged = cap != null && cap.energyStored > 0
 
             if (charged) {
@@ -1575,7 +1574,7 @@ object ClientEventHandler {
         }
 
         if (item == ModItems.SECONDARY_CATACLYSM.get()) {
-            val cap = stack.getCapability(Capabilities.EnergyStorage.ITEM)
+            val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
             val hasEnoughEnergy = cap != null && cap.energyStored > 3000
 
             val isChargedFire = zoom && hasEnoughEnergy

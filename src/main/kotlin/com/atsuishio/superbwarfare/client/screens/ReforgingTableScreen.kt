@@ -14,10 +14,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.item.ItemStack
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-
-@OnlyIn(Dist.CLIENT)
 open class ReforgingTableScreen(pMenu: ReforgingTableMenu, pPlayerInventory: Inventory, pTitle: Component) :
     AbstractContainerScreen<ReforgingTableMenu>(pMenu, pPlayerInventory, pTitle) {
     init {
@@ -92,8 +88,6 @@ open class ReforgingTableScreen(pMenu: ReforgingTableMenu, pPlayerInventory: Inv
         this.addRenderableWidget(damageUpgrade)
         this.addRenderableWidget(damageDowngrade)
     }
-
-    @OnlyIn(Dist.CLIENT)
     internal class ReforgeButton(pX: Int, pY: Int) : AbstractButton(pX, pY, 40, 16, Component.empty()) {
         override fun renderWidget(pGuiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int, pPartialTick: Float) {
             pGuiGraphics.blit(
@@ -116,8 +110,6 @@ open class ReforgingTableScreen(pMenu: ReforgingTableMenu, pPlayerInventory: Inv
         override fun updateWidgetNarration(pNarrationElementOutput: NarrationElementOutput) {
         }
     }
-
-    @OnlyIn(Dist.CLIENT)
     internal inner class UpgradeButton(pX: Int, pY: Int, var type: Perk.Type) :
         AbstractButton(pX, pY, 9, 9, Component.empty()) {
         override fun renderWidget(pGuiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int, pPartialTick: Float) {
@@ -164,8 +156,6 @@ open class ReforgingTableScreen(pMenu: ReforgingTableMenu, pPlayerInventory: Inv
         override fun updateWidgetNarration(pNarrationElementOutput: NarrationElementOutput) {
         }
     }
-
-    @OnlyIn(Dist.CLIENT)
     internal inner class DowngradeButton(pX: Int, pY: Int, var type: Perk.Type) :
         AbstractButton(pX, pY, 12, 12, Component.empty()) {
         override fun renderWidget(pGuiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int, pPartialTick: Float) {

@@ -23,8 +23,6 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 
 class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : GeoVehicleEntity(type, world) {
     init {
@@ -232,8 +230,6 @@ class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : GeoVehi
 
     override fun getWheelMaxHealth() = 100f
     override fun getEngineMaxHealth() = 150f
-
-    @OnlyIn(Dist.CLIENT)
     override fun firstPersonAmmoComponent(data: GunData, player: Player?): Component {
         val name = data.get(GunProp.NAME)
         if (name == null || name.isBlank()) return Component.empty()

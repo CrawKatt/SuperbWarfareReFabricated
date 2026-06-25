@@ -3,12 +3,8 @@ package com.atsuishio.superbwarfare.client.particle
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
 import net.minecraft.core.particles.SimpleParticleType
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import javax.annotation.ParametersAreNonnullByDefault
 import kotlin.math.max
-
-@OnlyIn(Dist.CLIENT)
 open class WhiteStarParticle protected constructor(
     world: ClientLevel,
     x: Double,

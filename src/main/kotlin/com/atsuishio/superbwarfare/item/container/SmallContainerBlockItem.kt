@@ -1,11 +1,10 @@
 package com.atsuishio.superbwarfare.item.container
 
-import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.loc
 import com.atsuishio.superbwarfare.client.renderer.item.SmallContainerBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlocks
-import com.atsuishio.superbwarfare.init.ModItems
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
@@ -17,17 +16,16 @@ import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.SeededContainerLoot
 import net.minecraft.world.level.storage.loot.LootTable
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent
 import software.bernie.geckolib.animatable.GeoItem
+import software.bernie.geckolib.animatable.client.GeoRenderProvider
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.animation.AnimatableManager
 import software.bernie.geckolib.animation.AnimationController
 import software.bernie.geckolib.animation.AnimationState
 import software.bernie.geckolib.animation.PlayState
+import software.bernie.geckolib.renderer.GeoItemRenderer
 import software.bernie.geckolib.util.GeckoLibUtil
+import java.util.function.Consumer
 
 class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER, Properties().stacksTo(1).fireResistant()),
     GeoItem {
@@ -41,6 +39,20 @@ class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER, Properties(
         return PlayState.CONTINUE
     }
 
+    @Environment(EnvType.CLIENT)
+    override fun createGeoRenderer(consumer: Consumer<GeoRenderProvider>) {
+        consumer.accept(object : GeoRenderProvider {
+            private var renderer: SmallContainerBlockItemRenderer? = null
+
+            override fun getGeoItemRenderer(): GeoItemRenderer<*> {
+                if (this.renderer == null) {
+                    this.renderer = SmallContainerBlockItemRenderer()
+                }
+                return this.renderer!!
+            }
+        })
+    }
+
     override fun registerControllers(data: AnimatableManager.ControllerRegistrar) {
         data.add(
             AnimationController(this, "controller", 0) { this.predicate(it) }
@@ -51,7 +63,6 @@ class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER, Properties(
         return this.cache
     }
 
-    @EventBusSubscriber(modid = Mod.MODID)
     companion object {
         @JvmField
         val SMALL_CONTAINERS: MutableList<() -> ItemStack> = mutableListOf(
@@ -72,17 +83,6 @@ class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER, Properties(
                 SeededContainerLoot(lootTable, lootTableSeed)
             )
             return stack
-        }
-
-        @SubscribeEvent
-        fun registerArmorExtensions(event: RegisterClientExtensionsEvent) {
-            event.registerItem(object : IClientItemExtensions {
-                private val renderer = SmallContainerBlockItemRenderer()
-
-                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                    return renderer
-                }
-            }, ModItems.SMALL_CONTAINER)
         }
     }
 }

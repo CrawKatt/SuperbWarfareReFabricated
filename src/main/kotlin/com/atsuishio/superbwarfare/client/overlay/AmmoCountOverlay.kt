@@ -65,7 +65,7 @@ object AmmoCountOverlay : CommonOverlay("ammo_count") {
         var yOffset = (-h - Ammo.entries.size * fontHeight) / 2f
 
         // 渲染总弹药数量
-        val cap = player.getData(ModAttachments.PLAYER_VARIABLE)
+        val cap = ModAttachments.PLAYER_VARIABLE.get(player)
         val font = Minecraft.getInstance().font
 
         for (type in Ammo.entries) {
@@ -125,8 +125,8 @@ object AmmoCountOverlay : CommonOverlay("ammo_count") {
             guiGraphics.drawString(
                 font,
                 ammoCountStr,
-                ammoX + (30 - font.width(ammoCountStr)),
-                h + yOffset,
+                (ammoX + (30 - font.width(ammoCountStr))).roundToInt(),
+                (h + yOffset).roundToInt(),
                 fontColor,
                 true
             )
@@ -135,8 +135,8 @@ object AmmoCountOverlay : CommonOverlay("ammo_count") {
             guiGraphics.drawString(
                 font,
                 Component.translatable(type.translationKey).string,
-                ammoX + 35,
-                h + yOffset,
+                (ammoX + 35).roundToInt(),
+                (h + yOffset).roundToInt(),
                 fontColor,
                 true
             )
@@ -166,8 +166,8 @@ object AmmoCountOverlay : CommonOverlay("ammo_count") {
                 Minecraft.getInstance().font,
                 boxAnimator.lerp(boxAnimator.oldValue().toFloat(), boxAmmoCount.toFloat(), currentTime).roundToInt()
                     .toString(),
-                ammoBoxX - 70,
-                h + yOffset,
+                (ammoBoxX - 70F).roundToInt(),
+                (h + yOffset).roundToInt(),
                 boxFontColor,
                 true
             )
