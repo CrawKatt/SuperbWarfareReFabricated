@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.client.overlay
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.overlay.components.BaseComponent
 import com.atsuishio.superbwarfare.tools.isNullOrSpector
 import com.atsuishio.superbwarfare.tools.localPlayer

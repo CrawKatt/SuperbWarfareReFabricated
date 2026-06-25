@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.resource
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.model.BedrockArmorModel
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.animation.BedrockAnimation
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.model.BedrockModel

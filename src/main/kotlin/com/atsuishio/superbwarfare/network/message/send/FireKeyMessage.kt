@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.network.message.send
 
-import com.atsuishio.superbwarfare.Mod.queueServerWork
+import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.event.GunEventHandler.playGunBoltSounds

@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.client.overlay.weapon
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.RenderHelper
 import com.atsuishio.superbwarfare.client.overlay.VehicleHudOverlay.renderKillIndicatorDynamic
 import com.atsuishio.superbwarfare.data.gun.GunProp

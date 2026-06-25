@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.client.renderer.projectile
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.projectile.BasicGeoProjectileEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils
 import com.atsuishio.superbwarfare.resource.BedrockModelLoader

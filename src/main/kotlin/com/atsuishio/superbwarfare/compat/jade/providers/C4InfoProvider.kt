@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.compat.jade.providers
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.projectile.C4Entity
 import net.minecraft.ChatFormatting

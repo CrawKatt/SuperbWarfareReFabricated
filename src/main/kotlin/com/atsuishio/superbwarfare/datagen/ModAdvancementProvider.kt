@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.datagen
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.advancement.criteria.OttoSprintTrigger
 import com.atsuishio.superbwarfare.advancement.criteria.RPGMeleeExplosionTrigger
 import com.atsuishio.superbwarfare.init.ModItems

@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.entity.vehicle.base
 
 import com.atsuishio.superbwarfare.Mod
-import com.atsuishio.superbwarfare.Mod.queueServerWork
+import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
 import com.atsuishio.superbwarfare.capability.PersistentDataAccessor
 import com.atsuishio.superbwarfare.mixins.EntityAccessor
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage

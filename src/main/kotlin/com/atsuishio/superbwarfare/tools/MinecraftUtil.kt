@@ -2,7 +2,7 @@
 
 package com.atsuishio.superbwarfare.tools
 
-import com.atsuishio.superbwarfare.Mod.queueClientWork
+import com.atsuishio.superbwarfare.Mod.Companion.queueClientWork
 import com.atsuishio.superbwarfare.tools.FormatTool.format0D
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment

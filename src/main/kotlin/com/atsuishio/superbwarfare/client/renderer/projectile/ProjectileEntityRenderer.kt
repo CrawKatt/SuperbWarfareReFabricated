@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.client.renderer.projectile
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.ClientRenderHandler
 import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils

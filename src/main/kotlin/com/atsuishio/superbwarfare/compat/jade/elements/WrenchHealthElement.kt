@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.compat.jade.elements
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.RenderHelper
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft

@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.tiers
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.init.ModItems
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries

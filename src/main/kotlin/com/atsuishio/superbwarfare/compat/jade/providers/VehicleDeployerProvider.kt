@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.compat.jade.providers
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.ContainerBlock.Companion.getEntityTranslationKey
 import com.atsuishio.superbwarfare.block.entity.VehicleDeployerBlockEntity
 import net.minecraft.ChatFormatting

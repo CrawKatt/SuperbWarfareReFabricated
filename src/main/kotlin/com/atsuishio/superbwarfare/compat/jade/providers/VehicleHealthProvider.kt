@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.compat.jade.providers
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.compat.jade.elements.WrenchHealthElement
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import net.minecraft.resources.ResourceLocation

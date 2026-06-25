@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.client.model.entity
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.vehicle.TruckEntity
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth

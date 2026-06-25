@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.compat.jade.providers
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component

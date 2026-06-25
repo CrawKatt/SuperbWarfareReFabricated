@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.client.screens
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.inventory.menu.ReforgingTableMenu
 import com.atsuishio.superbwarfare.network.message.send.GunReforgeMessage
 import com.atsuishio.superbwarfare.network.message.send.SetPerkLevelMessage

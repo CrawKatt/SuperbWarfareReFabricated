@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.capability.living
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.init.ModComponents
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag

@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.compat.jei
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.screens.BlueprintResearchTableScreen
 import com.atsuishio.superbwarfare.compat.jei.PotionMortarShellRecipeMaker.createRecipes
 import com.atsuishio.superbwarfare.init.ModItems

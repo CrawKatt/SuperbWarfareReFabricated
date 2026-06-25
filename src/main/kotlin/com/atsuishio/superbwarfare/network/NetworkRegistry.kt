@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.network
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.network.message.receive.*
 import com.atsuishio.superbwarfare.network.message.send.*
 import com.atsuishio.superbwarfare.serialization.ByteBufDecoder

@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.block
 
-import com.atsuishio.superbwarfare.Mod.queueClientWork
+import com.atsuishio.superbwarfare.Mod.Companion.queueClientWork
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.init.ModSounds

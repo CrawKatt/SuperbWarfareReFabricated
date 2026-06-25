@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.compat.jei
 
-import com.atsuishio.superbwarfare.Mod.loc
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.recipe.vehicle.VehicleAssemblingRecipe
 import mezz.jei.api.constants.VanillaTypes

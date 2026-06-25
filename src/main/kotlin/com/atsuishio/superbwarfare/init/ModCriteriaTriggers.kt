@@ -15,7 +15,7 @@ object ModCriteriaTriggers {
     val OTTO_SPRINT: OttoSprintTrigger = register("otto_sprint", OttoSprintTrigger())!!
 
     private fun <T : CriterionTrigger<*>?> register(name: String?, trigger: T?): T? {
-        return Registry.register<CriterionTrigger<*>?, T?>(BuiltInRegistries.TRIGGER_TYPES, Mod.loc(name), trigger)
+        return Registry.register<CriterionTrigger<*>?, T?>(BuiltInRegistries.TRIGGER_TYPES, Mod.loc(name!!), trigger)
     }
 
     @JvmStatic
