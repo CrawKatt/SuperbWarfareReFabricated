@@ -50,7 +50,7 @@ class DroneRenderer(renderManager: EntityRendererProvider.Context) :
                 val stack = player.mainHandItem
                 val tag = NBTTool.getTag(stack)
 
-                if (stack.`is`(ModItems.MONITOR.get()) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
+                if (stack.`is`(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
                     if (entityIn.getUUID().toString() == tag.getString("LinkedDrone")) {
                         flag = false
                     }

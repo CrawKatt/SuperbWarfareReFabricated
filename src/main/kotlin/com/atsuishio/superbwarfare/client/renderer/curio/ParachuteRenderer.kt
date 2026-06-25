@@ -81,21 +81,21 @@ class ParachuteRenderer : TrinketRenderer {
                 if (mc.options.cameraType != CameraType.FIRST_PERSON) return@register
 
                 val stack = context.matrixStack()
-                stack.pushPose()
+                stack?.pushPose()
 
                 if (firstPersonModel == null) {
                     firstPersonModel = ParachuteModel(mc.entityModels.bakeLayer(ParachuteModel.LAYER_LOCATION))
                 }
 
                 val tickDelta = mc.timer.getGameTimeDeltaPartialTick(false)
-                stack.mulPose(Axis.XP.rotationDegrees(180f))
-                stack.mulPose(Axis.YP.rotationDegrees(player.getViewYRot(tickDelta)))
-                stack.translate(0.0, 1.5, 0.0)
+                stack?.mulPose(Axis.XP.rotationDegrees(180f))
+                stack?.mulPose(Axis.YP.rotationDegrees(player.getViewYRot(tickDelta)))
+                stack?.translate(0.0, 1.5, 0.0)
 
                 firstPersonModel!!.prepareMobModel(player, 0f, 0f, tickDelta)
                 firstPersonModel!!.setupAnim(player, 0f, 0f, player.tickCount.toFloat(), 0f, 0f)
                 firstPersonModel!!.renderToBuffer(
-                    stack,
+                    stack!!,
                     buffers.bufferSource().getBuffer(RenderType.armorCutoutNoCull(TEXTURE)),
                     0xFFFFFF,
                     OverlayTexture.NO_OVERLAY,
