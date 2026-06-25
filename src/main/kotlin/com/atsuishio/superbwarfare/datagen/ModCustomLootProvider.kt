@@ -19,7 +19,6 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator
-import net.neoforged.neoforge.registries.DeferredHolder
 import java.util.function.BiConsumer
 
 private fun containers(name: String): ResourceKey<LootTable> {
@@ -60,7 +59,7 @@ private fun multiItems(rolls: Float, bonus: Float, vararg triplet: ItemEntry): L
     return builder
 }
 
-private typealias ItemRegistryType = DeferredHolder<Item, *>
+private typealias ItemRegistryType = Item
 
 
 private operator fun BiConsumer<ResourceKey<LootTable>, LootTable.Builder>.plusAssign(builder: LootTableBuilder) {
@@ -68,13 +67,6 @@ private operator fun BiConsumer<ResourceKey<LootTable>, LootTable.Builder>.plusA
 }
 
 private class LootTableBuilder(val key: ResourceKey<LootTable>, val builder: LootTable.Builder) {
-
-//    fun addSingleItem(
-//        item: ItemRegistryType,
-//        weight: Int,
-//    ) {
-//        addSingleItem(item.get(), weight)
-//    }
 
     fun addSingleItem(
         item: Item,
@@ -92,7 +84,7 @@ private class LootTableBuilder(val key: ResourceKey<LootTable>, val builder: Loo
         block: LootPool.Builder.() -> Unit = {}
     ) {
         builder.withPool(
-            singleItem(item.get(), rolls, bonus, weight, quality)
+            singleItem(item, rolls, bonus, weight, quality)
                 .apply(block)
         )
     }
@@ -102,10 +94,6 @@ private class LootTableBuilder(val key: ResourceKey<LootTable>, val builder: Loo
 
         fun withWeight(weight: Int, vararg items: ItemRegistryType) {
             items.forEach { it weighted weight }
-        }
-
-        infix fun ItemRegistryType.weighted(weight: Int): ItemEntry {
-            return ItemEntry(this.get(), weight).also { entries += it }
         }
 
         infix fun Item.weighted(weight: Int): ItemEntry {

@@ -2,28 +2,40 @@ package com.atsuishio.superbwarfare.datagen
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.loc
-import com.atsuishio.superbwarfare.datagen.builder.CustomSeparateModelBuilder
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModItems.Materials
 import com.atsuishio.superbwarfare.init.ModPerks
-import net.minecraft.client.renderer.block.model.BlockModel
+import com.google.gson.JsonObject
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.data.CachedOutput
+import net.minecraft.data.DataProvider
 import net.minecraft.data.PackOutput
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.level.block.Block
-import net.neoforged.neoforge.client.model.generators.ItemModelBuilder
-import net.neoforged.neoforge.client.model.generators.ItemModelProvider
-import net.neoforged.neoforge.client.model.generators.ModelFile
-import net.neoforged.neoforge.common.data.ExistingFileHelper
-import net.neoforged.neoforge.registries.DeferredHolder
+import java.util.concurrent.CompletableFuture
 
 @Suppress("unused")
-class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileHelper) :
-    ItemModelProvider(output, Mod.MODID, existingFileHelper) {
-    override fun registerModels() {
+class ModItemModelProvider(private val output: PackOutput) : DataProvider {
+    private val models = linkedMapOf<ResourceLocation, JsonObject>()
+
+    override fun run(pOutput: CachedOutput): CompletableFuture<*> {
+        models.clear()
+        registerModels()
+
+        val pathProvider = output.createPathProvider(PackOutput.Target.RESOURCE_PACK, "models")
+        return CompletableFuture.allOf(
+            *models.map { (id, json) -> DataProvider.saveStable(pOutput, json, pathProvider.json(id)) }
+                .toTypedArray()
+        )
+    }
+
+    override fun getName(): String {
+        return "${Mod.MODID} item models"
+    }
+
+    private fun registerModels() {
         // gun
         gunItem(ModItems.AA_12)
         gunItem(ModItems.AK_12)
@@ -199,13 +211,13 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         // perk
         simpleItem(ModItems.SHORTCUT_PACK)
         simpleItem(ModItems.EMPTY_PERK)
-        ModPerks.AMMO_PERKS.entries.forEach {
+        ModPerks.AMMO_PERKS.forEach {
             simpleItem(ModItems.PERK_ITEMS[it]!!)
         }
-        ModPerks.FUNC_PERKS.entries.forEach {
+        ModPerks.FUNC_PERKS.forEach {
             simpleItem(ModItems.PERK_ITEMS[it]!!)
         }
-        ModPerks.DAMAGE_PERKS.entries.forEach {
+        ModPerks.DAMAGE_PERKS.forEach {
             simpleItem(ModItems.PERK_ITEMS[it]!!)
         }
 
@@ -285,72 +297,116 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         simpleItem(materials.spring)
     }
 
-    private fun simpleItem(item: DeferredHolder<Item, out Item>, location: String = ""): ItemModelBuilder {
-        return withExistingParent(item.id.path, ResourceLocation.withDefaultNamespace("item/generated"))
-            .texture("layer0", loc("item/" + location + item.id.path))
-    }
-
-    private fun simpleItem(
-        item: DeferredHolder<Item, out Item>,
-        location: String,
-        renderType: String
-    ): ItemModelBuilder {
-        return withExistingParent(item.id.path, ResourceLocation.withDefaultNamespace("item/generated"))
-            .texture("layer0", loc("item/" + location + item.id.path)).renderType(renderType)
-    }
-
-    fun <T : Block> evenSimplerBlockItem(block: DeferredHolder<Block, T>) {
-        this.withExistingParent(
-            Mod.MODID + ":" + BuiltInRegistries.BLOCK.getKey(block.get()).path,
-            modLoc("block/" + BuiltInRegistries.BLOCK.getKey(block.get()).path)
+    private fun simpleItem(item: Item, location: String = "") {
+        val path = itemPath(item)
+        addModel(
+            loc("item/$path"),
+            model(ResourceLocation.withDefaultNamespace("item/generated"), mapOf("layer0" to loc("item/$location$path")))
         )
     }
 
-    private fun gunBlueprintItem(item: DeferredHolder<Item, out Item>): ItemModelBuilder {
-        return withExistingParent(item.id.path, ResourceLocation.withDefaultNamespace("item/generated"))
-            .texture("layer0", loc("item/gun_blueprint"))
+    private fun simpleItem(
+        item: Item,
+        location: String,
+        renderType: String
+    ) {
+        val path = itemPath(item)
+        addModel(
+            loc("item/$path"),
+            model(
+                ResourceLocation.withDefaultNamespace("item/generated"),
+                mapOf("layer0" to loc("item/$location$path")),
+                renderType = renderType
+            )
+        )
     }
 
-    private fun cannonBlueprintItem(item: DeferredHolder<Item, out Item>): ItemModelBuilder {
-        return withExistingParent(item.id.path, ResourceLocation.withDefaultNamespace("item/generated"))
-            .texture("layer0", loc("item/cannon_blueprint"))
+    fun <T : Block> evenSimplerBlockItem(block: T) {
+        val path = blockPath(block)
+        addModel(loc("item/$path"), model(loc("block/$path")))
     }
 
-    private fun handheldItem(item: DeferredHolder<Item, out Item>): ItemModelBuilder {
-        return withExistingParent(item.id.path, ResourceLocation.withDefaultNamespace("item/handheld"))
-            .texture("layer0", loc("item/" + item.id.path))
+    private fun gunBlueprintItem(item: Item) {
+        addModel(
+            loc("item/${itemPath(item)}"),
+            model(ResourceLocation.withDefaultNamespace("item/generated"), mapOf("layer0" to loc("item/gun_blueprint")))
+        )
     }
 
-    private fun gunIcon(item: DeferredHolder<Item, out Item>, name: String): ItemModelBuilder {
-        return withExistingParent(item.id.path + "_icon", ResourceLocation.withDefaultNamespace("item/generated"))
-            .texture("layer0", loc("item/" + name + "_icon"))
+    private fun cannonBlueprintItem(item: Item) {
+        addModel(
+            loc("item/${itemPath(item)}"),
+            model(ResourceLocation.withDefaultNamespace("item/generated"), mapOf("layer0" to loc("item/cannon_blueprint")))
+        )
     }
 
-    private fun gunBase(item: DeferredHolder<Item, out Item>, name: String): ItemModelBuilder {
-        return getBuilder(item.id.path + "_base")
-            .parent(ModelFile.UncheckedModelFile(modLoc("displaysettings/$name.item")))
-            .texture("layer0", loc("item/$name"))
+    private fun handheldItem(item: Item) {
+        val path = itemPath(item)
+        addModel(
+            loc("item/$path"),
+            model(ResourceLocation.withDefaultNamespace("item/handheld"), mapOf("layer0" to loc("item/$path")))
+        )
     }
 
-    private fun customSeparatedGunModel(item: DeferredHolder<Item, out Item>, name: String): ItemModelBuilder {
-        val base = modLoc("item/" + name + "_base").toString()
-        val icon = modLoc("item/" + name + "_icon").toString()
+    private fun gunIcon(item: Item, name: String) {
+        addModel(
+            loc("item/${itemPath(item)}_icon"),
+            model(ResourceLocation.withDefaultNamespace("item/generated"), mapOf("layer0" to loc("item/${name}_icon")))
+        )
+    }
 
-        return getBuilder(item.id.path)
-            .guiLight(BlockModel.GuiLight.FRONT)
-            .customLoader { parent, existingFileHelper ->
-                CustomSeparateModelBuilder.begin(parent, existingFileHelper)
-            }
-            .base(base)
-            .perspective(ItemDisplayContext.GUI, icon)
-            .texture("particle", modLoc("item/" + name + "_icon"))
-            .end()
+    private fun gunBase(item: Item, name: String) {
+        addModel(
+            loc("item/${itemPath(item)}_base"),
+            model(loc("displaysettings/$name.item"), mapOf("layer0" to loc("item/$name")))
+        )
+    }
+
+    private fun customSeparatedGunModel(item: Item, name: String) {
+        addModel(
+            loc("item/${itemPath(item)}"),
+            model(loc("item/${name}_base"), mapOf("particle" to loc("item/${name}_icon")), guiLight = "front")
+        )
     }
 
     @JvmOverloads
-    fun gunItem(item: DeferredHolder<Item, out Item>, name: String = item.id.path) {
+    fun gunItem(item: Item, name: String = itemPath(item)) {
         this.gunIcon(item, name)
         this.gunBase(item, name)
         this.customSeparatedGunModel(item, name)
+    }
+
+    private fun addModel(id: ResourceLocation, json: JsonObject) {
+        check(models.put(id, json) == null) { "Duplicate item model: $id" }
+    }
+
+    private fun model(
+        parent: ResourceLocation,
+        textures: Map<String, ResourceLocation> = emptyMap(),
+        guiLight: String? = null,
+        renderType: String? = null
+    ): JsonObject {
+        val json = JsonObject()
+        json.addProperty("parent", parent.toString())
+        if (guiLight != null) {
+            json.addProperty("gui_light", guiLight)
+        }
+        if (renderType != null) {
+            json.addProperty("render_type", renderType)
+        }
+        if (textures.isNotEmpty()) {
+            val textureJson = JsonObject()
+            textures.forEach { (key, value) -> textureJson.addProperty(key, value.toString()) }
+            json.add("textures", textureJson)
+        }
+        return json
+    }
+
+    private fun itemPath(item: Item): String {
+        return BuiltInRegistries.ITEM.getKey(item).path
+    }
+
+    private fun blockPath(block: Block): String {
+        return BuiltInRegistries.BLOCK.getKey(block).path
     }
 }

@@ -9,13 +9,11 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.data.CachedOutput
 import net.minecraft.data.DataProvider
 import net.minecraft.data.PackOutput
-import net.minecraft.server.packs.PackType
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
-import net.neoforged.neoforge.common.data.ExistingFileHelper
 import java.util.concurrent.CompletableFuture
 
-abstract class SbwWreckageLootProvider(val output: PackOutput, val existingFileHelper: ExistingFileHelper) :
-    DataProvider {
+abstract class SbwWreckageLootProvider(val output: PackOutput) : DataProvider {
     protected val lootData = mutableListOf<WreckageLootData>()
 
     abstract fun generate()
@@ -30,10 +28,11 @@ abstract class SbwWreckageLootProvider(val output: PackOutput, val existingFileH
 
         val list = mutableListOf<CompletableFuture<*>>()
         val pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "sbw/loot")
+        val generated = mutableSetOf<ResourceLocation>()
 
         val consumer = { data: WreckageLootData ->
             val id = data.id
-            if (existingFileHelper.exists(id, PackType.SERVER_DATA, ".json", "sbw/loot")) {
+            if (!generated.add(id)) {
                 throw IllegalArgumentException("Duplicate wreckage loot data: $id")
             }
             val path = pathProvider.json(id)

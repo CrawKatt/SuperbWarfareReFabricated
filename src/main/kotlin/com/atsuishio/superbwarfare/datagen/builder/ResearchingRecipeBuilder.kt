@@ -198,7 +198,7 @@ open class ResearchingRecipeBuilder private constructor(
 //
 //        override fun getId(): ResourceLocation = this.recipeId
 //
-//        override fun getType(): RecipeSerializer<*> = ModRecipes.RESEARCHING_SERIALIZER.get()
+//        override fun getType(): RecipeSerializer<*> = ModRecipes.RESEARCHING_SERIALIZER
 //
 //        override fun serializeAdvancement(): JsonObject = this.advancement.serializeToJson()
 //

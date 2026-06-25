@@ -34,7 +34,7 @@ class VehicleAssemblingRecipeBuilder : RecipeBuilder {
     }
 
     constructor(type: EntityType<*>, category: VehicleAssemblingRecipe.Category) {
-        this.result = ModItems.CONTAINER.get()
+        this.result = ModItems.CONTAINER
         this.entityType = type
         this.count = 1
         this.category = category

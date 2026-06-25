@@ -100,6 +100,15 @@ object ModTags {
         @JvmField val ANIMATED_MINIGUN = modItemTag("animated/minigun")
 
         // Common/convention tags
+        @JvmField val DUSTS = commonItemTag("dusts")
+        @JvmField val INGOTS = commonItemTag("ingots")
+        @JvmField val STORAGE_BLOCKS = commonItemTag("storage_blocks")
+        @JvmField val ORES = commonItemTag("ores")
+        @JvmField val RAW_MATERIALS = commonItemTag("raw_materials")
+        @JvmField val ORE_RATES_SINGULAR = commonItemTag("ore_rates/singular")
+        @JvmField val ORES_IN_GROUND_STONE = commonItemTag("ores_in_ground/stone")
+        @JvmField val ORES_IN_GROUND_DEEPSLATE = commonItemTag("ores_in_ground/deepslate")
+        @JvmField val ARMORS = commonItemTag("armors")
         @JvmField val INGOTS_GOLD = commonItemTag("ingots/gold")
         @JvmField val INGOTS_IRON = commonItemTag("ingots/iron")
         @JvmField val INGOTS_COPPER = commonItemTag("ingots/copper")
@@ -114,9 +123,12 @@ object ModTags {
         @JvmField val NUGGETS_IRON = commonItemTag("nuggets/iron")
         @JvmField val NUGGETS_GOLD = commonItemTag("nuggets/gold")
         @JvmField val GEMS_DIAMOND = commonItemTag("gems/diamond")
+        @JvmField val GEMS_AMETHYST = commonItemTag("gems/amethyst")
+        @JvmField val GEMS_EMERALD = commonItemTag("gems/emerald")
         @JvmField val GEMS_LAPIS = commonItemTag("gems/lapis")
         @JvmField val GEMS_QUARTZ = commonItemTag("gems/quartz")
         @JvmField val DUSTS_REDSTONE = commonItemTag("dusts/redstone")
+        @JvmField val GLASS_BLOCKS = commonItemTag("glass_blocks")
         @JvmField val GLASS_PANES = commonItemTag("glass_panes")
         @JvmField val SANDS = commonItemTag("sands")
         @JvmField val DYES_BLACK = commonItemTag("dyes/black")
@@ -139,6 +151,13 @@ object ModTags {
         @JvmField val AUTO_LANDING = modBlockTag("auto_landing")
         @JvmField val VEHICLE_PASS_THROUGH = modBlockTag("vehicle_pass_through")
         @JvmField val MINEABLE_WITH_MILITARY_SHOVEL = modBlockTag("mineable/military_shovel")
+
+        // Common/convention tags
+        @JvmField val GLASS_BLOCKS = commonBlockTag("glass_blocks")
+        @JvmField val GLASS_PANES = commonBlockTag("glass_panes")
+        @JvmField val ORES = commonBlockTag("ores")
+        @JvmField val ORES_IN_GROUND_STONE = commonBlockTag("ores_in_ground/stone")
+        @JvmField val ORES_IN_GROUND_DEEPSLATE = commonBlockTag("ores_in_ground/deepslate")
     }
 
     object DamageTypes {

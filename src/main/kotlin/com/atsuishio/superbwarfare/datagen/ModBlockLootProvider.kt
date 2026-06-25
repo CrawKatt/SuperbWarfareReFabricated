@@ -11,6 +11,7 @@ import net.minecraft.core.HolderLookup
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.data.loot.BlockLootSubProvider
+import net.minecraft.resources.ResourceKey
 import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
@@ -22,6 +23,7 @@ import net.minecraft.world.level.storage.loot.entries.LootItem
 import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
+import java.util.function.BiConsumer
 
 class ModBlockLootProvider(provider: HolderLookup.Provider) :
     BlockLootSubProvider(mutableSetOf<Item>(), FeatureFlags.REGISTRY.allFlags(), provider) {
@@ -149,8 +151,14 @@ class ModBlockLootProvider(provider: HolderLookup.Provider) :
         )
     }
 
-    override fun getKnownBlocks(): Iterable<Block> {
-        return Iterable { ModBlocks.REGISTRY.getEntries().stream().map { it }.iterator() }
+    override fun generate(output: BiConsumer<ResourceKey<LootTable>, LootTable.Builder>) {
+        this.generate()
+
+        for ((key, builder) in this.map) {
+            output.accept(key, builder)
+        }
+
+        this.map.clear()
     }
 
     fun createCopyComponentsDrops(

@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.datagen
 
-import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModTags
 import net.minecraft.core.HolderLookup
@@ -12,14 +11,12 @@ import net.minecraft.tags.DamageTypeTags
 import net.minecraft.tags.TagKey
 import net.minecraft.world.damagesource.DamageType
 import net.minecraft.world.damagesource.DamageTypes
-import net.neoforged.neoforge.common.data.ExistingFileHelper
 import java.util.concurrent.CompletableFuture
 
 class ModDamageTypeTagProvider(
     pOutput: PackOutput,
-    pLookupProvider: CompletableFuture<HolderLookup.Provider>,
-    existingFileHelper: ExistingFileHelper
-) : DamageTypeTagsProvider(pOutput, pLookupProvider, Mod.MODID, existingFileHelper) {
+    pLookupProvider: CompletableFuture<HolderLookup.Provider>
+) : DamageTypeTagsProvider(pOutput, pLookupProvider) {
     override fun addTags(pProvider: HolderLookup.Provider) {
         this.tag(ModTags.DamageTypes.PROJECTILE).add(
             ModDamageTypes.GUN_FIRE,
