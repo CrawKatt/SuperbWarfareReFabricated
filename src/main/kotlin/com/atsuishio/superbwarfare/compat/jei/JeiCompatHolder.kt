@@ -1,14 +1,14 @@
 package com.atsuishio.superbwarfare.compat.jei
 
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.world.item.ItemStack
-import net.neoforged.fml.ModList
 
 object JeiCompatHolder {
     const val JEI: String = "jei"
 
     @JvmStatic
     fun hasJEI(): Boolean {
-        return ModList.get().isLoaded(JEI)
+        return FabricLoader.getInstance().isModLoaded(JEI)
     }
 
     @JvmStatic

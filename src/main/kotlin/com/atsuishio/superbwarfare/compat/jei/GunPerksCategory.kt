@@ -26,7 +26,7 @@ class GunPerksCategory(helper: IGuiHelper) : IRecipeCategory<ItemStack> {
         .setTextureSize(144, 128)
         .build()
     private val icon: IDrawable =
-        helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, ItemStack(ModItems.AP_BULLET!!.get()))
+        helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, ItemStack(ModItems.AP_BULLET))
 
     override fun draw(
         recipe: ItemStack,
@@ -82,7 +82,7 @@ class GunPerksCategory(helper: IGuiHelper) : IRecipeCategory<ItemStack> {
         builder.addSlot(RecipeIngredientRole.INPUT, 1, 1).addItemStack(stack)
 
         for (i in sortedPerks.indices) {
-            val perkItem = sortedPerks[i].getItem().get()
+            val perkItem = sortedPerks[i].getItem()
             builder.addSlot(RecipeIngredientRole.INPUT, 1 + (i % 8) * 18, 21 + i / 8 * 18)
                 .addItemStack(perkItem.defaultInstance)
         }

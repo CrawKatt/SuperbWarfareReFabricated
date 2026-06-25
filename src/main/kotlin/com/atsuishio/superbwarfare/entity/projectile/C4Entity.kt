@@ -46,7 +46,7 @@ open class C4Entity : Entity, OwnableEntity {
 
     @JvmOverloads
     constructor(owner: LivingEntity?, level: Level, isControllable: Boolean = false) : super(
-        ModEntities.C4.get(),
+        ModEntities.C4,
         level
     ) {
         if (owner != null) {
@@ -164,11 +164,11 @@ open class C4Entity : Entity, OwnableEntity {
 
             val countdown = ExplosionConfig.C4_EXPLOSION_COUNTDOWN.get()
             if (countdown - bombTick > 39 && bombTick % ((20 * (countdown - bombTick)) / countdown + 1) == 0) {
-                this.level().playSound(null, this.onPos, ModSounds.C4_BEEP.get(), SoundSource.PLAYERS, 1f, 1f)
+                this.level().playSound(null, this.onPos, ModSounds.C4_BEEP, SoundSource.PLAYERS, 1f, 1f)
             }
 
             if (bombTick == countdown - 39) {
-                this.level().playSound(null, this.onPos, ModSounds.C4_FINAL.get(), SoundSource.PLAYERS, 2f, 1f)
+                this.level().playSound(null, this.onPos, ModSounds.C4_FINAL, SoundSource.PLAYERS, 2f, 1f)
             }
             this.entityData.set(BOMB_TICK, bombTick + 1)
         }
@@ -373,7 +373,7 @@ open class C4Entity : Entity, OwnableEntity {
 
         val resultPos = pResult.blockPos
         val state = this.level().getBlockState(resultPos)
-        val event = state.block.getSoundType(state, this.level(), resultPos, this).breakSound
+        val event = state.soundType.breakSound
         val speed = this.deltaMovement.length()
         if (speed > 0.1) {
             val volume = min(4f, speed.toFloat() / 4f + 0.5f)
@@ -435,7 +435,7 @@ open class C4Entity : Entity, OwnableEntity {
 
     val itemStack: ItemStack
         get() {
-            val stack = ItemStack(ModItems.C4_BOMB.get())
+            val stack = ItemStack(ModItems.C4_BOMB)
             if (this.getEntityData().get(IS_CONTROLLABLE)) {
                 val tag = NBTTool.getTag(stack)
                 tag.putBoolean("Control", true)

@@ -73,11 +73,11 @@ open class SteelCoilEntity(type: EntityType<SteelCoilEntity>, level: Level) : Pa
     }
 
     override fun getHurtSound(pDamageSource: DamageSource): SoundEvent {
-        return ModSounds.INDICATION_VEHICLE.get()
+        return ModSounds.INDICATION_VEHICLE
     }
 
     override fun getDeathSound(): SoundEvent {
-        return ModSounds.STEEL_PIPE_DROP.get()
+        return ModSounds.STEEL_PIPE_DROP
     }
 
     override fun aiStep() {
@@ -258,7 +258,7 @@ open class SteelCoilEntity(type: EntityType<SteelCoilEntity>, level: Level) : Pa
                 continue
             }
 
-            this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE.get(), this.soundSource, 1f, 1f)
+            this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE, this.soundSource, 1f, 1f)
 
             entity.forceHurt(
                 ModDamageTypes.causeVehicleStrikeDamage(

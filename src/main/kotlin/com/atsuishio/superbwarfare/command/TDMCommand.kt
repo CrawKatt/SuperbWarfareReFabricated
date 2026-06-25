@@ -13,13 +13,13 @@ val TDM_COMMAND = buildCommand("tdm") {
                 val tdm = source.level.dataStorage.computeIfAbsent(
                     SavedData.Factory(
                         { TDMSavedData() },
-                        { tag, _ -> TDMSavedData.load(tag) },
+                        TDMSavedData::load,
                         null
                     ), TDMSavedData.FILE_ID
                 )
 
                 entities.forEach { entity -> tdm.addEntity(entity.getStringUUID()) }
-                tdm.sync()
+                tdm.sync(source.level)
 
                 success {
                     if (entities.size == 1) {
@@ -43,13 +43,13 @@ val TDM_COMMAND = buildCommand("tdm") {
                 val tdm = source.level.dataStorage.computeIfAbsent(
                     SavedData.Factory(
                         { TDMSavedData() },
-                        { tag, _ -> TDMSavedData.load(tag) },
+                        TDMSavedData::load,
                         null
                     ), TDMSavedData.FILE_ID
                 )
 
                 entities.forEach { entity -> tdm.removeEntity(entity.getStringUUID()) }
-                tdm.sync()
+                tdm.sync(source.level)
 
                 if (entities.size == 1) {
                     success {

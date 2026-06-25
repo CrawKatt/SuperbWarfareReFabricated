@@ -48,7 +48,7 @@ class PotionMortarShellItem : MortarShellItem(), DispenserLaunchable {
 
             override fun getProjectile(level: Level, position: Position, stack: ItemStack): Projectile {
                 val shell = MortarShellEntity(
-                    ModEntities.MORTAR_SHELL.get(),
+                    ModEntities.MORTAR_SHELL,
                     position.x(),
                     position.y(),
                     position.z(),
@@ -61,7 +61,7 @@ class PotionMortarShellItem : MortarShellItem(), DispenserLaunchable {
 
             override fun playSound(source: BlockSource) {
                 source.level
-                    .playSound(null, source.pos, ModSounds.MORTAR_FIRE.get(), SoundSource.BLOCKS, 1f, 1f)
+                    .playSound(null, source.pos, ModSounds.MORTAR_FIRE, SoundSource.BLOCKS, 1f, 1f)
             }
         }
     }

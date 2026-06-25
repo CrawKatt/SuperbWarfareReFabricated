@@ -17,7 +17,10 @@ object ControlClothConfig {
                     ControlConfig.INVERT_AIRCRAFT_CONTROL.get()
                 )
                 .setDefaultValue(true)
-                .setSaveConsumer(save(ControlConfig.INVERT_AIRCRAFT_CONTROL))
+                .setSaveConsumer { v ->
+                    ControlConfig.INVERT_AIRCRAFT_CONTROL.set(v)
+                    ControlConfig.INVERT_AIRCRAFT_CONTROL.save()
+                }
                 .setTooltip(Component.translatable("config.superbwarfare.client.control.invert_aircraft_control.des"))
                 .build()
         )
@@ -31,7 +34,10 @@ object ControlClothConfig {
                     200
                 )
                 .setDefaultValue(100)
-                .setSaveConsumer(save(ControlConfig.MOUSE_SENSITIVITY))
+                .setSaveConsumer { v ->
+                    ControlConfig.MOUSE_SENSITIVITY.set(v)
+                    ControlConfig.MOUSE_SENSITIVITY.save()
+                }
                 .setTooltip(Component.translatable("config.superbwarfare.client.control.mouse_sensitivity.des")).build()
         )
     }

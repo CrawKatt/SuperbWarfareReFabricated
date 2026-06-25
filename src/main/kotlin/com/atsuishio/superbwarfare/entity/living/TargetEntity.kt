@@ -73,7 +73,7 @@ open class TargetEntity(type: EntityType<TargetEntity>, level: Level) : LivingEn
             this.level().playSound(
                 null,
                 BlockPos.containing(this.x, this.y, this.z),
-                ModSounds.HIT.get(),
+                ModSounds.HIT,
                 SoundSource.BLOCKS,
                 1f,
                 1f
@@ -83,7 +83,7 @@ open class TargetEntity(type: EntityType<TargetEntity>, level: Level) : LivingEn
                 this.x,
                 this.y,
                 this.z,
-                ModSounds.HIT.get(),
+                ModSounds.HIT,
                 SoundSource.BLOCKS,
                 1f,
                 1f,
@@ -106,7 +106,7 @@ open class TargetEntity(type: EntityType<TargetEntity>, level: Level) : LivingEn
             }
 
             if (!player.abilities.instabuild) {
-                player.addItem(ItemStack(ModItems.TARGET_DEPLOYER.get()))
+                player.addItem(ItemStack(ModItems.TARGET_DEPLOYER))
             }
         } else {
             this.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3((player.x), this.y, (player.z)))
@@ -148,13 +148,13 @@ open class TargetEntity(type: EntityType<TargetEntity>, level: Level) : LivingEn
     override fun tickDeath() {
         ++this.deathTime
         if (this.deathTime >= 100) {
-            this.spawnAtLocation(ItemStack(ModItems.TARGET_DEPLOYER.get()))
+            this.spawnAtLocation(ItemStack(ModItems.TARGET_DEPLOYER))
             this.remove(RemovalReason.KILLED)
         }
     }
 
     override fun getPickResult(): ItemStack? {
-        return ItemStack(ModItems.TARGET_DEPLOYER.get())
+        return ItemStack(ModItems.TARGET_DEPLOYER)
     }
 
     companion object {
@@ -184,7 +184,7 @@ open class TargetEntity(type: EntityType<TargetEntity>, level: Level) : LivingEn
                             format1D((entity.position()).distanceTo((sourceEntity.position())), "m")
                         ), true
                     )
-                    SoundTool.playLocalSound(sourceEntity, ModSounds.TARGET_DOWN.get(), 1f, 1f)
+                    SoundTool.playLocalSound(sourceEntity, ModSounds.TARGET_DOWN, 1f, 1f)
                     entity.downTime = 40
                 }
                 return false

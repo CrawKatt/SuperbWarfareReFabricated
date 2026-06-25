@@ -76,8 +76,9 @@ open class MonitorItem : Item(Properties().stacksTo(1)) {
         return super.use(level, player, hand)
     }
 
-    override fun getDefaultAttributeModifiers(stack: ItemStack): ItemAttributeModifiers {
-        val list = ArrayList(super.getDefaultAttributeModifiers(stack).modifiers())
+    @Deprecated("Deprecated in Java")
+    override fun getDefaultAttributeModifiers(): ItemAttributeModifiers {
+        val list = ArrayList(super.getDefaultAttributeModifiers().modifiers())
         list.addAll(
             listOf(
                 ItemAttributeModifiers.Entry(

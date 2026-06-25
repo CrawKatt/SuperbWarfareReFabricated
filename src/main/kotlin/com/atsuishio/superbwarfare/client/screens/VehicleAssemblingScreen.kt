@@ -87,7 +87,7 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
         val level = clientLevel ?: return
 
         val recipeManager = level.recipeManager
-        val recipeList = recipeManager.getAllRecipesFor(ModRecipes.VEHICLE_ASSEMBLING_TYPE.get())
+        val recipeList = recipeManager.getAllRecipesFor(ModRecipes.VEHICLE_ASSEMBLING_TYPE)
 
         for (recipe in recipeList) {
             this.recipes.computeIfAbsent(recipe.value().category) { _ -> Lists.newArrayList() }!!.add(recipe.id())
@@ -469,7 +469,7 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
         val stack = holder.value().result.getResult()
         var renderEntity: Entity? = null
 
-        if (stack.`is`(ModItems.CONTAINER.get())) {
+        if (stack.`is`(ModItems.CONTAINER)) {
             val data = stack.get(DataComponents.BLOCK_ENTITY_DATA)
             val tag = data?.copyTag()
 
@@ -631,7 +631,7 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
         val stack = holder.value().result.getResult()
 
         var renderItemName = true
-        if (stack.`is`(ModItems.CONTAINER.get())) {
+        if (stack.`is`(ModItems.CONTAINER)) {
             val data = stack.get(DataComponents.BLOCK_ENTITY_DATA)
             val tag = data?.copyTag()
             if (tag != null && tag.contains("EntityType")) {

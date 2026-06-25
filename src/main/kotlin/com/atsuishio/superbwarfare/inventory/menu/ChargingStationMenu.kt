@@ -5,13 +5,14 @@ import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModMenuTypes
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData
 import com.atsuishio.superbwarfare.network.dataslot.SimpleEnergyData
+import net.fabricmc.fabric.api.registry.FuelRegistry
+import net.minecraft.core.component.DataComponents
 import net.minecraft.world.Container
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.crafting.RecipeType
 import net.minecraft.world.level.Level
 
 open class ChargingStationMenu @JvmOverloads constructor(
@@ -19,7 +20,7 @@ open class ChargingStationMenu @JvmOverloads constructor(
     inventory: Inventory,
     container: Container = SimpleContainer(2),
     containerData: ContainerEnergyData = SimpleEnergyData(ChargingStationBlockEntity.MAX_DATA_COUNT)
-) : EnergyMenu(ModMenuTypes.CHARGING_STATION_MENU.get(), id, containerData) {
+) : EnergyMenu(ModMenuTypes.CHARGING_STATION_MENU, id, containerData) {
     private val container: Container
     private val containerData: ContainerEnergyData
     protected val level: Level
@@ -61,10 +62,7 @@ open class ChargingStationMenu @JvmOverloads constructor(
                     if (!this.moveItemStackTo(itemstack1, 1, 2, true)) {
                         return ItemStack.EMPTY
                     }
-                } else if (itemstack1.getBurnTime(RecipeType.SMELTING) > 0 || itemstack1.getFoodProperties(
-                        null
-                    ) != null
-                ) {
+                } else if (FuelRegistry.INSTANCE.get(itemstack1.item) != null || itemstack1.get(DataComponents.FOOD) != null) {
                     if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
                         return ItemStack.EMPTY
                     }

@@ -97,7 +97,7 @@ class TDMSavedData : SavedData {
 
         @JvmStatic
         fun register() {
-            ServerPlayConnectionEvents.JOIN.register { handler, _, _ ->
+            ServerPlayConnectionEvents.JOIN.register join@{ handler, _, _ ->
                 val player = handler.player
                 val level = player.serverLevel()
 
@@ -108,7 +108,7 @@ class TDMSavedData : SavedData {
                         null
                     ),
                     FILE_ID
-                ) ?: return@register
+                ) ?: return@join
 
                 ServerPlayNetworking.send(player, TDMSyncMessage(data))
             }

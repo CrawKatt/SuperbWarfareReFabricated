@@ -107,7 +107,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
             this.level().playSound(
                 null,
                 BlockPos.containing(this.x, this.y, this.z),
-                ModSounds.HIT.get(),
+                ModSounds.HIT,
                 SoundSource.BLOCKS,
                 1f,
                 1f
@@ -117,7 +117,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
                 this.x,
                 this.y,
                 this.z,
-                ModSounds.HIT.get(),
+                ModSounds.HIT,
                 SoundSource.BLOCKS,
                 1f,
                 1f,
@@ -140,7 +140,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
             }
 
             if (!player.abilities.instabuild) {
-                player.addItem(ItemStack(ModItems.DPS_GENERATOR_DEPLOYER.get()))
+                player.addItem(ItemStack(ModItems.DPS_GENERATOR_DEPLOYER))
             }
         } else {
             this.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3((player.x), this.y, (player.z)))
@@ -202,7 +202,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
                     this.level().playSound(
                         null,
                         BlockPos.containing(this.x, this.y, this.z),
-                        ModSounds.DPS_GENERATOR_EVOLVE.get(),
+                        ModSounds.DPS_GENERATOR_EVOLVE,
                         SoundSource.BLOCKS,
                         0.5f,
                         1f
@@ -212,7 +212,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
                         this.x,
                         this.y,
                         this.z,
-                        ModSounds.DPS_GENERATOR_EVOLVE.get(),
+                        ModSounds.DPS_GENERATOR_EVOLVE,
                         SoundSource.BLOCKS,
                         0.5f,
                         1f,
@@ -248,7 +248,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
     override fun tickDeath() {
         ++this.deathTime
         if (this.deathTime >= 100) {
-            this.spawnAtLocation(ItemStack(ModItems.DPS_GENERATOR_DEPLOYER.get()))
+            this.spawnAtLocation(ItemStack(ModItems.DPS_GENERATOR_DEPLOYER))
             this.remove(RemovalReason.KILLED)
         }
     }
@@ -301,7 +301,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
         }
     }
 
-    override fun getPickResult() = ItemStack(ModItems.DPS_GENERATOR_DEPLOYER.get())
+    override fun getPickResult() = ItemStack(ModItems.DPS_GENERATOR_DEPLOYER)
 
     companion object {
         @JvmField
@@ -322,7 +322,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
             dpsGenerator.health = 0.00001f
 
             if (sourceEntity is Player) {
-                sourceEntity.playLocalSound(ModSounds.TARGET_DOWN.get(), 1f, 1f)
+                sourceEntity.playLocalSound(ModSounds.TARGET_DOWN, 1f, 1f)
                 dpsGenerator.downTime = 40
             }
             return false

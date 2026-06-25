@@ -25,6 +25,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.crafting.RecipeHolder
 import net.minecraft.world.item.crafting.RecipeInput
 import kotlin.jvm.optionals.getOrNull
+
 class BlueprintResearchTableScreen(
     menu: BlueprintResearchTableMenu, playerInventory: Inventory, title: Component
 ) : AbstractContainerScreen<BlueprintResearchTableMenu>(menu, playerInventory, title) {
@@ -231,7 +232,7 @@ class BlueprintResearchTableScreen(
         }
 
         val optionalRecipe = manager.getRecipeFor(
-            ModRecipes.RESEARCHING_TYPE.get(),
+            ModRecipes.RESEARCHING_TYPE,
             inventory,
             level
         )

@@ -75,7 +75,7 @@ class RecipeButton(x: Int, y: Int, private val stack: ItemStack, onPress: OnPres
 
         pGuiGraphics.renderItem(this.stack, this.x + 2, this.y + 1)
         val hoverName: Component?
-        if (this.stack.`is`(ModItems.CONTAINER.get())) {
+        if (this.stack.`is`(ModItems.CONTAINER)) {
             val data = this.stack.get(DataComponents.BLOCK_ENTITY_DATA)
             val tag = data?.copyTag()
             if (tag != null && tag.contains("EntityType")) {

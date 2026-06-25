@@ -21,7 +21,7 @@ class VehicleAssemblingCategory(helper: IGuiHelper) : IRecipeCategory<VehicleAss
         .build()
     private val icon: IDrawable = helper.createDrawableIngredient(
         VanillaTypes.ITEM_STACK,
-        ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE.get())
+        ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE)
     )
 
     @Deprecated("Deprecated in Java")

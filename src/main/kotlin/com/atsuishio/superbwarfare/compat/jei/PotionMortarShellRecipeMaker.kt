@@ -15,13 +15,13 @@ import java.util.*
 object PotionMortarShellRecipeMaker {
     fun createRecipes(): MutableList<RecipeHolder<CraftingRecipe>> {
         val group = "jei.potion_mortar_shell"
-        val ingredient = Ingredient.of(ItemStack(ModItems.MORTAR_SHELL.get()))
+        val ingredient = Ingredient.of(ItemStack(ModItems.MORTAR_SHELL))
 
         return BuiltInRegistries.POTION.stream().map { potion ->
             val input = ItemStack(Items.LINGERING_POTION)
             input.set<PotionContents?>(DataComponents.POTION_CONTENTS, PotionContents(Holder.direct(potion)))
 
-            val output = ItemStack(ModItems.POTION_MORTAR_SHELL.get(), 4)
+            val output = ItemStack(ModItems.POTION_MORTAR_SHELL, 4)
             output.set<PotionContents?>(DataComponents.POTION_CONTENTS, PotionContents(Holder.direct(potion)))
 
             val potionIngredient = Ingredient.of(input)

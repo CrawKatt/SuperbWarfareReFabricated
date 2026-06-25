@@ -1,11 +1,6 @@
 package com.atsuishio.superbwarfare.compat.coldsweat
 
-import com.atsuishio.superbwarfare.compat.CompatHolder
-import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
-import com.momosoftworks.coldsweat.api.util.Temperature
-import net.neoforged.fml.ModList
-import net.neoforged.neoforge.event.tick.PlayerTickEvent
-
+/*
 object ColdSweatCompatHandler {
     @JvmStatic
     fun onPlayerInVehicle(event: PlayerTickEvent.Pre) {
@@ -24,3 +19,4 @@ object ColdSweatCompatHandler {
         return ModList.get().isLoaded(CompatHolder.COLD_SWEAT)
     }
 }
+*/

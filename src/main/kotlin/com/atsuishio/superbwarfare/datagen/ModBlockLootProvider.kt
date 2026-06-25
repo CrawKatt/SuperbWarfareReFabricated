@@ -26,33 +26,33 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
 class ModBlockLootProvider(provider: HolderLookup.Provider) :
     BlockLootSubProvider(mutableSetOf<Item>(), FeatureFlags.REGISTRY.allFlags(), provider) {
     override fun generate() {
-        this.dropSelf(ModBlocks.SANDBAG.get())
-        this.dropSelf(ModBlocks.BARBED_WIRE.get())
-        this.dropSelf(ModBlocks.JUMP_PAD.get())
-        this.dropSelf(ModBlocks.DRAGON_TEETH.get())
-        this.dropSelf(ModBlocks.REFORGING_TABLE.get())
-        this.dropSelf(ModBlocks.LEAD_BLOCK.get())
-        this.dropSelf(ModBlocks.STEEL_BLOCK.get())
-        this.dropSelf(ModBlocks.TUNGSTEN_BLOCK.get())
-        this.dropSelf(ModBlocks.CEMENTED_CARBIDE_BLOCK.get())
-        this.dropSelf(ModBlocks.SILVER_BLOCK.get())
-        this.dropSelf(ModBlocks.CREATIVE_CHARGING_STATION.get())
-        this.dropSelf(ModBlocks.FUMO_25.get())
-        this.dropSelf(ModBlocks.VEHICLE_DEPLOYER.get())
-        this.dropSelf(ModBlocks.AIRCRAFT_CATAPULT.get())
-        this.dropSelf(ModBlocks.SUPERB_ITEM_INTERFACE.get())
-        this.dropSelf(ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE.get())
-        this.dropSelf(ModBlocks.RAW_GALENA_BLOCK.get())
-        this.dropSelf(ModBlocks.RAW_SCHEELITE_BLOCK.get())
-        this.dropSelf(ModBlocks.RAW_SILVER_BLOCK.get())
+        this.dropSelf(ModBlocks.SANDBAG)
+        this.dropSelf(ModBlocks.BARBED_WIRE)
+        this.dropSelf(ModBlocks.JUMP_PAD)
+        this.dropSelf(ModBlocks.DRAGON_TEETH)
+        this.dropSelf(ModBlocks.REFORGING_TABLE)
+        this.dropSelf(ModBlocks.LEAD_BLOCK)
+        this.dropSelf(ModBlocks.STEEL_BLOCK)
+        this.dropSelf(ModBlocks.TUNGSTEN_BLOCK)
+        this.dropSelf(ModBlocks.CEMENTED_CARBIDE_BLOCK)
+        this.dropSelf(ModBlocks.SILVER_BLOCK)
+        this.dropSelf(ModBlocks.CREATIVE_CHARGING_STATION)
+        this.dropSelf(ModBlocks.FUMO_25)
+        this.dropSelf(ModBlocks.VEHICLE_DEPLOYER)
+        this.dropSelf(ModBlocks.AIRCRAFT_CATAPULT)
+        this.dropSelf(ModBlocks.SUPERB_ITEM_INTERFACE)
+        this.dropSelf(ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE)
+        this.dropSelf(ModBlocks.RAW_GALENA_BLOCK)
+        this.dropSelf(ModBlocks.RAW_SCHEELITE_BLOCK)
+        this.dropSelf(ModBlocks.RAW_SILVER_BLOCK)
         this.add(
-            ModBlocks.BLUEPRINT_RESEARCH_TABLE.get(),
+            ModBlocks.BLUEPRINT_RESEARCH_TABLE,
             this.applyExplosionDecay(
-                ModBlocks.BLUEPRINT_RESEARCH_TABLE.get(), LootTable.lootTable().withPool(
+                ModBlocks.BLUEPRINT_RESEARCH_TABLE, LootTable.lootTable().withPool(
                     LootPool.lootPool().add(
-                        LootItem.lootTableItem(ModBlocks.BLUEPRINT_RESEARCH_TABLE.get()).`when`(
+                        LootItem.lootTableItem(ModBlocks.BLUEPRINT_RESEARCH_TABLE).`when`(
                             LootItemBlockStatePropertyCondition.hasBlockStateProperties(
-                                ModBlocks.BLUEPRINT_RESEARCH_TABLE.get()
+                                ModBlocks.BLUEPRINT_RESEARCH_TABLE
                             ).setProperties(
                                 StatePropertiesPredicate.Builder.properties()
                                     .hasProperty(BlueprintResearchTableBlock.PART, BedPart.FOOT)
@@ -63,13 +63,13 @@ class ModBlockLootProvider(provider: HolderLookup.Provider) :
             )
         )
         this.add(
-            ModBlocks.VEHICLE_ASSEMBLING_TABLE.get(),
+            ModBlocks.VEHICLE_ASSEMBLING_TABLE,
             this.applyExplosionDecay(
-                ModBlocks.VEHICLE_ASSEMBLING_TABLE.get(), LootTable.lootTable().withPool(
+                ModBlocks.VEHICLE_ASSEMBLING_TABLE, LootTable.lootTable().withPool(
                     LootPool.lootPool().add(
-                        LootItem.lootTableItem(ModBlocks.VEHICLE_ASSEMBLING_TABLE.get()).`when`(
+                        LootItem.lootTableItem(ModBlocks.VEHICLE_ASSEMBLING_TABLE).`when`(
                             LootItemBlockStatePropertyCondition.hasBlockStateProperties(
-                                ModBlocks.VEHICLE_ASSEMBLING_TABLE.get()
+                                ModBlocks.VEHICLE_ASSEMBLING_TABLE
                             ).setProperties(
                                 StatePropertiesPredicate.Builder.properties()
                                     .hasProperty(VehicleAssemblingTableBlock.BLOCK_PART, BlockPart.FLB)
@@ -79,40 +79,40 @@ class ModBlockLootProvider(provider: HolderLookup.Provider) :
                 )
             )
         )
-        this.dropSelf(ModBlocks.BIOGAS_GENERATOR.get())
+        this.dropSelf(ModBlocks.BIOGAS_GENERATOR)
 
         this.add(
-            ModBlocks.CHARGING_STATION.get(), createCopyComponentsDrops(
-                ModBlocks.CHARGING_STATION.get(),
-                listOf(ModDataComponents.ENERGY.get())
+            ModBlocks.CHARGING_STATION, createCopyComponentsDrops(
+                ModBlocks.CHARGING_STATION,
+                listOf(ModDataComponents.ENERGY)
             )
         )
-        this.add(ModBlocks.GALENA_ORE.get(), this.createOreDrop(ModBlocks.GALENA_ORE.get(), ModItems.GALENA.get()))
+        this.add(ModBlocks.GALENA_ORE, this.createOreDrop(ModBlocks.GALENA_ORE, ModItems.GALENA))
         this.add(
-            ModBlocks.SCHEELITE_ORE.get(),
-            this.createOreDrop(ModBlocks.SCHEELITE_ORE.get(), ModItems.SCHEELITE.get())
+            ModBlocks.SCHEELITE_ORE,
+            this.createOreDrop(ModBlocks.SCHEELITE_ORE, ModItems.SCHEELITE)
         )
-        this.add(ModBlocks.SILVER_ORE.get(), this.createOreDrop(ModBlocks.SILVER_ORE.get(), ModItems.RAW_SILVER.get()))
+        this.add(ModBlocks.SILVER_ORE, this.createOreDrop(ModBlocks.SILVER_ORE, ModItems.RAW_SILVER))
         this.add(
-            ModBlocks.DEEPSLATE_GALENA_ORE.get(),
-            this.createOreDrop(ModBlocks.DEEPSLATE_GALENA_ORE.get(), ModItems.GALENA.get())
-        )
-        this.add(
-            ModBlocks.DEEPSLATE_SCHEELITE_ORE.get(),
-            this.createOreDrop(ModBlocks.DEEPSLATE_SCHEELITE_ORE.get(), ModItems.SCHEELITE.get())
+            ModBlocks.DEEPSLATE_GALENA_ORE,
+            this.createOreDrop(ModBlocks.DEEPSLATE_GALENA_ORE, ModItems.GALENA)
         )
         this.add(
-            ModBlocks.DEEPSLATE_SILVER_ORE.get(),
-            this.createOreDrop(ModBlocks.DEEPSLATE_SILVER_ORE.get(), ModItems.RAW_SILVER.get())
+            ModBlocks.DEEPSLATE_SCHEELITE_ORE,
+            this.createOreDrop(ModBlocks.DEEPSLATE_SCHEELITE_ORE, ModItems.SCHEELITE)
+        )
+        this.add(
+            ModBlocks.DEEPSLATE_SILVER_ORE,
+            this.createOreDrop(ModBlocks.DEEPSLATE_SILVER_ORE, ModItems.RAW_SILVER)
         )
 
         this.add(
-            ModBlocks.CONTAINER.get(), LootTable.lootTable().withPool(
+            ModBlocks.CONTAINER, LootTable.lootTable().withPool(
                 this.applyExplosionCondition(
-                    ModBlocks.CONTAINER.get(),
+                    ModBlocks.CONTAINER,
                     LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1f))
-                        .add(LootItem.lootTableItem(ModBlocks.CONTAINER.get()))
+                        .add(LootItem.lootTableItem(ModBlocks.CONTAINER))
                         .apply(
                             CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
                                 .include(DataComponents.BLOCK_ENTITY_DATA)
@@ -121,12 +121,12 @@ class ModBlockLootProvider(provider: HolderLookup.Provider) :
             )
         )
         this.add(
-            ModBlocks.SMALL_CONTAINER.get(), LootTable.lootTable().withPool(
+            ModBlocks.SMALL_CONTAINER, LootTable.lootTable().withPool(
                 this.applyExplosionCondition(
-                    ModBlocks.SMALL_CONTAINER.get(),
+                    ModBlocks.SMALL_CONTAINER,
                     LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1f))
-                        .add(LootItem.lootTableItem(ModBlocks.SMALL_CONTAINER.get()))
+                        .add(LootItem.lootTableItem(ModBlocks.SMALL_CONTAINER))
                         .apply(
                             CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
                                 .include(DataComponents.CONTAINER_LOOT)
@@ -135,11 +135,11 @@ class ModBlockLootProvider(provider: HolderLookup.Provider) :
             )
         )
         this.add(
-            ModBlocks.LUCKY_CONTAINER.get(), LootTable.lootTable().withPool(
+            ModBlocks.LUCKY_CONTAINER, LootTable.lootTable().withPool(
                 this.applyExplosionCondition(
-                    ModBlocks.LUCKY_CONTAINER.get(),
+                    ModBlocks.LUCKY_CONTAINER,
                     LootPool.lootPool().setRolls(ConstantValue.exactly(1f))
-                        .add(LootItem.lootTableItem(ModBlocks.LUCKY_CONTAINER.get()))
+                        .add(LootItem.lootTableItem(ModBlocks.LUCKY_CONTAINER))
                         .apply(
                             CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
                                 .include(DataComponents.BLOCK_ENTITY_DATA)
@@ -150,7 +150,7 @@ class ModBlockLootProvider(provider: HolderLookup.Provider) :
     }
 
     override fun getKnownBlocks(): Iterable<Block> {
-        return Iterable { ModBlocks.REGISTRY.getEntries().stream().map { it.get() }.iterator() }
+        return Iterable { ModBlocks.REGISTRY.getEntries().stream().map { it }.iterator() }
     }
 
     fun createCopyComponentsDrops(

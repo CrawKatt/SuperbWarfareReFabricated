@@ -3,7 +3,6 @@ package com.atsuishio.superbwarfare.entity.mixin
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.LivingEntity
-import net.neoforged.neoforge.common.damagesource.DamageContainer
 import java.util.*
 
 @Suppress("FunctionName")

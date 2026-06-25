@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.compat.clothconfig.client
 
-import com.atsuishio.superbwarfare.compat.clothconfig.ClothConfigHelper.save
 import com.atsuishio.superbwarfare.config.client.ReloadConfig
 import me.shedaniel.clothconfig2.api.ConfigBuilder
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder
@@ -17,7 +16,10 @@ object ReloadClothConfig {
                     ReloadConfig.LEFT_CLICK_RELOAD.get()
                 )
                 .setDefaultValue(true)
-                .setSaveConsumer(save(ReloadConfig.LEFT_CLICK_RELOAD))
+                .setSaveConsumer { v ->
+                    ReloadConfig.LEFT_CLICK_RELOAD.save()
+                    ReloadConfig.LEFT_CLICK_RELOAD.set(v)
+                }
                 .setTooltip(Component.translatable("config.superbwarfare.client.reload.left_click_reload.des")).build()
         )
     }

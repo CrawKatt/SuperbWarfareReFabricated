@@ -22,8 +22,9 @@ import net.minecraft.world.item.component.ItemAttributeModifiers
 import net.minecraft.world.level.Level
 
 open class RpgRocketStandardItem : Item(Properties().stacksTo(16)), DispenserLaunchable {
-    override fun getDefaultAttributeModifiers(stack: ItemStack): ItemAttributeModifiers {
-        val list = ArrayList(super.getDefaultAttributeModifiers(stack).modifiers())
+    @Deprecated("Deprecated in Java")
+    override fun getDefaultAttributeModifiers(): ItemAttributeModifiers {
+        val list = ArrayList(super.getDefaultAttributeModifiers().modifiers())
 
         list.addAll(
             listOf(

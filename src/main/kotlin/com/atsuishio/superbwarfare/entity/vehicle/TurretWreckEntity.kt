@@ -130,14 +130,14 @@ open class TurretWreckEntity(type: EntityType<TurretWreckEntity>, level: Level) 
             serverLevel.playSound(
                 null,
                 BlockPos.containing(position()),
-                ModSounds.HIT.get(),
+                ModSounds.HIT,
                 SoundSource.PLAYERS,
                 1f,
                 1f
             )
             ParticleTool.sendParticle(
                 serverLevel,
-                ModParticleTypes.FIRE_STAR.get(),
+                ModParticleTypes.FIRE_STAR,
                 position().x,
                 eyeY,
                 position().z,
@@ -215,7 +215,7 @@ open class TurretWreckEntity(type: EntityType<TurretWreckEntity>, level: Level) 
         var f = 0.98f
         if (this.onGround() || supportByVehicle) {
             val pos = this.blockPosBelowThatAffectsMyMovement
-            f = level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98f
+            f = level().getBlockState(pos).block.friction * 0.98f
 
 //            val targetRotation = Quaternionf().rotationXYZ(0f, -yRot * Mth.DEG_TO_RAD, 0f)
 //            val lerpFactor = 0.5f
@@ -331,7 +331,7 @@ open class TurretWreckEntity(type: EntityType<TurretWreckEntity>, level: Level) 
                 entries.forEach { entry ->
                     val random = Random.nextDouble()
                     val chance = if (type == WreckageLootData.Pool.Type.DEFAULT) {
-                        entry.chance * VehicleConfig.TURRET_WRECKAGE_LOOT_RATE.get()
+                        entry.chance * VehicleConfig.TURRET_WRECKAGE_LOOT_RATE.asDouble
                     } else {
                         entry.chance
                     }
@@ -444,7 +444,7 @@ open class TurretWreckEntity(type: EntityType<TurretWreckEntity>, level: Level) 
         if (verticalCollision) {
             if (Mth.abs(lastTickVerticalSpeed.toFloat()) > 0.4) {
                 if (!this.level().isClientSide) {
-                    this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE.get(), this.soundSource, 1f, 1f)
+                    this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE, this.soundSource, 1f, 1f)
                 }
                 this.bounceVertical(
                     Direction.getNearest(
@@ -465,7 +465,7 @@ open class TurretWreckEntity(type: EntityType<TurretWreckEntity>, level: Level) 
                 ).opposite
             )
             if (!this.level().isClientSide) {
-                this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE.get(), this.soundSource, 1f, 1f)
+                this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE, this.soundSource, 1f, 1f)
             }
         }
     }
@@ -537,7 +537,7 @@ open class TurretWreckEntity(type: EntityType<TurretWreckEntity>, level: Level) 
                 continue
             }
 
-            this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE.get(), this.soundSource, 1f, 1f)
+            this.level().playSound(null, this, ModSounds.VEHICLE_STRIKE, this.soundSource, 1f, 1f)
 
             entity.forceHurt(
                 ModDamageTypes.causeVehicleStrikeDamage(

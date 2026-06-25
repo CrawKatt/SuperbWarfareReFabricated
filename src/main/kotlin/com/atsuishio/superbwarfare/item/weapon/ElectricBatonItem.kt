@@ -90,7 +90,7 @@ class ElectricBatonItem : SwordItem(
         attacker.level().playSound(
             null,
             target.onPos,
-            ModSounds.MELEE_HIT.get(),
+            ModSounds.MELEE_HIT,
             SoundSource.PLAYERS,
             1f,
             ((2 * Math.random() - 1) * 0.1f + 1).toFloat()

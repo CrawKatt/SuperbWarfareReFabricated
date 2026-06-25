@@ -335,7 +335,7 @@ open class ClientGunImageTooltip(tooltip: GunImageComponent) : ClientTooltipComp
                 if (count > 5) continue
 
                 xOffset += 20
-                val ammoItem = perkInstance.perk.getItem().get()
+                val ammoItem = perkInstance.perk.getItem()
                 val perkStack = ammoItem.defaultInstance
 
                 val level = perkInstance.level.toInt()
@@ -386,7 +386,7 @@ open class ClientGunImageTooltip(tooltip: GunImageComponent) : ClientTooltipComp
             yOffset += 25
 
             val perkInstance = list[i]
-            val ammoItem = perkInstance.perk.getItem().get()
+            val ammoItem = perkInstance.perk.getItem()
             guiGraphics.renderItem(ammoItem.defaultInstance, x, y + 4 + yOffset)
 
             val id = perkInstance.perk.descriptionId

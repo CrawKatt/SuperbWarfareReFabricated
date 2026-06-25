@@ -47,13 +47,13 @@ class SbwJEIPlugin : IModPlugin {
     }
 
     override fun registerRecipeCatalysts(registration: IRecipeCatalystRegistration) {
-        registration.addRecipeCatalyst(ItemStack(ModItems.REFORGING_TABLE.get()), GunPerksCategory.TYPE)
+        registration.addRecipeCatalyst(ItemStack(ModItems.REFORGING_TABLE), GunPerksCategory.TYPE)
         registration.addRecipeCatalyst(
-            ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE.get()),
+            ItemStack(ModItems.VEHICLE_ASSEMBLING_TABLE),
             VehicleAssemblingCategory.TYPE
         )
         registration.addRecipeCatalyst(
-            ItemStack(ModItems.BLUEPRINT_RESEARCH_TABLE.get()),
+            ItemStack(ModItems.BLUEPRINT_RESEARCH_TABLE),
             ResearchingCategory.TYPE
         )
     }
@@ -68,22 +68,22 @@ class SbwJEIPlugin : IModPlugin {
         registration.addRecipes(GunPerksCategory.TYPE, guns)
         registration.addRecipes(
             VehicleAssemblingCategory.TYPE,
-            recipeManager.getAllRecipesFor(ModRecipes.VEHICLE_ASSEMBLING_TYPE.get())
+            recipeManager.getAllRecipesFor(ModRecipes.VEHICLE_ASSEMBLING_TYPE)
                 .map { it.value }
         )
 
         registration.addRecipes(
             ResearchingCategory.TYPE,
-            recipeManager.getAllRecipesFor(ModRecipes.RESEARCHING_TYPE.get())
+            recipeManager.getAllRecipesFor(ModRecipes.RESEARCHING_TYPE)
                 .map { it.value }
         )
 
         registration.addItemStackInfo(
-            ItemStack(ModItems.ANCIENT_CPU.get()),
+            ItemStack(ModItems.ANCIENT_CPU),
             Component.translatable("jei.superbwarfare.ancient_cpu")
         )
         registration.addItemStackInfo(
-            ItemStack(ModItems.CHARGING_STATION.get()),
+            ItemStack(ModItems.CHARGING_STATION),
             Component.translatable("jei.superbwarfare.charging_station")
         )
 
@@ -92,7 +92,7 @@ class SbwJEIPlugin : IModPlugin {
     }
 
     override fun registerItemSubtypes(registration: ISubtypeRegistration) {
-        registration.registerSubtypeInterpreter(ModItems.CONTAINER.get(), object : ISubtypeInterpreter<ItemStack> {
+        registration.registerSubtypeInterpreter(ModItems.CONTAINER, object : ISubtypeInterpreter<ItemStack> {
             override fun getSubtypeData(ingredient: ItemStack, context: UidContext): Any {
                 val data = ingredient.get(DataComponents.BLOCK_ENTITY_DATA)
                 val tag = if (data != null) data.copyTag() else CompoundTag()
@@ -110,7 +110,7 @@ class SbwJEIPlugin : IModPlugin {
         })
 
         registration.registerSubtypeInterpreter(
-            ModItems.POTION_MORTAR_SHELL.get(),
+            ModItems.POTION_MORTAR_SHELL,
             object : ISubtypeInterpreter<ItemStack> {
                 @ParametersAreNonnullByDefault
                 override fun getSubtypeData(ingredient: ItemStack, context: UidContext): Any? {
@@ -134,7 +134,7 @@ class SbwJEIPlugin : IModPlugin {
                 }
             })
 
-        registration.registerSubtypeInterpreter(ModItems.C4_BOMB.get(), object : ISubtypeInterpreter<ItemStack> {
+        registration.registerSubtypeInterpreter(ModItems.C4_BOMB, object : ISubtypeInterpreter<ItemStack> {
             @ParametersAreNonnullByDefault
             override fun getSubtypeData(ingredient: ItemStack, context: UidContext): Any {
                 return NBTTool.getTag(ingredient).getBoolean("Control")

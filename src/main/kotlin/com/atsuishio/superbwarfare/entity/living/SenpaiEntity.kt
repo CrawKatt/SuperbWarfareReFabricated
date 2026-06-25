@@ -98,19 +98,19 @@ open class SenpaiEntity(type: EntityType<SenpaiEntity>, level: Level) : Monster(
 
 
     public override fun getAmbientSound(): SoundEvent? {
-        return ModSounds.IDLE.get()
+        return ModSounds.IDLE
     }
 
     public override fun playStepSound(pos: BlockPos, blockIn: BlockState) {
-        this.playSound(ModSounds.STEP.get(), 0.25f, 1f)
+        this.playSound(ModSounds.STEP, 0.25f, 1f)
     }
 
     public override fun getHurtSound(ds: DamageSource): SoundEvent {
-        return ModSounds.OUCH.get()
+        return ModSounds.OUCH
     }
 
     public override fun getDeathSound(): SoundEvent {
-        return ModSounds.GROWL.get()
+        return ModSounds.GROWL
     }
 
     override fun baseTick() {
