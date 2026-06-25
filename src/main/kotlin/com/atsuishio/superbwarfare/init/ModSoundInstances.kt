@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.tools.mc
 import java.util.function.Consumer
 
 object ModSoundInstances {
+    @JvmStatic
     fun init() {
         VehicleEntity.playTrackSound =
             Consumer { mc.soundManager.play(VehicleSoundInstance.TrackSound(it)) }

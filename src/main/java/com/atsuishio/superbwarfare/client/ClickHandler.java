@@ -578,6 +578,7 @@ public class ClickHandler {
             var data = GunData.from(stack);
             var resource = GunResource.compute(stack);
 
+            /*
             // TODO 整合特殊处理
             if (!(stack.is(ModItems.BOCEK) || stack.is(ModItems.AURELIA_SCEPTRE))) {
                 if (!data.meleeOnly()) {
@@ -601,6 +602,7 @@ public class ClickHandler {
                     return;
                 }
             }
+            */
 
             if (!data.useBackpackAmmo() && !data.meleeOnly() && !data.hasEnoughAmmoToShoot(player) && data.reload.time() == 0) {
                 if (ReloadConfig.LEFT_CLICK_RELOAD.get()) {
@@ -625,7 +627,7 @@ public class ClickHandler {
                         if (ClientEventHandler.burstFireAmount == 0) {
                             noSprintTicks = 8;
                             player.setSprinting(false);
-                            ClientEventHandler.burstFireAmount = data.compute().burstAmount;
+                            ClientEventHandler.burstFireAmount = data.compute().getBurstAmount();
                         }
                     } else if (fireMode == FireMode.SEMI) {
                         if (ClientEventHandler.burstFireAmount == 0) {
@@ -663,7 +665,7 @@ public class ClickHandler {
         if (stack.getItem() instanceof GunItem) {
             var data = GunData.from(stack);
             var computed = data.compute();
-            if (computed.seekType == SeekType.HOLD_FIRE) {
+            if (computed.getSeekType() == SeekType.HOLD_FIRE) {
                 ClientEventHandler.stopWeaponSeekSound(Minecraft.getInstance().player);
             }
         }

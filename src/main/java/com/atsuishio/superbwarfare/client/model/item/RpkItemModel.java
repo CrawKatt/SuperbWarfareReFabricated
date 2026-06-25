@@ -35,7 +35,7 @@ public class RpkItemModel extends CustomGunModel<RpkItem> {
         double zp = ClientEventHandler.zoomPos;
         double zpz = ClientEventHandler.zoomPosZ;
 
-        double fp = ClientEventHandler.firePos;
+        double fp = ClientEventHandler.boltMove;
 
         int type = GunData.from(stack).attachment.get(AttachmentType.SCOPE);
 

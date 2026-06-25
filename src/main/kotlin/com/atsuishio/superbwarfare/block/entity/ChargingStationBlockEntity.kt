@@ -43,6 +43,7 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
     WorldlyContainer,
     MenuProvider {
 
+    @JvmField
     protected var items: NonNullList<ItemStack> = NonNullList.withSize(2, ItemStack.EMPTY)
 
     var fuelTick: Int = 0

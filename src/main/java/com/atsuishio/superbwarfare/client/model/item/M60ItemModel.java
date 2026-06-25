@@ -77,8 +77,8 @@ public class M60ItemModel extends CustomGunModel<M60Item> {
         double zp = ClientEventHandler.zoomPos;
         double zpz = ClientEventHandler.zoomPosZ;
 
-        double fp = ClientEventHandler.firePos;
-        double fr = ClientEventHandler.fireRot;
+        double fp = ClientEventHandler.boltMove;
+        double fr = ClientEventHandler.boltMove;
 
         gun.setPosX(3.74f * (float) zp);
 

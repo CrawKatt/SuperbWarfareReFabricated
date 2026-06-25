@@ -27,6 +27,7 @@ object ClothConfigHelper {
             return root
         }
 
+    @JvmStatic
     fun getConfigScreen(parent: Screen?): Screen {
         return configBuilder.setParentScreen(parent).build()
     }

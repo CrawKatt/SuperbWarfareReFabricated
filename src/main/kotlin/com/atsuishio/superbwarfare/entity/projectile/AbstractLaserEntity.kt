@@ -31,7 +31,10 @@ import kotlin.math.sin
  */
 abstract class AbstractLaserEntity(type: EntityType<*>, level: Level, countDown: Int) : Entity(type, level), TraceableEntity {
     var caster: LivingEntity? = null
+    @JvmField
     var yaw: Float = 0f
+
+    @JvmField
     var pitch: Float = 0f
     var preYaw: Float = 0f
     var prePitch: Float = 0f

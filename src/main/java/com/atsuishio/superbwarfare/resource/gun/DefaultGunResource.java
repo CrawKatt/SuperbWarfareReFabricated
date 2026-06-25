@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.resource.gun;
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.data.IDBasedData;
 import com.atsuishio.superbwarfare.data.ModColor;
+import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.resource.ModelResource;
 import com.google.gson.annotations.SerializedName;
 import net.minecraft.sounds.SoundEvent;

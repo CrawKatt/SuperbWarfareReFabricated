@@ -16,6 +16,7 @@ open class AmmoPerk : Perk {
     val bypassArmorRate: Double
     val damageRate: Double
     val speedRate: Double
+    @JvmField
     val slug: Boolean
     val rgb: FloatArray
     val hideParticle: Boolean

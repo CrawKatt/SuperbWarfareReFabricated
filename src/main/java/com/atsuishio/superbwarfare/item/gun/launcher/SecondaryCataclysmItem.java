@@ -1,5 +1,7 @@
 package com.atsuishio.superbwarfare.item.gun.launcher;
 
+import com.atsuishio.superbwarfare.init.ModSounds;
+import com.atsuishio.superbwarfare.item.material.BatteryItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
@@ -12,7 +14,6 @@ import com.atsuishio.superbwarfare.data.gun.ShootParameters;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.init.ModEnumExtensions;
-import com.atsuishio.superbwarfare.item.BatteryItem;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
@@ -185,7 +186,7 @@ public class SecondaryCataclysmItem extends GunGeoItem {
         var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
 
         if (cap != null && cap.getEnergyStored() > 3000 && zoom) {
-            float soundRadius = (float) data.compute().soundRadius;
+            float soundRadius = (float) data.compute().getSoundRadius();
 
             shooter.playSound(ModSounds.SECONDARY_CATACLYSM_FIRE_3P_CHARGE, soundRadius * 0.4f, 1f);
             shooter.playSound(ModSounds.SECONDARY_CATACLYSM_FAR_CHARGE, soundRadius * 0.7f, 1f);

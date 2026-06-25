@@ -13,11 +13,11 @@ public class VehicleDataTool {
                 return;
             }
 
-            ServerPlayNetworking.send(player, VehiclesDataMessage.create());
+            ServerPlayNetworking.send(player, VehiclesDataMessage.Companion.create());
         });
 
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, serverResourceManager, success) -> {
-            var message = VehiclesDataMessage.create();
+            var message = VehiclesDataMessage.Companion.create();
             for (var player : server.getPlayerList().getPlayers()) {
                 if (server.isSingleplayerOwner(player.getGameProfile())) {
                     continue;

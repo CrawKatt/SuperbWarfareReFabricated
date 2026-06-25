@@ -15,6 +15,7 @@ open class VehicleContainerHandler(
 ) : IItemHandler {
     protected var stacks: NonNullList<ItemStack> = NonNullList.withSize(size, ItemStack.EMPTY)
 
+    @get:JvmName("getSlotCount")
     val slots: Int
         get() = stacks.size
 

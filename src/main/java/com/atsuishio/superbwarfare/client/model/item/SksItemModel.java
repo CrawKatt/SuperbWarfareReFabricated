@@ -28,7 +28,7 @@ public class SksItemModel extends CustomGunModel<SksItem> {
         double zt = ClientEventHandler.zoomTime;
         double zp = ClientEventHandler.zoomPos;
         double zpz = ClientEventHandler.zoomPosZ;
-        double fp = ClientEventHandler.firePos;
+        double fp = ClientEventHandler.boltMove;
 
         gun.setPosX(1.53f * (float) zp);
         gun.setPosY(0.34f * (float) zp - (float) (0.6f * zpz));

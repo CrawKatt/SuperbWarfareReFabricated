@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.sniper;
 
+import com.atsuishio.superbwarfare.init.ModSounds;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
@@ -127,7 +128,7 @@ public class SentinelItem extends GunGeoItem {
         var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
 
         if (cap != null && cap.getEnergyStored() > 0) {
-            float soundRadius = (float) data.compute().soundRadius;
+            float soundRadius = (float) data.compute().getSoundRadius();
 
             shooter.playSound(ModSounds.SENTINEL_CHARGE_FAR, soundRadius * 0.7f, 1f);
             shooter.playSound(ModSounds.SENTINEL_CHARGE_FIRE_3P, soundRadius * 0.4f, 1f);

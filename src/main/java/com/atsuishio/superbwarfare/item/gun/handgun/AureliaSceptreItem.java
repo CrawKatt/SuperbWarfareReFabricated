@@ -49,7 +49,7 @@ public class AureliaSceptreItem extends GunGeoItem {
     public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
         if (!stack.isEmpty()) {
             if (entityLiving.getUsedItemHand() == hand) {
-                return ModEnumExtensions.Client.getAureliaSceptrePose();
+                //return ModEnumExtensions.Client.getAureliaSceptrePose();
             }
         }
         return HumanoidModel.ArmPose.EMPTY;
