@@ -27,7 +27,7 @@ class ResearchingCategory(helper: IGuiHelper) : IRecipeCategory<ResearchingRecip
         .build()
     private val icon: IDrawable = helper.createDrawableIngredient(
         VanillaTypes.ITEM_STACK,
-        ItemStack(ModItems.BLUEPRINT_RESEARCH_TABLE.get())
+        ItemStack(ModItems.BLUEPRINT_RESEARCH_TABLE)
     )
     private val progress: IDrawableAnimated = helper.drawableBuilder(TEXTURE, 0, 59, 128, 32)
         .setTextureSize(256, 128)

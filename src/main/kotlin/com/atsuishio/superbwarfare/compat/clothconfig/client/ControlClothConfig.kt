@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.compat.clothconfig.client
 
-import com.atsuishio.superbwarfare.compat.clothconfig.ClothConfigHelper.save
 import com.atsuishio.superbwarfare.config.client.ControlConfig
 import me.shedaniel.clothconfig2.api.ConfigBuilder
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder

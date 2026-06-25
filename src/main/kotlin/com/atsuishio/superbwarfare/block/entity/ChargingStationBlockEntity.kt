@@ -6,7 +6,7 @@ import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
 import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModCapabilities
-import com.atsuishio.superbwarfare.menu.ChargingStationMenu
+import com.atsuishio.superbwarfare.inventory.menu.ChargingStationMenu
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData
 import com.atsuishio.superbwarfare.tools.isSameItemStack
 import net.minecraft.core.BlockPos

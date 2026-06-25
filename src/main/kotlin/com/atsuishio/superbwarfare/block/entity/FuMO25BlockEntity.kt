@@ -8,7 +8,7 @@ import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModSounds
-import com.atsuishio.superbwarfare.menu.FuMO25Menu
+import com.atsuishio.superbwarfare.inventory.menu.FuMO25Menu
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData
 import com.atsuishio.superbwarfare.network.message.receive.EntitySyncMessage
 import com.atsuishio.superbwarfare.tools.SeekTool
