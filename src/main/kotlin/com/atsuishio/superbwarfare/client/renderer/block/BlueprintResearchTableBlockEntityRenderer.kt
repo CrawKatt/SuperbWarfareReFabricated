@@ -68,19 +68,8 @@ class BlueprintResearchTableBlockEntityRenderer : BlockEntityRenderer<BlueprintR
         return pBlockEntity.blockState.getValue(BlueprintResearchTableBlock.PART) == BedPart.FOOT
     }
 
-    override fun getRenderBoundingBox(blockEntity: BlueprintResearchTableBlockEntity): AABB {
-        val worldPosition = blockEntity.blockPos
-
-        // 创建一个更大的边界框（示例：覆盖从方块底部到顶部上方2格的范围）
-        val expansion = 2.0 // 根据模型实际大小调整
-        return AABB(
-            (worldPosition.x - 1).toDouble(),
-            worldPosition.y.toDouble(),
-            (worldPosition.z - 1).toDouble(),
-            (worldPosition.x + 2).toDouble(),
-            worldPosition.y + expansion,
-            (worldPosition.z + 2).toDouble()
-        )
+    override fun shouldRenderOffScreen(blockEntity: BlueprintResearchTableBlockEntity): Boolean {
+        return blockEntity.blockState.getValue(BlueprintResearchTableBlock.PART) == BedPart.FOOT
     }
 
     companion object {

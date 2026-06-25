@@ -6,22 +6,24 @@ import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.mc
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.HitResult
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent
 
-@EventBusSubscriber(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object ContainerBlockPreview {
-    @SubscribeEvent
-    fun render(event: RenderLevelStageEvent) {
-        if (event.stage != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) return
+    @JvmStatic
+    fun init() {
+        WorldRenderEvents.AFTER_TRANSLUCENT.register(ContainerBlockPreview::render)
+    }
 
+    fun render(context: WorldRenderContext) {
         val player = localPlayer ?: return
         // 仅在手持撬棍时检测
         val item = player.mainHandItem
@@ -34,8 +36,8 @@ object ContainerBlockPreview {
         val distance = 32
         val start = player.position().add(0.0, player.eyeHeight.toDouble(), 0.0)
         val end = player.position().add(look.x * distance, look.y * distance + player.eyeHeight, look.z * distance)
-        val context = ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player)
-        val result = player.level().clip(context)
+        val clipContext = ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player)
+        val result = player.level().clip(clipContext)
 
         if (result.type == HitResult.Type.MISS) return
 
@@ -60,11 +62,11 @@ object ContainerBlockPreview {
         }
         if (w == 0 || h == 0) return
 
-        val poseStack = event.poseStack
-        poseStack.pushPose()
+        val poseStack = context.matrixStack()
+        poseStack?.pushPose()
         val pos = blockEntity.blockPos
         val view = mc.gameRenderer.mainCamera.position
-        poseStack.translate(pos.x - view.x, pos.y - view.y + 1, pos.z - view.z)
+        poseStack?.translate(pos.x - view.x, pos.y - view.y + 1, pos.z - view.z)
 
         // 什么b位置
         val aabb = AABB(pos)
@@ -87,7 +89,7 @@ object ContainerBlockPreview {
         val alpha = 0.2f
 
         val builder = Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(ModRenderTypes.BLOCK_OVERLAY)
-        val m4f = poseStack.last().pose()
+        val m4f = poseStack?.last()!!.pose()
 
 
         // east
