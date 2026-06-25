@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.item.weapon
 
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModMobEffects
 import com.atsuishio.superbwarfare.init.ModSounds
@@ -21,7 +22,6 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.SwordItem
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
-import net.neoforged.neoforge.capabilities.Capabilities
 import org.joml.Math
 import java.util.*
 import kotlin.math.roundToInt
@@ -72,7 +72,7 @@ class ElectricBatonItem : SwordItem(
 
     override fun getBarWidth(stack: ItemStack): Int {
         if (NBTTool.getTag(stack).getBoolean(TAG_OPEN)) {
-            val cap = stack.getCapability(Capabilities.EnergyStorage.ITEM) ?: return 0
+            val cap = ModCapabilities.ENERGY_ITEM.find(stack, null) ?: return 0
 
             return (cap.energyStored.toFloat() * 13f / MAX_ENERGY).roundToInt()
         } else {
@@ -97,7 +97,7 @@ class ElectricBatonItem : SwordItem(
         )
 
         if (NBTTool.getTag(stack).getBoolean(TAG_OPEN)) {
-            val cap = stack.getCapability(Capabilities.EnergyStorage.ITEM)
+            val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
             if (cap != null && cap.energyStored >= ENERGY_COST) {
                 cap.extractEnergy(ENERGY_COST, false)
 
@@ -120,9 +120,9 @@ class ElectricBatonItem : SwordItem(
 
         @JvmStatic
         fun makeFullEnergyStack(): ItemStack {
-            val stack = ItemStack(ModItems.ELECTRIC_BATON.get())
+            val stack = ItemStack(ModItems.ELECTRIC_BATON)
 
-            val cap = stack.getCapability(Capabilities.EnergyStorage.ITEM)
+            val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
             cap?.receiveEnergy(MAX_ENERGY, false)
 
             val tag = NBTTool.getTag(stack)

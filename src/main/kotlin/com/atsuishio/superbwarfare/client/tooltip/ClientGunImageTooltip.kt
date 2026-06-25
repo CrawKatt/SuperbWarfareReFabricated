@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.data.gun.FireMode
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.GunProp
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModKeyMappings
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.perk.Perk
@@ -20,7 +21,6 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
-import net.neoforged.neoforge.capabilities.Capabilities
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -75,7 +75,7 @@ open class ClientGunImageTooltip(tooltip: GunImageComponent) : ClientTooltipComp
     }
 
     protected fun shouldRenderEnergyTooltip(): Boolean {
-        val cap = stack.getCapability(Capabilities.EnergyStorage.ITEM)
+        val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
         return cap != null && cap.maxEnergyStored > 0
     }
 
@@ -269,7 +269,7 @@ open class ClientGunImageTooltip(tooltip: GunImageComponent) : ClientTooltipComp
          * 获取武器能量文本组件
          */
         get() {
-            val storage = stack.getCapability(Capabilities.EnergyStorage.ITEM)
+            val storage = ModCapabilities.ENERGY_ITEM.find(stack, null)
             checkNotNull(storage)
 
             val energy = storage.energyStored

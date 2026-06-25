@@ -36,7 +36,7 @@ import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.client.event.InputEvent
 import net.neoforged.neoforge.client.settings.KeyConflictContext
 import org.lwjgl.glfw.GLFW
-import top.theillusivec4.curios.api.CuriosApi
+import dev.emi.trinkets.api.TrinketsApi
 
 @EventBusSubscriber(Dist.CLIENT)
 object ClickEventHandler {
@@ -268,8 +268,8 @@ object ClickEventHandler {
                     return
                 }
 
-                CuriosApi.getCuriosInventory(player).ifPresent {
-                    it.findFirstCurio(ModItems.THERMAL_IMAGING_GOGGLES.get()).ifPresent {
+                TrinketsApi.getTrinketComponent(player).ifPresent {
+                    if (it.isEquipped(ModItems.THERMAL_IMAGING_GOGGLES)) {
                         ClientEventHandler.activeThermalImaging = !ClientEventHandler.activeThermalImaging
                         if (ClientEventHandler.activeThermalImaging) {
                             player.playSound(ModSounds.NIGHT_VISION_ACTIVATE.get())

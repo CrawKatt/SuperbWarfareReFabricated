@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.network.message.send
 
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.GunProp
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.gun.GunItem
@@ -9,7 +10,6 @@ import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.network.ServerPacketPayload
 import com.atsuishio.superbwarfare.tools.SoundTool
 import kotlinx.serialization.Serializable
-import net.neoforged.neoforge.capabilities.Capabilities
 
 @Serializable
 data class FireModeMessage(val forward: Boolean) : ServerPacketPayload() {
@@ -38,7 +38,7 @@ data class FireModeMessage(val forward: Boolean) : ServerPacketPayload() {
         ) {
             for (cell in player.getInventory().items) {
                 if (cell.`is`(ModItems.CELL)) {
-                    val cap = cell.getCapability(Capabilities.EnergyStorage.ITEM)
+                    val cap = ModCapabilities.ENERGY_ITEM.find(cell, null)
                     if (cap != null && cap.energyStored > 0) {
                         data.charge.starter.markStart()
                     }

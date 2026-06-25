@@ -22,11 +22,8 @@ import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import org.joml.Math
 
-@OnlyIn(Dist.CLIENT)
 object LandVehicleHud {
     const val ID: String = "@Land"
 

@@ -139,7 +139,7 @@
   "item.superbwarfare.he_head": "Ogive HE",
   "item.superbwarfare.cannon_core": "Noyau de canon",
   "item.superbwarfare.dog_tag": "Plaque d'identité",
-  "curios.identifier.dog_tag": "Plaque d'identité",
+  "trinkets.slot.chest.dog_tag": "Plaque d'identité",
   "item.superbwarfare.cell": "Pile",
   "item.superbwarfare.battery": "Batterie",
   "item.superbwarfare.small_battery_pack": "Petit pack de batteries",

@@ -9,10 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Mth
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 
-@OnlyIn(Dist.CLIENT)
 object StaminaOverlay : CommonOverlay("stamina") {
 
     override fun shouldRender() =

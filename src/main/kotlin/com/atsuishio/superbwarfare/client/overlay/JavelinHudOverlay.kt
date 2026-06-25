@@ -17,11 +17,8 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Mth
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import kotlin.math.min
 
-@OnlyIn(Dist.CLIENT)
 object JavelinHudOverlay : CommonOverlay("javelin_hud") {
     private val FRAME = loc("textures/overlay/frame/frame.png")
     private val FRAME_TARGET = loc("textures/overlay/frame/frame_target_triangle.png")
@@ -44,7 +41,7 @@ object JavelinHudOverlay : CommonOverlay("javelin_hud") {
         val vehicle = player.vehicle
         if (vehicle is VehicleEntity && vehicle.banHand(player)) return
 
-        if (stack.item === ModItems.JAVELIN.get() && ClientEventHandler.zoomPos > 0.8 && isFirstPerson && ClientEventHandler.zoom) {
+        if (stack.item === ModItems.JAVELIN && ClientEventHandler.zoomPos > 0.8 && isFirstPerson && ClientEventHandler.zoom) {
             val data = from(stack)
             val tag = data.tag()
 

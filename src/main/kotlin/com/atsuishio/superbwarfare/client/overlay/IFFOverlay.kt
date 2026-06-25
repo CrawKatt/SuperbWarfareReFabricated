@@ -27,15 +27,8 @@ import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.ClientTickEvent
-import top.theillusivec4.curios.api.CuriosApi
+import dev.emi.trinkets.api.TrinketsApi
 
-@OnlyIn(Dist.CLIENT)
-@EventBusSubscriber(Dist.CLIENT)
 object IFFOverlay : CommonOverlay("iff") {
     val FRIENDLY_INDICATOR = loc("textures/overlay/teammate/friendly_indicator.png")
     val FRIENDLY_AIRCRAFT = loc("textures/overlay/teammate/friendly_aircraft.png")
@@ -52,12 +45,11 @@ object IFFOverlay : CommonOverlay("iff") {
     val FRIENDLY_MISSILE = loc("textures/overlay/teammate/friendly_missile.png")
     val FRIENDLY_MAID = loc("textures/overlay/teammate/friendly_maid.png")
 
-    @SubscribeEvent
-    fun onIFFClientTick(event: ClientTickEvent.Post) {
+    fun onIFFClientTick() {
         val player = localPlayer ?: return
         val level = clientLevel ?: return
-        CuriosApi.getCuriosInventory(player)
-            .flatMap { c -> c.findFirstCurio(ModItems.IFF.get()) }
+        TrinketsApi.getTrinketComponent(player)
+            .flatMap { c -> c.getEquipped(ModItems.IFF).stream().findFirst() }
             .ifPresent { _ ->
                 val clientEntities = SeekTool.Builder(player)
                     .friendly()
@@ -85,8 +77,8 @@ object IFFOverlay : CommonOverlay("iff") {
         val poseStack = guiGraphics.pose()
         poseStack.pushPose()
 
-        CuriosApi.getCuriosInventory(player)
-            .flatMap { c -> c.findFirstCurio(ModItems.IFF.get()) }
+        TrinketsApi.getTrinketComponent(player)
+            .flatMap { c -> c.getEquipped(ModItems.IFF).stream().findFirst() }
             .ifPresent { _ ->
                 val entities = ClientSyncedEntityHandler.getSyncedEntities(level)
                 for (entity in entities) {

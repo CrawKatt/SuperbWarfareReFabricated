@@ -18,24 +18,16 @@ import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.ClientTickEvent
 import kotlin.math.max
 
-@OnlyIn(Dist.CLIENT)
-@EventBusSubscriber(Dist.CLIENT)
 object Type63InfoOverlay : CommonOverlay("type_63_info") {
-    private val AP by lazy { ItemStack(ModItems.MEDIUM_ROCKET_AP.get()) }
-    private val HE by lazy { ItemStack(ModItems.MEDIUM_ROCKET_HE.get()) }
-    private val CM by lazy { ItemStack(ModItems.MEDIUM_ROCKET_CM.get()) }
+    private val AP by lazy { ItemStack(ModItems.MEDIUM_ROCKET_AP) }
+    private val HE by lazy { ItemStack(ModItems.MEDIUM_ROCKET_HE) }
+    private val CM by lazy { ItemStack(ModItems.MEDIUM_ROCKET_CM) }
 
     private var lookingEntity: Type63Entity? = null
 
-    @SubscribeEvent
-    fun tracingEntity(event: ClientTickEvent.Post) {
+    fun tracingEntity() {
         val player = localPlayer ?: return
         val entity = TraceTool.findLookingEntity(player, player.getEntityReach())
         lookingEntity = entity as? Type63Entity

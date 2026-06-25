@@ -10,11 +10,8 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.CameraType
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.util.Mth
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import kotlin.math.min
 
-@OnlyIn(Dist.CLIENT)
 object TowOverlay : CommonOverlay("tow") {
     private val SPYGLASS = loc("textures/overlay/spyglass/spyglass.png")
 

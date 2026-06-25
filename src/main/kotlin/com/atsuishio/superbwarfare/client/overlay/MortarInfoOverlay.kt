@@ -9,10 +9,7 @@ import com.atsuishio.superbwarfare.tools.TraceTool
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.plus
 import net.minecraft.network.chat.Component
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 
-@OnlyIn(Dist.CLIENT)
 object MortarInfoOverlay : CommonOverlay("mortar_info") {
     val BASE_POINT = CENTER.offset(-90F, -26F)
     val PITCH = StringComponent(BASE_POINT)

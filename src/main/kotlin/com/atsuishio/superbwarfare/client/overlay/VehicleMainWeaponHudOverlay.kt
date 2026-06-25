@@ -23,19 +23,12 @@ import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.ClientTickEvent
 import kotlin.math.cos
 import kotlin.math.sin
 
 /**
  * 控制载具主武器的玩家显示的HUD
  */
-@OnlyIn(Dist.CLIENT)
-@EventBusSubscriber(Dist.CLIENT)
 object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
     const val EMPTY = "@Empty"
 
@@ -61,8 +54,7 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
 
     override fun shouldRender() = super.shouldRender() && !ClientEventHandler.isEditing
 
-    @SubscribeEvent
-    fun onVehicleMainWeaponHudOverlayClientTick(event: ClientTickEvent.Post) {
+    fun onVehicleMainWeaponHudOverlayClientTick() {
         val player = localPlayer ?: return
         val vehicle = player.vehicle
         if (vehicle !is VehicleEntity) return

@@ -27,8 +27,6 @@ import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.item.component.ItemAttributeModifiers
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import javax.annotation.ParametersAreNonnullByDefault
 
 open class MonitorItem : Item(Properties().stacksTo(1)) {
@@ -98,7 +96,6 @@ open class MonitorItem : Item(Properties().stacksTo(1)) {
         return ItemAttributeModifiers(list, true)
     }
 
-    @OnlyIn(Dist.CLIENT)
     @ParametersAreNonnullByDefault
     override fun appendHoverText(
         stack: ItemStack,

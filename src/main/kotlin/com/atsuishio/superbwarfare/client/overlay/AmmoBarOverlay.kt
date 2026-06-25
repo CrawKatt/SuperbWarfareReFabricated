@@ -10,6 +10,7 @@ import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModKeyMappings
 import com.atsuishio.superbwarfare.item.gun.GunItem
@@ -21,13 +22,9 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.neoforge.capabilities.Capabilities
 import java.util.regex.Pattern
 import kotlin.math.max
 
-@OnlyIn(Dist.CLIENT)
 object AmmoBarOverlay : CommonOverlay("ammo_bar") {
 
     private val LINE = loc("textures/overlay/ammo_bar/fire_mode/line.png")
@@ -68,7 +65,7 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
             val font = Minecraft.getInstance().font
 
             // 渲染开火模式切换按键
-            if (item !== ModItems.MINIGUN.get()) {
+            if (item !== ModItems.MINIGUN) {
                 val str = "[${ModKeyMappings.FIRE_MODE.key.displayName.string}]"
                 guiGraphics.drawString(
                     font,
@@ -97,7 +94,7 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
                 )
             }
 
-            if (item === ModItems.MINIGUN.get()) {
+            if (item === ModItems.MINIGUN) {
                 fireMode = MOUSE
                 // 渲染加特林射速
                 guiGraphics.drawString(
@@ -178,11 +175,11 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
                     if (consumerType == AmmoConsumeType.PLAYER_AMMO) {
                         val ammoType = ammoConsumer.playerAmmoType!!
                         ammoStack = when (ammoType) {
-                            Ammo.HANDGUN -> ItemStack(ModItems.HANDGUN_AMMO.get())
-                            Ammo.RIFLE -> ItemStack(ModItems.RIFLE_AMMO.get())
-                            Ammo.SHOTGUN -> ItemStack(ModItems.SHOTGUN_AMMO.get())
-                            Ammo.SNIPER -> ItemStack(ModItems.SNIPER_AMMO.get())
-                            Ammo.HEAVY -> ItemStack(ModItems.HEAVY_AMMO.get())
+                            Ammo.HANDGUN -> ItemStack(ModItems.HANDGUN_AMMO)
+                            Ammo.RIFLE -> ItemStack(ModItems.RIFLE_AMMO)
+                            Ammo.SHOTGUN -> ItemStack(ModItems.SHOTGUN_AMMO)
+                            Ammo.SNIPER -> ItemStack(ModItems.SNIPER_AMMO)
+                            Ammo.HEAVY -> ItemStack(ModItems.HEAVY_AMMO)
                         }
                     } else {
                         ammoStack = ammoConsumer.stack()
@@ -363,7 +360,7 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
 
     private fun getGunAmmoString(data: GunData, player: Player?): String {
         if (data.selectedAmmoConsumer().type == AmmoConsumeType.ENERGY) {
-            val storage = data.stack.getCapability(Capabilities.EnergyStorage.ITEM)
+            val storage = ModCapabilities.ENERGY_ITEM.find(data.stack, null)
             val energy = if (storage == null) 0.0 else Mth.clamp(
                 storage.energyStored.toDouble() / max(
                     1,

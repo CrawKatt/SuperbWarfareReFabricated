@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.client.tooltip
 
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
@@ -8,7 +9,6 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
-import net.neoforged.neoforge.capabilities.Capabilities
 import kotlin.math.max
 
 open class ClientCellImageTooltip(tooltip: CellImageComponent) : ClientTooltipComponent {
@@ -26,7 +26,7 @@ open class ClientCellImageTooltip(tooltip: CellImageComponent) : ClientTooltipCo
     }
 
     protected fun shouldRenderEnergyTooltip(): Boolean {
-        return stack.getCapability(Capabilities.EnergyStorage.ITEM) != null
+        return ModCapabilities.ENERGY_ITEM.find(stack, null) != null
     }
 
     protected fun renderEnergyTooltip(font: Font, guiGraphics: GuiGraphics, x: Int, y: Int) {
@@ -35,7 +35,7 @@ open class ClientCellImageTooltip(tooltip: CellImageComponent) : ClientTooltipCo
 
     protected val energyComponent: Component
         get() {
-            val storage = stack.getCapability(Capabilities.EnergyStorage.ITEM)
+            val storage = ModCapabilities.ENERGY_ITEM.find(stack, null)
             checkNotNull(storage)
             val energy = storage.energyStored
             val maxEnergy = storage.maxEnergyStored

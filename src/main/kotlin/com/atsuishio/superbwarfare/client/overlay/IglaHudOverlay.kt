@@ -18,11 +18,8 @@ import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import kotlin.math.min
 
-@OnlyIn(Dist.CLIENT)
 object IglaHudOverlay : CommonOverlay("igla_9k38_hud") {
     private val FRAME = loc("textures/overlay/frame/frame_diamond.png")
     private val PART_1 = loc("textures/overlay/igla_9k38/part_1.png")
@@ -45,7 +42,7 @@ object IglaHudOverlay : CommonOverlay("igla_9k38_hud") {
         val vehicle = player.vehicle
         if (vehicle is VehicleEntity && vehicle.banHand(player)) return
 
-        if (stack.item === ModItems.IGLA_9K38.get() && ClientEventHandler.zoomPos > 0.83 && isFirstPerson && ClientEventHandler.zoom) {
+        if (stack.item === ModItems.IGLA_9K38 && ClientEventHandler.zoomPos > 0.83 && isFirstPerson && ClientEventHandler.zoom) {
             val data = from(stack)
 
             poseStack.pushPose()

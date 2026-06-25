@@ -24,15 +24,8 @@ import net.minecraft.util.Mth
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.ClientTickEvent
 import org.joml.Math
 
-@OnlyIn(Dist.CLIENT)
-@EventBusSubscriber(Dist.CLIENT)
 object OldAircraftHud {
     const val ID: String = "@OldAircraft"
 
@@ -54,8 +47,7 @@ object OldAircraftHud {
 
     private var dis = 512.0
 
-    @SubscribeEvent
-    fun onOldAircraftHudClientTick(event: ClientTickEvent.Post) {
+    fun onOldAircraftHudClientTick() {
         val player = localPlayer ?: return
         val vehicle = player.vehicle
         if (vehicle !is VehicleEntity) return

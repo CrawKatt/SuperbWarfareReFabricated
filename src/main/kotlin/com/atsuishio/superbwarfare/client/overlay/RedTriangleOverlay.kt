@@ -10,10 +10,7 @@ import com.atsuishio.superbwarfare.tools.worldToScreen
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 
-@OnlyIn(Dist.CLIENT)
 object RedTriangleOverlay : CommonOverlay("red_triangle") {
     private val TRIANGLE = loc("textures/overlay/rpg/red_triangle.png")
 
@@ -24,7 +21,7 @@ object RedTriangleOverlay : CommonOverlay("red_triangle") {
         if (vehicle is VehicleEntity && vehicle.banHand(player)) return
 
         val stack = player.mainHandItem
-        if (stack.`is`(ModItems.RPG.get()) && from(stack).selectedAmmoType.get() == 0) {
+        if (stack.`is`(ModItems.RPG) && from(stack).selectedAmmoType.get() == 0) {
             val idf = SeekTool.seekLivingEntity(player, 128.0, 6.0) ?: return
 
             val distance = idf.position().distanceTo(cameraPos)

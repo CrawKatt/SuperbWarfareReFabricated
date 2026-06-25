@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.network.ServerPacketPayload
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedUUID
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.sendPacketTo
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback
 import kotlinx.serialization.Serializable
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket
 import net.minecraft.server.level.ServerLevel
@@ -14,12 +15,12 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.stats.Stats
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.enchantment.EnchantmentHelper
-import net.neoforged.neoforge.common.CommonHooks
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -39,7 +40,10 @@ data class MeleeAttackMessage(val uuidList: List<SerializedUUID>) : ServerPacket
     fun attack(attacker: Player, targets: List<Entity>) {
         var hurtCount = 0
         targets.forEachIndexed { index, target ->
-            if (!CommonHooks.onPlayerAttackTarget(attacker, target)) return@forEachIndexed
+            if (
+                AttackEntityCallback.EVENT.invoker()
+                    .interact(attacker, attacker.level(), InteractionHand.MAIN_HAND, target, null) != InteractionResult.PASS
+            ) return@forEachIndexed
             if (!target.isAttackable) return@forEachIndexed
             if (target.skipAttackInteraction(attacker)) return@forEachIndexed
 

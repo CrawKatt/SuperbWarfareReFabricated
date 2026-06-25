@@ -13,11 +13,8 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.util.FastColor
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import kotlin.math.roundToInt
 
-@OnlyIn(Dist.CLIENT)
 object AmmoCountOverlay : CommonOverlay("ammo_count") {
 
     private val ammoInfoTimer: AnimationTimer = AnimationTimer(500, 2000)
@@ -41,14 +38,14 @@ object AmmoCountOverlay : CommonOverlay("ammo_count") {
         val currentTime = System.currentTimeMillis()
         val stack = player.mainHandItem
         val vehicle = player.vehicle
-        if ((stack.item is AmmoSupplierItem || stack.item === ModItems.AMMO_BOX.get())
+        if ((stack.item is AmmoSupplierItem || stack.item === ModItems.AMMO_BOX)
             && !(vehicle is VehicleEntity && vehicle.banHand(player))
         ) {
             // 刚拿出弹药物品时，视为开始弹药信息渲染
             startRenderingAmmoInfo = ammoInfoTimer.getProgress(currentTime) == 0f
             ammoInfoTimer.forward(currentTime)
 
-            if (stack.item === ModItems.AMMO_BOX.get()) {
+            if (stack.item === ModItems.AMMO_BOX) {
                 isAmmoBox = true
                 ammoBoxTimer.forward(currentTime)
             } else {

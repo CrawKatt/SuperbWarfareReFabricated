@@ -142,7 +142,7 @@
     "item.superbwarfare.he_head": "Testata HE",
     "item.superbwarfare.cannon_core": "Basamento del cannone",
     "item.superbwarfare.dog_tag": "Gettone",
-    "curios.identifier.dog_tag": "Gettone",
+    "trinkets.slot.chest.dog_tag": "Gettone",
     "item.superbwarfare.cell": "Batteria piccolo",
     "item.superbwarfare.battery": "Batteria grande",
     "item.superbwarfare.small_battery_pack": "Accumulatore piccolo",

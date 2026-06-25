@@ -26,12 +26,9 @@ import net.minecraft.util.Mth
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import kotlin.math.max
 import kotlin.math.min
 
-@OnlyIn(Dist.CLIENT)
 object CrossHairOverlay : CommonOverlay("cross_hair") {
     const val CROSSHAIR_EMPTY: String = "@Empty"
     const val CROSSHAIR_CUSTOM: String = "@Custom"

@@ -1,38 +1,35 @@
 package com.atsuishio.superbwarfare.client.language
 
+import com.atsuishio.superbwarfare.Mod
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.minecraft.client.resources.language.ClientLanguage
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.packs.PackType
 import net.minecraft.server.packs.resources.ResourceManager
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener
 import net.minecraft.util.profiling.ProfilerFiller
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent
 
-@OnlyIn(Dist.CLIENT)
-@EventBusSubscriber(Dist.CLIENT)
 object ClientLanguageGetter {
     @JvmStatic
     lateinit var EN_US: ClientLanguage
 
-    @SubscribeEvent
-    fun onResourcePackReload(event: RegisterClientReloadListenersEvent) {
-        event.registerReloadListener(object : SimplePreparableReloadListener<ClientLanguage>() {
-            override fun prepare(
-                pResourceManager: ResourceManager,
-                pProfiler: ProfilerFiller
-            ): ClientLanguage {
-                return ClientLanguage.loadFrom(pResourceManager, listOf("en_us"), false)
-            }
+    @JvmStatic
+    fun register() {
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(ReloadListener)
+    }
 
-            override fun apply(
-                pObject: ClientLanguage,
-                pResourceManager: ResourceManager,
-                pProfiler: ProfilerFiller
-            ) {
-                EN_US = pObject
-            }
-        })
+    object ReloadListener : SimplePreparableReloadListener<ClientLanguage>(), IdentifiableResourceReloadListener {
+        override fun getFabricId(): ResourceLocation {
+            return Mod.loc("client_language_getter")
+        }
+
+        override fun prepare(resourceManager: ResourceManager, profiler: ProfilerFiller): ClientLanguage {
+            return ClientLanguage.loadFrom(resourceManager, listOf("en_us"), false)
+        }
+
+        override fun apply(language: ClientLanguage, resourceManager: ResourceManager, profiler: ProfilerFiller) {
+            EN_US = language
+        }
     }
 }

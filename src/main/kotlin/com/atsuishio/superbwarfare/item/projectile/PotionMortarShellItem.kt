@@ -18,10 +18,7 @@ import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.level.Level
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 
 class PotionMortarShellItem : MortarShellItem(), DispenserLaunchable {
     override fun getDefaultInstance(): ItemStack {
@@ -69,17 +66,16 @@ class PotionMortarShellItem : MortarShellItem(), DispenserLaunchable {
         }
     }
 
-    @EventBusSubscriber(Dist.CLIENT)
     companion object {
-        @SubscribeEvent
-        fun onRegisterColorHandlers(event: RegisterColorHandlersEvent.Item) {
-            event.register(
+        @JvmStatic
+        fun registerColorHandler() {
+            ColorProviderRegistry.ITEM.register(
                 { stack, layer ->
                     if (layer == 1) FastColor.ARGB32.opaque(
                         stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).color
                     ) else -1
                 },
-                ModItems.POTION_MORTAR_SHELL.get()
+                ModItems.POTION_MORTAR_SHELL
             )
         }
     }

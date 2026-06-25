@@ -19,11 +19,8 @@ import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.level.ClipContext
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import kotlin.math.min
 
-@OnlyIn(Dist.CLIENT)
 object SpyglassRangeOverlay : CommonOverlay("spyglass_range") {
     private val INDICATOR = loc("textures/overlay/spyglass/indicator.png")
     private val SPYGLASS = loc("textures/overlay/spyglass/spyglass.png")
@@ -36,9 +33,9 @@ object SpyglassRangeOverlay : CommonOverlay("spyglass_range") {
 
         val stack = player.getUseItem()
         if (((player.isUsingItem && player.getUseItem()
-                .`is`(ModItems.ARTILLERY_INDICATOR.get())) || player.isScoping) && mc.options.cameraType == CameraType.FIRST_PERSON
+                .`is`(ModItems.ARTILLERY_INDICATOR)) || player.isScoping) && mc.options.cameraType == CameraType.FIRST_PERSON
         ) {
-            if (player.getUseItem().`is`(ModItems.ARTILLERY_INDICATOR.get())) {
+            if (player.getUseItem().`is`(ModItems.ARTILLERY_INDICATOR)) {
                 poseStack.pushPose()
                 RenderSystem.disableDepthTest()
                 RenderSystem.depthMask(false)

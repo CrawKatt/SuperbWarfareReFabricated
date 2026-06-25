@@ -8,14 +8,11 @@ import com.atsuishio.superbwarfare.tools.worldToScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 
-@OnlyIn(Dist.CLIENT)
 object SodayoRocketInfoOverlay : CommonOverlay("sodayo_rocket_info") {
-    private val AP by lazy { ItemStack(ModItems.MEDIUM_ROCKET_AP.get()) }
-    private val HE by lazy { ItemStack(ModItems.MEDIUM_ROCKET_HE.get()) }
-    private val CM by lazy { ItemStack(ModItems.MEDIUM_ROCKET_CM.get()) }
+    private val AP by lazy { ItemStack(ModItems.MEDIUM_ROCKET_AP) }
+    private val HE by lazy { ItemStack(ModItems.MEDIUM_ROCKET_HE) }
+    private val CM by lazy { ItemStack(ModItems.MEDIUM_ROCKET_CM) }
 
     override fun RenderContext.render() {
         val poseStack = guiGraphics.pose()

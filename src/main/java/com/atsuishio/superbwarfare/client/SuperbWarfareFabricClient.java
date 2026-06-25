@@ -13,6 +13,7 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
 import com.atsuishio.superbwarfare.init.*;
+import com.atsuishio.superbwarfare.item.projectile.PotionMortarShellItem;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
@@ -38,6 +39,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         ClientRenderHandler.registerTooltip();
         ClientRenderHandler.onClientSetup();
         ClientRenderHandler.registerItemDecorations();
+        PotionMortarShellItem.registerColorHandler();
         ParachuteRenderer.onRenderLevelStage();
         ContainerBlockPreview.init();
 

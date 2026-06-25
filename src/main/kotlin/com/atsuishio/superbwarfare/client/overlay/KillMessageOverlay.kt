@@ -26,12 +26,9 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.OwnableEntity
 import net.minecraft.world.entity.player.Player
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import top.theillusivec4.curios.api.CuriosApi
+import dev.emi.trinkets.api.TrinketsApi
 import kotlin.math.pow
 
-@OnlyIn(Dist.CLIENT)
 object KillMessageOverlay : CommonOverlay("kill_message") {
     private val HEADSHOT = loc("textures/overlay/damage_types/headshot.png")
 
@@ -375,22 +372,18 @@ object KillMessageOverlay : CommonOverlay("kill_message") {
             if (owner is Player) {
                 if (DisplayConfig.DOG_TAG_NAME_VISIBLE.get()) {
                     name = owner.displayName?.string + " + " + entityName
-                    CuriosApi.getCuriosInventory(owner).ifPresent { c ->
-                        c.findFirstCurio(ModItems.DOG_TAG.get()).ifPresent { s ->
-                            name = s.stack().getHoverName().string + " + " + entityName
-                        }
-                    }
+                    TrinketsApi.getTrinketComponent(owner)
+                        .flatMap { c -> c.getEquipped(ModItems.DOG_TAG).stream().findFirst() }
+                        .ifPresent { s -> name = s.getB().hoverName.string + " + " + entityName }
                 } else {
                     name = owner.displayName!!.string + " + " + entityName
                 }
             }
         } else if (entity is Player) {
             if (!DisplayConfig.DOG_TAG_NAME_VISIBLE.get()) return name
-            CuriosApi.getCuriosInventory(entity).ifPresent { c ->
-                c.findFirstCurio(ModItems.DOG_TAG.get()).ifPresent { s ->
-                    name = s.stack().getHoverName().string
-                }
-            }
+            TrinketsApi.getTrinketComponent(entity)
+                .flatMap { c -> c.getEquipped(ModItems.DOG_TAG).stream().findFirst() }
+                .ifPresent { s -> name = s.getB().hoverName.string }
         }
         return name
     }
@@ -400,11 +393,9 @@ object KillMessageOverlay : CommonOverlay("kill_message") {
         var name = entityName
         if (entity is Player) {
             if (!DisplayConfig.DOG_TAG_NAME_VISIBLE.get()) return name
-            CuriosApi.getCuriosInventory(entity).ifPresent { c ->
-                c.findFirstCurio(ModItems.DOG_TAG.get()).ifPresent { s ->
-                    name = s.stack().getHoverName().string
-                }
-            }
+            TrinketsApi.getTrinketComponent(entity)
+                .flatMap { c -> c.getEquipped(ModItems.DOG_TAG).stream().findFirst() }
+                .ifPresent { s -> name = s.getB().hoverName.string }
         }
         return name
     }
@@ -432,11 +423,12 @@ object KillMessageOverlay : CommonOverlay("kill_message") {
     }
 
     fun shouldRenderDogTagIcon(living: LivingEntity?): Boolean {
+        if (living == null) return false
         val flag = booleanArrayOf(false)
-        CuriosApi.getCuriosInventory(living).flatMap { c ->
-            c.findFirstCurio(ModItems.DOG_TAG.get())
+        TrinketsApi.getTrinketComponent(living).flatMap { c ->
+            c.getEquipped(ModItems.DOG_TAG).stream().findFirst()
         }.ifPresent { s ->
-            if (ClientDogTagImageTooltip.shouldRenderIcon(s.stack())) {
+            if (ClientDogTagImageTooltip.shouldRenderIcon(s.getB())) {
                 flag[0] = true
             }
         }
@@ -444,10 +436,11 @@ object KillMessageOverlay : CommonOverlay("kill_message") {
     }
 
     fun renderDogTagIcon(guiGraphics: GuiGraphics, living: LivingEntity?, x: Float, y: Float) {
-        CuriosApi.getCuriosInventory(living).flatMap { c ->
-            c.findFirstCurio(ModItems.DOG_TAG.get())
+        if (living == null) return
+        TrinketsApi.getTrinketComponent(living).flatMap { c ->
+            c.getEquipped(ModItems.DOG_TAG).stream().findFirst()
         }.ifPresent { s ->
-            val stack = s.stack()
+            val stack = s.getB()
             val icon = DogTagItem.getColors(stack)
 
             guiGraphics.pose().pushPose()

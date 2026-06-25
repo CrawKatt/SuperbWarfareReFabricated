@@ -16,10 +16,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 
-@OnlyIn(Dist.CLIENT)
 object ArtilleryHud {
     const val ID: String = "@Artillery"
     private val COMPASS = loc("textures/overlay/vehicle/base/compass.png")

@@ -6,17 +6,17 @@ import com.atsuishio.superbwarfare.item.trinket.ParachuteItem
 import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.network.ServerPacketPayload
 import com.atsuishio.superbwarfare.tools.NBTTool
+import dev.emi.trinkets.api.TrinketsApi
 import net.minecraft.sounds.SoundSource
-import top.theillusivec4.curios.api.CuriosApi
 
 object ParachuteMessage : ServerPacketPayload() {
     override fun PayloadContext.handler() {
         val player = sender()
 
-        CuriosApi.getCuriosInventory(player)
-            .flatMap { c -> c.findFirstCurio(ModItems.PARACHUTE) }
+        TrinketsApi.getTrinketComponent(player)
+            .flatMap { c -> c.getEquipped(ModItems.PARACHUTE).stream().findFirst() }
             .ifPresent { s ->
-                val stack = s.stack()
+                val stack = s.b
                 if (player.cooldowns.isOnCooldown(stack.item)) return@ifPresent
 
                 val tag = NBTTool.getTag(stack)

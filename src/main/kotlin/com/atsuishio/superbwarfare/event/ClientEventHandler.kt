@@ -57,7 +57,7 @@ import org.joml.Matrix4f
 import org.lwjgl.glfw.GLFW
 import software.bernie.geckolib.animation.AnimationProcessor
 import software.bernie.geckolib.cache.`object`.GeoBone
-import top.theillusivec4.curios.api.CuriosApi
+import dev.emi.trinkets.api.TrinketsApi
 import java.util.*
 import kotlin.experimental.or
 import kotlin.math.*
@@ -495,9 +495,11 @@ object ClientEventHandler {
 
     @JvmStatic
     fun hasThermalImagingGoggles(): Boolean {
-        return CuriosApi.getCuriosInventory(localPlayer).map {
-            it.findFirstCurio(ModItems.THERMAL_IMAGING_GOGGLES.get()).isPresent
-        }.orElse(false)
+        val player = localPlayer ?: return false
+
+        return TrinketsApi.getTrinketComponent(player)
+            .map { component -> component.isEquipped(ModItems.THERMAL_IMAGING_GOGGLES) }
+            .orElse(false)!!
     }
 
     fun handleThermalImaging(player: Player) {

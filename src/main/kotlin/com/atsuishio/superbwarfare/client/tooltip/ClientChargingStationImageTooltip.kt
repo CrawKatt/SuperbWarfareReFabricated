@@ -30,7 +30,7 @@ open class ClientChargingStationImageTooltip(tooltip: GunImageComponent) : Clien
 
     protected val energyComponent: Component
         get() {
-            val energy = stack.getOrDefault(ModDataComponents.ENERGY.get(), 0)
+            val energy = stack.getOrDefault(ModDataComponents.ENERGY, 0)
             val maxEnergy = max(1, MiscConfig.CHARGING_STATION_MAX_ENERGY.get())
             val percentage = Mth.clamp(energy.toFloat() / maxEnergy, 0f, 1f)
             val component = Component.empty()

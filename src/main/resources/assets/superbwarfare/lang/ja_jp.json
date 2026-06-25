@@ -151,7 +151,7 @@
   "item.superbwarfare.he_head": "HE弾頭",
   "item.superbwarfare.cannon_core": "砲台コア",
   "item.superbwarfare.dog_tag": "ドッグタグ(認識票)",
-  "curios.identifier.dog_tag": "ドッグタグ(認識票)",
+  "trinkets.slot.chest.dog_tag": "ドッグタグ(認識票)",
   "item.superbwarfare.cell": "セル",
   "item.superbwarfare.battery": "バッテリー",
   "item.superbwarfare.small_battery_pack": "小型バッテリーパック",

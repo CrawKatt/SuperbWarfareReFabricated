@@ -19,15 +19,8 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.PlayerTeam
 import net.minecraft.world.scores.Team
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.ClientTickEvent
 import kotlin.math.max
 
-@OnlyIn(Dist.CLIENT)
-@EventBusSubscriber(Dist.CLIENT)
 object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
     override fun shouldRender() = super.shouldRender() && DisplayConfig.VEHICLE_INFO.get()
 
@@ -35,8 +28,7 @@ object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
     private var entityRange = 0.0
     private var lookAtEntity = false
 
-    @SubscribeEvent
-    fun onVehicleTeamOverlayClientTick(event: ClientTickEvent.Post) {
+    fun onVehicleTeamOverlayClientTick() {
         val player = localPlayer ?: return
         val camera = mc.gameRenderer.mainCamera
         var viewPos = camera.position
@@ -85,7 +77,7 @@ object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
         val lookingEntity = lookingEntity as VehicleEntity
 
         val stack = player.mainHandItem
-        val usingDrone = stack.`is`(ModItems.MONITOR.get())
+        val usingDrone = stack.`is`(ModItems.MONITOR)
                 && NBTTool.getTag(stack).getBoolean("Using")
                 && NBTTool.getTag(stack).getBoolean("Linked")
 

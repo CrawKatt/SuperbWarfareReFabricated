@@ -23,10 +23,7 @@ import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 
-@OnlyIn(Dist.CLIENT)
 object DroneHudOverlay : CommonOverlay("drone_hud") {
     private val FRAME = loc("textures/overlay/frame/frame.png")
     private val TV_FRAME = loc("textures/overlay/vehicle/land/tv_frame.png")
@@ -63,7 +60,7 @@ object DroneHudOverlay : CommonOverlay("drone_hud") {
         val firstPerson =
             Minecraft.getInstance().options.cameraType == CameraType.FIRST_PERSON || Minecraft.getInstance().options.cameraType == CameraType.THIRD_PERSON_BACK
 
-        if (stack.`is`(ModItems.MONITOR.get()) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
+        if (stack.`is`(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
             if (firstPerson) {
                 guiGraphics.blit(CROSSHAIR, screenWidth / 2 - 16, screenHeight / 2 - 16, 0f, 0f, 32, 32, 32, 32)
                 guiGraphics.blit(DRONE_FOV, screenWidth / 2 + 100, screenHeight / 2 - 64, 0f, 0f, 64, 129, 64, 129)
@@ -286,7 +283,7 @@ object DroneHudOverlay : CommonOverlay("drone_hud") {
                     }
 
                     // 火炮位置
-                    if (offStack.`is`(ModItems.ARTILLERY_INDICATOR.get())) {
+                    if (offStack.`is`(ModItems.ARTILLERY_INDICATOR)) {
                         val tags =
                             NBTTool.getTag(offStack)
                                 .getList(ArtilleryIndicatorItem.TAG_CANNON, Tag.TAG_COMPOUND.toInt())

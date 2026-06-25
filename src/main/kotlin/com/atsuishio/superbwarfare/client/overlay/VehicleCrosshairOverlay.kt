@@ -25,11 +25,8 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import net.minecraft.world.level.ClipContext
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import org.joml.Math
 
-@OnlyIn(Dist.CLIENT)
 object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
 
     private val LOGGER = ResourceOnceLogger()
