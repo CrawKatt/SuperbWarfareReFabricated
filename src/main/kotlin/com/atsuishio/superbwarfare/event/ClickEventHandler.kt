@@ -344,7 +344,7 @@ object ClickEventHandler {
         val vehicle = player.vehicle
 
         if (action == GLFW.GLFW_PRESS) {
-            if (key == ModKeyMappings.ACTIVE_THERMAL_IMAGING.key.value) {
+            if (ModKeyMappings.ACTIVE_THERMAL_IMAGING.matches(key, scanCode)) {
                 if (vehicle is VehicleEntity) {
                     val index = vehicle.getSeatIndex(player)
                     val seat = vehicle.computed().seats().getOrNull(index) ?: return false
@@ -369,6 +369,7 @@ object ClickEventHandler {
                         }
                     }
                 }
+                return true
             }
 
             if (key == ModKeyMappings.DISMOUNT.key.value) {
