@@ -1,5 +1,4 @@
 {
-  "ID": "superbwarfare:qbz_191",
   "MinZoom": 1,
   "MaxZoom": 6,
   "Spread": 3.5,
@@ -11,8 +10,8 @@
   "Magazine": 30,
   "Weight": 3.5,
   "DefaultFireMode": "Auto",
-  "NormalReloadTime": 62,
-  "EmptyReloadTime": 66,
+  "NormalReloadTime": 52,
+  "EmptyReloadTime": 57,
   "BypassesArmor": 0.28,
   "SoundRadius": 13,
   "RPM": 750,
@@ -44,6 +43,7 @@
     "superbwarfare:firefly",
     "superbwarfare:fair_means",
     "superbwarfare:high_impact_reserves",
+    "superbwarfare:brain_storm",
     "!superbwarfare:micro_missile",
     "!superbwarfare:longer_wire",
     "!superbwarfare:cupid_arrow"

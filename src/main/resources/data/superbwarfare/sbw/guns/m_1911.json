@@ -1,7 +1,6 @@
 {
-  "ID": "superbwarfare:m_1911",
   "Spread": 2.5,
-  "RecoilX": 0.006,
+  "RecoilX": 0.002,
   "RecoilY": 0.018,
   "Damage": 9.5,
   "Headshot": 1.5,
@@ -34,9 +33,10 @@
     "superbwarfare:vorpal_weapon",
     "superbwarfare:firefly",
     "superbwarfare:fair_means",
+    "superbwarfare:brain_storm",
+    "superbwarfare:battle_of_wits",
     "!superbwarfare:micro_missile",
     "!superbwarfare:longer_wire",
-    "!superbwarfare:butterfly_bullet",
     "!superbwarfare:cupid_arrow"
   ],
   "SoundInfo": {

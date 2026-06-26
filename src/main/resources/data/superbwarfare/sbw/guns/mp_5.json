@@ -1,7 +1,6 @@
 {
-  "ID": "superbwarfare:mp_5",
   "Spread": 2.1,
-  "RecoilX": 0.002,
+  "RecoilX": 0.001,
   "RecoilY": 0.018,
   "Damage": 6.5,
   "Headshot": 1.5,
@@ -44,6 +43,7 @@
     "superbwarfare:firefly",
     "superbwarfare:fair_means",
     "superbwarfare:high_impact_reserves",
+    "superbwarfare:brain_storm",
     "!superbwarfare:micro_missile",
     "!superbwarfare:longer_wire",
     "!superbwarfare:cupid_arrow"
@@ -55,6 +55,7 @@
     "Fire3PVeryFar": "superbwarfare:mp_5_veryfar",
     "Fire1PSilent": "superbwarfare:mp_5_fire_1p_s",
     "Fire3PSilent": "superbwarfare:mp_5_fire_3p_s",
+    "Fire3PFarSilent": "superbwarfare:vector_far_s",
     "ReloadNormal": "superbwarfare:mp_5_reload_normal",
     "ReloadEmpty": "superbwarfare:mp_5_reload_empty",
     "CancellableSounds": [

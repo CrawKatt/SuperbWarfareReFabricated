@@ -135,6 +135,38 @@
       }
     ]
   },
+  "star_shoot_1p": {
+    "sounds": [
+      {
+        "name": "superbwarfare:gun/super_star_shooter/star_shoot_1p",
+        "stream": false
+      }
+    ]
+  },
+  "star_shoot_3p": {
+    "sounds": [
+      {
+        "name": "superbwarfare:gun/super_star_shooter/star_shoot_3p",
+        "stream": false
+      }
+    ]
+  },
+  "star_recover": {
+    "sounds": [
+      {
+        "name": "superbwarfare:gun/super_star_shooter/star_recover",
+        "stream": false
+      }
+    ]
+  },
+  "super_star_shooter_reload_empty": {
+    "sounds": [
+      {
+        "name": "superbwarfare:gun/super_star_shooter/super_star_shooter_reload_empty",
+        "stream": false
+      }
+    ]
+  },
   "m_79_fire_1p": {
     "sounds": [
       {
@@ -1319,6 +1351,30 @@
       }
     ]
   },
+  "m_870_fire_1p_s": {
+    "sounds": [
+      {
+        "name": "superbwarfare:gun/m_870/m_870_fire_1p_s",
+        "stream": false
+      }
+    ]
+  },
+  "m_870_fire_3p_s": {
+    "sounds": [
+      {
+        "name": "superbwarfare:gun/m_870/m_870_fire_3p_s",
+        "stream": false
+      }
+    ]
+  },
+  "m_870_far_s": {
+    "sounds": [
+      {
+        "name": "superbwarfare:gun/m_870/m_870_far_s",
+        "stream": false
+      }
+    ]
+  },
   "m_870_prepare_load": {
     "sounds": [
       {
@@ -2417,6 +2473,15 @@
       }
     ]
   },
+  "tiny_speedboat_engine": {
+    "sounds": [
+      {
+        "attenuation_distance": 32,
+        "stream": false,
+        "name": "superbwarfare:vehicle/tiny_speedboat/tiny_speedboat_engine"
+      }
+    ]
+  },
   "vehicle_strike": {
     "sounds": [
       {
@@ -2863,6 +2928,24 @@
       }
     ]
   },
+  "wheel_vehicle_skip": {
+    "sounds": [
+      {
+        "attenuation_distance": 32,
+        "stream": true,
+        "name": "superbwarfare:vehicle/common/wheel_vehicle_skip"
+      }
+    ]
+  },
+  "track_vehicle_skip": {
+    "sounds": [
+      {
+        "attenuation_distance": 32,
+        "stream": true,
+        "name": "superbwarfare:vehicle/common/track_vehicle_skip"
+      }
+    ]
+  },
   "laser_tower_shoot": {
     "sounds": [
       {
@@ -3078,7 +3161,7 @@
   "rocket_fly": {
     "sounds": [
       {
-        "attenuation_distance": 192,
+        "attenuation_distance": 128,
         "stream": true,
         "name": "superbwarfare:rocket_fly"
       }
@@ -3087,7 +3170,7 @@
   "shell_fly": {
     "sounds": [
       {
-        "attenuation_distance": 256,
+        "attenuation_distance": 96,
         "stream": true,
         "name": "superbwarfare:shell_fly"
       }
@@ -3096,7 +3179,7 @@
   "rocket_engine": {
     "sounds": [
       {
-        "attenuation_distance": 48,
+        "attenuation_distance": 32,
         "stream": true,
         "name": "superbwarfare:rocket_engine"
       }
@@ -3105,7 +3188,7 @@
   "vehicle_swim": {
     "sounds": [
       {
-        "attenuation_distance": 48,
+        "attenuation_distance": 24,
         "stream": true,
         "name": "superbwarfare:vehicle/common/vehicle_swim"
       }
@@ -3975,29 +4058,383 @@
       }
     ]
   },
-  "terrain": {
+  "lav_ad_fire": {
     "sounds": [
       {
-        "attenuation_distance": 64,
+        "attenuation_distance": 256,
         "stream": true,
-        "name": "superbwarfare:vehicle/common/terrain"
+        "name": "superbwarfare:vehicle/lav_ad/lav_ad_fire"
       }
     ]
   },
-  "pull_up": {
+  "mini_explosion": {
     "sounds": [
       {
-        "attenuation_distance": 64,
-        "stream": true,
-        "name": "superbwarfare:vehicle/common/pull_up"
-      }
-    ]
-  },
-  "mortar_shell_explode": {
-    "sounds": [
-      {
-        "name": "superbwarfare:explosion/explosion_close",
+        "name": "superbwarfare:explosion/mini_explosion_01",
         "stream": false
+      },
+      {
+        "name": "superbwarfare:explosion/mini_explosion_02",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:explosion/mini_explosion_03",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:explosion/mini_explosion_04",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:explosion/mini_explosion_05",
+        "stream": false
+      }
+    ]
+  },
+  "knife_flesh": {
+    "sounds": [
+      {
+        "name": "superbwarfare:super_star/knife_flesh_01",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:super_star/knife_flesh_02",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:super_star/knife_flesh_03",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:super_star/knife_flesh_04",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:super_star/knife_flesh_05",
+        "stream": false
+      }
+    ]
+  },
+  "night_vision_activate": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:night_vision_activate"
+      }
+    ]
+  },
+  "sodayo_pick_up_engine": {
+    "sounds": [
+      {
+        "attenuation_distance": 48,
+        "stream": true,
+        "name": "superbwarfare:vehicle/sodayo_pick_up/sodayo_pick_up_engine"
+      }
+    ]
+  },
+  "car_horn": {
+    "sounds": [
+      {
+        "attenuation_distance": 96,
+        "stream": true,
+        "name": "superbwarfare:car_horn"
+      }
+    ]
+  },
+  "kv_16_engine": {
+    "sounds": [
+      {
+        "attenuation_distance": 128,
+        "stream": true,
+        "name": "superbwarfare:vehicle/kv_16/kv_16_engine"
+      }
+    ]
+  },
+  "kv_16_engine_start": {
+    "sounds": [
+      {
+        "attenuation_distance": 64,
+        "stream": true,
+        "name": "superbwarfare:vehicle/kv_16/kv_16_engine_start"
+      }
+    ]
+  },
+  "stuka": {
+    "sounds": [
+      {
+        "attenuation_distance": 384,
+        "stream": true,
+        "name": "superbwarfare:vehicle/common/stuka"
+      }
+    ]
+  },
+  "mg_17_fire_1p": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/ju_87/mg_17_fire_1p",
+        "stream": false
+      }
+    ]
+  },
+  "mg_17_fire_1p_inside": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/ju_87/mg_17_fire_1p_inside",
+        "stream": false
+      }
+    ]
+  },
+  "mg_17_fire_3p": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/ju_87/mg_17_fire_3p",
+        "stream": false
+      }
+    ]
+  },
+  "mg_17_far": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/ju_87/mg_17_far",
+        "stream": false
+      }
+    ]
+  },
+  "mg_17_veryfar": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/ju_87/mg_17_veryfar",
+        "stream": false
+      }
+    ]
+  },
+  "ju_87_engine": {
+    "sounds": [
+      {
+        "attenuation_distance": 256,
+        "stream": true,
+        "name": "superbwarfare:vehicle/ju_87/ju_87_engine"
+      }
+    ]
+  },
+  "t_90a_reload": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/t_90a/t_90a_reload",
+        "stream": false
+      }
+    ]
+  },
+  "t_90a_fire_1p": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/t_90a/t_90a_fire_1p",
+        "stream": false
+      }
+    ]
+  },
+  "t_90a_fire_3p": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/t_90a/t_90a_fire_3p",
+        "stream": false
+      }
+    ]
+  },
+  "t_90a_far": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/t_90a/t_90a_far",
+        "stream": false
+      }
+    ]
+  },
+  "t_90a_veryfar": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/t_90a/t_90a_veryfar",
+        "stream": false
+      }
+    ]
+  },
+  "t_90a_engine": {
+    "sounds": [
+      {
+        "attenuation_distance": 64,
+        "stream": true,
+        "name": "superbwarfare:vehicle/t_90a/t_90a_engine"
+      }
+    ]
+  },
+  "m_1a_2_reload": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/m_1a_2/m_1a_2_reload",
+        "stream": false
+      }
+    ]
+  },
+  "m_1a_2_fire_1p": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/m_1a_2/m_1a_2_fire_1p",
+        "stream": false
+      }
+    ]
+  },
+  "m_1a_2_fire_3p": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/m_1a_2/m_1a_2_fire_3p",
+        "stream": false
+      }
+    ]
+  },
+  "m_1a_2_far": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/m_1a_2/m_1a_2_far",
+        "stream": false
+      }
+    ]
+  },
+  "m_1a_2_veryfar": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/m_1a_2/m_1a_2_veryfar",
+        "stream": false
+      }
+    ]
+  },
+  "bradley_cannon_fire_1p": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/bradley/bradley_cannon_fire_1p",
+        "stream": false
+      }
+    ]
+  },
+  "bradley_cannon_fire_3p": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/bradley/bradley_cannon_fire_3p",
+        "stream": false
+      }
+    ]
+  },
+  "bradley_cannon_far": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/bradley/bradley_cannon_far",
+        "stream": false
+      }
+    ]
+  },
+  "bradley_cannon_veryfar": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/bradley/bradley_cannon_veryfar",
+        "stream": false
+      }
+    ]
+  },
+  "bradley_engine": {
+    "sounds": [
+      {
+        "attenuation_distance": 64,
+        "stream": true,
+        "name": "superbwarfare:vehicle/bradley/bradley_engine"
+      }
+    ]
+  },
+  "turret_burn_start": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/common/turret_burn_start"
+      }
+    ]
+  },
+  "turret_burn": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/common/turret_burn_01"
+      },
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/common/turret_burn_02"
+      },
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/common/turret_burn_03"
+      }
+    ]
+  },
+  "heli_crash": {
+    "sounds": [
+      {
+        "attenuation_distance": 160,
+        "stream": true,
+        "name": "superbwarfare:vehicle/common/heli_crash"
+      }
+    ]
+  },
+  "ztz_99a_reload": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/ztz_99a/ztz_99a_reload",
+        "stream": false
+      }
+    ]
+  },
+  "ztz_99a_fire_1p": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/ztz_99a/ztz_99a_fire_1p",
+        "stream": false
+      }
+    ]
+  },
+  "ztz_99a_fire_3p": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/ztz_99a/ztz_99a_fire_3p",
+        "stream": false
+      }
+    ]
+  },
+  "ztz_99a_far": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/ztz_99a/ztz_99a_far",
+        "stream": false
+      }
+    ]
+  },
+  "ztz_99a_veryfar": {
+    "sounds": [
+      {
+        "name": "superbwarfare:vehicle/ztz_99a/ztz_99a_veryfar",
+        "stream": false
+      }
+    ]
+  },
+  "ztz_99a_engine": {
+    "sounds": [
+      {
+        "attenuation_distance": 64,
+        "stream": true,
+        "name": "superbwarfare:vehicle/ztz_99a/ztz_99a_engine"
+      }
+    ]
+  },
+  "steel_coil_move": {
+    "sounds": [
+      {
+        "attenuation_distance": 48,
+        "stream": false,
+        "name": "superbwarfare:steel_coil_move"
       }
     ]
   }

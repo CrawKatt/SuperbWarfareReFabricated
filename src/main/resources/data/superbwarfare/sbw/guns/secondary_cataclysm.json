@@ -1,12 +1,12 @@
 {
-  "ID": "superbwarfare:secondary_cataclysm",
   "Spread": 5,
   "RecoilX": 0.004,
   "RecoilY": 0.023,
   "MaxEnergy": 24000,
-  "Damage": 30,
+  "Damage": 80,
   "MeleeDamage": 19,
   "MeleeDuration": 20,
+  "MeleeRange": 1,
   "ExplosionDamage": 50,
   "ExplosionRadius": 5,
   "Headshot": 0,
@@ -19,7 +19,7 @@
   "PrepareTime": 31,
   "PrepareLoadTime": 31,
   "PrepareAmmoLoadTime": 3,
-  "IterativeTime": 20,
+  "IterativeTime": 18,
   "FinishTime": 22,
   "SoundRadius": 8,
   "RPM": 300,
@@ -60,7 +60,9 @@
     "superbwarfare:vorpal_weapon",
     "superbwarfare:micro_missile",
     "superbwarfare:regeneration",
-    "superbwarfare:one_two_punch"
+    "superbwarfare:one_two_punch",
+    "superbwarfare:cast_no_shadows",
+    "superbwarfare:battle_of_wits"
   ],
   "SoundInfo": {
     "Fire1P": "superbwarfare:secondary_cataclysm_fire_1p",

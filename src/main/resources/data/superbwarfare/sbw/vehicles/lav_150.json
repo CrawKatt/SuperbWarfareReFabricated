@@ -1,5 +1,4 @@
 {
-  "ID": "superbwarfare:lav_150",
   "MaxHealth": 270,
   "MaxEnergy": 5000000,
   "OBB": [
@@ -62,7 +61,8 @@
       "CanRotateHead": false,
       "MinPitch": -15,
       "MaxPitch": 32.5,
-      "Sensitivity": [0.55, 0.73, 1]
+      "Sensitivity": [0.55, 0.73, 1],
+      "HasThermalImaging": true
     },
     {
       "HidePassenger": true,
@@ -107,16 +107,16 @@
   ],
   "Weapons": {
     "Cannon": {
-      "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/cannon_20mm.png",
       "DefaultFireMode": "Auto",
       "AvailableFireModes": "Auto",
       "Projectile": "superbwarfare:small_cannon_shell",
       "DefaultZoom": 3,
       "RPM": 300,
-      "Velocity": 20,
+      "Velocity": 18,
       "Damage": 45,
-      "ExplosionDamage": 12,
-      "ExplosionRadius": 4,
+      "ExplosionDamage": 6,
+      "ExplosionRadius": 2,
+      "ProjectileLife": 40,
       "RecoilTime": 29,
       "RecoilForce": 0.55,
       "Spread": 0.5,
@@ -125,7 +125,7 @@
       "ShootAnimationTime": 3,
       "Crosshair": "@VehicleUsApc",
       "CrosshairColor": "0x66FF00",
-      "Name": "weapon.superbwarfare.20mm_cannon",
+      "Name": "weapon.superbwarfare.20mm_cannon_ap",
       "SoundInfo": {
         "Fire1P": "superbwarfare:lav_150_cannon_fire_1p",
         "Fire3P": "superbwarfare:lav_150_cannon_fire_3p",
@@ -134,7 +134,38 @@
         "Change": "superbwarfare:into_missile"
       },
       "SoundRadius": 24,
-      "AmmoType": "superbwarfare:small_shell",
+      "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/cannon_20mm_ap.png",
+      "AmmoType": [
+        "superbwarfare:small_shell_ap",
+        {
+          "Ammo": "superbwarfare:small_shell_he",
+          "Override": {
+            "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/cannon_20mm_he.png",
+            "Velocity": 15,
+            "Damage": 13,
+            "ExplosionDamage": 14,
+            "ExplosionRadius": 4,
+            "Name": "weapon.superbwarfare.20mm_cannon_he"
+          }
+        },
+        {
+          "Ammo": "superbwarfare:small_shell_gs",
+          "Override": {
+            "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/cannon_20mm_gs.png",
+            "Spread": 3,
+            "Velocity": 10,
+            "Damage": 8,
+            "ProjectileAmount": 12,
+            "DamageReduce": {
+              "Type": "Shotgun"
+            },
+            "ExplosionDamage": 0,
+            "ExplosionRadius": 0,
+            "Projectile": "superbwarfare:projectile",
+            "Name": "weapon.superbwarfare.20mm_cannon_gs"
+          }
+        }
+      ],
       "ShootPos": {
         "Transform": "Barrel",
         "Positions": [[0.02, 0.0517, 3.2]],
@@ -182,7 +213,7 @@
     "WheelRotSpeed": 1.25,
     "WheelDifferential": 0.3,
     "MaxForwardSpeedRate": 1,
-    "MaxBackwardSpeedRate": 0.5,
+    "MaxBackwardSpeedRate": 0.6,
     "Increment": 0.03,
     "Decrement": 0.02,
     "SteeringSpeed": 0.07
@@ -197,7 +228,8 @@
   "RotateOffsetHeight": 2.2,
   "Mass": 13.6,
   "DamageModifiers": [
-    "minecraft:lava - -11",
+    "All - 11",
+    "minecraft:lava + 11",
     "minecraft:lava * 10",
     "All * 0.2",
     "minecraft:arrow * 1.5",
@@ -220,14 +252,15 @@
     "@superbwarfare:mortar_shell * 1.25",
     "@superbwarfare:gun_grenade * 1.5",
     "@superbwarfare:javelin_missile * 0.8",
-    "@superbwarfare:igla_9k38_missile * 0.75",
-    "All - 11"
+    "@#superbwarfare:aa_missile * 0.75"
   ],
   "VehicleContainerType": "Medium",
   "DestroyInfo": {
     "ParticleType": "Huge",
     "ExplosionDamage": 120,
-    "ExplosionRadius": 7
+    "ExplosionRadius": 7,
+    "SympatheticDetonation": true,
+    "SympatheticDetonationChance": 0.25
   },
   "VehicleIcon": "superbwarfare:textures/vehicle_icon/lav_150_icon.png",
   "ContainerIcon": "superbwarfare:textures/gui/vehicle/type/land.png",

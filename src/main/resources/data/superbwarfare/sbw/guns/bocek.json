@@ -1,5 +1,4 @@
 {
-  "ID": "superbwarfare:bocek",
   "Spread": 4,
   "Headshot": 2.5,
   "Damage": 48,
@@ -23,6 +22,8 @@
     "superbwarfare:intelligent_chip",
     "superbwarfare:monster_hunter",
     "superbwarfare:cupid_arrow",
+    "superbwarfare:brain_storm",
+    "superbwarfare:battle_of_wits",
     "!superbwarfare:micro_missile",
     "!superbwarfare:butterfly_bullet"
   ]

@@ -1,8 +1,7 @@
 {
-  "ID": "superbwarfare:insidious",
   "Spread": 4,
-  "RecoilX": 0.006,
-  "RecoilY": 0.011,
+  "RecoilX": 0.0015,
+  "RecoilY": 0.015,
   "Damage": 11,
   "Headshot": 1.5,
   "Velocity": 50,
@@ -42,6 +41,7 @@
     "superbwarfare:firefly",
     "superbwarfare:fair_means",
     "superbwarfare:high_impact_reserves",
+    "superbwarfare:brain_storm",
     "!superbwarfare:micro_missile",
     "!superbwarfare:longer_wire",
     "!superbwarfare:cupid_arrow"

@@ -1,5 +1,4 @@
 {
-  "ID": "superbwarfare:mle_1934",
   "MaxHealth": 350,
   "MaxEnergy": 0,
   "TurretPos": [0, 0.196925, 0],
@@ -31,6 +30,7 @@
       "DefaultZoom": 5,
       "Velocity": 15,
       "Gravity": 0.06,
+      "ApDurability": 100,
       "Damage": 500,
       "ExplosionDamage": 130,
       "ExplosionRadius": 4,
@@ -38,6 +38,7 @@
       "RecoilForce": 1.1,
       "ShootShake": [12, 14, 80],
       "Spread": 0.05,
+      "ProjectileLife": 800,
       "ShootAnimationTime": 30,
       "Crosshair": "@VehicleDynamicCross",
       "CrosshairZooming": "@VehicleCommonCannonZooming",
@@ -53,13 +54,12 @@
       },
       "SoundRadius": 32,
       "AmmoType": [
-        "superbwarfare:ap_5_inches",
+        "superbwarfare:large_shell_ap",
         {
-          "Ammo": "superbwarfare:he_5_inches",
+          "Ammo": "superbwarfare:large_shell_he",
           "Override": {
             "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/he_shell.png",
-            "IsArmorPiercingProjectile": false,
-            "IsHighExplosiveProjectile": true,
+            "ShellType": "HE",
             "Damage": 250,
             "ExplosionDamage": 150,
             "ExplosionRadius": 11,
@@ -67,11 +67,10 @@
           }
         },
         {
-          "Ammo": "superbwarfare:cm_5_inches",
+          "Ammo": "superbwarfare:large_shell_cm",
           "Override": {
             "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/cm_shell.png",
-            "IsArmorPiercingProjectile": false,
-            "IsClusterMunitionsProjectile": true,
+            "ShellType": "CM",
             "SpreadAmount": 18,
             "SpreadAngle": 8,
             "Damage": 320,
@@ -81,17 +80,16 @@
           }
         },
         {
-          "Ammo": "superbwarfare:gs_5_inches",
+          "Ammo": "superbwarfare:large_shell_wp",
           "Override": {
-            "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/grape_shell.png",
-            "IsArmorPiercingProjectile": false,
-            "IsGrapeShotProjectile": true,
-            "SpreadAmount": 36,
-            "SpreadAngle": 5,
-            "Damage": 1000,
-            "ExplosionDamage": 180,
-            "ExplosionRadius": 6,
-            "Name": "weapon.superbwarfare.cannon_gs"
+            "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/wp_shell.png",
+            "ShellType": "WP",
+            "SpreadAmount": 108,
+            "SpreadAngle": 14,
+            "Damage": 220,
+            "ExplosionDamage": 40,
+            "ExplosionRadius": 9,
+            "Name": "weapon.superbwarfare.cannon_wp"
           }
         }
       ],
@@ -107,7 +105,8 @@
   },
   "Mass": 100,
   "DamageModifiers": [
-    "minecraft:lava - -8",
+    "All - 8",
+    "minecraft:lava + 8",
     "minecraft:lava * 10",
     "@minecraft:tnt * 3",
     "@minecraft:tnt_minecart * 3",
@@ -119,6 +118,7 @@
     "minecraft:mob_projectile * 1.5",
     "minecraft:explosion * 6",
     "minecraft:player_explosion * 6",
+    "@#superbwarfare:aerial_bomb * 3",
     "superbwarfare:custom_explosion * 2.4",
     "superbwarfare:projectile_explosion * 2",
     "superbwarfare:mine * 0.75",
@@ -127,11 +127,10 @@
     "#superbwarfare:projectile * 0.25",
     "#superbwarfare:projectile_absolute * 0.85",
     "superbwarfare:vehicle_strike * 5",
-    "@superbwarfare:gun_grenade * 1.5",
-    "All - 8"
+    "@superbwarfare:gun_grenade * 1.5"
   ],
   "ThirdPersonCameraPos": [0, 1.3, 10],
-  "VehicleContainerType": "Small",
+  "VehicleContainerType": "Mini",
   "EngineType": "Fixed",
   "DestroyInfo": {
     "ParticleType": "Medium",

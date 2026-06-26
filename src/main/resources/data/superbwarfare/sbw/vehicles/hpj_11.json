@@ -1,5 +1,4 @@
 {
-  "ID": "superbwarfare:hpj_11",
   "MaxHealth": 350,
   "TurretPos": [0, 0.25, 0],
   "TurretTurnSpeed": [20, 15],
@@ -8,7 +7,7 @@
   "MaxEnergy": 5000000,
   "Seats": {
     "HidePassenger": true,
-    "Transform": "VehicleFlat",
+    "Transform": "Vehicle",
     "Position": [0, 0, 0],
     "MinPitch": -32.5,
     "MaxPitch": 90,
@@ -19,7 +18,8 @@
       "Position": [-1.0625, 3, -1.0625],
       "ZoomDirection": "Barrel"
     },
-    "Weapons": ["Main"]
+    "Weapons": ["Main"],
+    "HasThermalImaging": true
   },
   "SeekInfo": {
     "MinSeekRange": 3,
@@ -31,14 +31,15 @@
   },
   "Weapons": {
     "Main": {
-      "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/cannon_20mm.png",
+      "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/cannon_30mm_ap.png",
       "DefaultFireMode": "Auto",
       "AvailableFireModes": "Auto",
       "Projectile": "superbwarfare:small_cannon_shell",
-      "IsAntiAirProjectile": true,
+      "ShellType": "AA",
       "DefaultZoom": 3,
       "RPM": 1200,
-      "Velocity": 30,
+      "Velocity": 25,
+      "ProjectileLife": 20,
       "Gravity": 0.03,
       "Damage": 25,
       "ExplosionDamage": 5,
@@ -49,11 +50,11 @@
       "ShootAnimationTime": 3,
       "Crosshair": "@VehicleDynamicCross",
       "CrosshairZooming": "@VehicleCnHpjZooming",
-      "Name": "weapon.superbwarfare.30mm_cannon",
-      "AmmoType": "superbwarfare:small_shell",
+      "Name": "weapon.superbwarfare.30mm_cannon_ap",
+      "AmmoType": "superbwarfare:small_shell_ap",
       "SeekWeaponInfo": {
         "SeekDirection": "Barrel",
-        "SeekRange": 384,
+        "SeekRange": 512,
         "SeekAngle": 20,
         "SeekTime": 10,
         "MinTargetSize": 0.1,
@@ -63,7 +64,8 @@
       "ShootPos": {
         "Transform": "Barrel",
         "Positions": [[0, 0.4, 2.578025]],
-        "Directions": ["Barrel"]
+        "Directions": ["Barrel"],
+        "ViewPosition": [0, 0.45, 2.0]
       },
       "SoundInfo": {
         "FireSoundInstances": "superbwarfare:hpj_11_fire"
@@ -72,7 +74,8 @@
   },
   "Mass": 30,
   "DamageModifiers": [
-    "minecraft:lava - -8",
+    "All - 8",
+    "minecraft:lava + 8",
     "minecraft:lava * 6.66",
     "@minecraft:tnt * 3",
     "@minecraft:tnt_minecart * 3",
@@ -97,8 +100,7 @@
     "@superbwarfare:mortar_shell * 1.25",
     "@superbwarfare:gun_grenade * 1.5",
     "@superbwarfare:javelin_missile * 0.8",
-    "@superbwarfare:igla_9k38_missile * 0.75",
-    "All - 8"
+    "@#superbwarfare:aa_missile * 0.75"
   ],
   "ThirdPersonCameraPos": [0, 1, 2],
   "EngineType": "Fixed",
@@ -109,6 +111,7 @@
   },
   "VehicleIcon": "superbwarfare:textures/vehicle_icon/hpj_11_icon.png",
   "ContainerIcon": "superbwarfare:textures/gui/vehicle/type/defense.png",
+  "VehicleContainerType": "Small",
   "Type": "Defense",
   "HudType": "@Artillery"
 }
