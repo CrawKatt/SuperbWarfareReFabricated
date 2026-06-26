@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.entity.vehicle.base
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
+import com.atsuishio.superbwarfare.advancement.CriteriaRegister
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage
 import com.atsuishio.superbwarfare.capability.energy.VehicleEnergyStorage
 import com.atsuishio.superbwarfare.client.animation.entity.VehicleAnimationInstance
@@ -1644,13 +1645,14 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
 
         val lastDriver = this.lastDriver
-        if (source.entity != null && lastDriver != null
-            && SeekTool.IS_FRIENDLY.test(lastDriver, source.entity)
+        val entity = source.entity
+        if (entity != null && lastDriver != null
+            && SeekTool.IS_FRIENDLY.test(lastDriver, entity)
             && lastDriver.team != null
-            && source.entity!!.team != null
-            && source.entity!!.team === lastDriver.team
-            && !source.entity!!.team!!.isAllowFriendlyFire
-            && (source.entity === lastDriver && !source.`is`(ModDamageTypes.VEHICLE_STRIKE)
+            && entity.team != null
+            && entity.team === lastDriver.team
+            && !entity.team!!.isAllowFriendlyFire
+            && (entity === lastDriver && !source.`is`(ModDamageTypes.VEHICLE_STRIKE)
                     && !source.`is`(ModDamageTypes.CUSTOM_EXPLOSION))
         ) {
             return false
@@ -1668,8 +1670,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         this.crash = source.`is`(ModDamageTypes.VEHICLE_STRIKE)
 
-        if (source.entity != null) {
-            lastAttackerUUID = source.entity!!.getStringUUID()
+        if (entity != null) {
+            lastAttackerUUID = entity.getStringUUID()
         }
 
         val projectile = source.directEntity
@@ -1694,6 +1696,12 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         this.lastDamageStamp = level().gameTime
 
         this.onHurt(computedAmount, source.entity, true)
+
+        // 触发载具受伤进度条件
+        if (entity is ServerPlayer) {
+            CriteriaRegister.VEHICLE_HURT.trigger(entity, source, computedAmount)
+        }
+
         return super.hurt(source, computedAmount)
     }
 
@@ -3008,7 +3016,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         if (entityHitResult != null) {
             hitResult = entityHitResult
         }
-        if (hitResult!!.type == HitResult.Type.ENTITY) {
+        if (hitResult.type == HitResult.Type.ENTITY) {
             if (entityHitResult != null) {
                 return entityHitResult.entity
             }
