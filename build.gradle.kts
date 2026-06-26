@@ -152,6 +152,10 @@ dependencies {
     }
 }
 
+fabricApi {
+    configureDataGeneration()
+}
+
 tasks.withType<ProcessResources> {
     val properties = mapOf(
         "version" to project.version,
