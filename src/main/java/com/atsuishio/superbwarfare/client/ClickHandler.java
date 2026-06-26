@@ -515,9 +515,30 @@ public class ClickHandler {
         }
 
         boolean down = action == GLFW.GLFW_PRESS;
+        syncMovementKeyConflictState(key, scanCode, down);
         syncKeyMapping(ModKeyMappings.DISMOUNT, key, scanCode, down);
         syncKeyMapping(ModKeyMappings.MELEE, key, scanCode, down);
         syncKeyMapping(ModKeyMappings.RELEASE_DECOY, key, scanCode, down);
+    }
+
+    private static void syncMovementKeyConflictState(int key, int scanCode, boolean down) {
+        var options = Minecraft.getInstance().options;
+
+        syncKeyMapping(options.keyUp, key, scanCode, down);
+        syncKeyMapping(options.keyDown, key, scanCode, down);
+        syncKeyMapping(options.keyLeft, key, scanCode, down);
+        syncKeyMapping(options.keyRight, key, scanCode, down);
+        syncKeyMapping(options.keyJump, key, scanCode, down);
+        syncKeyMapping(options.keyShift, key, scanCode, down);
+        syncKeyMapping(options.keySprint, key, scanCode, down);
+
+        syncKeyMapping(ModKeyMappings.MOVE_FORWARD, key, scanCode, down);
+        syncKeyMapping(ModKeyMappings.MOVE_BACKWARD, key, scanCode, down);
+        syncKeyMapping(ModKeyMappings.MOVE_LEFT, key, scanCode, down);
+        syncKeyMapping(ModKeyMappings.MOVE_RIGHT, key, scanCode, down);
+        syncKeyMapping(ModKeyMappings.MOVE_SPACE, key, scanCode, down);
+        syncKeyMapping(ModKeyMappings.MOVE_SHIFT, key, scanCode, down);
+        syncKeyMapping(ModKeyMappings.MOVE_CTRL, key, scanCode, down);
     }
 
     private static void syncKeyMapping(KeyMapping keyMapping, int key, int scanCode, boolean down) {
