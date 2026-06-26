@@ -13,6 +13,8 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
 import com.atsuishio.superbwarfare.item.gun.GunItem
+import com.atsuishio.superbwarfare.mixins.KeyMappingAccessor
+import com.atsuishio.superbwarfare.mixins.MinecraftAccessor
 import com.atsuishio.superbwarfare.network.message.send.*
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.*
@@ -42,16 +44,18 @@ object ClickEventHandler {
         if (notInGame) return
         if (action != InputConstants.RELEASE) return
 
+        syncModMouseConflictState(button, action)
+
         val player = localPlayer ?: return
         if (player.hasEffect(ModMobEffects.SHOCK)) return
 
-        if (button == ModKeyMappings.FIRE.key.value) {
+        if (ModKeyMappings.FIRE.matchesMouse(button)) {
             handleWeaponFireRelease()
         }
 
-        if (button == ModKeyMappings.HOLD_ZOOM.key.value) {
+        if (ModKeyMappings.HOLD_ZOOM.matchesMouse(button)) {
             handleWeaponZoomRelease()
-        } else if (button == ModKeyMappings.SWITCH_ZOOM.key.value && !switchZoom) {
+        } else if (ModKeyMappings.SWITCH_ZOOM.matchesMouse(button) && !switchZoom) {
             handleWeaponZoomRelease()
         }
     }
@@ -69,9 +73,107 @@ object ClickEventHandler {
     }
 
     @JvmStatic
+    fun shouldCancelMouseButton(button: Int): Boolean {
+        if (notInGame) return false
+
+        val player = localPlayer ?: return false
+        if (player.isSpectator) return false
+
+        val stack = player.mainHandItem
+
+        if (ModKeyMappings.FIRE.matchesMouse(button) && cancelFireKey(player, stack)) {
+            return true
+        }
+
+        if ((ModKeyMappings.HOLD_ZOOM.matchesMouse(button) || ModKeyMappings.SWITCH_ZOOM.matchesMouse(button))
+            && cancelZoomKey(player, stack)
+        ) {
+            return true
+        }
+
+        return button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE
+                && (player.hasEffect(ModMobEffects.SHOCK)
+                || stack.`is`(ModItems.ARTILLERY_INDICATOR)
+                || (stack.`is`(ModItems.MONITOR) && player.offhandItem.`is`(ModItems.ARTILLERY_INDICATOR)))
+    }
+
+    @JvmStatic
+    fun releaseVanillaMouseButton(button: Int) {
+        val options = mc.options
+
+        if (options.keyAttack.matchesMouse(button)) {
+            options.keyAttack.setDown(false)
+        }
+        if (options.keyUse.matchesMouse(button)) {
+            options.keyUse.setDown(false)
+        }
+        if (options.keyPickItem.matchesMouse(button)) {
+            options.keyPickItem.setDown(false)
+        }
+    }
+
+    @JvmStatic
+    fun forwardVanillaMouseButtonIfNeeded(button: Int, action: Int) {
+        if (notInGame || !hasModMouseConflict(button)) {
+            return
+        }
+
+        val options = mc.options
+        forwardVanillaMouseButton(options.keyAttack, button, action)
+        forwardVanillaMouseButton(options.keyUse, button, action)
+        forwardVanillaMouseButton(options.keyPickItem, button, action)
+    }
+
+    private fun hasModMouseConflict(button: Int): Boolean {
+        return ModKeyMappings.FIRE.matchesMouse(button)
+                || ModKeyMappings.HOLD_ZOOM.matchesMouse(button)
+                || ModKeyMappings.SWITCH_ZOOM.matchesMouse(button)
+                || ModKeyMappings.FIRE_MODE.matchesMouse(button)
+                || ModKeyMappings.MELEE.matchesMouse(button)
+                || ModKeyMappings.MARK.matchesMouse(button)
+    }
+
+    private fun syncModMouseConflictState(button: Int, action: Int) {
+        if (action != InputConstants.PRESS && action != InputConstants.RELEASE) {
+            return
+        }
+
+        val down = action == InputConstants.PRESS
+        syncMouseMapping(ModKeyMappings.MELEE, button, down)
+        syncMouseMapping(ModKeyMappings.RELEASE_DECOY, button, down)
+    }
+
+    private fun syncMouseMapping(keyMapping: KeyMapping, button: Int, down: Boolean) {
+        if (keyMapping.matchesMouse(button)) {
+            keyMapping.setDown(down)
+        }
+    }
+
+    private fun forwardVanillaMouseButton(keyMapping: KeyMapping, button: Int, action: Int) {
+        if (!keyMapping.matchesMouse(button) || !isShadowedMouseMapping(keyMapping, button)) {
+            return
+        }
+
+        if (action == InputConstants.PRESS) {
+            keyMapping.setDown(true)
+            val accessor = keyMapping as KeyMappingAccessor
+            accessor.`superbwarfare$setClickCount`(accessor.`superbwarfare$getClickCount`() + 1)
+        } else if (action == InputConstants.RELEASE) {
+            keyMapping.setDown(false)
+        }
+    }
+
+    private fun isShadowedMouseMapping(keyMapping: KeyMapping, button: Int): Boolean {
+        val key = InputConstants.Type.MOUSE.getOrCreate(button)
+        return KeyMappingAccessor.`superbwarfare$getMap`()[key] != keyMapping
+    }
+
+    @JvmStatic
     fun onButtonPressed(button: Int, action: Int, modifiers: Int): Boolean {
         if (notInGame) return false
         if (action != InputConstants.PRESS) return false
+
+        syncModMouseConflictState(button, action)
 
         val player = localPlayer ?: return false
         if (player.isSpectator) return false
@@ -83,19 +185,11 @@ object ClickEventHandler {
 
         val stack = player.mainHandItem
 
-        val fireKey = ModKeyMappings.FIRE.key
-        if (fireKey.type == InputConstants.Type.MOUSE
-            && fireKey.value == button
-            && cancelFireKey(player, stack)
-        ) {
+        if (ModKeyMappings.FIRE.matchesMouse(button) && cancelFireKey(player, stack)) {
             canceled = true
         }
 
-        val zoomKey = ModKeyMappings.HOLD_ZOOM.key
-        if (zoomKey.type == InputConstants.Type.MOUSE
-            && zoomKey.value == button
-            && cancelZoomKey(player, stack)
-        ) {
+        if (ModKeyMappings.HOLD_ZOOM.matchesMouse(button) && cancelZoomKey(player, stack)) {
             canceled = true
         }
 
@@ -108,7 +202,7 @@ object ClickEventHandler {
             }
         }
 
-        if (button == ModKeyMappings.MARK.key.value) {
+        if (ModKeyMappings.MARK.matchesMouse(button)) {
             if (stack.`is`(ModItems.ARTILLERY_INDICATOR)) {
                 sendPacketToServer(SetFiringParametersMessage)
             }
@@ -124,21 +218,20 @@ object ClickEventHandler {
             || (stack.`is`(Items.SPYGLASS) && player.isScoping && player.offhandItem.`is`(ModItems.FIRING_PARAMETERS))
             || stack.`is`(ModItems.ARTILLERY_INDICATOR)
         ) {
-            if (button == ModKeyMappings.FIRE.key.value) {
+            if (ModKeyMappings.FIRE.matchesMouse(button)) {
                 handleWeaponFirePress(player, stack)
             }
 
-            if (button == ModKeyMappings.HOLD_ZOOM.key.value) {
+            if (ModKeyMappings.HOLD_ZOOM.matchesMouse(button)) {
                 handleWeaponZoomPress(player, stack)
                 switchZoom = false
-            } else if (button == ModKeyMappings.SWITCH_ZOOM.key.value) {
+            } else if (ModKeyMappings.SWITCH_ZOOM.matchesMouse(button)) {
                 handleWeaponZoomPress(player, stack)
                 switchZoom = !switchZoom
             }
         }
 
-        val fireModeKey = ModKeyMappings.FIRE_MODE.key
-        if (fireModeKey.type == InputConstants.Type.MOUSE && button == fireModeKey.value) {
+        if (ModKeyMappings.FIRE_MODE.matchesMouse(button)) {
             val vehicle = player.vehicle
             if (vehicle is VehicleEntity) {
                 val data = vehicle.getGunData(player)
@@ -204,6 +297,7 @@ object ClickEventHandler {
             if (data.canSwitchScope()) {
                 sendPacketToServer(SwitchScopeMessage(scroll))
             } else if (data.canAdjustZoom() || stack.`is`(ModItems.MINIGUN)) {
+                AdjustZoomFovMessage.apply(player, scroll, false)
                 sendPacketToServer(AdjustZoomFovMessage(scroll))
             }
             canceled = true
@@ -240,6 +334,8 @@ object ClickEventHandler {
 
         val key = keyCode
         if (key < 0) return false
+
+        syncModKeyConflictState(key, scanCode, action)
 
         if (player.isSpectator) return false
         if (player.hasEffect(ModMobEffects.SHOCK)) return false
@@ -307,7 +403,7 @@ object ClickEventHandler {
             }
             if (key == ModKeyMappings.INTERACT.key.value) {
                 if (stack.item is GunItem) {
-                    KeyMapping.click(mc.options.keyUse.key)
+                    (mc as MinecraftAccessor).`superbwarfare$startUseItem`()
                 } else if (stack.`is`(ModItems.MONITOR)) {
                     sendPacketToServer(InteractMessage)
                 }
@@ -431,6 +527,44 @@ object ClickEventHandler {
             }
         }
         return false
+    }
+
+    private fun syncModKeyConflictState(key: Int, scanCode: Int, action: Int) {
+        if (action != GLFW.GLFW_PRESS && action != GLFW.GLFW_RELEASE) {
+            return
+        }
+
+        val down = action == GLFW.GLFW_PRESS
+        syncMovementKeyConflictState(key, scanCode, down)
+        syncKeyMapping(ModKeyMappings.DISMOUNT, key, scanCode, down)
+        syncKeyMapping(ModKeyMappings.MELEE, key, scanCode, down)
+        syncKeyMapping(ModKeyMappings.RELEASE_DECOY, key, scanCode, down)
+    }
+
+    private fun syncMovementKeyConflictState(key: Int, scanCode: Int, down: Boolean) {
+        val options = mc.options
+
+        syncKeyMapping(options.keyUp, key, scanCode, down)
+        syncKeyMapping(options.keyDown, key, scanCode, down)
+        syncKeyMapping(options.keyLeft, key, scanCode, down)
+        syncKeyMapping(options.keyRight, key, scanCode, down)
+        syncKeyMapping(options.keyJump, key, scanCode, down)
+        syncKeyMapping(options.keyShift, key, scanCode, down)
+        syncKeyMapping(options.keySprint, key, scanCode, down)
+
+        syncKeyMapping(ModKeyMappings.MOVE_FORWARD, key, scanCode, down)
+        syncKeyMapping(ModKeyMappings.MOVE_BACKWARD, key, scanCode, down)
+        syncKeyMapping(ModKeyMappings.MOVE_LEFT, key, scanCode, down)
+        syncKeyMapping(ModKeyMappings.MOVE_RIGHT, key, scanCode, down)
+        syncKeyMapping(ModKeyMappings.MOVE_SPACE, key, scanCode, down)
+        syncKeyMapping(ModKeyMappings.MOVE_SHIFT, key, scanCode, down)
+        syncKeyMapping(ModKeyMappings.MOVE_CTRL, key, scanCode, down)
+    }
+
+    private fun syncKeyMapping(keyMapping: KeyMapping, key: Int, scanCode: Int, down: Boolean) {
+        if (keyMapping.matches(key, scanCode)) {
+            keyMapping.setDown(down)
+        }
     }
 
     fun handleWeaponFirePress(player: Player, stack: ItemStack) {

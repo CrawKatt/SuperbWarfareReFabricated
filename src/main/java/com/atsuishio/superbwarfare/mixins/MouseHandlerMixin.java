@@ -1,16 +1,19 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.client.ClickHandler;
+import com.atsuishio.superbwarfare.event.ClickEventHandler;
+import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.tools.NBTTool;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.Minecraft;
+import org.objectweb.asm.Opcodes;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
@@ -19,6 +22,11 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
  */
 @Mixin(MouseHandler.class)
 public class MouseHandlerMixin {
+
+    @ModifyVariable(method = "turnPlayer(D)V", at = @At(value = "STORE", opcode = Opcodes.DSTORE), ordinal = 1)
+    private double superbwarfare$sensitivity(double original) {
+        return ClientMouseHandler.changeSensitivity(original);
+    }
 
     @Inject(
             method = "onPress(JIII)V",
@@ -29,28 +37,28 @@ public class MouseHandlerMixin {
             cancellable = true
     )
     private void superbwarfare$onMousePressed(long window, int button, int action, int modifiers, CallbackInfo ci) {
-        ClickHandler.onButtonPressed(button, action, modifiers);
+        ClickEventHandler.onButtonPressed(button, action, modifiers);
 
-        if (ClickHandler.shouldCancelMouseButton(button)) {
-            ClickHandler.releaseVanillaMouseButton(button);
+        if (ClickEventHandler.shouldCancelMouseButton(button)) {
+            ClickEventHandler.releaseVanillaMouseButton(button);
             ci.cancel();
             return;
         }
 
-        ClickHandler.forwardVanillaMouseButtonIfNeeded(button, action);
+        ClickEventHandler.forwardVanillaMouseButtonIfNeeded(button, action);
     }
 
     @Inject(method = "onPress(JIII)V", at = @At("TAIL"))
     private void superbwarfare$onMouseReleased(long window, int button, int action, int modifiers, CallbackInfo ci) {
         if (action == GLFW.GLFW_RELEASE) {
-            ClickHandler.onButtonReleased(button, action, modifiers);
-            ClickHandler.forwardVanillaMouseButtonIfNeeded(button, action);
+            ClickEventHandler.onButtonReleased(button, action, modifiers);
+            ClickEventHandler.forwardVanillaMouseButtonIfNeeded(button, action);
         }
     }
 
     @Inject(method = "onScroll(JDD)V", at = @At("HEAD"), cancellable = true)
     private void superbwarfare$onMouseScrolled(long window, double horizontalAmount, double verticalAmount, CallbackInfo ci) {
-        if (ClickHandler.onMouseScrolling(horizontalAmount, verticalAmount)) {
+        if (ClickEventHandler.onMouseScrolling(horizontalAmount, verticalAmount)) {
             ci.cancel();
         }
     }

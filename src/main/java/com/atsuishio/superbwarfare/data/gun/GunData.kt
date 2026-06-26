@@ -72,6 +72,8 @@ class GunData private constructor(
     @JvmField
     var defaultDataSupplier: () -> DefaultGunData
     var lastTimeStack: ItemStack? = null
+    private var sourceStackSnapshot: ItemStack = stack.copy()
+    private val usesExternalDefaultDataSupplier = initialDefaultDataSupplier != null
 
     private fun getOrPut(name: String): CompoundTag {
         if (!this.tag.contains(name)) {
@@ -157,13 +159,15 @@ class GunData private constructor(
     @Suppress("UNCHECKED_CAST")
     fun <T> get(prop: GunProp<*, T>): T {
         val currentStack = this.stack
-        val modifier = if (this.pmc == null || !(currentStack sameWith lastTimeStack)) {
+        val stackChanged = !(currentStack sameWith lastTimeStack)
+        val rebuildModifier = this.pmc == null || stackChanged
+        val modifier = if (rebuildModifier) {
             PMC(this).also { this.pmc = it }
         } else {
             this.pmc!!
         }
 
-        if (!(currentStack sameWith lastTimeStack)) {
+        if (rebuildModifier) {
             lastTimeStack = currentStack.copy()
         } else {
             return modifier[prop]
@@ -745,7 +749,7 @@ class GunData private constructor(
     val perk: Perks
 
     fun save() {
-        val keysToRemove = ArrayList<String?>()
+        val keysToRemove = ArrayList<String>()
         for (key in perkTag.allKeys) {
             val compoundTag = perkTag.get(key) as? CompoundTag
             if (compoundTag?.isEmpty == true) {
@@ -769,12 +773,23 @@ class GunData private constructor(
         }
 
         if (!tag.isEmpty) {
+            val current = stack.get(DataComponents.CUSTOM_DATA)?.copyTag()
+            if (current == cleanedTag) {
+                sourceStackSnapshot = stack.copy()
+                return
+            }
+
             stack.set(DataComponents.CUSTOM_DATA, CustomData.of(cleanedTag))
         } else {
+            if (!stack.has(DataComponents.CUSTOM_DATA)) {
+                sourceStackSnapshot = stack.copy()
+                return
+            }
             stack.remove(DataComponents.CUSTOM_DATA)
         }
 
         update()
+        sourceStackSnapshot = stack.copy()
     }
 
     override fun equals(obj: Any?): Boolean {
@@ -887,8 +902,16 @@ class GunData private constructor(
         @JvmOverloads
         fun from(stack: ItemStack, defaultDataSupplier: (() -> DefaultGunData)? = null): GunData {
             defaultDataSupplier?.let { itemStackDefaultDataSupplier[stack] = it }
-            return DATA_CACHE.getUnchecked(stack)
-                .also { itemStackDefaultDataSupplier -= stack }
+            var data = DATA_CACHE.getUnchecked(stack)
+
+            if (!(stack sameWith data.sourceStackSnapshot)) {
+                val supplier = defaultDataSupplier ?: data.defaultDataSupplier.takeIf { data.usesExternalDefaultDataSupplier }
+                supplier?.let { itemStackDefaultDataSupplier[stack] = it }
+                DATA_CACHE.invalidate(stack)
+                data = DATA_CACHE.getUnchecked(stack)
+            }
+
+            return data.also { itemStackDefaultDataSupplier -= stack }
         }
 
         @JvmStatic
