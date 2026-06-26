@@ -6,8 +6,8 @@ import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.network.message.receive.EntitySyncMessage
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.SeekTool
+import com.atsuishio.superbwarfare.tools.ServerSyncedEntityHandler
 import com.atsuishio.superbwarfare.tools.sendPacketTo
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
@@ -147,7 +147,22 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
     override fun tick() {
         super.tick()
         this.distractedByDecoy()
+        // 向服务端同步处理器注册自身
+        if (level() is ServerLevel && owner != null) {
+            val targetEntity = EntityFindUtil.findEntity(level(), getTargetUUID())
+            if (targetEntity != null) {
+                setTargetPos(targetEntity.position())
+            }
+            ServerSyncedEntityHandler.register(this, getTargetPos())
+        }
         this.syncPosition()
+    }
+
+    override fun remove(reason: RemovalReason) {
+        if (!level().isClientSide) {
+            ServerSyncedEntityHandler.unregister(this)
+        }
+        super.remove(reason)
     }
 
     open fun distractedByDecoy() {
@@ -165,7 +180,7 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
     }
 
     /**
-     * 给队友同步友方导弹位置
+     * 给队友同步友方导弹位置（从 ServerSyncedEntityHandler 查询，避免遍历所有实体）
      */
     open fun syncPosition() {
         val level = this.level()
@@ -173,30 +188,24 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
         if (server != null && server!!.tickCount % MiscConfig.SYNC_ENTITY_INTERVAL.get() != 0) return
 
         if (level is ServerLevel && owner != null) {
-            val friendlyMissileList = arrayListOf<EntitySyncMessage.SyncedEntity>()
-            val targetEntity = EntityFindUtil.findEntity(level, getTargetUUID())
-            if (targetEntity != null) {
-                setTargetPos(targetEntity.position())
-            }
-            val syncedTargetPos = when {
-                getTargetPos() != null -> getTargetPos()
-                distractedValue -> null
-                else -> null
-            }
-            val synced = EntitySyncMessage.SyncedEntity(
-                id,
-                BuiltInRegistries.ENTITY_TYPE.getKey(type),
-                position(),
-                syncedTargetPos,
-                CompoundTag().also { tag -> this.saveWithoutId(tag) },
-                yRot
-            )
+            val dim = level.dimension().location()
+            val friendlyMissileList = ServerSyncedEntityHandler.getEntries(dim)
+                .asSequence()
+                .mapNotNull { entry ->
+                    val entity = level.getEntity(entry.entityId) ?: return@mapNotNull null
+                    if (entity !is MissileProjectile) return@mapNotNull null
+                    if (!SeekTool.IS_FRIENDLY.test(owner, entity)) return@mapNotNull null
+                    EntitySyncMessage.SyncedEntity(
+                        entry.entityId, entry.entityType, entry.pos, entry.targetPos, entry.nbt, entry.yRot,
+                        heightAboveGround = entry.heightAboveGround,
+                    )
+                }.toList()
 
-            friendlyMissileList.add(synced)
+            if (friendlyMissileList.isEmpty()) return
 
             for (player in server!!.playerList.players) {
                 if (SeekTool.IS_FRIENDLY.test(player, this.owner)) {
-                    sendPacketTo(player, EntitySyncMessage(level.dimension().location(), friendlyMissileList, true))
+                    sendPacketTo(player, EntitySyncMessage(dim, friendlyMissileList, true))
                 }
             }
         }
