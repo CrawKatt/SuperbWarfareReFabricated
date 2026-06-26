@@ -1,0 +1,7 @@
+{
+  "parent": "superbwarfare:item/repair_tool_base",
+  "gui_light": "front",
+  "textures": {
+    "particle": "superbwarfare:item/repair_tool_icon"
+  }
+}

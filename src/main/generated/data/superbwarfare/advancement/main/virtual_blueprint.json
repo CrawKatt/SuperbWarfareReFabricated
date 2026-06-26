@@ -1,0 +1,33 @@
+{
+  "parent": "superbwarfare:main/superb_blueprint",
+  "criteria": {
+    "0": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#superbwarfare:blueprint/virtual"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "superbwarfare.advancement.main.virtual_blueprint.des"
+    },
+    "icon": {
+      "count": 1,
+      "id": "superbwarfare:trachelium_blueprint"
+    },
+    "title": {
+      "translate": "superbwarfare.advancement.main.virtual_blueprint"
+    }
+  },
+  "requirements": [
+    [
+      "0"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

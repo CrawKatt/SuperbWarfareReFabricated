@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": {
+      "tag": "c:ingots/lead"
+    },
+    "b": {
+      "tag": "c:plates/copper"
+    },
+    "c": {
+      "item": "minecraft:gunpowder"
+    },
+    "d": {
+      "item": "superbwarfare:primer"
+    }
+  },
+  "pattern": [
+    " a ",
+    "bcb",
+    " d "
+  ],
+  "result": {
+    "count": 24,
+    "id": "superbwarfare:shotgun_ammo"
+  }
+}

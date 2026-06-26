@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "superbwarfare:empty_perk"
+    },
+    "b": {
+      "tag": "c:storage_blocks/copper"
+    },
+    "c": {
+      "tag": "c:ingots/copper"
+    }
+  },
+  "pattern": [
+    "cbc",
+    "bab",
+    "cbc"
+  ],
+  "result": {
+    "count": 1,
+    "id": "superbwarfare:jhp_bullet"
+  }
+}

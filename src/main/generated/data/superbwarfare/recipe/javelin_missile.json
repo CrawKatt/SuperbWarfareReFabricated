@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": {
+      "item": "superbwarfare:seeker"
+    },
+    "b": {
+      "tag": "c:ingots/iron"
+    },
+    "c": {
+      "item": "superbwarfare:ap_head"
+    },
+    "d": {
+      "item": "superbwarfare:missile_engine"
+    }
+  },
+  "pattern": [
+    " a ",
+    "bcb",
+    " d "
+  ],
+  "result": {
+    "count": 1,
+    "id": "superbwarfare:javelin_missile"
+  }
+}

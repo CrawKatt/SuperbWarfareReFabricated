@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "superbwarfare:empty_perk"
+    },
+    "b": {
+      "tag": "c:gems/diamond"
+    },
+    "c": {
+      "tag": "c:ores/netherite_scrap"
+    }
+  },
+  "pattern": [
+    "bcb",
+    "cac",
+    "bcb"
+  ],
+  "result": {
+    "count": 1,
+    "id": "superbwarfare:ancient_cpu"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": {
+      "tag": "superbwarfare:ingots/steel"
+    },
+    "b": {
+      "tag": "superbwarfare:ingots/cemented_carbide"
+    }
+  },
+  "pattern": [
+    " aa",
+    " ba",
+    "a  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "superbwarfare:military_shovel"
+  }
+}

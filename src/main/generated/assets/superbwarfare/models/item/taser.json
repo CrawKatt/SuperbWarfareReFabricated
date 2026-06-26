@@ -1,0 +1,7 @@
+{
+  "parent": "superbwarfare:item/taser_base",
+  "gui_light": "front",
+  "textures": {
+    "particle": "superbwarfare:item/taser_icon"
+  }
+}

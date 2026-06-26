@@ -1,0 +1,7 @@
+{
+  "parent": "superbwarfare:item/trachelium_base",
+  "gui_light": "front",
+  "textures": {
+    "particle": "superbwarfare:item/trachelium_icon"
+  }
+}
