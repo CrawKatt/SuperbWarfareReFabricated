@@ -39,6 +39,7 @@ import com.atsuishio.superbwarfare.network.registerPayloads
 import com.atsuishio.superbwarfare.tiers.ModArmorMaterials
 import com.atsuishio.superbwarfare.tools.GunsTool
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger
+import com.atsuishio.superbwarfare.tools.registerMinecraftUtil
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry
 import net.fabricmc.api.ModInitializer
@@ -73,6 +74,7 @@ class Mod : ModInitializer {
         ContainerBlockItem.registerContainers()
         ModCapabilities.init()
         CustomData.load()
+        registerMinecraftUtil()
 
         CommandRegister.register()
         ContainerDataManager.register()
