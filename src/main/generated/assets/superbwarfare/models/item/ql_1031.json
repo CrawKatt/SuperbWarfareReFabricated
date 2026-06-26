@@ -1,0 +1,7 @@
+{
+  "parent": "superbwarfare:item/ql_1031_base",
+  "gui_light": "front",
+  "textures": {
+    "particle": "superbwarfare:item/ql_1031_icon"
+  }
+}

@@ -3,7 +3,7 @@ package com.atsuishio.superbwarfare.datagen
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 
-object DataGenerators : DataGeneratorEntrypoint {
+class DataGenerators : DataGeneratorEntrypoint {
     override fun onInitializeDataGenerator(fabricDataGenerator: FabricDataGenerator) {
         val pack = fabricDataGenerator.createPack()
 

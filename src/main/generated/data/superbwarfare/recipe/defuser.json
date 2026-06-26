@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "tag": "superbwarfare:ingots/steel"
+    },
+    "b": {
+      "tag": "c:nuggets/iron"
+    },
+    "c": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    "  a",
+    "cb ",
+    " c "
+  ],
+  "result": {
+    "count": 1,
+    "id": "superbwarfare:defuser"
+  }
+}

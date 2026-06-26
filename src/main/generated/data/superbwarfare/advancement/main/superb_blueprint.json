@@ -1,0 +1,33 @@
+{
+  "parent": "superbwarfare:main/legendary_blueprint",
+  "criteria": {
+    "0": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#superbwarfare:blueprint/superb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "superbwarfare.advancement.main.superb_blueprint.des"
+    },
+    "icon": {
+      "count": 1,
+      "id": "superbwarfare:super_star_shooter_blueprint"
+    },
+    "title": {
+      "translate": "superbwarfare.advancement.main.superb_blueprint"
+    }
+  },
+  "requirements": [
+    [
+      "0"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

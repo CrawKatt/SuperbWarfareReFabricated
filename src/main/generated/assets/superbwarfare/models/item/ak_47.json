@@ -1,0 +1,7 @@
+{
+  "parent": "superbwarfare:item/ak_47_base",
+  "gui_light": "front",
+  "textures": {
+    "particle": "superbwarfare:item/ak_47_icon"
+  }
+}

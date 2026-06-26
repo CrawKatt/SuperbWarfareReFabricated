@@ -153,10 +153,13 @@ dependencies {
 }
 
 fabricApi {
-    configureDataGeneration()
+    configureDataGeneration {
+        outputDirectory = file("src/generated/resources")
+    }
 }
 
 tasks.withType<ProcessResources> {
+    duplicatesStrategy = DuplicatesStrategy.WARN
     val properties = mapOf(
         "version" to project.version,
         "minecraft_version" to project.property("minecraft_version"),

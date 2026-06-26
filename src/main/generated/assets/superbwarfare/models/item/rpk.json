@@ -1,0 +1,7 @@
+{
+  "parent": "superbwarfare:item/rpk_base",
+  "gui_light": "front",
+  "textures": {
+    "particle": "superbwarfare:item/rpk_icon"
+  }
+}

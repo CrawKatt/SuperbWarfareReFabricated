@@ -1,0 +1,7 @@
+{
+  "parent": "superbwarfare:item/ntw_20_base",
+  "gui_light": "front",
+  "textures": {
+    "particle": "superbwarfare:item/ntw_20_icon"
+  }
+}
