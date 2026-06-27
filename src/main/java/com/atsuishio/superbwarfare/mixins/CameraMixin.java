@@ -100,6 +100,7 @@ public abstract class CameraMixin implements ICustomCamera {
             }
 
             if (rotation != null || position != null) {
+                superbWarfare$applyComputedAngles(partialTicks, false);
                 info.cancel();
             }
 

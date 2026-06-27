@@ -1244,6 +1244,16 @@ object ClientEventHandler {
         }
     }
 
+    private fun clearWeaponCameraTransforms() {
+        cameraRot[0] = 0.0
+        cameraRot[1] = 0.0
+        cameraRot[2] = 0.0
+
+        turnRot[0] = 0.0
+        turnRot[1] = 0.0
+        turnRot[2] = 0.0
+    }
+
     @JvmStatic
     fun isProne(player: Player): Boolean {
         val level = player.level()
@@ -1868,6 +1878,10 @@ object ClientEventHandler {
         shakeTime = Mth.lerp(0.05 * getDelta(), shakeTime, 0.0)
 
         val vehicle = player.vehicle
+        val blocksHand = vehicle is VehicleEntity && vehicle.banHand(player)
+        val baseRoll = if (blocksHand) 0f else roll
+        var appliedScreenShake = false
+
         if (shakeTime > 0) {
             val shakeRadiusAmplitude =
                 (1 - player.position().distanceTo(Vec3(shakePos[0], shakePos[1], shakePos[2])) / shakeRadius)
@@ -1882,7 +1896,7 @@ object ClientEventHandler {
                     (pitch - (shakeTime * sin(0.5 * Math.PI * shakeTime) * shakeAmplitude * shakeRadiusAmplitude * shakeType *
                             if (onVehicle) 0.1 else 1.0)).toFloat()
                 cameraRoll =
-                    (roll - (shakeTime * sin(0.5 * Math.PI * shakeTime) * shakeAmplitude * shakeRadiusAmplitude *
+                    (baseRoll - (shakeTime * sin(0.5 * Math.PI * shakeTime) * shakeAmplitude * shakeRadiusAmplitude *
                             if (onVehicle) 0.1 else 1.0)).toFloat()
             } else {
                 event.yaw =
@@ -1892,16 +1906,22 @@ object ClientEventHandler {
                     (pitch + (shakeTime * sin(0.5 * Math.PI * shakeTime) * shakeAmplitude * shakeRadiusAmplitude * shakeType *
                             if (onVehicle) 0.1 else 1.0)).toFloat()
                 cameraRoll =
-                    (roll + (shakeTime * sin(0.5 * Math.PI * shakeTime) * shakeAmplitude * shakeRadiusAmplitude *
+                    (baseRoll + (shakeTime * sin(0.5 * Math.PI * shakeTime) * shakeAmplitude * shakeRadiusAmplitude *
                             if (onVehicle) 0.1 else 1.0)).toFloat()
             }
+            appliedScreenShake = true
         }
 
         cameraPitch = event.pitch
         cameraYaw = event.yaw
-        cameraRoll *= 0.99f
 
-        if (vehicle is VehicleEntity && vehicle.banHand(player)) return
+        if (blocksHand) {
+            clearWeaponCameraTransforms()
+            cameraRoll = if (appliedScreenShake) cameraRoll * 0.99f else 0f
+            return
+        }
+
+        cameraRoll *= 0.99f
 
         if (stack.item is GunItem) {
             handleWeaponSway(entity)
