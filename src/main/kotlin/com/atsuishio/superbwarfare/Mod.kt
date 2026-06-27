@@ -36,12 +36,14 @@ import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.init.ModVillagers
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.network.registerPayloads
+import com.atsuishio.superbwarfare.resource.BedrockModelLoader
 import com.atsuishio.superbwarfare.tiers.ModArmorMaterials
 import com.atsuishio.superbwarfare.tools.GunsTool
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger
 import com.atsuishio.superbwarfare.tools.registerMinecraftUtil
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry
+import net.fabricmc.api.EnvType
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
@@ -63,6 +65,7 @@ class Mod : ModInitializer {
     override fun onInitialize() {
         LOGGER.info("Initializing Superb Warfare (Fabric)")
 
+        registerClientBedrockModels()
         triggerInit()
         callInits()
 
@@ -86,6 +89,13 @@ class Mod : ModInitializer {
         registerBuiltinResourcePacks()
         registerDataTickets()
         registerTicks()
+    }
+
+    // Necessary for load SBM Models
+    private fun registerClientBedrockModels() {
+        if (FabricLoader.getInstance().environmentType == EnvType.CLIENT) {
+            BedrockModelLoader.init()
+        }
     }
 
     private fun triggerInit() {

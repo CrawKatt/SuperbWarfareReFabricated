@@ -20,6 +20,8 @@ import java.io.InputStreamReader
 
 @Environment(EnvType.CLIENT)
 object BedrockModelLoader {
+    private var initialized = false
+
     private val COMMON_MODELS = mutableListOf<ResourceLocation>()
     private val COMMON_MODELS_AND_ANIMATIONS = hashMapOf<ResourceLocation, ResourceLocation>()
     private val ARMOR_MODELS = mutableListOf<ResourceLocation>()
@@ -139,6 +141,9 @@ object BedrockModelLoader {
 
     @JvmStatic
     fun init() {
+        if (initialized) return
+        initialized = true
+
         RegisterBedrockModelEvent.EVENT.register { event -> onRegisterBedrockModels(event) }
         RegisterBedrockAnimationEvent.EVENT.register { event -> onRegisterBedrockAnimations(event) }
         RegisterBedrockModelReloadListenerEvent.EVENT.register { event -> onModelLoaded(event) }

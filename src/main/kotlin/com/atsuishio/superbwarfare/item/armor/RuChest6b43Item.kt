@@ -62,6 +62,7 @@ class RuChest6b43Item : ArmorItem(
                     }
 
                     armorRenderer.preparePose(entity, stack, slot, contextModel)
+                    armorRenderer.young = entity.isBaby
 
                     ArmorRenderer.renderPart(
                         matrices,

@@ -60,6 +60,7 @@ class UsHelmetPasgtItem :
                     }
 
                     armorRenderer.preparePose(entity, stack, slot, contextModel)
+                    armorRenderer.young = entity.isBaby
 
                     ArmorRenderer.renderPart(
                         matrices,
