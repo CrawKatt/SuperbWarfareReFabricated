@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
 import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
 import com.atsuishio.superbwarfare.client.molang.MolangVariable;
+import com.atsuishio.superbwarfare.client.screens.SnapshotWarningScreen;
 import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.data.DataLoader;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -18,6 +19,7 @@ import com.atsuishio.superbwarfare.network.NetworkRegistryKt;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.neoforged.fml.config.ModConfig;
 
@@ -43,6 +45,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         PotionMortarShellItem.registerColorHandler();
         ParachuteRenderer.onRenderLevelStage();
         ContainerBlockPreview.init();
+        SnapshotWarningScreen.register();
 
         MouseMovementHandler.init();
         MolangVariable.register();
@@ -52,6 +55,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         NetworkRegistryKt.registerClientReceivers();
 
         registerClientTicks();
+        registerClientConnectionEvents();
         registerRenderFrames();
     }
 
@@ -64,6 +68,10 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
             KillMessageHandler.onClientTick();
             FuMO25ScreenHelper.onClientTick();
         });
+    }
+
+    private static void registerClientConnectionEvents() {
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> ClientEventHandler.onPlayerLoggedIn());
     }
 
     private static void registerRenderFrames() {

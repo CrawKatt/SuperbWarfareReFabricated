@@ -5,10 +5,13 @@ import com.atsuishio.superbwarfare.command.CommandRegister
 import com.atsuishio.superbwarfare.compat.thermoo.ThermooCompatHandler
 import com.atsuishio.superbwarfare.config.CommonConfig
 import com.atsuishio.superbwarfare.config.ServerConfig
+import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.DataLoader
 import com.atsuishio.superbwarfare.data.container.ContainerDataManager
+import com.atsuishio.superbwarfare.data.loot.WreckageLootDataManager
 import com.atsuishio.superbwarfare.data.vehicle.VehicleDataTool
+import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
 import com.atsuishio.superbwarfare.event.PlayerEventHandler
 import com.atsuishio.superbwarfare.init.ModAttributes
@@ -35,12 +38,17 @@ import com.atsuishio.superbwarfare.init.ModTabs
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.init.ModVillagers
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
+import com.atsuishio.superbwarfare.item.trinket.IffItem
+import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect
 import com.atsuishio.superbwarfare.network.registerPayloads
+import com.atsuishio.superbwarfare.perk.damage.BattleOfWits
+import com.atsuishio.superbwarfare.recipe.ModPotionRecipes
 import com.atsuishio.superbwarfare.resource.BedrockModelLoader
 import com.atsuishio.superbwarfare.tiers.ModArmorMaterials
 import com.atsuishio.superbwarfare.tools.GunsTool
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger
 import com.atsuishio.superbwarfare.tools.registerMinecraftUtil
+import com.atsuishio.superbwarfare.world.saveddata.ChunkPosSavedData
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry
 import net.fabricmc.api.EnvType
@@ -73,6 +81,11 @@ class Mod : ModInitializer {
         VehicleDataTool.register()
         GunsTool.register()
         DataLoader.register()
+        WreckageLootDataManager.register()
+        FastThrowableProjectile.init()
+        IffItem.init()
+        PhosphorusFireMobEffect.registerEvents()
+        PlayerVariable.registerEvents()
 
         ContainerBlockItem.registerContainers()
         ModCapabilities.init()
@@ -81,6 +94,7 @@ class Mod : ModInitializer {
 
         CommandRegister.register()
         ContainerDataManager.register()
+        ChunkPosSavedData.register()
         TDMSavedData.register()
         ModDataComponents.init()
 
@@ -115,6 +129,7 @@ class Mod : ModInitializer {
         ModMobEffects.init()
         ModParticleTypes.init()
         ModPotions.init()
+        ModPotionRecipes.register()
         ModRecipes.init()
         ModArmorMaterials.register()
         ModAttributes.init()
@@ -122,6 +137,7 @@ class Mod : ModInitializer {
         ModCommandArguments.init()
         ModTabs.init()
         ModPerks.init()
+        BattleOfWits.register()
         ModVillagers.init()
         ModSerializers.init()
         ModDamageTypes.init()

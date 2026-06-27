@@ -28,6 +28,8 @@ public class ItemInHandRendererMixin {
             float partialTick, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource,
             LocalPlayer player, int packedLight, CallbackInfo ci
     ) {
+        ClientEventHandler.handleWeaponTurn(partialTick);
+
         if (VehicleClientRenderState.shouldHideHandsAndHotbar(player)) {
             ci.cancel();
         }

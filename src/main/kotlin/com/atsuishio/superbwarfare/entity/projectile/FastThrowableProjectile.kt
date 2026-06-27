@@ -64,14 +64,6 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, CustomSyncMoti
         }
     }
 
-    fun init() {
-        EntityTrackingEvents.START_TRACKING.register { entity, player ->
-            if (entity is FastThrowableProjectile) {
-                ServerPlayNetworking.send(player, ClientMotionSyncMessage(entity))
-            }
-        }
-    }
-
     override fun readAdditionalSaveData(compound: CompoundTag) {
         super.readAdditionalSaveData(compound)
         if (compound.contains("Damage")) {
@@ -394,6 +386,15 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, CustomSyncMoti
     }
 
     companion object {
+        @JvmStatic
+        fun init() {
+            EntityTrackingEvents.START_TRACKING.register { entity, player ->
+                if (entity is FastThrowableProjectile) {
+                    ServerPlayNetworking.send(player, ClientMotionSyncMessage(entity))
+                }
+            }
+        }
+
         var playFlySound: Consumer<FastThrowableProjectile> = Consumer { }
         var playNearFlySound: Consumer<FastThrowableProjectile> = Consumer { }
     }
