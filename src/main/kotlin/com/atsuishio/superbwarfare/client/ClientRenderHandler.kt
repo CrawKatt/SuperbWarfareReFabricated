@@ -141,7 +141,6 @@ object ClientRenderHandler {
 
         HudRenderCallback.EVENT.register { guiGraphics, deltaTracker ->
             JavelinHudOverlay.render(guiGraphics, deltaTracker)
-            KillMessageOverlay.render(guiGraphics, deltaTracker)
             ArmorPlateOverlay.render(guiGraphics, deltaTracker)
             AmmoBarOverlay.render(guiGraphics, deltaTracker)
             IFFOverlay.render(guiGraphics, deltaTracker)
@@ -163,6 +162,7 @@ object ClientRenderHandler {
             MortarInfoOverlay.render(guiGraphics, deltaTracker)
             Type63InfoOverlay.render(guiGraphics, deltaTracker)
             SodayoRocketInfoOverlay.render(guiGraphics, deltaTracker)
+            KillMessageOverlay.render(guiGraphics, deltaTracker)
         }
     }
 
@@ -180,27 +180,25 @@ object ClientRenderHandler {
     fun onClientSetup() {
         val tm62Renderer = lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
         BuiltinItemRendererRegistry.INSTANCE.register(
-            ModItems.TM_62,
-            BuiltinItemRendererRegistry.DynamicItemRenderer { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
-                tm62Renderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
-            }
-        )
+            ModItems.TM_62
+        ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
+            tm62Renderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
+        }
 
         val blueprintResearchTableRenderer =
             lazy { BlueprintResearchingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
         BuiltinItemRendererRegistry.INSTANCE.register(
-            ModItems.BLUEPRINT_RESEARCH_TABLE,
-            BuiltinItemRendererRegistry.DynamicItemRenderer { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
-                blueprintResearchTableRenderer.value.renderByItem(
-                    stack,
-                    displayContext,
-                    poseStack,
-                    buffer,
-                    packedLight,
-                    packedOverlay
-                )
-            }
-        )
+            ModItems.BLUEPRINT_RESEARCH_TABLE
+        ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
+            blueprintResearchTableRenderer.value.renderByItem(
+                stack,
+                displayContext,
+                poseStack,
+                buffer,
+                packedLight,
+                packedOverlay
+            )
+        }
 
         TrinketRendererRegistry.registerRenderer(ModItems.PARACHUTE, ParachuteRenderer())
         TrinketRendererRegistry.registerRenderer(ModItems.THERMAL_IMAGING_GOGGLES, ThermalImagingGogglesRenderer())

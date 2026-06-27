@@ -67,6 +67,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.IntArrayTag
 import net.minecraft.nbt.IntTag
 import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.LongTag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
 import net.minecraft.network.protocol.game.ClientboundSoundPacket
@@ -1317,7 +1318,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
         }
 
         val energyNBT = compound.get("Energy")
-        if (this.hasEnergyStorage() && energyNBT is IntTag) {
+        if (this.hasEnergyStorage() && (energyNBT is IntTag || energyNBT is LongTag)) {
             (energyStorage as SyncedEntityEnergyStorage).deserializeNBT(level().registryAccess(), energyNBT)
         }
 
