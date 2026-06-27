@@ -47,6 +47,8 @@ object ClientSyncedEntityHandler {
     @JvmField
     val SYNCED_PLAYERS = ConcurrentHashMap<SyncedPlayerKey, ClientSyncedPlayer>()
 
+    @JvmStatic
+    @JvmOverloads
     fun sync(dim: ResourceLocation, list: List<SyncedEntity>, friendly: Boolean, neutral: Boolean = false) {
         val level = mc.level ?: return
         val time = System.currentTimeMillis()
@@ -78,6 +80,7 @@ object ClientSyncedEntityHandler {
         }
     }
 
+    @JvmStatic
     fun syncPlayerInfo(dim: ResourceLocation, list: List<SyncedPlayerInfo>) {
         if (mc.level == null) return
         val time = System.currentTimeMillis()
@@ -87,6 +90,7 @@ object ClientSyncedEntityHandler {
         }
     }
 
+    @JvmStatic
     fun clean() {
         val tick = System.currentTimeMillis()
         val expire = MiscConfig.CLIENT_SYNC_EXPIRE_TIME.get()
@@ -126,6 +130,7 @@ object ClientSyncedEntityHandler {
         SYNCED_PLAYERS.filterKeys { it.dim == level.dimension().location() }.map { it.value }
 
     /** 按 ID 查找任一分类中的条目 */
+    @JvmStatic
     fun getSyncedEntry(level: Level, entityId: Int): ClientSyncedEntity? {
         val dim = level.dimension().location()
         return SYNCED_FRIENDLY[SyncedKey(dim, entityId)]
@@ -149,6 +154,7 @@ object ClientSyncedEntityHandler {
     @JvmField
     val SYNCED_RADARS = ConcurrentHashMap<SyncedKey, SyncedRadar>()
 
+    @JvmStatic
     fun syncRadars(dim: ResourceLocation, radars: List<RadarSyncMessage.SyncedRadar>) {
         val time = System.currentTimeMillis()
         for (r in radars) {

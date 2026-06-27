@@ -15,7 +15,6 @@ import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.network.initializeNetwork
 import com.atsuishio.superbwarfare.sound.SoundLimit
 import com.atsuishio.superbwarfare.tiers.ModArmorMaterial
-import com.atsuishio.superbwarfare.tools.ServerSyncedEntityHandler
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.PackType
@@ -104,10 +103,6 @@ class Mod(bus: IEventBus, container: ModContainer) {
     @Suppress("unused")
     private fun tick(event: ServerTickEvent.Post) {
         executeWork(SERVER_QUEUE)
-        val server = event.server
-        if (server.tickCount % 200 == 0) {
-            ServerSyncedEntityHandler.cleanAll(server)
-        }
     }
 
     @SubscribeEvent
