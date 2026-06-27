@@ -10,6 +10,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -53,6 +55,21 @@ public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
 
     @Shadow
     public abstract Vec3 getDeltaMovement();
+
+    @Shadow
+    public abstract Entity getVehicle();
+
+    @Shadow
+    private AABB bb;
+
+    @Shadow
+    private float eyeHeight;
+
+    @Shadow
+    private Vec3 position;
+
+    @Shadow
+    public abstract EntityDimensions getDimensions(Pose pose);
 
     @Inject(method = "collide", at = @At("HEAD"))
     private void sbw$spoofGroundStart(Vec3 movement, CallbackInfoReturnable<Vec3> cir) {
@@ -119,6 +136,49 @@ public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
             if (player.getVehicle() != null) {
                 player.getVehicle().onPassengerTurned(player);
             }
+        }
+    }
+
+    @Inject(method = "getBoundingBox()Lnet/minecraft/world/phys/AABB;",
+            at = @At("RETURN"), cancellable = true)
+    private void getBoundingBox(CallbackInfoReturnable<AABB> cir) {
+        if (this.getVehicle() instanceof VehicleEntity vehicle) {
+            cir.cancel();
+            var s = vehicle.getPassengerRenderScale();
+            var x = bb.getXsize() - bb.getXsize() * s;
+            var y = bb.getYsize() - bb.getYsize() * s;
+            var z = bb.getZsize() - bb.getZsize() * s;
+            cir.setReturnValue(bb.deflate(x, y, z));
+        }
+    }
+
+    @Inject(method = "getEyeY()D",
+            at = @At("RETURN"), cancellable = true)
+    private void getEyeY(CallbackInfoReturnable<Double> cir) {
+        if (this.getVehicle() instanceof VehicleEntity vehicle) {
+            cir.cancel();
+            var s = vehicle.getPassengerRenderScale();
+            cir.setReturnValue(this.position.y + (double) this.eyeHeight * s);
+        }
+    }
+
+    @Inject(method = "getEyeHeight()F",
+            at = @At("RETURN"), cancellable = true)
+    private void getEyeHeight(CallbackInfoReturnable<Float> cir) {
+        if (this.getVehicle() instanceof VehicleEntity vehicle) {
+            cir.cancel();
+            var s = vehicle.getPassengerRenderScale();
+            cir.setReturnValue(this.eyeHeight * s);
+        }
+    }
+
+    @Inject(method = "getEyeHeight(Lnet/minecraft/world/entity/Pose;)F",
+            at = @At("RETURN"), cancellable = true)
+    private void getEyeHeightDimensions(Pose pose, CallbackInfoReturnable<Float> cir) {
+        if (this.getVehicle() instanceof VehicleEntity vehicle) {
+            cir.cancel();
+            var s = vehicle.getPassengerRenderScale();
+            cir.setReturnValue(getDimensions(pose).height() * 0.85f * s);
         }
     }
 
