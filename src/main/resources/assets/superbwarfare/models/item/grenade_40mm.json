@@ -1,7 +1,0 @@
-{
-  "parent": "superbwarfare:custom/grenade_40mm",
-  "textures": {
-    "0": "superbwarfare:item/grenade_40mm",
-    "particle": "superbwarfare:item/grenade_40mm"
-  }
-}

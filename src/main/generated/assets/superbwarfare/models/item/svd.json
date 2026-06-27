@@ -1,7 +1,0 @@
-{
-  "parent": "superbwarfare:item/svd_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/svd_icon"
-  }
-}

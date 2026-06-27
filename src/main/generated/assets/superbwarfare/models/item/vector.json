@@ -1,7 +1,0 @@
-{
-  "parent": "superbwarfare:item/vector_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/vector_icon"
-  }
-}

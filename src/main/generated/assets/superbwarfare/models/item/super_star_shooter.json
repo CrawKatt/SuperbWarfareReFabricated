@@ -1,7 +1,0 @@
-{
-  "parent": "superbwarfare:item/super_star_shooter_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/super_star_shooter_icon"
-  }
-}
