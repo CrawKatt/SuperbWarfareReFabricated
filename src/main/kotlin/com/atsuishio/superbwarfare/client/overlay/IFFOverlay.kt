@@ -9,14 +9,11 @@ import com.atsuishio.superbwarfare.entity.projectile.MissileProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModTags
-import com.atsuishio.superbwarfare.network.message.receive.EntitySyncMessage
 import com.atsuishio.superbwarfare.tools.*
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Camera
 import net.minecraft.client.renderer.GameRenderer
-import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
@@ -28,9 +25,7 @@ import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.ClientTickEvent
 import top.theillusivec4.curios.api.CuriosApi
 
 @OnlyIn(Dist.CLIENT)
@@ -51,32 +46,6 @@ object IFFOverlay : CommonOverlay("iff") {
     val FRIENDLY_MISSILE = loc("textures/overlay/teammate/friendly_missile.png")
     val FRIENDLY_MAID = loc("textures/overlay/teammate/friendly_maid.png")
     val FRIENDLY_AIRSHIP = loc("textures/overlay/teammate/friendly_airship.png")
-
-    @SubscribeEvent
-    fun onIFFClientTick(@Suppress("UNUSED") event: ClientTickEvent.Post) {
-        val player = localPlayer ?: return
-        val level = clientLevel ?: return
-        CuriosApi.getCuriosInventory(player)
-            .flatMap { c -> c.findFirstCurio(ModItems.IFF.get()) }
-            .ifPresent { _ ->
-                val clientEntities = SeekTool.Builder(player)
-                    .friendly()
-                    .notPlayer()
-                    .build()
-                    .asSequence()
-                    .map {
-                        EntitySyncMessage.SyncedEntity(
-                            it.id,
-                            BuiltInRegistries.ENTITY_TYPE.getKey(it.type),
-                            it.position(),
-                            null,
-                            CompoundTag().also { tag -> it.saveWithoutId(tag) },
-                            it.yRot
-                        )
-                    }.toList()
-                ClientSyncedEntityHandler.sync(level.dimension().location(), clientEntities, friendly = true)
-            }
-    }
 
     override fun shouldRender() = super.shouldRender() && DisplayConfig.IFF_HUD.get()
 
