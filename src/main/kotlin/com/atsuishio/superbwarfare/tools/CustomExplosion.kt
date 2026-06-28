@@ -2,12 +2,14 @@ package com.atsuishio.superbwarfare.tools
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
+import com.atsuishio.superbwarfare.entity.OBBEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.weapon.BeastItem.Companion.beastKill
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
 import com.atsuishio.superbwarfare.network.message.receive.ShakeClientMessage.Companion.sendToNearbyPlayers
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
 import net.minecraft.core.particles.ParticleOptions
@@ -24,6 +26,7 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.item.PrimedTnt
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.ExplosionDamageCalculator
 import net.minecraft.world.level.Level
@@ -31,8 +34,11 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.shapes.CollisionContext
 import net.neoforged.neoforge.event.EventHooks
+import org.joml.Vector3d
 import java.util.function.Supplier
 import kotlin.math.cos
 import kotlin.math.floor
@@ -44,10 +50,10 @@ class CustomExplosion @JvmOverloads constructor(
     private val entity: Entity?,
     source: DamageSource?,
     damageCalculator: ExplosionDamageCalculator?,
-    private val damage: Float,
-    private val x: Double,
-    private val y: Double,
-    private val z: Double,
+    val damage: Float,
+    val x: Double,
+    val y: Double,
+    val z: Double,
     private val radius: Float,
     blockInteraction: BlockInteraction,
     smallParticle: ParticleOptions = ParticleTypes.EXPLOSION,
@@ -59,7 +65,7 @@ class CustomExplosion @JvmOverloads constructor(
     x, y, z, radius,
     false, blockInteraction, smallParticle, bigParticle, sound
 ) {
-    private val damageSource: DamageSource
+    val damageSource: DamageSource
     private val damageCalculator: ExplosionDamageCalculator
     private var fireTime = 0
     private var beast = false
@@ -333,11 +339,14 @@ class CustomExplosion @JvmOverloads constructor(
                     val distance = sqrt(xDistance * xDistance + yDistance * yDistance + zDistance * zDistance)
 
                     if (distance != 0.0) {
-                        val seenPercent = Mth.clamp(
-                            getSeenPercent(position, entity).toDouble(),
-                            0.01 * ExplosionConfig.EXPLOSION_PENETRATION_RATIO.get(),
-                            Double.POSITIVE_INFINITY
-                        )
+                        // VehicleEntity handled by LivingEventHandler.onExplosionDetonate
+                        if (entity is VehicleEntity) continue
+
+                        val seenPercent =
+                            getSeenPercent(position, entity).toDouble().coerceIn(
+                                0.01 * ExplosionConfig.EXPLOSION_PENETRATION_RATIO.get(),
+                                Double.POSITIVE_INFINITY
+                            )
                         val damagePercent = (1 - distanceRate) * seenPercent
                         val damageFinal = (damagePercent * damagePercent + damagePercent) / 2 * damage
 
@@ -353,11 +362,9 @@ class CustomExplosion @JvmOverloads constructor(
                         val capturedDamageFinal = damageFinal
                         val capturedDamageSource = this.damageSource
                         val capturedFireTime = this.fireTime
-                        val isLiving = entity is LivingEntity
-                        val isPlayer = entity is Player
 
                         // Compute knockback force at explosion time
-                        val knockbackForce = if (isLiving) {
+                        val knockbackForce = if (entity is LivingEntity) {
                             var force = damageFinal * 0.015
 
                             val blockpos = BlockPos.containing(position.x, position.y, position.z)
@@ -394,7 +401,7 @@ class CustomExplosion @JvmOverloads constructor(
 
                                     force = force.coerceAtLeast(0.0)
                                     if (force > 0.0) {
-                                        if (isPlayer && !entity.isCreative && !entity.isSpectator) {
+                                        if (entity is Player && !entity.isCreative && !entity.isSpectator) {
                                             entity.deltaMovement = entity.deltaMovement.add(vec31.scale(force))
                                         } else {
                                             entity.deltaMovement = entity.deltaMovement.add(vec31.scale(force))
@@ -622,4 +629,78 @@ class CustomExplosion @JvmOverloads constructor(
             )
         }
     }
+
+    companion object {
+        /**
+         * Replacement for [Explosion.getSeenPercent] that samples points on the
+         * actual OBB surfaces instead of a dense grid over the vanilla AABB.
+         *
+         * Uses the OBB center + 6 face centres per OBB (7 points each).
+         * For AC-130H: 23 OBBs × 7 = 161 raycasts, vs 118 000 vanilla.
+         */
+        @JvmStatic
+        fun getSeenPercentOptimized(level: Level, center: Vec3, entity: Entity): Float {
+            if (entity is OBBEntity && !entity.enableAABB()) {
+                return getSeenPercentForOBB(level, center, entity)
+            }
+            return getSeenPercent(center, entity)
+        }
+
+        /** Sample every OBB centre + 6 face centres, raycast from [center] to each. */
+        @JvmStatic
+        fun getSeenPercentForOBB(level: Level, center: Vec3, obbEntity: OBBEntity): Float {
+            var hits = 0
+            var total = 0
+            val tmp = Vector3d()
+
+            for (obb in obbEntity.getOBBs()) {
+                val axes = obb.getAxes() // fresh copy each iteration
+                val e = obb.extents
+                val c = obb.center
+
+                // 7 samples per OBB: centre + face centres on ±X, ±Y, ±Z
+                for (axisI in 0..2) {
+                    for (sign in listOf(0.0, 1.0, -1.0)) {
+                        if (sign == 0.0 && axisI > 0) continue // centre only once
+                        val offset = axes[axisI].mul(sign * e.get(axisI), tmp)
+                        val point = OBB.vector3dToVec3(Vector3d(c).add(offset))
+                        if (level.clip(
+                                ClipContext(
+                                    center, point,
+                                    ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()
+                                )
+                            ).type == HitResult.Type.MISS
+                        ) hits++
+                        total++
+                    }
+                }
+            }
+            return if (total > 0) hits.toFloat() / total else 0f
+        }
+
+        @JvmStatic
+        fun addBlockDrops(
+            pDropPositionArray: ObjectArrayList<Pair<ItemStack, BlockPos>>,
+            pStack: ItemStack,
+            pPos: BlockPos
+        ) {
+            val i = pDropPositionArray.size
+
+            for (j in 0..<i) {
+                val pair = pDropPositionArray[j]
+                val itemstack = pair.first
+                if (ItemEntity.areMergable(itemstack, pStack)) {
+                    val itemstack1 = ItemEntity.merge(itemstack, pStack, 16)
+                    pDropPositionArray[j] = itemstack1 to pair.second
+                    if (pStack.isEmpty) {
+                        return
+                    }
+                }
+            }
+
+            pDropPositionArray.add(pStack to pPos)
+        }
+    }
 }
+
+val CustomExplosion.position get() = Vec3(x, y, z)

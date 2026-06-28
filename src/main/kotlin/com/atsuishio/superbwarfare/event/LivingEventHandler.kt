@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.gun.SoundInfo
 import com.atsuishio.superbwarfare.data.gun.value.ReloadState
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
+import com.atsuishio.superbwarfare.entity.mixin.ExplosionAccess
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
@@ -43,15 +44,18 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Explosion
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.common.util.TriState
 import net.neoforged.neoforge.event.entity.living.*
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent.Applicable
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent
+import net.neoforged.neoforge.event.level.ExplosionEvent
 import java.util.*
 import kotlin.math.max
 import kotlin.math.pow
+import kotlin.math.sqrt
 
 @EventBusSubscriber
 object LivingEventHandler {
@@ -731,7 +735,48 @@ object LivingEventHandler {
             && vehicle is VehicleEntity
             && vehicle.isEnclosed(vehicle.getSeatIndex(entity))
         ) {
-            event.setResult(Applicable.Result.DO_NOT_APPLY)
+            event.result = Applicable.Result.DO_NOT_APPLY
+        }
+    }
+
+    /**
+     * 取消原版爆炸对载具的影响，改为单独计算
+     * Code based on YWZJ-Vehicle
+     */
+    @SubscribeEvent
+    fun onExplosionDetonate(event: ExplosionEvent.Detonate) {
+        val explosion = event.explosion as? CustomExplosion ?: return
+
+        val iterator = event.affectedEntities.iterator()
+        while (iterator.hasNext()) {
+            val entity = iterator.next() as? VehicleEntity ?: continue
+
+            iterator.remove()
+            val explosionPos = explosion.position
+            val explosionRadius = (explosion as ExplosionAccess).`superbwarfare$getRadius`() * 2.0F
+            if (!entity.ignoreExplosion(explosion)) {
+                val distanceRatio = sqrt(entity.distanceToSqr(explosionPos)) / explosionRadius
+                if (distanceRatio <= 1.0) {
+                    val dx = entity.x - explosionPos.x
+                    val dy = entity.eyeY - explosionPos.y
+                    val dz = entity.z - explosionPos.z
+                    val distance = sqrt(dx * dx + dy * dy + dz * dz)
+                    if (distance != 0.0) {
+                        // Use capped sampling for OBB vehicles — their massive AABB
+                        // (e.g. AC-130H at ~28×12×41) would otherwise cause 100 000+
+                        // raycasts inside vanilla Explosion.getSeenPercent.
+                        val visibilityFactor = if (!entity.enableAABB())
+                            CustomExplosion.getSeenPercentOptimized(entity.level(), explosionPos, entity)
+                        else
+                            Explosion.getSeenPercent(explosionPos, entity)
+                        val impactStrength = (1.0 - distanceRatio) * visibilityFactor
+                        val damage =
+                            (impactStrength * impactStrength + impactStrength) / 2.0 * 7.0 * explosionRadius + 1.0
+
+                        entity.hurt(explosion.damageSource, damage.toFloat())
+                    }
+                }
+            }
         }
     }
 }
