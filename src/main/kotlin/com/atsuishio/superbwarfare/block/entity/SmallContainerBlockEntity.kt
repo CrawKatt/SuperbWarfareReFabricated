@@ -33,8 +33,6 @@ import net.minecraft.world.level.storage.loot.LootTable
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 
 open class SmallContainerBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(ModBlockEntities.SMALL_CONTAINER.get(), pos, state) {
@@ -44,8 +42,8 @@ open class SmallContainerBlockEntity(pos: BlockPos, state: BlockState) :
     var player: Player? = null
     var opened: Boolean = false
 
-    @OnlyIn(Dist.CLIENT)
-    open val animationInstance: SmallContainerBlockAnimationInstance? = SmallContainerBlockAnimationInstance(this)
+    val animationInstance: SmallContainerBlockAnimationInstance? =
+        if (this.level?.isClientSide == true) SmallContainerBlockAnimationInstance(this) else null
 
     override fun applyImplicitComponents(componentInput: DataComponentInput) {
         super.applyImplicitComponents(componentInput)
