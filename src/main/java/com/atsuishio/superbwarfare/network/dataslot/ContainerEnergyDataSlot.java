@@ -5,31 +5,31 @@ package com.atsuishio.superbwarfare.network.dataslot;
  */
 public abstract class ContainerEnergyDataSlot {
 
-    private int prevValue;
+    private long prevValue = Long.MIN_VALUE;
 
     public ContainerEnergyDataSlot() {
     }
 
     public static ContainerEnergyDataSlot forContainer(final ContainerEnergyData data, final int index) {
         return new ContainerEnergyDataSlot() {
-            public int get() {
+            public long get() {
                 return data.get(index);
             }
 
             @Override
-            public void set(int value) {
+            public void set(long value) {
                 data.set(index, value);
             }
 
         };
     }
 
-    public abstract int get();
+    public abstract long get();
 
-    public abstract void set(int value);
+    public abstract void set(long value);
 
     public boolean checkAndClearUpdateFlag() {
-        int tmp = this.get();
+        long tmp = this.get();
         boolean changed = tmp != this.prevValue;
         this.prevValue = tmp;
         return changed;

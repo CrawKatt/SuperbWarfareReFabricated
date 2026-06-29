@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.capability.api;
 
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,8 @@ public class EnergyStorage implements IEnergyStorage, team.reborn.energy.api.Ene
     public void deserializeNBT(HolderLookup.Provider provider, @NotNull Tag nbt) {
         if (nbt instanceof LongTag longTag) {
             this.energy = longTag.getAsLong();
+        } else if (nbt instanceof IntTag intTag) {
+            this.energy = intTag.getAsInt();
         }
     }
 
@@ -87,6 +90,13 @@ public class EnergyStorage implements IEnergyStorage, team.reborn.energy.api.Ene
     @Override
     public long insert(long maxAmount, TransactionContext transaction) {
         if (!supportsInsertion()) return 0;
+        if (transaction == null) {
+            try (var t = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+                long inserted = insert(maxAmount, t);
+                t.commit();
+                return inserted;
+            }
+        }
 
         long energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, maxAmount));
         if (energyReceived > 0) {
@@ -104,6 +114,13 @@ public class EnergyStorage implements IEnergyStorage, team.reborn.energy.api.Ene
     @Override
     public long extract(long maxAmount, TransactionContext transaction) {
         if (!supportsExtraction()) return 0;
+        if (transaction == null) {
+            try (var t = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+                long extracted = extract(maxAmount, t);
+                t.commit();
+                return extracted;
+            }
+        }
 
         long energyExtracted = Math.min(energy, Math.min(this.maxExtract, maxAmount));
         if (energyExtracted > 0) {

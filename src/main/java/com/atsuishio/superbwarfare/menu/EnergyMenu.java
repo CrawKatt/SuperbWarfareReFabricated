@@ -9,8 +9,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerListener;
-import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.MenuType;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,27 +24,18 @@ public abstract class EnergyMenu extends AbstractContainerMenu {
         super(pMenuType, id);
 
         for (int i = 0; i < containerData.getCount(); ++i) {
-            addDataSlot(DataSlot.standalone());
             this.containerEnergyDataSlots.add(ContainerEnergyDataSlot.forContainer(containerData, i));
         }
     }
 
-    @Override
-    public void addSlotListener(ContainerListener listener) {
-        super.addSlotListener(listener);
-        if (listener instanceof ServerPlayer serverPlayer) {
-            onOpened(serverPlayer);
+    protected void trackUsingPlayer(Player player) {
+        if (player instanceof ServerPlayer serverPlayer && !this.usingPlayers.contains(serverPlayer)) {
+            this.usingPlayers.add(serverPlayer);
+            this.onOpened(serverPlayer);
         }
     }
 
     protected void onOpened(ServerPlayer player) {
-        this.usingPlayers.add(player);
-
-        List<ContainerDataMessage.Pair> toSync = new ArrayList<>();
-        for (int i = 0; i < this.containerEnergyDataSlots.size(); ++i) {
-            toSync.add(new ContainerDataMessage.Pair(i, this.containerEnergyDataSlots.get(i).get()));
-        }
-        ServerPlayNetworking.send(player, new ContainerDataMessage(this.containerId, toSync));
     }
 
     @Override
@@ -78,7 +67,10 @@ public abstract class EnergyMenu extends AbstractContainerMenu {
     }
 
     public void setData(int id, int data) {
-        super.setData(id, data);
+        this.setData(id, (long) data);
+    }
+
+    public void setData(int id, long data) {
         if (id < 0 || id >= this.containerEnergyDataSlots.size()) {
             Mod.LOGGER.error("EnergyMenu.setData id out of bounds: {}", id);
             return;

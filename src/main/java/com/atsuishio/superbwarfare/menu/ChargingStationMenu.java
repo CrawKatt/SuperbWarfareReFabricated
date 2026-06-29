@@ -37,10 +37,10 @@ public class ChargingStationMenu extends EnergyMenu {
         this.container = container;
         this.containerData = containerData;
         this.level = inventory.player.level();
+        this.trackUsingPlayer(inventory.player);
 
         this.addSlot(new Slot(container, 0, 44, 54));
         this.addSlot(new ChargingSlot(container, 1, 116, 54));
-        this.addDataSlots(containerData);
 
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 9; ++j) {

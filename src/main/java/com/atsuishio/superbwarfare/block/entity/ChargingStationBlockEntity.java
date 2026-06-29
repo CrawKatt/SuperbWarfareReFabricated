@@ -63,7 +63,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
     public boolean showRange = false;
 
     protected final ContainerEnergyData dataAccess = new ContainerEnergyData() {
-        public int get(int pIndex) {
+        public long get(int pIndex) {
             return switch (pIndex) {
                 case 0 -> ChargingStationBlockEntity.this.fuelTick;
                 case 1 -> ChargingStationBlockEntity.this.maxFuelTick;
@@ -74,20 +74,20 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
                     var cap = ModCapabilities.ENERGY_BLOCK.find(level, ChargingStationBlockEntity.this.getBlockPos(), null);
                     if (cap == null) yield 0;
 
-                    yield cap.getEnergyStored();
+                    yield cap instanceof EnergyStorage storage ? storage.getAmount() : cap.getEnergyStored();
                 }
                 case 3 -> ChargingStationBlockEntity.this.showRange ? 1 : 0;
                 default -> 0;
             };
         }
 
-        public void set(int pIndex, int pValue) {
+        public void set(int pIndex, long pValue) {
             switch (pIndex) {
                 case 0:
-                    ChargingStationBlockEntity.this.fuelTick = pValue;
+                    ChargingStationBlockEntity.this.fuelTick = (int) pValue;
                     break;
                 case 1:
-                    ChargingStationBlockEntity.this.maxFuelTick = pValue;
+                    ChargingStationBlockEntity.this.maxFuelTick = (int) pValue;
                     break;
                 case 2:
                     var level = ChargingStationBlockEntity.this.level;
@@ -96,7 +96,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
                     var cap = ModCapabilities.ENERGY_BLOCK.find(level, ChargingStationBlockEntity.this.getBlockPos(), null);
                     if (cap == null) return;
 
-                    cap.receiveEnergy(pValue, false);
+                    cap.receiveEnergy((int) Math.min(Integer.MAX_VALUE, pValue), false);
                     break;
                 case 3:
                     ChargingStationBlockEntity.this.showRange = pValue == 1;
@@ -268,7 +268,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
     protected void collectImplicitComponents(DataComponentMap.@NotNull Builder components) {
         super.collectImplicitComponents(components);
 
-        components.set(EnergyStorage.ENERGY_COMPONENT, (long) this.energyStorage.getEnergyStored());
+        components.set(EnergyStorage.ENERGY_COMPONENT, ((EnergyStorage) this.energyStorage).getAmount());
     }
 
     @Override
@@ -277,7 +277,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
 
         if (tag.contains("Energy")) {
             var energy = tag.get("Energy");
-            if (energy instanceof IntTag) {
+            if (energy instanceof IntTag || energy instanceof LongTag) {
                 ((EnergyStorage) this.energyStorage).deserializeNBT(registries, energy);
             }
         }
@@ -292,7 +292,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
     protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
         super.saveAdditional(tag, registries);
 
-        tag.putInt("Energy", this.energyStorage.getEnergyStored());
+        tag.put("Energy", ((EnergyStorage) this.energyStorage).serializeNBT(registries));
 
         tag.putInt("FuelTick", this.fuelTick);
         tag.putInt("MaxFuelTick", this.maxFuelTick);

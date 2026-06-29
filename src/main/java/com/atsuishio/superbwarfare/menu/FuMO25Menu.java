@@ -54,6 +54,7 @@ public class FuMO25Menu extends EnergyMenu {
         this.container = container;
         this.access = access;
         this.containerData = containerData;
+        this.trackUsingPlayer(inventory.player);
 
         this.addSlot(new ParaSlot(container, 0, 278, 60));
 

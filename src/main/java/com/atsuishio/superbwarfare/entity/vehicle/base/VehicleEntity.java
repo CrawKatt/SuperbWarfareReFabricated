@@ -42,6 +42,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -2117,8 +2118,13 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
 
                 long n = neededEnergy;
                 long energyToExtract = stored < n ? stored : n;
-                energyCap.extract(energyToExtract, null);
-                this.setEnergy(this.getEnergy() + (int) energyToExtract);
+                try (Transaction transaction = Transaction.openOuter()) {
+                    long extracted = energyCap.extract(energyToExtract, transaction);
+                    if (extracted > 0) {
+                        transaction.commit();
+                        this.setEnergy(this.getEnergy() + (int) extracted);
+                    }
+                }
             }
         }
 

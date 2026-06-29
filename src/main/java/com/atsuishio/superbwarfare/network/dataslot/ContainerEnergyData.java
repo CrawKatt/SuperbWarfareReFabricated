@@ -1,12 +1,10 @@
 package com.atsuishio.superbwarfare.network.dataslot;
 
-import net.minecraft.world.inventory.ContainerData;
+public interface ContainerEnergyData {
 
-public interface ContainerEnergyData extends ContainerData {
+    long get(int pIndex);
 
-    int get(int pIndex);
-
-    void set(int pIndex, int pValue);
+    void set(int pIndex, long pValue);
 
     int getCount();
 }

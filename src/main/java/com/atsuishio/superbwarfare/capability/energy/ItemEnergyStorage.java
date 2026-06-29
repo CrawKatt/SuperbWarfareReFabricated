@@ -50,6 +50,14 @@ public class ItemEnergyStorage extends DynamicEnergyStorage {
 
     @Override
     public long insert(long maxAmount, TransactionContext transaction) {
+        if (transaction == null) {
+            try (var t = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+                long inserted = insert(maxAmount, t);
+                t.commit();
+                return inserted;
+            }
+        }
+
         long inserted = super.insert(maxAmount, transaction);
         if (inserted > 0) {
             transaction.addCloseCallback((t, result) -> {
@@ -63,6 +71,14 @@ public class ItemEnergyStorage extends DynamicEnergyStorage {
 
     @Override
     public long extract(long maxAmount, TransactionContext transaction) {
+        if (transaction == null) {
+            try (var t = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+                long extracted = extract(maxAmount, t);
+                t.commit();
+                return extracted;
+            }
+        }
+
         long extracted = super.extract(maxAmount, transaction);
         if (extracted > 0) {
             transaction.addCloseCallback((t, result) -> {
