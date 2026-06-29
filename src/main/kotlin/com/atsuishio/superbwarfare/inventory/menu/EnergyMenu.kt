@@ -10,7 +10,6 @@ import com.google.common.collect.Lists
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
-import net.minecraft.world.inventory.ContainerListener
 import net.minecraft.world.inventory.DataSlot
 import net.minecraft.world.inventory.MenuType
 
@@ -26,15 +25,10 @@ abstract class EnergyMenu(pMenuType: MenuType<*>?, id: Int, containerData: Conta
         }
     }
 
-    override fun addSlotListener(listener: ContainerListener) {
-        super.addSlotListener(listener)
-        if (listener is ServerPlayer) {
-            onOpened(listener)
+    open fun onOpened(player: ServerPlayer) {
+        if (!this.usingPlayers.contains(player)) {
+            this.usingPlayers.add(player)
         }
-    }
-
-    protected open fun onOpened(player: ServerPlayer) {
-        this.usingPlayers.add(player)
 
         val toSync: MutableList<ContainerDataMessage.Pair> = ArrayList()
         for (i in this.containerEnergyDataSlots.indices) {
@@ -50,7 +44,7 @@ abstract class EnergyMenu(pMenuType: MenuType<*>?, id: Int, containerData: Conta
         }
     }
 
-    protected open fun onClosed(player: ServerPlayer) {
+    open fun onClosed(player: ServerPlayer) {
         this.usingPlayers.remove(player)
     }
 

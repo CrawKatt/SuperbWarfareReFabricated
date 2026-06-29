@@ -174,12 +174,12 @@ open class FuMO25Menu(
         player.sendPacket(RadarMenuCloseMessage)
     }
 
-    override fun removed(pPlayer: Player) {
-        super.removed(pPlayer)
+    override fun removed(player: Player) {
+        super.removed(player)
         this.access.execute { _, _ ->
             val para = this.container.getItem(0)
             if (!para.isEmpty) {
-                pPlayer.getInventory().placeItemBackInInventory(para)
+                player.getInventory().placeItemBackInInventory(para)
             }
             this.container.removeItemNoUpdate(0)
             resetPos()

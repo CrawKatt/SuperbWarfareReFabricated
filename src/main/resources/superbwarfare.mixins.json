@@ -22,6 +22,7 @@
     "RecipeManagerMixin",
     "ReloadableServerResourcesMixin",
     "ResultSlotMixin",
+    "ServerPlayerMenuMixin",
     "SteelPipeFallMixin",
     "VillagerMixin"
   ],

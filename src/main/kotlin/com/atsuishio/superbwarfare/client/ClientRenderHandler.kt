@@ -56,7 +56,6 @@ import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.SentinelImageComponent
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModItems
-import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.item.armor.GeHelmetM35Item
 import com.atsuishio.superbwarfare.item.armor.RuChest6b43Item
 import com.atsuishio.superbwarfare.item.armor.RuHelmet6b47Item
@@ -101,12 +100,12 @@ object ClientRenderHandler {
     fun registerTooltip() {
         TooltipComponentCallback.EVENT.register { component ->
             when (component) {
-                is GunImageComponent -> if (component.stack.item is GunItem) ClientGunImageTooltip(component) else null
                 is BocekImageComponent -> ClientBocekImageTooltip(component)
                 is CellImageComponent -> ClientCellImageTooltip(component)
                 is SentinelImageComponent -> ClientSentinelImageTooltip(component)
                 is ChargingStationImageComponent -> ClientChargingStationImageTooltip(component)
                 is DogTagImageComponent -> ClientDogTagImageTooltip(component)
+                is GunImageComponent -> ClientGunImageTooltip(component)
                 else -> null
             }
         }
