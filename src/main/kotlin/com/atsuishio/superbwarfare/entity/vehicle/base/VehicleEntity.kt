@@ -2189,7 +2189,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         } else {
             // 呼吸回血
             if (repairCoolDown == 0 && health > 0) {
-                this.heal(5f)
+                this.heal(repairAmount())
             }
         }
 
@@ -2317,7 +2317,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         this.crushEntities()
         this.setDeltaMovement(this.deltaMovement.add(0.0, -this.computed().gravity, 0.0))
         this.move(MoverType.SELF, this.deltaMovement)
-
 
         if (this.hasEnergyStorage() && this.tickCount % 20 == 0) {
             for (stack in this.inventory.getItems()) {

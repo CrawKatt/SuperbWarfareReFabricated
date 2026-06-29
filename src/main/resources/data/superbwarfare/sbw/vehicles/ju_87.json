@@ -282,7 +282,6 @@
   ],
   "RotateOffsetHeight": 1.78,
   "DestroyInfo": {
-    "ParticleType": "Huge",
     "ExplosionDamage": 300,
     "ExplosionRadius": 8,
     "CrashPassengers": true
@@ -308,6 +307,6 @@
     "EngineSoundVolume" : 0.8
   },
   "TerrainCompat": [[-1.388, 0, 2.414], [1.388, 0, 2.414], [0, 1.1, -4.544]],
-  "TerrainCompatRotateRate": 0.5,
+  "TerrainCompatRotateRate" : 0.75,
   "EngineSound": "superbwarfare:ju_87_engine"
 }
