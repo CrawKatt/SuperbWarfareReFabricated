@@ -7,7 +7,9 @@ import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
 import com.atsuishio.superbwarfare.client.particle.CustomFlareOption
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig
+import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.projectile.IAdvancedHitDetection.Companion.rayTraceBlocks
+import com.atsuishio.superbwarfare.entity.setValue
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.weapon.BeastItem.Companion.beastKill
@@ -21,6 +23,9 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.game.ClientboundSoundPacket
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.level.TicketType
@@ -160,6 +165,10 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
             this.lifeValue = compound.getInt("Life")
         }
 
+        if (compound.contains("SyncedTick")) {
+            syncedTick = compound.getInt("SyncedTick")
+        }
+
         val listTag = compound.getList("CustomPotionEffects", 10)
         for (i in listTag.indices) {
             val compoundTag = listTag.getCompound(i)
@@ -189,6 +198,8 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
             compound.putInt("Life", this.lifeValue)
         }
 
+        compound.putInt("SyncedTick", syncedTick)
+
         if (!this.effectsValue.isEmpty()) {
             val list = ListTag()
             for (instance in this.effectsValue) {
@@ -200,6 +211,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
 
     override fun tick() {
         super.baseTick()
+        if (!level().isClientSide) syncedTick++
 
         val level = this.level()
         if (!level.isClientSide() && this.tickCount > this.getNoHitTicks()) {
@@ -762,7 +774,19 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
     }
 
     companion object {
+        @JvmField
+        val SYNCED_TICK: EntityDataAccessor<Int> =
+            SynchedEntityData.defineId(FastThrowableProjectile::class.java, EntityDataSerializers.INT)
+
         var playFlySound: Consumer<FastThrowableProjectile> = Consumer { }
         var playNearFlySound: Consumer<FastThrowableProjectile> = Consumer { }
+    }
+
+    /** 独立于原版 tickCount 的计时器，每 tick +1，通过 EntityData 持久化同步 */
+    open var syncedTick by SYNCED_TICK
+
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        super.defineSynchedData(builder)
+        builder.define(SYNCED_TICK, 0)
     }
 }
