@@ -344,6 +344,10 @@ object ClickEventHandler {
         val vehicle = player.vehicle
 
         if (action == GLFW.GLFW_PRESS) {
+            if (vehicle is VehicleEntity && handleVehicleSeatHotbarKey(player, vehicle, key, scanCode)) {
+                return true
+            }
+
             if (ModKeyMappings.ACTIVE_THERMAL_IMAGING.matches(key, scanCode)) {
                 if (vehicle is VehicleEntity) {
                     val index = vehicle.getSeatIndex(player)
@@ -528,6 +532,26 @@ object ClickEventHandler {
             }
         }
         return false
+    }
+
+    private fun handleVehicleSeatHotbarKey(player: Player, vehicle: VehicleEntity, key: Int, scanCode: Int): Boolean {
+        var index = -1
+        for (i in 0..<9) {
+            if (mc.options.keyHotbarSlots[i].matches(key, scanCode)) {
+                index = i
+                break
+            }
+        }
+
+        if (index == -1) return false
+        if (vehicle.maxPassengers <= 1) return false
+        if (!mc.options.keyShift.isDown && !Screen.hasShiftDown()) return false
+        if (index >= vehicle.maxPassengers) return false
+        if (vehicle.getNthEntity(index) != null) return false
+
+        sendPacketToServer(ChangeVehicleSeatMessage(index))
+        vehicle.changeSeat(player, index)
+        return true
     }
 
     private fun syncModKeyConflictState(key: Int, scanCode: Int, action: Int) {
