@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.client.renderer
 
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.client.renderer.SyncedEntityWorldRenderer.MAX_RENDER_DISTANCE
+import com.atsuishio.superbwarfare.tools.clientLevel
 import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.shaders.FogShape
 import com.mojang.blaze3d.systems.RenderSystem
@@ -9,7 +10,6 @@ import com.mojang.blaze3d.vertex.VertexSorting
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.core.BlockPos
-import net.minecraft.world.entity.Entity
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -29,25 +29,25 @@ import org.joml.Matrix4f
 object SyncedEntityWorldRenderer {
     //TODO 需要服务端配置和开关
     private const val MAX_RENDER_DISTANCE = 4096.0
-    private val MAX_RENDER_DISTANCE_SQ = MAX_RENDER_DISTANCE * MAX_RENDER_DISTANCE
+    private const val MAX_RENDER_DISTANCE_SQ = MAX_RENDER_DISTANCE * MAX_RENDER_DISTANCE
 
     @SubscribeEvent
     fun onRenderLevelStage(event: RenderLevelStageEvent) {
         if (event.stage != RenderLevelStageEvent.Stage.AFTER_ENTITIES) return
 
-        val minecraft = mc
-        val level = minecraft.level ?: return
+        val level = clientLevel ?: return
         val camera = event.camera
-        val dispatcher = minecraft.entityRenderDispatcher
-        val bufferSource = minecraft.renderBuffers().bufferSource()
+        val dispatcher = mc.entityRenderDispatcher
+        val bufferSource = mc.renderBuffers().bufferSource()
         val partialTick = event.partialTick
 
-        val allSynced = mutableListOf<Entity>()
-        allSynced.addAll(ClientSyncedEntityHandler.getSyncedFriendlyEntities(level))
-        allSynced.addAll(ClientSyncedEntityHandler.getSyncedHostileEntities(level))
-        allSynced.addAll(ClientSyncedEntityHandler.getSyncedNeutralEntities(level))
+        val allSynced = buildList {
+            addAll(ClientSyncedEntityHandler.getSyncedFriendlyEntities(level))
+            addAll(ClientSyncedEntityHandler.getSyncedHostileEntities(level))
+            addAll(ClientSyncedEntityHandler.getSyncedNeutralEntities(level))
+        }
 
-        val seen = HashSet<Int>()
+        val seen = hashSetOf<Int>()
         val uniqueEntities = allSynced.filter { seen.add(it.id) }
 
         // Save current state

@@ -2,12 +2,11 @@ package com.atsuishio.superbwarfare.client.screens
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
-import com.atsuishio.superbwarfare.client.map.TacticalMapCache
+import com.atsuishio.superbwarfare.client.map.*
+import com.atsuishio.superbwarfare.client.map.CoordinateConverter.scaleFromZoom
 import com.atsuishio.superbwarfare.client.map.context.MapContextMenu
 import com.atsuishio.superbwarfare.client.map.context.MapMarker
 import com.atsuishio.superbwarfare.client.map.context.MarkerPersistence
-import com.atsuishio.superbwarfare.client.screens.map.*
-import com.atsuishio.superbwarfare.client.screens.map.CoordinateConverter.scaleFromZoom
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
@@ -25,6 +24,7 @@ import com.atsuishio.superbwarfare.tools.sendPacketToServer
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.math.Axis
+import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
@@ -270,7 +270,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         contextMenu.onLoiterPointEdit = {
             val vehicle = localPlayer?.vehicle as? VehicleEntity
             if (vehicle != null) {
-                minecraft!!.setScreen(com.atsuishio.superbwarfare.client.screens.LoiterConfigScreen(vehicle))
+                minecraft!!.setScreen(LoiterConfigScreen(vehicle))
             }
         }
         contextMenu.onLoiterPointDelete = {
@@ -292,7 +292,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         lastFollowState = followPlayer
         followBtn.message = if (followPlayer) followIconActive else followIconNormal
         val player = localPlayer
-        // Only centre on player when NOT restoring a saved free-pan position
+        // Only center on player when NOT restoring a saved free-pan position
         if (player != null && (savedZoom <= 0 || followPlayer)) {
             viewBlockX = player.x
             viewBlockZ = player.z
@@ -377,11 +377,13 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
                     }
                     // Recompute display name so inline %1$s ammo placeholder stays in sync
                     val rawName = vehicles.firstNotNullOfOrNull { v ->
-                        v.gunDataMap[entry.weaponName]?.get(GunProp.NAME) as? String
+                        v.gunDataMap[entry.weaponName]?.get(GunProp.NAME)
                     } ?: entry.weaponName
                     val translated = try {
                         Component.translatable(rawName).string
-                    } catch (_: Exception) { rawName }
+                    } catch (_: Exception) {
+                        rawName
+                    }
                     val ammoStr = "×$totalAmmo"
                     val newDisplay = if (translated.contains("%1\$s"))
                         translated.replace("%1\$s", ammoStr) else translated
@@ -569,8 +571,8 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
 
         // Clear focus from bottom buttons after rendering to prevent
         // the white focus border from sticking after a click.
-        centerBtn.setFocused(false)
-        followBtn.setFocused(false)
+        centerBtn.isFocused = false
+        followBtn.isFocused = false
 
         // Button tooltips (must render after buttons)
         val font = minecraft!!.font
@@ -628,8 +630,10 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         val color = 0xFFFFFFFF.toInt()
 
         hoveredLine = null
-        val clipL = mapLeft.toFloat(); val clipR = (mapLeft + mapAreaW).toFloat()
-        val clipT = mapTop.toFloat(); val clipB = (mapTop + mapAreaH).toFloat()
+        val clipL = mapLeft.toFloat()
+        val clipR = (mapLeft + mapAreaW).toFloat()
+        val clipT = mapTop.toFloat()
+        val clipB = (mapTop + mapAreaH).toFloat()
         for ((a, b) in getValidConnections()) {
             val ax = (mapCenterX + (a.x - viewBlockX) * scale).toFloat()
             val ay = (mapCenterY + (a.z - viewBlockZ) * scale).toFloat()
@@ -637,7 +641,8 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
             val by = (mapCenterY + (b.z - viewBlockZ) * scale).toFloat()
             // 快速剔除：两端点都在可视区域外且线段不与区域相交
             if ((ax < clipL && bx < clipL) || (ax > clipR && bx > clipR) ||
-                (ay < clipT && by < clipT) || (ay > clipB && by > clipB)) continue
+                (ay < clipT && by < clipT) || (ay > clipB && by > clipB)
+            ) continue
 
             // Check hover (suppressed when mouse is over a marker)
             val isHovered = hoveredMarker == null && hitTestLine(
@@ -705,7 +710,16 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
 
         // Dashed line via PoseStack rotation: 1px segments with 1px gaps, clipped to visible area
         val dashColor = 0xAAFFAA00.toInt()
-        val range = MapEntityRenderer.clipDashRange(sx.toFloat(), sy.toFloat(), mx.toFloat(), my.toFloat(), mapLeft, mapTop, mapAreaW, mapAreaH)
+        val range = MapEntityRenderer.clipDashRange(
+            sx.toFloat(),
+            sy.toFloat(),
+            mx.toFloat(),
+            my.toFloat(),
+            mapLeft,
+            mapTop,
+            mapAreaW,
+            mapAreaH
+        )
         if (range != null) {
             val pose = guiGraphics.pose()
             pose.pushPose()
@@ -849,9 +863,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
                 radius.coerceAtLeast(lodSize), factor
             )
             for (lodTile in lodTiles) {
-                val texLoc = TacticalMapCache.getLodTileTexture(
-                    lodTile.factor, lodTile.rx, lodTile.rz
-                )
+                val texLoc = TacticalMapCache.getLodTileTexture(lodTile.factor, lodTile.rx, lodTile.rz)
 
                 val wx = lodTile.rx * lodSize
                 val wz = lodTile.rz * lodSize
@@ -941,7 +953,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
 
         // Chunk borderlines (every 16 blocks) — visible only at high zoom
         if (zoom > 15.0) {
-            val chunkColor = 0x3300EE00.toInt()  // translucent green — chunk borders
+            val chunkColor = 0x3300EE00  // translucent green — chunk borders
             val chunkInterval = 16
             val chunkOriginX = (viewBlockX / chunkInterval).toInt() * chunkInterval
             val chunkOriginZ = (viewBlockZ / chunkInterval).toInt() * chunkInterval
@@ -998,7 +1010,13 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         else -> "5km"
     }
 
-    private fun renderFriendlyMarkers(guiGraphics: GuiGraphics, player: Player, pPartialTick: Float, mouseX: Int, mouseY: Int) {
+    private fun renderFriendlyMarkers(
+        guiGraphics: GuiGraphics,
+        player: Player,
+        pPartialTick: Float,
+        mouseX: Int,
+        mouseY: Int
+    ) {
         val scale = scaleFromZoom(zoom)
         val level = player.level()
 
@@ -1021,8 +1039,10 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         val useDragPt = draggingLoiterPoint || System.currentTimeMillis() < loiterDragExpireTime
 
         // 友方（绿色）
-        entityRenderer.renderEntityBatch(guiGraphics,
-            ClientSyncedEntityHandler.getSyncedFriendlyEntities(level).filter { it.vehicle == null }.distinctBy { it.id },
+        entityRenderer.renderEntityBatch(
+            guiGraphics,
+            ClientSyncedEntityHandler.getSyncedFriendlyEntities(level).filter { it.vehicle == null }
+                .distinctBy { it.id },
             level, 0xFF7FFFAD.toInt(), "context.superbwarfare.tactical_map.relation.friendly",
             viewBlockX, viewBlockZ, mapCenterX, mapCenterY, mapLeft, mapTop, mapAreaW, mapAreaH,
             scale, pPartialTick, mouseX, mouseY, selectedEntities, entityRenderList,
@@ -1031,8 +1051,10 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         )
 
         // 中立（灰色）
-        entityRenderer.renderEntityBatch(guiGraphics,
-            ClientSyncedEntityHandler.getSyncedNeutralEntities(level).filter { it.vehicle == null }.distinctBy { it.id },
+        entityRenderer.renderEntityBatch(
+            guiGraphics,
+            ClientSyncedEntityHandler.getSyncedNeutralEntities(level).filter { it.vehicle == null }
+                .distinctBy { it.id },
             level, 0xFFAAAAAA.toInt(), "context.superbwarfare.tactical_map.relation.neutral",
             viewBlockX, viewBlockZ, mapCenterX, mapCenterY, mapLeft, mapTop, mapAreaW, mapAreaH,
             scale, pPartialTick, mouseX, mouseY, selectedEntities, entityRenderList,
@@ -1041,8 +1063,10 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         )
 
         // 敌对（红色）
-        entityRenderer.renderEntityBatch(guiGraphics,
-            ClientSyncedEntityHandler.getSyncedHostileEntities(level).filter { it.vehicle == null }.distinctBy { it.id },
+        entityRenderer.renderEntityBatch(
+            guiGraphics,
+            ClientSyncedEntityHandler.getSyncedHostileEntities(level).filter { it.vehicle == null }
+                .distinctBy { it.id },
             level, 0xFFFF5555.toInt(), "context.superbwarfare.tactical_map.relation.hostile",
             viewBlockX, viewBlockZ, mapCenterX, mapCenterY, mapLeft, mapTop, mapAreaW, mapAreaH,
             scale, pPartialTick, mouseX, mouseY, selectedEntities, entityRenderList,
@@ -1059,7 +1083,8 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
                 useDragPt, loiterDragNewX, loiterDragNewZ, loiterDragExpireTime)
             val sx = CoordinateConverter.worldToScreenX(ownVehicle.x, mapCenterX, viewBlockX, scale).toFloat()
             val sy = CoordinateConverter.worldToScreenY(ownVehicle.z, mapCenterY, viewBlockZ, scale).toFloat()
-            entityRenderList.add(MapEntityRenderer.EntityRenderEntry(
+            entityRenderList.add(
+                MapEntityRenderer.EntityRenderEntry(
                 ownVehicle, sx, sy, "friendly"))
         }
 
@@ -1157,8 +1182,8 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         val arcPixels = sweepDeg / 180f * kotlin.math.PI.toFloat() * radius
         val steps = (arcPixels / 30f).toInt().coerceIn(3, 12)
 //        buf.begin(
-//            com.mojang.blaze3d.vertex.VertexFormat.Mode.TRIANGLE_STRIP,
-//            com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION
+//            VertexFormat.Mode.TRIANGLE_STRIP,
+//            DefaultVertexFormat.POSITION
 //        )
         val matrix = pose.last().pose()
 
@@ -1182,17 +1207,20 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
 
         val edgeP = floatArrayOf(-(ex - sx), ex - sx, -(ey - sy), ey - sy)
         val edgeQ = floatArrayOf(sx - cx1, cx2 - sx, sy - cy1, cy2 - sy)
-        var tMin = 0f; var tMax = 1f
+        var tMin = 0f
+        var tMax = 1f
 
         for (i in 0 until 4) {
-            if (edgeP[i] == 0f) { if (edgeQ[i] < 0) return null }
-            else {
+            if (edgeP[i] == 0f) {
+                if (edgeQ[i] < 0) return null
+            } else {
                 val t = edgeQ[i] / edgeP[i]
                 if (edgeP[i] < 0) tMin = maxOf(tMin, t) else tMax = minOf(tMax, t)
             }
         }
         if (tMin > tMax) return null
-        val dx = ex - sx; val dy = ey - sy
+        val dx = ex - sx
+        val dy = ey - sy
         val len = kotlin.math.sqrt((dx * dx + dy * dy).toDouble()).toFloat()
         val half = (len / 2f).toInt()
         val lo = (-half + tMin * len).toInt()
@@ -1200,7 +1228,14 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         return maxOf(-half, lo) to minOf(half, hi)
     }
 
-    private fun renderTargetPos(targetPos: Vec3, scale: Double, screenX: Float, screenY: Float, guiGraphics: GuiGraphics, entity: Entity) {
+    private fun renderTargetPos(
+        targetPos: Vec3,
+        scale: Double,
+        screenX: Float,
+        screenY: Float,
+        guiGraphics: GuiGraphics,
+        entity: Entity
+    ) {
         val tdx = targetPos.x - viewBlockX
         val tdz = targetPos.z - viewBlockZ
         val targetScreenX = (mapCenterX + tdx * scale).toFloat()
@@ -1328,24 +1363,31 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
             if (len > 2f) {
                 val range = clipDashRange(screenX, screenY, navScreenX.toFloat(), navScreenY.toFloat())
                 if (range != null) {
-                val angle = atan2(ldy, ldx)
-                val midX = ((screenX + navScreenX) / 2f).toFloat()
-                val midY = ((screenY + navScreenY) / 2f).toFloat()
-                val dashColor = 0xAACDFFF6.toInt()
-                val linePose = guiGraphics.pose()
-                linePose.pushPose()
-                linePose.translate(midX, midY, 0f)
-                linePose.rotateAround(Axis.ZP.rotationDegrees(Math.toDegrees(angle).toFloat()), 0f, 0f, 0f)
-                var ox = range.first
-                while (ox < range.second) {
-                    guiGraphics.fill(ox, 0, ox + 1, 1, dashColor)
-                    ox += 2
-                }
-                linePose.popPose()
-                val font = minecraft!!.font
-                val dist = kotlin.math.sqrt((lx - entity.x) * (lx - entity.x) + (lz - entity.z) * (lz - entity.z))
-                val label = "${dist.toInt()}m"
-                guiGraphics.drawString(font, label, (navScreenX + 10).toInt(), (navScreenY + 6).toInt(), 0xFFCDFFF6.toInt(), true)
+                    val angle = atan2(ldy, ldx)
+                    val midX = ((screenX + navScreenX) / 2f).toFloat()
+                    val midY = ((screenY + navScreenY) / 2f).toFloat()
+                    val dashColor = 0xAACDFFF6.toInt()
+                    val linePose = guiGraphics.pose()
+                    linePose.pushPose()
+                    linePose.translate(midX, midY, 0f)
+                    linePose.rotateAround(Axis.ZP.rotationDegrees(Math.toDegrees(angle).toFloat()), 0f, 0f, 0f)
+                    var ox = range.first
+                    while (ox < range.second) {
+                        guiGraphics.fill(ox, 0, ox + 1, 1, dashColor)
+                        ox += 2
+                    }
+                    linePose.popPose()
+                    val font = minecraft!!.font
+                    val dist = kotlin.math.sqrt((lx - entity.x) * (lx - entity.x) + (lz - entity.z) * (lz - entity.z))
+                    val label = "${dist.toInt()}m"
+                    guiGraphics.drawString(
+                        font,
+                        label,
+                        (navScreenX + 10).toInt(),
+                        (navScreenY + 6).toInt(),
+                        0xFFCDFFF6.toInt(),
+                        true
+                    )
                 }
             }
 
@@ -1419,12 +1461,24 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
      */
     private fun renderPlayerOffscreenIndicator(guiGraphics: GuiGraphics, player: Player) {
         val scale = scaleFromZoom(zoom)
-        entityRenderer.renderPlayerOffscreenIndicator(guiGraphics, player, viewBlockX, viewBlockZ, mapCenterX, mapCenterY, scale, mapLeft, mapTop, mapAreaW, mapAreaH)
+        entityRenderer.renderPlayerOffscreenIndicator(
+            guiGraphics,
+            player,
+            viewBlockX,
+            viewBlockZ,
+            mapCenterX,
+            mapCenterY,
+            scale,
+            mapLeft,
+            mapTop,
+            mapAreaW,
+            mapAreaH
+        )
     }
 
     private fun renderEntityContextMenu(
         guiGraphics: GuiGraphics,
-        font: net.minecraft.client.gui.Font,
+        font: Font,
         mouseX: Int,
         mouseY: Int
     ) {
@@ -1435,7 +1489,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
             return
         }
         val isFriendlyVehicle = target is VehicleEntity &&
-            entityRenderList.any { it.entity === target && it.relation == "friendly" }
+                entityRenderList.any { it.entity === target && it.relation == "friendly" }
         val selectLabel = if (selectedEntities.any { it.id == target.id })
             Component.translatable("context.superbwarfare.tactical_map.entity_menu.deselect").string
         else
@@ -1526,9 +1580,13 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
                 if (hovered && !mw.inRange) {
                     guiGraphics.renderTooltip(
                         font,
-                        listOf(Component.translatable("context.superbwarfare.tactical_map.out_of_range",
-                            "%.0f".format(mw.maxGuidedRange))),
-                        java.util.Optional.empty(), mouseX, mouseY
+                        listOf(
+                            Component.translatable(
+                                "context.superbwarfare.tactical_map.out_of_range",
+                                "%.0f".format(mw.maxGuidedRange)
+                            )
+                        ),
+                        Optional.empty(), mouseX, mouseY
                     )
                 }
                 idx++
@@ -1544,7 +1602,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
             return false
         }
         val isFriendlyVehicle = target is VehicleEntity &&
-            entityRenderList.any { it.entity === target && it.relation == "friendly" }
+                entityRenderList.any { it.entity === target && it.relation == "friendly" }
         val selectLabel = if (selectedEntities.any { it.id == target.id })
             Component.translatable("context.superbwarfare.tactical_map.entity_menu.deselect").string
         else
@@ -1610,7 +1668,9 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         if (missileWeapons.isNotEmpty()) {
             ty += itemHeight + 1 // skip separator line
             for (mw in missileWeapons) {
-                if (mw.ammoCount <= 0 || !mw.inRange) { ty += itemHeight; continue }
+                if (mw.ammoCount <= 0 || !mw.inRange) {
+                    ty += itemHeight; continue
+                }
                 if (mouseX in mx.toDouble()..(mx + menuW).toDouble() && mouseY in ty.toDouble()..(ty + itemHeight).toDouble()) {
                     fireEntityMissile(target, mw)
                     // Don't close menu — allow multiple attacks
@@ -1646,8 +1706,12 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
     private fun buildEntityMissileWeapons(entity: Entity): List<EntityMissileWeapon> {
         val vehicles = getSelectedVehicles()
         return MissileWeaponHelper.aggregateWeapons(vehicles, entity, requireLockEntity = true, requireLockBlock = true)
-            .map { EntityMissileWeapon(it.weaponName, it.displayNameBase, it.totalAmmo, it.canLockEntity,
-                it.inRange, it.maxGuidedRange) }
+            .map {
+                EntityMissileWeapon(
+                    it.weaponName, it.displayNameBase, it.totalAmmo, it.canLockEntity,
+                    it.inRange, it.maxGuidedRange
+                )
+            }
     }
 
     private fun fireEntityMissile(entity: Entity, weapon: EntityMissileWeapon) {
@@ -1657,28 +1721,48 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
             ?: return
         val remoteShooterId = if (shooter !== localPlayer?.vehicle) shooter.id else null
         val targetPos = SerializedVector3f(entity.x.toFloat(), (entity.y + 1.5).toFloat(), entity.z.toFloat())
-        sendPacketToServer(VehicleFireMessage(
-            uuid = if (weapon.lockEntity) entity.uuid else null,
-            targetPos = targetPos,
-            weaponName = weapon.weaponName,
-            shooterVehicleId = remoteShooterId,
-        ))
+        sendPacketToServer(
+            VehicleFireMessage(
+                uuid = if (weapon.lockEntity) entity.uuid else null,
+                targetPos = targetPos,
+                weaponName = weapon.weaponName,
+                shooterVehicleId = remoteShooterId,
+            )
+        )
     }
 
     private fun renderSelectionBox(guiGraphics: GuiGraphics) {
-        SelectionBoxManager.render(guiGraphics, selBoxes, viewBlockX, viewBlockZ, mapCenterX, mapCenterY, zoom,
+        SelectionBoxManager.render(
+            guiGraphics, selBoxes, viewBlockX, viewBlockZ, mapCenterX, mapCenterY, zoom,
             selectionDragging, selDragStartX, selDragStartY, selDragEndX, selDragEndY,
-            minecraft!!.font, mapLeft, mapTop, mapAreaW, mapAreaH)
+            minecraft!!.font, mapLeft, mapTop, mapAreaW, mapAreaH
+        )
     }
 
     private fun hitTestSelectionBox(mouseX: Double, mouseY: Double): SelBox? {
-        return SelectionBoxManager.hitTestBox(mouseX, mouseY, selBoxes, viewBlockX, viewBlockZ, mapCenterX, mapCenterY, zoom)
+        return SelectionBoxManager.hitTestBox(
+            mouseX,
+            mouseY,
+            selBoxes,
+            viewBlockX,
+            viewBlockZ,
+            mapCenterX,
+            mapCenterY,
+            zoom
+        )
     }
 
-    private fun renderSelContextMenu(guiGraphics: GuiGraphics, font: net.minecraft.client.gui.Font, mouseX: Int, mouseY: Int) {
-        SelectionBoxManager.renderContextMenu(guiGraphics, font, mouseX, mouseY,
+    private fun renderSelContextMenu(
+        guiGraphics: GuiGraphics,
+        font: Font,
+        mouseX: Int,
+        mouseY: Int
+    ) {
+        SelectionBoxManager.renderContextMenu(
+            guiGraphics, font, mouseX, mouseY,
             selMenuX, selMenuY, width, height,
-            minecraft?.player?.hasPermissions(2) ?: false, selMenuConfirmClear)
+            minecraft?.player?.hasPermissions(2) ?: false, selMenuConfirmClear
+        )
     }
 
     private fun handleSelMenuClick(mouseX: Double, mouseY: Double): Boolean {
@@ -1686,7 +1770,17 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         val isAdmin = minecraft?.player?.hasPermissions(2) ?: false
         val font = minecraft!!.font
 
-        when (SelectionBoxManager.handleMenuClick(mouseX, mouseY, selMenuX, selMenuY, width, height, isAdmin, selMenuConfirmClear, font)) {
+        when (SelectionBoxManager.handleMenuClick(
+            mouseX,
+            mouseY,
+            selMenuX,
+            selMenuY,
+            width,
+            height,
+            isAdmin,
+            selMenuConfirmClear,
+            font
+        )) {
             1 -> {
                 selBoxes.remove(targetBox)
                 selMenuVisible = false
@@ -1694,15 +1788,19 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
                 selMenuTargetBox = null
                 return true
             }
+
+
             2 -> {
                 if (!selMenuConfirmClear) {
                     selMenuConfirmClear = true
                     return true
                 }
-                sendPacketToServer(EntityAreaClearMessage(
-                    targetBox.worldMinX, -64.0, targetBox.worldMinZ,
-                    targetBox.worldMaxX, 320.0, targetBox.worldMaxZ
-                ))
+                sendPacketToServer(
+                    EntityAreaClearMessage(
+                        targetBox.worldMinX, -64.0, targetBox.worldMinZ,
+                        targetBox.worldMaxX, 320.0, targetBox.worldMaxZ
+                    )
+                )
                 selMenuVisible = false
                 selMenuTargetBox = null
                 selMenuConfirmClear = false
@@ -2095,15 +2193,20 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
                 )
                 if (groundWeapons.isNotEmpty()) {
                     val weapons = groundWeapons.map {
-                        MapContextMenu.MissileWeaponEntry(it.weaponName,
-                            it.displayNameBase.replace("%1\$s", "×${it.totalAmmo}"), it.totalAmmo)
+                        MapContextMenu.MissileWeaponEntry(
+                            it.weaponName,
+                            it.displayNameBase.replace("%1\$s", "×${it.totalAmmo}"), it.totalAmmo
+                        )
                     }
                     contextMenu.missileWeapons = weapons
                     contextMenu.onDirectAttack = { weaponName ->
                         val agg = groundWeapons.find { it.weaponName == weaponName }
                         attackHandler.maxGuidedRange = agg?.maxGuidedRange ?: 2048.0
                         attackHandler.sourcePositions = sourceVehicles.map { it.position() }
-                        attackHandler.enterDirectMode(weaponName, weapons.find { it.weaponName == weaponName }?.ammoCount ?: 0)
+                        attackHandler.enterDirectMode(
+                            weaponName,
+                            weapons.find { it.weaponName == weaponName }?.ammoCount ?: 0
+                        )
                     }
                     contextMenu.onQueueAttack = { weaponName ->
                         val firstVeh = sourceVehicles.firstOrNull { it.gunDataMap.containsKey(weaponName) }
@@ -2175,7 +2278,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         }
         if (draggingLoiterPoint && pButton == 0) {
             val scale = scaleFromZoom(zoom)
-            val vehicle = localPlayer?.vehicle as? VehicleEntity ?: return true
+            if (localPlayer?.vehicle !is VehicleEntity) return true
             val sx = pMouseX + loiterDragOffX
             val sy = pMouseY + loiterDragOffY
             loiterDragNewX = (viewBlockX + (sx - mapCenterX) / scale)
@@ -2209,11 +2312,13 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
                 val wMinZ = viewBlockZ + (minSY - mapCenterY) / scale
                 val wMaxX = viewBlockX + (maxSX - mapCenterX) / scale
                 val wMaxZ = viewBlockZ + (maxSY - mapCenterY) / scale
-                selBoxes.add(SelBox(
-                    nextSelBoxId(),
-                    minOf(wMinX, wMaxX), minOf(wMinZ, wMaxZ),
-                    maxOf(wMinX, wMaxX), maxOf(wMinZ, wMaxZ)
-                ))
+                selBoxes.add(
+                    SelBox(
+                        nextSelBoxId(),
+                        minOf(wMinX, wMaxX), minOf(wMinZ, wMaxZ),
+                        maxOf(wMinX, wMaxX), maxOf(wMinZ, wMaxZ)
+                    )
+                )
                 // 快捷选取框选区域内的所有友方载具
                 val boxMinX = minOf(wMinX, wMaxX)
                 val boxMaxX = maxOf(wMinX, wMaxX)
@@ -2370,12 +2475,22 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
     // ═══════════════════════════════════════════════════════════════
 
     private fun renderAttackCursor(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int) {
-        attackHandler.renderAttackCursor(guiGraphics, mouseX, mouseY, minecraft!!.font,
-            viewBlockX, viewBlockZ, mapCenterX, mapCenterY, zoom)
+        attackHandler.renderAttackCursor(
+            guiGraphics, mouseX, mouseY, minecraft!!.font,
+            viewBlockX, viewBlockZ, mapCenterX, mapCenterY, zoom
+        )
     }
 
     private fun renderQueueTargets(guiGraphics: GuiGraphics, player: Player) {
-        attackHandler.renderQueueTargets(guiGraphics, viewBlockX, viewBlockZ, mapCenterX, mapCenterY, zoom, minecraft!!.font)
+        attackHandler.renderQueueTargets(
+            guiGraphics,
+            viewBlockX,
+            viewBlockZ,
+            mapCenterX,
+            mapCenterY,
+            zoom,
+            minecraft!!.font
+        )
     }
 
     private fun renderQueueMenu(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int) {
@@ -2404,10 +2519,12 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
     // ═══════════════════════════════════════════════════════════════
 
     private fun handleAttackModeClick(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        return attackHandler.handleClick(mouseX, mouseY, button,
+        return attackHandler.handleClick(
+            mouseX, mouseY, button,
             isMouseInPanel(mouseX, mouseY),
             viewBlockX, viewBlockZ, mapCenterX, mapCenterY, zoom,
-            minecraft!!.player!!.level())
+            minecraft!!.player!!.level()
+        )
     }
 
     private fun handleQueueMenuClick(mouseX: Double, mouseY: Double): Boolean {
