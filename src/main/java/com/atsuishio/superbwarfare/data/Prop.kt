@@ -1,27 +1,28 @@
 package com.atsuishio.superbwarfare.data
 
-import com.google.gson.annotations.SerializedName
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import java.lang.reflect.Type
 import kotlin.reflect.KMutableProperty1
-import kotlin.reflect.javaType
 
-@OptIn(ExperimentalStdlibApi::class)
+private val PROP_SERIALIZATION_NAME_OVERRIDES = mapOf(
+    "ammoConsumers" to "AmmoType",
+    "rpm" to "RPM",
+)
+
+private fun serializationNameOf(propName: String): String {
+    return PROP_SERIALIZATION_NAME_OVERRIDES[propName]
+        ?: propName.replaceFirstChar { it.uppercaseChar() }
+}
+
 abstract class Prop<DATA : DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA, FIELD, RESULT, SELF : Prop<DATA, DEFAULT_DATA, FIELD, RESULT, SELF>> protected constructor(
     val prop: KMutableProperty1<DEFAULT_DATA, FIELD>,
     val transform: (FIELD) -> RESULT,
 ) {
-    protected val type: Type = prop.returnType.javaType
-
     val serializer by lazy { prop.serializer() }
 
     override fun toString() = "Prop[$serializationName]"
 
-    val serializationName = prop.annotations.filterIsInstance<SerialName>().singleOrNull()?.value
-        ?: prop.annotations.filterIsInstance<SerializedName>().singleOrNull()?.value
-        ?: prop.name
+    val serializationName = serializationNameOf(prop.name)
 
     init {
         props.add(this)
