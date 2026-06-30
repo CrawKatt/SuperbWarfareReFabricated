@@ -2315,7 +2315,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                     serializeNBT(level().registryAccess()),
                     yRot,
                     xRot,
-                    roll,
                     heightAboveGround = hag,
                 )
                 // TODO shouldWorldRender这里搞配置，服务端or载具json控制
