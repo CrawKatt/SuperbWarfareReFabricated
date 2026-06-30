@@ -58,6 +58,8 @@ open class IffItem : Item(Properties().stacksTo(1)), ICurioItem {
                     null,
                     player.serializeNBT(player.level().registryAccess()),
                     player.yRot,
+                    player.xRot,
+                    0f,
                     heightAboveGround = hag,
                 )
                 val msg = EntitySyncMessage(dim, listOf(synced), true)
