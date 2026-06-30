@@ -25,11 +25,10 @@ import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.fml.common.EventBusSubscriber
 import top.theillusivec4.curios.api.CuriosApi
 
 @OnlyIn(Dist.CLIENT)
-@EventBusSubscriber(Dist.CLIENT)
+// @EventBusSubscriber(Dist.CLIENT)
 object IFFOverlay : CommonOverlay("iff") {
     val FRIENDLY_INDICATOR = loc("textures/overlay/teammate/friendly_indicator.png")
     val FRIENDLY_AIRCRAFT = loc("textures/overlay/teammate/friendly_aircraft.png")
