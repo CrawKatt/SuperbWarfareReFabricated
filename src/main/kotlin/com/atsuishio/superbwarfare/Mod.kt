@@ -10,7 +10,6 @@ import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.DataLoader
 import com.atsuishio.superbwarfare.data.container.ContainerDataManager
 import com.atsuishio.superbwarfare.data.loot.WreckageLootDataManager
-import com.atsuishio.superbwarfare.data.vehicle.VehicleDataTool
 import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
 import com.atsuishio.superbwarfare.event.PlayerEventHandler
@@ -45,7 +44,6 @@ import com.atsuishio.superbwarfare.perk.damage.BattleOfWits
 import com.atsuishio.superbwarfare.recipe.ModPotionRecipes
 import com.atsuishio.superbwarfare.resource.BedrockModelLoader
 import com.atsuishio.superbwarfare.tiers.ModArmorMaterials
-import com.atsuishio.superbwarfare.tools.GunsTool
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger
 import com.atsuishio.superbwarfare.tools.registerMinecraftUtil
 import com.atsuishio.superbwarfare.world.saveddata.ChunkPosSavedData
@@ -78,8 +76,6 @@ class Mod : ModInitializer {
         callInits()
 
         registerPayloads()
-        VehicleDataTool.register()
-        GunsTool.register()
         DataLoader.register()
         WreckageLootDataManager.register()
         FastThrowableProjectile.init()

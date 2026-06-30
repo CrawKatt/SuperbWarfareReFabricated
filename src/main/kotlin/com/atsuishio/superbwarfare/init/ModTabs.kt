@@ -141,17 +141,17 @@ object ModTabs {
                 output.accept(ModItems.CROWBAR)
                 output.accept(ModItems.VEHICLE_ASSEMBLING_TABLE)
 
-                RegisterContainersEvent.CONTAINERS.forEach { output.accept(it) }
+                RegisterContainersEvent.CONTAINERS.forEach { output.accept(it.copyWithCount(1)) }
 
                 output.accept(ModItems.LUCKY_CONTAINER)
                 LuckyContainerBlockItem.LUCKY_CONTAINERS.stream()
                     .map { it() }
-                    .forEach { output.accept(it) }
+                    .forEach { output.accept(it.copyWithCount(1)) }
 
                 output.accept(ModItems.SMALL_CONTAINER)
                 SmallContainerBlockItem.SMALL_CONTAINERS.stream()
                     .map { it() }
-                    .forEach { output.accept(it) }
+                    .forEach { output.accept(it.copyWithCount(1)) }
             }
             .build()
     )
