@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.serialization.ByteBufDecoder
 import com.atsuishio.superbwarfare.serialization.ByteBufEncoder
 import com.atsuishio.superbwarfare.tools.createStreamCodec
 import kotlinx.serialization.serializer
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.network.FriendlyByteBuf
@@ -77,7 +78,7 @@ private inline fun <reified T : ClientPacketPayload> playToClient() {
  */
 private inline fun <reified T : ClientPacketPayload> clientReceiver() {
     val type = payloadTypeMap[T::class.java] as CustomPacketPayload.Type<T>
-    net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.registerGlobalReceiver(type) { msg, context ->
+    ClientPlayNetworking.registerGlobalReceiver(type) { msg, context ->
         with(msg) { PayloadContext(context.player()).handler() }
     }
 }
