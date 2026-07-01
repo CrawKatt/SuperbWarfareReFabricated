@@ -90,9 +90,14 @@ open class Perk(val descriptionId: String, val type: Type) : PropertyModifier<Gu
     }
 
     /**
-     * 用于处理武器近战攻击后的逻辑
+     * 用于处理武器近战攻击后的逻辑（命中实体时触发）
      */
     open fun onMeleeAttack(data: GunData, instance: PerkInstance, target: Entity, source: DamageSource) {}
+
+    /**
+     * 用于处理武器按下近战键的逻辑（无论是否命中实体都会触发）
+     */
+    open fun onMeleeSwing(data: GunData, instance: PerkInstance, entity: Entity?) {}
 
     private val perkKey = ResourceKey.create(ModPerks.PERK_KEY, ResourceLocation.parse(this.descriptionId))
 

@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.init
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.perk.AmmoPerk
+import com.atsuishio.superbwarfare.perk.EmptyPerk
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.perk.ammo.*
 import com.atsuishio.superbwarfare.perk.damage.*
@@ -93,6 +94,7 @@ object ModPerks {
     lateinit var BACKPACK_LINKED_MAGAZINE: DeferredHolder<Perk, Perk>
     lateinit var POWERFUL_COOLER: DeferredHolder<Perk, Perk>
     lateinit var CAST_NO_SHADOWS: DeferredHolder<Perk, Perk>
+    lateinit var EAGER_EDGE: DeferredHolder<Perk, Perk>
     // @formatter:on
 
     /**
@@ -121,6 +123,7 @@ object ModPerks {
     lateinit var ONE_TWO_PUNCH: DeferredHolder<Perk, Perk>
     lateinit var BRAIN_STORM: DeferredHolder<Perk, Perk>
     lateinit var BATTLE_OF_WITS: DeferredHolder<Perk, Perk>
+    lateinit var TARGET_LOCK: DeferredHolder<Perk, Perk>
     // @formatter:on
 
     fun register(bus: IEventBus) {
@@ -224,6 +227,9 @@ object ModPerks {
             autoRegistryObjects["powerful_cooler"] ?: registerFuncPerk("powerful_cooler") { PowerfulCooler }
         CAST_NO_SHADOWS =
             autoRegistryObjects["cast_no_shadows"] ?: registerFuncPerk("cast_no_shadows") { CastNoShadows }
+        EAGER_EDGE = autoRegistryObjects["eager_edge"] ?: registerFuncPerk("eager_edge") {
+            EmptyPerk("eager_edge", Perk.Type.FUNCTIONAL)
+        }
 
         // Damage Perks
         KILL_CLIP = autoRegistryObjects["kill_clip"] ?: registerDamagePerk("kill_clip") { KillClip }
@@ -244,5 +250,8 @@ object ModPerks {
         ONE_TWO_PUNCH = autoRegistryObjects["one_two_punch"] ?: registerDamagePerk("one_two_punch") { OneTwoPunch }
         BRAIN_STORM = autoRegistryObjects["brain_storm"] ?: registerDamagePerk("brain_storm") { BrainStorm }
         BATTLE_OF_WITS = autoRegistryObjects["battle_of_wits"] ?: registerDamagePerk("battle_of_wits") { BattleOfWits }
+        TARGET_LOCK = autoRegistryObjects["target_lock"] ?: registerDamagePerk("target_lock") {
+            EmptyPerk("target_lock", Perk.Type.DAMAGE)
+        }
     }
 }
