@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.item.container
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.renderer.item.SmallContainerBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlocks
+import com.atsuishio.superbwarfare.init.ModItems
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.core.component.DataComponents
@@ -73,7 +74,7 @@ class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER, Properties(
 
         @JvmOverloads
         fun createInstance(lootTable: ResourceKey<LootTable>, lootTableSeed: Long = 0L): ItemStack {
-            val stack = ItemStack(ModBlocks.SMALL_CONTAINER)
+            val stack = ItemStack(ModItems.SMALL_CONTAINER)
             stack.set(
                 DataComponents.CONTAINER_LOOT,
                 SeededContainerLoot(lootTable, lootTableSeed)

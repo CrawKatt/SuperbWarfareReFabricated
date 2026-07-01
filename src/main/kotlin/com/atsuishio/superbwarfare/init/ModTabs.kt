@@ -141,17 +141,17 @@ object ModTabs {
                 output.accept(ModItems.CROWBAR)
                 output.accept(ModItems.VEHICLE_ASSEMBLING_TABLE)
 
-                RegisterContainersEvent.CONTAINERS.forEach { output.accept(it.copyWithCount(1)) }
+                RegisterContainersEvent.CONTAINERS.forEach { output.acceptSingle(it) }
 
                 output.accept(ModItems.LUCKY_CONTAINER)
                 LuckyContainerBlockItem.LUCKY_CONTAINERS.stream()
                     .map { it() }
-                    .forEach { output.accept(it.copyWithCount(1)) }
+                    .forEach { output.acceptSingle(it) }
 
                 output.accept(ModItems.SMALL_CONTAINER)
                 SmallContainerBlockItem.SMALL_CONTAINERS.stream()
                     .map { it() }
-                    .forEach { output.accept(it.copyWithCount(1)) }
+                    .forEach { output.acceptSingle(it) }
             }
             .build()
     )
@@ -166,6 +166,12 @@ object ModTabs {
 
     private fun register(name: String, tab: CreativeModeTab): CreativeModeTab {
         return Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Mod.loc(name), tab)
+    }
+
+    private fun CreativeModeTab.Output.acceptSingle(stack: ItemStack) {
+        if (!stack.isEmpty) {
+            accept(stack.copyWithCount(1))
+        }
     }
 
     private fun generatePotionEffectTypes(

@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.renderer.item.ContainerBlockItemRender
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModEntities
+import com.atsuishio.superbwarfare.init.ModItems
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.core.component.DataComponents
@@ -141,7 +142,7 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
 
         @JvmStatic
         fun createInstance(entity: Entity): ItemStack {
-            val stack = ItemStack(ModBlocks.CONTAINER)
+            val stack = ItemStack(ModItems.CONTAINER)
 
             val data = stack.get(DataComponents.BLOCK_ENTITY_DATA)
             val tag = if (data != null) data.copyTag() else CompoundTag()
@@ -161,7 +162,7 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
 
         @JvmStatic
         fun createInstance(entityType: EntityType<*>): ItemStack {
-            val stack = ItemStack(ModBlocks.CONTAINER)
+            val stack = ItemStack(ModItems.CONTAINER)
             val data = stack.get(DataComponents.BLOCK_ENTITY_DATA)
             val tag = if (data != null) data.copyTag() else CompoundTag()
 

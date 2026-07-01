@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.renderer.item.LuckyContainerBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModBlocks
+import com.atsuishio.superbwarfare.init.ModItems
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.nbt.CompoundTag
@@ -90,7 +91,7 @@ class LuckyContainerBlockItem :
 
         @JvmOverloads
         fun createInstance(location: ResourceLocation, icon: ResourceLocation? = null): ItemStack {
-            val stack = ItemStack(ModBlocks.LUCKY_CONTAINER)
+            val stack = ItemStack(ModItems.LUCKY_CONTAINER)
             val tag = CompoundTag()
             tag.putString("Location", location.toString())
             if (icon != null) {
