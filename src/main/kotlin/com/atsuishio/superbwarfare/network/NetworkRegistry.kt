@@ -89,7 +89,7 @@ private fun registerPayloads() {
     playToClient<SoundClientMessage>()
     playToClient<VehicleShootClientMessage>()
     playToClient<TDMSyncMessage>()
-    playToClient<EntitySyncMessage>()
+    playToClient<EntityRelationSyncMessage>()
     playToClient<PlayerInfoSyncMessage>()
     playToClient<RadarSyncMessage>()
     playToClient<ClientVehicleItemMessage>()
