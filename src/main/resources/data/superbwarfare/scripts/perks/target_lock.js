@@ -16,8 +16,8 @@ function tick(perkTag, level, gunDataProxy, entityProxy) {
         perkTag.reduceCooldown("TargetLockTick")
         if (!perkTag.has("TargetLockTick")) {
             const stacks = perkTag.getInt("TargetLockStacks")
-            perkTag.putInt("TargetLockStacks", Math.max(5, stacks + 1))
-            perkTag.putInt("TargetLockTick", 50)
+            perkTag.putInt("TargetLockStacks", Math.min(5, stacks + 1))
+            perkTag.putInt("TargetLockTick", 20)
         }
     } else if (hasStacks) {
         perkTag.reduceCooldown("TargetLockTick")
@@ -36,5 +36,5 @@ function modifyProperty(pmcProxy, level, perkTag, gunDataProxy) {
     const stacks = perkTag.getInt("TargetLockStacks")
     if (stacks <= 0) return
 
-    pmcProxy.mul("Damage", 1 + stacks * level * 0.1)
+    pmcProxy.mul("Damage", 1 + stacks * (level * 0.05 + 0.2))
 }
