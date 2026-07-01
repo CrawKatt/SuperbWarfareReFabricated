@@ -22,7 +22,9 @@
     "superbwarfare:powerful_attraction",
     "superbwarfare:intelligent_chip",
     "superbwarfare:monster_hunter",
-    "superbwarfare:vorpal_weapon"
+    "superbwarfare:vorpal_weapon",
+    "superbwarfare:brain_storm",
+    "superbwarfare:target_lock"
   ],
   "SoundInfo": {
     "Fire1P": "superbwarfare:star_shoot_1p",
