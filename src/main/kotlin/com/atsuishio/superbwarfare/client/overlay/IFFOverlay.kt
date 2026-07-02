@@ -49,6 +49,7 @@ object IFFOverlay : CommonOverlay("iff") {
 
     override fun shouldRender() = super.shouldRender() && DisplayConfig.IFF_HUD.get()
 
+
     override fun RenderContext.render() {
         val level = player.level()
 
@@ -58,7 +59,14 @@ object IFFOverlay : CommonOverlay("iff") {
         CuriosApi.getCuriosInventory(player).ifPresent { c ->
             c.findFirstCurio(ModItems.IFF.get()).ifPresent { _ ->
                 // ── 友方实体（绿色）──
-                val friendlyEntities = ClientSyncedEntityHandler.getSyncedFriendlyEntities(level)
+                var friendlyEntities = ClientSyncedEntityHandler.getSyncedFriendlyEntities(level)
+                val clientEntities = SeekTool.Builder(player)
+                    .friendly()
+                    .notPlayer()
+                    .build().toList()
+
+                friendlyEntities = (friendlyEntities + clientEntities).distinctBy { it.id }
+
                 for (entity in friendlyEntities) {
                     val e = level.getEntity(entity.id) ?: entity
                     if (e !== player && e.position().canBeSeen() && e !== player.vehicle) {
