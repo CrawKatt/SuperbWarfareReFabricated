@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.data
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.KSerializer
 import kotlin.reflect.KMutableProperty1
 
 private val PROP_SERIALIZATION_NAME_OVERRIDES = mapOf(
@@ -17,8 +18,9 @@ private fun serializationNameOf(propName: String): String {
 abstract class Prop<DATA : DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA, FIELD, RESULT, SELF : Prop<DATA, DEFAULT_DATA, FIELD, RESULT, SELF>> protected constructor(
     val prop: KMutableProperty1<DEFAULT_DATA, FIELD>,
     val transform: (FIELD) -> RESULT,
+    private val serializerOverride: KSerializer<FIELD>? = null,
 ) {
-    val serializer by lazy { prop.serializer() }
+    val serializer by lazy { serializerOverride ?: prop.serializer() }
 
     override fun toString() = "Prop[$serializationName]"
 

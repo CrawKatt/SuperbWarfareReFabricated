@@ -6,6 +6,8 @@ import com.atsuishio.superbwarfare.data.Prop
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.getPerkPriority
 import com.atsuishio.superbwarfare.init.ModPerks
 import com.atsuishio.superbwarfare.perk.Perk
+import com.atsuishio.superbwarfare.serialization.kserializer.ResourceLocationSerializer
+import kotlinx.serialization.KSerializer
 import kotlin.math.min
 import kotlin.reflect.KMutableProperty1
 
@@ -13,7 +15,8 @@ import kotlin.reflect.KMutableProperty1
 class GunProp<T, R>(
     private val rawProp: KMutableProperty1<DefaultGunData, T>,
     transform: (T) -> R,
-) : Prop<GunData, DefaultGunData, T, R, GunProp<T, R>>(rawProp, transform) {
+    serializerOverride: KSerializer<T>? = null,
+) : Prop<GunData, DefaultGunData, T, R, GunProp<T, R>>(rawProp, transform, serializerOverride) {
 
     override fun toString() = "GunProp[$serializationName]"
 
@@ -27,15 +30,17 @@ class GunProp<T, R>(
 
         inline fun <reified T> plainProp(
             prop: KMutableProperty1<DefaultGunData, T>,
+            serializerOverride: KSerializer<T>? = null,
         ): GunProp<T, T> {
-            return GunProp(prop) { it }.also { entries.add(it) }
+            return GunProp(prop, { it }, serializerOverride).also { entries.add(it) }
         }
 
         inline fun <reified T, R> complexProp(
             prop: KMutableProperty1<DefaultGunData, T>,
+            serializerOverride: KSerializer<T>? = null,
             noinline transform: (T) -> R
         ): GunProp<T, R> {
-            return GunProp(prop, transform).also { entries.add(it) }
+            return GunProp(prop, transform, serializerOverride).also { entries.add(it) }
         }
 
         @JvmField
@@ -320,7 +325,7 @@ class GunProp<T, R>(
         }
 
         @JvmField
-        val ICON = complexProp(DefaultGunData::icon) { it }
+        val ICON = complexProp(DefaultGunData::icon, ResourceLocationSerializer) { it }
 
         @JvmField
         val CROSSHAIR = complexProp(DefaultGunData::crosshair) { it.ifEmpty { "@GunDefault" } }
