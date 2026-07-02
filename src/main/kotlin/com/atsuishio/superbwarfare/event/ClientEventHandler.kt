@@ -411,6 +411,14 @@ object ClientEventHandler {
     @JvmField
     var keysCache: Short = 0
 
+    /** 自动盘旋双击夺回操控权：上次按下前进键的tick */
+    @JvmField
+    var loiterLastForwardTapTick: Int = -20
+
+    /** 自动盘旋双击夺回操控权：前进键连击计数 */
+    @JvmField
+    var loiterForwardTapCount: Int = 0
+
     @JvmField
     var tdmSavedData: TDMSavedData = TDMSavedData()
 
@@ -720,12 +728,33 @@ object ClientEventHandler {
         }
 
         if (keys != keysCache) {
-            // 盘旋模式下阻止操控包发往服务端
+            // 盘旋模式下阻止操控包发往服务端，但检测双击前进键夺回操控权
             val blockLoiter = vehicle is VehicleEntity
                 && vehicle.loiterActive
                 && vehicle.computed().engineType == EngineType.AIRCRAFT
             if (!blockLoiter) {
                 sendPacketToServer(VehicleMovementMessage(keys))
+            } else {
+                // 检测双击前进键(W)在0.5s(10tick)内夺回操控权
+                val forwardBit = 0b000000100
+                val forwardJustPressed = (keys.toInt() and forwardBit) != 0 && (keysCache.toInt() and forwardBit) == 0
+                if (forwardJustPressed) {
+                    val currentTick = player.tickCount
+                    if (currentTick - loiterLastForwardTapTick <= 10) {
+                        sendPacketToServer(LoiterOverrideMessage)
+                        loiterForwardTapCount = 0
+                        loiterLastForwardTapTick = -20
+                    } else {
+                        loiterForwardTapCount = 1
+                        loiterLastForwardTapTick = currentTick
+                        player.displayClientMessage(
+                            Component.translatable(
+                                "tips.superbwarfare.loiter_override_hint",
+                                ModKeyMappings.MOVE_FORWARD.key.displayName.string
+                            ), true
+                        )
+                    }
+                }
             }
             keysCache = keys
         }

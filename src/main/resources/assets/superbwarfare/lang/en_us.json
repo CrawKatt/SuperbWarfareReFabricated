@@ -852,6 +852,7 @@
   "tips.superbwarfare.flare.ready": "FLARE READY",
   "tips.superbwarfare.hover_mode_on": "HOVER ON",
   "tips.superbwarfare.hover_mode_off": "HOVER OFF",
+  "tips.superbwarfare.loiter_override_hint": "Double tap [%s] to regain control",
   "tips.superbwarfare.flare.reloading": "FLARE RELOADING",
   "tips.superbwarfare.gear_retracted": "GEAR RETRACTED",
   "tips.superbwarfare.gear_extended": "GEAR EXTENDED",

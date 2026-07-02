@@ -4,11 +4,6 @@
   "MouseSensitivity": 0.2,
   "OBB": [
     {
-      "Part": "Collision",
-      "Size": [3.375, 3.3125, 20.594],
-      "Position": [0, 3.3125, -2.469]
-    },
-    {
       "Size": [28.0625, 0.625, 3.531],
       "Position": [0, 6, -1.094]
     },
