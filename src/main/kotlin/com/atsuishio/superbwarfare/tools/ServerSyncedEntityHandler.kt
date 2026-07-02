@@ -52,6 +52,9 @@ object ServerSyncedEntityHandler {
     // dim string → entityId → Entry
     private val entities = ConcurrentHashMap<String, ConcurrentHashMap<Int, Entry>>()
 
+    /** 等待在下一 tick 广播中发送 removed=true 通知给客户端的实体集合 */
+    private val pendingRemovals = ConcurrentHashMap<String, MutableSet<Pair<Int, ResourceLocation>>>()
+
     /**
      * 注册或更新实体。每 tick 由 VehicleEntity / MissileProjectile / IffItem 调用。
      * NBT 每 tick 重新序列化，保证 [BeyondVisualEntitySyncMessage] 携带最新实体状态。
@@ -63,18 +66,15 @@ object ServerSyncedEntityHandler {
         val level = entity.level()
         if (level.isClientSide) return
         level.server ?: return
-        if (entity is VehicleEntity && entity.isWreck) return
         if (entity !is VehicleEntity && entity !is MissileProjectile && entity !is Player
-            && entity !is LivingEntity
-            && !VehicleConfig.inScanList(entity.type)
-        ) return
+            && entity !is LivingEntity && !VehicleConfig.inScanList(entity.type)) return
 
         val dim = level.dimension().location().toString()
         val now = System.currentTimeMillis()
 
         val nbt = entity.serializeNBT(level.registryAccess())
 
-        val td = if (entity is VehicleEntity && !entity.isWreck)
+        val td = if (entity is VehicleEntity)
             entity.computed().trackDistanceMultiply else 1.0
         val hag = computeHeightAboveGround(entity)
 
@@ -98,7 +98,11 @@ object ServerSyncedEntityHandler {
     @JvmStatic
     fun unregister(entity: Entity) {
         if (entity.level().isClientSide) return
-        entities[entity.level().dimension().location().toString()]?.remove(entity.id)
+        val dim = entity.level().dimension().location().toString()
+        entities[dim]?.remove(entity.id)
+        // 记录待移除实体，下一 tick 广播时通知客户端立即清理
+        val entityType = BuiltInRegistries.ENTITY_TYPE.getKey(entity.type)
+        pendingRemovals.getOrPut(dim) { ConcurrentHashMap.newKeySet() }.add(Pair(entity.id, entityType))
     }
 
     @JvmStatic
@@ -138,8 +142,16 @@ object ServerSyncedEntityHandler {
         for (dimLevel in server.allLevels) {
             val dimKey = dimLevel.dimension().location().toString()
             val dimEntries = entities[dimKey] ?: continue
-            dimEntries.values.removeIf { entry ->
+            val toRemove = dimEntries.values.filter { entry ->
                 dimLevel.getEntity(entry.entityId) == null && now - entry.timeStamp > MiscConfig.SERVER_SYNC_EXPIRE_TIME.get()
+            }
+            if (toRemove.isNotEmpty()) {
+                dimEntries.values.removeAll(toRemove)
+                // 过期清理时也通知客户端移除
+                val pending = pendingRemovals.getOrPut(dimKey) { ConcurrentHashMap.newKeySet() }
+                for (entry in toRemove) {
+                    pending.add(Pair(entry.entityId, entry.entityType))
+                }
             }
         }
     }
@@ -160,21 +172,66 @@ object ServerSyncedEntityHandler {
     private fun broadcastWorldRender(server: MinecraftServer) {
         for (dimLevel in server.allLevels) {
             val dim = dimLevel.dimension().location()
-            val dimEntries = entities[dim.toString()] ?: continue
-            if (dimEntries.isEmpty()) continue
+            val dimStr = dim.toString()
+            val dimEntries = entities[dimStr] ?: continue
 
-            val syncedList = dimEntries.values.mapNotNull { entry ->
-                val entity = dimLevel.getEntity(entry.entityId) ?: return@mapNotNull null
-                if (entity !is VehicleEntity && entity !is MissileProjectile && entity !is LivingEntity) return@mapNotNull null
-                BeyondVisualEntitySyncMessage.SyncedEntity(
-                    entry.entityId, entry.entityType, entry.pos, entry.targetPos, entry.nbt,
-                    entry.yRot, entry.xRot,
-                    heightAboveGround = entry.heightAboveGround,
+            // 收集待移除实体的通知（来自 unregister / cleanAll）
+            val removedList = mutableListOf<BeyondVisualEntitySyncMessage.SyncedEntity>()
+            val pending = pendingRemovals.remove(dimStr)
+            if (pending != null) {
+                for ((id, type) in pending) {
+                    removedList.add(
+                        BeyondVisualEntitySyncMessage.SyncedEntity(
+                            id = id,
+                            type = type,
+                            pos = Vec3.ZERO,
+                            targetPos = null,
+                            tag = CompoundTag(),
+                            removed = true,
+                        )
+                    )
+                }
+            }
+
+            if (dimEntries.isEmpty() && removedList.isEmpty()) continue
+
+            val syncedList = mutableListOf<BeyondVisualEntitySyncMessage.SyncedEntity>()
+            val deadIds = mutableListOf<Int>()
+
+            for (entry in dimEntries.values) {
+                val entity = dimLevel.getEntity(entry.entityId)
+                if (entity == null) {
+                    // 实体已从世界中移除但条目仍在 map 中，通知客户端清理并移除条目
+                    deadIds.add(entry.entityId)
+                    removedList.add(
+                        BeyondVisualEntitySyncMessage.SyncedEntity(
+                            id = entry.entityId,
+                            type = entry.entityType,
+                            pos = Vec3.ZERO,
+                            targetPos = null,
+                            tag = CompoundTag(),
+                            removed = true,
+                        )
+                    )
+                    continue
+                }
+                if (entity !is VehicleEntity && entity !is MissileProjectile && entity !is LivingEntity) continue
+                syncedList.add(
+                    BeyondVisualEntitySyncMessage.SyncedEntity(
+                        entry.entityId, entry.entityType, entry.pos, entry.targetPos, entry.nbt,
+                        entry.yRot, entry.xRot,
+                        heightAboveGround = entry.heightAboveGround,
+                    )
                 )
             }
 
-            if (syncedList.isNotEmpty()) {
-                val msg = BeyondVisualEntitySyncMessage(dim, syncedList)
+            // 从 map 中移除已死实体条目
+            for (id in deadIds) {
+                dimEntries.remove(id)
+            }
+
+            if (syncedList.isNotEmpty() || removedList.isNotEmpty()) {
+                val msg = BeyondVisualEntitySyncMessage(dim, syncedList + removedList)
                 for (player in dimLevel.players()) {
                     sendPacketTo(player, msg)
                 }

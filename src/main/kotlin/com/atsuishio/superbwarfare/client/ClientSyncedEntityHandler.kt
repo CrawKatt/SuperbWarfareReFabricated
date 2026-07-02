@@ -33,7 +33,11 @@ object ClientSyncedEntityHandler {
 
     data class ClientSyncedPlayer(
         val timeStamp: Long, val uuid: UUID, val pos: Vec3, val name: String,
-        val onVehicle: Boolean, val isDriver: Boolean
+        val onVehicle: Boolean, val isDriver: Boolean,
+        /** 关系标识："friendly" / "hostile" / "neutral" */
+        val relation: String = "friendly",
+        /** 服务端实体 ID，用于管理员清除等操作（-1 表示未知） */
+        val entityId: Int = -1,
     )
 
     // ── 轻量级 ID 池：dim string → entityId → timestamp ──
@@ -85,7 +89,7 @@ object ClientSyncedEntityHandler {
         val time = System.currentTimeMillis()
         for (info in list) {
             SYNCED_PLAYERS[SyncedPlayerKey(dim, info.uuid)] =
-                ClientSyncedPlayer(time, info.uuid, info.pos, info.name, info.onVehicle, info.isDriver)
+                ClientSyncedPlayer(time, info.uuid, info.pos, info.name, info.onVehicle, info.isDriver, info.relation, info.entityId)
         }
     }
 

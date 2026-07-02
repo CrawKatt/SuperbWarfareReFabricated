@@ -19,6 +19,7 @@ import com.atsuishio.superbwarfare.network.message.send.EntityAreaClearMessage
 import com.atsuishio.superbwarfare.network.message.send.EntityClearMessage
 import com.atsuishio.superbwarfare.network.message.send.VehicleFireMessage
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVector3f
+import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.sendPacketToServer
 import com.mojang.blaze3d.platform.GlStateManager
@@ -168,8 +169,12 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
 
     // Entity right-click menu
     private val entityRenderList = mutableListOf<MapEntityRenderer.EntityRenderEntry>()
+    /** 同步玩家屏幕位置（不含本地实体的远端玩家），用于右键菜单命中检测 */
+    private val syncedPlayerHitEntries = mutableListOf<Triple<ClientSyncedEntityHandler.ClientSyncedPlayer, Float, Float>>()
     private var entityMenuVisible = false
     private var entityMenuTarget: Entity? = null
+    /** 远端玩家的回退菜单目标（当本地无对应 Entity 时使用） */
+    private var syncedMenuTarget: ClientSyncedEntityHandler.ClientSyncedPlayer? = null
     private var entityMenuX = 0
     private var entityMenuY = 0
     // Area selection (shift + left-drag)
@@ -550,7 +555,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         }
 
         // Entity right-click menu
-        if (entityMenuVisible && entityMenuTarget != null) {
+        if (entityMenuVisible && (entityMenuTarget != null || syncedMenuTarget != null)) {
             renderEntityContextMenu(pGuiGraphics, font, pMouseX, pMouseY)
         }
 
@@ -1034,6 +1039,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         // 雷达扇面置于最底层
         entityRenderer.renderRadars(level, scale, guiGraphics, mapCenterX, mapCenterY, viewBlockX, viewBlockZ)
         entityRenderList.clear()
+        syncedPlayerHitEntries.clear()
         hoveredEntityLines = null
 
         val useDragPt = draggingLoiterPoint || System.currentTimeMillis() < loiterDragExpireTime
@@ -1074,6 +1080,18 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
             useDragPt, loiterDragNewX, loiterDragNewZ, loiterDragExpireTime
         )
 
+        // 队友玩家标记（来自 SYNCED_PLAYERS，不依赖 SYNCED_WORLD_RENDER 的实体实例化）
+        entityRenderer.renderSyncedTeammates(
+            guiGraphics,
+            ClientSyncedEntityHandler.getSyncedPlayerInfo(level),
+            player,
+            viewBlockX, viewBlockZ, mapCenterX, mapCenterY, scale,
+            mouseX = mouseX, mouseY = mouseY,
+            onHover = { lines, x, y -> hoveredEntityLines = lines; hoveredEntityTipX = x; hoveredEntityTipY = y },
+            outEntries = entityRenderList,
+            outSyncedHitEntries = syncedPlayerHitEntries,
+        )
+
         // 玩家自己骑乘的载具（不在同步实体列表中，需单独渲染）
         val ownVehicle = player.vehicle
         if (ownVehicle is VehicleEntity) {
@@ -1092,6 +1110,11 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         if (entityMenuTarget != null && entityRenderList.none { it.entity === entityMenuTarget }) {
             entityMenuVisible = false
             entityMenuTarget = null
+        }
+        // 远端玩家数据过期则关闭菜单
+        if (syncedMenuTarget != null && syncedPlayerHitEntries.none { (info, _, _) -> info.uuid == syncedMenuTarget!!.uuid }) {
+            entityMenuVisible = false
+            syncedMenuTarget = null
         }
         selectedEntities.removeAll { sel -> entityRenderList.none { it.entity.id == sel.id } }
 
@@ -1483,33 +1506,43 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         mouseY: Int
     ) {
         val target = entityMenuTarget
-        if (target == null || target.isRemoved) {
+        val synced = syncedMenuTarget
+        if (target == null && synced == null) {
+            entityMenuVisible = false
+            return
+        }
+        if (target != null && target.isRemoved) {
             entityMenuVisible = false
             entityMenuTarget = null
             return
         }
+
+        val tX = target?.x ?: synced!!.pos.x
+        val tY = target?.y ?: synced!!.pos.y
+        val tZ = target?.z ?: synced!!.pos.z
         val isFriendlyVehicle = target is VehicleEntity &&
                 entityRenderList.any { it.entity === target && it.relation == "friendly" }
-        val selectLabel = if (selectedEntities.any { it.id == target.id })
+        val selectLabel = if (target != null && selectedEntities.any { it.id == target.id })
             Component.translatable("context.superbwarfare.tactical_map.entity_menu.deselect").string
         else
             Component.translatable("context.superbwarfare.tactical_map.entity_menu.select").string
         val teleportLabel = Component.translatable(
             "context.superbwarfare.tactical_map.entity_menu.teleport",
-            target.x.toInt(), target.y.toInt() + 1, target.z.toInt()
+            tX.toInt(), tY.toInt() + 1, tZ.toInt()
         ).string
         val clearLabel = Component.translatable("context.superbwarfare.tactical_map.entity_menu.clear").string
 
         val isAdmin = minecraft?.player?.hasPermissions(2) ?: false
-        val missileWeapons = buildEntityMissileWeapons(target)
+        val canClear = isAdmin && (target != null || (synced != null && synced.entityId >= 0))
+        val missileWeapons = buildEntityMissileWeapons(target ?: synced!!)
         val itemHeight = 14
-        val baseCount = 1 + (if (isFriendlyVehicle) 1 else 0) + (if (isAdmin) 1 else 0)
+        val baseCount = 1 + (if (isFriendlyVehicle) 1 else 0) + (if (canClear) 1 else 0)
         val missileCount = missileWeapons.size
         val totalCount = baseCount + missileCount
         // Compute widest label
         var maxW = font.width(teleportLabel)
         if (isFriendlyVehicle) maxW = maxOf(maxW, font.width(selectLabel))
-        if (isAdmin) maxW = maxOf(maxW, font.width(clearLabel))
+        if (canClear) maxW = maxOf(maxW, font.width(clearLabel))
         for (mw in missileWeapons) maxW = maxOf(maxW, font.width(mw.displayName))
         val menuW = maxW + 16
         val menuH = totalCount * itemHeight + 4 + (if (missileCount > 0) 1 else 0)
@@ -1550,7 +1583,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         }
 
         // Item 2: Clear (admin only)
-        if (isAdmin) {
+        if (canClear) {
             val ty2 = my + 2 + idx * itemHeight
             val hovered2 = mouseX in mx..mx + menuW && mouseY in ty2..ty2 + itemHeight
             if (hovered2) guiGraphics.fill(mx + 1, ty2, mx + menuW - 1, ty2 + itemHeight, 0x66444444)
@@ -1596,33 +1629,43 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
 
     private fun handleEntityMenuClick(mouseX: Double, mouseY: Double): Boolean {
         val target = entityMenuTarget
-        if (target == null || target.isRemoved) {
+        val synced = syncedMenuTarget
+        if (target == null && synced == null) {
+            entityMenuVisible = false
+            return false
+        }
+        if (target != null && target.isRemoved) {
             entityMenuVisible = false
             entityMenuTarget = null
             return false
         }
+
+        val tX = target?.x ?: synced!!.pos.x
+        val tY = target?.y ?: synced!!.pos.y
+        val tZ = target?.z ?: synced!!.pos.z
         val isFriendlyVehicle = target is VehicleEntity &&
                 entityRenderList.any { it.entity === target && it.relation == "friendly" }
-        val selectLabel = if (selectedEntities.any { it.id == target.id })
+        val selectLabel = if (target != null && selectedEntities.any { it.id == target.id })
             Component.translatable("context.superbwarfare.tactical_map.entity_menu.deselect").string
         else
             Component.translatable("context.superbwarfare.tactical_map.entity_menu.select").string
         val teleportLabel = Component.translatable(
             "context.superbwarfare.tactical_map.entity_menu.teleport",
-            target.x.toInt(), target.y.toInt() + 1, target.z.toInt()
+            tX.toInt(), tY.toInt() + 1, tZ.toInt()
         ).string
         val clearLabel = Component.translatable("context.superbwarfare.tactical_map.entity_menu.clear").string
 
         val isAdmin = minecraft?.player?.hasPermissions(2) ?: false
-        val missileWeapons = buildEntityMissileWeapons(target)
+        val canClear = isAdmin && (target != null || (synced != null && synced.entityId >= 0))
+        val missileWeapons = buildEntityMissileWeapons(target ?: synced!!)
         val itemHeight = 14
-        val baseCount = 1 + (if (isFriendlyVehicle) 1 else 0) + (if (isAdmin) 1 else 0)
+        val baseCount = 1 + (if (isFriendlyVehicle) 1 else 0) + (if (canClear) 1 else 0)
         val missileCount = missileWeapons.size
         val totalCount = baseCount + missileCount
         val font = minecraft!!.font
         var maxW = font.width(teleportLabel)
         if (isFriendlyVehicle) maxW = maxOf(maxW, font.width(selectLabel))
-        if (isAdmin) maxW = maxOf(maxW, font.width(clearLabel))
+        if (canClear) maxW = maxOf(maxW, font.width(clearLabel))
         for (mw in missileWeapons) maxW = maxOf(maxW, font.width(mw.displayName))
         val menuW = maxW + 16
         val menuH = totalCount * itemHeight + 4 + (if (missileCount > 0) 1 else 0)
@@ -1635,14 +1678,15 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         // Row 0: Teleport
         var ty = my + 2
         if (mouseX in mx.toDouble()..(mx + menuW).toDouble() && mouseY in ty.toDouble()..(ty + itemHeight).toDouble()) {
-            minecraft?.player?.connection?.sendCommand("tp ${target.x.toInt()} ${target.y.toInt() + 1} ${target.z.toInt()}")
+            minecraft?.player?.connection?.sendCommand("tp ${tX.toInt()} ${tY.toInt() + 1} ${tZ.toInt()}")
             entityMenuVisible = false
             entityMenuTarget = null
+            syncedMenuTarget = null
             return true
         }
 
         // Row 1: Select / Deselect (friendly vehicle only)
-        if (isFriendlyVehicle) {
+        if (isFriendlyVehicle && target != null) {
             ty += itemHeight
             if (mouseX in mx.toDouble()..(mx + menuW).toDouble() && mouseY in ty.toDouble()..(ty + itemHeight).toDouble()) {
                 val idx = selectedEntities.indexOfFirst { it.id == target.id }
@@ -1654,12 +1698,14 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         }
 
         // Row 2: Clear (admin)
-        if (isAdmin) {
+        if (canClear) {
             ty += itemHeight
             if (mouseX in mx.toDouble()..(mx + menuW).toDouble() && mouseY in ty.toDouble()..(ty + itemHeight).toDouble()) {
-                sendPacketToServer(EntityClearMessage(target.id))
+                val clearId = target?.id ?: synced!!.entityId
+                sendPacketToServer(EntityClearMessage(clearId))
                 entityMenuVisible = false
                 entityMenuTarget = null
+                syncedMenuTarget = null
                 return true
             }
         }
@@ -1672,8 +1718,8 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
                     ty += itemHeight; continue
                 }
                 if (mouseX in mx.toDouble()..(mx + menuW).toDouble() && mouseY in ty.toDouble()..(ty + itemHeight).toDouble()) {
-                    fireEntityMissile(target, mw)
-                    // Don't close menu — allow multiple attacks
+                    if (target != null) fireEntityMissile(target, mw)
+                    else fireSyncedMissile(synced!!, mw)
                     return true
                 }
                 ty += itemHeight
@@ -1703,19 +1749,26 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
     private fun findFirstVehicleWithWeapon(weaponName: String): VehicleEntity? =
         MissileWeaponHelper.findFirstVehicleWithWeapon(weaponName, getSelectedVehicles(), localPlayer)
 
-    private fun buildEntityMissileWeapons(entity: Entity): List<EntityMissileWeapon> {
+    /** 构建导弹武器列表，支持 Entity 和 ClientSyncedPlayer（远端玩家无本地实体时传同步数据） */
+    private fun buildEntityMissileWeapons(target: Any): List<EntityMissileWeapon> {
         val vehicles = getSelectedVehicles()
-        return MissileWeaponHelper.aggregateWeapons(vehicles, entity, requireLockEntity = true, requireLockBlock = true)
-            .map {
-                EntityMissileWeapon(
-                    it.weaponName, it.displayNameBase, it.totalAmmo, it.canLockEntity,
-                    it.inRange, it.maxGuidedRange
-                )
-            }
+        val entity = target as? Entity
+        // 远端玩家：从战术地图缓存计算离地高度，用于锁定类导弹的最小/最大高度校验
+        val targetHeight = if (entity == null && target is ClientSyncedEntityHandler.ClientSyncedPlayer) {
+            val cachedH = TacticalMapCache.getCachedHeight(target.pos.x.toInt(), target.pos.z.toInt())
+            if (cachedH != null) (target.pos.y - cachedH).coerceAtLeast(0.0) else -1.0
+        } else -1.0
+        return MissileWeaponHelper.aggregateWeapons(
+            vehicles, entity, requireLockEntity = true, requireLockBlock = true, targetHeight = targetHeight
+        ).map {
+            EntityMissileWeapon(
+                it.weaponName, it.displayNameBase, it.totalAmmo, it.canLockEntity,
+                it.inRange, it.maxGuidedRange
+            )
+        }
     }
 
     private fun fireEntityMissile(entity: Entity, weapon: EntityMissileWeapon) {
-        // 遥控发射：在所有选中载具中找第一个有弹药的
         val shooter = findFirstVehicleWithWeapon(weapon.weaponName)
             ?: (localPlayer?.vehicle as? VehicleEntity)
             ?: return
@@ -1724,6 +1777,23 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         sendPacketToServer(
             VehicleFireMessage(
                 uuid = if (weapon.lockEntity) entity.uuid else null,
+                targetPos = targetPos,
+                weaponName = weapon.weaponName,
+                shooterVehicleId = remoteShooterId,
+            )
+        )
+    }
+
+    /** 对远端同步玩家发射导弹（无本地 Entity，使用同步位置和 UUID） */
+    private fun fireSyncedMissile(info: ClientSyncedEntityHandler.ClientSyncedPlayer, weapon: EntityMissileWeapon) {
+        val shooter = findFirstVehicleWithWeapon(weapon.weaponName)
+            ?: (localPlayer?.vehicle as? VehicleEntity)
+            ?: return
+        val remoteShooterId = if (shooter !== localPlayer?.vehicle) shooter.id else null
+        val targetPos = SerializedVector3f(info.pos.x.toFloat(), (info.pos.y + 1.5).toFloat(), info.pos.z.toFloat())
+        sendPacketToServer(
+            VehicleFireMessage(
+                uuid = if (weapon.lockEntity) info.uuid else null,
                 targetPos = targetPos,
                 weaponName = weapon.weaponName,
                 shooterVehicleId = remoteShooterId,
@@ -1984,6 +2054,21 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
                     pMouseY.toFloat() in (entry.screenY - 6)..(entry.screenY + 6)
                 ) {
                     entityMenuTarget = entry.entity
+                    syncedMenuTarget = null
+                    entityMenuX = pMouseX.toInt()
+                    entityMenuY = pMouseY.toInt()
+                    entityMenuVisible = true
+                    return true
+                }
+            }
+            // 远端玩家头像命中检测（无本地 Entity，使用同步数据）
+            for ((info, sx, sy) in syncedPlayerHitEntries) {
+                if (pMouseX.toFloat() in (sx - 4)..(sx + 4) &&
+                    pMouseY.toFloat() in (sy - 4)..(sy + 4)
+                ) {
+                    val localEntity = EntityFindUtil.findPlayer(minecraft!!.player!!.level(), info.uuid.toString())
+                    entityMenuTarget = localEntity
+                    syncedMenuTarget = if (localEntity == null) info else null
                     entityMenuX = pMouseX.toInt()
                     entityMenuY = pMouseY.toInt()
                     entityMenuVisible = true
@@ -2005,6 +2090,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
             if (handleEntityMenuClick(pMouseX, pMouseY)) return true
             entityMenuVisible = false
             entityMenuTarget = null
+            syncedMenuTarget = null
             return true
         }
 
