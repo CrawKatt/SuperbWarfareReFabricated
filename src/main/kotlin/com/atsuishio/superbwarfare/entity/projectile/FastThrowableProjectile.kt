@@ -301,7 +301,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         this.isFastMoving = this.isFastMoving()
 
         if (level is ServerLevel && this.canPassThroughFluid() && isInLiquid(level, position())) {
-            this.deltaMovement = this.deltaMovement.scale(this.underwaterMotionScaleValue.toDouble().coerceAtLeast(0.0))
+            this.deltaMovement = this.deltaMovement.scale(this.underwaterMotionScaleValue.toDouble().coerceIn(0.0, 1.0))
         }
 
         // 同步动量与位置到客户端

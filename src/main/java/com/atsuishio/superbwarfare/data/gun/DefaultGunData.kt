@@ -425,6 +425,9 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
     @SerialName("Name")
     var name: String? = null
 
+    @SerialName("UnderwaterMotionScale")
+    var underwaterMotionScale = 0.75f
+
     override fun limit() {
         maxDurability = max(0, maxDurability)
         durabilityPerShoot = max(0, durabilityPerShoot)
@@ -461,6 +464,7 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
 
         burstAmount = max(0, burstAmount)
         rpm = rpm.coerceIn(1, 114514)
+        underwaterMotionScale = underwaterMotionScale.coerceIn(0.0f, 1.0f)
     }
 
     companion object {

@@ -365,6 +365,9 @@ class GunProp<T, R>(
         @JvmField
         val AP_DURABILITY = plainProp(DefaultGunData::apDurability)
 
+        @JvmField
+        val UNDERWATER_MOTION_SCALE = plainProp(DefaultGunData::underwaterMotionScale)
+
         // TODO 会不会有点屎...
         fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) = with(modifier) {
             modify(MAX_DURABILITY) { it.coerceAtLeast(0) }
@@ -397,6 +400,7 @@ class GunProp<T, R>(
 
             modify(BURST_AMOUNT) { it.coerceAtLeast(0) }
             modify(RPM) { it.coerceIn(1, 114514) }
+            modify(UNDERWATER_MOTION_SCALE) { it.coerceIn(0.0f, 1.0f) }
         }
     }
 }

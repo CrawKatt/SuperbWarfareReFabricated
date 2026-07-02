@@ -8,10 +8,17 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.monster.Monster
 import net.minecraft.world.entity.monster.Vex
 
-class TargetProxy(target: Entity) {
-    val armor: Double = if (target is LivingEntity) target.getAttributeValue(Attributes.ARMOR) else 0.0
-    val isUndead: Boolean = target is LivingEntity && target.mobType == MobType.UNDEAD
-    val isRaider: Boolean = target.type.`is`(EntityTypeTags.RAIDERS) || target is Vex
-    val isMonster: Boolean = target is Monster
-    val health: Float = (target as? LivingEntity)?.health ?: 0f
+class TargetProxy(val target: Entity) {
+    fun getArmor(): Double = if (target is LivingEntity) target.getAttributeValue(Attributes.ARMOR) else 0.0
+
+    fun isUndead(): Boolean = target is LivingEntity && target.mobType == MobType.UNDEAD
+
+    fun isRaider(): Boolean = target.type.`is`(EntityTypeTags.RAIDERS) || target is Vex
+
+    fun isMonster(): Boolean = target is Monster
+
+    fun getHealth(): Float = (target as? LivingEntity)?.health ?: 0f
+
+    // 这里高版本应该使用#aquatic标签判断
+    fun isAquatic(): Boolean = (target as? LivingEntity)?.mobType == MobType.WATER
 }

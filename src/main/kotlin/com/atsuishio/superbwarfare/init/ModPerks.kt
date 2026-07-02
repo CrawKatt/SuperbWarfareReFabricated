@@ -67,6 +67,7 @@ object ModPerks {
     lateinit var PHASE_PENETRATING_BULLET: RegistryObject<Perk>
     lateinit var BLADE_BULLET: RegistryObject<Perk>
     lateinit var PHOSPHORUS_FLAME_BULLET: RegistryObject<Perk>
+    lateinit var AQUA_BULLET: RegistryObject<Perk>
     // @formatter:on
 
     /**
@@ -201,6 +202,9 @@ object ModPerks {
         BLADE_BULLET = autoRegistryObjects["blade_bullet"] ?: registerAmmoPerk("blade_bullet") { BladeBullet }
         PHOSPHORUS_FLAME_BULLET = autoRegistryObjects["phosphorus_flame_bullet"]
             ?: registerAmmoPerk("phosphorus_flame_bullet") { PhosphorusFlameBullet }
+        AQUA_BULLET = autoRegistryObjects["aqua_bullet"] ?: registerAmmoPerk("aqua_bullet") {
+            EmptyPerk("aqua_bullet", Perk.Type.AMMO)
+        }
 
         // Functional Perks
         HEAL_CLIP = autoRegistryObjects["heal_clip"] ?: registerFuncPerk("heal_clip") { HealClip }
