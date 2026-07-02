@@ -44,6 +44,8 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         this.noCulling = true
     }
 
+    override fun canPassThroughFluid() = true
+
     override fun getDefaultItem(): Item = Items.NETHER_STAR
 
     override fun onHitEntity(result: EntityHitResult) {

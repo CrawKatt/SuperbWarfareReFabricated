@@ -24,6 +24,8 @@ open class MelonBombEntity(type: EntityType<out MelonBombEntity>, level: Level) 
         return Items.MELON
     }
 
+    override fun canPassThroughFluid() = true
+
     override fun afterHitEntity(result: EntityHitResult) {
         if (result.entity is MelonBombEntity) return
 

@@ -36,6 +36,8 @@ open class GrapeshotEntity : FastThrowableProjectile {
         return ModItems.LARGE_SHELL_GS.get()
     }
 
+    override fun canPassThroughFluid() = true
+
     override fun performDamage(
         entity: Entity,
         damage: Float,

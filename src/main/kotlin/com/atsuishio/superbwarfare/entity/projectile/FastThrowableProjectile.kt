@@ -16,6 +16,7 @@ import com.atsuishio.superbwarfare.item.weapon.BeastItem.Companion.beastKill
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
 import com.atsuishio.superbwarfare.network.message.receive.MissileTrailParticleMessage
 import com.atsuishio.superbwarfare.tools.*
+import com.atsuishio.superbwarfare.tools.VectorTool.isInLiquid
 import com.atsuishio.superbwarfare.world.phys.ExtendedEntityRayTraceResult
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -69,6 +70,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
     protected var beastValue = false
     protected var penetratingValue: Boolean = false
     protected val effectsValue: MutableSet<MobEffectInstance> = hashSetOf()
+    protected var underwaterMotionScaleValue = 0.75f
 
     override fun getDamage(): Float = damageValue
     override fun setDamage(value: Float) {
@@ -120,6 +122,11 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         this.effectsValue.addAll(effects)
     }
 
+    override fun getUnderwaterMotionScale(): Float = underwaterMotionScaleValue
+    override fun setUnderwaterMotionScale(value: Float) {
+        underwaterMotionScaleValue = value
+    }
+
     private var isFastMoving = false
 
     var exploded: Boolean = false
@@ -165,9 +172,11 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         if (compound.contains("Life")) {
             this.lifeValue = compound.getInt("Life")
         }
-
         if (compound.contains("SyncedTick")) {
-            syncedTick = compound.getInt("SyncedTick")
+            this.syncedTick = compound.getInt("SyncedTick")
+        }
+        if (compound.contains("UnderwaterMotionScale")) {
+            this.underwaterMotionScaleValue = compound.getFloat("UnderwaterMotionScale")
         }
 
         val listTag = compound.getList("CustomPotionEffects", 10)
@@ -201,6 +210,10 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
 
         compound.putInt("SyncedTick", syncedTick)
 
+        if (this.underwaterMotionScaleValue > 0) {
+            compound.putFloat("UnderwaterMotionScale", this.underwaterMotionScaleValue)
+        }
+
         if (!this.effectsValue.isEmpty()) {
             val list = ListTag()
             for (instance in this.effectsValue) {
@@ -222,7 +235,11 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
             // 1. 查找最近的方块碰撞点
             val blockHit = rayTraceBlocks(
                 level,
-                ClipContext(startVec, fullEndVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this),
+                ClipContext(
+                    startVec, fullEndVec, ClipContext.Block.COLLIDER,
+                    if (this.canPassThroughFluid()) ClipContext.Fluid.NONE else ClipContext.Fluid.ANY,
+                    this
+                ),
                 if (this.isPenetrating()) Predicate { true } else Predicate { false }
             ).takeIf { it.type != HitResult.Type.MISS }
 
@@ -286,6 +303,10 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         }
         this.isFastMoving = this.isFastMoving()
 
+        if (level is ServerLevel && this.canPassThroughFluid() && isInLiquid(level, position())) {
+            this.deltaMovement = this.deltaMovement.scale(this.underwaterMotionScaleValue.toDouble().coerceAtLeast(0.0))
+        }
+
         // 同步动量与位置到客户端
         this.syncMotion()
 
@@ -296,6 +317,10 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
                 this.keepChunkLoaded(position().add(this.deltaMovement.multiply(1.0, 0.0, 1.0)))
             }
         }
+    }
+
+    open fun canPassThroughFluid(): Boolean {
+        return false
     }
 
     override fun updateRotation() {
