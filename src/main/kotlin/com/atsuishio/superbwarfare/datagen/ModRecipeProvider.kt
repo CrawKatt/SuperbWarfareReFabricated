@@ -2585,6 +2585,17 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 .unlockedBy(getHasName(ModItems.EMPTY_PERK.get()), has(ModItems.EMPTY_PERK.get()))
                 .unlockedBy(getHasName(ModItems.CLAYMORE_MINE.get()), has(ModItems.CLAYMORE_MINE.get()))
                 .save(writer, perkLoc(ModPerks.BLADE_BULLET))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.PERK_ITEMS[ModPerks.AQUA_BULLET]!!.get())
+                .pattern("dbd")
+                .pattern("cac")
+                .pattern("dcd")
+                .define('a', ModItems.EMPTY_PERK.get())
+                .define('b', Items.TRIDENT)
+                .define('c', Items.PRISMARINE_SHARD)
+                .define('d', ItemTags.FISHES)
+                .unlockedBy(getHasName(ModItems.EMPTY_PERK.get()), has(ModItems.EMPTY_PERK.get()))
+                .unlockedBy(getHasName(Items.TRIDENT), has(Items.TRIDENT))
+                .save(writer, perkLoc(ModPerks.AQUA_BULLET))
         }
 
         private fun buildMiscRecipes(writer: Consumer<FinishedRecipe>) {
