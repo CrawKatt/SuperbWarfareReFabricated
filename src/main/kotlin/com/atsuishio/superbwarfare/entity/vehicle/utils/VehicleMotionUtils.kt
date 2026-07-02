@@ -29,12 +29,14 @@ import net.minecraft.world.entity.vehicle.Boat
 import net.minecraft.world.entity.vehicle.Minecart
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.entity.EntityTypeTest
+import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import org.joml.Math
 import org.joml.Matrix4d
 import org.joml.Vector3d
+import kotlin.math.max
 
 /**
  * 处理载具运动相关方法的工具类
@@ -322,7 +324,7 @@ object VehicleMotionUtils {
 
             if (entity is VehicleEntity) {
                 f = Mth.clamp((entity.mass / vehicle.mass).toDouble(), 0.25, 4.0)
-                f1 = Mth.clamp((vehicle.mass / vehicle.mass).toDouble(), 0.25, 4.0)
+                f1 = Mth.clamp((vehicle.mass / entity.mass).toDouble(), 0.25, 4.0)
             } else {
                 f = Mth.clamp(entitySize / thisSize, 0.25, 4.0)
                 f1 = Mth.clamp(thisSize / entitySize, 0.25, 4.0)
@@ -543,10 +545,19 @@ object VehicleMotionUtils {
         }
     }
 
+    fun getHeightAboveGround(vehicle: VehicleEntity): Double {
+        val level = vehicle.level()
+        val chunkX = vehicle.blockX shr 4
+        val chunkZ = vehicle.blockZ shr 4
+        if (!level.hasChunk(chunkX, chunkZ)) return Double.MAX_VALUE
+        val groundY = level.getHeight(Heightmap.Types.MOTION_BLOCKING, vehicle.blockX, vehicle.blockZ).toDouble()
+        return max(0.0, vehicle.y - groundY)
+    }
+
     @JvmStatic
     fun terrainCompact(vehicle: VehicleEntity, positions: MutableList<Vec3>) {
         if (vehicle.vehicleType == VehicleType.AIRSHIP) return
-        if (!vehicle.onGround()) {
+        if (getHeightAboveGround(vehicle) > 3) {
             if (vehicle.isInFluidType) {
                 vehicle.xRot *= 0.9f; vehicle.setZRot(vehicle.roll * 0.9f)
             }

@@ -115,17 +115,11 @@ object VehicleEngineUtils {
         val maxPower = if (sprintInputDown) 1.25f else (if (power > 1) power - 0.002f else 1f)
 
         if (forwardInputDown && !backInputDown) {
-            power = Math.min(
-                power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)),
-                maxPower
-            )
+            power = Math.min(power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)), maxPower)
         }
 
         if (backInputDown) {
-            power = Math.max(
-                power - (if (power > 0) powerReduce * 4f else powerReduce) * (maxPower - (Mth.abs(power) / 1.02f)),
-                -1f
-            )
+            power = Math.max(power - (if (power > 0) powerReduce * 4f else powerReduce) * (maxPower - (Mth.abs(power) / 1.02f)), -1f)
             if (rightInputDown) {
                 holdTick++
                 deltaRot += steeringSpeed * 0.12f * Math.min(holdTick, 10)
@@ -212,8 +206,7 @@ object VehicleEngineUtils {
         yRot = (yRot - (if (isInFluidType && !onGround()) 2.5 else 8.0) * deltaRot - i * s0).toFloat()
 
         if (isInFluidType || onGround()) {
-            deltaMovement =
-                deltaMovement.add(getViewVector(1f).scale((if (drift()) 0.03 else 0.15) * targetSpeed * power))
+            deltaMovement = deltaMovement.add(getViewVector(1f).scale((if (drift()) 0.03 else 0.15) * targetSpeed * power))
         }
     }
 
@@ -325,10 +318,7 @@ object VehicleEngineUtils {
         val maxPower = if (sprintInputDown) 1.3f else (if (power > 1) power - 0.002f else 1f)
 
         if (forwardInputDown && !backInputDown) {
-            power = Math.min(
-                power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)),
-                maxPower
-            )
+            power = Math.min(power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)), maxPower)
         }
 
         if (backInputDown) {
@@ -414,8 +404,7 @@ object VehicleEngineUtils {
         ) * rudderRot * (if (power > 0) 1 else -1) - i * s0).toFloat()
 
         if ((isInFluidType || onGround())) {
-            deltaMovement =
-                deltaMovement.add(getViewVector(1f).scale((if (drift()) 0.02 else 0.15) * targetSpeed * power))
+            deltaMovement = deltaMovement.add(getViewVector(1f).scale((if (drift()) 0.02 else 0.15) * targetSpeed * power))
         }
     }
 
@@ -486,15 +475,12 @@ object VehicleEngineUtils {
         val maxPower = if (sprintInputDown) 1.3f else (if (power > 1) power - 0.002f else 1f)
 
         if (forwardInputDown && !backInputDown) {
-            power = Math.min(
-                power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)),
-                maxPower
-            )
+            power = Math.min(power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)), maxPower)
         }
 
         if (backInputDown) {
             power = Math.max(
-                power - (if (power > 0) powerReduce * 4f else powerReduce) * (maxPower - (Mth.abs(power) / 1.02f)), -1f
+                    power - (if (power > 0) powerReduce * 4f else powerReduce) * (maxPower - (Mth.abs(power) / 1.02f)), -1f
             )
         }
 
@@ -550,11 +536,7 @@ object VehicleEngineUtils {
             )
 
             deltaMovement = deltaMovement.add(
-                getUpVec(1f).scale(
-                    deltaMovement.length() * 0.005 * VehicleVecUtils.getSubmergedHeight(this) * Mth.abs(
-                        xRot
-                    )
-                )
+                getUpVec(1f).scale(deltaMovement.length() * 0.005 * VehicleVecUtils.getSubmergedHeight(this) * Mth.abs(xRot))
             )
         } else {
             xRot *= 0.99f
@@ -781,6 +763,8 @@ object VehicleEngineUtils {
         val speedRate = engineInfo.speedRate
         val resistance = engineInfo.resistance * if (downInputDown) 1.5 else 1.0
         val gearRotateAngle = engineInfo.gearRotateAngle
+        val clampPitch = engineInfo.clampPitch
+        val clampRoll = engineInfo.clampRoll
         val energyCost = (engineInfo.energyCostRate * Mth.abs(power)).toInt()
 
         val speedSqr = deltaMovement.lengthSqr()
@@ -911,7 +895,7 @@ object VehicleEngineUtils {
 
             yRot += yawSpeed * addY
             if (!onGround()) {
-                xRot += pitchSpeed * addX
+                xRot = Mth.clamp(xRot + pitchSpeed * addX, -clampPitch, clampPitch)
 
                 if (tickCount > 5) {
                     updateRotation(this)
@@ -921,7 +905,7 @@ object VehicleEngineUtils {
                     addY *= Mth.clamp(1f - Mth.abs(roll) / 45, 0f, 1f)
                 }
 
-                setZRot(roll - rollSpeed * addZ)
+                setZRot(Mth.clamp(roll - rollSpeed * addZ, -clampRoll, clampRoll))
             }
 
             // 自动回正
