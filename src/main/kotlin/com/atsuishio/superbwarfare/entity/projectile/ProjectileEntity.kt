@@ -85,11 +85,13 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
     protected var velocityValue = 20f
     protected var forceKnockbackValue = false
     protected var lifeValue = 40
+
     // 子弹的穿甲比例
     protected var bypassArmorRateValue = 0.0f
 
     // 是否能穿墙
     protected var penetratingValue: Boolean = false
+
     // 水下的动量系数
     protected var underwaterMotionScaleValue = 0.75f
 
@@ -404,7 +406,8 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
 
         if (level is ServerLevel) {
             if (isInLiquid(level, position())) {
-                this.deltaMovement = this.deltaMovement.scale(this.underwaterMotionScaleValue.toDouble().coerceAtLeast(0.0))
+                this.deltaMovement =
+                    this.deltaMovement.scale(this.underwaterMotionScaleValue.toDouble().coerceIn(0.0, 1.0))
             }
             if (this.isInWater) {
                 val l = deltaMovement.length()
@@ -749,7 +752,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
             }
         }
 
-        this.damageValue *= (deltaMovement.length() / velocityValue).coerceAtLeast(0.0).toFloat()
+        this.damageValue *= (deltaMovement.length() / velocityValue).coerceIn(0.0, 1.0).toFloat()
 
         val shooter = this.owner
         if (headshot) {
