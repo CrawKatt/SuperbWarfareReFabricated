@@ -82,12 +82,15 @@ object MissileWeaponHelper {
         targetEntity: Entity?,
         requireLockEntity: Boolean,
         requireLockBlock: Boolean,
+        /** 目标离地高度（无实体时手动指定，-1 表示未知） */
+        targetHeight: Double = -1.0,
     ): List<AggregatedWeapon> {
         if (vehicles.isEmpty()) return emptyList()
         if (targetEntity != null && vehicles.any { it === targetEntity || it.id == targetEntity.id }) return emptyList()
 
         val level = vehicles.first().level()
-        val heightAboveGround = if (targetEntity != null) {
+        val heightAboveGround = if (targetHeight >= 0) targetHeight
+        else if (targetEntity != null) {
             ClientSyncedEntityHandler.getSyncedEntry(level, targetEntity.id)?.heightAboveGround ?: -1.0
         } else -1.0
 

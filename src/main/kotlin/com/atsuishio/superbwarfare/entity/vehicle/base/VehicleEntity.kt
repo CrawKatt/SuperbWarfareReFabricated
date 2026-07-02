@@ -2289,7 +2289,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         this.setDeltaMovement(this.deltaMovement.add(0.0, -this.computed().gravity, 0.0))
         this.move(MoverType.SELF, this.deltaMovement)
 
-        if (!level().isClientSide) {
+        if (!level().isClientSide && isAlive) {
             if(onGround() && isWreck) {
                 ServerSyncedEntityHandler.unregister(this)
             } else {

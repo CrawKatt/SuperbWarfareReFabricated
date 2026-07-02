@@ -4,10 +4,12 @@ import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier.Companion.createDefaultModifier
 import com.atsuishio.superbwarfare.init.ModDamageTypes
+import com.atsuishio.superbwarfare.init.ModDamageTypes.causeCustomExplosionDamage
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.tools.CustomExplosion
+import com.atsuishio.superbwarfare.tools.DamageHandler.doDamage
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData.Companion.enabledTDM
 import net.minecraft.core.BlockPos
@@ -38,7 +40,7 @@ open class Tm62Entity : Entity, OwnableEntity {
 
     constructor(owner: LivingEntity?, level: Level, fuse: Boolean) : super(ModEntities.TM_62.get(), level) {
         if (owner != null) {
-            this.setOwnerUUID(owner.getUUID())
+            this.ownerUUID = owner.getUUID()
         }
         this.entityData.set(FUSE, fuse)
     }
@@ -118,7 +120,7 @@ open class Tm62Entity : Entity, OwnableEntity {
 
         if (uuid != null) {
             try {
-                this.setOwnerUUID(uuid)
+                this.ownerUUID = uuid
             } catch (_: Throwable) {
             }
         }
@@ -206,6 +208,11 @@ open class Tm62Entity : Entity, OwnableEntity {
             for (entity in entities) {
                 if (entity != null) {
                     trigger = true
+                    doDamage(
+                        entity, causeCustomExplosionDamage(
+                            level().registryAccess(), this, this.owner
+                        ), ExplosionConfig.TM_62_EXPLOSION_DAMAGE.get().toFloat()
+                    )
                     break
                 }
             }

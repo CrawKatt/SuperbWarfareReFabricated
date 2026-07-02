@@ -6,7 +6,9 @@ import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType
 import com.atsuishio.superbwarfare.entity.projectile.MissileProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.localPlayer
+import com.mojang.authlib.GameProfile
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.Tesselator
@@ -15,6 +17,7 @@ import com.mojang.math.Axis
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.components.PlayerFaceRenderer
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
@@ -24,6 +27,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.vehicle.Boat
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
+import java.util.*
 import kotlin.math.*
 
 /**
@@ -61,6 +65,17 @@ class MapEntityRenderer {
         private val ICON_MINE = loc("textures/overlay/tactical_map/vehicle/mine.png")
         private val ICON_MISSILE = loc("textures/overlay/tactical_map/vehicle/missile.png")
         private val ICON_MAID = loc("textures/overlay/tactical_map/vehicle/maid.png")
+
+        private val playerFaceCache = WeakHashMap<UUID, ResourceLocation>()
+
+        /** 绘制玩家头像贴图，优先使用缓存，缺失时从 SkinManager 获取 */
+        fun drawPlayerFace(guiGraphics: GuiGraphics, uuid: java.util.UUID, name: String, x: Int, y: Int, size: Int) {
+            val skin = playerFaceCache.getOrPut(uuid) {
+                val gameProfile = GameProfile(uuid, name)
+                Minecraft.getInstance().skinManager.getInsecureSkinLocation(gameProfile)
+            }
+            PlayerFaceRenderer.draw(guiGraphics, skin, x, y, size)
+        }
 
         /** Liang-Barsky 线裁剪到地图可视区域，返回本地虚线坐标范围 */
         fun clipDashRange(
@@ -342,6 +357,113 @@ class MapEntityRenderer {
         pose.rotateAround(Axis.ZP.rotationDegrees(player.yRot + 180f), 0f, 0f, 0f)
         guiGraphics.blit(PLAYER_MARKER, -6, -6, 0f, 0f, 12, 12, 12, 12)
         pose.popPose()
+    }
+
+    /**
+     * 渲染从 [ClientSyncedEntityHandler.SYNCED_PLAYERS] 获取的玩家标记。
+     * 根据 relation 使用不同颜色：friendly=绿, hostile=橙, neutral=白。
+     * 仅渲染未骑乘载具的玩家（载具已通过实体批次渲染），跳过本地玩家自身。
+     *
+     * @param onHover 鼠标悬停回调，参数为 (tooltipLines, tipX, tipY)
+     */
+    fun renderSyncedTeammates(
+        guiGraphics: GuiGraphics,
+        syncedPlayers: List<ClientSyncedEntityHandler.ClientSyncedPlayer>,
+        localPlayer: Player,
+        viewBlockX: Double, viewBlockZ: Double,
+        mapCenterX: Float, mapCenterY: Float, scale: Double,
+        mouseX: Int = -1, mouseY: Int = -1,
+        onHover: ((lines: List<Component>, tipX: Int, tipY: Int) -> Unit)? = null,
+        outEntries: MutableList<EntityRenderEntry>? = null,
+        outSyncedHitEntries: MutableList<Triple<ClientSyncedEntityHandler.ClientSyncedPlayer, Float, Float>>? = null,
+    ) {
+        val faceSize = 8
+        val faceHalf = faceSize / 2
+        val hitHalf = 4  // 命中判定略小于实际贴图，避免误触
+        val level = localPlayer.level()
+        for (info in syncedPlayers) {
+            if (info.uuid == localPlayer.uuid) continue
+            if (info.onVehicle) continue  // 载具已由实体批次渲染
+
+            val px = CoordinateConverter.worldToScreenX(info.pos.x, mapCenterX, viewBlockX, scale).toFloat()
+            val py = CoordinateConverter.worldToScreenY(info.pos.z, mapCenterY, viewBlockZ, scale).toFloat()
+
+            // 记录屏幕位置用于远端玩家右键菜单命中检测
+            outSyncedHitEntries?.add(Triple(info, px, py))
+
+            // 查找本地实体以支持完整右键菜单（含清除功能）
+            val foundPlayer = EntityFindUtil.findPlayer(level, info.uuid.toString())
+            if (foundPlayer != null && outEntries != null) {
+                outEntries.add(EntityRenderEntry(foundPlayer, px, py, info.relation))
+            }
+
+            // 根据关系选择颜色和关系文本
+            val (r, g, b) = when (info.relation) {
+                "hostile" -> Triple(1f, 0.74f, 0.5f)
+                "neutral" -> Triple(0.67f, 0.67f, 0.67f)
+                else -> Triple(0.5f, 1f, 0.68f)
+            }
+            val relationKey = when (info.relation) {
+                "hostile" -> "context.superbwarfare.tactical_map.relation.hostile"
+                "neutral" -> "context.superbwarfare.tactical_map.relation.neutral"
+                else -> "context.superbwarfare.tactical_map.relation.friendly"
+            }
+            val relationStyle = when (info.relation) {
+                "hostile" -> ChatFormatting.RED
+                "neutral" -> ChatFormatting.GRAY
+                else -> ChatFormatting.GREEN
+            }
+
+            // 悬停检测
+            if (onHover != null && mouseX >= 0
+                && mouseX.toFloat() in (px - hitHalf)..(px + hitHalf)
+                && mouseY.toFloat() in (py - hitHalf)..(py + hitHalf)
+            ) {
+                val lines = mutableListOf<Component>()
+                lines.add(Component.literal(info.name).withStyle(ChatFormatting.WHITE))
+                lines.add(
+                    Component.translatable(
+                        "context.superbwarfare.tactical_map.tooltip.pos",
+                        info.pos.x.toInt().toString(),
+                        info.pos.y.toInt().toString(),
+                        info.pos.z.toInt().toString()
+                    ).withStyle(ChatFormatting.GRAY)
+                )
+                // 离地高度（本地实体用高度图，远端用缓存）
+                val hag = if (foundPlayer != null) {
+                    val surfaceY = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE, foundPlayer.blockX, foundPlayer.blockZ)
+                    (foundPlayer.y - surfaceY).coerceAtLeast(0.0)
+                } else {
+                    val cachedH = TacticalMapCache.getCachedHeight(info.pos.x.toInt(), info.pos.z.toInt())
+                    if (cachedH != null) (info.pos.y - cachedH).coerceAtLeast(0.0) else -1.0
+                }
+                lines.add(
+                    if (hag >= 0)
+                        Component.translatable("context.superbwarfare.tactical_map.tooltip.height", "%.1f".format(hag))
+                    else Component.translatable("context.superbwarfare.tactical_map.tooltip.height_na")
+                )
+                lines.add(Component.translatable(relationKey).withStyle(relationStyle))
+                onHover.invoke(lines, mouseX, mouseY)
+            }
+
+            // 关系色边框 + 头像
+            val borderColor = when (info.relation) {
+                "hostile" -> 0xFFFF0000.toInt()
+                "neutral" -> 0xFFFFFFFF.toInt()
+                else -> 0xFF00FF00.toInt()
+            }
+            val border = 1
+            val pose = guiGraphics.pose()
+            pose.pushPose()
+            pose.translate(px, py, 0f)
+            // 边框底色
+            guiGraphics.fill(-faceHalf - border, -faceHalf - border, faceHalf + border, faceHalf + border, borderColor)
+            // 头像贴图
+            RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
+            drawPlayerFace(guiGraphics, info.uuid, info.name, -faceHalf, -faceHalf, faceSize)
+            pose.popPose()
+            RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
+        }
     }
 
     fun renderPlayerOffscreenIndicator(

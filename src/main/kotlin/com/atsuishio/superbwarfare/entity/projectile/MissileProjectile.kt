@@ -142,7 +142,7 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
     override fun tick() {
         super.tick()
         this.distractedByDecoy()
-        if (level() is ServerLevel && owner != null) {
+        if (level() is ServerLevel && owner != null && isAlive) {
             val targetEntity = EntityFindUtil.findEntity(level(), getTargetUUID())
             if (targetEntity != null) {
                 setTargetPos(targetEntity.position())

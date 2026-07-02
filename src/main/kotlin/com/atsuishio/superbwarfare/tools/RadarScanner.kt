@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.tools
 import com.atsuishio.superbwarfare.entity.projectile.MissileProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.network.message.receive.EntityRelationSyncMessage
+import com.atsuishio.superbwarfare.network.message.receive.PlayerInfoSyncMessage
 import com.atsuishio.superbwarfare.network.message.receive.RadarSyncMessage
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.Mth
@@ -77,6 +78,8 @@ object RadarScanner {
         val dim: net.minecraft.resources.ResourceLocation,
         val hostileIds: List<Int>,
         val neutralIds: List<Int>,
+        /** 检测到的敌对/中立玩家信息，用于在客户端渲染玩家图标 */
+        val playerInfos: List<PlayerInfoSyncMessage.SyncedPlayerInfo> = emptyList(),
     ) {
         fun sendToClients(owner: Player, level: ServerLevel, shareWithTeammates: Boolean = true) {
             val recipients = level.players()
@@ -88,6 +91,11 @@ object RadarScanner {
 
             if (hostileIds.isNotEmpty() || neutralIds.isNotEmpty()) {
                 val msg = EntityRelationSyncMessage(dim, hostileIds = hostileIds, neutralIds = neutralIds)
+                recipients.forEach { sendPacketTo(it, msg) }
+            }
+            // 同步检测到的敌对/中立玩家信息，供客户端 IFF 和战术地图渲染
+            if (playerInfos.isNotEmpty()) {
+                val msg = PlayerInfoSyncMessage(dim, playerInfos)
                 recipients.forEach { sendPacketTo(it, msg) }
             }
         }
@@ -138,6 +146,7 @@ object RadarScanner {
 
         val hostileList = mutableListOf<Int>()
         val neutralList = mutableListOf<Int>()
+        val playerInfoList = mutableListOf<PlayerInfoSyncMessage.SyncedPlayerInfo>()
 
         // ── 搜索载具和导弹 ──
         if (config.searchType == SearchType.VEHICLES || config.searchType == SearchType.ALL) {
@@ -182,9 +191,38 @@ object RadarScanner {
                 when {
                     // 中立：无驾驶员、无主人、lastDriverUUID 为空
                     isNeutral(entity) -> neutralList.add(entry.entityId)
-                    // 敌对
-                    !SeekTool.IS_FRIENDLY.test(config.owner, entity) -> hostileList.add(entry.entityId)
+                    // 敌对：有队伍且非友方；无队伍实体（怪物除外）均为中立
+                    !SeekTool.IS_FRIENDLY.test(config.owner, entity) -> {
+                        if (entity is Player && entity.team == null) {
+                            neutralList.add(entry.entityId)
+                        } else if (entity is VehicleEntity && entity.firstPassenger is Player
+                            && (entity.firstPassenger as Player).team == null
+                        ) {
+                            neutralList.add(entry.entityId)
+                        } else if (entity is LivingEntity && entity.team == null
+                            && entity.type.category != MobCategory.MONSTER
+                        ) {
+                            neutralList.add(entry.entityId)
+                        } else {
+                            hostileList.add(entry.entityId)
+                        }
+                    }
                     // 友方不在此处处理（由 IffItem/MissileProjectile/VehicleEntity 单独同步 ID）
+                }
+
+                // 为敌对/中立玩家收集信息，供客户端渲染
+                if (entity is Player && !SeekTool.IS_FRIENDLY.test(config.owner, entity)) {
+                    playerInfoList.add(
+                        PlayerInfoSyncMessage.SyncedPlayerInfo(
+                            uuid = entity.uuid,
+                            pos = entity.position(),
+                            name = entity.name.string,
+                            onVehicle = entity.vehicle != null,
+                            isDriver = entity.vehicle != null && entity.vehicle?.controllingPassenger == entity,
+                            relation = if (entity.team == null) "neutral" else "hostile",
+                            entityId = entity.id,
+                        )
+                    )
                 }
             }
         }
@@ -218,6 +256,7 @@ object RadarScanner {
             dim = dim,
             hostileIds = hostileList,
             neutralIds = neutralList,
+            playerInfos = playerInfoList,
         )
     }
 
