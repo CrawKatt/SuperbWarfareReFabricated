@@ -18,6 +18,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.particles.BlockParticleOption
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.tags.BlockTags
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
@@ -31,7 +32,6 @@ import net.minecraft.world.level.entity.EntityTypeTest
 import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.registries.ForgeRegistries
 import org.joml.Math
 import org.joml.Matrix4d
 import org.joml.Vector3d
@@ -282,7 +282,7 @@ object VehicleMotionUtils {
             ) { entity -> entity !== vehicle && entity !== vehicle.getFirstPassenger() && entity!!.vehicle == null }
                 .stream().filter { entity ->
                     if (entity.isAlive && vehicle.isInObb(entity, vec3)) {
-                        val type = ForgeRegistries.ENTITY_TYPES.getKey(entity.type)
+                        val type = BuiltInRegistries.ENTITY_TYPE.getKey(entity.type)
                         return@filter (entity is VehicleEntity || entity is Boat || entity is Minecart || (entity is TurretWreckEntity && entity.tickCount > 5) || (entity is LivingEntity && !(entity is Player && entity.isSpectator))) || VehicleConfig.COLLISION_ENTITY_WHITELIST.get()
                             .contains(type.toString())
                     }
@@ -296,7 +296,7 @@ object VehicleMotionUtils {
             ) { entity -> entity !== vehicle && entity !== vehicle.getFirstPassenger() && entity!!.vehicle == null }
                 .stream().filter { entity ->
                     if (entity.isAlive) {
-                        val type = ForgeRegistries.ENTITY_TYPES.getKey(entity.type)
+                        val type = BuiltInRegistries.ENTITY_TYPE.getKey(entity.type)
                         return@filter (entity is VehicleEntity || entity is Boat || entity is Minecart || (entity is TurretWreckEntity && entity.tickCount > 5)
                                 || (entity is LivingEntity && !(entity is Player && entity.isSpectator)))
                                 || VehicleConfig.COLLISION_ENTITY_WHITELIST.get().contains(type.toString())
