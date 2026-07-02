@@ -137,6 +137,7 @@ fun registerPayloads() {
     playToServer<AimVillagerMessage>()
     playToServer<AssembleVehicleMessage>()
     playToServer<ChangeVehicleSeatMessage>()
+    playToServer<CreativeContainerStackMessage>()
     playToServer<ActiveThermalImagingMessage>()
     playToServer<ArtilleryIndicatorFireMessage>()
     playToServer<DogTagFinishEditMessage>()

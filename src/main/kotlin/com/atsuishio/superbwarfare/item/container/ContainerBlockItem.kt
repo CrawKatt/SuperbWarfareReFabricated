@@ -112,6 +112,7 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
             event.add(ModEntities.SODAYO_PICK_UP_ROCKET)
             event.add(ModEntities.TRUCK)
             event.add(ModEntities.TYPE_63)
+            event.add(ModEntities.TOW)
             event.add(ModEntities.MK_42)
             event.add(ModEntities.MLE_1934)
             event.add(ModEntities.BL_132)
