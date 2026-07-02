@@ -95,7 +95,7 @@ object VehicleMotionUtils {
         if (vehicle.isRemoved) return
         if (vehicle.enableAABB()) return
 
-        val searchBox = vehicle.getCombinedAABB().inflate(0.5)
+        val searchBox = calculateCombinedAABBOptimized(vehicle).inflate(0.5)
         val entities = vehicle.level().getEntities(
             EntityTypeTest.forClass(Entity::class.java), searchBox
         ) { entity ->
