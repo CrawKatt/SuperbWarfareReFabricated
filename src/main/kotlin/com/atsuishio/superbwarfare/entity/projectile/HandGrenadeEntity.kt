@@ -42,6 +42,8 @@ open class HandGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity
         return ModItems.HAND_GRENADE.get()
     }
 
+    override fun canPassThroughFluid() = true
+
     override fun afterHitBlock(result: BlockHitResult) {
         val resultPos = result.blockPos
         val state = this.level().getBlockState(resultPos)

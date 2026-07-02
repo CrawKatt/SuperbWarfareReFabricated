@@ -78,6 +78,8 @@ open class M18SmokeGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEn
         }
     }
 
+    override fun canPassThroughFluid() = true
+
     override fun getDefaultItem(): Item {
         return ModItems.M18_SMOKE_GRENADE.get()
     }

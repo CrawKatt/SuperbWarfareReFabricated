@@ -58,6 +58,8 @@ open class CannonShellEntity(type: EntityType<out CannonShellEntity>, level: Lev
         return true
     }
 
+    override fun canPassThroughFluid() = this.type == Type.AP
+
     override fun addAdditionalSaveData(compound: CompoundTag) {
         super.addAdditionalSaveData(compound)
 

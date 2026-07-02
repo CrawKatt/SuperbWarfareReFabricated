@@ -87,6 +87,8 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
     protected var bypassArmorRateValue = 0.0f
     // 是否能穿墙
     protected var penetratingValue: Boolean = false
+    // 水下的动量系数
+    protected var underwaterMotionScaleValue = 0.75f
 
     override fun getDamage(): Float = damageValue
     override fun setDamage(value: Float) {
@@ -161,6 +163,11 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
     override fun isPenetrating(): Boolean = penetratingValue
     override fun setPenetrating(value: Boolean) {
         penetratingValue = value
+    }
+
+    override fun getUnderwaterMotionScale(): Float = underwaterMotionScaleValue
+    override fun setUnderwaterMotionScale(value: Float) {
+        underwaterMotionScaleValue = value
     }
 
     // 子弹造成的状态效果
@@ -392,7 +399,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
 
         if (level is ServerLevel) {
             if (isInLiquid(level, position())) {
-                this.deltaMovement = this.deltaMovement.multiply(0.75, 0.75, 0.75)
+                this.deltaMovement = this.deltaMovement.scale(this.underwaterMotionScaleValue.toDouble().coerceAtLeast(0.0))
             }
             if (this.isInWater) {
                 val l = deltaMovement.length()
@@ -736,7 +743,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
             }
         }
 
-        this.damageValue *= (deltaMovement.length() / velocityValue).coerceIn(0.0, 1.0).toFloat()
+        this.damageValue *= (deltaMovement.length() / velocityValue).coerceAtLeast(0.0).toFloat()
 
         val shooter = this.owner
         if (headshot) {

@@ -27,6 +27,8 @@ open class AerialBombEntity(type: EntityType<out AerialBombEntity>, level: Level
         return 0.7f
     }
 
+    override fun canPassThroughFluid() = true
+
     override fun afterHitEntity(result: EntityHitResult) {
         val entity = result.entity
         val owner = this.owner
