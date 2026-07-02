@@ -484,6 +484,11 @@ object ClientEventHandler {
     fun handleClientTick(event: ClientTickEvent.Post) {
         val player = localPlayer ?: return
 
+        if (mc.fps <= 20) {
+            handleGunShoot()
+            handleVehicleGunShoot()
+        }
+
         val stack = player.mainHandItem
         if (notInGame && !ClickEventHandler.switchZoom) {
             zoom = false
@@ -1376,6 +1381,13 @@ object ClientEventHandler {
 
     @SubscribeEvent
     fun handleWeaponFire(@Suppress("unused") event: RenderFrameEvent.Pre) {
+        if (mc.fps > 20) {
+            handleVehicleGunShoot()
+            handleGunShoot()
+        }
+    }
+
+    fun handleGunShoot() {
         if (clientLevel == null) return
         val player = localPlayer ?: return
 
@@ -1710,8 +1722,7 @@ object ClientEventHandler {
         }
     }
 
-    @SubscribeEvent
-    fun handleVehicleFire(@Suppress("unused") event: RenderFrameEvent.Pre) {
+    fun handleVehicleGunShoot() {
         if (clientLevel == null) return
         val player = localPlayer ?: return
 
