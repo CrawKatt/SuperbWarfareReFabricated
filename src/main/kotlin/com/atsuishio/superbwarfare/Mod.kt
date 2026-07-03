@@ -10,6 +10,7 @@ import com.atsuishio.superbwarfare.config.CLIENT_CONFIG
 import com.atsuishio.superbwarfare.config.COMMON_CONFIG
 import com.atsuishio.superbwarfare.config.SERVER_CONFIG
 import com.atsuishio.superbwarfare.data.CustomData
+import com.atsuishio.superbwarfare.event.ProjectileChunkLoadingHandler
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.network.NetworkRegistry
 import com.atsuishio.superbwarfare.sound.SoundLimit
@@ -86,6 +87,7 @@ class Mod {
         }
 
         MinecraftForge.EVENT_BUS.register(this)
+        MinecraftForge.EVENT_BUS.register(ProjectileChunkLoadingHandler)
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             SoundLimit.init()

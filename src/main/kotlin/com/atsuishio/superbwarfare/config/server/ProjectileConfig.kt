@@ -19,4 +19,28 @@ object ProjectileConfig {
         define("projectile_chunk_loading", true)
             .also { pop() }
     }
+
+    @JvmField
+    val PROJECTILE_MAX_CHUNKS_FORCE_LOADED = buildServerConfig {
+        push("projectile")
+
+        comment("Maximum chunks force-loaded by projectiles at once. Set to 0 for unlimited.")
+        comment("投射物同时强制加载的最大区块数，设为0表示无限制")
+        define("max_projectile_chunks_force_loaded", 256)
+    }
+
+    @JvmField
+    val PROJECTILE_MAX_CHUNKS_LOADED_EACH_TICK = buildServerConfig {
+        comment("Maximum new chunks loaded per tick for projectiles.")
+        comment("每tick最多为投射物加载的新区块数")
+        define("max_projectile_chunks_loaded_each_tick", 32)
+    }
+
+    @JvmField
+    val PROJECTILE_CHUNK_AGE = buildServerConfig {
+        comment("Ticks before a force-loaded projectile chunk expires without entity activity.")
+        comment("投射物强制加载的区块在无实体活动后的存活tick数")
+        define("projectile_chunk_age", 20)
+            .also { pop() }
+    }
 }
