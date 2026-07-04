@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.client.renderer
 
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
+import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.tools.clientLevel
 import com.atsuishio.superbwarfare.tools.mc
@@ -29,6 +30,8 @@ import org.joml.Matrix4f
 object SyncedEntityWorldRenderer {
     //TODO 需要服务端配置和开关
     private const val MAX_RENDER_DISTANCE = 2048.0
+    private const val MIN_RENDER_HEIGHT = 256.0
+    private const val ONLY_RENDER_FLYING_ENTITY: Boolean = true
     private const val MAX_RENDER_DISTANCE_SQ = MAX_RENDER_DISTANCE * MAX_RENDER_DISTANCE
 
     @SubscribeEvent
@@ -66,6 +69,14 @@ object SyncedEntityWorldRenderer {
                 val iz: Double
 
                 val entry = ClientSyncedEntityHandler.getWorldRenderEntry(level, entity.id) ?: continue
+                if (entry.entity.y < MIN_RENDER_HEIGHT) continue
+
+                entity.xRotO = entity.xRot
+                if (entity is VehicleEntity) {
+                    if (ONLY_RENDER_FLYING_ENTITY && entity.engineInfo !is EngineInfo.Aircraft && entity.engineInfo !is EngineInfo.Helicopter && entity.engineInfo !is EngineInfo.Tom6 && entity.engineInfo !is EngineInfo.AirShip) continue
+                    entity.prevRoll = entity.roll
+                }
+
                 val elapsedTicks = ((System.currentTimeMillis() - entry.timeStamp) / 50.0)
                     .coerceIn(0.0, 2.0)
                 ix = entity.x + entry.velocity.x * elapsedTicks
@@ -88,11 +99,6 @@ object SyncedEntityWorldRenderer {
                 val relX = ix - camera.position.x
                 val relY = iy - camera.position.y
                 val relZ = iz - camera.position.z
-
-                entity.xRotO = entity.xRot
-                if (entity is VehicleEntity) {
-                    entity.prevRoll = entity.roll
-                }
 
                 dispatcher.render(
                     entity,
