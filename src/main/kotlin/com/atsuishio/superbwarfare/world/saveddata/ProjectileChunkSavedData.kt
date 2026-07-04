@@ -15,19 +15,22 @@ import net.minecraft.world.level.chunk.ChunkStatus
 import net.minecraft.world.level.chunk.LevelChunk
 import net.minecraft.world.level.chunk.ProtoChunk
 import net.minecraft.world.level.saveddata.SavedData
+import net.minecraftforge.event.TickEvent
+import net.minecraftforge.eventbus.api.SubscribeEvent
+import net.minecraftforge.fml.common.Mod
 
 /**
  * Per-dimension chunk manager that force-loads chunks for fast-moving projectiles.
  *
  * Inspired by Create Big Cannons / Ritchie's Projectile Library's ChunkManager.
  * Uses a queue-based approach where projectiles enqueue their current chunk each tick,
- * and this manager processes the queue at [LevelTickEvent.END], force-loading chunks
+ * and this manager processes the queue at [net.minecraftforge.event.TickEvent.LevelTickEvent], force-loading chunks
  * via [ServerLevel.getChunkSource().updateChunkForced] and aging them out with a
  * configurable TTL.
  *
  * @param chunks the persisted set of chunk positions to keep loaded (survives server restart)
  */
-class ProjectileChunkManager private constructor(private val chunks: LongOpenHashSet) : SavedData() {
+class ProjectileChunkSavedData private constructor(private val chunks: LongOpenHashSet) : SavedData() {
 
     /** Pending chunks to process (not persisted) */
     private val queue: LongArrayFIFOQueue = LongArrayFIFOQueue()
@@ -122,7 +125,7 @@ class ProjectileChunkManager private constructor(private val chunks: LongOpenHas
         val toLoad = minOf(maxEachTick, capacity.coerceAtLeast(0), qSize)
 
         repeat(toLoad) {
-            if (queue.isEmpty()) return@repeat
+            if (queue.isEmpty) return@repeat
 
             val chunkLong = queue.dequeueLong()
             inQueue.remove(chunkLong)
@@ -195,17 +198,19 @@ class ProjectileChunkManager private constructor(private val chunks: LongOpenHas
         return access is LevelChunk
     }
 
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
     companion object {
         private const val FILE_ID = "superbwarfare_projectile_chunks"
         private const val KEY_LOADED_CHUNKS = "LoadedChunks"
 
         /**
-         * Get or create the per-dimension [ProjectileChunkManager].
+         * Get or create the per-dimension [ProjectileChunkSavedData].
          */
-        fun get(level: ServerLevel): ProjectileChunkManager {
+        @JvmStatic
+        fun get(level: ServerLevel): ProjectileChunkSavedData {
             return level.dataStorage.computeIfAbsent(
                 { tag -> load(tag) },
-                { ProjectileChunkManager(LongOpenHashSet()) },
+                { ProjectileChunkSavedData(LongOpenHashSet()) },
                 FILE_ID
             )
         }
@@ -213,6 +218,7 @@ class ProjectileChunkManager private constructor(private val chunks: LongOpenHas
         /**
          * Convenience: enqueue a chunk for force-loading on the given level.
          */
+        @JvmStatic
         fun queueForceLoad(level: ServerLevel, chunkPos: ChunkPos) {
             get(level).queueForceLoad(chunkPos)
         }
@@ -220,14 +226,23 @@ class ProjectileChunkManager private constructor(private val chunks: LongOpenHas
         /**
          * Convenience: run the tick processing for the given level.
          */
+        @JvmStatic
         fun tick(level: ServerLevel) {
             get(level).tick(level)
         }
 
-        private fun load(tag: CompoundTag): ProjectileChunkManager {
+        private fun load(tag: CompoundTag): ProjectileChunkSavedData {
             val arr = tag.getLongArray(KEY_LOADED_CHUNKS)
             val set = LongOpenHashSet(arr)
-            return ProjectileChunkManager(set)
+            return ProjectileChunkSavedData(set)
+        }
+
+        @SubscribeEvent
+        fun onChunkLoadLevelTick(event: TickEvent.LevelTickEvent) {
+            if (!ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()) return
+            if (event.phase != TickEvent.Phase.END) return
+            val level = event.level as? ServerLevel ?: return
+            tick(level)
         }
     }
 }

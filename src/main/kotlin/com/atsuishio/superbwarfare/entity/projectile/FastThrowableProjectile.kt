@@ -18,7 +18,7 @@ import com.atsuishio.superbwarfare.network.message.receive.MissileTrailParticleM
 import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.tools.VectorTool.isInLiquid
 import com.atsuishio.superbwarfare.world.phys.ExtendedEntityRayTraceResult
-import com.atsuishio.superbwarfare.world.saveddata.ProjectileChunkManager
+import com.atsuishio.superbwarfare.world.saveddata.ProjectileChunkSavedData
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
@@ -308,17 +308,17 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         this.syncMotion()
 
         // 每 tick 将当前所在区块加入强制加载队列，由 ProjectileChunkManager 在 tick 末尾统一处理
-        if (level() is ServerLevel) {
+        if (level is ServerLevel) {
             if (forceLoadChunk() && ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()) {
                 val currentChunkPos = this.chunkPosition()
                 val nextChunkPos = ChunkPos(BlockPos.containing(position().add(deltaMovement)))
                 val nextNextChunkPos = ChunkPos(BlockPos.containing(position().add(deltaMovement.scale(2.0))))
-                ProjectileChunkManager.queueForceLoad(level() as ServerLevel, currentChunkPos)
+                ProjectileChunkSavedData.queueForceLoad(level, currentChunkPos)
                 if (nextChunkPos != currentChunkPos) {
-                    ProjectileChunkManager.queueForceLoad(level() as ServerLevel, nextChunkPos)
+                    ProjectileChunkSavedData.queueForceLoad(level, nextChunkPos)
                 }
                 if (nextNextChunkPos != nextChunkPos) {
-                    ProjectileChunkManager.queueForceLoad(level() as ServerLevel, nextNextChunkPos)
+                    ProjectileChunkSavedData.queueForceLoad(level, nextNextChunkPos)
                 }
             }
         }
