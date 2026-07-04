@@ -117,7 +117,14 @@ object SeekTool {
         val minY = level.minBuildHeight
         val maxY = level.maxBuildHeight
         if (y !in minY..maxY) return@TriPredicate true
-        if (level.isClientSide && level.getEntity(entity.id) == null) return@TriPredicate true
+        if (level.isClientSide && level.getEntity(entity.id) == null) {
+            // 雷达超视距假实体：使用服务端预计算的高度，确保 heightRange 条件对其生效
+            val entry = ClientSyncedEntityHandler.getSyncedEntry(level, entity.id)
+            if (entry != null && entry.heightAboveGround >= 0) {
+                return@TriPredicate entry.heightAboveGround >= min && entry.heightAboveGround <= max
+            }
+            return@TriPredicate true
+        }
 
         var height = 0
         while (true) {
