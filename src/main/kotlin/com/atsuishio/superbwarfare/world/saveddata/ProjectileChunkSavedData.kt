@@ -227,7 +227,7 @@ class ProjectileChunkSavedData private constructor(private val chunks: LongOpenH
          * Convenience: run the tick processing for the given level.
          */
         @JvmStatic
-        fun tick(level: ServerLevel) {
+        fun tickLevel(level: ServerLevel) {
             get(level).tick(level)
         }
 
@@ -242,7 +242,7 @@ class ProjectileChunkSavedData private constructor(private val chunks: LongOpenH
             if (!ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()) return
             if (event.phase != TickEvent.Phase.END) return
             val level = event.level as? ServerLevel ?: return
-            tick(level)
+            tickLevel(level)
         }
     }
 }

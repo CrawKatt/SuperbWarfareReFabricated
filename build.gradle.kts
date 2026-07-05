@@ -232,9 +232,6 @@ dependencies {
     implementation(fg.deobf("curse.maven:oculus-581495:6020952"))
     implementation(fg.deobf("curse.maven:embeddium-908741:5681725"))
 
-    implementation(fg.deobf("curse.maven:ritchies-projectile-library-1279407:7292523"))
-    implementation(fg.deobf("curse.maven:create-big-cannons-646668:8169547"))
-
     implementation(fg.deobf("curse.maven:timeless-and-classics-zero-1028108:6518539"))
     implementation(fg.deobf("curse.maven:create-328085:7178761"))
     implementation(fg.deobf("curse.maven:mmmmmmmmmmmm-225738:6237015"))
