@@ -1,7 +1,7 @@
 {
   "type": "minecraft:smithing_transform",
   "addition": {
-    "tag": "superbwarfare:ingots/steel"
+    "tag": "forge:ingots/steel"
   },
   "base": {
     "item": "superbwarfare:rare_material_pack"

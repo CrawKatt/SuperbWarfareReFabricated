@@ -5,9 +5,14 @@
     {
       "tag": "forge:dusts/iron"
     },
-    {
-      "tag": "forge:dusts/coal_coke"
-    }
+    [
+      {
+        "tag": "forge:dusts/coal_coke"
+      },
+      {
+        "tag": "forge:dusts/coal"
+      }
+    ]
   ],
   "result": {
     "item": "superbwarfare:coal_iron_powder"

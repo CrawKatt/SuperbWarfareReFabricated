@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "a": {
-      "tag": "superbwarfare:ingots/steel"
+      "tag": "forge:ingots/steel"
     },
     "b": {
       "item": "minecraft:hopper"

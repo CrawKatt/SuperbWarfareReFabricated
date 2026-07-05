@@ -3,10 +3,10 @@
   "category": "equipment",
   "key": {
     "a": {
-      "tag": "superbwarfare:ingots/lead"
+      "tag": "forge:ingots/lead"
     },
     "b": {
-      "tag": "superbwarfare:ingots/steel"
+      "tag": "forge:ingots/steel"
     },
     "c": {
       "item": "minecraft:gunpowder"

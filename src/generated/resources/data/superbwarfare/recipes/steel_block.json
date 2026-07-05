@@ -3,7 +3,7 @@
   "category": "building",
   "key": {
     "a": {
-      "tag": "superbwarfare:ingots/steel"
+      "tag": "forge:ingots/steel"
     }
   },
   "pattern": [
