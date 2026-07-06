@@ -6,10 +6,10 @@ import top.theillusivec4.curios.api.CuriosApi
 import top.theillusivec4.curios.api.SlotContext
 import top.theillusivec4.curios.api.type.capability.ICurioItem
 
-class ThermalImagingGogglesItem : Item(Properties().stacksTo(1)), ICurioItem {
+open class ThermalImagingGogglesItem : Item(Properties().stacksTo(1)), ICurioItem {
     override fun canEquip(slotContext: SlotContext, stack: ItemStack?): Boolean {
         return CuriosApi.getCuriosInventory(slotContext.entity)
             .map { it.findFirstCurio(this).isEmpty }
-            .orElse(false)
+            .orElseGet { false }
     }
 }

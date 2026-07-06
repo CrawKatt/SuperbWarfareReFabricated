@@ -75,6 +75,7 @@ private fun registerPayloads() {
     playToClient<RadarSyncMessage>()
     playToClient<ClientVehicleItemMessage>()
     playToClient<OpenVehicleSkinScreenMessage>()
+    playToClient<OpenTacticalMapScreenMessage>()
 
     playToServer<AdjustMortarAngleMessage>()
     playToServer<AdjustZoomFovMessage>()

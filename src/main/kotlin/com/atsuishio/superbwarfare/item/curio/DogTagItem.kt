@@ -23,7 +23,7 @@ import top.theillusivec4.curios.api.SlotContext
 import top.theillusivec4.curios.api.type.capability.ICurioItem
 import java.util.*
 
-class DogTagItem : Item(Properties().stacksTo(1)), ICurioItem, ItemScreenProvider, IVehicleInteract {
+open class DogTagItem : Item(Properties().stacksTo(1)), ICurioItem, ItemScreenProvider, IVehicleInteract {
     override fun appendHoverText(
         pStack: ItemStack,
         pLevel: Level?,

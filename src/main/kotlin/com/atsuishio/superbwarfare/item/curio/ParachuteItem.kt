@@ -13,7 +13,7 @@ import top.theillusivec4.curios.api.CuriosApi
 import top.theillusivec4.curios.api.SlotContext
 import top.theillusivec4.curios.api.type.capability.ICurioItem
 
-class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), ICurioItem {
+open class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), ICurioItem {
     override fun isValidRepairItem(pStack: ItemStack, pRepairCandidate: ItemStack): Boolean {
         return pRepairCandidate.`is`(Items.PHANTOM_MEMBRANE)
     }
@@ -21,7 +21,7 @@ class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), ICurioItem
     override fun canEquip(slotContext: SlotContext, stack: ItemStack?): Boolean {
         return CuriosApi.getCuriosInventory(slotContext.entity)
             .map { it.findFirstCurio(this).isEmpty }
-            .orElse(false)
+            .orElseGet { false }
     }
 
     override fun curioTick(slotContext: SlotContext, stack: ItemStack) {
@@ -90,17 +90,18 @@ class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), ICurioItem
                     it.findFirstCurio(ModItems.PARACHUTE.get())
                         .map { c ->
                             c.stack.orCreateTag.getBoolean(TAG_OPEN)
-                        }.orElse(false)
-                }.orElse(false)
+                        }.orElseGet { false }
+                }.orElseGet { false }
         }
 
+        @JvmStatic
         fun isParachuteVisible(entity: LivingEntity?): Boolean {
             return CuriosApi.getCuriosInventory(entity)
                 .map {
                     it.findFirstCurio(ModItems.PARACHUTE.get()).map { c ->
                         c.slotContext().visible()
-                    }.orElse(false)
-                }.orElse(false)
+                    }.orElseGet { false }
+                }.orElseGet { false }
         }
     }
 }
