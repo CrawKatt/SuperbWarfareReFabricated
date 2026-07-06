@@ -20,6 +20,7 @@ import com.atsuishio.superbwarfare.network.message.send.EntityClearMessage
 import com.atsuishio.superbwarfare.network.message.send.VehicleFireMessage
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVector3f
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
+import com.atsuishio.superbwarfare.tools.SeekTool
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.sendPacketToServer
 import com.mojang.blaze3d.platform.GlStateManager
@@ -1046,11 +1047,18 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
 
         val useDragPt = draggingLoiterPoint || System.currentTimeMillis() < loiterDragExpireTime
 
+        var friendlyEntities = ClientSyncedEntityHandler.getSyncedFriendlyEntities(level)
+        val clientEntities = SeekTool.Builder(player)
+            .friendly()
+            .notPlayer()
+            .build().toList()
+
+        friendlyEntities = (friendlyEntities + clientEntities).distinctBy { it.id }
+
         // 友方（绿色）
         entityRenderer.renderEntityBatch(
             guiGraphics,
-            ClientSyncedEntityHandler.getSyncedFriendlyEntities(level).filter { it.vehicle == null }
-                .distinctBy { it.id },
+            friendlyEntities.filter { it.vehicle == null },
             level, 0xFF7FFFAD.toInt(), "context.superbwarfare.tactical_map.relation.friendly",
             viewBlockX, viewBlockZ, mapCenterX, mapCenterY, mapLeft, mapTop, mapAreaW, mapAreaH,
             scale, pPartialTick, mouseX, mouseY, selectedEntities, entityRenderList,

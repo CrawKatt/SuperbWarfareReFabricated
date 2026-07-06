@@ -978,13 +978,13 @@ object VehicleEngineUtils {
                 roll *= xSpeed
             }
 
-            if (Mth.abs(xRot) < 20 && Mth.abs(mouseMoveSpeedY) < 0.002) {
+            if (Mth.abs(xRot) < 20 && Mth.abs(mouseMoveSpeedY) < 0.001) {
                 xRot += if (deltaMovement.y() < 0) {
-                    1.2f * deltaMovement.y.toFloat()
+                    0.2f * deltaMovement.y.toFloat()
                 } else {
-                    0.5f * deltaMovement.y.toFloat()
+                    0.2f * deltaMovement.y.toFloat()
                 }
-                xRot *= 0.996f
+                xRot *= 0.98f
             }
 
             propellerRot += 30 * power
@@ -1078,11 +1078,17 @@ object VehicleEngineUtils {
 
         val flapAngle = ((flap1LRot + flap1RRot + flap1L2Rot + flap1R2Rot) / 50).toDouble()
 
+        if (xRot > 0 && deltaMovement.y() > 0) {
+            liftOffset -= 0.0005f
+        } else {
+            liftOffset *= 0.95f
+        }
+
         deltaMovement = deltaMovement.add(
             getUpVec(1f).scale(
                 (1 - Mth.abs(
                     deltaMovement.normalize().dot(getUpVec(1f)).toFloat()
-                )) * speed * 0.008 * lift * (flapAngle + Mth.clamp(
+                )) * speed * (0.008 + liftOffset) * lift * (flapAngle + Mth.clamp(
                     4 - 0.25 * Mth.abs(dotViewVector.toFloat()),
                     1.0,
                     4.0

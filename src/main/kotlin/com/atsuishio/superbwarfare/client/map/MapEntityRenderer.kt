@@ -196,7 +196,8 @@ class MapEntityRenderer {
             )
         }
         val syncedEntry = ClientSyncedEntityHandler.getSyncedEntry(level, entity.id)
-        val hag = syncedEntry?.heightAboveGround ?: -1.0
+        val hag = syncedEntry?.heightAboveGround
+            ?: computeEntityHeightAboveGround(level, entity)
         lines.add(
             if (hag >= 0)
                 Component.translatable("context.superbwarfare.tactical_map.tooltip.height", "%.1f".format(hag))
@@ -216,6 +217,16 @@ class MapEntityRenderer {
         }
         lines.add(Component.translatable(relationKey).withStyle(ChatFormatting.YELLOW))
         return lines
+    }
+
+    /** 对客户端 level 中已存在的实体（非超视距同步），使用高度图实时计算离地高度 */
+    private fun computeEntityHeightAboveGround(level: Level, entity: Entity): Double {
+        val surfaceY = level.getHeight(
+            net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE,
+            entity.blockX,
+            entity.blockZ
+        )
+        return (entity.y - surfaceY).coerceAtLeast(0.0)
     }
 
     // ═══════════════════════════════════════════════════════════════

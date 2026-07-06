@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.client.renderer
 
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.config.server.SyncConfig
-import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.tools.clientLevel
 import com.atsuishio.superbwarfare.tools.mc
@@ -10,7 +9,6 @@ import com.mojang.blaze3d.shaders.FogShape
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.VertexSorting
 import net.minecraft.client.renderer.LevelRenderer
-import net.minecraft.client.renderer.LightTexture
 import net.minecraft.core.BlockPos
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.client.event.RenderLevelStageEvent
@@ -68,12 +66,6 @@ object SyncedEntityWorldRenderer {
 
                 entity.xRotO = entity.xRot
                 if (entity is VehicleEntity) {
-                    if (SyncConfig.ONLY_RENDER_FLYING_ENTITY.get()
-                        && entity.engineInfo !is EngineInfo.Aircraft
-                        && entity.engineInfo !is EngineInfo.Helicopter
-                        && entity.engineInfo !is EngineInfo.Tom6
-                        && entity.engineInfo !is EngineInfo.AirShip
-                    ) continue
                     entity.prevRoll = entity.roll
                 }
 
@@ -90,11 +82,7 @@ object SyncedEntityWorldRenderer {
                 if (distSq > SyncConfig.MAX_RENDER_DISTANCE.get() * SyncConfig.MAX_RENDER_DISTANCE.get()) continue
 
                 val blockPos = BlockPos.containing(ix, iy, iz)
-                val packedLight = if (level.getChunk(blockPos) != null) {
-                    LevelRenderer.getLightColor(level, blockPos)
-                } else {
-                    LightTexture.FULL_BRIGHT
-                }
+                val packedLight = LevelRenderer.getLightColor(level, blockPos)
 
                 val relX = ix - camera.position.x
                 val relY = iy - camera.position.y
