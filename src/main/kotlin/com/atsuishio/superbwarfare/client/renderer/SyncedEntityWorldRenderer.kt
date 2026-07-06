@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.client.renderer
 
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
+import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.tools.clientLevel
@@ -28,12 +29,6 @@ import org.joml.Matrix4f
  */
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
 object SyncedEntityWorldRenderer {
-    //TODO 需要服务端配置和开关
-    private const val MAX_RENDER_DISTANCE = 2048.0
-    private const val MIN_RENDER_HEIGHT = 256.0
-    private const val ONLY_RENDER_FLYING_ENTITY: Boolean = true
-    private const val MAX_RENDER_DISTANCE_SQ = MAX_RENDER_DISTANCE * MAX_RENDER_DISTANCE
-
     @SubscribeEvent
     fun onRenderLevelStage(event: RenderLevelStageEvent) {
         if (event.stage != RenderLevelStageEvent.Stage.AFTER_ENTITIES) return
@@ -57,7 +52,7 @@ object SyncedEntityWorldRenderer {
         RenderSystem.setProjectionMatrix(extendedProj, VertexSorting.DISTANCE_TO_ORIGIN)
 
         RenderSystem.setShaderFogStart(savedFogEnd)
-        RenderSystem.setShaderFogEnd(MAX_RENDER_DISTANCE.toFloat())
+        RenderSystem.setShaderFogEnd(SyncConfig.MAX_RENDER_DISTANCE.get().toFloat())
         RenderSystem.setShaderFogShape(FogShape.SPHERE)
 
         try {
@@ -69,11 +64,16 @@ object SyncedEntityWorldRenderer {
                 val iz: Double
 
                 val entry = ClientSyncedEntityHandler.getWorldRenderEntry(level, entity.id) ?: continue
-                if (entry.entity.y < MIN_RENDER_HEIGHT) continue
+                if (entry.entity.y < SyncConfig.MIN_RENDER_HEIGHT.get()) continue
 
                 entity.xRotO = entity.xRot
                 if (entity is VehicleEntity) {
-                    if (ONLY_RENDER_FLYING_ENTITY && entity.engineInfo !is EngineInfo.Aircraft && entity.engineInfo !is EngineInfo.Helicopter && entity.engineInfo !is EngineInfo.Tom6 && entity.engineInfo !is EngineInfo.AirShip) continue
+                    if (SyncConfig.ONLY_RENDER_FLYING_ENTITY.get()
+                        && entity.engineInfo !is EngineInfo.Aircraft
+                        && entity.engineInfo !is EngineInfo.Helicopter
+                        && entity.engineInfo !is EngineInfo.Tom6
+                        && entity.engineInfo !is EngineInfo.AirShip
+                    ) continue
                     entity.prevRoll = entity.roll
                 }
 
@@ -87,10 +87,10 @@ object SyncedEntityWorldRenderer {
                 val dy = iy - camera.position.y
                 val dz = iz - camera.position.z
                 val distSq = dx * dx + dy * dy + dz * dz
-                if (distSq > MAX_RENDER_DISTANCE_SQ) continue
+                if (distSq > SyncConfig.MAX_RENDER_DISTANCE.get() * SyncConfig.MAX_RENDER_DISTANCE.get()) continue
 
                 val blockPos = BlockPos.containing(ix, iy, iz)
-                val packedLight = if (level.hasChunkAt(blockPos)) {
+                val packedLight = if (level.getChunk(blockPos) != null) {
                     LevelRenderer.getLightColor(level, blockPos)
                 } else {
                     LightTexture.FULL_BRIGHT
@@ -123,18 +123,14 @@ object SyncedEntityWorldRenderer {
 
     /**
      * 从当前投影矩阵创建扩展远裁剪面的新矩阵。
-     * 保留原有 FOV、aspect、near，仅将 far 替换为 [MAX_RENDER_DISTANCE] + 512。
+     * 保留原有 FOV、aspect、near，仅将 far 替换为 [SyncConfig.MAX_RENDER_DISTANCE] + 512。
      */
     private fun createExtendedProjection(projection: Matrix4f): Matrix4f {
         val extended = Matrix4f(projection)
-        // Extract near plane from perspective matrix:
-        //  m22 = -(far + near) / (far - near)
-        //  m32 = -(2 * far * near) / (far - near)
-        //  → near = m32 / (m22 - 1)
         val m22 = projection.m22()
         val m32 = projection.m32()
         val near = m32 / (m22 - 1f)
-        val far = MAX_RENDER_DISTANCE.toFloat() + 512f
+        val far = SyncConfig.MAX_RENDER_DISTANCE.get().toFloat() + 512f
         extended.m22(-(far + near) / (far - near))
         extended.m32(-(2f * far * near) / (far - near))
         return extended

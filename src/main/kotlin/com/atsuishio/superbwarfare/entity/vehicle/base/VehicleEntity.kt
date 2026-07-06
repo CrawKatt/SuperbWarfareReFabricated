@@ -6,7 +6,7 @@ import com.atsuishio.superbwarfare.advancement.CriteriaRegister
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage
 import com.atsuishio.superbwarfare.capability.energy.VehicleEnergyStorage
 import com.atsuishio.superbwarfare.client.animation.entity.VehicleAnimationInstance
-import com.atsuishio.superbwarfare.config.server.MiscConfig
+import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.data.DataLoader
 import com.atsuishio.superbwarfare.data.StringOrVec3
@@ -2290,13 +2290,13 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         this.move(MoverType.SELF, this.deltaMovement)
 
         if (!level().isClientSide && isAlive) {
-            if(onGround() && isWreck) {
+            if (onGround() && isWreck) {
                 ServerSyncedEntityHandler.unregister(this)
-            } else {
+            } else if (this.tickCount % SyncConfig.SYNC_ENTITY_INTERVAL.get() == 0) {
                 ServerSyncedEntityHandler.register(this)
 
                 // 向友方玩家同步自身 ID（轻量级，实体状态数据由 BeyondVisualEntitySyncMessage 统一发送）
-                val srv = server
+                val srv = this.server
                 if (srv != null) {
                     val dim = level().dimension().location()
                     val msg = EntityRelationSyncMessage(dim, friendlyIds = listOf(id))
@@ -2441,7 +2441,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     }
 
     fun vehicleRadar() {
-        if (!MiscConfig.SYNC_ENTITY_OVER_RANGE.get()) return
+        if (!SyncConfig.SYNC_ENTITY_OVER_RANGE.get()) return
         val radars = computed().radar ?: return
         val level = this.level()
         if (level !is ServerLevel) return
@@ -2482,7 +2482,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             return getVectorFromString(stringOrVec3.string!!, partialTicks)
         } else {
             val vec3 = stringOrVec3.vec3!!
-            val worldPosition = VehicleVecUtils.transformPosition(getVehicleTransform(partialTicks),
+            val worldPosition = VehicleVecUtils.transformPosition(
+                getVehicleTransform(partialTicks),
                 vec3.x + stringOrVec3.vec3.x,
                 vec3.y + stringOrVec3.vec3.y,
                 vec3.z + stringOrVec3.vec3.z

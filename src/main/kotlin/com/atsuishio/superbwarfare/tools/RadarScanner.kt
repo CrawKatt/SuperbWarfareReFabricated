@@ -37,8 +37,10 @@ object RadarScanner {
     enum class SearchType {
         /** 只搜索载具和导弹（从 ServerSyncedEntityHandler 查询，快速） */
         VEHICLES,
+
         /** 只搜索生物（遍历 level.allEntities，慢） */
         LIVING,
+
         /** 两者都搜索 */
         ALL,
     }
@@ -113,17 +115,19 @@ object RadarScanner {
             }
             .toList()
         val effectiveYRot = config.effectiveYRot(level.server.tickCount)
-        val msg = RadarSyncMessage(level.dimension().location(), listOf(
-            RadarSyncMessage.SyncedRadar(
-                pos = config.center,
-                radius = config.radius,
-                sweepAngle = config.sweepAngle,
-                yRot = effectiveYRot,
-                ownerName = config.owner.displayName.string,
-                showIcon = config.showIcon,
-                sourceId = config.sourceId,
+        val msg = RadarSyncMessage(
+            level.dimension().location(), listOf(
+                RadarSyncMessage.SyncedRadar(
+                    pos = config.center,
+                    radius = config.radius,
+                    sweepAngle = config.sweepAngle,
+                    yRot = effectiveYRot,
+                    ownerName = config.owner.displayName.string,
+                    showIcon = config.showIcon,
+                    sourceId = config.sourceId,
+                )
             )
-        ))
+        )
         recipients.forEach { sendPacketTo(it, msg) }
     }
 
@@ -155,7 +159,8 @@ object RadarScanner {
                 if (entry.entityId == config.owner.id) continue
 
                 // 距离检查（隐身载具的 trackDistanceMultiply 减益其被探测距离）
-                val effectiveRangeSq = radiusSq * (if (config.affectedByStealthTarget) entry.trackDistanceMultiply * entry.trackDistanceMultiply else 1.0)
+                val effectiveRangeSq =
+                    radiusSq * (if (config.affectedByStealthTarget) entry.trackDistanceMultiply * entry.trackDistanceMultiply else 1.0)
                 if (entry.pos.distanceToSqr(config.center) > effectiveRangeSq) continue
 
                 // 查找真实实体
@@ -230,16 +235,17 @@ object RadarScanner {
         // ── 搜索生物 ──
         if (config.searchType == SearchType.LIVING) {
             level.allEntities.asSequence()
-                .filter { it is LivingEntity }
-                .filter { !ServerSyncedEntityHandler.isUnderground(it) }
-                .filter { it.id != config.owner.id }
-                .filter { it.distanceToSqr(config.center) <= radiusSq }
+                .filter {
+                    it is LivingEntity
+                            && !ServerSyncedEntityHandler.isUnderground(it)
+                            && it.id != config.owner.id
+                            && it.distanceToSqr(config.center) <= radiusSq
+                }
                 .filter {
                     val toEntity = config.center.vectorTo(it.position()).multiply(1.0, 0.0, 1.0)
                     VectorTool.calculateAngle(toEntity, sweepDir) <= config.sweepAngle / 2.0
                 }
-                .filter { SeekTool.NOT_IN_SMOKE.test(it) }
-                .filter { !SeekTool.IS_FRIENDLY.test(config.owner, it) }
+                .filter { SeekTool.NOT_IN_SMOKE.test(it) && !SeekTool.IS_FRIENDLY.test(config.owner, it) }
                 .forEach {
                     // 注册到 ServerSyncedEntityHandler，使其进入超视距世界渲染广播
                     ServerSyncedEntityHandler.register(it)
