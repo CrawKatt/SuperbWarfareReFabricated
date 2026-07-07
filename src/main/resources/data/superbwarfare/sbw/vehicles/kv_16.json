@@ -101,7 +101,8 @@
         "ViewDirection": "Bomb"
       },
       "ProjectileDummyInfo": {
-        "Offset": [0, -0.25, 0]
+        "Offset": [0, -0.25, 0],
+        "HideDummyWhileZooming": true
       },
       "SoundInfo": {
         "Fire1P": "superbwarfare:bomb_release",
