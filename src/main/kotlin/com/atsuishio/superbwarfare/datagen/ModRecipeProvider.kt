@@ -67,6 +67,7 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
 
     companion object {
         val PLATES_COPPER: TagKey<Item> = commonItemTag("plates/copper")
+        val PLATES_STEEL: TagKey<Item> = commonItemTag("plates/steel")
         val INGOTS_STEEL: TagKey<Item> = commonItemTag("ingots/steel")
         val INGOTS_LEAD: TagKey<Item> = commonItemTag("ingots/lead")
         val INGOTS_SILVER: TagKey<Item> = commonItemTag("ingots/silver")
@@ -104,14 +105,10 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 .define('c', Items.GOLDEN_APPLE)
                 .unlockedBy(getHasName(Items.GOLDEN_APPLE), has(Items.GOLDEN_APPLE))
                 .save(writer, loc(getItemName(ModItems.MEDICAL_KIT.get())))
-            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.ARMOR_PLATE.get(), 4)
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.ARMOR_PLATE.get(), 2)
                 .pattern("aba")
-                .pattern("ccc")
-                .pattern("ada")
                 .define('a', Items.STRING)
-                .define('b', ItemTags.TERRACOTTA)
-                .define('c', INGOTS_STEEL)
-                .define('d', ItemTags.WOOL)
+                .define('b', PLATES_STEEL)
                 .unlockedBy(getHasName(Items.STRING), has(Items.STRING))
                 .save(writer, loc(getItemName(ModItems.ARMOR_PLATE.get())))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.VEHICLE_DAMAGE_ANALYZER.get())
@@ -188,6 +185,62 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                     has(ModItems.CEMENTED_CARBIDE_HAMMER.get())
                 )
                 .save(writer, loc(getItemName(ModItems.NETHERITE_HAMMER.get())))
+            // cemented carbide tools
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.CEMENTED_CARBIDE_SWORD.get())
+                .pattern("a")
+                .pattern("a")
+                .pattern("b")
+                .define('a', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
+                .define('b', Items.STICK)
+                .unlockedBy(
+                    getHasName(ModItems.CEMENTED_CARBIDE_INGOT.get()),
+                    has(ModItems.CEMENTED_CARBIDE_INGOT.get())
+                )
+                .save(writer, loc(getItemName(ModItems.CEMENTED_CARBIDE_SWORD.get())))
+            ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CEMENTED_CARBIDE_PICKAXE.get())
+                .pattern("aaa")
+                .pattern(" b ")
+                .pattern(" b ")
+                .define('a', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
+                .define('b', Items.STICK)
+                .unlockedBy(
+                    getHasName(ModItems.CEMENTED_CARBIDE_INGOT.get()),
+                    has(ModItems.CEMENTED_CARBIDE_INGOT.get())
+                )
+                .save(writer, loc(getItemName(ModItems.CEMENTED_CARBIDE_PICKAXE.get())))
+            ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CEMENTED_CARBIDE_AXE.get())
+                .pattern("aa")
+                .pattern("ab")
+                .pattern(" b")
+                .define('a', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
+                .define('b', Items.STICK)
+                .unlockedBy(
+                    getHasName(ModItems.CEMENTED_CARBIDE_INGOT.get()),
+                    has(ModItems.CEMENTED_CARBIDE_INGOT.get())
+                )
+                .save(writer, loc(getItemName(ModItems.CEMENTED_CARBIDE_AXE.get())))
+            ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CEMENTED_CARBIDE_SHOVEL.get())
+                .pattern("a")
+                .pattern("b")
+                .pattern("b")
+                .define('a', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
+                .define('b', Items.STICK)
+                .unlockedBy(
+                    getHasName(ModItems.CEMENTED_CARBIDE_INGOT.get()),
+                    has(ModItems.CEMENTED_CARBIDE_INGOT.get())
+                )
+                .save(writer, loc(getItemName(ModItems.CEMENTED_CARBIDE_SHOVEL.get())))
+            ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CEMENTED_CARBIDE_HOE.get())
+                .pattern("aa")
+                .pattern(" b")
+                .pattern(" b")
+                .define('a', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
+                .define('b', Items.STICK)
+                .unlockedBy(
+                    getHasName(ModItems.CEMENTED_CARBIDE_INGOT.get()),
+                    has(ModItems.CEMENTED_CARBIDE_INGOT.get())
+                )
+                .save(writer, loc(getItemName(ModItems.CEMENTED_CARBIDE_HOE.get())))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.CROWBAR.get())
                 .pattern("  a")
                 .pattern(" b ")
@@ -1141,6 +1194,30 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 .requires(ModTags.Items.HAMMER)
                 .unlockedBy(getHasName(ModItems.HAMMER.get()), has(ModTags.Items.HAMMER))
                 .save(writer, loc(getItemName(ModItems.COPPER_PLATE.get())))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.STEEL_PLATE.get())
+                .requires(INGOTS_STEEL)
+                .requires(ModTags.Items.HAMMER)
+                .unlockedBy(getHasName(ModItems.HAMMER.get()), has(ModTags.Items.HAMMER))
+                .save(writer, loc(getItemName(ModItems.STEEL_PLATE.get())))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.SLIME_COVERED_LEATHER.get())
+                .requires(Items.LEATHER)
+                .requires(Items.SLIME_BALL)
+                .requires(Items.BLAZE_POWDER)
+                .unlockedBy(getHasName(Items.SLIME_BALL), has(Items.SLIME_BALL))
+                .save(writer, loc(getItemName(ModItems.SLIME_COVERED_LEATHER.get())))
+            SimpleCookingRecipeBuilder.generic(
+                Ingredient.of(ModItems.SLIME_COVERED_LEATHER.get()),
+                RecipeCategory.MISC,
+                ModItems.ENGINEERING_PLASTIC.get(),
+                0.3f,
+                200,
+                RecipeSerializer.SMELTING_RECIPE
+            )
+                .unlockedBy(
+                    getHasName(ModItems.SLIME_COVERED_LEATHER.get()),
+                    has(ModItems.SLIME_COVERED_LEATHER.get())
+                )
+                .save(writer, loc(getItemName(ModItems.ENGINEERING_PLASTIC.get())))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.FUSEE.get(), 4)
                 .pattern("a")
                 .pattern("b")
@@ -2960,6 +3037,16 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 .define('d', Tags.Items.NUGGETS_GOLD)
                 .unlockedBy(getHasName(ModItems.DATA_CHIP_SUBSTRATE.get()), has(ModItems.DATA_CHIP_SUBSTRATE.get()))
                 .save(writer, loc(getItemName(ModItems.DAMAGE_PERK_DATA_CHIP.get())))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SKIN_SPRAY.get())
+                .pattern(" ab")
+                .pattern("cdc")
+                .pattern(" c ")
+                .define('a', Items.IRON_NUGGET)
+                .define('b', Items.TRIPWIRE_HOOK)
+                .define('c', PLATES_STEEL)
+                .define('d', Tags.Items.DYES)
+                .unlockedBy(getHasName(Items.TRIPWIRE_HOOK), has(Items.TRIPWIRE_HOOK))
+                .save(writer, loc(getItemName(ModItems.SKIN_SPRAY.get())))
             ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.GALENA.get(), 9)
                 .requires(commonItemTag("storage_blocks/raw_lead"))
                 .unlockedBy(getHasName(ModItems.RAW_GALENA_BLOCK.get()), has(commonItemTag("storage_blocks/raw_lead")))

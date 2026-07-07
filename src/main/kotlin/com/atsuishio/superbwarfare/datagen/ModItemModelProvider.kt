@@ -108,6 +108,9 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         simpleItem(ModItems.GS_HEAD)
         simpleItem(ModItems.CANNON_CORE)
         simpleItem(ModItems.COPPER_PLATE)
+        simpleItem(ModItems.STEEL_PLATE)
+        simpleItem(ModItems.SLIME_COVERED_LEATHER)
+        simpleItem(ModItems.ENGINEERING_PLASTIC)
         simpleItem(ModItems.STEEL_INGOT)
         simpleItem(ModItems.LEAD_INGOT)
         simpleItem(ModItems.TUNGSTEN_INGOT)
@@ -205,6 +208,13 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         simpleItem(ModItems.BOOST_RESEARCH_MODULE)
 
         handheldItem(ModItems.VEHICLE_KEY)
+
+        // cemented carbide tools
+        handheldItem(ModItems.CEMENTED_CARBIDE_SWORD)
+        handheldItem(ModItems.CEMENTED_CARBIDE_PICKAXE)
+        handheldItem(ModItems.CEMENTED_CARBIDE_AXE)
+        handheldItem(ModItems.CEMENTED_CARBIDE_SHOVEL)
+        handheldItem(ModItems.CEMENTED_CARBIDE_HOE)
 
         // perk
         simpleItem(ModItems.SHORTCUT_PACK)
