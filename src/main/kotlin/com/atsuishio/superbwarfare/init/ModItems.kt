@@ -224,6 +224,11 @@ object ModItems {
     @JvmField val STEEL_HAMMER = registerItem("steel_hammer") { HammerItem(ModItemTier.STEEL, 9, -3.2f, Properties().durability(600)) }
     @JvmField val DIAMOND_HAMMER = registerItem("diamond_hammer") { HammerItem(Tiers.DIAMOND, 12, -3.2f, Properties().durability(1500)) }
     @JvmField val CEMENTED_CARBIDE_HAMMER = registerItem("cemented_carbide_hammer") { HammerItem(ModItemTier.CEMENTED_CARBIDE, 8, -3.2f, Properties().durability(2000)) }
+    @JvmField val CEMENTED_CARBIDE_SWORD = registerItem("cemented_carbide_sword") { SwordItem(ModItemTier.CEMENTED_CARBIDE, -2, -2.4f, Properties()) }
+    @JvmField val CEMENTED_CARBIDE_PICKAXE = registerItem("cemented_carbide_pickaxe") { PickaxeItem(ModItemTier.CEMENTED_CARBIDE, -4, -2.8f, Properties()) }
+    @JvmField val CEMENTED_CARBIDE_AXE = registerItem("cemented_carbide_axe") { AxeItem(ModItemTier.CEMENTED_CARBIDE, 0f, -3.0f, Properties()) }
+    @JvmField val CEMENTED_CARBIDE_SHOVEL = registerItem("cemented_carbide_shovel") { ShovelItem(ModItemTier.CEMENTED_CARBIDE, -3.5f, -3.0f, Properties()) }
+    @JvmField val CEMENTED_CARBIDE_HOE = registerItem("cemented_carbide_hoe") { HoeItem(ModItemTier.CEMENTED_CARBIDE, -8, 0.0f, Properties()) }
     @JvmField val NETHERITE_HAMMER = registerItem("netherite_hammer") { NetheriteHammerItem() }
 
     @JvmField val T_BATON = registerItem("t_baton") { TBatonItem() }
@@ -259,6 +264,8 @@ object ModItems {
     @JvmField val WP_HEAD = registerItem("wp_head")
     @JvmField val CANNON_CORE = registerItem("cannon_core")
     @JvmField val COPPER_PLATE = registerItem("copper_plate")
+    @JvmField val STEEL_PLATE = registerItem("steel_plate")
+    @JvmField val ENGINEERING_PLASTIC = registerItem("engineering_plastic")
     @JvmField val STEEL_INGOT = registerItem("steel_ingot")
     @JvmField val LEAD_INGOT = registerItem("lead_ingot")
     @JvmField val SILVER_INGOT = registerItem("silver_ingot")
@@ -274,6 +281,7 @@ object ModItems {
     @JvmField val GALENA = registerItem("galena")
     @JvmField val SCHEELITE = registerItem("scheelite")
     @JvmField val RAW_SILVER = registerItem("raw_silver")
+    @JvmField val SLIME_COVERED_LEATHER = registerItem("slime_covered_leather")
     @JvmField val DOG_TAG = registerItem("dog_tag") { DogTagItem() }
     @JvmField val IFF = registerItem("iff") { IffItem() }
     @JvmField val CELL = registerItem("cell") { BatteryItem(24000, Properties()) }

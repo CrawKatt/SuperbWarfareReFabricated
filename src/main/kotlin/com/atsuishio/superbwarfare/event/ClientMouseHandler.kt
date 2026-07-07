@@ -271,7 +271,7 @@ object ClientMouseHandler {
             return 0.0
         }
 
-        if (ClientEventHandler.isFreeCam(player)) {
+        if (ClientEventHandler.isFreeCam(player) || ClientEventHandler.isNacelleCam(player)) {
             return 0.0
         }
 

@@ -198,6 +198,9 @@
   "item.superbwarfare.tungsten_powder": "Polvere di Tungsteno",
   "item.superbwarfare.raw_cemented_carbide_powder": "Polvere di Carburo Cementato Grezzo",
   "item.superbwarfare.copper_plate": "Lastra di Rame",
+  "item.superbwarfare.steel_plate": "Lastra di Acciaio",
+  "item.superbwarfare.slime_covered_leather": "Pelle Ricoperta di Slime",
+  "item.superbwarfare.engineering_plastic": "Plastica Ingegneristica",
   "item.superbwarfare.lead_ingot": "Lingotto di Piombo",
   "item.superbwarfare.steel_ingot": "Lingotto d'Acciaio",
   "item.superbwarfare.tungsten_ingot": "Lingotto di Tungsteno",
@@ -240,5 +243,10 @@
   "perk.superbwarfare.slot": "Tipo: ",
   "entity.superbwarfare.taser_bullet": "Cartuccia per Taser",
   "entity.superbwarfare.kirov": "Dirigibile Kirov",
-  "item.superbwarfare.cemented_carbide_hammer": "Martello di Carburo Cementato"
+  "item.superbwarfare.cemented_carbide_hammer": "Martello di Carburo Cementato",
+  "item.superbwarfare.cemented_carbide_sword": "Spada di Carburo Cementato",
+  "item.superbwarfare.cemented_carbide_pickaxe": "Piccone di Carburo Cementato",
+  "item.superbwarfare.cemented_carbide_axe": "Ascia di Carburo Cementato",
+  "item.superbwarfare.cemented_carbide_shovel": "Pala di Carburo Cementato",
+  "item.superbwarfare.cemented_carbide_hoe": "Zappa di Carburo Cementato"
 }

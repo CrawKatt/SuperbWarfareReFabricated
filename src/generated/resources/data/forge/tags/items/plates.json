@@ -1,5 +1,6 @@
 {
   "values": [
-    "#forge:plates/copper"
+    "#forge:plates/copper",
+    "#forge:plates/steel"
   ]
 }

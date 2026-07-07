@@ -3,18 +3,25 @@
   "category": "misc",
   "key": {
     "a": {
-      "item": "minecraft:string"
+      "item": "minecraft:iron_nugget"
     },
     "b": {
+      "item": "minecraft:tripwire_hook"
+    },
+    "c": {
       "tag": "forge:plates/steel"
+    },
+    "d": {
+      "tag": "forge:dyes"
     }
   },
   "pattern": [
-    "aba"
+    " ab",
+    "cdc",
+    " c "
   ],
   "result": {
-    "count": 2,
-    "item": "superbwarfare:armor_plate"
+    "item": "superbwarfare:skin_spray"
   },
   "show_notification": true
 }
