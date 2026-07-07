@@ -2633,7 +2633,7 @@
   "ah_6_engine": {
     "sounds": [
       {
-        "attenuation_distance": 512,
+        "attenuation_distance": 384,
         "stream": true,
         "name": "superbwarfare:vehicle/ah_6/ah_6_engine"
       }
@@ -3227,7 +3227,7 @@
   "rocket_engine": {
     "sounds": [
       {
-        "attenuation_distance": 256,
+        "attenuation_distance": 128,
         "stream": true,
         "name": "superbwarfare:rocket_engine"
       }
@@ -3245,7 +3245,7 @@
   "a_10a_engine": {
     "sounds": [
       {
-        "attenuation_distance": 1024,
+        "attenuation_distance": 768,
         "stream": true,
         "name": "superbwarfare:vehicle/a_10a/a_10a_engine"
       }
@@ -4023,7 +4023,7 @@
   "mi_28_engine": {
     "sounds": [
       {
-        "attenuation_distance": 512,
+        "attenuation_distance": 384,
         "stream": true,
         "name": "superbwarfare:vehicle/mi_28/mi_28_engine"
       }
@@ -4188,7 +4188,7 @@
   "kv_16_engine": {
     "sounds": [
       {
-        "attenuation_distance": 512,
+        "attenuation_distance": 384,
         "stream": true,
         "name": "superbwarfare:vehicle/kv_16/kv_16_engine"
       }
@@ -4255,7 +4255,7 @@
   "ju_87_engine": {
     "sounds": [
       {
-        "attenuation_distance": 768,
+        "attenuation_distance": 512,
         "stream": true,
         "name": "superbwarfare:vehicle/ju_87/ju_87_engine"
       }
@@ -4574,7 +4574,7 @@
   "kirov_engine": {
     "sounds": [
       {
-        "attenuation_distance": 192,
+        "attenuation_distance": 128,
         "stream": true,
         "name": "superbwarfare:vehicle/kirov/kirov_engine"
       }
@@ -4583,7 +4583,7 @@
   "ac_130h_engine": {
     "sounds": [
       {
-        "attenuation_distance": 1024,
+        "attenuation_distance": 768,
         "stream": true,
         "name": "superbwarfare:vehicle/ac_130h/ac_130h_engine"
       }

@@ -55,7 +55,7 @@ public abstract class VehicleSoundInstance extends AbstractTickableSoundInstance
             this.fade++;
         }
 
-        this.volume = this.getVolume(this.mobileVehicle) * fade;
+        this.volume = this.getVolume(this.mobileVehicle) * fade * Mth.clamp(0.01f * player.tickCount, 0, 1);
 
         this.x = this.mobileVehicle.getX();
         this.y = this.mobileVehicle.getY();

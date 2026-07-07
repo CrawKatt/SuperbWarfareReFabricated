@@ -182,7 +182,7 @@ object IFFOverlay : CommonOverlay("iff") {
                             poseStack.pushPose()
                             poseStack.translate(xf, yf, 0f)
                             poseStack.scale(0.75f, 0.75f, 1f)
-                            val str = "${e.displayName.string} [${FormatTool.format1D(pos.distanceTo(cameraPos))}m]"
+                            val str = "${e.displayName.string} [${FormatTool.format1DZ(pos.distanceTo(cameraPos))}m]"
                             guiGraphics.drawString(mc.font, str, -mc.font.width(str) / 2, 10, 0xFFBD7F, false)
                             poseStack.popPose()
                         }
@@ -235,7 +235,7 @@ object IFFOverlay : CommonOverlay("iff") {
                         poseStack.pushPose()
                         poseStack.translate(xf, yf, 0f)
                         poseStack.scale(0.75f, 0.75f, 1f)
-                        val str = "${e.displayName.string} [${FormatTool.format1D(pos.distanceTo(cameraPos))}m]"
+                        val str = "${e.displayName.string} [${FormatTool.format1DZ(pos.distanceTo(cameraPos))}m]"
                         guiGraphics.drawString(mc.font, str, -mc.font.width(str) / 2, 10, -1, false)
                         poseStack.popPose()
                     }
@@ -384,7 +384,7 @@ object IFFOverlay : CommonOverlay("iff") {
             } else if (info.onVehicle) {
                 ""
             } else {
-                "${info.name} [${FormatTool.format1D(pos.distanceTo(cameraPos))}m]"
+                "${info.name} [${FormatTool.format1DZ(pos.distanceTo(cameraPos))}m]"
             }
 
             guiGraphics.drawString(mc.font, str, -mc.font.width(str) / 2, height, color, false)
