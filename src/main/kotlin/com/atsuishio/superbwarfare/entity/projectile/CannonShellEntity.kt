@@ -37,8 +37,8 @@ open class CannonShellEntity(type: EntityType<out CannonShellEntity>, level: Lev
     private var fireProbability = 0f
     private var fireTime = 0
 
-    enum class Type {
-        AP, HE, CM, WP
+    enum class Type(val tagName: String) {
+        AP("AP"), HE("HE"), CM("CM"), WP("WP")
     }
 
     private var type: Type? = Type.AP
@@ -65,6 +65,12 @@ open class CannonShellEntity(type: EntityType<out CannonShellEntity>, level: Lev
 
         compound.putFloat("FireProbability", this.fireProbability)
         compound.putInt("FireTime", this.fireTime)
+        compound.putInt("SpreadAmount", this.spreadAmount)
+        compound.putInt("SpreadAngle", this.spreadAngle)
+
+        if (this.type != null) {
+            compound.putString("Type", this.type!!.tagName)
+        }
     }
 
     override fun readAdditionalSaveData(compound: CompoundTag) {
@@ -76,6 +82,19 @@ open class CannonShellEntity(type: EntityType<out CannonShellEntity>, level: Lev
 
         if (compound.contains("FireTime")) {
             this.fireTime = compound.getInt("FireTime")
+        }
+
+        if (compound.contains("SpreadAmount")) {
+            this.spreadAmount = compound.getInt("SpreadAmount")
+        }
+
+        if (compound.contains("SpreadAngle")) {
+            this.spreadAngle = compound.getInt("SpreadAngle")
+        }
+
+        if (compound.contains("Type")) {
+            val type = compound.getString("Type")
+            this.type = Type.valueOf(type)
         }
     }
 
