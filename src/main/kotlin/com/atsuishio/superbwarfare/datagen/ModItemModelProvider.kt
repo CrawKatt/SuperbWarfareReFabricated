@@ -203,7 +203,6 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         simpleItem(ModItems.EFFECTIVE_RESEARCH_MODULE)
         simpleItem(ModItems.BOOST_RESEARCH_MODULE)
 
-        handheldItem(ModItems.SKIN_SPRAY)
         handheldItem(ModItems.VEHICLE_KEY)
 
         // perk
