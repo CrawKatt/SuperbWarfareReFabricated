@@ -24,6 +24,7 @@ import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.atsuishio.superbwarfare.tools.SpritePixelHelper
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
+import com.github.mcmodderanchor.simplebedrockmodel.v1.common.model.BedrockBone
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
 import com.maydaymemory.mae.blend.EulerAdditiveBlender
@@ -31,6 +32,7 @@ import com.maydaymemory.mae.blend.SimpleEulerAdditiveBlender
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import com.mojang.math.Axis
+import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.culling.Frustum
@@ -229,6 +231,70 @@ open class SbmVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             }
         }
 
+        val laserBones = model.laserBones
+        val laserFlag = laserBones.isNotEmpty()
+        if (laserFlag) {
+            customLaserLength(laserBones, entity, partialTick)
+        }
+
+        if (!entity.sympatheticDetonated && laserFlag) {
+            for (laser in laserBones) {
+                poseStack.pushPose()
+                poseStack.mulPoseMatrix(laser.globalTransform)
+
+                val lastPose = poseStack.last()
+                val pose = lastPose.pose()
+                val normal = lastPose.normal()
+
+                val consumerOut = buffer.getBuffer(RenderType.eyes(LASER_TEX))
+                val consumerIn = buffer.getBuffer(RenderType.eyes(LASER_TEX_IN))
+
+                val c = entity.laserColor
+
+                val color = Quaternionf(
+                    ((c shr 16) and 0xFF).toFloat(),
+                    ((c shr 8) and 0xFF).toFloat(),
+                    (c and 0xFF).toFloat(),
+                    255f
+                )
+                val colorW = Quaternionf(255f, 255f, 255f, 255f)
+
+                val scale = entity.laserBaseScale.toFloat()
+
+                renderLaser(consumerOut, pose, normal,scale, color)
+                renderLaser(consumerIn, pose, normal,scale, colorW)
+
+                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
+
+                renderLaser(consumerOut, pose, normal,scale, color)
+                renderLaser(consumerIn, pose, normal,scale, colorW)
+
+                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
+
+                renderLaser(consumerOut, pose, normal,scale, color)
+                renderLaser(consumerIn, pose, normal,scale, colorW)
+
+                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
+
+                renderLaser(consumerOut, pose, normal,scale, color)
+                renderLaser(consumerIn, pose, normal,scale, colorW)
+
+                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
+
+                renderLaser(consumerOut, pose, normal,scale, color)
+                renderLaser(consumerIn, pose, normal,scale, colorW)
+
+                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
+
+                renderLaser(consumerOut, pose, normal,scale, color)
+                renderLaser(consumerIn, pose, normal,scale, colorW)
+
+                poseStack.popPose()
+            }
+
+
+        }
+
         // 自定义图章
         if (dogTagFlag && entity.health > 0) {
             val list = entity.dogTagIcon
@@ -268,18 +334,33 @@ open class SbmVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
         poseStack.popPose()
     }
 
-    private fun vertex(
-        pConsumer: VertexConsumer,
-        pPose: Matrix4f,
-        pNormal: Matrix3f,
-        pLightmapUV: Int,
+    open fun customLaserLength(laserBones: List<BedrockBone>, entity: VehicleEntity, partialTicks: Float) {
+        for (laser in laserBones) {
+            laser.visible = false
+
+            laser.zScale = 10 * entity.laserLength
+            val scale = Mth.lerp(
+                partialTicks,
+                entity.laserScaleO,
+                entity.laserScale
+            ).coerceAtMost(1.2f)
+
+            laser.xScale = scale
+            laser.yScale = scale
+        }
+    }
+
+    fun renderLaser(
+        consumer: VertexConsumer,
+        pose: Matrix4f,
+        normal: Matrix3f,
         pX: Float,
-        pZ: Float,
-        pU: Int,
-        pV: Int
+        color: Quaternionf
     ) {
-        pConsumer.vertex(pPose, pX, 0f, -pZ).color(255, 255, 255, 255).uv(pU.toFloat(), pV.toFloat())
-            .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(pLightmapUV).normal(pNormal, 0f, 1f, 0f).endVertex()
+        vertex(consumer, pose, normal, -pX, 0f, 0, 1, color)
+        vertex(consumer, pose, normal, pX, 0f, 1, 1, color)
+        vertex(consumer, pose, normal, pX, 0.1f, 1, 0, color)
+        vertex(consumer, pose, normal, -pX, 0.1f, 0, 0, color)
     }
 
     open fun tickVariables(vehicle: T, entityYaw: Float, partialTicks: Float) {
@@ -488,20 +569,6 @@ open class SbmVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             barrel.rotation.rotationX(rot)
         }
 
-        // Laser
-        val laser = model.getBone("laser")
-        if (laser != null) {
-            laser.zScale = 10 * vehicle.laserLength
-            val scale = Mth.lerp(
-                partialTicks,
-                vehicle.laserScaleO,
-                vehicle.laserScale
-            ).coerceAtMost(1.2f)
-
-            laser.xScale = scale
-            laser.yScale = scale
-        }
-
         // 乘客武器站
         val passengerWeaponStationYaw = model.getBone("passengerWeaponStationYaw")
 
@@ -642,5 +709,35 @@ open class SbmVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
         val BLENDER: EulerAdditiveBlender = SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }
         val MUZZLE_FLARE = Mod.loc("textures/particle/flare.png")
         val MUZZLE_FLARE_MODEL = Mod.loc("models/bedrock/vehicle/muzzle_flare.geo.json")
+        val LASER_TEX_IN = Mod.loc("textures/bedrock/vehicle/laser_in.png")
+        val LASER_TEX = Mod.loc("textures/bedrock/vehicle/laser.png")
+
+        private fun vertex(
+            pConsumer: VertexConsumer,
+            pPose: Matrix4f,
+            pNormal: Matrix3f,
+            pLightmapUV: Int,
+            pX: Float,
+            pY: Float,
+            pU: Int,
+            pV: Int,
+        ) {
+            pConsumer.vertex(pPose, pX - 0.5f, pY - 0.25f, 0f).color(255, 255, 255, 255).uv(pU.toFloat(), pV.toFloat())
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(pLightmapUV).normal(pNormal, 0f, 1f, 0f).endVertex()
+        }
+
+        private fun vertex(
+            pConsumer: VertexConsumer,
+            pPose: Matrix4f,
+            pNormal: Matrix3f,
+            pX: Float,
+            pZ: Float,
+            pU: Int,
+            pV: Int,
+            color: Quaternionf
+        ) {
+            pConsumer.vertex(pPose, pX, 0f, -pZ).color(color.x.toInt(), color.y.toInt(), color.z.toInt(), color.w.toInt()).uv(pU.toFloat(), pV.toFloat())
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(pNormal, 0f, 1f, 0f).endVertex()
+        }
     }
 }

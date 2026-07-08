@@ -20,6 +20,9 @@ open class BedrockVehicleModel(pojo: BedrockModelPOJO) : BedrockModel(pojo) {
         val FLARE_PATTERN: Pattern = Pattern.compile("^flare.*")
 
         @JvmField
+        val LASER_PATTERN: Pattern = Pattern.compile("^laser.*")
+
+        @JvmField
         val DOG_TAG_PATTERN: Pattern = Pattern.compile("^.*_dogTag$")
     }
 
@@ -38,6 +41,7 @@ open class BedrockVehicleModel(pojo: BedrockModelPOJO) : BedrockModel(pojo) {
     lateinit var rightTrackRot: List<BedrockBone>
 
     lateinit var flareBones: List<BedrockBone>
+    lateinit var laserBones: List<BedrockBone>
 
     lateinit var dogTagBones: List<BedrockBone>
 
@@ -57,6 +61,7 @@ open class BedrockVehicleModel(pojo: BedrockModelPOJO) : BedrockModel(pojo) {
         val rightTrackRot = hashMapOf<Int, BedrockBone>()
 
         val flareBones = mutableListOf<BedrockBone>()
+        val laserBones = mutableListOf<BedrockBone>()
 
         val dogTagBones = mutableListOf<BedrockBone>()
 
@@ -113,6 +118,11 @@ open class BedrockVehicleModel(pojo: BedrockModelPOJO) : BedrockModel(pojo) {
                 flareBones += bone
             }
 
+            val matcherLaser = LASER_PATTERN.matcher(name)
+            if (matcherLaser.matches()) {
+                laserBones += bone
+            }
+
             val matcherDogTag = DOG_TAG_PATTERN.matcher(name)
             if (matcherDogTag.matches()) {
                 dogTagBones += bone
@@ -132,6 +142,7 @@ open class BedrockVehicleModel(pojo: BedrockModelPOJO) : BedrockModel(pojo) {
         this.rightTrackRot = rightTrackRot.toSortedMap().values.toMutableList()
 
         this.flareBones = flareBones
+        this.laserBones = laserBones
 
         this.dogTagBones = dogTagBones
     }

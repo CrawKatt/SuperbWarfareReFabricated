@@ -3348,6 +3348,9 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open val rotateOffsetHeight: Double
         get() = computed().rotateOffsetHeight.toDouble()
 
+    open val laserBaseScale: Double
+        get() = computed().laserScale.toDouble()
+
     open fun getVehicleFlatTransform(partialTicks: Float): Matrix4d {
         return VehicleVecUtils.getVehicleFlatTransform(this, partialTicks)
     }
@@ -4283,6 +4286,9 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     open val hudColor: Int
         get() = computed().hudColor.get()
+
+    open val laserColor: Int
+        get() = computed().laserColor.get()
 
     open var power by POWER
     open var deltaRot by DELTA_ROT

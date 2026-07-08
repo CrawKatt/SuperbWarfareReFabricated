@@ -1,6 +1,8 @@
 {
   "MaxHealth": 400,
   "MaxEnergy": 20000000,
+  "LaserColor": "0x2FF6FF",
+  "LaserScale": 0.2,
   "OBB": [
     {
       "Part": "Collision",
@@ -102,8 +104,8 @@
       "ExplosionRadius": 12,
       "Spread": 0,
       "HeatPerShoot": 50,
-      "NaturalCooldown": 0.7,
-      "ShootAnimationTime": 3,
+      "NaturalCooldown": 1,
+      "ShootAnimationTime": 2,
       "AmmoCostPerShoot": 100000,
       "AmmoType": [
         "FE",
@@ -115,7 +117,7 @@
             "RPM": 1200,
             "Velocity": 6000000000,
             "Damage": 15,
-            "HeatPerShoot": 3,
+            "HeatPerShoot": 2,
             "ShootAnimationTime": 1,
             "AmmoCostPerShoot": 5000,
             "ExplosionDamage": 0,

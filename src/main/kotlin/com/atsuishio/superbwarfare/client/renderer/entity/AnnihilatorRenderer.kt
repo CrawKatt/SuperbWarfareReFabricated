@@ -5,7 +5,9 @@ import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.entity.vehicle.AnnihilatorEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
+import com.github.mcmodderanchor.simplebedrockmodel.v1.common.model.BedrockBone
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
@@ -16,7 +18,6 @@ import net.minecraft.util.Mth
 class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtilleryRenderer(manager) {
     companion object {
         val TEXTURE_GLOW = Mod.loc("textures/bedrock/vehicle/annihilator_glow.png")
-        val TEXTURE_LASER = Mod.loc("textures/bedrock/vehicle/annihilator_laser.png")
         val TEXTURE_POWER = Mod.loc("textures/bedrock/vehicle/annihilator_power.png")
     }
 
@@ -33,9 +34,9 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
         val laser2 = model.getBone("laser2")
         val laser3 = model.getBone("laser3")
 
-        laser1.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_LEFT_LENGTH)
-        laser2.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_MIDDLE_LENGTH)
-        laser3.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_RIGHT_LENGTH)
+        laser1.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_LEFT_LENGTH) * 10
+        laser2.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_MIDDLE_LENGTH) * 10
+        laser3.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_RIGHT_LENGTH) * 10
 
         val energy = vehicle.chargeProgress
 
@@ -49,6 +50,21 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
                 greenBone.visible = energy >= (i / 5.0)
                 redBone.visible = energy < (i / 5.0)
             }
+        }
+    }
+
+    override fun customLaserLength(laserBones: List<BedrockBone>, entity: VehicleEntity, partialTicks: Float) {
+        for (laser in laserBones) {
+            laser.visible = false
+
+            val scale = Mth.lerp(
+                partialTicks,
+                entity.laserScaleO,
+                entity.laserScale
+            ).coerceAtMost(1.2f)
+
+            laser.xScale = scale
+            laser.yScale = scale
         }
     }
 
@@ -94,17 +110,6 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
                 buffer,
                 ModRenderTypes.LASER.apply(TEXTURE_GLOW),
                 BedrockModelRenderTypes.polyMeshCutout(TEXTURE_GLOW),
-                packedLight,
-                OverlayTexture.NO_OVERLAY
-            )
-
-            // laser
-
-            model.renderToBuffer(
-                poseStack,
-                buffer,
-                RenderType.energySwirl(TEXTURE_LASER, 1f, 1f),
-                BedrockModelRenderTypes.polyMeshCutout(TEXTURE_LASER),
                 packedLight,
                 OverlayTexture.NO_OVERLAY
             )

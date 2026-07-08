@@ -1,14 +1,11 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
-import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.PrismTankEntity
-import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.github.mcmodderanchor.simplebedrockmodel.v1.common.model.BedrockBone
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.entity.EntityRendererProvider
-import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.util.Mth
 
 class PrismTankRenderer(manager: EntityRendererProvider.Context) : SbmVehicleRenderer<PrismTankEntity>(manager) {
@@ -34,26 +31,19 @@ class PrismTankRenderer(manager: EntityRendererProvider.Context) : SbmVehicleRen
         fanR.rotation.rotationY(rot)
     }
 
-    override fun renderCustomPart(
-        vehicle: PrismTankEntity,
-        model: BedrockVehicleModel,
-        poseStack: PoseStack,
-        entityYaw: Float,
-        partialTicks: Float,
-        buffer: MultiBufferSource,
-        packedLight: Int
-    ) {
-        super.renderCustomPart(vehicle, model, poseStack, entityYaw, partialTicks, buffer, packedLight)
+    override fun customLaserLength(laserBones: List<BedrockBone>, entity: VehicleEntity, partialTicks: Float) {
+        for (laser in laserBones) {
+            laser.visible = false
 
-        if (vehicle.laserScale > 0) {
-            model.renderToBuffer(
-                poseStack,
-                buffer,
-                RenderType.energySwirl(LASER, 1f, 1f),
-                BedrockModelRenderTypes.polyMeshCutout(LASER),
-                packedLight,
-                OverlayTexture.NO_OVERLAY
-            )
+            laser.zScale = 10 * entity.laserLength
+            val scale = Mth.lerp(
+                partialTicks,
+                entity.laserScaleO,
+                entity.laserScale
+            ).coerceAtMost(1.2f)
+
+            laser.xScale = scale
+            laser.yScale = 2.8f * scale
         }
     }
 
@@ -116,9 +106,5 @@ class PrismTankRenderer(manager: EntityRendererProvider.Context) : SbmVehicleRen
         if (t <= 99.25) return Mth.lerp((t - 98.8333f) / (99.25f - 98.8333f), -3.03f, -1.95f)
 
         return Mth.lerp((t - 99.25f) / (100f - 99.25f), -1.95f, 0f)
-    }
-
-    companion object {
-        val LASER = Mod.loc("textures/bedrock/vehicle/prism_tank_laser.png")
     }
 }

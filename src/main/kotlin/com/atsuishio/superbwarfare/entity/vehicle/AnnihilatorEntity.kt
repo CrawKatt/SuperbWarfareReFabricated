@@ -112,7 +112,7 @@ open class AnnihilatorEntity(type: EntityType<AnnihilatorEntity>, world: Level) 
             )
         )
 
-        val hitPos = result.getLocation()
+        val hitPos = result.location
         val blockPos = result.blockPos
 
         val hardness = this.level().getBlockState(blockPos).block.defaultDestroyTime()
@@ -122,15 +122,17 @@ open class AnnihilatorEntity(type: EntityType<AnnihilatorEntity>, world: Level) 
             this.level().destroyBlock(blockPos, true)
         }
 
-        causeLaserExplode(hitPos, data, living)
-        this.level().explode(
-            living,
-            hitPos.x,
-            hitPos.y,
-            hitPos.z,
-            (data.get(GunProp.EXPLOSION_RADIUS) * 0.5f).toFloat(),
-            if (ExplosionConfig.EXPLOSION_DESTROY.get()) Level.ExplosionInteraction.BLOCK else Level.ExplosionInteraction.NONE
-        )
+        if (level().getBlockState(blockPos).canOcclude()) {
+            causeLaserExplode(hitPos, data, living)
+            this.level().explode(
+                living,
+                hitPos.x,
+                hitPos.y,
+                hitPos.z,
+                (data.get(GunProp.EXPLOSION_RADIUS) * 0.5f).toFloat(),
+                if (ExplosionConfig.EXPLOSION_DESTROY.get()) Level.ExplosionInteraction.BLOCK else Level.ExplosionInteraction.NONE
+            )
+        }
 
         return pos.distanceTo(hitPos).toFloat()
     }
@@ -272,21 +274,15 @@ open class AnnihilatorEntity(type: EntityType<AnnihilatorEntity>, world: Level) 
                 val shootPos = gunData.get(GunProp.SHOOT_POS)
                 val list = shootPos.positions
                 val size = list.size
-
                 val index: Int = if (shootPos.boundUpWithAmmoAmount) {
                     Mth.clamp(gunData.ammo.get() - 1, 0, size)
                 } else {
                     gunData.fireIndex.get() % size
                 }
-
-                sendPacketToAll(
-                    VehicleShootClientMessage(
-                        living.uuid,
-                        this.uuid,
-                        index
-                    )
-                )
+                sendPacketToAll(VehicleShootClientMessage(living.uuid, this.uuid, index, "Main"))
             }
+
+            laserScale = gunData.get(GunProp.SHOOT_ANIMATION_TIME).toFloat()
 
             gunData.shakePlayers(this)
             playShootSound3p(living, gunData, barrelMiddlePos)

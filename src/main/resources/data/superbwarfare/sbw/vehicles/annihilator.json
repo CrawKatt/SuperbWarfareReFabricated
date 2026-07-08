@@ -5,6 +5,8 @@
   "TurretPitchRange": [-5, 45],
   "BarrelPos": [0, 1.797, 4.95],
   "MaxEnergy": 20000000,
+  "LaserColor": "0x00FF00",
+  "LaserScale": 0.2,
   "OBB": [
     {
       "Size": [6.4375, 1.875, 3.3125],
@@ -137,7 +139,7 @@
       "Damage": 1000,
       "ExplosionDamage": 72,
       "ExplosionRadius": 16,
-      "ShootAnimationTime": 12,
+      "ShootAnimationTime": 2,
       "AmmoCostPerShoot": 2000000,
       "AmmoType": "FE",
       "RecoilTime": 42,

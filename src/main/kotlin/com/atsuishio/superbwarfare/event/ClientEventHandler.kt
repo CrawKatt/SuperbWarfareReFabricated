@@ -1774,42 +1774,52 @@ object ClientEventHandler {
             val cooldown = (1000 / rps).roundToInt()
 
             if (holdFireVehicle) {
-                if (!clientTimerVehicle.started()) {
-                    clientTimerVehicle.start()
-                    // 首发瞬间发射
-                    clientTimerVehicle.progress = (cooldown + 1).toLong()
-                }
-
-                if (clientTimerVehicle.progress >= cooldown) {
-                    var newProgress = clientTimerVehicle.progress
-
-                    // 低帧率下的开火次数补偿
-                    do {
-                        sendPacketToServer(
-                            VehicleFireMessage(
-                                if (lockingEntityVehicle != null) lockingEntityVehicle!!.uuid else null,
-                                if (lockingPosVehicle != null) lockingPosVehicle!!.toVector3f() else (if (gunData.get(GunProp.SEEK_WEAPON_INFO)?.inputBlockPos == true) missileLockingPos?.center?.toVector3f() else null)
-                            )
-                        )
-//                        FORGE_BUS.post(ClientVehicleFireEvent(vehicle, player))
-                        if (mc.options.cameraType == CameraType.FIRST_PERSON || zoomVehicle) {
-                            playVehicleClientSounds(player, vehicle)
-                        }
-
-                        newProgress -= cooldown
-                    } while (newProgress - cooldown > 0)
-
-                    clientTimerVehicle.progress = newProgress
-                }
                 if (gunData.get(GunProp.DEFAULT_FIRE_MODE) == "Semi") {
-                    holdFireVehicle = false
+                    if (clientTimerVehicle.progress == 0L) {
+                        clientTimerVehicle.start()
+                        clientShootVehicle(player, vehicle, gunData)
+                    }
+                } else {
+                    if (!clientTimerVehicle.started()) {
+                        clientTimerVehicle.start()
+                        // 首发瞬间发射
+                        clientTimerVehicle.progress = cooldown.toLong() + 1L
+                    }
+
+                    if (clientTimerVehicle.progress >= cooldown) {
+                        var newProgress = clientTimerVehicle.progress
+
+                        // 低帧率下的开火次数补偿
+                        do {
+                            clientShootVehicle(player, vehicle, gunData)
+                            newProgress -= cooldown
+                        } while (newProgress - cooldown > 0)
+
+                        clientTimerVehicle.progress = newProgress
+                    }
+                }
+
+                if (notInGame) {
                     clientTimerVehicle.stop()
                 }
+
             } else if (clientTimerVehicle.progress >= cooldown) {
                 clientTimerVehicle.stop()
             }
         } else {
             clientTimerVehicle.stop()
+        }
+    }
+
+    fun clientShootVehicle(player: Player, vehicle: VehicleEntity, gunData: GunData) {
+        sendPacketToServer(
+            VehicleFireMessage(
+                if (lockingEntityVehicle != null) lockingEntityVehicle!!.uuid else null,
+                if (lockingPosVehicle != null) lockingPosVehicle!!.toVector3f() else (if (gunData.get(GunProp.SEEK_WEAPON_INFO)?.inputBlockPos == true) missileLockingPos?.center?.toVector3f() else null)
+            )
+        )
+        if (mc.options.cameraType == CameraType.FIRST_PERSON || zoomVehicle) {
+            playVehicleClientSounds(player, vehicle)
         }
     }
 

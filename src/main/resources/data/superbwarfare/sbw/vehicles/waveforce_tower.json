@@ -13,6 +13,8 @@
     "MinTargetSize": 0.25,
     "SeekEnergyCost": 5000
   },
+  "LaserColor": "0x2FF6FF",
+  "LaserScale": 0.1,
   "Weapons": {
     "Main": {
       "DefaultFireMode": "Auto",
