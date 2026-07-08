@@ -305,6 +305,7 @@ object ModItems {
     @JvmField val VEHICLE_RESET_KIT = registerItem("vehicle_reset_kit") { VehicleResetKitItem() }
     @JvmField val SKIN_SPRAY = registerItem("skin_spray") { SkinSprayItem() }
     @JvmField val VEHICLE_KEY = registerItem("vehicle_key") { VehicleKeyItem() }
+    @JvmField val CREATIVE_VEHICLE_KEY = registerItem("creative_vehicle_key") { CreativeVehicleKeyItem() }
 
     @JvmField val TUNGSTEN_ROD = registerItem("tungsten_rod")
 

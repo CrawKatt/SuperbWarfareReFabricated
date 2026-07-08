@@ -208,6 +208,7 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         simpleItem(ModItems.BOOST_RESEARCH_MODULE)
 
         handheldItem(ModItems.VEHICLE_KEY)
+        handheldItem(ModItems.CREATIVE_VEHICLE_KEY)
 
         // cemented carbide tools
         handheldItem(ModItems.CEMENTED_CARBIDE_SWORD)
