@@ -48,35 +48,35 @@ open class ContainerBlock :
     }
 
     override fun use(
-        pState: BlockState,
-        pLevel: Level,
-        pPos: BlockPos,
-        pPlayer: Player,
-        pHand: InteractionHand,
-        pHit: BlockHitResult
+        state: BlockState,
+        level: Level,
+        pos: BlockPos,
+        player: Player,
+        hand: InteractionHand,
+        hit: BlockHitResult
     ): InteractionResult {
-        val blockEntity = pLevel.getBlockEntity(pPos)
-        if (pLevel.isClientSide
-            || pState.getValue(OPENED)
+        val blockEntity = level.getBlockEntity(pos)
+        if (level.isClientSide
+            || state.getValue(OPENED)
             || blockEntity !is ContainerBlockEntity
         ) return InteractionResult.PASS
 
-        val stack = pPlayer.getItemInHand(pHand)
+        val stack = player.mainHandItem
         if (!stack.`is`(ModTags.Items.TOOLS_CROWBAR)) {
-            pPlayer.displayClientMessage(Component.translatable("des.superbwarfare.container.fail.crowbar"), true)
+            player.displayClientMessage(Component.translatable("des.superbwarfare.container.fail.crowbar"), true)
             return InteractionResult.PASS
         }
 
-        if (!hasEntity(pLevel, pPos)) {
-            pPlayer.displayClientMessage(Component.translatable("des.superbwarfare.container.fail.empty"), true)
+        if (!hasEntity(level, pos)) {
+            player.displayClientMessage(Component.translatable("des.superbwarfare.container.fail.empty"), true)
             return InteractionResult.PASS
         }
 
-        if (canOpen(pLevel, pPos, blockEntity.entityType, blockEntity.entityTag)) {
-            pLevel.setBlockAndUpdate(pPos, pState.setValue(OPENED, true))
-            pLevel.playSound(
+        if (canOpen(level, pos, blockEntity.entityType, blockEntity.entityTag)) {
+            level.setBlockAndUpdate(pos, state.setValue(OPENED, true))
+            level.playSound(
                 null,
-                BlockPos.containing(pPos.x.toDouble(), pPos.y.toDouble(), pPos.z.toDouble()),
+                BlockPos.containing(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()),
                 ModSounds.OPEN.get(),
                 SoundSource.BLOCKS,
                 1f,
@@ -85,7 +85,7 @@ open class ContainerBlock :
 
             return InteractionResult.SUCCESS
         } else {
-            pPlayer.displayClientMessage(Component.translatable("des.superbwarfare.container.fail.open"), true)
+            player.displayClientMessage(Component.translatable("des.superbwarfare.container.fail.open"), true)
             return InteractionResult.PASS
         }
     }

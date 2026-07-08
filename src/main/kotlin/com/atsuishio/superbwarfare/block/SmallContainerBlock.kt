@@ -55,7 +55,7 @@ open class SmallContainerBlock :
             return InteractionResult.PASS
         }
 
-        val stack = pPlayer.getItemInHand(pHand)
+        val stack = pPlayer.mainHandItem
         if (!stack.`is`(ModTags.Items.TOOLS_CROWBAR)) {
             pPlayer.displayClientMessage(Component.translatable("des.superbwarfare.container.fail.crowbar"), true)
             return InteractionResult.PASS
@@ -79,20 +79,14 @@ open class SmallContainerBlock :
     override fun <T : BlockEntity?> getTicker(
         pLevel: Level,
         pState: BlockState,
-        pBlockEntityType: BlockEntityType<T?>
+        pBlockEntityType: BlockEntityType<T>
     ): BlockEntityTicker<T?>? {
         if (!pLevel.isClientSide) {
-            return createTickerHelper<SmallContainerBlockEntity?, T?>(
+            return createTickerHelper<SmallContainerBlockEntity, T>(
                 pBlockEntityType,
-                ModBlockEntities.SMALL_CONTAINER.get()
-            ) { pLevel, pPos, pState, blockEntity ->
-                SmallContainerBlockEntity.serverTick(
-                    pLevel,
-                    pPos,
-                    pState,
-                    blockEntity
-                )
-            }
+                ModBlockEntities.SMALL_CONTAINER.get(),
+                SmallContainerBlockEntity::serverTick
+            )
         }
         return null
     }

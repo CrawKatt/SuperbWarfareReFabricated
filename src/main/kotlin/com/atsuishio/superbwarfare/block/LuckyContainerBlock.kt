@@ -33,7 +33,7 @@ import net.minecraft.world.phys.shapes.VoxelShape
 import javax.annotation.ParametersAreNonnullByDefault
 
 @Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
-class LuckyContainerBlock :
+open class LuckyContainerBlock :
     BaseEntityBlock(Properties.of().sound(SoundType.METAL).strength(3.0f).noOcclusion().requiresCorrectToolForDrops()) {
     init {
         this.registerDefaultState(
@@ -56,7 +56,7 @@ class LuckyContainerBlock :
             || pLevel.getBlockEntity(pPos) !is LuckyContainerBlockEntity
         ) return InteractionResult.PASS
 
-        val stack = pPlayer.getItemInHand(pHand)
+        val stack = pPlayer.mainHandItem
         if (!stack.`is`(ModTags.Items.TOOLS_CROWBAR)) {
             pPlayer.displayClientMessage(Component.translatable("des.superbwarfare.container.fail.crowbar"), true)
             return InteractionResult.PASS
@@ -78,20 +78,14 @@ class LuckyContainerBlock :
     override fun <T : BlockEntity?> getTicker(
         pLevel: Level,
         pState: BlockState,
-        pBlockEntityType: BlockEntityType<T?>
+        pBlockEntityType: BlockEntityType<T>
     ): BlockEntityTicker<T?>? {
         if (!pLevel.isClientSide) {
-            return createTickerHelper<LuckyContainerBlockEntity?, T?>(
+            return createTickerHelper<LuckyContainerBlockEntity, T>(
                 pBlockEntityType,
-                ModBlockEntities.LUCKY_CONTAINER.get()
-            ) { pLevel, pPos, pState, blockEntity ->
-                LuckyContainerBlockEntity.serverTick(
-                    pLevel,
-                    pPos,
-                    pState,
-                    blockEntity
-                )
-            }
+                ModBlockEntities.LUCKY_CONTAINER.get(),
+                LuckyContainerBlockEntity::serverTick
+            )
         }
         return null
     }
