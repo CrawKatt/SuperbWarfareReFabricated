@@ -15,7 +15,9 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 
-class VehicleKeyItem : Item(Properties().stacksTo(1)), IVehicleInteract {
+open class VehicleKeyItem(properties: Properties) : Item(properties), IVehicleInteract {
+    constructor() : this(Properties().stacksTo(1))
+
     override fun appendHoverText(
         stack: ItemStack,
         level: Level?,
@@ -71,6 +73,14 @@ class VehicleKeyItem : Item(Properties().stacksTo(1)), IVehicleInteract {
         hand: InteractionHand
     ): InteractionResult {
         val uuid = stack.tag?.getString(TAG_UUID) ?: return InteractionResult.FAIL
+        if (!vehicle.passengers.isEmpty()) {
+            player.displayClientMessage(
+                Component.translatable("tips.superbwarfare.vehicle.lock_not_empty")
+                    .withStyle(ChatFormatting.RED), true
+            )
+            return InteractionResult.FAIL
+        }
+
         if (!vehicle.locked) {
             if (vehicle.lastDriverUUID == uuid || vehicle.lastDriverUUID == "undefined") {
                 vehicle.lastDriverUUID = uuid

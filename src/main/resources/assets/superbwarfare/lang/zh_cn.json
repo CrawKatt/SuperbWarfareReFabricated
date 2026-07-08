@@ -362,6 +362,8 @@
   "curios.identifier.tactical_terminal": "单兵战术终端",
   "des.superbwarfare.tactical_terminal": "右击使用或装备时按下%1$s以打开战术地图",
   "des.superbwarfare.tactical_terminal.disabled": "已禁用，请查看服务端配置文件",
+  "item.superbwarfare.creative_vehicle_key": "创造车钥匙",
+  "des.superbwarfare.creative_vehicle_key": "可以锁定和解锁任意载具",
 
   "attribute.superbwarfare.bullet_resistance": "子弹防护",
 
@@ -839,6 +841,7 @@
   "tips.superbwarfare.vehicle.lock_fail": "这不是你的载具",
   "tips.superbwarfare.vehicle.lock_hurt": "你的位于[%1$s, %2$s, %3$s]的载具%4$s正在遭受攻击",
   "tips.superbwarfare.vehicle.lock_destroy": "你的位于[%1$s, %2$s, %3$s]的载具%4$s已被损毁",
+  "tips.superbwarfare.vehicle.lock_not_empty": "只有空车才能上锁",
 
   "tips.superbwarfare.target.yaw": "目标偏航角: ",
   "tips.superbwarfare.target.pitch": "目标俯仰角: ",
