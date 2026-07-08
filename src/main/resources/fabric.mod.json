@@ -8,7 +8,7 @@
     "${mod_authors}"
   ],
   "contact": {
-    "sources": "https://github.com/Atsuishio/SuperbWarfareReFabricated"
+    "sources": "https://github.com/CrawKatt/SuperbWarfareReFabricated"
   },
   "license": "${mod_license}",
   "icon": "logo.png",
