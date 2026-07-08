@@ -287,6 +287,8 @@ tasks.named<ProcessResources>("processResources") {
 }
 
 tasks.named<Jar>("jar") {
+    from("COPYING", "COPYING.LESSER")
+
     manifest {
         attributes(
             "Specification-Title" to project.property("mod_id"),
@@ -299,6 +301,10 @@ tasks.named<Jar>("jar") {
         )
     }
     finalizedBy("reobfJar")
+}
+
+tasks.named<Jar>("jarJar") {
+    from("COPYING", "COPYING.LESSER")
 }
 
 java {
