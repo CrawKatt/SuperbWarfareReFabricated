@@ -33,9 +33,9 @@ open class BiogasGeneratorBlock :
         )
     }
 
-    val codec: MapCodec<BiogasGeneratorBlock> = simpleCodec { _ -> BiogasGeneratorBlock() }
+    private val blockCodec: MapCodec<BiogasGeneratorBlock> = simpleCodec { _ -> BiogasGeneratorBlock() }
 
-    override fun codec(): MapCodec<out BaseEntityBlock> = codec
+    override fun codec(): MapCodec<out BaseEntityBlock> = blockCodec
 
     override fun getRenderShape(pState: BlockState): RenderShape {
         return RenderShape.MODEL
