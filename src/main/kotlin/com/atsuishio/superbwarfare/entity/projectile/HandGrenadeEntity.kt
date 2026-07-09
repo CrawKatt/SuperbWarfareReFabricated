@@ -8,7 +8,6 @@ import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessag
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import com.atsuishio.superbwarfare.tools.sendPacketTo
 import com.atsuishio.superbwarfare.world.phys.ExtendedEntityRayTraceResult
-import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
@@ -20,10 +19,9 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
-import net.minecraft.world.phys.Vec3
 import kotlin.math.min
 
-open class HandGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity {
+open class HandGrenadeEntity : BounceProjectile, BasicGeoProjectileEntity {
     constructor(type: EntityType<out HandGrenadeEntity>, level: Level) : super(type, level)
 
     constructor(type: EntityType<out HandGrenadeEntity>, x: Double, y: Double, z: Double, level: Level) :
@@ -54,9 +52,9 @@ open class HandGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity
             val volume = min(4f, speed.toFloat() / 4f + 0.5f)
             this.level().playSound(
                 null,
-                result.getLocation().x,
-                result.getLocation().y,
-                result.getLocation().z,
+                result.location.x,
+                result.location.y,
+                result.location.z,
                 event,
                 SoundSource.AMBIENT,
                 volume,
@@ -104,17 +102,6 @@ open class HandGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity
                 level, ParticleTypes.SMOKE, this.xo, this.yo, this.zo,
                 1, 0.0, 0.0, 0.0, 0.01, true
             )
-        }
-        if (isInFluidType) {
-            deltaMovement = deltaMovement.scale(0.75)
-        }
-
-        // 接近静止且下方有固体方块时，彻底停止移动，避免因重力反复微弹跳
-        if (!level.isClientSide && this.deltaMovement.length() < 0.08) {
-            val groundPos = BlockPos.containing(this.position().subtract(0.0, 0.15, 0.0))
-            if (level.getBlockState(groundPos).isSolid) {
-                this.deltaMovement = Vec3.ZERO
-            }
         }
     }
 

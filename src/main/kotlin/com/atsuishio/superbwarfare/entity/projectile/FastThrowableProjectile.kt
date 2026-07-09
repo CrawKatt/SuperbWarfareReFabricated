@@ -20,7 +20,6 @@ import com.atsuishio.superbwarfare.tools.VectorTool.isInLiquid
 import com.atsuishio.superbwarfare.world.phys.ExtendedEntityRayTraceResult
 import com.atsuishio.superbwarfare.world.saveddata.ProjectileChunkSavedData
 import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
@@ -268,11 +267,45 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
             // 4. 仅对最近的命中目标调用一次 onHit（与原版 ThrowableProjectile 一致）
             if (closestHit != null) {
                 this.onHit(closestHit)
-                // 命中后将位置设置到碰撞点，确保反弹等逻辑从正确的表面开始
-                val hitLoc = closestHit.location
-                this.setPos(hitLoc.x, hitLoc.y, hitLoc.z)
             }
         }
+
+        projectileMove(level())
+
+        // 同步动量与位置到客户端
+        this.syncMotion()
+
+        if (this.tickCount > lifeValue) {
+            if (explosionRadiusValue > 0) {
+                causeExplode(position())
+            }
+            this.discard()
+        }
+
+        if (!this.isFastMoving && this.isFastMoving() && this.level().isClientSide) {
+            playFlySound.accept(this)
+            playNearFlySound.accept(this)
+        }
+        this.isFastMoving = this.isFastMoving()
+
+        // 每 tick 将当前所在区块加入强制加载队列，由 ProjectileChunkManager 在 tick 末尾统一处理
+        if (level is ServerLevel) {
+            if (forceLoadChunk() && ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()) {
+                val currentChunkPos = this.chunkPosition()
+                val nextChunkPos = ChunkPos(BlockPos.containing(position().add(deltaMovement)))
+                val nextNextChunkPos = ChunkPos(BlockPos.containing(position().add(deltaMovement.scale(2.0))))
+                ProjectileChunkSavedData.queueForceLoad(level() as ServerLevel, currentChunkPos)
+                if (nextChunkPos != currentChunkPos) {
+                    ProjectileChunkSavedData.queueForceLoad(level() as ServerLevel, nextChunkPos)
+                }
+                if (nextNextChunkPos != nextChunkPos) {
+                    ProjectileChunkSavedData.queueForceLoad(level() as ServerLevel, nextNextChunkPos)
+                }
+            }
+        }
+    }
+
+    open fun projectileMove(level: Level) {
         // 客户端位置由 ClientMotionSyncMessage 每 tick 同步，不再自行推算
 
         val vec = this.deltaMovement
@@ -290,40 +323,8 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
 
         this.setPos(posX, posY, posZ)
 
-        if (this.tickCount > lifeValue) {
-            if (explosionRadiusValue > 0) {
-                causeExplode(position())
-            }
-            this.discard()
-        }
-
-        if (!this.isFastMoving && this.isFastMoving() && this.level().isClientSide) {
-            playFlySound.accept(this)
-            playNearFlySound.accept(this)
-        }
-        this.isFastMoving = this.isFastMoving()
-
         if (level is ServerLevel && this.canPassThroughFluid() && isInLiquid(level, position())) {
             this.deltaMovement = this.deltaMovement.scale(this.underwaterMotionScaleValue.toDouble().coerceIn(0.0, 1.0))
-        }
-
-        // 同步动量与位置到客户端
-        this.syncMotion()
-
-        // 每 tick 将当前所在区块加入强制加载队列，由 ProjectileChunkManager 在 tick 末尾统一处理
-        if (level is ServerLevel) {
-            if (forceLoadChunk() && ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()) {
-                val currentChunkPos = this.chunkPosition()
-                val nextChunkPos = ChunkPos(BlockPos.containing(position().add(deltaMovement)))
-                val nextNextChunkPos = ChunkPos(BlockPos.containing(position().add(deltaMovement.scale(2.0))))
-                ProjectileChunkSavedData.queueForceLoad(level() as ServerLevel, currentChunkPos)
-                if (nextChunkPos != currentChunkPos) {
-                    ProjectileChunkSavedData.queueForceLoad(level() as ServerLevel, nextChunkPos)
-                }
-                if (nextNextChunkPos != nextChunkPos) {
-                    ProjectileChunkSavedData.queueForceLoad(level() as ServerLevel, nextNextChunkPos)
-                }
-            }
         }
     }
 
@@ -767,26 +768,6 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         this.xRot = (-Mth.atan2(vec3.y, d0) * (180f / Math.PI.toFloat()).toDouble()).toFloat()
         this.yRotO = this.yRot
         this.xRotO = this.xRot
-    }
-
-    open fun bounce(direction: Direction) {
-        val speed = this.deltaMovement.length()
-        if (speed < 0.15) {
-            this.deltaMovement = Vec3.ZERO
-            return
-        }
-
-        when (direction.axis) {
-            Direction.Axis.X -> this.deltaMovement = this.deltaMovement.multiply(-0.6, 0.8, 0.8)
-            Direction.Axis.Y -> {
-                this.deltaMovement = this.deltaMovement.multiply(0.8, -0.5, 0.8)
-                if (this.deltaMovement.y() < this.getCustomGravity()) {
-                    this.deltaMovement = this.deltaMovement.multiply(1.0, 0.0, 1.0)
-                }
-            }
-
-            Direction.Axis.Z -> this.deltaMovement = this.deltaMovement.multiply(0.8, 0.8, -0.6)
-        }
     }
 
     companion object {
