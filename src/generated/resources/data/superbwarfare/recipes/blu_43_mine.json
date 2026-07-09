@@ -9,7 +9,7 @@
       "item": "superbwarfare:high_energy_explosives"
     },
     "c": {
-      "item": "minecraft:green_concrete"
+      "tag": "forge:plates/plastic"
     }
   },
   "pattern": [

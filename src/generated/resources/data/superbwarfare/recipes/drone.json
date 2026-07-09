@@ -9,10 +9,7 @@
       "item": "superbwarfare:motor"
     },
     "c": {
-      "item": "minecraft:compass"
-    },
-    "d": {
-      "tag": "forge:nuggets/iron"
+      "tag": "forge:plates/plastic"
     },
     "e": {
       "item": "superbwarfare:cell"
@@ -21,7 +18,7 @@
   "pattern": [
     "a a",
     "bcb",
-    "ded"
+    " e "
   ],
   "result": {
     "count": 4,

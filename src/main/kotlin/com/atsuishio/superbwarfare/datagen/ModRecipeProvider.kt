@@ -59,6 +59,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
     companion object {
         val PLATES_COPPER: TagKey<Item> = commonItemTag("plates/copper")
         val PLATES_STEEL: TagKey<Item> = commonItemTag("plates/steel")
+        val PLATES_PLASTIC: TagKey<Item> = commonItemTag("plates/plastic")
         val INGOTS_STEEL: TagKey<Item> = commonItemTag("ingots/steel")
         val INGOTS_LEAD: TagKey<Item> = commonItemTag("ingots/lead")
         val INGOTS_SILVER: TagKey<Item> = commonItemTag("ingots/silver")
@@ -262,7 +263,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 .pattern("bc")
                 .define('a', Items.REDSTONE_TORCH)
                 .define('b', Items.STONE_BUTTON)
-                .define('c', Tags.Items.INGOTS_IRON)
+                .define('c', PLATES_PLASTIC)
                 .unlockedBy(getHasName(Items.REDSTONE_TORCH), has(Items.REDSTONE_TORCH))
                 .save(writer, loc(getItemName(ModItems.DETONATOR.get())))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.ELECTRIC_BATON.get())
@@ -284,11 +285,11 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 .save(writer, loc(getItemName(ModItems.KNIFE.get())))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MONITOR.get())
                 .pattern("a a")
-                .pattern("bcb")
-                .pattern("ded")
+                .pattern("beb")
+                .pattern("dcd")
                 .define('a', Items.LIGHTNING_ROD)
                 .define('b', Items.LEVER)
-                .define('c', Tags.Items.INGOTS_IRON)
+                .define('c', PLATES_PLASTIC)
                 .define('d', Items.AMETHYST_SHARD)
                 .define('e', Tags.Items.GLASS_PANES)
                 .unlockedBy(getHasName(Items.LIGHTNING_ROD), has(Items.LIGHTNING_ROD))
@@ -329,7 +330,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 .pattern("b")
                 .pattern("c")
                 .define('a', Items.TARGET)
-                .define('b', INGOTS_STEEL)
+                .define('b', PLATES_STEEL)
                 .define('c', Items.ARMOR_STAND)
                 .unlockedBy(getHasName(Items.TARGET), has(Items.TARGET))
                 .save(writer, loc(getItemName(ModItems.TARGET_DEPLOYER.get())))
@@ -513,7 +514,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 .pattern("c")
                 .define('a', Items.STONE_PRESSURE_PLATE)
                 .define('b', ModItems.HIGH_ENERGY_EXPLOSIVES.get())
-                .define('c', Items.GREEN_CONCRETE)
+                .define('c', PLATES_PLASTIC)
                 .unlockedBy(
                     getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES.get()),
                     has(ModItems.HIGH_ENERGY_EXPLOSIVES.get())
@@ -1032,10 +1033,9 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.AP_HEAD.get(), 2)
                 .pattern(" e ")
                 .pattern("bdb")
-                .pattern("cac")
-                .define('a', ModItems.HIGH_ENERGY_EXPLOSIVES.get())
-                .define('b', Tags.Items.INGOTS_IRON)
-                .define('c', INGOTS_STEEL)
+                .pattern(" a ")
+                .define('a', Items.GUNPOWDER)
+                .define('b', PLATES_STEEL)
                 .define('d', ModItems.TUNGSTEN_ROD.get())
                 .define('e', ModItems.FUSEE.get())
                 .unlockedBy(
@@ -1145,10 +1145,9 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.CM_HEAD.get(), 2)
                 .pattern("ddd")
                 .pattern("bdb")
-                .pattern("cac")
+                .pattern(" a ")
                 .define('a', Items.GUNPOWDER)
-                .define('b', Tags.Items.INGOTS_IRON)
-                .define('c', INGOTS_STEEL)
+                .define('b', PLATES_STEEL)
                 .define('d', ModItems.GRENADE_40MM.get())
                 .unlockedBy(getHasName(ModItems.GRENADE_40MM.get()), has(ModItems.GRENADE_40MM.get()))
                 .save(writer, loc(getItemName(ModItems.CM_HEAD.get())))
@@ -1225,20 +1224,18 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.GS_HEAD.get(), 2)
                 .pattern("ddd")
                 .pattern("bdb")
-                .pattern("cac")
+                .pattern(" a ")
                 .define('a', Items.GUNPOWDER)
-                .define('b', Tags.Items.INGOTS_IRON)
-                .define('c', INGOTS_STEEL)
+                .define('b', PLATES_STEEL)
                 .define('d', INGOTS_LEAD)
                 .unlockedBy(getHasName(Items.GUNPOWDER), has(Items.GUNPOWDER))
                 .save(writer, loc(getItemName(ModItems.GS_HEAD.get())))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WP_HEAD.get(), 2)
                 .pattern("ede")
                 .pattern("bdb")
-                .pattern("cac")
+                .pattern(" a ")
                 .define('a', Items.GUNPOWDER)
-                .define('b', Tags.Items.INGOTS_IRON)
-                .define('c', INGOTS_STEEL)
+                .define('b', PLATES_STEEL)
                 .define('d', Items.BONE_MEAL)
                 .define('e', Items.BLAZE_POWDER)
                 .unlockedBy(getHasName(Items.GUNPOWDER), has(Items.GUNPOWDER))
@@ -1246,10 +1243,10 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.HE_HEAD.get(), 2)
                 .pattern(" e ")
                 .pattern("bab")
-                .pattern("cac")
+                .pattern(" c ")
                 .define('a', ModItems.HIGH_ENERGY_EXPLOSIVES.get())
-                .define('b', Tags.Items.INGOTS_IRON)
-                .define('c', INGOTS_STEEL)
+                .define('b', PLATES_STEEL)
+                .define('c', Items.GUNPOWDER)
                 .define('e', ModItems.FUSEE.get())
                 .unlockedBy(
                     getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES.get()),
@@ -1407,28 +1404,24 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 .unlockedBy(getHasName(ModItems.GRAIN.get()), has(ModItems.GRAIN.get()))
                 .save(writer, loc(getItemName(ModItems.MISSILE_ENGINE.get())))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MORTAR_BARREL.get())
-                .pattern("a a")
-                .pattern("a a")
-                .pattern("aba")
-                .define('a', Tags.Items.INGOTS_IRON)
-                .define('b', Tags.Items.DYES_GREEN)
+                .pattern("a")
+                .pattern("a")
+                .pattern("a")
+                .define('a', PLATES_STEEL)
                 .unlockedBy(getHasName(Items.IRON_INGOT), has(Tags.Items.INGOTS_IRON))
                 .save(writer, loc(getItemName(ModItems.MORTAR_BARREL.get())))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MORTAR_BASE_PLATE.get())
-                .pattern(" b ")
-                .pattern("aaa")
-                .define('a', Tags.Items.INGOTS_IRON)
-                .define('b', Tags.Items.DYES_GREEN)
+                .pattern("b")
+                .pattern("a")
+                .define('a', PLATES_STEEL)
+                .define('b', Items.IRON_NUGGET)
                 .unlockedBy(getHasName(Items.IRON_INGOT), has(Tags.Items.INGOTS_IRON))
                 .save(writer, loc(getItemName(ModItems.MORTAR_BASE_PLATE.get())))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MORTAR_BIPOD.get())
                 .pattern(" a ")
                 .pattern("bbb")
-                .pattern("cdc")
-                .define('a', Tags.Items.INGOTS_IRON)
-                .define('b', Tags.Items.NUGGETS_IRON)
-                .define('c', Items.IRON_BARS)
-                .define('d', Tags.Items.DYES_GREEN)
+                .define('a', INGOTS_STEEL)
+                .define('b', Items.IRON_BARS)
                 .unlockedBy(getHasName(Items.IRON_BARS), has(Items.IRON_BARS))
                 .save(writer, loc(getItemName(ModItems.MORTAR_BIPOD.get())))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MOTOR.get(), 2)
@@ -2202,7 +2195,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 writer,
                 ModItems.GLOCK_17_BLUEPRINT.get(),
                 GunRarity.COMMON,
-                Items.IRON_INGOT,
+                PLATES_PLASTIC,
                 ModItems.GLOCK_17.get()
             )
             gunSmithing(
@@ -2216,7 +2209,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 writer,
                 ModItems.GLOCK_18_BLUEPRINT.get(),
                 GunRarity.RARE,
-                Items.GOLD_INGOT,
+                PLATES_PLASTIC,
                 ModItems.GLOCK_18.get()
             )
             gunSmithing(
@@ -2330,7 +2323,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 writer,
                 ModItems.TASER_BLUEPRINT.get(),
                 GunRarity.COMMON,
-                Items.YELLOW_CONCRETE,
+                PLATES_PLASTIC,
                 ModItems.TASER.get()
             )
             gunSmithing(
@@ -2344,7 +2337,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 writer,
                 ModItems.QBZ_95_BLUEPRINT.get(),
                 GunRarity.RARE,
-                INGOTS_STEEL,
+                PLATES_PLASTIC,
                 ModItems.QBZ_95.get()
             )
             gunSmithing(
@@ -2709,11 +2702,10 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.DRONE.get(), 4)
                 .pattern("a a")
                 .pattern("bcb")
-                .pattern("ded")
+                .pattern(" e ")
                 .define('a', ModItems.PROPELLER.get())
                 .define('b', ModItems.MOTOR.get())
-                .define('c', Items.COMPASS)
-                .define('d', Tags.Items.NUGGETS_IRON)
+                .define('c', PLATES_PLASTIC)
                 .define('e', ModItems.CELL.get())
                 .unlockedBy(getHasName(ModItems.PROPELLER.get()), has(ModItems.PROPELLER.get()))
                 .unlockedBy(getHasName(ModItems.MOTOR.get()), has(ModItems.MOTOR.get()))

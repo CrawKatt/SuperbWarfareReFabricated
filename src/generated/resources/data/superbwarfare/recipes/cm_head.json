@@ -6,10 +6,7 @@
       "item": "minecraft:gunpowder"
     },
     "b": {
-      "tag": "forge:ingots/iron"
-    },
-    "c": {
-      "tag": "forge:ingots/steel"
+      "tag": "forge:plates/steel"
     },
     "d": {
       "item": "superbwarfare:grenade_40mm"
@@ -18,7 +15,7 @@
   "pattern": [
     "ddd",
     "bdb",
-    "cac"
+    " a "
   ],
   "result": {
     "count": 2,

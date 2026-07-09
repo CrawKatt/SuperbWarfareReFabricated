@@ -3,15 +3,15 @@
   "category": "misc",
   "key": {
     "a": {
-      "tag": "forge:ingots/iron"
+      "tag": "forge:plates/steel"
     },
     "b": {
-      "tag": "forge:dyes/green"
+      "item": "minecraft:iron_nugget"
     }
   },
   "pattern": [
-    " b ",
-    "aaa"
+    "b",
+    "a"
   ],
   "result": {
     "item": "superbwarfare:mortar_base_plate"
