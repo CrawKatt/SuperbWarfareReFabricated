@@ -1,15 +1,18 @@
 package com.atsuishio.superbwarfare.block
 
 import com.atsuishio.superbwarfare.block.entity.ContainerBlockEntity
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.resource.vehicle.VehicleResource
 import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
@@ -112,16 +115,17 @@ open class ContainerBlock :
     }
 
     override fun appendHoverText(
-        pStack: ItemStack,
-        pLevel: BlockGetter?,
-        pTooltip: MutableList<Component>,
-        pFlag: TooltipFlag
+        stack: ItemStack,
+        level: BlockGetter?,
+        tooltip: MutableList<Component>,
+        flag: TooltipFlag
     ) {
-        super.appendHoverText(pStack, pLevel, pTooltip, pFlag)
-        val tag = BlockItem.getBlockEntityData(pStack)
+        super.appendHoverText(stack, level, tooltip, flag)
+        val tag = BlockItem.getBlockEntityData(stack)
         if (tag != null && tag.contains("EntityType")) {
             val type = tag.getString("EntityType")
             val location = ResourceLocation.tryParse(type) ?: return
+            var entity: Entity? = null
 
             val info =
                 Component.translatableWithFallback("info.${location.namespace}.${location.path}", "")
@@ -129,16 +133,16 @@ open class ContainerBlock :
 
             if (Screen.hasShiftDown() && hasDescription) {
                 // 详细描述
-                pTooltip.add(info.withStyle(ChatFormatting.GRAY))
-                pTooltip.add(Component.empty())
-                pTooltip.add(
+                tooltip.add(info.withStyle(ChatFormatting.GRAY))
+                tooltip.add(Component.empty())
+                tooltip.add(
                     Component.translatableWithFallback(
                         "info.${location.namespace}.mod_id",
                         location.namespace
                     ).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.AQUA)
                 )
             } else {
-                pTooltip.add(
+                tooltip.add(
                     Component.translatable(
                         "des.superbwarfare.container.info",
                         Component.literal("[Shift]").withStyle(ChatFormatting.AQUA)
@@ -147,18 +151,16 @@ open class ContainerBlock :
             }
 
             val entityType = EntityType.byString(type).orElse(null)
-            if (entityType != null) {
-                var w = 0f
-                var h = 0
+            if (entityType != null && level is Level) {
+                var w: Float
+                var h: Int
 
+                entity = entityType.create(level)
                 // N * N * N
-                if (pLevel is Level && tag.contains("Entity")) {
-                    val entity: Entity? = entityType.create(pLevel)
-                    if (entity != null) {
-                        entity.load(tag.getCompound("Entity"))
-                        w = ceil((entity.type.dimensions.width / 2).toDouble()).toFloat()
-                        h = (entity.type.dimensions.height + 1).toInt()
-                    }
+                if (tag.contains("Entity") && entity != null) {
+                    entity.load(tag.getCompound("Entity"))
+                    w = ceil((entity.type.dimensions.width / 2).toDouble()).toFloat()
+                    h = (entity.type.dimensions.height + 1).toInt()
                 } else {
                     w = ceil((entityType.dimensions.width / 2).toDouble()).toFloat()
                     h = (entityType.dimensions.height + 1).toInt()
@@ -166,9 +168,21 @@ open class ContainerBlock :
                 if (w != 0f && h != 0) {
                     w *= 2f
                     if (w.toInt() % 2 == 0) w++
-                    pTooltip.add(
+                    tooltip.add(
                         Component.literal(w.toInt().toString() + " x " + w.toInt() + " x " + h)
                             .withStyle(ChatFormatting.YELLOW)
+                    )
+                }
+            }
+
+            if (entity is VehicleEntity) {
+                val resource = VehicleResource.compute(entity)
+                val sponsor = resource.sponsor
+                if (sponsor != null) {
+                    tooltip.add(
+                        Component.translatable(
+                            "des.superbwarfare.container.sponsor", sponsor
+                        ).withStyle(Style.EMPTY.withColor(0x7DEA79))
                     )
                 }
             }

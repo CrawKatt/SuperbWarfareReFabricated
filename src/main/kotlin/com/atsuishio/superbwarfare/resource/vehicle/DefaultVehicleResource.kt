@@ -50,6 +50,9 @@ class DefaultVehicleResource : IDBasedData<DefaultVehicleResource> {
     @SerialName("Script")
     private val script: SerializedResourceLocation? = null
 
+    @SerialName("Sponsor")
+    val sponsor: String? = null
+
     @Transient
     @kotlin.jvm.Transient
     private var scriptCache: VehicleScriptManager.ScriptFunction? = null
