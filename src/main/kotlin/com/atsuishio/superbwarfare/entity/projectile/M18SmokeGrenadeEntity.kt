@@ -8,7 +8,6 @@ import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessag
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import com.atsuishio.superbwarfare.tools.sendPacketTo
 import com.atsuishio.superbwarfare.world.phys.ExtendedEntityRayTraceResult
-import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.nbt.CompoundTag
@@ -25,7 +24,7 @@ import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
 import kotlin.math.min
 
-open class M18SmokeGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEntity {
+open class M18SmokeGrenadeEntity : BounceProjectile, BasicGeoProjectileEntity {
     private var count = 8
     private var fuse = 100
     var red: Float = 1.0f
@@ -176,14 +175,6 @@ open class M18SmokeGrenadeEntity : FastThrowableProjectile, BasicGeoProjectileEn
                 level, ParticleTypes.SMOKE, this.xo, this.yo, this.zo,
                 1, 0.0, 0.0, 0.0, 0.01, true
             )
-        }
-
-        // 接近静止且下方有固体方块时，彻底停止移动，避免因重力反复微弹跳
-        if (!level.isClientSide && this.deltaMovement.length() < 0.08) {
-            val groundPos = BlockPos.containing(this.position().subtract(0.0, 0.15, 0.0))
-            if (level.getBlockState(groundPos).isSolid) {
-                this.deltaMovement = Vec3.ZERO
-            }
         }
     }
 
