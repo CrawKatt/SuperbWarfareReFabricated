@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.tools.NBTTool.getTag
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
 import net.minecraft.core.BlockPos
 import net.minecraft.tags.TagKey
@@ -18,7 +19,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.entity.EntityTypeTest
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.common.util.TriPredicate
+import net.neoforged.neoforge.common.util.TriPredicate
 import java.util.function.BiPredicate
 import java.util.function.Predicate
 
@@ -141,11 +142,12 @@ object SeekTool {
         if (self !is Player || target == null) return@BiPredicate false
         val stack = self.mainHandItem
         var myDrone: DroneEntity? = null
+        val tag = getTag(stack)
         if (stack.`is`(ModItems.MONITOR.get()) &&
-            stack.orCreateTag.getBoolean("Using") &&
-            stack.orCreateTag.getBoolean("Linked")
+            tag.getBoolean("Using") &&
+            tag.getBoolean("Linked")
         ) {
-            myDrone = EntityFindUtil.findDrone(self.level(), stack.orCreateTag.getString("LinkedDrone"))
+            myDrone = EntityFindUtil.findDrone(self.level(), tag.getString("LinkedDrone"))
         }
         target is DroneEntity &&
                 target !== myDrone &&
