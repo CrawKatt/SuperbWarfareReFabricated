@@ -106,7 +106,7 @@ object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
                 poseStack.pushPose()
                 poseStack.translate(x, y - 12, 0f)
 
-                val size = ((50 / ClientEventHandler.fov) * 0.9f * max((512 - entityRange) / 512, 0.1)
+                val size = ((30 / ClientEventHandler.fov) * 0.9f * max((512 - entityRange) / 512, 0.1)
                     .coerceIn(0.4, 1.0)).toFloat()
                 poseStack.scale(size, size, size)
                 val font = gui.minecraft.font
