@@ -64,7 +64,7 @@ open class IffItem : Item(Properties().stacksTo(1)), ICurioItem {
                                     it.id,
                                     BuiltInRegistries.ENTITY_TYPE.getKey(it.type),
                                     it.position(),
-                                    it.deltaMovement,
+                                    null,
                                     CompoundTag().also { tag -> it.saveWithoutId(tag) },
                                     it.yRot
                                 )

@@ -1,8 +1,10 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
 import com.atsuishio.superbwarfare.config.server.MiscConfig
+import com.atsuishio.superbwarfare.init.ModSerializers
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.network.message.receive.EntitySyncMessage
+import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.SeekTool
 import com.atsuishio.superbwarfare.tools.sendPacketTo
 import net.minecraft.core.registries.BuiltInRegistries
@@ -20,10 +22,13 @@ import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
 
 abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, IEntityWithComplexSpawn {
-    private var targetPosValue: Vec3? = null
-    override fun getTargetPos(): Vec3? = targetPosValue
+    override fun getTargetPos(): Vec3? {
+        val v = entityData.get(TARGET_POS)
+        return if (v == Vec3.ZERO) null else v
+    }
+
     override fun setTargetPos(value: Vec3?) {
-        targetPosValue = value
+        entityData.set(TARGET_POS, value ?: Vec3.ZERO)
     }
 
     private var guideTypeValue: Int = 0
@@ -71,13 +76,14 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
 
     fun setTargetVec(targetPos: Vec3?) {
         if (targetPos != null) {
-            this.targetPosValue = targetPos
+            setTargetPos(targetPos)
         }
     }
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
         super.defineSynchedData(builder)
         builder.define(TARGET_UUID, "none")
+        builder.define(TARGET_POS, Vec3.ZERO)
     }
 
     override fun readAdditionalSaveData(compound: CompoundTag) {
@@ -85,11 +91,26 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
         if (compound.contains("TargetUuid")) {
             setTargetUUID(compound.getString("TargetUuid"))
         }
+        if (compound.contains("TargetPosX")) {
+            setTargetPos(
+                Vec3(
+                    compound.getDouble("TargetPosX"),
+                    compound.getDouble("TargetPosY"),
+                    compound.getDouble("TargetPosZ")
+                )
+            )
+        }
     }
 
     override fun addAdditionalSaveData(compound: CompoundTag) {
         super.addAdditionalSaveData(compound)
         compound.putString("TargetUuid", this.getTargetUUID())
+        val tp = getTargetPos()
+        if (tp != null) {
+            compound.putDouble("TargetPosX", tp.x)
+            compound.putDouble("TargetPosY", tp.y)
+            compound.putDouble("TargetPosZ", tp.z)
+        }
     }
 
     override fun afterHitBlock(result: BlockHitResult) {
@@ -117,6 +138,10 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
         @JvmField
         val TARGET_UUID: EntityDataAccessor<String> =
             SynchedEntityData.defineId(MissileProjectile::class.java, EntityDataSerializers.STRING)
+
+        @JvmField
+        val TARGET_POS: EntityDataAccessor<Vec3> =
+            SynchedEntityData.defineId(MissileProjectile::class.java, ModSerializers.VEC3_SERIALIZER.get())
     }
 
     override fun tick() {
@@ -149,11 +174,17 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
 
         if (level is ServerLevel && owner != null) {
             val friendlyMissileList = arrayListOf<EntitySyncMessage.SyncedEntity>()
+            val targetEntity = EntityFindUtil.findEntity(level, getTargetUUID())
+            val syncedTargetPos = when {
+                targetEntity != null -> targetEntity.position()
+                getTargetPos() != null -> getTargetPos()
+                else -> null
+            }
             val synced = EntitySyncMessage.SyncedEntity(
                 id,
                 BuiltInRegistries.ENTITY_TYPE.getKey(type),
                 position(),
-                deltaMovement,
+                syncedTargetPos,
                 CompoundTag().also { tag -> this.saveWithoutId(tag) },
                 yRot
             )

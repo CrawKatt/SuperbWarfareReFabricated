@@ -2,10 +2,12 @@ package com.atsuishio.superbwarfare.init
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.data.gun.GunData
+import io.netty.buffer.ByteBuf
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.syncher.EntityDataSerializer
+import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.NeoForgeRegistries
@@ -33,6 +35,26 @@ object ModSerializers {
             Supplier {
                 EntityDataSerializer.forValueType(
                     ByteBufCodecs.FLOAT.apply(ByteBufCodecs.list())
+                )
+            }
+        )
+
+    @JvmField
+    val VEC3_SERIALIZER: DeferredHolder<EntityDataSerializer<*>, EntityDataSerializer<Vec3>> =
+        REGISTRY.register("vec3_serializer",
+            Supplier {
+                EntityDataSerializer.forValueType(
+                    object : StreamCodec<ByteBuf, Vec3> {
+                        override fun decode(buf: ByteBuf): Vec3 {
+                            return Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble())
+                        }
+
+                        override fun encode(buf: ByteBuf, vec: Vec3) {
+                            buf.writeDouble(vec.x)
+                            buf.writeDouble(vec.y)
+                            buf.writeDouble(vec.z)
+                        }
+                    }
                 )
             }
         )

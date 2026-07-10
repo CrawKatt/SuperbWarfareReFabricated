@@ -2403,7 +2403,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                         it.id,
                         BuiltInRegistries.ENTITY_TYPE.getKey(it.type),
                         it.position(),
-                        it.deltaMovement,
+                        null,
                         CompoundTag().also { tag -> it.saveWithoutId(tag) },
                         it.yRot
                     )

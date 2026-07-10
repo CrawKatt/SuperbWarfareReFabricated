@@ -244,7 +244,6 @@
           "Ammo": "superbwarfare:large_anti_ground_missile",
           "ShouldUnload": false,
           "Override": {
-            "Name": "weapon.superbwarfare.kh_39_missile_block",
             "SeekWeaponInfo": {
               "SeekDirection": "Barrel",
               "SeekRange": 512,
@@ -259,7 +258,6 @@
           "Ammo": "superbwarfare:large_anti_ground_missile",
           "ShouldUnload": false,
           "Override": {
-            "Name": "weapon.superbwarfare.kh_39_missile_block",
             "SeekWeaponInfo": {
               "SeekDirection": "Barrel",
               "InputBlockPos": true
@@ -273,7 +271,7 @@
       "Magazine": 2,
       "EmptyReloadTime": 260,
       "Projectile": "superbwarfare:kh_39",
-      "Name": "weapon.superbwarfare.kh_39_missile_entity",
+      "Name": "weapon.superbwarfare.kh_39_missile",
       "Damage": 1100,
       "ExplosionDamage": 180,
       "ExplosionRadius": 12,
@@ -373,7 +371,7 @@
     "LiftSpeed": 1,
     "Speed": 0.97,
     "EngineStartSound": "superbwarfare:mi_28_engine_start",
-    "EngineSoundVolume": 2
+    "EngineSoundVolume" : 2
   },
   "EngineSound": "superbwarfare:mi_28_engine",
   "ThirdPersonCameraPos": [2.025, 3, 9],
@@ -414,17 +412,16 @@
     "@#superbwarfare:aerial_bomb * 2"
   ],
   "DestroyInfo": {
-    "ParticleType": "Giant",
     "ExplosionDamage": 400,
     "ExplosionRadius": 14,
     "CrashPassengers": true
   },
   "HUDColor": "0xFFC700",
   "VehicleIcon": "superbwarfare:textures/vehicle_icon/mi_28_icon.png",
-  "ContainerIcon": "superbwarfare:textures/gui/vehicle/type/aircraft.png",
+  "ContainerIcon": "superbwarfare:textures/gui/vehicle/type/helicopter.png",
   "VehicleContainerType": "Small",
   "Type": "Helicopter",
   "HudType": "@Helicopter",
   "TerrainCompat": [[-0.963, 0, 1.296], [0.963, 0, 1.296], [0, 0.435, -8.325]],
-  "TerrainCompatRotateRate": 0.4
+  "TerrainCompatRotateRate" : 0.4
 }

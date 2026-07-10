@@ -336,7 +336,7 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
                     it.id,
                     BuiltInRegistries.ENTITY_TYPE.getKey(it.type),
                     it.position(),
-                    it.deltaMovement,
+                    null,
                     CompoundTag().also { tag -> it.saveWithoutId(tag) },
                     it.yRot
                 )
