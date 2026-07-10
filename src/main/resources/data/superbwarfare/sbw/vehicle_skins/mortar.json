@@ -10,7 +10,7 @@
     {
       "Id": "firework",
       "Name": "Firework",
-      "Description": "Congratulations!",
+      "Description": "Component#skin.superbwarfare.mortar.firework",
       "Texture": "superbwarfare:textures/bedrock/vehicle/mortar_firework.png",
       "Priority": 2
     }

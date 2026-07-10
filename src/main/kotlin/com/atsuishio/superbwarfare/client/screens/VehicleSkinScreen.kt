@@ -214,12 +214,12 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
 
             RenderHelper.renderCenteredScrollingString(
                 graphics, font, Component.literal(nameText), 1f,
-                this.x + 1, this.y - 3, this.x + this.width - 1, this.y + 8, textColor
+                this.x + 1, this.y + 2, this.x + this.width - 1, this.y + 13, textColor
             )
 
             RenderHelper.renderCenteredScrollingString(
                 graphics, font, Component.literal(idText), 1f,
-                this.x + 1, textY + 8, this.x + this.width - 1, textY + 19, 0xAAAAAA
+                this.x + 1, textY + 12, this.x + this.width - 1, textY + 23, 0xAAAAAA
             )
 
             if (description.isNotBlank()) {
