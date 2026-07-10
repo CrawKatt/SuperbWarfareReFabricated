@@ -11,8 +11,8 @@ import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.neoforged.api.distmarker.Dist
+import net.neoforged.api.distmarker.OnlyIn
 import org.lwjgl.glfw.GLFW
 
 /**
@@ -97,7 +97,7 @@ class LoiterConfigScreen(private val vehicle: VehicleEntity) :
     }
 
     override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
-        this.renderBackground(guiGraphics)
+        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
 
         val i = (this.width - imageWidth) / 2
         val j = (this.height - imageHeight) / 2
@@ -155,7 +155,7 @@ class LoiterConfigScreen(private val vehicle: VehicleEntity) :
         editBox.setCanLoseFocus(true)
         editBox.setTextColor(-1)
         editBox.setTextColorUneditable(-1)
-        editBox.setBordered(false)
+        editBox.isBordered = false
         editBox.setMaxLength(9)
         this.addWidget(editBox)
         editBox.setEditable(true)

@@ -11,7 +11,7 @@ import net.minecraft.world.entity.projectile.ProjectileUtil
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.*
-import net.minecraftforge.entity.PartEntity
+import net.neoforged.neoforge.entity.PartEntity
 import java.util.function.Predicate
 import kotlin.math.floor
 import kotlin.math.max
