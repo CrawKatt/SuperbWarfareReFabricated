@@ -4,7 +4,7 @@ import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.world.level.chunk.ChunkStatus
+import net.minecraft.world.level.chunk.status.ChunkStatus
 import net.minecraft.world.level.levelgen.Heightmap
 import org.joml.Quaternionf
 
@@ -84,13 +84,15 @@ val LOITER_COMMAND = buildCommand("loiter") {
                             val x = getArg(this@centerX).toFloat()
                             val z = getArg(this@centerZ).toFloat()
                             val r = intArg.toFloat()
-                            val safeY = resolveSafeY(vehicle, x.toInt(), getArg(this@centerY).toFloat().toInt(), z.toInt())
+                            val safeY =
+                                resolveSafeY(vehicle, x.toInt(), getArg(this@centerY).toFloat().toInt(), z.toInt())
 
                             vehicle.loiterParams = Quaternionf(x, safeY, z, r)
                             vehicle.loiterActive = true
 
                             success {
-                                val hint = if (safeY != getArg(this@centerY).toFloat()) " §7(已自动抬升至地形+50)" else ""
+                                val hint =
+                                    if (safeY != getArg(this@centerY).toFloat()) " §7(已自动抬升至地形+50)" else ""
                                 Component.translatable(
                                     "commands.superbwarfare.loiter.success",
                                     x.toInt(), safeY.toInt(), z.toInt(), r.toInt()
@@ -224,7 +226,7 @@ val LOITER_COMMAND = buildCommand("loiter") {
  */
 private fun editLoiterParam(
     player: net.minecraft.world.entity.player.Player?,
-    failCb: (net.minecraft.network.chat.Component) -> Unit,
+    failCb: (Component) -> Unit,
     newX: Float? = null,
     newY: Float? = null,
     newZ: Float? = null,
@@ -248,16 +250,16 @@ private fun editLoiterParam(
     val rawY = newY ?: lp.y()
 
     val safeY = if (skipTerrain) rawY
-                else resolveSafeY(vehicle, finalX.toInt(), rawY.toInt(), finalZ.toInt())
+    else resolveSafeY(vehicle, finalX.toInt(), rawY.toInt(), finalZ.toInt())
 
-    vehicle.loiterParams = org.joml.Quaternionf(
+    vehicle.loiterParams = Quaternionf(
         finalX, safeY, finalZ,
         newR ?: lp.w()
     )
 
     val hint = if (safeY != rawY) " §7(Y已自动抬升)" else ""
     player.sendSystemMessage(
-        net.minecraft.network.chat.Component.translatable(
+        Component.translatable(
             "commands.superbwarfare.loiter.edit",
             vehicle.loiterCenterX.toInt(),
             vehicle.loiterCenterY.toInt(),

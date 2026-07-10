@@ -19,19 +19,20 @@ import net.minecraft.world.level.Level
 class VehicleKeyItem : Item(Properties().stacksTo(1)), IVehicleInteract {
     override fun appendHoverText(
         stack: ItemStack,
-        level: Level?,
+        context: TooltipContext,
         tooltip: MutableList<Component>,
         flag: TooltipFlag
     ) {
-        val tag = stack.tag
-        if (tag == null || !tag.contains(TAG_UUID)) {
+        val tag = NBTTool.getTag(stack)
+        val level = context.level()
+        if (!tag.contains(TAG_UUID)) {
             tooltip.add(Component.translatable("des.superbwarfare.vehicle_key.empty").withStyle(ChatFormatting.GRAY))
         } else {
             val entity = if (level != null) EntityFindUtil.findEntity(level, tag.getString(TAG_UUID)) else null
-            if (entity != null) {
+            if (entity != null && entity.displayName != null) {
                 tooltip.add(
                     Component.translatable(
-                        "des.superbwarfare.vehicle_key.bind", Component.empty().append(entity.displayName).withStyle(
+                        "des.superbwarfare.vehicle_key.bind", Component.empty().append(entity.displayName!!).withStyle(
                             ChatFormatting.GREEN
                         )
                     ).withStyle(ChatFormatting.GRAY)
@@ -54,13 +55,15 @@ class VehicleKeyItem : Item(Properties().stacksTo(1)), IVehicleInteract {
         if (!tag.contains(TAG_UUID)) {
             tag.putString(TAG_UUID, player.stringUUID)
             NBTTool.saveTag(stack, tag)
-            player.displayClientMessage(
-                Component.translatable(
-                    "des.superbwarfare.vehicle_key.bind", Component.empty().append(player.displayName).withStyle(
-                        ChatFormatting.GREEN
-                    )
-                ).withStyle(ChatFormatting.GRAY), true
-            )
+            if (player.displayName != null) {
+                player.displayClientMessage(
+                    Component.translatable(
+                        "des.superbwarfare.vehicle_key.bind", Component.empty().append(player.displayName!!).withStyle(
+                            ChatFormatting.GREEN
+                        )
+                    ).withStyle(ChatFormatting.GRAY), true
+                )
+            }
             player.playSound(SoundEvents.ARROW_HIT_PLAYER)
             return InteractionResultHolder.success(stack)
         }
