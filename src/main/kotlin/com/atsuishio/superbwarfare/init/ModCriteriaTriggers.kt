@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.init
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.advancement.criteria.OttoSprintTrigger
 import com.atsuishio.superbwarfare.advancement.criteria.RPGMeleeExplosionTrigger
+import com.atsuishio.superbwarfare.advancement.criteria.VehicleHurtTrigger
 import net.minecraft.advancements.CriterionTrigger
 import net.minecraft.core.registries.Registries
 import net.neoforged.neoforge.registries.DeferredRegister
@@ -19,4 +20,8 @@ object ModCriteriaTriggers {
     @JvmField
     val OTTO_SPRINT: Supplier<OttoSprintTrigger> =
         REGISTRY.register("otto_sprint", ::OttoSprintTrigger)
+
+    @JvmField
+    val VEHICLE_HURT: Supplier<VehicleHurtTrigger> =
+        REGISTRY.register("vehicle_hurt", ::VehicleHurtTrigger)
 }

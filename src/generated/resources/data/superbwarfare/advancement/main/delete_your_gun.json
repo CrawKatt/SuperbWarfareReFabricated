@@ -1,0 +1,43 @@
+{
+  "parent": "superbwarfare:main/super_container",
+  "criteria": {
+    "0": {
+      "conditions": {
+        "damage": {
+          "type": {
+            "tags": [
+              {
+                "expected": true,
+                "id": "superbwarfare:gun_damage"
+              }
+            ]
+          },
+          "dealt": {
+            "max": 0.1
+          }
+        }
+      },
+      "trigger": "superbwarfare:vehicle_hurt"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "superbwarfare.advancement.main.delete_your_gun.des"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "superbwarfare:k_98"
+    },
+    "title": {
+      "translate": "superbwarfare.advancement.main.delete_your_gun"
+    }
+  },
+  "requirements": [
+    [
+      "0"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

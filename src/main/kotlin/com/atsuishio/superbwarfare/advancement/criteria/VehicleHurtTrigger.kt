@@ -1,64 +1,77 @@
 package com.atsuishio.superbwarfare.advancement.criteria
 
-import com.atsuishio.superbwarfare.Mod
-import com.google.gson.JsonObject
-import net.minecraft.advancements.critereon.*
-import net.minecraft.resources.ResourceLocation
+import com.atsuishio.superbwarfare.init.ModCriteriaTriggers
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.minecraft.advancements.Criterion
+import net.minecraft.advancements.critereon.ContextAwarePredicate
+import net.minecraft.advancements.critereon.DamagePredicate
+import net.minecraft.advancements.critereon.EntityPredicate
+import net.minecraft.advancements.critereon.SimpleCriterionTrigger
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.damagesource.DamageSource
+import java.util.*
 
 class VehicleHurtTrigger : SimpleCriterionTrigger<VehicleHurtTrigger.TriggerInstance>() {
-    companion object {
-        val ID = Mod.loc("vehicle_hurt")
-    }
-
-    override fun createInstance(
-        pJson: JsonObject,
-        pPredicate: ContextAwarePredicate,
-        pDeserializationContext: DeserializationContext
-    ): TriggerInstance {
-        val damagePredicate = DamagePredicate.fromJson(pJson.get("damage"))
-        return TriggerInstance(pPredicate, damagePredicate)
-    }
-
-    override fun getId(): ResourceLocation {
-        return ID
+    override fun codec(): Codec<TriggerInstance> {
+        return TriggerInstance.CODEC
     }
 
     fun trigger(pPlayer: ServerPlayer, source: DamageSource, amount: Float) {
         this.trigger(pPlayer) { instance -> instance.matches(pPlayer, source, amount) }
     }
 
-    class TriggerInstance(
-        player: ContextAwarePredicate,
-        private val damage: DamagePredicate
-    ) : AbstractCriterionTriggerInstance(ID, player) {
+    @JvmRecord
+    data class TriggerInstance(
+        val playerVar: Optional<ContextAwarePredicate>,
+        val damage: Optional<DamagePredicate>
+    ) : SimpleInstance {
+        override fun player() = this.playerVar
 
         companion object {
-            @JvmStatic
-            fun vehicleHurt(): TriggerInstance {
-                return TriggerInstance(ContextAwarePredicate.ANY, DamagePredicate.ANY)
+            val CODEC: Codec<TriggerInstance> = RecordCodecBuilder.create { instance ->
+                instance.group(
+                    EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(TriggerInstance::playerVar),
+                    DamagePredicate.CODEC.optionalFieldOf("damage").forGetter(TriggerInstance::damage)
+                ).apply(instance) { player, damage -> TriggerInstance(player, damage) }
             }
 
             @JvmStatic
-            fun vehicleHurt(damage: DamagePredicate): TriggerInstance {
-                return TriggerInstance(ContextAwarePredicate.ANY, damage)
+            fun vehicleHurt(): Criterion<TriggerInstance> {
+                return ModCriteriaTriggers.VEHICLE_HURT.get()
+                    .createCriterion(
+                        TriggerInstance(
+                            Optional.empty<ContextAwarePredicate>(),
+                            Optional.empty<DamagePredicate>()
+                        )
+                    )
             }
 
             @JvmStatic
-            fun vehicleHurt(damageBuilder: DamagePredicate.Builder): TriggerInstance {
-                return TriggerInstance(ContextAwarePredicate.ANY, damageBuilder.build())
+            fun vehicleHurt(damage: DamagePredicate): Criterion<TriggerInstance> {
+                return ModCriteriaTriggers.VEHICLE_HURT.get()
+                    .createCriterion(
+                        TriggerInstance(
+                            Optional.empty<ContextAwarePredicate>(),
+                            Optional.of(damage)
+                        )
+                    )
+            }
+
+            @JvmStatic
+            fun vehicleHurt(damageBuilder: DamagePredicate.Builder): Criterion<TriggerInstance> {
+                return ModCriteriaTriggers.VEHICLE_HURT.get()
+                    .createCriterion(
+                        TriggerInstance(
+                            Optional.empty<ContextAwarePredicate>(),
+                            Optional.of(damageBuilder.build())
+                        )
+                    )
             }
         }
 
         fun matches(pPlayer: ServerPlayer, source: DamageSource, amount: Float): Boolean {
-            return this.damage.matches(pPlayer, source, amount, amount, false)
-        }
-
-        override fun serializeToJson(pConditions: SerializationContext): JsonObject {
-            val jsonObject = super.serializeToJson(pConditions)
-            jsonObject.add("damage", this.damage.serializeToJson())
-            return jsonObject
+            return this.damage.isPresent && this.damage.get().matches(pPlayer, source, amount, amount, false)
         }
     }
 }
