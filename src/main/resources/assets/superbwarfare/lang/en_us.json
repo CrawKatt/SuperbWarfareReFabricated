@@ -1091,7 +1091,8 @@
   "jei.superbwarfare.researching.selectable": "[Selectable]",
 
   "config.jade.plugin_superbwarfare.vehicle_energy": "Vehicle Energy",
-  "config.jade.plugin_superbwarfare.vehicle_health": "Vehicle Health",
+  "config.jade.plugin_superbwarfare.vehicle_info": "Vehicle Info",
+  "config.jade.plugin_superbwarfare.vehicle_skin": "Vehicle Skin: %1$s",
   "config.jade.plugin_superbwarfare.container_entity": "Container Entity",
   "config.jade.plugin_superbwarfare.c4_info": "C4 Info",
   "des.jade_plugin_superbwarfare.c4.remote_control": "Remote Controlled",
@@ -1214,6 +1215,8 @@
   "warning.superbwarfare.content.snapshot": "It has been detected that Minecraft is running a snapshot version of SuperbWarfare mod. This version may be incompatible with some add-on mods, cause unknown bugs, or even have irreversible effects on existing save files. If you wish to continue playing this version, please create a new save file to do so!",
 
   "pack.superbwarfare.sbw_legacy": "Superb Warfare Legacy Textures",
+
+  "skin.superbwarfare.truck.green": "Original skin from Limitless Vehicle",
 
   "superbwarfare.book.superb_warfare_manual": "Superb Warfare Manual",
   "superbwarfare.book.superb_warfare_manual.des": "A tutorial on Superb Warfare mod, teaching you how to become a superb soldier (WIP)",

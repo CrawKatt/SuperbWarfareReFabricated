@@ -447,7 +447,7 @@
   "jei.superbwarfare.ancient_cpu": "神秘的古代科技，可在古城找到。",
   "jei.superbwarfare.charging_station": "使用燃料或食物進行發電，亦可接收主動輸入的FE能量。能夠為相鄰的方塊提供FE能量，為周圍一定範圍內的可充能載具充能。",
   "config.jade.plugin_superbwarfare.vehicle_energy": "載具能量",
-  "config.jade.plugin_superbwarfare.vehicle_health": "載具血量",
+  "config.jade.plugin_superbwarfare.vehicle_info": "載具血量",
   "config.jade.plugin_superbwarfare.container_entity": "集裝箱實體",
   "superbwarfare.advancement.main.root": "卓越前線",
   "superbwarfare.advancement.main.root.des": "歡迎來到卓越前線！",

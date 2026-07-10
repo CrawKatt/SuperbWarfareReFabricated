@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.client.screens
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.client.RenderHelper
 import com.atsuishio.superbwarfare.data.vehicle_skin.SkinInfo
 import com.atsuishio.superbwarfare.data.vehicle_skin.VehicleSkin
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
@@ -127,6 +128,8 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
         super.removed()
         previewEntities.values.forEach { it.discard() }
         previewEntities.clear()
+        this.currentPage = 0
+        this.maxPage = 0
     }
 
     override fun keyPressed(pKeyCode: Int, pScanCode: Int, pModifiers: Int): Boolean {
@@ -209,12 +212,27 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
             pose.pushPose()
             pose.translate(0.0, 0.0, 200.0)
 
-            graphics.drawCenteredString(font, nameText, this.x + this.width / 2, this.y + 2, textColor)
-            graphics.drawCenteredString(font, idText, this.x + this.width / 2, textY + 15, 0xAAAAAA)
+            RenderHelper.renderCenteredScrollingString(
+                graphics, font, Component.literal(nameText), 1f,
+                this.x + 1, this.y - 3, this.x + this.width - 1, this.y + 8, textColor
+            )
+
+            RenderHelper.renderCenteredScrollingString(
+                graphics, font, Component.literal(idText), 1f,
+                this.x + 1, textY + 8, this.x + this.width - 1, textY + 19, 0xAAAAAA
+            )
 
             if (description.isNotBlank()) {
-                val descText = font.plainSubstrByWidth(description, this.width - 4)
-                graphics.drawCenteredString(font, descText, this.x + this.width / 2, textY + 25, 0x888888)
+                val des = if (description.startsWith("Component#")) {
+                    Component.translatable(description.substringAfter("Component#"))
+                } else {
+                    Component.literal(description)
+                }
+
+                RenderHelper.renderCenteredScrollingString(
+                    graphics, font, des, 1f,
+                    this.x + 1, textY + 23, this.x + this.width - 1, textY + 34, 0x888888
+                )
             }
 
             pose.popPose()

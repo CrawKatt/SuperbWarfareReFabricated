@@ -431,7 +431,7 @@
     "jei.superbwarfare.ancient_cpu": "Таинственные древние технологии, можно найти в древних городах.",
     "jei.superbwarfare.charging_station": "Генерирует энергию, потребляя топливо или пищу, а также принимает FE энергию. Этот блок заряжает энергией FE близлежащие блоки, а также может заряжать транспортные средства в пределах радиуса действия, если они требуют энергии.",
     "config.jade.plugin_superbwarfare.vehicle_energy": "Энергия транспорта",
-    "config.jade.plugin_superbwarfare.vehicle_health": "Прочность транспорта",
+    "config.jade.plugin_superbwarfare.vehicle_info": "Прочность транспорта",
   "config.jade.plugin_superbwarfare.container_entity": "Контейнер",
   "superbwarfare.advancement.main.root.des": "Авторы перевода: SfortzaPhantom, Kenat856, HappyCoffee",
     "superbwarfare.advancement.main.best_friend": "\"Лучшие друзья\" навсегда",

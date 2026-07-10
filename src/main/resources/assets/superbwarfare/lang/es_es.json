@@ -410,7 +410,7 @@
     "jei.superbwarfare.ancient_cpu": "Tecnología antigua misteriosa, puede encontrarse en ciudades antiguas.",
     "jei.superbwarfare.charging_station": "Genera energía consumiendo combustible o comida, y también acepta entrada de energía FE. Suministra energía FE a bloques adyacentes y puede cargar vehículos recargables en su alcance.",
     "config.jade.plugin_superbwarfare.vehicle_energy": "Energía del Vehículo",
-    "config.jade.plugin_superbwarfare.vehicle_health": "Salud del Vehículo",
+    "config.jade.plugin_superbwarfare.vehicle_info": "Salud del Vehículo",
     "config.jade.plugin_superbwarfare.container_entity": "Entidad Contenedora",
     "superbwarfare.advancement.main.root": "Guerra Excelente",
     "superbwarfare.advancement.main.root.des": "¡Bienvenido a Guerra Excelente!",
