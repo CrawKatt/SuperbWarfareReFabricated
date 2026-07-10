@@ -21,6 +21,7 @@ import com.atsuishio.superbwarfare.tools.ParticleTool.spawnMediumCannonMuzzlePar
 import com.atsuishio.superbwarfare.tools.VectorTool.combineRotations
 import com.atsuishio.superbwarfare.tools.VectorTool.combineRotationsBarrel
 import com.atsuishio.superbwarfare.tools.VectorTool.combineRotationsTurret
+import com.atsuishio.superbwarfare.tools.getEntityReach
 import it.unimi.dsi.fastutil.ints.IntArrayList
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -182,19 +183,21 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
         }
     }
 
-    override fun defineSynchedData() {
-        super.defineSynchedData()
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        super.defineSynchedData(builder)
         val list = IntArrayList()
         repeat(this.getContainerSize()) {
             list.add(-1)
         }
 
-        this.entityData.define(TARGET_PITCH, 0f)
-        this.entityData.define(TARGET_YAW, 0f)
-        this.entityData.define(BODY_YAW, 0f)
-        this.entityData.define(SHOOT_PITCH, 0f)
-        this.entityData.define(SHOOT_YAW, 0f)
-        this.entityData.define(LOADED_AMMO, list)
+        with(builder) {
+            define(TARGET_PITCH, 0f)
+            define(TARGET_YAW, 0f)
+            define(BODY_YAW, 0f)
+            define(SHOOT_PITCH, 0f)
+            define(SHOOT_YAW, 0f)
+            define(LOADED_AMMO, list)
+        }
     }
 
     override fun addAdditionalSaveData(compound: CompoundTag) {

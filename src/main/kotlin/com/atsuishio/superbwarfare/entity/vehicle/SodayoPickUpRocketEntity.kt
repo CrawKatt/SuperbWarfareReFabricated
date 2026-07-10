@@ -16,6 +16,7 @@ import com.atsuishio.superbwarfare.tools.OBB.Companion.vector3dToVec3
 import com.atsuishio.superbwarfare.tools.ParticleTool.spawnMediumCannonMuzzleParticles
 import com.atsuishio.superbwarfare.tools.VectorTool.combineRotations
 import com.atsuishio.superbwarfare.tools.VectorTool.combineRotationsBarrel
+import com.atsuishio.superbwarfare.tools.getEntityReach
 import it.unimi.dsi.fastutil.ints.IntArrayList
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -132,13 +133,13 @@ open class SodayoPickUpRocketEntity(type: EntityType<SodayoPickUpRocketEntity>, 
 
     var cooldown: Int = 0
 
-    override fun defineSynchedData() {
-        super.defineSynchedData()
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        super.defineSynchedData(builder)
         val list = IntArrayList()
         repeat(this.getContainerSize()) {
             list.add(-1)
         }
-        this.entityData.define(LOADED_AMMO, list)
+        builder.define(LOADED_AMMO, list)
     }
 
     public override fun readAdditionalSaveData(compound: CompoundTag) {
