@@ -72,7 +72,7 @@ object ServerSyncedEntityHandler {
         val dim = level.dimension().location().toString()
         val now = System.currentTimeMillis()
 
-        val nbt = entity.serializeNBT()
+        val nbt = entity.getBvrSyncNbt()
 
         val td = if (entity is VehicleEntity)
             entity.computed().trackDistanceMultiply else 1.0

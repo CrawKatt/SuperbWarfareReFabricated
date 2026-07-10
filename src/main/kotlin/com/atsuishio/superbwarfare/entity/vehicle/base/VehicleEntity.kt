@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.entity.vehicle.base
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
 import com.atsuishio.superbwarfare.advancement.CriteriaRegister
+import com.atsuishio.superbwarfare.annotation.ExcludeBvrSync
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage
 import com.atsuishio.superbwarfare.capability.energy.VehicleEnergyStorage
 import com.atsuishio.superbwarfare.client.animation.entity.VehicleAnimationInstance
@@ -881,7 +882,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             define(ENERGY, 0)
             define(SYNCHED_PROPELLER_ROT, 0f)
             define(PROPELLER_ROT, 0f)
-            define(PROPELLER_ROT_O, 0f)
 
             define(HORN_VOLUME, 0f)
             define(LASER_LENGTH, 0f)
@@ -1407,7 +1407,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         synchedGearRot = compound.getFloat("GearRot")
         gearUp = compound.getBoolean("GearUp")
         propellerRot = compound.getFloat("PropellerRot")
-        propellerRotO = compound.getFloat("PropellerRotO")
         chargeProgress = compound.getFloat("ChargeProgress")
         lastAttackerUUID = compound.getString("LastAttacker")
         lastDriverUUID = compound.getString("LastDriver")
@@ -1536,7 +1535,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         compound.putFloat("GearRot", synchedGearRot)
         compound.putBoolean("GearUp", gearUp)
         compound.putFloat("PropellerRot", propellerRot)
-        compound.putFloat("PropellerRotO", propellerRotO)
         compound.putFloat("ChargeProgress", chargeProgress)
 
         compound.putFloat("ServerYaw", serverYaw)
@@ -4295,7 +4293,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open var decoyReady by DECOY_READY
     open var synchedPropellerRot by SYNCHED_PROPELLER_ROT
     open var propellerRot by PROPELLER_ROT
-    open var propellerRotO by PROPELLER_ROT_O
+    open var propellerRotO = 0f
     open var planeBreak by PLANE_BREAK
     open var synchedGearRot by SYNCHED_GEAR_ROT
     open var gearUp by GEAR_UP
@@ -4474,6 +4472,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.STRING)
 
         @JvmField
+        @ExcludeBvrSync("LastAttacker")
         val LAST_ATTACKER_UUID: EntityDataAccessor<String> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.STRING)
 
@@ -4482,6 +4481,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.STRING)
 
         @JvmField
+        @ExcludeBvrSync("DogTagIcon")
         val DOG_TAG_ICON: EntityDataAccessor<List<List<Short>>> =
             SynchedEntityData.defineId(VehicleEntity::class.java, ModSerializers.SHORT_LIST_LIST_SERIALIZER.get())
 
@@ -4507,47 +4507,58 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
         @JvmField
+        @ExcludeBvrSync("SelectedWeapon")
         val SELECTED_WEAPON: EntityDataAccessor<List<Int>> = SynchedEntityData.defineId(
             VehicleEntity::class.java, ModSerializers.INT_LIST_SERIALIZER.get()
         )
 
         @JvmField
+        @ExcludeBvrSync("TurretHealth")
         val TURRET_HEALTH: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
         @JvmField
+        @ExcludeBvrSync("LeftWheelHealth")
         val L_WHEEL_HEALTH: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
         @JvmField
+        @ExcludeBvrSync("RightWheelHealth")
         val R_WHEEL_HEALTH: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
         @JvmField
+        @ExcludeBvrSync("MainEngineHealth")
         val MAIN_ENGINE_HEALTH: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
         @JvmField
+        @ExcludeBvrSync("SubEngineHealth")
         val SUB_ENGINE_HEALTH: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
         @JvmField
+        @ExcludeBvrSync("TurretDamaged")
         val TURRET_DAMAGED: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
 
         @JvmField
+        @ExcludeBvrSync("LeftWheelDamaged")
         val L_WHEEL_DAMAGED: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
 
         @JvmField
+        @ExcludeBvrSync("RightWheelDamaged")
         val R_WHEEL_DAMAGED: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
 
         @JvmField
+        @ExcludeBvrSync("MainEngineDamaged")
         val MAIN_ENGINE_DAMAGED: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
 
         @JvmField
+        @ExcludeBvrSync("SubEngineDamaged")
         val SUB_ENGINE_DAMAGED: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
 
@@ -4607,6 +4618,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
         @JvmField
+        @ExcludeBvrSync("DecoyReady")
         val DECOY_READY: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
 
@@ -4616,10 +4628,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         @JvmField
         val PROPELLER_ROT: EntityDataAccessor<Float> =
-            SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
-
-        @JvmField
-        val PROPELLER_ROT_O: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
         @JvmField
@@ -4671,6 +4679,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
         @JvmField
+        @ExcludeBvrSync("Energy")
         val ENERGY: EntityDataAccessor<Int> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.INT)
 
@@ -4687,6 +4696,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
         @JvmField
+        @ExcludeBvrSync("ChargeProgress")
         val CHARGE_PROGRESS: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
@@ -4699,10 +4709,12 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
 
         @JvmField
+        @ExcludeBvrSync("TurretBurned")
         val TURRET_BURNED: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
 
         @JvmField
+        @ExcludeBvrSync("TurretBurnTimer")
         val TURRET_BURN_TIMER: EntityDataAccessor<Int> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.INT)
 
@@ -4711,6 +4723,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
 
         @JvmField
+        @ExcludeBvrSync("Locked")
         val LOCKED: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
 
@@ -4725,6 +4738,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         /** 盘旋功能开关 */
         @JvmField
+        @ExcludeBvrSync("LoiterActive")
         val LOITER_ACTIVE: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
 
@@ -4737,5 +4751,17 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         @JvmField
         val LIFT_OFFSET: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
+
+        init {
+            // 注册超视距同步排除：扫描 @ExcludeBvrSync 注解标记的 EntityDataAccessor 字段
+            BvrSyncExclusion.scanClass(VehicleEntity::class.java)
+            // 手动注册非 EntityDataAccessor 对应的 NBT key（如 Inventory 容器数据）
+            BvrSyncExclusion.registerDirectKeys(
+                VehicleEntity::class.java,
+                "Inventory",
+                "LoiterX", "LoiterY", "LoiterZ", "LoiterR",
+                "PropellerRotO"
+            )
+        }
     }
 }
