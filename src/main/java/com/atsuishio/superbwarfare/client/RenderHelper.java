@@ -343,7 +343,7 @@ public class RenderHelper {
             pGuiGraphics.drawString(pFont, pText, pMinX - (int) d3, pMinY, pColor);
             pGuiGraphics.disableScissor();
         } else {
-            pGuiGraphics.drawCenteredString(pFont, pText, (pMinX + pMaxX) / 2, (pMinY + pMaxY) / 2, pColor);
+            pGuiGraphics.drawCenteredString(pFont, pText, (pMinX + pMaxX) / 2, pMinY, pColor);
         }
     }
 
