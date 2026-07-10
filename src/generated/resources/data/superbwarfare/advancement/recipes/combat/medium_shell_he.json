@@ -1,11 +1,21 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_grain": {
+    "has_high_energy_explosives": {
       "conditions": {
         "items": [
           {
-            "items": "superbwarfare:grain"
+            "items": "superbwarfare:high_energy_explosives"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_primer": {
+      "conditions": {
+        "items": [
+          {
+            "items": "superbwarfare:primer"
           }
         ]
       },
@@ -13,31 +23,21 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "superbwarfare:mortar_shell_smoke"
+        "recipe": "superbwarfare:medium_shell_he"
       },
       "trigger": "minecraft:recipe_unlocked"
-    },
-    "has_wheat": {
-      "conditions": {
-        "items": [
-          {
-            "items": "minecraft:wheat"
-          }
-        ]
-      },
-      "trigger": "minecraft:inventory_changed"
     }
   },
   "requirements": [
     [
       "has_the_recipe",
-      "has_wheat",
-      "has_grain"
+      "has_primer",
+      "has_high_energy_explosives"
     ]
   ],
   "rewards": {
     "recipes": [
-      "superbwarfare:mortar_shell_smoke"
+      "superbwarfare:medium_shell_he"
     ]
   }
 }

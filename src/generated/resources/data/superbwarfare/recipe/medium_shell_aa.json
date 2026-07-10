@@ -6,13 +6,13 @@
       "item": "superbwarfare:fusee"
     },
     "b": {
-      "tag": "superbwarfare:ingots/steel"
+      "tag": "c:ingots/copper"
     },
     "c": {
-      "item": "minecraft:wheat"
+      "item": "minecraft:gunpowder"
     },
     "d": {
-      "item": "superbwarfare:grain"
+      "item": "superbwarfare:primer"
     }
   },
   "pattern": [
@@ -22,6 +22,6 @@
   ],
   "result": {
     "count": 8,
-    "id": "superbwarfare:mortar_shell_smoke"
+    "id": "superbwarfare:medium_shell_aa"
   }
 }

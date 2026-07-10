@@ -3,16 +3,16 @@
   "category": "equipment",
   "key": {
     "a": {
-      "item": "superbwarfare:fusee"
+      "item": "superbwarfare:tungsten_rod"
     },
     "b": {
       "tag": "superbwarfare:ingots/steel"
     },
     "c": {
-      "item": "minecraft:wheat"
+      "item": "minecraft:gunpowder"
     },
     "d": {
-      "item": "superbwarfare:grain"
+      "item": "superbwarfare:primer"
     }
   },
   "pattern": [
@@ -21,7 +21,7 @@
     " d "
   ],
   "result": {
-    "count": 8,
-    "id": "superbwarfare:mortar_shell_smoke"
+    "count": 4,
+    "id": "superbwarfare:medium_shell_ap"
   }
 }

@@ -237,7 +237,7 @@ dependencies {
     jarJar(sbm) {
         version {
             strictly("[2.0,3.0)")
-            prefer("2.3.3")
+            prefer("2.3.3-neoforge-mc1.21.1")
         }
     }
     compileOnly("com.maydaymemory:mae:1.1.2") {

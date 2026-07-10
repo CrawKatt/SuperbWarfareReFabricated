@@ -3,25 +3,22 @@
   "category": "equipment",
   "key": {
     "a": {
-      "item": "superbwarfare:fusee"
-    },
-    "b": {
       "tag": "superbwarfare:ingots/steel"
     },
     "c": {
-      "item": "minecraft:wheat"
+      "item": "superbwarfare:high_energy_explosives"
     },
     "d": {
-      "item": "superbwarfare:grain"
+      "item": "superbwarfare:primer"
     }
   },
   "pattern": [
     " a ",
-    "bcb",
+    "aca",
     " d "
   ],
   "result": {
-    "count": 8,
-    "id": "superbwarfare:mortar_shell_smoke"
+    "count": 4,
+    "id": "superbwarfare:medium_shell_he"
   }
 }
