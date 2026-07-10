@@ -30,8 +30,8 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.vehicle.Boat
 import net.minecraft.world.level.chunk.LevelChunk
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.neoforged.api.distmarker.Dist
+import net.neoforged.api.distmarker.OnlyIn
 import java.io.File
 import java.util.*
 import kotlin.math.atan2
@@ -113,10 +113,12 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
     private var attackTargetQueue = mutableListOf<BlockPos>()
     private var attackFireInterval = 0    // ticks between sequential shots
     private var directAttackAmmo = 0      // remaining ammo for direct attack cursor display
+
     // Queue context menu
     private var queueMenuVisible = false
     private var queueMenuX = 0
     private var queueMenuY = 0
+
     // Sequential fire (only active after "次序发射" is clicked)
     private var seqFireActive = false
     private var seqFireTimer = 0
@@ -320,7 +322,7 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
             if (gd != null) {
                 val ammoCost = gd.get(GunProp.AMMO_COST_PER_SHOOT)
                 directAttackAmmo = if (ammoCost <= 0) 999
-                    else gd.currentAvailableAmmo(localPlayer) / ammoCost
+                else gd.currentAvailableAmmo(localPlayer) / ammoCost
             }
         }
 
@@ -333,12 +335,14 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
                     if (gd != null) {
                         val ammoCost = gd.get(GunProp.AMMO_COST_PER_SHOOT)
                         val available = if (ammoCost <= 0) 999
-                            else gd.currentAvailableAmmo(localPlayer) / ammoCost
+                        else gd.currentAvailableAmmo(localPlayer) / ammoCost
                         // Recompute display name so inline %1$s ammo placeholder stays in sync
                         val rawName = gd.get(GunProp.NAME) ?: entry.weaponName
                         val translated = try {
                             Component.translatable(rawName).string
-                        } catch (_: Exception) { rawName }
+                        } catch (_: Exception) {
+                            rawName
+                        }
                         val ammoStr = "×$available"
                         val newDisplay = if (translated.contains("%1\$s"))
                             translated.replace("%1\$s", ammoStr) else translated
@@ -789,7 +793,7 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
             for (lodTile in lodTiles) {
                 val texLoc = TacticalMapCache.getLodTileTexture(
                     lodTile.factor, lodTile.rx, lodTile.rz
-                ) ?: continue
+                )
 
                 val wx = lodTile.rx * lodSize
                 val wz = lodTile.rz * lodSize
@@ -1281,13 +1285,13 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
                             val o = consumer.override ?: return@any false
                             val seekObj = o.getAsJsonObject("SeekWeaponInfo") ?: return@any false
                             (seekObj.get("OnlyLockBlock")?.asBoolean == true)
-                                || (seekObj.get("InputBlockPos")?.asBoolean == true)
+                                    || (seekObj.get("InputBlockPos")?.asBoolean == true)
                         }
                     }
                     if (hasGroundStrike) {
                         val ammoCost = gunData.get(GunProp.AMMO_COST_PER_SHOOT)
                         val available = if (ammoCost <= 0) 999
-                            else gunData.currentAvailableAmmo(localPlayer) / ammoCost
+                        else gunData.currentAvailableAmmo(localPlayer) / ammoCost
                         val rawName = gunData.get(GunProp.NAME) ?: name
                         val translated = try {
                             Component.translatable(rawName).string
@@ -1369,20 +1373,20 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
         return super.mouseReleased(pMouseX, pMouseY, pButton)
     }
 
-    override fun mouseScrolled(pMouseX: Double, pMouseY: Double, pScroll: Double): Boolean {
-        if (isMouseInPanel(pMouseX, pMouseY)) {
+    override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
+        if (isMouseInPanel(mouseX, mouseY)) {
             val oldScale = zoom / 5.0
-            zoom = (zoom * (1.0 + pScroll * 0.15)).coerceIn(0.05, 20.0)
+            zoom = (zoom * (1.0 + scrollX * 0.15)).coerceIn(0.05, 20.0)
             val newScale = zoom / 5.0
             if (!followPlayer) {
                 // Adjust view center so the world point under the mouse stays fixed
-                viewBlockX += (pMouseX - mapCenterX) * (1.0 / oldScale - 1.0 / newScale)
-                viewBlockZ += (pMouseY - mapCenterY) * (1.0 / oldScale - 1.0 / newScale)
+                viewBlockX += (mouseX - mapCenterX) * (1.0 / oldScale - 1.0 / newScale)
+                viewBlockZ += (mouseY - mapCenterY) * (1.0 / oldScale - 1.0 / newScale)
             }
             DisplayConfig.TACTICAL_MAP_ZOOM.set(zoom)
             return true
         }
-        return super.mouseScrolled(pMouseX, pMouseY, pScroll)
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)
     }
 
     private fun isMouseInPanel(mx: Double, my: Double): Boolean {
@@ -1456,9 +1460,11 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
         // Ammo count in top-right corner
         val font = minecraft!!.font
         val ammoText = "×$directAttackAmmo"
-        guiGraphics.drawString(font, ammoText,
+        guiGraphics.drawString(
+            font, ammoText,
             mouseX + 10, mouseY - 12,
-            if (directAttackAmmo > 0) 0xFFFFAA00.toInt() else 0xFFAA3333.toInt(), true)
+            if (directAttackAmmo > 0) 0xFFFFAA00.toInt() else 0xFFAA3333.toInt(), true
+        )
     }
 
     private fun renderQueueTargets(guiGraphics: GuiGraphics, player: Player) {
@@ -1476,9 +1482,11 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
             // Sequence number centered inside the frame
             val num = "${i + 1}"
             val nw = font.width(num)
-            guiGraphics.drawString(font, num,
+            guiGraphics.drawString(
+                font, num,
                 (sx - nw / 2f).roundToInt(), (sy - font.lineHeight / 2f).roundToInt(),
-                0xFFFFFFFF.toInt(), false)
+                0xFFFFFFFF.toInt(), false
+            )
         }
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
     }
@@ -1501,8 +1509,10 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
             val hovered = mouseX in mx..mx + pw && mouseY in my..my + ph
             guiGraphics.fill(mx, my, mx + pw, my + ph, 0xEE2A2A2A.toInt())
             if (hovered) guiGraphics.fill(mx + 1, my, mx + pw - 1, my + ph, 0x66444444)
-            guiGraphics.drawString(font, label, mx + 4, my + 3,
-                if (hovered) 0xFFFF5555.toInt() else 0xFFCC6666.toInt(), false)
+            guiGraphics.drawString(
+                font, label, mx + 4, my + 3,
+                if (hovered) 0xFFFF5555.toInt() else 0xFFCC6666.toInt(), false
+            )
             return
         }
         val padding = 4
@@ -1521,7 +1531,7 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
             val hovered = mouseX in mx..mx + menuW && mouseY in iy..iy + itemHeight
             val isSeqFire = i == 0
             val itemColor = if (isSeqFire && disabled) 0xFF666666.toInt()
-                else if (hovered) 0xFFFFFFFF.toInt() else 0xFFCCCCCC.toInt()
+            else if (hovered) 0xFFFFFFFF.toInt() else 0xFFCCCCCC.toInt()
             if (hovered && (!isSeqFire || !disabled)) {
                 guiGraphics.fill(mx + 1, iy, mx + menuW - 1, iy + itemHeight, 0x664444FF)
             }
@@ -1641,6 +1651,7 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
                         queueMenuVisible = false
                         startSequentialFire()
                     }
+
                     1 -> {
                         queueMenuVisible = false
                         cancelQueueAttack()
@@ -1677,7 +1688,7 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
         val gd = vehicle.gunDataMap[name] ?: return 0
         val ammoCost = gd.get(GunProp.AMMO_COST_PER_SHOOT)
         return if (ammoCost <= 0) 999
-            else gd.currentAvailableAmmo(localPlayer) / ammoCost
+        else gd.currentAvailableAmmo(localPlayer) / ammoCost
     }
 
     // Called from tick() for sequential fire
@@ -1698,6 +1709,11 @@ class TacticalMapScreen : Screen(Component.translatable("screen.superbwarfare.ta
         seqFireTimer = attackFireInterval
     }
 
-    override fun renderBackground(pGuiGraphics: GuiGraphics) {
+    override fun renderBackground(
+        guiGraphics: GuiGraphics,
+        mouseX: Int,
+        mouseY: Int,
+        partialTick: Float
+    ) {
     }
 }

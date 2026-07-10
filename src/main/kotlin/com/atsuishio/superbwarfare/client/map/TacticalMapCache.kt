@@ -3,6 +3,10 @@ package com.atsuishio.superbwarfare.client.map
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.map.TacticalMapCache.drawnChunks
+import com.atsuishio.superbwarfare.client.map.TacticalMapCache.invalidateLodTilesBatch
+import com.atsuishio.superbwarfare.client.map.TacticalMapCache.invalidateLodTilesForBaseTile
+import com.atsuishio.superbwarfare.client.map.TacticalMapCache.loadAllChunks
+import com.atsuishio.superbwarfare.client.map.TacticalMapCache.preloadedChunkData
 import com.atsuishio.superbwarfare.client.map.TacticalMapCache.processPendingChunks
 import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.platform.NativeImage
@@ -15,8 +19,8 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.chunk.LevelChunk
 import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.level.material.MapColor
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.neoforged.api.distmarker.Dist
+import net.neoforged.api.distmarker.OnlyIn
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -374,7 +378,7 @@ object TacticalMapCache {
 
                 while (y > level.minBuildHeight && state.getMapColor(level, mutablePos) == MapColor.NONE) {
                     y--
-                    mutablePos.setY(y)
+                    mutablePos.y = y
                     state = chunk.getBlockState(mutablePos)
                 }
 
@@ -711,8 +715,8 @@ object TacticalMapCache {
         val queueSize = pendingChunkQueue.size
         val adaptiveMax = when {
             queueSize > 2000 -> maxCount * 4
-            queueSize > 500  -> maxCount * 2
-            else             -> maxCount
+            queueSize > 500 -> maxCount * 2
+            else -> maxCount
         }
 
         val pcx = (px / CHUNK_SIZE).toInt()

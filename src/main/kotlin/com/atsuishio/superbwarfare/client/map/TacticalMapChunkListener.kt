@@ -3,13 +3,13 @@ package com.atsuishio.superbwarfare.client.map
 import com.atsuishio.superbwarfare.config.server.MapConfig
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.world.level.chunk.LevelChunk
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.event.level.ChunkEvent
-import net.minecraftforge.event.level.LevelEvent
-import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.common.Mod
+import net.neoforged.api.distmarker.Dist
+import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.neoforge.event.level.ChunkEvent
+import net.neoforged.neoforge.event.level.LevelEvent
 
-@Mod.EventBusSubscriber(value = [Dist.CLIENT])
+@EventBusSubscriber(value = [Dist.CLIENT])
 object TacticalMapChunkListener {
 
     fun isEnabled(): Boolean {
