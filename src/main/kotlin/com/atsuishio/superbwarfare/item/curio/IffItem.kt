@@ -65,7 +65,8 @@ open class IffItem : Item(Properties().stacksTo(1)), ICurioItem {
                                     BuiltInRegistries.ENTITY_TYPE.getKey(it.type),
                                     it.position(),
                                     it.deltaMovement,
-                                    CompoundTag().also { tag -> it.saveWithoutId(tag) }
+                                    CompoundTag().also { tag -> it.saveWithoutId(tag) },
+                                    it.yRot
                                 )
                             }.toList()
                             sendPacketTo(player, EntitySyncMessage(level.dimension().location(), list, true))

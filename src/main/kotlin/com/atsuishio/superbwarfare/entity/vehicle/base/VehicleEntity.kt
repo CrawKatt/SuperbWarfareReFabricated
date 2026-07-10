@@ -465,7 +465,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open var mouseMoveSpeedX by MOUSE_SPEED_X
     open var mouseMoveSpeedY by MOUSE_SPEED_Y
 
-    open      var locked by LOCKED
+    open var locked by LOCKED
 
     // container start
     val inventory = VehicleContainerHandler(6 * 17, this)
@@ -2404,7 +2404,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                         BuiltInRegistries.ENTITY_TYPE.getKey(it.type),
                         it.position(),
                         it.deltaMovement,
-                        CompoundTag().also { tag -> it.saveWithoutId(tag) }
+                        CompoundTag().also { tag -> it.saveWithoutId(tag) },
+                        it.yRot
                     )
                 }.toList()
             sendPacketTo(player, EntitySyncMessage(level.dimension().location(), hostileList, false))

@@ -154,7 +154,8 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
                 BuiltInRegistries.ENTITY_TYPE.getKey(type),
                 position(),
                 deltaMovement,
-                CompoundTag().also { tag -> this.saveWithoutId(tag) }
+                CompoundTag().also { tag -> this.saveWithoutId(tag) },
+                yRot
             )
 
             friendlyMissileList.add(synced)
