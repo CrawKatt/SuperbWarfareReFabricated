@@ -9,7 +9,6 @@ import org.mozillaa.javascript.ScriptableObject
 
 typealias JSFunction = org.mozillaa.javascript.Function
 
-// TODO 测试用，以后不这样写
 object VehicleScriptManager {
     val RHINO_CONTEXT: Context = Context.enter()
     val SHARED_SCOPE: ScriptableObject = RHINO_CONTEXT.initStandardObjects()
