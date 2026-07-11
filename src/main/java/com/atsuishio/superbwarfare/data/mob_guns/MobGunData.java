@@ -88,7 +88,7 @@ public class MobGunData {
         var stack = new ItemStack(item);
 
         if (selectedData.data != null) {
-            stack.setTag(TagDataParser.parse(selectedData.data));
+            stack.setTag(TagDataParser.parseObject(selectedData.data));
         }
 
         var data = GunData.from(stack);

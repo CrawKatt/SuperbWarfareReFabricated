@@ -24,7 +24,7 @@ public class LaunchableEntityTool {
             return null;
         }
 
-        return TagDataParser.parse(launchableData, name -> switch (name) {
+        return TagDataParser.parseObject(launchableData, name -> switch (name) {
             case "@sbw:damage" -> DoubleTag.valueOf(data.damage());
             case "@sbw:owner" -> data.shooter() != null ? NbtUtils.createUUID(data.shooter()) : null;
             case "@sbw:owner_string_lower" -> data.shooter() != null

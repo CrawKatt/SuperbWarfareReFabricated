@@ -156,8 +156,8 @@ object SeekTool {
         }
         target is DroneEntity &&
                 target !== myDrone &&
-                target.controller != null &&
-                IN_SAME_TEAM.test(target, target.controller)
+                target.getController() != null &&
+                IN_SAME_TEAM.test(target, target.getController())
     }
 
     /** 判断两个实体是否是友方关系 */

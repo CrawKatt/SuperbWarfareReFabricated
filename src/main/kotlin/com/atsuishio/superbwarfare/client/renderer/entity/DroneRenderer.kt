@@ -117,7 +117,7 @@ class DroneRenderer(renderManager: EntityRendererProvider.Context) :
         val xLength = displayData[9]
         val yLength = displayData[10]
 
-        for (i in 0..<entity.ammo) {
+        for (i in 0..<entity.getAmmo()) {
             val x: Float
             val z: Float
             if (data.get(DroneEntity.MAX_AMMO) == 1) {

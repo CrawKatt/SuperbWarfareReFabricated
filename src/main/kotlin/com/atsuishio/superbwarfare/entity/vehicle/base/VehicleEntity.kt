@@ -314,7 +314,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open var decoyReloadCoolDown = 0
 
     open var lastTickSpeed = 0.0
-    protected var lastTickVerticalSpeed = 0.0
+    open var lastTickVerticalSpeed = 0.0
 
     open var collisionCoolDown = 0
 
