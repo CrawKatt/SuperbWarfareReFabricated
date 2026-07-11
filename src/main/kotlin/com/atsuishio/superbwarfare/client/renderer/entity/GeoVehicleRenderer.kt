@@ -20,6 +20,7 @@ import com.atsuishio.superbwarfare.resource.model.VehicleLODModelReloadListener
 import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListener
 import com.atsuishio.superbwarfare.resource.vehicle.VehicleModelPojo
 import com.atsuishio.superbwarfare.resource.vehicle.VehicleResource
+import com.atsuishio.superbwarfare.script.VehicleScriptManager
 import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.atsuishio.superbwarfare.tools.SpritePixelHelper
 import com.atsuishio.superbwarfare.tools.localPlayer
@@ -211,7 +212,11 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                     poseStack.pushPose()
                     poseStack.mulPoseMatrix(flare.globalTransform)
                     poseStack.translate(0f, 0f, (0.01 * (Math.random() - 0.5)).toFloat())
-                    poseStack.scale(1 + (0.02 * (Math.random() - 0.5)).toFloat(), 1 + (0.02 * (Math.random() - 0.5)).toFloat(), 1 + (0.02 * (Math.random() - 0.5)).toFloat())
+                    poseStack.scale(
+                        1 + (0.02 * (Math.random() - 0.5)).toFloat(),
+                        1 + (0.02 * (Math.random() - 0.5)).toFloat(),
+                        1 + (0.02 * (Math.random() - 0.5)).toFloat()
+                    )
                     flareModel.renderToBuffer(
                         poseStack,
                         buffer,
@@ -261,33 +266,33 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
 
                 val scale = entity.laserBaseScale.toFloat()
 
-                renderLaser(consumerOut, pose, normal,scale, color)
-                renderLaser(consumerIn, pose, normal,scale, colorW)
+                renderLaser(consumerOut, pose, normal, scale, color)
+                renderLaser(consumerIn, pose, normal, scale, colorW)
 
                 poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
 
-                renderLaser(consumerOut, pose, normal,scale, color)
-                renderLaser(consumerIn, pose, normal,scale, colorW)
+                renderLaser(consumerOut, pose, normal, scale, color)
+                renderLaser(consumerIn, pose, normal, scale, colorW)
 
                 poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
 
-                renderLaser(consumerOut, pose, normal,scale, color)
-                renderLaser(consumerIn, pose, normal,scale, colorW)
+                renderLaser(consumerOut, pose, normal, scale, color)
+                renderLaser(consumerIn, pose, normal, scale, colorW)
 
                 poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
 
-                renderLaser(consumerOut, pose, normal,scale, color)
-                renderLaser(consumerIn, pose, normal,scale, colorW)
+                renderLaser(consumerOut, pose, normal, scale, color)
+                renderLaser(consumerIn, pose, normal, scale, colorW)
 
                 poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
 
-                renderLaser(consumerOut, pose, normal,scale, color)
-                renderLaser(consumerIn, pose, normal,scale, colorW)
+                renderLaser(consumerOut, pose, normal, scale, color)
+                renderLaser(consumerIn, pose, normal, scale, colorW)
 
                 poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
 
-                renderLaser(consumerOut, pose, normal,scale, color)
-                renderLaser(consumerIn, pose, normal,scale, colorW)
+                renderLaser(consumerOut, pose, normal, scale, color)
+                renderLaser(consumerIn, pose, normal, scale, colorW)
 
                 poseStack.popPose()
             }
@@ -463,6 +468,8 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                 }
             }
         }
+
+        this.renderByScript(vehicle, model, poseStack, entityYaw, partialTicks, buffer, packedLight)
     }
 
     open fun transformCustomModelPart(
@@ -612,13 +619,11 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
 
                         // TODO 期待后人智慧，万一哪天正确实现了获取骨骼朝向呢
 
-                        val diffY = Mth.wrapDegrees(-VehicleVecUtils.getYRotFromVector(targetVec) + VehicleVecUtils.getYRotFromVector(
-                            defaultVec
-                        )
+                        val diffY = Mth.wrapDegrees(
+                            -VehicleVecUtils.getYRotFromVector(targetVec) + VehicleVecUtils.getYRotFromVector(defaultVec)
                         ).toFloat()
-                        val diffX = Mth.wrapDegrees(-VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(
-                            defaultVec
-                        )
+                        val diffX = Mth.wrapDegrees(
+                            -VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(defaultVec)
                         ).toFloat()
 
                         val yawRot = Axis.YP.rotationDegrees(-diffY)
@@ -632,6 +637,19 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
         }
     }
 
+    open fun renderByScript(
+        vehicle: T,
+        model: BedrockVehicleModel,
+        poseStack: PoseStack,
+        entityYaw: Float,
+        partialTicks: Float,
+        buffer: MultiBufferSource,
+        packedLight: Int
+    ) {
+        val func = VehicleResource.getDefault(vehicle).getScript() ?: return
+        VehicleScriptManager.invokeTransform(func, vehicle, model, poseStack, entityYaw, partialTicks, this)
+    }
+
     open fun rotateVehicleAxis(entityIn: T, poseStack: PoseStack, entityYaw: Float, partialTicks: Float) {
         val root = Vec3(0.0, entityIn.rotateOffsetHeight, 0.0)
         poseStack.rotateAround(
@@ -641,13 +659,25 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             root.z.toFloat()
         )
         poseStack.rotateAround(
-            Axis.XP.rotationDegrees(-Mth.lerp(partialTicks, entityIn.xRotO + entityIn.fakePitchO, entityIn.xRot + entityIn.fakePitch)),
+            Axis.XP.rotationDegrees(
+                -Mth.lerp(
+                    partialTicks,
+                    entityIn.xRotO + entityIn.fakePitchO,
+                    entityIn.xRot + entityIn.fakePitch
+                )
+            ),
             root.x.toFloat(),
             root.y.toFloat(),
             root.z.toFloat()
         )
         poseStack.rotateAround(
-            Axis.ZP.rotationDegrees(-Mth.lerp(partialTicks, entityIn.prevRoll + entityIn.fakeRollO, entityIn.roll + entityIn.fakeRoll)),
+            Axis.ZP.rotationDegrees(
+                -Mth.lerp(
+                    partialTicks,
+                    entityIn.prevRoll + entityIn.fakeRollO,
+                    entityIn.roll + entityIn.fakeRoll
+                )
+            ),
             root.x.toFloat(),
             root.y.toFloat(),
             root.z.toFloat()
@@ -736,8 +766,11 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             pV: Int,
             color: Quaternionf
         ) {
-            pConsumer.vertex(pPose, pX, 0f, -pZ).color(color.x.toInt(), color.y.toInt(), color.z.toInt(), color.w.toInt()).uv(pU.toFloat(), pV.toFloat())
-                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(pNormal, 0f, 1f, 0f).endVertex()
+            pConsumer.vertex(pPose, pX, 0f, -pZ)
+                .color(color.x.toInt(), color.y.toInt(), color.z.toInt(), color.w.toInt())
+                .uv(pU.toFloat(), pV.toFloat())
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(pNormal, 0f, 1f, 0f)
+                .endVertex()
         }
     }
 }

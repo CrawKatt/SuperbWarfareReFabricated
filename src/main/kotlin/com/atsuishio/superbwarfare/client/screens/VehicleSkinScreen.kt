@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.data.vehicle_skin.SkinInfo
 import com.atsuishio.superbwarfare.data.vehicle_skin.VehicleSkin
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.network.message.send.SetVehicleSkinMessage
+import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.atsuishio.superbwarfare.tools.mc
 import com.atsuishio.superbwarfare.tools.options
 import com.atsuishio.superbwarfare.tools.sendPacketToServer
@@ -166,6 +167,8 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
 
             // 载具皮肤模型
             if (previewEntity != null) {
+                RenderDistanceHelper.markGuiRenderTimestamp()
+
                 pose.pushPose()
 
                 val centerX = this.x + this.width / 2.0
