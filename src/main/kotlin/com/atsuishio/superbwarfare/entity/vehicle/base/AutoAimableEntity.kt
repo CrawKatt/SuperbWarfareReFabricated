@@ -414,7 +414,7 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
             .baseFilter()
             .noVehicle()
             .notFriendly()
-            .isNotOwner()
+            .isNotMyOwner()
             .build()
 
         for (e in entities) {
