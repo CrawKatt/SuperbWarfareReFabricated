@@ -95,7 +95,7 @@ class TurretWreckRenderer(renderManager: EntityRendererProvider.Context) :
                     1.0f
                 )
                 poseStack.popPose()
-            } else if (renderer is SbmVehicleRenderer) {
+            } else if (renderer is GeoVehicleRenderer) {
                 val models = VehicleResource.compute(entity).getModels()
                 if (models.isEmpty()) return
                 val modelPath = models.first().model ?: return
