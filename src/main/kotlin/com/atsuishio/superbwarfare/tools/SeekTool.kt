@@ -395,6 +395,10 @@ object SeekTool {
             filters.add { IS_NOT_OWNER.test(entity, it) }
         }
 
+        fun isNotMyOwner(): Builder = apply {
+            filters.add { IS_NOT_OWNER.test(it, entity) }
+        }
+
         fun noClip(): Builder = apply {
             filters.add { e ->
                 entity.level()

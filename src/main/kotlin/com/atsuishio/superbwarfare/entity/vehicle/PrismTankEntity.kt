@@ -165,7 +165,7 @@ open class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : Ve
             .baseFilter()
             .noVehicle()
             .notFriendly()
-            .isNotOwner()
+            .isNotMyOwner()
             .build()
 
         for (e in entities) {
