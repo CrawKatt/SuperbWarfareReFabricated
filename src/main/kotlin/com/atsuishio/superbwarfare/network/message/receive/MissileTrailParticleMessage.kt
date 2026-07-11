@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.network.message.receive
 
 import com.atsuishio.superbwarfare.client.particle.CustomFlareOption
+import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.network.ClientPacketPayload
 import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.tools.localPlayer
@@ -55,8 +56,12 @@ data class MissileTrailParticleMessage(
             motionX: Double, motionY: Double, motionZ: Double
         ) {
             for (player in level.players()) {
-                // TODO 把4096改成之后最大超视距的距离
-                if (player.position().distanceToSqr(Vec3(xo, yo, zo)) < 2048 * 2048) {
+                val distance = try {
+                    SyncConfig.MAX_RENDER_DISTANCE.get()
+                } catch (_: Exception) {
+                    2048
+                }
+                if (player.position().distanceToSqr(Vec3(xo, yo, zo)) < distance * distance) {
                     player.sendPacket(MissileTrailParticleMessage(xo, yo, zo, bbHeight, motionX, motionY, motionZ))
                 }
             }

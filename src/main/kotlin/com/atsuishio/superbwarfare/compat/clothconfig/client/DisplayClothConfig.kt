@@ -25,6 +25,20 @@ object DisplayClothConfig {
         category.addEntry(
             entryBuilder
                 .startIntSlider(
+                    Component.translatable("config.superbwarfare.client.display.vehicle_lod_distance"),
+                    DisplayConfig.VEHICLE_LOD_DISTANCE.get(),
+                    -1,
+                    512
+                )
+                .setDefaultValue(64)
+                .setSaveConsumer { DisplayConfig.VEHICLE_LOD_DISTANCE.set(it) }
+                .setTooltip(Component.translatable("config.superbwarfare.client.display.vehicle_lod_distance.des"))
+                .build()
+        )
+
+        category.addEntry(
+            entryBuilder
+                .startIntSlider(
                     Component.translatable("config.superbwarfare.client.display.weapon_hud_x_offset"),
                     DisplayConfig.WEAPON_HUD_X_OFFSET.get(),
                     -1000,

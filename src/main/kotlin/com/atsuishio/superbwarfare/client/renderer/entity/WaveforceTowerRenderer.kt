@@ -3,8 +3,6 @@ package com.atsuishio.superbwarfare.client.renderer.entity
 import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
-import com.atsuishio.superbwarfare.resource.vehicle.VehicleResource
-import com.atsuishio.superbwarfare.script.VehicleScriptManager
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
@@ -15,19 +13,6 @@ class WaveforceTowerRenderer(manager: EntityRendererProvider.Context) : BasicAut
 
     @Suppress("unused")
     var energy0: Float = 0f
-
-    // TODO 测试用
-    override fun transformCustomModelPart(
-        vehicle: AutoAimableEntity,
-        model: BedrockVehicleModel,
-        poseStack: PoseStack,
-        entityYaw: Float,
-        partialTicks: Float
-    ) {
-        val func = VehicleResource.getDefault(vehicle).getScript() ?: return
-        VehicleScriptManager.invokeTransform(func, vehicle, model, poseStack, entityYaw, partialTicks, this)
-        super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
-    }
 
     override fun renderCustomPart(
         vehicle: AutoAimableEntity,

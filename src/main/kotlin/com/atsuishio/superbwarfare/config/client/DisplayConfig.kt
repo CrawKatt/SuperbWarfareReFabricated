@@ -14,6 +14,13 @@ object DisplayConfig {
     }
 
     @JvmField
+    val VEHICLE_LOD_DISTANCE = buildClientConfig {
+        comment("The global LOD distance for rendering vehicles. Set -1 to disable this config")
+        comment("渲染载具低模的最小全局距离，设置为-1则不生效")
+        defineInRange("vehicle_lod_distance", 64, -1, Int.MAX_VALUE)
+    }
+
+    @JvmField
     val WEAPON_HUD_X_OFFSET = buildClientConfig {
         comment("The x offset of weapon hud")
         comment("枪械HUD的水平方向偏移量")
