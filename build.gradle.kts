@@ -229,8 +229,10 @@ dependencies {
 
     // 测试用mod
     // 这俩是仅客户端mod
-    implementation(fg.deobf("curse.maven:oculus-581495:6020952"))
-    implementation(fg.deobf("curse.maven:embeddium-908741:5681725"))
+    if (!project.gradle.startParameter.taskNames.any { it.contains("runServer") }) {
+        runtimeOnly(fg.deobf("curse.maven:oculus-581495:6020952"))
+        runtimeOnly(fg.deobf("curse.maven:embeddium-908741:5681725"))
+    }
 
     implementation(fg.deobf("curse.maven:timeless-and-classics-zero-1028108:6518539"))
     implementation(fg.deobf("curse.maven:create-328085:7178761"))
