@@ -222,9 +222,10 @@ object ClientMouseHandler {
         if (ClientEventHandler.isNacelleCam(player)) {
             nacelleCameraYaw -= 0.2f * times * lerpNacelleSpeedX
             nacelleCameraPitch += 0.2f * times * lerpNacelleSpeedY
+        } else {
+            nacelleCameraYaw = 0.0
+            nacelleCameraPitch = 0.0
         }
-
-        nacelleCameraPitch = Mth.clamp(nacelleCameraPitch, 0.0, 180.0)
 
         while (nacelleCameraYaw > 180F) {
             nacelleCameraYaw -= 360
@@ -271,8 +272,16 @@ object ClientMouseHandler {
             return 0.0
         }
 
-        if (ClientEventHandler.isFreeCam(player) || ClientEventHandler.isNacelleCam(player)) {
+        if (ClientEventHandler.isNacelleCam(player)) {
             return 0.0
+        }
+
+        if (player.vehicle is VehicleEntity) {
+            val vehicle = player.vehicle as VehicleEntity
+            val index = vehicle.getSeatIndex(player)
+            if (ClientEventHandler.isFreeCam(player) && vehicle.useAircraftCamera(index)) {
+                return 0.0
+            }
         }
 
         if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR.get()) && mc.options.cameraType == CameraType.FIRST_PERSON) {
