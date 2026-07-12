@@ -2181,6 +2181,16 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 .require(Items.PAPER, 4)
                 .unlockedBy(getHasName(Items.PAPER), has(Items.PAPER))
                 .save(writer, loc(getItemName(ModItems.VEHICLE_RESET_KIT.get()) + "_assembling"))
+            // TODO 临时配方
+            VehicleAssemblingRecipeBuilder.entity(
+                ModEntities.AIR_SHEEP.get(),
+                VehicleAssemblingRecipe.Category.AIRCRAFT
+            )
+                .require(ItemTags.WOOL, 16)
+                .require(ItemTags.BOATS)
+                .require(Items.MUTTON, 8)
+                .unlockedBy(getHasName(Items.WHITE_WOOL), has(ItemTags.WOOL))
+                .save(writer, loc(getEntityTypeName(ModEntities.AIR_SHEEP.get())))
         }
 
         private fun buildGunRecipes(writer: Consumer<FinishedRecipe>) {
