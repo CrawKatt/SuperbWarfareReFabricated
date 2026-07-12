@@ -84,7 +84,6 @@ open class AirSheepEntity(type: EntityType<AirSheepEntity>, world: Level) : Vehi
             val woolItem = WOOL_BY_DYE_COLOR.getOrElse(colorId) { Items.WHITE_WOOL }
             val mutton = ItemEntity(level, x, (y + 1), z, ItemStack(Items.MUTTON))
             val wool = ItemEntity(level, x, (y + 1), z, ItemStack(woolItem))
-
             val boat = ItemEntity(level, x, (y + 1), z, ItemStack(Items.OAK_BOAT))
 
             mutton.setPickUpDelay(10)
@@ -94,7 +93,6 @@ open class AirSheepEntity(type: EntityType<AirSheepEntity>, world: Level) : Vehi
 
             level.addFreshEntity(mutton)
             level.addFreshEntity(wool)
-
             level.addFreshEntity(boat)
         }
         super.destroy()
