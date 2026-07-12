@@ -16,15 +16,15 @@ function transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialT
     glow2.yScale = scale
     glow2.zScale = scale
 
-    const charge = model.getBone("charge")
-    const energy = vehicle.chargeProgress
-    const energyRate0 = renderer.getEnergy0()
+    let charge = model.getBone("charge")
+    let energy = vehicle.chargeProgress
+    let energyRate0 = renderer.getEnergy0()
     charge.zScale = JsMath.lerp(partialTicks, energyRate0, energy)
     renderer.setEnergy0(energy)
 
     for (let i = 1; i <= 7; i++) {
-        const boneName = "light_on" + i
-        const bone = model.getBone(boneName)
+        let boneName = `light_on${i}`
+        let bone = model.getBone(boneName)
 
         if (bone != null) {
             bone.visible = energy >= (i / 7.0)
