@@ -468,8 +468,6 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                 }
             }
         }
-
-        this.renderByScript(vehicle, model, poseStack, entityYaw, partialTicks, buffer, packedLight)
     }
 
     open fun transformCustomModelPart(
@@ -635,16 +633,16 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                 }
             }
         }
+
+        this.transformCustomModelPartByScript(vehicle, model, poseStack, entityYaw, partialTicks)
     }
 
-    open fun renderByScript(
+    open fun transformCustomModelPartByScript(
         vehicle: T,
         model: BedrockVehicleModel,
         poseStack: PoseStack,
         entityYaw: Float,
-        partialTicks: Float,
-        buffer: MultiBufferSource,
-        packedLight: Int
+        partialTicks: Float
     ) {
         val func = VehicleResource.getDefault(vehicle).getScript() ?: return
         VehicleScriptManager.invokeTransform(func, vehicle, model, poseStack, entityYaw, partialTicks, this)
