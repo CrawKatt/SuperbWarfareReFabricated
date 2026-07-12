@@ -17,6 +17,7 @@ import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.LuckyContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
 import com.atsuishio.superbwarfare.item.curio.*
+import com.atsuishio.superbwarfare.item.food.CrustItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.item.gun.handgun.*
 import com.atsuishio.superbwarfare.item.gun.launcher.*
@@ -39,7 +40,6 @@ import com.atsuishio.superbwarfare.item.weapon.*
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.tiers.ModItemTier
 import net.minecraft.core.registries.Registries
-import net.minecraft.world.food.FoodProperties
 import net.minecraft.world.item.*
 import net.minecraft.world.item.Item.Properties
 import net.minecraft.world.level.block.Block
@@ -195,7 +195,6 @@ object ModItems {
     @JvmField
     val ITEMS: DeferredRegister<Item> = DeferredRegister.create(Registries.ITEM, Mod.MODID)
 
-    @JvmField val CRUST = registerItem("crust") { Item(Properties().food(FoodProperties.Builder().nutrition(10).saturationMod(0.5f).build())) }
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
          ForgeSpawnEggItem(ModEntities.SENPAI, -11584987, -14014413, Properties())
@@ -250,6 +249,8 @@ object ModItems {
     @JvmField val THERMAL_IMAGING_GOGGLES = registerItem("thermal_imaging_goggles") { ThermalImagingGogglesItem() }
     @JvmField val HANDSOME_GOGGLES = registerItem("handsome_goggles") { HandsomeGogglesItem() }
     @JvmField val TACTICAL_TERMINAL = registerItem("tactical_terminal") { TacticalTerminalItem() }
+
+    @JvmField val CRUST = registerItem("crust") { CrustItem() }
 
     @JvmField val MORTAR_DEPLOYER = registerItem("mortar_deployer") { MortarDeployerItem() }
     @JvmField val MORTAR_BARREL = registerItem("mortar_barrel")

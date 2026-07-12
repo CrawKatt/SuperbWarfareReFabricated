@@ -460,6 +460,8 @@
 
   "item.superbwarfare.armor_plate": "Armor Plate",
   "des.superbwarfare.armor_plate.infinite": "Infinite",
+  "item.superbwarfare.crust": "Crust",
+  "des.superbwarfare.crust": "It can't fly...",
 
   "item.superbwarfare.ru_helmet_6b47": "Russian 6b47 Helmet",
   "item.superbwarfare.ru_chest_6b43": "Russian 6b43 Chest",
@@ -1156,6 +1158,8 @@
   "superbwarfare.advancement.main.delete_your_gun.des": "It does barely any damage to vehicles anyway—oh, and by the way, you're out of ammo too",
   "superbwarfare.advancement.main.critical_hit": "クリティカルヒット",
   "superbwarfare.advancement.main.critical_hit.des": "もう止まらないくらい 脳髄まで届くわHit",
+  "superbwarfare.advancement.main.eat_crust": "Pie in the Sky",
+  "superbwarfare.advancement.main.eat_crust.des": "Who wouldn't want to pilot a flying pie?",
 
   "context.superbwarfare.tactical_map.create_marker": "Create Marker",
   "context.superbwarfare.tactical_map.edit_marker": "Edit",
@@ -1341,6 +1345,5 @@
   "superbwarfare.page.resources.scheelite.3": "$(thing)Tungsten Ingot$() can only be blasted by $(thing)Blast Furnace$().",
   "superbwarfare.entry.resources.silver": "Silver Ore",
   "superbwarfare.page.resources.silver.1": "$(thing)Silver Ore$() is generated in the overworld $(thing)from Y=48 to Y=1$().",
-  "superbwarfare.page.resources.silver.2": "$(thing)Deepslate Silver Ore() is generated in the overworld $(thing)from Y=0 to Y=-64$().",
-  "item.superbwarfare.crust": "Crust"
+  "superbwarfare.page.resources.silver.2": "$(thing)Deepslate Silver Ore() is generated in the overworld $(thing)from Y=0 to Y=-64$()."
 }
