@@ -102,17 +102,13 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
             OverlayTexture.NO_OVERLAY, red, green, 0f, 1f
         )
 
-        if (vehicle.chargeProgress < 1) {
-            // glow
-
-            model.renderToBuffer(
-                poseStack,
-                buffer,
-                ModRenderTypes.LASER.apply(TEXTURE_GLOW),
-                BedrockModelRenderTypes.polyMeshCutout(TEXTURE_GLOW),
-                packedLight,
-                OverlayTexture.NO_OVERLAY
-            )
-        }
+        model.renderToBuffer(
+            poseStack,
+            buffer,
+            ModRenderTypes.LASER.apply(TEXTURE_GLOW),
+            BedrockModelRenderTypes.polyMeshCutout(TEXTURE_GLOW),
+            packedLight,
+            OverlayTexture.NO_OVERLAY
+        )
     }
 }
