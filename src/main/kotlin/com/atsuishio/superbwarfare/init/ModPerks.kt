@@ -24,6 +24,8 @@ import net.minecraftforge.registries.RegistryBuilder
 import net.minecraftforge.registries.RegistryObject
 import java.nio.file.Files
 
+typealias PERK = RegistryObject<Perk>
+
 @net.minecraftforge.fml.common.Mod.EventBusSubscriber(bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD)
 @Suppress("unused")
 object ModPerks {
@@ -46,28 +48,28 @@ object ModPerks {
     @JvmField
     val AMMO_PERKS: DeferredRegister<Perk> = DeferredRegister.create(LOCATION, Mod.MODID)
     private val registeredIds = mutableSetOf<String>()
-    private val autoRegistryObjects = mutableMapOf<String, RegistryObject<Perk>>()
-    private fun registerAmmoPerk(id: String, perk: () -> Perk): RegistryObject<Perk> {
+    private val autoRegistryObjects = mutableMapOf<String, PERK>()
+    private fun registerAmmoPerk(id: String, perk: () -> Perk): PERK {
         registeredIds.add(id)
         return AMMO_PERKS.register(id, perk)
     }
 
     // @formatter:off
-    lateinit var AP_BULLET: RegistryObject<Perk>
-    lateinit var JHP_BULLET: RegistryObject<Perk>
-    lateinit var HE_BULLET: RegistryObject<Perk>
-    lateinit var SILVER_BULLET: RegistryObject<Perk>
-    lateinit var POISONOUS_BULLET: RegistryObject<Perk>
-    lateinit var BEAST_BULLET: RegistryObject<Perk>
-    lateinit var LONGER_WIRE: RegistryObject<Perk>
-    lateinit var INCENDIARY_BULLET: RegistryObject<Perk>
-    lateinit var MICRO_MISSILE: RegistryObject<Perk>
-    lateinit var CUPID_ARROW: RegistryObject<Perk>
-    lateinit var RIOT_BULLET: RegistryObject<Perk>
-    lateinit var PHASE_PENETRATING_BULLET: RegistryObject<Perk>
-    lateinit var BLADE_BULLET: RegistryObject<Perk>
-    lateinit var PHOSPHORUS_FLAME_BULLET: RegistryObject<Perk>
-    lateinit var AQUA_BULLET: RegistryObject<Perk>
+    lateinit var AP_BULLET: PERK
+    lateinit var JHP_BULLET: PERK
+    lateinit var HE_BULLET: PERK
+    lateinit var SILVER_BULLET: PERK
+    lateinit var POISONOUS_BULLET: PERK
+    lateinit var BEAST_BULLET: PERK
+    lateinit var LONGER_WIRE: PERK
+    lateinit var INCENDIARY_BULLET: PERK
+    lateinit var MICRO_MISSILE: PERK
+    lateinit var CUPID_ARROW: PERK
+    lateinit var RIOT_BULLET: PERK
+    lateinit var PHASE_PENETRATING_BULLET: PERK
+    lateinit var BLADE_BULLET: PERK
+    lateinit var PHOSPHORUS_FLAME_BULLET: PERK
+    lateinit var AQUA_BULLET: PERK
     // @formatter:on
 
     /**
@@ -75,24 +77,24 @@ object ModPerks {
      */
     @JvmField
     val FUNC_PERKS: DeferredRegister<Perk> = DeferredRegister.create(LOCATION, Mod.MODID)
-    private fun registerFuncPerk(id: String, perk: () -> Perk): RegistryObject<Perk> {
+    private fun registerFuncPerk(id: String, perk: () -> Perk): PERK {
         registeredIds.add(id)
         return FUNC_PERKS.register(id, perk)
     }
 
     // @formatter:off
-    lateinit var HEAL_CLIP: RegistryObject<Perk>
-    lateinit var FOURTH_TIMES_CHARM: RegistryObject<Perk>
-    lateinit var SUBSISTENCE: RegistryObject<Perk>
-    lateinit var FIELD_DOCTOR: RegistryObject<Perk>
-    lateinit var REGENERATION: RegistryObject<Perk>
-    lateinit var TURBO_CHARGER: RegistryObject<Perk>
-    lateinit var POWERFUL_ATTRACTION: RegistryObject<Perk>
-    lateinit var INTELLIGENT_CHIP: RegistryObject<Perk>
-    lateinit var BACKPACK_LINKED_MAGAZINE: RegistryObject<Perk>
-    lateinit var POWERFUL_COOLER: RegistryObject<Perk>
-    lateinit var CAST_NO_SHADOWS: RegistryObject<Perk>
-    lateinit var EAGER_EDGE: RegistryObject<Perk>
+    lateinit var HEAL_CLIP: PERK
+    lateinit var FOURTH_TIMES_CHARM: PERK
+    lateinit var SUBSISTENCE: PERK
+    lateinit var FIELD_DOCTOR: PERK
+    lateinit var REGENERATION: PERK
+    lateinit var TURBO_CHARGER: PERK
+    lateinit var POWERFUL_ATTRACTION: PERK
+    lateinit var INTELLIGENT_CHIP: PERK
+    lateinit var BACKPACK_LINKED_MAGAZINE: PERK
+    lateinit var POWERFUL_COOLER: PERK
+    lateinit var CAST_NO_SHADOWS: PERK
+    lateinit var EAGER_EDGE: PERK
     // @formatter:on
 
     /**
@@ -100,28 +102,28 @@ object ModPerks {
      */
     @JvmField
     val DAMAGE_PERKS: DeferredRegister<Perk> = DeferredRegister.create(LOCATION, Mod.MODID)
-    private fun registerDamagePerk(id: String, perk: () -> Perk): RegistryObject<Perk> {
+    private fun registerDamagePerk(id: String, perk: () -> Perk): PERK {
         registeredIds.add(id)
         return DAMAGE_PERKS.register(id, perk)
     }
 
     // @formatter:off
-    lateinit var KILL_CLIP: RegistryObject<Perk>
-    lateinit var GUTSHOT_STRAIGHT: RegistryObject<Perk>
-    lateinit var KILLING_TALLY: RegistryObject<Perk>
-    lateinit var HEAD_SEEKER: RegistryObject<Perk>
-    lateinit var MONSTER_HUNTER: RegistryObject<Perk>
-    lateinit var VOLT_OVERLOAD: RegistryObject<Perk>
-    lateinit var DESPERADO: RegistryObject<Perk>
-    lateinit var VORPAL_WEAPON: RegistryObject<Perk>
-    lateinit var MAGNIFICENT_HOWL: RegistryObject<Perk>
-    lateinit var FIREFLY: RegistryObject<Perk>
-    lateinit var FAIR_MEANS: RegistryObject<Perk>
-    lateinit var HIGH_IMPACT_RESERVES: RegistryObject<Perk>
-    lateinit var ONE_TWO_PUNCH: RegistryObject<Perk>
-    lateinit var BRAIN_STORM: RegistryObject<Perk>
-    lateinit var BATTLE_OF_WITS: RegistryObject<Perk>
-    lateinit var TARGET_LOCK: RegistryObject<Perk>
+    lateinit var KILL_CLIP: PERK
+    lateinit var GUTSHOT_STRAIGHT: PERK
+    lateinit var KILLING_TALLY: PERK
+    lateinit var HEAD_SEEKER: PERK
+    lateinit var MONSTER_HUNTER: PERK
+    lateinit var VOLT_OVERLOAD: PERK
+    lateinit var DESPERADO: PERK
+    lateinit var VORPAL_WEAPON: PERK
+    lateinit var MAGNIFICENT_HOWL: PERK
+    lateinit var FIREFLY: PERK
+    lateinit var FAIR_MEANS: PERK
+    lateinit var HIGH_IMPACT_RESERVES: PERK
+    lateinit var ONE_TWO_PUNCH: PERK
+    lateinit var BRAIN_STORM: PERK
+    lateinit var BATTLE_OF_WITS: PERK
+    lateinit var TARGET_LOCK: PERK
     // @formatter:on
 
     fun register(bus: IEventBus) {
@@ -143,7 +145,7 @@ object ModPerks {
                         if (id in registeredIds) return@forEach
                         val descriptor = parsePerkJson(path) ?: return@forEach
                         val perk = JsPerk(id, descriptor)
-                        val ro: RegistryObject<Perk> = when (descriptor.perkType) {
+                        val ro: PERK = when (descriptor.perkType) {
                             Perk.Type.AMMO -> registerAmmoPerk(id) { perk }
                             Perk.Type.FUNCTIONAL -> registerFuncPerk(id) { perk }
                             Perk.Type.DAMAGE -> registerDamagePerk(id) { perk }
