@@ -25,6 +25,8 @@ import net.neoforged.neoforge.registries.NewRegistryEvent
 import net.neoforged.neoforge.registries.RegistryBuilder
 import java.nio.file.Files
 
+typealias PERK = DeferredHolder<Perk, Perk>
+
 @EventBusSubscriber
 @Suppress("unused")
 object ModPerks {
@@ -49,28 +51,28 @@ object ModPerks {
     @JvmField
     val AMMO_PERKS: DeferredRegister<Perk> = DeferredRegister.create(LOCATION, Mod.MODID)
     private val registeredIds = mutableSetOf<String>()
-    private val autoRegistryObjects = mutableMapOf<String, DeferredHolder<Perk, Perk>>()
-    private fun registerAmmoPerk(id: String, perk: () -> Perk): DeferredHolder<Perk, Perk> {
+    private val autoRegistryObjects = mutableMapOf<String, PERK>()
+    private fun registerAmmoPerk(id: String, perk: () -> Perk): PERK {
         registeredIds.add(id)
         return AMMO_PERKS.register(id, perk)
     }
 
     // @formatter:off
-    lateinit var AP_BULLET: DeferredHolder<Perk, Perk>
-    lateinit var JHP_BULLET: DeferredHolder<Perk, Perk>
-    lateinit var HE_BULLET: DeferredHolder<Perk, Perk>
-    lateinit var SILVER_BULLET: DeferredHolder<Perk, Perk>
-    lateinit var POISONOUS_BULLET: DeferredHolder<Perk, Perk>
-    lateinit var BEAST_BULLET: DeferredHolder<Perk, Perk>
-    lateinit var LONGER_WIRE: DeferredHolder<Perk, Perk>
-    lateinit var INCENDIARY_BULLET: DeferredHolder<Perk, Perk>
-    lateinit var MICRO_MISSILE: DeferredHolder<Perk, Perk>
-    lateinit var CUPID_ARROW: DeferredHolder<Perk, Perk>
-    lateinit var RIOT_BULLET: DeferredHolder<Perk, Perk>
-    lateinit var PHASE_PENETRATING_BULLET: DeferredHolder<Perk, Perk>
-    lateinit var BLADE_BULLET: DeferredHolder<Perk, Perk>
-    lateinit var PHOSPHORUS_FLAME_BULLET: DeferredHolder<Perk, Perk>
-    lateinit var AQUA_BULLET: DeferredHolder<Perk, Perk>
+    lateinit var AP_BULLET: PERK
+    lateinit var JHP_BULLET: PERK
+    lateinit var HE_BULLET: PERK
+    lateinit var SILVER_BULLET: PERK
+    lateinit var POISONOUS_BULLET: PERK
+    lateinit var BEAST_BULLET: PERK
+    lateinit var LONGER_WIRE: PERK
+    lateinit var INCENDIARY_BULLET: PERK
+    lateinit var MICRO_MISSILE: PERK
+    lateinit var CUPID_ARROW: PERK
+    lateinit var RIOT_BULLET: PERK
+    lateinit var PHASE_PENETRATING_BULLET: PERK
+    lateinit var BLADE_BULLET: PERK
+    lateinit var PHOSPHORUS_FLAME_BULLET: PERK
+    lateinit var AQUA_BULLET: PERK
     // @formatter:on
 
     /**
@@ -78,24 +80,24 @@ object ModPerks {
      */
     @JvmField
     val FUNC_PERKS: DeferredRegister<Perk> = DeferredRegister.create(LOCATION, Mod.MODID)
-    private fun registerFuncPerk(id: String, perk: () -> Perk): DeferredHolder<Perk, Perk> {
+    private fun registerFuncPerk(id: String, perk: () -> Perk): PERK {
         registeredIds.add(id)
         return FUNC_PERKS.register(id, perk)
     }
 
     // @formatter:off
-    lateinit var HEAL_CLIP: DeferredHolder<Perk, Perk>
-    lateinit var FOURTH_TIMES_CHARM: DeferredHolder<Perk, Perk>
-    lateinit var SUBSISTENCE: DeferredHolder<Perk, Perk>
-    lateinit var FIELD_DOCTOR: DeferredHolder<Perk, Perk>
-    lateinit var REGENERATION: DeferredHolder<Perk, Perk>
-    lateinit var TURBO_CHARGER: DeferredHolder<Perk, Perk>
-    lateinit var POWERFUL_ATTRACTION: DeferredHolder<Perk, Perk>
-    lateinit var INTELLIGENT_CHIP: DeferredHolder<Perk, Perk>
-    lateinit var BACKPACK_LINKED_MAGAZINE: DeferredHolder<Perk, Perk>
-    lateinit var POWERFUL_COOLER: DeferredHolder<Perk, Perk>
-    lateinit var CAST_NO_SHADOWS: DeferredHolder<Perk, Perk>
-    lateinit var EAGER_EDGE: DeferredHolder<Perk, Perk>
+    lateinit var HEAL_CLIP: PERK
+    lateinit var FOURTH_TIMES_CHARM: PERK
+    lateinit var SUBSISTENCE: PERK
+    lateinit var FIELD_DOCTOR: PERK
+    lateinit var REGENERATION: PERK
+    lateinit var TURBO_CHARGER: PERK
+    lateinit var POWERFUL_ATTRACTION: PERK
+    lateinit var INTELLIGENT_CHIP: PERK
+    lateinit var BACKPACK_LINKED_MAGAZINE: PERK
+    lateinit var POWERFUL_COOLER: PERK
+    lateinit var CAST_NO_SHADOWS: PERK
+    lateinit var EAGER_EDGE: PERK
     // @formatter:on
 
     /**
@@ -103,28 +105,28 @@ object ModPerks {
      */
     @JvmField
     val DAMAGE_PERKS: DeferredRegister<Perk> = DeferredRegister.create(LOCATION, Mod.MODID)
-    private fun registerDamagePerk(id: String, perk: () -> Perk): DeferredHolder<Perk, Perk> {
+    private fun registerDamagePerk(id: String, perk: () -> Perk): PERK {
         registeredIds.add(id)
         return DAMAGE_PERKS.register(id, perk)
     }
 
     // @formatter:off
-    lateinit var KILL_CLIP: DeferredHolder<Perk, Perk>
-    lateinit var GUTSHOT_STRAIGHT: DeferredHolder<Perk, Perk>
-    lateinit var KILLING_TALLY: DeferredHolder<Perk, Perk>
-    lateinit var HEAD_SEEKER: DeferredHolder<Perk, Perk>
-    lateinit var MONSTER_HUNTER: DeferredHolder<Perk, Perk>
-    lateinit var VOLT_OVERLOAD: DeferredHolder<Perk, Perk>
-    lateinit var DESPERADO: DeferredHolder<Perk, Perk>
-    lateinit var VORPAL_WEAPON: DeferredHolder<Perk, Perk>
-    lateinit var MAGNIFICENT_HOWL: DeferredHolder<Perk, Perk>
-    lateinit var FIREFLY: DeferredHolder<Perk, Perk>
-    lateinit var FAIR_MEANS: DeferredHolder<Perk, Perk>
-    lateinit var HIGH_IMPACT_RESERVES: DeferredHolder<Perk, Perk>
-    lateinit var ONE_TWO_PUNCH: DeferredHolder<Perk, Perk>
-    lateinit var BRAIN_STORM: DeferredHolder<Perk, Perk>
-    lateinit var BATTLE_OF_WITS: DeferredHolder<Perk, Perk>
-    lateinit var TARGET_LOCK: DeferredHolder<Perk, Perk>
+    lateinit var KILL_CLIP: PERK
+    lateinit var GUTSHOT_STRAIGHT: PERK
+    lateinit var KILLING_TALLY: PERK
+    lateinit var HEAD_SEEKER: PERK
+    lateinit var MONSTER_HUNTER: PERK
+    lateinit var VOLT_OVERLOAD: PERK
+    lateinit var DESPERADO: PERK
+    lateinit var VORPAL_WEAPON: PERK
+    lateinit var MAGNIFICENT_HOWL: PERK
+    lateinit var FIREFLY: PERK
+    lateinit var FAIR_MEANS: PERK
+    lateinit var HIGH_IMPACT_RESERVES: PERK
+    lateinit var ONE_TWO_PUNCH: PERK
+    lateinit var BRAIN_STORM: PERK
+    lateinit var BATTLE_OF_WITS: PERK
+    lateinit var TARGET_LOCK: PERK
     // @formatter:on
 
     fun register(bus: IEventBus) {
@@ -146,7 +148,7 @@ object ModPerks {
                         if (id in registeredIds) return@forEach
                         val descriptor = parsePerkJson(path) ?: return@forEach
                         val perk = JsPerk(id, descriptor)
-                        val ro: DeferredHolder<Perk, Perk> = when (descriptor.perkType) {
+                        val ro: PERK = when (descriptor.perkType) {
                             Perk.Type.AMMO -> registerAmmoPerk(id) { perk }
                             Perk.Type.FUNCTIONAL -> registerFuncPerk(id) { perk }
                             Perk.Type.DAMAGE -> registerDamagePerk(id) { perk }
