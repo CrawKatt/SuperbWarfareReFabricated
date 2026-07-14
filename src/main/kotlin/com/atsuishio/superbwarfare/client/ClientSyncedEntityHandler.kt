@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.client
 
-import com.atsuishio.superbwarfare.config.server.MiscConfig
+import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.network.message.receive.BeyondVisualEntitySyncMessage.SyncedEntity
 import com.atsuishio.superbwarfare.network.message.receive.PlayerInfoSyncMessage.SyncedPlayerInfo
 import com.atsuishio.superbwarfare.network.message.receive.RadarSyncMessage
@@ -96,7 +96,7 @@ object ClientSyncedEntityHandler {
     @JvmStatic
     fun clean() {
         val tick = System.currentTimeMillis()
-        val expire = MiscConfig.CLIENT_SYNC_EXPIRE_TIME.get()
+        val expire = SyncConfig.CLIENT_SYNC_EXPIRE_TIME.get()
         SYNCED_WORLD_RENDER.values.removeIf { tick - it.timeStamp > expire }
         SYNCED_PLAYERS.values.removeIf { tick - it.timeStamp > expire }
         // 雷达过期清理：超过 2 个 sync 周期未更新则移除
@@ -150,7 +150,6 @@ object ClientSyncedEntityHandler {
 
     /**
      * 无条件同步实体到超视距世界渲染池。
-     * 由 [BeyondVisualEntitySyncMessage] 调用，不区分敌我，不依赖雷达。
      */
     @JvmStatic
     fun syncWorldRender(dim: ResourceLocation, list: List<SyncedEntity>) {

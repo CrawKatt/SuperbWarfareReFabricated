@@ -18,4 +18,5 @@ val SERVER_CONFIG = buildConfig(
     MiscConfig,
     AmmoConfig,
     MapConfig,
+    SyncConfig,
 )

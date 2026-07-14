@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.tools
 
-import com.atsuishio.superbwarfare.config.server.MiscConfig
+import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.projectile.MissileProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
@@ -62,17 +62,18 @@ object ServerSyncedEntityHandler {
     @JvmStatic
     @JvmOverloads
     fun register(entity: Entity, targetPos: Vec3? = null) {
-        if (!MiscConfig.SYNC_ENTITY_OVER_RANGE.get()) return
+        if (!SyncConfig.SYNC_ENTITY_OVER_RANGE.get()) return
         val level = entity.level()
         if (level.isClientSide) return
         level.server ?: return
         if (entity !is VehicleEntity && entity !is MissileProjectile && entity !is Player
-            && entity !is LivingEntity && !VehicleConfig.inScanList(entity.type)) return
+            && entity !is LivingEntity && !VehicleConfig.inScanList(entity.type)
+        ) return
 
         val dim = level.dimension().location().toString()
         val now = System.currentTimeMillis()
 
-        val nbt = entity.serializeNBT(level.registryAccess())
+        val nbt = CompoundTag().also { entity.saveWithoutId(it) }
 
         val td = if (entity is VehicleEntity)
             entity.computed().trackDistanceMultiply else 1.0
@@ -143,10 +144,10 @@ object ServerSyncedEntityHandler {
             val dimKey = dimLevel.dimension().location().toString()
             val dimEntries = entities[dimKey] ?: continue
             val toRemove = dimEntries.values.filter { entry ->
-                dimLevel.getEntity(entry.entityId) == null && now - entry.timeStamp > MiscConfig.SERVER_SYNC_EXPIRE_TIME.get()
+                dimLevel.getEntity(entry.entityId) == null && now - entry.timeStamp > SyncConfig.SERVER_SYNC_EXPIRE_TIME.get()
             }
             if (toRemove.isNotEmpty()) {
-                dimEntries.values.removeAll(toRemove)
+                dimEntries.values.removeAll(toRemove.toSet())
                 // 过期清理时也通知客户端移除
                 val pending = pendingRemovals.getOrPut(dimKey) { ConcurrentHashMap.newKeySet() }
                 for (entry in toRemove) {
@@ -159,7 +160,7 @@ object ServerSyncedEntityHandler {
     @SubscribeEvent
     fun tick(event: ServerTickEvent.Post) {
         val server = event.server
-        if (server.tickCount % MiscConfig.SERVER_SYNC_CLEAN_INTERVAL.get() == 0) {
+        if (server.tickCount % SyncConfig.SERVER_SYNC_CLEAN_INTERVAL.get() == 0) {
             cleanAll(server)
         }
         broadcastWorldRender(server)

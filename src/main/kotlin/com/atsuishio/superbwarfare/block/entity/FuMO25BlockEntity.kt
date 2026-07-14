@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.block.entity
 
 import com.atsuishio.superbwarfare.block.FuMO25Block
-import com.atsuishio.superbwarfare.config.server.MiscConfig
+import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.inventory.menu.FuMO25Menu
@@ -184,7 +184,7 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
         const val MAX_DATA_COUNT: Int = 5
 
         fun serverTick(level: Level, pos: BlockPos, state: BlockState, blockEntity: FuMO25BlockEntity) {
-            if (!MiscConfig.SYNC_ENTITY_OVER_RANGE.get()) return
+            if (!SyncConfig.SYNC_ENTITY_OVER_RANGE.get()) return
             val energyStorage = blockEntity.getEnergyStorage()
             val energy = energyStorage.energyStored
 

@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.init.ModSerializers
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.network.message.receive.EntityRelationSyncMessage
@@ -151,16 +152,19 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
             if (targetEntity != null) {
                 setTargetPos(targetEntity.position())
             }
-            ServerSyncedEntityHandler.register(this, getTargetPos())
 
-            // 向友方玩家同步自身 ID（轻量级，实体状态数据由 BeyondVisualEntitySyncMessage 统一发送）
-            val srv = server
-            if (srv != null) {
-                val dim = level().dimension().location()
-                val msg = EntityRelationSyncMessage(dim, friendlyIds = listOf(id))
-                for (player in srv.playerList.players) {
-                    if (SeekTool.IS_FRIENDLY.test(player, this.owner)) {
-                        sendPacketTo(player, msg)
+            if (this.tickCount % SyncConfig.SYNC_ENTITY_INTERVAL.get() == 0) {
+                ServerSyncedEntityHandler.register(this, getTargetPos())
+
+                // 向友方玩家同步自身 ID（轻量级，实体状态数据由 BeyondVisualEntitySyncMessage 统一发送）
+                val srv = this.server
+                if (srv != null) {
+                    val dim = level().dimension().location()
+                    val msg = EntityRelationSyncMessage(dim, friendlyIds = listOf(id))
+                    for (player in srv.playerList.players) {
+                        if (SeekTool.IS_FRIENDLY.test(player, this.owner)) {
+                            sendPacketTo(player, msg)
+                        }
                     }
                 }
             }
