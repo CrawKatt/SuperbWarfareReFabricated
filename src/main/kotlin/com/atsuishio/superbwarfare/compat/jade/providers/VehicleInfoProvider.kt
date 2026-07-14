@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.OwnableEntity
 import snownee.jade.api.EntityAccessor
 import snownee.jade.api.IEntityComponentProvider
 import snownee.jade.api.ITooltip
@@ -30,7 +31,7 @@ object VehicleInfoProvider : IEntityComponentProvider {
         } catch (_: Exception) {
             null
         }
-        if (uuid != null) {
+        if (uuid != null && vehicle !is OwnableEntity) {
             val name = CommonProxy.getLastKnownUsername(uuid) ?: "???"
             tooltip.add(Component.translatable("jade.owner", name))
         }

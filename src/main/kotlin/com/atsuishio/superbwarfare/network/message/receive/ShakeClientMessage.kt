@@ -8,10 +8,7 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler.shakeTime
 import com.atsuishio.superbwarfare.event.ClientEventHandler.shakeType
 import com.atsuishio.superbwarfare.network.ClientPacketPayload
 import com.atsuishio.superbwarfare.network.PayloadContext
-import com.atsuishio.superbwarfare.tools.isNullOrSpector
-import com.atsuishio.superbwarfare.tools.localPlayer
-import com.atsuishio.superbwarfare.tools.queueClientWorkIfDelayed
-import com.atsuishio.superbwarfare.tools.sendPacket
+import com.atsuishio.superbwarfare.tools.*
 import kotlinx.serialization.Serializable
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.util.Mth.DEG_TO_RAD
@@ -65,13 +62,11 @@ data class ShakeClientMessage(
             amplitude: Double
         ) {
             val center = Vec3(x, y, z)
-
-            for (serverPlayer in level.getEntitiesOfClass(
-                ServerPlayer::class.java,
-                AABB(center, center).inflate(sendRadius)
-            ) { true }) {
-                serverPlayer.sendPacket(ShakeClientMessage(time, sendRadius, amplitude, x, y, z))
+            val entitiesInRange = mutableListOf<ServerPlayer>()
+            EntityFindUtil.getEntities(level).get(AABB(center, center).inflate(sendRadius)) {
+                if (it is ServerPlayer) entitiesInRange.add(it)
             }
+            entitiesInRange.forEach { it.sendPacket(ShakeClientMessage(time, sendRadius, amplitude, x, y, z)) }
         }
 
         @JvmStatic

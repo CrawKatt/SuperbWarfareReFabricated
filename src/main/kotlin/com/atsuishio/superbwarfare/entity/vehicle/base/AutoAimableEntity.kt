@@ -63,8 +63,7 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
         get() = TowerAI.ThreatConfig()
 
     override fun interact(player: Player, hand: InteractionHand): InteractionResult {
-        val res = super.interact(player, hand)
-        if (player.isShiftKeyDown && !isWreck) {
+        if (player.isCrouching && !isWreck && !this.locked ) {
             if (this.optionalOwnerUUID.isEmpty) {
                 ownerUUID = player.getUUID()
             }
@@ -88,7 +87,7 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
         }
 
         targetUUID = ""
-        return res
+        return super.interact(player, hand)
     }
 
     override fun onCrowbarInteract(
@@ -315,8 +314,6 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
     open fun basicEnemyProjectileFilter(projectile: Projectile): Boolean {
         return TowerAI.TeamResolver.isHostileProjectile(this, projectile)
     }
-
-
 
     /**
      * 判断具有威胁的弹射物。
