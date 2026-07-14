@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.tools
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.OBBEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
@@ -190,6 +191,9 @@ open class CustomExplosion(
 
             val numTiers = tierBoundaries.size - 1
 
+            // Pre-compute VS ship transforms for block destruction on physics bodies
+            val vsShipCache = ValkyrienSkiesCompat.ShipTransformCache.create(this@CustomExplosion.level, aabb)
+
             // ================================================================
             // Process each tier: search → filter → destroy → clear toBlow.
             // Tier 0 runs immediately, tier N is delayed by N ticks.
@@ -270,7 +274,8 @@ open class CustomExplosion(
                         val flattenedRadius = effectiveRadius * 1.2f
                         if (flattenedDistSqr > flattenedRadius * flattenedRadius) continue
 
-                        val blockState = this@CustomExplosion.level.getBlockState(blockpos)
+                        val actualPos = vsShipCache.toShipSpace(blockpos) ?: blockpos
+                        val blockState = this@CustomExplosion.level.getBlockState(actualPos)
                         var resistance = blockState.block.defaultDestroyTime()
                         if (blockState.soundType === SoundType.METAL || blockState.soundType === SoundType.COPPER || blockState.soundType === SoundType.NETHERITE_BLOCK) {
                             resistance *= 3f
@@ -278,10 +283,10 @@ open class CustomExplosion(
                         force *= ((1f - (flattenedDistSqr / (flattenedRadius * flattenedRadius))).coerceIn(0.0, 1.0)).toFloat()
 
                         if (resistance != -1f && force > resistance && this@CustomExplosion.damageCalculator.shouldBlockExplode(
-                                this@CustomExplosion, this@CustomExplosion.level, blockpos, blockState, force)
+                                this@CustomExplosion, this@CustomExplosion.level, actualPos, blockState, force)
                         ) {
-                            this@CustomExplosion.toBlow.add(blockpos.immutable())
-                            qualified.add(blockpos.immutable())
+                            this@CustomExplosion.toBlow.add(actualPos.immutable())
+                            qualified.add(actualPos.immutable())
                         }
                     }
 
