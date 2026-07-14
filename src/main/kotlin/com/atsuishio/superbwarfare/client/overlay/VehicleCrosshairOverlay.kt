@@ -410,12 +410,12 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
 
                 if (player === entity.getFirstPassenger()) {
                     if (entity.hasDecoy()) {
-                        if (entity.decoyReady) {
+                        if (entity.decoyCount > 0) {
                             guiGraphics.drawString(
                                 Minecraft.getInstance().font,
                                 Component.translatable("tips.superbwarfare.smoke.ready").append(
                                     Component.literal(
-                                        " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
+                                        " " + entity.decoyCount + " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
                                     )
                                 ),
                                 30,
@@ -424,14 +424,25 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                                 false
                             )
                         } else {
-                            guiGraphics.drawString(
-                                Minecraft.getInstance().font,
-                                Component.translatable("tips.superbwarfare.smoke.reloading"),
-                                30,
-                                1,
-                                0xFF0000,
-                                false
-                            )
+                            if (entity.decoyItemCount > 0) {
+                                guiGraphics.drawString(
+                                    Minecraft.getInstance().font,
+                                    Component.translatable("tips.superbwarfare.smoke.reloading"),
+                                    30,
+                                    1,
+                                    0xFF0000,
+                                    false
+                                )
+                            } else {
+                                guiGraphics.drawString(
+                                    Minecraft.getInstance().font,
+                                    Component.translatable("tips.superbwarfare.smoke.none"),
+                                    30,
+                                    1,
+                                    0xFF0000,
+                                    false
+                                )
+                            }
                         }
                     }
                 }

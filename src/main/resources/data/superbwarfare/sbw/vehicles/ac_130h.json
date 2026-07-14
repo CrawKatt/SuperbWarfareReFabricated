@@ -2,6 +2,8 @@
   "MaxHealth": 1000,
   "MaxEnergy": 40000000,
   "MouseSensitivity": 0.2,
+  "DecoyMagazineSize": 32,
+  "DecoyReloadTime": 600,
   "OBB": [
     {
       "Size": [28.0625, 0.625, 3.531],

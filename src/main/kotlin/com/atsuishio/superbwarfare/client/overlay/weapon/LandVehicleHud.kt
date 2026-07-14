@@ -311,12 +311,12 @@ object LandVehicleHud {
 
             // 诱饵
             if (vehicle.hasDecoy() && player === vehicle.getFirstPassenger()) {
-                if (vehicle.decoyReady) {
+                if (vehicle.decoyCount > 0) {
                     guiGraphics.drawString(
                         Minecraft.getInstance().font,
                         Component.translatable("tips.superbwarfare.smoke.ready").append(
                             Component.literal(
-                                " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
+                                " " + vehicle.decoyCount + " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
                             )
                         ),
                         screenWidth / 2 - 165,
@@ -325,14 +325,25 @@ object LandVehicleHud {
                         false
                     )
                 } else {
-                    guiGraphics.drawString(
-                        Minecraft.getInstance().font,
-                        Component.translatable("tips.superbwarfare.smoke.reloading"),
-                        screenWidth / 2 - 165,
-                        screenHeight / 2 - 36,
-                        0xFF0000,
-                        false
-                    )
+                    if (vehicle.decoyItemCount > 0) {
+                        guiGraphics.drawString(
+                            Minecraft.getInstance().font,
+                            Component.translatable("tips.superbwarfare.smoke.reloading"),
+                            screenWidth / 2 - 165,
+                            screenHeight / 2 - 36,
+                            0xFF0000,
+                            false
+                        )
+                    } else {
+                        guiGraphics.drawString(
+                            Minecraft.getInstance().font,
+                            Component.translatable("tips.superbwarfare.smoke.none"),
+                            screenWidth / 2 - 165,
+                            screenHeight / 2 - 36,
+                            0xFF0000,
+                            false
+                        )
+                    }
                 }
             }
 

@@ -352,12 +352,12 @@ object AircraftHud {
 
             // 热诱弹
             if (vehicle.hasDecoy()) {
-                if (vehicle.decoyReady) {
+                if (vehicle.decoyCount > 0) {
                     guiGraphics.drawString(
                         Minecraft.getInstance().font,
                         Component.translatable("tips.superbwarfare.flare.ready").append(
                             Component.literal(
-                                " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
+                                " " + vehicle.decoyCount + " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
                             )
                         ),
                         72,
@@ -366,14 +366,25 @@ object AircraftHud {
                         false
                     )
                 } else {
-                    guiGraphics.drawString(
-                        Minecraft.getInstance().font,
-                        Component.translatable("tips.superbwarfare.flare.reloading"),
-                        72,
-                        0,
-                        0xFF0000,
-                        false
-                    )
+                    if (vehicle.decoyItemCount > 0) {
+                        guiGraphics.drawString(
+                            Minecraft.getInstance().font,
+                            Component.translatable("tips.superbwarfare.flare.reloading"),
+                            72,
+                            0,
+                            0xFF0000,
+                            false
+                        )
+                    } else {
+                        guiGraphics.drawString(
+                            Minecraft.getInstance().font,
+                            Component.translatable("tips.superbwarfare.flare.none"),
+                            72,
+                            0,
+                            0xFF0000,
+                            false
+                        )
+                    }
                 }
             }
             guiGraphics.drawString(mc.font, Component.literal("TGT"), 76, 78, color, false)
@@ -642,10 +653,10 @@ object AircraftHud {
                 }
 
                 if (vehicle.hasDecoy()) {
-                    if (vehicle.decoyReady) {
+                    if (vehicle.decoyCount > 0) {
                         val componentReady = Component.translatable("tips.superbwarfare.flare.ready").append(
                             Component.literal(
-                                " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
+                                " " + vehicle.decoyCount + " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
                             )
                         )
                         val length = font.width(componentReady)
@@ -659,7 +670,11 @@ object AircraftHud {
                             false
                         )
                     } else {
-                        val componentReloading = Component.translatable("tips.superbwarfare.flare.reloading")
+                        var componentReloading = Component.translatable("tips.superbwarfare.flare.reloading")
+                        if (vehicle.decoyItemCount < 1) {
+                            componentReloading = Component.translatable("tips.superbwarfare.flare.none")
+                        }
+
                         val length = font.width(componentReloading)
 
                         guiGraphics.drawString(

@@ -6,6 +6,8 @@ import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo
 import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.entity.projectile.C4Entity
+import com.atsuishio.superbwarfare.entity.projectile.FlareDecoyEntity
+import com.atsuishio.superbwarfare.entity.projectile.SmokeDecoyEntity
 import com.atsuishio.superbwarfare.entity.vehicle.TurretWreckEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleEngineUtils.lerpAngle
@@ -102,7 +104,7 @@ object VehicleMotionUtils {
         val entities = vehicle.level().getEntities(
             EntityTypeTest.forClass(Entity::class.java), searchBox
         ) { entity ->
-            entity !== vehicle && entity !== vehicle.getFirstPassenger() && entity.vehicle == null && entity !is C4Entity
+            entity !== vehicle && entity !== vehicle.getFirstPassenger() && entity.vehicle == null && entity !is C4Entity && entity !is SmokeDecoyEntity && entity !is FlareDecoyEntity
         }
 
         for (entity in entities) {

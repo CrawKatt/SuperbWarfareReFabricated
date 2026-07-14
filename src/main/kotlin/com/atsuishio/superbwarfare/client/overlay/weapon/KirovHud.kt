@@ -166,12 +166,12 @@ object KirovHud {
 
                 guiGraphics.drawString(mc.font, component, 25, -9, Mth.hsvToRgb(0f, heat, 1f), false)
                 if (vehicle.hasDecoy()) {
-                    if (vehicle.decoyReady) {
+                    if (vehicle.decoyCount > 0) {
                         guiGraphics.drawString(
                             Minecraft.getInstance().font,
                             Component.translatable("tips.superbwarfare.flare.ready").append(
                                 Component.literal(
-                                    " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
+                                    " " + vehicle.decoyCount + " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
                                 )
                             ),
                             25,
@@ -180,14 +180,25 @@ object KirovHud {
                             false
                         )
                     } else {
-                        guiGraphics.drawString(
-                            Minecraft.getInstance().font,
-                            Component.translatable("tips.superbwarfare.flare.reloading"),
-                            25,
-                            1,
-                            0xFF0000,
-                            false
-                        )
+                        if (vehicle.decoyItemCount > 0) {
+                            guiGraphics.drawString(
+                                Minecraft.getInstance().font,
+                                Component.translatable("tips.superbwarfare.flare.reloading"),
+                                25,
+                                1,
+                                0xFF0000,
+                                false
+                            )
+                        } else {
+                            guiGraphics.drawString(
+                                Minecraft.getInstance().font,
+                                Component.translatable("tips.superbwarfare.flare.none"),
+                                25,
+                                1,
+                                0xFF0000,
+                                false
+                            )
+                        }
                     }
                 }
 

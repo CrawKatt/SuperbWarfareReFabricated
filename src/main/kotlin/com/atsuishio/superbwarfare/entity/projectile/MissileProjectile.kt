@@ -177,14 +177,17 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
     open fun distractedByDecoy() {
         if (this.isDistracted()) return
 
-        val decoy = SeekTool.seekLivingEntities(this, 32.0, 90.0)
+        val decoy = SeekTool.seekLivingEntities(this, 32.0, 60.0)
             .asSequence()
             .filter { it.type.`is`(ModTags.EntityTypes.DECOY) }
             .toList()
 
-        if (decoy.isNotEmpty()) {
-            this.setTargetUUID(decoy.first().stringUUID)
-            this.setDistracted(true)
+        for (d in decoy) {
+            if (Math.random() < 0.25) {
+                this.setTargetUUID(d.stringUUID)
+                this.setDistracted(true)
+                return
+            }
         }
     }
 

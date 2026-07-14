@@ -9,7 +9,6 @@ import com.atsuishio.superbwarfare.item.ammo.AmmoSupplierItem
 import net.minecraft.core.NonNullList
 import net.minecraft.tags.TagKey
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -269,15 +268,15 @@ object InventoryTool {
     }
 
     /**
-     * 消耗生物物品列表内指定物品
+     * 消耗实体物品列表内指定物品
      * 
-     * @param living 物品类型
+     * @param entity 实体类型
      * @param item   物品类型
      * @param count  要消耗的数量
      */
     @JvmStatic
-    fun consumeItem(living: LivingEntity, item: Item, count: Int) {
-        living.getCapability(ForgeCapabilities.ITEM_HANDLER)
+    fun consumeItem(entity: Entity, item: Item, count: Int) {
+        entity.getCapability(ForgeCapabilities.ITEM_HANDLER)
             .ifPresent { consumeItem(it, item, count) }
     }
 

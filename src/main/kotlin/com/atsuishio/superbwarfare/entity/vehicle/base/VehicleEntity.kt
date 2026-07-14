@@ -32,6 +32,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.utils.*
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleEngineUtils.aircraftLoiter
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotFromVector
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getYRotFromVector
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleWeaponUtils.reloadDecoy
 import com.atsuishio.superbwarfare.event.ClientMouseHandler
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.inventory.handler.VehicleContainerHandler
@@ -311,7 +312,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     protected var noPassengerTime = 0
     var damageDebugResultReceiver: Player? = null
 
-    open var decoyReloadCoolDown = 0
 
     open var lastTickSpeed = 0.0
     open var lastTickVerticalSpeed = 0.0
@@ -864,7 +864,9 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             define(YAW_WHILE_SHOOT, 0f)
             define(SERVER_YAW, yRot)
             define(SERVER_PITCH, xRot)
-            define(DECOY_READY, false)
+            define(DECOY_COUNT, 0)
+            define(DECOY_RELOAD_COOLDOWN, getDecoyReloadTime())
+            define(DECOY_ITEM_COUNT, 0)
             define(SYNCHED_GEAR_ROT, 0f)
             define(GEAR_UP, false)
             define(FORWARD_INPUT_DOWN, false)
@@ -1403,7 +1405,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         subEngineDamaged = compound.getBoolean("SubEngineDamaged")
 
         power = compound.getFloat("Power")
-        decoyReady = compound.getBoolean("DecoyReady")
+        decoyCount = compound.getInt("DecoyCount")
+        decoyReloadCoolDown = compound.getInt("DecoyReloadCoolDown")
         synchedGearRot = compound.getFloat("GearRot")
         gearUp = compound.getBoolean("GearUp")
         propellerRot = compound.getFloat("PropellerRot")
@@ -1531,7 +1534,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         compound.putBoolean("SubEngineDamaged", subEngineDamaged)
 
         compound.putFloat("Power", power)
-        compound.putBoolean("DecoyReady", decoyReady)
+        compound.putInt("DecoyCount", decoyCount)
+        compound.putInt("DecoyReloadCoolDown", decoyReloadCoolDown)
         compound.putFloat("GearRot", synchedGearRot)
         compound.putBoolean("GearUp", gearUp)
         compound.putFloat("PropellerRot", propellerRot)
@@ -1881,7 +1885,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
 
     open fun getMaxHealth() = computed().maxHealth
-
+    open fun getDecoyReloadTime() = computed().decoyReloadTime
     open fun getTurretMaxHealth() = 50f
     open fun getWheelMaxHealth() = 50f
     open fun getEngineMaxHealth() = 50f
@@ -2265,10 +2269,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             gunYRotO = deltaG + this.gunYRot
         }
 
-        if (decoyReloadCoolDown > 0) {
-            decoyReloadCoolDown--
-        }
-
         if (this.cannonRecoilTime > 0) {
             cannonRecoilTime -= 1
         }
@@ -2333,11 +2333,26 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         hornVolume *= 0.5f
 
-        if (hasDecoy()) {
-            if (this.vehicleType == VehicleType.AIRPLANE || this.vehicleType == VehicleType.HELICOPTER || vehicleType == VehicleType.AIRSHIP) {
+        if (hasDecoy() && level() is ServerLevel) {
+            decoyItemCount = countDecoyItem()
+            val type = vehicleType
+            if (type == VehicleType.AIRPLANE || type == VehicleType.HELICOPTER || type == VehicleType.AIRSHIP) {
                 releaseDecoy()
             } else {
                 releaseSmokeDecoy(getTurretVector(1f))
+            }
+
+            if (decoyReloadCoolDown > 0) {
+                if (decoyItemCount > 0 && decoyCount == 0) {
+                    decoyReloadCoolDown--
+                } else {
+                    decoyReloadCoolDown = getDecoyReloadTime()
+                }
+
+            }
+
+            if (decoyReloadCoolDown == 0 && decoyItemCount > 0 && decoyCount == 0) {
+                reloadDecoy(this)
             }
         }
 
@@ -3979,6 +3994,14 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     open fun releaseDecoy() = VehicleWeaponUtils.releaseDecoy(this)
 
+    open fun countDecoyItem(): Int {
+        return if (this.vehicleType == VehicleType.AIRPLANE || this.vehicleType == VehicleType.HELICOPTER || vehicleType == VehicleType.AIRSHIP) {
+            InventoryTool.countItem(this, ModItems.FLYING_FLARE_AMMO.get())
+        } else {
+            InventoryTool.countItem(this, ModItems.VEHICLE_SMOKE_AMMO.get())
+        }
+    }
+
     open fun terrainCompact(positions: MutableList<Vec3>) {
         VehicleMotionUtils.terrainCompact(this, positions)
     }
@@ -4290,8 +4313,10 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     open var power by POWER
     open var deltaRot by DELTA_ROT
-    open var decoyReady by DECOY_READY
+    open var decoyCount by DECOY_COUNT
+    open var decoyReloadCoolDown by DECOY_RELOAD_COOLDOWN
     open var synchedPropellerRot by SYNCHED_PROPELLER_ROT
+    open var decoyItemCount by DECOY_ITEM_COUNT
     open var propellerRot by PROPELLER_ROT
     open var propellerRotO = 0f
     open var planeBreak by PLANE_BREAK
@@ -4618,9 +4643,18 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
         @JvmField
-        @ExcludeBvrSync("DecoyReady")
-        val DECOY_READY: EntityDataAccessor<Boolean> =
-            SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
+        @ExcludeBvrSync("DecoyCount")
+        val DECOY_COUNT: EntityDataAccessor<Int> =
+            SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.INT)
+
+        @JvmField
+        @ExcludeBvrSync("DecoyReloadCoolDown")
+        val DECOY_RELOAD_COOLDOWN: EntityDataAccessor<Int> =
+            SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.INT)
+
+        @JvmField
+        val DECOY_ITEM_COUNT: EntityDataAccessor<Int> =
+            SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.INT)
 
         @JvmField
         val SYNCHED_PROPELLER_ROT: EntityDataAccessor<Float> =
