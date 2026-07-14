@@ -142,7 +142,7 @@
           "ShouldUnload": false,
           "Override": {
             "SeekWeaponInfo": {
-              "MaxGuidedRange": 2000000,
+              "MaxGuidedRange": 200000,
               "SeekDirection": "Passenger",
               "InputBlockPos": true
             }
