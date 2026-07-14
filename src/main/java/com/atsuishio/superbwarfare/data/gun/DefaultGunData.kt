@@ -429,7 +429,7 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
     var underwaterMotionScale = 0.75f
 
     @SerialName("ExplosionDestroy")
-    var explosionDestroy = false
+    var explosionDestroy = true
 
     override fun limit() {
         maxDurability = max(0, maxDurability)
