@@ -408,7 +408,7 @@ interface IAdvancedHitDetection {
                 )
 
                 if (shipHit != null) {
-                    val (shipHitPos, shipBlockPos) = shipHit
+                    val (shipHitPos, _) = shipHit
                     val shipDistSqr = context.from.distanceToSqr(shipHitPos)
                     val vanillaDistSqr = if (vanillaHit.type != HitResult.Type.MISS)
                         context.from.distanceToSqr(vanillaHit.location)
@@ -417,10 +417,13 @@ interface IAdvancedHitDetection {
 
                     if (shipDistSqr < vanillaDistSqr) {
                         val dir = context.from.subtract(shipHitPos)
+                        // 使用投射物当前坐标作为 blockPos，避免船舶投影坐标（可能处于极远的区块分配位置）
+                        // 导致爆炸/方块破坏发生在错误的世界坐标
+                        val projectileBlockPos = BlockPos.containing(context.from)
                         return BlockHitResult(
                             shipHitPos,
                             Direction.getNearest(dir.x, dir.y, dir.z),
-                            shipBlockPos,
+                            projectileBlockPos,
                             false
                         )
                     }

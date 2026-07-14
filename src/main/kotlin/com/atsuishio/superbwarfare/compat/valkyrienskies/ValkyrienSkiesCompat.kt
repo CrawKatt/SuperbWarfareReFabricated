@@ -13,6 +13,7 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.fml.ModList
+import org.joml.Matrix4d
 import org.joml.Matrix4dc
 import org.joml.Vector3d
 import org.joml.primitives.AABBd
@@ -172,7 +173,6 @@ object ValkyrienSkiesCompat {
     ): Pair<Vec3, BlockPos>? {
         return try {
             val worldToShip = ship.worldToShip
-            val shipToWorld = ship.shipToWorld
 
             // 将射线转换到船舶空间
             val shipStart = startVec.toJOML().also { worldToShip.transformPosition(it) }.toMinecraft()
@@ -219,9 +219,11 @@ object ValkyrienSkiesCompat {
             if (shipResult.type == HitResult.Type.MISS) return null
 
             // 将命中位置转换回世界空间
-            val worldHitPos = shipToWorld
+            // 使用 worldToShip 的逆矩阵而不是 shipToWorld，确保使用完全一致的坐标系统
+            val worldPos = worldToShip
+                .invert(Matrix4d())
                 .transformPosition(shipResult.location.toJOML())
-                .toMinecraft()
+            val worldHitPos = Vec3(worldPos.x, worldPos.y, worldPos.z)
             val worldBlockPos = BlockPos.containing(worldHitPos)
 
             Pair(worldHitPos, worldBlockPos)
