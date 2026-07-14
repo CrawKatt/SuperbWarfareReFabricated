@@ -137,6 +137,13 @@ repositories {
         url = uri("https://thedarkcolour.github.io/KotlinForForge/")
     }
     maven {
+        name = "Valkyrien Skies"
+        url = uri("https://maven.valkyrienskies.org")
+        content {
+            includeGroup("org.valkyrienskies.core")
+        }
+    }
+    maven {
         url = uri("https://jitpack.io")
         content {
             includeGroup("com.github.mcmodderanchor")
@@ -241,6 +248,10 @@ dependencies {
 //    implementation(fg.deobf("curse.maven:limitless-vehicle-1446269:7675116"))
     implementation(fg.deobf("curse.maven:create-power-loader-936020:6549987"))
 
+    // vs
+    compileOnly("org.valkyrienskies.core:api:1.1.0+") {
+        exclude("org.joml", "joml")
+    }
     implementation(fg.deobf("curse.maven:valkyrien-skies-258371:7906689"))
     implementation(fg.deobf("curse.maven:eureka-ships-654384:7979379"))
 
@@ -273,10 +284,12 @@ mixin {
 }
 
 tasks.withType<JavaCompile> {
-    options.compilerArgs.addAll(listOf(
-        "-Amixin.refmap=mixins.superbwarfare.refmap.json",
-        "-Amixin.defaultRefmap=mixins.superbwarfare.refmap.json"
-    ))
+    options.compilerArgs.addAll(
+        listOf(
+            "-Amixin.refmap=mixins.superbwarfare.refmap.json",
+            "-Amixin.defaultRefmap=mixins.superbwarfare.refmap.json"
+        )
+    )
 }
 
 tasks.named<ProcessResources>("processResources") {

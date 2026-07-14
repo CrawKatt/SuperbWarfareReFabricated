@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.entity.OBBEntity
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
@@ -41,6 +42,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.VoxelShape
 import java.util.*
@@ -369,7 +371,8 @@ interface IAdvancedHitDetection {
             context: ClipContext,
             ignorePredicate: Predicate<BlockState>
         ): BlockHitResult {
-            return performRayTrace(
+            // 1. Vanilla ray trace against world blocks
+            val vanillaHit = performRayTrace(
                 context, { rayTraceContext, blockPos ->
                     val blockState: BlockState = world.getBlockState(blockPos)
                     if (ignorePredicate.test(blockState)) return@performRayTrace null
@@ -397,6 +400,34 @@ interface IAdvancedHitDetection {
                         BlockPos.containing(rayTraceContext.to)
                     )
                 })
+
+            // 2. Check for Valkyrien Skies ship block hits (closer hit wins)
+            if (ValkyrienSkiesCompat.hasMod()) {
+                val shipHit = ValkyrienSkiesCompat.rayTraceShipBlocks(
+                    world, context.from, context.to, ignorePredicate
+                )
+
+                if (shipHit != null) {
+                    val (shipHitPos, shipBlockPos) = shipHit
+                    val shipDistSqr = context.from.distanceToSqr(shipHitPos)
+                    val vanillaDistSqr = if (vanillaHit.type != HitResult.Type.MISS)
+                        context.from.distanceToSqr(vanillaHit.location)
+                    else
+                        Double.MAX_VALUE
+
+                    if (shipDistSqr < vanillaDistSqr) {
+                        val dir = context.from.subtract(shipHitPos)
+                        return BlockHitResult(
+                            shipHitPos,
+                            Direction.getNearest(dir.x, dir.y, dir.z),
+                            shipBlockPos,
+                            false
+                        )
+                    }
+                }
+            }
+
+            return vanillaHit
         }
 
         @JvmStatic
