@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.annotation.ExcludeBvrSync
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage
 import com.atsuishio.superbwarfare.capability.energy.VehicleEnergyStorage
 import com.atsuishio.superbwarfare.client.animation.entity.VehicleAnimationInstance
+import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.data.DataLoader
@@ -4090,7 +4091,9 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                     val list = level().getEntityCollisions(this, movedBox.expandTowards(0.0, -vec31.y + pVec.y, 0.0))
                     stepDown = collideBoundingBox(this, Vec3(0.0, -vec31.y + pVec.y, 0.0), movedBox, level(), list)
                 }
-                return vec31.add(stepDown)
+                return ValkyrienSkiesCompat.adjustMovementForShipCollisions(
+                    this, vec31.add(stepDown), this.boundingBox, this.level()
+                )
             }
         }
 
@@ -4099,7 +4102,9 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             ignoreEntityGroundCheckStepping = false
         }
 
-        return vec3
+        return ValkyrienSkiesCompat.adjustMovementForShipCollisions(
+            this, vec3, this.boundingBox, this.level()
+        )
     }
 
     open fun vMove(pType: MoverType, pPos: Vec3) {
@@ -4169,7 +4174,11 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             ignoreEntityGroundCheckStepping = true
         }
 
-        vMove(movementType, movement)
+        if (getCollisionOBBInfo() != null) {
+            vMove(movementType, movement)
+        } else {
+            super.move(movementType, movement)
+        }
 
         if (lastTickSpeed < 0.2 || collisionCoolDown > 0 || this is DroneEntity) return
         val driver = this.lastDriver
