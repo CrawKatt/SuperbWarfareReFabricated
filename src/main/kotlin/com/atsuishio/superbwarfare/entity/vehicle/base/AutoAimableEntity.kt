@@ -64,8 +64,7 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
         get() = TowerAI.ThreatConfig()
 
     override fun interact(player: Player, hand: InteractionHand): InteractionResult {
-        val res = super.interact(player, hand)
-        if (player.isCrouching && !isWreck) {
+        if (player.isCrouching && !isWreck && !this.locked) {
             if (this.optionalOwnerUUID.isEmpty) {
                 ownerUUID = player.getUUID()
             }
@@ -89,7 +88,7 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
         }
 
         targetUUID = ""
-        return res
+        return super.interact(player, hand)
     }
 
     override fun onCrowbarInteract(

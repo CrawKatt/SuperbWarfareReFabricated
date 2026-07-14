@@ -302,7 +302,7 @@ class TowerAI(private val tower: AutoAimableEntity) {
          *
          * @return 评分（越高越优先），返回 null 表示该目标不应被考虑
          */
-        fun evaluateThreat(tower: AutoAimableEntity, target: Entity): Double? {
+        fun evaluateThreat(tower: AutoAimableEntity, target: Entity): Double {
             val config = tower.threatConfig
 
             val distance = target.distanceTo(tower)
@@ -366,8 +366,8 @@ class TowerAI(private val tower: AutoAimableEntity) {
             val config = tower.threatConfig
 
             return candidates
-                .mapNotNull { target ->
-                    val score = evaluateThreat(tower, target) ?: return@mapNotNull null
+                .map { target ->
+                    val score = evaluateThreat(tower, target)
                     target to score
                 }
                 .filter { (_, score) -> score >= config.minThreatScore }
@@ -390,8 +390,8 @@ class TowerAI(private val tower: AutoAimableEntity) {
 
             val config = tower.threatConfig
 
-            val currentScore = evaluateThreat(tower, currentTarget) ?: return true
-            val newScore = evaluateThreat(tower, newTarget) ?: return false
+            val currentScore = evaluateThreat(tower, currentTarget)
+            val newScore = evaluateThreat(tower, newTarget)
 
             // 新目标必须显著优于当前目标才切换
             return newScore > currentScore + config.targetSwitchHysteresis
@@ -516,17 +516,19 @@ class TowerAI(private val tower: AutoAimableEntity) {
             val seekRangeSqr = maxRange * maxRange
             val minRangeSqr = minRange * minRange
 
-            val candidates = tower.level().getEntitiesOfClass(
-                Entity::class.java,
-                AABB(pos, pos).inflate(maxRange)
-            ) { true }
-                .filter { target ->
-                    val distSqr = target.distanceToSqr(tower)
-                    distSqr > minRangeSqr && distSqr <= seekRangeSqr
-                            // 显式检查炮管到目标之间是否有方块遮挡
-                            && TargetValidator.checkLineOfSight(tower, target, pos)
-                            && TargetValidator.isValidTarget(tower, target, pos, minAngle, maxAngle, minRange, maxRange)
-                }
+            val aabb = AABB(pos, pos).inflate(maxRange)
+            val entitiesInRange = mutableListOf<Entity>()
+            EntityFindUtil.getEntities(tower.level()).get(aabb) { entity ->
+                entitiesInRange.add(entity)
+            }
+            val candidates = entitiesInRange.filter { target ->
+                val distSqr = target.distanceToSqr(tower)
+                distSqr > minRangeSqr && distSqr <= seekRangeSqr
+                        // 显式检查炮管到目标之间是否有方块遮挡
+                        && TargetValidator.checkLineOfSight(tower, target, pos)
+                        && TargetValidator.isValidTarget(tower, target, pos, minAngle, maxAngle, minRange, maxRange)
+                        && target.boundingBox.size >= minTargetSize
+            }
 
             if (candidates.isEmpty()) return
 
