@@ -1,9 +1,5 @@
 {
   "values": [
-    "superbwarfare:cemented_carbide_block",
-    {
-      "id": "dreamaticvoyage:hqss_bread_bricks",
-      "required": false
-    }
+    "superbwarfare:cemented_carbide_block"
   ]
 }

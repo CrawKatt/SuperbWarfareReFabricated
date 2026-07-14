@@ -2,7 +2,7 @@
   "type": "superbwarfare:vehicle_assembling",
   "category": "defense",
   "inputs": [
-    "#superbwarfare:storage_blocks/steel",
+    "#c:storage_blocks/steel",
     "superbwarfare:laser_unit",
     "superbwarfare:small_battery_pack",
     "superbwarfare:motor"

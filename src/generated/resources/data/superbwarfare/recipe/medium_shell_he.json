@@ -3,7 +3,7 @@
   "category": "equipment",
   "key": {
     "a": {
-      "tag": "superbwarfare:ingots/steel"
+      "tag": "c:ingots/steel"
     },
     "c": {
       "item": "superbwarfare:high_energy_explosives"

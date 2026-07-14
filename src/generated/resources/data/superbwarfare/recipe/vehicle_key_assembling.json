@@ -2,7 +2,7 @@
   "type": "superbwarfare:vehicle_assembling",
   "category": "misc",
   "inputs": [
-    "#superbwarfare:ingots/steel",
+    "#c:ingots/steel",
     "2 #c:ingots/iron",
     "2 #c:ingots/copper"
   ],

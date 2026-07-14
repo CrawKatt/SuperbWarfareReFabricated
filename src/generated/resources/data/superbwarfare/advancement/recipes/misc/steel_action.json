@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#superbwarfare:ingots/steel"
+            "items": "#c:ingots/steel"
           }
         ]
       },

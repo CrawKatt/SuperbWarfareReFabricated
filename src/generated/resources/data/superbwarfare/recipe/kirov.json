@@ -3,7 +3,7 @@
   "category": "aircraft",
   "inputs": [
     "2 superbwarfare:large_battery_pack",
-    "24 #superbwarfare:storage_blocks/steel",
+    "24 #c:storage_blocks/steel",
     "3 superbwarfare:heavy_armament_module",
     "640 minecraft:white_wool",
     "5 superbwarfare:large_motor",

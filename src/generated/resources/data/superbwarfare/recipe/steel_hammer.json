@@ -3,10 +3,10 @@
   "category": "equipment",
   "key": {
     "a": {
-      "tag": "superbwarfare:ingots/steel"
+      "tag": "c:ingots/steel"
     },
     "b": {
-      "tag": "superbwarfare:storage_blocks/steel"
+      "tag": "c:storage_blocks/steel"
     },
     "c": {
       "item": "minecraft:stick"

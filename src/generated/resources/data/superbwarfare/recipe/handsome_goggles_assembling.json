@@ -8,7 +8,7 @@
     "superbwarfare:heavy_armament_module",
     "superbwarfare:medium_battery_pack",
     "2 minecraft:lever",
-    "4 #superbwarfare:ingots/steel",
+    "4 #c:ingots/steel",
     "3 #c:glass_panes"
   ],
   "result": {

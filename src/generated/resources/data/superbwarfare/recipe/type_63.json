@@ -2,7 +2,7 @@
   "type": "superbwarfare:vehicle_assembling",
   "category": "defense",
   "inputs": [
-    "#superbwarfare:storage_blocks/steel",
+    "#c:storage_blocks/steel",
     "12 superbwarfare:mortar_barrel",
     "2 superbwarfare:wheel"
   ],

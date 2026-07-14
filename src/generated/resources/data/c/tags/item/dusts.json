@@ -1,6 +1,9 @@
 {
   "values": [
     "#c:dusts/coal_coke",
-    "#c:dusts/tungsten"
+    "#c:dusts/coal",
+    "#c:dusts/iron",
+    "#c:dusts/tungsten",
+    "#c:dusts/scheelite"
   ]
 }
