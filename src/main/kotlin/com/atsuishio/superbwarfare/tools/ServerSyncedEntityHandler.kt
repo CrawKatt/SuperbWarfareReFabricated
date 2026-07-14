@@ -232,9 +232,24 @@ object ServerSyncedEntityHandler {
             }
 
             if (syncedList.isNotEmpty() || removedList.isNotEmpty()) {
-                val msg = BeyondVisualEntitySyncMessage(dim, syncedList + removedList)
                 for (player in dimLevel.players()) {
-                    sendPacketTo(player, msg)
+                    // 收集玩家乘坐链上所有载具的 ID，无需将载具同步给乘坐在其上的玩家
+                    val ridingIds = mutableSetOf<Int>()
+                    var riding: Entity? = player.vehicle
+                    while (riding != null) {
+                        ridingIds.add(riding.id)
+                        riding = riding.vehicle
+                    }
+
+                    val filtered = if (ridingIds.isEmpty()) {
+                        syncedList
+                    } else {
+                        syncedList.filter { it.id !in ridingIds }
+                    }
+
+                    if (filtered.isNotEmpty() || removedList.isNotEmpty()) {
+                        sendPacketTo(player, BeyondVisualEntitySyncMessage(dim, filtered + removedList))
+                    }
                 }
             }
         }
