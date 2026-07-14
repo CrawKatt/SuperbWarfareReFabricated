@@ -11,7 +11,6 @@ import com.atsuishio.superbwarfare.config.CLIENT_CONFIG
 import com.atsuishio.superbwarfare.config.COMMON_CONFIG
 import com.atsuishio.superbwarfare.config.SERVER_CONFIG
 import com.atsuishio.superbwarfare.data.CustomData
-import com.atsuishio.superbwarfare.event.ProjectileChunkLoadingHandler
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.network.initializeNetwork
 import com.atsuishio.superbwarfare.sound.SoundLimit
@@ -92,7 +91,6 @@ class Mod(bus: IEventBus, container: ModContainer) {
         }
 
         NeoForge.EVENT_BUS.register(this)
-        NeoForge.EVENT_BUS.register(ProjectileChunkLoadingHandler)
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             SoundLimit.init()

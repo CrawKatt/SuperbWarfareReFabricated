@@ -17,13 +17,10 @@ object ProjectileConfig {
         comment("Set true to allow projectiles to load chunks")
         comment("是否允许投射物加载区块")
         define("projectile_chunk_loading", true)
-            .also { pop() }
     }
 
     @JvmField
     val PROJECTILE_MAX_CHUNKS_FORCE_LOADED = buildServerConfig {
-        push("projectile")
-
         comment("Maximum chunks force-loaded by projectiles at once. Set to 0 for unlimited.")
         comment("投射物同时强制加载的最大区块数，设为0表示无限制")
         define("max_projectile_chunks_force_loaded", 256)
