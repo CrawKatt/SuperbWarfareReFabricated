@@ -172,6 +172,7 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         simpleItem(ModItems.MEDIUM_SHELL_HE)
         simpleItem(ModItems.MEDIUM_SHELL_GS)
         simpleItem(ModItems.MEDIUM_SHELL_AA)
+        simpleItem(ModItems.TACTICAL_TERMINAL)
 
         simpleMaterials(ModItems.IRON_MATERIALS)
         simpleMaterials(ModItems.STEEL_MATERIALS)

@@ -353,6 +353,10 @@
   "des.superbwarfare.vehicle_key.empty": "未绑定车主，右击以绑定",
   "des.superbwarfare.vehicle_key.bind": "已绑定至：%1$s",
   "des.superbwarfare.vehicle_key.not_found": "找不到车主",
+  "item.superbwarfare.tactical_terminal": "单兵战术终端",
+  "curios.identifier.tactical_terminal": "单兵战术终端",
+  "des.superbwarfare.tactical_terminal": "右击使用或装备时按下%1$s以打开战术地图",
+  "des.superbwarfare.tactical_terminal.disabled": "已禁用，请查看服务端配置文件",
 
   "attribute.superbwarfare.bullet_resistance": "子弹防护",
 

@@ -34,9 +34,9 @@ class DogTagItem : Item(Properties().stacksTo(1)), ICurioItem, ItemScreenProvide
     }
 
     override fun canEquip(slotContext: SlotContext, stack: ItemStack?): Boolean {
-        return CuriosApi.getCuriosInventory(slotContext.entity())
-            .flatMap { c -> c.findFirstCurio(this) }
-            .isEmpty
+        return CuriosApi.getCuriosInventory(slotContext.entity)
+            .map { it.findFirstCurio(this).isEmpty }
+            .orElseGet { false }
     }
 
     override fun getTooltipImage(pStack: ItemStack): Optional<TooltipComponent> {

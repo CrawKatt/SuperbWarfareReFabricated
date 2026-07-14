@@ -23,7 +23,7 @@ class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), ICurioItem
     override fun canEquip(slotContext: SlotContext, stack: ItemStack?): Boolean {
         return CuriosApi.getCuriosInventory(slotContext.entity)
             .map { it.findFirstCurio(this).isEmpty }
-            .orElse(false)
+            .orElseGet { false }
     }
 
     override fun curioTick(slotContext: SlotContext, stack: ItemStack) {
@@ -91,14 +91,14 @@ class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), ICurioItem
         fun isParachuteOpen(entity: LivingEntity?): Boolean {
             return CuriosApi.getCuriosInventory(entity).map {
                 it.findFirstCurio(ModItems.PARACHUTE.get())
-                    .map { c -> NBTTool.getTag(c.stack).getBoolean(TAG_OPEN) }.orElse(false)
-            }.orElse(false)
+                    .map { c -> NBTTool.getTag(c.stack).getBoolean(TAG_OPEN) }.orElseGet { false }
+            }.orElseGet { false }
         }
 
         fun isParachuteVisible(entity: LivingEntity?): Boolean {
             return CuriosApi.getCuriosInventory(entity).map {
-                it.findFirstCurio(ModItems.PARACHUTE.get()).map { c -> c.slotContext().visible() }.orElse(false)
-            }.orElse(false)
+                it.findFirstCurio(ModItems.PARACHUTE.get()).map { c -> c.slotContext().visible() }.orElseGet { false }
+            }.orElseGet { false }
         }
     }
 }

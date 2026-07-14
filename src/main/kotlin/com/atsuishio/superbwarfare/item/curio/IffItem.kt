@@ -20,9 +20,9 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem
 
 open class IffItem : Item(Properties().stacksTo(1)), ICurioItem {
     override fun canEquip(slotContext: SlotContext, stack: ItemStack?): Boolean {
-        return CuriosApi.getCuriosInventory(slotContext.entity())
-            .flatMap { c -> c.findFirstCurio(this) }
-            .isEmpty
+        return CuriosApi.getCuriosInventory(slotContext.entity)
+            .map { it.findFirstCurio(this).isEmpty }
+            .orElseGet { false }
     }
 
     override fun appendHoverText(

@@ -17,6 +17,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.MortarEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
+import com.atsuishio.superbwarfare.item.curio.TacticalTerminalItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.network.message.send.*
 import com.atsuishio.superbwarfare.resource.gun.GunResource
@@ -290,7 +291,7 @@ object ClickEventHandler {
             }
 
             if (key == ModKeyMappings.TOGGLE_TACTICAL_MAP.key.value && MapConfig.ENABLE_TACTICAL_MAP.get()) {
-                if (mc.screen == null) {
+                if (TacticalTerminalItem.isTerminalEquipped(player) && mc.screen == null) {
                     mc.setScreen(TacticalMapScreen())
                 }
             }

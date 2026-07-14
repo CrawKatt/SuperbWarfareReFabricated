@@ -353,6 +353,10 @@
   "des.superbwarfare.vehicle_key.empty": "No owner bound. Right-click to bind",
   "des.superbwarfare.vehicle_key.bind": "Bound to: %1$s",
   "des.superbwarfare.vehicle_key.not_found": "Owner not found",
+  "item.superbwarfare.tactical_terminal": "Personal Tactical Terminal",
+  "curios.identifier.tactical_terminal": "Personal Tactical Terminal",
+  "des.superbwarfare.tactical_terminal": "Right-click to use, or press %1$s when equipped to open the tactical map.",
+  "des.superbwarfare.tactical_terminal.disabled": "Disabled, please check the server config file",
 
   "attribute.superbwarfare.bullet_resistance": "Bullet Resistance",
 
