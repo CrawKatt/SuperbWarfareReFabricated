@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
-import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.OBBEntity
 import com.atsuishio.superbwarfare.entity.getValue
@@ -203,16 +202,16 @@ open class C4Entity : Entity, OwnableEntity {
             uuid = compound.getUUID("Owner")
         } else {
             val s = compound.getString("Owner")
+            val server = this.server
 
-            try {
-                uuid = if (this.server == null) {
+            uuid = if (server == null) {
+                try {
                     UUID.fromString(s)
-                } else {
-                    OldUsersConverter.convertMobOwnerIfNecessary(this.server!!, s)
+                } catch (_: Exception) {
+                    null
                 }
-            } catch (exception: Exception) {
-                Mod.LOGGER.error("Couldn't load owner UUID of {}: {}", this, exception)
-                uuid = null
+            } else {
+                OldUsersConverter.convertMobOwnerIfNecessary(server, s)
             }
         }
 

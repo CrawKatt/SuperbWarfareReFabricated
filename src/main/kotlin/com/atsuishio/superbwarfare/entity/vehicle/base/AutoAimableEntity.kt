@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.entity.vehicle.base
 
-import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.getValue
@@ -136,7 +135,7 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
         }
     }
 
-    public override fun readAdditionalSaveData(compound: CompoundTag) {
+    override fun readAdditionalSaveData(compound: CompoundTag) {
         super.readAdditionalSaveData(compound)
 
         active = compound.getBoolean("Active")
@@ -146,17 +145,16 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
             uuid = compound.getUUID("Owner")
         } else {
             val s = compound.getString("Owner")
+            val server = this.server
 
-            try {
-                val server = this.server
-                uuid = if (server == null) {
+            uuid = if (server == null) {
+                try {
                     UUID.fromString(s)
-                } else {
-                    OldUsersConverter.convertMobOwnerIfNecessary(server, s)
+                } catch (_: Exception) {
+                    null
                 }
-            } catch (exception: Exception) {
-                Mod.LOGGER.error("Couldn't load owner UUID of {}: {}", this, exception)
-                uuid = null
+            } else {
+                OldUsersConverter.convertMobOwnerIfNecessary(server, s)
             }
         }
 
