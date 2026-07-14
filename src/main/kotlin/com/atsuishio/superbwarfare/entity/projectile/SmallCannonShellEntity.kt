@@ -15,7 +15,6 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.Item
-import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.entity.EntityTypeTest
 import net.minecraft.world.phys.BlockHitResult
@@ -27,7 +26,6 @@ open class SmallCannonShellEntity(type: EntityType<out SmallCannonShellEntity>, 
     private var aa = false
 
     init {
-        this.noCulling = true
         this.damageValue = 40f
         this.explosionDamageValue = 80f
         this.explosionRadiusValue = 5f
@@ -51,7 +49,7 @@ open class SmallCannonShellEntity(type: EntityType<out SmallCannonShellEntity>, 
         if (this.level() is ServerLevel) {
             val hardness = this.level().getBlockState(resultPos).block.defaultDestroyTime()
             if (hardness != -1f) {
-                if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+                if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get() && this.explosionDestroyValue) {
                     val destroy = Math.random() < (1.0 - (hardness / 50.0)).coerceIn(0.1, 1.0)
                     if (destroy) {
                         this.level().destroyBlock(resultPos, true)
@@ -70,7 +68,7 @@ open class SmallCannonShellEntity(type: EntityType<out SmallCannonShellEntity>, 
             .radius(explosionRadiusValue)
             .position(vec3)
             .beast(this.isBeast())
-            .destroyBlock { if (hitEntity) Explosion.BlockInteraction.KEEP else (if (ExplosionConfig.EXPLOSION_DESTROY.get()) Explosion.BlockInteraction.DESTROY else Explosion.BlockInteraction.KEEP) }
+            .destroyBlock(if (hitEntity) false else explosionDestroyValue)
             .explode()
     }
 

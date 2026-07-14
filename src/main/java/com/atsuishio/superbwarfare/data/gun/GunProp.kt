@@ -368,6 +368,9 @@ class GunProp<T, R>(
         @JvmField
         val UNDERWATER_MOTION_SCALE = plainProp(DefaultGunData::underwaterMotionScale)
 
+        @JvmField
+        val EXPLOSION_DESTROY = plainProp(DefaultGunData::explosionDestroy)
+
         // TODO 会不会有点屎...
         fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) = with(modifier) {
             modify(MAX_DURABILITY) { it.coerceAtLeast(0) }

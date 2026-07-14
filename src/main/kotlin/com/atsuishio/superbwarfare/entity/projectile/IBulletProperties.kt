@@ -82,6 +82,10 @@ interface IBulletProperties {
     fun getUnderwaterMotionScale(): Float = 0.75f
     fun setUnderwaterMotionScale(value: Float) {}
 
+    // 是否造成爆炸破坏
+    fun hasExplosionDestroy(): Boolean = true
+    fun setExplosionDestroy(value: Boolean) {}
+
     // tickCount 小于这个值时，不触发 onHit 判定
     fun getNoHitTicks(): Int = 0
 

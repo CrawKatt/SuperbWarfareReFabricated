@@ -119,7 +119,15 @@ open class CustomExplosion(
         pToBlowZ: Double,
         pRadius: Float
     ) : this(pLevel, pSource, source, null, damage, pToBlowX, pToBlowY, pToBlowZ, pRadius, BlockInteraction.KEEP) {
-        sendToNearbyPlayers(level, pToBlowX, pToBlowY, pToBlowZ, radius.coerceAtMost(50f).toDouble(), 5 + 0.2 * radius.coerceAtMost(50f), 2 + 0.02 * radius.coerceAtMost(50f))
+        sendToNearbyPlayers(
+            level,
+            pToBlowX,
+            pToBlowY,
+            pToBlowZ,
+            radius.coerceAtMost(50f).toDouble(),
+            5 + 0.2 * radius.coerceAtMost(50f),
+            2 + 0.02 * radius.coerceAtMost(50f)
+        )
     }
 
     fun setFireTime(fireTime: Int): CustomExplosion {
@@ -280,10 +288,14 @@ open class CustomExplosion(
                         if (blockState.soundType === SoundType.METAL || blockState.soundType === SoundType.COPPER || blockState.soundType === SoundType.NETHERITE_BLOCK) {
                             resistance *= 3f
                         }
-                        force *= ((1f - (flattenedDistSqr / (flattenedRadius * flattenedRadius))).coerceIn(0.0, 1.0)).toFloat()
+                        force *= ((1f - (flattenedDistSqr / (flattenedRadius * flattenedRadius))).coerceIn(
+                            0.0,
+                            1.0
+                        )).toFloat()
 
                         if (resistance != -1f && force > resistance && this@CustomExplosion.damageCalculator.shouldBlockExplode(
-                                this@CustomExplosion, this@CustomExplosion.level, actualPos, blockState, force)
+                                this@CustomExplosion, this@CustomExplosion.level, actualPos, blockState, force
+                            )
                         ) {
                             this@CustomExplosion.toBlow.add(actualPos.immutable())
                             qualified.add(actualPos.immutable())
@@ -489,8 +501,7 @@ open class CustomExplosion(
         private var damage = 0f
         private var radius = 0f
         private var particleType: ParticleTool.ParticleType? = null
-        private var destroyBlock: Supplier<BlockInteraction> =
-            Supplier { if (ExplosionConfig.EXPLOSION_DESTROY.get()) BlockInteraction.DESTROY else BlockInteraction.KEEP }
+        private var destroyBlock: Boolean = true
         private var fireTime = 0
         private var damageSource: DamageSource? = null
         private var particlePosition: Vec3? = null
@@ -533,13 +544,13 @@ open class CustomExplosion(
             return this
         }
 
-        fun destroyBlock(destroyBlock: Supplier<BlockInteraction>): Builder {
+        fun destroyBlock(destroyBlock: Boolean): Builder {
             this.destroyBlock = destroyBlock
             return this
         }
 
         fun keepBlock(): Builder {
-            this.destroyBlock = Supplier { BlockInteraction.KEEP }
+            this.destroyBlock = false
             return this
         }
 
@@ -578,10 +589,15 @@ open class CustomExplosion(
                     attackerEntity
                 ))!!
 
+            val interaction =
+                Supplier {
+                    if (ExplosionConfig.EXPLOSION_DESTROY.get() && this.destroyBlock) BlockInteraction.DESTROY else BlockInteraction.KEEP
+                }
+
             val customExplosion = CustomExplosion(
                 level, directSource,
                 source, damage,
-                position.x, position.y, position.z, radius, destroyBlock.get()
+                position.x, position.y, position.z, radius, interaction.get()
             )
                 .setFireTime(fireTime)
                 .setBeast(beast)
@@ -613,7 +629,7 @@ open class CustomExplosion(
             if (entity is OBBEntity && !entity.enableAABB()) {
                 return getSeenPercentForOBB(level, center, entity)
             }
-            return Explosion.getSeenPercent(center, entity)
+            return getSeenPercent(center, entity)
         }
 
         /** Sample every OBB centre + 6 face centres, raycast from [center] to each. */
@@ -634,8 +650,11 @@ open class CustomExplosion(
                         if (sign == 0.0 && axisI > 0) continue // centre only once
                         val offset = axes[axisI].mul(sign * e.get(axisI), tmp)
                         val point = OBB.vector3dToVec3(Vector3d(c).add(offset))
-                        if (level.clip(ClipContext(center, point,
-                                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null)
+                        if (level.clip(
+                                ClipContext(
+                                    center, point,
+                                    ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null
+                                )
                             ).type == HitResult.Type.MISS
                         ) hits++
                         total++
