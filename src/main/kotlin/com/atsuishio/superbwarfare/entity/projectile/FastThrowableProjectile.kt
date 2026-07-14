@@ -18,6 +18,7 @@ import com.atsuishio.superbwarfare.network.message.receive.MissileTrailParticleM
 import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.tools.VectorTool.isInLiquid
 import com.atsuishio.superbwarfare.world.phys.ExtendedEntityRayTraceResult
+import com.atsuishio.superbwarfare.world.saveddata.ProjectileChunkManager
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
@@ -30,7 +31,6 @@ import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.server.level.TicketType
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
@@ -310,11 +310,19 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         // 同步动量与位置到客户端
         this.syncMotion()
 
-        // 更新区块加载位置
+        // 每 tick 将当前所在区块加入强制加载队列，由 ProjectileChunkManager 在 tick 末尾统一处理
         if (level() is ServerLevel) {
             if (forceLoadChunk() && ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()) {
-                this.keepChunkLoaded(this.position())
-                this.keepChunkLoaded(position().add(this.deltaMovement.multiply(1.0, 0.0, 1.0)))
+                val currentChunkPos = this.chunkPosition()
+                val nextChunkPos = ChunkPos(BlockPos.containing(position().add(deltaMovement)))
+                val nextNextChunkPos = ChunkPos(BlockPos.containing(position().add(deltaMovement.scale(2.0))))
+                ProjectileChunkManager.queueForceLoad(level() as ServerLevel, currentChunkPos)
+                if (nextChunkPos != currentChunkPos) {
+                    ProjectileChunkManager.queueForceLoad(level() as ServerLevel, nextChunkPos)
+                }
+                if (nextNextChunkPos != nextChunkPos) {
+                    ProjectileChunkManager.queueForceLoad(level() as ServerLevel, nextNextChunkPos)
+                }
             }
         }
     }
@@ -586,11 +594,6 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
 
     open fun discardAfterExplode(): Boolean {
         return false
-    }
-
-    open fun keepChunkLoaded(position: Vec3) {
-        val chunkPos = ChunkPos(BlockPos.containing(position))
-        (level() as ServerLevel).chunkSource.addRegionTicket(TicketType.POST_TELEPORT, chunkPos, 3, this.id)
     }
 
     override fun isFastMoving(): Boolean {
