@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_iron_ingot": {
+    "has_iron_nugget": {
       "conditions": {
         "items": [
           {
-            "tag": "forge:ingots/iron"
+            "tag": "forge:nuggets/iron"
           }
         ]
       },
@@ -20,7 +20,7 @@
   },
   "requirements": [
     [
-      "has_iron_ingot",
+      "has_iron_nugget",
       "has_the_recipe"
     ]
   ],

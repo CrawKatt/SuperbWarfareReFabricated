@@ -1,13 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_high_energy_explosives": {
+    "has_engineering_plastic": {
       "conditions": {
         "items": [
           {
-            "items": [
-              "superbwarfare:high_energy_explosives"
-            ]
+            "tag": "forge:plates/steel"
           }
         ]
       },
@@ -22,7 +20,7 @@
   },
   "requirements": [
     [
-      "has_high_energy_explosives",
+      "has_engineering_plastic",
       "has_the_recipe"
     ]
   ],
