@@ -119,6 +119,12 @@ object ClientSyncedEntityHandler {
                 true
             } else false
         }
+        phantomStukaSounds.entries.removeIf { (id, sound) ->
+            if (id !in activeIds) {
+                mc.soundManager.stop(sound)
+                true
+            } else false
+        }
     }
 
     /**
@@ -170,6 +176,7 @@ object ClientSyncedEntityHandler {
             if (syncedEntity.removed) {
                 SYNCED_WORLD_RENDER.remove(key)
                 phantomEngineSounds.remove(syncedEntity.id)?.let { mc.soundManager.stop(it) }
+                phantomStukaSounds.remove(syncedEntity.id)?.let { mc.soundManager.stop(it) }
                 continue
             }
 
@@ -208,13 +215,15 @@ object ClientSyncedEntityHandler {
                 entity, time, syncedEntity.targetPos, syncedEntity.heightAboveGround, vel,
                 shouldWorldRender = true
             )
-            // 为超视距载具假实体管理引擎音效
+            // 为超视距载具假实体管理引擎音效和斯图卡音效
             // 若真实实体已存在，只停止残留的假实体音效（真实实体会通过 baseTick 自行创建音效）
             if (entity is VehicleEntity) {
                 if (realEntityExists) {
                     phantomEngineSounds.remove(syncedEntity.id)?.let { mc.soundManager.stop(it) }
+                    phantomStukaSounds.remove(syncedEntity.id)?.let { mc.soundManager.stop(it) }
                 } else {
                     managePhantomEngineSound(entity, syncedEntity.id)
+                    managePhantomStukaSound(entity, syncedEntity.id)
                 }
             }
         }
@@ -232,6 +241,26 @@ object ClientSyncedEntityHandler {
         } else if (!shouldPlay && existingSound != null) {
             mc.soundManager.stop(existingSound)
             phantomEngineSounds.remove(id)
+        }
+    }
+
+    /** 为超视距载具假实体创建或移除斯图卡尖啸音效 */
+    private fun managePhantomStukaSound(vehicle: VehicleEntity, id: Int) {
+        val hasStukaConfig = vehicle.computed().engineInfo.get("HasStukaSound")?.asBoolean ?: false
+        if (!hasStukaConfig) {
+            phantomStukaSounds.remove(id)?.let { mc.soundManager.stop(it) }
+            return
+        }
+        val existingSound = phantomStukaSounds[id]
+        val shouldPlay = vehicle.engineRunning() && vehicle.stuka()
+
+        if (shouldPlay && existingSound == null) {
+            val sound = VehicleSoundInstance.StukaSound(vehicle)
+            phantomStukaSounds[id] = sound
+            mc.soundManager.play(sound)
+        } else if (!shouldPlay && existingSound != null) {
+            mc.soundManager.stop(existingSound)
+            phantomStukaSounds.remove(id)
         }
     }
 
@@ -290,6 +319,9 @@ object ClientSyncedEntityHandler {
 
     /** 超视距假实体的引擎音效实例，key 为 entityId */
     private val phantomEngineSounds = ConcurrentHashMap<Int, VehicleSoundInstance>()
+
+    /** 超视距假实体的斯图卡尖啸音效实例，key 为 entityId */
+    private val phantomStukaSounds = ConcurrentHashMap<Int, VehicleSoundInstance>()
 
     @JvmStatic
     fun syncRadars(dim: ResourceLocation, radars: List<RadarSyncMessage.SyncedRadar>) {
