@@ -1,10 +1,12 @@
 package com.atsuishio.superbwarfare.client.screens
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.data.vehicle_skin.SkinInfo
 import com.atsuishio.superbwarfare.data.vehicle_skin.VehicleSkin
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.network.message.send.SetVehicleSkinMessage
 import com.atsuishio.superbwarfare.tools.mc
+import com.atsuishio.superbwarfare.tools.options
 import com.atsuishio.superbwarfare.tools.sendPacketToServer
 import com.mojang.blaze3d.platform.Lighting
 import com.mojang.math.Axis
@@ -19,14 +21,24 @@ import net.neoforged.api.distmarker.OnlyIn
 
 @OnlyIn(Dist.CLIENT)
 class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) {
+    companion object {
+        private val TEXTURE = loc("textures/gui/vehicle_skin.png")
+        private val BUTTON = loc("textures/gui/vehicle_skin_button.png")
 
-    private val columns = 4
-    private val buttonWidth = 110
-    private val buttonHeight = 160
-    private val gapX = 10
-    private val gapY = 10
+        const val BUTTON_WIDTH = 142
+        const val BUTTON_HEIGHT = 94
+        const val BUTTON_SIZE = 256
+
+        const val IMAGE_WIDTH = 320
+        const val IMAGE_HEIGHT = 200
+        const val IMAGE_SIZE = 328
+
+        const val PAGE_SIZE = 4
+    }
 
     private val previewEntities = mutableMapOf<String, VehicleEntity>()
+    var currentPage = 0
+    var maxPage = 0
 
     override fun isPauseScreen(): Boolean {
         return false
@@ -36,23 +48,24 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
         super.init()
         this.clearWidgets()
         previewEntities.clear()
+        this.registerButtons()
+    }
 
+    fun registerButtons() {
         val vehicle = entity as? VehicleEntity ?: return
         val currentSkinId = vehicle.skinId
         val vehicleType = vehicle.type
 
-        // Build skin list: vanilla always first
         val skinEntries = mutableListOf<Pair<String, SkinInfo?>>()
         skinEntries.add("" to null)
 
         val skinData = VehicleSkin.getSkins(vehicleType)
         skinEntries.addAll(
             skinData.skins
-            .filter { it.id != "vanilla" }
-            .map { it.id to it }
+                .filter { it.id != "vanilla" }
+                .map { it.id to it }
         )
 
-        // Create client-side-only preview entities for each skin
         val clientLevel = mc.level ?: return
         for ((skinId, _) in skinEntries) {
             val previewEntity = vehicleType.create(clientLevel) as? VehicleEntity ?: continue
@@ -60,18 +73,22 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
             previewEntities[skinId] = previewEntity
         }
 
-        // Calculate grid position
-        val rows = (skinEntries.size + columns - 1) / columns
-        val totalWidth = columns * buttonWidth + (columns - 1) * gapX
-        val startX = (this.width - totalWidth) / 2
-        val startY = (this.height - (rows * buttonHeight + (rows - 1) * gapY)) / 2
+        val pages = (skinEntries.size + PAGE_SIZE - 1) / PAGE_SIZE
+        this.maxPage = if (pages > 0) pages - 1 else 0
+
+        val i = (this.width - IMAGE_WIDTH) / 2
+        val j = (this.height - IMAGE_HEIGHT) / 2
+
+        val startX = i + 4
+        val startY = j + 4
 
         for ((index, entry) in skinEntries.withIndex()) {
+            if ((index + 1) !in this.currentPage * 4..this.currentPage * 4 + 4) continue
+
             val (skinId, skinInfo) = entry
-            val col = index % columns
-            val row = index / columns
-            val x = startX + col * (buttonWidth + gapX)
-            val y = startY + row * (buttonHeight + gapY)
+            val offset = index % 4
+            val x = startX + (BUTTON_WIDTH + 2) * (offset % 2)
+            val y = startY + (BUTTON_HEIGHT + 2) * (offset / 2)
 
             val isSelected = if (skinId.isBlank()) {
                 currentSkinId.isBlank()
@@ -81,7 +98,7 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
 
             this.addRenderableWidget(
                 SkinSlotButton(
-                    x, y, buttonWidth, buttonHeight,
+                    x, y,
                     skinId, skinInfo,
                     previewEntities[skinId],
                     entity.id,
@@ -89,6 +106,9 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
                 )
             )
         }
+
+        this.addRenderableWidget(PageButton(i + 296, j + 4, true))
+        this.addRenderableWidget(PageButton(i + 296, j + 102, false))
     }
 
     override fun render(pGuiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int, pPartialTick: Float) {
@@ -96,15 +116,16 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick)
     }
 
-    override fun mouseClicked(pMouseX: Double, pMouseY: Double, pButton: Int): Boolean {
-        val hitButton = this.children().any {
-            it is AbstractButton && it.isMouseOver(pMouseX, pMouseY)
-        }
-        if (!hitButton) {
-            this.onClose()
-            return true
-        }
-        return super.mouseClicked(pMouseX, pMouseY, pButton)
+    override fun renderBackground(
+        guiGraphics: GuiGraphics,
+        mouseX: Int,
+        mouseY: Int,
+        partialTick: Float
+    ) {
+        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
+        val i = (this.width - IMAGE_WIDTH) / 2
+        val j = (this.height - IMAGE_HEIGHT) / 2
+        guiGraphics.blit(TEXTURE, i, j, 0f, 0f, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_SIZE, IMAGE_SIZE)
     }
 
     override fun removed() {
@@ -113,48 +134,52 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
         previewEntities.clear()
     }
 
+    override fun keyPressed(pKeyCode: Int, pScanCode: Int, pModifiers: Int): Boolean {
+        if (pKeyCode == options.keyInventory.key.value) {
+            this.onClose()
+            return true
+        }
+        return super.keyPressed(pKeyCode, pScanCode, pModifiers)
+    }
+
+    fun onPageChanged() {
+        this.clearWidgets()
+        this.registerButtons()
+    }
+
     @OnlyIn(Dist.CLIENT)
     private inner class SkinSlotButton(
-        pX: Int, pY: Int, pWidth: Int, pHeight: Int,
+        x: Int, y: Int,
         private val skinId: String,
         private val skinInfo: SkinInfo?,
         private val previewEntity: VehicleEntity?,
         private val vehicleEntityId: Int,
         private val isSelected: Boolean
-    ) : AbstractButton(pX, pY, pWidth, pHeight, Component.empty()) {
+    ) : AbstractButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, Component.empty()) {
 
-        override fun renderWidget(pGuiGraphics: GuiGraphics, pMouseX: Int, pMouseY: Int, pPartialTick: Float) {
-            val pose = pGuiGraphics.pose()
+        override fun renderWidget(graphics: GuiGraphics, pMouseX: Int, pMouseY: Int, pPartialTick: Float) {
+            val pose = graphics.pose()
 
-            // Draw selection highlight
-            if (isSelected) {
-                pGuiGraphics.fill(this.x - 1, this.y - 1, this.x + this.width + 1, this.y + this.height + 1, -0x2900)
+            if (this.isHovered || this.isSelected) {
+                graphics.blit(BUTTON, x, y, 0f, 0f, this.width, this.height, BUTTON_SIZE, BUTTON_SIZE)
+            } else {
+                graphics.blit(BUTTON, x, y, 0f, 95f, this.width, this.height, BUTTON_SIZE, BUTTON_SIZE)
             }
 
-            // Draw hover highlight
-            if (this.isHovered && this.isActive) {
-                pGuiGraphics.fill(this.x, this.y, this.x + this.width, this.y + this.height, 0x33FFFFFF)
-            }
-
-            // Render 3D vehicle preview
+            // 载具皮肤模型
             if (previewEntity != null) {
                 pose.pushPose()
 
-                // Position: center of slot, upper portion for 3D model
                 val centerX = this.x + this.width / 2.0
-                val centerY = this.y + 56.0
+                val centerY = this.y + this.height - 20.0
                 pose.translate(centerX, centerY, 80.0)
 
-                // Scale to fit slot — normalize by bounding box size
                 val bbSize = previewEntity.boundingBox.size.toFloat()
-                val scale = (this.width * 0.35f) / maxOf(bbSize, 1f)
+                val scale = (this.width * 0.3f) / maxOf(bbSize, 1f)
                 pose.scale(scale, scale, -scale)
 
-                // Flip right-side up (vanilla InventoryScreen uses rotateZ(PI))
-                pose.mulPose(Axis.ZP.rotationDegrees(180f))
-                // Nice 3/4 angle view
-                pose.mulPose(Axis.YP.rotationDegrees(150f))
-                pose.mulPose(Axis.XP.rotationDegrees(15f))
+                pose.mulPose(Axis.XP.rotationDegrees(195f))
+                pose.mulPose(Axis.YP.rotationDegrees(30f))
 
                 Lighting.setupForEntityInInventory()
                 val erd = mc.entityRenderDispatcher
@@ -164,18 +189,18 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
                     0.0, 0.0, 0.0,
                     0f, 1f,
                     pose,
-                    pGuiGraphics.bufferSource(),
+                    graphics.bufferSource(),
                     15728880
                 )
-                pGuiGraphics.flush()
+                graphics.flush()
                 erd.setRenderShadow(true)
                 Lighting.setupFor3DItems()
 
                 pose.popPose()
             }
 
-            // Draw skin id, name, description below the preview
-            val textY = this.y + this.height - 36
+            // 皮肤信息
+            val textY = this.y + this.height - 35
             val displayName = skinInfo?.name ?: "Vanilla"
             val displayId = skinId.ifBlank { "vanilla" }
             val description = skinInfo?.description ?: ""
@@ -186,13 +211,18 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
             val nameText = font.plainSubstrByWidth(displayName, this.width - 4)
             val idText = font.plainSubstrByWidth(displayId, this.width - 4)
 
-            pGuiGraphics.drawCenteredString(font, nameText, this.x + this.width / 2, textY, textColor)
-            pGuiGraphics.drawCenteredString(font, idText, this.x + this.width / 2, textY + 10, 0xAAAAAA)
+            pose.pushPose()
+            pose.translate(0.0, 0.0, 200.0)
+
+            graphics.drawCenteredString(font, nameText, this.x + this.width / 2, this.y + 2, textColor)
+            graphics.drawCenteredString(font, idText, this.x + this.width / 2, textY + 15, 0xAAAAAA)
 
             if (description.isNotBlank()) {
                 val descText = font.plainSubstrByWidth(description, this.width - 4)
-                pGuiGraphics.drawCenteredString(font, descText, this.x + this.width / 2, textY + 20, 0x888888)
+                graphics.drawCenteredString(font, descText, this.x + this.width / 2, textY + 25, 0x888888)
             }
+
+            pose.popPose()
         }
 
         override fun onPress() {
@@ -202,6 +232,38 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
         }
 
         override fun updateWidgetNarration(pNarrationElementOutput: NarrationElementOutput) {
+        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private inner class PageButton(
+        x: Int,
+        y: Int,
+        val forward: Boolean
+    ) : AbstractButton(x, y, 20, 94, Component.empty()) {
+        override fun onPress() {
+            val page = this@VehicleSkinScreen.currentPage
+            val maxPage = this@VehicleSkinScreen.maxPage
+            if (this.forward) {
+                this@VehicleSkinScreen.currentPage = (page - 1).coerceIn(0, maxPage)
+            } else {
+                this@VehicleSkinScreen.currentPage = (page + 1).coerceIn(0, maxPage)
+            }
+            this@VehicleSkinScreen.onPageChanged()
+        }
+
+        override fun updateWidgetNarration(pNarrationElementOutput: NarrationElementOutput) {
+        }
+
+        override fun renderWidget(
+            pGuiGraphics: GuiGraphics,
+            pMouseX: Int,
+            pMouseY: Int,
+            pPartialTick: Float
+        ) {
+            val uOffset = if (this.forward) 143f else 164f
+            val vOffset = if (this.isHovered) 0f else 95f
+            pGuiGraphics.blit(BUTTON, this.x, this.y, uOffset, vOffset, 20, 94, BUTTON_SIZE, BUTTON_SIZE)
         }
     }
 }
