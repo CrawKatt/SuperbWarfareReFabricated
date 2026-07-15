@@ -69,6 +69,9 @@ repositories {
         }
     }
     maven {
+        url = uri("https://maven.ryanhcode.dev/releases")
+    }
+    maven {
         name = "Kotlin for Forge"
         url = uri("https://thedarkcolour.github.io/KotlinForForge/")
         content {
@@ -272,7 +275,6 @@ dependencies {
     // 真实相机
     compileOnly("curse.maven:real-camera-851574:${project.property("real_camera_id")}")
 
-
     // 网络音乐机
     implementation("curse.maven:net-music-978569:6838604")
 
@@ -286,12 +288,17 @@ dependencies {
     implementation("curse.maven:spark-361579:6225208")
     implementation("maven.modrinth:sodium:mc1.21.1-0.6.13-neoforge")
 
+    // 这俩是仅客户端mod
+    if (!project.gradle.startParameter.taskNames.any { it.contains("runServer") }) {
+        runtimeOnly("curse.maven:irisshaders-455508:6661598")
+        runtimeOnly("curse.maven:sodium-394468:6382651")
+    }
+
     compileOnly("curse.maven:create-328085:7963363")
     // Sable
-    compileOnly("curse.maven:sable-1312371:8007005")
-    compileOnly("maven.modrinth:create-aeronautics:1.1.3+mc1.21.1")
-//    implementation(fg.deobf("curse.maven:oculus-581495:6020952"))
-//    implementation(fg.deobf("curse.maven:embeddium-908741:5681725"))
+    implementation("curse.maven:sable-1312371:8007005")
+    compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-1.21.1:1.6.0")
+    implementation("maven.modrinth:create-aeronautics:1.1.3+mc1.21.1")
 //    implementation(fg.deobf("curse.maven:timeless-and-classics-zero-1028108:6069384"))
 //    implementation(fg.deobf("curse.maven:create-328085:6255513"))
 //    implementation(fg.deobf("curse.maven:mmmmmmmmmmmm-225738:6237015"))
