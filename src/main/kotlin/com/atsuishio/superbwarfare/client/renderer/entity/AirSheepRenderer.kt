@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
-import com.atsuishio.superbwarfare.entity.vehicle.TinySpeedboatEntity
+import com.atsuishio.superbwarfare.entity.vehicle.AirSheepEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
 import com.mojang.blaze3d.vertex.PoseStack
@@ -10,28 +10,13 @@ import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.texture.OverlayTexture
-import net.minecraft.util.Mth
 import net.minecraft.world.item.DyeColor
 
-class TinySpeedboatRenderer(manager: EntityRendererProvider.Context) :
-    SbmVehicleRenderer<TinySpeedboatEntity>(manager) {
-    override fun transformCustomModelPart(
-        vehicle: TinySpeedboatEntity,
-        model: BedrockVehicleModel,
-        poseStack: PoseStack,
-        entityYaw: Float,
-        partialTicks: Float
-    ) {
-        super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
-        val control = model.getBone("control")
-        val rudder = model.getBone("rudder")
-
-        control.rotation.rotationZ(-3 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
-        rudder.rotation.rotationY(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
-    }
+class AirSheepRenderer(manager: EntityRendererProvider.Context) :
+    SbmVehicleRenderer<AirSheepEntity>(manager) {
 
     override fun renderCustomPart(
-        vehicle: TinySpeedboatEntity,
+        vehicle: AirSheepEntity,
         model: BedrockVehicleModel,
         poseStack: PoseStack,
         entityYaw: Float,
