@@ -95,6 +95,9 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
     // 水下的动量系数
     protected var underwaterMotionScaleValue = 0.75f
 
+    // 爆炸是否造成破坏
+    protected var explosionDestroyValue = true
+
     override fun getDamage(): Float = damageValue
     override fun setDamage(value: Float) {
         damageValue = value
@@ -173,6 +176,11 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
     override fun getUnderwaterMotionScale(): Float = underwaterMotionScaleValue
     override fun setUnderwaterMotionScale(value: Float) {
         underwaterMotionScaleValue = value
+    }
+
+    override fun hasExplosionDestroy(): Boolean = explosionDestroyValue
+    override fun setExplosionDestroy(value: Boolean) {
+        explosionDestroyValue = value
     }
 
     // 子弹造成的状态效果
@@ -599,6 +607,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
                     .radius(this.explosionRadiusValue)
                     .position(location)
                     .beast(this.isBeast())
+                    .destroyBlock(this.explosionDestroyValue)
                     .explode()
             }
 
@@ -819,6 +828,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
                 .radius(this.explosionRadiusValue)
                 .position(result.location)
                 .beast(this.isBeast())
+                .destroyBlock(this.explosionDestroyValue)
                 .explode()
         }
 

@@ -34,7 +34,7 @@ open class AerialBombEntity(type: EntityType<out AerialBombEntity>, level: Level
         val owner = this.owner
         if (entity == owner || (owner != null && entity == owner.vehicle) || entity is AerialBombEntity) return
         if (this.level() is ServerLevel) {
-            if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+            if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get() && this.explosionDestroyValue) {
                 val aabb = AABB(result.getLocation(), result.getLocation()).inflate(5.0)
                 BlockPos.betweenClosedStream(aabb).forEach {
                     val hard = this.level().getBlockState(it).block.defaultDestroyTime()
@@ -56,7 +56,7 @@ open class AerialBombEntity(type: EntityType<out AerialBombEntity>, level: Level
 
     override fun afterHitBlock(result: BlockHitResult) {
         if (this.level() is ServerLevel) {
-            if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+            if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get() && this.explosionDestroyValue) {
                 val aabb = AABB(result.getLocation(), result.getLocation()).inflate(5.0)
                 BlockPos.betweenClosedStream(aabb).forEach {
                     val hard = this.level().getBlockState(it).block.defaultDestroyTime()

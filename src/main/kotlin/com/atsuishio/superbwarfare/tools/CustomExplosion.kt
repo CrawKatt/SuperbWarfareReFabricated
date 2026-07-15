@@ -519,8 +519,7 @@ class CustomExplosion @JvmOverloads constructor(
         private var damage = 0f
         private var radius = 0f
         private var particleType: ParticleTool.ParticleType? = null
-        private var destroyBlock: Supplier<BlockInteraction> =
-            Supplier { if (ExplosionConfig.EXPLOSION_DESTROY.get()) BlockInteraction.DESTROY else BlockInteraction.KEEP }
+        private var destroyBlock: Boolean = true
         private var fireTime = 0
         private var damageSource: DamageSource? = null
         private var particlePosition: Vec3? = null
@@ -563,13 +562,13 @@ class CustomExplosion @JvmOverloads constructor(
             return this
         }
 
-        fun destroyBlock(destroyBlock: Supplier<BlockInteraction>): Builder {
+        fun destroyBlock(destroyBlock: Boolean): Builder {
             this.destroyBlock = destroyBlock
             return this
         }
 
         fun keepBlock(): Builder {
-            this.destroyBlock = Supplier { BlockInteraction.KEEP }
+            this.destroyBlock = false
             return this
         }
 
@@ -608,10 +607,15 @@ class CustomExplosion @JvmOverloads constructor(
                     attackerEntity
                 ))!!
 
+            val interaction =
+                Supplier {
+                    if (ExplosionConfig.EXPLOSION_DESTROY.get() && this.destroyBlock) BlockInteraction.DESTROY else BlockInteraction.KEEP
+                }
+
             val customExplosion = CustomExplosion(
                 level, directSource,
                 source, damage,
-                position.x, position.y, position.z, radius, destroyBlock.get()
+                position.x, position.y, position.z, radius, interaction.get()
             )
                 .setFireTime(fireTime)
                 .setBeast(beast)

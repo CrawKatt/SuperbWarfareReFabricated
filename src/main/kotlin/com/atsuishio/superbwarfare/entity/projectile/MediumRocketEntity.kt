@@ -105,7 +105,7 @@ open class MediumRocketEntity : FastThrowableProjectile, BasicGeoProjectileEntit
             return
         }
 
-        if (ExplosionConfig.EXPLOSION_DESTROY.get()) {
+        if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get() && this.explosionDestroyValue) {
             val hardness = level.getBlockState(pos).block.defaultDestroyTime()
 
             val resistance = 0.95 - (hardness / 100).coerceIn(0f, 1f)

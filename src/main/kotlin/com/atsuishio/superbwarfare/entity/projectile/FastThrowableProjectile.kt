@@ -70,6 +70,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
     protected var penetratingValue: Boolean = false
     protected val effectsValue: MutableSet<MobEffectInstance> = hashSetOf()
     protected var underwaterMotionScaleValue = 0.75f
+    protected var explosionDestroyValue = true
 
     override fun getDamage(): Float = damageValue
     override fun setDamage(value: Float) {
@@ -126,6 +127,11 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         underwaterMotionScaleValue = value
     }
 
+    override fun hasExplosionDestroy(): Boolean = explosionDestroyValue
+    override fun setExplosionDestroy(value: Boolean) {
+        explosionDestroyValue = value
+    }
+
     private var isFastMoving = false
 
     var exploded: Boolean = false
@@ -177,6 +183,9 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         if (compound.contains("UnderwaterMotionScale")) {
             this.underwaterMotionScaleValue = compound.getFloat("UnderwaterMotionScale")
         }
+        if (compound.contains("ExplosionDestroy")) {
+            this.explosionDestroyValue = compound.getBoolean("ExplosionDestroy")
+        }
 
         val listTag = compound.getList("CustomPotionEffects", 10)
         for (i in listTag.indices) {
@@ -212,6 +221,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         if (this.underwaterMotionScaleValue > 0) {
             compound.putFloat("UnderwaterMotionScale", this.underwaterMotionScaleValue)
         }
+        compound.putBoolean("ExplosionDestroy", this.explosionDestroyValue)
 
         if (!this.effectsValue.isEmpty()) {
             val list = ListTag()
@@ -522,21 +532,15 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         val resultPos = blockHitResult.blockPos
         val hardness = this.level().getBlockState(resultPos).block.defaultDestroyTime()
         if (hardness != -1f) {
-            if (ExplosionConfig.EXPLOSION_DESTROY.get()) {
-                if (firstHit) {
-                    causeExplode(blockHitResult.location)
-                    firstHit = false
-                    queueServerWork(3) { this.discard() }
-                }
-                if (ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
-                    this.level().destroyBlock(resultPos, true)
-                }
+            if (firstHit) {
+                causeExplode(blockHitResult.location)
+                firstHit = false
+                queueServerWork(3) { this.discard() }
+            }
+            if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get() && this.explosionDestroyValue) {
+                this.level().destroyBlock(resultPos, true)
             }
         } else {
-            causeExplode(blockHitResult.location)
-            this.discard()
-        }
-        if (!ExplosionConfig.EXPLOSION_DESTROY.get()) {
             causeExplode(blockHitResult.location)
             this.discard()
         }
@@ -549,6 +553,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
             .radius(explosionRadiusValue)
             .position(vec3)
             .beast(this.isBeast())
+            .destroyBlock(explosionDestroyValue)
     }
 
     open fun causeRangedEffects(vec3: Vec3) {

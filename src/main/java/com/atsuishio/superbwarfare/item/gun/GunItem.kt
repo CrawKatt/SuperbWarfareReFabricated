@@ -771,6 +771,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
                     setBypassArmorRate(bypassArmorRate.toFloat())
                     setVelocity(finalVelocity)
                     setUnderwaterMotionScale(data.get(GunProp.UNDERWATER_MOTION_SCALE))
+                    setExplosionDestroy(data.get(GunProp.EXPLOSION_DESTROY))
                 }
             }
 
