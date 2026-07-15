@@ -7,6 +7,8 @@ import com.google.gson.JsonObject
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.levelgen.Heightmap
 
 /**
  * 导弹武器聚合工具。
@@ -17,6 +19,16 @@ object MissileWeaponHelper {
 
     fun JsonObject.gsonDouble(vararg keys: String) =
         keys.firstNotNullOfOrNull { if (has(it)) get(it).asDouble else null }
+
+    /** 对客户端 level 中已存在的实体（非超视距同步），使用高度图实时计算离地高度 */
+    private fun computeEntityHeightAboveGround(level: Level, entity: Entity): Double {
+        val surfaceY = level.getHeight(
+            Heightmap.Types.WORLD_SURFACE,
+            entity.blockX,
+            entity.blockZ
+        )
+        return (entity.y - surfaceY).coerceAtLeast(0.0)
+    }
 
     /** 单种武器聚合结果 */
     data class AggregatedWeapon(
@@ -91,7 +103,8 @@ object MissileWeaponHelper {
         val level = vehicles.first().level()
         val heightAboveGround = if (targetHeight >= 0) targetHeight
         else if (targetEntity != null) {
-            ClientSyncedEntityHandler.getSyncedEntry(level, targetEntity.id)?.heightAboveGround ?: -1.0
+            ClientSyncedEntityHandler.getSyncedEntry(level, targetEntity.id)?.heightAboveGround
+                ?: computeEntityHeightAboveGround(level, targetEntity)
         } else -1.0
 
         data class InnerAgg(
@@ -148,6 +161,11 @@ object MissileWeaponHelper {
 
                 if (requireLockEntity && canLockEntity && heightAboveGround >= 0) {
                     if (heightAboveGround !in minH..maxH) canLockEntity = false
+                }
+                // 若实体锁定因目标高度超出上限而被禁用，且目标是实体（非地面坐标），
+                // 则同时禁用对地打击——对高空实体发射对地导弹没有意义
+                if (targetEntity != null && !canLockEntity && maxH > 0 && heightAboveGround > maxH) {
+                    canGroundStrike = false
                 }
                 if (!canLockEntity && !canGroundStrike) continue
 

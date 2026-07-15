@@ -1,6 +1,8 @@
 package com.atsuishio.superbwarfare.client
 
+import com.atsuishio.superbwarfare.client.sound.VehicleSoundInstance
 import com.atsuishio.superbwarfare.config.server.SyncConfig
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.network.message.receive.BeyondVisualEntitySyncMessage.SyncedEntity
 import com.atsuishio.superbwarfare.network.message.receive.PlayerInfoSyncMessage.SyncedPlayerInfo
 import com.atsuishio.superbwarfare.network.message.receive.RadarSyncMessage
@@ -109,6 +111,14 @@ object ClientSyncedEntityHandler {
             }
             pool.values.removeIf { it.isEmpty() }
         }
+        // 清理假实体引擎音效：移除已不在 SYNCED_WORLD_RENDER 中的实体的音效
+        val activeIds = SYNCED_WORLD_RENDER.keys.map { it.id }.toSet()
+        phantomEngineSounds.entries.removeIf { (id, sound) ->
+            if (id !in activeIds) {
+                mc.soundManager.stop(sound)
+                true
+            } else false
+        }
     }
 
     /**
@@ -159,8 +169,14 @@ object ClientSyncedEntityHandler {
             val key = SyncedKey(dim, syncedEntity.id)
             if (syncedEntity.removed) {
                 SYNCED_WORLD_RENDER.remove(key)
+                phantomEngineSounds.remove(syncedEntity.id)?.let { mc.soundManager.stop(it) }
                 continue
             }
+
+            // 若真实实体已被服务端通过原版路径同步到客户端，
+            // 假实体本身保留在 SYNCED_WORLD_RENDER 中（供 IFF / 战术地图使用），仅停止假实体引擎音效
+            val realEntityExists = level.getEntity(syncedEntity.id) != null
+
             val existedEntry = SYNCED_WORLD_RENDER[key]
             val vel = if (existedEntry != null) {
                 val dt = ((time - existedEntry.timeStamp) / 50.0).coerceAtLeast(0.5)
@@ -192,6 +208,30 @@ object ClientSyncedEntityHandler {
                 entity, time, syncedEntity.targetPos, syncedEntity.heightAboveGround, vel,
                 shouldWorldRender = true
             )
+            // 为超视距载具假实体管理引擎音效
+            // 若真实实体已存在，只停止残留的假实体音效（真实实体会通过 baseTick 自行创建音效）
+            if (entity is VehicleEntity) {
+                if (realEntityExists) {
+                    phantomEngineSounds.remove(syncedEntity.id)?.let { mc.soundManager.stop(it) }
+                } else {
+                    managePhantomEngineSound(entity, syncedEntity.id)
+                }
+            }
+        }
+    }
+
+    /** 为超视距载具假实体创建或移除引擎音效 */
+    private fun managePhantomEngineSound(vehicle: VehicleEntity, id: Int) {
+        val existingSound = phantomEngineSounds[id]
+        val shouldPlay = vehicle.engineRunning()
+
+        if (shouldPlay && existingSound == null) {
+            val sound = VehicleSoundInstance.EngineSound(vehicle)
+            phantomEngineSounds[id] = sound
+            mc.soundManager.play(sound)
+        } else if (!shouldPlay && existingSound != null) {
+            mc.soundManager.stop(existingSound)
+            phantomEngineSounds.remove(id)
         }
     }
 
@@ -247,6 +287,9 @@ object ClientSyncedEntityHandler {
 
     @JvmField
     val SYNCED_RADARS = ConcurrentHashMap<SyncedKey, SyncedRadar>()
+
+    /** 超视距假实体的引擎音效实例，key 为 entityId */
+    private val phantomEngineSounds = ConcurrentHashMap<Int, VehicleSoundInstance>()
 
     @JvmStatic
     fun syncRadars(dim: ResourceLocation, radars: List<RadarSyncMessage.SyncedRadar>) {

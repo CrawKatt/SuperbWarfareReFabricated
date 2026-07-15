@@ -69,10 +69,8 @@ object IFFOverlay : CommonOverlay("iff") {
                 friendlyEntities = (friendlyEntities + clientEntities).distinctBy { it.id }
 
                 for (entity in friendlyEntities) {
-                    val e = level.getEntity(entity.id) ?: entity
-                    if (e !== player && e.position().canBeSeen() && e !== player.vehicle) {
-                        val teammate = e.vehicle ?: e
-
+                    val teammate = level.getEntity(entity.id) ?: entity
+                    if (teammate !== player && teammate.position().canBeSeen() && teammate !== player.vehicle && teammate.vehicle == null) {
                         RenderSystem.disableDepthTest()
                         RenderSystem.depthMask(false)
                         RenderSystem.enableBlend()
@@ -90,7 +88,7 @@ object IFFOverlay : CommonOverlay("iff") {
                             if (checkNoClip(player, teammate, cameraPos)) 1f else 0.4f
                         )
 
-                        val pos = if (level.getEntity(e.id) != null)
+                        val pos = if (level.getEntity(teammate.id) != null)
                             VectorTool.lerpGetEntityBoundingBoxCenter(teammate, partialTick)
                         else
                             ClientSyncedEntityHandler.getExtrapolatedPos(level, teammate)
@@ -117,7 +115,7 @@ object IFFOverlay : CommonOverlay("iff") {
                             poseStack.pushPose()
                             poseStack.translate(xf, yf, 0f)
                             poseStack.scale(0.75f, 0.75f, 1f)
-                            val str = "${e.displayName?.string} [${FormatTool.format1D(pos.distanceTo(cameraPos))}m]"
+                            val str = "${teammate.displayName?.string} [${FormatTool.format1D(pos.distanceTo(cameraPos))}m]"
                             guiGraphics.drawString(mc.font, str, -mc.font.width(str) / 2, 10, 0x7FFFAD, false)
                             poseStack.popPose()
                         }
@@ -130,7 +128,7 @@ object IFFOverlay : CommonOverlay("iff") {
                 for (otherPlayer in syncedPlayers) {
                     if (otherPlayer.uuid == player.uuid) continue
                     val color = when (otherPlayer.relation) {
-                        "hostile" -> 0xFFBD7F.toInt()
+                        "hostile" -> 0xFFBD7F
                         "neutral" -> -0x1
                         else -> 0x7FFFAD
                     }
@@ -144,7 +142,7 @@ object IFFOverlay : CommonOverlay("iff") {
                 for (entity in hostileEntities) {
                     val e = level.getEntity(entity.id) ?: entity
 
-                    if (e !== player && e.position().canBeSeen() && e !== player.vehicle) {
+                    if (e !== player && e.position().canBeSeen() && e !== player.vehicle && e.vehicle == null) {
                         val enemy = e.vehicle ?: e
 
                         RenderSystem.disableDepthTest()
@@ -203,7 +201,7 @@ object IFFOverlay : CommonOverlay("iff") {
                 val neutralEntities = ClientSyncedEntityHandler.getSyncedNeutralEntities(player.level())
                 for (entity in neutralEntities) {
                     val e = level.getEntity(entity.id) ?: entity
-                    if (e === player || !e.position().canBeSeen() || e === player.vehicle) continue
+                    if (e === player || !e.position().canBeSeen() || e === player.vehicle || e.vehicle != null) continue
                     val neutral = e.vehicle ?: e
 
                     RenderSystem.disableDepthTest()

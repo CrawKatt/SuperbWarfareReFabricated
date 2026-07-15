@@ -363,6 +363,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     open var liftSpeed = 0f
     open var destroyRot = 0f
+    open var liftOffset by LIFT_OFFSET
 
     open var jumpCoolDown = 0
     open var deltaMovementO: Vec3 = deltaMovement
@@ -886,6 +887,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             define(LASER_SCALE_O, 0f)
             define(CHARGE_PROGRESS, 0f)
             define(ROLL, 0f)
+            define(LIFT_OFFSET, 0f)
             define(IS_WRECK, false)
             define(SYMPATHETIC_DETONATED, false)
             define(TURRET_BURNED, false)
@@ -3299,22 +3301,25 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         val engineType = computed.engineType
         if (engineType == EngineType.EMPTY || engineType == EngineType.FIXED) return 0f
 
-        val engineInfo = this.engineInfo ?: return 0f
+        // Fallback to computed engineInfo JSON when runtime engineInfo is not yet initialized (e.g. phantom entities)
+        val engineSoundVolume = this.engineInfo?.engineSoundVolume
+            ?: computed.engineInfo.get("EngineSoundVolume")?.asFloat
+            ?: 0.4f
 
         return when (engineType) {
             EngineType.TRACK -> Math.max(
                 Mth.abs(power),
                 Mth.abs(1.4f * deltaRot)
-            ) * engineInfo.engineSoundVolume
+            ) * engineSoundVolume
 
-            EngineType.HELICOPTER -> synchedPropellerRot * engineInfo.engineSoundVolume
+            EngineType.HELICOPTER -> synchedPropellerRot * engineSoundVolume
             EngineType.AIRSHIP -> Mth.clamp(
-                Mth.abs(power) * engineInfo.engineSoundVolume + engineInfo.engineSoundVolume,
-                engineInfo.engineSoundVolume,
+                Mth.abs(power) * engineSoundVolume + engineSoundVolume,
+                engineSoundVolume,
                 1.5f
             )
 
-            else -> Mth.abs(power) * engineInfo.engineSoundVolume
+            else -> Mth.abs(power) * engineSoundVolume
         }
     }
 
@@ -4693,6 +4698,11 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         /** ROLL */
         @JvmField
         val ROLL: EntityDataAccessor<Float> =
+            SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
+
+        /** LIFT_OFFSET */
+        @JvmField
+        val LIFT_OFFSET: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
     }
 }

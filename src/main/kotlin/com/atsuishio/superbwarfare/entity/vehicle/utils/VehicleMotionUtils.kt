@@ -759,7 +759,7 @@ object VehicleMotionUtils {
                         speed,
                         level,
                         1,
-                        vehicle.deltaMovement.scale(60.0)
+                        vehicle.deltaMovement.scale(1.0)
                     )
                 } else {
                     vehicle.addRandomParticle(

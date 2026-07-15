@@ -23,7 +23,5 @@ void main() {
     // This gives the same gradual fog attenuation as entities rendered at any distance,
     // rather than the vanilla particle fog that saturates to white near the render edge.
     // Only RGB is fogged; alpha is preserved so the particle texture still works.
-    float maxFogDistance = 2048.0;
-    float fogValue = clamp((vertexDistance - FogStart) / (maxFogDistance - FogStart), 0.0, 1.0);
-    fragColor = vec4(mix(color.rgb, FogColor.rgb, fogValue * FogColor.a), color.a);
+    fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);
 }
