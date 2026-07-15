@@ -981,7 +981,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         var pos: Vec3? = null
 
         if (state.canOcclude()) {
-            pos = blockHitResult.getLocation()
+            pos = blockHitResult.location
         }
 
         val toVec = shootPosition.add(shootDirection.x * range, shootDirection.y * range, shootDirection.z * range)
@@ -991,14 +991,14 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             shootPosition,
             toVec,
             aabb,
-            { p -> !p.isSpectator && p.isAlive },
+            { p -> !p.isSpectator && p.isAlive && p != shooter && p != shooter.vehicle},
             distance
         )
 
         var hitPos: Vec3? = null
 
         if (entityHitResult != null) {
-            hitPos = entityHitResult.getLocation()
+            hitPos = entityHitResult.location
             target = entityHitResult.entity
         }
 

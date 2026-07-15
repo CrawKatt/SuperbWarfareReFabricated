@@ -143,6 +143,12 @@ class DefaultVehicleData : IDBasedData<DefaultVehicleData> {
     @SerialName("HUDColor")
     var hudColor: ModColor = ModColor(0x66FF00)
 
+    @SerialName("LaserColor")
+    var laserColor: ModColor = ModColor(0xFF0000)
+
+    @SerialName("LaserScale")
+    var laserScale: Float = 0.035f
+
     @SerialName("Type")
     var type: VehicleType = VehicleType.EMPTY
 
