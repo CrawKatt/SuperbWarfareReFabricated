@@ -100,7 +100,7 @@ class TurretWreckRenderer(renderManager: EntityRendererProvider.Context) :
                     FastColor.ARGB32.colorFromFloat(1.0f, 0.3f, 0.3f, 0.3f)
                 )
                 poseStack.popPose()
-            } else if (renderer is SbmVehicleRenderer) {
+            } else if (renderer is GeoVehicleRenderer) {
                 val models = VehicleResource.compute(entity).getModels()
                 if (models.isEmpty()) return
                 val modelPath = models.first().model ?: return

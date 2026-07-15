@@ -49,7 +49,7 @@ import org.joml.Matrix4f
 import org.joml.Quaterniond
 import org.joml.Quaternionf
 
-open class SbmVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
+open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
     EntityRenderer<T>(manager) where T : VehicleEntity, T : BasicGeoVehicleEntity {
 
     var pitch = 0f

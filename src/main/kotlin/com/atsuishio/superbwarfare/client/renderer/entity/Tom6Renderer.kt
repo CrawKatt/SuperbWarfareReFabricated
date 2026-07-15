@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.TntMinecartRenderer
 import net.minecraft.world.level.block.Blocks
 
-class Tom6Renderer(manager: EntityRendererProvider.Context) : SbmVehicleRenderer<Tom6Entity>(manager) {
+class Tom6Renderer(manager: EntityRendererProvider.Context) : GeoVehicleRenderer<Tom6Entity>(manager) {
 
     private val blockRenderer: BlockRenderDispatcher = manager.blockRenderDispatcher
 

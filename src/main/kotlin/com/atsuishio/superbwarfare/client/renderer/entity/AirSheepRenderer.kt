@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.item.DyeColor
 
 class AirSheepRenderer(manager: EntityRendererProvider.Context) :
-    SbmVehicleRenderer<AirSheepEntity>(manager) {
+    GeoVehicleRenderer<AirSheepEntity>(manager) {
 
     override fun renderCustomPart(
         vehicle: AirSheepEntity,

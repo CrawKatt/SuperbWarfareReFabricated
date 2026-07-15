@@ -14,7 +14,7 @@ import net.minecraft.util.Mth
 import net.minecraft.world.item.DyeColor
 
 class TinySpeedboatRenderer(manager: EntityRendererProvider.Context) :
-    SbmVehicleRenderer<TinySpeedboatEntity>(manager) {
+    GeoVehicleRenderer<TinySpeedboatEntity>(manager) {
     override fun transformCustomModelPart(
         vehicle: TinySpeedboatEntity,
         model: BedrockVehicleModel,

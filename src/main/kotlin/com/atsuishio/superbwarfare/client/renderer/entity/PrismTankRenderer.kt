@@ -8,7 +8,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.util.Mth
 
-class PrismTankRenderer(manager: EntityRendererProvider.Context) : SbmVehicleRenderer<PrismTankEntity>(manager) {
+class PrismTankRenderer(manager: EntityRendererProvider.Context) : GeoVehicleRenderer<PrismTankEntity>(manager) {
     override fun hideForTurretControllerWhileZooming(): Boolean {
         return true
     }

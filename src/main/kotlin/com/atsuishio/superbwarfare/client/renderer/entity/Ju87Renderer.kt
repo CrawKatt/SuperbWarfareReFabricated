@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.util.Mth
 
-class Ju87Renderer(manager: EntityRendererProvider.Context) : SbmVehicleRenderer<Ju87Entity>(manager){
+class Ju87Renderer(manager: EntityRendererProvider.Context) : GeoVehicleRenderer<Ju87Entity>(manager){
     override fun transformCustomModelPart(
         vehicle: Ju87Entity,
         model: BedrockVehicleModel,
