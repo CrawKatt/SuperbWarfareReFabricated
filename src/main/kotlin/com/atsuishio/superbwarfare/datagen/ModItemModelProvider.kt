@@ -177,6 +177,7 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         simpleItem(ModItems.MEDIUM_SHELL_HE)
         simpleItem(ModItems.MEDIUM_SHELL_GS)
         simpleItem(ModItems.MEDIUM_SHELL_AA)
+        simpleItem(ModItems.TACTICAL_TERMINAL)
         simpleItem(ModItems.CRUST)
 
         simpleMaterials(ModItems.IRON_MATERIALS)
@@ -239,7 +240,6 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         simpleItem(ModItems.US_CHEST_IOTV)
         simpleItem(ModItems.GE_HELMET_M_35)
         simpleItem(ModItems.HANDSOME_GOGGLES)
-        simpleItem(ModItems.TACTICAL_TERMINAL)
 
         // blueprints
         gunBlueprintItem(ModItems.TRACHELIUM_BLUEPRINT)

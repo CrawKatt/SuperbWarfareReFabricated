@@ -708,7 +708,6 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                     has(ModItems.M18_SMOKE_GRENADE.get())
                 )
                 .save(writer, loc(getItemName(ModItems.VEHICLE_SMOKE_AMMO.get()) + "_from_m18_smoke_grenade"))
-
             ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.M18_SMOKE_GRENADE.get(), 1)
                 .requires(ModItems.VEHICLE_SMOKE_AMMO.get(), 1)
                 .unlockedBy(
@@ -716,7 +715,6 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                     has(ModItems.VEHICLE_SMOKE_AMMO.get())
                 )
                 .save(writer, loc(getItemName(ModItems.M18_SMOKE_GRENADE.get()) + "_from_vehicle_smoke_ammo"))
-
             ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.FLYING_FLARE_AMMO.get(), 16)
                 .requires(Items.BLAZE_POWDER)
                 .requires(Items.GUNPOWDER)
