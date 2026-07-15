@@ -360,6 +360,10 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8" // Use the UTF-8 charset for Java compilation
 }
 
+tasks.named<Jar>("jarJar") {
+    from("COPYING", "COPYING.LESSER")
+}
+
 tasks.named("createMinecraftArtifacts") {
     dependsOn(tasks.named("generateModMetadata"))
 }
