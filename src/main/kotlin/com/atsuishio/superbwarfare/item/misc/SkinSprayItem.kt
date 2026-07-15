@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.item.misc
 
 import com.atsuishio.superbwarfare.client.renderer.item.SkinSprayRenderer
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.network.message.receive.OpenVehicleSkinScreenMessage
 import com.atsuishio.superbwarfare.tools.mc
@@ -12,8 +13,10 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import net.minecraftforge.client.extensions.common.IClientItemExtensions
-import java.util.function.Consumer
+import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent
 
 class SkinSprayItem : Item(Properties().stacksTo(1)), IVehicleInteract {
     override fun onInteractVehicle(
@@ -29,17 +32,20 @@ class SkinSprayItem : Item(Properties().stacksTo(1)), IVehicleInteract {
         return InteractionResult.CONSUME
     }
 
-    override fun initializeClient(consumer: Consumer<IClientItemExtensions?>) {
-        super.initializeClient(consumer)
-        consumer.accept(object : IClientItemExtensions {
-            private var renderer: BlockEntityWithoutLevelRenderer? = null
+    @EventBusSubscriber
+    companion object {
+        @SubscribeEvent
+        fun registerSkinSprayRenderer(event: RegisterClientExtensionsEvent) {
+            event.registerItem(object : IClientItemExtensions {
+                private var renderer: BlockEntityWithoutLevelRenderer? = null
 
-            override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                if (renderer == null) {
-                    renderer = SkinSprayRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
+                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
+                    if (renderer == null) {
+                        renderer = SkinSprayRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
+                    }
+                    return renderer!!
                 }
-                return renderer!!
-            }
-        })
+            }, ModItems.SKIN_SPRAY.get())
+        }
     }
 }

@@ -39,6 +39,7 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.item.*
 import net.minecraft.world.item.Item.Properties
+import net.minecraft.world.item.SwordItem.createAttributes
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.DispenserBlock
 import net.neoforged.bus.api.IEventBus
@@ -222,7 +223,7 @@ object ModItems {
     @JvmField val KNIFE = registerItem("knife") {
         SwordItem(
             ModItemTier.STEEL,
-            CustomDamageProperty(1200).attributes(SwordItem.createAttributes(ModItemTier.STEEL, 0, -1.8f))
+            CustomDamageProperty(1200).attributes(createAttributes(ModItemTier.STEEL, 0, -1.8f))
         )
     }
     @JvmField val HAMMER = registerItem("hammer") { HammerItem(Tiers.IRON, 11, -3.2f, Properties().durability(400)) }
@@ -230,11 +231,11 @@ object ModItems {
     @JvmField val STEEL_HAMMER = registerItem("steel_hammer") { HammerItem(ModItemTier.STEEL, 9, -3.2f, Properties().durability(600)) }
     @JvmField val DIAMOND_HAMMER = registerItem("diamond_hammer") { HammerItem(Tiers.DIAMOND, 12, -3.2f, Properties().durability(1500)) }
     @JvmField val CEMENTED_CARBIDE_HAMMER = registerItem("cemented_carbide_hammer") { HammerItem(ModItemTier.CEMENTED_CARBIDE, 8, -3.2f, Properties().durability(2000)) }
-    @JvmField val CEMENTED_CARBIDE_SWORD = registerItem("cemented_carbide_sword") { SwordItem(ModItemTier.CEMENTED_CARBIDE, -2, -2.4f, Properties()) }
-    @JvmField val CEMENTED_CARBIDE_PICKAXE = registerItem("cemented_carbide_pickaxe") { PickaxeItem(ModItemTier.CEMENTED_CARBIDE, -4, -2.8f, Properties()) }
-    @JvmField val CEMENTED_CARBIDE_AXE = registerItem("cemented_carbide_axe") { AxeItem(ModItemTier.CEMENTED_CARBIDE, 0f, -3.0f, Properties()) }
-    @JvmField val CEMENTED_CARBIDE_SHOVEL = registerItem("cemented_carbide_shovel") { ShovelItem(ModItemTier.CEMENTED_CARBIDE, -3.5f, -3.0f, Properties()) }
-    @JvmField val CEMENTED_CARBIDE_HOE = registerItem("cemented_carbide_hoe") { HoeItem(ModItemTier.CEMENTED_CARBIDE, -8, 0.0f, Properties()) }
+    @JvmField val CEMENTED_CARBIDE_SWORD = registerItem("cemented_carbide_sword") { SwordItem(ModItemTier.CEMENTED_CARBIDE, Properties().attributes(createAttributes(ModItemTier.CEMENTED_CARBIDE, -2, -2.4f))) }
+    @JvmField val CEMENTED_CARBIDE_PICKAXE = registerItem("cemented_carbide_pickaxe") { PickaxeItem(ModItemTier.CEMENTED_CARBIDE, Properties().attributes(createAttributes(ModItemTier.CEMENTED_CARBIDE, -4, -2.8f))) }
+    @JvmField val CEMENTED_CARBIDE_AXE = registerItem("cemented_carbide_axe") { AxeItem(ModItemTier.CEMENTED_CARBIDE, Properties().attributes(createAttributes(ModItemTier.CEMENTED_CARBIDE,  0f, -3.0f))) }
+    @JvmField val CEMENTED_CARBIDE_SHOVEL = registerItem("cemented_carbide_shovel") { ShovelItem(ModItemTier.CEMENTED_CARBIDE, Properties().attributes(createAttributes(ModItemTier.CEMENTED_CARBIDE, -3.5f, -3.0f))) }
+    @JvmField val CEMENTED_CARBIDE_HOE = registerItem("cemented_carbide_hoe") { HoeItem(ModItemTier.CEMENTED_CARBIDE, Properties().attributes(createAttributes(ModItemTier.CEMENTED_CARBIDE, -8, 0.0f))) }
     @JvmField val NETHERITE_HAMMER = registerItem("netherite_hammer") { NetheriteHammerItem() }
 
     @JvmField val T_BATON = registerItem("t_baton") { TBatonItem() }

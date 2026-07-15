@@ -1211,7 +1211,8 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 ModItems.ENGINEERING_PLASTIC.get(),
                 0.3f,
                 200,
-                RecipeSerializer.SMELTING_RECIPE
+                RecipeSerializer.SMELTING_RECIPE,
+                ::SmeltingRecipe
             )
                 .unlockedBy(
                     getHasName(ModItems.SLIME_COVERED_LEATHER.get()),

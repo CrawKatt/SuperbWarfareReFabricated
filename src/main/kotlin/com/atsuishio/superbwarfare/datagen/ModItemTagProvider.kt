@@ -340,7 +340,8 @@ class ModItemTagProvider(
             ModItems.T_BATON.get(),
             ModItems.ELECTRIC_BATON.get(),
             ModItems.STEEL_PIPE.get(),
-            ModItems.CROWBAR.get()
+            ModItems.CROWBAR.get(),
+            ModItems.CEMENTED_CARBIDE_SWORD.get()
         ).addTag(ModTags.Items.HAMMER)
         this.tag(ItemTags.SWORD_ENCHANTABLE).add(
             ModItems.MILITARY_SHOVEL.get(),
@@ -348,15 +349,37 @@ class ModItemTagProvider(
             ModItems.T_BATON.get(),
             ModItems.ELECTRIC_BATON.get(),
             ModItems.STEEL_PIPE.get(),
-            ModItems.CROWBAR.get()
+            ModItems.CROWBAR.get(),
+            ModItems.CEMENTED_CARBIDE_SWORD.get()
         ).addTag(ModTags.Items.HAMMER)
 
-        this.tag(ItemTags.AXES).add(ModItems.MILITARY_SHOVEL.get())
-        this.tag(ItemTags.SHOVELS).add(ModItems.MILITARY_SHOVEL.get())
-        this.tag(ItemTags.HOES).add(ModItems.MILITARY_SHOVEL.get())
-        this.tag(ItemTags.MINING_ENCHANTABLE).add(ModItems.MILITARY_SHOVEL.get())
-        this.tag(ItemTags.VANISHING_ENCHANTABLE).add(ModItems.MILITARY_SHOVEL.get())
-        this.tag(ItemTags.DURABILITY_ENCHANTABLE).add(ModItems.MILITARY_SHOVEL.get())
+        this.tag(ItemTags.AXES).add(ModItems.MILITARY_SHOVEL.get(), ModItems.CEMENTED_CARBIDE_AXE.get())
+        this.tag(ItemTags.SHOVELS).add(ModItems.MILITARY_SHOVEL.get(), ModItems.CEMENTED_CARBIDE_SHOVEL.get())
+        this.tag(ItemTags.HOES).add(ModItems.MILITARY_SHOVEL.get(), ModItems.CEMENTED_CARBIDE_HOE.get())
+        this.tag(ItemTags.PICKAXES).add(ModItems.CEMENTED_CARBIDE_PICKAXE.get())
+
+        this.tag(ItemTags.MINING_ENCHANTABLE).add(
+            ModItems.MILITARY_SHOVEL.get(),
+            ModItems.CEMENTED_CARBIDE_AXE.get(),
+            ModItems.CEMENTED_CARBIDE_SHOVEL.get(),
+            ModItems.CEMENTED_CARBIDE_PICKAXE.get()
+        )
+        this.tag(ItemTags.VANISHING_ENCHANTABLE).add(
+            ModItems.MILITARY_SHOVEL.get(),
+            ModItems.CEMENTED_CARBIDE_AXE.get(),
+            ModItems.CEMENTED_CARBIDE_SHOVEL.get(),
+            ModItems.CEMENTED_CARBIDE_PICKAXE.get(),
+            ModItems.CEMENTED_CARBIDE_HOE.get(),
+            ModItems.CEMENTED_CARBIDE_SWORD.get()
+        )
+        this.tag(ItemTags.DURABILITY_ENCHANTABLE).add(
+            ModItems.MILITARY_SHOVEL.get(),
+            ModItems.CEMENTED_CARBIDE_AXE.get(),
+            ModItems.CEMENTED_CARBIDE_SHOVEL.get(),
+            ModItems.CEMENTED_CARBIDE_PICKAXE.get(),
+            ModItems.CEMENTED_CARBIDE_HOE.get(),
+            ModItems.CEMENTED_CARBIDE_SWORD.get()
+        )
 
         ModItems.PERKS.entries.forEach {
             val item = it.get()
