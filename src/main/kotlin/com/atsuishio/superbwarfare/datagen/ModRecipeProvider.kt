@@ -2258,7 +2258,7 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 .require(ModItems.LARGE_BATTERY_PACK.get(), 2)
                 .require(STORAGE_BLOCK_STEEL, 24)
                 .require(ModItems.HEAVY_ARMAMENT_MODULE.get(), 3)
-                .require(Items.WHITE_WOOL, 640)
+                .require(ItemTags.WOOL, 640)
                 .require(ModItems.LARGE_MOTOR.get(), 5)
                 .require(ModItems.LARGE_PROPELLER.get(), 5)
                 .require(Items.FLOWER_POT)

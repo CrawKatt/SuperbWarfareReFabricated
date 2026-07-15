@@ -42,6 +42,101 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
         )
 
         this.add(
+            ModEntities.AC_130H.get(),
+            LootBuilder()
+                .addPool(
+                    PoolBuilder(type = Type.COMPLETE)
+                        .source(ModDamageTypes.REPAIR_TOOL)
+                        .addEntry(
+                            Entry(ModItems.STEEL_BLOCK.get(), 15, 1.0),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.LARGE_BATTERY_PACK.get(),1, 0.5),
+                            Entry(ModItems.LARGE_BATTERY_PACK.get(),1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
+                            Entry(ModItems.WHEEL.get(),2, 0.5),
+                            Entry(ModItems.WHEEL.get(),2, 0.5),
+                            Entry(ModItems.WHEEL.get(),2, 0.5),
+                            Entry(ModItems.WHEEL.get(),2, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                        ).build(),
+                    PoolBuilder(type = Type.COMPLETE)
+                        .addEntry(
+                            Entry(ModItems.STEEL_BLOCK.get(), 3, 0.5),
+                            Entry(ModItems.STEEL_BLOCK.get(), 3, 0.5),
+                            Entry(ModItems.STEEL_BLOCK.get(), 3, 0.5),
+                            Entry(ModItems.STEEL_BLOCK.get(), 3, 0.5),
+                            Entry(ModItems.STEEL_BLOCK.get(), 3, 0.5),
+                        ).build()
+                )
+        )
+
+        this.add(
+            ModEntities.HAPPIEST_GHAST.get(),
+            LootBuilder()
+                .addPool(
+                    PoolBuilder(type = Type.COMPLETE)
+                        .source(ModDamageTypes.REPAIR_TOOL)
+                        .addEntry(
+                            Entry(ModItems.HANDSOME_GOGGLES.get(), 1, 1.0),
+                            Entry(Items.GHAST_TEAR, 4, 1.0),
+                        ).build(),
+                    PoolBuilder(type = Type.COMPLETE)
+                        .addEntry(
+                            Entry(Items.GHAST_TEAR, 1, 0.5),
+                            Entry(Items.GHAST_TEAR, 1, 0.5),
+                            Entry(Items.GHAST_TEAR, 1, 0.5),
+                            Entry(Items.GHAST_TEAR, 1, 0.5),
+                        ).build()
+                )
+        )
+
+        this.add(
+            ModEntities.KIROV.get(),
+            LootBuilder()
+                .addPool(
+                    PoolBuilder(type = Type.COMPLETE)
+                        .source(ModDamageTypes.REPAIR_TOOL)
+                        .addEntry(
+                            Entry(ModItems.STEEL_BLOCK.get(), 20, 1.0),
+                            Entry(Items.FLOWER_POT, 1, 1.0),
+                            Entry(Items.BLACK_WOOL, 64, 1.0),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.LARGE_BATTERY_PACK.get(),1, 0.5),
+                            Entry(ModItems.LARGE_BATTERY_PACK.get(),1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                        ).build(),
+                    PoolBuilder(type = Type.COMPLETE)
+                        .addEntry(
+                            Entry(ModItems.STEEL_BLOCK.get(), 4, 0.5),
+                            Entry(ModItems.STEEL_BLOCK.get(), 4, 0.5),
+                            Entry(ModItems.STEEL_BLOCK.get(), 4, 0.5),
+                            Entry(ModItems.STEEL_BLOCK.get(), 4, 0.5),
+                            Entry(ModItems.STEEL_BLOCK.get(), 4, 0.5),
+                            Entry(Items.FLOWER_POT, 1, 1.0),
+                        ).build()
+                )
+        )
+
+        this.add(
             ModEntities.AH_6.get(),
             LootBuilder()
                 .addPool(
