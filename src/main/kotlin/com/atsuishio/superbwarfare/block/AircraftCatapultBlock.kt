@@ -6,7 +6,6 @@ import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
@@ -24,7 +23,7 @@ import kotlin.math.max
 
 @Suppress("OVERRIDE_DEPRECATION")
 open class AircraftCatapultBlock :
-    Block(Properties.of().sound(SoundType.METAL).strength(3.0f).requiresCorrectToolForDrops()) {
+    Block(Properties.of().sound(SoundType.METAL).strength(3.0f).requiresCorrectToolForDrops().friction(0.989f)) {
     init {
         this.registerDefaultState(
             this.stateDefinition.any()
@@ -117,10 +116,7 @@ open class AircraftCatapultBlock :
         val power = pState.getValue(POWER)
         if (power == 0) return
 
-        var rate = power / 400f
-        if (pEntity is LivingEntity) {
-            rate = power / 50f
-        }
+        val rate = power / 200f
         val localDir = Vec3(direction.stepX.toDouble(), 0.0, direction.stepZ.toDouble())
         val worldDir = ValkyrienSkiesCompat.toWorldDirection(pLevel, Vec3.atCenterOf(pPos), localDir)
         if (pEntity.deltaMovement.dot(worldDir) < 0.2 * power) {
