@@ -56,7 +56,7 @@ open class SmallContainerBlock :
         hitResult: BlockHitResult
     ): ItemInteractionResult {
         val blockEntity = level.getBlockEntity(pos)
-        if (level.isClientSide || state.getValue(OPENED) || (blockEntity !is SmallContainerBlockEntity)) {
+        if (level.isClientSide || state.getValue(OPENED) || (blockEntity !is SmallContainerBlockEntity || hand == InteractionHand.OFF_HAND)) {
             return ItemInteractionResult.FAIL
         }
 

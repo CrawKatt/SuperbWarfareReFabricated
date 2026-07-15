@@ -37,7 +37,6 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
-import javax.annotation.ParametersAreNonnullByDefault
 import kotlin.math.ceil
 
 @Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
@@ -51,7 +50,6 @@ open class ContainerBlock :
         )
     }
 
-    @ParametersAreNonnullByDefault
     override fun useItemOn(
         stack: ItemStack,
         state: BlockState,
@@ -65,6 +63,7 @@ open class ContainerBlock :
         if (level.isClientSide
             || state.getValue(OPENED)
             || blockEntity !is ContainerBlockEntity
+            || hand == InteractionHand.OFF_HAND
         ) return ItemInteractionResult.FAIL
 
         if (!stack.`is`(ModTags.Items.TOOLS_CROWBAR)) {
@@ -116,7 +115,6 @@ open class ContainerBlock :
         return null
     }
 
-    @ParametersAreNonnullByDefault
     override fun appendHoverText(
         stack: ItemStack,
         context: TooltipContext,
@@ -216,7 +214,6 @@ open class ContainerBlock :
             .setValue(OPENED, false)
     }
 
-    @ParametersAreNonnullByDefault
     override fun getCloneItemStack(
         state: BlockState,
         target: HitResult,
