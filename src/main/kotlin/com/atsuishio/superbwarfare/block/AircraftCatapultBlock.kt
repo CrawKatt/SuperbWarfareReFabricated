@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.block
 
+import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
@@ -120,16 +121,10 @@ open class AircraftCatapultBlock :
         if (pEntity is LivingEntity) {
             rate = power / 50f
         }
-        if (pEntity.deltaMovement
-                .dot(Vec3(direction.stepX.toDouble(), 0.0, direction.stepZ.toDouble())) < 0.2 * power
-        ) {
-            pEntity.addDeltaMovement(
-                Vec3(
-                    (direction.stepX * rate).toDouble(),
-                    0.0,
-                    (direction.stepZ * rate).toDouble()
-                )
-            )
+        val localDir = Vec3(direction.stepX.toDouble(), 0.0, direction.stepZ.toDouble())
+        val worldDir = ValkyrienSkiesCompat.toWorldDirection(pLevel, Vec3.atCenterOf(pPos), localDir)
+        if (pEntity.deltaMovement.dot(worldDir) < 0.2 * power) {
+            pEntity.addDeltaMovement(Vec3(worldDir.x * rate, worldDir.y * rate, worldDir.z * rate))
         }
     }
 

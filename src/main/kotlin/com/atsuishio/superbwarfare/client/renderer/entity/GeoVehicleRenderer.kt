@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.client.renderer.SmartTextureBrightener
 import com.atsuishio.superbwarfare.client.renderer.TextureBrightnessHandler
+import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.vehicle.subdata.SeatInfo
@@ -560,10 +561,12 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             base.rotation.mul(Quaternionf(quaternion))
         }
 
+        val shipYaw = vehicle.vehicle?.let { ValkyrienSkiesCompat.getShipYaw(it) } ?: 0f
+
         // Turret
         val turret = model.getBone("turret")
         if (turret != null) {
-            turret.rotation.rotationY(turretYRot * Mth.DEG_TO_RAD)
+            turret.rotation.rotationY((turretYRot + shipYaw) * Mth.DEG_TO_RAD)
             turret.visible = !(vehicle.isWreck && vehicle.hasTurret() && vehicle.sympatheticDetonated)
         }
 

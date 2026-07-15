@@ -23,10 +23,13 @@ import org.valkyrienskies.mod.api.getShipsIntersecting
 import org.valkyrienskies.mod.api.toJOML
 import org.valkyrienskies.mod.api.toMinecraft
 import org.valkyrienskies.mod.common.getLevelFromDimensionId
+import org.valkyrienskies.mod.common.getLoadedShipManagingPos
 import org.valkyrienskies.mod.common.util.EntityShipCollisionUtils
 import java.util.function.Predicate
+import kotlin.math.atan2
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sqrt
 
 object ValkyrienSkiesCompat {
 
@@ -49,6 +52,181 @@ object ValkyrienSkiesCompat {
             )
         } catch (_: Exception) {
             movement
+        }
+    }
+
+    /**
+     * 将 VS 船舶上的局部坐标转换为世界绝对坐标。
+     * 通过区块归属查询管理该位置的船舶，不受船舶当前世界AABB限制。
+     * 若该位置未在任何船舶上，则原样返回。
+     *
+     * @param level 当前世界
+     * @param pos   待转换的坐标（船舶局部或世界坐标）
+     * @return 世界绝对坐标
+     */
+    @JvmStatic
+    fun toWorldSpace(level: Level, pos: Vec3): Vec3 {
+        if (!hasMod() || level !is ServerLevel) return pos
+
+        return try {
+            val blockPos = BlockPos(pos.x.toInt(), pos.y.toInt(), pos.z.toInt())
+            val ship = level.getLoadedShipManagingPos(blockPos) ?: return pos
+            val jomlPos = Vector3d(pos.toJOML())
+            (ship as Ship).shipToWorld.transformPosition(jomlPos)
+            Vec3(jomlPos.x, jomlPos.y, jomlPos.z)
+        } catch (_: Exception) {
+            pos
+        }
+    }
+
+    /**
+     * 获取 VS 船舶在指定位置的世界空间 Y 轴旋转角（度），用于雷达等需要与船舶朝向同步的功能。
+     * 若该位置未在任何船舶上，返回 null。
+     *
+     * @param level 当前世界
+     * @param pos   待查询的坐标
+     * @return 船舶的 Y 轴旋转角（yaw），未找到船舶时返回 null
+     */
+    @JvmStatic
+    fun getShipYaw(level: Level, pos: Vec3): Double? {
+        if (!hasMod() || level !is ServerLevel) return null
+
+        return try {
+            val blockPos = BlockPos(pos.x.toInt(), pos.y.toInt(), pos.z.toInt())
+            val ship = level.getLoadedShipManagingPos(blockPos) ?: return null
+            val forward = Vector3d(0.0, 0.0, -1.0)
+            (ship as Ship).shipToWorld.transformDirection(forward)
+            Math.toDegrees(Math.atan2(-forward.x, forward.z)) + 180.0
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+
+    @JvmStatic
+    fun getShipYaw(entity: Entity): Float? {
+        if (!hasMod()) return null
+
+        return try {
+            val level = entity.level()
+            val chunkX = entity.blockX shr 4
+            val chunkZ = entity.blockZ shr 4
+            val ship = level.getLoadedShipManagingPos(chunkX, chunkZ)
+            if (ship != null) {
+                val forward = Vector3d(0.0, 0.0, 1.0)
+                (ship as Ship).shipToWorld.transformDirection(forward)
+                return Math.toDegrees(atan2(-forward.x, forward.z)).toFloat()
+            }
+
+            null
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    @JvmStatic
+    fun getShipPitch(entity: Entity): Float? {
+        if (!hasMod()) return null
+
+        return try {
+            val level = entity.level()
+            val chunkX = entity.blockX shr 4
+            val chunkZ = entity.blockZ shr 4
+            val ship = level.getLoadedShipManagingPos(chunkX, chunkZ) ?: return null
+            val forward = Vector3d(0.0, 0.0, 1.0)
+            (ship as Ship).shipToWorld.transformDirection(forward)
+            val hLen = sqrt(forward.x * forward.x + forward.z * forward.z)
+            Math.toDegrees(atan2(-forward.y, hLen)).toFloat()
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    /**
+     * 获取实体所在 VS 船舶的世界空间 Z 轴旋转角/横滚角（度）。
+     * 通过船舶的 up 向量在 XY 平面的投影计算。
+     * 仅对固定在物理体上的载具生效。
+     */
+    @JvmStatic
+    fun getShipRoll(entity: Entity): Float? {
+        if (!hasMod()) return null
+
+        return try {
+            val level = entity.level()
+            val chunkX = entity.blockX shr 4
+            val chunkZ = entity.blockZ shr 4
+            val ship = level.getLoadedShipManagingPos(chunkX, chunkZ) ?: return null
+            val up = Vector3d(0.0, 1.0, 0.0)
+            (ship as Ship).shipToWorld.transformDirection(up)
+            Math.toDegrees(atan2(up.x, up.y)).toFloat()
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    /**
+     * 将 VS 船舶上的局部方向向量转换为世界空间方向。
+     * 用于弹射器、传送带等需要跟随船舶旋转的方块。
+     * 若该位置未在任何船舶上，则原样返回。
+     *
+     * @param level    当前世界
+     * @param pos      待查询的坐标
+     * @param localDir 船舶局部方向向量
+     * @return 世界空间方向向量
+     */
+    @JvmStatic
+    fun toWorldDirection(level: Level, pos: Vec3, localDir: Vec3): Vec3 {
+        if (!hasMod()) return localDir
+
+        return try {
+            val blockPos = BlockPos(pos.x.toInt(), pos.y.toInt(), pos.z.toInt())
+            val ship = level.getLoadedShipManagingPos(blockPos) ?: return localDir
+            val jomlDir = Vector3d(localDir.toJOML())
+            (ship as Ship).shipToWorld.transformDirection(jomlDir)
+            Vec3(jomlDir.x, jomlDir.y, jomlDir.z)
+        } catch (_: Exception) {
+            localDir
+        }
+    }
+
+    /**
+     * 将世界空间方向向量转换为 VS 船舶局部方向。
+     * 与 [toWorldDirection] 互为逆操作。
+     *
+     * @param level    当前世界
+     * @param pos      待查询的坐标
+     * @param worldDir 世界空间方向向量
+     * @return 船舶局部方向向量
+     */
+    @JvmStatic
+    fun toShipDirection(level: Level, pos: Vec3, worldDir: Vec3): Vec3 {
+        if (!hasMod()) return worldDir
+
+        return try {
+            val blockPos = BlockPos(pos.x.toInt(), pos.y.toInt(), pos.z.toInt())
+            // 优先区块归属查询
+            val ship = level.getLoadedShipManagingPos(blockPos)
+            if (ship != null) {
+                val jomlDir = Vector3d(worldDir.toJOML())
+                (ship as Ship).worldToShip.transformDirection(jomlDir)
+                return Vec3(jomlDir.x, jomlDir.y, jomlDir.z)
+            }
+
+            // 回退：世界空间 AABB 查询
+            val queryAabb = AABBd(
+                pos.x - 2.0, pos.y - 2.0, pos.z - 2.0,
+                pos.x + 2.0, pos.y + 2.0, pos.z + 2.0
+            ).correctBounds()
+            val ships = level.getShipsIntersecting(queryAabb)
+            for (s in ships) {
+                val jomlDir = Vector3d(worldDir.toJOML())
+                (s as Ship).worldToShip.transformDirection(jomlDir)
+                return Vec3(jomlDir.x, jomlDir.y, jomlDir.z)
+            }
+
+            worldDir
+        } catch (_: Exception) {
+            worldDir
         }
     }
 

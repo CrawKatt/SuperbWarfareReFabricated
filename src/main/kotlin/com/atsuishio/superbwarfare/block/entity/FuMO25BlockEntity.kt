@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.block.entity
 
 import com.atsuishio.superbwarfare.block.FuMO25Block
+import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.inventory.menu.FuMO25Menu
@@ -34,7 +35,6 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.energy.EnergyStorage
 import java.util.*
-import kotlin.math.abs
 
 open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
     BlockEntity(ModBlockEntities.FUMO_25.get(), pPos, pBlockState), MenuProvider {
@@ -42,7 +42,6 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
 
     var type: FuncType = FuncType.NORMAL
     var powered: Boolean = false
-    var tickO: Int = 0
     var tick: Int = 0
     var ownerUUID: UUID? = null
 
@@ -55,7 +54,6 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
                 1 -> this@FuMO25BlockEntity.type.ordinal.toLong()
                 2 -> if (this@FuMO25BlockEntity.powered) 1L else 0L
                 3 -> this@FuMO25BlockEntity.tick.toLong()
-                4 -> this@FuMO25BlockEntity.tickO.toLong()
                 else -> 0L
             }
         }
@@ -72,7 +70,6 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
                 1 -> this@FuMO25BlockEntity.type = FuncType.entries[value.toInt()]
                 2 -> this@FuMO25BlockEntity.powered = value == 1L
                 3 -> this@FuMO25BlockEntity.tick = value.toInt()
-                4 -> this@FuMO25BlockEntity.tickO = value.toInt()
             }
         }
 
@@ -104,7 +101,6 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
         this.type = FuncType.entries[tag.getInt("Type").coerceIn(0, 3)]
         this.powered = tag.getBoolean("Powered")
         this.tick = tag.getInt("Tick")
-        this.tickO = tag.getInt("TickO")
 
         if (tag.contains("OwnerUUID")) {
             this.ownerUUID = tag.getUUID("OwnerUUID")
@@ -123,7 +119,6 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
         tag.putInt("Type", this.type.ordinal)
         tag.putBoolean("Powered", this.powered)
         tag.putInt("Tick", this.tick)
-        tag.putInt("TickO", this.tickO)
 
         this.ownerUUID?.let { tag.putUUID("OwnerUUID", it) }
     }
@@ -213,7 +208,6 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
             val energy =
                 blockEntity.energyHandler.map { it.energyStored }.orElse(0)
 
-            blockEntity.tickO = blockEntity.tick
 
             if (state.getValue(FuMO25Block.POWERED)) {
                 blockEntity.tick++
@@ -256,35 +250,17 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
                     if (uuid != null) {
                         val owner = level.getPlayerByUUID(uuid)
                         if (owner != null && level is ServerLevel) {
-                            // 每 tick 同步雷达配置到客户端（自旋模式保证旋转流畅）
-                            val range = if (blockEntity.type == FuncType.WIDER) 2048 else 1024
-                            val sourceId = "block_${pos.x}_${pos.y}_${pos.z}"
-                            RadarScanner.sendRadarConfig(
-                                RadarScanner.RadarConfig(
-                                    owner = owner,
-                                    center = Vec3(pos.x + 0.5, pos.y + 2.5, pos.z + 0.5),
-                                    radius = range.toDouble(),
-                                    sweepAngle = 120.0,
-                                    yRot = blockEntity.tick.toDouble(),
-                                    searchType = RadarScanner.SearchType.VEHICLES,
-                                    sourceId = sourceId,
-                                ), level
-                            )
-                            // 每 SYNC_ENTITY_INTERVAL 扫描实体
                             scanEntities(level, pos, blockEntity, owner)
                         }
                     }
                 }
             }
 
-            val deltaT = abs(blockEntity.tick - blockEntity.tickO)
             while (blockEntity.tick > 360) {
                 blockEntity.tick -= 360
-                blockEntity.tickO = blockEntity.tick - deltaT
             }
             while (blockEntity.tick <= 0) {
                 blockEntity.tick += 360
-                blockEntity.tickO = deltaT + blockEntity.tick
             }
 
 
@@ -338,7 +314,10 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
         ) {
 
             val range = if (blockEntity.type == FuncType.WIDER) 2048 else 1024
-            val radarPos = Vec3(pos.x + 0.5, pos.y + 2.5, pos.z + 0.5)
+            val radarPos = ValkyrienSkiesCompat.toWorldSpace(
+                level, Vec3(pos.x + 0.5, pos.y + 2.5, pos.z + 0.5)
+            )
+            val shipYaw = ValkyrienSkiesCompat.getShipYaw(level, Vec3.atCenterOf(pos)) ?: 0.0
 
             val sourceId = "block_${pos.x}_${pos.y}_${pos.z}"
             val config = RadarScanner.RadarConfig(
@@ -346,12 +325,14 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
                 center = radarPos,
                 radius = range.toDouble(),
                 sweepAngle = 120.0,
-                yRot = blockEntity.tick.toDouble(),
+                yRot = blockEntity.tick.toDouble() + shipYaw,
                 searchType = RadarScanner.SearchType.VEHICLES,
                 sourceId = sourceId,
                 affectedByStealthTarget = true
             )
 
+            // 每 tick 同步雷达视觉配置（自旋模式保证旋转流畅）
+            RadarScanner.sendRadarConfig(config, level)
             val result = RadarScanner.scan(level, config)
             result.sendToClients(player, level, config.shareWithTeammates)
 
@@ -361,7 +342,7 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
                 center = radarPos,
                 radius = rangeLiving.toDouble(),
                 sweepAngle = 120.0,
-                yRot = blockEntity.tick.toDouble(),
+                yRot = blockEntity.tick.toDouble() + shipYaw,
                 searchType = RadarScanner.SearchType.LIVING,
                 sourceId = sourceId,
             )
