@@ -194,6 +194,13 @@ class ModAdvancementProvider(
                 .type(ModAdvancement.Type.SECRET_CHALLENGE)
                 .parent(deleteYourGun)
         }
+
+        // 饼皮
+        val eatCrust = advancement("eat_crust") {
+            it.icon(ModItems.CRUST.get())
+                .whenIconConsumed()
+                .parent(mainRoot)
+        }
     }
 
     private fun advancement(id: String, b: UnaryOperator<ModAdvancement.Builder>): ModAdvancement {

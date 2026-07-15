@@ -460,6 +460,8 @@
 
   "item.superbwarfare.armor_plate": "防弹插板",
   "des.superbwarfare.armor_plate.infinite": "无限",
+  "item.superbwarfare.crust": "饼皮",
+  "des.superbwarfare.crust": "它可不会飞……",
 
   "item.superbwarfare.ru_helmet_6b47": "俄罗斯6B47头盔",
   "item.superbwarfare.ru_chest_6b43": "俄罗斯6B43防弹胸甲",
@@ -1156,6 +1158,8 @@
   "superbwarfare.advancement.main.delete_your_gun.des": "打载具都不咋掉血，奥对了，你弹药也没了",
   "superbwarfare.advancement.main.critical_hit": "会心一击！",
   "superbwarfare.advancement.main.critical_hit.des": "已经到了无法停下的程度，直入脑髓的一击",
+  "superbwarfare.advancement.main.eat_crust": "画饼充“机”",
+  "superbwarfare.advancement.main.eat_crust.des": "谁不想驾驶一张会飞的饼呢？",
 
   "context.superbwarfare.tactical_map.create_marker": "创建标记点",
   "context.superbwarfare.tactical_map.edit_marker": "编辑",
@@ -1341,6 +1345,5 @@
   "superbwarfare.page.resources.scheelite.3": "$(thing)钨锭$()只能使用$(thing)高炉$()进行熔炼。",
   "superbwarfare.entry.resources.silver": "银矿石",
   "superbwarfare.page.resources.silver.1": "$(thing)银矿石$()生成于主世界的$(thing)48 ~ 1$()层。",
-  "superbwarfare.page.resources.silver.2": "$(thing)深层银矿石$()生成于主世界的$(thing)0 ~ -64$()层。",
-  "item.superbwarfare.crust": "饼皮"
+  "superbwarfare.page.resources.silver.2": "$(thing)深层银矿石$()生成于主世界的$(thing)0 ~ -64$()层。"
 }
