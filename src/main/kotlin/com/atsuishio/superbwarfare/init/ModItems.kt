@@ -37,6 +37,7 @@ import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.tiers.ModItemTier
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
+import net.minecraft.world.food.FoodProperties
 import net.minecraft.world.item.*
 import net.minecraft.world.item.Item.Properties
 import net.minecraft.world.item.SwordItem.createAttributes
@@ -193,6 +194,7 @@ object ModItems {
     @JvmField
     val ITEMS: DeferredRegister<Item> = DeferredRegister.create(Registries.ITEM, Mod.MODID)
 
+    @JvmField val CRUST = registerItem("crust") { Item(Properties().food(FoodProperties.Builder().nutrition(10).saturationModifier(0.5f).build())) }
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
         DeferredSpawnEggItem(

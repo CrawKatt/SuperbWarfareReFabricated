@@ -59,6 +59,10 @@ object ModVillagers {
             // 等级 1 交易
             val list1 = listOf(
                 BasicItemListing(
+                    ItemStack(Items.EMERALD, 1),
+                    ItemStack(ModItems.CRUST.get(), 4), 16, 4, 0.05f
+                ),
+                BasicItemListing(
                     ItemStack(ModItems.TASER_BLUEPRINT.get()),
                     ItemStack(Items.EMERALD, 2), 16, 5, 0.05f
                 ),
