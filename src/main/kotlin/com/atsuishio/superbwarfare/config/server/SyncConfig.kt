@@ -51,6 +51,6 @@ object SyncConfig {
     val MIN_RENDER_HEIGHT = buildServerConfig {
         comment("The minimum height for rendering synchronized entities")
         comment("允许渲染超视距同步实体的最小高度")
-        defineInRange("min_render_height", 256, 1, Int.MAX_VALUE)
+        defineInRange("min_render_height", 256, 1, Int.MAX_VALUE).also { pop() }
     }
 }

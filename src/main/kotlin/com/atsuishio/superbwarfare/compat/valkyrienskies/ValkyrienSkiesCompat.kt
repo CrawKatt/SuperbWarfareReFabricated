@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.compat.valkyrienskies
 
 import com.atsuishio.superbwarfare.compat.CompatHolder
+import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat.toWorldDirection
 import com.atsuishio.superbwarfare.entity.projectile.IAdvancedHitDetection
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
@@ -96,7 +97,7 @@ object ValkyrienSkiesCompat {
             val ship = level.getLoadedShipManagingPos(blockPos) ?: return null
             val forward = Vector3d(0.0, 0.0, -1.0)
             (ship as Ship).shipToWorld.transformDirection(forward)
-            Math.toDegrees(Math.atan2(-forward.x, forward.z)) + 180.0
+            Math.toDegrees(atan2(-forward.x, forward.z)) + 180.0
         } catch (_: Exception) {
             null
         }
@@ -220,7 +221,7 @@ object ValkyrienSkiesCompat {
             val ships = level.getShipsIntersecting(queryAabb)
             for (s in ships) {
                 val jomlDir = Vector3d(worldDir.toJOML())
-                (s as Ship).worldToShip.transformDirection(jomlDir)
+                s.worldToShip.transformDirection(jomlDir)
                 return Vec3(jomlDir.x, jomlDir.y, jomlDir.z)
             }
 

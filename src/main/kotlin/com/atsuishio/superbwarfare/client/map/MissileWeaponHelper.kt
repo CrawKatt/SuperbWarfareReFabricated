@@ -1,12 +1,15 @@
 package com.atsuishio.superbwarfare.client.map
 
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
+import com.atsuishio.superbwarfare.client.map.MissileWeaponHelper.getSelectedVehicles
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.google.gson.JsonObject
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.levelgen.Heightmap
 
 /**
  * 远程打击武器聚合工具。
@@ -22,9 +25,9 @@ object MissileWeaponHelper {
         keys.firstNotNullOfOrNull { if (has(it)) get(it).asDouble else null }
 
     /** 对客户端 level 中已存在的实体（非超视距同步），使用高度图实时计算离地高度 */
-    private fun computeEntityHeightAboveGround(level: net.minecraft.world.level.Level, entity: net.minecraft.world.entity.Entity): Double {
+    private fun computeEntityHeightAboveGround(level: Level, entity: Entity): Double {
         val surfaceY = level.getHeight(
-            net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE,
+            Heightmap.Types.WORLD_SURFACE,
             entity.blockX,
             entity.blockZ
         )
@@ -69,7 +72,7 @@ object MissileWeaponHelper {
     // ═══════════════════════════════════════════════════════════════
 
     /**
-     * **[权威入口] 客户端实时查询指定武器在载具列表中的可用射击次数。**
+     * **客户端实时查询指定武器在载具列表中的可用射击次数。**
      *
      * 战术地图中所有远程打击武器（导弹、火炮、火箭弹等）的备弹量显示
      * **必须**使用此方法。仅读取载具同步的 [virtualAmmo][GunData.virtualAmmo]，
@@ -89,17 +92,6 @@ object MissileWeaponHelper {
             val ammoCost = gd.get(GunProp.AMMO_COST_PER_SHOOT)
             if (ammoCost <= 0) 999 else gd.currentAvailableAmmo(null) / ammoCost
         }
-    }
-
-    /**
-     * 汇总所有选中载具中指定武器的总弹药数。
-     *
-     * @deprecated 请直接使用 [queryWeaponAmmo]，参数更简洁且语义更明确。
-     *             保留此方法仅为向后兼容。
-     */
-    @Deprecated("Use queryWeaponAmmo(weaponName, vehicles) instead", ReplaceWith("queryWeaponAmmo(weaponName, vehicles)"))
-    fun currentAttackAmmo(weaponName: String, vehicles: List<VehicleEntity>, player: Player?): Int {
-        return queryWeaponAmmo(weaponName, vehicles)
     }
 
     /**
