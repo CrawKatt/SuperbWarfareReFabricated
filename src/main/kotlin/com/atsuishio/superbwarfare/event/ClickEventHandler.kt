@@ -190,7 +190,7 @@ object ClickEventHandler {
         val vehicle = player.vehicle
 
         // 按下自由视角键时，为载具调整相机距离
-        if (vehicle is VehicleEntity && player == vehicle.firstPassenger && ModKeyMappings.FREE_CAMERA.isDown()) {
+        if (vehicle is VehicleEntity && ModKeyMappings.FREE_CAMERA.isDown()) {
             ClientMouseHandler.custom3pDistance =
                 (ClientMouseHandler.custom3pDistance - event.scrollDeltaY).coerceIn(-3.0, 20.0)
             event.isCanceled = true

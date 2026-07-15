@@ -48,7 +48,12 @@ object VehicleClientUtils {
             val data = seat.cameraPos
             if (data != null) {
                 if (zoom && gunData != null && gunData.get(GunProp.SHOOT_POS).viewDirection != null) {
-                    return Vec2(
+                    return if (ClientEventHandler.isNacelleCam(player)) {
+                        Vec2(
+                            (-getYRotFromVector(vehicle.getViewVec(player, partialTicks)).toFloat() - ClientMouseHandler.nacelleCameraYaw).toFloat(),
+                            (-getXRotFromVector(vehicle.getViewVec(player, partialTicks)).toFloat() + ClientMouseHandler.nacelleCameraPitch).toFloat()
+                        )
+                    } else Vec2(
                         -getYRotFromVector(vehicle.getViewVec(player, partialTicks)).toFloat(),
                         -getXRotFromVector(vehicle.getViewVec(player, partialTicks)).toFloat()
                     )

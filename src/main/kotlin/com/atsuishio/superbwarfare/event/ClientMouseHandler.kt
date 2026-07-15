@@ -109,8 +109,15 @@ object ClientMouseHandler {
             val y = if (ControlConfig.INVERT_AIRCRAFT_CONTROL.get()) -1 else 1
             val sensitivity = vehicle.mouseSensitivity
 
-            speedX = sensitivity * moveSpeedX * (if (ClientEventHandler.zoomVehicle && !ClientEventHandler.isNacelleCam(player)) 0.3 else 1.0)
-            speedY = y * sensitivity * moveSpeedY * (if (ClientEventHandler.zoomVehicle && !ClientEventHandler.isNacelleCam(player)) 0.4 else 1.0)
+            speedX = sensitivity * moveSpeedX * (if (ClientEventHandler.zoomVehicle && !ClientEventHandler.isNacelleCam(
+                    player
+                )
+            ) 0.3 else 1.0)
+            speedY =
+                y * sensitivity * moveSpeedY * (if (ClientEventHandler.zoomVehicle && !ClientEventHandler.isNacelleCam(
+                        player
+                    )
+                ) 0.4 else 1.0)
 
             mouseXMoveTick = Mth.lerp(0.1, mouseXMoveTick, speedX)
             mouseYMoveTick = Mth.lerp(0.1, mouseYMoveTick, speedY)
@@ -123,8 +130,10 @@ object ClientMouseHandler {
                 lerpSpeedY = Mth.lerp((0.0035 * abs(mouseYMoveTick)).coerceAtLeast(0.1), lerpSpeedY, speedY * 0.5)
             }
 
-            lerpNacelleSpeedX = Mth.lerp((0.05 * abs(mouseXMoveTick)).coerceAtLeast(0.13), lerpNacelleSpeedX, speedX * 1.4)
-            lerpNacelleSpeedY = Mth.lerp((0.05 * abs(mouseYMoveTick)).coerceAtLeast(0.13), lerpNacelleSpeedY, speedY * 1.4)
+            lerpNacelleSpeedX =
+                Mth.lerp((0.05 * abs(mouseXMoveTick)).coerceAtLeast(0.13), lerpNacelleSpeedX, speedX * 1.4)
+            lerpNacelleSpeedY =
+                Mth.lerp((0.05 * abs(mouseYMoveTick)).coerceAtLeast(0.13), lerpNacelleSpeedY, speedY * 1.4)
 
             // 盘旋模式下禁止操控
             if (vehicle.loiterActive && vehicle.computed().engineType == EngineType.AIRCRAFT) {
@@ -211,10 +220,12 @@ object ClientMouseHandler {
 
         custom3pDistanceLerp = Mth.lerp(times.toDouble(), custom3pDistanceLerp, custom3pDistance)
 
-
         if (ClientEventHandler.isNacelleCam(player)) {
             nacelleCameraYaw -= 0.2f * times * lerpNacelleSpeedX
             nacelleCameraPitch += 0.2f * times * lerpNacelleSpeedY
+        } else {
+            nacelleCameraYaw = 0.0
+            nacelleCameraPitch = 0.0
         }
 
         nacelleCameraPitch = Mth.clamp(nacelleCameraPitch, 0.0, 180.0)
@@ -263,8 +274,16 @@ object ClientMouseHandler {
             return 0.0
         }
 
-        if (ClientEventHandler.isFreeCam(player) || ClientEventHandler.isNacelleCam(player)) {
+        if (ClientEventHandler.isNacelleCam(player)) {
             return 0.0
+        }
+
+        if (player.vehicle is VehicleEntity) {
+            val vehicle = player.vehicle as VehicleEntity
+            val index = vehicle.getSeatIndex(player)
+            if (ClientEventHandler.isFreeCam(player) && vehicle.useAircraftCamera(index)) {
+                return 0.0
+            }
         }
 
         if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR.get()) && mc.options.cameraType == CameraType.FIRST_PERSON) {
