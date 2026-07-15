@@ -468,12 +468,12 @@ object HelicopterHud {
                 )
 
                 if (vehicle.hasDecoy()) {
-                    if (vehicle.decoyReady) {
+                    if (vehicle.decoyCount > 0) {
                         guiGraphics.drawString(
                             Minecraft.getInstance().font,
                             Component.translatable("tips.superbwarfare.flare.ready").append(
                                 Component.literal(
-                                    " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
+                                    " " + vehicle.decoyCount + " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
                                 )
                             ),
                             screenWidth / 2 - 160,
@@ -482,14 +482,25 @@ object HelicopterHud {
                             false
                         )
                     } else {
-                        guiGraphics.drawString(
-                            Minecraft.getInstance().font,
-                            Component.translatable("tips.superbwarfare.flare.reloading"),
-                            screenWidth / 2 - 160,
-                            screenHeight / 2 - 50,
-                            0xFF0000,
-                            false
-                        )
+                        if (vehicle.decoyItemCount > 0) {
+                            guiGraphics.drawString(
+                                Minecraft.getInstance().font,
+                                Component.translatable("tips.superbwarfare.flare.reloading"),
+                                screenWidth / 2 - 160,
+                                screenHeight / 2 - 50,
+                                0xFF0000,
+                                false
+                            )
+                        } else {
+                            guiGraphics.drawString(
+                                Minecraft.getInstance().font,
+                                Component.translatable("tips.superbwarfare.flare.none"),
+                                screenWidth / 2 - 160,
+                                screenHeight / 2 - 50,
+                                0xFF0000,
+                                false
+                            )
+                        }
                     }
                 }
                 val component = vehicle.firstPersonAmmoComponent(data, player)
@@ -640,10 +651,10 @@ object HelicopterHud {
                 VehicleMainWeaponHudOverlay.renderWeaponInfoThirdAir(guiGraphics, vehicle, player, data, font)
 
                 if (vehicle.hasDecoy()) {
-                    if (vehicle.decoyReady) {
+                    if (vehicle.decoyCount > 0) {
                         val componentReady = Component.translatable("tips.superbwarfare.flare.ready").append(
                             Component.literal(
-                                " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
+                                " " + vehicle.decoyCount + " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
                             )
                         )
                         val length = font.width(componentReady)
@@ -657,7 +668,10 @@ object HelicopterHud {
                             false
                         )
                     } else {
-                        val componentReloading = Component.translatable("tips.superbwarfare.flare.reloading")
+                        var componentReloading = Component.translatable("tips.superbwarfare.flare.reloading")
+                        if (vehicle.decoyItemCount < 1) {
+                            componentReloading = Component.translatable("tips.superbwarfare.flare.none")
+                        }
                         val length = font.width(componentReloading)
 
                         guiGraphics.drawString(

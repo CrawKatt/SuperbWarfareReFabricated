@@ -122,6 +122,14 @@ class DefaultVehicleData : IDBasedData<DefaultVehicleData> {
     var mass: Float = 1f
 
     @ServerOnly
+    @SerialName("DecoyMagazineSize")
+    var decoyMagazineSize: Int = 8
+
+    @ServerOnly
+    @SerialName("DecoyReloadTime")
+    var decoyReloadTime: Int = 500
+
+    @ServerOnly
     @SerialName("DestroyInfo")
     var destroyInfo: DestroyInfo = DestroyInfo()
 

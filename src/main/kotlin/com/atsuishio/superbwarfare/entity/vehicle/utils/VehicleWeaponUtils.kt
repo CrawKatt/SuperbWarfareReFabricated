@@ -1,16 +1,17 @@
 package com.atsuishio.superbwarfare.entity.vehicle.utils
 
-import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
+import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType
 import com.atsuishio.superbwarfare.entity.projectile.FlareDecoyEntity
 import com.atsuishio.superbwarfare.entity.projectile.SmokeDecoyEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotFromVector
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getYRotFromVector
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.transformPosition
+import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.tools.EntityFindUtil.findEntity
+import com.atsuishio.superbwarfare.tools.InventoryTool
 import com.atsuishio.superbwarfare.tools.RangeTool.calculateFiringSolution
-import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.ai.attributes.Attributes
@@ -133,106 +134,57 @@ object VehicleWeaponUtils {
     @JvmStatic
     fun releaseSmokeDecoy(vehicle: VehicleEntity, vec3: Vec3) {
         if (vehicle.decoyInputDown) {
-            if (vehicle.decoyReady && vehicle.level() is ServerLevel) {
+            if (vehicle.decoyCount > 0) {
                 for (i in 0..7) {
                     val smokeDecoyEntity = SmokeDecoyEntity(vehicle.level())
                     smokeDecoyEntity.setPos(vehicle.x, vehicle.y + vehicle.bbHeight, vehicle.z)
                     smokeDecoyEntity.decoyShoot(vehicle, vec3.yRot((-78.75f + 22.5f * i) * Mth.DEG_TO_RAD), 4f, 8f)
+                    smokeDecoyEntity.deltaMovement.add(vehicle.deltaMovement)
                     vehicle.level().addFreshEntity(smokeDecoyEntity)
                 }
 
                 vehicle.level()
                     .playSound(null, vehicle, ModSounds.DECOY_RELEASE.get(), vehicle.soundSource, 1f, 1f)
-                vehicle.decoyReloadCoolDown = 500
-                vehicle.decoyReady = false
+                vehicle.decoyCount --
+                if (vehicle.decoyCount == 0) {
+                    vehicle.decoyReloadCoolDown = vehicle.getDecoyReloadTime()
+                }
             }
             vehicle.decoyInputDown = false
-        }
-
-        if (!vehicle.decoyReady && vehicle.decoyReloadCoolDown == 0 && vehicle.level() is ServerLevel) {
-            vehicle.decoyReady = true
-            vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELOAD.get(), vehicle.soundSource, 1f, 1f)
-            vehicle.decoyReloadCoolDown = 500
         }
     }
 
     /**
      * 发射热诱弹
-     * 
+     *
      * @param vehicle 载具
      */
     @JvmStatic
     fun releaseDecoy(vehicle: VehicleEntity) {
         if (vehicle.decoyInputDown) {
-            if (vehicle.decoyReady && vehicle.level() is ServerLevel) {
-                var i = 0
-                while (i < 54) {
-                    val finalI = i
-                    queueServerWork(i) {
-                        val transform = vehicle.getVehicleTransform(1f)
-                        val worldPositionO = transformPosition(transform, 0.0, 0.0, 0.0)
-                        val worldPosition = transformPosition(transform, 1.0, -0.2, 0.6)
-                        val worldPosition2 = transformPosition(transform, -1.0, -0.2, 0.6)
+            if (vehicle.decoyCount > 0) {
+                val transform = vehicle.getVehicleTransform(1f)
+                val worldPositionO = transformPosition(transform, 0.0, 0.0, 0.0)
+                val worldPosition = transformPosition(transform, 1.0, -0.2, 0.6)
+                val worldPosition2 = transformPosition(transform, -1.0, -0.2, 0.6)
 
-                        val shootVecO = Vec3(worldPositionO.x, worldPositionO.y, worldPositionO.z)
-                        val shootVec1 = Vec3(worldPosition.x, worldPosition.y, worldPosition.z)
-                        val shootVec2 = Vec3(worldPosition2.x, worldPosition2.y, worldPosition2.z)
+                val shootVecO = Vec3(worldPositionO.x, worldPositionO.y, worldPositionO.z)
+                val shootVec1 = Vec3(worldPosition.x, worldPosition.y, worldPosition.z)
+                val shootVec2 = Vec3(worldPosition2.x, worldPosition2.y, worldPosition2.z)
 
-                        shootDecoy(vehicle, shootVecO.vectorTo(shootVec1).normalize(), finalI == 6)
-                        shootDecoy(vehicle, shootVecO.vectorTo(shootVec2).normalize(), finalI == 6)
-                    }
-                    i += 6
+                shootDecoy(vehicle, shootVecO.vectorTo(shootVec1).normalize())
+                shootDecoy(vehicle, shootVecO.vectorTo(shootVec2).normalize())
+                vehicle.decoyCount--
+                if (vehicle.decoyCount == 0) {
+                    vehicle.decoyReloadCoolDown = vehicle.getDecoyReloadTime()
                 }
-
-                vehicle.decoyReloadCoolDown = 400
-                vehicle.decoyReady = false
             }
             vehicle.decoyInputDown = false
-        }
-        if (!vehicle.decoyReady && vehicle.decoyReloadCoolDown == 0 && vehicle.level() is ServerLevel) {
-            vehicle.decoyReady = true
-            vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELOAD.get(), vehicle.soundSource, 1f, 1f)
-            vehicle.decoyReloadCoolDown = 400
         }
     }
 
     @JvmStatic
-    fun releaseDecoyLarge(vehicle: VehicleEntity) {
-        if (vehicle.decoyInputDown) {
-            if (vehicle.decoyReady && vehicle.level() is ServerLevel) {
-                var i = 0
-                while (i < 100) {
-                    val finalI = i
-                    queueServerWork(i) {
-                        val transform = vehicle.getVehicleTransform(1f)
-                        val worldPositionO = transformPosition(transform, 0.0, 0.0, 0.0)
-                        val worldPosition = transformPosition(transform, 1.0, -0.2, 0.6)
-                        val worldPosition2 = transformPosition(transform, -1.0, -0.2, 0.6)
-
-                        val shootVecO = Vec3(worldPositionO.x, worldPositionO.y, worldPositionO.z)
-                        val shootVec1 = Vec3(worldPosition.x, worldPosition.y, worldPosition.z)
-                        val shootVec2 = Vec3(worldPosition2.x, worldPosition2.y, worldPosition2.z)
-
-                        shootDecoy(vehicle, shootVecO.vectorTo(shootVec1).normalize(), finalI == 6)
-                        shootDecoy(vehicle, shootVecO.vectorTo(shootVec2).normalize(), finalI == 6)
-                    }
-                    i += if (i > 6) 2 else 6
-                }
-
-                vehicle.decoyReloadCoolDown = 400
-                vehicle.decoyReady = false
-            }
-            vehicle.decoyInputDown = false
-        }
-        if (!vehicle.decoyReady && vehicle.decoyReloadCoolDown == 0 && vehicle.level() is ServerLevel) {
-            vehicle.decoyReady = true
-            vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELOAD.get(), vehicle.soundSource, 1f, 1f)
-            vehicle.decoyReloadCoolDown = 400
-        }
-    }
-
-    @JvmStatic
-    fun shootDecoy(vehicle: VehicleEntity, shootVec: Vec3, first: Boolean) {
+    fun shootDecoy(vehicle: VehicleEntity, shootVec: Vec3) {
         val flareDecoyEntity = FlareDecoyEntity(vehicle.level())
 
         flareDecoyEntity.setPos(
@@ -246,11 +198,25 @@ object VehicleWeaponUtils {
         vehicle.level().playSound(
             null,
             vehicle,
-            if (first) ModSounds.DECOY_RELEASE_FIRST.get() else ModSounds.DECOY_RELEASE.get(),
+            ModSounds.DECOY_RELEASE.get(),
             vehicle.soundSource,
-            2f,
+            3f,
             1f
         )
+    }
+
+    @JvmStatic
+    fun reloadDecoy(vehicle: VehicleEntity) {
+        val type = vehicle.vehicleType
+        if (type == VehicleType.AIRPLANE || type == VehicleType.HELICOPTER || type == VehicleType.AIRSHIP) {
+            val decoyMagazineCount = vehicle.decoyItemCount.coerceAtMost(vehicle.computed().decoyMagazineSize)
+            vehicle.decoyCount += decoyMagazineCount
+            InventoryTool.consumeItem(vehicle, ModItems.FLYING_FLARE_AMMO.get(), decoyMagazineCount)
+        } else {
+            vehicle.decoyCount = 1
+            InventoryTool.consumeItem(vehicle, ModItems.VEHICLE_SMOKE_AMMO.get(), 1)
+        }
+        vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELOAD.get(), vehicle.soundSource, 2f, 1f)
     }
 
     /**

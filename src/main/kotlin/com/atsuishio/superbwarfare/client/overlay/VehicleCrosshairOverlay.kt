@@ -379,7 +379,10 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
             val seekInfo = data.get(GunProp.SEEK_WEAPON_INFO)
             val flag = seekInfo != null && seekInfo.inputBlockPos
             // 渲染第三人称
-            if (!flag && pos.canBeSeen() && !((entity.vehicleType == VehicleType.AIRPLANE || entity.vehicleType == VehicleType.HELICOPTER || data.get(GunProp.CROSSHAIR) == "@AirBomb") && player === entity.getFirstPassenger())) {
+            if (!flag && pos.canBeSeen() && !((entity.vehicleType == VehicleType.AIRPLANE || entity.vehicleType == VehicleType.HELICOPTER || data.get(
+                    GunProp.CROSSHAIR
+                ) == "@AirBomb") && player === entity.getFirstPassenger())
+            ) {
                 val x = p.x.toFloat()
                 val y = p.y.toFloat()
 
@@ -408,29 +411,42 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
 
                 renderWeaponInfoThird(guiGraphics, entity, player, data, mc.font)
 
-                if (player === entity.getFirstPassenger() && entity.hasDecoy()) {
-                    if (entity.decoyReady) {
-                        guiGraphics.drawString(
-                            Minecraft.getInstance().font,
-                            Component.translatable("tips.superbwarfare.smoke.ready").append(
-                                Component.literal(
-                                    " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
+                if (player === entity.getFirstPassenger()) {
+                    if (entity.hasDecoy()) {
+                        if (entity.decoyCount > 0) {
+                            guiGraphics.drawString(
+                                Minecraft.getInstance().font,
+                                Component.translatable("tips.superbwarfare.smoke.ready").append(
+                                    Component.literal(
+                                        " " + entity.decoyCount + " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
+                                    )
+                                ),
+                                30,
+                                1,
+                                -1,
+                                false
+                            )
+                        } else {
+                            if (entity.decoyItemCount > 0) {
+                                guiGraphics.drawString(
+                                    Minecraft.getInstance().font,
+                                    Component.translatable("tips.superbwarfare.smoke.reloading"),
+                                    30,
+                                    1,
+                                    0xFF0000,
+                                    false
                                 )
-                            ),
-                            30,
-                            1,
-                            -1,
-                            false
-                        )
-                    } else {
-                        guiGraphics.drawString(
-                            Minecraft.getInstance().font,
-                            Component.translatable("tips.superbwarfare.smoke.reloading"),
-                            30,
-                            1,
-                            0xFF0000,
-                            false
-                        )
+                            } else {
+                                guiGraphics.drawString(
+                                    Minecraft.getInstance().font,
+                                    Component.translatable("tips.superbwarfare.smoke.none"),
+                                    30,
+                                    1,
+                                    0xFF0000,
+                                    false
+                                )
+                            }
+                        }
                     }
                 }
 

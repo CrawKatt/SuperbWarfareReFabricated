@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.entity.vehicle
 
 import com.atsuishio.superbwarfare.client.animation.AnimationPlayType
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
-import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleWeaponUtils
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
@@ -26,9 +25,5 @@ open class Ac130hEntity(type: EntityType<Ac130hEntity>, world: Level) : VehicleE
             }
             wasGearUp = gearUp
         }
-    }
-
-    override fun releaseDecoy() {
-        VehicleWeaponUtils.releaseDecoyLarge(this)
     }
 }

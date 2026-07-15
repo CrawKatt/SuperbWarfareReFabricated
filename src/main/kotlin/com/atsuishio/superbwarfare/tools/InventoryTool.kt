@@ -9,7 +9,6 @@ import com.atsuishio.superbwarfare.item.ammo.AmmoSupplierItem
 import net.minecraft.core.NonNullList
 import net.minecraft.tags.TagKey
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -165,7 +164,7 @@ object InventoryTool {
      */
     @JvmStatic
     fun hasItem(entity: Entity?, item: Item): Boolean {
-        return !findFirst(entity, item).isEmpty()
+        return !findFirst(entity, item).isEmpty
     }
 
     /**
@@ -269,15 +268,15 @@ object InventoryTool {
     }
 
     /**
-     * 消耗生物物品列表内指定物品
+     * 消耗实体物品列表内指定物品
      * 
-     * @param living 物品类型
+     * @param entity 实体类型
      * @param item   物品类型
      * @param count  要消耗的数量
      */
     @JvmStatic
-    fun consumeItem(living: LivingEntity, item: Item, count: Int) {
-        living.getCapability(Capabilities.ItemHandler.ENTITY)
+    fun consumeItem(entity: Entity, item: Item, count: Int) {
+        entity.getCapability(Capabilities.ItemHandler.ENTITY)
             ?.let { consumeItem(it, item, count) }
     }
 
@@ -338,7 +337,7 @@ object InventoryTool {
         maxStackSize = Math.min(maxStackSize, item.getMaxStackSize(defaultStack))
 
         for (i in itemList.indices) {
-            val stack = itemList.get(i)
+            val stack = itemList[i]
 
             if (stack.`is`(item) && stack.count < maxStackSize) {
                 val countToAdd = Math.min(maxStackSize - stack.count, count)

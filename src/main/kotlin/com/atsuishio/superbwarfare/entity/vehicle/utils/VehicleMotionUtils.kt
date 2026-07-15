@@ -6,6 +6,8 @@ import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo
 import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.entity.projectile.C4Entity
+import com.atsuishio.superbwarfare.entity.projectile.FlareDecoyEntity
+import com.atsuishio.superbwarfare.entity.projectile.SmokeDecoyEntity
 import com.atsuishio.superbwarfare.entity.vehicle.TurretWreckEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleEngineUtils.lerpAngle
@@ -99,7 +101,7 @@ object VehicleMotionUtils {
         val entities = vehicle.level().getEntities(
             EntityTypeTest.forClass(Entity::class.java), searchBox
         ) { entity ->
-            entity !== vehicle && entity !== vehicle.getFirstPassenger() && entity.vehicle == null && entity !is C4Entity
+            entity !== vehicle && entity !== vehicle.getFirstPassenger() && entity.vehicle == null && entity !is C4Entity && entity !is SmokeDecoyEntity && entity !is FlareDecoyEntity
         }
 
         for (entity in entities) {
@@ -629,30 +631,21 @@ object VehicleMotionUtils {
         val sampleLz = ArrayList<Double>()
         val sampleLy = ArrayList<Double>()
 
-        if (collisionInfo != null) {
-            // 用碰撞OBB底面footprint采样：cols列(左右,决定roll) × rows排(前后,决定pitch)
-            val cx = collisionInfo.position.x
-            val cz = collisionInfo.position.z
-            val hx = collisionInfo.size.x
-            val hz = collisionInfo.size.z
-            val bottomY = collisionInfo.position.y - collisionInfo.size.y
-            val cols = 3
-            val rows = 5
-            for (ci in 0 until cols) {
-                val lx = cx - hx + 2.0 * hx * ci / (cols - 1)
-                for (ri in 0 until rows) {
-                    val lz = cz - hz + 2.0 * hz * ri / (rows - 1)
-                    sampleLx.add(lx)
-                    sampleLz.add(lz)
-                    sampleLy.add(bottomY)
-                }
-            }
-        } else {
-            // 回退：无碰撞OBB时用预设接地点（轮位/起落架）
-            for (p in positions) {
-                sampleLx.add(p.x)
-                sampleLz.add(p.z)
-                sampleLy.add(p.y)
+        // 用碰撞OBB底面footprint采样：cols列(左右,决定roll) × rows排(前后,决定pitch)
+        val cx = collisionInfo.position.x
+        val cz = collisionInfo.position.z
+        val hx = collisionInfo.size.x
+        val hz = collisionInfo.size.z
+        val bottomY = collisionInfo.position.y - collisionInfo.size.y
+        val cols = 3
+        val rows = 5
+        for (ci in 0 until cols) {
+            val lx = cx - hx + 2.0 * hx * ci / (cols - 1)
+            for (ri in 0 until rows) {
+                val lz = cz - hz + 2.0 * hz * ri / (rows - 1)
+                sampleLx.add(lx)
+                sampleLz.add(lz)
+                sampleLy.add(bottomY)
             }
         }
         val count = sampleLx.size
@@ -817,14 +810,35 @@ object VehicleMotionUtils {
                         val color = SpritePixelHelper.getRandomPixelRGB(sprite, 0)
                         val speed = Math.min(vehicle.deltaMovement.length(), 0.5).toFloat()
 
-                        val particleOption = CustomCloudOption(color, 70, 1f + 7f * speed + Math.random().toFloat() * 2, Math.random().toFloat() * -0.12f, false, false)
-                        vehicle.addRandomParticle(particleOption, p.add(0.0, 0.2, 0.0).subtract(vehicle.deltaMovement.scale(1.5)), speed, vehicle.level(), 1, vehicle.deltaMovement.scale(60.0))
+                        val particleOption = CustomCloudOption(
+                            color, 70, 1f + 7f * speed + Math.random().toFloat() * 2, Math.random().toFloat() * -0.12f,
+                            cooldown = false,
+                            light = false
+                        )
+                        vehicle.addRandomParticle(
+                            particleOption,
+                            p.add(0.0, 0.2, 0.0).subtract(vehicle.deltaMovement.scale(1.5)),
+                            speed,
+                            vehicle.level(),
+                            1,
+                            vehicle.deltaMovement.scale(60.0)
+                        )
                     } else {
                         val particleData = BlockParticleOption(ParticleTypes.BLOCK, state)
                         vehicle.addRandomParticle(particleData, p.add(0.0, 0.1, 0.0), 0.2f, vehicle.level(), 0f, 1)
 
-                        if (vehicle.engineInfo is EngineInfo.Track && vehicle.drift() && vehicle.deltaMovement.horizontalDistanceSqr() > 0.0004 && state.`is`(BlockTags.MINEABLE_WITH_PICKAXE)) {
-                            vehicle.addRandomParticle(ModParticleTypes.FIRE_STAR.get(), p.add(0.0, 0.1, 0.0), 0.25f, vehicle.level(), 0.08f, 1)
+                        if (vehicle.engineInfo is EngineInfo.Track && vehicle.drift() && vehicle.deltaMovement.horizontalDistanceSqr() > 0.0004 && state.`is`(
+                                BlockTags.MINEABLE_WITH_PICKAXE
+                            )
+                        ) {
+                            vehicle.addRandomParticle(
+                                ModParticleTypes.FIRE_STAR.get(),
+                                p.add(0.0, 0.1, 0.0),
+                                0.25f,
+                                vehicle.level(),
+                                0.08f,
+                                1
+                            )
                         }
                     }
                 }
