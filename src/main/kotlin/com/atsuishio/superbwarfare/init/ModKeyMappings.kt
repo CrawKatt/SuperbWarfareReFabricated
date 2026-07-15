@@ -58,6 +58,9 @@ object ModKeyMappings {
     val BREATH = registerKey("breath", GLFW.GLFW_KEY_LEFT_CONTROL)
 
     @JvmField
+    val CHANGE_SEAT = registerKey("change_seat", GLFW.GLFW_KEY_LEFT_SHIFT)
+
+    @JvmField
     val CONFIG = registerKey(
         "config",
         GLFW.GLFW_KEY_O,
