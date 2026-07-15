@@ -163,9 +163,8 @@ open class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : Ve
             .withinRange(vec, range)
             .notItsVehicle()
             .baseFilter()
-            .smokeFilter()
             .noVehicle()
-            .differentTeam()
+            .notFriendly()
             .build()
 
         for (e in entities) {
@@ -187,7 +186,7 @@ open class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : Ve
                     0.0,
                     true
                 )
-                i += 0.2f
+                i += 0.1f
             }
 
             ParticleTool.sendParticle(

@@ -116,9 +116,10 @@ class ModItemTagProvider(
             ModItems.DEEPSLATE_SILVER_ORE.get()
         )
 
-        this.tag(commonItemTag("plates")).addTags(commonItemTag("plates/copper"), commonItemTag("plates/steel"))
+        this.tag(commonItemTag("plates")).addTags(commonItemTag("plates/copper"), commonItemTag("plates/steel"), commonItemTag("plates/plastic"))
         this.tag(commonItemTag("plates/copper")).add(ModItems.COPPER_PLATE.get())
         this.tag(commonItemTag("plates/steel")).add(ModItems.STEEL_PLATE.get())
+        this.tag(commonItemTag("plates/plastic")).add(ModItems.ENGINEERING_PLASTIC.get())
 
         this.tag(commonItemTag("tools/crowbar")).add(ModItems.CROWBAR.get())
 

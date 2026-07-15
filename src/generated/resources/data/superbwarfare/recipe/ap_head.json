@@ -3,13 +3,10 @@
   "category": "misc",
   "key": {
     "a": {
-      "item": "superbwarfare:high_energy_explosives"
+      "item": "minecraft:gunpowder"
     },
     "b": {
-      "tag": "c:ingots/iron"
-    },
-    "c": {
-      "tag": "c:ingots/steel"
+      "tag": "c:plates/steel"
     },
     "d": {
       "item": "superbwarfare:tungsten_rod"
@@ -21,7 +18,7 @@
   "pattern": [
     " e ",
     "bdb",
-    "cac"
+    " a "
   ],
   "result": {
     "count": 2,

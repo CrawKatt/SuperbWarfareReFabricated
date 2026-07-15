@@ -223,7 +223,7 @@ object ModItems {
     @JvmField val KNIFE = registerItem("knife") {
         SwordItem(
             ModItemTier.STEEL,
-            CustomDamageProperty(1200).attributes(createAttributes(ModItemTier.STEEL, 0, -1.8f))
+            CustomDamageProperty(1600).attributes(createAttributes(ModItemTier.STEEL, 4, -1.8f))
         )
     }
     @JvmField val HAMMER = registerItem("hammer") { HammerItem(Tiers.IRON, 11, -3.2f, Properties().durability(400)) }

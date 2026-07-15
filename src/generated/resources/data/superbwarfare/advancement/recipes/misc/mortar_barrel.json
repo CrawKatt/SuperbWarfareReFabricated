@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_iron_ingot": {
+    "has_engineering_plastic": {
       "conditions": {
         "items": [
           {
-            "items": "#c:ingots/iron"
+            "items": "#c:plates/steel"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_iron_ingot"
+      "has_engineering_plastic"
     ]
   ],
   "rewards": {

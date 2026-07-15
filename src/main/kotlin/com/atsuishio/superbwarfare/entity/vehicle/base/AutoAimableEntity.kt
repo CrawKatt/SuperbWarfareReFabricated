@@ -412,9 +412,7 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
             .withinRange(vec, range)
             .notItsVehicle()
             .baseFilter()
-            .smokeFilter()
             .noVehicle()
-            .differentTeam()
             .notFriendly()
             .build()
 
@@ -437,7 +435,7 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
                     0.0,
                     true
                 )
-                i += 0.2f
+                i += 0.1f
             }
 
             ParticleTool.sendParticle(

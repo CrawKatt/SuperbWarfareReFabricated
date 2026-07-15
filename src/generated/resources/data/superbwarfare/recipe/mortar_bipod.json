@@ -3,22 +3,15 @@
   "category": "misc",
   "key": {
     "a": {
-      "tag": "c:ingots/iron"
+      "tag": "c:ingots/steel"
     },
     "b": {
-      "tag": "c:nuggets/iron"
-    },
-    "c": {
       "item": "minecraft:iron_bars"
-    },
-    "d": {
-      "tag": "c:dyes/green"
     }
   },
   "pattern": [
     " a ",
-    "bbb",
-    "cdc"
+    "bbb"
   ],
   "result": {
     "count": 1,

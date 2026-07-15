@@ -1,7 +1,7 @@
 {
   "type": "minecraft:smithing_transform",
   "addition": {
-    "item": "minecraft:iron_ingot"
+    "tag": "c:plates/plastic"
   },
   "base": {
     "item": "superbwarfare:common_material_pack"
