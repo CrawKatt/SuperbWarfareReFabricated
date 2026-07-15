@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.client.map
 
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
+import com.atsuishio.superbwarfare.client.map.MissileWeaponHelper.getSelectedVehicles
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.google.gson.JsonObject
@@ -11,7 +12,10 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.levelgen.Heightmap
 
 /**
- * 导弹武器聚合工具。
+ * 远程打击武器聚合工具。
+ *
+ * 统一管理战术地图中所有远程打击手段（导弹、火炮、火箭弹等）的武器查询、
+ * 弹药统计和目标筛选逻辑。所有战术地图备弹量显示都应使用此类提供的方法。
  */
 object MissileWeaponHelper {
     fun JsonObject.gsonBool(vararg keys: String) =
@@ -59,19 +63,29 @@ object MissileWeaponHelper {
         player: Player?
     ): VehicleEntity? {
         return vehicles.firstOrNull { vehicle ->
-            val gd = vehicle.gunDataMap[weaponName] ?: return@firstOrNull false
-            val ammoCost = gd.get(GunProp.AMMO_COST_PER_SHOOT)
-            val available = if (ammoCost <= 0) 999 else gd.currentAvailableAmmo(player) / ammoCost
-            available > 0
+            queryWeaponAmmo(weaponName, listOf(vehicle)) > 0
         }
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    //  通用弹药查询（所有战术地图备弹显示的权威入口）
+    // ═══════════════════════════════════════════════════════════════
+
     /**
-     * 汇总所有选中载具中指定武器的总弹药数。
-     * 传入 null 作为弹药提供者，仅读取载具同步的 virtualAmmo，
-     * 避免读取玩家背包弹药导致的数值卡住问题。
+     * **客户端实时查询指定武器在载具列表中的可用射击次数。**
+     *
+     * 战术地图中所有远程打击武器（导弹、火炮、火箭弹等）的备弹量显示
+     * **必须**使用此方法。仅读取载具同步的 [virtualAmmo][GunData.virtualAmmo]，
+     * 不读取玩家背包弹药，避免因背包缓存导致的数值卡住问题。
+     *
+     * 调用方不需要手动处理弹药消耗系数——本方法已内置 `AMMO_COST_PER_SHOOT` 除法。
+     *
+     * @param weaponName 武器注册名（对应 [VehicleEntity.gunDataMap] 的 key）
+     * @param vehicles   载具列表（通常来自 [getSelectedVehicles]）
+     * @return 可用射击次数。若弹药消耗系数 ≤0 则返回 999（视为无限弹药），
+     *         若指定武器不存在或无弹药则返回 0
      */
-    fun currentAttackAmmo(weaponName: String, vehicles: List<VehicleEntity>, player: Player?): Int {
+    fun queryWeaponAmmo(weaponName: String, vehicles: List<VehicleEntity>): Int {
         if (vehicles.isEmpty()) return 0
         return vehicles.sumOf { vehicle ->
             val gd = vehicle.gunDataMap[weaponName] ?: return@sumOf 0
@@ -169,8 +183,7 @@ object MissileWeaponHelper {
                 }
                 if (!canLockEntity && !canGroundStrike) continue
 
-                val ammoCost = gunData.get(GunProp.AMMO_COST_PER_SHOOT)
-                val available = if (ammoCost <= 0) 999 else gunData.currentAvailableAmmo(null) / ammoCost
+                val available = queryWeaponAmmo(name, listOf(vehicle))
                 if (available <= 0) continue
 
                 val rawName = gunData.get(GunProp.NAME) ?: name

@@ -309,7 +309,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
         // Wire attack handler callbacks
         attackHandler.onFireMissile = { wx, wy, wz, name -> fireMissileAt(wx, wy, wz) }
         attackHandler.onGetAmmo = { name ->
-            MissileWeaponHelper.currentAttackAmmo(name, getSelectedVehicles(), localPlayer)
+            MissileWeaponHelper.queryWeaponAmmo(name, getSelectedVehicles())
         }
     }
 
@@ -375,12 +375,8 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
             val vehicles = getSelectedVehicles()
             if (vehicles.isNotEmpty()) {
                 contextMenu.missileWeapons = contextMenu.missileWeapons.map { entry ->
-                    // 汇总所有载具中该武器的弹药
-                    val totalAmmo = vehicles.sumOf { v ->
-                        val gd = v.gunDataMap[entry.weaponName] ?: return@sumOf 0
-                        val ammoCost = gd.get(GunProp.AMMO_COST_PER_SHOOT)
-                        if (ammoCost <= 0) 999 else gd.currentAvailableAmmo(localPlayer) / ammoCost
-                    }
+                    // 使用权威弹药查询方法，仅读取载具同步 virtualAmmo，避免背包缓存导致数值卡住
+                    val totalAmmo = MissileWeaponHelper.queryWeaponAmmo(entry.weaponName, vehicles)
                     // Recompute display name so inline %1$s ammo placeholder stays in sync
                     val rawName = vehicles.firstNotNullOfOrNull { v ->
                         v.gunDataMap[entry.weaponName]?.get(GunProp.NAME)
@@ -2628,7 +2624,7 @@ class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare
     /** 所有选中载具（或当前骑乘载具）中指定武器的总弹药数 */
     private fun currentAttackAmmo(): Int {
         val name = attackHandler.weaponName ?: return 0
-        return MissileWeaponHelper.currentAttackAmmo(name, getSelectedVehicles(), localPlayer)
+        return MissileWeaponHelper.queryWeaponAmmo(name, getSelectedVehicles())
     }
 
     override fun renderBackground(
