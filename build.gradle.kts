@@ -360,7 +360,7 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8" // Use the UTF-8 charset for Java compilation
 }
 
-tasks.named<Jar>("jarJar") {
+tasks.processResources {
     from("COPYING", "COPYING.LESSER")
 }
 
