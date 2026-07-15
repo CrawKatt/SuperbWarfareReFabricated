@@ -105,21 +105,12 @@ object ClientMouseHandler {
         }
 
         val vehicle = player.vehicle
-        if (vehicle is VehicleEntity && player == vehicle.firstPassenger
-            && (vehicle.vehicleType == VehicleType.AIRPLANE || vehicle.vehicleType == VehicleType.HELICOPTER)
-        ) {
-
-            var y = 1
-            if (ControlConfig.INVERT_AIRCRAFT_CONTROL.get()) {
-                y = -1
-            }
-
+        if (vehicle is VehicleEntity && (vehicle.vehicleType == VehicleType.AIRPLANE || vehicle.vehicleType == VehicleType.HELICOPTER)) {
+            val y = if (ControlConfig.INVERT_AIRCRAFT_CONTROL.get()) -1 else 1
             val sensitivity = vehicle.mouseSensitivity
 
             speedX = sensitivity * moveSpeedX * (if (ClientEventHandler.zoomVehicle && !ClientEventHandler.isNacelleCam(player)) 0.3 else 1.0)
             speedY = y * sensitivity * moveSpeedY * (if (ClientEventHandler.zoomVehicle && !ClientEventHandler.isNacelleCam(player)) 0.4 else 1.0)
-
-
 
             mouseXMoveTick = Mth.lerp(0.1, mouseXMoveTick, speedX)
             mouseYMoveTick = Mth.lerp(0.1, mouseYMoveTick, speedY)
@@ -150,6 +141,8 @@ object ClientMouseHandler {
             if (Mth.abs(vehicle.roll) > 90) {
                 i *= (1 - (Mth.abs(vehicle.roll) - 90) / 90)
             }
+
+            if (player != vehicle.firstPassenger) return
 
             if (notInGame) {
                 sendPacketToServer(MouseMoveMessage(0.0, 0.0))
