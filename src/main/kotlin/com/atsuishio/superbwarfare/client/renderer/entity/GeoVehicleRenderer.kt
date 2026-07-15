@@ -20,6 +20,7 @@ import com.atsuishio.superbwarfare.resource.model.VehicleLODModelReloadListener
 import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListener
 import com.atsuishio.superbwarfare.resource.vehicle.VehicleModelPojo
 import com.atsuishio.superbwarfare.resource.vehicle.VehicleResource
+import com.atsuishio.superbwarfare.script.VehicleScriptManager
 import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.atsuishio.superbwarfare.tools.SpritePixelHelper
 import com.atsuishio.superbwarfare.tools.localPlayer
@@ -463,6 +464,8 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                 }
             }
         }
+
+        this.renderByScript(vehicle, model, poseStack, entityYaw, partialTicks, buffer, packedLight)
     }
 
     open fun transformCustomModelPart(
@@ -632,6 +635,19 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                 }
             }
         }
+    }
+
+    open fun renderByScript(
+        vehicle: T,
+        model: BedrockVehicleModel,
+        poseStack: PoseStack,
+        entityYaw: Float,
+        partialTicks: Float,
+        buffer: MultiBufferSource,
+        packedLight: Int
+    ) {
+        val func = VehicleResource.getDefault(vehicle).getScript() ?: return
+        VehicleScriptManager.invokeTransform(func, vehicle, model, poseStack, entityYaw, partialTicks, this)
     }
 
     open fun rotateVehicleAxis(entityIn: T, poseStack: PoseStack, entityYaw: Float, partialTicks: Float) {

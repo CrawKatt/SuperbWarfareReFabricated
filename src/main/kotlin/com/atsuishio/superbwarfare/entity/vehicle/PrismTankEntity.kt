@@ -165,6 +165,7 @@ open class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : Ve
             .baseFilter()
             .noVehicle()
             .notFriendly()
+            .isNotOwner()
             .build()
 
         for (e in entities) {
@@ -232,7 +233,7 @@ open class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : Ve
     @OnlyIn(Dist.CLIENT)
     override fun firstPersonAmmoComponent(data: GunData, player: Player?): Component {
         val name = data.get(GunProp.NAME)
-        if (name == null || name.isBlank()) return Component.empty()
+        if (name.isNullOrBlank()) return Component.empty()
 
         return Component.translatable(name, (25 + data.heat.get()).toInt().toString() + " " + "°C")
     }
