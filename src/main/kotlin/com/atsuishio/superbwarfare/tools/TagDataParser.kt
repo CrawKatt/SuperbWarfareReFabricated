@@ -16,13 +16,13 @@ object TagDataParser {
      */
     @JvmOverloads
     @JvmStatic
-    fun parse(`object`: JsonObject?, tagModifier: Function<String, Tag?>? = null): CompoundTag {
+    fun parseObject(`object`: JsonObject?, tagModifier: Function<String, Tag?>? = null): CompoundTag {
         val tag = CompoundTag()
         if (`object` == null) return tag
 
         for (d in `object`.entrySet()) {
             try {
-                val parsed = parse(d.value, tagModifier) ?: continue
+                val parsed = parseElement(d.value, tagModifier) ?: continue
                 tag.put(d.key, parsed)
             } catch (e: Exception) {
                 Mod.LOGGER.error("Failed to parse tag {}: {}", d.key, e)
@@ -40,13 +40,13 @@ object TagDataParser {
      * @return 替换后的NBT Tag
      */
     @JvmStatic
-    fun parse(`object`: JsonElement, tagModifier: Function<String, Tag?>?): Tag? {
+    fun parseElement(`object`: JsonElement, tagModifier: Function<String, Tag?>?): Tag? {
         if (`object`.isJsonObject) {
             // 递归处理嵌套内容
             val tag = CompoundTag()
             for (d in `object`.getAsJsonObject().entrySet()) {
                 try {
-                    val parsed = parse(d.value, tagModifier) ?: continue
+                    val parsed = parseElement(d.value, tagModifier) ?: continue
                     tag.put(d.key, parsed)
                 } catch (e: Exception) {
                     Mod.LOGGER.error("Failed to parse tag {}: {}", d.key, e)
@@ -57,7 +57,7 @@ object TagDataParser {
             // 处理数组相关内容
             val tag = ListTag()
             for (d in `object`.getAsJsonArray()) {
-                tag.add(parse(d, tagModifier))
+                tag.add(parseElement(d, tagModifier))
             }
             return tag
         } else if (`object`.isJsonPrimitive) {

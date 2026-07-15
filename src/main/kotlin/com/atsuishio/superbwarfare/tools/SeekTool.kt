@@ -122,7 +122,7 @@ object SeekTool {
             // 雷达超视距假实体：使用服务端预计算的高度，确保 heightRange 条件对其生效
             val entry = ClientSyncedEntityHandler.getSyncedEntry(level, entity.id)
             if (entry != null && entry.heightAboveGround >= 0) {
-                return@TriPredicate entry.heightAboveGround >= min && entry.heightAboveGround <= max
+                return@TriPredicate entry.heightAboveGround in min..max
             }
             return@TriPredicate true
         }
@@ -158,8 +158,8 @@ object SeekTool {
         }
         target is DroneEntity &&
                 target !== myDrone &&
-                target.controller != null &&
-                IN_SAME_TEAM.test(target, target.controller)
+                target.getController() != null &&
+                IN_SAME_TEAM.test(target, target.getController())
     }
 
     /** 判断两个实体是否是友方关系 */

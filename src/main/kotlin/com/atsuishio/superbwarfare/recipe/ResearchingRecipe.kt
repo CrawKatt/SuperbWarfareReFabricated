@@ -148,7 +148,7 @@ class ResearchingRecipe(
             if (!item.isEmpty()) {
                 val item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(item))
                 if (nbt != null) {
-                    val tag = TagDataParser.parse(nbt)
+                    val tag = TagDataParser.parseObject(nbt)
                     val tmp = CompoundTag()
 
                     tmp.put("components", tag)
