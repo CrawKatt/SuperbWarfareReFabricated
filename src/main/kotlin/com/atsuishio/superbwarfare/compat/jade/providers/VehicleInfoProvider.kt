@@ -2,7 +2,9 @@ package com.atsuishio.superbwarfare.compat.jade.providers
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.compat.jade.elements.WrenchHealthElement
+import com.atsuishio.superbwarfare.data.vehicle_skin.VehicleSkin
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import snownee.jade.api.EntityAccessor
@@ -12,8 +14,8 @@ import snownee.jade.api.config.IPluginConfig
 import snownee.jade.util.CommonProxy
 import java.util.*
 
-object VehicleHealthProvider : IEntityComponentProvider {
-    private val ID = loc("vehicle_health")
+object VehicleInfoProvider : IEntityComponentProvider {
+    private val ID = loc("vehicle_info")
 
     override fun appendTooltip(tooltip: ITooltip, accessor: EntityAccessor, config: IPluginConfig?) {
         // 对EntityHealthProvider的拙劣模仿罢了
@@ -31,6 +33,14 @@ object VehicleHealthProvider : IEntityComponentProvider {
         if (uuid != null) {
             val name = CommonProxy.getLastKnownUsername(uuid) ?: "???"
             tooltip.add(Component.translatable("jade.owner", name))
+        }
+
+        val skin = VehicleSkin.getSkin(vehicle)
+        if (skin != null && skin.id != "vanilla") {
+            tooltip.add(
+                Component.translatable("config.jade.plugin_superbwarfare.vehicle_skin", skin.id)
+                    .withStyle(ChatFormatting.GRAY)
+            )
         }
     }
 

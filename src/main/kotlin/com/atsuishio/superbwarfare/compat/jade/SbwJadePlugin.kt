@@ -19,7 +19,7 @@ class SbwJadePlugin : IWailaPlugin {
     }
 
     override fun registerClient(registration: IWailaClientRegistration) {
-        registration.registerEntityComponent(VehicleHealthProvider, VehicleEntity::class.java)
+        registration.registerEntityComponent(VehicleInfoProvider, VehicleEntity::class.java)
         registration.registerEntityComponent(C4InfoProvider, C4Entity::class.java)
         registration.registerEntityComponent(DPSGeneratorProvider, DPSGeneratorEntity::class.java)
         registration.registerBlockComponent(ContainerEntityProvider, ContainerBlock::class.java)

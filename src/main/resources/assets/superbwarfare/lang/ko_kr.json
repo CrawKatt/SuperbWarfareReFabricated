@@ -419,7 +419,7 @@
   "jei.superbwarfare.ancient_cpu": "신비한 고대 기술은 고대 도시에서 찾아볼 수 있습니다.",
   "jei.superbwarfare.charging_station": "연료나 식량을 소비하여 전력을 생산하며, FE 에너지 입력도 받을 수 있습니다. 이 블록은 인접 블록에 FE 에너지를 공급하고, 범위 내 충전식 차량을 충전할 수도 있습니다.",
   "config.jade.plugin_superbwarfare.vehicle_energy": "차량 에너지",
-  "config.jade.plugin_superbwarfare.vehicle_health": "차량 상태",
+  "config.jade.plugin_superbwarfare.vehicle_info": "차량 상태",
   "config.jade.plugin_superbwarfare.container_entity": "컨테이너 엔티티",
   "superbwarfare.advancement.main.root.des": "Superb Warfare에 오신 것을 환영합니다!",
   "superbwarfare.advancement.main.best_friend": "영원히 \"최고의 친구\"",

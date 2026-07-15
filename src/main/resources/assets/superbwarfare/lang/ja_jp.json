@@ -427,7 +427,7 @@
   "jei.superbwarfare.ancient_cpu": "神秘的な古代の技術は古代都市で発見出来ます。",
   "jei.superbwarfare.charging_station": "燃料または食料を消費することで電力を生成し、FEエネルギーの入力も受け付けます。このブロックは隣接するブロックにFEエネルギーを供給し、範囲内の充電式車両を充電することもできます。",
   "config.jade.plugin_superbwarfare.vehicle_energy": "車両エネルギー",
-  "config.jade.plugin_superbwarfare.vehicle_health": "車両耐久力",
+  "config.jade.plugin_superbwarfare.vehicle_info": "車両耐久力",
   "config.jade.plugin_superbwarfare.container_entity": "コンテナエンティティ",
   "superbwarfare.advancement.main.root.des": "Superb Warfareへようこそ！",
   "superbwarfare.advancement.main.best_friend": "永遠の「親友」",
