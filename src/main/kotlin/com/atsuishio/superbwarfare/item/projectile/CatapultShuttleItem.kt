@@ -107,10 +107,23 @@ open class CatapultShuttleItem : AbstractDeployerItem(Properties().rarity(Rarity
         return CatapultShuttleEntity(level)
     }
 
+    /**
+     * 获取弹射器滑块的放置朝向。
+     * 当瓦尔基里天空模组加载时，使用船舶局部朝向（因为滑块实体会作为 shipyard entity 固定在船体上）；
+     * 否则将局部方向转换为世界方向后计算朝向。
+     */
     private fun getWorldYRot(level: Level, pos: BlockPos, blockstate: BlockState): Float {
         val facing = blockstate.getValue(AircraftCatapultBlock.FACING)
-        val localDir = Vec3(facing.stepX.toDouble(), 0.0, facing.stepZ.toDouble())
-        val worldDir = ValkyrienSkiesCompat.toWorldDirection(level, Vec3.atCenterOf(pos), localDir)
-        return Math.toDegrees(atan2(worldDir.x, worldDir.z)).toFloat()
+        val stepX = facing.stepX.toDouble()
+        val stepZ = facing.stepZ.toDouble()
+
+        return if (ValkyrienSkiesCompat.hasMod()) {
+            // Shipyard entity 使用船舶局部 yaw
+            Math.toDegrees(atan2(stepX, stepZ)).toFloat()
+        } else {
+            val localDir = Vec3(stepX, 0.0, stepZ)
+            val worldDir = ValkyrienSkiesCompat.toWorldDirection(level, Vec3.atCenterOf(pos), localDir)
+            Math.toDegrees(atan2(worldDir.x, worldDir.z)).toFloat()
+        }
     }
 }

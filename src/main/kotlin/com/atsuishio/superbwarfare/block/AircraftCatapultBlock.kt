@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.entity.entity.CatapultShuttleEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.context.BlockPlaceContext
@@ -19,6 +20,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.block.state.properties.DirectionProperty
 import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.phys.Vec3
+import kotlin.math.atan2
 import kotlin.math.max
 
 @Suppress("OVERRIDE_DEPRECATION")
@@ -127,6 +129,10 @@ open class AircraftCatapultBlock :
         super.entityInside(pState, pLevel, pPos, pEntity)
         if (pEntity !is CatapultShuttleEntity) return
 
+        val diffY = Mth.wrapDegrees(getWorldYRot(pLevel, pPos, pState) - pEntity.yRot)
+        pEntity.yRot += 0.9f * diffY
+        pEntity.yRotO += 0.9f * diffY
+
         val state = pLevel.getBlockState(pPos)
         val power = state.getValue(LAUNCH_POWER)
         if (power == 0) return
@@ -138,6 +144,21 @@ open class AircraftCatapultBlock :
         val moveDir = if (state.getValue(REVERSED)) worldDir.scale(-1.0) else worldDir
         if (pEntity.deltaMovement.dot(moveDir) < 0.2 * power) {
             pEntity.addDeltaMovement(Vec3(moveDir.x * rate, moveDir.y * rate, moveDir.z * rate))
+        }
+    }
+
+    private fun getWorldYRot(level: Level, pos: BlockPos, blockstate: BlockState): Float {
+        val facing = blockstate.getValue(FACING)
+        val stepX = facing.stepX.toDouble()
+        val stepZ = facing.stepZ.toDouble()
+
+        return if (ValkyrienSkiesCompat.hasMod()) {
+            // Shipyard entity 使用船舶局部 yaw
+            Math.toDegrees(atan2(stepX, stepZ)).toFloat()
+        } else {
+            val localDir = Vec3(stepX, 0.0, stepZ)
+            val worldDir = ValkyrienSkiesCompat.toWorldDirection(level, Vec3.atCenterOf(pos), localDir)
+            Math.toDegrees(atan2(worldDir.x, worldDir.z)).toFloat()
         }
     }
 

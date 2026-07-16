@@ -66,7 +66,7 @@ object ModEntities {
     @JvmField
     val CATAPULT_SHUTTLE = register(
         "catapult_shuttle",
-        misc(::CatapultShuttleEntity).setTrackingRange(64).setUpdateInterval(1).sized(0.75f, 1.2f)
+        misc(::CatapultShuttleEntity).setTrackingRange(64).setUpdateInterval(1).sized(1.0f, 1.2f)
     )
 
     @JvmField

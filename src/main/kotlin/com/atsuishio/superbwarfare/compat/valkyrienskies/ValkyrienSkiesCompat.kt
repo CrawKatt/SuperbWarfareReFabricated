@@ -81,6 +81,30 @@ object ValkyrienSkiesCompat {
     }
 
     /**
+     * 将世界坐标转换为 VS 船舶上的局部坐标。
+     * 通过区块归属查询管理该位置的船舶，不受船舶当前世界AABB限制。
+     * 若该位置未在任何船舶上，则原样返回。
+     *
+     * @param level 当前世界
+     * @param pos   待转换的世界坐标
+     * @return 船舶局部坐标（若不在船上则返回原值）
+     */
+    @JvmStatic
+    fun toShipSpace(level: Level, pos: Vec3): Vec3 {
+        if (!hasMod() || level !is ServerLevel) return pos
+
+        return try {
+            val blockPos = BlockPos(pos.x.toInt(), pos.y.toInt(), pos.z.toInt())
+            val ship = level.getLoadedShipManagingPos(blockPos) ?: return pos
+            val jomlPos = Vector3d(pos.toJOML())
+            (ship as Ship).worldToShip.transformPosition(jomlPos)
+            Vec3(jomlPos.x, jomlPos.y, jomlPos.z)
+        } catch (_: Exception) {
+            pos
+        }
+    }
+
+    /**
      * 获取 VS 船舶在指定位置的世界空间 Y 轴旋转角（度），用于雷达等需要与船舶朝向同步的功能。
      * 若该位置未在任何船舶上，返回 null。
      *
