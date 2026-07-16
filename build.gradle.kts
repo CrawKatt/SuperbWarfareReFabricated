@@ -296,9 +296,9 @@ dependencies {
 
     implementation("curse.maven:create-328085:7963363")
     // Sable
-    implementation("curse.maven:sable-1312371:8007005")
+    compileOnly("curse.maven:sable-1312371:8007005")
     compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-1.21.1:1.6.0")
-    implementation("maven.modrinth:create-aeronautics:1.1.3+mc1.21.1")
+    compileOnly("maven.modrinth:create-aeronautics:1.1.3+mc1.21.1")
 //    implementation(fg.deobf("curse.maven:mmmmmmmmmmmm-225738:6237015"))
 //    implementation(fg.deobf("curse.maven:selene-499980:6249659"))
 }

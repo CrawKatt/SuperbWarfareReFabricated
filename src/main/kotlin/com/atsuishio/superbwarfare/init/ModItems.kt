@@ -311,6 +311,7 @@ object ModItems {
     @JvmField val SKIN_SPRAY = registerItem("skin_spray") { SkinSprayItem() }
     @JvmField val VEHICLE_KEY = registerItem("vehicle_key") { VehicleKeyItem() }
     @JvmField val CREATIVE_VEHICLE_KEY = registerItem("creative_vehicle_key") { CreativeVehicleKeyItem() }
+    @JvmField val CATAPULT_SHUTTLE = registerItem("catapult_shuttle") { CatapultShuttleItem() }
 
     @JvmField val TUNGSTEN_ROD = registerItem("tungsten_rod")
 

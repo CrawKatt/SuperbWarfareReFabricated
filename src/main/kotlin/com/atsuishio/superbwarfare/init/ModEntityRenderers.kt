@@ -40,6 +40,7 @@ object ModEntityRenderers {
             registerEntityRenderer(ModEntities.WHEEL_CHAIR.get(), ::WheelChairRenderer)
             registerEntityRenderer(ModEntities.AH_6.get(), ::Ah6Renderer)
             registerEntityRenderer(ModEntities.FLARE_DECOY.get(), ::FlareDecoyEntityRenderer)
+            registerEntityRenderer(ModEntities.CATAPULT_SHUTTLE.get(), ::CatapultShuttleRenderer)
             registerEntityRenderer(
                 ModEntities.WHITE_PHOSPHORUS_PROJECTILE.get(),
                 ::WhitePhosphorusProjectileEntityRenderer

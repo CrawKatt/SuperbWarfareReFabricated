@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.atsuishio.superbwarfare.entity.living.SenpaiEntity
 import com.atsuishio.superbwarfare.entity.living.SteelCoilEntity
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
+import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.entity.projectile.*
 import com.atsuishio.superbwarfare.entity.vehicle.*
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
@@ -60,6 +61,12 @@ object ModEntities {
     val FLARE_DECOY = register(
         "flare_decoy",
         misc(::FlareDecoyEntity).setTrackingRange(64).setUpdateInterval(1).noSave().sized(1f, 1f)
+    )
+
+    @JvmField
+    val CATAPULT_SHUTTLE = register(
+        "catapult_shuttle",
+        misc(::CatapultShuttleEntity).setTrackingRange(64).setUpdateInterval(1).sized(1.0f, 1.2f)
     )
 
     @JvmField
