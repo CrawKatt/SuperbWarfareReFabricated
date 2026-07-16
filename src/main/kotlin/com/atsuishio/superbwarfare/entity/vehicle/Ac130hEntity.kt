@@ -6,7 +6,6 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
 open class Ac130hEntity(type: EntityType<Ac130hEntity>, world: Level) : VehicleEntity(type, world) {
-    private var wasGearUp = false
 
     override fun baseTick() {
         super.baseTick()
@@ -17,11 +16,9 @@ open class Ac130hEntity(type: EntityType<Ac130hEntity>, world: Level) : VehicleE
         if (level().isClientSide) {
             val ctx = anim?.context ?: return
             if (gearUp && !wasGearUp) {
-                ctx.playAnimation("animation.ac_130h.gear_up", AnimationPlayType.LOOP,
-                    fadeInTicks = 260)
+                ctx.playAnimation("animation.ac_130h.gear_up", AnimationPlayType.PLAY_ONCE_HOLD)
             } else if (gearDown && wasGearUp) {
-                ctx.stopAnimation("animation.ac_130h.idle",
-                    fadeOutTicks = 260)
+                ctx.playAnimation("animation.ac_130h.gear_down", AnimationPlayType.PLAY_ONCE_HOLD)
             }
             wasGearUp = gearUp
         }

@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.vehicle
 
+import com.atsuishio.superbwarfare.client.animation.AnimationPlayType
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModParticleTypes
@@ -46,6 +47,23 @@ open class A10Entity(type: EntityType<A10Entity>, world: Level) : VehicleEntity(
                     true
                 ), pos, 0.5f, level(), 1.5f, 1
             )
+        }
+    }
+
+    override fun baseTick() {
+        super.baseTick()
+
+        val gearUp = (this.gearUp && synchedGearRot > 0 && synchedGearRot < 1) || synchedGearRot == 1f
+        val gearDown = (!this.gearUp && synchedGearRot > 0 && synchedGearRot < 1) || synchedGearRot == 0f
+
+        if (level().isClientSide) {
+            val ctx = anim?.context ?: return
+            if (gearUp && !wasGearUp) {
+                ctx.playAnimation("animation.a_10.gear_up", AnimationPlayType.PLAY_ONCE_HOLD)
+            } else if (gearDown && wasGearUp) {
+                ctx.playAnimation("animation.a_10.gear_down", AnimationPlayType.PLAY_ONCE_HOLD)
+            }
+            wasGearUp = gearUp
         }
     }
 }

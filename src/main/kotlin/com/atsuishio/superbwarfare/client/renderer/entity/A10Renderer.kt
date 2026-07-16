@@ -86,14 +86,6 @@ class A10Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRendere
             ) * Mth.DEG_TO_RAD
         )
 
-        val gear = model.getBone("gear")
-        val gear2 = model.getBone("gear2")
-        val gear3 = model.getBone("gear3")
-
-        gear.rotation.rotationX(vehicle.gearRot(partialTicks) * Mth.DEG_TO_RAD)
-        gear2.rotation.rotationX(vehicle.gearRot(partialTicks) * Mth.DEG_TO_RAD)
-        gear3.rotation.rotationX(vehicle.gearRot(partialTicks) * Mth.DEG_TO_RAD)
-
         val qianzhou = model.getBone("qianzhou")
         val qianzhou2 = model.getBone("qianzhou2")
 

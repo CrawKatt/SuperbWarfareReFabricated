@@ -93,6 +93,54 @@
 					}
 				}
 			}
+		},
+		"animation.a_10.gear_up": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 1,
+			"bones": {
+				"gear": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [-90, 0, 0]
+					}
+				},
+				"gear2": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [-90, 0, 0]
+					}
+				},
+				"gear3": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [-90, 0, 0]
+					}
+				}
+			}
+		},
+		"animation.a_10.gear_down": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 1,
+			"bones": {
+				"gear": {
+					"rotation": {
+						"0.0": [-90, 0, 0],
+						"1.0": [0, 0, 0]
+					}
+				},
+				"gear2": {
+					"rotation": {
+						"0.0": [-90, 0, 0],
+						"1.0": [0, 0, 0]
+					}
+				},
+				"gear3": {
+					"rotation": {
+						"0.0": [-90, 0, 0],
+						"1.0": [0, 0, 0]
+					}
+				}
+			}
 		}
 	}
 }

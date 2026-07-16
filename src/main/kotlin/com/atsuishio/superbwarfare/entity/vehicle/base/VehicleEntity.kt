@@ -351,7 +351,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open var flap2RRotO = 0f
     open var flap3Rot = 0f
     open var flap3RotO = 0f
-    private var gearRotO = 0f
 
     open var gearRot = 0f
 
@@ -384,6 +383,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     var fakeRollO = 0f
     var fakePitch = 0f
     var fakeRoll = 0f
+
+    var wasGearUp = false
 
     open var lastDamageSource: DamageSource? = null
         get() {
@@ -2050,7 +2051,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         flap2LRotO = this.flap2LRot
         flap2RRotO = this.flap2RRot
         flap3RotO = this.flap3Rot
-        gearRotO = this.gearRot
         deltaMovementO = deltaMovement
         positionO = position()
         absoluteSpeedO = absoluteSpeed
@@ -3749,8 +3749,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     open val passengerRenderScale: Float
         get() = computed().passengerRenderScale
-
-    open fun gearRot(tickDelta: Float) = Mth.lerp(tickDelta, gearRotO, this.gearRot)
 
     open val mass: Float
         get() = computed().mass
