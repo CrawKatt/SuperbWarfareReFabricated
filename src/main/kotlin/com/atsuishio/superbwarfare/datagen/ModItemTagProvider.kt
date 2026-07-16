@@ -310,10 +310,21 @@ class ModItemTagProvider(
         this.tag(ModTags.Items.ENLARGED_LEGENDARY_BLUEPRINT)
             .addTags(ModTags.Items.LEGENDARY_BLUEPRINT, ModTags.Items.SUPERB_BLUEPRINT)
 
-        this.tag(ItemTags.SWORDS).add(ModItems.MILITARY_SHOVEL.get())
-        this.tag(ItemTags.AXES).add(ModItems.MILITARY_SHOVEL.get())
-        this.tag(ItemTags.SHOVELS).add(ModItems.MILITARY_SHOVEL.get())
-        this.tag(ItemTags.HOES).add(ModItems.MILITARY_SHOVEL.get())
+        this.tag(ItemTags.SWORDS).add(
+            ModItems.MILITARY_SHOVEL.get(),
+            ModItems.KNIFE.get(),
+            ModItems.T_BATON.get(),
+            ModItems.ELECTRIC_BATON.get(),
+            ModItems.STEEL_PIPE.get(),
+            ModItems.CROWBAR.get(),
+            ModItems.CEMENTED_CARBIDE_SWORD.get()
+        ).addTag(ModTags.Items.HAMMER)
+
+        this.tag(ItemTags.AXES).add(ModItems.MILITARY_SHOVEL.get(), ModItems.CEMENTED_CARBIDE_AXE.get())
+        this.tag(ItemTags.SHOVELS).add(ModItems.MILITARY_SHOVEL.get(), ModItems.CEMENTED_CARBIDE_SHOVEL.get())
+        this.tag(ItemTags.HOES).add(ModItems.MILITARY_SHOVEL.get(), ModItems.CEMENTED_CARBIDE_HOE.get())
+        this.tag(ItemTags.PICKAXES).add(ModItems.CEMENTED_CARBIDE_PICKAXE.get())
+
 
         ModItems.PERKS.entries.forEach {
             val item = it.get()

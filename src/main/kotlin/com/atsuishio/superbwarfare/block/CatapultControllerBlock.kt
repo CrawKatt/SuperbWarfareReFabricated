@@ -23,7 +23,8 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty
 import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.phys.BlockHitResult
 
-class CatapultControllerBlock : Block(Properties.of().sound(SoundType.METAL).strength(3.0f).requiresCorrectToolForDrops()) {
+@Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
+class CatapultControllerBlock : Block(Properties.of().sound(SoundType.METAL).strength(3.0f)) {
     init {
         this.registerDefaultState(
             this.stateDefinition.any()
@@ -121,7 +122,13 @@ class CatapultControllerBlock : Block(Properties.of().sound(SoundType.METAL).str
         super.onRemove(state, level, pos, newState, movedByPiston)
     }
 
-    private fun updateConnectedCatapults(level: Level, controllerPos: BlockPos, facing: Direction, power: Int, controlled: Boolean) {
+    private fun updateConnectedCatapults(
+        level: Level,
+        controllerPos: BlockPos,
+        facing: Direction,
+        power: Int,
+        controlled: Boolean
+    ) {
         var checkPos = controllerPos.relative(facing)
         while (level.getBlockState(checkPos).block is AircraftCatapultBlock) {
             val catapultState = level.getBlockState(checkPos)
