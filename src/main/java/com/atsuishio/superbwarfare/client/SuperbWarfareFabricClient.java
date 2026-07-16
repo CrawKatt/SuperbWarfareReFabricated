@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.client;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
+import com.atsuishio.superbwarfare.client.model.DragonTeethObjModelLoader;
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler;
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
 import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
@@ -27,6 +28,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        DragonTeethObjModelLoader.register();
         NeoForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.CLIENT, ClientConfig.init());
         ModScreens.init();
         ModEntityRenderers.init();

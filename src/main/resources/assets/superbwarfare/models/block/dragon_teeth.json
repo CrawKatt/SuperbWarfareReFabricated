@@ -1,18 +1,7 @@
 {
-  "parent": "neoforge:item/default",
-  "loader": "neoforge:composite",
-  "children": {
-    "part1": {
-      "loader": "neoforge:obj",
-      "model": "superbwarfare:models/block/dragon_teeth.obj",
-      "emissive_ambient": true,
-      "textures": {
-        "#m_40ddb3f7-b960-0c4a-147f-2010aa6221ab": "superbwarfare:block/dragon_teeth"
-      }
-    }
-  },
+  "parent": "minecraft:block/block",
   "textures": {
-    "particle": "minecraft:block/smooth_stone"
-  },
-  "render_type": "solid"
+    "particle": "minecraft:block/smooth_stone",
+    "dragon_teeth": "superbwarfare:block/dragon_teeth"
+  }
 }
