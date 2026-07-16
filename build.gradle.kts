@@ -176,9 +176,9 @@ dependencies {
     }
 
     // SBM
-    val sbm = implementation(fg.deobf("com.github.mcmodderanchor:simplebedrockmodel:2.3.3-forge-mc1.20.1"))
+    val sbm = implementation(fg.deobf("com.github.mcmodderanchor:simplebedrockmodel:2.4.12-forge-mc1.20.1"))
     jarJar(sbm) {
-        jarJar.ranged(sbm, "[2.3.3,)")
+        jarJar.ranged(sbm, "[2.4.12,)")
     }
     compileOnly("com.maydaymemory:mae:1.1.2") {
         exclude("com.google.code.findbugs", "jsr305")
