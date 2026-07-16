@@ -235,12 +235,12 @@ dependencies {
     val sbm = implementation(
         group = "com.github.MCModderAnchor",
         name = "SimpleBedrockModel",
-        version = "2.3.3-neoforge-mc1.21.1",
+        version = "2.4.12-neoforge-mc1.21.1",
     )
     jarJar(sbm) {
         version {
             strictly("[2.0,3.0)")
-            prefer("2.3.3-neoforge-mc1.21.1")
+            prefer("2.4.12-neoforge-mc1.21.1")
         }
     }
     compileOnly("com.maydaymemory:mae:1.1.2") {
@@ -294,13 +294,11 @@ dependencies {
         runtimeOnly("curse.maven:sodium-394468:6382651")
     }
 
-    compileOnly("curse.maven:create-328085:7963363")
+    implementation("curse.maven:create-328085:7963363")
     // Sable
     implementation("curse.maven:sable-1312371:8007005")
     compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-1.21.1:1.6.0")
     implementation("maven.modrinth:create-aeronautics:1.1.3+mc1.21.1")
-//    implementation(fg.deobf("curse.maven:timeless-and-classics-zero-1028108:6069384"))
-//    implementation(fg.deobf("curse.maven:create-328085:6255513"))
 //    implementation(fg.deobf("curse.maven:mmmmmmmmmmmm-225738:6237015"))
 //    implementation(fg.deobf("curse.maven:selene-499980:6249659"))
 }
