@@ -212,6 +212,7 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
 
         handheldItem(ModItems.VEHICLE_KEY)
         handheldItem(ModItems.CREATIVE_VEHICLE_KEY)
+        simpleItem(ModItems.CATAPULT_SHUTTLE)
 
         // cemented carbide tools
         handheldItem(ModItems.CEMENTED_CARBIDE_SWORD)
@@ -297,6 +298,7 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         evenSimplerBlockItem(ModBlocks.CREATIVE_CHARGING_STATION)
         evenSimplerBlockItem(ModBlocks.VEHICLE_DEPLOYER)
         evenSimplerBlockItem(ModBlocks.AIRCRAFT_CATAPULT)
+        evenSimplerBlockItem(ModBlocks.CATAPULT_CONTROLLER)
         evenSimplerBlockItem(ModBlocks.SUPERB_ITEM_INTERFACE)
         evenSimplerBlockItem(ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE)
         evenSimplerBlockItem(ModBlocks.BIOGAS_GENERATOR)

@@ -304,6 +304,7 @@ object ModItems {
     @JvmField val SKIN_SPRAY = registerItem("skin_spray") { SkinSprayItem() }
     @JvmField val VEHICLE_KEY = registerItem("vehicle_key") { VehicleKeyItem() }
     @JvmField val CREATIVE_VEHICLE_KEY = registerItem("creative_vehicle_key") { CreativeVehicleKeyItem() }
+    @JvmField val CATAPULT_SHUTTLE = registerItem("catapult_shuttle") { CatapultShuttleItem() }
 
     @JvmField val TUNGSTEN_ROD = registerItem("tungsten_rod")
 
@@ -430,6 +431,7 @@ object ModItems {
         BlockItem(ModBlocks.VEHICLE_DEPLOYER.get(), Properties().stacksTo(1).rarity(Rarity.EPIC))
     }
     @JvmField val AIRCRAFT_CATAPULT = registerBlock(ModBlocks.AIRCRAFT_CATAPULT)
+    @JvmField val CATAPULT_CONTROLLER = registerBlock(ModBlocks.CATAPULT_CONTROLLER)
     @JvmField val SUPERB_ITEM_INTERFACE = registerBlock(ModBlocks.SUPERB_ITEM_INTERFACE)
     @JvmField val CREATIVE_SUPERB_ITEM_INTERFACE = registerBlock(ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE.id.path) {
         BlockItem(ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE.get(), Properties().rarity(Rarity.EPIC))

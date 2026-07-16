@@ -43,6 +43,7 @@ object ModBlocks {
     @JvmField val SMALL_CONTAINER = registerBlock("small_container") { SmallContainerBlock() }
     @JvmField val VEHICLE_DEPLOYER = registerBlock("vehicle_deployer") { VehicleDeployerBlock() }
     @JvmField val AIRCRAFT_CATAPULT = registerBlock("aircraft_catapult") { AircraftCatapultBlock() }
+    @JvmField val CATAPULT_CONTROLLER = registerBlock("catapult_controller") { CatapultControllerBlock() }
     @JvmField val SUPERB_ITEM_INTERFACE = registerBlock("superb_item_interface") { SuperbItemInterfaceBlock() }
     @JvmField val CREATIVE_SUPERB_ITEM_INTERFACE = registerBlock("creative_superb_item_interface") { CreativeSuperbItemInterfaceBlock() }
     @JvmField val LUCKY_CONTAINER = registerBlock("lucky_container") { LuckyContainerBlock() }

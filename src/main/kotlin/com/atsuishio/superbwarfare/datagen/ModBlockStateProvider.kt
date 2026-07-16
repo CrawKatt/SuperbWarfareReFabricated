@@ -66,6 +66,18 @@ class ModBlockStateProvider(output: PackOutput, exFileHelper: ExistingFileHelper
         )
 
         horizontalBlock(
+            ModBlocks.CATAPULT_CONTROLLER.get(), models().cube(
+                "catapult_controller",
+                modLoc("block/vehicle_deployer_bottom"),
+                modLoc("block/aircraft_catapult_controller_top"),
+                modLoc("block/aircraft_catapult_controller_side"),
+                modLoc("block/aircraft_catapult_controller_side"),
+                modLoc("block/aircraft_catapult_side2"),
+                modLoc("block/aircraft_catapult_side2")
+            ).texture("particle", modLoc("block/aircraft_catapult_top"))
+        )
+
+        horizontalBlock(
             ModBlocks.AIRCRAFT_CATAPULT.get(), models().cube(
                 "aircraft_catapult",
                 modLoc("block/vehicle_deployer_bottom"),
