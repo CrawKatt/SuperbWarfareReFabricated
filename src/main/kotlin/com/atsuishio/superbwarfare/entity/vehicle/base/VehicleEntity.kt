@@ -4089,7 +4089,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                     val list = level().getEntityCollisions(this, movedBox.expandTowards(0.0, -vec31.y + pVec.y, 0.0))
                     stepDown = collideBoundingBox(this, Vec3(0.0, -vec31.y + pVec.y, 0.0), movedBox, level(), list)
                 }
-                return ValkyrienSkiesCompat.adjustMovementForShipCollisions(
+                return if (!ValkyrienSkiesCompat.hasMod()) vec31.add(stepDown)
+                else ValkyrienSkiesCompat.adjustMovementForShipCollisions(
                     this, vec31.add(stepDown), this.boundingBox, this.level()
                 )
             }
@@ -4100,7 +4101,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             ignoreEntityGroundCheckStepping = false
         }
 
-        return ValkyrienSkiesCompat.adjustMovementForShipCollisions(
+        return if (!ValkyrienSkiesCompat.hasMod()) vec3
+        else ValkyrienSkiesCompat.adjustMovementForShipCollisions(
             this, vec3, this.boundingBox, this.level()
         )
     }

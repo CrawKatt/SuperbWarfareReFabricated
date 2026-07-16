@@ -122,8 +122,7 @@ open class CatapultShuttleItem : AbstractDeployerItem(Properties().rarity(Rarity
             Math.toDegrees(atan2(stepX, stepZ)).toFloat()
         } else {
             val localDir = Vec3(stepX, 0.0, stepZ)
-            val worldDir = ValkyrienSkiesCompat.toWorldDirection(level, Vec3.atCenterOf(pos), localDir)
-            Math.toDegrees(atan2(worldDir.x, worldDir.z)).toFloat()
+            Math.toDegrees(atan2(localDir.x, localDir.z)).toFloat()
         }
     }
 }

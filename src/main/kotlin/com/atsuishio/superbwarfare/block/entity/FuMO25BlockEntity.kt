@@ -314,10 +314,12 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
         ) {
 
             val range = if (blockEntity.type == FuncType.WIDER) 2048 else 1024
-            val radarPos = ValkyrienSkiesCompat.toWorldSpace(
+            val radarPos = if (!ValkyrienSkiesCompat.hasMod()) Vec3(pos.x + 0.5, pos.y + 2.5, pos.z + 0.5)
+            else ValkyrienSkiesCompat.toWorldSpace(
                 level, Vec3(pos.x + 0.5, pos.y + 2.5, pos.z + 0.5)
             )
-            val shipYaw = ValkyrienSkiesCompat.getShipYaw(level, Vec3.atCenterOf(pos)) ?: 0.0
+            val shipYaw = if (!ValkyrienSkiesCompat.hasMod()) 0.0
+            else ValkyrienSkiesCompat.getShipYaw(level, Vec3.atCenterOf(pos)) ?: 0.0
 
             val sourceId = "block_${pos.x}_${pos.y}_${pos.z}"
             val config = RadarScanner.RadarConfig(

@@ -46,7 +46,6 @@ object ValkyrienSkiesCompat {
         boundingBox: AABB,
         level: Level
     ): Vec3 {
-        if (!hasMod()) return movement
         return try {
             EntityShipCollisionUtils.adjustEntityMovementForShipCollisions(
                 entity, movement, boundingBox, level
@@ -67,7 +66,7 @@ object ValkyrienSkiesCompat {
      */
     @JvmStatic
     fun toWorldSpace(level: Level, pos: Vec3): Vec3 {
-        if (!hasMod() || level !is ServerLevel) return pos
+        if (level !is ServerLevel) return pos
 
         return try {
             val blockPos = BlockPos(pos.x.toInt(), pos.y.toInt(), pos.z.toInt())
@@ -91,7 +90,7 @@ object ValkyrienSkiesCompat {
      */
     @JvmStatic
     fun toShipSpace(level: Level, pos: Vec3): Vec3 {
-        if (!hasMod() || level !is ServerLevel) return pos
+        if (level !is ServerLevel) return pos
 
         return try {
             val blockPos = BlockPos(pos.x.toInt(), pos.y.toInt(), pos.z.toInt())
@@ -114,7 +113,7 @@ object ValkyrienSkiesCompat {
      */
     @JvmStatic
     fun getShipYaw(level: Level, pos: Vec3): Double? {
-        if (!hasMod() || level !is ServerLevel) return null
+        if (level !is ServerLevel) return null
 
         return try {
             val blockPos = BlockPos(pos.x.toInt(), pos.y.toInt(), pos.z.toInt())
@@ -127,11 +126,8 @@ object ValkyrienSkiesCompat {
         }
     }
 
-
     @JvmStatic
     fun getShipYaw(entity: Entity): Float? {
-        if (!hasMod()) return null
-
         return try {
             val level = entity.level()
             val chunkX = entity.blockX shr 4
@@ -151,8 +147,6 @@ object ValkyrienSkiesCompat {
 
     @JvmStatic
     fun getShipPitch(entity: Entity): Float? {
-        if (!hasMod()) return null
-
         return try {
             val level = entity.level()
             val chunkX = entity.blockX shr 4
@@ -174,8 +168,6 @@ object ValkyrienSkiesCompat {
      */
     @JvmStatic
     fun getShipRoll(entity: Entity): Float? {
-        if (!hasMod()) return null
-
         return try {
             val level = entity.level()
             val chunkX = entity.blockX shr 4
@@ -225,8 +217,6 @@ object ValkyrienSkiesCompat {
      */
     @JvmStatic
     fun toShipDirection(level: Level, pos: Vec3, worldDir: Vec3): Vec3 {
-        if (!hasMod()) return worldDir
-
         return try {
             val blockPos = BlockPos(pos.x.toInt(), pos.y.toInt(), pos.z.toInt())
             // 优先区块归属查询
@@ -262,7 +252,7 @@ object ValkyrienSkiesCompat {
         companion object {
             @JvmStatic
             fun create(level: Level, explosionAABB: AABB): ShipTransformCache {
-                if (!hasMod() || level !is ServerLevel) return ShipTransformCache(emptyList())
+                if (level !is ServerLevel) return ShipTransformCache(emptyList())
 
                 return try {
                     val minVec = Vec3(explosionAABB.minX, explosionAABB.minY, explosionAABB.minZ).toJOML()
@@ -321,7 +311,7 @@ object ValkyrienSkiesCompat {
         endVec: Vec3,
         ignorePredicate: Predicate<BlockState>
     ): Pair<Vec3, BlockPos>? {
-        if (!hasMod() || level !is ServerLevel) return null
+        if (level !is ServerLevel) return null
 
         return try {
             // 构建射线包围盒，用于查询相交的船舶

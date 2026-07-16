@@ -561,7 +561,10 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             base.rotation.mul(Quaternionf(quaternion))
         }
 
-        val shipYaw = vehicle.vehicle?.let { ValkyrienSkiesCompat.getShipYaw(it) } ?: 0f
+        val shipYaw = vehicle.vehicle?.let {
+            if (!ValkyrienSkiesCompat.hasMod()) null
+            else ValkyrienSkiesCompat.getShipYaw(it)
+        } ?: 0f
 
         // Turret
         val turret = model.getBone("turret")

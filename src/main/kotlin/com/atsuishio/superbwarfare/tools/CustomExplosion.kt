@@ -200,7 +200,9 @@ open class CustomExplosion(
             val numTiers = tierBoundaries.size - 1
 
             // Pre-compute VS ship transforms for block destruction on physics bodies
-            val vsShipCache = ValkyrienSkiesCompat.ShipTransformCache.create(this@CustomExplosion.level, aabb)
+            val vsShipCache = if (ValkyrienSkiesCompat.hasMod())
+                ValkyrienSkiesCompat.ShipTransformCache.create(this@CustomExplosion.level, aabb)
+            else null
 
             // ================================================================
             // Process each tier: search → filter → destroy → clear toBlow.
@@ -282,7 +284,9 @@ open class CustomExplosion(
                         val flattenedRadius = effectiveRadius * 1.2f
                         if (flattenedDistSqr > flattenedRadius * flattenedRadius) continue
 
-                        val actualPos = vsShipCache.toShipSpace(blockpos) ?: blockpos
+                        val actualPos = if (ValkyrienSkiesCompat.hasMod())
+                            vsShipCache?.toShipSpace(blockpos) ?: blockpos
+                        else blockpos
                         val blockState = this@CustomExplosion.level.getBlockState(actualPos)
                         var resistance = blockState.block.defaultDestroyTime()
                         if (blockState.soundType === SoundType.METAL || blockState.soundType === SoundType.COPPER || blockState.soundType === SoundType.NETHERITE_BLOCK) {

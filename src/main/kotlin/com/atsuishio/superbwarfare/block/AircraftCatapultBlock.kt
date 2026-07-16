@@ -48,10 +48,12 @@ open class AircraftCatapultBlock :
             val behind = pos.relative(state.getValue(FACING).opposite)
             if (level.getBlockState(behind).block is CatapultControllerBlock) {
                 val controllerState = level.getBlockState(behind)
-                level.setBlock(pos, state
-                    .setValue(LAUNCH_POWER, controllerState.getValue(CatapultControllerBlock.LAUNCH_POWER))
-                    .setValue(CONTROLLED, true)
-                    .setValue(REVERSED, !controllerState.getValue(CatapultControllerBlock.POWERED)), 3)
+                level.setBlock(
+                    pos, state
+                        .setValue(LAUNCH_POWER, controllerState.getValue(CatapultControllerBlock.LAUNCH_POWER))
+                        .setValue(CONTROLLED, true)
+                        .setValue(REVERSED, !controllerState.getValue(CatapultControllerBlock.POWERED)), 3
+                )
                 return
             }
             val neighborPower = this.getFacingPower(level, pos, state)
@@ -124,7 +126,6 @@ open class AircraftCatapultBlock :
     }
 
 
-
     override fun entityInside(pState: BlockState, pLevel: Level, pPos: BlockPos, pEntity: Entity) {
         super.entityInside(pState, pLevel, pPos, pEntity)
         if (pEntity !is CatapultShuttleEntity) return
@@ -140,7 +141,8 @@ open class AircraftCatapultBlock :
         val direction = state.getValue(FACING)
         val rate = power / 75f
         val localDir = Vec3(direction.stepX.toDouble(), 0.0, direction.stepZ.toDouble())
-        val worldDir = ValkyrienSkiesCompat.toWorldDirection(pLevel, Vec3.atCenterOf(pPos), localDir)
+        val worldDir = if (!ValkyrienSkiesCompat.hasMod()) localDir
+        else ValkyrienSkiesCompat.toWorldDirection(pLevel, Vec3.atCenterOf(pPos), localDir)
         val moveDir = if (state.getValue(REVERSED)) worldDir.scale(-1.0) else worldDir
         if (pEntity.deltaMovement.dot(moveDir) < 0.2 * power) {
             pEntity.addDeltaMovement(Vec3(moveDir.x * rate, moveDir.y * rate, moveDir.z * rate))
@@ -157,8 +159,7 @@ open class AircraftCatapultBlock :
             Math.toDegrees(atan2(stepX, stepZ)).toFloat()
         } else {
             val localDir = Vec3(stepX, 0.0, stepZ)
-            val worldDir = ValkyrienSkiesCompat.toWorldDirection(level, Vec3.atCenterOf(pos), localDir)
-            Math.toDegrees(atan2(worldDir.x, worldDir.z)).toFloat()
+            Math.toDegrees(atan2(localDir.x, localDir.z)).toFloat()
         }
     }
 
