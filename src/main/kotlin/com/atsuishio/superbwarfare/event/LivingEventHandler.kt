@@ -124,11 +124,12 @@ object LivingEventHandler {
                     event.isCanceled = true
                 }
             } else {
+                val rate = vehicle.getSeat(entity)?.damageAbsorbRate ?: 0.0f
                 if (!source.`is`(ModTags.DamageTypes.VEHICLE_NOT_ABSORB)) {
-                    vehicle.hurt(source, 0.7f * event.amount)
+                    vehicle.hurt(source, rate.coerceIn(0f, 1f) * event.amount)
                 }
 
-                event.amount *= 0.3f
+                event.amount *= (1 - rate).coerceIn(0f, 1f)
             }
         }
     }

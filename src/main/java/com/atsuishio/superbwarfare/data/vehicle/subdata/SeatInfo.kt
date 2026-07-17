@@ -71,4 +71,7 @@ class SeatInfo {
 
     @SerialName("DismountInfo")
     var dismountInfo: DismountInfo? = null
+
+    @SerialName("DamageAbsorbRate")
+    var damageAbsorbRate: Float = 0.7f
 }
