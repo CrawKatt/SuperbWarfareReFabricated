@@ -49,6 +49,7 @@ class ModBlockTagProvider(
             ModBlocks.SMALL_CONTAINER.get(),
             ModBlocks.VEHICLE_DEPLOYER.get(),
             ModBlocks.AIRCRAFT_CATAPULT.get(),
+            ModBlocks.CATAPULT_CONTROLLER.get(),
             ModBlocks.SUPERB_ITEM_INTERFACE.get(),
             ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE.get(),
             ModBlocks.LUCKY_CONTAINER.get(),

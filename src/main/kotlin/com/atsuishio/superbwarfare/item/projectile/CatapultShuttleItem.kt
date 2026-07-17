@@ -99,6 +99,7 @@ open class CatapultShuttleItem : AbstractDeployerItem(Properties().rarity(Rarity
             }
         }
     }
+
     override fun spawnDeployedEntity(
         level: Level,
         player: Player
