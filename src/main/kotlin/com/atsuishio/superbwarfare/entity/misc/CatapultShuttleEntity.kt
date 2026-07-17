@@ -1,4 +1,4 @@
-package com.atsuishio.superbwarfare.entity.entity
+package com.atsuishio.superbwarfare.entity.misc
 
 import com.atsuishio.superbwarfare.init.ModEntities
 import net.minecraft.nbt.CompoundTag

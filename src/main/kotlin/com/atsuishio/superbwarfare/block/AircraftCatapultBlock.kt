@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.block
 
 import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
-import com.atsuishio.superbwarfare.entity.entity.CatapultShuttleEntity
+import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel

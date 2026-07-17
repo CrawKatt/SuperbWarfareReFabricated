@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.item.projectile
 
 import com.atsuishio.superbwarfare.block.AircraftCatapultBlock
 import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
-import com.atsuishio.superbwarfare.entity.entity.CatapultShuttleEntity
+import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.item.misc.AbstractDeployerItem
 import net.minecraft.core.BlockPos
