@@ -48,7 +48,7 @@ open class CatapultShuttleItem : AbstractDeployerItem(Properties().rarity(Rarity
             }
 
             val entity = this.spawnDeployedEntity(level, player)
-            entity.setPos(pos.x.toDouble() + 0.5, pos.y.toDouble() - 1, pos.z.toDouble() + 0.5)
+            entity.setPos(pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5)
             entity.yRot = getWorldYRot(level, pos, blockstate)
             level.addFreshEntity(entity)
 
@@ -82,7 +82,7 @@ open class CatapultShuttleItem : AbstractDeployerItem(Properties().rarity(Rarity
                 val entity = this.spawnDeployedEntity(level, player)
                 entity.setPos(
                     blockpos.x.toDouble() + 0.5,
-                    blockpos.y.toDouble() - 1,
+                    blockpos.y.toDouble(),
                     blockpos.z.toDouble() + 0.5
                 )
                 entity.yRot = getWorldYRot(level, blockpos, blockstate)

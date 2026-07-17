@@ -1,13 +1,9 @@
 package com.atsuishio.superbwarfare.block
 
-import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
-import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
@@ -19,8 +15,6 @@ import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.block.state.properties.DirectionProperty
 import net.minecraft.world.level.block.state.properties.IntegerProperty
-import net.minecraft.world.phys.Vec3
-import kotlin.math.atan2
 import kotlin.math.max
 
 @Suppress("OVERRIDE_DEPRECATION")
@@ -123,44 +117,6 @@ open class AircraftCatapultBlock :
             max = max(max, blockState.getValue(LAUNCH_POWER))
         }
         return max
-    }
-
-
-    override fun entityInside(pState: BlockState, pLevel: Level, pPos: BlockPos, pEntity: Entity) {
-        super.entityInside(pState, pLevel, pPos, pEntity)
-        if (pEntity !is CatapultShuttleEntity) return
-
-        val diffY = Mth.wrapDegrees(getWorldYRot(pLevel, pPos, pState) - pEntity.yRot)
-        pEntity.yRot += 0.9f * diffY
-        pEntity.yRotO += 0.9f * diffY
-
-        val state = pLevel.getBlockState(pPos)
-        val power = state.getValue(LAUNCH_POWER)
-        if (power == 0) return
-
-        val direction = state.getValue(FACING)
-        val rate = power / 75f
-        val localDir = Vec3(direction.stepX.toDouble(), 0.0, direction.stepZ.toDouble())
-        val worldDir = if (!ValkyrienSkiesCompat.hasMod()) localDir
-        else ValkyrienSkiesCompat.toWorldDirection(pLevel, Vec3.atCenterOf(pPos), localDir)
-        val moveDir = if (state.getValue(REVERSED)) worldDir.scale(-1.0) else worldDir
-        if (pEntity.deltaMovement.dot(moveDir) < 0.2 * power) {
-            pEntity.addDeltaMovement(Vec3(moveDir.x * rate, moveDir.y * rate, moveDir.z * rate))
-        }
-    }
-
-    private fun getWorldYRot(level: Level, pos: BlockPos, blockstate: BlockState): Float {
-        val facing = blockstate.getValue(FACING)
-        val stepX = facing.stepX.toDouble()
-        val stepZ = facing.stepZ.toDouble()
-
-        return if (ValkyrienSkiesCompat.hasMod()) {
-            // Shipyard entity 使用船舶局部 yaw
-            Math.toDegrees(atan2(stepX, stepZ)).toFloat()
-        } else {
-            val localDir = Vec3(stepX, 0.0, stepZ)
-            Math.toDegrees(atan2(localDir.x, localDir.z)).toFloat()
-        }
     }
 
     companion object {
