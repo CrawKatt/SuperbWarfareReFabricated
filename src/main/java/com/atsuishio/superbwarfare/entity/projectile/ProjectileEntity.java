@@ -44,6 +44,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
@@ -599,8 +600,9 @@ public class ProjectileEntity extends Projectile implements GeoEntity, CustomSyn
 
         if (ProjectileHitCallback.postHitEntity(new ProjectileHitEvent.HitEntity(this.shooter, this, result))) return;
 
-        // TODO Fabric: No PartEntity equivalent - handle multipart entities differently
-        // if (entity instanceof PartEntity) { entity = ((PartEntity) entity).getParent(); }
+        if (entity instanceof EnderDragonPart part) {
+            entity = part.parentMob;
+        }
 
         if (entity instanceof LivingEntity living) {
             living.level().playSound(null, living.getOnPos(), ModSounds.MELEE_HIT.get(), SoundSource.PLAYERS, 1, (float) (2 * Math.random() - 1) * 0.1f + 1.0f);

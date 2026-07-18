@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.capability.energy;
 
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Function;
@@ -24,37 +23,12 @@ public class ItemEnergyStorage extends DynamicEnergyStorage {
 
         this.stack = stack;
         if (stack.getTag() != null) {
-            this.amount = stack.hasTag() && stack.getTag().contains(NBT_ENERGY) ? stack.getTag().getInt(NBT_ENERGY) : 0;
+            this.amount = stack.hasTag() && stack.getTag().contains(NBT_ENERGY) ? stack.getTag().getLong(NBT_ENERGY) : 0;
         }
     }
 
     @Override
-    public long insert(long maxAmount, TransactionContext transaction) {
-        long inserted = super.insert(maxAmount, transaction);
-
-        if (inserted > 0) {
-            transaction.addCloseCallback((transactionContext, result) -> {
-                if (result.wasCommitted()) {
-                    stack.getOrCreateTag().putLong(NBT_ENERGY, getAmount());
-                }
-            });
-        }
-
-        return inserted;
-    }
-
-    @Override
-    public long extract(long maxAmount, TransactionContext transaction) {
-        long extracted = super.extract(maxAmount, transaction);
-
-        if (extracted > 0) {
-            transaction.addCloseCallback((transactionContext, result) -> {
-                if (result.wasCommitted()) {
-                    stack.getOrCreateTag().putLong(NBT_ENERGY, getAmount());
-                }
-            });
-        }
-
-        return extracted;
+    protected void onFinalCommit() {
+        stack.getOrCreateTag().putLong(NBT_ENERGY, getAmount());
     }
 }

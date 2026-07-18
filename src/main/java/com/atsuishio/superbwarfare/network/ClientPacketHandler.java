@@ -105,6 +105,13 @@ public class ClientPacketHandler {
         ClientEventHandler.tdmSavedData = message.data();
     }
 
+    public static void handleModVersionMismatch(ModVersionMismatchMessage message) {
+        Player player = Minecraft.getInstance().player;
+        if (player != null) {
+            ClientEventHandler.onModVersionMismatch(player, message.previousVersion(), message.currentVersion());
+        }
+    }
+
     public static void handleSoundClient(SoundClientMessage message) {
         Player player = Minecraft.getInstance().player;
         if (player == null) return;

@@ -4,30 +4,46 @@ import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.network.message.receive.*;
 import com.atsuishio.superbwarfare.network.message.send.*;
 import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class NetworkRegistry {
 
+    private static final String PROTOCOL_VERSION = "1";
+    private static final ResourceLocation PROTOCOL_CHANNEL = new ResourceLocation(Mod.MODID, Mod.MODID);
     private static final Map<Class<?>, MessageEntry<?>> MESSAGES = new HashMap<>();
+    private static final Queue<PendingSpawnData> PENDING_SPAWN_DATA = new ConcurrentLinkedQueue<>();
 
     private record MessageEntry<T>(ResourceLocation id, BiConsumer<T, FriendlyByteBuf> encoder) {
     }
 
+    private record PendingSpawnData(Entity entity, ServerPlayer player, EntitySpawnDataMessage message) {
+    }
+
     public static void register() {
+        registerProtocolHandshake();
 
         // ========== Client-bound (S2C) ==========
 
@@ -66,6 +82,8 @@ public class NetworkRegistry {
                 SoundClientMessage::decode, SoundClientMessage::handler);
         registerS2C(EntitySpawnDataMessage.class, EntitySpawnDataMessage::encode,
                 EntitySpawnDataMessage::decode, EntitySpawnDataMessage::handler);
+        registerS2C(ModVersionMismatchMessage.class, ModVersionMismatchMessage::encode,
+                ModVersionMismatchMessage::decode, ModVersionMismatchMessage::handler);
 
         // ========== Server-bound (C2S) ==========
 
@@ -142,14 +160,78 @@ public class NetworkRegistry {
         registerC2S(WeaponZoomingMessage.class, WeaponZoomingMessage::encode,
                 WeaponZoomingMessage::decode, WeaponZoomingMessage::handler);
 
-        // TODO: Phase 4 — migrate RegisterContainersEvent (was posted here in Forge)
+        registerSpawnDataSync();
+    }
+
+    private static void registerProtocolHandshake() {
+        boolean receiverRegistered = ServerLoginNetworking.registerGlobalReceiver(PROTOCOL_CHANNEL,
+                (server, handler, understood, buffer, synchronizer, responseSender) -> {
+                    if (!understood) {
+                        handler.disconnect(Component.literal(
+                                "This server requires Superb Warfare (Fabric) with network protocol "
+                                        + PROTOCOL_VERSION + ". Install the matching mod version."));
+                        return;
+                    }
+
+                    final String clientProtocol;
+                    try {
+                        clientProtocol = buffer.readUtf(32);
+                    } catch (RuntimeException exception) {
+                        handler.disconnect(Component.literal(
+                                "Invalid Superb Warfare login response. Install the matching mod version "
+                                        + "(network protocol " + PROTOCOL_VERSION + ")."));
+                        return;
+                    }
+
+                    if (!PROTOCOL_VERSION.equals(clientProtocol)) {
+                        handler.disconnect(Component.literal(
+                                "Incompatible Superb Warfare network protocol (server: "
+                                        + PROTOCOL_VERSION + ", client: " + clientProtocol
+                                        + "). Install the matching mod version."));
+                    }
+                });
+
+        if (!receiverRegistered) {
+            throw new IllegalStateException("Duplicate Superb Warfare login protocol receiver");
+        }
+
+        ServerLoginConnectionEvents.QUERY_START.register((handler, server, sender, synchronizer) -> {
+            FriendlyByteBuf buffer = PacketByteBufs.create();
+            buffer.writeUtf(PROTOCOL_VERSION);
+            sender.sendPacket(PROTOCOL_CHANNEL, buffer);
+        });
+
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            ClientNetworkRegistry.registerLoginHandshake(PROTOCOL_CHANNEL, PROTOCOL_VERSION);
+        }
+    }
+
+    private static void registerSpawnDataSync() {
+        EntityTrackingEvents.START_TRACKING.register((entity, player) -> {
+            if (entity instanceof CustomSpawnDataEntity) {
+                PENDING_SPAWN_DATA.add(new PendingSpawnData(
+                        entity, player, new EntitySpawnDataMessage(entity)));
+            }
+        });
+
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            PendingSpawnData pending;
+            while ((pending = PENDING_SPAWN_DATA.poll()) != null) {
+                if (!pending.entity().isRemoved()
+                        && PlayerLookup.tracking(pending.entity()).contains(pending.player())) {
+                    sendToPlayer(pending.player(), pending.message());
+                }
+            }
+        });
+
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> PENDING_SPAWN_DATA.clear());
     }
 
     // ========== S2C (Client-bound) Registration ==========
 
     private static <T> void registerS2C(Class<T> type, BiConsumer<T, FriendlyByteBuf> encoder,
                                          Function<FriendlyByteBuf, T> decoder, Consumer<T> handler) {
-        var id = new ResourceLocation(Mod.MODID, "s2c_" + type.getSimpleName().toLowerCase());
+        var id = new ResourceLocation(Mod.MODID, "s2c_" + type.getSimpleName().toLowerCase(Locale.ROOT));
         MESSAGES.put(type, new MessageEntry<>(id, encoder));
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             ClientNetworkRegistry.registerS2C(id, decoder, handler);
@@ -159,7 +241,7 @@ public class NetworkRegistry {
     @SuppressWarnings("unchecked")
     private static <T> void registerS2C(T instance, Runnable handler) {
         var type = (Class<T>) instance.getClass();
-        var id = new ResourceLocation(Mod.MODID, "s2c_" + type.getSimpleName().toLowerCase());
+        var id = new ResourceLocation(Mod.MODID, "s2c_" + type.getSimpleName().toLowerCase(Locale.ROOT));
         MESSAGES.put(type, new MessageEntry<>(id, (msg, buf) -> {}));
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             ClientNetworkRegistry.registerS2C(id, handler);
@@ -170,7 +252,7 @@ public class NetworkRegistry {
 
     private static <T> void registerC2S(Class<T> type, BiConsumer<T, FriendlyByteBuf> encoder,
                                          Function<FriendlyByteBuf, T> decoder, BiConsumer<T, ServerPlayer> handler) {
-        var id = new ResourceLocation(Mod.MODID, "c2s_" + type.getSimpleName().toLowerCase());
+        var id = new ResourceLocation(Mod.MODID, "c2s_" + type.getSimpleName().toLowerCase(Locale.ROOT));
         MESSAGES.put(type, new MessageEntry<>(id, encoder));
         ServerPlayNetworking.registerGlobalReceiver(id, (server, player, handlerNet, buf, responseSender) -> {
             T message = decoder.apply(buf);
@@ -181,7 +263,7 @@ public class NetworkRegistry {
     @SuppressWarnings("unchecked")
     private static <T> void registerC2S(T instance, Consumer<ServerPlayer> handler) {
         var type = (Class<T>) instance.getClass();
-        var id = new ResourceLocation(Mod.MODID, "c2s_" + type.getSimpleName().toLowerCase());
+        var id = new ResourceLocation(Mod.MODID, "c2s_" + type.getSimpleName().toLowerCase(Locale.ROOT));
         MESSAGES.put(type, new MessageEntry<>(id, (msg, buf) -> {}));
         ServerPlayNetworking.registerGlobalReceiver(id, (server, player, handlerNet, buf, responseSender) -> {
             server.execute(() -> handler.accept(player));
@@ -221,13 +303,8 @@ public class NetworkRegistry {
     }
 
     public static <T> void sendToTracking(Entity entity, T message) {
-        var server = Mod.getServer();
-        if (server != null) {
-            for (var player : server.getPlayerList().getPlayers()) {
-                if (player.distanceToSqr(entity) < 1024.0) {
-                    sendToPlayer(player, message);
-                }
-            }
+        for (var player : PlayerLookup.tracking(entity)) {
+            sendToPlayer(player, message);
         }
     }
 

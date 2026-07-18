@@ -21,6 +21,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -43,6 +44,7 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import team.reborn.energy.api.EnergyStorage;
+import team.reborn.energy.api.EnergyStorageUtil;
 
 public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
 
@@ -117,10 +119,7 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
         energyStorage.setMaxExtract(this.getMaxTransfer());
 
         if (pCompound.contains("Energy")) {
-            try (var t = Transaction.openOuter()) {
-                energyStorage.insert(pCompound.getLong("Energy"), t);
-                t.commit();
-            }
+            energyStorage.setEnergy((int) Mth.clamp(pCompound.getLong("Energy"), 0L, this.getMaxEnergy()));
         }
     }
 
@@ -180,7 +179,10 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
             }
 
             if (!player.getAbilities().instabuild) {
-                player.addItem(new ItemStack(ModItems.DPS_GENERATOR_DEPLOYER.get()));
+                var stack = new ItemStack(ModItems.DPS_GENERATOR_DEPLOYER.get());
+                if (!player.addItem(stack)) {
+                    player.drop(stack, false);
+                }
             }
         } else {
             this.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3((player.getX()), this.getY(), (player.getZ())));
@@ -318,9 +320,8 @@ public class DPSGeneratorEntity extends LivingEntity implements GeoEntity {
         if (blockEnergy == null || !blockEnergy.supportsInsertion()) return;
 
         try (var t = Transaction.openOuter()) {
-            long extracted = energyStorage.extract(energyStorage.getAmount(), t);
-            long inserted = blockEnergy.insert(extracted, t);
-            if (inserted > 0) {
+            long transferred = EnergyStorageUtil.move(energyStorage, blockEnergy, energyStorage.getAmount(), t);
+            if (transferred > 0) {
                 t.commit();
                 this.level().blockEntityChanged(blockPos);
             }

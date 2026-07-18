@@ -44,7 +44,15 @@ public final class VehicleVecUtils {
 
     public static double getSubmergedHeight(Entity entity) {
         var fluidState = entity.level().getFluidState(entity.blockPosition());
-        return entity.getFluidHeight(FluidTags.WATER);
+        if (fluidState.is(FluidTags.WATER)) {
+            return entity.getFluidHeight(FluidTags.WATER);
+        }
+
+        if (fluidState.is(FluidTags.LAVA)) {
+            return entity.getFluidHeight(FluidTags.LAVA);
+        }
+
+        return Math.max(entity.getFluidHeight(FluidTags.WATER), entity.getFluidHeight(FluidTags.LAVA));
     }
 
     public static Quaternionf eulerToQuaternion(float yaw, float pitch, float roll) {

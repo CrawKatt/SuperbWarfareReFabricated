@@ -17,12 +17,12 @@ public class InfinityEnergyStorage implements EnergyStorage {
 
     @Override
     public long getAmount() {
-        return Long.MAX_VALUE;
+        return Integer.MAX_VALUE;
     }
 
     @Override
     public long getCapacity() {
-        return Long.MAX_VALUE;
+        return Integer.MAX_VALUE;
     }
 
     @Override

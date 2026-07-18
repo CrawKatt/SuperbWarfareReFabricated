@@ -10,6 +10,9 @@ public interface LivingDeathCallback {
             callbacks -> event -> {
                 for (LivingDeathCallback callback : callbacks) {
                     callback.onLivingDeath(event);
+                    if (event.isCanceled()) {
+                        return;
+                    }
                 }
             }
     );

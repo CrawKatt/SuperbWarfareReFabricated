@@ -14,11 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GuiGraphics.class)
 public class GuiGraphicsMixin {
 
-    @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;II)V", at = @At("TAIL"))
-    private void superbwarfare$renderContainerItemDecorator(Font font, ItemStack stack, int x, int y, CallbackInfo ci) {
-        renderSuperbWarfareDecorators(font, stack, x, y);
-    }
-
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("TAIL"))
     private void superbwarfare$renderContainerItemDecorator(Font font, ItemStack stack, int x, int y, String text, CallbackInfo ci) {
         renderSuperbWarfareDecorators(font, stack, x, y);

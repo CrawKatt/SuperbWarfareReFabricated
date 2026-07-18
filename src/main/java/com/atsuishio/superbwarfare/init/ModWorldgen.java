@@ -51,7 +51,7 @@ public class ModWorldgen {
 
         BiomeModifications.addSpawn(
                 BiomeSelectors.includeByKey(SENPAI_BIOMES),
-                MobCategory.CREATURE,
+                MobCategory.MONSTER,
                 ModEntities.SENPAI.get(),
                 20, 4, 4
         );

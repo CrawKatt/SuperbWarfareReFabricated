@@ -83,9 +83,13 @@ public class LivingEventHandler {
             }
         });
 
-        MobEffectAddedCallback.EVENT.register((entity, effect, source) -> {
-            if (onEffectApply(effect, entity)) {
-                entity.removeEffect(effect.getEffect());
+        PreKillCallback.EVENT.register(event -> {
+            if (event instanceof PreKillEvent.SendKillMessage sendKillMessage
+                    && onPreSendKillMessage(sendKillMessage)) {
+                event.setCanceled(true);
+            } else if (event instanceof PreKillEvent.Indicator indicator
+                    && onPreIndicator(indicator)) {
+                event.setCanceled(true);
             }
         });
     }
@@ -357,7 +361,7 @@ public class LivingEventHandler {
 
     // TODO: Register in Mod.java using Fabric event API
     public static void handleChangeSlot(Player player, EquipmentSlot slot, ItemStack from, ItemStack to) {
-        if (player.level().isClientSide) {
+        if (slot != EquipmentSlot.MAINHAND || player.level().isClientSide) {
             return;
         }
 

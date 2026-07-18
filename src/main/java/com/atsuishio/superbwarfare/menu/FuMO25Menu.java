@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.menu;
 
+import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity;
 import com.atsuishio.superbwarfare.init.ModBlocks;
 import com.atsuishio.superbwarfare.init.ModItems;
@@ -67,7 +68,12 @@ public class FuMO25Menu extends EnergyMenu {
         }
 
         if (inventory.player instanceof ServerPlayer serverPlayer) {
-            this.getSelfPos().ifPresent(pos -> NetworkRegistry.sendToPlayer(serverPlayer, new RadarMenuOpenMessage(pos)));
+            Mod.queueServerWork(1, () -> {
+                if (serverPlayer.containerMenu == this) {
+                    this.startUsing(serverPlayer);
+                    this.getSelfPos().ifPresent(pos -> NetworkRegistry.sendToPlayer(serverPlayer, new RadarMenuOpenMessage(pos)));
+                }
+            });
         }
     }
 
@@ -170,6 +176,8 @@ public class FuMO25Menu extends EnergyMenu {
             this.container.removeItemNoUpdate(0);
             resetPos();
         });
+
+        super.removed(pPlayer);
     }
 
     public long getEnergy() {

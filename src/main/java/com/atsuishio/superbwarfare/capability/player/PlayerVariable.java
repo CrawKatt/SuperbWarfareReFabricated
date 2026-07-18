@@ -1,21 +1,44 @@
 package com.atsuishio.superbwarfare.capability.player;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.capability.ModCapabilities;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
-import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
-public class PlayerVariable implements Component {
+public class PlayerVariable implements AutoSyncedComponent {
 
     public static ResourceLocation ID = Mod.loc("player_variables");
     private PlayerVariable old = null;
 
     public Map<Ammo, Integer> ammo = new HashMap<>();
     public boolean tacticalSprint = false;
+
+    public static PlayerVariable getOrDefault(Entity entity) {
+        return ModCapabilities.PLAYER_VARIABLE.maybeGet(entity).orElseGet(PlayerVariable::new);
+    }
+
+    /**
+     * Mutates a player's persistent variables on the logical server and synchronizes
+     * the component if its contents actually changed.
+     */
+    public static void modify(Entity entity, Consumer<PlayerVariable> consumer) {
+        if (entity.level().isClientSide) return;
+
+        ModCapabilities.PLAYER_VARIABLE.maybeGet(entity).ifPresent(variable -> {
+            var old = variable.copy();
+            consumer.accept(variable);
+            if (!old.equals(variable)) {
+                ModCapabilities.PLAYER_VARIABLE.sync(entity);
+            }
+        });
+    }
 
     public PlayerVariable watch() {
         this.old = this.copy();

@@ -119,7 +119,7 @@ public enum Ammo {
     }
 
     public void set(Player player, int count) {
-        set(ModCapabilities.PLAYER_VARIABLE.get(player), Math.max(0, count));
+        PlayerVariable.modify(player, variable -> set(variable, Math.max(0, count)));
     }
 
     public void add(Player player, int count) {

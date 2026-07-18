@@ -50,7 +50,7 @@ public class CreativeChargingStationBlock extends BaseEntityBlock {
         if (energy == null) return InteractionResult.FAIL;
         if (energy.supportsInsertion() && energy.getAmount() < energy.getCapacity()) {
             try (Transaction t = Transaction.openOuter()) {
-                energy.insert(Long.MAX_VALUE, t);
+                energy.insert(Integer.MAX_VALUE, t);
                 t.commit();
             }
             if (!level.isClientSide) {
@@ -59,7 +59,7 @@ public class CreativeChargingStationBlock extends BaseEntityBlock {
             return InteractionResult.SUCCESS;
         } else if (energy.supportsExtraction()) {
             try (Transaction t = Transaction.openOuter()) {
-                energy.extract(Long.MAX_VALUE, t);
+                energy.extract(Integer.MAX_VALUE, t);
                 t.commit();
             }
             if (!level.isClientSide) {

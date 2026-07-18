@@ -3,6 +3,7 @@ accessWidener v2 named
 accessible class net/minecraft/server/level/DistanceManager$PlayerTicketTracker
 
 accessible method net/minecraft/client/multiplayer/ClientLevel getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
+accessible method net/minecraft/server/level/ServerLevel getEntities ()Lnet/minecraft/world/level/entity/LevelEntityGetter;
 
 accessible field net/minecraft/client/player/LocalPlayer handsBusy Z
 

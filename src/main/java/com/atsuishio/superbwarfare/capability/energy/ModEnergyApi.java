@@ -7,9 +7,12 @@ import com.atsuishio.superbwarfare.item.BatteryItem;
 import com.atsuishio.superbwarfare.item.ElectricBaton;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
+import org.jetbrains.annotations.Nullable;
 import team.reborn.energy.api.EnergyStorage;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
@@ -34,6 +37,19 @@ public class ModEnergyApi {
                 ModBlockEntities.FUMO_25.get()
         );
 
+        ItemStorage.SIDED.registerForBlockEntity(
+                (blockEntity, direction) -> InventoryStorage.of(blockEntity, direction),
+                ModBlockEntities.CHARGING_STATION.get()
+        );
+        ItemStorage.SIDED.registerForBlockEntity(
+                (blockEntity, direction) -> InventoryStorage.of(blockEntity, direction),
+                ModBlockEntities.SUPERB_ITEM_INTERFACE.get()
+        );
+        ItemStorage.SIDED.registerForBlockEntity(
+                (blockEntity, direction) -> InventoryStorage.of(blockEntity, direction),
+                ModBlockEntities.CREATIVE_SUPERB_ITEM_INTERFACE.get()
+        );
+
         EnergyStorage.ITEM.registerForItems((stack, context) -> {
             return new ItemEnergyStorage(stack,
                     ModEnergyApi::getBatteryCapacity,
@@ -47,6 +63,9 @@ public class ModEnergyApi {
                     s -> (long) ElectricBaton.MAX_ENERGY,
                     s -> (long) ElectricBaton.MAX_ENERGY);
         }, ModItems.ELECTRIC_BATON.get());
+
+        EnergyStorage.ITEM.registerForItems((stack, context) -> new InfinityEnergyStorage(),
+                ModItems.CREATIVE_CHARGING_STATION.get());
 
         EnergyStorage.ITEM.registerForItems((stack, context) -> {
             return new ItemEnergyStorage(stack,
@@ -93,15 +112,21 @@ public class ModEnergyApi {
         return new SimpleEnergyStorage(capacity, maxInsert, maxExtract);
     }
 
-    public static int getEnergyStored(EnergyStorage storage) {
-        return (int) storage.getAmount();
+    public static int getEnergyStored(@Nullable EnergyStorage storage) {
+        return storage == null ? 0 : saturatingEnergy(storage.getAmount());
     }
 
-    public static int getMaxEnergyStored(EnergyStorage storage) {
-        return (int) storage.getCapacity();
+    public static int getMaxEnergyStored(@Nullable EnergyStorage storage) {
+        return storage == null ? 0 : saturatingEnergy(storage.getCapacity());
     }
 
-    public static int receiveEnergy(EnergyStorage storage, int maxReceive, boolean simulate) {
+    private static int saturatingEnergy(long amount) {
+        if (amount <= 0) return 0;
+        return amount >= Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) amount;
+    }
+
+    public static int receiveEnergy(@Nullable EnergyStorage storage, int maxReceive, boolean simulate) {
+        if (storage == null) return 0;
         try (Transaction t = Transaction.openOuter()) {
             long received = storage.insert(maxReceive, t);
             if (!simulate) {
@@ -111,7 +136,8 @@ public class ModEnergyApi {
         }
     }
 
-    public static int extractEnergy(EnergyStorage storage, int maxExtract, boolean simulate) {
+    public static int extractEnergy(@Nullable EnergyStorage storage, int maxExtract, boolean simulate) {
+        if (storage == null) return 0;
         try (Transaction t = Transaction.openOuter()) {
             long extracted = storage.extract(maxExtract, t);
             if (!simulate) {
@@ -121,12 +147,9 @@ public class ModEnergyApi {
         }
     }
 
+    @Nullable
     public static EnergyStorage get(ItemStack stack) {
-        var storage = EnergyStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
-        if (storage == null) {
-            return new SimpleEnergyStorage(0, 0, 0);
-        }
-        return storage;
+        return EnergyStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
     }
 
     public static int getEnergyStored(ItemStack stack) {
@@ -146,6 +169,6 @@ public class ModEnergyApi {
     }
 
     public static boolean hasEnergy(ItemStack stack) {
-        return getEnergyStored(stack) > 0;
+        return get(stack) != null;
     }
 }

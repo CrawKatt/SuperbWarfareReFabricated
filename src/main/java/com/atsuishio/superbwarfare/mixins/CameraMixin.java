@@ -65,6 +65,7 @@ public abstract class CameraMixin implements ICustomCamera {
 
                         setRotation(drone.getYaw(partialTicks), drone.getPitch(partialTicks));
                         setPosition(worldPosition.x, worldPosition.y, worldPosition.z);
+                        superbwarfare$applyComputedAngles(partialTicks);
                         info.cancel();
                     } else {
                         var rotation = drone.getCameraRotation(partialTicks, player, false, false);
@@ -77,6 +78,7 @@ public abstract class CameraMixin implements ICustomCamera {
                         }
 
                         if (rotation != null || position != null) {
+                            superbwarfare$applyComputedAngles(partialTicks);
                             info.cancel();
                         }
                     }
@@ -110,6 +112,7 @@ public abstract class CameraMixin implements ICustomCamera {
                 }
 
                 if (rotation != null || position != null) {
+                    superbwarfare$applyComputedAngles(partialTicks);
                     info.cancel();
                 }
 
@@ -140,25 +143,21 @@ public abstract class CameraMixin implements ICustomCamera {
                 && Math.max(ClientEventHandler.bowPullPos, ClientEventHandler.zoomPos) > 0
         ) {
             move(-getMaxZoom(-2.9 * Math.max(ClientEventHandler.bowPullPos, ClientEventHandler.zoomPos)), 0, -ClientEventHandler.cameraLocation * Math.max(ClientEventHandler.bowPullPos, ClientEventHandler.zoomPos));
-            return;
+        } else if (thirdPerson && entity.getVehicle() instanceof VehicleEntity vehicle) {
+            var cameraPosition = vehicle.getThirdPersonCameraPosition();
+            move(-getMaxZoom(cameraPosition.x()), cameraPosition.y(), cameraPosition.z());
         }
 
-        if (!thirdPerson || !(entity.getVehicle() instanceof VehicleEntity vehicle)) {
-            fireComputeCameraAngles(entity, tickDelta);
-            return;
-        }
-
-        var cameraPosition = vehicle.getThirdPersonCameraPosition();
-        move(-getMaxZoom(cameraPosition.x()), cameraPosition.y(), cameraPosition.z());
-        fireComputeCameraAngles(entity, tickDelta);
+        superbwarfare$applyComputedAngles(tickDelta);
     }
 
     @Unique
-    private void fireComputeCameraAngles(Entity entity, float tickDelta) {
+    private void superbwarfare$applyComputedAngles(float tickDelta) {
         ComputeCameraAnglesCallback.Event event = new ComputeCameraAnglesCallback.Event(
                 (Camera) (Object) this, tickDelta, this.yRot, this.xRot, 0
         );
         ComputeCameraAnglesCallback.EVENT.invoker().onComputeCameraAngles(event);
+        this.setRotation(event.getYaw(), event.getPitch());
     }
 
     @Shadow

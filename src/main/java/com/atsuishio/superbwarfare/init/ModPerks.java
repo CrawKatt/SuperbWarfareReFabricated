@@ -78,13 +78,37 @@ public class ModPerks {
     public static final Supplier<Perk> ONE_TWO_PUNCH = damage("one_two_punch", OneTwoPunch::new);
 
     public static void register() {
-
+        registerAll(AMMO_PERKS);
+        registerAll(FUNC_PERKS);
+        registerAll(DAMAGE_PERKS);
     }
 
-    public record NamedSupplier<T>(String name, Supplier<T> supplier) implements Supplier<T> {
+    private static void registerAll(List<NamedSupplier<Perk>> perks) {
+        for (NamedSupplier<Perk> perk : perks) {
+            Registry.register(PERK_REGISTRY, Mod.loc(perk.name()), perk.get());
+        }
+    }
+
+    public static final class NamedSupplier<T> implements Supplier<T> {
+        private final String name;
+        private final Supplier<T> factory;
+        private T value;
+
+        public NamedSupplier(String name, Supplier<T> factory) {
+            this.name = name;
+            this.factory = factory;
+        }
+
+        public String name() {
+            return this.name;
+        }
+
         @Override
         public T get() {
-            return supplier.get();
+            if (this.value == null) {
+                this.value = this.factory.get();
+            }
+            return this.value;
         }
     }
 
@@ -113,7 +137,7 @@ public class ModPerks {
         if (FabricLoader.getInstance().isModLoaded(CompatHolder.VRC)) {
             AMMO_PERKS.add(new NamedSupplier<>("curse_flame_bullet",
                     () -> new AmmoPerk(new AmmoPerk.Builder("curse_flame_bullet", Perk.Type.AMMO)
-                            .bypassArmorRate(0.0f).damageRate(1.2f).speedRate(0.9f).rgb(0xB1, 0xC1, 0xF2).mobEffect(() -> CompatHolder.VRC_CURSE_FLAME))));
+                            .bypassArmorRate(0.0f).damageRate(1.2f).speedRate(0.9f).rgb(0xB1, 0xC1, 0xF2).mobEffect(CompatHolder::getVrcCurseFlame))));
             AMMO_PERKS.add(new NamedSupplier<>("butterfly_bullet",
                     () -> new AmmoPerk(new AmmoPerk.Builder("butterfly_bullet", Perk.Type.AMMO)
                             .bypassArmorRate(0.0f))));

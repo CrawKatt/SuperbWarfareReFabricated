@@ -14,6 +14,7 @@ import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
+import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.common.ammo.PotionMortarShell;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
@@ -23,6 +24,8 @@ import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -42,6 +45,7 @@ public class ClientMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         registerGuiIconModels();
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.BARBED_WIRE.get(), RenderType.cutout());
         ModKeyMappings.register();
         MouseMovementHandler.init();
         MolangVariable.register();
@@ -57,7 +61,6 @@ public class ClientMod implements ClientModInitializer {
         FuMO25ScreenHelper.registerEvents();
         ContainerBlockPreview.registerEvents();
         ClientRenderHandler.registerTooltip();
-        ClientRenderHandler.onClientSetup();
         ClientRenderHandler.registerBlockRenderers();
         ClientRenderHandler.registerLayerDefinitions();
         ClientLanguageGetter.registerReloadListeners();
@@ -69,6 +72,10 @@ public class ClientMod implements ClientModInitializer {
 
         ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.CLIENT, ClientConfig.init());
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.player != null) {
+                PlayerEventHandler.onPlayerTick(client.player, true);
+            }
+
             List<AbstractMap.SimpleEntry<Runnable, Integer>> actions = new ArrayList<>();
             Mod.CLIENT_QUEUE.forEach(work -> {
                 work.setValue(work.getValue() - 1);
@@ -85,6 +92,9 @@ public class ClientMod implements ClientModInitializer {
             ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
             if (item instanceof GunGeoItem || CUSTOM_GUI_ICON_ITEMS.contains(itemId)) {
                 context.addModels(new ModelResourceLocation(itemId.withPath(path -> path + "_icon"), "inventory"));
+            }
+            if (CUSTOM_GUI_ICON_ITEMS.contains(itemId)) {
+                context.addModels(new ModelResourceLocation(itemId.withPath(path -> path + "_3d"), "inventory"));
             }
         }));
     }

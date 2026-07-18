@@ -21,6 +21,6 @@ public class TooltipTool {
 
     public static void addScreenProviderText(List<Component> tooltip) {
         tooltip.add(Component.translatable("des.superbwarfare.item_screen_provider",
-                "[" + ModKeyMappings.EDIT_MODE.getDefaultKey().getDisplayName().getString() + "]").withStyle(ChatFormatting.AQUA));
+                "[" + ModKeyMappings.EDIT_MODE.getTranslatedKeyMessage().getString() + "]").withStyle(ChatFormatting.AQUA));
     }
 }

@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType;
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.Tom6Entity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.event.custom.ComputeCameraAnglesCallback;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
@@ -14,7 +15,6 @@ import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.network.message.send.MouseMoveMessage;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -43,7 +43,7 @@ public class ClientMouseHandler {
 
     public static void registerEvents() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> handleClientTick());
-        WorldRenderEvents.START.register(context -> handleComputeCameraAngles());
+        ComputeCameraAnglesCallback.EVENT.register(event -> handleComputeCameraAngles());
     }
 
     private static boolean notInGame() {
@@ -219,7 +219,7 @@ public class ClientMouseHandler {
         }
 
         if (player.getVehicle() instanceof VehicleEntity vehicle) {
-            return vehicle.getSensitivity(original, ClientEventHandler.zoomVehicle, vehicle.getSeatIndex(player), vehicle.onGround());
+            return vehicle.getSensitivity(original, ClientEventHandler.zoomVehicle, vehicle.getSeatIndex(player), vehicle.onGround(), mc.options.getCameraType().isFirstPerson());
         }
 
         if (stack.getItem() instanceof GunItem) {

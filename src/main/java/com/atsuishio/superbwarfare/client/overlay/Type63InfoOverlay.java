@@ -39,8 +39,7 @@ public class Type63InfoOverlay {
         if (player == null) return;
         if (mc.gameMode == null) return;
 
-        // Entity lookingEntity = TraceTool.findLookingEntity(player, player.getEntityReach());
-        double reach = mc.gameMode.getPickRange();
+        double reach = PlayerReachTool.getEntityReach(player);
         Entity lookingEntity = TraceTool.findLookingEntity(player, reach);
 
         if (!(lookingEntity instanceof Type63Entity type63Entity)) return;

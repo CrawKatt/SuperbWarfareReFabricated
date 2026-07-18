@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.block.entity;
 
+import com.atsuishio.superbwarfare.capability.energy.InfinityEnergyStorage;
 import com.atsuishio.superbwarfare.entity.DPSGeneratorEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
@@ -12,7 +13,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import team.reborn.energy.api.EnergyStorage;
-import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import java.util.List;
 
@@ -23,12 +23,7 @@ public class CreativeChargingStationBlockEntity extends BlockEntity {
 
     public static final int CHARGE_RADIUS = 8;
 
-    public final EnergyStorage energyStorage = new SimpleEnergyStorage(Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE) {
-        @Override
-        protected void onFinalCommit() {
-            setChanged();
-        }
-    };
+    public final EnergyStorage energyStorage = new InfinityEnergyStorage();
 
     public CreativeChargingStationBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CREATIVE_CHARGING_STATION.get(), pos, state);
@@ -59,7 +54,7 @@ public class CreativeChargingStationBlockEntity extends BlockEntity {
             }
 
             try (Transaction t = Transaction.openOuter()) {
-                targetEnergy.insert(Long.MAX_VALUE, t);
+                targetEnergy.insert(Integer.MAX_VALUE, t);
                 t.commit();
             }
         }
@@ -77,7 +72,7 @@ public class CreativeChargingStationBlockEntity extends BlockEntity {
             var targetEnergy = EnergyStorage.SIDED.find(level, blockEntity.getBlockPos(), direction.getOpposite());
             if (targetEnergy != null && targetEnergy.supportsInsertion()) {
                 try (Transaction t = Transaction.openOuter()) {
-                    targetEnergy.insert(Long.MAX_VALUE, t);
+                    targetEnergy.insert(Integer.MAX_VALUE, t);
                     t.commit();
                 }
                 blockEntity.setChanged();

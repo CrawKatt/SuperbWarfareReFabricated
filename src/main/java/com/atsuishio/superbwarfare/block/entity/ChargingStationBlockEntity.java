@@ -28,14 +28,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import team.reborn.energy.api.EnergyStorage;
+import team.reborn.energy.api.EnergyStorageUtil;
 import team.reborn.energy.api.base.SimpleEnergyStorage;
 
 import java.util.List;
@@ -88,7 +87,12 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
                     break;
                 case 2:
                     try (Transaction t = Transaction.openOuter()) {
-                        ChargingStationBlockEntity.this.energyStorage.insert((int) pValue, t);
+                        long current = ChargingStationBlockEntity.this.energyStorage.getAmount();
+                        if (pValue > current) {
+                            ChargingStationBlockEntity.this.energyStorage.insert(pValue - current, t);
+                        } else if (pValue < current) {
+                            ChargingStationBlockEntity.this.energyStorage.extract(current - pValue, t);
+                        }
                         t.commit();
                     }
                     break;
@@ -113,7 +117,9 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
             setChanged(pLevel, pPos, pState);
         }
 
-        blockEntity.chargeEntity();
+        if (blockEntity.energyStorage.getAmount() > 0) {
+            blockEntity.chargeEntity();
+        }
         if (blockEntity.energyStorage.getAmount() > 0) {
             blockEntity.chargeItemStack();
         }
@@ -138,11 +144,10 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
             if (ModEnergyApi.hasEnergy(fuel)) {
                 var itemEnergy = ModEnergyApi.get(fuel);
                 var energyToExtract = Math.min(CHARGE_OTHER_SPEED, (int) (blockEntity.energyStorage.getCapacity() - blockEntity.energyStorage.getAmount()));
-                if (itemEnergy.supportsExtraction() && blockEntity.energyStorage.supportsInsertion()) {
+                if (itemEnergy != null && itemEnergy.supportsExtraction() && blockEntity.energyStorage.supportsInsertion()) {
                     try (Transaction t = Transaction.openOuter()) {
-                        long extracted = itemEnergy.extract(energyToExtract, t);
-                        long inserted = blockEntity.energyStorage.insert(extracted, t);
-                        if (inserted > 0 && extracted > 0) {
+                        long transferred = EnergyStorageUtil.move(itemEnergy, blockEntity.energyStorage, energyToExtract, t);
+                        if (transferred > 0) {
                             t.commit();
                         }
                     }
@@ -152,11 +157,12 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
                 blockEntity.fuelTick = burnTime;
                 blockEntity.maxFuelTick = burnTime;
 
-                if (fuel.getItem().getCraftingRemainingItem() != Items.AIR) {
+                ItemStack remainder = fuel.getRecipeRemainder();
+                if (!remainder.isEmpty()) {
                     if (fuel.getCount() <= 1) {
-                        blockEntity.setItem(SLOT_FUEL, new ItemStack(fuel.getItem().getCraftingRemainingItem()));
+                        blockEntity.setItem(SLOT_FUEL, remainder);
                     } else {
-                        ItemStack copy = new ItemStack(fuel.getItem().getCraftingRemainingItem());
+                        ItemStack copy = remainder.copy();
                         copy.setCount(1);
 
                         ItemEntity itemEntity = new ItemEntity(pLevel,
@@ -181,7 +187,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
                 float saturation = properties.getSaturationModifier() * 2.0f * nutrition;
                 int tick = nutrition * 80 + (int) (saturation * 200);
 
-                if (fuel.getItem().getCraftingRemainingItem() != Items.AIR) {
+                if (!fuel.getRecipeRemainder().isEmpty()) {
                     tick += 400;
                 }
 
@@ -213,9 +219,8 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
 
             try (Transaction t = Transaction.openOuter()) {
                 long toTransfer = Math.min(this.energyStorage.getAmount(), CHARGE_OTHER_SPEED * 20L);
-                long received = targetEnergy.insert(toTransfer, t);
-                this.energyStorage.extract(received, t);
-                if (received > 0) {
+                long transferred = EnergyStorageUtil.move(this.energyStorage, targetEnergy, toTransfer, t);
+                if (transferred > 0) {
                     t.commit();
                     this.setChanged();
                 }
@@ -232,9 +237,10 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
         if (consumer != null && consumer.getAmount() < consumer.getCapacity()) {
             try (Transaction t = Transaction.openOuter()) {
                 long toTransfer = Math.min(CHARGE_OTHER_SPEED, energyStorage.getAmount());
-                long received = consumer.insert(toTransfer, t);
-                energyStorage.extract(received, t);
-                t.commit();
+                long transferred = EnergyStorageUtil.move(energyStorage, consumer, toTransfer, t);
+                if (transferred > 0) {
+                    t.commit();
+                }
             }
         }
         this.setChanged();
@@ -253,9 +259,8 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
             if (targetEnergy.supportsInsertion() && targetEnergy.getAmount() < targetEnergy.getCapacity()) {
                 try (Transaction t = Transaction.openOuter()) {
                     long toTransfer = Math.min(energyStorage.getAmount(), CHARGE_OTHER_SPEED);
-                    long received = targetEnergy.insert(toTransfer, t);
-                    energyStorage.extract(received, t);
-                    if (received > 0) {
+                    long transferred = EnergyStorageUtil.move(energyStorage, targetEnergy, toTransfer, t);
+                    if (transferred > 0) {
                         t.commit();
                         BlockEntity targetBE = this.level.getBlockEntity(targetPos);
                         if (targetBE != null) {
@@ -278,6 +283,7 @@ public class ChargingStationBlockEntity extends BlockEntity implements WorldlyCo
 
         if (pTag.contains("Energy")) {
             try (Transaction t = Transaction.openOuter()) {
+                energyStorage.extract(Long.MAX_VALUE, t);
                 energyStorage.insert(pTag.getLong("Energy"), t);
                 t.commit();
             }

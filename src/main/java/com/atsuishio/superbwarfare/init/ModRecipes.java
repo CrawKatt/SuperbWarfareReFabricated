@@ -24,6 +24,10 @@ public class ModRecipes {
             Registration.recipeSerializer("vehicle_assembling", VehicleAssemblingRecipeSerializer::new);
     public static final Supplier<RecipeSerializer<VehicleResetRecipe>> VEHICLE_RESET_SERIALIZER =
             Registration.recipeSerializer("vehicle_reset", () -> new SimpleCraftingRecipeSerializer<>(VehicleResetRecipe::new));
+    public static final Supplier<RecipeSerializer<CupidArrowRecipe>> CUPID_ARROW_SERIALIZER =
+            Registration.recipeSerializer("cupid_arrow", () -> new SimpleCraftingRecipeSerializer<>(CupidArrowRecipe::new));
+    public static final Supplier<RecipeSerializer<C4BombRcRecipe>> C4_BOMB_RC_SERIALIZER =
+            Registration.recipeSerializer("c4_bomb_rc", () -> new SimpleCraftingRecipeSerializer<>(C4BombRcRecipe::new));
 
     public static final Supplier<RecipeType<VehicleAssemblingRecipe>> VEHICLE_ASSEMBLING_TYPE =
             Registration.recipeType("vehicle_assembling", () -> new RecipeType<>() {

@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.mobeffect;
 
+import com.atsuishio.superbwarfare.entity.mixin.EntityPersistentDataAccess;
 import com.atsuishio.superbwarfare.event.custom.LivingAttackCallback;
 import com.atsuishio.superbwarfare.event.custom.LivingTickCallback;
 import com.atsuishio.superbwarfare.event.custom.MobEffectAddedCallback;
@@ -26,12 +27,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ShockMobEffect extends MobEffect {
 
-    private static final Map<Integer, Integer> SHOCK_ATTACKERS = new HashMap<>();
+    private static final String SHOCK_ATTACKER = "TargetShockAttacker";
 
     public ShockMobEffect() {
         super(MobEffectCategory.HARMFUL, -256);
@@ -47,11 +45,12 @@ public class ShockMobEffect extends MobEffect {
 
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
+        var persistentData = EntityPersistentDataAccess.of(entity).superbwarfare$getPersistentData();
         Entity attacker;
-        if (!SHOCK_ATTACKERS.containsKey(entity.getId())) {
+        if (!persistentData.contains(SHOCK_ATTACKER)) {
             attacker = null;
         } else {
-            attacker = entity.level().getEntity(SHOCK_ATTACKERS.get(entity.getId()));
+            attacker = entity.level().getEntity(persistentData.getInt(SHOCK_ATTACKER));
         }
 
         DamageHandler.doDamage(entity, ModDamageTypes.causeShockDamage(entity.level().registryAccess(), attacker), 2 + (1.25f * amplifier));
@@ -85,7 +84,8 @@ public class ShockMobEffect extends MobEffect {
                 2 + (1.25f * instance.getAmplifier()));
 
         if (source instanceof LivingEntity entitySource) {
-            SHOCK_ATTACKERS.put(living.getId(), entitySource.getId());
+            EntityPersistentDataAccess.of(living).superbwarfare$getPersistentData()
+                    .putInt(SHOCK_ATTACKER, entitySource.getId());
         }
     }
 
@@ -95,7 +95,8 @@ public class ShockMobEffect extends MobEffect {
         }
 
         if (instance.getEffect().equals(ModMobEffects.SHOCK.get())) {
-            SHOCK_ATTACKERS.remove(living.getId());
+            EntityPersistentDataAccess.of(living).superbwarfare$getPersistentData()
+                    .remove(SHOCK_ATTACKER);
         }
     }
 

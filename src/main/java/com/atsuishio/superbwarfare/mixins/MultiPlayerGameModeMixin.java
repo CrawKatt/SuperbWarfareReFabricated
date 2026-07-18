@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.tools.PlayerReachTool;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import org.spongepowered.asm.mixin.Final;
@@ -23,6 +24,14 @@ public class MultiPlayerGameModeMixin {
         if (player == null) return;
         if (player.isPassenger() && player.getVehicle() instanceof VehicleEntity vehicle) {
             cir.setReturnValue(vehicle.hasMenu());
+        }
+    }
+
+    @Inject(method = "getPickRange", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$getBlockReach(CallbackInfoReturnable<Float> cir) {
+        var player = this.minecraft.player;
+        if (player != null) {
+            cir.setReturnValue((float) PlayerReachTool.getBlockReach(player));
         }
     }
 }

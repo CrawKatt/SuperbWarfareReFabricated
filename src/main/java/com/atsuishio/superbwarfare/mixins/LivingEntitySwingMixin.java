@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
 public class LivingEntitySwingMixin {
-    @Inject(method = "swing(Lnet/minecraft/world/InteractionHand;)V", at = @At("HEAD"), cancellable = true)
-    private void superbwarfare$onSwing(InteractionHand hand, CallbackInfo ci) {
+    @Inject(method = "swing(Lnet/minecraft/world/InteractionHand;Z)V", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$onSwing(InteractionHand hand, boolean updateSelf, CallbackInfo ci) {
         LivingEntity entity = (LivingEntity) (Object) this;
         ItemStack stack = entity.getItemInHand(hand);
 

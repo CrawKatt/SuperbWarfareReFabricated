@@ -1,7 +1,10 @@
 package com.atsuishio.superbwarfare.item;
 
+import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.init.ModBlocks;
+import com.atsuishio.superbwarfare.init.ModAttributes;
 import com.atsuishio.superbwarfare.init.ModItems;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -19,6 +22,7 @@ import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 public class Crowbar extends SwordItem {
 
@@ -68,8 +72,14 @@ public class Crowbar extends SwordItem {
     }
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
-        Multimap<Attribute, AttributeModifier> map = super.getDefaultAttributeModifiers(slot);
+    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
+        Multimap<Attribute, AttributeModifier> map = super.getAttributeModifiers(stack, slot);
+        if (slot == EquipmentSlot.MAINHAND) {
+            UUID uuid = new UUID(slot.toString().hashCode(), 0);
+            map = HashMultimap.create(map);
+            map.put(ModAttributes.BLOCK_REACH.get(), new AttributeModifier(
+                    uuid, Mod.ATTRIBUTE_MODIFIER, 3, AttributeModifier.Operation.ADDITION));
+        }
         return map;
     }
 

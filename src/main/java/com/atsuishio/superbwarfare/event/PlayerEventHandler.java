@@ -7,16 +7,18 @@ import com.atsuishio.superbwarfare.config.server.MiscConfig;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.vehicle.VehicleDataTool;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
-import com.atsuishio.superbwarfare.event.custom.LivingAttackCallback;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModParticleTypes;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.init.ModTags;
+import com.atsuishio.superbwarfare.item.Beast;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.GunsTool;
 import com.atsuishio.superbwarfare.tools.InventoryTool;
+import com.atsuishio.superbwarfare.tools.PlayerReachTool;
 import com.atsuishio.superbwarfare.tools.TraceTool;
 import com.atsuishio.superbwarfare.world.TDMSavedData;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -28,6 +30,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -64,12 +67,9 @@ public class PlayerEventHandler {
             }
         });
 
-        LivingAttackCallback.EVENT.register((entity, source, amount) -> {
-            Entity attacker = source.getEntity();
-            if (attacker instanceof Player player) {
-                return !onAttackEntity(player, entity);
-            }
-            return true;
+        AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+            onAttackEntity(player, entity);
+            return InteractionResult.PASS;
         });
     }
 
@@ -205,12 +205,10 @@ public class PlayerEventHandler {
     }
 
     // TODO: Register in Mod.java using Fabric event API
-    public static boolean onAttackEntity(Player player, net.minecraft.world.entity.Entity target) {
+    public static boolean onAttackEntity(Player player, Entity target) {
+        boolean vehicleTarget = target instanceof VehicleEntity;
         if (target instanceof VehicleEntity vehicle) {
-            double reach = 4.5D;
-            if (player instanceof ServerPlayer serverPlayer) {
-                reach = serverPlayer.gameMode.getGameModeForPlayer().isCreative() ? 5.0D : 4.5D;
-            }
+            double reach = PlayerReachTool.getEntityReach(player);
 
             Vec3 position = TraceTool.playerFindLookingPos(player, vehicle, reach);
 
@@ -224,8 +222,12 @@ public class PlayerEventHandler {
                             2, 0, 0, 0, 0.2, false);
                 }
             }
-            return true;
         }
-        return false;
+
+        if (player.getMainHandItem().getItem() instanceof Beast) {
+            Beast.beastKill(player, target);
+        }
+
+        return vehicleTarget;
     }
 }

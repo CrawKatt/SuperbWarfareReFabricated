@@ -14,17 +14,18 @@ public class EntitySpawnDataMessage {
         this.entityId = entity.getId();
 
         FriendlyByteBuf buffer = new FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
-        ((CustomSpawnDataEntity) entity).writeSpawnData(buffer);
-
-        this.data = new byte[buffer.readableBytes()];
-        buffer.readBytes(this.data);
-        buffer.release();
+        try {
+            ((CustomSpawnDataEntity) entity).writeSpawnData(buffer);
+            this.data = new byte[buffer.readableBytes()];
+            buffer.readBytes(this.data);
+        } finally {
+            buffer.release();
+        }
     }
 
-    public EntitySpawnDataMessage(int entityId, FriendlyByteBuf dataBuffer) {
+    private EntitySpawnDataMessage(int entityId, byte[] data) {
         this.entityId = entityId;
-        this.data = new byte[dataBuffer.readableBytes()];
-        dataBuffer.readBytes(this.data);
+        this.data = data;
     }
 
     public static void encode(EntitySpawnDataMessage message, FriendlyByteBuf buffer) {
@@ -35,9 +36,7 @@ public class EntitySpawnDataMessage {
     public static EntitySpawnDataMessage decode(FriendlyByteBuf buffer) {
         int entityId = buffer.readInt();
         byte[] data = buffer.readByteArray();
-
-        FriendlyByteBuf dataBuffer = new FriendlyByteBuf(io.netty.buffer.Unpooled.wrappedBuffer(data));
-        return new EntitySpawnDataMessage(entityId, dataBuffer);
+        return new EntitySpawnDataMessage(entityId, data);
     }
 
     public static void handler(EntitySpawnDataMessage message) {
@@ -53,7 +52,10 @@ public class EntitySpawnDataMessage {
         }
 
         FriendlyByteBuf buffer = new FriendlyByteBuf(io.netty.buffer.Unpooled.wrappedBuffer(message.data));
-        spawnDataEntity.readSpawnData(buffer);
-        buffer.release();
+        try {
+            spawnDataEntity.readSpawnData(buffer);
+        } finally {
+            buffer.release();
+        }
     }
 }

@@ -19,6 +19,7 @@ import com.atsuishio.superbwarfare.event.custom.MouseScrollCallback;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.ItemScreenProvider;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
+import com.atsuishio.superbwarfare.mixins.accessor.KeyMappingAccessor;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.network.message.send.*;
 import com.atsuishio.superbwarfare.resource.gun.GunResource;
@@ -289,7 +290,7 @@ public class ClickHandler {
                 handleParachute();
             }
 
-            if (ModKeyMappings.CONFIG.matches(key, event.getScanCode())) { //&& ModKeyMappings.CONFIG.getKeyModifier().isActive(KeyConflictContext.IN_GAME)) {
+            if (ModKeyMappings.CONFIG.matches(key, event.getScanCode()) && Screen.hasAltDown()) {
                 handleConfigScreen(player);
             }
             if (ModKeyMappings.RELOAD.matches(key, event.getScanCode())) {
@@ -312,7 +313,7 @@ public class ClickHandler {
             }
             if (ModKeyMappings.INTERACT.matches(key, event.getScanCode())) {
                 if (stack.getItem() instanceof GunItem) {
-                    KeyMapping.click(mc.options.keyUse.getDefaultKey());
+                    KeyMapping.click(((KeyMappingAccessor) mc.options.keyUse).superbwarfare$getKey());
                 } else if (stack.is(ModItems.MONITOR.get())) {
                     NetworkRegistry.sendToServer(InteractMessage.INSTANCE);
                 }

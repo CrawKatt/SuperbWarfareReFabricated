@@ -11,7 +11,12 @@ public interface LivingDropsCallback {
     net.fabricmc.fabric.api.event.Event<LivingDropsCallback> EVENT = EventFactory.createArrayBacked(
             LivingDropsCallback.class,
             callbacks -> event -> {
-                for (var callback : callbacks) callback.onLivingDrops(event);
+                for (var callback : callbacks) {
+                    callback.onLivingDrops(event);
+                    if (event.isCanceled()) {
+                        return;
+                    }
+                }
             }
     );
 

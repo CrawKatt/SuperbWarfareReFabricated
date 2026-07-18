@@ -745,6 +745,10 @@ public class GunData implements DefaultDataSupplier<DefaultGunData> {
         return this.item.getEnergyStored(this, ammoSupplier);
     }
 
+    public int extractEnergy(@Nullable Entity ammoSupplier, int amount, boolean simulate) {
+        return this.item.extractEnergy(this, ammoSupplier, amount, simulate);
+    }
+
     public void shakePlayers(@Nullable Entity source) {
         if (source == null) return;
 

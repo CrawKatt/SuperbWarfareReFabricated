@@ -27,7 +27,6 @@ import com.atsuishio.superbwarfare.resource.gun.GunResource;
 import com.atsuishio.superbwarfare.tools.*;
 import com.atsuishio.superbwarfare.world.TDMSavedData;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.CameraType;
@@ -248,17 +247,8 @@ public class ClientEventHandler {
     public static void registerEvents() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> handleClientTick());
 
-        WorldRenderEvents.START.register(context -> {
-            handleWeaponFire();
-            handleVehicleFire();
-            handleWeaponBreathSway();
-        });
-
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            if (client.player != null) {
-                onPlayerLoggedIn(client.player);
-            }
-        });
+        WorldRenderEvents.START.register(context -> handleRenderTick());
+        WorldRenderEvents.END.register(context -> handleRenderTick());
 
         ComputeCameraAnglesCallback.EVENT.register(ClientEventHandler::computeCameraAngles);
         ComputeFovCallback.EVENT.register(ClientEventHandler::onFovUpdate);
@@ -271,6 +261,12 @@ public class ClientEventHandler {
         RenderPlayerCallback.EVENT.register(ClientEventHandler::setPlayerInvisible);
         RenderGuiOverlayCallback.EVENT.register(ClientEventHandler::handleRenderGuiOverlay);
         RenderNameTagCallback.EVENT.register(ClientEventHandler::onRenderNameTag);
+    }
+
+    private static void handleRenderTick() {
+        handleWeaponFire();
+        handleVehicleFire();
+        handleWeaponBreathSway();
     }
 
     public static void handleWeaponTurn(RenderHandCallback.Event event) {
@@ -2385,29 +2381,24 @@ public class ClientEventHandler {
         }
     }
 
-    public static void onPlayerLoggedIn(Player player) {
+    public static void onModVersionMismatch(Player player, String previousVersion, String currentVersion) {
         if (!DisplayConfig.ENABLE_VERSION_CHECK_WARNING.get()) return;
-        /*
-        if (ModVersionEventHandler.currentVersion == null || ModVersionEventHandler.previousVersion == null) return;
 
         player.displayClientMessage(Component.translatable("tips.superbwarfare.vehicle_reset_kit_1",
-                        Component.literal("" + ModVersionEventHandler.previousVersion).withStyle(ChatFormatting.YELLOW),
-                        Component.literal("" + ModVersionEventHandler.currentVersion).withStyle(ChatFormatting.YELLOW))
+                        Component.literal(previousVersion).withStyle(ChatFormatting.YELLOW),
+                        Component.literal(currentVersion).withStyle(ChatFormatting.YELLOW))
                 .withStyle(ChatFormatting.RED), false);
-        */
         player.displayClientMessage(Component.translatable("tips.superbwarfare.vehicle_reset_kit_2",
                 Component.literal("[").append(ModItems.VEHICLE_RESET_KIT.get().getDefaultInstance().getHoverName()).append("]").withStyle(ChatFormatting.GREEN)), false);
         player.displayClientMessage(Component.translatable("tips.superbwarfare.vehicle_reset_kit_3")
                 .withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.UNDERLINE), false);
     }
 
-    // ToDo: Comprobar equivalente en Forge
     private static double getEntityReach(Player player) {
-        return player.isCreative() ? 5.0D : 4.5D;
+        return PlayerReachTool.getEntityReach(player);
     }
 
-    // ToDo: Comprobar equivalente en Forge
     private static double getBlockReach(Player player) {
-        return player.isCreative() ? 5.0D : 4.5D;
+        return PlayerReachTool.getBlockReach(player);
     }
 }

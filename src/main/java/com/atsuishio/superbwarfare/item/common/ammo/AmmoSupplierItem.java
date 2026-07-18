@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.item.common.ammo;
 
-import com.atsuishio.superbwarfare.capability.ModCapabilities;
+import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModSounds;
@@ -46,7 +46,7 @@ public class AmmoSupplierItem extends Item {
         if (offhandItem.is(ModItems.AMMO_BOX.get())) {
             this.type.add(offhandItem, ammoToAdd * count);
         } else {
-            this.type.add(ModCapabilities.PLAYER_VARIABLE.get(player), ammoToAdd * count);
+            PlayerVariable.modify(player, capability -> this.type.add(capability, ammoToAdd * count));
         }
 
         if (!level.isClientSide()) {

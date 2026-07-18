@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.common.ammo.MediumRocketItem;
 import com.atsuishio.superbwarfare.tools.OBB;
+import com.atsuishio.superbwarfare.tools.PlayerReachTool;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import com.atsuishio.superbwarfare.tools.VectorTool;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -140,7 +141,7 @@ public class Type63Entity extends GeoVehicleEntity {
         if (result != InteractionResult.PASS) return result;
 
         var stack = player.getMainHandItem();
-        var lookingObb = OBB.getLookingObb(player, player.isCreative() ? 5.0 : 4.5);
+        var lookingObb = OBB.getLookingObb(player, PlayerReachTool.getEntityReach(player));
 
         if (stack.isEmpty()) {
             if (player.isShiftKeyDown()) {
@@ -176,7 +177,10 @@ public class Type63Entity extends GeoVehicleEntity {
                 if (level() instanceof ServerLevel serverLevel && cooldown == 0) {
                     for (int i = 0; i < this.barrel.length; i++) {
                         if (lookingObb == this.barrel[i] && !items.get(i).isEmpty()) {
-                            player.addItem(items.get(i).copyWithCount(1));
+                            var extracted = items.get(i).copyWithCount(1);
+                            if (!player.addItem(extracted)) {
+                                player.drop(extracted, false);
+                            }
                             Vec3 vec3 = OBB.vector3dToVec3(this.barrel[i].center());
                             serverLevel.playSound(null, vec3.x, vec3.y, vec3.z, ModSounds.TYPE_63_RELOAD.get(), SoundSource.PLAYERS, 1f, random.nextFloat() * 0.1f + 0.9f);
                             cooldown = 5;
@@ -249,7 +253,7 @@ public class Type63Entity extends GeoVehicleEntity {
     }
 
     public boolean lookingAtBarrel(Player player) {
-        var lookingObb = OBB.getLookingObb(player, player.isCreative() ? 5.0 : 4.5);
+        var lookingObb = OBB.getLookingObb(player, PlayerReachTool.getEntityReach(player));
 
         for (int i = 0; i < 12; i++) {
             if (lookingObb == barrel[i]) {

@@ -1141,4 +1141,8 @@ public abstract class GunItem extends Item implements ItemScreenProvider, GunPro
     public int getEnergyStored(@NotNull GunData data, @Nullable Entity ammoSupplier) {
         return ModEnergyApi.getEnergyStored(data.stack);
     }
+
+    public int extractEnergy(@NotNull GunData data, @Nullable Entity ammoSupplier, int amount, boolean simulate) {
+        return ModEnergyApi.extractEnergy(data.stack, amount, simulate);
+    }
 }

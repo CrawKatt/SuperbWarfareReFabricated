@@ -44,6 +44,10 @@ public class ArtilleryEntity extends GeoVehicleEntity {
         this.entityData.set(BARREL_ANIM, IntList.of(new int[this.getMaxBarrel()]));
     }
 
+    public void initializeShootVector() {
+        this.entityData.set(SHOOT_VEC, getForward().toVector3f());
+    }
+
     @Override
     public @NotNull InteractionResult interact(Player player, @NotNull InteractionHand hand) {
         var gunData = getGunData("Main");

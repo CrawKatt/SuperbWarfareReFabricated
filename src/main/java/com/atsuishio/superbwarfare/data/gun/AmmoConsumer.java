@@ -5,7 +5,6 @@ import com.atsuishio.superbwarfare.annotation.ServerOnly;
 import com.atsuishio.superbwarfare.data.DeserializeFromString;
 import com.atsuishio.superbwarfare.data.JsonPropertyModifier;
 import com.atsuishio.superbwarfare.data.StringToObject;
-import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.tools.InventoryTool;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
@@ -13,6 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -106,12 +106,12 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
         }
 
         if (type == AmmoConsumeType.ENERGY) {
-            return ModEnergyApi.extractEnergy(data.stack, count, false);
+            return data.extractEnergy(shooter, count, false);
         }
 
         if (type == AmmoConsumeType.PLAYER_AMMO) {
-            if (shooter instanceof Player player) {
-                var fromInventory = InventoryTool.consumeAmmoItem(player, this.playerAmmoType, count);
+            if (hasItemInventory(shooter)) {
+                var fromInventory = InventoryTool.consumeAmmoItem(shooter, this.playerAmmoType, count);
                 var rest = fromInventory - count;
                 data.virtualAmmo.add(rest);
                 return consumedFromPlayerAmmo + count;
@@ -120,8 +120,8 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
             return consumedFromPlayerAmmo;
         }
 
-        if (shooter instanceof Player player) {
-            return consumedFromPlayerAmmo + InventoryTool.consumeItem(player, this::isAmmoItem, count);
+        if (hasItemInventory(shooter)) {
+            return consumedFromPlayerAmmo + InventoryTool.consumeItem(shooter, this::isAmmoItem, count);
         }
 
         Mod.LOGGER.warn("consume ammo failed: unsupported entity type {}", shooter);
@@ -143,16 +143,12 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
             return data.getEnergyStored(entity);
         }
 
-        if (entity instanceof Player player) {
-            if (type == AmmoConsumeType.ITEM) {
-                return playerAmmoCount + InventoryTool.countItem(player, this::isAmmoItem);
-            } else if (type == AmmoConsumeType.ENERGY) {
-                return ModEnergyApi.getEnergyStored(data.stack);
-            }
-            return playerAmmoCount + InventoryTool.countAmmoItem(player, this.playerAmmoType);
+        if (type == AmmoConsumeType.ITEM) {
+            return playerAmmoCount + InventoryTool.countItem(entity, this::isAmmoItem);
+        } else if (type == AmmoConsumeType.ENERGY) {
+            return data.getEnergyStored(entity);
         }
-
-        return playerAmmoCount;
+        return playerAmmoCount + InventoryTool.countAmmoItem(entity, this.playerAmmoType);
     }
 
     /**
@@ -181,6 +177,8 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
                 } else {
                     Mod.LOGGER.warn("withdraw player ammo failed: invalid player ammo type");
                 }
+            } else if (ammoSupplier instanceof Container container && container.getContainerSize() > 0) {
+                return withdraw(container, count);
             } else {
                 Mod.LOGGER.warn("withdraw ammo failed: unsupported entity type {}", ammoSupplier);
             }
@@ -193,7 +191,8 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
             while (count > 0) {
                 var toInsert = Math.min(limit, count);
                 var stackToGive = this.stack.copyWithCount(toInsert);
-                if (!player.addItem(stackToGive)) {
+                player.addItem(stackToGive);
+                if (!stackToGive.isEmpty()) {
                     player.drop(stackToGive, false);
                 }
                 inserted += toInsert;
@@ -202,8 +201,39 @@ public class AmmoConsumer implements DeserializeFromString, GunPropertyModifier 
             return inserted;
         }
 
+        if (ammoSupplier instanceof Container container && container.getContainerSize() > 0) {
+            return withdraw(container, count);
+        }
+
         Mod.LOGGER.warn("withdraw ammo failed: unsupported entity type {}", ammoSupplier);
         return 0;
+    }
+
+    private static boolean hasItemInventory(Entity entity) {
+        return entity instanceof Player
+                || entity instanceof Container container && container.getContainerSize() > 0;
+    }
+
+    private int withdraw(@NotNull Container container, int count) {
+        ItemStack stackToInsert = type == AmmoConsumeType.PLAYER_AMMO
+                ? this.playerAmmoType.getItemStack()
+                : this.stack;
+
+        int inserted = 0;
+        while (count > 0) {
+            int toInsert = Math.min(stackToInsert.getMaxStackSize(), count);
+            ItemStack candidate = stackToInsert.copyWithCount(toInsert);
+            int insertedNow = InventoryTool.insertItem(container, candidate);
+            inserted += insertedNow;
+            count -= insertedNow;
+
+            if (insertedNow < toInsert) {
+                Mod.LOGGER.warn("trying to withdraw ammo {} with count {}, but only {} is inserted",
+                        stackToInsert, count, inserted);
+                break;
+            }
+        }
+        return inserted;
     }
 
     private static final Pattern AMMO_PATTERN = Pattern.compile("^(?<count>(\\d+)?)\\s*(?<prefix>[@#]?)(?<id>\\w+(:\\w+)?)\\s*(?<data>(\\{.*})?)$");

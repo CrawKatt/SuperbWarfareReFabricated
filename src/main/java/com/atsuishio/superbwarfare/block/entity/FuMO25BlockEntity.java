@@ -88,7 +88,14 @@ public class FuMO25BlockEntity extends BlockEntity implements MenuProvider, GeoB
         @Override
         public void set(int pIndex, long pValue) {
             switch (pIndex) {
-                case 0 -> ModEnergyApi.receiveEnergy(FuMO25BlockEntity.this.energyStorage, (int) pValue, false);
+                case 0 -> {
+                    long current = FuMO25BlockEntity.this.energyStorage.getAmount();
+                    if (pValue > current) {
+                        ModEnergyApi.receiveEnergy(FuMO25BlockEntity.this.energyStorage, (int) (pValue - current), false);
+                    } else if (pValue < current) {
+                        ModEnergyApi.extractEnergy(FuMO25BlockEntity.this.energyStorage, (int) (current - pValue), false);
+                    }
+                }
                 case 1 -> FuMO25BlockEntity.this.type = FuncType.values()[(int) pValue];
                 case 2 -> FuMO25BlockEntity.this.time = (int) pValue;
                 case 3 -> FuMO25BlockEntity.this.powered = pValue == 1;
@@ -190,6 +197,7 @@ public class FuMO25BlockEntity extends BlockEntity implements MenuProvider, GeoB
 
         if (pTag.contains("Energy")) {
             try (var t = Transaction.openOuter()) {
+                energyStorage.extract(Long.MAX_VALUE, t);
                 energyStorage.insert(pTag.getLong("Energy"), t);
                 t.commit();
             }

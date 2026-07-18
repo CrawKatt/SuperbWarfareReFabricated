@@ -157,7 +157,10 @@ public class TargetEntity extends LivingEntity implements GeoEntity {
             }
 
             if (!player.getAbilities().instabuild) {
-                player.addItem(new ItemStack(ModItems.TARGET_DEPLOYER.get()));
+                var stack = new ItemStack(ModItems.TARGET_DEPLOYER.get());
+                if (!player.addItem(stack)) {
+                    player.drop(stack, false);
+                }
             }
         } else {
             this.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3((player.getX()), this.getY(), (player.getZ())));

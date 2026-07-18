@@ -2,8 +2,6 @@ package com.atsuishio.superbwarfare.event;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.api.event.ReloadEvent;
-import com.atsuishio.superbwarfare.capability.ModCapabilities;
-import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.data.gun.AmmoConsumer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.ReloadType;
@@ -18,6 +16,7 @@ import com.atsuishio.superbwarfare.tools.SoundTool;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
@@ -205,10 +204,9 @@ public class GunEventHandler {
             int count = ammoCount - magazine - (hasBulletInBarrel ? 1 : 0);
 
             if (shooter instanceof Player player) {
-                var capability = ModCapabilities.PLAYER_VARIABLE.get(player);
                 if (data.selectedAmmoConsumer().type == AmmoConsumer.AmmoConsumeType.PLAYER_AMMO) {
                     var ammoType = data.selectedAmmoConsumer().getPlayerAmmoType();
-                    ammoType.add(capability, count);
+                    ammoType.add(player, count);
                 }
             }
 
@@ -587,8 +585,14 @@ public class GunEventHandler {
         data.charge.timer.reduce();
 
         if (data.charge.timer.get() == 17) {
-            if (!(entity instanceof Player player)) return;
-            var inv = player.getInventory();
+            Container inv;
+            if (entity instanceof Player player) {
+                inv = player.getInventory();
+            } else if (entity instanceof Container container) {
+                inv = container;
+            } else {
+                return;
+            }
 
             for (int i = 0; i < inv.getContainerSize(); i++) {
                 var cell = inv.getItem(i);
@@ -597,13 +601,13 @@ public class GunEventHandler {
                     var stackStorage = ModEnergyApi.get(data.stack());
                     if (stackStorage == null) continue;
 
-                    int stackMaxEnergy = (int) stackStorage.getCapacity();
-                    int stackEnergy = (int) stackStorage.getAmount();
+                    int stackMaxEnergy = ModEnergyApi.getMaxEnergyStored(stackStorage);
+                    int stackEnergy = ModEnergyApi.getEnergyStored(stackStorage);
 
                     var cellStorage = ModEnergyApi.get(cell);
                     if (cellStorage == null) continue;
 
-                    int cellEnergy = (int) cellStorage.getAmount();
+                    int cellEnergy = ModEnergyApi.getEnergyStored(cellStorage);
 
                     int stackEnergyNeed = Math.min(cellEnergy, stackMaxEnergy - stackEnergy);
 

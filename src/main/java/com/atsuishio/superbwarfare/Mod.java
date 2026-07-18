@@ -13,30 +13,28 @@ import com.atsuishio.superbwarfare.data.container.ContainerDataManager;
 import com.atsuishio.superbwarfare.entity.DPSGeneratorEntity;
 import com.atsuishio.superbwarfare.entity.TargetEntity;
 import com.atsuishio.superbwarfare.event.CustomEventHandler;
-import com.atsuishio.superbwarfare.event.EntityUseGunEventHandler;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
+import com.atsuishio.superbwarfare.event.ModVersionEventHandler;
 import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.common.container.ContainerBlockItem;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect;
-import com.atsuishio.superbwarfare.network.CustomSpawnDataEntity;
-import com.atsuishio.superbwarfare.network.message.receive.EntitySpawnDataMessage;
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import com.atsuishio.superbwarfare.recipe.ModPotionRecipes;
+import dev.emi.trinkets.api.Trinket;
+import dev.emi.trinkets.api.TrinketsApi;
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
+import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.entity.Mob;
 import net.minecraftforge.fml.config.ModConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,7 +63,12 @@ public class Mod implements ModInitializer {
         ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.COMMON, CommonConfig.init());
         ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.SERVER, ServerConfig.init());
 
+        ModPerks.registerCompatPerks();
         ModItems.register();
+        FuelRegistry.INSTANCE.add(ModItems.C4_BOMB.get(), 20_000);
+        TrinketsApi.registerTrinket(ModItems.PARACHUTE.get(), (Trinket) ModItems.PARACHUTE.get());
+        TrinketsApi.registerTrinket(ModItems.DOG_TAG.get(), (Trinket) ModItems.DOG_TAG.get());
+        TrinketsApi.registerTrinket(ModItems.IFF.get(), (Trinket) ModItems.IFF.get());
         ModBlocks.register();
         ModBlockEntities.register();
         ModEntities.register();
@@ -86,8 +89,8 @@ public class Mod implements ModInitializer {
         ModEnergyApi.register();
         ModTags.register();
         ModEntities.registerAttributes();
+        ModEntities.registerSpawnPlacements();
         ModItems.registerDispenserBehavior();
-        ModPerks.registerCompatPerks();
         ModPotionRecipes.register();
         CriteriaRegister.setup();
         DataLoader.registerReloadListeners();
@@ -104,6 +107,7 @@ public class Mod implements ModInitializer {
         HitboxHelperEventHandler.registerEvents();
         LivingEventHandler.registerEvents();
         PlayerEventHandler.registerEvents();
+        ModVersionEventHandler.registerEvents();
         ModLootModifier.register();
 
         registerDataTickets();
@@ -121,18 +125,6 @@ public class Mod implements ModInitializer {
             ServerTickEvents.END_SERVER_TICK.register(server -> { });
         }
         */
-
-        EntityTrackingEvents.START_TRACKING.register((entity, player) -> {
-            if (entity instanceof CustomSpawnDataEntity) {
-                NetworkRegistry.sendToPlayer(player, new EntitySpawnDataMessage(entity));
-            }
-        });
-
-        ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
-            if (entity instanceof Mob mob) {
-                EntityUseGunEventHandler.entityJoin(mob);
-            }
-        });
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             List<AbstractMap.SimpleEntry<Runnable, Integer>> actions = new ArrayList<>();

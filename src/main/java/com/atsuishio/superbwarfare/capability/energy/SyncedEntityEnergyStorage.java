@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.capability.energy;
 
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NumericTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 
@@ -45,8 +46,16 @@ public class SyncedEntityEnergyStorage extends DynamicEnergyStorage {
         return entityData.get(energyDataAccessor);
     }
 
+    @Override
+    protected void readSnapshot(Long snapshot) {
+        super.readSnapshot(snapshot);
+        entityData.set(energyDataAccessor, snapshot.intValue());
+    }
+
     public void deserializeNBT(Tag nbt) {
-        entityData.set(energyDataAccessor, (int) amount);
+        if (nbt instanceof NumericTag numericTag) {
+            setEnergy(numericTag.getAsInt());
+        }
     }
 
     public void setEnergy(int energy) {

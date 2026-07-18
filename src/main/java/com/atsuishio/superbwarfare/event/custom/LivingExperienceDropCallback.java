@@ -8,7 +8,12 @@ public interface LivingExperienceDropCallback {
     net.fabricmc.fabric.api.event.Event<LivingExperienceDropCallback> EVENT = EventFactory.createArrayBacked(
             LivingExperienceDropCallback.class,
             callbacks -> event -> {
-                for (var callback : callbacks) callback.onLivingExperienceDrop(event);
+                for (var callback : callbacks) {
+                    callback.onLivingExperienceDrop(event);
+                    if (event.isCanceled()) {
+                        return;
+                    }
+                }
             }
     );
 

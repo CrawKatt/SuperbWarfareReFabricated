@@ -11,11 +11,11 @@ import com.atsuishio.superbwarfare.event.custom.ReloadCallback;
 import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.perk.Perk;
-import com.tacz.guns.block.TargetBlock;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.BellBlock;
+import net.minecraft.world.level.block.TargetBlock;
 
 public class CustomEventHandler {
     public static void registerEvents() {

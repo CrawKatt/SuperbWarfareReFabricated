@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.item.gun.vehicle;
 
 import com.atsuishio.superbwarfare.data.gun.DefaultGunData;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.entity.vehicle.PrismTankEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
@@ -15,7 +16,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import team.reborn.energy.api.EnergyStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,11 +75,20 @@ public class VehicleGun extends GunItem {
         if (ammoSupplier instanceof VehicleEntity vehicle) {
             var storage = vehicle.getEnergyStorage();
             if (storage != null && storage.supportsExtraction()) {
-                return (int) storage.getAmount();
+                return ModEnergyApi.getEnergyStored(storage);
             }
         }
 
         return super.getEnergyStored(data, null);
+    }
+
+    @Override
+    public int extractEnergy(@NotNull GunData data, @Nullable Entity ammoSupplier, int amount, boolean simulate) {
+        if (ammoSupplier instanceof VehicleEntity vehicle) {
+            return ModEnergyApi.extractEnergy(vehicle.getEnergyStorage(), amount, simulate);
+        }
+
+        return super.extractEnergy(data, null, amount, simulate);
     }
 
     @Override

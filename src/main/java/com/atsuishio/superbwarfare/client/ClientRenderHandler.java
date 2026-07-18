@@ -10,9 +10,9 @@ import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
@@ -39,11 +39,11 @@ public class ClientRenderHandler {
 
     public static void registerTooltip() {
         TooltipComponentCallback.EVENT.register(component -> {
-            if (component instanceof GunImageComponent c && c.stack.getItem() instanceof GunItem) return new ClientGunImageTooltip(c);
             if (component instanceof BocekImageComponent c) return new ClientBocekImageTooltip(c);
-            if (component instanceof CellImageComponent c) return new ClientCellImageTooltip(c);
             if (component instanceof SentinelImageComponent c) return new ClientSentinelImageTooltip(c);
             if (component instanceof ChargingStationImageComponent c) return new ClientChargingStationImageTooltip(c);
+            if (component instanceof GunImageComponent c && c.stack.getItem() instanceof GunItem) return new ClientGunImageTooltip(c);
+            if (component instanceof CellImageComponent c) return new ClientCellImageTooltip(c);
             if (component instanceof DogTagImageComponent c) return new ClientDogTagImageTooltip(c);
             return null;
         });
@@ -58,36 +58,35 @@ public class ClientRenderHandler {
         BlockEntityRenderers.register(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE.get(), c -> new VehicleAssemblingTableBlockEntityRenderer());
     }
 
-    public static void onClientSetup() {
-        HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> {
-            var mc = Minecraft.getInstance();
-            if (mc.player == null) return;
-            int w = mc.getWindow().getGuiScaledWidth();
-            int h = mc.getWindow().getGuiScaledHeight();
+    public static void renderOverlays(GuiGraphics guiGraphics, float partialTick) {
+        var mc = Minecraft.getInstance();
+        if (mc.player == null) return;
 
-            AmmoBarOverlay.render(guiGraphics, tickDelta, w, h);
-            AmmoCountOverlay.render(guiGraphics, tickDelta, w, h);
-            ArmorPlateOverlay.render(guiGraphics, tickDelta, w, h);
-            CrossHairOverlay.render(guiGraphics, tickDelta, w, h);
-            DroneHudOverlay.render(guiGraphics, tickDelta, w, h);
-            HandsomeFrameOverlay.render(guiGraphics, tickDelta, w, h);
-            HeatBarOverlay.render(guiGraphics, tickDelta, w, h);
-            IFFOverlay.render(guiGraphics, tickDelta, w, h);
-            IglaHudOverlay.render(guiGraphics, tickDelta, w, h);
-            ItemRendererFixOverlay.render(guiGraphics, tickDelta, w, h);
-            JavelinHudOverlay.render(guiGraphics, tickDelta, w, h);
-            KillMessageOverlay.render(guiGraphics, tickDelta, w, h);
-            MortarInfoOverlay.render(guiGraphics, tickDelta, w, h);
-            RedTriangleOverlay.render(guiGraphics, tickDelta, w, h);
-            SpyglassRangeOverlay.render(guiGraphics, tickDelta, w, h);
-            StaminaOverlay.render(guiGraphics, tickDelta, w, h);
-            TowOverlay.render(guiGraphics, tickDelta, w, h);
-            Type63InfoOverlay.render(guiGraphics, tickDelta, w, h);
-            VehicleMainWeaponHudOverlay.render(guiGraphics, tickDelta, w, h);
-            VehicleCrosshairOverlay.render(guiGraphics, tickDelta, w, h);
-            VehicleHudOverlay.render(guiGraphics, tickDelta, w, h);
-            VehicleTeamOverlay.render(guiGraphics, tickDelta, w, h);
-        });
+        int w = guiGraphics.guiWidth();
+        int h = guiGraphics.guiHeight();
+
+        Type63InfoOverlay.render(guiGraphics, partialTick, w, h);
+        MortarInfoOverlay.render(guiGraphics, partialTick, w, h);
+        TowOverlay.render(guiGraphics, partialTick, w, h);
+        SpyglassRangeOverlay.render(guiGraphics, partialTick, w, h);
+        HandsomeFrameOverlay.render(guiGraphics, partialTick, w, h);
+        RedTriangleOverlay.render(guiGraphics, partialTick, w, h);
+        DroneHudOverlay.render(guiGraphics, partialTick, w, h);
+        HeatBarOverlay.render(guiGraphics, partialTick, w, h);
+        CrossHairOverlay.render(guiGraphics, partialTick, w, h);
+        ItemRendererFixOverlay.render(guiGraphics, partialTick, w, h);
+        AmmoCountOverlay.render(guiGraphics, partialTick, w, h);
+        StaminaOverlay.render(guiGraphics, partialTick, w, h);
+        VehicleCrosshairOverlay.render(guiGraphics, partialTick, w, h);
+        VehicleMainWeaponHudOverlay.render(guiGraphics, partialTick, w, h);
+        VehicleHudOverlay.render(guiGraphics, partialTick, w, h);
+        IglaHudOverlay.render(guiGraphics, partialTick, w, h);
+        JavelinHudOverlay.render(guiGraphics, partialTick, w, h);
+        VehicleTeamOverlay.render(guiGraphics, partialTick, w, h);
+        IFFOverlay.render(guiGraphics, partialTick, w, h);
+        AmmoBarOverlay.render(guiGraphics, partialTick, w, h);
+        ArmorPlateOverlay.render(guiGraphics, partialTick, w, h);
+        KillMessageOverlay.render(guiGraphics, partialTick, w, h);
     }
 
     public static void registerLayerDefinitions() {

@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.command;
 
-import com.atsuishio.superbwarfare.capability.ModCapabilities;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -38,7 +37,7 @@ public class AmmoCommand {
                     var value = IntegerArgumentType.getInteger(context, "value");
 
                     for (var player : players) {
-                        type.set(ModCapabilities.PLAYER_VARIABLE.get(player), value);
+                        type.set(player, value);
                     }
 
                     context.getSource().sendSuccess(() -> Component.translatable("commands.ammo.set", Component.translatable(type.translationKey), value, players.size()), true);
@@ -50,7 +49,7 @@ public class AmmoCommand {
                     var value = IntegerArgumentType.getInteger(context, "value");
 
                     for (var player : players) {
-                        type.add(ModCapabilities.PLAYER_VARIABLE.get(player), value);
+                        type.add(player, value);
                     }
 
                     context.getSource().sendSuccess(() -> Component.translatable("commands.ammo.add", Component.translatable(type.translationKey), value, players.size()), true);

@@ -38,7 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
-public class Beast extends SwordItem {
+public class Beast extends SwordItem implements EntitySwingHook {
 
     public Beast() {
         super(Tiers.NETHERITE, 0, 0, new Properties()
@@ -122,6 +122,15 @@ public class Beast extends SwordItem {
 
     @Override
     public boolean isEnchantable(@NotNull ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
+        var target = TraceTool.findMeleeEntity(entity, 51.4);
+        if (target != null) {
+            beastKill(entity, target);
+        }
         return false;
     }
 

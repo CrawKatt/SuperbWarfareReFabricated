@@ -111,7 +111,7 @@ public class AmmoBarOverlay {
             if (stack.getItem() != ModItems.MINIGUN.get()) {
                 guiGraphics.drawString(
                         font,
-                        "[" + ModKeyMappings.FIRE_MODE.getDefaultKey().getDisplayName().getString() + "]",
+                        "[" + ModKeyMappings.FIRE_MODE.getTranslatedKeyMessage().getString() + "]",
                         (int) (x - 111.5f),
                         y - 20,
                         0xFFFFFF,

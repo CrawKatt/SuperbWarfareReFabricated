@@ -28,11 +28,7 @@ public class Hammer extends SwordItem {
     }
 
     @Override
-    public boolean hasCraftingRemainingItem() {
-        return true;
-    }
-
-    public ItemStack getCraftingRemainingItem(ItemStack itemstack) {
+    public ItemStack getRecipeRemainder(ItemStack itemstack) {
         ItemStack stack = itemstack.copy();
         stack.hurt(1, RandomSource.create(), null);
         stack.getOrCreateTag().putInt("CraftCount", stack.getOrCreateTag().getInt("CraftCount") + 1);
@@ -42,11 +38,6 @@ public class Hammer extends SwordItem {
         }
 
         return stack;
-    }
-
-    @Override
-    public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
-        return true;
     }
 
     @Override

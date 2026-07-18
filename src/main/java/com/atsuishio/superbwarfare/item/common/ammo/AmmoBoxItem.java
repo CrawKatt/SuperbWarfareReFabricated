@@ -1,8 +1,9 @@
 package com.atsuishio.superbwarfare.item.common.ammo;
 
-import com.atsuishio.superbwarfare.capability.ModCapabilities;
+import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.atsuishio.superbwarfare.init.ModSounds;
+import com.atsuishio.superbwarfare.item.EntitySwingHook;
 import com.atsuishio.superbwarfare.tools.FormatTool;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AmmoBoxItem extends Item {
+public class AmmoBoxItem extends Item implements EntitySwingHook {
 
     private static final List<String> AMMO_TYPE_LIST = generateAmmoTypeList();
 
@@ -41,28 +42,27 @@ public class AmmoBoxItem extends Item {
         player.getCooldowns().addCooldown(this, 10);
         String type = tag.getString("Type").isEmpty() ? "All" : tag.getString("Type");
 
-        var cap = ModCapabilities.PLAYER_VARIABLE.get(player);
-        var types = (type.equals("All") || tag.getBoolean("IsDrop")) ? Ammo.values() : new Ammo[]{Ammo.getType(type)};
+        PlayerVariable.modify(player, cap -> {
+            var types = (type.equals("All") || tag.getBoolean("IsDrop")) ? Ammo.values() : new Ammo[]{Ammo.getType(type)};
 
-        for (var ammoType : types) {
-            if (ammoType == null) break;
+            for (var ammoType : types) {
+                if (ammoType == null) return;
 
-            if (player.isCrouching() && !tag.getBoolean("IsDrop")) {
-                ammoType.add(tag, ammoType.get(cap));
-                ammoType.set(cap, 0);
-            } else {
-                ammoType.add(cap, ammoType.get(tag));
-                ammoType.set(tag, 0);
+                if (player.isCrouching() && !tag.getBoolean("IsDrop")) {
+                    ammoType.add(tag, ammoType.get(cap));
+                    ammoType.set(cap, 0);
+                } else {
+                    ammoType.add(cap, ammoType.get(tag));
+                    ammoType.set(tag, 0);
+                }
             }
-        }
 
-        if (!level.isClientSide()) {
             level.playSound(null, player.blockPosition(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1, 1);
-        }
 
-        if (tag.getBoolean("IsDrop")) {
-            stack.shrink(1);
-        }
+            if (tag.getBoolean("IsDrop")) {
+                stack.shrink(1);
+            }
+        });
         return InteractionResultHolder.consume(stack);
     }
 
@@ -77,6 +77,7 @@ public class AmmoBoxItem extends Item {
         return list;
     }
 
+    @Override
     public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
         if (entity instanceof Player player && player.isCrouching()) {
             var tag = stack.getOrCreateTag();

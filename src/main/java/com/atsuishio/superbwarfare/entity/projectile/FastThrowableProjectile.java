@@ -1,7 +1,9 @@
 package com.atsuishio.superbwarfare.entity.projectile;
 
+import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent;
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption;
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig;
+import com.atsuishio.superbwarfare.event.custom.ProjectileHitCallback;
 import com.atsuishio.superbwarfare.network.CustomSpawnDataEntity;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.network.message.receive.ClientMotionSyncMessage;
@@ -149,27 +151,25 @@ public abstract class FastThrowableProjectile extends ThrowableItemProjectile im
     @Override
     protected void onHitEntity(@NotNull EntityHitResult pResult) {
         super.onHitEntity(pResult);
-        // TODO Fabric: Replace with Fabric event API for projectile hit entity
-                /*new ProjectileHitEvent.HitEntity(
-                        this.getOwner(),
-                        this,
-                        pResult.getEntity(),
-                        pResult.getLocation()
-                )*/
+        ProjectileHitCallback.postHitEntity(new ProjectileHitEvent.HitEntity(
+                this.getOwner(),
+                this,
+                pResult.getEntity(),
+                pResult.getLocation()
+        ));
     }
 
     @Override
     protected void onHitBlock(@NotNull BlockHitResult pResult) {
         super.onHitBlock(pResult);
-        // TODO Fabric: Replace with Fabric event API for projectile hit block
-                /*new ProjectileHitEvent.HitBlock(
-                        pResult.getBlockPos(),
-                        this.level().getBlockState(pResult.getBlockPos()),
-                        pResult.getDirection(),
-                        this.getOwner(),
-                        this,
-                        pResult.getLocation()
-                )*/
+        ProjectileHitCallback.postHitBlock(new ProjectileHitEvent.HitBlock(
+                pResult.getBlockPos(),
+                this.level().getBlockState(pResult.getBlockPos()),
+                pResult.getDirection(),
+                this.getOwner(),
+                this,
+                pResult.getLocation()
+        ));
     }
 
     public void destroyBlock() {

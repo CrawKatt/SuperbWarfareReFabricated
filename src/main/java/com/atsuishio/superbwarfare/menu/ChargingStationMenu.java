@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.menu;
 
+import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.block.entity.ChargingStationBlockEntity;
 import com.atsuishio.superbwarfare.init.ModMenuTypes;
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData;
@@ -7,6 +8,7 @@ import com.atsuishio.superbwarfare.network.dataslot.SimpleEnergyData;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
@@ -49,6 +51,14 @@ public class ChargingStationMenu extends EnergyMenu {
 
         for (int k = 0; k < 9; ++k) {
             this.addSlot(new Slot(inventory, k, 8 + k * 18 + X_OFFSET, 142 + Y_OFFSET));
+        }
+
+        if (inventory.player instanceof ServerPlayer serverPlayer) {
+            Mod.queueServerWork(1, () -> {
+                if (serverPlayer.containerMenu == this) {
+                    this.startUsing(serverPlayer);
+                }
+            });
         }
     }
 

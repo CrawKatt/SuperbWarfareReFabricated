@@ -38,7 +38,8 @@ public class KeymappingMixin {
         if (player == null || !(player.getVehicle() instanceof VehicleEntity vehicle)) return;
 
         for (int i = 0; i < 9; i++) {
-            if (Minecraft.getInstance().options.keyHotbarSlots[i].getDefaultKey() == key) {
+            var hotbarKey = ((KeyMappingAccessor) Minecraft.getInstance().options.keyHotbarSlots[i]).superbwarfare$getKey();
+            if (hotbarKey.equals(this.key)) {
                 if (vehicle.getMaxPassengers() > 1
                         && Screen.hasShiftDown()
                         && i < vehicle.getMaxPassengers()

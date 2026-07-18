@@ -36,8 +36,8 @@ import com.atsuishio.superbwarfare.world.TDMSavedData;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.IntList;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -900,7 +900,6 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         if (index == -1) return;
 
         orderedPassengers.set(index, null);
-        seatIndexMap.remove(pPassenger.getUUID());
 
         pPassenger.boardingCooldown = 60;
         super.removePassenger(pPassenger);
@@ -914,12 +913,10 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
         return VehicleData.compute(this);
     }
 
-    /*
     @Override
-    public float getStepHeight() {
+    public float maxUpStep() {
         return computed().upStep;
     }
-    */
 
     @Override
     public @Nullable Entity getFirstPassenger() {
@@ -1623,14 +1620,14 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             }
 
             if (this.getFirstPassenger() == null) {
-                // TODO Fabric: No FakePlayer equivalent
+                if (player instanceof FakePlayer) return InteractionResult.PASS;
                 VehicleVecUtils.setDriverAngle(this, player);
                 player.setSprinting(false);
                 if (player.level() instanceof ServerLevel) {
                     return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
                 }
             } else if (!(this.getFirstPassenger() instanceof Player)) {
-                // TODO Fabric: No FakePlayer equivalent
+                if (player instanceof FakePlayer) return InteractionResult.PASS;
                 this.getFirstPassenger().stopRiding();
                 VehicleVecUtils.setDriverAngle(this, player);
                 player.setSprinting(false);
@@ -1639,7 +1636,7 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
                 }
             }
             if (this.canAddPassenger(player)) {
-                // TODO Fabric: No FakePlayer equivalent
+                if (player instanceof FakePlayer) return InteractionResult.PASS;
                 player.setSprinting(false);
                 if (player.level() instanceof ServerLevel) {
                     return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
@@ -2842,8 +2839,8 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
             Vec3 targetPos = target.getBoundingBox().getCenter();
             Vec3 targetVel = target.getDeltaMovement();
 
-            if (target instanceof LivingEntity living) {
-                double gravity = -0.08; // TODO Fabric: Replace with proper gravity attribute lookup
+            if (target instanceof LivingEntity) {
+                double gravity = 0.08;
                 targetVel = targetVel.add(0, gravity, 0);
             }
 
@@ -3503,13 +3500,14 @@ public abstract class VehicleEntity extends Entity implements VehiclePropertyMod
      * @param zoom       是否在载具上瞄准
      * @param seatIndex  玩家座位
      * @param isOnGround 载具是否在地面
+     * @param firstPerson 客户端当前是否为第一人称视角
      * @return 调整后的灵敏度
      */
-    public double getSensitivity(double original, boolean zoom, int seatIndex, boolean isOnGround) {
+    public double getSensitivity(double original, boolean zoom, int seatIndex, boolean isOnGround, boolean firstPerson) {
         var seat = getSeat(seatIndex);
         if (seat == null) return original;
         Vec3 sensitivity = seat.sensitivity;
-        return zoom ? sensitivity.x * original : Minecraft.getInstance().options.getCameraType().isFirstPerson() ? sensitivity.y * original : sensitivity.z * original;
+        return zoom ? sensitivity.x * original : firstPerson ? sensitivity.y * original : sensitivity.z * original;
     }
 
     /**

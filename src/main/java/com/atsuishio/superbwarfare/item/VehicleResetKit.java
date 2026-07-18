@@ -18,6 +18,11 @@ public class VehicleResetKit extends Item {
     }
 
     @Override
+    public ItemStack getRecipeRemainder(ItemStack stack) {
+        return stack.copy();
+    }
+
+    @Override
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         pTooltipComponents.add(Component.translatable("des.superbwarfare.vehicle_reset_kit_1").withStyle(ChatFormatting.AQUA));
         pTooltipComponents.add(Component.translatable("des.superbwarfare.vehicle_reset_kit_2").withStyle(ChatFormatting.GRAY));

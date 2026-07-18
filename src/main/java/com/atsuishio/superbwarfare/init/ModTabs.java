@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.init;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.api.event.RegisterContainersEvent;
 import com.atsuishio.superbwarfare.item.ArmorPlate;
 import com.atsuishio.superbwarfare.item.BatteryItem;
@@ -29,7 +30,11 @@ public class ModTabs {
                         output.accept(registryObject.get());
 
                         var stack = new ItemStack(registryObject.get());
-                        // TechReborn Energy API: full-energy variants are provided via makeFullEnergyStack
+                        int capacity = ModEnergyApi.getMaxEnergyStored(stack);
+                        if (capacity > 0) {
+                            ModEnergyApi.receiveEnergy(stack, capacity, false);
+                            output.accept(stack);
+                        }
                     }))
                     .build());
 
@@ -69,12 +74,11 @@ public class ModTabs {
                     .icon(() -> new ItemStack(ModItems.TARGET_DEPLOYER.get()))
                     .displayItems((param, output) -> ModItems.ITEMS_LIST.forEach(registryObject -> {
                         var item = registryObject.get();
+                        output.accept(item);
                         if (item instanceof BatteryItem batteryItem) {
                             output.accept(batteryItem.makeFullEnergyStack());
                         } else if (item == ModItems.ELECTRIC_BATON.get()) {
                             output.accept(ElectricBaton.makeFullEnergyStack());
-                        } else {
-                            output.accept(item);
                         }
                         if (item == ModItems.ARMOR_PLATE.get()) {
                             output.accept(ArmorPlate.getInfiniteInstance());

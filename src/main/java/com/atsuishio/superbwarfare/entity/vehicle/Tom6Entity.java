@@ -131,7 +131,7 @@ public class Tom6Entity extends GeoVehicleEntity {
     }
 
     @Override
-    public double getSensitivity(double original, boolean zoom, int seatIndex, boolean isOnGround) {
+    public double getSensitivity(double original, boolean zoom, int seatIndex, boolean isOnGround, boolean firstPerson) {
         return ModKeyMappings.FREE_CAMERA.isDown() ? 0 : 0.6;
     }
 

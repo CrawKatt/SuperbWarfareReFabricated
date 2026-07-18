@@ -212,7 +212,7 @@ public class VehicleCrosshairOverlay {
                 if (player == vehicle.getFirstPassenger()) {
                     if (vehicle.hasDecoy()) {
                         if (vehicle.getDecoyState().equals("READY")) {
-                            guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getDefaultKey().getDisplayName().getString() + "]")), 30, 1, -1, false);
+                            guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.ready").append(Component.literal(" [" + ModKeyMappings.RELEASE_DECOY.getTranslatedKeyMessage().getString() + "]")), 30, 1, -1, false);
                         } else {
                             guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("tips.superbwarfare.smoke.reloading"), 30, 1, 0xFF0000, false);
                         }

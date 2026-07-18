@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.block.entity;
 import com.atsuishio.superbwarfare.block.SuperbItemInterfaceBlock;
 import com.atsuishio.superbwarfare.init.ModBlockEntities;
 import com.atsuishio.superbwarfare.menu.SuperbItemInterfaceMenu;
+import com.atsuishio.superbwarfare.tools.InventoryTool;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -55,10 +56,11 @@ public class SuperbItemInterfaceBlockEntity extends BaseContainerBlockEntity {
                 (Entity) null,
                 new AABB(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y + 0.5, z + 0.5),
                 entity -> entity instanceof Player
+                        || entity instanceof Container container && container.getContainerSize() > 0
         );
         if (list.isEmpty()) return;
-        var target = (Player) list.get(level.random.nextInt(list.size()));
-        var inventory = target.getInventory();
+        var target = list.get(level.random.nextInt(list.size()));
+        Container inventory = target instanceof Player player ? player.getInventory() : (Container) target;
 
         // item transfer
         for (int i = 0; i < blockEntity.items.size(); i++) {
@@ -67,25 +69,7 @@ public class SuperbItemInterfaceBlockEntity extends BaseContainerBlockEntity {
 
             var originalStack = stack.copy();
 
-            var totalInserted = 0;
-            for (int ii = 0; ii < inventory.getContainerSize(); ii++) {
-                var existing = inventory.getItem(ii);
-
-                if (existing.isEmpty()) {
-                    var toInsert = Math.min(stack.getCount(), stack.getMaxStackSize());
-                    inventory.setItem(ii, stack.copyWithCount(toInsert));
-                    stack.shrink(toInsert);
-                    totalInserted += toInsert;
-                } else if (ItemStack.isSameItemSameTags(existing, stack) && existing.getCount() < existing.getMaxStackSize()) {
-                    var space = existing.getMaxStackSize() - existing.getCount();
-                    var toInsert = Math.min(space, stack.getCount());
-                    existing.grow(toInsert);
-                    stack.shrink(toInsert);
-                    totalInserted += toInsert;
-                }
-
-                if (stack.isEmpty()) break;
-            }
+            var totalInserted = InventoryTool.insertItemInSlotOrder(inventory, stack);
 
             if (!blockEntity.isCreative()) {
                 blockEntity.items.set(i, stack);

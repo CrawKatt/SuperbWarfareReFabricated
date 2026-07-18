@@ -9,6 +9,9 @@ public interface LivingHealCallback {
             callbacks -> event -> {
                 for (LivingHealCallback callback : callbacks) {
                     callback.onLivingHeal(event);
+                    if (event.isCanceled()) {
+                        return;
+                    }
                 }
             }
     );

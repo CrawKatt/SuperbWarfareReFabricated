@@ -22,7 +22,7 @@ import java.util.Set;
 public class ItemRendererMixin {
 
     @Unique
-    private static final Set<ResourceLocation> CUSTOM_GUI_ICON_ITEMS = Set.of(
+    private static final Set<ResourceLocation> CUSTOM_SEPARATE_TRANSFORM_ITEMS = Set.of(
             new ResourceLocation("superbwarfare", "lunge_mine")
     );
 
@@ -35,29 +35,32 @@ public class ItemRendererMixin {
             at = @At("HEAD"),
             argsOnly = true
     )
-    private BakedModel superbwarfare$useGuiIconModel(BakedModel bakedModel, ItemStack stack, ItemDisplayContext displayContext) {
-        if (superbwarfare$usesGuiIconModel(stack) && superbwarfare$isGuiLikeDisplay(displayContext)) {
-            ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
-            ModelResourceLocation iconModelLocation = new ModelResourceLocation(itemId.withPath(path -> path + "_icon"), "inventory");
-            return this.itemModelShaper.getModelManager().getModel(iconModelLocation);
-        }
+    private BakedModel superbwarfare$useSeparateTransformModel(BakedModel bakedModel, ItemStack stack, ItemDisplayContext displayContext) {
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        String suffix = superbwarfare$getSeparateModelSuffix(stack, itemId, displayContext);
+        if (suffix == null) return bakedModel;
 
-        return bakedModel;
+        ModelResourceLocation modelLocation = new ModelResourceLocation(
+                itemId.withPath(path -> path + suffix),
+                "inventory"
+        );
+        return this.itemModelShaper.getModelManager().getModel(modelLocation);
     }
 
     @Unique
-    private static boolean superbwarfare$usesGuiIconModel(ItemStack stack) {
+    private static String superbwarfare$getSeparateModelSuffix(ItemStack stack, ResourceLocation itemId,
+                                                                ItemDisplayContext displayContext) {
+        // Forge's generated gun models override only the GUI perspective.
         if (stack.getItem() instanceof GunGeoItem) {
-            return true;
+            return displayContext == ItemDisplayContext.GUI ? "_icon" : null;
         }
 
-        return CUSTOM_GUI_ICON_ITEMS.contains(BuiltInRegistries.ITEM.getKey(stack.getItem()));
-    }
+        if (!CUSTOM_SEPARATE_TRANSFORM_ITEMS.contains(itemId)) return null;
 
-    @Unique
-    private static boolean superbwarfare$isGuiLikeDisplay(ItemDisplayContext displayContext) {
-        return displayContext == ItemDisplayContext.GUI
-                || displayContext == ItemDisplayContext.GROUND
-                || displayContext == ItemDisplayContext.FIXED;
+        return switch (displayContext) {
+            case GUI, GROUND, FIXED, THIRD_PERSON_LEFT_HAND -> "_icon";
+            case THIRD_PERSON_RIGHT_HAND -> "_3d";
+            default -> null;
+        };
     }
 }

@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.mobeffect;
 
+import com.atsuishio.superbwarfare.entity.mixin.EntityPersistentDataAccess;
 import com.atsuishio.superbwarfare.event.custom.LivingTickCallback;
 import com.atsuishio.superbwarfare.event.custom.MobEffectAddedCallback;
 import com.atsuishio.superbwarfare.event.custom.MobEffectRemovedCallback;
@@ -21,12 +22,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class BurnMobEffect extends MobEffect {
 
-    private static final Map<Integer, Integer> BURN_ATTACKERS = new HashMap<>();
+    private static final String BURN_ATTACKER = "BurnAttacker";
 
     public BurnMobEffect() {
         super(MobEffectCategory.HARMFUL, -12708330);
@@ -40,11 +38,12 @@ public class BurnMobEffect extends MobEffect {
 
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
+        var persistentData = EntityPersistentDataAccess.of(entity).superbwarfare$getPersistentData();
         Entity attacker;
-        if (!BURN_ATTACKERS.containsKey(entity.getId())) {
+        if (!persistentData.contains(BURN_ATTACKER)) {
             attacker = null;
         } else {
-            attacker = entity.level().getEntity(BURN_ATTACKERS.get(entity.getId()));
+            attacker = entity.level().getEntity(persistentData.getInt(BURN_ATTACKER));
         }
 
         DamageHandler.doDamage(entity, ModDamageTypes.causeBurnDamage(entity.level().registryAccess(), attacker), 0.6f + (0.3f * amplifier));
@@ -71,7 +70,8 @@ public class BurnMobEffect extends MobEffect {
         living.invulnerableTime = 0;
 
         if (source instanceof LivingEntity entitySource) {
-            BURN_ATTACKERS.put(living.getId(), entitySource.getId());
+            EntityPersistentDataAccess.of(living).superbwarfare$getPersistentData()
+                    .putInt(BURN_ATTACKER, entitySource.getId());
         }
     }
 
@@ -81,7 +81,8 @@ public class BurnMobEffect extends MobEffect {
         }
 
         if (instance.getEffect().equals(ModMobEffects.BURN.get())) {
-            BURN_ATTACKERS.remove(living.getId());
+            EntityPersistentDataAccess.of(living).superbwarfare$getPersistentData()
+                    .remove(BURN_ATTACKER);
         }
     }
 
