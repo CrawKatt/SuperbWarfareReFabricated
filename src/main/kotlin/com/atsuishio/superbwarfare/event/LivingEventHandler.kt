@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.gun.value.ReloadState
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
+import com.atsuishio.superbwarfare.entity.mixin.ExplosionAccess
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
@@ -732,7 +733,7 @@ object LivingEventHandler {
 
             iterator.remove()
             val explosionPos = explosion.position
-            val explosionRadius = explosion.radius * 2.0F
+            val explosionRadius = (explosion as ExplosionAccess).`superbwarfare$getRadius`() * 2.0F
             if (!entity.ignoreExplosion()) {
                 val distanceRatio = sqrt(entity.distanceToSqr(explosionPos)) / explosionRadius
                 if (distanceRatio <= 1.0) {
@@ -750,7 +751,7 @@ object LivingEventHandler {
                             Explosion.getSeenPercent(explosionPos, entity)
                         val impactStrength = (1.0 - distanceRatio) * visibilityFactor
                         val damage =
-                            (impactStrength * impactStrength + impactStrength) / 2.0 * explosion.damage
+                            (impactStrength * impactStrength + impactStrength) / 2.0 * 7.0 * explosionRadius + 1.0
 
                         entity.hurt(explosion.damageSource, damage.toFloat())
                     }

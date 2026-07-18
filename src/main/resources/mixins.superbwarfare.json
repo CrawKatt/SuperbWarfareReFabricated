@@ -11,6 +11,7 @@
     "ClientboundSetPassengersPacketMixin",
     "ClientLevelMixin",
     "EntityMixin",
+    "ExplosionMixin",
     "FishingHookMixin",
     "GeoModelAccessor",
     "LevelMixin",
