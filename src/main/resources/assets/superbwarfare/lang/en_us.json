@@ -252,6 +252,7 @@
   "item.superbwarfare.cannon_core": "Cannon Core",
   "item.superbwarfare.dog_tag": "Dog Tag",
   "curios.identifier.dog_tag": "Dog Tag",
+  "trinkets.slot.chest.dog_tag": "Dog Tag",
   "item.superbwarfare.cell": "Cell",
   "item.superbwarfare.battery": "Battery",
   "item.superbwarfare.small_battery_pack": "Small Battery Pack",
@@ -294,6 +295,7 @@
   "des.superbwarfare.artillery_indicator.full": "The artillery array is full, no more artillery can be added",
   "item.superbwarfare.iff": "IFF",
   "curios.identifier.iff": "IFF",
+  "trinkets.slot.chest.iff": "IFF",
   "des.superbwarfare.iff_1": "When player joins a vanilla team and is not in TDM mode, teammate indicator will display onscreen",
   "item.superbwarfare.medical_kit": "Medical Kit",
   "des.superbwarfare.medical_kit": "Right-click while sneaking to throw it, hold right mouse button to heal when health is not full",
@@ -308,6 +310,8 @@
   "des.superbwarfare.vehicle_reset_kit_2": "A mysterious oil paper bag with some small parts inside",
 
   "attribute.superbwarfare.bullet_resistance": "Bullet Resistance",
+  "attribute.superbwarfare.block_reach": "Block Reach",
+  "attribute.superbwarfare.entity_reach": "Entity Reach",
 
   "block.superbwarfare.jump_pad": "Jump Pad",
   "block.superbwarfare.sandbag": "Sandbag",

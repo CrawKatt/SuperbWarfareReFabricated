@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "tag": "c:gold_ingots"
+    },
+    "b": {
+      "tag": "c:diamonds"
+    },
+    "c": {
+      "tag": "c:redstone_dusts"
+    },
+    "d": {
+      "item": "minecraft:polished_basalt"
+    },
+    "e": {
+      "item": "superbwarfare:ancient_cpu"
+    }
+  },
+  "pattern": [
+    "abc",
+    "ded",
+    "ddd"
+  ],
+  "result": {
+    "item": "superbwarfare:reforging_table"
+  },
+  "show_notification": true
+}

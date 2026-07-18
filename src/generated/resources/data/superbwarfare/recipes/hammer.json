@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "a": {
+      "tag": "c:iron_ingots"
+    },
+    "b": {
+      "tag": "c:storage_blocks/iron"
+    },
+    "c": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    "aba",
+    " c ",
+    " c "
+  ],
+  "result": {
+    "item": "superbwarfare:hammer"
+  },
+  "show_notification": true
+}

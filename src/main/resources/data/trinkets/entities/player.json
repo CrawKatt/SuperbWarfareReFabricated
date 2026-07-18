@@ -1,7 +1,11 @@
 {
   "replace": false,
+  "entities": [
+    "minecraft:player"
+  ],
   "slots": [
-    "back",
-    "chest"
+    "chest/back",
+    "chest/dog_tag",
+    "chest/iff"
   ]
 }

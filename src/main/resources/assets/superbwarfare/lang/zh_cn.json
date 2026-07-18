@@ -252,6 +252,7 @@
   "item.superbwarfare.cannon_core": "火炮核心",
   "item.superbwarfare.dog_tag": "狗牌",
   "curios.identifier.dog_tag": "狗牌",
+  "trinkets.slot.chest.dog_tag": "狗牌",
   "item.superbwarfare.cell": "电池",
   "item.superbwarfare.battery": "大型电池",
   "item.superbwarfare.small_battery_pack": "小型电池组",
@@ -294,6 +295,7 @@
   "des.superbwarfare.artillery_indicator.full": "火炮阵列已满，无法继续添加火炮",
   "item.superbwarfare.iff": "敌我识别装置",
   "curios.identifier.iff": "敌我识别装置",
+  "trinkets.slot.chest.iff": "敌我识别装置",
   "des.superbwarfare.iff_1": "当玩家加入原版队伍，且不在TDM模式下时，会在屏幕上标记队友位置",
   "item.superbwarfare.medical_kit": "医疗包",
   "des.superbwarfare.medical_kit": "潜行使用以丢出，在生命值未满的情况下长按使用以治疗",
@@ -308,6 +310,8 @@
   "des.superbwarfare.vehicle_reset_kit_2": "一个神秘的油纸包，里面是一些小零件",
 
   "attribute.superbwarfare.bullet_resistance": "子弹防护",
+  "attribute.superbwarfare.block_reach": "方块触及距离",
+  "attribute.superbwarfare.entity_reach": "实体触及距离",
 
   "block.superbwarfare.jump_pad": "弹射台",
   "block.superbwarfare.sandbag": "沙袋",

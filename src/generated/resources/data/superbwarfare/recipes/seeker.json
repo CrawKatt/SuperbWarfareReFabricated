@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "b": {
+      "tag": "c:iron_ingots"
+    },
+    "c": {
+      "item": "minecraft:compass"
+    },
+    "d": {
+      "tag": "c:quartz"
+    },
+    "e": {
+      "item": "minecraft:comparator"
+    }
+  },
+  "pattern": [
+    " a ",
+    "bcb",
+    "ded"
+  ],
+  "result": {
+    "count": 4,
+    "item": "superbwarfare:seeker"
+  },
+  "show_notification": true
+}

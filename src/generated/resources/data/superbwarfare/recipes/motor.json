@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "tag": "c:nuggets/iron"
+    },
+    "b": {
+      "tag": "c:lapis"
+    },
+    "c": {
+      "tag": "c:copper_ingots"
+    },
+    "d": {
+      "tag": "c:redstone_dusts"
+    }
+  },
+  "pattern": [
+    " a ",
+    "bcd",
+    "bcd"
+  ],
+  "result": {
+    "count": 2,
+    "item": "superbwarfare:motor"
+  },
+  "show_notification": true
+}

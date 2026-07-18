@@ -1,8 +1,0 @@
-{
-  "replace": false,
-  "icon": "trinkets:gui/slots/back",
-  "order": -512,
-  "validator_predicates": [],
-  "quick_move_predicates": [],
-  "tooltip_predicates": []
-}

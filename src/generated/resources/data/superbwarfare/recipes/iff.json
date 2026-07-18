@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "tag": "c:redstone_dusts"
+    },
+    "b": {
+      "tag": "c:lapis"
+    },
+    "c": {
+      "tag": "c:plates/copper"
+    }
+  },
+  "pattern": [
+    "ab",
+    "c "
+  ],
+  "result": {
+    "item": "superbwarfare:iff"
+  },
+  "show_notification": true
+}

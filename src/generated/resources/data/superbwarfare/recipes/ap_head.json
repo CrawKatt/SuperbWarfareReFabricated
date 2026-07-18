@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "superbwarfare:high_energy_explosives"
+    },
+    "b": {
+      "tag": "c:iron_ingots"
+    },
+    "c": {
+      "tag": "superbwarfare:ingots/steel"
+    },
+    "d": {
+      "item": "superbwarfare:tungsten_rod"
+    }
+  },
+  "pattern": [
+    " b ",
+    "bdb",
+    "cac"
+  ],
+  "result": {
+    "count": 2,
+    "item": "superbwarfare:ap_head"
+  },
+  "show_notification": true
+}

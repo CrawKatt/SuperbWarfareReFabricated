@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "tag": "c:gold_ingots"
+    },
+    "b": {
+      "item": "minecraft:observer"
+    },
+    "c": {
+      "item": "minecraft:note_block"
+    },
+    "d": {
+      "tag": "c:iron_ingots"
+    }
+  },
+  "pattern": [
+    "aba",
+    "aca",
+    "ada"
+  ],
+  "result": {
+    "item": "superbwarfare:vehicle_damage_analyzer"
+  },
+  "show_notification": true
+}

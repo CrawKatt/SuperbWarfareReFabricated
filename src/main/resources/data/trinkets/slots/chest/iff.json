@@ -1,8 +1,10 @@
 {
   "replace": false,
-  "icon": "trinkets:gui/slots/charm",
+  "icon": "superbwarfare:slot/iff_slot",
   "order": -507,
-  "validator_predicates": [],
+  "validator_predicates": [
+    "trinkets:tag"
+  ],
   "quick_move_predicates": [],
   "tooltip_predicates": []
 }

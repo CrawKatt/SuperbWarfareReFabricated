@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "tag": "c:redstone_dusts"
+    },
+    "b": {
+      "tag": "c:plates/copper"
+    },
+    "c": {
+      "tag": "c:glass_panes"
+    },
+    "d": {
+      "tag": "c:iron_ingots"
+    }
+  },
+  "pattern": [
+    " b ",
+    "cac",
+    " d "
+  ],
+  "result": {
+    "item": "superbwarfare:battery"
+  },
+  "show_notification": true
+}

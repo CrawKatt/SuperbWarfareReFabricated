@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "tag": "c:iron_ingots"
+    },
+    "b": {
+      "tag": "c:nuggets/iron"
+    },
+    "c": {
+      "item": "minecraft:iron_bars"
+    },
+    "d": {
+      "tag": "c:green_dyes"
+    }
+  },
+  "pattern": [
+    " a ",
+    "bbb",
+    "cdc"
+  ],
+  "result": {
+    "item": "superbwarfare:mortar_bipod"
+  },
+  "show_notification": true
+}

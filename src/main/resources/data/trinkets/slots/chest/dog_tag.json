@@ -1,8 +1,10 @@
 {
   "replace": false,
-  "icon": "trinkets:gui/slots/charm",
+  "icon": "superbwarfare:slot/dog_tag_slot",
   "order": -508,
-  "validator_predicates": [],
+  "validator_predicates": [
+    "trinkets:tag"
+  ],
   "quick_move_predicates": [],
   "tooltip_predicates": []
 }

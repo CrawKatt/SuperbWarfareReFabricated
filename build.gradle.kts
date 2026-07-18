@@ -4,7 +4,7 @@ import java.time.Instant
 plugins {
     eclipse
     idea
-    id("fabric-loom") version "1.8.13"
+    id("fabric-loom") version "1.13.6"
 }
 
 fun getGitCommitHash(): String {
@@ -123,12 +123,27 @@ repositories {
     }
 
     maven {
+        name = "Modrinth"
+        url = uri("https://api.modrinth.com/maven")
+        content {
+            includeGroup("maven.modrinth")
+        }
+    }
+
+    maven {
         name = "SpongePowered"
         url = uri("https://repo.spongepowered.org/maven/")
     }
 
     maven("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/") {
         name = "Fuzs Mod Resources"
+    }
+
+    maven("https://mvn.devos.one/releases/") {
+        name = "DevOS"
+        content {
+            includeGroup("io.github.fabricators_of_create.Porting-Lib")
+        }
     }
 }
 
@@ -143,16 +158,15 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_api_version")}")
 
-    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
-
     // CuriosAPI -> Trinkets
     modImplementation("dev.emi:trinkets:3.7.1")
 
-    // TechReborn Energy API
-    modImplementation("teamreborn:energy:3.0.0")
-
-    // Cardinal Components API
-    modImplementation("com.github.OnyxStudios.Cardinal-Components-API:cardinal-components-api:5.2.3")
+    // Runtime APIs used directly by the mod. Nest them so a release JAR has
+    // the same built-in capabilities that Forge provides without requiring
+    // users to discover undeclared libraries after a startup crash.
+    include(modImplementation("teamreborn:energy:3.0.0")!!)
+    include(modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.0")!!)
+    include(modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.0")!!)
 
     // JSR-305 (javax.annotation @ParametersAreNonnullByDefault)
     implementation("com.google.code.findbugs:jsr305:3.0.2")
@@ -160,6 +174,10 @@ dependencies {
     // GeckoLib
     modImplementation("software.bernie.geckolib:geckolib-fabric-1.20.1:4.4.6")
     implementation("com.eliotlash.mclib:mclib:20")
+
+    // Restore Forge's OBJ dragon_teeth model. The obj_loader artifact already
+    // nests Porting Lib's model_loader, core and MixinExtras modules.
+    include(modImplementation("io.github.fabricators_of_create.Porting-Lib:obj_loader:2.3.12+1.20.1")!!)
 
     // JEI Fabric
     modCompileOnly("mezz.jei:jei-${project.property("minecraft_version")}-fabric-api:${project.property("jei_version")}")
@@ -172,21 +190,16 @@ dependencies {
     // Cloth Config Fabric
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:${project.property("cloth_config_version")}")
 
-    // Jade Fabric: usa el archivo Fabric correspondiente en CurseMaven
-    modImplementation("curse.maven:jade-324717:${project.property("jade_version")}")
-
-    // Dependencias CurseMaven: verifica que estos IDs sean archivos Fabric.
-    modImplementation("curse.maven:timeless-and-classics-zero-1028108:6518539")
-    modImplementation("curse.maven:create-328085:6255513")
-    modImplementation("curse.maven:mmmmmmmmmmmm-225738:6237015")
-    modImplementation("curse.maven:selene-499980:6249659")
-    modImplementation("curse.maven:better-combat-by-daedelus-639842:5625757")
-    modImplementation("curse.maven:playeranimator-658587:4587214")
+    // Optional integrations. Use the Fabric Jade API and keep the Forge-only
+    // TaCZ artifact off the runtime classpath; the latter is needed solely to
+    // compile its guarded compatibility mixin.
+    modCompileOnly("maven.modrinth:nvQzSEkH:oJx1UoWN") // Jade 11.12.3 Fabric
+    modCompileOnly("curse.maven:timeless-and-classics-zero-1028108:6518539")
 
     modApi("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:8.0.3")
 
-    // Opcionales
-    modCompileOnly("curse.maven:real-camera-851574:${project.property("real_camera_id")}")
+    // Optional client compatibility, compiled against the Fabric artifact.
+    modCompileOnly("maven.modrinth:fYYSAh4R:ncXw8tDz") // Real Camera 0.7.4 Fabric
 }
 
 tasks.named<ProcessResources>("processResources") {
@@ -195,7 +208,6 @@ tasks.named<ProcessResources>("processResources") {
         "entity_type" to "entity_types",
         "item" to "items"
     )
-    val vehicleAssemblingRecipeType = "\"type\": \"superbwarfare:vehicle_assembling\""
     val replaceProperties = mapOf(
         "version" to project.version.toString(),
         "minecraft_version" to project.property("minecraft_version"),
@@ -214,9 +226,7 @@ tasks.named<ProcessResources>("processResources") {
     eachFile {
         val parts = path.split("/")
         if (parts.size > 3 && parts[0] == "data") {
-            if (parts[2] == "recipe" && file.isFile && file.readText().contains(vehicleAssemblingRecipeType)) {
-                path = (parts.take(2) + "recipes" + parts.drop(3)).joinToString("/")
-            } else if (parts[2] == "tags") {
+            if (parts[2] == "tags") {
                 val replacement = parts.getOrNull(3)?.let(legacyTagPathSegments::get)
                 if (replacement != null) {
                     path = (parts.take(3) + replacement + parts.drop(4)).joinToString("/")
