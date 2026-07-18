@@ -1,11 +1,9 @@
 package com.atsuishio.superbwarfare.block
 
-import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
@@ -17,7 +15,6 @@ import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.block.state.properties.DirectionProperty
 import net.minecraft.world.level.block.state.properties.IntegerProperty
-import net.minecraft.world.phys.Vec3
 import kotlin.math.max
 
 @Suppress("OVERRIDE_DEPRECATION")
@@ -118,23 +115,6 @@ open class AircraftCatapultBlock :
             max = max(max, blockState.getValue(LAUNCH_POWER))
         }
         return max
-    }
-
-    override fun entityInside(pState: BlockState, pLevel: Level, pPos: BlockPos, pEntity: Entity) {
-        super.entityInside(pState, pLevel, pPos, pEntity)
-        if (pEntity !is CatapultShuttleEntity) return
-
-        val state = pLevel.getBlockState(pPos)
-        val power = state.getValue(LAUNCH_POWER)
-        if (power == 0) return
-
-        val direction = state.getValue(FACING)
-        val rate = power / 75f
-        val localDir = Vec3(direction.stepX.toDouble(), 0.0, direction.stepZ.toDouble())
-        val moveDir = if (state.getValue(REVERSED)) localDir.scale(-1.0) else localDir
-        if (pEntity.deltaMovement.dot(moveDir) < 0.2 * power) {
-            pEntity.addDeltaMovement(Vec3(moveDir.x * rate, moveDir.y * rate, moveDir.z * rate))
-        }
     }
 
     companion object {

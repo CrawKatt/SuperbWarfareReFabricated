@@ -12,7 +12,8 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.resources.ResourceLocation
 
-class CatapultShuttleRenderer(renderManager: EntityRendererProvider.Context) : EntityRenderer<CatapultShuttleEntity>(renderManager) {
+class CatapultShuttleRenderer(renderManager: EntityRendererProvider.Context) :
+    EntityRenderer<CatapultShuttleEntity>(renderManager) {
     init {
         this.shadowRadius = 0f
     }
@@ -28,6 +29,7 @@ class CatapultShuttleRenderer(renderManager: EntityRendererProvider.Context) : E
         val model = EntityModelReloadListener.getModel(MODEL) ?: return
 
         poseStack.pushPose()
+        poseStack.translate(0.0, -1.0, 0.0)
         poseStack.mulPose(Axis.YP.rotationDegrees(-entityYaw + 180f))
 
         val renderType = RenderType.entityTranslucent(getTextureLocation(entityIn))
