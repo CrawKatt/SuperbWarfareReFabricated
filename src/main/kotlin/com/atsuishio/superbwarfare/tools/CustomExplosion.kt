@@ -54,7 +54,7 @@ class CustomExplosion @JvmOverloads constructor(
     val x: Double,
     val y: Double,
     val z: Double,
-    private val radius: Float,
+    val radius: Float,
     blockInteraction: BlockInteraction,
     smallParticle: ParticleOptions = ParticleTypes.EXPLOSION,
     bigParticle: ParticleOptions = ParticleTypes.EXPLOSION_EMITTER,
@@ -354,7 +354,7 @@ class CustomExplosion @JvmOverloads constructor(
                         val shockwaveDelay = (distance / 340 * 20).toInt().coerceAtMost(100)
 
                         // Set hit flag immediately for player feedback
-                        if (entity is LivingEntity || entity is VehicleEntity) {
+                        if (entity is LivingEntity) {
                             hit = true
                         }
 
