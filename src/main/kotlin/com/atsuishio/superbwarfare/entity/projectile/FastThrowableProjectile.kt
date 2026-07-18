@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitBlock
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitEntity
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
 import com.atsuishio.superbwarfare.client.particle.CustomFlareOption
+import com.atsuishio.superbwarfare.compat.sable.SableCompatHandler
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig
 import com.atsuishio.superbwarfare.entity.getValue
@@ -241,15 +242,28 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
             val startVec = this.position()
             val fullEndVec = startVec.add(this.deltaMovement)
 
-            // 1. 查找最近的方块碰撞点
-            val blockHit = rayTraceBlocks(
-                level,
-                ClipContext(
-                    startVec, fullEndVec, ClipContext.Block.COLLIDER,
-                    if (this.canPassThroughFluid()) ClipContext.Fluid.NONE else ClipContext.Fluid.ANY,
-                    this
-                ),
-                if (this.isPenetrating()) Predicate { true } else Predicate { false }
+            // 1. 查找最近的方块碰撞点（含Sable物理结构）
+            val blockHit = (
+                if (SableCompatHandler.hasMod())
+                    SableCompatHandler.rayTraceBlocksWithSable(
+                        level,
+                        ClipContext(
+                            startVec, fullEndVec, ClipContext.Block.COLLIDER,
+                            if (this.canPassThroughFluid()) ClipContext.Fluid.NONE else ClipContext.Fluid.ANY,
+                            this
+                        ),
+                        if (this.isPenetrating()) Predicate { true } else Predicate { false }
+                    )
+                else
+                    rayTraceBlocks(
+                        level,
+                        ClipContext(
+                            startVec, fullEndVec, ClipContext.Block.COLLIDER,
+                            if (this.canPassThroughFluid()) ClipContext.Fluid.NONE else ClipContext.Fluid.ANY,
+                            this
+                        ),
+                        if (this.isPenetrating()) Predicate { true } else Predicate { false }
+                    )
             ).takeIf { it.type != HitResult.Type.MISS }
 
             // 2. 在路径上查找实体（仅在方块碰撞点之前）
