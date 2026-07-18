@@ -24,7 +24,7 @@ import net.minecraftforge.registries.RegistryBuilder
 import net.minecraftforge.registries.RegistryObject
 import java.nio.file.Files
 
-typealias PERK = RegistryObject<Perk>
+private typealias PERK = RegistryObject<Perk>
 
 @net.minecraftforge.fml.common.Mod.EventBusSubscriber(bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD)
 @Suppress("unused")
