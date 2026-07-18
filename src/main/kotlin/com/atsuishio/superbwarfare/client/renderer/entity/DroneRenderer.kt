@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.client.layer.vehicle.DroneLayer
 import com.atsuishio.superbwarfare.client.model.entity.DroneModel
+import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.tools.NBTTool
@@ -107,10 +108,15 @@ class DroneRenderer(renderManager: EntityRendererProvider.Context) :
             entityCache = renderEntity
             attachedTick = entity.tickCount
         }
-        val displayData = data.get(DroneEntity.DISPLAY_DATA)
+        if (renderEntity == null) return
 
-        renderEntity!!.tickCount =
-            if (displayData[11] >= 0) displayData[11].toInt() else entity.tickCount - attachedTick
+        val displayData = data.get(DroneEntity.DISPLAY_DATA)
+        val entityTick = if (displayData[11] >= 0) displayData[11].toInt() else entity.tickCount - attachedTick
+
+        renderEntity.tickCount = entityTick
+        if (renderEntity is FastThrowableProjectile) {
+            renderEntity.syncedTick = entityTick
+        }
 
         val scale = floatArrayOf(displayData[0], displayData[1], displayData[2])
         val offset = floatArrayOf(displayData[3], displayData[4], displayData[5])
