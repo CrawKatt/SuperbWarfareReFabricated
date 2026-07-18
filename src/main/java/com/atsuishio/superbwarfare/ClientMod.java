@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.client.ClickHandler;
 import com.atsuishio.superbwarfare.client.ClientRenderHandler;
 import com.atsuishio.superbwarfare.client.MouseMovementHandler;
 import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
+import com.atsuishio.superbwarfare.client.model.DragonTeethObjModelLoader;
 import com.atsuishio.superbwarfare.client.molang.MolangVariable;
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
@@ -44,6 +45,7 @@ public class ClientMod implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        DragonTeethObjModelLoader.register();
         registerGuiIconModels();
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.BARBED_WIRE.get(), RenderType.cutout());
         ModKeyMappings.register();

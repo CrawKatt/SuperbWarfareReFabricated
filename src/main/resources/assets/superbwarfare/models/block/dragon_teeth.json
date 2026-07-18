@@ -1,10 +1,7 @@
 {
-  "gui_light": "front",
-  "loader": "porting_lib:obj",
-  "model": "superbwarfare:models/block/dragon_teeth.obj",
-  "emissiveAmbient": true,
+  "parent": "minecraft:block/block",
   "textures": {
     "particle": "minecraft:block/smooth_stone",
-    "#m_40ddb3f7-b960-0c4a-147f-2010aa6221ab": "superbwarfare:block/dragon_teeth"
+    "dragon_teeth": "superbwarfare:block/dragon_teeth"
   }
 }

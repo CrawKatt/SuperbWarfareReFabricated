@@ -175,10 +175,6 @@ dependencies {
     modImplementation("software.bernie.geckolib:geckolib-fabric-1.20.1:4.4.6")
     implementation("com.eliotlash.mclib:mclib:20")
 
-    // Restore Forge's OBJ dragon_teeth model. The obj_loader artifact already
-    // nests Porting Lib's model_loader, core and MixinExtras modules.
-    include(modImplementation("io.github.fabricators_of_create.Porting-Lib:obj_loader:2.3.12+1.20.1")!!)
-
     // JEI Fabric
     modCompileOnly("mezz.jei:jei-${project.property("minecraft_version")}-fabric-api:${project.property("jei_version")}")
     modRuntimeOnly("mezz.jei:jei-${project.property("minecraft_version")}-fabric:${project.property("jei_version")}")
