@@ -725,15 +725,18 @@ object LivingEventHandler {
      */
     @SubscribeEvent
     fun onExplosionDetonate(event: ExplosionEvent.Detonate) {
-        val explosion = event.explosion as? CustomExplosion ?: return
-
+        val explosion = event.explosion
         val iterator = event.affectedEntities.iterator()
+        val isCustom = explosion is CustomExplosion
+
         while (iterator.hasNext()) {
             val entity = iterator.next() as? VehicleEntity ?: continue
 
             iterator.remove()
             val explosionPos = explosion.position
-            val explosionRadius = (explosion as ExplosionAccess).`superbwarfare$getRadius`() * 2.0F
+            val explosionRadius = if (isCustom) explosion.radius * 2.0F
+            else (explosion as ExplosionAccess).`superbwarfare$getRadius`() * 2.0F
+
             if (!entity.ignoreExplosion()) {
                 val distanceRatio = sqrt(entity.distanceToSqr(explosionPos)) / explosionRadius
                 if (distanceRatio <= 1.0) {
@@ -742,16 +745,14 @@ object LivingEventHandler {
                     val dz = entity.z - explosionPos.z
                     val distance = sqrt(dx * dx + dy * dy + dz * dz)
                     if (distance != 0.0) {
-                        // Use capped sampling for OBB vehicles — their massive AABB
-                        // (e.g. AC-130H at ~28×12×41) would otherwise cause 100 000+
-                        // raycasts inside vanilla Explosion.getSeenPercent.
                         val visibilityFactor = if (!entity.enableAABB())
                             CustomExplosion.getSeenPercentOptimized(entity.level(), explosionPos, entity)
                         else
                             Explosion.getSeenPercent(explosionPos, entity)
                         val impactStrength = (1.0 - distanceRatio) * visibilityFactor
                         val damage =
-                            (impactStrength * impactStrength + impactStrength) / 2.0 * 7.0 * explosionRadius + 1.0
+                            if (isCustom) (impactStrength * impactStrength + impactStrength) / 2.0 * explosion.damage
+                            else (impactStrength * impactStrength + impactStrength) / 2.0 * 7.0 * explosionRadius + 1.0
 
                         entity.hurt(explosion.damageSource, damage.toFloat())
                     }

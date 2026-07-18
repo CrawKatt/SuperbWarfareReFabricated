@@ -52,11 +52,11 @@ open class CustomExplosion(
     private val entity: Entity?,
     source: DamageSource?,
     damageCalculator: ExplosionDamageCalculator?,
-    private val damage: Float,
-    private val x: Double,
-    private val y: Double,
-    private val z: Double,
-    private val radius: Float,
+    val damage: Float,
+    val x: Double,
+    val y: Double,
+    val z: Double,
+    val radius: Float,
     blockInteraction: BlockInteraction
 ) : Explosion(
     level,
@@ -362,7 +362,7 @@ open class CustomExplosion(
                         val shockwaveDelay = (distance / 340 * 20).toInt().coerceAtMost(100)
 
                         // Set hit flag immediately for player feedback
-                        if (entity is LivingEntity || entity is VehicleEntity) {
+                        if (entity is LivingEntity) {
                             hit = true
                         }
 
