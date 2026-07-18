@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.entity.vehicle.utils
 
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
+import com.atsuishio.superbwarfare.compat.sable.SableCompatHandler
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo
 import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType
@@ -997,7 +998,8 @@ object VehicleMotionUtils {
                 }
             }
         }
-        return false
+        // Also check Sable sublevel blocks for ground support
+        return SableCompatHandler.hasMod() && SableCompatHandler.isOnSubLevelGround(vehicle.level(), searchAABB)
     }
 
     /**
@@ -1146,12 +1148,16 @@ object VehicleMotionUtils {
             .inflate(0.5)
             .expandTowards(0.0, vehicle.stepHeight.toDouble() + 0.5, 0.0)
 
-        // 收集世界碰撞AABB（方块 + 实体）
+        // 收集世界碰撞AABB（方块 + 实体 + Sable子世界方块）
         val allAabbs = mutableListOf<AABB>()
         for (shape in vehicle.level().getBlockCollisions(vehicle, searchBox))
             for (aabb in shape.toAabbs()) allAabbs.add(aabb)
         for (shape in vehicle.level().getEntityCollisions(vehicle, searchBox))
             for (aabb in shape.toAabbs()) allAabbs.add(aabb)
+        // 添加Sable物理化结构的方块碰撞
+        if (SableCompatHandler.hasMod()) {
+            SableCompatHandler.collectSubLevelBlockCollisions(vehicle.level(), searchBox, allAabbs)
+        }
         if (allAabbs.isEmpty()) return movement
 
         var rx = movement.x
