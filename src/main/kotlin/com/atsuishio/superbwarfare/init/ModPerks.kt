@@ -25,7 +25,7 @@ import net.neoforged.neoforge.registries.NewRegistryEvent
 import net.neoforged.neoforge.registries.RegistryBuilder
 import java.nio.file.Files
 
-typealias PERK = DeferredHolder<Perk, Perk>
+private typealias PERK = DeferredHolder<Perk, Perk>
 
 @EventBusSubscriber
 @Suppress("unused")
