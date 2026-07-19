@@ -123,23 +123,36 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     override fun getAnimationInstance() = anim
 
+    private var gunDataMapCache: Map<String, GunData>? = null
+    private var gunDataMapWeaponKeys: Set<String>? = null
+
     open var gunDataMap: Map<String, GunData>
         get() {
+            val cache = gunDataMapCache
+            val currentKeys = computed().weapons().keys
+            if (cache != null && currentKeys == gunDataMapWeaponKeys) {
+                return cache
+            }
+
             val rawMap = entityData.get(GUN_DATA_MAP)
-            val newMap = mutableMapOf<String, GunData>()
             val weapons = computed().weapons()
+            val newMap = linkedMapOf<String, GunData>()
 
             for (kv in weapons.entries) {
                 val oldData = rawMap[kv.key]
                 val stack = oldData?.stack?.copy() ?: ItemStack(ModItems.VEHICLE_GUN.get())
-                val data = GunData.from(stack) { kv.value }
-
-                newMap[kv.key] = data
+                newMap[kv.key] = GunData.from(stack) { kv.value }
             }
 
-            return newMap.toMap()
+            gunDataMapCache = newMap
+            gunDataMapWeaponKeys = currentKeys
+            return newMap
         }
-        set(value) = this.entityData.set(GUN_DATA_MAP, value.toMap())
+        set(value) {
+            this.entityData.set(GUN_DATA_MAP, value.toMap())
+            this.gunDataMapCache = null
+            this.gunDataMapWeaponKeys = null
+        }
 
     open fun getSeat(seatIndex: Int) =
         computed().seats().getOrNull(seatIndex)
@@ -227,15 +240,13 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open fun modifyGunData(name: String?, consumer: Consumer<GunData>) {
         if (name == null) return
 
-        val map = this.gunDataMap.toMutableMap()
-        val oldData = map[name] ?: return
+        val map = this.gunDataMap
+        val data = map[name] ?: return
 
-        val data = oldData.copy()
         consumer.accept(data)
         data.save()
-        map[name] = data
 
-        gunDataMap = map
+        this.entityData.set(GUN_DATA_MAP, map, true)
     }
 
     private var obbCache: MutableList<OBB>? = null
@@ -405,6 +416,14 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         super.onSyncedDataUpdated(dataValues)
 
         data().update()
+    }
+
+    override fun onSyncedDataUpdated(key: EntityDataAccessor<*>) {
+        super.onSyncedDataUpdated(key)
+        if (key == GUN_DATA_MAP) {
+            gunDataMapCache = null
+            gunDataMapWeaponKeys = null
+        }
     }
 
     open fun processInput(keys: Short) {
@@ -1503,8 +1522,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         compound.put("DogTagIcon", listTag)
 
         val tag = CompoundTag()
-        for (kv in gunDataMap.entries) {
-            val data = GunData.from(kv.value.stack.copy())
+        for ((weaponName, gunData) in gunDataMap) {
+            val data = gunData.copy()
             data.backupAmmoCount.reset()
             data.save()
 
@@ -1515,7 +1534,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                 if (stackTag.isEmpty) continue
             }
 
-            tag.put(kv.key, stackTag)
+            tag.put(weaponName, stackTag)
         }
 
         if (!tag.isEmpty) {
@@ -1996,14 +2015,11 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         } else {
             // 枪数据处理
-            val newMap = mutableMapOf<String, GunData>()
-
-            for (kv in gunDataMap.entries) {
-                val newData = kv.value.copy()
-                newData.tick(this, true)
-                newMap[kv.key] = newData
+            val map = this.gunDataMap
+            for ((_, gunData) in map) {
+                gunData.tick(this, true)
             }
-            gunDataMap = newMap
+            this.entityData.set(GUN_DATA_MAP, map, true)
         }
 
         this.wasEngineRunning = this.engineRunning()
