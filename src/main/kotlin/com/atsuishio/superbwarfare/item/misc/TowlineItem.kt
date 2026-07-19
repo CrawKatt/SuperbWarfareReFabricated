@@ -4,6 +4,8 @@ import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
+import com.atsuishio.superbwarfare.tools.getOrCreateTag
+import com.atsuishio.superbwarfare.tools.tag
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.sounds.SoundEvents
@@ -13,7 +15,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
-import net.minecraft.world.level.Level
 
 open class TowlineItem : Item(Properties().stacksTo(1)), IVehicleInteract {
 
@@ -23,19 +24,19 @@ open class TowlineItem : Item(Properties().stacksTo(1)), IVehicleInteract {
 
     override fun appendHoverText(
         stack: ItemStack,
-        level: Level?,
-        tooltip: MutableList<Component>,
-        flag: TooltipFlag
+        context: TooltipContext,
+        tooltipComponents: MutableList<Component>,
+        tooltipFlag: TooltipFlag
     ) {
         val tag = stack.tag
         val target = tag?.getString(TAG_TOW_TARGET)
         if (!target.isNullOrBlank()) {
-            tooltip.add(
+            tooltipComponents.add(
                 Component.translatable("des.superbwarfare.towline.target_selected")
                     .withStyle(ChatFormatting.GOLD)
             )
         } else {
-            tooltip.add(
+            tooltipComponents.add(
                 Component.translatable("des.superbwarfare.towline.hint")
                     .withStyle(ChatFormatting.GRAY)
             )

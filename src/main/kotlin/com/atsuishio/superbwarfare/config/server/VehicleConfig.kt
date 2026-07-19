@@ -127,8 +127,22 @@ object VehicleConfig {
         push("towing")
 
         comment("Maximum straight-line distance for towing two vehicles together")
-        comment("两个载具能被拖绳连接的最大直线距离(格)")
-        defineInRange("tow_max_distance", 16, 1, 512).also { pop() }
+        comment("两个载具能被拖绳连接的最大直线距离（格）")
+        defineInRange("tow_max_distance", 16, 1, 512)
+    }
+
+    @JvmField
+    val TOW_PULL_DISTANCE = buildServerConfig {
+        comment("Minimum distance before a towing vehicle starts pulling the towed vehicle")
+        comment("牵引载具开始拉动被牵引载具的最小距离（格）")
+        defineInRange("tow_pull_distance", 10, 5, 512)
+    }
+
+    @JvmField
+    val TOW_BREAK_DISTANCE = buildServerConfig {
+        comment("Maximum distance that towline breaks when a vehicle is pulling the towed vehicle. Set to 0 to make it unbreakable")
+        comment("拖绳会断裂的最大距离（格），设置成0则不会断裂")
+        defineInRange("tow_break_distance", 0, 0, Int.MAX_VALUE).also { pop() }
     }
 
     @JvmField

@@ -6,6 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.Util;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
@@ -64,14 +65,14 @@ public class ModRenderTypes extends RenderType {
 
     public static final Function<ResourceLocation, RenderType> TOW_CHAIN = Util.memoize((location) -> {
         RenderType.CompositeState state = RenderType.CompositeState.builder()
-                .setShaderState(RenderStateShard.POSITION_COLOR_TEX_SHADER)
+                .setShaderState(RenderStateShard.POSITION_COLOR_TEX_LIGHTMAP_SHADER)
                 .setTextureState(new RenderStateShard.TextureStateShard(location, false, false))
                 .setCullState(RenderStateShard.NO_CULL)
                 .setLightmapState(RenderStateShard.NO_LIGHTMAP)
                 .setTransparencyState(RenderStateShard.NO_TRANSPARENCY)
                 .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
                 .createCompositeState(false);
-        return RenderType.create("tow_chain", DefaultVertexFormat.POSITION_COLOR_TEX,
+        return RenderType.create("tow_chain", DefaultVertexFormat.POSITION_TEX_COLOR,
                 VertexFormat.Mode.TRIANGLE_STRIP, 256, false, true, state);
     });
 

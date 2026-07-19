@@ -3103,6 +3103,15 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 .requires(ModItems.VEHICLE_KEY.get())
                 .unlockedBy(getHasName(ModItems.VEHICLE_KEY.get()), has(ModItems.VEHICLE_KEY.get()))
                 .save(writer, loc("${getItemName(ModItems.VEHICLE_KEY.get())}_reset"))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.TOWLINE.get(), 1)
+                .pattern(" a ")
+                .pattern("cbc")
+                .pattern(" a ")
+                .define('a', Items.CHAIN)
+                .define('b', Items.LEAD)
+                .define('c', INGOTS_STEEL)
+                .unlockedBy(getHasName(Items.LEAD), has(Items.LEAD))
+                .save(writer, loc("${getItemName(ModItems.TOWLINE.get())}"))
         }
 
         private fun buildSpecialRecipes(writer: RecipeOutput) {

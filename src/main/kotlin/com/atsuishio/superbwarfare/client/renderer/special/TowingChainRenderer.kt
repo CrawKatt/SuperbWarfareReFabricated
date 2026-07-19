@@ -12,13 +12,13 @@ import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.client.event.RenderLevelStageEvent
-import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.common.Mod
+import net.neoforged.api.distmarker.Dist
+import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent
 import org.joml.Matrix4f
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
+@EventBusSubscriber(value = [Dist.CLIENT])
 object TowingChainRenderer {
 
     // Length of each chain link in blocks
@@ -68,10 +68,11 @@ object TowingChainRenderer {
 
         // --- Pass 1: ribbon in XZ plane ---
         var builder = bufferSource.getBuffer(renderType)
+        val pt = partialTick.getGameTimeDeltaPartialTick(true)
         for (vehicle in vehicles) {
             val towedEntity = vehicle.towingEntity ?: continue
-            val fromPos = getCenterPosition(vehicle, partialTick)
-            val toPos = getCenterPosition(towedEntity, partialTick)
+            val fromPos = getCenterPosition(vehicle, pt)
+            val toPos = getCenterPosition(towedEntity, pt)
             renderChain(builder, pose, fromPos, toPos, ribbon = 0)
         }
         bufferSource.endBatch()
@@ -80,8 +81,8 @@ object TowingChainRenderer {
         builder = bufferSource.getBuffer(renderType)
         for (vehicle in vehicles) {
             val towedEntity = vehicle.towingEntity ?: continue
-            val fromPos = getCenterPosition(vehicle, partialTick)
-            val toPos = getCenterPosition(towedEntity, partialTick)
+            val fromPos = getCenterPosition(vehicle, pt)
+            val toPos = getCenterPosition(towedEntity, pt)
             renderChain(builder, pose, fromPos, toPos, ribbon = 1)
         }
 
@@ -144,27 +145,33 @@ object TowingChainRenderer {
             when (ribbon) {
                 0 -> {
                     // Ribbon 0: width in XZ perpendicular direction
-                    consumer.vertex(pose, px + perp1X * HALF_WIDTH, py, pz + perp1Z * HALF_WIDTH)
-                        .color(255, 255, 255, 255)
-                        .uv(u, 1.0f)
-                        .endVertex()
+                    consumer.addVertex(pose, px + perp1X * HALF_WIDTH, py, pz + perp1Z * HALF_WIDTH)
+                        .setColor(255, 255, 255, 255)
+                        .setUv(u, 1.0f)
 
-                    consumer.vertex(pose, px - perp1X * HALF_WIDTH, py, pz - perp1Z * HALF_WIDTH)
-                        .color(255, 255, 255, 255)
-                        .uv(u, 0.0f)
-                        .endVertex()
+                    consumer.addVertex(pose, px - perp1X * HALF_WIDTH, py, pz - perp1Z * HALF_WIDTH)
+                        .setColor(255, 255, 255, 255)
+                        .setUv(u, 0.0f)
                 }
                 1 -> {
                     // Ribbon 1: width in perp2 direction (cross(dir, perp1)), forming X cross-section
-                    consumer.vertex(pose, px + perp2X * HALF_WIDTH, py + perp2Y * HALF_WIDTH, pz + perp2Z * HALF_WIDTH)
-                        .color(255, 255, 255, 255)
-                        .uv(u, 1.0f)
-                        .endVertex()
+                    consumer.addVertex(
+                        pose,
+                        px + perp2X * HALF_WIDTH,
+                        py + perp2Y * HALF_WIDTH,
+                        pz + perp2Z * HALF_WIDTH
+                    )
+                        .setColor(255, 255, 255, 255)
+                        .setUv(u, 1.0f)
 
-                    consumer.vertex(pose, px - perp2X * HALF_WIDTH, py - perp2Y * HALF_WIDTH, pz - perp2Z * HALF_WIDTH)
-                        .color(255, 255, 255, 255)
-                        .uv(u, 0.0f)
-                        .endVertex()
+                    consumer.addVertex(
+                        pose,
+                        px - perp2X * HALF_WIDTH,
+                        py - perp2Y * HALF_WIDTH,
+                        pz - perp2Z * HALF_WIDTH
+                    )
+                        .setColor(255, 255, 255, 255)
+                        .setUv(u, 0.0f)
                 }
             }
         }
