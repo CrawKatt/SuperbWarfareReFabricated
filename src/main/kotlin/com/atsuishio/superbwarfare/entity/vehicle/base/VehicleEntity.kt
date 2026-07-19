@@ -609,6 +609,42 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
     }
 
+    // Code based on Dragon Rise
+    open fun towedTick() {
+        if (this.level().isClientSide) return
+
+        val tower = towedByEntity ?: return
+
+        val dist = this.distanceTo(tower)
+        val bb = this.boundingBox
+        val towerBB = tower.boundingBox
+        val longestSide = maxOf(bb.xsize, bb.ysize, bb.zsize)
+        val towerLongestSide = maxOf(towerBB.xsize, towerBB.ysize, towerBB.zsize)
+
+        val minDist = max(
+            VehicleConfig.TOW_PULL_DISTANCE.get().toDouble(),
+            longestSide + towerLongestSide + 1.0
+        )
+        val maxDist = VehicleConfig.TOW_BREAK_DISTANCE.get().toDouble()
+
+        if (dist > maxDist && maxDist > 0) {
+            this.clearTowingInfo()
+            return
+        }
+
+        if (dist <= minDist) return
+
+        val overshoot = dist - minDist
+        val dir = this.position().subtract(tower.position()).normalize()
+        val velAlong = this.deltaMovement.dot(dir)
+
+        val k = 0.6 // 弹簧刚性
+        val d = 0.15 // 阻尼
+        val force = -k * overshoot - d * velAlong
+
+        this.deltaMovement = this.deltaMovement.add(dir.scale(force))
+    }
+
     override fun openCustomInventoryScreen(player: Player) {
         if (player is ServerPlayer) {
             this.openMenu(player)
@@ -2183,6 +2219,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
 
         this.travel()
+        this.towedTick()
         vehicleRadar()
 
         // 固定翼飞机自动盘旋：空中、引擎启动、有能量、未坠毁、有乘客、盘旋开关已开启
@@ -4511,7 +4548,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         if (enableAABB()) return
         invalidateAABBCache()
         val aabb = getCombinedAABB()
-        if (!aabb.hasNaN() && aabb.getSize() > 0.0) {
+        if (!aabb.hasNaN() && aabb.size > 0.0) {
             this.boundingBox = aabb
         }
     }
