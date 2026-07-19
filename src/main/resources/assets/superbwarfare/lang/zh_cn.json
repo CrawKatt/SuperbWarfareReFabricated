@@ -368,6 +368,8 @@
   "item.superbwarfare.creative_vehicle_key": "创造车钥匙",
   "des.superbwarfare.creative_vehicle_key": "可以锁定和解锁任意载具",
   "item.superbwarfare.towline": "拖绳",
+  "des.superbwarfare.towline.hint": "右键载具选择牵引目标，Shift+右键清除连接",
+  "des.superbwarfare.towline.target_selected": "已选择牵引目标",
 
   "attribute.superbwarfare.bullet_resistance": "子弹防护",
 
@@ -854,6 +856,15 @@
   "tips.superbwarfare.vehicle.lock_hurt": "你的位于[%1$s, %2$s, %3$s]的载具%4$s正在遭受攻击",
   "tips.superbwarfare.vehicle.lock_destroy": "你的位于[%1$s, %2$s, %3$s]的载具%4$s已被损毁",
   "tips.superbwarfare.vehicle.lock_not_empty": "只有空车才能上锁",
+
+  "tips.superbwarfare.towline.select_towing": "已选择牵引载具: %1$s",
+  "tips.superbwarfare.towline.target_lost": "牵引目标丢失！先前选择的载具已不存在",
+  "tips.superbwarfare.towline.same_vehicle": "不能将载具连接到自身！",
+  "tips.superbwarfare.towline.already_linked": "其中一个载具已在牵引关系中",
+  "tips.superbwarfare.towline.too_far": "距离太远！当前距离: %1$s 格 (最大: %2$s)",
+  "tips.superbwarfare.towline.linked": "已连接: %1$s 牵引 %2$s",
+  "tips.superbwarfare.towline.unlinked": "已解除牵引连接",
+  "tips.superbwarfare.towline.selection_cleared": "已清除牵引目标选择",
 
   "tips.superbwarfare.target.yaw": "目标偏航角: ",
   "tips.superbwarfare.target.pitch": "目标俯仰角: ",
