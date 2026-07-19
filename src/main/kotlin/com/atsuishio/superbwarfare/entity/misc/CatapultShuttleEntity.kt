@@ -80,8 +80,8 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
                 lastEffectiveFacing != effectiveFacing
 
         if (power == 0 || isTurn) {
-            // 无动力或转弯时，急刹车到当前方块中心
-            this.setPos(belowPos.x + 0.5, this.y, belowPos.z + 0.5)
+            // 无动力或转弯时，急刹车到当前方块中心，Y对齐到弹射器方块顶部
+            this.setPos(belowPos.x + 0.5, belowPos.y + 1.0, belowPos.z + 0.5)
             this.deltaMovement = Vec3.ZERO
             this.lastBelowPos = belowPos
             this.lastEffectiveFacing = effectiveFacing
@@ -93,8 +93,8 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
         val nextBelowState = this.level().getBlockState(nextBelowPos)
 
         if (nextBelowState.block !is AircraftCatapultBlock) {
-            // 前方没有轨道，急停在当前弹射器方块中心
-            this.setPos(belowPos.x + 0.5, this.y, belowPos.z + 0.5)
+            // 前方没有轨道，急停在当前弹射器方块中心，Y对齐到弹射器方块顶部
+            this.setPos(belowPos.x + 0.5, belowPos.y + 1.0, belowPos.z + 0.5)
             this.deltaMovement = Vec3.ZERO
             this.lastBelowPos = null
             this.lastEffectiveFacing = null
@@ -119,14 +119,18 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
         // 参考 FastThrowableProjectile.projectileMove：直接 setPos 而非 move(MoverType.SELF, ...)
         this.setPos(this.x + this.deltaMovement.x, this.y, this.z + this.deltaMovement.z)
 
-        // 在垂直于运动方向对齐到方块中心，确保转弯时准确定位在轨道上
+        // 重新计算移动后的下方方块位置，确保对齐时使用最新的方块坐标
+        val newBelowPos = BlockPos.containing(this.x, this.boundingBox.minY - 0.01, this.z)
+
+        // Y轴（上下方向）对齐到弹射器方块顶部（整数坐标），确保和脚下的弹射器方块保持一致
+        // 沿轨道方向的坐标保留小数以保证平滑移动，垂直于轨道方向的坐标对齐到方块中心
         if (effectiveFacing.axis == Direction.Axis.X) {
-            this.setPos(this.x, this.y, belowPos.z + 0.5)
+            this.setPos(this.x, newBelowPos.y + 1.0, newBelowPos.z + 0.5)
         } else {
-            this.setPos(belowPos.x + 0.5, this.y, this.z)
+            this.setPos(newBelowPos.x + 0.5, newBelowPos.y + 1.0, this.z)
         }
 
-        this.lastBelowPos = belowPos
+        this.lastBelowPos = newBelowPos
         this.lastEffectiveFacing = effectiveFacing
     }
 
