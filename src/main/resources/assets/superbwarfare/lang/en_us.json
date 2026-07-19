@@ -367,6 +367,7 @@
   "des.superbwarfare.tactical_terminal.disabled": "Disabled, please check the server config file",
   "item.superbwarfare.creative_vehicle_key": "Creative Vehicle Key",
   "des.superbwarfare.creative_vehicle_key": "Locks and unlocks any vehicle",
+  "item.superbwarfare.towline": "Towline",
 
   "attribute.superbwarfare.bullet_resistance": "Bullet Resistance",
 
