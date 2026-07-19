@@ -123,6 +123,15 @@ object VehicleConfig {
     }
 
     @JvmField
+    val TOW_MAX_DISTANCE = buildServerConfig {
+        push("towing")
+
+        comment("Maximum straight-line distance for towing two vehicles together")
+        comment("两个载具能被拖绳连接的最大直线距离(格)")
+        defineInRange("tow_max_distance", 16, 1, 512).also { pop() }
+    }
+
+    @JvmField
     val REPAIR_COOLDOWN = buildServerConfig {
         push("repair")
 

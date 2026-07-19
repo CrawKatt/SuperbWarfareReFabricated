@@ -368,6 +368,8 @@
   "item.superbwarfare.creative_vehicle_key": "Creative Vehicle Key",
   "des.superbwarfare.creative_vehicle_key": "Locks and unlocks any vehicle",
   "item.superbwarfare.towline": "Towline",
+  "des.superbwarfare.towline.hint": "Right-click a vehicle to select towing target. Shift+Right-click to unlink",
+  "des.superbwarfare.towline.target_selected": "Towing target selected",
 
   "attribute.superbwarfare.bullet_resistance": "Bullet Resistance",
 
@@ -854,6 +856,15 @@
   "tips.superbwarfare.vehicle.lock_hurt": "Your vehicle %4$s at [%1$s, %2$s, %3$s] is under attack",
   "tips.superbwarfare.vehicle.lock_destroy": "Your vehicle %4$s at [%1$s, %2$s, %3$s] has been destroyed",
   "tips.superbwarfare.vehicle.lock_not_empty": "Only empty vehicle can be locked",
+
+  "tips.superbwarfare.towline.select_towing": "Selected towing vehicle: %1$s",
+  "tips.superbwarfare.towline.target_lost": "Towing target lost! The previously selected vehicle no longer exists",
+  "tips.superbwarfare.towline.same_vehicle": "Cannot link a vehicle to itself!",
+  "tips.superbwarfare.towline.already_linked": "One of the vehicles is already in a towing relationship",
+  "tips.superbwarfare.towline.too_far": "Too far apart! Distance: %1$s blocks (max: %2$s)",
+  "tips.superbwarfare.towline.linked": "Linked: %1$s towing %2$s",
+  "tips.superbwarfare.towline.unlinked": "Towing link cleared",
+  "tips.superbwarfare.towline.selection_cleared": "Stored target selection cleared",
 
   "tips.superbwarfare.target.yaw": "Target Yaw: ",
   "tips.superbwarfare.target.pitch": "Target Pitch: ",

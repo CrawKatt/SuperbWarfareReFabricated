@@ -596,7 +596,17 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                 }
             }
         }
+        this.clearTowingInfo()
         super.remove(reason)
+    }
+
+    open fun clearTowingInfo() {
+        if (!this.level().isClientSide) {
+            towedByEntity?.towingUUID = ""
+            towingEntity?.towedByUUID = ""
+            towingUUID = ""
+            towedByUUID = ""
+        }
     }
 
     override fun openCustomInventoryScreen(player: Player) {
@@ -921,6 +931,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             define(LOCKED, false)
             define(LOITER_PARAMS, Quaternionf(0f, 318f, 0f, 400f))
             define(LOITER_ACTIVE, false)
+            define(TOWING_UUID, "")
+            define(TOWED_BY_UUID, "")
         }
     }
 
@@ -1498,6 +1510,9 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         if (compound.contains("LoiterActive")) {
             loiterActive = compound.getBoolean("LoiterActive")
         }
+
+        towingUUID = compound.getString("TowingUUID")
+        towedByUUID = compound.getString("TowedByUUID")
     }
 
     public override fun addAdditionalSaveData(compound: CompoundTag) {
@@ -1590,6 +1605,9 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         compound.putFloat("LoiterZ", lp.z())
         compound.putFloat("LoiterR", lp.w())
         compound.putBoolean("LoiterActive", loiterActive)
+
+        compound.putString("TowingUUID", towingUUID)
+        compound.putString("TowedByUUID", towedByUUID)
     }
 
     override fun interact(player: Player, hand: InteractionHand): InteractionResult {
@@ -4381,6 +4399,21 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open var aiTurretTargetUUID by AI_TURRET_TARGET_UUID
     open var aiPassengerWeaponTargetUUID by AI_PASSENGER_WEAPON_TARGET_UUID
 
+    open var towingUUID by TOWING_UUID
+    open var towedByUUID by TOWED_BY_UUID
+
+    open val towingEntity: VehicleEntity?
+        get() {
+            if (towingUUID.isBlank()) return null
+            return EntityFindUtil.findEntity(level(), towingUUID) as? VehicleEntity
+        }
+
+    open val towedByEntity: VehicleEntity?
+        get() {
+            if (towedByUUID.isBlank()) return null
+            return EntityFindUtil.findEntity(level(), towedByUUID) as? VehicleEntity
+        }
+
     open var yawWhileShoot by YAW_WHILE_SHOOT
     open var hornVolume by HORN_VOLUME
 
@@ -4800,6 +4833,16 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         @ExcludeBvrSync("LoiterActive")
         val LOITER_ACTIVE: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
+
+        /** 正在牵引的载具UUID */
+        @JvmField
+        val TOWING_UUID: EntityDataAccessor<String> =
+            SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.STRING)
+
+        /** 正在被牵引的载具UUID */
+        @JvmField
+        val TOWED_BY_UUID: EntityDataAccessor<String> =
+            SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.STRING)
 
         /** ROLL */
         @JvmField
