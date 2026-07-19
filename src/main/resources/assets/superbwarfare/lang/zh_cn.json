@@ -367,6 +367,7 @@
   "des.superbwarfare.tactical_terminal.disabled": "已禁用，请查看服务端配置文件",
   "item.superbwarfare.creative_vehicle_key": "创造车钥匙",
   "des.superbwarfare.creative_vehicle_key": "可以锁定和解锁任意载具",
+  "item.superbwarfare.towline": "拖绳",
 
   "attribute.superbwarfare.bullet_resistance": "子弹防护",
 
