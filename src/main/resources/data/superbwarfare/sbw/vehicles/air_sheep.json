@@ -55,6 +55,7 @@
   "UpStep": 1.1,
   "RotateOffsetHeight": 1,
   "Mass": 0.05,
+  "TowForceFactor": 10.0,
   "DamageModifiers": [
     "minecraft:lava * 2.667",
     "All * 0.75",

@@ -188,6 +188,7 @@
   "UpStep": 1.1,
   "RotateOffsetHeight": 1.088,
   "Mass": 1.2,
+  "TowForceFactor": 2.0,
   "AllowFreeCam": true,
   "HasDecoy": true,
   "DamageModifiers": [

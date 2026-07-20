@@ -266,6 +266,7 @@
   "UpStep": 1.1,
   "RotateOffsetHeight": 24,
   "Mass": 400,
+  "TowForceFactor": 10.0,
   "HasDecoy": true,
   "DamageModifiers": [
     "All - 15",

@@ -20,6 +20,7 @@
     }
   ],
   "Mass": 0.07,
+  "TowForceFactor": 10.0,
   "RotateOffsetHeight": 0.5,
   "DamageModifiers": [
     "All - 2",

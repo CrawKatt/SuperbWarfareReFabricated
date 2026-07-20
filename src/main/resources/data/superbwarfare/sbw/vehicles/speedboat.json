@@ -128,7 +128,6 @@
       "SoundRadius": 16
     }
   },
-
   "TurretPos": [0, 3.112, -0.365],
   "TurretTurnSpeed": [25, 25],
   "TurretPitchRange": [-20, 60],

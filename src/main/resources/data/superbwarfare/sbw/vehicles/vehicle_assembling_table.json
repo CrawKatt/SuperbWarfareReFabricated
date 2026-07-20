@@ -13,6 +13,7 @@
   },
   "UpStep": 1.1,
   "Mass": 1,
+  "TowForceFactor": 114.0,
   "DamageModifiers": [
     "superbwarfare:vehicle_strike * 0.5",
     "superbwarfare:grapeshot_hit * 0.5",

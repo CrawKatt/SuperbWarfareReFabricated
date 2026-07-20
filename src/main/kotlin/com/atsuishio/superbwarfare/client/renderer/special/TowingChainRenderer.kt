@@ -24,7 +24,7 @@ object TowingChainRenderer {
     // Length of each chain link in blocks
     private const val LINK_LENGTH = 0.5f
     // Chain ribbon half-width in blocks (total visible width = 2 * HALF_WIDTH)
-    private const val HALF_WIDTH = 0.15f
+    private const val HALF_WIDTH = 0.25f
 
     private val CHAIN_TEXTURE = loc("textures/item/towline_chain.png")
 

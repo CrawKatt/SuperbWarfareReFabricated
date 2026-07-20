@@ -260,6 +260,7 @@
   "UpStep": 2.25,
   "RotateOffsetHeight": 2.75,
   "Mass": 47,
+  "TowForceFactor": 1.5,
   "DamageModifiers": [
     "minecraft:arrow 0",
     "minecraft:trident 0",
