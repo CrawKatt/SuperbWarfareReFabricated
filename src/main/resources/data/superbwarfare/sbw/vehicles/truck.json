@@ -93,6 +93,7 @@
   },
   "UpStep": 1.5,
   "Mass": 100,
+  "TowForceFactor": 5.0,
   "RotateOffsetHeight": 2.2,
   "DamageModifiers": [
     "All - 5",

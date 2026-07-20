@@ -122,6 +122,10 @@ class DefaultVehicleData : IDBasedData<DefaultVehicleData> {
     var mass: Float = 1f
 
     @ServerOnly
+    @SerialName("TowForceFactor")
+    var towForceFactor: Float = 1f
+
+    @ServerOnly
     @SerialName("DecoyMagazineSize")
     var decoyMagazineSize: Int = 8
 

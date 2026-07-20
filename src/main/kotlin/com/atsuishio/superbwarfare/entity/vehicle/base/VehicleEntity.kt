@@ -639,17 +639,22 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         // 使用双方的相对速度，使阻尼更准确
         val relVelAlong = this.deltaMovement.subtract(tower.deltaMovement).dot(dir)
 
-        val k = 0.6 // 弹簧刚性
-        val d = 0.15 // 阻尼
-        val springForce = -k * overshoot - d * relVelAlong
+        val k = 0.2  // 钢索刚性
+        val d = 0.1  // 阻尼
+        val ropeForce = -k * overshoot - d * relVelAlong
 
-        // 根据双方质量分配动量（F = ma → Δv = F/m），质量越大速度变化越小
-        // 轻车拖重车时牵引者会被拉回，重车拖轻车时被牵引者响应灵敏
-        val towedMass = this.mass.toDouble().coerceAtLeast(0.1)
-        val towerMass = tower.mass.toDouble().coerceAtLeast(0.1)
+        val towerFactor = tower.computed().towForceFactor.toDouble().coerceAtLeast(0.0)
+        val towedMass = this.mass.toDouble().coerceAtLeast(0.01)
+        val towerMass = tower.mass.toDouble().coerceAtLeast(0.01)
 
-        this.deltaMovement = this.deltaMovement.add(dir.scale(springForce / towedMass))
-        tower.deltaMovement = tower.deltaMovement.add(dir.scale(-springForce / towerMass))
+        val towForce = towerMass * towerFactor * ropeForce / 6.0
+
+        val maxDeltaV = max(2.0, tower.deltaMovement.length())
+        val towedScalar = (towForce / towedMass).coerceIn(-maxDeltaV, maxDeltaV)
+        val towerScalar = (-ropeForce / towerMass).coerceIn(-maxDeltaV, maxDeltaV)
+
+        this.deltaMovement = this.deltaMovement.add(dir.scale(towedScalar))
+        tower.deltaMovement = tower.deltaMovement.add(dir.scale(towerScalar))
     }
 
     override fun openCustomInventoryScreen(player: Player) {
