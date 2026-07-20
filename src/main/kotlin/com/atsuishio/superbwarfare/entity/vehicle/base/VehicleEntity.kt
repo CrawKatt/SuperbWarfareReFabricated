@@ -636,13 +636,20 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         val overshoot = dist - minDist
         val dir = this.position().subtract(tower.position()).normalize()
-        val velAlong = this.deltaMovement.dot(dir)
+        // 使用双方的相对速度，使阻尼更准确
+        val relVelAlong = this.deltaMovement.subtract(tower.deltaMovement).dot(dir)
 
         val k = 0.6 // 弹簧刚性
         val d = 0.15 // 阻尼
-        val force = -k * overshoot - d * velAlong
+        val springForce = -k * overshoot - d * relVelAlong
 
-        this.deltaMovement = this.deltaMovement.add(dir.scale(force))
+        // 根据双方质量分配动量（F = ma → Δv = F/m），质量越大速度变化越小
+        // 轻车拖重车时牵引者会被拉回，重车拖轻车时被牵引者响应灵敏
+        val towedMass = this.mass.toDouble().coerceAtLeast(0.001)
+        val towerMass = tower.mass.toDouble().coerceAtLeast(0.001)
+
+        this.deltaMovement = this.deltaMovement.add(dir.scale(springForce / towedMass))
+        tower.deltaMovement = tower.deltaMovement.add(dir.scale(-springForce / towerMass))
     }
 
     override fun openCustomInventoryScreen(player: Player) {
