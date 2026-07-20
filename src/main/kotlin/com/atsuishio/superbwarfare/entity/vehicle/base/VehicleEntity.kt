@@ -641,8 +641,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         // 根据双方质量分配动量（F = ma → Δv = F/m），质量越大速度变化越小
         // 轻车拖重车时牵引者会被拉回，重车拖轻车时被牵引者响应灵敏
-        val towedMass = this.mass.toDouble().coerceAtLeast(0.001)
-        val towerMass = tower.mass.toDouble().coerceAtLeast(0.001)
+        val towedMass = this.mass.toDouble().coerceAtLeast(0.1)
+        val towerMass = tower.mass.toDouble().coerceAtLeast(0.1)
 
         this.deltaMovement = this.deltaMovement.add(dir.scale(springForce / towedMass))
         tower.deltaMovement = tower.deltaMovement.add(dir.scale(-springForce / towerMass))
