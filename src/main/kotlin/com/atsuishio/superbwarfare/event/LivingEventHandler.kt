@@ -599,7 +599,8 @@ object LivingEventHandler {
             pickUp.discard()
 
             if (oldCount > count && entity is Player) {
-                val item = ItemStack(stack.item, oldCount - count)
+                val item = stack.copy()
+                item.count = oldCount - count
                 if (!entity.addItem(item)) {
                     entity.drop(item, false)
                 }
