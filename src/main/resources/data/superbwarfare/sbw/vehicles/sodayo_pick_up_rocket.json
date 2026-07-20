@@ -1,17 +1,142 @@
 {
   "MaxHealth": 175,
   "MaxEnergy": 5000000,
+  "OBB": [
+    {
+      "Part": "Collision",
+      "Size": [1.25, 0.729, 3.375],
+      "Position": [0, 0.719, 0.563]
+    },
+    {
+      "Size": [0.25, 0.5, 0.5],
+      "Position": [1, 0.5, 2.875],
+      "Part": "WheelLeft"
+    },
+    {
+      "Size": [0.25, 0.5, 0.5],
+      "Position": [-1, 0.5, 2.875],
+      "Part": "WheelRight"
+    },
+    {
+      "Size": [0.25, 0.5, 0.5],
+      "Position": [1, 0.5, -1.28],
+      "Part": "WheelLeft"
+    },
+    {
+      "Size": [0.25, 0.5, 0.5],
+      "Position": [-1, 0.5, -1.28],
+      "Part": "WheelRight"
+    },
+    {
+      "Size": [1.1875, 0.5, 3.41],
+      "Position": [0, 1, 0.593]
+    },
+    {
+      "Size": [1.1875, 0.375, 0.1875],
+      "Position": [0, 1.875, 0.375]
+    },
+    {
+      "Size": [1.1875, 0.094, 0.34375],
+      "Position": [0, 2.15625, 0.9]
+    },
+    {
+      "Part": "Turret",
+      "Size": [0.4765625, 0.3515625, 0.7578125],
+      "Position": [0, 0, 0.3740625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    },
+    {
+      "Part": "Interactive",
+      "Size": [0.09375, 0.09375, 0.0625],
+      "Position": [-0.3659375, 0.244375, -0.44625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    },
+    {
+      "Part": "Interactive",
+      "Size": [0.09375, 0.09375, 0.0625],
+      "Position": [-0.1221875, 0.244375, -0.44625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    },
+    {
+      "Part": "Interactive",
+      "Size": [0.09375, 0.09375, 0.0625],
+      "Position": [0.1215625, 0.244375, -0.44625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    },
+    {
+      "Part": "Interactive",
+      "Size": [0.09375, 0.09375, 0.0625],
+      "Position": [0.3653125, 0.244375, -0.44625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    },
+    {
+      "Part": "Interactive",
+      "Size": [0.09375, 0.09375, 0.0625],
+      "Position": [-0.3659375, 0.000625, -0.44625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    },
+    {
+      "Part": "Interactive",
+      "Size": [0.09375, 0.09375, 0.0625],
+      "Position": [-0.1221875, 0.000625, -0.44625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    },
+    {
+      "Part": "Interactive",
+      "Size": [0.09375, 0.09375, 0.0625],
+      "Position": [0.1215625, 0.000625, -0.44625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    },
+    {
+      "Part": "Interactive",
+      "Size": [0.09375, 0.09375, 0.0625],
+      "Position": [0.3653125, 0.000625, -0.44625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    },
+    {
+      "Part": "Interactive",
+      "Size": [0.09375, 0.09375, 0.0625],
+      "Position": [-0.3659375, -0.243125, -0.44625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    },
+    {
+      "Part": "Interactive",
+      "Size": [0.09375, 0.09375, 0.0625],
+      "Position": [-0.1221875, -0.243125, -0.44625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    },
+    {
+      "Part": "Interactive",
+      "Size": [0.09375, 0.09375, 0.0625],
+      "Position": [0.1215625, -0.243125, -0.44625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    },
+    {
+      "Part": "Interactive",
+      "Size": [0.09375, 0.09375, 0.0625],
+      "Position": [0.3653125, -0.243125, -0.44625],
+      "Transform": "Barrel",
+      "Rotation": "Barrel"
+    }
+  ],
   "TurretPos": [0, 1.85, -1.288],
   "TurretTurnSpeed": [4, 4],
   "TurretPitchRange": [-10, 60],
   "BarrelPos": [0, 0.65, -0.203125],
   "TurretControllerIndex": 2,
   "Seats": [
-    {
-      "Part": "Collision",
-      "Size": [1.25, 0.729, 3.375],
-      "Position": [0, 0.719, 0.563]
-    },
     {
       "IsEnclosed": true,
       "Transform": "Vehicle",
