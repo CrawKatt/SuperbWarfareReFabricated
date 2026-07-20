@@ -34,5 +34,6 @@
   "ContainerIcon": "superbwarfare:textures/gui/vehicle/type/civilian.png",
   "TerrainCompat": [[-1, 0, 1], [1, 0, 1], [-1, 0, -1], [1, 0, -1]],
   "TerrainCompatRotateRate" : 6,
-  "Type": "Car"
+  "Type": "Car",
+  "VehicleContainerType": "Empty"
 }
