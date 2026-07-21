@@ -614,19 +614,26 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
     }
 
+    private fun calculateLongestSide(): Double {
+        val obb = this.getCollisionOBB()
+        if (obb == null || this.enableAABB()) {
+            val bb = this.boundingBox
+            return maxOf(bb.xsize, bb.ysize, bb.zsize)
+        }
+        return maxOf(obb.extents.x, obb.extents.y, obb.extents.z)
+    }
+
     // Code based on Dragon Rise
     open fun towedTick() {
         val tower = towedByEntity ?: return
 
         val dist = this.distanceTo(tower)
-        val bb = this.boundingBox
-        val towerBB = tower.boundingBox
-        val longestSide = maxOf(bb.xsize, bb.ysize, bb.zsize)
-        val towerLongestSide = maxOf(towerBB.xsize, towerBB.ysize, towerBB.zsize)
+        val longestSide = this.calculateLongestSide()
+        val towerLongestSide = tower.calculateLongestSide()
 
         val minDist = max(
             VehicleConfig.TOW_PULL_DISTANCE.get().toDouble(),
-            longestSide + towerLongestSide + 1.0
+            longestSide + towerLongestSide + 4.0
         )
         val maxDist = VehicleConfig.TOW_BREAK_DISTANCE.get().toDouble()
 
@@ -673,9 +680,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         val dist = this.distanceTo(towed)
         val bb = towed.boundingBox
-        val thisBB = this.boundingBox
         val longestSide = maxOf(bb.xsize, bb.ysize, bb.zsize)
-        val thisLongestSide = maxOf(thisBB.xsize, thisBB.ysize, thisBB.zsize)
+        val thisLongestSide = this.calculateLongestSide()
 
         val minDist = max(
             VehicleConfig.TOW_PULL_DISTANCE.get().toDouble(),
