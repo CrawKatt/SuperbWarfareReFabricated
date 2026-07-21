@@ -129,12 +129,12 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
         val scale: Float = scopeScale
 
         var shootPos = entity.getShootPosForHud(player, partialTick)
-        var shootVec = entity.getShootDirectionForHud(player, partialTick).scale(512.0)
+        var shootVec = entity.getShootDirectionForHud(player, partialTick)
         val nacelleCam = ClientEventHandler.isNacelleCam(player)
 
         if (nacelleCam) {
             shootPos = camera.position
-            shootVec = Vec3(camera.lookVector).scale(512.0)
+            shootVec = Vec3(camera.lookVector)
         }
 
         val result = player.level().clip(
@@ -150,7 +150,7 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
 
         var lookingEntity = entity.getPlayerLookAtEntityOnVehicle(player, 512.0, partialTick)
         if (nacelleCam) {
-            lookingEntity = TraceTool.cameraFindLookingEntity(player, shootPos, shootVec, 512.0)
+            lookingEntity = OverlayTraceHandler.cameraMaxRangeEntity
         }
 
         if (lookingEntity != null) {
@@ -163,12 +163,10 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
         // 渲染第一人称
         if (Minecraft.getInstance().options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle) {
             poseStack.pushPose()
-
-            val texture: ResourceLocation?
-            if (crosshairPath.startsWith("@")) {
-                texture = CROSSHAIR_MAP.get(crosshairPath)
+            val texture = if (crosshairPath.startsWith("@")) {
+                CROSSHAIR_MAP[crosshairPath]
             } else {
-                texture = ResourceLocation.tryParse(crosshairPath)
+                ResourceLocation.tryParse(crosshairPath)
             }
 
             if (texture == null) {
@@ -177,7 +175,7 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                     LOGGER.log(
                         crosshairPath
                     ) { logger ->
-                        logger!!.error(
+                        logger.error(
                             "Failed to load crosshair texture for {}",
                             finalCrosshairPath
                         )
@@ -283,7 +281,7 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                     )
 
                 } else if (crosshairPath == "@VehicleCnHpjZooming") {
-                    val dynamicTexture: ResourceLocation? = CROSSHAIR_MAP.get("@VehicleDynamicCross")
+                    val dynamicTexture: ResourceLocation? = CROSSHAIR_MAP["@VehicleDynamicCross"]
                     RenderHelper.blit(
                         poseStack,
                         dynamicTexture,
