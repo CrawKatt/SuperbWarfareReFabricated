@@ -607,7 +607,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     // Code based on Dragon Rise
     open fun towedTick() {
-        if (this.level().isClientSide) return
+//        if (this.level().isClientSide) return
 
         val tower = towedByEntity ?: return
 
@@ -636,7 +636,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         val relVelAlong = this.deltaMovement.subtract(tower.deltaMovement).dot(dir)
 
         val k = 0.2  // 钢索刚性
-        val d = 0.1  // 阻尼
+        val d = 0.01 // 阻尼
         val ropeForce = -k * overshoot - d * relVelAlong
 
         val towerFactor = tower.computed().towForceFactor.toDouble().coerceAtLeast(0.0)
@@ -649,8 +649,15 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         val towedScalar = (towForce / towedMass).coerceIn(-maxDeltaV, maxDeltaV)
         val towerScalar = (-ropeForce / towerMass).coerceIn(-maxDeltaV, maxDeltaV)
 
-        this.deltaMovement = this.deltaMovement.add(dir.scale(towedScalar))
+        var towerDir = dir.scale(towedScalar)
+
+        this.deltaMovement = this.deltaMovement.add(towerDir)
         tower.deltaMovement = tower.deltaMovement.add(dir.scale(towerScalar))
+
+        if (!this.computed().forwardTowed) towerDir = towerDir.scale(-1.0)
+
+        val diffY = Mth.wrapDegrees(-getYRotFromVector(towerDir) + getYRotFromVector(this.getViewVector(1f))).toFloat()
+        this.yRot += 0.05f * diffY
     }
 
     override fun openCustomInventoryScreen(player: Player) {
