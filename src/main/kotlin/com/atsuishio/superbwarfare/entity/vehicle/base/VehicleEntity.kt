@@ -29,6 +29,8 @@ import com.atsuishio.superbwarfare.entity.vehicle.Tom6Entity
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier
 import com.atsuishio.superbwarfare.entity.vehicle.utils.*
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleEngineUtils.aircraftLoiter
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils.towedTick
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils.towingTick
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotFromVector
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getYRotFromVector
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleWeaponUtils.reloadDecoy
@@ -607,108 +609,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             }
             towingUUID = ""
             towedByUUID = ""
-        }
-    }
-
-    private fun calculateLongestSide(): Double {
-        val obb = this.getCollisionOBB()
-        if (obb == null || this.enableAABB()) {
-            val bb = this.boundingBox
-            return maxOf(bb.xsize, bb.ysize, bb.zsize)
-        }
-        return maxOf(obb.extents.x, obb.extents.y, obb.extents.z)
-    }
-
-    // Code based on Dragon Rise
-    open fun towedTick() {
-        val tower = towedByEntity ?: return
-
-        val dist = this.distanceTo(tower)
-        val longestSide = this.calculateLongestSide()
-        val towerLongestSide = tower.calculateLongestSide()
-
-        val minDist = max(
-            VehicleConfig.TOW_PULL_DISTANCE.get().toDouble(),
-            longestSide + towerLongestSide + 4.0
-        )
-        val maxDist = VehicleConfig.TOW_BREAK_DISTANCE.get().toDouble()
-
-        if (dist > maxDist && maxDist > 0) {
-            this.clearTowingInfo()
-            return
-        }
-
-        if (dist <= minDist) return
-
-        val overshoot = dist - minDist
-        val dir = this.position().subtract(tower.position()).normalize()
-        // 使用双方的相对速度，使阻尼更准确
-        val relVelAlong = this.deltaMovement.subtract(tower.deltaMovement).dot(dir)
-
-        val k = 0.2  // 钢索刚性
-        val d = 0.01 // 阻尼
-        val ropeForce = -k * overshoot - d * relVelAlong
-
-        val towerFactor = tower.computed().towForceFactor.toDouble().coerceAtLeast(0.0)
-        val towedMass = this.mass.toDouble().coerceAtLeast(0.01)
-        val towerMass = tower.mass.toDouble().coerceAtLeast(0.01)
-
-        val towForce = towerMass * towerFactor * ropeForce / 6.0
-
-        val maxDeltaV = max(2.0, tower.deltaMovement.length())
-        val towedScalar = (towForce / towedMass).coerceIn(-maxDeltaV, maxDeltaV)
-        val towerScalar = (-ropeForce / towerMass).coerceIn(-maxDeltaV, maxDeltaV)
-
-        var towerDir = dir.scale(towedScalar)
-
-        this.deltaMovement = this.deltaMovement.add(towerDir)
-        tower.deltaMovement = tower.deltaMovement.add(dir.scale(towerScalar))
-
-        if (!this.computed().forwardTowed) towerDir = towerDir.scale(-1.0)
-
-        val diffY = Mth.wrapDegrees(-getYRotFromVector(towerDir) + getYRotFromVector(this.getViewVector(1f))).toFloat()
-        this.yRot += 0.05f * diffY
-    }
-
-    open fun towingTick() {
-        val towed = towingEntity ?: return
-        if (towed is VehicleEntity) return
-
-        val dist = this.distanceTo(towed)
-        val bb = towed.boundingBox
-        val longestSide = maxOf(bb.xsize, bb.ysize, bb.zsize)
-        val thisLongestSide = this.calculateLongestSide()
-
-        val minDist = max(
-            VehicleConfig.TOW_PULL_DISTANCE.get().toDouble(),
-            longestSide + thisLongestSide + 1.0
-        )
-        val maxDist = VehicleConfig.TOW_BREAK_DISTANCE.get().toDouble()
-
-        if (dist > maxDist && maxDist > 0) {
-            this.clearTowingInfo()
-            return
-        }
-
-        if (dist <= minDist) return
-
-        val overshoot = dist - minDist
-        val dir = this.position().subtract(towed.position()).reverse().normalize()
-        val relVelAlong = towed.deltaMovement.subtract(this.deltaMovement).dot(dir)
-
-        val k = 0.2  // 钢索刚性
-        val d = 0.01 // 阻尼
-        val ropeForce = -k * overshoot - d * relVelAlong
-
-        val maxDeltaV = max(2.0, this.deltaMovement.length())
-        val pullForce = dir.scale((ropeForce / 6.0).coerceIn(-maxDeltaV, maxDeltaV))
-
-        towed.fallDistance = 0f
-
-        if (towed is Player && towed.level().isClientSide) {
-            towed.deltaMovement = towed.deltaMovement.add(pullForce)
-        } else {
-            towed.deltaMovement = towed.deltaMovement.add(pullForce)
         }
     }
 
@@ -2288,8 +2188,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
 
         this.travel()
-        this.towedTick()
-        this.towingTick()
+        towedTick(this)
+        towingTick(this)
         vehicleRadar()
 
         // 固定翼飞机自动盘旋：空中、引擎启动、有能量、未坠毁、有乘客、盘旋开关已开启
