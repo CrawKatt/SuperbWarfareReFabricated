@@ -822,14 +822,35 @@ object VehicleMotionUtils {
                         val color = SpritePixelHelper.getRandomPixelRGB(sprite, 0)
                         val speed = Math.min(vehicle.deltaMovement.length(), 0.5).toFloat()
 
-                        val particleOption = CustomCloudOption(color, 70, 1f + 7f * speed + Math.random().toFloat() * 2, Math.random().toFloat() * -0.12f, false, false)
-                        vehicle.addRandomParticle(particleOption, p.add(0.0, 0.2, 0.0).subtract(vehicle.deltaMovement.scale(1.5)), speed, vehicle.level(), 1, vehicle.deltaMovement.scale(60.0))
+                        val particleOption = CustomCloudOption(
+                            color, 70, 1f + 7f * speed + Math.random().toFloat() * 2, Math.random().toFloat() * -0.12f,
+                            cooldown = false,
+                            light = false
+                        )
+                        vehicle.addRandomParticle(
+                            particleOption,
+                            p.add(0.0, 0.2, 0.0).subtract(vehicle.deltaMovement.scale(1.5)),
+                            speed,
+                            vehicle.level(),
+                            1,
+                            vehicle.deltaMovement.scale(60.0)
+                        )
                     } else {
                         val particleData = BlockParticleOption(ParticleTypes.BLOCK, state)
                         vehicle.addRandomParticle(particleData, p.add(0.0, 0.1, 0.0), 0.2f, vehicle.level(), 0f, 1)
 
-                        if (vehicle.engineInfo is EngineInfo.Track && vehicle.drift() && vehicle.deltaMovement.horizontalDistanceSqr() > 0.0004 && state.`is`(BlockTags.MINEABLE_WITH_PICKAXE)) {
-                            vehicle.addRandomParticle(ModParticleTypes.FIRE_STAR.get(), p.add(0.0, 0.1, 0.0), 0.25f, vehicle.level(), 0.08f, 1)
+                        if (vehicle.engineInfo is EngineInfo.Track && vehicle.drift() && vehicle.deltaMovement.horizontalDistanceSqr() > 0.0004 && state.`is`(
+                                BlockTags.MINEABLE_WITH_PICKAXE
+                            )
+                        ) {
+                            vehicle.addRandomParticle(
+                                ModParticleTypes.FIRE_STAR.get(),
+                                p.add(0.0, 0.1, 0.0),
+                                0.25f,
+                                vehicle.level(),
+                                0.08f,
+                                1
+                            )
                         }
                     }
                 }
@@ -1239,7 +1260,7 @@ object VehicleMotionUtils {
 
     // Code based on Dragon Rise
     @JvmStatic
-    open fun towedTick(vehicle: VehicleEntity) {
+    fun towedTick(vehicle: VehicleEntity) {
         val tower = vehicle.towedByEntity ?: return
 
         val dist = vehicle.distanceTo(tower)
@@ -1285,15 +1306,16 @@ object VehicleMotionUtils {
 
         if (!vehicle.computed().forwardTowed) towerDir = towerDir.scale(-1.0)
 
-        val diffY = Mth.wrapDegrees(-VehicleVecUtils.getYRotFromVector(towerDir) + VehicleVecUtils.getYRotFromVector(
-            vehicle.getViewVector(1f)
-        )
+        val diffY = Mth.wrapDegrees(
+            -VehicleVecUtils.getYRotFromVector(towerDir) + VehicleVecUtils.getYRotFromVector(
+                vehicle.getViewVector(1f)
+            )
         ).toFloat()
         vehicle.yRot += 0.05f * diffY
     }
 
     @JvmStatic
-    open fun towingTick(vehicle: VehicleEntity) {
+    fun towingTick(vehicle: VehicleEntity) {
         val towed = vehicle.towingEntity ?: return
         if (towed is VehicleEntity) return
 
@@ -1327,9 +1349,10 @@ object VehicleMotionUtils {
         val pullForce = dir.scale((ropeForce / 6.0).coerceIn(-maxDeltaV, maxDeltaV))
 
         towed.fallDistance = 0f
-        val diffY = Mth.wrapDegrees(-VehicleVecUtils.getYRotFromVector(pullForce) + VehicleVecUtils.getYRotFromVector(
-            towed.getViewVector(1f)
-        )
+        val diffY = Mth.wrapDegrees(
+            -VehicleVecUtils.getYRotFromVector(pullForce) + VehicleVecUtils.getYRotFromVector(
+                towed.getViewVector(1f)
+            )
         ).toFloat()
 
         if (towed is Player && towed.level().isClientSide) {
@@ -1341,6 +1364,7 @@ object VehicleMotionUtils {
         }
     }
 
+    @JvmStatic
     fun calculateLongestSide(vehicle: VehicleEntity): Double {
         val obb = vehicle.getCollisionOBB()
         if (obb == null || vehicle.enableAABB()) {
