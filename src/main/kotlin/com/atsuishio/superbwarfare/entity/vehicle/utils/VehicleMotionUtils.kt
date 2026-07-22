@@ -1254,7 +1254,7 @@ object VehicleMotionUtils {
 
     // Code based on Dragon Rise
     @JvmStatic
-    open fun towedTick(vehicle: VehicleEntity) {
+    fun towedTick(vehicle: VehicleEntity) {
         val tower = vehicle.towedByEntity ?: return
 
         val dist = vehicle.distanceTo(tower)
@@ -1300,15 +1300,16 @@ object VehicleMotionUtils {
 
         if (!vehicle.computed().forwardTowed) towerDir = towerDir.scale(-1.0)
 
-        val diffY = Mth.wrapDegrees(-VehicleVecUtils.getYRotFromVector(towerDir) + VehicleVecUtils.getYRotFromVector(
-            vehicle.getViewVector(1f)
-        )
+        val diffY = Mth.wrapDegrees(
+            -VehicleVecUtils.getYRotFromVector(towerDir) + VehicleVecUtils.getYRotFromVector(
+                vehicle.getViewVector(1f)
+            )
         ).toFloat()
         vehicle.yRot += 0.05f * diffY
     }
 
     @JvmStatic
-    open fun towingTick(vehicle: VehicleEntity) {
+    fun towingTick(vehicle: VehicleEntity) {
         val towed = vehicle.towingEntity ?: return
         if (towed is VehicleEntity) return
 
@@ -1342,9 +1343,10 @@ object VehicleMotionUtils {
         val pullForce = dir.scale((ropeForce / 6.0).coerceIn(-maxDeltaV, maxDeltaV))
 
         towed.fallDistance = 0f
-        val diffY = Mth.wrapDegrees(-VehicleVecUtils.getYRotFromVector(pullForce) + VehicleVecUtils.getYRotFromVector(
-            towed.getViewVector(1f)
-        )
+        val diffY = Mth.wrapDegrees(
+            -VehicleVecUtils.getYRotFromVector(pullForce) + VehicleVecUtils.getYRotFromVector(
+                towed.getViewVector(1f)
+            )
         ).toFloat()
 
         if (towed is Player && towed.level().isClientSide) {
@@ -1356,6 +1358,7 @@ object VehicleMotionUtils {
         }
     }
 
+    @JvmStatic
     fun calculateLongestSide(vehicle: VehicleEntity): Double {
         val obb = vehicle.getCollisionOBB()
         if (obb == null || vehicle.enableAABB()) {

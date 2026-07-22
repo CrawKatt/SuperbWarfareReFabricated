@@ -29,8 +29,6 @@ import com.atsuishio.superbwarfare.entity.vehicle.Tom6Entity
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier
 import com.atsuishio.superbwarfare.entity.vehicle.utils.*
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleEngineUtils.aircraftLoiter
-import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils.towedTick
-import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils.towingTick
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotFromVector
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getYRotFromVector
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleWeaponUtils.reloadDecoy
@@ -604,9 +602,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             val towed = towingEntity
             if (towed is VehicleEntity) {
                 towed.towedByUUID = ""
-            } else if (towed != null) {
-                towed.persistentData.remove("TowedByUUID")
-            }
+            } else towed?.persistentData?.remove("TowedByUUID")
             towingUUID = ""
             towedByUUID = ""
         }
@@ -2188,8 +2184,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
 
         this.travel()
-        towedTick(this)
-        towingTick(this)
+        this.towedTick()
+        this.towingTick()
         vehicleRadar()
 
         // 固定翼飞机自动盘旋：空中、引擎启动、有能量、未坠毁、有乘客、盘旋开关已开启
@@ -2488,6 +2484,14 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             this.keepChunkLoaded(this.position())
             this.keepChunkLoaded(position().add(deltaMovement.normalize().scale(16.0)))
         }
+    }
+
+    open fun towedTick() {
+        VehicleMotionUtils.towedTick(this)
+    }
+
+    open fun towingTick() {
+        VehicleMotionUtils.towingTick(this)
     }
 
     fun keepChunkLoaded(position: Vec3) {
