@@ -10,6 +10,7 @@ import com.atsuishio.superbwarfare.tools.SeekTool
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.OwnableEntity
 import net.minecraft.world.entity.TraceableEntity
 import net.minecraft.world.entity.monster.Enemy
 import net.minecraft.world.entity.player.Player
@@ -27,9 +28,6 @@ import kotlin.math.max
  * 子类可通过覆盖 [AutoAimableEntity.threatConfig] 定制 AI 行为。
  */
 class TowerAI(private val tower: AutoAimableEntity) {
-
-    // region Threat Configuration
-
     /**
      * 威胁评分配置，控制各因素在目标优先级中的权重。
      */
@@ -54,10 +52,6 @@ class TowerAI(private val tower: AutoAimableEntity) {
         val minThreatScore: Double = 0.0,
     )
 
-    // endregion
-
-    // region TeamResolver
-
     /**
      * 集中化队伍 / TDM 判定。
      */
@@ -71,6 +65,7 @@ class TowerAI(private val tower: AutoAimableEntity) {
          * 2. TDM 启用 → 敌对
          * 3. 非友方且非同队 → 敌对
          */
+        @JvmStatic
         fun isHostile(tower: AutoAimableEntity, target: Entity): Boolean {
             // 排除弹射物（弹射物用 isHostileProjectile 单独处理）
             if (target is Projectile) return false
@@ -102,6 +97,7 @@ class TowerAI(private val tower: AutoAimableEntity) {
         /**
          * 判断弹射物对防御塔是否敌对。
          */
+        @JvmStatic
         fun isHostileProjectile(tower: AutoAimableEntity, projectile: Projectile): Boolean {
             val owner = tower.owner ?: return false
 
@@ -120,6 +116,7 @@ class TowerAI(private val tower: AutoAimableEntity) {
         /**
          * 判断目标是否对防御塔友好。
          */
+        @JvmStatic
         fun isFriendly(tower: AutoAimableEntity, target: Entity): Boolean {
             val owner = tower.owner ?: return false
 
@@ -130,10 +127,6 @@ class TowerAI(private val tower: AutoAimableEntity) {
         }
     }
 
-    // endregion
-
-    // region TargetValidator
-
     /**
      * 目标合法性验证。
      */
@@ -142,6 +135,7 @@ class TowerAI(private val tower: AutoAimableEntity) {
         /**
          * 综合验证目标是否可以被锁定攻击。
          */
+        @JvmStatic
         fun isValidTarget(
             tower: AutoAimableEntity,
             target: Entity,
@@ -157,6 +151,7 @@ class TowerAI(private val tower: AutoAimableEntity) {
             if (!target.isAlive) return false
             if (target is LivingEntity && target.health <= 0) return false
             if (target is VehicleEntity && target.isWreck) return false
+            if (target is OwnableEntity && target.owner === tower.owner) return false
 
             // 距离范围
             val distSqr = target.distanceToSqr(tower)
@@ -197,10 +192,12 @@ class TowerAI(private val tower: AutoAimableEntity) {
          * 验证弹射物是否为有威胁的目标。
          * 包含轨迹分析：判断弹射物是否正飞向防御塔。
          */
+        @JvmStatic
         fun isValidProjectileTarget(tower: AutoAimableEntity, projectile: Projectile, pos: Vec3): Boolean {
             // 排除已落地或静止的弹射物
             if (projectile.onGround()) return false
             if (projectile.deltaMovement.lengthSqr() < 0.0001) return false
+            if (projectile.owner === tower.owner) return false
 
             // 排除特定类型的弹射物
             if (projectile is SmallCannonShellEntity) return false
@@ -225,6 +222,7 @@ class TowerAI(private val tower: AutoAimableEntity) {
          * 算法：计算弹射物运动射线与防御塔包围盒的最近距离，
          * 如果小于阈值且弹射物正朝防御塔移动，则视为威胁。
          */
+        @JvmStatic
         fun isOnCollisionCourse(tower: AutoAimableEntity, projectile: Projectile, threshold: Double): Boolean {
             val projPos = projectile.position()
             val velocity = projectile.deltaMovement
@@ -278,6 +276,7 @@ class TowerAI(private val tower: AutoAimableEntity) {
         /**
          * 检查目标和炮塔之间是否有障碍物遮挡。
          */
+        @JvmStatic
         fun checkLineOfSight(tower: AutoAimableEntity, target: Entity, pos: Vec3): Boolean {
             return tower.level().clip(
                 ClipContext(
@@ -287,10 +286,6 @@ class TowerAI(private val tower: AutoAimableEntity) {
             ).type != HitResult.Type.BLOCK
         }
     }
-
-    // endregion
-
-    // region TargetPrioritizer
 
     /**
      * 目标优先级评分器。
@@ -302,6 +297,7 @@ class TowerAI(private val tower: AutoAimableEntity) {
          *
          * @return 评分（越高越优先），返回 null 表示该目标不应被考虑
          */
+        @JvmStatic
         fun evaluateThreat(tower: AutoAimableEntity, target: Entity): Double {
             val config = tower.threatConfig
 
@@ -362,6 +358,7 @@ class TowerAI(private val tower: AutoAimableEntity) {
          *
          * @return 评分最高的目标，如果所有目标评分都低于阈值则返回 null
          */
+        @JvmStatic
         fun selectBestTarget(tower: AutoAimableEntity, candidates: List<Entity>): Entity? {
             val config = tower.threatConfig
 
@@ -379,6 +376,7 @@ class TowerAI(private val tower: AutoAimableEntity) {
          * 判断是否应该从当前目标切换到新目标。
          * 使用滞后机制防止频繁切换。
          */
+        @JvmStatic
         fun shouldSwitchTarget(
             tower: AutoAimableEntity,
             currentTarget: Entity?,
@@ -397,10 +395,6 @@ class TowerAI(private val tower: AutoAimableEntity) {
             return newScore > currentScore + config.targetSwitchHysteresis
         }
     }
-
-    // endregion
-
-    // region TargetTracker
 
     /**
      * 目标追踪器，管理目标获取、验证与切换。
@@ -556,12 +550,6 @@ class TowerAI(private val tower: AutoAimableEntity) {
         }
     }
 
-    // endregion
-
-    // region Public API
-
     /** 目标追踪器实例 */
     val tracker: TargetTracker = TargetTracker()
-
-    // endregion
 }
