@@ -8,7 +8,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -77,7 +79,9 @@ public class Crowbar extends SwordItem {
         if (slot == EquipmentSlot.MAINHAND) {
             UUID uuid = new UUID(slot.toString().hashCode(), 0);
             map = HashMultimap.create(map);
-            map.put(ModAttributes.BLOCK_REACH.get(), new AttributeModifier(
+            Attribute blockReachAttribute = BuiltInRegistries.ATTRIBUTE.get(
+                    new ResourceLocation("reach-entity-attributes", "reach"));
+            map.put(blockReachAttribute != null ? blockReachAttribute : ModAttributes.BLOCK_REACH.get(), new AttributeModifier(
                     uuid, Mod.ATTRIBUTE_MODIFIER, 3, AttributeModifier.Operation.ADDITION));
         }
         return map;

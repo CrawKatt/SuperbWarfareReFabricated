@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(ServerGamePacketListenerImpl.class)
+@Mixin(value = ServerGamePacketListenerImpl.class, priority = 900)
 public class ServerGamePacketListenerReachMixin {
 
     @Shadow
@@ -19,6 +19,7 @@ public class ServerGamePacketListenerReachMixin {
 
     @Redirect(
             method = "handleUseItemOn",
+            require = 0,
             at = @At(
                     value = "FIELD",
                     target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;MAX_INTERACTION_DISTANCE:D",
@@ -31,6 +32,7 @@ public class ServerGamePacketListenerReachMixin {
 
     @ModifyConstant(
             method = "handleUseItemOn",
+            require = 0,
             constant = @Constant(doubleValue = 64.0D)
     )
     private double superbwarfare$removeRedundantVanillaDistanceCheck(double original) {

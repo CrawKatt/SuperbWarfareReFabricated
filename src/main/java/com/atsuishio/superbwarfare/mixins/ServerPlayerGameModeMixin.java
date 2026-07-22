@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(ServerPlayerGameMode.class)
+@Mixin(value = ServerPlayerGameMode.class, priority = 900)
 public class ServerPlayerGameModeMixin {
 
     @Shadow
@@ -19,6 +19,7 @@ public class ServerPlayerGameModeMixin {
 
     @Redirect(
             method = "handleBlockBreakAction",
+            require = 0,
             at = @At(
                     value = "FIELD",
                     target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;MAX_INTERACTION_DISTANCE:D",
