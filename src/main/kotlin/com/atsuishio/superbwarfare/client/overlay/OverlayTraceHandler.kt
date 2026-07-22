@@ -8,6 +8,8 @@ import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.mc
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.ClipContext
+import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
@@ -29,6 +31,9 @@ object OverlayTraceHandler {
 
     @JvmField
     var cameraMaxRangeEntity: Entity? = null
+
+    @JvmField
+    var blockMaxRangeResult: BlockHitResult? = null
 
     @SubscribeEvent
     fun onOverlayTraceClientTick(event: TickEvent.ClientTickEvent) {
@@ -77,6 +82,13 @@ object OverlayTraceHandler {
             viewPos = vehicle.getShootPosForHud(player, 1f)
         }
 
+        blockMaxRangeResult = player.level().clip(
+            ClipContext(
+                viewPos, viewPos.add(viewVec.scale(512.0)),
+                ClipContext.Block.OUTLINE, ClipContext.Fluid.ANY, player
+            )
+        )
+
         val cameraRes = TraceTool.cameraFindLookingEntity(player, viewPos, viewVec, distance)
         if (cameraRes is VehicleEntity) {
             val decoy = TraceTool.findLookDecoy(player, viewPos, viewVec, distance)
@@ -102,5 +114,6 @@ object OverlayTraceHandler {
         maxRangeEntity = null
         cameraEntity = null
         maxRangeEntity = null
+        blockMaxRangeResult = null
     }
 }

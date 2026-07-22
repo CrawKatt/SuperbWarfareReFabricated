@@ -21,8 +21,6 @@ import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
-import net.minecraft.world.level.ClipContext
-import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 import org.joml.Math
@@ -53,7 +51,6 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
         "@AC130Gun" to loc("textures/overlay/vehicle/crosshair/ac_130_gun.png"),
         "@AC130Cannon" to loc("textures/overlay/vehicle/crosshair/ac_130_cannon.png"),
         "@NoCross" to loc("textures/overlay/vehicle/crosshair/empty.png")
-
     )
 
     private val CROSSHAIR_THIRD_CAMERA = loc("textures/overlay/vehicle/crosshair/third_camera.png")
@@ -129,23 +126,14 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
         val scale: Float = scopeScale
 
         var shootPos = entity.getShootPosForHud(player, partialTick)
-        var shootVec = entity.getShootDirectionForHud(player, partialTick)
         val nacelleCam = ClientEventHandler.isNacelleCam(player)
 
         if (nacelleCam) {
             shootPos = camera.position
-            shootVec = Vec3(camera.lookVector)
         }
 
-        val result = player.level().clip(
-            ClipContext(
-                shootPos, shootPos.add(shootVec),
-                ClipContext.Block.OUTLINE, ClipContext.Fluid.ANY, player
-            )
-        )
-
-        val hitPos = result.location
-
+        val result = OverlayTraceHandler.blockMaxRangeResult
+        val hitPos = result?.location ?: shootPos
         var dis = shootPos.distanceTo(hitPos)
 
         var lookingEntity = entity.getPlayerLookAtEntityOnVehicle(player, 512.0, partialTick)
