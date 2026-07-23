@@ -26,13 +26,12 @@ class SkinSprayRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityMode
     ) {
         if (stack.item !is SkinSprayItem) return
         val model = ItemModelReloadListener.getModel(MODEL) ?: return
+        val instance = model.createInstance()
         poseStack.pushPose()
 
         poseStack.translate(0.5f, 0.5f, 0.5f)
 
-        model.applyPose(model.bindPose)
-
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer,
             RenderType.entityCutout(TEXTURE),

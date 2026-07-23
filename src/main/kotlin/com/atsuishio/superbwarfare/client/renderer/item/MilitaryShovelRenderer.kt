@@ -24,13 +24,12 @@ class MilitaryShovelRenderer(dispatcher: BlockEntityRenderDispatcher, set: Entit
     ) {
         if (stack.item !is MilitaryShovelItem) return
         val model = ItemModelReloadListener.getModel(MODEL) ?: return
+        val instance = model.createInstance()
         poseStack.pushPose()
 
         poseStack.translate(0.5f, 0.5f, 0.5f)
 
-        model.applyPose(model.bindPose)
-
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.entityCutout(TEXTURE)),
             packedLight,
