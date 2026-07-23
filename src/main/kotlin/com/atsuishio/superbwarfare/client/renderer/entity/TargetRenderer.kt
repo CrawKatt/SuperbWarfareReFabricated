@@ -52,9 +52,25 @@ class TargetRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
         )
 
         poseStack.pushPose()
-        val boneIndex = instance.getIndex("ba")
+        val boneIndex = instance.getIndex("move_ba")
+        val global = instance.getGlobalTransform(boneIndex)
+
+        // TODO 发光层呢
         val boneConsumer = buffer.getBuffer(RenderType.eyes(TEXTURE_E))
-        model.renderBone(instance, boneIndex, poseStack, boneConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f, false)
+        poseStack.mulPoseMatrix(global)
+        model.renderBone(
+            instance,
+            boneIndex,
+            poseStack,
+            boneConsumer,
+            packedLight,
+            OverlayTexture.NO_OVERLAY,
+            1f,
+            1f,
+            1f,
+            1f,
+            false
+        )
         poseStack.popPose()
 
         poseStack.popPose()

@@ -26,7 +26,7 @@ class SteelCoilRenderer(renderManager: EntityRendererProvider.Context) :
     ) {
         val model = EntityModelReloadListener.getModel(MODEL) ?: return
         val instance = model.createInstance()
-        val bone = instance.getBone("main") ?: return
+        val bone = instance.getBone("move_main") ?: return
 
         poseStack.pushPose()
 

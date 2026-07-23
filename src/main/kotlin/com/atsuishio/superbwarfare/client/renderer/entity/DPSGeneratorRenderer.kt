@@ -53,16 +53,32 @@ class DPSGeneratorRenderer(renderManager: EntityRendererProvider.Context) :
         )
 
         poseStack.pushPose()
-        val boneIndex = instance.getIndex("ba")
+        val boneIndex = instance.getIndex("move_ba")
+        val global = instance.getGlobalTransform(boneIndex)
+
         val boneConsumer = buffer.getBuffer(RenderType.eyes(TEXTURE_E))
-        model.renderBone(instance, boneIndex, poseStack, boneConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f, false)
+        poseStack.mulPoseMatrix(global)
+        model.renderBone(
+            instance,
+            boneIndex,
+            poseStack,
+            boneConsumer,
+            packedLight,
+            OverlayTexture.NO_OVERLAY,
+            1f,
+            1f,
+            1f,
+            1f,
+            false
+        )
         poseStack.popPose()
 
         poseStack.popPose()
     }
 
     companion object {
-        val TEXTURES = ArrayList<ResourceLocation>((0..7).map { loc("textures/bedrock/entity/dps_generator_tier_${it}.png") })
+        val TEXTURES =
+            ArrayList<ResourceLocation>((0..7).map { loc("textures/bedrock/entity/dps_generator_tier_${it}.png") })
         val TEXTURE_E = loc("textures/bedrock/entity/dps_generator_e.png")
         val BLENDER: EulerAdditiveBlender = SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }
         val MODEL = loc("models/bedrock/entity/dps_generator.geo.json")

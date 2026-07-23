@@ -9,7 +9,7 @@
       "loop": "hold_on_last_frame",
       "animation_length": 2,
       "bones": {
-        "ba": {
+        "move_ba": {
           "rotation": {
             "0.0": [0, 0, 0],
             "0.125": [-90, 0, 0],
