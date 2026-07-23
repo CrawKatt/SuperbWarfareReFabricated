@@ -293,10 +293,8 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.compilerArgs.addAll(
         listOf(
-            // Correct Mixin AP option: provide SRG file for refmap generation
-            "-AreobfSrgFile=${project.file("build/createSrgToMcp/output.srg").absolutePath}",
-            // Tell AP to use Searge/SRG obfuscation environment
-            "-AdefaultObfuscationEnv=searge"
+            "-Amixin.refmap=mixins.superbwarfare.refmap.json",
+            "-Amixin.defaultRefmap=mixins.superbwarfare.refmap.json"
         )
     )
 }
