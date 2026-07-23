@@ -58,7 +58,7 @@ object VehicleWeaponUtils {
         val diffY = Mth.wrapDegrees(-getYRotFromVector(shootVec) + getYRotFromVector(barrelVector)).toFloat()
         val diffX = Mth.wrapDegrees(-getXRotFromVector(shootVec) + getXRotFromVector(barrelVector)).toFloat()
 
-        if (vehicle.getEntityData().get(VehicleEntity.TURRET_DAMAGED)) {
+        if (vehicle.entityData.get(VehicleEntity.TURRET_DAMAGED)) {
             ySpeed *= 0.2f
             xSpeed *= 0.2f
         }
@@ -68,8 +68,8 @@ object VehicleWeaponUtils {
 
         vehicle.turretXRot = Mth.clamp(
             vehicle.turretXRot + Mth.clamp(0.75f * diffX, -xSpeed, xSpeed),
-            -vehicle.turretMaxPitch,
-            -vehicle.turretMinPitch
+            -vehicle.turretMaxPitch + vehicle.customTurretMaxPitch,
+            -vehicle.turretMinPitch - vehicle.customTurretMinPitch
         )
         vehicle.turretYRot = Mth.clamp(
             vehicle.turretYRot - Mth.clamp(1f * diffY, min, max),

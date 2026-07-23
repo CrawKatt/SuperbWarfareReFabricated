@@ -107,13 +107,12 @@ open class HappiestGhastEntity(type: EntityType<HappiestGhastEntity>, world: Lev
         targetPos = BlockPos.containing(randomPos)
     }
 
-    override fun beforeShoot(living: LivingEntity?) {
+    override fun beforeShoot(living: LivingEntity?, weaponName: String?) {
         val serverLevel = level()
         if (serverLevel is ServerLevel) {
-            val name = this.getGunName(0)
-            if (name == "Main" || name == "AAMissile") {
-                val pos = getShootPos(name, 1f)
-                val direct = getShootVec(name, 1f)
+            if (weaponName == "Main" || weaponName == "AAMissile") {
+                val pos = getShootPos(weaponName, 1f)
+                val direct = getShootVec(weaponName, 1f)
                 missileLaunchEffect(serverLevel, pos, direct)
             }
         }

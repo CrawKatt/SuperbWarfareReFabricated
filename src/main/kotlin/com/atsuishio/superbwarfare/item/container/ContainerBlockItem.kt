@@ -131,6 +131,7 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER.get(), Properties().sta
             event.add(ModEntities.M_1A_2)
             event.add(ModEntities.YX_100)
             event.add(ModEntities.PLZ_05)
+            event.add(ModEntities.FH_77BW)
             event.add(ModEntities.AH_6)
             event.add(ModEntities.MI_28)
             event.add(ModEntities.TOM_6)

@@ -77,6 +77,12 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
     @SerialName("BoundBones")
     var boundBones: ObjectToList<String>? = ObjectToList()
 
+    @SerialName("BoundBonesYaw")
+    var boundBonesYaw: ObjectToList<String>? = ObjectToList()
+
+    @SerialName("BoundBonesPitch")
+    var boundBonesPitch: ObjectToList<String>? = ObjectToList()
+
     @SerialName("MinZoom")
     var minZoom = defaultZoom
 

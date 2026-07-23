@@ -1,13 +1,13 @@
 package com.atsuishio.superbwarfare.entity.vehicle
 
 import com.atsuishio.superbwarfare.client.animation.AnimationPlayType
-import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity
+import com.atsuishio.superbwarfare.entity.vehicle.base.SpArtilleryEntity
 import com.atsuishio.superbwarfare.tools.angleTo
 import com.atsuishio.superbwarfare.tools.toVec3
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
-open class Plz05Entity(type: EntityType<Plz05Entity>, world: Level) : ArtilleryEntity(type, world) {
+open class Plz05Entity(type: EntityType<Plz05Entity>, world: Level) : SpArtilleryEntity(type, world) {
     private var wasLockTurret = false
 
     override fun baseTick() {
@@ -36,6 +36,4 @@ open class Plz05Entity(type: EntityType<Plz05Entity>, world: Level) : ArtilleryE
             wasLockTurret = lockTurret
         }
     }
-
-    override fun canBind() = true
 }

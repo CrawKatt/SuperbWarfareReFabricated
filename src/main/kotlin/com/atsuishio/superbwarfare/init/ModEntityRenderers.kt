@@ -93,6 +93,7 @@ object ModEntityRenderers {
             registerEntityRenderer(ModEntities.MI_28.get(), ::Mi28Renderer)
             registerEntityRenderer(ModEntities.KH_39.get(), ::BasicProjectileRenderer)
             registerEntityRenderer(ModEntities.PLZ_05.get(), ::Plz05Renderer)
+            registerEntityRenderer(ModEntities.FH_77BW.get(), ::Fh88bwRenderer)
             registerEntityRenderer(ModEntities.LAV_AD.get(), ::LavAdRenderer)
             registerEntityRenderer(ModEntities.KV_16.get(), ::Kv16Renderer)
             registerEntityRenderer(ModEntities.JU_87.get(), ::Ju87Renderer)
