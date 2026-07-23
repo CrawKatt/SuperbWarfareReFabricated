@@ -26,7 +26,7 @@ object EntityModelReloadListener : BasicModelReloadListenerV2("entity") {
                 BakerOptions.ofAnimationFile(anim)
             } else {
                 BakerOptions.defaults()
-            }.withPreservedBoneRegexes(setOf("ba", "main", "^move_.*"))
+            }.withPreservedBoneRegexes(setOf("^move_.*"))
 
             this.models[location] = BakedBedrockModel.bake(pojo, options)
         }

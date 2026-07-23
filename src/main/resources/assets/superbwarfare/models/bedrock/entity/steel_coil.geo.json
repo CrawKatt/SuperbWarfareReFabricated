@@ -12,7 +12,7 @@
 			},
 			"bones": [
 				{
-					"name": "main",
+					"name": "move_main",
 					"pivot": [0, 8, 0],
 					"poly_mesh": {
 						"normalized_uvs": true,

@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.client.renderer.entity
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
+import com.atsuishio.superbwarfare.tools.mulPoseMatrix
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
 import com.maydaymemory.mae.blend.EulerAdditiveBlender
@@ -52,9 +53,25 @@ class TargetRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
         )
 
         poseStack.pushPose()
-        val boneIndex = instance.getIndex("ba")
+        val boneIndex = instance.getIndex("move_ba")
+        val global = instance.getGlobalTransform(boneIndex)
+
+        // TODO 发光层呢
         val boneConsumer = buffer.getBuffer(RenderType.eyes(TEXTURE_E))
-        model.renderBone(instance, boneIndex, poseStack, boneConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f, false)
+        poseStack.mulPoseMatrix(global)
+        model.renderBone(
+            instance,
+            boneIndex,
+            poseStack,
+            boneConsumer,
+            packedLight,
+            OverlayTexture.NO_OVERLAY,
+            1f,
+            1f,
+            1f,
+            1f,
+            false
+        )
         poseStack.popPose()
 
         poseStack.popPose()
