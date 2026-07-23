@@ -2,7 +2,7 @@
 
 package com.atsuishio.superbwarfare.tools
 
-import com.atsuishio.superbwarfare.Mod.Companion.queueClientWork
+import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.network.NetworkRegistry
 import com.atsuishio.superbwarfare.tools.FormatTool.format0D
 import net.minecraft.client.Minecraft
@@ -130,7 +130,7 @@ fun <T : Event> postEvent(event: T) = MinecraftForge.EVENT_BUS.post(event)
 
 inline fun queueClientWorkIfDelayed(delay: Int, crossinline block: () -> Unit) {
     if (delay > 0) {
-        queueClientWork(delay) { block() }
+        Mod.queueClientWork(delay) { block() }
     } else {
         block()
     }

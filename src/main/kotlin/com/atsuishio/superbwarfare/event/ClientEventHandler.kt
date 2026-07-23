@@ -3,11 +3,14 @@ package com.atsuishio.superbwarfare.event
 import com.atsuishio.superbwarfare.api.event.ClientVehicleFireEvent
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
+import com.atsuishio.superbwarfare.client.lighting.LightPositionRegistry
+import com.atsuishio.superbwarfare.client.lighting.VehicleLightingHandler
 import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
+import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
@@ -527,6 +530,19 @@ object ClientEventHandler {
         handleControlVehicle(player, stack)
         handleArtilleryIndicator(player, stack)
         calculateBombHitPos(player)
+
+        // Dynamic lighting: update light engine and expire old sources
+        if (!LightPositionRegistry.isEmpty()) {
+            val clientLevel = clientLevel
+            if (clientLevel != null) {
+                val engine = clientLevel.lightEngine
+                val iter = LightPositionRegistry.activeIterator()
+                while (iter.hasNext()) {
+                    engine.checkBlock(BlockPos.of(iter.nextLong()))
+                }
+            }
+        }
+        LightPositionRegistry.tick()
     }
 
     @JvmStatic
@@ -2785,6 +2801,21 @@ object ClientEventHandler {
     fun handleRenderCrossHair(event: RenderGuiOverlayEvent.Pre) {
         if (event.overlay != VanillaGuiOverlay.CROSSHAIR.type()) return
         val player = localPlayer ?: return
+
+        // When combat HUD is hidden by server, suppress vanilla crosshair in ALL views
+        if (MiscConfig.HIDE_COMBAT_HUD.get()) {
+            val stack = player.mainHandItem
+            if (stack.item is GunItem) {
+                event.isCanceled = true
+                return
+            }
+            val vehicle = player.vehicle
+            if (vehicle is VehicleEntity && vehicle.hasWeapon(vehicle.getSeatIndex(player))) {
+                event.isCanceled = true
+                return
+            }
+        }
+
         if (!mc.options.cameraType.isFirstPerson) return
 
         if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR.get())) {
@@ -3009,8 +3040,10 @@ object ClientEventHandler {
     @SubscribeEvent
     fun onClientVehicleFire(event: ClientVehicleFireEvent) {
         val shooter = event.shooter
-        val vehicle = event.entity
+        val vehicle = event.vehicle
         val index = event.index
+
+        VehicleLightingHandler.onVehicleFire(event)
 
         val ani = vehicle.getAnimationInstance() ?: return
         val name = event.weaponName

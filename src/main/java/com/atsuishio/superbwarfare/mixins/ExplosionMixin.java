@@ -6,12 +6,14 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
+/**
+ * Implements {@link ExplosionAccess} to expose the explosion radius field
+ * to both client and server code without reflection.
+ */
 @Mixin(Explosion.class)
-public class ExplosionMixin implements ExplosionAccess {
+public abstract class ExplosionMixin implements ExplosionAccess {
 
-    @Shadow
-    @Final
-    private float radius;
+    @Shadow @Final private float radius;
 
     @Override
     public float superbwarfare$getRadius() {

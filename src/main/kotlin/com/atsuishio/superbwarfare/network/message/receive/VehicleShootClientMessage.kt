@@ -7,8 +7,8 @@ import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedUUID
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.localPlayer
+import com.atsuishio.superbwarfare.tools.postEvent
 import kotlinx.serialization.Serializable
-import thedarkcolour.kotlinforforge.forge.FORGE_BUS
 
 @Serializable
 data class VehicleShootClientMessage(
@@ -26,7 +26,8 @@ data class VehicleShootClientMessage(
 
         if (v is VehicleEntity) {
             val name = weaponName.ifEmpty { null }
-            FORGE_BUS.post(s?.let { ClientVehicleFireEvent(v, it, index, name) })
+            val resolvedShooter = s ?: player
+            postEvent(ClientVehicleFireEvent(v, resolvedShooter, index, name))
         }
     }
 }

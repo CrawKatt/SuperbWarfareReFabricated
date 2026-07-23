@@ -22,7 +22,6 @@ import java.lang.Math
 import kotlin.math.acos
 import kotlin.math.sqrt
 
-
 operator fun Vec3.plus(other: Vec3): Vec3 = add(other)
 operator fun Vec3.minus(other: Vec3): Vec3 = subtract(other)
 operator fun Vec3.times(factor: Double): Vec3 = scale(factor)
@@ -45,8 +44,14 @@ fun Vec3.worldToScreen(): Vec3 {
     val window = mc.window
     val camera = mc.gameRenderer.mainCamera
     val worldPosRel = Vector4d(camera.position.reverse().add(this).toVector3f(), 1.0)
-    worldPosRel.mul(ClientEventHandler.modelViewMatrix)
-    worldPosRel.mul(ClientEventHandler.projectionMatrix)
+    
+    // Handle matrix nullability checks securely before multiplying
+    val modelView = ClientEventHandler.modelViewMatrix
+    val projection = ClientEventHandler.projectionMatrix
+    if (modelView != null && projection != null) {
+        worldPosRel.mul(modelView)
+        worldPosRel.mul(projection)
+    }
 
     val depth = worldPosRel.w
 
@@ -199,14 +204,9 @@ object VectorTool {
      * @param v0 平面法向量（朝向向量）。
      * @return 反射向量 v2。
      */
+    @JvmStatic
     fun calculateReflection(v1: Vec3, v0: Vec3): Vec3 {
-        // 归一化法向量（确保单位长度）
-
-        // 计算点积 v1 · n
-
         val dot = v1.dot(v0)
-
-        // 计算反射向量: v2 = v1 - 2 * (v1 · n) * n
         return v1 - v0 * (2 * dot)
     }
 
