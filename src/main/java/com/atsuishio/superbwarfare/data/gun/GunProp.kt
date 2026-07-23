@@ -177,6 +177,12 @@ class GunProp<T, R>(
         val BOUND_BONES = plainProp(DefaultGunData::boundBones)
 
         @JvmField
+        val BOUND_BONES_YAW = plainProp(DefaultGunData::boundBonesYaw)
+
+        @JvmField
+        val BOUND_BONES_PITCH = plainProp(DefaultGunData::boundBonesPitch)
+
+        @JvmField
         val BURST_AMOUNT = plainProp(DefaultGunData::burstAmount)
 
         @JvmField

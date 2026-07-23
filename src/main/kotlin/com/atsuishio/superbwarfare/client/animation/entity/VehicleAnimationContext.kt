@@ -115,24 +115,22 @@ class VehicleAnimationContext<T>(val entity: T, location: ResourceLocation) wher
         val runner = AnimationRunner(animation, AnimationContext(animation.specifiedEndTimeS))
         runner.state = type.state()
 
-        val weaponName = extractWeaponName(animationName)
-        if (weaponName != null) {
-            fadeMap.remove(weaponName)
-            weaponRunners[weaponName] = runner
-            if (fadeInTicks > 0) {
-                fadeMap[weaponName] = FadeInfo(weaponName, true, fadeInTicks)
-            }
+        val animKey = animationName!!.removePrefix("animation.")
+        fadeMap.remove(animKey)
+        weaponRunners[animKey] = runner
+        if (fadeInTicks > 0) {
+            fadeMap[animKey] = FadeInfo(animKey, true, fadeInTicks)
         }
     }
 
     fun stopAnimation(animationName: String, fadeOutTicks: Int = 0) {
-        val weaponName = extractWeaponName(animationName) ?: return
-        if (fadeOutTicks > 0 && weaponRunners.containsKey(weaponName)) {
-            fadeMap[weaponName] = FadeInfo(weaponName, false, fadeOutTicks)
+        val animKey = animationName.removePrefix("animation.")
+        if (fadeOutTicks > 0 && weaponRunners.containsKey(animKey)) {
+            fadeMap[animKey] = FadeInfo(animKey, false, fadeOutTicks)
         } else {
-            weaponRunners.remove(weaponName)
-            weaponIndices.remove(weaponName)
-            fadeMap.remove(weaponName)
+            weaponRunners.remove(animKey)
+            weaponIndices.remove(animKey)
+            fadeMap.remove(animKey)
         }
     }
 

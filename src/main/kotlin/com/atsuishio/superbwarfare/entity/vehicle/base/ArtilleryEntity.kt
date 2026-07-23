@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.entity.vehicle.base
 
 import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.setValue
-import com.atsuishio.superbwarfare.entity.vehicle.Plz05Entity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotFromVector
 import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.item.misc.firingParameters
@@ -82,7 +81,7 @@ open class ArtilleryEntity(type: EntityType<*>, world: Level) : VehicleEntity(ty
             define(TARGET_POS, BlockPos(0, 0, 0))
             define(ORIGIN_POS, BlockPos(0, 0, 0))
             define(RADIUS, 0)
-            define(LOCK_TURRET, false)
+            define(LOCK_TURRET, true)
         }
     }
 
@@ -212,7 +211,7 @@ open class ArtilleryEntity(type: EntityType<*>, world: Level) : VehicleEntity(ty
 
         val controller = getNthEntity(turretControllerIndex)
 
-        if (deltaMovement.horizontalDistanceSqr() > 0.007 && this !is Plz05Entity) {
+        if (deltaMovement.horizontalDistanceSqr() > 0.007 && this !is SpArtilleryEntity) {
             lockTurret = true
         }
 
@@ -224,16 +223,16 @@ open class ArtilleryEntity(type: EntityType<*>, world: Level) : VehicleEntity(ty
     }
 
     override fun vehicleShoot(living: LivingEntity?, weaponName: String, targetPos: Vec3?) {
-        beforeShoot(living)
+        beforeShoot(living, weaponName)
         super.vehicleShoot(living, weaponName, targetPos)
     }
 
     override fun vehicleShoot(living: LivingEntity?, uuid: UUID?, targetPos: Vec3?) {
-        beforeShoot(living)
+        beforeShoot(living, getGunName(getSeatIndex(living)))
         super.vehicleShoot(living, uuid, targetPos)
     }
 
-    open fun beforeShoot(living: LivingEntity?) {
+    open fun beforeShoot(living: LivingEntity?, weaponName: String? = null) {
         val level = living?.level()
         if (level is ServerLevel) {
             ParticleTool.spawnBigCannonMuzzleParticles(getShootVec("Main", 1f), getShootPos("Main", 1f), level, this)

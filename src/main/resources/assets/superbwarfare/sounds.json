@@ -4653,5 +4653,21 @@
         "name": "superbwarfare:vehicle/ac_130h/m102_fire_3p"
       }
     ]
+  },
+  "fh_77bw_fire_1p": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/fh_77bw/fh_77bw_fire_1p"
+      }
+    ]
+  },
+  "fh_77bw_fire_3p": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/fh_77bw/fh_77bw_fire_3p"
+      }
+    ]
   }
 }

@@ -602,33 +602,67 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
         for ((index, seat) in seats.withIndex()) {
             for (k in seat.weapons().indices) {
                 val data = vehicle.getGunData(index, k) ?: continue
-                val boundBones = data.get(GunProp.BOUND_BONES) ?: continue
                 val defaultVec = vehicle.getDefaultBarrelDirection(index, partialTicks) ?: continue
                 val targetVec = vehicle.getShootVec(index, partialTicks) ?: continue
                 if (vehicle.getNthEntity(index) == null) continue
+                val boundBones = data.get(GunProp.BOUND_BONES)
+                val boundBonesYaw = data.get(GunProp.BOUND_BONES_YAW)
+                val boundBonesPitch = data.get(GunProp.BOUND_BONES_PITCH)
 
-                for (name in boundBones) {
-                    val bone = model.getBone(name)
-                    if (bone != null) {
+                if (boundBones != null) {
+                    for (name in boundBones) {
+                        val bone = model.getBone(name)
+                        if (bone != null) {
 
-                        // TODO 期待后人智慧，万一哪天正确实现了获取骨骼朝向呢
+                            // TODO 期待后人智慧，万一哪天正确实现了获取骨骼朝向呢
 
-                        val diffY = Mth.wrapDegrees(
-                            -VehicleVecUtils.getYRotFromVector(targetVec) + VehicleVecUtils.getYRotFromVector(
-                                defaultVec
-                            )
-                        ).toFloat()
-                        val diffX = Mth.wrapDegrees(
-                            -VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(
-                                defaultVec
-                            )
-                        ).toFloat()
+                            val diffY = Mth.wrapDegrees(
+                                -VehicleVecUtils.getYRotFromVector(targetVec) + VehicleVecUtils.getYRotFromVector(defaultVec)
+                            ).toFloat()
+                            val diffX = Mth.wrapDegrees(
+                                -VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(defaultVec)
+                            ).toFloat()
 
-                        val yawRot = Axis.YP.rotationDegrees(-diffY)
-                        val pitchRot = Axis.XP.rotationDegrees(-diffX)
+                            val yawRot = Axis.YP.rotationDegrees(-diffY)
+                            val pitchRot = Axis.XP.rotationDegrees(-diffX)
 
-                        val quaternion = Quaterniond(yawRot).mul(Quaterniond(pitchRot))
-                        bone.rotation.mul(Quaternionf(quaternion))
+                            val quaternion = Quaterniond(yawRot).mul(Quaterniond(pitchRot))
+                            bone.rotation.mul(Quaternionf(quaternion))
+                        }
+                    }
+                }
+
+                if (boundBonesYaw != null) {
+                    for (name in boundBonesYaw) {
+                        val bone = model.getBone(name)
+                        if (bone != null) {
+
+                            val diffY = Mth.wrapDegrees(
+                                -VehicleVecUtils.getYRotFromVector(targetVec) + VehicleVecUtils.getYRotFromVector(defaultVec)
+                            ).toFloat()
+
+                            val yawRot = Axis.YP.rotationDegrees(-diffY)
+
+                            val quaternion = Quaterniond(yawRot)
+                            bone.rotation.mul(Quaternionf(quaternion))
+                        }
+                    }
+                }
+
+                if (boundBonesPitch != null) {
+                    for (name in boundBonesPitch) {
+                        val bone = model.getBone(name)
+                        if (bone != null) {
+
+                            val diffX = Mth.wrapDegrees(
+                                -VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(defaultVec)
+                            ).toFloat()
+
+                            val pitchRot = Axis.XP.rotationDegrees(-diffX)
+
+                            val quaternion = Quaterniond(pitchRot)
+                            bone.rotation.mul(Quaternionf(quaternion))
+                        }
                     }
                 }
             }

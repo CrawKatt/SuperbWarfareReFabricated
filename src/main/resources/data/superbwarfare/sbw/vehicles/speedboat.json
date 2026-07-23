@@ -44,6 +44,7 @@
       "MinPitch": -20,
       "MaxPitch": 60,
       "CanRotateBody": true,
+      "Sensitivity": [0.57, 0.75, 0.9],
       "CameraPos": {
         "Transform": "Turret",
         "UseFixedCameraPos": true,

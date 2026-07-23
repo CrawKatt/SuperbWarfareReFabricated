@@ -294,6 +294,9 @@ object ModEntities {
     @JvmField
     val PLZ_05 = register("plz_05", vehicle(::Plz05Entity).sized(4.6f, 3.25f))
 
+    @JvmField
+    val FH_77BW = register("fh_77bw", vehicle(::Fh77bwEntity).sized(13f, 4f))
+
     // Aircraft
     @JvmField
     val TOM_6 = register("tom_6", vehicle(::Tom6Entity).sized(1.05f, 1.0f))
