@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.mixins;
 
+import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.init.ModBlocks;
 import com.atsuishio.superbwarfare.init.ModTags;
@@ -43,9 +44,17 @@ public abstract class BlockStateMixin {
                 ci.setReturnValue(Shapes.empty());
             }
 
-            if (state.is(ModBlocks.DRAGON_TEETH.get())) {
+			if (state.is(ModBlocks.DRAGON_TEETH.get())) {
                 ci.setReturnValue(this.getShape(worldIn, pos).move(0, Mth.clamp(vehicle.getBbHeight() - 0.25, 0, 1), 0));
             }
-        }
-    }
+		}
+
+		if (entity instanceof CatapultShuttleEntity catapultShuttle) {
+			BlockState state = catapultShuttle.level().getBlockState(pos);
+
+			if (state.is(ModBlocks.AIRCRAFT_CATAPULT.get())) {
+				ci.setReturnValue(Shapes.empty());
+			}
+		}
+	}
 }
