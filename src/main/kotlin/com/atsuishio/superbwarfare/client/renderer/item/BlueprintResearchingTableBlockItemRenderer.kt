@@ -25,6 +25,7 @@ class BlueprintResearchingTableBlockItemRenderer(dispatcher: BlockEntityRenderDi
     ) {
         if (stack.item !is BlueprintResearchTableBlockItem) return
         val model = BlockModelReloadListener.getModel(MODEL) ?: return
+        val instance = model.createInstance()
 
         poseStack.pushPose()
 
@@ -46,7 +47,7 @@ class BlueprintResearchingTableBlockItemRenderer(dispatcher: BlockEntityRenderDi
             }
         }
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.entityCutout(TEXTURE)),
             packedLight,

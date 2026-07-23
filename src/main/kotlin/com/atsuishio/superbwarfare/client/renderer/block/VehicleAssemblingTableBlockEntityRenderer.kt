@@ -23,6 +23,7 @@ class VehicleAssemblingTableBlockEntityRenderer : BlockEntityRenderer<VehicleAss
         packedOverlay: Int
     ) {
         val model = BlockModelReloadListener.getModel(MODEL) ?: return
+        val instance = model.createInstance()
 
         poseStack.pushPose()
 
@@ -36,9 +37,9 @@ class VehicleAssemblingTableBlockEntityRenderer : BlockEntityRenderer<VehicleAss
         poseStack.translate(0.5, 0.0, 0.5)
         poseStack.mulPose(Axis.YP.rotationDegrees(rot))
 
-        model.applyPose(model.bindPose)
+        instance.resetPose()
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.entityTranslucent(TEXTURE)),
             packedLight,
@@ -46,7 +47,7 @@ class VehicleAssemblingTableBlockEntityRenderer : BlockEntityRenderer<VehicleAss
         )
 
         if (blockEntity.level?.isNight == true) {
-            model.renderToBuffer(
+            instance.renderToBuffer(
                 poseStack,
                 buffer.getBuffer(RenderType.eyes(TEXTURE_E)),
                 packedLight,

@@ -30,6 +30,7 @@ class LuckyContainerBlockEntityRenderer : BlockEntityRenderer<LuckyContainerBloc
             blockEntity.animationInstance = LuckyContainerBlockAnimationInstance(blockEntity)
         }
         val ani = blockEntity.animationInstance ?: return
+        val instance = model.createInstance()
 
         poseStack.pushPose()
 
@@ -45,9 +46,9 @@ class LuckyContainerBlockEntityRenderer : BlockEntityRenderer<LuckyContainerBloc
 
         ani.context.partialTick = partialTick
         ani.tick()
-        model.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+        instance.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.entityTranslucent(TEXTURE)),
             packedLight,
