@@ -712,9 +712,9 @@ object GunEventHandler {
             val stackEnergyNeed = min(cellEnergy, stackMaxEnergy - stackEnergy)
 
             if (cellEnergy > 0) {
-                stackStorage.receiveEnergy(stackEnergyNeed, false)
+                val received = stackStorage.receiveEnergy(stackEnergyNeed, false)
+                cellStorage.extractEnergy(received, false)
             }
-            cellStorage.extractEnergy(stackEnergyNeed, false)
         }
     }
 

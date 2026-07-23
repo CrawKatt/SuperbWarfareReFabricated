@@ -18,7 +18,7 @@ open class SyncedEntityEnergyStorage(
 ) : EnergyStorage(capacity, maxReceive, maxExtract, 0) {
     /**
      * 自动同步的实体能量存储能力
-     * 
+     *
      * @param capacity           能量上限
      * @param data               实体的entityData
      * @param energyDataAccessor 能量的EntityDataAccessor
@@ -30,6 +30,11 @@ open class SyncedEntityEnergyStorage(
         data,
         energyDataAccessor
     )
+
+    init {
+        // 从entityData同步初始能量值，避免reviveCaps()后内部energy字段与entityData不一致
+        this.energy = entityData.get(energyDataAccessor)
+    }
 
     fun setEnergy(energy: Int) {
         this.energy = energy

@@ -89,8 +89,8 @@ open class BatteryItem(var maxEnergy: Int, properties: Properties) : Item(proper
             val stackEnergyNeed =
                 min(cellEnergy.toDouble(), (toCharge.maxEnergyStored - toCharge.energyStored).toDouble()).toInt()
 
-            toCharge.receiveEnergy(stackEnergyNeed, false)
-            energyStorage.extractEnergy(stackEnergyNeed, false)
+            val received = toCharge.receiveEnergy(stackEnergyNeed, false)
+            energyStorage.extractEnergy(received, false)
         }
 
         CuriosApi.getCuriosInventory(entity).ifPresent { s ->
@@ -107,8 +107,8 @@ open class BatteryItem(var maxEnergy: Int, properties: Properties) : Item(proper
                 val stackEnergyNeed =
                     min(cellEnergy.toDouble(), (toCharge.maxEnergyStored - toCharge.energyStored).toDouble()).toInt()
 
-                toCharge.receiveEnergy(stackEnergyNeed, false)
-                energyStorage.extractEnergy(stackEnergyNeed, false)
+                val received = toCharge.receiveEnergy(stackEnergyNeed, false)
+                energyStorage.extractEnergy(received, false)
             }
         }
     }
