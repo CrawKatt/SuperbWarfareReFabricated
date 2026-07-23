@@ -30,6 +30,7 @@ class SmallContainerBlockEntityRenderer : BlockEntityRenderer<SmallContainerBloc
             blockEntity.animationInstance = SmallContainerBlockAnimationInstance(blockEntity)
         }
         val ani = blockEntity.animationInstance ?: return
+        val instance = model.createInstance()
 
         poseStack.pushPose()
 
@@ -45,7 +46,7 @@ class SmallContainerBlockEntityRenderer : BlockEntityRenderer<SmallContainerBloc
 
         ani.context.partialTick = partialTick
         ani.tick()
-        model.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+        instance.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
 
         val texture = if (blockEntity.lootTableSeed != 0L && blockEntity.lootTableSeed % 205 == 0L) {
             TEXTURE_SUI
@@ -53,7 +54,7 @@ class SmallContainerBlockEntityRenderer : BlockEntityRenderer<SmallContainerBloc
             TEXTURE
         }
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.entityTranslucent(texture)),
             packedLight,

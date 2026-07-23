@@ -28,14 +28,15 @@ class ContainerBlockItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: E
         val model = BlockModelReloadListener.getModel(MODEL) ?: return
         val icon = ContainerItemDecorator.getCustomIcon(stack)
         if (icon != null && transformType == ItemDisplayContext.GUI) return
+        val instance = model.createInstance()
 
         poseStack.pushPose()
 
         poseStack.translate(0.5f, 0.5f, 0.5f)
 
-        model.applyPose(model.bindPose)
+        instance.resetPose()
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             bufferSource.getBuffer(RenderType.entityCutout(TEXTURE)),
             packedLight,

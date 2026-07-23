@@ -20,7 +20,8 @@ class FuMO25BlockEntityRenderer : BlockEntityRenderer<FuMO25BlockEntity> {
         packedOverlay: Int
     ) {
         val model = BlockModelReloadListener.getModel(MODEL) ?: return
-        val bone = model.getBone("rolling") ?: return
+        val instance = model.createInstance()
+        val bone = instance.getBone("rolling") ?: return
 
         poseStack.pushPose()
 
@@ -36,14 +37,12 @@ class FuMO25BlockEntityRenderer : BlockEntityRenderer<FuMO25BlockEntity> {
             )
         )
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.entityTranslucent(TEXTURE)),
             packedLight,
             packedOverlay
         )
-
-        model.applyPose(model.bindPose)
 
         poseStack.popPose()
     }

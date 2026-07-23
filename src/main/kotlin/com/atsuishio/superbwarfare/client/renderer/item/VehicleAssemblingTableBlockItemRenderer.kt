@@ -25,14 +25,15 @@ class VehicleAssemblingTableBlockItemRenderer(dispatcher: BlockEntityRenderDispa
         if (stack.item !is VehicleAssemblingTableBlockItem) return
 
         val model = BlockModelReloadListener.getModel(MODEL) ?: return
+        val instance = model.createInstance()
 
         poseStack.pushPose()
 
         poseStack.translate(0.5f, 0.5f, 0.5f)
 
-        model.applyPose(model.bindPose)
+        instance.resetPose()
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             bufferSource.getBuffer(RenderType.entityCutout(TEXTURE)),
             packedLight,
