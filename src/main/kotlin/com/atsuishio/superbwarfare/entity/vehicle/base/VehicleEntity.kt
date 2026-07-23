@@ -2362,8 +2362,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                 if (stored <= 0) continue
 
                 val energyToExtract = Math.min(stored, neededEnergy)
-                energyStorage.extractEnergy(energyToExtract, false)
-                this.energy += energyToExtract
+                val extracted = energyStorage.extractEnergy(energyToExtract, false)
+                this.energy += extracted
             }
         }
 

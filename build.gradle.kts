@@ -259,6 +259,9 @@ dependencies {
     implementation(fg.deobf("curse.maven:better-combat-by-daedelus-639842:5625757"))
     implementation(fg.deobf("curse.maven:playeranimator-658587:4587214"))
 
+    // mek
+    implementation(fg.deobf("curse.maven:mekanism-268560:6123077"))
+
 //    implementation(fg.deobf("curse.maven:raise-sound-limit-simplified-unofficial-forge-port-1559322:8173274"))
 
 //    implementation(fg.deobf("curse.maven:lionfish-api-1001614:7923140"))
