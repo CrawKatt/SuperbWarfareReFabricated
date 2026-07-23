@@ -27,6 +27,7 @@ class CatapultShuttleRenderer(renderManager: EntityRendererProvider.Context) :
         packedLightIn: Int
     ) {
         val model = EntityModelReloadListener.getModel(MODEL) ?: return
+        val instance = model.createInstance()
 
         poseStack.pushPose()
         poseStack.translate(0.0, -1.0, 0.0)
@@ -35,7 +36,7 @@ class CatapultShuttleRenderer(renderManager: EntityRendererProvider.Context) :
         val renderType = RenderType.entityTranslucent(getTextureLocation(entityIn))
         val vertexConsumer = bufferIn.getBuffer(renderType)
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             vertexConsumer,
             packedLightIn,

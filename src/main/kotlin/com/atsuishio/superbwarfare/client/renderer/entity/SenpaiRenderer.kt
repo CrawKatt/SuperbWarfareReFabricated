@@ -36,6 +36,7 @@ class SenpaiRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
     ) {
         val model = EntityModelReloadListener.getModel(MODEL) ?: return
         val ani = pEntity.animationInstance ?: return
+        val instance = model.createInstance()
 
         pPoseStack.pushPose()
         pPoseStack.mulPose(Axis.YP.rotationDegrees(180f))
@@ -43,9 +44,9 @@ class SenpaiRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
 
         ani.context.partialTick = pPartialTick
         ani.tick()
-        model.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+        instance.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             pPoseStack,
             pBuffer,
             RenderType.entityCutout(getTextureLocation(pEntity)),
