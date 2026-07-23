@@ -41,7 +41,7 @@ open class BlueprintResearchTableBlockEntity(pos: BlockPos, state: BlockState) :
     protected val items: NonNullList<ItemStack> = NonNullList.withSize(6, ItemStack.EMPTY)
 
     private var itemHandlers =
-        SidedInvWrapper.create(this, Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.EAST)
+        SidedInvWrapper.create(this, Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST)
 
     var tick: Int = 0
     var lastSelectedIndex: Int = 0
@@ -102,13 +102,33 @@ open class BlueprintResearchTableBlockEntity(pos: BlockPos, state: BlockState) :
         ContainerHelper.saveAllItems(tag, this.items)
     }
 
+    /**
+     * 将绝对世界方向转换为相对于方块朝向的方向。
+     * 方块的"正面"（NORTH）始终对应 SLOT_INPUT，此方法将世界方向旋转到方块局部坐标系。
+     */
+    private fun getBlockRelativeDirection(absoluteSide: Direction): Direction {
+        // 竖直方向不受水平旋转影响
+        if (absoluteSide.axis == Direction.Axis.Y) return absoluteSide
+
+        val facing = this.blockState.getValue(BlueprintResearchTableBlock.FACING)
+        var result = absoluteSide
+        when (facing) {
+            Direction.EAST -> result = result.counterClockWise
+            Direction.SOUTH -> result = result.opposite
+            Direction.WEST -> result = result.clockWise
+            else -> {} // NORTH: 无需旋转
+        }
+        return result
+    }
+
     override fun getSlotsForFace(side: Direction): IntArray {
         if (this.blockState.getValue(BlueprintResearchTableBlock.PART) == BedPart.HEAD) return intArrayOf()
-        return when (side) {
+        val relativeSide = getBlockRelativeDirection(side)
+        return when (relativeSide) {
             Direction.DOWN -> intArrayOf(SLOT_OUTPUT)
-            Direction.NORTH -> intArrayOf(SLOT_INPUT)
-            Direction.EAST -> intArrayOf(SLOT_BASE)
-            Direction.SOUTH -> intArrayOf(SLOT_ADDITION)
+            Direction.EAST -> intArrayOf(SLOT_INPUT)
+            Direction.SOUTH -> intArrayOf(SLOT_BASE)
+            Direction.WEST -> intArrayOf(SLOT_ADDITION)
             else -> intArrayOf(SLOT_FUEL)
         }
     }
@@ -119,12 +139,14 @@ open class BlueprintResearchTableBlockEntity(pos: BlockPos, state: BlockState) :
         side: Direction?
     ): Boolean {
         if (this.blockState.getValue(BlueprintResearchTableBlock.PART) == BedPart.HEAD) return false
+        if (side == null) return false
 
-        return when (side) {
+        val relativeSide = getBlockRelativeDirection(side)
+        return when (relativeSide) {
             Direction.DOWN -> index == SLOT_OUTPUT
-            Direction.NORTH -> index == SLOT_INPUT
-            Direction.EAST -> index == SLOT_BASE
-            Direction.SOUTH -> index == SLOT_ADDITION
+            Direction.EAST -> index == SLOT_INPUT
+            Direction.SOUTH -> index == SLOT_BASE
+            Direction.WEST -> index == SLOT_ADDITION
             else -> index == SLOT_FUEL
         }
     }
@@ -281,7 +303,8 @@ open class BlueprintResearchTableBlockEntity(pos: BlockPos, state: BlockState) :
                 Direction.DOWN -> itemHandlers[1].cast()
                 Direction.NORTH -> itemHandlers[2].cast()
                 Direction.SOUTH -> itemHandlers[3].cast()
-                else -> itemHandlers[4].cast()
+                Direction.EAST -> itemHandlers[4].cast()
+                Direction.WEST -> itemHandlers[5].cast()
             }
         }
         return super.getCapability(cap, side)
@@ -295,7 +318,7 @@ open class BlueprintResearchTableBlockEntity(pos: BlockPos, state: BlockState) :
     override fun reviveCaps() {
         super.reviveCaps()
         this.itemHandlers =
-            SidedInvWrapper.create(this, Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.EAST)
+            SidedInvWrapper.create(this, Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST)
     }
 
     fun sync() {
