@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.client.animation
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.api.event.RenderPlayerArmEvent
+import com.atsuishio.superbwarfare.client.lighting.MuzzleFlashHelper
 import com.atsuishio.superbwarfare.client.renderer.CustomGunRenderer
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.client.renderer.SmartTextureBrightener.getSmartBrightenedTexture
@@ -175,17 +176,20 @@ object AnimationHelper {
     ) {
         val data = from(itemStack)
 
-        if (name == "flare" && ClientEventHandler.fireRotTimer > 0 && ClientEventHandler.fireRotTimer < 0.3 && data.attachment.get(
-                AttachmentType.BARREL
-            ) != 2
+        if (name == "flare"
+            && ClientEventHandler.fireRotTimer > 0
+            && ClientEventHandler.fireRotTimer < 0.3
+            && data.attachment.get(AttachmentType.BARREL) != 2
         ) {
-            bone.setScaleX((size + 0.8 * size * (Math.random() - 0.5)).toFloat())
-            bone.setScaleY((size + 0.8 * size * (Math.random() - 0.5)).toFloat())
-            bone.setRotZ((0.5 * (Math.random() - 0.5)).toFloat())
+            bone.scaleX = (size + 0.8 * size * (Math.random() - 0.5)).toFloat()
+            bone.scaleY = (size + 0.8 * size * (Math.random() - 0.5)).toFloat()
+            bone.rotZ = (0.5 * (Math.random() - 0.5)).toFloat()
 
             var height = 0f
-
-            if ((data.attachment.get(AttachmentType.SCOPE) == 2 || data.attachment.get(AttachmentType.SCOPE) == 3) && ClientEventHandler.zoom) {
+            if ((data.attachment.get(AttachmentType.SCOPE) == 2
+                        || data.attachment.get(AttachmentType.SCOPE) == 3)
+                && ClientEventHandler.zoom
+            ) {
                 height = -0.07f
             }
 
@@ -205,17 +209,61 @@ object AnimationHelper {
             vertex(vertexConsumer, pose, packedLightIn, 0f, 1f, 0, 0)
             stack.popPose()
 
+            // Spawn muzzle flash light at computed world-space barrel tip
+            spawnMuzzleLight(itemStack, x, y, z)
+
             lerpTimer = Mth.lerp(
                 Minecraft.getInstance().timer.getGameTimeDeltaPartialTick(true),
                 lerpTimer,
                 ClientEventHandler.fireRotTimer.toFloat() * 0.667f
             )
-
-            //            handleShootSmoke(stack, bone, buffer, packedLightIn, x, y, z, height);
-//            handleShootSmoke2(stack, bone, buffer, packedLightIn, x, y, z, height);
         }
     }
 
+    /**
+     * Computes the world-space muzzle tip position from the flare offsets and
+     * the local player's eye position + look direction, then registers a
+     * directional cone of dynamic light sources along the barrel axis.
+     *
+     * <p>The flare coordinate system matches the first-person weapon model:
+     * <ul>
+     *   <li>{@code +z} → forward along the barrel (aligns with lookAngle)</li>
+     *   <li>{@code +x} → left in model space (negated → camera right)</li>
+     *   <li>{@code +y} → up (aligns with camera up)</li>
+     * </ul>
+     *
+     * @param itemStack the held weapon stack
+     * @param flareX    lateral offset in blocks (model +x = camera left)
+     * @param flareY    vertical offset in blocks
+     * @param flareZ    forward offset in blocks along barrel
+     */
+    @JvmStatic
+    fun spawnMuzzleLight(itemStack: ItemStack, flareX: Double, flareY: Double, flareZ: Double) {
+        val params = MuzzleFlashHelper
+            .calculateFromStack(itemStack) ?: return
+
+        val player = Minecraft.getInstance().player ?: return
+        val look = player.lookAngle
+
+        // Build camera-aligned basis vectors.
+        // Right: perpendicular to look direction in the horizontal plane.
+        val worldUp = net.minecraft.world.phys.Vec3(0.0, 1.0, 0.0)
+        val right = look.cross(worldUp).normalize()
+        // Up: perpendicular to both look and right.
+        val up = right.cross(look).normalize()
+
+        // Model +x is camera LEFT, so negate for right.
+        val muzzleWorld = player.eyePosition
+            .add(look.scale(flareZ))
+            .add(right.scale(-flareX))
+            .add(up.scale(flareY))
+
+        // Spawn a forward-facing cone of lights instead of a linear chain.
+        MuzzleFlashHelper
+            .spawnFlashCone(muzzleWorld, look, params)
+    }
+
+    @JvmStatic
     fun handleShootSmoke(
         stack: PoseStack,
         bone: GeoBone,
@@ -233,15 +281,52 @@ object AnimationHelper {
         RenderUtil.rotateMatrixAroundBone(stack, bone)
         RenderUtil.scaleMatrixForBone(stack, bone)
         RenderUtil.translateAwayFromPivotPoint(stack, bone)
-        val `$$6` = stack.last()
 
         stack.scale(3f + lerpTimer * 20f, 3f + lerpTimer * 20f, 1f)
 
-        val `$$9` = buffer.getBuffer(RenderType.entityTranslucent(loc("textures/particle/shoot_smoke.png")))
-        vertexSmoke(`$$9`, `$$6`, packedLightIn, 0 - 0.15f - lerpTimer, 0f, 0, 1, lerpTimer.toDouble())
-        vertexSmoke(`$$9`, `$$6`, packedLightIn, 1 - 0.15f - lerpTimer, 0f, 1, 1, lerpTimer.toDouble())
-        vertexSmoke(`$$9`, `$$6`, packedLightIn, 1 - 0.15f - lerpTimer, 1f, 1, 0, lerpTimer.toDouble())
-        vertexSmoke(`$$9`, `$$6`, packedLightIn, 0 - 0.15f - lerpTimer, 1f, 0, 0, lerpTimer.toDouble())
+        val consumer = buffer.getBuffer(RenderType.entityTranslucent(loc("textures/particle/shoot_smoke.png")))
+        val pose = stack.last()
+
+        vertexSmoke(
+            consumer,
+            pose,
+            packedLightIn,
+            0f - 0.15f - lerpTimer,
+            0f,
+            0,
+            1,
+            lerpTimer.toDouble()
+        )
+        vertexSmoke(
+            consumer,
+            pose,
+            packedLightIn,
+            1f - 0.15f - lerpTimer,
+            0f,
+            1,
+            1,
+            lerpTimer.toDouble()
+        )
+        vertexSmoke(
+            consumer,
+            pose,
+            packedLightIn,
+            1f - 0.15f - lerpTimer,
+            1f,
+            1,
+            0,
+            lerpTimer.toDouble()
+        )
+        vertexSmoke(
+            consumer,
+            pose,
+            packedLightIn,
+            0f - 0.15f - lerpTimer,
+            1f,
+            0,
+            0,
+            lerpTimer.toDouble()
+        )
 
         stack.popPose()
     }
@@ -263,15 +348,53 @@ object AnimationHelper {
         RenderUtil.rotateMatrixAroundBone(stack, bone)
         RenderUtil.scaleMatrixForBone(stack, bone)
         RenderUtil.translateAwayFromPivotPoint(stack, bone)
-        val `$$6` = stack.last()
 
         stack.scale(3f + lerpTimer * 20f, 3f + lerpTimer * 20f, 1f)
 
-        val `$$9` = buffer.getBuffer(RenderType.entityTranslucentEmissive(loc("textures/particle/shoot_smoke2.png")))
-        vertexSmoke(`$$9`, `$$6`, packedLightIn, 0 + 0.15f + lerpTimer, 0f, 0, 1, lerpTimer.toDouble())
-        vertexSmoke(`$$9`, `$$6`, packedLightIn, 1 + 0.15f + lerpTimer, 0f, 1, 1, lerpTimer.toDouble())
-        vertexSmoke(`$$9`, `$$6`, packedLightIn, 1 + 0.15f + lerpTimer, 1f, 1, 0, lerpTimer.toDouble())
-        vertexSmoke(`$$9`, `$$6`, packedLightIn, 0 + 0.15f + lerpTimer, 1f, 0, 0, lerpTimer.toDouble())
+        val consumer =
+            buffer.getBuffer(RenderType.entityTranslucentEmissive(loc("textures/particle/shoot_smoke2.png")))
+        val pose = stack.last()
+
+        vertexSmoke(
+            consumer,
+            pose,
+            packedLightIn,
+            0f + 0.15f + lerpTimer,
+            0f,
+            0,
+            1,
+            lerpTimer.toDouble()
+        )
+        vertexSmoke(
+            consumer,
+            pose,
+            packedLightIn,
+            1f + 0.15f + lerpTimer,
+            0f,
+            1,
+            1,
+            lerpTimer.toDouble()
+        )
+        vertexSmoke(
+            consumer,
+            pose,
+            packedLightIn,
+            1f + 0.15f + lerpTimer,
+            1f,
+            1,
+            0,
+            lerpTimer.toDouble()
+        )
+        vertexSmoke(
+            consumer,
+            pose,
+            packedLightIn,
+            0f + 0.15f + lerpTimer,
+            1f,
+            0,
+            0,
+            lerpTimer.toDouble()
+        )
 
         stack.popPose()
     }
@@ -401,142 +524,145 @@ object AnimationHelper {
 
     @JvmStatic
     fun renderArms(
-        localPlayer: LocalPlayer, transformType: ItemDisplayContext?, stack: PoseStack, name: String?, bone: GeoBone,
+        localPlayer: LocalPlayer?, transformType: ItemDisplayContext?, stack: PoseStack, name: String?, bone: GeoBone,
         currentBuffer: MultiBufferSource, renderType: RenderType, packedLightIn: Int, useOldHandRender: Boolean
     ) {
-        var packedLightIn = packedLightIn
-        if (transformType != null && transformType.firstPerson()) {
-            val mc = Minecraft.getInstance()
-            val playerRenderer = mc.entityRenderDispatcher.getRenderer<LocalPlayer?>(localPlayer) as PlayerRenderer
-            val model = playerRenderer.getModel()
-            stack.pushPose()
-            RenderUtil.translateMatrixToBone(stack, bone)
-            RenderUtil.translateToPivotPoint(stack, bone)
-            RenderUtil.rotateMatrixAroundBone(stack, bone)
-            RenderUtil.scaleMatrixForBone(stack, bone)
-            RenderUtil.translateAwayFromPivotPoint(stack, bone)
+        if (transformType == null || !transformType.firstPerson()) {
+            return
+        }
 
-            val arm = if ("Lefthand" == name) HumanoidArm.LEFT else HumanoidArm.RIGHT
-            val renderPlayerArmEvent = RenderPlayerArmEvent(
-                localPlayer,
-                transformType,
-                stack,
-                arm,
-                bone,
-                currentBuffer,
-                renderType,
-                packedLightIn,
-                useOldHandRender
-            )
-            if (postEvent(renderPlayerArmEvent).isCanceled()) {
-                currentBuffer.getBuffer(renderType) // 用来重置 Render Type，防止后续渲染出错
-                stack.popPose()
-                return
-            }
+        val mc = Minecraft.getInstance()
 
-            val loc = localPlayer.skin.texture()
-            val overlayTexture = if (activeThermalImaging) OverlayTexture.pack(15, 10) else OverlayTexture.NO_OVERLAY
+        if (localPlayer == null) {
+            return
+        }
 
-            if (activeThermalImaging) {
-                packedLightIn = LightTexture.FULL_BRIGHT
-            }
+        val playerRenderer = mc.entityRenderDispatcher.getRenderer(localPlayer) as PlayerRenderer
+        val model = playerRenderer.getModel()
+        stack.pushPose()
+        RenderUtil.translateMatrixToBone(stack, bone)
+        RenderUtil.translateToPivotPoint(stack, bone)
+        RenderUtil.rotateMatrixAroundBone(stack, bone)
+        RenderUtil.scaleMatrixForBone(stack, bone)
+        RenderUtil.translateAwayFromPivotPoint(stack, bone)
 
-            if (arm == HumanoidArm.LEFT) {
-                if (!model.leftArm.visible) {
-                    model.leftArm.visible = true
-                }
-                if (!model.leftSleeve.visible && mc.options.isModelPartEnabled(PlayerModelPart.LEFT_SLEEVE)) {
-                    model.leftSleeve.visible = true
-                }
-
-                stack.translate(
-                    -1.0f * CustomGunRenderer.SCALE_RECIPROCAL,
-                    2.0f * CustomGunRenderer.SCALE_RECIPROCAL,
-                    0.0f
-                )
-                if (useOldHandRender) {
-                    renderPartOverBone(
-                        model.leftArm,
-                        bone,
-                        stack,
-                        currentBuffer.getBuffer(RenderType.entitySolid(loc)),
-                        packedLightIn,
-                        overlayTexture
-                    )
-                    renderPartOverBone(
-                        model.leftSleeve,
-                        bone,
-                        stack,
-                        currentBuffer.getBuffer(RenderType.entityTranslucent(loc)),
-                        packedLightIn,
-                        overlayTexture
-                    )
-                } else {
-                    renderPartOverBone2(
-                        model.leftArm,
-                        bone,
-                        stack,
-                        currentBuffer.getBuffer(RenderType.entitySolid(loc)),
-                        packedLightIn,
-                        overlayTexture
-                    )
-                    renderPartOverBone2(
-                        model.leftSleeve,
-                        bone,
-                        stack,
-                        currentBuffer.getBuffer(RenderType.entityTranslucent(loc)),
-                        packedLightIn,
-                        overlayTexture
-                    )
-                }
-            } else {
-                if (!model.rightArm.visible) {
-                    model.rightArm.visible = true
-                }
-                if (!model.rightSleeve.visible && mc.options.isModelPartEnabled(PlayerModelPart.RIGHT_SLEEVE)) {
-                    model.rightSleeve.visible = true
-                }
-
-                stack.translate(CustomGunRenderer.SCALE_RECIPROCAL, 2.0f * CustomGunRenderer.SCALE_RECIPROCAL, 0.0f)
-                if (useOldHandRender) {
-                    renderPartOverBone(
-                        model.rightArm,
-                        bone,
-                        stack,
-                        currentBuffer.getBuffer(RenderType.entitySolid(loc)),
-                        packedLightIn,
-                        overlayTexture
-                    )
-                    renderPartOverBone(
-                        model.rightSleeve,
-                        bone,
-                        stack,
-                        currentBuffer.getBuffer(RenderType.entityTranslucent(loc)),
-                        packedLightIn,
-                        overlayTexture
-                    )
-                } else {
-                    renderPartOverBone2(
-                        model.rightArm,
-                        bone,
-                        stack,
-                        currentBuffer.getBuffer(RenderType.entitySolid(loc)),
-                        packedLightIn,
-                        overlayTexture
-                    )
-                    renderPartOverBone2(
-                        model.rightSleeve,
-                        bone,
-                        stack,
-                        currentBuffer.getBuffer(RenderType.entityTranslucent(loc)),
-                        packedLightIn,
-                        overlayTexture
-                    )
-                }
-            }
-
+        val arm = if ("Lefthand" == name) HumanoidArm.LEFT else HumanoidArm.RIGHT
+        val renderPlayerArmEvent = RenderPlayerArmEvent(
+            localPlayer,
+            transformType,
+            stack,
+            arm,
+            bone,
+            currentBuffer,
+            renderType,
+            packedLightIn,
+            useOldHandRender
+        )
+        if (postEvent(renderPlayerArmEvent).isCanceled()) {
             currentBuffer.getBuffer(renderType) // 用来重置 Render Type，防止后续渲染出错
             stack.popPose()
+            return
         }
+
+        val loc = localPlayer.skin.texture
+        val armBuilder = currentBuffer.getBuffer(RenderType.entitySolid(loc))
+        val sleeveBuilder = currentBuffer.getBuffer(RenderType.entityTranslucent(loc))
+
+        val overlayTexture = if (activeThermalImaging) OverlayTexture.pack(15, 10) else OverlayTexture.NO_OVERLAY
+
+        var effectivePackedLight = packedLightIn
+        if (activeThermalImaging) {
+            effectivePackedLight = LightTexture.FULL_BRIGHT
+        }
+
+        if (arm == HumanoidArm.LEFT) {
+            if (!model.leftArm.visible) {
+                model.leftArm.visible = true
+            }
+            if (!model.leftSleeve.visible && mc.options.isModelPartEnabled(PlayerModelPart.LEFT_SLEEVE)) {
+                model.leftSleeve.visible = true
+            }
+
+            stack.translate(
+                -1.0f * CustomGunRenderer.SCALE_RECIPROCAL,
+                2.0f * CustomGunRenderer.SCALE_RECIPROCAL,
+                0.0f
+            )
+            if (useOldHandRender) {
+                renderPartOverBone(model.leftArm, bone, stack, armBuilder, effectivePackedLight, overlayTexture)
+                renderPartOverBone(
+                    model.leftSleeve,
+                    bone,
+                    stack,
+                    sleeveBuilder,
+                    effectivePackedLight,
+                    overlayTexture,
+                )
+            } else {
+                renderPartOverBone2(
+                    model.leftArm,
+                    bone,
+                    stack,
+                    armBuilder,
+                    effectivePackedLight,
+                    overlayTexture,
+                )
+                renderPartOverBone2(
+                    model.leftSleeve,
+                    bone,
+                    stack,
+                    sleeveBuilder,
+                    effectivePackedLight,
+                    overlayTexture,
+                )
+            }
+        } else {
+            if (!model.rightArm.visible) {
+                model.rightArm.visible = true
+            }
+            if (!model.rightSleeve.visible && mc.options.isModelPartEnabled(PlayerModelPart.RIGHT_SLEEVE)) {
+                model.rightSleeve.visible = true
+            }
+
+            stack.translate(CustomGunRenderer.SCALE_RECIPROCAL, 2.0f * CustomGunRenderer.SCALE_RECIPROCAL, 0.0f)
+            if (useOldHandRender) {
+                renderPartOverBone(
+                    model.rightArm,
+                    bone,
+                    stack,
+                    armBuilder,
+                    effectivePackedLight,
+                    overlayTexture,
+                )
+                renderPartOverBone(
+                    model.rightSleeve,
+                    bone,
+                    stack,
+                    sleeveBuilder,
+                    effectivePackedLight,
+                    overlayTexture,
+                )
+            } else {
+                renderPartOverBone2(
+                    model.rightArm,
+                    bone,
+                    stack,
+                    armBuilder,
+                    effectivePackedLight,
+                    overlayTexture,
+                )
+                renderPartOverBone2(
+                    model.rightSleeve,
+                    bone,
+                    stack,
+                    sleeveBuilder,
+                    effectivePackedLight,
+                    overlayTexture,
+                )
+            }
+        }
+
+        currentBuffer.getBuffer(renderType) // 用来重置 Render Type，防止后续渲染出错
+        stack.popPose()
     }
 }

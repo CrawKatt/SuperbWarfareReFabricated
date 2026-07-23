@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.client.RenderHelper
 import com.atsuishio.superbwarfare.client.overlay.weapon.*
+import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
@@ -29,8 +30,6 @@ import net.neoforged.api.distmarker.OnlyIn
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.client.event.ClientTickEvent
-import kotlin.math.cos
-import kotlin.math.sin
 
 /**
  * 控制载具主武器的玩家显示的HUD
@@ -196,7 +195,10 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
 
         val seekInfo = gunData.get(GunProp.SEEK_WEAPON_INFO)
         val color = gunData.get(GunProp.CROSSHAIR_COLOR).get()
-        if (seekInfo == null) {
+
+        // Lock-on frames, target indicators, and entity labels are part of
+        // the targeting HUD — suppress when server disables crosshair overlay.
+        if (seekInfo == null || MiscConfig.HIDE_COMBAT_HUD.get()) {
             poseStack.popPose()
             return
         }
@@ -704,28 +706,5 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
         val length = font.width(component)
 
         guiGraphics.drawString(font, component, -length / 2, -9, Mth.hsvToRgb(0f, heat, 1f), false)
-    }
-
-    fun getAroundPos(direction: Vec3, center: Vec3, radius: Double): Vec3 {
-        var direction = direction
-        direction = direction.normalize()
-
-        // 构建垂直正交基
-        val randomPerp: Vec3 = getRandomPerpendicular(direction)
-        val u = randomPerp.normalize()
-        val v = direction.cross(u).normalize()
-
-        val theta = 2 * Math.PI
-        val xOffset = radius * (cos(theta) * u.x + sin(theta) * v.x)
-        val yOffset = radius * (cos(theta) * u.y + sin(theta) * v.y)
-        val zOffset = radius * (cos(theta) * u.z + sin(theta) * v.z)
-
-        return center.add(xOffset, yOffset, zOffset)
-    }
-
-    private fun getRandomPerpendicular(dir: Vec3): Vec3 {
-        val candidate1 = Vec3(dir.y, -dir.x, 0.0) // 在XY平面垂直
-        if (candidate1.lengthSqr() > 1e-4) return candidate1
-        return Vec3(0.0, dir.z, -dir.y) // 备用垂直向量
     }
 }

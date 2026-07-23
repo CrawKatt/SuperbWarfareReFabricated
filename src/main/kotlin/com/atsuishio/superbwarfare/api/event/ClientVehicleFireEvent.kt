@@ -6,8 +6,8 @@ import net.neoforged.bus.api.Event
 import org.jetbrains.annotations.ApiStatus
 
 @ApiStatus.AvailableSince("0.8.9.1")
-class ClientVehicleFireEvent(
-    val entity: VehicleEntity,
+open class ClientVehicleFireEvent(
+    val vehicle: VehicleEntity,
     val shooter: Entity,
     val index: Int,
     val weaponName: String? = null

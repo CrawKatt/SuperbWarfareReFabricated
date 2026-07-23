@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.entity.projectile
 
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitBlock
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitEntity
+import com.atsuishio.superbwarfare.client.lighting.ClientLightingHandler
 import com.atsuishio.superbwarfare.client.particle.BulletDecalOption
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
 import com.atsuishio.superbwarfare.compat.sable.SableCompatHandler
@@ -128,9 +129,12 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         explosionDamageValue = value
     }
 
-    override fun getExplosionRadius(): Float = explosionRadiusValue
+    override fun getExplosionRadius(): Float =
+        this.entityData.get(EXPLOSION_RADIUS)
+
     override fun setExplosionRadius(value: Float) {
-        explosionRadiusValue = value
+        // Write to SynchedEntityData so the client always has the correct value
+        this.entityData.set(EXPLOSION_RADIUS, value)
     }
 
     override fun getFireLevel(): Int = fireLevelValue
@@ -210,12 +214,15 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
             for (obb in entity.getOBBs()) {
                 if (obb.part == OBB.Part.COLLISION) continue
                 val obbVec = obb.clip(startVec.toVector3d(), endVec.toVector3d()).orElse(null) ?: continue
-                hitPos = obbVec.toVec3()
+
+                val pos = obbVec.toVec3()
+                hitPos = pos
+
                 val level = this.level()
                 if (level is ServerLevel) {
                     level.playSound(
                         null,
-                        BlockPos.containing(hitPos),
+                        BlockPos.containing(pos),
                         ModSounds.HIT.get(),
                         SoundSource.PLAYERS,
                         1f,
@@ -224,9 +231,9 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
                     ParticleTool.sendParticle(
                         level,
                         ModParticleTypes.FIRE_STAR.get(),
-                        hitPos.x,
-                        hitPos.y,
-                        hitPos.z,
+                        pos.x,
+                        pos.y,
+                        pos.z,
                         2,
                         0.0,
                         0.0,
@@ -237,9 +244,9 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
                     ParticleTool.sendParticle(
                         level,
                         ParticleTypes.SMOKE,
-                        hitPos.x,
-                        hitPos.y,
-                        hitPos.z,
+                        pos.x,
+                        pos.y,
+                        pos.z,
                         2,
                         0.0,
                         0.0,
@@ -311,9 +318,15 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
     }
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
-        builder.define(COLOR_R, DEFAULT_R)
-            .define(COLOR_G, DEFAULT_G)
-            .define(COLOR_B, DEFAULT_B)
+        with(builder) {
+            define(COLOR_R, DEFAULT_R)
+            define(COLOR_G, DEFAULT_G)
+            define(COLOR_B, DEFAULT_B)
+
+            // Synced to client so onRemovedFromWorld() can read the correct radius
+            // for the explosion flash — without this the client always sees 0f
+            define(EXPLOSION_RADIUS, 0f)
+        }
     }
 
     override fun tick() {
@@ -392,8 +405,10 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
 
             this.onHitWater(fluidResult.getLocation(), fluidResult)
             this.setPos(this.x + vec.x, this.y + vec.y, this.z + vec.z)
+
         } else {
             this.setPosRaw(this.x + vec.x, this.y + vec.y, this.z + vec.z)
+            ClientLightingHandler.handleProjectileTick(this)
         }
 
         this.deltaMovement = this.deltaMovement.add(0.0, -this.gravity.toDouble(), 0.0)
@@ -611,7 +626,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
                 CustomExplosion.Builder(this)
                     .attacker(this.owner)
                     .damage(this.explosionDamageValue)
-                    .radius(this.explosionRadiusValue)
+                    .radius(this.getExplosionRadius())
                     .position(location)
                     .beast(this.isBeast())
                     .destroyBlock(this.explosionDestroyValue)
@@ -625,52 +640,36 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
 
             if (this.isBeast()) {
                 ParticleTool.sendParticle(
-                    level,
-                    ParticleTypes.END_ROD,
-                    location.x,
-                    location.y,
-                    location.z,
-                    15,
-                    0.1,
-                    0.1,
-                    0.1,
-                    0.05,
-                    true
+                    level, ParticleTypes.END_ROD,
+                    location.x, location.y, location.z,
+                    15, 0.1, 0.1, 0.1, 0.05, true
                 )
             } else {
                 val bulletDecalOption = BulletDecalOption(
-                    result.direction,
-                    result.blockPos,
+                    result.direction, result.blockPos,
                     this.entityData.get(COLOR_R),
                     this.entityData.get(COLOR_G),
                     this.entityData.get(COLOR_B)
                 )
-
                 ParticleTool.sendParticle(
-                    level,
-                    bulletDecalOption,
-                    location.x,
-                    location.y,
-                    location.z,
-                    1,
-                    0.0,
-                    0.0,
-                    0.0,
-                    0.0,
-                    true
+                    level, bulletDecalOption,
+                    location.x, location.y, location.z,
+                    1, 0.0, 0.0, 0.0, 0.0, true
                 )
                 summonVectorParticle(level, state, location, dir)
-
-                this.discard()
+                // Explosion flash is emitted client-side via onRemovedFromWorld()
+                // when discard() propagates the removal packet to the client.
+                // The dead-code "if (level.isClientSide)" block has been removed.
             }
             level.playSound(
                 null,
                 BlockPos(location.x.toInt(), location.y.toInt(), location.z.toInt()),
                 ModSounds.LAND.get(),
                 SoundSource.BLOCKS,
-                1f,
-                1f
+                1f, 1f
             )
+
+            this.discard()
         }
     }
 
@@ -984,6 +983,13 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         this.gravity = gravity
     }
 
+    override fun onRemovedFromLevel() {
+        super.onRemovedFromLevel()
+        if (level().isClientSide) {
+            ClientLightingHandler.handleProjectileRemoved(this)
+        }
+    }
+
     // ===== Builder methods (return ProjectileEntity for chaining) =====
     fun setFireBullet(fireLevel: Int, dragonBreath: Boolean) {
         this.fireLevelValue = fireLevel
@@ -1013,7 +1019,9 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
     companion object {
         @JvmField
         val PROJECTILE_TARGETS_FAST =
-            Predicate { input: Entity? -> input != null && input.isPickable && !input.isSpectator && input.isAlive }
+            Predicate { input: Entity? ->
+                input != null && input.isPickable && !input.isSpectator && input.isAlive
+            }
 
         @JvmField
         val COLOR_R: EntityDataAccessor<Float> =
@@ -1027,8 +1035,18 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         val COLOR_B: EntityDataAccessor<Float> =
             SynchedEntityData.defineId(ProjectileEntity::class.java, EntityDataSerializers.FLOAT)
 
+        /**
+         * Synced explosion radius — read by the client in {@code onRemovedFromWorld()}
+         * to determine the explosion flash intensity.
+         * Non-explosive projectiles keep the default value of 0f.
+         */
+        @JvmField
+        val EXPLOSION_RADIUS: EntityDataAccessor<Float> =
+            SynchedEntityData.defineId(ProjectileEntity::class.java, EntityDataSerializers.FLOAT)
+
         private val IGNORE_LIST = Predicate { input: BlockState ->
-            input.`is`(ModTags.Blocks.BULLET_IGNORE) && !(input.`is`(Blocks.IRON_DOOR) || input.`is`(Blocks.IRON_TRAPDOOR))
+            input.`is`(ModTags.Blocks.BULLET_IGNORE) &&
+                    !(input.`is`(Blocks.IRON_DOOR) || input.`is`(Blocks.IRON_TRAPDOOR))
         }
     }
 }
