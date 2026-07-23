@@ -30,7 +30,6 @@ class CatapultShuttleRenderer(renderManager: EntityRendererProvider.Context) :
         val instance = model.createInstance()
 
         poseStack.pushPose()
-        poseStack.translate(0.0, -1.0, 0.0)
         poseStack.mulPose(Axis.YP.rotationDegrees(-entityYaw + 180f))
 
         val renderType = RenderType.entityTranslucent(getTextureLocation(entityIn))
