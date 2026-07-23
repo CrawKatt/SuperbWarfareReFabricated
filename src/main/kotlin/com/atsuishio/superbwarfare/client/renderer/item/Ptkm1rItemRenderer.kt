@@ -24,13 +24,14 @@ class Ptkm1rItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityMod
     ) {
         if (stack.item !is Ptkm1rItem) return
         val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
+        val instance = model.createInstance()
         poseStack.pushPose()
 
         poseStack.translate(0.5f, 0.5f, 0.5f)
 
-        model.applyPose(model.bindPose)
+        instance.applyPose(model.bindPose)
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.entityCutout(TEXTURE)),
             packedLight,

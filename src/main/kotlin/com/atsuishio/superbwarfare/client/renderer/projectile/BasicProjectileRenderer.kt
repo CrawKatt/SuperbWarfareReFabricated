@@ -62,6 +62,7 @@ open class BasicProjectileRenderer<T>(manager: EntityRendererProvider.Context) :
         }
 
         val model = ProjectileModelReloadListener.getModel(getModelLocation(entity)) ?: return
+        val instance = model.createInstance()
 
         poseStack.pushPose()
 
@@ -76,16 +77,16 @@ open class BasicProjectileRenderer<T>(manager: EntityRendererProvider.Context) :
             val ani = entity.getAnimationInstance()!!
             ani.context.partialTick = partialTick
             ani.tick()
-            model.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+            instance.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
         }
 
-        val flare = model.getBone("flare")
+        val flare = instance.getBone("flare")
         val flag = flare != null
         if (flag) {
             flare.visible = false
         }
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer,
             RenderType.entityCutout(getTextureLocation(entity)),
@@ -96,7 +97,7 @@ open class BasicProjectileRenderer<T>(manager: EntityRendererProvider.Context) :
 
         val texture = entity.getEmissiveTexture()
         if (texture != null) {
-            model.renderToBuffer(
+            instance.renderToBuffer(
                 poseStack,
                 buffer,
                 RenderType.entityCutout(getTextureLocation(entity)),
@@ -114,15 +115,19 @@ open class BasicProjectileRenderer<T>(manager: EntityRendererProvider.Context) :
 
         if (flag && flag2) {
             flare.visible = true
-            flare.rotation.rotationZ(2.5f * (Math.random().toFloat() - 0.5f))
+            flare.rotation.mul(Axis.ZP.rotationDegrees(2.5f * (Math.random().toFloat() - 0.5f)))
             flare.xScale = ((2 * Math.random() - 1) * 0.4f + 1.6).toFloat()
             flare.yScale = ((2 * Math.random() - 1) * 0.4f + 1.6).toFloat()
             flare.zScale = ((2 * Math.random() - 1) * 0.4f + 1.6).toFloat()
-            flare.render(
+            model.renderBone(
+                instance,
+                instance.getIndex("flare"),
                 poseStack,
                 buffer.getBuffer(RenderType.eyes(FLARE_TEXTURE)),
                 packedLight,
-                OverlayTexture.NO_OVERLAY
+                OverlayTexture.NO_OVERLAY,
+                1f, 1f, 1f, 1f,
+                true
             )
         }
 

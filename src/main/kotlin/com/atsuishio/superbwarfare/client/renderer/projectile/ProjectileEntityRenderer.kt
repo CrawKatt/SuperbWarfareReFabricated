@@ -40,6 +40,7 @@ class ProjectileEntityRenderer(manager: EntityRendererProvider.Context) : Entity
         packedLight: Int
     ) {
         val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
+        val instance = model.createInstance()
         val eyePos = localPlayer?.eyePosition ?: return
 
         poseStack.pushPose()
@@ -57,7 +58,7 @@ class ProjectileEntityRenderer(manager: EntityRendererProvider.Context) : Entity
 
         if (entity.tickCount >= 5 || distance > 6.0) {
             val type = RenderType.energySwirl(TEXTURE, 15.0f, 15.0f)
-            model.renderToBuffer(
+            instance.renderToBuffer(
                 poseStack,
                 buffer.getBuffer(type),
                 packedLight,

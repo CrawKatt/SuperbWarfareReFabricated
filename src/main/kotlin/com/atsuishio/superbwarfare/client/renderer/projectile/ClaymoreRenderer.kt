@@ -26,6 +26,7 @@ class ClaymoreRenderer(renderManager: EntityRendererProvider.Context) : EntityRe
         packedLightIn: Int
     ) {
         val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
+        val instance = model.createInstance()
 
         poseStack.pushPose()
 
@@ -35,7 +36,7 @@ class ClaymoreRenderer(renderManager: EntityRendererProvider.Context) : EntityRe
         val renderType = RenderType.entityTranslucent(getTextureLocation(entityIn))
         val vertexConsumer = bufferIn.getBuffer(renderType)
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             vertexConsumer,
             packedLightIn,

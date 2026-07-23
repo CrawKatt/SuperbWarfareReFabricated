@@ -54,10 +54,7 @@ class DPSGeneratorRenderer(renderManager: EntityRendererProvider.Context) :
 
         poseStack.pushPose()
         val boneIndex = instance.getIndex("move_ba")
-        val global = instance.getGlobalTransform(boneIndex)
-
         val boneConsumer = buffer.getBuffer(RenderType.eyes(TEXTURE_E))
-        poseStack.mulPoseMatrix(global)
         model.renderBone(
             instance,
             boneIndex,
@@ -69,7 +66,7 @@ class DPSGeneratorRenderer(renderManager: EntityRendererProvider.Context) :
             1f,
             1f,
             1f,
-            false
+            true
         )
         poseStack.popPose()
 

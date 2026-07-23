@@ -32,6 +32,7 @@ class C4Renderer(renderManager: EntityRendererProvider.Context) : EntityRenderer
         packedLightIn: Int
     ) {
         val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
+        val instance = model.createInstance()
 
         poseStack.pushPose()
         val q = Quaternionf(entityIn.getQuaternion(partialTicks))
@@ -40,7 +41,7 @@ class C4Renderer(renderManager: EntityRendererProvider.Context) : EntityRenderer
         val renderType = RenderType.entityTranslucent(getTextureLocation(entityIn))
         val vertexConsumer = bufferIn.getBuffer(renderType)
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             vertexConsumer,
             packedLightIn,

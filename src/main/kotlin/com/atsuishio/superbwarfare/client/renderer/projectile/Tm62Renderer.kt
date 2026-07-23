@@ -23,6 +23,7 @@ class Tm62Renderer(renderManager: EntityRendererProvider.Context) : EntityRender
         packedLightIn: Int
     ) {
         val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
+        val instance = model.createInstance()
 
         poseStack.pushPose()
 
@@ -31,7 +32,7 @@ class Tm62Renderer(renderManager: EntityRendererProvider.Context) : EntityRender
         val renderType = RenderType.entityTranslucent(getTextureLocation(entityIn))
         val vertexConsumer = bufferIn.getBuffer(renderType)
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             vertexConsumer,
             packedLightIn,
