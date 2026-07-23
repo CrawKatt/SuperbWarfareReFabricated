@@ -42,6 +42,7 @@ class SmallCannonShellEntityRenderer(manager: EntityRendererProvider.Context) :
         packedLight: Int
     ) {
         val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
+        val instance = model.createInstance()
         val eyePos = localPlayer?.eyePosition ?: return
 
         poseStack.pushPose()
@@ -59,7 +60,7 @@ class SmallCannonShellEntityRenderer(manager: EntityRendererProvider.Context) :
 
         if (entity.tickCount >= 5 || distance > 5.0) {
             val type = RenderType.energySwirl(TEXTURE, 15.0f, 15.0f)
-            model.renderToBuffer(
+            instance.renderToBuffer(
                 poseStack,
                 buffer.getBuffer(type),
                 packedLight,

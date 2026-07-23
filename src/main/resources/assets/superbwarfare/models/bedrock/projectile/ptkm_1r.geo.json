@@ -16,13 +16,13 @@
 					"pivot": [0, 0, 0]
 				},
 				{
-					"name": "body",
+					"name": "move_body",
 					"parent": "ptkm",
 					"pivot": [0, 0, 0]
 				},
 				{
 					"name": "zhu",
-					"parent": "body",
+					"parent": "move_body",
 					"pivot": [0, 0, 0],
 					"cubes": [
 						{
@@ -282,8 +282,8 @@
 					]
 				},
 				{
-					"name": "zhu2",
-					"parent": "body",
+					"name": "move_zhu2",
+					"parent": "move_body",
 					"pivot": [0, 3.5005, 0.5],
 					"cubes": [
 						{
@@ -683,7 +683,7 @@
 				},
 				{
 					"name": "bone",
-					"parent": "zhu2",
+					"parent": "move_zhu2",
 					"pivot": [0, 7.5, 0],
 					"cubes": [
 						{
@@ -738,7 +738,7 @@
 				},
 				{
 					"name": "mic",
-					"parent": "zhu2",
+					"parent": "move_zhu2",
 					"pivot": [0, 0, 0]
 				},
 				{
@@ -793,7 +793,7 @@
 				},
 				{
 					"name": "mic2",
-					"parent": "zhu2",
+					"parent": "move_zhu2",
 					"pivot": [0, 0, 0],
 					"rotation": [0, -90, 0]
 				},
@@ -849,7 +849,7 @@
 				},
 				{
 					"name": "mic3",
-					"parent": "zhu2",
+					"parent": "move_zhu2",
 					"pivot": [0, 0, 0],
 					"rotation": [0, 180, 0]
 				},
@@ -905,7 +905,7 @@
 				},
 				{
 					"name": "mic4",
-					"parent": "zhu2",
+					"parent": "move_zhu2",
 					"pivot": [0, 0, 0],
 					"rotation": [0, 90, 0]
 				},

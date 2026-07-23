@@ -24,7 +24,8 @@ class EDDRenderer(renderManager: EntityRendererProvider.Context) : EntityRendere
         packedLight: Int
     ) {
         val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
-        val bone = model.getBone("laser") ?: return
+        val instance = model.createInstance()
+        val bone = instance.getBone("move_laser") ?: return
 
         poseStack.pushPose()
 
@@ -44,14 +45,12 @@ class EDDRenderer(renderManager: EntityRendererProvider.Context) : EntityRendere
         bone.visible = entity.tickCount <= 20
         bone.zScale = ExplosionConfig.EDD_TRACE_RANGE.get().toFloat()
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity))),
             packedLight,
             OverlayTexture.NO_OVERLAY
         )
-
-        model.applyPose(model.bindPose)
 
         poseStack.popPose()
     }
