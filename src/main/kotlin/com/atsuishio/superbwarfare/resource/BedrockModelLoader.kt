@@ -10,6 +10,7 @@ object BedrockModelLoader {
     @SubscribeEvent
     fun onAddClientResourceListener(event: RegisterClientReloadListenersEvent) {
         event.registerReloadListener(VehicleModelReloadListener)
+        event.registerReloadListener(VehicleModelReloadListenerV2)
         event.registerReloadListener(VehicleLODModelReloadListener)
         event.registerReloadListener(ProjectileModelReloadListener)
         event.registerReloadListener(EntityModelReloadListener)
