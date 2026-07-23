@@ -31,6 +31,7 @@ class TargetRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
     ) {
         val model = EntityModelReloadListener.getModel(MODEL) ?: return
         val ani = entity.animationInstance ?: return
+        val instance = model.createInstance()
 
         poseStack.pushPose()
         poseStack.mulPose(Axis.YP.rotationDegrees(180f))
@@ -41,9 +42,9 @@ class TargetRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
 
         ani.context.partialTick = partialTick
         ani.tick()
-        model.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+        instance.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             vertexConsumer,
             packedLight,
@@ -51,9 +52,9 @@ class TargetRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
         )
 
         poseStack.pushPose()
-        val bone = model.getBone("ba")
+        val boneIndex = instance.getIndex("ba")
         val boneConsumer = buffer.getBuffer(RenderType.eyes(TEXTURE_E))
-        bone.render(poseStack, boneConsumer, packedLight, OverlayTexture.NO_OVERLAY)
+        model.renderBone(instance, boneIndex, poseStack, boneConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f, false)
         poseStack.popPose()
 
         poseStack.popPose()

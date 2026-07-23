@@ -25,7 +25,8 @@ class SteelCoilRenderer(renderManager: EntityRendererProvider.Context) :
         packedLight: Int
     ) {
         val model = EntityModelReloadListener.getModel(MODEL) ?: return
-        val bone = model.getBone("main") ?: return
+        val instance = model.createInstance()
+        val bone = instance.getBone("main") ?: return
 
         poseStack.pushPose()
 
@@ -34,7 +35,7 @@ class SteelCoilRenderer(renderManager: EntityRendererProvider.Context) :
 
         bone.rotation.mul(Axis.XP.rotationDegrees(-entity.getRotation(partialTick)))
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer,
             RenderType.entityCutout(getTextureLocation(entity)),
@@ -42,8 +43,6 @@ class SteelCoilRenderer(renderManager: EntityRendererProvider.Context) :
             packedLight,
             OverlayTexture.NO_OVERLAY
         )
-
-        model.applyPose(model.bindPose)
 
         poseStack.popPose()
     }
