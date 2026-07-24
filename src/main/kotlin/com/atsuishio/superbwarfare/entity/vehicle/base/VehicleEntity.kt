@@ -22,10 +22,7 @@ import com.atsuishio.superbwarfare.entity.OBBEntity
 import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter
 import com.atsuishio.superbwarfare.entity.setValue
-import com.atsuishio.superbwarfare.entity.vehicle.BasicGeoVehicleEntity
-import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity
-import com.atsuishio.superbwarfare.entity.vehicle.MortarEntity
-import com.atsuishio.superbwarfare.entity.vehicle.Tom6Entity
+import com.atsuishio.superbwarfare.entity.vehicle.*
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier
 import com.atsuishio.superbwarfare.entity.vehicle.utils.*
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleEngineUtils.aircraftLoiter
@@ -43,6 +40,8 @@ import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessag
 import com.atsuishio.superbwarfare.network.message.receive.ClientVehicleItemMessage
 import com.atsuishio.superbwarfare.network.message.receive.EntityRelationSyncMessage
 import com.atsuishio.superbwarfare.network.message.receive.VehicleShootClientMessage
+import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListenerV2
+import com.atsuishio.superbwarfare.resource.vehicle.VehicleResource
 import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.tools.OBB.Part.*
 import com.atsuishio.superbwarfare.tools.VectorTool.combineRotationsTurret
@@ -122,6 +121,21 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         if (pLevel.isClientSide) VehicleAnimationInstance.create(this) else null
 
     override fun getAnimationInstance() = anim
+
+    private val modelEntriesValue: List<VehicleModelEntry> by lazy {
+        if (!level().isClientSide) return@lazy emptyList()
+
+        val models = VehicleResource.compute(this).getModels()
+        models.mapNotNull { pojo ->
+            val modelPath = pojo.model ?: return@mapNotNull null
+            val texture = pojo.texture ?: return@mapNotNull null
+            val bakedModel = VehicleModelReloadListenerV2.getModel(modelPath) ?: return@mapNotNull null
+            val instance = bakedModel.createInstance()
+            VehicleModelEntry(instance, texture, pojo.emissiveTexture, pojo.distance)
+        }
+    }
+
+    override fun getModelEntries() = modelEntriesValue
 
     private var gunDataMapCache: Map<String, GunData>? = null
     private var gunDataMapWeaponKeys: Set<String>? = null

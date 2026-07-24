@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType
 import com.atsuishio.superbwarfare.data.vehicle_skin.VehicleSkin
 import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.BasicGeoVehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.VehicleModelEntry
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils
@@ -810,6 +811,18 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                 .setOverlay(OverlayTexture.NO_OVERLAY)
                 .setLight(LightTexture.FULL_BRIGHT)
                 .setNormal(pNormal, 0f, 1f, 0f)
+        }
+
+        @JvmStatic
+        fun selectModelEntry(entries: List<VehicleModelEntry>, poseStack: PoseStack): VehicleModelEntry? {
+            if (entries.isEmpty()) return null
+            entries.forEachIndexed { index, entry ->
+                if (index == 0) return@forEachIndexed  // skip main model (distance = 0)
+                if (RenderDistanceHelper.shouldRenderLOD(poseStack, entry.lodDistance.toDouble())) {
+                    return entry
+                }
+            }
+            return entries.firstOrNull()
         }
     }
 }

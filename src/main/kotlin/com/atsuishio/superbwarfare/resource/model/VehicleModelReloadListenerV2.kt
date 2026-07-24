@@ -9,7 +9,7 @@ import net.minecraft.server.packs.resources.ResourceManager
 import net.minecraft.util.profiling.ProfilerFiller
 
 // TODO 替换掉原本的loader
-object VehicleModelReloadListenerV2 : BasicModelReloadListenerV2("vehicle_v2") {
+object VehicleModelReloadListenerV2 : BasicModelReloadListenerV2("vehicle") {
     override fun apply(
         map: Map<ResourceLocation, BedrockModelPOJO>,
         resourceManager: ResourceManager,
