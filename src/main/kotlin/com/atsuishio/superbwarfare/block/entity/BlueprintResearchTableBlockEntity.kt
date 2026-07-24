@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.block.entity
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.BlueprintResearchTableBlock
 import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.init.ModBlockEntities
@@ -7,6 +8,7 @@ import com.atsuishio.superbwarfare.init.ModRecipes
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.inventory.menu.BlueprintResearchTableMenu
 import com.atsuishio.superbwarfare.recipe.ResearchingRecipe
+import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import com.atsuishio.superbwarfare.tools.isSameItemStack
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -41,6 +43,8 @@ open class BlueprintResearchTableBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(ModBlockEntities.BLUEPRINT_RESEARCH_TABLE.get(), pos, state),
     WorldlyContainer, MenuProvider {
     protected val items: NonNullList<ItemStack> = NonNullList.withSize(6, ItemStack.EMPTY)
+
+    open val modelInstance = BlockModelReloadListener.getModel(MODEL)?.createInstance()
 
     var tick: Int = 0
     var lastSelectedIndex: Int = 0
@@ -329,6 +333,8 @@ open class BlueprintResearchTableBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/block/blueprint_research_table.geo.json")
+
         const val SLOT_FUEL = 0
         const val SLOT_INPUT = 1
         const val SLOT_BASE = 2

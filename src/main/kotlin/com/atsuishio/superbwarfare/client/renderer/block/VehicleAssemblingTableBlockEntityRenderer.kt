@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.VehicleAssemblingTableBlock
 import com.atsuishio.superbwarfare.block.entity.VehicleAssemblingTableBlockEntity
 import com.atsuishio.superbwarfare.block.property.BlockPart
-import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
@@ -23,8 +22,7 @@ class VehicleAssemblingTableBlockEntityRenderer : BlockEntityRenderer<VehicleAss
         packedLight: Int,
         packedOverlay: Int
     ) {
-        val model = BlockModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = blockEntity.modelInstance ?: return
 
         poseStack.pushPose()
 

@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.LuckyContainerBlock
 import com.atsuishio.superbwarfare.block.entity.LuckyContainerBlockEntity
 import com.atsuishio.superbwarfare.client.animation.block.LuckyContainerBlockAnimationInstance
-import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
 import com.maydaymemory.mae.blend.EulerAdditiveBlender
@@ -25,12 +24,11 @@ class LuckyContainerBlockEntityRenderer : BlockEntityRenderer<LuckyContainerBloc
         packedLight: Int,
         packedOverlay: Int
     ) {
-        val model = BlockModelReloadListener.getModel(MODEL) ?: return
+        val instance = blockEntity.modelInstance ?: return
         if (blockEntity.animationInstance == null) {
             blockEntity.animationInstance = LuckyContainerBlockAnimationInstance(blockEntity)
         }
         val ani = blockEntity.animationInstance ?: return
-        val instance = model.createInstance()
 
         poseStack.pushPose()
 
@@ -46,7 +44,7 @@ class LuckyContainerBlockEntityRenderer : BlockEntityRenderer<LuckyContainerBloc
 
         ani.context.partialTick = partialTick
         ani.tick()
-        instance.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+        instance.applyPose(BLENDER.blend(instance.bindPose, ani.getPose()))
 
         instance.renderToBuffer(
             poseStack,

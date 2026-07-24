@@ -14,6 +14,9 @@ import net.minecraft.world.item.ItemStack
 
 class LuckyContainerBlockItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityModelSet) :
     BlockEntityWithoutLevelRenderer(dispatcher, set) {
+
+    private val modelInstance by lazy { BlockModelReloadListener.getModel(MODEL)?.createInstance() }
+
     override fun renderByItem(
         stack: ItemStack,
         transformType: ItemDisplayContext,
@@ -24,8 +27,7 @@ class LuckyContainerBlockItemRenderer(dispatcher: BlockEntityRenderDispatcher, s
     ) {
         if (stack.item !is LuckyContainerBlockItem) return
 
-        val model = BlockModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = modelInstance ?: return
 
         poseStack.pushPose()
 

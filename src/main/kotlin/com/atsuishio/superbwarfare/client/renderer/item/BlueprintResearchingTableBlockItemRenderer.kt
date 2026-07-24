@@ -15,6 +15,9 @@ import net.minecraft.world.item.ItemStack
 
 class BlueprintResearchingTableBlockItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityModelSet) :
     BlockEntityWithoutLevelRenderer(dispatcher, set) {
+
+    private val modelInstance by lazy { BlockModelReloadListener.getModel(MODEL)?.createInstance() }
+
     override fun renderByItem(
         stack: ItemStack,
         displayContext: ItemDisplayContext,
@@ -24,8 +27,7 @@ class BlueprintResearchingTableBlockItemRenderer(dispatcher: BlockEntityRenderDi
         packedOverlay: Int
     ) {
         if (stack.item !is BlueprintResearchTableBlockItem) return
-        val model = BlockModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = modelInstance ?: return
 
         poseStack.pushPose()
 

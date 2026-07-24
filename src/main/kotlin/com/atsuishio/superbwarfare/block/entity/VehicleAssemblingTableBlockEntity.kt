@@ -1,7 +1,9 @@
 package com.atsuishio.superbwarfare.block.entity
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.inventory.menu.VehicleAssemblingMenu
+import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.world.MenuProvider
@@ -15,6 +17,8 @@ import net.minecraft.world.level.block.state.BlockState
 open class VehicleAssemblingTableBlockEntity(pPos: BlockPos, pBlockState: BlockState) :
     BlockEntity(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE.get(), pPos, pBlockState), MenuProvider {
 
+    open val modelInstance = BlockModelReloadListener.getModel(MODEL)?.createInstance()
+
     override fun getDisplayName(): Component {
         return Component.empty()
     }
@@ -25,5 +29,9 @@ open class VehicleAssemblingTableBlockEntity(pPos: BlockPos, pBlockState: BlockS
             pPlayerInventory,
             ContainerLevelAccess.create(pPlayer.level(), this.worldPosition)
         )
+    }
+
+    companion object {
+        val MODEL = loc("models/bedrock/block/vehicle_assembling_table.geo.json")
     }
 }

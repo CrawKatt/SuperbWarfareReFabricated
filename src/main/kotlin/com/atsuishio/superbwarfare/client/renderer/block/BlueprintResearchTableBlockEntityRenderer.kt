@@ -3,7 +3,6 @@ package com.atsuishio.superbwarfare.client.renderer.block
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.BlueprintResearchTableBlock
 import com.atsuishio.superbwarfare.block.entity.BlueprintResearchTableBlockEntity
-import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
@@ -23,11 +22,12 @@ class BlueprintResearchTableBlockEntityRenderer : BlockEntityRenderer<BlueprintR
         packedLight: Int,
         packedOverlay: Int
     ) {
-        val model = BlockModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = blockEntity.modelInstance ?: return
         val bone = instance.getBone("rolling") ?: return
 
         poseStack.pushPose()
+
+        instance.resetPose()
 
         val rot = when (blockEntity.blockState.getValue(BlueprintResearchTableBlock.FACING)) {
             Direction.EAST -> -90f

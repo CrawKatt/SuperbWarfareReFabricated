@@ -1,10 +1,12 @@
 package com.atsuishio.superbwarfare.block.entity
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.LuckyContainerBlock
 import com.atsuishio.superbwarfare.client.animation.block.LuckyContainerBlockAnimationInstance
 import com.atsuishio.superbwarfare.data.container.ContainerDataManager
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModBlockEntities
+import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import net.minecraft.core.BlockPos
 import net.minecraft.core.HolderLookup
@@ -27,6 +29,9 @@ import org.joml.Math
 
 open class LuckyContainerBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(ModBlockEntities.LUCKY_CONTAINER.get(), pos, state) {
+
+    open val modelInstance = BlockModelReloadListener.getModel(MODEL)?.createInstance()
+
     var location: ResourceLocation? = null
     var icon: ResourceLocation? = null
     var tick: Int = 0
@@ -117,6 +122,8 @@ open class LuckyContainerBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/block/lucky_container.geo.json")
+
         fun serverTick(pLevel: Level, pPos: BlockPos, pState: BlockState, blockEntity: LuckyContainerBlockEntity) {
             if (!pState.getValue(LuckyContainerBlock.OPENED)) {
                 return
