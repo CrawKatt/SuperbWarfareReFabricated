@@ -15,6 +15,9 @@ import net.minecraft.world.item.ItemStack
 
 class ContainerBlockItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityModelSet) :
     BlockEntityWithoutLevelRenderer(dispatcher, set) {
+
+    private val modelInstance by lazy { BlockModelReloadListener.getModel(MODEL)?.createInstance() }
+
     override fun renderByItem(
         stack: ItemStack,
         transformType: ItemDisplayContext,
@@ -25,10 +28,9 @@ class ContainerBlockItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: E
     ) {
         if (stack.item !is ContainerBlockItem) return
 
-        val model = BlockModelReloadListener.getModel(MODEL) ?: return
         val icon = ContainerItemDecorator.getCustomIcon(stack)
         if (icon != null && transformType == ItemDisplayContext.GUI) return
-        val instance = model.createInstance()
+        val instance = modelInstance ?: return
 
         poseStack.pushPose()
 

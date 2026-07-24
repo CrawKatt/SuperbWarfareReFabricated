@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.SmallContainerBlock
 import com.atsuishio.superbwarfare.block.entity.SmallContainerBlockEntity
 import com.atsuishio.superbwarfare.client.animation.block.SmallContainerBlockAnimationInstance
-import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
 import com.maydaymemory.mae.blend.EulerAdditiveBlender
@@ -25,12 +24,11 @@ class SmallContainerBlockEntityRenderer : BlockEntityRenderer<SmallContainerBloc
         packedLight: Int,
         packedOverlay: Int
     ) {
-        val model = BlockModelReloadListener.getModel(MODEL) ?: return
+        val instance = blockEntity.modelInstance ?: return
         if (blockEntity.animationInstance == null) {
             blockEntity.animationInstance = SmallContainerBlockAnimationInstance(blockEntity)
         }
         val ani = blockEntity.animationInstance ?: return
-        val instance = model.createInstance()
 
         poseStack.pushPose()
 
@@ -46,7 +44,7 @@ class SmallContainerBlockEntityRenderer : BlockEntityRenderer<SmallContainerBloc
 
         ani.context.partialTick = partialTick
         ani.tick()
-        instance.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+        instance.applyPose(BLENDER.blend(instance.bindPose, ani.getPose()))
 
         val texture = if (blockEntity.lootTableSeed != 0L && blockEntity.lootTableSeed % 205 == 0L) {
             TEXTURE_SUI

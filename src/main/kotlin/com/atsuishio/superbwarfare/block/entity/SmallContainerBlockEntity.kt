@@ -1,8 +1,10 @@
 package com.atsuishio.superbwarfare.block.entity
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.SmallContainerBlock
 import com.atsuishio.superbwarfare.client.animation.block.SmallContainerBlockAnimationInstance
 import com.atsuishio.superbwarfare.init.ModBlockEntities
+import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import net.minecraft.advancements.CriteriaTriggers
 import net.minecraft.core.BlockPos
@@ -29,6 +31,9 @@ import net.minecraft.world.phys.Vec3
 
 open class SmallContainerBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(ModBlockEntities.SMALL_CONTAINER.get(), pos, state) {
+
+    open val modelInstance = BlockModelReloadListener.getModel(MODEL)?.createInstance()
+
     var lootTable: ResourceLocation? = null
     var lootTableSeed: Long = 0
     var tick: Int = 0
@@ -104,6 +109,8 @@ open class SmallContainerBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/block/small_container.geo.json")
+
         fun serverTick(pLevel: Level, pPos: BlockPos, pState: BlockState, blockEntity: SmallContainerBlockEntity) {
             if (!pState.getValue(SmallContainerBlock.OPENED)) {
                 return

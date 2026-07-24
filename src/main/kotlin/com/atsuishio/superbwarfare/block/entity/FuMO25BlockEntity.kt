@@ -1,11 +1,13 @@
 package com.atsuishio.superbwarfare.block.entity
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.FuMO25Block
 import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.inventory.menu.FuMO25Menu
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData
+import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import com.atsuishio.superbwarfare.tools.RadarScanner
 import com.atsuishio.superbwarfare.tools.SeekTool
 import net.minecraft.core.BlockPos
@@ -39,6 +41,8 @@ import java.util.*
 open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
     BlockEntity(ModBlockEntities.FUMO_25.get(), pPos, pBlockState), MenuProvider {
     private var energyHandler: LazyOptional<EnergyStorage> = LazyOptional.of { EnergyStorage(MAX_ENERGY) }
+
+    open val modelInstance = BlockModelReloadListener.getModel(MODEL)?.createInstance()
 
     var type: FuncType = FuncType.NORMAL
     var powered: Boolean = false
@@ -190,6 +194,8 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/block/fumo_25.geo.json")
+
         const val MAX_ENERGY: Int = 1000000
 
         // 固定距离，以后有人改动这个需要自行解决GUI渲染问题
