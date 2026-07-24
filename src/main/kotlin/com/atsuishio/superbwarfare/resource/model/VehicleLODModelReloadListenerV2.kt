@@ -26,18 +26,7 @@ object VehicleLODModelReloadListenerV2 : BasicModelReloadListenerV2("vehicle_lod
                 BakerOptions.ofAnimationFile(anim)
             } else {
                 BakerOptions.defaults()
-            }.withPreservedBoneRegexes(
-                setOf(
-                    "^w_.*",        // wheel bones: w_lb, w_rb, w_lr, w_rr
-                    "^root$",       // root bone
-                    "^move_.*",     // bones moved by scripts
-                    "^flare.*",     // flare bones
-                    "^laser.*",     // laser bones
-                    "^wheel[LR].*", // alternative wheel naming
-                    "^track.*",     // track bones
-                    "^shell.*",     // shell bones
-                )
-            )
+            }.withPreservedBoneRegexes(VehicleModelReloadListenerV2.PATTERNS)
 
             this.models[location] = BakedBedrockModel.bake(pojo, options)
         }

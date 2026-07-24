@@ -10,6 +10,27 @@ import net.minecraft.util.profiling.ProfilerFiller
 
 // TODO 替换掉原本的loader
 object VehicleModelReloadListenerV2 : BasicModelReloadListenerV2("vehicle") {
+    @JvmStatic
+    val PATTERNS = setOf(
+        "^w_.*",        // wheel bones: w_lb, w_rb, w_lr, w_rr
+        "^root$",       // root bone
+        "^move_.*",     // bones moved by scripts
+        "^flare.*",     // flare bones
+        "^laser.*",     // laser bones
+        "^wheel[LR].*", // alternative wheel naming
+        "^track.*",     // track bones
+        "^shell.*",     // shell bones
+        "^.*_dogTag$",
+        "^dummy_.*",
+        "^waterMask$",
+        "^passengerWeaponStation$",
+        "^base$",
+        "^turret$",
+        "^barrel$",
+        "^passengerWeaponStationYaw$",
+        "^passengerWeaponStationPitch$"
+    )
+
     override fun apply(
         map: Map<ResourceLocation, BedrockModelPOJO>,
         resourceManager: ResourceManager,
@@ -27,18 +48,7 @@ object VehicleModelReloadListenerV2 : BasicModelReloadListenerV2("vehicle") {
                 BakerOptions.ofAnimationFile(anim)
             } else {
                 BakerOptions.defaults()
-            }.withPreservedBoneRegexes(
-                setOf(
-                    "^w_.*",        // wheel bones: w_lb, w_rb, w_lr, w_rr
-                    "^root$",       // root bone
-                    "^move_.*",     // bones moved by scripts
-                    "^flare.*",     // flare bones
-                    "^laser.*",     // laser bones
-                    "^wheel[LR].*", // alternative wheel naming
-                    "^track.*",     // track bones
-                    "^shell.*",     // shell bones
-                )
-            )
+            }.withPreservedBoneRegexes(PATTERNS)
 
             this.models[location] = BakedBedrockModel.bake(pojo, options)
         }
