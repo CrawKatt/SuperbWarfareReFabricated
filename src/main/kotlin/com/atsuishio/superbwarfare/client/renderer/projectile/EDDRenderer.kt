@@ -3,7 +3,6 @@ package com.atsuishio.superbwarfare.client.renderer.projectile
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.projectile.EDDEntity
-import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
@@ -23,8 +22,7 @@ class EDDRenderer(renderManager: EntityRendererProvider.Context) : EntityRendere
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = entity.modelInstance ?: return
         val bone = instance.getBone("move_laser") ?: return
 
         poseStack.pushPose()
@@ -62,6 +60,5 @@ class EDDRenderer(renderManager: EntityRendererProvider.Context) : EntityRendere
     companion object {
         val TEXTURE = loc("textures/bedrock/projectile/edd.png")
         val TEXTURE_ALTER = loc("textures/bedrock/projectile/edd_alter.png")
-        val MODEL = loc("models/bedrock/projectile/edd.geo.json")
     }
 }

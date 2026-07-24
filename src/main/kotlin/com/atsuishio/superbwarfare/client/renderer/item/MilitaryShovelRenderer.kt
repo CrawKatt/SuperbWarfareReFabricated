@@ -23,8 +23,7 @@ class MilitaryShovelRenderer(dispatcher: BlockEntityRenderDispatcher, set: Entit
         packedOverlay: Int
     ) {
         if (stack.item !is MilitaryShovelItem) return
-        val model = ItemModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = modelInstance ?: return
         poseStack.pushPose()
 
         poseStack.translate(0.5f, 0.5f, 0.5f)
@@ -42,5 +41,6 @@ class MilitaryShovelRenderer(dispatcher: BlockEntityRenderDispatcher, set: Entit
     companion object {
         val TEXTURE = loc("textures/bedrock/item/military_shovel.png")
         val MODEL = loc("models/bedrock/item/military_shovel.geo.json")
+        val modelInstance = ItemModelReloadListener.getModel(MODEL)?.createInstance()
     }
 }

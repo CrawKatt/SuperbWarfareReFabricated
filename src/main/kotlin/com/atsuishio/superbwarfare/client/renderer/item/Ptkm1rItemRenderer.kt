@@ -23,13 +23,12 @@ class Ptkm1rItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityMod
         packedOverlay: Int
     ) {
         if (stack.item !is Ptkm1rItem) return
-        val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = modelInstance ?: return
         poseStack.pushPose()
 
         poseStack.translate(0.5f, 0.5f, 0.5f)
 
-        instance.applyPose(model.bindPose)
+        instance.applyPose(instance.bindPose)
 
         instance.renderToBuffer(
             poseStack,
@@ -44,5 +43,6 @@ class Ptkm1rItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityMod
     companion object {
         val TEXTURE = loc("textures/bedrock/projectile/ptkm_1r.png")
         val MODEL = loc("models/bedrock/projectile/ptkm_1r_item.geo.json")
+        val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
     }
 }

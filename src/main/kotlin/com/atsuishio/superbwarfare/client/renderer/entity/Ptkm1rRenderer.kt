@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.projectile.Ptkm1rEntity
-import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
 import com.maydaymemory.mae.blend.EulerAdditiveBlender
@@ -34,8 +33,7 @@ class Ptkm1rRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = entity.modelInstance ?: return
         val ani = entity.animationInstance ?: return
 
         poseStack.pushPose()
@@ -45,7 +43,7 @@ class Ptkm1rRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
 
         ani.context.partialTick = partialTick
         ani.tick()
-        instance.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+        instance.applyPose(BLENDER.blend(instance.bindPose, ani.getPose()))
 
         val bodyBone = instance.getBone("move_body")
         bodyBone?.rotation?.mul(Axis.YP.rotationDegrees(-entityYaw))
@@ -66,6 +64,5 @@ class Ptkm1rRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
     companion object {
         val TEXTURE = loc("textures/bedrock/projectile/ptkm_1r.png")
         val BLENDER: EulerAdditiveBlender = SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }
-        val MODEL = loc("models/bedrock/projectile/ptkm_1r.geo.json")
     }
 }

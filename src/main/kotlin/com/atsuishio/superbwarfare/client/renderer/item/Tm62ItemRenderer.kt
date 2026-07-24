@@ -23,8 +23,7 @@ class Tm62ItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityModel
         packedOverlay: Int
     ) {
         if (stack.item !is Tm62Item) return
-        val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = modelInstance ?: return
         poseStack.pushPose()
 
         poseStack.translate(0.5f, 0.5f, 0.5f)
@@ -42,5 +41,6 @@ class Tm62ItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityModel
     companion object {
         val TEXTURE = loc("textures/bedrock/projectile/tm_62.png")
         val MODEL = loc("models/bedrock/projectile/tm_62.geo.json")
+        val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
     }
 }

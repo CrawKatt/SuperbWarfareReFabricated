@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitBlock
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitEntity
 import com.atsuishio.superbwarfare.client.lighting.ClientLightingHandler
@@ -25,6 +26,7 @@ import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.item.weapon.BeastItem.Companion.beastKill
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
+import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.tools.HitboxHelper.getBoundingBox
 import com.atsuishio.superbwarfare.tools.HitboxHelper.getVelocity
@@ -72,6 +74,8 @@ import kotlin.math.max
 @Suppress("unused")
 open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level: Level) : Projectile(entityType, level),
     IBulletProperties, IAdvancedHitDetection, IFastMotionSync {
+    open val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
+
     // ===== IBulletProperties 属性（使用 getter/setter 方法） =====
     protected var damageValue = 1f
     protected var headShotValue = 1f
@@ -1024,6 +1028,8 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/projectile/projectile.geo.json")
+
         @JvmField
         val PROJECTILE_TARGETS_FAST =
             Predicate { input: Entity? ->
