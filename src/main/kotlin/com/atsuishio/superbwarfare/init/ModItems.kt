@@ -305,6 +305,7 @@ object ModItems {
     @JvmField val VEHICLE_KEY = registerItem("vehicle_key") { VehicleKeyItem() }
     @JvmField val CREATIVE_VEHICLE_KEY = registerItem("creative_vehicle_key") { CreativeVehicleKeyItem() }
     @JvmField val TOWLINE = registerItem("towline") { TowlineItem() }
+    @JvmField val TOW_BAR = registerItem("tow_bar") { TowBarItem() }
     @JvmField val CATAPULT_SHUTTLE = registerItem("catapult_shuttle") { CatapultShuttleItem() }
 
     @JvmField val TUNGSTEN_ROD = registerItem("tungsten_rod")

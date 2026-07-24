@@ -2,6 +2,8 @@ package com.atsuishio.superbwarfare.client.renderer.special
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
+import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
+import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.clientLevel
@@ -27,12 +29,17 @@ object TowingChainRenderer {
     private const val HALF_WIDTH = 0.25f
 
     private val CHAIN_TEXTURE = loc("textures/item/towline_chain.png")
+    private val TOW_BAR_CHAIN_TEXTURE = loc("textures/item/towline_bar.png")
 
     private fun getCenterPosition(entity: Entity, partialTick: Float): Vec3 {
+        var height = entity.bbHeight / 2.0
+        if (entity is CatapultShuttleEntity) height = 1.1
         val x = Mth.lerp(partialTick.toDouble(), entity.xo, entity.x)
-        val y = Mth.lerp(partialTick.toDouble(), entity.yo, entity.y) + entity.bbHeight / 2.0
+        val y = Mth.lerp(partialTick.toDouble(), entity.yo, entity.y) + height
         val z = Mth.lerp(partialTick.toDouble(), entity.zo, entity.z)
-        return Vec3(x, y, z)
+        val localPos = Vec3(x, y, z)
+        // Convert to world space if the entity is on a Valkyrien Skies ship
+        return ValkyrienSkiesCompat.toWorldPos(localPos, entity)
     }
 
     @SubscribeEvent
@@ -44,8 +51,6 @@ object TowingChainRenderer {
         val poseStack = event.poseStack
         val bufferSource = mc.renderBuffers().bufferSource()
         val partialTick = event.partialTick
-
-        val renderType = ModRenderTypes.TOW_CHAIN.apply(CHAIN_TEXTURE)
 
         poseStack.pushPose()
 
@@ -60,25 +65,41 @@ object TowingChainRenderer {
         val range = options.simulationDistance().get().toDouble() * 8
         val box = AABB.ofSize(camera.position, range, range, range)
         val vehicles = mutableListOf<VehicleEntity>()
+        val shuttles = mutableListOf<CatapultShuttleEntity>()
         EntityFindUtil.getEntities(level).get(box) {
             if (it is VehicleEntity && it.towingUUID.isNotBlank()) {
                 vehicles.add(it)
             }
+            if (it is CatapultShuttleEntity && it.towingUUID.isNotBlank()) {
+                shuttles.add(it)
+            }
         }
 
-        // --- Pass 1: ribbon in XZ plane ---
-        var builder = bufferSource.getBuffer(renderType)
-        for (vehicle in vehicles) {
-            val towedEntity = vehicle.towingEntity ?: continue
-            val fromPos = getCenterPosition(vehicle, partialTick)
-            val toPos = getCenterPosition(towedEntity, partialTick)
-            renderChain(builder, pose, fromPos, toPos, 0)
+        // Helper to render both ribbons for a towing pair
+        fun renderTowChain(from: Entity, to: Entity, renderType: net.minecraft.client.renderer.RenderType) {
+            val fromPos = getCenterPosition(from, partialTick)
+            val toPos = getCenterPosition(to, partialTick)
+            val b1 = bufferSource.getBuffer(renderType)
+            renderChain(b1, pose, fromPos, toPos, 0)
             bufferSource.endBatch()
-
-            builder = bufferSource.getBuffer(renderType)
-            renderChain(builder, pose, fromPos, toPos, 1)
+            val b2 = bufferSource.getBuffer(renderType)
+            renderChain(b2, pose, fromPos, toPos, 1)
         }
-        
+
+        // --- Vehicle towing chains ---
+        val vehicleRenderType = ModRenderTypes.TOW_CHAIN.apply(CHAIN_TEXTURE)
+        for (vehicle in vehicles) {
+            val towed = vehicle.towingEntity ?: continue
+            renderTowChain(vehicle, towed, vehicleRenderType)
+        }
+
+        // --- Catapult shuttle towing chains ---
+        val shuttleRenderType = ModRenderTypes.TOW_CHAIN.apply(TOW_BAR_CHAIN_TEXTURE)
+        for (shuttle in shuttles) {
+            val towed = shuttle.towingEntity ?: continue
+            renderTowChain(shuttle, towed, shuttleRenderType)
+        }
+
         poseStack.popPose()
         bufferSource.endBatch()
     }

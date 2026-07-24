@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo
 import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
+import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.entity.projectile.C4Entity
 import com.atsuishio.superbwarfare.entity.projectile.FlareDecoyEntity
 import com.atsuishio.superbwarfare.entity.projectile.SmokeDecoyEntity
@@ -104,7 +105,7 @@ object VehicleMotionUtils {
         val entities = vehicle.level().getEntities(
             EntityTypeTest.forClass(Entity::class.java), searchBox
         ) { entity ->
-            entity !== vehicle && entity !== vehicle.getFirstPassenger() && entity.vehicle == null && entity !is C4Entity && entity !is SmokeDecoyEntity && entity !is FlareDecoyEntity
+            entity !== vehicle && entity !== vehicle.getFirstPassenger() && entity.vehicle == null && entity !is C4Entity && entity !is SmokeDecoyEntity && entity !is FlareDecoyEntity && entity !is CatapultShuttleEntity
         }
 
         for (entity in entities) {
@@ -1261,7 +1262,12 @@ object VehicleMotionUtils {
     // Code based on Dragon Rise
     @JvmStatic
     fun towedTick(vehicle: VehicleEntity) {
-        val tower = vehicle.towedByEntity ?: return
+        val tower = vehicle.towedByEntity
+
+        if (tower == null) {
+            vehicle.clearTowingInfo()
+            return
+        }
 
         val dist = vehicle.distanceTo(tower)
         val longestSide = calculateLongestSide(vehicle)
@@ -1316,7 +1322,11 @@ object VehicleMotionUtils {
 
     @JvmStatic
     fun towingTick(vehicle: VehicleEntity) {
-        val towed = vehicle.towingEntity ?: return
+        val towed = vehicle.towingEntity
+        if (towed == null) {
+           vehicle.clearTowingInfo()
+            return
+        }
         if (towed is VehicleEntity) return
 
         val dist = vehicle.distanceTo(towed)

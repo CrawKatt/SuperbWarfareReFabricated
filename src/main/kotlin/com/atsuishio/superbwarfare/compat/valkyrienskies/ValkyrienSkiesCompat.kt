@@ -80,6 +80,83 @@ object ValkyrienSkiesCompat {
     }
 
     /**
+     * 将实体的位置转换为世界空间坐标。
+     * 通过实体所在区块查找管理船舶，可在服务端和客户端使用。
+     * 若实体未在 VS 船舶上，则返回其原始 position()。
+     *
+     * @param entity 待转换位置的实体
+     * @return 世界空间坐标
+     */
+    @JvmStatic
+    fun toWorldSpace(entity: Entity): Vec3 {
+        if (!hasMod()) return entity.position()
+
+        return try {
+            val level = entity.level()
+            val chunkX = entity.blockX shr 4
+            val chunkZ = entity.blockZ shr 4
+            val ship = level.getLoadedShipManagingPos(chunkX, chunkZ) ?: return entity.position()
+            val jomlPos = Vector3d(entity.position().toJOML())
+            (ship as Ship).shipToWorld.transformPosition(jomlPos)
+            Vec3(jomlPos.x, jomlPos.y, jomlPos.z)
+        } catch (_: Exception) {
+            entity.position()
+        }
+    }
+
+    /**
+     * 将实体附近的某个坐标转换为世界空间坐标。
+     * 通过实体所在区块查找管理船舶，适用于需要转换插值坐标的渲染场景。
+     * 若实体未在 VS 船舶上，则原样返回输入坐标。
+     *
+     * @param pos    待转换的坐标（通常为实体的插值坐标）
+     * @param entity 用于确定所属船舶的实体
+     * @return 世界空间坐标
+     */
+    @JvmStatic
+    fun toWorldPos(pos: Vec3, entity: Entity): Vec3 {
+        if (!hasMod()) return pos
+
+        return try {
+            val level = entity.level()
+            val chunkX = entity.blockX shr 4
+            val chunkZ = entity.blockZ shr 4
+            val ship = level.getLoadedShipManagingPos(chunkX, chunkZ) ?: return pos
+            val jomlPos = Vector3d(pos.toJOML())
+            (ship as Ship).shipToWorld.transformPosition(jomlPos)
+            Vec3(jomlPos.x, jomlPos.y, jomlPos.z)
+        } catch (_: Exception) {
+            pos
+        }
+    }
+
+    /**
+     * 将实体局部方向向量转换为世界空间方向。
+     * 通过实体所在区块查找管理船舶，可在服务端和客户端使用。
+     * 若实体未在 VS 船舶上，则原样返回输入方向。
+     *
+     * @param entity   用于确定所属船舶的实体
+     * @param localDir 实体局部方向向量
+     * @return 世界空间方向向量
+     */
+    @JvmStatic
+    fun toWorldDirection(entity: Entity, localDir: Vec3): Vec3 {
+        if (!hasMod()) return localDir
+
+        return try {
+            val level = entity.level()
+            val chunkX = entity.blockX shr 4
+            val chunkZ = entity.blockZ shr 4
+            val ship = level.getLoadedShipManagingPos(chunkX, chunkZ) ?: return localDir
+            val jomlDir = Vector3d(localDir.toJOML())
+            (ship as Ship).shipToWorld.transformDirection(jomlDir)
+            Vec3(jomlDir.x, jomlDir.y, jomlDir.z)
+        } catch (_: Exception) {
+            localDir
+        }
+    }
+
+    /**
      * 将世界坐标转换为 VS 船舶上的局部坐标。
      * 通过区块归属查询管理该位置的船舶，不受船舶当前世界AABB限制。
      * 若该位置未在任何船舶上，则原样返回。
