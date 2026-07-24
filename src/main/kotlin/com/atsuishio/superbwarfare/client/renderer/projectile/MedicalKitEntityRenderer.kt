@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.client.renderer.projectile
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.projectile.MedicalKitEntity
-import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
@@ -31,8 +30,7 @@ class MedicalKitEntityRenderer(renderManager: EntityRendererProvider.Context) :
         bufferIn: MultiBufferSource,
         packedLightIn: Int
     ) {
-        val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = entityIn.modelInstance ?: return
 
         poseStack.pushPose()
         if (entityIn.deltaMovement.lengthSqr() > 0) {
@@ -59,6 +57,5 @@ class MedicalKitEntityRenderer(renderManager: EntityRendererProvider.Context) :
 
     companion object {
         val TEXTURE = loc("textures/bedrock/projectile/medical_kit.png")
-        val MODEL = loc("models/bedrock/projectile/medical_kit.geo.json")
     }
 }

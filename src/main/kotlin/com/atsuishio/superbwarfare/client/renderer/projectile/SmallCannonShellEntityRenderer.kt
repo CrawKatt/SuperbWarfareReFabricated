@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.ClientRenderHandler
 import com.atsuishio.superbwarfare.entity.projectile.SmallCannonShellEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils
-import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
@@ -41,8 +40,7 @@ class SmallCannonShellEntityRenderer(manager: EntityRendererProvider.Context) :
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = entity.modelInstance ?: return
         val eyePos = localPlayer?.eyePosition ?: return
 
         poseStack.pushPose()
@@ -79,6 +77,5 @@ class SmallCannonShellEntityRenderer(manager: EntityRendererProvider.Context) :
 
     companion object {
         val TEXTURE = loc("textures/bedrock/projectile/small_cannon_shell.png")
-        val MODEL = loc("models/bedrock/projectile/small_cannon_shell.geo.json")
     }
 }

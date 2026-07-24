@@ -3,7 +3,6 @@ package com.atsuishio.superbwarfare.client.renderer.projectile
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.projectile.C4Entity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils
-import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
@@ -31,8 +30,7 @@ class C4Renderer(renderManager: EntityRendererProvider.Context) : EntityRenderer
         bufferIn: MultiBufferSource,
         packedLightIn: Int
     ) {
-        val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = entityIn.modelInstance ?: return
 
         poseStack.pushPose()
         val q = Quaternionf(entityIn.getQuaternion(partialTicks))
@@ -104,6 +102,5 @@ class C4Renderer(renderManager: EntityRendererProvider.Context) : EntityRenderer
     companion object {
         val TEXTURE = loc("textures/bedrock/projectile/c4.png")
         val TEXTURE_ALTER = loc("textures/bedrock/projectile/c4_alter.png")
-        val MODEL = loc("models/bedrock/projectile/c4.geo.json")
     }
 }

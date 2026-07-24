@@ -1,11 +1,13 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier.Companion.createDefaultModifier
 import com.atsuishio.superbwarfare.init.*
+import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.ParticleTool
@@ -30,6 +32,8 @@ import net.minecraftforge.items.ItemHandlerHelper
 import java.util.*
 
 open class ClaymoreEntity(type: EntityType<ClaymoreEntity>, level: Level) : Entity(type, level), OwnableEntity {
+    open val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
+
     constructor(owner: LivingEntity?, level: Level) : this(ModEntities.CLAYMORE.get(), level) {
         if (owner != null) {
             this.setOwnerUUID(owner.getUUID())
@@ -246,6 +250,8 @@ open class ClaymoreEntity(type: EntityType<ClaymoreEntity>, level: Level) : Enti
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/projectile/claymore.geo.json")
+
         @JvmField
         protected val OWNER_UUID: EntityDataAccessor<Optional<UUID>> = SynchedEntityData.defineId(
             ClaymoreEntity::class.java,

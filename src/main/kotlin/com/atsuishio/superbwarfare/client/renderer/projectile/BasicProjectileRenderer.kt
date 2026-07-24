@@ -62,7 +62,7 @@ open class BasicProjectileRenderer<T>(manager: EntityRendererProvider.Context) :
         }
 
         val model = ProjectileModelReloadListener.getModel(getModelLocation(entity)) ?: return
-        val instance = model.createInstance()
+        val instance = entity.getModelInstance() ?: return
 
         poseStack.pushPose()
 
@@ -77,7 +77,7 @@ open class BasicProjectileRenderer<T>(manager: EntityRendererProvider.Context) :
             val ani = entity.getAnimationInstance()!!
             ani.context.partialTick = partialTick
             ani.tick()
-            instance.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+            instance.applyPose(BLENDER.blend(instance.bindPose, ani.getPose()))
         }
 
         val flare = instance.getBone("flare")

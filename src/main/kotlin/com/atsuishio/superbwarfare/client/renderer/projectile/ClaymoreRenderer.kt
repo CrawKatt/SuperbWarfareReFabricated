@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.client.renderer.projectile
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.projectile.ClaymoreEntity
-import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
@@ -25,8 +24,7 @@ class ClaymoreRenderer(renderManager: EntityRendererProvider.Context) : EntityRe
         bufferIn: MultiBufferSource,
         packedLightIn: Int
     ) {
-        val model = ProjectileModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = entityIn.modelInstance ?: return
 
         poseStack.pushPose()
 
@@ -62,6 +60,5 @@ class ClaymoreRenderer(renderManager: EntityRendererProvider.Context) : EntityRe
     companion object {
         val TEXTURE = loc("textures/bedrock/projectile/claymore.png")
         val TEXTURE_ALTER = loc("textures/bedrock/projectile/claymore_alter.png")
-        val MODEL = loc("models/bedrock/projectile/claymore.geo.json")
     }
 }

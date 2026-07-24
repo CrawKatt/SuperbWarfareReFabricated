@@ -25,8 +25,7 @@ class SkinSprayRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityMode
         packedOverlay: Int
     ) {
         if (stack.item !is SkinSprayItem) return
-        val model = ItemModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = modelInstance ?: return
         poseStack.pushPose()
 
         poseStack.translate(0.5f, 0.5f, 0.5f)
@@ -46,5 +45,6 @@ class SkinSprayRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityMode
     companion object {
         val TEXTURE = loc("textures/bedrock/item/skin_spray.png")
         val MODEL = loc("models/bedrock/item/skin_spray.geo.json")
+        val modelInstance = ItemModelReloadListener.getModel(MODEL)?.createInstance()
     }
 }

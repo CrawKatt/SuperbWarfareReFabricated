@@ -1,10 +1,12 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.init.ModDamageTypes.causeProjectileHitDamage
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
+import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.forceHurt
 import com.atsuishio.superbwarfare.tools.sendPacketTo
@@ -24,6 +26,7 @@ import net.minecraft.world.phys.Vec3
 open class SmallCannonShellEntity(type: EntityType<out SmallCannonShellEntity>, level: Level) :
     FastThrowableProjectile(type, level) {
     private var aa = false
+    open val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
 
     init {
         this.damageValue = 40f
@@ -132,5 +135,9 @@ open class SmallCannonShellEntity(type: EntityType<out SmallCannonShellEntity>, 
 
     override fun isFastMoving(): Boolean {
         return false
+    }
+
+    companion object {
+        val MODEL = loc("models/bedrock/projectile/small_cannon_shell.geo.json")
     }
 }

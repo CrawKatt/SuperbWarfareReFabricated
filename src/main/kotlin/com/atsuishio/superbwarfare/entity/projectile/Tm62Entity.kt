@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier.Companion.createDefaultModifier
 import com.atsuishio.superbwarfare.init.ModDamageTypes
@@ -7,6 +8,7 @@ import com.atsuishio.superbwarfare.init.ModDamageTypes.causeCustomExplosionDamag
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.DamageHandler.doDamage
 import com.atsuishio.superbwarfare.tools.ParticleTool
@@ -35,6 +37,8 @@ import net.minecraftforge.items.ItemHandlerHelper
 import java.util.*
 
 open class Tm62Entity : Entity, OwnableEntity {
+    open val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
+
     constructor(type: EntityType<Tm62Entity>, world: Level) : super(type, world)
 
     constructor(owner: LivingEntity?, level: Level, fuse: Boolean) : super(ModEntities.TM_62.get(), level) {
@@ -252,6 +256,8 @@ open class Tm62Entity : Entity, OwnableEntity {
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/projectile/tm_62.geo.json")
+
         @JvmField
         protected val OWNER_UUID: EntityDataAccessor<Optional<UUID>> =
             SynchedEntityData.defineId(Tm62Entity::class.java, EntityDataSerializers.OPTIONAL_UUID)

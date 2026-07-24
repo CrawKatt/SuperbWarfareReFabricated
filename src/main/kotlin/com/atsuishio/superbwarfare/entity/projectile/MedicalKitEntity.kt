@@ -1,7 +1,9 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.init.ModItems
+import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
@@ -22,6 +24,8 @@ import net.minecraft.world.level.entity.EntityTypeTest
 import net.minecraftforge.items.ItemHandlerHelper
 
 open class MedicalKitEntity(type: EntityType<MedicalKitEntity>, level: Level) : Entity(type, level) {
+    open val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
+
     override fun defineSynchedData() {
     }
 
@@ -141,6 +145,8 @@ open class MedicalKitEntity(type: EntityType<MedicalKitEntity>, level: Level) : 
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/projectile/medical_kit.geo.json")
+
         @JvmStatic
         protected fun lerpRotation(pCurrentRotation: Float, pTargetRotation: Float): Float {
             var pCurrentRotation = pCurrentRotation

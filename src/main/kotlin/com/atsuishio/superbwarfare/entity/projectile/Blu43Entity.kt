@@ -1,11 +1,13 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier.Companion.createDefaultModifier
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData.Companion.enabledTDM
 import net.minecraft.nbt.CompoundTag
@@ -33,6 +35,8 @@ import java.util.*
 import kotlin.math.max
 
 open class Blu43Entity : Entity, OwnableEntity {
+    open val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
+
     constructor(type: EntityType<Blu43Entity>, world: Level) : super(type, world)
 
     constructor(owner: LivingEntity?, level: Level) : super(ModEntities.BLU_43.get(), level) {
@@ -269,6 +273,8 @@ open class Blu43Entity : Entity, OwnableEntity {
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/projectile/blu_43.geo.json")
+
         @JvmField
         protected val OWNER_UUID: EntityDataAccessor<Optional<UUID>> =
             SynchedEntityData.defineId(Blu43Entity::class.java, EntityDataSerializers.OPTIONAL_UUID)

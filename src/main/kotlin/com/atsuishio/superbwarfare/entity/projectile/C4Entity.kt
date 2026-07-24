@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.OBBEntity
 import com.atsuishio.superbwarfare.entity.getValue
@@ -8,6 +9,7 @@ import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.OBB
@@ -48,6 +50,7 @@ import kotlin.math.sqrt
 open class C4Entity : Entity, OwnableEntity {
     protected var inGround: Boolean = false
     var onEntity by ON_ENTITY
+    open val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
     private var lastState: BlockState? = null
 
     // Previous-tick quaternion for interpolation
@@ -686,6 +689,8 @@ open class C4Entity : Entity, OwnableEntity {
         get() = this.entityData.get(BOMB_TICK)
 
     companion object {
+        val MODEL = loc("models/bedrock/projectile/c4.geo.json")
+
         @JvmField
         protected val OWNER_UUID: EntityDataAccessor<Optional<UUID>> =
             SynchedEntityData.defineId(C4Entity::class.java, EntityDataSerializers.OPTIONAL_UUID)

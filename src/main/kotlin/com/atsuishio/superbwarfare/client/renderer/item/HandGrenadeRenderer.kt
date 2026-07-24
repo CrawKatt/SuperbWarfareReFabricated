@@ -25,8 +25,7 @@ class HandGrenadeRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityMo
         packedOverlay: Int
     ) {
         if (stack.item !is HandGrenade) return
-        val model = ItemModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = modelInstance ?: return
         poseStack.pushPose()
 
         poseStack.translate(0.5f, 0.5f, 0.5f)
@@ -46,5 +45,6 @@ class HandGrenadeRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityMo
     companion object {
         val TEXTURE = loc("textures/bedrock/item/hand_grenade.png")
         val MODEL = loc("models/bedrock/item/hand_grenade.geo.json")
+        val modelInstance = ItemModelReloadListener.getModel(MODEL)?.createInstance()
     }
 }
