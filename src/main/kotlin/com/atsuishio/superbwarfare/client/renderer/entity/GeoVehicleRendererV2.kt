@@ -1,0 +1,990 @@
+package com.atsuishio.superbwarfare.client.renderer.entity
+
+import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
+import com.atsuishio.superbwarfare.client.renderer.SmartTextureBrightener
+import com.atsuishio.superbwarfare.client.renderer.TextureBrightnessHandler
+import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
+import com.atsuishio.superbwarfare.config.client.DisplayConfig
+import com.atsuishio.superbwarfare.data.gun.GunProp
+import com.atsuishio.superbwarfare.data.vehicle.subdata.SeatInfo
+import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType
+import com.atsuishio.superbwarfare.data.vehicle_skin.VehicleSkin
+import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
+import com.atsuishio.superbwarfare.entity.vehicle.BasicGeoVehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.VehicleModelEntry
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils
+import com.atsuishio.superbwarfare.event.ClientEventHandler
+import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListener
+import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
+import com.atsuishio.superbwarfare.tools.SpritePixelHelper
+import com.atsuishio.superbwarfare.tools.localPlayer
+import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.baked.BakedBedrockModel
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BoneState
+import com.maydaymemory.mae.basic.ArrayPoseBuilder
+import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
+import com.maydaymemory.mae.blend.EulerAdditiveBlender
+import com.maydaymemory.mae.blend.SimpleEulerAdditiveBlender
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vertex.VertexConsumer
+import com.mojang.math.Axis
+import net.minecraft.client.renderer.LightTexture
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.culling.Frustum
+import net.minecraft.client.renderer.entity.EntityRenderer
+import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.Mth
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
+import org.joml.Matrix3f
+import org.joml.Matrix4f
+import org.joml.Quaterniond
+import org.joml.Quaternionf
+import java.util.regex.Pattern
+
+open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
+    EntityRenderer<T>(manager) where T : VehicleEntity, T : BasicGeoVehicleEntity {
+
+    var pitch = 0f
+    var yaw = 0f
+    var roll = 0f
+    var leftWheelRot = 0f
+    var rightWheelRot = 0f
+    var leftTrack = 0f
+    var rightTrack = 0f
+
+    var turretYRot = 0f
+    var turretXRot = 0f
+    var turretYaw = 0f
+    var recoilShake = 0f
+
+    var hideForTurretControllerWhileZooming = false
+    var hideForPassengerWeaponStationControllerWhileZooming = false
+
+    private var seatsCache: MutableList<SeatInfo>? = null
+
+    // Cache bone groups keyed by base model, since all instances from the same model share bone names
+    private var boneGroupsCache: ModelBoneGroups? = null
+    private var boneGroupsCacheKey: BakedBedrockModel? = null
+
+    override fun getTextureLocation(entity: T): ResourceLocation {
+        val (_, namespace, id) = entity.type.descriptionId.split(".")
+        return ResourceLocation(namespace, "textures/bedrock/vehicle/$id.png")
+    }
+
+    open fun getEmissiveTextureLocation(poseStack: PoseStack, entity: T): ResourceLocation? {
+        return getCurrentModelEntry(poseStack, entity)?.emissiveTexture
+    }
+
+    open fun renderScale(): Float {
+        return 1f
+    }
+
+    override fun shouldShowName(pEntity: T): Boolean {
+        return false
+    }
+
+    override fun render(
+        entity: T,
+        yaw: Float,
+        partialTick: Float,
+        poseStack: PoseStack,
+        buffer: MultiBufferSource,
+        packedLight: Int
+    ) {
+        val entry = getCurrentModelEntry(poseStack, entity) ?: return
+        val instance = entry.instance
+        var texture = entry.texture
+
+        // Apply vehicle skin (only for full-detail models, not LOD)
+        val isLOD = entry.isLOD()
+        if (!isLOD) {
+            val skinInfo = VehicleSkin.getSkin(entity)
+            if (skinInfo != null) {
+                val skinTexture = ResourceLocation.tryParse(skinInfo.texture)
+                if (skinTexture != null) {
+                    texture = skinTexture
+                }
+            }
+        }
+
+        val emissiveTexture = this.getEmissiveTextureLocation(poseStack, entity)
+        texture = if (ClientEventHandler.activeThermalImaging) {
+            SmartTextureBrightener.getSmartBrightenedTexture(texture, 3f)
+        } else if (entity.isWreck) {
+            if ((entity.vehicleType == VehicleType.AIRPLANE || entity.vehicleType == VehicleType.HELICOPTER || entity.vehicleType == VehicleType.AIRSHIP)) {
+                if (entity.sympatheticDetonated) {
+                    TextureBrightnessHandler.getBrightenedTexture(texture, 0.3f)
+                } else {
+                    texture
+                }
+            } else {
+                TextureBrightnessHandler.getBrightenedTexture(texture, 0.3f)
+            }
+        } else {
+            texture
+        }
+
+        poseStack.pushPose()
+
+        this.rotateVehicleAxis(entity, poseStack, yaw, partialTick)
+        poseStack.scale(renderScale(), renderScale(), renderScale())
+
+        if (entity.getAnimationInstance() != null && !isLOD && !entity.sympatheticDetonated) {
+            val ani = entity.getAnimationInstance()!!
+            ani.context.partialTick = partialTick
+            ani.tick()
+            instance.applyPose(BLENDER.blend(instance.bindPose, ani.getPose()))
+        } else {
+            instance.applyPose(instance.bindPose)
+        }
+
+        this.tickVariables(entity, yaw, partialTick)
+        this.transformCustomModelPart(entity, instance, poseStack, yaw, partialTick)
+
+        val waterMask = instance.getBone("waterMask")
+        val waterFlag = waterMask != null
+        if (waterFlag) {
+            waterMask.visible = false
+        }
+
+        val boneGroups = getOrComputeBoneGroups(instance)
+        val dogTagBones = boneGroups.dogTagBones
+        val dogTagFlag = dogTagBones.isNotEmpty()
+        if (dogTagFlag) {
+            dogTagBones.forEach { it.visible = false }
+        }
+
+        instance.renderToBuffer(
+            poseStack,
+            buffer,
+            RenderType.entityTranslucent(texture),
+            BedrockModelRenderTypes.polyMeshCutout(texture),
+            packedLight,
+            OverlayTexture.NO_OVERLAY
+        )
+
+        if (emissiveTexture != null) {
+            instance.renderToBuffer(
+                poseStack,
+                buffer,
+                RenderType.eyes(emissiveTexture),
+                BedrockModelRenderTypes.polyMeshCutout(emissiveTexture),
+                packedLight,
+                OverlayTexture.NO_OVERLAY
+            )
+        }
+
+        if (waterFlag) {
+            waterMask.visible = true
+            val waterMaskIndex = instance.getIndex("waterMask")
+            instance.baseModel().renderBone(
+                instance,
+                waterMaskIndex,
+                poseStack,
+                buffer.getBuffer(RenderType.waterMask()),
+                packedLight,
+                OverlayTexture.NO_OVERLAY,
+                1f, 1f, 1f, 1f,
+                true
+            )
+        }
+
+        val flareBones = boneGroups.flareBones
+        val flareFlag = flareBones.isNotEmpty()
+        if (flareFlag) {
+            for (flare in flareBones) {
+                flare.visible = false
+                flare.rotation.rotateZ((0.15 * (Math.random() - 0.5)).toFloat())
+            }
+        }
+
+        if (!isLOD && !entity.sympatheticDetonated && flareFlag && !(ClientEventHandler.zoomVehicle && (hideForTurretControllerWhileZooming || hideForPassengerWeaponStationControllerWhileZooming))) {
+            val flareModel = VehicleModelReloadListener.getModel(MUZZLE_FLARE_MODEL)
+
+            if (flareModel != null) {
+                for (flare in flareBones) {
+                    poseStack.pushPose()
+                    poseStack.mulPoseMatrix(flare.getGlobalTransform(instance))
+                    poseStack.translate(0f, 0f, (0.01 * (Math.random() - 0.5)).toFloat())
+                    poseStack.scale(
+                        1 + (0.02 * (Math.random() - 0.5)).toFloat(),
+                        1 + (0.02 * (Math.random() - 0.5)).toFloat(),
+                        1 + (0.02 * (Math.random() - 0.5)).toFloat()
+                    )
+                    flareModel.renderToBuffer(
+                        poseStack,
+                        buffer,
+                        ModRenderTypes.MUZZLE_FLASH_TYPE.apply(MUZZLE_FLARE),
+                        BedrockModelRenderTypes.polyMeshCutout(MUZZLE_FLARE),
+                        packedLight,
+                        OverlayTexture.NO_OVERLAY,
+                        1f,
+                        1f,
+                        1f,
+                        1f
+                    )
+                    flareModel.applyPose(flareModel.bindPose)
+
+                    poseStack.popPose()
+                }
+            }
+        }
+
+        val laserBones = boneGroups.laserBones
+        val laserFlag = laserBones.isNotEmpty()
+        if (laserFlag) {
+            customLaserLength(laserBones, entity, partialTick)
+        }
+
+        if (!entity.sympatheticDetonated && laserFlag) {
+            for (laser in laserBones) {
+                poseStack.pushPose()
+                poseStack.mulPoseMatrix(laser.getGlobalTransform(instance))
+
+                val lastPose = poseStack.last()
+                val pose = lastPose.pose()
+                val normal = lastPose.normal()
+
+                val consumerOut = buffer.getBuffer(RenderType.eyes(LASER_TEX))
+                val consumerIn = buffer.getBuffer(RenderType.eyes(LASER_TEX_IN))
+
+                val c = entity.laserColor
+
+                val color = Quaternionf(
+                    ((c shr 16) and 0xFF).toFloat(),
+                    ((c shr 8) and 0xFF).toFloat(),
+                    (c and 0xFF).toFloat(),
+                    255f
+                )
+                val colorW = Quaternionf(255f, 255f, 255f, 255f)
+
+                val scale = entity.laserBaseScale.toFloat()
+
+                renderLaser(consumerOut, pose, normal, scale, color)
+                renderLaser(consumerIn, pose, normal, scale, colorW)
+
+                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
+
+                renderLaser(consumerOut, pose, normal, scale, color)
+                renderLaser(consumerIn, pose, normal, scale, colorW)
+
+                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
+
+                renderLaser(consumerOut, pose, normal, scale, color)
+                renderLaser(consumerIn, pose, normal, scale, colorW)
+
+                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
+
+                renderLaser(consumerOut, pose, normal, scale, color)
+                renderLaser(consumerIn, pose, normal, scale, colorW)
+
+                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
+
+                renderLaser(consumerOut, pose, normal, scale, color)
+                renderLaser(consumerIn, pose, normal, scale, colorW)
+
+                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
+
+                renderLaser(consumerOut, pose, normal, scale, color)
+                renderLaser(consumerIn, pose, normal, scale, colorW)
+
+                poseStack.popPose()
+            }
+        }
+
+        // 自定义图章
+        if (dogTagFlag && entity.health > 0) {
+            val list = entity.dogTagIcon
+            val flag = list.all { row -> row.all { it == (-1).toShort() } }
+            if (DisplayConfig.DOG_TAG_ICON_VISIBLE.get() && !flag) {
+                val dogTagTexture = SpritePixelHelper.getDogTagIcon(list, entity.uuid.toString())
+
+                for (bone in dogTagBones) {
+                    poseStack.pushPose()
+                    poseStack.mulPoseMatrix(bone.getGlobalTransform(instance))
+                    poseStack.mulPose(Axis.YP.rotationDegrees(180f))
+                    poseStack.mulPose(Axis.XP.rotationDegrees(90f))
+
+                    val pose = poseStack.last()
+                    val lastMatrix = pose.pose()
+                    val lastMatrix3f = pose.normal()
+                    val vertexConsumer =
+                        buffer.getBuffer(RenderType.entityCutoutNoCull(dogTagTexture))
+
+                    // V2 BoneState doesn't expose cube dimensions; use 1f as default
+                    val xSize = 1f
+                    val ySize = 1f
+
+                    vertex(vertexConsumer, lastMatrix, lastMatrix3f, packedLight, -0.5f * xSize, -0.5f * ySize, 0, 1)
+                    vertex(vertexConsumer, lastMatrix, lastMatrix3f, packedLight, 0.5f * xSize, -0.5f * ySize, 1, 1)
+                    vertex(vertexConsumer, lastMatrix, lastMatrix3f, packedLight, 0.5f * xSize, 0.5f * ySize, 1, 0)
+                    vertex(vertexConsumer, lastMatrix, lastMatrix3f, packedLight, -0.5f * xSize, 0.5f * ySize, 0, 0)
+                    poseStack.popPose()
+                }
+
+                buffer.getBuffer(RenderType.entityTranslucent(getTextureLocation(entity)))
+            }
+        }
+
+        this.renderCustomPart(entity, instance, poseStack, yaw, partialTick, buffer, packedLight)
+
+        poseStack.popPose()
+    }
+
+    open fun customLaserLength(laserBones: List<BoneState>, entity: VehicleEntity, partialTicks: Float) {
+        for (laser in laserBones) {
+            laser.visible = false
+
+            laser.zScale = 10 * entity.laserLength
+            val scale = Mth.lerp(
+                partialTicks,
+                entity.laserScaleO,
+                entity.laserScale
+            ).coerceAtMost(1.2f)
+
+            laser.xScale = scale
+            laser.yScale = scale
+        }
+    }
+
+    fun renderLaser(
+        consumer: VertexConsumer,
+        pose: Matrix4f,
+        normal: Matrix3f,
+        pX: Float,
+        color: Quaternionf
+    ) {
+        vertex(consumer, pose, normal, -pX, 0f, 0, 1, color)
+        vertex(consumer, pose, normal, pX, 0f, 1, 1, color)
+        vertex(consumer, pose, normal, pX, 0.1f, 1, 0, color)
+        vertex(consumer, pose, normal, -pX, 0.1f, 0, 0, color)
+    }
+
+    open fun tickVariables(vehicle: T, entityYaw: Float, partialTicks: Float) {
+        pitch = vehicle.getPitch(partialTicks)
+        yaw = vehicle.getYaw(partialTicks)
+        roll = vehicle.getRoll(partialTicks)
+
+        leftWheelRot = Mth.lerp(partialTicks, vehicle.leftWheelRotO, vehicle.leftWheelRot)
+        rightWheelRot = Mth.lerp(partialTicks, vehicle.rightWheelRotO, vehicle.rightWheelRot)
+
+        leftTrack = Mth.lerp(partialTicks, vehicle.leftTrackO, vehicle.leftTrack)
+        rightTrack = Mth.lerp(partialTicks, vehicle.rightTrackO, vehicle.rightTrack)
+
+        turretYRot = Mth.lerp(partialTicks, vehicle.turretYRotO, vehicle.turretYRot)
+        turretXRot = Mth.lerp(partialTicks, vehicle.turretXRotO, vehicle.turretXRot)
+
+        turretYaw = vehicle.getTurretYaw(partialTicks)
+
+        recoilShake = Mth.lerp(partialTicks, vehicle.recoilShakeO.toFloat(), vehicle.recoilShake.toFloat())
+
+        hideForTurretControllerWhileZooming =
+            ClientEventHandler.zoomVehicle && vehicle.getNthEntity(vehicle.turretControllerIndex) === localPlayer
+        hideForPassengerWeaponStationControllerWhileZooming =
+            ClientEventHandler.zoomVehicle && vehicle.getNthEntity(vehicle.passengerWeaponStationControllerIndex) === localPlayer
+    }
+
+    open fun renderCustomPart(
+        vehicle: T,
+        instance: BakedModelInstance,
+        poseStack: PoseStack,
+        entityYaw: Float,
+        partialTicks: Float,
+        buffer: MultiBufferSource,
+        packedLight: Int
+    ) {
+        val seats = this.seatsCache ?: vehicle.computed().seats().also { this.seatsCache = it }
+
+        for ((index, seat) in seats.withIndex()) {
+            for (k in seat.weapons().indices) {
+                val data = vehicle.getGunData(index, k) ?: continue
+                val dummyInfo = data.get(GunProp.PROJECTILE_DUMMY_INFO) ?: continue
+                val ammo = data.ammo.get()
+                if (ammo <= 0) continue
+
+                val projectileInfo = data.get(GunProp.PROJECTILE)
+                val projectileType = projectileInfo.itemId
+
+                EntityType.byString(projectileType).ifPresent { entityType ->
+                    val entity = entityType.create(vehicle.level()) ?: return@ifPresent
+                    entity.tickCount = 1
+                    if (entity is FastThrowableProjectile) {
+                        entity.syncedTick = 1
+                    }
+
+                    val size = data.get(GunProp.SHOOT_POS).positions.size
+                    if (size <= 0) return@ifPresent
+
+                    for (j in 0..<size) {
+                        if (j >= ammo) continue
+
+                        val dummyName = "dummy_${index}_${k}_${j + 1}"
+                        val bone = instance.getBone(dummyName) ?: continue
+
+                        poseStack.pushPose()
+                        poseStack.mulPoseMatrix(bone.getGlobalTransform(instance))
+
+                        val scale = dummyInfo.scale
+
+                        poseStack.scale(scale.x.toFloat(), scale.y.toFloat(), scale.z.toFloat())
+                        poseStack.mulPose(Axis.YP.rotationDegrees(180f))
+
+                        val rotate = dummyInfo.rotate
+
+                        val yawRot = Axis.YP.rotation(rotate.y.toFloat())
+                        val pitchRot = Axis.XP.rotation(rotate.x.toFloat())
+                        val rollRot = Axis.ZP.rotation(rotate.z.toFloat())
+                        val quaternion = Quaterniond(yawRot).mul(Quaterniond(pitchRot)).mul(Quaterniond(rollRot))
+                        poseStack.mulPose(Quaternionf(quaternion))
+
+                        val offset = dummyInfo.offset
+
+                        val flag = dummyInfo.hideDummyWhileZooming && ClientEventHandler.zoomVehicle
+
+                        if (!flag) {
+                            entityRenderDispatcher.render(
+                                entity,
+                                offset.x,
+                                offset.y,
+                                offset.z,
+                                entityYaw,
+                                partialTicks,
+                                poseStack,
+                                buffer,
+                                packedLight
+                            )
+                        }
+
+                        poseStack.popPose()
+                    }
+                }
+            }
+        }
+    }
+
+    open fun transformCustomModelPart(
+        vehicle: T,
+        instance: BakedModelInstance,
+        poseStack: PoseStack,
+        entityYaw: Float,
+        partialTicks: Float
+    ) {
+        val boneGroups = getOrComputeBoneGroups(instance)
+
+        // 车轮
+        boneGroups.leftWheels.forEach {
+            it.rotation.rotationX(1.5f * leftWheelRot)
+        }
+        boneGroups.rightWheels.forEach {
+            it.rotation.rotationX(1.5f * rightWheelRot)
+        }
+        boneGroups.leftWheelsTurn.forEach {
+            val yawRot = Axis.YP.rotation(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+            val pitchRot = Axis.XP.rotation(1.5f * leftWheelRot)
+            val quaternion = Quaterniond(yawRot).mul(Quaterniond(pitchRot))
+            it.rotation.mul(Quaternionf(quaternion))
+        }
+        boneGroups.rightWheelsTurn.forEach {
+            val yawRot = Axis.YP.rotation(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+            val pitchRot = Axis.XP.rotation(1.5f * rightWheelRot)
+            val quaternion = Quaterniond(yawRot).mul(Quaterniond(pitchRot))
+            it.rotation.mul(Quaternionf(quaternion))
+        }
+
+        // 履带
+        boneGroups.leftTrackMove.forEachIndexed { index, bone ->
+            val t = wrap(leftTrack + getTrackDistance() * index, vehicle)
+            bone.y += getBoneMoveY(t)
+            bone.z += getBoneMoveZ(t)
+        }
+
+        boneGroups.rightTrackMove.forEachIndexed { index, bone ->
+            val t = wrap(rightTrack + getTrackDistance() * index, vehicle)
+            bone.y += getBoneMoveY(t)
+            bone.z += getBoneMoveZ(t)
+        }
+
+        boneGroups.leftTrackRot.forEachIndexed { index, bone ->
+            val t = wrap(leftTrack + getTrackDistance() * index, vehicle)
+            bone.rotation.rotationX(-getBoneRotX(t) * Mth.DEG_TO_RAD)
+        }
+
+        boneGroups.rightTrackRot.forEachIndexed { index, bone ->
+            val t = wrap(rightTrack + getTrackDistance() * index, vehicle)
+            bone.rotation.rotationX(-getBoneRotX(t) * Mth.DEG_TO_RAD)
+        }
+
+        // 瞄准时隐藏车体
+        val root = instance.getBone("root")
+        if (root != null && hideForTurretControllerWhileZooming()) {
+            root.visible = !hideForTurretControllerWhileZooming
+        }
+
+        // 瞄准时隐藏乘客武器站
+        val passengerWeaponStation = instance.getBone("passengerWeaponStation")
+        if (passengerWeaponStation != null && hideForTurretControllerWhileZooming()) {
+            passengerWeaponStation.visible = !hideForPassengerWeaponStationControllerWhileZooming
+        }
+
+        // 射击时带来的车体摇晃视觉效果
+        val base = instance.getBone("base")
+        if (base != null) {
+            val a = vehicle.yawWhileShoot
+            val r = (Mth.abs(a) - 90f) / 90f
+
+            val r2 = if (Mth.abs(a) <= 90f) {
+                a / 90f
+            } else {
+                if (a < 0) {
+                    -(180f + a) / 90f
+                } else {
+                    (180f - a) / 90f
+                }
+            }
+
+            base.x = -r2 * recoilShake * 0.5f
+            base.z = r * recoilShake
+
+            val pitch = Axis.XP.rotationDegrees(r * recoilShake)
+            val roll = Axis.ZP.rotationDegrees(r2 * recoilShake)
+            val quaternion = Quaterniond(pitch).mul(Quaterniond(roll))
+            base.rotation.mul(Quaternionf(quaternion))
+        }
+
+        val shipYaw = vehicle.vehicle?.let {
+            if (!ValkyrienSkiesCompat.hasMod()) null
+            else ValkyrienSkiesCompat.getShipYaw(it)
+        } ?: 0f
+
+        // Turret
+        val turret = instance.getBone("turret")
+        if (turret != null) {
+            turret.rotation.rotationY((turretYRot + shipYaw) * Mth.DEG_TO_RAD)
+            turret.visible = !(vehicle.isWreck && vehicle.hasTurret() && vehicle.sympatheticDetonated)
+        }
+
+        // Barrel
+        val barrel = instance.getBone("barrel")
+        if (barrel != null) {
+            val rot = Mth.clamp(-turretXRot, vehicle.turretMinPitch, vehicle.turretMaxPitch) * Mth.DEG_TO_RAD
+            barrel.rotation.rotationX(rot)
+        }
+
+        // 乘客武器站
+        val passengerWeaponStationYaw = instance.getBone("passengerWeaponStationYaw")
+        passengerWeaponStationYaw?.rotation?.rotationY(
+            Mth.lerp(
+                partialTicks,
+                vehicle.gunYRotO,
+                vehicle.gunYRot
+            ) * Mth.DEG_TO_RAD - turretYRot * Mth.DEG_TO_RAD
+        )
+
+        val passengerWeaponStationPitch = instance.getBone("passengerWeaponStationPitch")
+        passengerWeaponStationPitch?.rotation?.rotationX(
+            Mth.clamp(
+                -Mth.lerp(
+                    partialTicks,
+                    vehicle.gunXRotO,
+                    vehicle.gunXRot
+                ) * Mth.DEG_TO_RAD,
+                vehicle.passengerWeaponMinPitch * Mth.DEG_TO_RAD,
+                vehicle.passengerWeaponMaxPitch * Mth.DEG_TO_RAD
+            )
+        )
+
+        // 武器绑定骨骼
+        val seats = this.seatsCache ?: vehicle.computed().seats().also { this.seatsCache = it }
+
+        for ((index, seat) in seats.withIndex()) {
+            for (k in seat.weapons().indices) {
+                val data = vehicle.getGunData(index, k) ?: continue
+                val defaultVec = vehicle.getDefaultBarrelDirection(index, partialTicks) ?: continue
+                val targetVec = vehicle.getShootVec(index, partialTicks) ?: continue
+                if (vehicle.getNthEntity(index) == null) continue
+                val boundBones = data.get(GunProp.BOUND_BONES)
+                val boundBonesYaw = data.get(GunProp.BOUND_BONES_YAW)
+                val boundBonesPitch = data.get(GunProp.BOUND_BONES_PITCH)
+
+                if (boundBones != null) {
+                    for (name in boundBones) {
+                        val bone = instance.getBone(name)
+                        if (bone != null) {
+                            // TODO 期待后人智慧，万一哪天正确实现了获取骨骼朝向
+                            val diffY = Mth.wrapDegrees(
+                                -VehicleVecUtils.getYRotFromVector(targetVec) + VehicleVecUtils.getYRotFromVector(defaultVec)
+                            ).toFloat()
+                            val diffX = Mth.wrapDegrees(
+                                -VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(defaultVec)
+                            ).toFloat()
+
+                            val yawRot = Axis.YP.rotationDegrees(-diffY)
+                            val pitchRot = Axis.XP.rotationDegrees(-diffX)
+
+                            val quaternion = Quaterniond(yawRot).mul(Quaterniond(pitchRot))
+                            bone.rotation.mul(Quaternionf(quaternion))
+                        }
+                    }
+                }
+
+                if (boundBonesYaw != null) {
+                    for (name in boundBonesYaw) {
+                        val bone = instance.getBone(name)
+                        if (bone != null) {
+                            val diffY = Mth.wrapDegrees(
+                                -VehicleVecUtils.getYRotFromVector(targetVec) + VehicleVecUtils.getYRotFromVector(defaultVec)
+                            ).toFloat()
+
+                            val yawRot = Axis.YP.rotationDegrees(-diffY)
+
+                            val quaternion = Quaterniond(yawRot)
+                            bone.rotation.mul(Quaternionf(quaternion))
+                        }
+                    }
+                }
+
+                if (boundBonesPitch != null) {
+                    for (name in boundBonesPitch) {
+                        val bone = instance.getBone(name)
+                        if (bone != null) {
+                            val diffX = Mth.wrapDegrees(
+                                -VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(defaultVec)
+                            ).toFloat()
+
+                            val pitchRot = Axis.XP.rotationDegrees(-diffX)
+
+                            val quaternion = Quaterniond(pitchRot)
+                            bone.rotation.mul(Quaternionf(quaternion))
+                        }
+                    }
+                }
+            }
+        }
+
+        this.transformCustomModelPartByScript(vehicle, instance, poseStack, entityYaw, partialTicks)
+    }
+
+    /**
+     * Script-based bone transforms. In V2, vehicle scripts use V1 BedrockVehicleModel API.
+     * Override this in specific renderers to add script support if needed.
+     * For now, this is a no-op since VehicleScriptManager.invokeTransform takes V1 model type.
+     */
+    open fun transformCustomModelPartByScript(
+        vehicle: T,
+        instance: BakedModelInstance,
+        poseStack: PoseStack,
+        entityYaw: Float,
+        partialTicks: Float
+    ) {
+        // TODO: adapt VehicleScriptManager for V2 model type when script support is needed
+    }
+
+    open fun rotateVehicleAxis(entityIn: T, poseStack: PoseStack, entityYaw: Float, partialTicks: Float) {
+        val root = Vec3(0.0, entityIn.rotateOffsetHeight, 0.0)
+        poseStack.rotateAround(
+            Axis.YP.rotationDegrees(-entityYaw + 180),
+            root.x.toFloat(),
+            root.y.toFloat(),
+            root.z.toFloat()
+        )
+        poseStack.rotateAround(
+            Axis.XP.rotationDegrees(
+                -Mth.lerp(
+                    partialTicks,
+                    entityIn.xRotO + entityIn.fakePitchO,
+                    entityIn.xRot + entityIn.fakePitch
+                )
+            ),
+            root.x.toFloat(),
+            root.y.toFloat(),
+            root.z.toFloat()
+        )
+        poseStack.rotateAround(
+            Axis.ZP.rotationDegrees(
+                -Mth.lerp(
+                    partialTicks,
+                    entityIn.prevRoll + entityIn.fakeRollO,
+                    entityIn.roll + entityIn.fakeRoll
+                )
+            ),
+            root.x.toFloat(),
+            root.y.toFloat(),
+            root.z.toFloat()
+        )
+    }
+
+    open fun hideForTurretControllerWhileZooming() = false
+
+    open fun getCurrentModelEntry(poseStack: PoseStack, vehicle: T): VehicleModelEntry? {
+        val entries = vehicle.getModelEntries()
+        return selectModelEntry(entries, poseStack)
+    }
+
+    override fun shouldRender(vehicle: T, pCamera: Frustum, pCamX: Double, pCamY: Double, pCamZ: Double): Boolean {
+        if (!vehicle.shouldRender(pCamX, pCamY, pCamZ)) {
+            return false
+        } else if (vehicle.noCulling) {
+            return true
+        } else {
+            var aabb = VehicleMotionUtils.calculateCombinedAABBOptimized(vehicle).inflate(3.0)
+
+            if (aabb.hasNaN() || aabb.getSize() == 0.0) {
+                aabb = AABB(
+                    vehicle.x - 8.0,
+                    vehicle.y - 6.0,
+                    vehicle.z - 8.0,
+                    vehicle.x + 8.0,
+                    vehicle.y + 6.0,
+                    vehicle.z + 8.0
+                )
+            }
+
+            return pCamera.isVisible(aabb)
+        }
+    }
+
+    open fun getBoneRotX(t: Float) = t
+
+    open fun getBoneMoveY(t: Float) = t
+
+    open fun getBoneMoveZ(t: Float) = t
+
+    open fun getTrackDistance() = 2f
+
+    protected fun wrap(value: Float, range: Int) = ((value % range) + range) % range
+
+    protected fun wrap(value: Float, vehicle: VehicleEntity) = wrap(value, getDefaultWrapRange(vehicle))
+
+    fun getDefaultWrapRange(vehicle: VehicleEntity) = vehicle.getTrackAnimationLength()
+
+    // --- Bone group computation for V2 ---
+
+    data class ModelBoneGroups(
+        val leftWheels: List<BoneState>,
+        val rightWheels: List<BoneState>,
+        val leftWheelsTurn: List<BoneState>,
+        val rightWheelsTurn: List<BoneState>,
+        val leftTrackMove: List<BoneState>,
+        val leftTrackRot: List<BoneState>,
+        val rightTrackMove: List<BoneState>,
+        val rightTrackRot: List<BoneState>,
+        val shell: List<BoneState>,
+        val flareBones: List<BoneState>,
+        val laserBones: List<BoneState>,
+        val dogTagBones: List<BoneState>,
+    )
+
+    private fun getOrComputeBoneGroups(instance: BakedModelInstance): ModelBoneGroups {
+        val baseModel = instance.baseModel()
+        if (boneGroupsCacheKey === baseModel && boneGroupsCache != null) {
+            return boneGroupsCache!!
+        }
+
+        val groups = computeBoneGroups(instance)
+        boneGroupsCache = groups
+        boneGroupsCacheKey = baseModel
+        return groups
+    }
+
+    companion object {
+        val BLENDER: EulerAdditiveBlender = SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }
+        val MUZZLE_FLARE = Mod.loc("textures/particle/flare.png")
+        val MUZZLE_FLARE_MODEL = Mod.loc("models/bedrock/vehicle/muzzle_flare.geo.json")
+        val LASER_TEX_IN = Mod.loc("textures/bedrock/vehicle/laser_in.png")
+        val LASER_TEX = Mod.loc("textures/bedrock/vehicle/laser.png")
+
+        @JvmField
+        val WHEEL_PATTERN: Pattern = Pattern.compile("^wheel(?<direction>[LR]).*$")
+
+        @JvmField
+        val W_PATTERN: Pattern = Pattern.compile("^w_(?<direction>[lLrR]).*$")
+
+        @JvmField
+        val SHELL_PATTERN: Pattern = Pattern.compile("^shell(?<id>\\d+)$")
+
+        @JvmField
+        val TRACK_PATTERN: Pattern = Pattern.compile("^track(?<type>Mov|Rot)(?<direction>[LR])(?<id>\\d+)$")
+
+        @JvmField
+        val FLARE_PATTERN: Pattern = Pattern.compile("^flare.*")
+
+        @JvmField
+        val LASER_PATTERN: Pattern = Pattern.compile("^laser.*")
+
+        @JvmField
+        val DOG_TAG_PATTERN: Pattern = Pattern.compile("^.*_dogTag$")
+
+        @JvmStatic
+        fun selectModelEntry(entries: List<VehicleModelEntry>, poseStack: PoseStack): VehicleModelEntry? {
+            if (entries.isEmpty()) return null
+            entries.forEachIndexed { index, entry ->
+                if (index == 0) return@forEachIndexed  // skip main model (distance = 0)
+                if (RenderDistanceHelper.shouldRenderLOD(poseStack, entry.lodDistance.toDouble())) {
+                    return entry
+                }
+            }
+            return entries.firstOrNull()
+        }
+
+        fun computeBoneGroups(instance: BakedModelInstance): ModelBoneGroups {
+            val leftWheels = mutableListOf<BoneState>()
+            val rightWheels = mutableListOf<BoneState>()
+            val leftWheelsTurn = mutableListOf<BoneState>()
+            val rightWheelsTurn = mutableListOf<BoneState>()
+
+            val tempShell = hashMapOf<Int, BoneState>()
+
+            val leftTrackMove = hashMapOf<Int, BoneState>()
+            val leftTrackRot = hashMapOf<Int, BoneState>()
+            val rightTrackMove = hashMapOf<Int, BoneState>()
+            val rightTrackRot = hashMapOf<Int, BoneState>()
+
+            val flareBones = mutableListOf<BoneState>()
+            val laserBones = mutableListOf<BoneState>()
+
+            val dogTagBones = mutableListOf<BoneState>()
+
+            for (bone in instance.boneIndexes) {
+                val name = bone.name()
+
+                val wheelMatcher = WHEEL_PATTERN.matcher(name)
+                if (wheelMatcher.matches()) {
+                    val left = wheelMatcher.group("direction") == "L"
+                    val turn = name.endsWith("Turn")
+
+                    if (left) {
+                        if (turn) {
+                            leftWheelsTurn += bone
+                        } else {
+                            leftWheels += bone
+                        }
+                    } else {
+                        if (turn) {
+                            rightWheelsTurn += bone
+                        } else {
+                            rightWheels += bone
+                        }
+                    }
+                }
+
+                // Also match w_ prefix wheel bones (e.g. w_lb, w_rb, w_lr, w_rr)
+                val wMatcher = W_PATTERN.matcher(name)
+                if (wMatcher.matches()) {
+                    val left = wMatcher.group("direction").lowercase() == "l"
+                    val turn = name.endsWith("Turn")
+
+                    if (left) {
+                        if (turn) {
+                            leftWheelsTurn += bone
+                        } else {
+                            leftWheels += bone
+                        }
+                    } else {
+                        if (turn) {
+                            rightWheelsTurn += bone
+                        } else {
+                            rightWheels += bone
+                        }
+                    }
+                }
+
+                val shellMatcher = SHELL_PATTERN.matcher(name)
+                if (shellMatcher.matches()) {
+                    val index = shellMatcher.group("id").toInt()
+                    tempShell[index] = bone
+                }
+
+                val trackMatcher = TRACK_PATTERN.matcher(name)
+                if (trackMatcher.matches()) {
+                    val isRot = trackMatcher.group("type") == "Rot"
+                    val isL = trackMatcher.group("direction") == "L"
+                    val index = trackMatcher.group("id").toInt()
+
+                    if (isRot) {
+                        if (isL) {
+                            leftTrackRot[index] = bone
+                        } else {
+                            rightTrackRot[index] = bone
+                        }
+                    } else {
+                        if (isL) {
+                            leftTrackMove[index] = bone
+                        } else {
+                            rightTrackMove[index] = bone
+                        }
+                    }
+                }
+
+                val flareMatcher = FLARE_PATTERN.matcher(name)
+                if (flareMatcher.matches()) {
+                    flareBones += bone
+                }
+
+                val laserMatcher = LASER_PATTERN.matcher(name)
+                if (laserMatcher.matches()) {
+                    laserBones += bone
+                }
+
+                val dogTagMatcher = DOG_TAG_PATTERN.matcher(name)
+                if (dogTagMatcher.matches()) {
+                    dogTagBones += bone
+                }
+            }
+
+            return ModelBoneGroups(
+                leftWheels = leftWheels,
+                rightWheels = rightWheels,
+                leftWheelsTurn = leftWheelsTurn,
+                rightWheelsTurn = rightWheelsTurn,
+                leftTrackMove = leftTrackMove.toSortedMap().values.toMutableList(),
+                leftTrackRot = leftTrackRot.toSortedMap().values.toMutableList(),
+                rightTrackMove = rightTrackMove.toSortedMap().values.toMutableList(),
+                rightTrackRot = rightTrackRot.toSortedMap().values.toMutableList(),
+                shell = tempShell.toSortedMap().values.toMutableList(),
+                flareBones = flareBones,
+                laserBones = laserBones,
+                dogTagBones = dogTagBones,
+            )
+        }
+
+        private fun vertex(
+            pConsumer: VertexConsumer,
+            pPose: Matrix4f,
+            pNormal: Matrix3f,
+            pLightmapUV: Int,
+            pX: Float,
+            pY: Float,
+            pU: Int,
+            pV: Int,
+        ) {
+            pConsumer.vertex(pPose, pX - 0.5f, pY - 0.25f, 0f).color(255, 255, 255, 255).uv(pU.toFloat(), pV.toFloat())
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(pLightmapUV).normal(pNormal, 0f, 1f, 0f).endVertex()
+        }
+
+        private fun vertex(
+            pConsumer: VertexConsumer,
+            pPose: Matrix4f,
+            pNormal: Matrix3f,
+            pX: Float,
+            pZ: Float,
+            pU: Int,
+            pV: Int,
+            color: Quaternionf
+        ) {
+            pConsumer.vertex(pPose, pX, 0f, -pZ)
+                .color(color.x.toInt(), color.y.toInt(), color.z.toInt(), color.w.toInt())
+                .uv(pU.toFloat(), pV.toFloat())
+                .overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(pNormal, 0f, 1f, 0f)
+                .endVertex()
+        }
+    }
+}
