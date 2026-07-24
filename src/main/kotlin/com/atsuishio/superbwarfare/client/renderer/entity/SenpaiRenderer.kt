@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.living.SenpaiEntity
-import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
@@ -34,9 +33,8 @@ class SenpaiRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
         pBuffer: MultiBufferSource,
         pPackedLight: Int
     ) {
-        val model = EntityModelReloadListener.getModel(MODEL) ?: return
         val ani = pEntity.animationInstance ?: return
-        val instance = model.createInstance()
+        val instance = pEntity.modelInstance ?: return
 
         pPoseStack.pushPose()
         pPoseStack.mulPose(Axis.YP.rotationDegrees(180f))
@@ -44,7 +42,7 @@ class SenpaiRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
 
         ani.context.partialTick = pPartialTick
         ani.tick()
-        instance.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+        instance.applyPose(BLENDER.blend(instance.bindPose, ani.getPose()))
 
         instance.renderToBuffer(
             pPoseStack,
@@ -60,6 +58,5 @@ class SenpaiRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
     companion object {
         var TEXTURE = loc("textures/bedrock/entity/senpai.png")
         val BLENDER: EulerAdditiveBlender = SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }
-        val MODEL = loc("models/bedrock/entity/senpai.geo.json")
     }
 }

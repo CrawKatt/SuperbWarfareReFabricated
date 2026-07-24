@@ -1,9 +1,11 @@
 package com.atsuishio.superbwarfare.entity.misc
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
+import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.Packet
@@ -24,6 +26,8 @@ import net.minecraftforge.network.NetworkHooks
 import kotlin.math.max
 
 open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, world: Level) : Entity(type, world) {
+
+    open val modelInstance = EntityModelReloadListener.getModel(MODEL)?.createInstance()
 
     override fun getAddEntityPacket(): Packet<ClientGamePacketListener> {
         return NetworkHooks.getEntitySpawningPacket(this)
@@ -143,6 +147,8 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
 
     companion object {
         const val TOWED_BY_SHUTTLE_TAG_KEY = "TowedByShuttle"
+
+        val MODEL = loc("models/bedrock/entity/catapult_shuttle.geo.json")
 
         @JvmField
         val TOWING_UUID: EntityDataAccessor<String> =

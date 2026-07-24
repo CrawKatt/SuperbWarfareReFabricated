@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
-import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
@@ -26,8 +25,7 @@ class CatapultShuttleRenderer(renderManager: EntityRendererProvider.Context) :
         bufferIn: MultiBufferSource,
         packedLightIn: Int
     ) {
-        val model = EntityModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = entityIn.modelInstance ?: return
 
         poseStack.pushPose()
         poseStack.mulPose(Axis.YP.rotationDegrees(-entityYaw + 180f))
@@ -55,6 +53,5 @@ class CatapultShuttleRenderer(renderManager: EntityRendererProvider.Context) :
 
     companion object {
         val TEXTURE = loc("textures/bedrock/entity/catapult_shuttle.png")
-        val MODEL = loc("models/bedrock/entity/catapult_shuttle.geo.json")
     }
 }

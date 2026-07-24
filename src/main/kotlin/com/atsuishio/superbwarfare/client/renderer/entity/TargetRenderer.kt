@@ -29,9 +29,9 @@ class TargetRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        val model = EntityModelReloadListener.getModel(MODEL) ?: return
+        val model = EntityModelReloadListener.getModel(TargetEntity.MODEL) ?: return
         val ani = entity.animationInstance ?: return
-        val instance = model.createInstance()
+        val instance = entity.modelInstance ?: return
 
         poseStack.pushPose()
         poseStack.mulPose(Axis.YP.rotationDegrees(180f))
@@ -42,7 +42,7 @@ class TargetRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
 
         ani.context.partialTick = partialTick
         ani.tick()
-        instance.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+        instance.applyPose(BLENDER.blend(instance.bindPose, ani.getPose()))
 
         instance.renderToBuffer(
             poseStack,
@@ -76,6 +76,5 @@ class TargetRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
         val TEXTURE = loc("textures/bedrock/entity/target.png")
         val TEXTURE_E = loc("textures/bedrock/entity/target_e.png")
         val BLENDER: EulerAdditiveBlender = SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }
-        val MODEL = loc("models/bedrock/entity/target.geo.json")
     }
 }

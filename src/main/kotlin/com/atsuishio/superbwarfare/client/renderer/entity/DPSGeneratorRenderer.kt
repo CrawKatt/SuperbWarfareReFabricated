@@ -30,9 +30,9 @@ class DPSGeneratorRenderer(renderManager: EntityRendererProvider.Context) :
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        val model = EntityModelReloadListener.getModel(MODEL) ?: return
+        val model = EntityModelReloadListener.getModel(DPSGeneratorEntity.MODEL) ?: return
         val ani = entity.animationInstance ?: return
-        val instance = model.createInstance()
+        val instance = entity.modelInstance ?: return
 
         poseStack.pushPose()
         poseStack.mulPose(Axis.YP.rotationDegrees(180f))
@@ -43,7 +43,7 @@ class DPSGeneratorRenderer(renderManager: EntityRendererProvider.Context) :
 
         ani.context.partialTick = partialTick
         ani.tick()
-        instance.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+        instance.applyPose(BLENDER.blend(instance.bindPose, ani.getPose()))
 
         instance.renderToBuffer(
             poseStack,
@@ -78,6 +78,5 @@ class DPSGeneratorRenderer(renderManager: EntityRendererProvider.Context) :
             ArrayList<ResourceLocation>((0..7).map { loc("textures/bedrock/entity/dps_generator_tier_${it}.png") })
         val TEXTURE_E = loc("textures/bedrock/entity/dps_generator_e.png")
         val BLENDER: EulerAdditiveBlender = SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }
-        val MODEL = loc("models/bedrock/entity/dps_generator.geo.json")
     }
 }

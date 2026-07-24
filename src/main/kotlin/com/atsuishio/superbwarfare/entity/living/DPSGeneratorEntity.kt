@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.living
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage
 import com.atsuishio.superbwarfare.client.animation.entity.DPSGeneratorAnimationInstance
 import com.atsuishio.superbwarfare.entity.getValue
@@ -9,6 +10,7 @@ import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
 import com.atsuishio.superbwarfare.tools.FormatTool
 import com.atsuishio.superbwarfare.tools.playLocalSound
 import net.minecraft.commands.arguments.EntityAnchorArgument
@@ -48,6 +50,7 @@ import kotlin.math.roundToInt
 open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level) : LivingEntity(type, level){
     val animationInstance: DPSGeneratorAnimationInstance? =
         if (this.level().isClientSide) DPSGeneratorAnimationInstance(this) else null
+    open val modelInstance = EntityModelReloadListener.getModel(MODEL)?.createInstance()
     protected val energyStorage: SyncedEntityEnergyStorage =
         SyncedEntityEnergyStorage(5120, 0, 2560, this.entityData, ENERGY)
     val energyCap: LazyOptional<IEnergyStorage> = LazyOptional.of { energyStorage }
@@ -367,6 +370,8 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
         @JvmField
         val LEVEL: EntityDataAccessor<Int> =
             SynchedEntityData.defineId(DPSGeneratorEntity::class.java, EntityDataSerializers.INT)
+
+        val MODEL = loc("models/bedrock/entity/dps_generator.geo.json")
 
         @SubscribeEvent
         fun onDPSGeneratorDown(event: LivingDeathEvent) {

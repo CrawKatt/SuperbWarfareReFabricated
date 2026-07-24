@@ -1,10 +1,12 @@
 package com.atsuishio.superbwarfare.entity.living
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.animation.entity.SenpaiAnimationInstance
 import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.setValue
 import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
 import net.minecraft.core.BlockPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.Packet
@@ -35,6 +37,7 @@ import net.minecraftforge.network.NetworkHooks
 open class SenpaiEntity(type: EntityType<SenpaiEntity>, level: Level) : Monster(type, level) {
     open val animationInstance: SenpaiAnimationInstance? =
         if (this.level().isClientSide) SenpaiAnimationInstance(this) else null
+    open val modelInstance = EntityModelReloadListener.getModel(MODEL)?.createInstance()
     open var runner by RUNNER
 
     init {
@@ -157,5 +160,7 @@ open class SenpaiEntity(type: EntityType<SenpaiEntity>, level: Level) : Monster(
                 .add(Attributes.FOLLOW_RANGE, 64.0)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.5)
         }
+
+        val MODEL = loc("models/bedrock/entity/senpai.geo.json")
     }
 }
