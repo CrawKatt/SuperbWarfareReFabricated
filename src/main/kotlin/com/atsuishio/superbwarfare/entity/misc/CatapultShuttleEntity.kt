@@ -1,10 +1,12 @@
 package com.atsuishio.superbwarfare.entity.misc
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.setValue
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
+import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -22,6 +24,9 @@ import net.minecraft.world.level.Level
 import kotlin.math.max
 
 open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, world: Level) : Entity(type, world) {
+
+    open val modelInstance = EntityModelReloadListener.getModel(MODEL)?.createInstance()
+
     constructor(level: Level) : this(ModEntities.CATAPULT_SHUTTLE.get(), level)
 
     override fun isPickable(): Boolean {
@@ -134,6 +139,8 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
 
     companion object {
         const val TOWED_BY_SHUTTLE_TAG_KEY = "TowedByShuttle"
+
+        val MODEL = loc("models/bedrock/entity/catapult_shuttle.geo.json")
 
         @JvmField
         val TOWING_UUID: EntityDataAccessor<String> =

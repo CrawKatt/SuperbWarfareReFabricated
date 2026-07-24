@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.living.SteelCoilEntity
-import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
@@ -24,8 +23,7 @@ class SteelCoilRenderer(renderManager: EntityRendererProvider.Context) :
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        val model = EntityModelReloadListener.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val instance = entity.modelInstance ?: return
         val bone = instance.getBone("move_main") ?: return
 
         poseStack.pushPose()
@@ -54,6 +52,5 @@ class SteelCoilRenderer(renderManager: EntityRendererProvider.Context) :
     companion object {
         val TEXTURE = loc("textures/bedrock/entity/steel_coil.png")
         val TEXTURE_ALTER = loc("textures/bedrock/entity/steel_coil_alter.png")
-        val MODEL = loc("models/bedrock/entity/steel_coil.geo.json")
     }
 }
