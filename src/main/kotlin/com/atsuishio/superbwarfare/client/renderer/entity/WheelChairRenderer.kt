@@ -1,8 +1,9 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.entity.vehicle.VehicleModelEntry
 import com.atsuishio.superbwarfare.entity.vehicle.WheelChairEntity
-import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListenerV2
+import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
@@ -33,13 +34,12 @@ class WheelChairRenderer(manager: EntityRendererProvider.Context) : EntityRender
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        // Fetch model every frame to properly handle resource reloads
-        val model = VehicleModelReloadListenerV2.getModel(MODEL) ?: return
-        val instance = model.createInstance()
+        val entries = entity.getModelEntries()
+        if (entries.isEmpty()) return
+        val entry = selectModelEntry(entries, poseStack) ?: return
 
         poseStack.pushPose()
 
-        // Vehicle axis rotation (same as GeoVehicleRenderer.rotateVehicleAxis)
         val root = Vec3(0.0, entity.rotateOffsetHeight, 0.0)
         poseStack.rotateAround(
             Axis.YP.rotationDegrees(-entityYaw + 180f),
@@ -58,25 +58,19 @@ class WheelChairRenderer(manager: EntityRendererProvider.Context) : EntityRender
             root.x.toFloat(), root.y.toFloat(), root.z.toFloat()
         )
 
-        // Reset instance to bind pose before applying per-frame transforms
-        instance.resetPose()
-
-        // Wheel rotation
         val rightWheelRot = Mth.lerp(partialTicks, entity.rightWheelRotO, entity.rightWheelRot)
         val leftWheelRot = Mth.lerp(partialTicks, entity.leftWheelRotO, entity.leftWheelRot)
 
-        instance.getBone("w_rb")?.rotation?.rotationX(rightWheelRot)
-        instance.getBone("w_lb")?.rotation?.rotationX(leftWheelRot)
-        instance.getBone("w_rr")?.rotation?.rotationX(4f * rightWheelRot)
-        instance.getBone("w_lr")?.rotation?.rotationX(4f * leftWheelRot)
+        entry.instance.getBone("w_rb")?.rotation?.rotationX(rightWheelRot)
+        entry.instance.getBone("w_lb")?.rotation?.rotationX(leftWheelRot)
+        entry.instance.getBone("w_rr")?.rotation?.rotationX(4f * rightWheelRot)
+        entry.instance.getBone("w_lr")?.rotation?.rotationX(4f * leftWheelRot)
 
-        // Render with dual render types (translucent + cutout)
-        model.renderToBuffer(
-            instance,
+        entry.instance.renderToBuffer(
             poseStack,
             buffer,
-            RenderType.entityTranslucent(TEXTURE),
-            BedrockModelRenderTypes.polyMeshCutout(TEXTURE),
+            RenderType.entityTranslucent(entry.texture),
+            BedrockModelRenderTypes.polyMeshCutout(entry.texture),
             packedLight,
             OverlayTexture.NO_OVERLAY
         )
@@ -87,5 +81,18 @@ class WheelChairRenderer(manager: EntityRendererProvider.Context) : EntityRender
     companion object {
         val TEXTURE: ResourceLocation = Mod.loc("textures/bedrock/vehicle/wheel_chair.png")
         val MODEL: ResourceLocation = Mod.loc("models/bedrock/vehicle_v2/wheel_chair.geo.json")
+
+        // TODO 合并至geo renderer
+        @JvmStatic
+        fun selectModelEntry(entries: List<VehicleModelEntry>, poseStack: PoseStack): VehicleModelEntry? {
+            if (entries.isEmpty()) return null
+            entries.forEachIndexed { index, entry ->
+                if (index == 0) return@forEachIndexed  // skip main model (distance = 0)
+                if (RenderDistanceHelper.shouldRenderLOD(poseStack, entry.lodDistance.toDouble())) {
+                    return entry
+                }
+            }
+            return entries.firstOrNull()
+        }
     }
 }
