@@ -89,8 +89,6 @@ object ValkyrienSkiesCompat {
      */
     @JvmStatic
     fun toWorldSpace(entity: Entity): Vec3 {
-        if (!hasMod()) return entity.position()
-
         return try {
             val level = entity.level()
             val chunkX = entity.blockX shr 4
@@ -115,8 +113,6 @@ object ValkyrienSkiesCompat {
      */
     @JvmStatic
     fun toWorldPos(pos: Vec3, entity: Entity): Vec3 {
-        if (!hasMod()) return pos
-
         return try {
             val level = entity.level()
             val chunkX = entity.blockX shr 4
@@ -141,8 +137,6 @@ object ValkyrienSkiesCompat {
      */
     @JvmStatic
     fun toWorldDirection(entity: Entity, localDir: Vec3): Vec3 {
-        if (!hasMod()) return localDir
-
         return try {
             val level = entity.level()
             val chunkX = entity.blockX shr 4

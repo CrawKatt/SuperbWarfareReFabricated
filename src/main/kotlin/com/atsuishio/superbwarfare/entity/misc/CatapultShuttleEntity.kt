@@ -94,7 +94,9 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
             clearTowingInfo()
             return
         }
-        val shuttleWorldPos = ValkyrienSkiesCompat.toWorldSpace(this)
+        val shuttleWorldPos = if (ValkyrienSkiesCompat.hasMod())
+            ValkyrienSkiesCompat.toWorldSpace(this)
+        else this.position()
         val towedPos = towed.position()
 
         val dist = shuttleWorldPos.distanceTo(towedPos)
@@ -103,7 +105,9 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
 
         val minDist = longestSide + 1.5
 
-        val worldLookAngle = ValkyrienSkiesCompat.toWorldDirection(this, lookAngle)
+        val worldLookAngle = if (ValkyrienSkiesCompat.hasMod())
+            ValkyrienSkiesCompat.toWorldDirection(this, lookAngle)
+        else lookAngle
         if (shuttleWorldPos.vectorTo(towedPos).dot(worldLookAngle) > 0) {
             clearTowingInfo()
             return

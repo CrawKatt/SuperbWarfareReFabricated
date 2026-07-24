@@ -41,8 +41,7 @@ object TowingChainRenderer {
         val y = Mth.lerp(partialTick.toDouble(), entity.yo, entity.y) + height
         val z = Mth.lerp(partialTick.toDouble(), entity.zo, entity.z)
         val localPos = Vec3(x, y, z)
-        // Convert to world space if the entity is on a Valkyrien Skies ship
-        return ValkyrienSkiesCompat.toWorldPos(localPos, entity)
+        return if (ValkyrienSkiesCompat.hasMod()) ValkyrienSkiesCompat.toWorldPos(localPos, entity) else localPos
     }
 
     private fun renderTowChain(

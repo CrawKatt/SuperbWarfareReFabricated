@@ -118,9 +118,11 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
 
         // Shift+right-click on living entity: clear towing relationship / stored target
         if (player.isShiftKeyDown) {
-            val towedByShuttle = interactionTarget.persistentData.getString(CatapultShuttleEntity.TOWED_BY_SHUTTLE_TAG_KEY)
+            val towedByShuttle =
+                interactionTarget.persistentData.getString(CatapultShuttleEntity.TOWED_BY_SHUTTLE_TAG_KEY)
             if (towedByShuttle.isNotBlank()) {
-                val shuttle = EntityFindUtil.findEntity(interactionTarget.level(), towedByShuttle) as? CatapultShuttleEntity
+                val shuttle =
+                    EntityFindUtil.findEntity(interactionTarget.level(), towedByShuttle) as? CatapultShuttleEntity
                 shuttle?.clearTowingInfo()
                 interactionTarget.persistentData.remove(CatapultShuttleEntity.TOWED_BY_SHUTTLE_TAG_KEY)
 
@@ -230,10 +232,14 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
         }
 
         // Distance check — use world-space shuttle position for VS ship compatibility
-        val shuttleWorldPos = ValkyrienSkiesCompat.toWorldSpace(shuttle)
+        val shuttleWorldPos = if (ValkyrienSkiesCompat.hasMod())
+            ValkyrienSkiesCompat.toWorldSpace(shuttle)
+        else shuttle.position()
 
         // Don't allow connecting if target is in front of the shuttle
-        val worldLookAngle = ValkyrienSkiesCompat.toWorldDirection(shuttle, shuttle.lookAngle)
+        val worldLookAngle = if (ValkyrienSkiesCompat.hasMod())
+            ValkyrienSkiesCompat.toWorldDirection(shuttle, shuttle.lookAngle)
+        else shuttle.lookAngle
         if (shuttleWorldPos.vectorTo(targetEntity.position()).dot(worldLookAngle) > 0) {
             player.displayClientMessage(
                 Component.translatable("tips.superbwarfare.tow_bar.target_in_front")
