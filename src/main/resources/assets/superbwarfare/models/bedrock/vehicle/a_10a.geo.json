@@ -4556,7 +4556,7 @@
 					]
 				},
 				{
-					"name": "qianzhou",
+					"name": "move_qianzhou",
 					"parent": "engineL",
 					"pivot": [-19.845, 40.5, 39.2025],
 					"cubes": [
@@ -5774,7 +5774,7 @@
 					]
 				},
 				{
-					"name": "qianzhou2",
+					"name": "move_qianzhou2",
 					"parent": "engineR",
 					"pivot": [19.845, 40.5, 39.2025],
 					"cubes": [
@@ -5826,7 +5826,7 @@
 					"pivot": [-36.45, 24.60509, 70.36251]
 				},
 				{
-					"name": "weiyiL",
+					"name": "move_weiyiL",
 					"parent": "tailWing",
 					"pivot": [37.4625, 37.51135, 84.15805],
 					"cubes": [
@@ -5868,7 +5868,7 @@
 					]
 				},
 				{
-					"name": "weiyiR",
+					"name": "move_weiyiR",
 					"parent": "tailWing",
 					"pivot": [-37.4625, 37.51135, 84.15805],
 					"cubes": [
@@ -6024,7 +6024,7 @@
 					]
 				},
 				{
-					"name": "wingLB",
+					"name": "move_wingLB",
 					"parent": "hengweiyi",
 					"pivot": [19.74375, 29.3625, 85.01625],
 					"cubes": [
@@ -6043,7 +6043,7 @@
 					]
 				},
 				{
-					"name": "wingRB",
+					"name": "move_wingRB",
 					"parent": "hengweiyi",
 					"pivot": [-19.74375, 29.3625, 85.01625],
 					"cubes": [
@@ -6452,7 +6452,7 @@
 					]
 				},
 				{
-					"name": "wingLR",
+					"name": "move_wingLR",
 					"parent": "zuoyi",
 					"pivot": [77.84902, 28.70353, 9.15164],
 					"rotation": [0, 4, 0],
@@ -6474,7 +6474,7 @@
 					]
 				},
 				{
-					"name": "wingLR2",
+					"name": "move_wingLR2",
 					"parent": "zuoyi",
 					"pivot": [77.84902, 28.70353, 9.15164],
 					"rotation": [0, 4, 0],
@@ -6679,7 +6679,7 @@
 					]
 				},
 				{
-					"name": "wingRR",
+					"name": "move_wingRR",
 					"parent": "youyi",
 					"pivot": [-77.84902, 28.70353, 9.15164],
 					"rotation": [0, -4, 0],
@@ -6701,7 +6701,7 @@
 					]
 				},
 				{
-					"name": "wingRR2",
+					"name": "move_wingRR2",
 					"parent": "youyi",
 					"pivot": [-77.84902, 28.70353, 9.15164],
 					"rotation": [0, -4, 0],

@@ -23,7 +23,7 @@ class Plz05Renderer(manager: EntityRendererProvider.Context) : BasicArtilleryRen
     ) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
 
-        val tiTop1 = model.getBone("titop1")
+        val tiTop1 = model.getBone("move_titop1")
         tiTop1.visible = !(vehicle.getNthEntity(vehicle.turretControllerIndex) === localPlayer && options.cameraType == CameraType.FIRST_PERSON)
 
         val barrel = model.getBone("barrel")

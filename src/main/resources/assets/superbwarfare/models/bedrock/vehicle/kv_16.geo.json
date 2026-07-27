@@ -16,7 +16,7 @@
 					"pivot": [0, 1.6, 0]
 				},
 				{
-					"name": "propeller",
+					"name": "move_propeller",
 					"parent": "root",
 					"pivot": [0, 13.19155, -12.07308],
 					"cubes": [

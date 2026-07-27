@@ -22,11 +22,11 @@ class SpeedBoatRenderer(manager: EntityRendererProvider.Context) : BasicVehicleR
     ) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
 
-        val propeller = model.getBone("propeller")
-        val propeller2 = model.getBone("propeller2")
+        val propeller = model.getBone("move_propeller")
+        val propeller2 = model.getBone("move_propeller2")
         val turret = model.getBone("turret")
-        val control = model.getBone("control")
-        val rudder = model.getBone("rudder")
+        val control = model.getBone("move_control")
+        val rudder = model.getBone("move_rudder")
 
         propeller.rotation.rotationZ(Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
         propeller2.rotation.rotationZ(-Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))

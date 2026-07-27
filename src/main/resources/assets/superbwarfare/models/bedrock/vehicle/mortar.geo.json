@@ -16,13 +16,13 @@
 					"pivot": [0, 0, 0]
 				},
 				{
-					"name": "paoguan",
+					"name": "move_paoguan",
 					"parent": "mortar",
 					"pivot": [0, 3.2, 0]
 				},
 				{
 					"name": "bone2",
-					"parent": "paoguan",
+					"parent": "move_paoguan",
 					"pivot": [0, 3.2, 0],
 					"rotation": [90, 0, 0]
 				},
@@ -1055,7 +1055,7 @@
 					]
 				},
 				{
-					"name": "monitor",
+					"name": "move_monitor",
 					"parent": "paotong",
 					"pivot": [0, 16.92347, 0.00569],
 					"cubes": [
@@ -1272,13 +1272,13 @@
 					]
 				},
 				{
-					"name": "jiaojia",
+					"name": "move_jiaojia",
 					"parent": "bone2",
 					"pivot": [0, 18.9455, -3.01388]
 				},
 				{
 					"name": "bone",
-					"parent": "jiaojia",
+					"parent": "move_jiaojia",
 					"pivot": [0, 18.9455, -3.01388],
 					"rotation": [-167.5, 0, 0],
 					"cubes": [

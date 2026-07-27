@@ -19,8 +19,8 @@ class TowRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRendere
         partialTicks: Float
     ) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
-        val guanMiao = model.getBone("guanmiao")
-        val missile = model.getBone("missile")
+        val guanMiao = model.getBone("move_guanmiao")
+        val missile = model.getBone("move_missile")
 
         guanMiao.visible = !(vehicle.turretControllerIndex == vehicle.getSeatIndex(localPlayer)
                 && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))

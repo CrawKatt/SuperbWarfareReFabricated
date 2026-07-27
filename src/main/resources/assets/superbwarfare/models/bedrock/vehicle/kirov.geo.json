@@ -33266,7 +33266,7 @@
 					"pivot": [0, 464, 167.46667]
 				},
 				{
-					"name": "prop1",
+					"name": "move_prop1",
 					"parent": "FengineT",
 					"pivot": [0, 464, 177.06667],
 					"cubes": [
@@ -33288,7 +33288,7 @@
 				},
 				{
 					"name": "bone2",
-					"parent": "prop1",
+					"parent": "move_prop1",
 					"pivot": [0, 464, 177.06667],
 					"cubes": [
 						{
@@ -33431,7 +33431,7 @@
 				},
 				{
 					"name": "bone3",
-					"parent": "prop1",
+					"parent": "move_prop1",
 					"pivot": [0, 464, 176.53333],
 					"rotation": [0, 0, 90],
 					"cubes": [
@@ -33648,7 +33648,7 @@
 					"pivot": [0, 464, 167.46667]
 				},
 				{
-					"name": "prop2",
+					"name": "move_prop2",
 					"parent": "FengineL",
 					"pivot": [0, 464, 177.06667],
 					"cubes": [
@@ -33670,7 +33670,7 @@
 				},
 				{
 					"name": "bone4",
-					"parent": "prop2",
+					"parent": "move_prop2",
 					"pivot": [0, 464, 177.06667],
 					"cubes": [
 						{
@@ -33813,7 +33813,7 @@
 				},
 				{
 					"name": "bone5",
-					"parent": "prop2",
+					"parent": "move_prop2",
 					"pivot": [0, 464, 176.53333],
 					"rotation": [0, 0, 90],
 					"cubes": [
@@ -34030,7 +34030,7 @@
 					"pivot": [0, 133.33333, 167.46667]
 				},
 				{
-					"name": "prop3",
+					"name": "move_prop3",
 					"parent": "FengineR",
 					"pivot": [0, 133.33333, 177.06667],
 					"cubes": [
@@ -34052,7 +34052,7 @@
 				},
 				{
 					"name": "bone6",
-					"parent": "prop3",
+					"parent": "move_prop3",
 					"pivot": [0, 133.33333, 177.06667],
 					"cubes": [
 						{
@@ -34195,7 +34195,7 @@
 				},
 				{
 					"name": "bone7",
-					"parent": "prop3",
+					"parent": "move_prop3",
 					"pivot": [0, 133.33333, 176.53333],
 					"rotation": [0, 0, 90],
 					"cubes": [
@@ -34375,7 +34375,7 @@
 					"rotation": [-90, 0, 0]
 				},
 				{
-					"name": "prop4",
+					"name": "move_prop4",
 					"parent": "UengineL",
 					"pivot": [166.4, 328, 8.53333],
 					"rotation": [-90, 0, 0],
@@ -34398,7 +34398,7 @@
 				},
 				{
 					"name": "bone8",
-					"parent": "prop4",
+					"parent": "move_prop4",
 					"pivot": [166.4, 328, 9.06667],
 					"cubes": [
 						{
@@ -34541,7 +34541,7 @@
 				},
 				{
 					"name": "bone9",
-					"parent": "prop4",
+					"parent": "move_prop4",
 					"pivot": [166.4, 328, 8.53333],
 					"rotation": [0, 0, 90],
 					"cubes": [
@@ -34721,7 +34721,7 @@
 					"rotation": [-90, 0, 0]
 				},
 				{
-					"name": "prop5",
+					"name": "move_prop5",
 					"parent": "UengineR",
 					"pivot": [-166.4, 328, 8.53333],
 					"rotation": [-90, 0, 0],
@@ -34744,7 +34744,7 @@
 				},
 				{
 					"name": "bone10",
-					"parent": "prop5",
+					"parent": "move_prop5",
 					"pivot": [-166.4, 328, 9.06667],
 					"cubes": [
 						{
@@ -34887,7 +34887,7 @@
 				},
 				{
 					"name": "bone11",
-					"parent": "prop5",
+					"parent": "move_prop5",
 					"pivot": [-166.4, 328, 8.53333],
 					"rotation": [0, 0, -90],
 					"cubes": [
@@ -35206,7 +35206,7 @@
 					]
 				},
 				{
-					"name": "controlP",
+					"name": "move_controlP",
 					"parent": "seat",
 					"pivot": [8, 134.85, -238.5],
 					"cubes": [
@@ -35396,7 +35396,7 @@
 					]
 				},
 				{
-					"name": "rudder",
+					"name": "move_rudder",
 					"parent": "control",
 					"pivot": [0, 143.35, -246.5],
 					"cubes": [
@@ -35429,7 +35429,7 @@
 				},
 				{
 					"name": "pan",
-					"parent": "rudder",
+					"parent": "move_rudder",
 					"pivot": [0, 143.35, -245.5],
 					"cubes": [
 						{
@@ -35484,7 +35484,7 @@
 				},
 				{
 					"name": "pan2",
-					"parent": "rudder",
+					"parent": "move_rudder",
 					"pivot": [0, 143.35, -245.75],
 					"cubes": [
 						{

@@ -4920,7 +4920,7 @@
 					]
 				},
 				{
-					"name": "shoulunx",
+					"name": "move_shoulunx",
 					"parent": "turret",
 					"pivot": [12.5125, 16.5425, 2.99],
 					"cubes": [
@@ -4966,7 +4966,7 @@
 				},
 				{
 					"name": "shoulunpanx",
-					"parent": "shoulunx",
+					"parent": "move_shoulunx",
 					"pivot": [12.44945, 16.4125, 0],
 					"cubes": [
 						{
@@ -5022,7 +5022,7 @@
 					]
 				},
 				{
-					"name": "shouluny",
+					"name": "move_shouluny",
 					"parent": "turret",
 					"pivot": [9.91445, 7.9625, 9.88],
 					"cubes": [
@@ -5043,7 +5043,7 @@
 				},
 				{
 					"name": "shoulunpany",
-					"parent": "shouluny",
+					"parent": "move_shouluny",
 					"pivot": [9.91445, 7.9625, 9.88],
 					"rotation": [0, -90, 0],
 					"cubes": [

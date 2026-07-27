@@ -22,8 +22,8 @@ class PrismTankRenderer(manager: EntityRendererProvider.Context) : GeoVehicleRen
     ) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
 
-        val fanL = model.getBone("fanL")
-        val fanR = model.getBone("fanR")
+        val fanL = model.getBone("move_fanL")
+        val fanR = model.getBone("move_fanR")
 
         val rot = (System.currentTimeMillis() % 36000000) / 75f
 

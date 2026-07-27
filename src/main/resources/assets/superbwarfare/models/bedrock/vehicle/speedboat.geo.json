@@ -1512,7 +1512,7 @@
 					"rotation": [22.5, 0, 0]
 				},
 				{
-					"name": "control",
+					"name": "move_control",
 					"parent": "fxp",
 					"pivot": [-0.01581, 24.6022, -15.30523],
 					"cubes": [
@@ -1650,7 +1650,7 @@
 					]
 				},
 				{
-					"name": "rudder",
+					"name": "move_rudder",
 					"parent": "root",
 					"pivot": [0, 9.6672, 51.27234],
 					"cubes": [
@@ -1708,7 +1708,7 @@
 					]
 				},
 				{
-					"name": "propeller",
+					"name": "move_propeller",
 					"parent": "root",
 					"pivot": [7.98, 3.078, 46.056],
 					"cubes": [
@@ -1743,7 +1743,7 @@
 				},
 				{
 					"name": "bone5",
-					"parent": "propeller",
+					"parent": "move_propeller",
 					"pivot": [7.98, 3.078, 54.264],
 					"cubes": [
 						{
@@ -1808,7 +1808,7 @@
 				},
 				{
 					"name": "bone6",
-					"parent": "propeller",
+					"parent": "move_propeller",
 					"pivot": [7.98, 3.078, 54.264],
 					"rotation": [0, 0, 90],
 					"cubes": [
@@ -1874,7 +1874,7 @@
 				},
 				{
 					"name": "bone7",
-					"parent": "propeller",
+					"parent": "move_propeller",
 					"pivot": [7.98, 3.078, 54.264],
 					"rotation": [0, 0, -180],
 					"cubes": [
@@ -1940,7 +1940,7 @@
 				},
 				{
 					"name": "bone8",
-					"parent": "propeller",
+					"parent": "move_propeller",
 					"pivot": [7.98, 3.078, 54.264],
 					"rotation": [0, 0, -90],
 					"cubes": [
@@ -2005,7 +2005,7 @@
 					]
 				},
 				{
-					"name": "propeller2",
+					"name": "move_propeller2",
 					"parent": "root",
 					"pivot": [-7.98, 3.078, 46.056],
 					"cubes": [
@@ -2040,7 +2040,7 @@
 				},
 				{
 					"name": "bone13",
-					"parent": "propeller2",
+					"parent": "move_propeller2",
 					"pivot": [-7.98, 3.078, 54.264],
 					"cubes": [
 						{
@@ -2105,7 +2105,7 @@
 				},
 				{
 					"name": "bone15",
-					"parent": "propeller2",
+					"parent": "move_propeller2",
 					"pivot": [-7.98, 3.078, 54.264],
 					"rotation": [0, 0, -90],
 					"cubes": [
@@ -2171,7 +2171,7 @@
 				},
 				{
 					"name": "bone16",
-					"parent": "propeller2",
+					"parent": "move_propeller2",
 					"pivot": [-7.98, 3.078, 54.264],
 					"rotation": [0, 0, 180],
 					"cubes": [
@@ -2237,7 +2237,7 @@
 				},
 				{
 					"name": "bone17",
-					"parent": "propeller2",
+					"parent": "move_propeller2",
 					"pivot": [-7.98, 3.078, 54.264],
 					"rotation": [0, 0, 90],
 					"cubes": [

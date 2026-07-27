@@ -464,7 +464,7 @@
 					]
 				},
 				{
-					"name": "guangdian",
+					"name": "move_guangdian",
 					"parent": "paota",
 					"pivot": [-16.79152, 58.87326, 21.68732],
 					"cubes": [
@@ -4685,13 +4685,13 @@
 					]
 				},
 				{
-					"name": "Track",
+					"name": "move_Track",
 					"parent": "root",
 					"pivot": [0, 0, 0]
 				},
 				{
 					"name": "Wheel",
-					"parent": "Track",
+					"parent": "move_Track",
 					"pivot": [-0.17338, 4.98284, 0.37702]
 				},
 				{
@@ -5908,7 +5908,7 @@
 				},
 				{
 					"name": "TrackR",
-					"parent": "Track",
+					"parent": "move_Track",
 					"pivot": [-20.898, 1.0836, -6.708]
 				},
 				{
@@ -7348,7 +7348,7 @@
 				},
 				{
 					"name": "TrackL",
-					"parent": "Track",
+					"parent": "move_Track",
 					"pivot": [0, 0, 0]
 				},
 				{

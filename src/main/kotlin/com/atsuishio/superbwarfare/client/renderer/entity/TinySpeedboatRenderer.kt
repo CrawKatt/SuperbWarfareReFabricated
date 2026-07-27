@@ -23,8 +23,8 @@ class TinySpeedboatRenderer(manager: EntityRendererProvider.Context) :
         partialTicks: Float
     ) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
-        val control = model.getBone("control")
-        val rudder = model.getBone("rudder")
+        val control = model.getBone("move_control")
+        val rudder = model.getBone("move_rudder")
 
         control.rotation.rotationZ(-3 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
         rudder.rotation.rotationY(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))

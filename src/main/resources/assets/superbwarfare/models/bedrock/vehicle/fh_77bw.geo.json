@@ -16,13 +16,13 @@
 					"pivot": [0, 0, 0]
 				},
 				{
-					"name": "hmg",
+					"name": "move_hmg",
 					"parent": "root",
 					"pivot": [11.83803, 68.70908, -73.62406]
 				},
 				{
 					"name": "hmgYaw",
-					"parent": "hmg",
+					"parent": "move_hmg",
 					"pivot": [11.83803, 72.03145, -74.42725],
 					"cubes": [
 						{
@@ -1317,7 +1317,7 @@
 					"rotation": [-25, 0, 0]
 				},
 				{
-					"name": "control",
+					"name": "move_control",
 					"parent": "fxp",
 					"pivot": [0, 51.91984, -100.60644],
 					"cubes": [
@@ -1394,7 +1394,7 @@
 				},
 				{
 					"name": "bone5",
-					"parent": "control",
+					"parent": "move_control",
 					"pivot": [0, 51.91987, -100.60648],
 					"cubes": [
 						{
@@ -6721,7 +6721,7 @@
 					]
 				},
 				{
-					"name": "yeyagan",
+					"name": "move_yeyagan",
 					"parent": "turret",
 					"pivot": [0, 34.6956, 96.13365],
 					"cubes": [
@@ -8333,7 +8333,7 @@
 					}
 				},
 				{
-					"name": "yeya",
+					"name": "move_yeya",
 					"parent": "barrel",
 					"pivot": [14.325, 46.50686, 82.05758],
 					"cubes": [

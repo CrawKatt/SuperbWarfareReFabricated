@@ -44,11 +44,11 @@ class Fh88bwRenderer(manager: EntityRendererProvider.Context) : BasicArtilleryRe
                     -32.1847 * cos(pitch) + 9.4012 * sin(pitch) + 18.1086
                 )
 
-        model.getBone("yeyagan")?.rotation?.rotationX(b.toFloat())
-        model.getBone("yeya")?.rotation?.rotationX((b - angle).toFloat())
-        model.getBone("control")?.rotation?.rotationY(12 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        model.getBone("move_yeyagan")?.rotation?.rotationX(b.toFloat())
+        model.getBone("move_yeya")?.rotation?.rotationX((b - angle).toFloat())
+        model.getBone("move_control")?.rotation?.rotationY(12 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
 
-        model.getBone("hmg")?.visible =
+        model.getBone("move_hmg")?.visible =
             !(localPlayer == vehicle.getNthEntity(2) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
     }
 }

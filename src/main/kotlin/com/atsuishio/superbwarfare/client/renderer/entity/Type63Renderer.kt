@@ -10,8 +10,8 @@ class Type63Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRend
 
     override fun transformCustomModelPart(vehicle: VehicleEntity, model: BedrockVehicleModel, poseStack: PoseStack, entityYaw: Float, partialTicks: Float) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
-        val shouLunX = model.getBone("shoulunx")
-        val shouLunY = model.getBone("shouluny")
+        val shouLunX = model.getBone("move_shoulunx")
+        val shouLunY = model.getBone("move_shouluny")
 
         if (shouLunX != null && shouLunY != null) {
             shouLunX.rotation.rotationX(-turretXRot * 3)

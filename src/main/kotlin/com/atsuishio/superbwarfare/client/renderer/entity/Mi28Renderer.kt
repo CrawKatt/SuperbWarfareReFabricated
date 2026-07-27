@@ -16,8 +16,8 @@ class Mi28Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRender
     ) {
 
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
-        val propeller = model.getBone("propeller")
-        val tailPropeller = model.getBone("tailPropeller")
+        val propeller = model.getBone("move_propeller")
+        val tailPropeller = model.getBone("move_tailPropeller")
 
         propeller.rotation.rotateY(-Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
         tailPropeller.rotation.rotateX(6 * Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))

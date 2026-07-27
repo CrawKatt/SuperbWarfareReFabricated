@@ -21,9 +21,9 @@ class WheelChairRenderer(manager: EntityRendererProvider.Context) : BasicVehicle
         val rightWheelRot = Mth.lerp(partialTicks, vehicle.rightWheelRotO, vehicle.rightWheelRot)
         val leftWheelRot = Mth.lerp(partialTicks, vehicle.leftWheelRotO, vehicle.leftWheelRot)
 
-        instance.getBone("w_rb")?.rotation?.rotationX(rightWheelRot)
-        instance.getBone("w_lb")?.rotation?.rotationX(leftWheelRot)
-        instance.getBone("w_rr")?.rotation?.rotationX(4f * rightWheelRot)
-        instance.getBone("w_lr")?.rotation?.rotationX(4f * leftWheelRot)
+        instance.getBone("move_w_rb")?.rotation?.rotationX(rightWheelRot)
+        instance.getBone("move_w_lb")?.rotation?.rotationX(leftWheelRot)
+        instance.getBone("move_w_rr")?.rotation?.rotationX(4f * rightWheelRot)
+        instance.getBone("move_w_lr")?.rotation?.rotationX(4f * leftWheelRot)
     }
 }

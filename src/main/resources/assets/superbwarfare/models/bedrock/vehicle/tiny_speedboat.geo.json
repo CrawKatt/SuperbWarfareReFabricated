@@ -35,7 +35,7 @@
 					]
 				},
 				{
-					"name": "rudder",
+					"name": "move_rudder",
 					"parent": "root",
 					"pivot": [0, 2.025, 15.2],
 					"cubes": [
@@ -1368,7 +1368,7 @@
 					"rotation": [45, 0, 0]
 				},
 				{
-					"name": "control",
+					"name": "move_control",
 					"parent": "fxp",
 					"pivot": [0, 8.44086, -10.17091],
 					"cubes": [
