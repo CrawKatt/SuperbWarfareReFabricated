@@ -47,7 +47,6 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
-import org.joml.Quaterniond
 import org.joml.Quaternionf
 import java.util.regex.Pattern
 
@@ -212,6 +211,10 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                 for (flare in flareBones) {
                     poseStack.pushPose()
                     poseStack.mulPoseMatrix(flare.getGlobalTransform(instance))
+                    val flareDef = flare.definition()
+                    poseStack.translate(
+                        flareDef.pivotX(), flareDef.pivotY(), flareDef.pivotZ()
+                    )
                     poseStack.translate(0f, 0f, (0.01 * (Math.random() - 0.5)).toFloat())
                     poseStack.scale(
                         1 + (0.02 * (Math.random() - 0.5)).toFloat(),
@@ -427,19 +430,19 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
 
                         poseStack.pushPose()
                         poseStack.mulPoseMatrix(bone.getGlobalTransform(instance))
+                        val boneDef = bone.definition()
+                        poseStack.translate(boneDef.pivotX(), boneDef.pivotY(), boneDef.pivotZ())
 
                         val scale = dummyInfo.scale
-
                         poseStack.scale(scale.x.toFloat(), scale.y.toFloat(), scale.z.toFloat())
                         poseStack.mulPose(Axis.YP.rotationDegrees(180f))
 
                         val rotate = dummyInfo.rotate
-
-                        val yawRot = Axis.YP.rotation(rotate.y.toFloat())
-                        val pitchRot = Axis.XP.rotation(rotate.x.toFloat())
-                        val rollRot = Axis.ZP.rotation(rotate.z.toFloat())
-                        val quaternion = Quaterniond(yawRot).mul(Quaterniond(pitchRot)).mul(Quaterniond(rollRot))
-                        poseStack.mulPose(Quaternionf(quaternion))
+                        val quaternion = Quaternionf()
+                            .rotateZ(rotate.z.toFloat() * Mth.DEG_TO_RAD)
+                            .rotateX(rotate.x.toFloat() * Mth.DEG_TO_RAD)
+                            .rotateY(rotate.y.toFloat() * Mth.DEG_TO_RAD)
+                        poseStack.mulPose(quaternion)
 
                         val offset = dummyInfo.offset
 
