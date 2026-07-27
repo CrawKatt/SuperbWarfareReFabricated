@@ -4,8 +4,6 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.model.entity.VehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.TurretWreckEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
-import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListener
-import com.atsuishio.superbwarfare.resource.vehicle.VehicleResource
 import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
@@ -101,22 +99,20 @@ class TurretWreckRenderer(renderManager: EntityRendererProvider.Context) :
                 )
                 poseStack.popPose()
             } else if (renderer is GeoVehicleRenderer) {
-                val models = VehicleResource.compute(entity).getModels()
-                if (models.isEmpty()) return
-                val modelPath = models.first().model ?: return
-                val texturePath = models.first().texture ?: return
-                val model = VehicleModelReloadListener.getModel(modelPath) ?: return
+                val entries = entity.getModelEntries()
+                if (entries.isEmpty()) return
+                val entry = entries.first()
+                val instance = entry.instance
 
-                val turret = model.getBone("turret")
-                if (turret.isEmpty) return
+                val turret = instance.getBone("turret") ?: return
 
-                val barrelBone = model.getBone("barrel")
+                val barrelBone = instance.getBone("barrel")
                 barrelBone?.rotation?.rotationX((-wreckEntity.xRotO * Mth.DEG_TO_RAD))
 
-                val passerWeaponPitch = model.getBone("passengerWeaponStationPitch")
+                val passerWeaponPitch = instance.getBone("passengerWeaponStationPitch")
                 passerWeaponPitch?.rotation?.rotationX(0f)
 
-                val passerWeaponYaw = model.getBone("passengerWeaponStationYaw")
+                val passerWeaponYaw = instance.getBone("passengerWeaponStationYaw")
                 passerWeaponYaw?.rotation?.rotationY(0f)
 
                 turret.visible = true
@@ -131,12 +127,16 @@ class TurretWreckRenderer(renderManager: EntityRendererProvider.Context) :
 
                 poseStack.mulPose(Axis.YP.rotationDegrees(180f))
 
-                turret.render(
+                val turretIndex = instance.getIndex("turret")
+                instance.baseModel().renderBone(
+                    instance,
+                    turretIndex,
                     poseStack,
-                    bufferSource.getBuffer(RenderType.entityTranslucent(texturePath)),
+                    bufferSource.getBuffer(RenderType.entityTranslucent(entry.texture)),
                     packedLight,
                     OverlayTexture.NO_OVERLAY,
-                    0.3f, 0.3f, 0.3f, 1f
+                    0.3f, 0.3f, 0.3f, 1f,
+                    true
                 )
                 poseStack.popPose()
             }

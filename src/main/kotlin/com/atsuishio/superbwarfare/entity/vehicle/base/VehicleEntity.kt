@@ -40,8 +40,8 @@ import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessag
 import com.atsuishio.superbwarfare.network.message.receive.ClientVehicleItemMessage
 import com.atsuishio.superbwarfare.network.message.receive.EntityRelationSyncMessage
 import com.atsuishio.superbwarfare.network.message.receive.VehicleShootClientMessage
-import com.atsuishio.superbwarfare.resource.model.VehicleLODModelReloadListenerV2
-import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListenerV2
+import com.atsuishio.superbwarfare.resource.model.VehicleLODModelReloadListener
+import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListener
 import com.atsuishio.superbwarfare.resource.vehicle.VehicleResource
 import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.tools.OBB.Part.*
@@ -131,8 +131,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             val modelPath = pojo.model ?: return@mapNotNull null
             val texture = pojo.texture ?: return@mapNotNull null
             val distance = pojo.distance
-            val bakedModel = if (distance > 0) VehicleLODModelReloadListenerV2.getModel(modelPath)
-            else VehicleModelReloadListenerV2.getModel(modelPath)
+            val bakedModel = if (distance > 0) VehicleLODModelReloadListener.getModel(modelPath)
+            else VehicleModelReloadListener.getModel(modelPath)
             val instance = bakedModel?.createInstance() ?: return@mapNotNull null
             VehicleModelEntry(instance, texture, pojo.emissiveTexture, distance)
         }

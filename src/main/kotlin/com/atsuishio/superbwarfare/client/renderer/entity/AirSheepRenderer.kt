@@ -1,9 +1,9 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
-import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.AirSheepEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.MultiBufferSource
@@ -17,14 +17,14 @@ class AirSheepRenderer(manager: EntityRendererProvider.Context) :
 
     override fun renderCustomPart(
         vehicle: AirSheepEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float,
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        super.renderCustomPart(vehicle, model, poseStack, entityYaw, partialTicks, buffer, packedLight)
+        super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
         val emissive = this.getEmissiveTextureLocation(poseStack, vehicle) ?: return
 
         val renderType = RenderType.entityTranslucent(emissive)
@@ -51,7 +51,7 @@ class AirSheepRenderer(manager: EntityRendererProvider.Context) :
             packedLight = LightTexture.FULL_BRIGHT
         }
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer,
             renderType,

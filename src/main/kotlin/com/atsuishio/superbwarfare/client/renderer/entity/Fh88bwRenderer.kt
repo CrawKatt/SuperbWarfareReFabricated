@@ -1,10 +1,10 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
-import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.options
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.CameraType
 import net.minecraft.client.renderer.entity.EntityRendererProvider
@@ -20,23 +20,23 @@ class Fh88bwRenderer(manager: EntityRendererProvider.Context) : BasicArtilleryRe
 
     override fun transformCustomModelPart(
         vehicle: ArtilleryEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
 
         val pitch = Mth.clamp(-turretXRot, vehicle.turretMinPitch, vehicle.turretMaxPitch) * Mth.DEG_TO_RAD
 
-        val barrel = model.getBone("barrel")
+        val barrel = instance.getBone("barrel")
         val angle = if (!vehicle.lockTurret) {
             pitch
         } else {
             0f
         }
 
-        barrel.rotation.rotationX(angle)
+        barrel?.rotation?.rotationX(angle)
 
         val b = atan2(11.8113, -14.0761) -
                 atan2(
@@ -44,11 +44,11 @@ class Fh88bwRenderer(manager: EntityRendererProvider.Context) : BasicArtilleryRe
                     -32.1847 * cos(pitch) + 9.4012 * sin(pitch) + 18.1086
                 )
 
-        model.getBone("move_yeyagan")?.rotation?.rotationX(b.toFloat())
-        model.getBone("move_yeya")?.rotation?.rotationX((b - angle).toFloat())
-        model.getBone("move_control")?.rotation?.rotationY(12 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        instance.getBone("move_yeyagan")?.rotation?.rotationX(b.toFloat())
+        instance.getBone("move_yeya")?.rotation?.rotationX((b - angle).toFloat())
+        instance.getBone("move_control")?.rotation?.rotationY(12 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
 
-        model.getBone("move_hmg")?.visible =
+        instance.getBone("move_hmg")?.visible =
             !(localPlayer == vehicle.getNthEntity(2) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
     }
 }
