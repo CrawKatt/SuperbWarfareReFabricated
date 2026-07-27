@@ -11180,7 +11180,7 @@
 					]
 				},
 				{
-					"name": "titop1",
+					"name": "move_titop1",
 					"parent": "titop",
 					"pivot": [0, -0.936, 0],
 					"cubes": [
@@ -11208,7 +11208,7 @@
 				},
 				{
 					"name": "bone37",
-					"parent": "titop1",
+					"parent": "move_titop1",
 					"pivot": [73.476, 89.81128, -77.9688],
 					"cubes": [
 						{
@@ -11261,7 +11261,7 @@
 				},
 				{
 					"name": "bone39",
-					"parent": "titop1",
+					"parent": "move_titop1",
 					"pivot": [18.4392, 58.22201, -4.9608],
 					"cubes": [
 						{
@@ -11314,7 +11314,7 @@
 				},
 				{
 					"name": "bone38",
-					"parent": "titop1",
+					"parent": "move_titop1",
 					"pivot": [73.476, 104.03848, -77.9688],
 					"cubes": [
 						{

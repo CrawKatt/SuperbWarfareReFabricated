@@ -1902,7 +1902,7 @@
 					"rotation": [-25, 0, 0]
 				},
 				{
-					"name": "control",
+					"name": "move_control",
 					"parent": "fxp",
 					"pivot": [10.6, 32.29296, -70.754],
 					"cubes": [
@@ -1979,7 +1979,7 @@
 				},
 				{
 					"name": "bone",
-					"parent": "control",
+					"parent": "move_control",
 					"pivot": [10.6, 32.29298, -70.75403],
 					"cubes": [
 						{

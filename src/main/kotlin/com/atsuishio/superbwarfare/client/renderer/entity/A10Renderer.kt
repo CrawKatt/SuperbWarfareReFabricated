@@ -19,7 +19,7 @@ class A10Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRendere
         val root = model.getBone("root")
         root.visible = !(hideForTurretControllerWhileZooming && vehicle.getWeaponIndex(0) == 2)
 
-        val wingLR = model.getBone("wingLR")
+        val wingLR = model.getBone("move_wingLR")
 
         wingLR.rotation.rotateX(
             1.5f * Mth.lerp(
@@ -29,7 +29,7 @@ class A10Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRendere
             ) * Mth.DEG_TO_RAD
         )
 
-        val wingRR = model.getBone("wingRR")
+        val wingRR = model.getBone("move_wingRR")
 
         wingRR.rotation.rotateX(
             1.5f * Mth.lerp(
@@ -39,7 +39,7 @@ class A10Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRendere
             ) * Mth.DEG_TO_RAD
         )
 
-        val wingLR2 = model.getBone("wingLR2")
+        val wingLR2 = model.getBone("move_wingLR2")
 
         wingLR2.rotation.rotateX(
             1.5f * Mth.lerp(
@@ -49,7 +49,7 @@ class A10Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRendere
             ) * Mth.DEG_TO_RAD
         )
 
-        val wingRR2 = model.getBone("wingRR2")
+        val wingRR2 = model.getBone("move_wingRR2")
 
         wingRR2.rotation.rotateX(
             1.5f * Mth.lerp(
@@ -59,16 +59,16 @@ class A10Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRendere
             ) * Mth.DEG_TO_RAD
         )
 
-        val wingLB = model.getBone("wingLB")
+        val wingLB = model.getBone("move_wingLB")
 
         wingLB.rotation.rotateX(Mth.lerp(partialTicks, vehicle.flap2LRotO, vehicle.flap2LRot) * Mth.DEG_TO_RAD)
 
-        val wingRB = model.getBone("wingRB")
+        val wingRB = model.getBone("move_wingRB")
 
         wingRB.rotation.rotateX(Mth.lerp(partialTicks, vehicle.flap2RRotO, vehicle.flap2RRot) * Mth.DEG_TO_RAD)
 
-        val weiyiL = model.getBone("weiyiL")
-        val weiyiR = model.getBone("weiyiR")
+        val weiyiL = model.getBone("move_weiyiL")
+        val weiyiR = model.getBone("move_weiyiR")
 
         weiyiL.rotation.rotateY(
             Mth.clamp(
@@ -86,8 +86,8 @@ class A10Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRendere
             ) * Mth.DEG_TO_RAD
         )
 
-        val qianzhou = model.getBone("qianzhou")
-        val qianzhou2 = model.getBone("qianzhou2")
+        val qianzhou = model.getBone("move_qianzhou")
+        val qianzhou2 = model.getBone("move_qianzhou2")
 
         qianzhou.rotation.rotateZ(Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
         qianzhou2.rotation.rotateZ(Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))

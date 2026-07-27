@@ -16,7 +16,7 @@
 					"pivot": [0, 0, 0]
 				},
 				{
-					"name": "w_lb",
+					"name": "move_w_lb",
 					"parent": "root",
 					"pivot": [8.16, 9.04921, 5],
 					"cubes": [
@@ -214,7 +214,7 @@
 				},
 				{
 					"name": "lun2",
-					"parent": "w_lb",
+					"parent": "move_w_lb",
 					"pivot": [9, 9, 5]
 				},
 				{
@@ -595,7 +595,7 @@
 					]
 				},
 				{
-					"name": "w_rb",
+					"name": "move_w_rb",
 					"parent": "root",
 					"pivot": [-8.16, 9.04921, 5],
 					"cubes": [
@@ -793,7 +793,7 @@
 				},
 				{
 					"name": "lun3",
-					"parent": "w_rb",
+					"parent": "move_w_rb",
 					"pivot": [-9, 9, 5]
 				},
 				{
@@ -1174,7 +1174,7 @@
 					]
 				},
 				{
-					"name": "w_lr",
+					"name": "move_w_lr",
 					"parent": "root",
 					"pivot": [6.9, 2.76871, -9.4],
 					"cubes": [
@@ -1301,7 +1301,7 @@
 					]
 				},
 				{
-					"name": "w_rr",
+					"name": "move_w_rr",
 					"parent": "root",
 					"pivot": [-6.9, 2.76871, -9.4],
 					"cubes": [

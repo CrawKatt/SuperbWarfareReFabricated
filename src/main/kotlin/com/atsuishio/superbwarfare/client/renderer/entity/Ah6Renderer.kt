@@ -15,8 +15,8 @@ class Ah6Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRendere
         partialTicks: Float
     ) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
-        val propeller = model.getBone("propeller")
-        val tailPropeller = model.getBone("tailPropeller")
+        val propeller = model.getBone("move_propeller")
+        val tailPropeller = model.getBone("move_tailPropeller")
 
         propeller.rotation.rotationY(Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
         tailPropeller.rotation.rotationX(-6 * Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))

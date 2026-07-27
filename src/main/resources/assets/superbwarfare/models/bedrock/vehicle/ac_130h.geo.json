@@ -3351,7 +3351,7 @@
 					]
 				},
 				{
-					"name": "tailWingHL",
+					"name": "move_tailWingHL",
 					"parent": "root",
 					"pivot": [175.4504, 100.892, 332.5],
 					"cubes": [
@@ -3448,7 +3448,7 @@
 					]
 				},
 				{
-					"name": "tailWingHR",
+					"name": "move_tailWingHR",
 					"parent": "root",
 					"pivot": [-175.4504, 100.892, 332.5],
 					"cubes": [
@@ -3545,7 +3545,7 @@
 					]
 				},
 				{
-					"name": "tailWingV",
+					"name": "move_tailWingV",
 					"parent": "root",
 					"pivot": [0, 259.15835, 349.31836],
 					"cubes": [
@@ -3565,7 +3565,7 @@
 				},
 				{
 					"name": "bone2",
-					"parent": "tailWingV",
+					"parent": "move_tailWingV",
 					"pivot": [0, 259.15835, 357.31836],
 					"cubes": [
 						{
@@ -3673,7 +3673,7 @@
 				},
 				{
 					"name": "bone3",
-					"parent": "tailWingV",
+					"parent": "move_tailWingV",
 					"pivot": [0, 259.15835, 357.31836],
 					"cubes": [
 						{
@@ -3780,7 +3780,7 @@
 					]
 				},
 				{
-					"name": "wingFL",
+					"name": "move_wingFL",
 					"parent": "root",
 					"pivot": [376.45549, 105.62432, 13.03828],
 					"rotation": [-2.5077, 4.4957, -0.6967],
@@ -4009,7 +4009,7 @@
 					}
 				},
 				{
-					"name": "wingFR",
+					"name": "move_wingFR",
 					"parent": "root",
 					"pivot": [-376.45549, 105.62432, 13.03828],
 					"rotation": [-2.5077, -4.4957, 0.6967],
@@ -4700,7 +4700,7 @@
 					]
 				},
 				{
-					"name": "prop1",
+					"name": "move_prop1",
 					"parent": "engine",
 					"pivot": [115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, 22.5],
@@ -5086,7 +5086,7 @@
 				},
 				{
 					"name": "ye",
-					"parent": "prop1",
+					"parent": "move_prop1",
 					"pivot": [115.3383, 86.9592, -82.7712],
 					"cubes": [
 						{
@@ -5155,7 +5155,7 @@
 				},
 				{
 					"name": "ye2",
-					"parent": "prop1",
+					"parent": "move_prop1",
 					"pivot": [115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, 90],
 					"cubes": [
@@ -5225,7 +5225,7 @@
 				},
 				{
 					"name": "ye3",
-					"parent": "prop1",
+					"parent": "move_prop1",
 					"pivot": [115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, -180],
 					"cubes": [
@@ -5295,7 +5295,7 @@
 				},
 				{
 					"name": "ye4",
-					"parent": "prop1",
+					"parent": "move_prop1",
 					"pivot": [115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, -90],
 					"cubes": [
@@ -5826,7 +5826,7 @@
 					]
 				},
 				{
-					"name": "prop2",
+					"name": "move_prop2",
 					"parent": "engine2",
 					"pivot": [-115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, 50],
@@ -6212,7 +6212,7 @@
 				},
 				{
 					"name": "ye5",
-					"parent": "prop2",
+					"parent": "move_prop2",
 					"pivot": [-115.3383, 86.9592, -82.7712],
 					"cubes": [
 						{
@@ -6281,7 +6281,7 @@
 				},
 				{
 					"name": "ye6",
-					"parent": "prop2",
+					"parent": "move_prop2",
 					"pivot": [-115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, -90],
 					"cubes": [
@@ -6351,7 +6351,7 @@
 				},
 				{
 					"name": "ye7",
-					"parent": "prop2",
+					"parent": "move_prop2",
 					"pivot": [-115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, 180],
 					"cubes": [
@@ -6421,7 +6421,7 @@
 				},
 				{
 					"name": "ye8",
-					"parent": "prop2",
+					"parent": "move_prop2",
 					"pivot": [-115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, 90],
 					"cubes": [
@@ -6952,7 +6952,7 @@
 					]
 				},
 				{
-					"name": "prop3",
+					"name": "move_prop3",
 					"parent": "engine4",
 					"pivot": [-231.107, 91.4677, -82.7712],
 					"rotation": [0, 0, -25],
@@ -7338,7 +7338,7 @@
 				},
 				{
 					"name": "ye9",
-					"parent": "prop3",
+					"parent": "move_prop3",
 					"pivot": [-115.3383, 86.9592, -82.7712],
 					"cubes": [
 						{
@@ -7407,7 +7407,7 @@
 				},
 				{
 					"name": "ye10",
-					"parent": "prop3",
+					"parent": "move_prop3",
 					"pivot": [-115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, -90],
 					"cubes": [
@@ -7477,7 +7477,7 @@
 				},
 				{
 					"name": "ye11",
-					"parent": "prop3",
+					"parent": "move_prop3",
 					"pivot": [-115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, 180],
 					"cubes": [
@@ -7547,7 +7547,7 @@
 				},
 				{
 					"name": "ye12",
-					"parent": "prop3",
+					"parent": "move_prop3",
 					"pivot": [-115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, 90],
 					"cubes": [
@@ -8078,7 +8078,7 @@
 					]
 				},
 				{
-					"name": "prop4",
+					"name": "move_prop4",
 					"parent": "engine3",
 					"pivot": [231.107, 91.4677, -82.7712],
 					"rotation": [0, 0, -82.5],
@@ -8464,7 +8464,7 @@
 				},
 				{
 					"name": "ye13",
-					"parent": "prop4",
+					"parent": "move_prop4",
 					"pivot": [115.3383, 86.9592, -82.7712],
 					"cubes": [
 						{
@@ -8533,7 +8533,7 @@
 				},
 				{
 					"name": "ye14",
-					"parent": "prop4",
+					"parent": "move_prop4",
 					"pivot": [115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, 90],
 					"cubes": [
@@ -8603,7 +8603,7 @@
 				},
 				{
 					"name": "ye15",
-					"parent": "prop4",
+					"parent": "move_prop4",
 					"pivot": [115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, -180],
 					"cubes": [
@@ -8673,7 +8673,7 @@
 				},
 				{
 					"name": "ye16",
-					"parent": "prop4",
+					"parent": "move_prop4",
 					"pivot": [115.3383, 86.9592, -82.7712],
 					"rotation": [0, 0, -90],
 					"cubes": [
@@ -19390,7 +19390,7 @@
 					]
 				},
 				{
-					"name": "gd",
+					"name": "move_gd",
 					"parent": "zxc",
 					"pivot": [53.84132, 7.37582, -77.19999],
 					"cubes": [

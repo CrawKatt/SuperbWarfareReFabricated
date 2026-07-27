@@ -19,7 +19,7 @@ class Kv16Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRender
         val root = model.getBone("root")
         root.visible = !(hideForTurretControllerWhileZooming && vehicle.getWeaponIndex(0) == 1)
 
-        val propeller = model.getBone("propeller")
+        val propeller = model.getBone("move_propeller")
 
         propeller.rotation.rotateZ(Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
     }

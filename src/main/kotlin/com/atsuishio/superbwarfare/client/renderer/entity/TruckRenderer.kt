@@ -15,7 +15,7 @@ class TruckRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRende
         partialTicks: Float
     ) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
-        val control = model.getBone("control")
+        val control = model.getBone("move_control")
 
         control.rotation.rotationY(12 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
     }

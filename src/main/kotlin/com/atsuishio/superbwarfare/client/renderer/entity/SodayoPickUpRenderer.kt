@@ -24,8 +24,8 @@ class SodayoPickUpRenderer(manager: EntityRendererProvider.Context) : BasicVehic
         partialTicks: Float
     ) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
-        val control = model.getBone("control")
-        val head = model.getBone("head")
+        val control = model.getBone("move_control")
+        val head = model.getBone("move_head")
 
         control.rotation.rotationZ(8 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
 
@@ -42,7 +42,7 @@ class SodayoPickUpRenderer(manager: EntityRendererProvider.Context) : BasicVehic
         }
 
         if (vehicle is SodayoPickUpTowEntity) {
-            val guanMiao = model.getBone("guanmiao")
+            val guanMiao = model.getBone("move_guanmiao")
             guanMiao.visible = !(vehicle.turretControllerIndex == vehicle.getSeatIndex(localPlayer) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
         }
     }

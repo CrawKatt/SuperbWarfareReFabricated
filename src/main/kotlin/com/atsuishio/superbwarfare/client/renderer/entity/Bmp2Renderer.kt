@@ -32,7 +32,7 @@ class Bmp2Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRender
         val hide = player != null && vehicle === player.vehicle && vehicle.getFirstPassenger() !== player && vehicle.hasWeapon(vehicle.getSeatIndex(player)) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle)
 
         val base = model.getBone("base")
-        val track = model.getBone("Track")
+        val track = model.getBone("move_Track")
 
         base.visible = !hide
         track.visible = !hide

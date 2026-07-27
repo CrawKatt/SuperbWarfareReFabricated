@@ -4817,7 +4817,7 @@
 					]
 				},
 				{
-					"name": "fanL",
+					"name": "move_fanL",
 					"parent": "sanreT",
 					"pivot": [12, 36.11018, 24],
 					"cubes": [
@@ -4921,7 +4921,7 @@
 				},
 				{
 					"name": "L4",
-					"parent": "fanL",
+					"parent": "move_fanL",
 					"pivot": [12, 39.503, 24],
 					"cubes": [
 						{
@@ -5466,7 +5466,7 @@
 					]
 				},
 				{
-					"name": "fanR",
+					"name": "move_fanR",
 					"parent": "sanreT",
 					"pivot": [-12, 36.11018, 24],
 					"cubes": [
@@ -5570,7 +5570,7 @@
 				},
 				{
 					"name": "R4",
-					"parent": "fanR",
+					"parent": "move_fanR",
 					"pivot": [-12, 39.503, 24],
 					"cubes": [
 						{

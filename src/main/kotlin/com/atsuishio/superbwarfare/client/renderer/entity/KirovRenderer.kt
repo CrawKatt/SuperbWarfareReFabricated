@@ -20,12 +20,12 @@ class KirovRenderer(manager: EntityRendererProvider.Context) : GeoVehicleRendere
     ) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
 
-        val propeller = model.getBone("prop1")
-        val propeller2 = model.getBone("prop2")
-        val propeller3 = model.getBone("prop3")
+        val propeller = model.getBone("move_prop1")
+        val propeller2 = model.getBone("move_prop2")
+        val propeller3 = model.getBone("move_prop3")
 
-        val propeller4 = model.getBone("prop4")
-        val propeller5 = model.getBone("prop5")
+        val propeller4 = model.getBone("move_prop4")
+        val propeller5 = model.getBone("move_prop5")
 
         val rot = Mth.lerp(partialTicks, vehicle.propellerO, vehicle.propeller)
         propeller.rotation.rotateZ(rot)
@@ -41,16 +41,16 @@ class KirovRenderer(manager: EntityRendererProvider.Context) : GeoVehicleRendere
         propeller4.rotation.rotateZ(rotV)
         propeller5.rotation.rotateZ(rotV)
 
-        val turretRight = model.getBone("turret_right")
+        val turretRight = model.getBone("move_turret_right")
         if (turretRight != null) {
             turretRight.rotation.rotationY(turretYRot * Mth.DEG_TO_RAD)
             turretRight.visible = !(vehicle.isWreck && vehicle.hasTurret() && vehicle.sympatheticDetonated)
         }
 
-        val controlP = model.getBone("controlP")
+        val controlP = model.getBone("move_controlP")
         controlP?.rotation?.rotationX(Mth.clamp(-vehicle.power * 48, -20f, 20f) * Mth.DEG_TO_RAD)
 
-        val rudder = model.getBone("rudder")
+        val rudder = model.getBone("move_rudder")
         rudder.rotation.rotationZ(12 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
     }
 }

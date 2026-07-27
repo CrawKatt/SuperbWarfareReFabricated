@@ -18,9 +18,9 @@ class MortarRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRend
         entityYaw: Float,
         partialTicks: Float
     ) {
-        val paoguan = model.getBone("paoguan")
-        val monitor = model.getBone("monitor")
-        val jiaojia = model.getBone("jiaojia")
+        val paoguan = model.getBone("move_paoguan")
+        val monitor = model.getBone("move_monitor")
+        val jiaojia = model.getBone("move_jiaojia")
         val headPitch = -Mth.lerp(partialTicks, vehicle.xRotO, vehicle.xRot)
 
         paoguan.rotation.rotationX(headPitch * Mth.DEG_TO_RAD)

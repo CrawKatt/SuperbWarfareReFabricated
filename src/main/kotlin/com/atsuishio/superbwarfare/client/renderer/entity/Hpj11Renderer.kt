@@ -28,12 +28,12 @@ class Hpj11Renderer(manager: EntityRendererProvider.Context) : BasicAutoAimableR
     ) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
 
-        val radar2 = model.getBone("radar2")
+        val radar2 = model.getBone("move_radar2")
 
         radar2.visible = !(vehicle.getNthEntity(vehicle.turretControllerIndex) === localPlayer && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
 
-        val rdr = model.getBone("rdr")
-        val rdr2 = model.getBone("rdr2")
+        val rdr = model.getBone("move_rdr")
+        val rdr2 = model.getBone("move_rdr2")
 
         val rot = Mth.clamp(-turretXRot, vehicle.turretMinPitch, vehicle.turretMaxPitch) * Mth.DEG_TO_RAD
 

@@ -24,7 +24,7 @@ class BradleyRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRen
     ) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
 
-        val guangDian = model.getBone("guangdian")
+        val guangDian = model.getBone("move_guangdian")
         val rot = Mth.clamp(-turretXRot, vehicle.turretMinPitch, vehicle.turretMaxPitch) * Mth.DEG_TO_RAD
         guangDian.rotation.rotationX(rot)
 
@@ -32,7 +32,7 @@ class BradleyRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRen
         val hide = player != null && vehicle === player.vehicle && vehicle.getFirstPassenger() !== player && vehicle.hasWeapon(vehicle.getSeatIndex(player)) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle)
 
         val base = model.getBone("base")
-        val track = model.getBone("Track")
+        val track = model.getBone("move_Track")
 
         base.visible = !hide
         track.visible = !hide

@@ -1475,7 +1475,7 @@
 					]
 				},
 				{
-					"name": "control",
+					"name": "move_control",
 					"parent": "inner",
 					"pivot": [9.41057, 20.3477, -23.40053],
 					"cubes": [
@@ -2554,7 +2554,7 @@
 					"pivot": [1.15, 23.6732, -28.4]
 				},
 				{
-					"name": "head",
+					"name": "move_head",
 					"parent": "upper",
 					"pivot": [1.15, 24.95, -28.4],
 					"cubes": [
