@@ -250,6 +250,10 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             for (laser in laserBones) {
                 poseStack.pushPose()
                 poseStack.mulPoseMatrix(laser.getGlobalTransform(instance))
+                val laserDef = laser.definition()
+                poseStack.translate(
+                    laserDef.pivotX(), laserDef.pivotY(), laserDef.pivotZ()
+                )
 
                 val lastPose = poseStack.last()
                 val pose = lastPose.pose()
@@ -499,14 +503,17 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
 
         boneGroups.leftTrackMove.forEachIndexed { index, bone ->
             val t = wrap(leftTrack + getTrackDistance() * index, vehicle)
-            bone.y = getBoneMoveY(t)
-            bone.z = getBoneMoveZ(t)
+            val bd = bone.definition()
+            // Fold pivot into y/z — translateAndRotateAndScale discards pivot for unrotated bones
+            bone.y = bd.pivotY() * 16f + getBoneMoveY(t)
+            bone.z = bd.pivotZ() * 16f + getBoneMoveZ(t)
         }
 
         boneGroups.rightTrackMove.forEachIndexed { index, bone ->
             val t = wrap(rightTrack + getTrackDistance() * index, vehicle)
-            bone.y = getBoneMoveY(t)
-            bone.z = getBoneMoveZ(t)
+            val bd = bone.definition()
+            bone.y = bd.pivotY() * 16f + getBoneMoveY(t)
+            bone.z = bd.pivotZ() * 16f + getBoneMoveZ(t)
         }
 
         boneGroups.leftTrackRot.forEachIndexed { index, bone ->
@@ -547,8 +554,8 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                 }
             }
 
-            base.x = -r2 * recoilShake * 0.5f
-            base.z = r * recoilShake
+            base.x = -r2 * recoilShake * 0.5f * 16f
+            base.z = r * recoilShake * 16f
 
             base.rotation.rotationX(r * recoilShake * Mth.DEG_TO_RAD)
             base.rotation.rotateZ(r2 * recoilShake * Mth.DEG_TO_RAD)
