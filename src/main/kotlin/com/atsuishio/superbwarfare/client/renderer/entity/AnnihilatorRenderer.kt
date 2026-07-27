@@ -1,13 +1,13 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod
-import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.entity.vehicle.AnnihilatorEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
-import com.github.mcmodderanchor.simplebedrockmodel.v1.common.model.BedrockBone
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BoneState
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
@@ -23,28 +23,28 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
 
     override fun transformCustomModelPart(
         vehicle: ArtilleryEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
 
-        val laser1 = model.getBone("laser1")
-        val laser2 = model.getBone("laser2")
-        val laser3 = model.getBone("laser3")
+        val laser1 = instance.getBone("laser1")
+        val laser2 = instance.getBone("laser2")
+        val laser3 = instance.getBone("laser3")
 
-        laser1.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_LEFT_LENGTH) * 10
-        laser2.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_MIDDLE_LENGTH) * 10
-        laser3.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_RIGHT_LENGTH) * 10
+        laser1?.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_LEFT_LENGTH) * 10
+        laser2?.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_MIDDLE_LENGTH) * 10
+        laser3?.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_RIGHT_LENGTH) * 10
 
         val energy = vehicle.chargeProgress
 
         for (i in 1..5) {
             val greenBoneName = "light_on$i"
             val redBoneName = "light_off$i"
-            val greenBone = model.getBone(greenBoneName)
-            val redBone = model.getBone(redBoneName)
+            val greenBone = instance.getBone(greenBoneName)
+            val redBone = instance.getBone(redBoneName)
 
             if (greenBone != null && redBone != null) {
                 greenBone.visible = energy >= (i / 5.0)
@@ -53,7 +53,7 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
         }
     }
 
-    override fun customLaserLength(laserBones: List<BedrockBone>, entity: VehicleEntity, partialTicks: Float) {
+    override fun customLaserLength(laserBones: List<BoneState>, entity: VehicleEntity, partialTicks: Float) {
         for (laser in laserBones) {
             laser.visible = false
 
@@ -70,21 +70,21 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
 
     override fun renderCustomPart(
         vehicle: ArtilleryEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float,
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        super.renderCustomPart(vehicle, model, poseStack, entityYaw, partialTicks, buffer, packedLight)
+        super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
 
         // power
 
         val red = 1 - Mth.clamp(2.5f * vehicle.energy / vehicle.maxEnergy, 0f, 1f)
         val green = Mth.clamp(2.5f * vehicle.energy / vehicle.maxEnergy, 0f, 1f)
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer,
             RenderType.entityTranslucent(TEXTURE_POWER),
@@ -93,7 +93,7 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
             OverlayTexture.NO_OVERLAY, red, green, 0f, 1f
         )
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer,
             ModRenderTypes.LASER.apply(TEXTURE_POWER),
@@ -102,7 +102,7 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
             OverlayTexture.NO_OVERLAY, red, green, 0f, 1f
         )
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer,
             ModRenderTypes.LASER.apply(TEXTURE_GLOW),

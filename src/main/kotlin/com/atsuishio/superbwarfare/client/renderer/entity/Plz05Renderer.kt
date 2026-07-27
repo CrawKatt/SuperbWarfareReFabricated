@@ -1,9 +1,9 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
-import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.options
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.CameraType
 import net.minecraft.client.renderer.entity.EntityRendererProvider
@@ -16,24 +16,24 @@ class Plz05Renderer(manager: EntityRendererProvider.Context) : BasicArtilleryRen
 
     override fun transformCustomModelPart(
         vehicle: ArtilleryEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
 
-        val tiTop1 = model.getBone("move_titop1")
-        tiTop1.visible = !(vehicle.getNthEntity(vehicle.turretControllerIndex) === localPlayer && options.cameraType == CameraType.FIRST_PERSON)
+        val tiTop1 = instance.getBone("move_titop1")
+        tiTop1?.visible = !(vehicle.getNthEntity(vehicle.turretControllerIndex) === localPlayer && options.cameraType == CameraType.FIRST_PERSON)
 
-        val barrel = model.getBone("barrel")
+        val barrel = instance.getBone("barrel")
         val angle = if (!vehicle.lockTurret) {
             Mth.clamp(-turretXRot, vehicle.turretMinPitch, vehicle.turretMaxPitch) * Mth.DEG_TO_RAD
         } else {
             1.2f * Mth.DEG_TO_RAD
         }
 
-        barrel.rotation.rotationX(angle)
+        barrel?.rotation?.rotationX(angle)
     }
 
     override fun getBoneRotX(t: Float): Float {

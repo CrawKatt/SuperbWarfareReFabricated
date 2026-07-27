@@ -1,11 +1,11 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
-import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.options
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.CameraType
 import net.minecraft.client.renderer.MultiBufferSource
@@ -21,41 +21,42 @@ class Hpj11Renderer(manager: EntityRendererProvider.Context) : BasicAutoAimableR
 
     override fun transformCustomModelPart(
         vehicle: AutoAimableEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
 
-        val radar2 = model.getBone("move_radar2")
+        val radar2 = instance.getBone("move_radar2")
 
-        radar2.visible = !(vehicle.getNthEntity(vehicle.turretControllerIndex) === localPlayer && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
+        radar2?.visible =
+            !(vehicle.getNthEntity(vehicle.turretControllerIndex) === localPlayer && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
 
-        val rdr = model.getBone("move_rdr")
-        val rdr2 = model.getBone("move_rdr2")
+        val rdr = instance.getBone("move_rdr")
+        val rdr2 = instance.getBone("move_rdr2")
 
         val rot = Mth.clamp(-turretXRot, vehicle.turretMinPitch, vehicle.turretMaxPitch) * Mth.DEG_TO_RAD
 
-        rdr.rotation.rotationX(rot)
-        rdr2.rotation.rotationX(rot)
+        rdr?.rotation?.rotationX(rot)
+        rdr2?.rotation?.rotationX(rot)
     }
 
     override fun renderCustomPart(
         vehicle: AutoAimableEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float,
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        super.renderCustomPart(vehicle, model, poseStack, entityYaw, partialTicks, buffer, packedLight)
+        super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
 
         val heat = Mth.clamp(vehicle.getWeaponHeat(0).toFloat(), 0f, 100f)
 
         if (heat > 0) {
-            model.renderToBuffer(
+            instance.renderToBuffer(
                 poseStack,
                 buffer.getBuffer(RenderType.eyes(HEAT)),
                 packedLight,

@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.ResourceManager
 import net.minecraft.util.profiling.ProfilerFiller
 
-object EntityModelReloadListener : BasicModelReloadListenerV2("entity") {
+object EntityModelReloadListener : BasicModelReloadListener("entity") {
     override fun apply(
         map: Map<ResourceLocation, BedrockModelPOJO>,
         resourceManager: ResourceManager,

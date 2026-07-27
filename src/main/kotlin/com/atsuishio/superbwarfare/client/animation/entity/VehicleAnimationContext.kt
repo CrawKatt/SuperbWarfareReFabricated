@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.client.animation.entity
 
 import com.atsuishio.superbwarfare.client.animation.AnimationPlayType
 import com.atsuishio.superbwarfare.entity.vehicle.BasicGeoVehicleEntity
-import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListenerV2
+import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListener
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.animation.BedrockAnimation
 import com.maydaymemory.mae.basic.*
 import com.maydaymemory.mae.blend.EulerAdditiveBlender
@@ -50,7 +50,7 @@ class VehicleAnimationContext<T>(val entity: T, location: ResourceLocation) wher
     }
 
     init {
-        val ani = VehicleModelReloadListenerV2.getAnimation(location)
+        val ani = VehicleModelReloadListener.getAnimation(location)
         if (ani != null) {
             for (entry in ani) {
                 animations[entry.name] = entry

@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.script
 
-import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
 import org.mozillaa.javascript.Context
 import org.mozillaa.javascript.Script
@@ -18,7 +18,7 @@ object VehicleScriptManager {
     fun invokeTransform(
         scriptFunc: ScriptFunction,
         vehicle: Any,
-        model: BedrockVehicleModel,
+        model: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float,

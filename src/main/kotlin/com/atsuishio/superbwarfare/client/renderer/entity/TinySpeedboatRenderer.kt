@@ -1,9 +1,9 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
-import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.TinySpeedboatEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.MultiBufferSource
@@ -17,29 +17,29 @@ class TinySpeedboatRenderer(manager: EntityRendererProvider.Context) :
     GeoVehicleRenderer<TinySpeedboatEntity>(manager) {
     override fun transformCustomModelPart(
         vehicle: TinySpeedboatEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
-        val control = model.getBone("move_control")
-        val rudder = model.getBone("move_rudder")
+        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        val control = instance.getBone("move_control")
+        val rudder = instance.getBone("move_rudder")
 
-        control.rotation.rotationZ(-3 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
-        rudder.rotation.rotationY(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        control?.rotation?.rotationZ(-3 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        rudder?.rotation?.rotationY(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
     }
 
     override fun renderCustomPart(
         vehicle: TinySpeedboatEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float,
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        super.renderCustomPart(vehicle, model, poseStack, entityYaw, partialTicks, buffer, packedLight)
+        super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
         val emissive = this.getEmissiveTextureLocation(poseStack, vehicle) ?: return
 
         val renderType = RenderType.entityTranslucent(emissive)
@@ -62,7 +62,7 @@ class TinySpeedboatRenderer(manager: EntityRendererProvider.Context) :
             packedLight = LightTexture.FULL_BRIGHT
         }
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer,
             renderType,
