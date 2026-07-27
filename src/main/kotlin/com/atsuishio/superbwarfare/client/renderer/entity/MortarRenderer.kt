@@ -1,8 +1,8 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
-import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.MortarEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.entity.EntityRendererProvider
@@ -13,20 +13,19 @@ class MortarRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRend
 
     override fun transformCustomModelPart(
         vehicle: VehicleEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        val paoguan = model.getBone("move_paoguan")
-        val monitor = model.getBone("move_monitor")
-        val jiaojia = model.getBone("move_jiaojia")
+        val paoguan = instance.getBone("move_paoguan")
+        val monitor = instance.getBone("move_monitor")
+        val jiaojia = instance.getBone("move_jiaojia")
         val headPitch = -Mth.lerp(partialTicks, vehicle.xRotO, vehicle.xRot)
 
-        paoguan.rotation.rotationX(headPitch * Mth.DEG_TO_RAD)
-        jiaojia.rotation.rotationX(-2 * ((headPitch - (10 - headPitch * 0.1f)) * Mth.DEG_TO_RAD))
-        monitor.visible = vehicle.entityData.get(MortarEntity.INTELLIGENT)
-
+        paoguan?.rotation?.rotationX(headPitch * Mth.DEG_TO_RAD)
+        jiaojia?.rotation?.rotationX(-2 * ((headPitch - (10 - headPitch * 0.1f)) * Mth.DEG_TO_RAD))
+        monitor?.visible = vehicle.entityData.get(MortarEntity.INTELLIGENT)
     }
 
     override fun rotateVehicleAxis(entityIn: VehicleEntity, poseStack: PoseStack, entityYaw: Float, partialTicks: Float) {

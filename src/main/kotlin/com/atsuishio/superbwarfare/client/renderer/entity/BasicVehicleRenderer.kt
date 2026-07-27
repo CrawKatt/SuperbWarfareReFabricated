@@ -3,4 +3,4 @@ package com.atsuishio.superbwarfare.client.renderer.entity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 
-open class BasicVehicleRenderer(manager: EntityRendererProvider.Context) : GeoVehicleRenderer<VehicleEntity>(manager)
+open class BasicVehicleRenderer(manager: EntityRendererProvider.Context) : GeoVehicleRendererV2<VehicleEntity>(manager)

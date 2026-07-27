@@ -1,9 +1,9 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
-import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.tools.localPlayer
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.util.Mth
@@ -15,23 +15,23 @@ class SpeedBoatRenderer(manager: EntityRendererProvider.Context) : BasicVehicleR
 
     override fun transformCustomModelPart(
         vehicle: VehicleEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
 
-        val propeller = model.getBone("move_propeller")
-        val propeller2 = model.getBone("move_propeller2")
-        val turret = model.getBone("turret")
-        val control = model.getBone("move_control")
-        val rudder = model.getBone("move_rudder")
+        val propeller = instance.getBone("move_propeller")
+        val propeller2 = instance.getBone("move_propeller2")
+        val turret = instance.getBone("turret")
+        val control = instance.getBone("move_control")
+        val rudder = instance.getBone("move_rudder")
 
-        propeller.rotation.rotationZ(Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
-        propeller2.rotation.rotationZ(-Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
-        turret.visible = !(vehicle.getNthEntity(vehicle.turretControllerIndex) === localPlayer && ClientEventHandler.zoomVehicle)
-        control.rotation.rotationZ(-4 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
-        rudder.rotation.rotationY(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        propeller?.rotation?.rotationZ(Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
+        propeller2?.rotation?.rotationZ(-Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
+        turret?.visible = !(vehicle.getNthEntity(vehicle.turretControllerIndex) === localPlayer && ClientEventHandler.zoomVehicle)
+        control?.rotation?.rotationZ(-4 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        rudder?.rotation?.rotationY(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
     }
 }
