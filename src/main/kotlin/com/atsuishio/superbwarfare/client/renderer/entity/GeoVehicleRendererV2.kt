@@ -17,7 +17,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils
 import com.atsuishio.superbwarfare.event.ClientEventHandler
-import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListener
+import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListenerV2
 import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.atsuishio.superbwarfare.tools.SpritePixelHelper
 import com.atsuishio.superbwarfare.tools.localPlayer
@@ -143,8 +143,6 @@ open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
             ani.context.partialTick = partialTick
             ani.tick()
             instance.applyPose(BLENDER.blend(instance.bindPose, ani.getPose()))
-        } else {
-            instance.applyPose(instance.bindPose)
         }
 
         this.tickVariables(entity, yaw, partialTick)
@@ -208,7 +206,7 @@ open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
         }
 
         if (!isLOD && !entity.sympatheticDetonated && flareFlag && !(ClientEventHandler.zoomVehicle && (hideForTurretControllerWhileZooming || hideForPassengerWeaponStationControllerWhileZooming))) {
-            val flareModel = VehicleModelReloadListener.getModel(MUZZLE_FLARE_MODEL)
+            val flareModel = flareModelInstance
 
             if (flareModel != null) {
                 for (flare in flareBones) {
@@ -232,7 +230,6 @@ open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
                         1f,
                         1f
                     )
-                    flareModel.applyPose(flareModel.bindPose)
 
                     poseStack.popPose()
                 }
@@ -822,6 +819,9 @@ open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
 
         @JvmField
         val DOG_TAG_PATTERN: Pattern = Pattern.compile("^.*_dogTag$")
+
+        @JvmField
+        val flareModelInstance = VehicleModelReloadListenerV2.getModel(MUZZLE_FLARE_MODEL)?.createInstance()
 
         @JvmStatic
         fun selectModelEntry(entries: List<VehicleModelEntry>, poseStack: PoseStack): VehicleModelEntry? {
