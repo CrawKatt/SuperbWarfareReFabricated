@@ -1,49 +1,47 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
-import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.SodayoPickUpRocketEntity
 import com.atsuishio.superbwarfare.entity.vehicle.SodayoPickUpTowEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.options
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.math.Axis
 import net.minecraft.client.CameraType
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.util.Mth
-import org.joml.Quaterniond
-import org.joml.Quaternionf
 
 class SodayoPickUpRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
     override fun transformCustomModelPart(
         vehicle: VehicleEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
-        val control = model.getBone("move_control")
-        val head = model.getBone("move_head")
+        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        val control = instance.getBone("move_control")
+        val head = instance.getBone("move_head")
 
-        control.rotation.rotationZ(8 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        control?.rotation?.rotationZ(8 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
 
-        val pitchRot = Axis.XP.rotation(head.rotationInEuler.x + -5f * vehicle.getAcceleration().toFloat())
-        val rollRot = Axis.ZP.rotation(head.rotationInEuler.z + 0.5f * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot) * vehicle.deltaMovement.horizontalDistance().toFloat())
-        val quaternion =  Quaterniond(pitchRot).mul(Quaterniond(rollRot))
-        head.rotation.mul(Quaternionf(quaternion))
+        val pitch = -5f * vehicle.getAcceleration().toFloat() * Mth.DEG_TO_RAD
+        val roll = 0.5f * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot) * vehicle.deltaMovement.horizontalDistance().toFloat() * Mth.DEG_TO_RAD
+        head?.rotation?.rotateX(pitch)
+        head?.rotation?.rotateZ(roll)
 
         if (vehicle is SodayoPickUpRocketEntity) {
-            model.shell.forEachIndexed { index, bone ->
+            getOrComputeBoneGroups(instance).shell.forEachIndexed { index, bone ->
                 val items = vehicle.entityData.get(SodayoPickUpRocketEntity.LOADED_AMMO)
                 bone.visible = items[index] != -1
             }
         }
 
         if (vehicle is SodayoPickUpTowEntity) {
-            val guanMiao = model.getBone("move_guanmiao")
-            guanMiao.visible = !(vehicle.turretControllerIndex == vehicle.getSeatIndex(localPlayer) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
+            val guanMiao = instance.getBone("move_guanmiao")
+            guanMiao?.visible =
+                !(vehicle.turretControllerIndex == vehicle.getSeatIndex(localPlayer) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
         }
     }
 }

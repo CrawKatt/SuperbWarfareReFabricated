@@ -1,10 +1,10 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
-import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.options
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.CameraType
 import net.minecraft.client.renderer.entity.EntityRendererProvider
@@ -21,21 +21,21 @@ class Bmp2Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRender
 
     override fun transformCustomModelPart(
         vehicle: VehicleEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
 
         val player = localPlayer
         val hide = player != null && vehicle === player.vehicle && vehicle.getFirstPassenger() !== player && vehicle.hasWeapon(vehicle.getSeatIndex(player)) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle)
 
-        val base = model.getBone("base")
-        val track = model.getBone("move_Track")
+        val base = instance.getBone("base")
+        val track = instance.getBone("move_Track")
 
-        base.visible = !hide
-        track.visible = !hide
+        base?.visible = !hide
+        track?.visible = !hide
     }
 
     override fun getBoneRotX(t: Float): Float {

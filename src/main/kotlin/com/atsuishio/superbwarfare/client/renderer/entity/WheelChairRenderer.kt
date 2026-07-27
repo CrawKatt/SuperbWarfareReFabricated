@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.util.Mth
 
-class WheelChairRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRendererV2(manager) {
+class WheelChairRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
     init {
         this.shadowRadius = 0.5f
     }

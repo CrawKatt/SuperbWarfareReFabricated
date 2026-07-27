@@ -485,29 +485,24 @@ open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
             it.rotation.rotationX(1.5f * rightWheelRot)
         }
         boneGroups.leftWheelsTurn.forEach {
-            val yawRot = Axis.YP.rotation(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
-            val pitchRot = Axis.XP.rotation(1.5f * leftWheelRot)
-            val quaternion = Quaterniond(yawRot).mul(Quaterniond(pitchRot))
-            it.rotation.mul(Quaternionf(quaternion))
+            it.rotation.rotationY(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+            it.rotation.rotateX(1.5f * leftWheelRot)
         }
         boneGroups.rightWheelsTurn.forEach {
-            val yawRot = Axis.YP.rotation(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
-            val pitchRot = Axis.XP.rotation(1.5f * rightWheelRot)
-            val quaternion = Quaterniond(yawRot).mul(Quaterniond(pitchRot))
-            it.rotation.mul(Quaternionf(quaternion))
+            it.rotation.rotationY(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+            it.rotation.rotateX(1.5f * rightWheelRot)
         }
 
-        // 履带
         boneGroups.leftTrackMove.forEachIndexed { index, bone ->
             val t = wrap(leftTrack + getTrackDistance() * index, vehicle)
-            bone.y += getBoneMoveY(t)
-            bone.z += getBoneMoveZ(t)
+            bone.y = getBoneMoveY(t)
+            bone.z = getBoneMoveZ(t)
         }
 
         boneGroups.rightTrackMove.forEachIndexed { index, bone ->
             val t = wrap(rightTrack + getTrackDistance() * index, vehicle)
-            bone.y += getBoneMoveY(t)
-            bone.z += getBoneMoveZ(t)
+            bone.y = getBoneMoveY(t)
+            bone.z = getBoneMoveZ(t)
         }
 
         boneGroups.leftTrackRot.forEachIndexed { index, bone ->
@@ -551,10 +546,8 @@ open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
             base.x = -r2 * recoilShake * 0.5f
             base.z = r * recoilShake
 
-            val pitch = Axis.XP.rotationDegrees(r * recoilShake)
-            val roll = Axis.ZP.rotationDegrees(r2 * recoilShake)
-            val quaternion = Quaterniond(pitch).mul(Quaterniond(roll))
-            base.rotation.mul(Quaternionf(quaternion))
+            base.rotation.rotationX(r * recoilShake * Mth.DEG_TO_RAD)
+            base.rotation.rotateZ(r2 * recoilShake * Mth.DEG_TO_RAD)
         }
 
         val shipYaw = vehicle.vehicle?.let {
@@ -624,11 +617,8 @@ open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
                                 -VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(defaultVec)
                             ).toFloat()
 
-                            val yawRot = Axis.YP.rotationDegrees(-diffY)
-                            val pitchRot = Axis.XP.rotationDegrees(-diffX)
-
-                            val quaternion = Quaterniond(yawRot).mul(Quaterniond(pitchRot))
-                            bone.rotation.mul(Quaternionf(quaternion))
+                            bone.rotation.rotationY(-diffY * Mth.DEG_TO_RAD)
+                            bone.rotation.rotateX(-diffX * Mth.DEG_TO_RAD)
                         }
                     }
                 }
@@ -641,10 +631,7 @@ open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
                                 -VehicleVecUtils.getYRotFromVector(targetVec) + VehicleVecUtils.getYRotFromVector(defaultVec)
                             ).toFloat()
 
-                            val yawRot = Axis.YP.rotationDegrees(-diffY)
-
-                            val quaternion = Quaterniond(yawRot)
-                            bone.rotation.mul(Quaternionf(quaternion))
+                            bone.rotation.rotationY(-diffY * Mth.DEG_TO_RAD)
                         }
                     }
                 }
@@ -657,10 +644,7 @@ open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
                                 -VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(defaultVec)
                             ).toFloat()
 
-                            val pitchRot = Axis.XP.rotationDegrees(-diffX)
-
-                            val quaternion = Quaterniond(pitchRot)
-                            bone.rotation.mul(Quaternionf(quaternion))
+                            bone.rotation.rotationX(-diffX * Mth.DEG_TO_RAD)
                         }
                     }
                 }
@@ -757,9 +741,9 @@ open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
 
     open fun getTrackDistance() = 2f
 
-    protected fun wrap(value: Float, range: Int) = ((value % range) + range) % range
+    open fun wrap(value: Float, range: Int) = ((value % range) + range) % range
 
-    protected fun wrap(value: Float, vehicle: VehicleEntity) = wrap(value, getDefaultWrapRange(vehicle))
+    open fun wrap(value: Float, vehicle: VehicleEntity) = wrap(value, getDefaultWrapRange(vehicle))
 
     fun getDefaultWrapRange(vehicle: VehicleEntity) = vehicle.getTrackAnimationLength()
 
@@ -780,7 +764,7 @@ open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
         val dogTagBones: List<BoneState>,
     )
 
-    private fun getOrComputeBoneGroups(instance: BakedModelInstance): ModelBoneGroups {
+    open fun getOrComputeBoneGroups(instance: BakedModelInstance): ModelBoneGroups {
         val baseModel = instance.baseModel()
         if (boneGroupsCacheKey === baseModel && boneGroupsCache != null) {
             return boneGroupsCache!!
@@ -820,8 +804,9 @@ open class GeoVehicleRendererV2<T>(manager: EntityRendererProvider.Context) :
         @JvmField
         val DOG_TAG_PATTERN: Pattern = Pattern.compile("^.*_dogTag$")
 
-        @JvmField
-        val flareModelInstance = VehicleModelReloadListenerV2.getModel(MUZZLE_FLARE_MODEL)?.createInstance()
+        val flareModelInstance by lazy {
+            VehicleModelReloadListenerV2.getModel(MUZZLE_FLARE_MODEL)?.createInstance()
+        }
 
         @JvmStatic
         fun selectModelEntry(entries: List<VehicleModelEntry>, poseStack: PoseStack): VehicleModelEntry? {

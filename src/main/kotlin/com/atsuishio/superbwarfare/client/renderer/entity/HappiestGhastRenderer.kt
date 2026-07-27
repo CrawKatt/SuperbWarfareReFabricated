@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import java.io.IOException
 
-class HappiestGhastRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRendererV2(manager) {
+class HappiestGhastRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
 
     override fun transformCustomModelPart(
         vehicle: VehicleEntity,
