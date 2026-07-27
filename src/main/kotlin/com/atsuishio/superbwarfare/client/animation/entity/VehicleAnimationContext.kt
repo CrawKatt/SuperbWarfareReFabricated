@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.client.animation.entity
 
 import com.atsuishio.superbwarfare.client.animation.AnimationPlayType
 import com.atsuishio.superbwarfare.entity.vehicle.BasicGeoVehicleEntity
-import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListener
+import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListenerV2
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.animation.BedrockAnimation
 import com.maydaymemory.mae.basic.*
 import com.maydaymemory.mae.blend.EulerAdditiveBlender
@@ -50,7 +50,7 @@ class VehicleAnimationContext<T>(val entity: T, location: ResourceLocation) wher
     }
 
     init {
-        val ani = VehicleModelReloadListener.getAnimation(location)
+        val ani = VehicleModelReloadListenerV2.getAnimation(location)
         if (ani != null) {
             for (entry in ani) {
                 animations[entry.name] = entry
@@ -217,10 +217,10 @@ class VehicleAnimationContext<T>(val entity: T, location: ResourceLocation) wher
         if (index != null && index > 0) {
             val base = weaponName.substringBeforeLast('#')
             val specificName = "animation.$base.idle.$index"
-            if (animations.containsKey(specificName)) {
-                idleAnimName = specificName
+            idleAnimName = if (animations.containsKey(specificName)) {
+                specificName
             } else {
-                idleAnimName = "animation.$base.idle"
+                "animation.$base.idle"
             }
         } else {
             val base = weaponName.substringBeforeLast('#')
@@ -266,7 +266,7 @@ class VehicleAnimationContext<T>(val entity: T, location: ResourceLocation) wher
         if (alpha <= 0f) return DummyPose.INSTANCE
 
         val builder = ArrayPoseBuilder()
-        for (transform in pose.getBoneTransforms()) {
+        for (transform in pose.boneTransforms) {
             // Translation: scale toward [0,0,0] (additive)
             val translation = Vector3f(transform.translation()).mul(alpha)
 

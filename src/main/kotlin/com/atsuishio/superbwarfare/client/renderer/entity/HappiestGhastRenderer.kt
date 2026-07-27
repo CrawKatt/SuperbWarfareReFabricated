@@ -1,10 +1,10 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod
-import com.atsuishio.superbwarfare.client.model.entity.BedrockVehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.tools.mc
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.platform.NativeImage
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
@@ -16,40 +16,39 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import java.io.IOException
 
-class HappiestGhastRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
+class HappiestGhastRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRendererV2(manager) {
 
     override fun transformCustomModelPart(
         vehicle: VehicleEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
-
-        val turretRight = model.getBone("move_turret_right")
+        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        val turretRight = instance.getBone("move_turret_right")
         if (turretRight != null) {
             turretRight.rotation.rotationY(turretYRot * Mth.DEG_TO_RAD)
             turretRight.visible = !(vehicle.isWreck && vehicle.hasTurret() && vehicle.sympatheticDetonated)
         }
 
-        val controlP = model.getBone("move_controlP")
+        val controlP = instance.getBone("move_controlP")
         controlP?.rotation?.rotationX(Mth.clamp(-vehicle.power * 40, -20f, 20f) * Mth.DEG_TO_RAD)
 
-        val controlT = model.getBone("move_controlT")
+        val controlT = instance.getBone("move_controlT")
         controlT?.rotation?.rotationZ(Mth.clamp(vehicle.deltaRot * 16, -20f, 20f) * Mth.DEG_TO_RAD)
     }
 
     override fun renderCustomPart(
         vehicle: VehicleEntity,
-        model: BedrockVehicleModel,
+        instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float,
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        super.renderCustomPart(vehicle, model, poseStack, entityYaw, partialTicks, buffer, packedLight)
+        super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
 
         // 确保动态纹理已预计算，直接获取当前帧对应的预计算纹理
         ensureFlowTexturesLoaded()
@@ -63,14 +62,14 @@ class HappiestGhastRenderer(manager: EntityRendererProvider.Context) : BasicVehi
         val renderTypeLight = RenderType.eyes(texLocation)
         val polyMeshType = BedrockModelRenderTypes.polyMeshCutout(texLocation)
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack, buffer, renderType, polyMeshType,
             packedLight, OverlayTexture.NO_OVERLAY,
             1f, 1f, 1f, 1f
         )
 
         if (!vehicle.sympatheticDetonated) {
-            model.renderToBuffer(
+            instance.renderToBuffer(
                 poseStack, buffer, renderTypeLight, polyMeshType,
                 packedLight, OverlayTexture.NO_OVERLAY,
                 1f, 1f, 1f, 1f
