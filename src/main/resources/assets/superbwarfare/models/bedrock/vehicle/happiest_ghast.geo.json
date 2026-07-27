@@ -1114,13 +1114,13 @@
 					]
 				},
 				{
-					"name": "turret_right",
+					"name": "move_turret_right",
 					"parent": "barrel",
 					"pivot": [-42.90479, 27.5181, 0.757]
 				},
 				{
 					"name": "flare3",
-					"parent": "turret_right",
+					"parent": "move_turret_right",
 					"pivot": [-41.4, 31.99, -49.83133],
 					"cubes": [
 						{
@@ -1181,7 +1181,7 @@
 				},
 				{
 					"name": "cannon5",
-					"parent": "turret_right",
+					"parent": "move_turret_right",
 					"pivot": [-38.4126, 32.0015, -0.0017],
 					"rotation": [0, 0, 90],
 					"cubes": [
@@ -1255,7 +1255,7 @@
 				},
 				{
 					"name": "cannon6",
-					"parent": "turret_right",
+					"parent": "move_turret_right",
 					"pivot": [-38.4126, 32.0015, -0.0017],
 					"rotation": [0, 0, 90]
 				},
@@ -1684,7 +1684,7 @@
 					]
 				},
 				{
-					"name": "controlP",
+					"name": "move_controlP",
 					"parent": "root",
 					"pivot": [4, 64.5, -27.5],
 					"cubes": [
@@ -1713,7 +1713,7 @@
 					]
 				},
 				{
-					"name": "controlT",
+					"name": "move_controlT",
 					"parent": "root",
 					"pivot": [-4.1, 64.5, -27.5],
 					"cubes": [

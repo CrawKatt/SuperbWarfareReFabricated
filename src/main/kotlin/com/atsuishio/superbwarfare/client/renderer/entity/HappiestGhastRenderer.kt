@@ -27,16 +27,16 @@ class HappiestGhastRenderer(manager: EntityRendererProvider.Context) : BasicVehi
     ) {
         super.transformCustomModelPart(vehicle, model, poseStack, entityYaw, partialTicks)
 
-        val turretRight = model.getBone("turret_right")
+        val turretRight = model.getBone("move_turret_right")
         if (turretRight != null) {
             turretRight.rotation.rotationY(turretYRot * Mth.DEG_TO_RAD)
             turretRight.visible = !(vehicle.isWreck && vehicle.hasTurret() && vehicle.sympatheticDetonated)
         }
 
-        val controlP = model.getBone("controlP")
+        val controlP = model.getBone("move_controlP")
         controlP?.rotation?.rotationX(Mth.clamp(-vehicle.power * 40, -20f, 20f) * Mth.DEG_TO_RAD)
 
-        val controlT = model.getBone("controlT")
+        val controlT = model.getBone("move_controlT")
         controlT?.rotation?.rotationZ(Mth.clamp(vehicle.deltaRot * 16, -20f, 20f) * Mth.DEG_TO_RAD)
     }
 
