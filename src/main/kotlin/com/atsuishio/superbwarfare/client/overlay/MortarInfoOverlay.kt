@@ -21,6 +21,10 @@ object MortarInfoOverlay : CommonOverlay("mortar_info") {
         registerComponents(PITCH, YAW, RANGE)
     }
 
+    override fun shouldRender(): Boolean {
+        return super.shouldRender() && OverlayTraceHandler.playerReachEntity is MortarEntity
+    }
+
     override fun RenderContext.preRender() {
         val mortar = OverlayTraceHandler.playerReachEntity as? MortarEntity ?: return
 
