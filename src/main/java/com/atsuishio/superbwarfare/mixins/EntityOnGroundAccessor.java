@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 /**
- * Provides direct field-level access to {@link Entity#onGround} (SRG: {@code f_19796_}),
+ * Provides direct field-level access to {@link Entity#onGround()} (SRG: {@code f_19796_}),
  * bypassing {@link Entity#setOnGround(boolean)} which internally calls the expensive
  */
 @Mixin(Entity.class)
