@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.tools
 
 import com.atsuishio.superbwarfare.annotation.ExcludeBvrSync
+import com.atsuishio.superbwarfare.entity.IBvrSyncableEntity
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.world.entity.Entity

@@ -54,21 +54,27 @@ data class OBB(
      *
      * @param center new world-space centre position
      */
-    fun setCenter(center: Vector3d?) { this.center.set(center) }
+    fun setCenter(center: Vector3d?) {
+        this.center.set(center)
+    }
 
     /**
      * Updates this OBB's half-extents to [extents] in-place.
      *
      * @param extents new half-lengths along local X/Y/Z axes
      */
-    fun setExtents(extents: Vector3d?) { this.extents.set(extents) }
+    fun setExtents(extents: Vector3d?) {
+        this.extents.set(extents)
+    }
 
     /**
      * Updates this OBB's orientation to [rotation] in-place.
      *
      * @param rotation new rotation quaternion
      */
-    fun updateRotation(rotation: Quaterniond?) { this.rotation.set(rotation) }
+    fun updateRotation(rotation: Quaterniond?) {
+        this.rotation.set(rotation)
+    }
 
     //
     // Axis helpers
@@ -93,9 +99,14 @@ data class OBB(
      * @throws ArrayIndexOutOfBoundsException if `out.size < 3`
      */
     fun getAxesInto(out: Array<Vector3d>) {
-        out[0].set(1.0, 0.0, 0.0); rotation.transform(out[0])
-        out[1].set(0.0, 1.0, 0.0); rotation.transform(out[1])
-        out[2].set(0.0, 0.0, 1.0); rotation.transform(out[2])
+        out[0].set(1.0, 0.0, 0.0)
+        rotation.transform(out[0])
+
+        out[1].set(0.0, 1.0, 0.0)
+        rotation.transform(out[1])
+
+        out[2].set(0.0, 0.0, 1.0)
+        rotation.transform(out[2])
     }
 
     /**
@@ -153,9 +164,17 @@ data class OBB(
         val dy = extents.y - projY
         val dz = extents.z - projZ
 
-        if (dx < min) { min = dx; index = 1 }
-        if (dy < min) { min = dy; index = 2 }
-        if (dz < min) { index = 3 }
+        if (dx < min) {
+            min = dx
+            index = 1
+        }
+        if (dy < min) {
+            min = dy
+            index = 2
+        }
+        if (dz < min) {
+            index = 3
+        }
 
         return index * (if (rel.dot(axes[index - 1]) < 0) -1 else 1)
     }
@@ -205,13 +224,13 @@ data class OBB(
         val vertices = arrayOfNulls<Vector3d>(8)
         val localVertices = arrayOf(
             Vector3d(-extents.x, -extents.y, -extents.z),
-            Vector3d( extents.x, -extents.y, -extents.z),
-            Vector3d( extents.x,  extents.y, -extents.z),
-            Vector3d(-extents.x,  extents.y, -extents.z),
-            Vector3d(-extents.x, -extents.y,  extents.z),
-            Vector3d( extents.x, -extents.y,  extents.z),
-            Vector3d( extents.x,  extents.y,  extents.z),
-            Vector3d(-extents.x,  extents.y,  extents.z)
+            Vector3d(extents.x, -extents.y, -extents.z),
+            Vector3d(extents.x, extents.y, -extents.z),
+            Vector3d(-extents.x, extents.y, -extents.z),
+            Vector3d(-extents.x, -extents.y, extents.z),
+            Vector3d(extents.x, -extents.y, extents.z),
+            Vector3d(extents.x, extents.y, extents.z),
+            Vector3d(-extents.x, extents.y, extents.z)
         )
         for (i in 0..7) {
             val vertex = localVertices[i]
@@ -239,16 +258,16 @@ data class OBB(
         getAxesInto(axes)
 
         val localFrom = worldToLocal(pFrom, axes)
-        val localTo   = worldToLocal(pTo,   axes)
+        val localTo = worldToLocal(pTo, axes)
         val dir = Vector3d(localTo).sub(localFrom)
 
         var tEnter = 0.0
-        var tExit  = 1.0
+        var tExit = 1.0
 
         for (i in 0..2) {
             val min = -extents.get(i)
-            val max =  extents.get(i)
-            val origin    = localFrom.get(i)
+            val max = extents.get(i)
+            val origin = localFrom.get(i)
             val direction = dir.get(i)
 
             if (Math.abs(direction) < 1e-7f) {
@@ -259,10 +278,10 @@ data class OBB(
             val t1 = (min - origin) / direction
             val t2 = (max - origin) / direction
             val tNear = Math.min(t1, t2)
-            val tFar  = Math.max(t1, t2)
+            val tFar = Math.max(t1, t2)
 
             if (tNear > tEnter) tEnter = tNear
-            if (tFar  < tExit)  tExit  = tFar
+            if (tFar < tExit) tExit = tFar
             if (tEnter > tExit) return Optional.empty()
         }
 
@@ -353,15 +372,41 @@ data class OBB(
      */
     @Serializable
     enum class Part {
-        @SerializedName("Empty")       @SerialName("Empty")       EMPTY,
-        @SerializedName("WheelLeft")   @SerialName("WheelLeft")   WHEEL_LEFT,
-        @SerializedName("WheelRight")  @SerialName("WheelRight")  WHEEL_RIGHT,
-        @SerializedName("Turret")      @SerialName("Turret")      TURRET,
-        @SerializedName("MainEngine")  @SerialName("MainEngine")  MAIN_ENGINE,
-        @SerializedName("SubEngine")   @SerialName("SubEngine")   SUB_ENGINE,
-        @SerializedName("Body")        @SerialName("Body")        BODY,
-        @SerializedName("Interactive") @SerialName("Interactive") INTERACTIVE,
-        @SerializedName("Collision")   @SerialName("Collision")   COLLISION
+        @SerializedName("Empty")
+        @SerialName("Empty")
+        EMPTY,
+
+        @SerializedName("WheelLeft")
+        @SerialName("WheelLeft")
+        WHEEL_LEFT,
+
+        @SerializedName("WheelRight")
+        @SerialName("WheelRight")
+        WHEEL_RIGHT,
+
+        @SerializedName("Turret")
+        @SerialName("Turret")
+        TURRET,
+
+        @SerializedName("MainEngine")
+        @SerialName("MainEngine")
+        MAIN_ENGINE,
+
+        @SerializedName("SubEngine")
+        @SerialName("SubEngine")
+        SUB_ENGINE,
+
+        @SerializedName("Body")
+        @SerialName("Body")
+        BODY,
+
+        @SerializedName("Interactive")
+        @SerialName("Interactive")
+        INTERACTIVE,
+
+        @SerializedName("Collision")
+        @SerialName("Collision")
+        COLLISION
     }
 
     //
@@ -425,10 +470,14 @@ data class OBB(
          */
         @JvmStatic
         fun isColliding(obb: OBB, other: OBB): Boolean {
-            val axes1 = AXES_A.get(); obb.getAxesInto(axes1)
-            val axes2 = AXES_B.get(); other.getAxesInto(axes2)
+            val axes1 = AXES_A.get()
+            obb.getAxesInto(axes1)
+
+            val axes2 = AXES_B.get()
+            other.getAxesInto(axes2)
+
             return Intersectiond.testObOb(
-                obb.center,   axes1[0], axes1[1], axes1[2], obb.extents,
+                obb.center, axes1[0], axes1[1], axes1[2], obb.extents,
                 other.center, axes2[0], axes2[1], axes2[2], other.extents
             )
         }
@@ -445,8 +494,9 @@ data class OBB(
          */
         @JvmStatic
         fun isColliding(obb: OBB, aabb: AABB): Boolean {
-            val axes = AXES_A.get(); obb.getAxesInto(axes)
-            val aabbCenter      = Vector3d(aabb.center.x, aabb.center.y, aabb.center.z)
+            val axes = AXES_A.get()
+            obb.getAxesInto(axes)
+            val aabbCenter = Vector3d(aabb.center.x, aabb.center.y, aabb.center.z)
             val aabbHalfExtents = Vector3d(aabb.xsize / 2.0, aabb.ysize / 2.0, aabb.zsize / 2.0)
             return Intersectiond.testObOb(
                 obb.center.x, obb.center.y, obb.center.z,
@@ -554,7 +604,9 @@ data class OBB(
             val obbHalfArr = doubleArrayOf(extX, extY, extZ)
             for (i in 0..2) {
                 val axis = obbAxesArr[i]
-                val axisX = axis.x; val axisY = axis.y; val axisZ = axis.z
+                val axisX = axis.x
+                val axisY = axis.y
+                val axisZ = axis.z
                 val centerDist = dX * axisX + dY * axisY + dZ * axisZ
                 val obbRadius = obbHalfArr[i]
                 val aabbRadius = Math.abs(axisX) * aabbHalfX + Math.abs(axisY) * aabbHalfY + Math.abs(axisZ) * aabbHalfZ
@@ -562,7 +614,9 @@ data class OBB(
                 if (overlap < 0.0) return null
                 if (overlap < minOverlap) {
                     minOverlap = overlap
-                    mtvAxisX = axisX; mtvAxisY = axisY; mtvAxisZ = axisZ
+                    mtvAxisX = axisX
+                    mtvAxisY = axisY
+                    mtvAxisZ = axisZ
                     pushNegative = centerDist < 0.0
                 }
             }
@@ -576,7 +630,9 @@ data class OBB(
                 if (overlap < 0.0) return null
                 if (overlap < minOverlap) {
                     minOverlap = overlap
-                    mtvAxisX = 1.0; mtvAxisY = 0.0; mtvAxisZ = 0.0
+                    mtvAxisX = 1.0
+                    mtvAxisY = 0.0
+                    mtvAxisZ = 0.0
                     pushNegative = dX < 0.0
                 }
             }
@@ -586,7 +642,9 @@ data class OBB(
                 if (overlap < 0.0) return null
                 if (overlap < minOverlap) {
                     minOverlap = overlap
-                    mtvAxisX = 0.0; mtvAxisY = 1.0; mtvAxisZ = 0.0
+                    mtvAxisX = 0.0
+                    mtvAxisY = 1.0
+                    mtvAxisZ = 0.0
                     pushNegative = dY < 0.0
                 }
             }
@@ -596,7 +654,9 @@ data class OBB(
                 if (overlap < 0.0) return null
                 if (overlap < minOverlap) {
                     minOverlap = overlap
-                    mtvAxisX = 0.0; mtvAxisY = 0.0; mtvAxisZ = 1.0
+                    mtvAxisX = 0.0
+                    mtvAxisY = 0.0
+                    mtvAxisZ = 1.0
                     pushNegative = dZ < 0.0
                 }
             }
@@ -611,11 +671,27 @@ data class OBB(
             for (i in 0..2) {
                 val a = obbAxesArr[i]
                 for (j in 0..2) {
-                    val axisX: Double; val axisY: Double; val axisZ: Double
+                    val axisX: Double
+                    val axisY: Double
+                    val axisZ: Double
                     when (j) {
-                        0 -> { axisX = 0.0;  axisY =  a.z; axisZ = -a.y }
-                        1 -> { axisX = -a.z; axisY = 0.0;  axisZ =  a.x }
-                        else -> { axisX =  a.y; axisY = -a.x; axisZ = 0.0 }
+                        0 -> {
+                            axisX = 0.0
+                            axisY = a.z
+                            axisZ = -a.y
+                        }
+
+                        1 -> {
+                            axisX = -a.z
+                            axisY = 0.0
+                            axisZ = a.x
+                        }
+
+                        else -> {
+                            axisX = a.y
+                            axisY = -a.x
+                            axisZ = 0.0
+                        }
                     }
 
                     val lenSq = axisX * axisX + axisY * axisY + axisZ * axisZ
@@ -624,7 +700,9 @@ data class OBB(
                     if (lenSq < 1.0e-9) continue
 
                     val invLen = 1.0 / Math.sqrt(lenSq)
-                    val nx = axisX * invLen; val ny = axisY * invLen; val nz = axisZ * invLen
+                    val nx = axisX * invLen
+                    val ny = axisY * invLen
+                    val nz = axisZ * invLen
 
                     val centerDist = dX * nx + dY * ny + dZ * nz
                     var obbRadius = 0.0
@@ -711,15 +789,20 @@ data class OBB(
          */
         @JvmStatic
         fun getWorldAABB(obb: OBB): AABB {
-            val axes = AXES_A.get(); obb.getAxesInto(axes)
-            val c = obb.center; val e = obb.extents
+            val axes = AXES_A.get()
+            obb.getAxesInto(axes)
+
+            val c = obb.center
+            val e = obb.extents
 
             val halfX = Math.abs(axes[0].x) * e.x + Math.abs(axes[1].x) * e.y + Math.abs(axes[2].x) * e.z
             val halfY = Math.abs(axes[0].y) * e.x + Math.abs(axes[1].y) * e.y + Math.abs(axes[2].y) * e.z
             val halfZ = Math.abs(axes[0].z) * e.x + Math.abs(axes[1].z) * e.y + Math.abs(axes[2].z) * e.z
 
-            return AABB(c.x - halfX, c.y - halfY, c.z - halfZ,
-                        c.x + halfX, c.y + halfY, c.z + halfZ)
+            return AABB(
+                c.x - halfX, c.y - halfY, c.z - halfZ,
+                c.x + halfX, c.y + halfY, c.z + halfZ
+            )
         }
 
         //
@@ -739,9 +822,9 @@ data class OBB(
          */
         @JvmStatic
         fun getClosestPointOBB(point: Vector3d, obb: OBB): Vector3d {
-            val axes    = AXES_A.get(); obb.getAxesInto(axes)
-            val nearP   = Vector3d(obb.center)
-            val dist    = point.sub(nearP, Vector3d())
+            val axes = AXES_A.get(); obb.getAxesInto(axes)
+            val nearP = Vector3d(obb.center)
+            val dist = point.sub(nearP, Vector3d())
             val extents = doubleArrayOf(obb.extents.x, obb.extents.y, obb.extents.z)
 
             for (i in 0..2) {
@@ -770,7 +853,7 @@ data class OBB(
             val lookingEntity = TraceTool.findLookingEntity(player, range)
             if (lookingEntity !is OBBEntity || lookingEntity.enableAABB()) return null
 
-            val eyePos  = player.getEyePosition(1.0f)
+            val eyePos = player.getEyePosition(1.0f)
             val viewVec = player.getViewVector(1.0f)
             val lookEnd = eyePos.add(viewVec.scale(range))
 
@@ -802,18 +885,18 @@ data class OBB(
          * @return world-space hit position, or `null` if no intersection
          */
         fun rayIntersect(obb: OBB, start: Vec3, end: Vec3): Vec3? {
-            val center  = vector3dToVec3(obb.center)
+            val center = vector3dToVec3(obb.center)
             val extents = vector3dToVec3(obb.extents)
 
             val localStart = toLocal(obb, start)
-            val localEnd   = toLocal(obb, end)
+            val localEnd = toLocal(obb, end)
 
             val result = Vector2d()
             val intersects = Intersectiond.intersectRayAab(
                 localStart.x, localStart.y, localStart.z,
                 localEnd.x - localStart.x, localEnd.y - localStart.y, localEnd.z - localStart.z,
                 -extents.x, -extents.y, -extents.z,
-                 extents.x,  extents.y,  extents.z,
+                extents.x, extents.y, extents.z,
                 result
             )
 
@@ -831,7 +914,7 @@ data class OBB(
 
         /** Transforms [worldPoint] into [obb]'s local coordinate frame. */
         private fun toLocal(obb: OBB, worldPoint: Vec3): Vector3d {
-            val center  = vector3dToVec3(obb.center)
+            val center = vector3dToVec3(obb.center)
             val inverse = Quaterniond(obb.rotation).conjugate()
             val relative = Vector3d(
                 worldPoint.x - center.x,

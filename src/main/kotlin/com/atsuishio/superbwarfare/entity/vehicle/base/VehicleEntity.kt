@@ -19,6 +19,7 @@ import com.atsuishio.superbwarfare.data.vehicle.VehicleData
 import com.atsuishio.superbwarfare.data.vehicle.VehiclePropertyModifier
 import com.atsuishio.superbwarfare.data.vehicle.subdata.*
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo.*
+import com.atsuishio.superbwarfare.entity.IBvrSyncableEntity
 import com.atsuishio.superbwarfare.entity.OBBEntity
 import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter
