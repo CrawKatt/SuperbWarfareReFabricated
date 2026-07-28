@@ -26,7 +26,7 @@ class LavAdRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRende
     ) {
         super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
 
-        val heat = Mth.clamp(vehicle.getWeaponHeat(0).toFloat(), 0f, 100f)
+        val heat = Mth.clamp(vehicle.getWeaponHeat(0, 0).toFloat(), 0f, 100f)
 
         if (heat > 0) {
             instance.renderToBuffer(
