@@ -554,8 +554,8 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                 }
             }
 
-            base.x = -r2 * recoilShake * 0.5f * 16f
-            base.z = r * recoilShake * 16f
+            base.x = -r2 * recoilShake * 0.5f
+            base.z = r * recoilShake
 
             base.rotation.rotationX(r * recoilShake * Mth.DEG_TO_RAD)
             base.rotation.rotateZ(r2 * recoilShake * Mth.DEG_TO_RAD)
