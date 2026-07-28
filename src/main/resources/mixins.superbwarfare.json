@@ -10,6 +10,7 @@
     "ClientLevelMixin",
     "EnchantedCountIncreaseFunctionMixin",
     "EntityMixin",
+    "EntityOnGroundAccessor",
     "ExplosionMixin",
     "FishingHookMixin",
     "LevelMixin",

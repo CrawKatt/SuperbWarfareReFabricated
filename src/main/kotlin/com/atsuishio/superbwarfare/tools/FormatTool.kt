@@ -11,7 +11,7 @@ fun String.camelToSnake() = FormatTool.camelToSnake(this)
  * Utility class for decimal formatting and string modifications.
  *
  * @author atsuishio
- * @since 1.0.0
+ * @since 0.8.9.1
  */
 object FormatTool {
     @JvmField

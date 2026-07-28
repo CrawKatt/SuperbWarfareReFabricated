@@ -4,10 +4,7 @@ import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.init.ModSerializers
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.network.message.receive.EntityRelationSyncMessage
-import com.atsuishio.superbwarfare.tools.EntityFindUtil
-import com.atsuishio.superbwarfare.tools.SeekTool
-import com.atsuishio.superbwarfare.tools.ServerSyncedEntityHandler
-import com.atsuishio.superbwarfare.tools.sendPacketTo
+import com.atsuishio.superbwarfare.tools.*
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
@@ -21,7 +18,8 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
 
-abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, IEntityWithComplexSpawn {
+abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, IEntityWithComplexSpawn,
+    IBvrSyncableEntity {
     override fun getTargetPos(): Vec3? {
         val v = entityData.get(TARGET_POS)
         return if (v == Vec3.ZERO) null else v
@@ -84,6 +82,37 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
         super.defineSynchedData(builder)
         builder.define(TARGET_UUID, "none")
         builder.define(TARGET_POS, Vec3.ZERO)
+    }
+
+    /**
+     * Direct lightweight BVR serialization for guided missiles.
+     *
+     * Writes only spatial coordinates, target vectors, and orientation without triggering
+     * full throwable projectile NBT saves.
+     *
+     * @param tag destination compound tag.
+     */
+    override fun buildBvrSyncNbt(tag: CompoundTag) {
+        val encodeId = this.encodeId ?: return
+        tag.putString("id", encodeId)
+        tag.putInt("EntityId", this.id)
+        tag.putDouble("PosX", x)
+        tag.putDouble("PosY", y)
+        tag.putDouble("PosZ", z)
+        tag.putDouble("MotionX", deltaMovement.x)
+        tag.putDouble("MotionY", deltaMovement.y)
+        tag.putDouble("MotionZ", deltaMovement.z)
+        tag.putFloat("Yaw", yRot)
+        tag.putFloat("Pitch", xRot)
+        tag.putUUID("UUID", this.uuid)
+
+        tag.putString("TargetUuid", getTargetUUID())
+        val tp = getTargetPos()
+        if (tp != null) {
+            tag.putDouble("TargetPosX", tp.x)
+            tag.putDouble("TargetPosY", tp.y)
+            tag.putDouble("TargetPosZ", tp.z)
+        }
     }
 
     override fun readAdditionalSaveData(compound: CompoundTag) {

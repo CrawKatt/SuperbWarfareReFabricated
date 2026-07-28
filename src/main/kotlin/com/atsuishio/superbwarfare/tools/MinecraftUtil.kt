@@ -81,11 +81,24 @@ fun Vec3?.toFormattedString(): String {
     return "[ " + format0D(x) + ", " + format0D(y) + ", " + format0D(z) + " ]"
 }
 
-fun isSameItemStack(a: ItemStack, b: ItemStack) = a sameWith b
+/**
+ * Returns `true` when [this] and [that] represent the same item type with
+ * identical NBT data, treating `null` and empty [CompoundTag] as equivalent.
+ *
+ * Unlike [ItemStack.isSameItemSameTags], this method **never** triggers
+ * capability-gathering or posts to the Forge event bus, making it safe to
+ * call in tight per-tick loops (ammo scanning, inventory searches).
+ *
+ * @param that the stack to compare against; `null` returns `false`
+ * @return `true` if item type and NBT are equivalent
+ */
 infix fun ItemStack.sameWith(that: ItemStack?): Boolean {
-    return if (that == null) false
-    else ItemStack.isSameItemSameComponents(this, that)
+    if (that == null) return false
+    return ItemStack.isSameItemSameComponents(this, that)
 }
+
+// Keeps the existing public alias working without changes at call sites.
+fun isSameItemStack(a: ItemStack, b: ItemStack) = a sameWith b
 
 fun Player.sendPacket(packet: CustomPacketPayload) = sendPacketTo(this, packet)
 fun Player.sendPacket(packet: Packet<*>) = sendPacketTo(this, packet)
