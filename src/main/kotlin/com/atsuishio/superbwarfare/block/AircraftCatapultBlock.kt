@@ -129,7 +129,7 @@ open class AircraftCatapultBlock :
         super.entityInside(pState, pLevel, pPos, pEntity)
         if (pEntity !is CatapultShuttleEntity) return
 
-        val diffY = Mth.wrapDegrees(getWorldYRot(pState) - pEntity.yRot)
+        val diffY = Mth.wrapDegrees(-getWorldYRot(pState) - pEntity.yRot)
         pEntity.yRot += 0.9f * diffY
         pEntity.yRotO += 0.9f * diffY
 

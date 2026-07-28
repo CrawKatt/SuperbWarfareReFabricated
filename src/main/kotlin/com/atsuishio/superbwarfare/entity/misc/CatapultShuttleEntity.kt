@@ -35,6 +35,10 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
 
     constructor(level: Level) : this(ModEntities.CATAPULT_SHUTTLE.get(), level)
 
+    override fun canCollideWith(entity: Entity): Boolean {
+        return entity is CatapultShuttleEntity
+    }
+
     override fun isPickable(): Boolean {
         return !this.isRemoved
     }
@@ -113,7 +117,7 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
             return
         }
 
-        if (dist > 16) {
+        if (dist > 16 + longestSide) {
             clearTowingInfo()
             return
         }
