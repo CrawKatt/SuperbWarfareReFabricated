@@ -1395,7 +1395,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                 VehicleShootClientMessage(
                     living.uuid,
                     this.uuid,
-                    index
+                    index,
+                    getGunName(seatIndex) ?: ""
                 )
             )
         }
