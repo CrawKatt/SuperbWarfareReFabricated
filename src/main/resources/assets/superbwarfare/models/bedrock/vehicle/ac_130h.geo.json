@@ -23331,14 +23331,14 @@
 					]
 				},
 				{
-					"name": "bofors",
+					"name": "move_bofors",
 					"parent": "weapon",
 					"pivot": [40.57422, 39.32734, 53.5],
 					"rotation": [0, -90, 25]
 				},
 				{
 					"name": "barrelAction",
-					"parent": "bofors",
+					"parent": "move_bofors",
 					"pivot": [40.57422, 39.32734, 53.5],
 					"cubes": [
 						{
@@ -23505,7 +23505,7 @@
 					]
 				},
 				{
-					"name": "m102",
+					"name": "move_m102",
 					"parent": "weapon",
 					"pivot": [33.6383, 48.27205, 107.23047],
 					"rotation": [0, -90, 20],
@@ -23806,7 +23806,7 @@
 				},
 				{
 					"name": "bone41",
-					"parent": "m102",
+					"parent": "move_m102",
 					"pivot": [33.6383, 47.9447, 94.69714],
 					"cubes": [
 						{
@@ -23863,7 +23863,7 @@
 				},
 				{
 					"name": "bone46",
-					"parent": "m102",
+					"parent": "move_m102",
 					"pivot": [33.38842, 50.58342, 98.89887],
 					"cubes": [
 						{
@@ -23958,7 +23958,7 @@
 				},
 				{
 					"name": "move",
-					"parent": "m102",
+					"parent": "move_m102",
 					"pivot": [34.556, 46.94116, 75.67377],
 					"cubes": [
 						{
@@ -24280,7 +24280,7 @@
 				},
 				{
 					"name": "flare4",
-					"parent": "m102",
+					"parent": "move_m102",
 					"pivot": [33.75, 47.8, 41.30156]
 				},
 				{
@@ -24348,14 +24348,14 @@
 					]
 				},
 				{
-					"name": "m61a",
+					"name": "move_m61a",
 					"parent": "weapon",
 					"pivot": [37.57422, 40.32734, -143],
 					"rotation": [0, -90, 31.5]
 				},
 				{
 					"name": "rot_barrel",
-					"parent": "m61a",
+					"parent": "move_m61a",
 					"pivot": [37.57422, 40.32733, -138.67735]
 				},
 				{
@@ -24851,7 +24851,7 @@
 				},
 				{
 					"name": "bone12",
-					"parent": "m61a",
+					"parent": "move_m61a",
 					"pivot": [37.57422, 40.32733, -138.67735],
 					"rotation": [0, -90, 0],
 					"cubes": [
@@ -24901,7 +24901,7 @@
 				},
 				{
 					"name": "bone15",
-					"parent": "m61a",
+					"parent": "move_m61a",
 					"pivot": [37.57422, 40.32734, -145.36306],
 					"rotation": [0, -90, 0],
 					"cubes": [
@@ -24957,36 +24957,36 @@
 				},
 				{
 					"name": "bone16",
-					"parent": "m61a",
+					"parent": "move_m61a",
 					"pivot": [37.57422, 40.32733, -138.67735]
 				},
 				{
 					"name": "bone17",
-					"parent": "m61a",
+					"parent": "move_m61a",
 					"pivot": [37.57422, 40.32733, -138.67735],
 					"rotation": [0, 0, -72]
 				},
 				{
 					"name": "bone18",
-					"parent": "m61a",
+					"parent": "move_m61a",
 					"pivot": [37.57422, 40.32733, -138.67735],
 					"rotation": [0, 0, -144]
 				},
 				{
 					"name": "bone19",
-					"parent": "m61a",
+					"parent": "move_m61a",
 					"pivot": [37.57422, 40.32733, -138.67735],
 					"rotation": [0, 0, 144]
 				},
 				{
 					"name": "bone20",
-					"parent": "m61a",
+					"parent": "move_m61a",
 					"pivot": [37.57422, 40.32733, -138.67735],
 					"rotation": [0, 0, 72]
 				},
 				{
 					"name": "flare",
-					"parent": "m61a",
+					"parent": "move_m61a",
 					"pivot": [37.5, 41.3, -170.69844]
 				},
 				{
@@ -25054,14 +25054,14 @@
 					]
 				},
 				{
-					"name": "m61b",
+					"name": "move_m61b",
 					"parent": "weapon",
 					"pivot": [37.57422, 40.32734, -126],
 					"rotation": [0, -90, 31.5]
 				},
 				{
 					"name": "rot_barrel2",
-					"parent": "m61b",
+					"parent": "move_m61b",
 					"pivot": [37.57422, 40.32733, -121.67735]
 				},
 				{
@@ -25557,7 +25557,7 @@
 				},
 				{
 					"name": "bone30",
-					"parent": "m61b",
+					"parent": "move_m61b",
 					"pivot": [37.57422, 40.32733, -121.67735],
 					"rotation": [0, -90, 0],
 					"cubes": [
@@ -25607,7 +25607,7 @@
 				},
 				{
 					"name": "bone31",
-					"parent": "m61b",
+					"parent": "move_m61b",
 					"pivot": [37.57422, 40.32734, -128.36306],
 					"rotation": [0, -90, 0],
 					"cubes": [
@@ -25663,36 +25663,36 @@
 				},
 				{
 					"name": "bone32",
-					"parent": "m61b",
+					"parent": "move_m61b",
 					"pivot": [37.57422, 40.32733, -121.67735]
 				},
 				{
 					"name": "bone33",
-					"parent": "m61b",
+					"parent": "move_m61b",
 					"pivot": [37.57422, 40.32733, -121.67735],
 					"rotation": [0, 0, -72]
 				},
 				{
 					"name": "bone34",
-					"parent": "m61b",
+					"parent": "move_m61b",
 					"pivot": [37.57422, 40.32733, -121.67735],
 					"rotation": [0, 0, -144]
 				},
 				{
 					"name": "bone36",
-					"parent": "m61b",
+					"parent": "move_m61b",
 					"pivot": [37.57422, 40.32733, -121.67735],
 					"rotation": [0, 0, 144]
 				},
 				{
 					"name": "bone38",
-					"parent": "m61b",
+					"parent": "move_m61b",
 					"pivot": [37.57422, 40.32733, -121.67735],
 					"rotation": [0, 0, 72]
 				},
 				{
 					"name": "flare2",
-					"parent": "m61b",
+					"parent": "move_m61b",
 					"pivot": [37.5, 41.3, -153.69844]
 				},
 				{

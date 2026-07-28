@@ -178,8 +178,8 @@
     },
     "MachineGun": {
       "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/gun_12_7mm.png",
-      "BoundBonesYaw": ["hmgYaw"],
-      "BoundBonesPitch": ["hmgPitch"],
+      "BoundBonesYaw": ["move_hmgYaw"],
+      "BoundBonesPitch": ["move_hmgPitch"],
       "DefaultFireMode": "Auto",
       "AvailableFireModes": "Auto",
       "Spread": 0.25,

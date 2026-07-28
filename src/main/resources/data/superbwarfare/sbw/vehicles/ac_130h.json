@@ -222,7 +222,7 @@
     "M61": {
       "DefaultFireMode": "Auto",
       "AvailableFireModes": "Auto",
-      "BoundBones": ["m61a", "m61b"],
+      "BoundBones": ["move_m61a", "move_m61b"],
       "Projectile": "superbwarfare:small_cannon_shell",
       "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/cannon_25mm_he.png",
       "DefaultZoom": 3,
@@ -266,7 +266,7 @@
     "Bofors": {
       "DefaultFireMode": "Auto",
       "AvailableFireModes": "Auto",
-      "BoundBones": ["bofors"],
+      "BoundBones": ["move_bofors"],
       "Projectile": "superbwarfare:small_cannon_shell",
       "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/cannon_40mm_he.png",
       "DefaultZoom": 3,
@@ -315,7 +315,7 @@
     "M102": {
       "DefaultFireMode": "Auto",
       "AvailableFireModes": "Auto",
-      "BoundBones": ["m102"],
+      "BoundBones": ["move_m102"],
       "Projectile": "superbwarfare:cannon_shell",
       "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/he_shell.png",
       "DefaultZoom": 3,
