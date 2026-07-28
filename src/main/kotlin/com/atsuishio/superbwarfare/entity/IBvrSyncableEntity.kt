@@ -1,4 +1,4 @@
-package com.atsuishio.superbwarfare.tools
+package com.atsuishio.superbwarfare.entity
 
 import net.minecraft.nbt.CompoundTag
 
@@ -18,7 +18,7 @@ interface IBvrSyncableEntity {
     /**
      * Writes minimal NBT fields required for long-range BVR client rendering and tracking.
      *
-     * @param tag destination [CompoundTag] to write fields into.
+     * @param tag destination [net.minecraft.nbt.CompoundTag] to write fields into.
      */
     fun buildBvrSyncNbt(tag: CompoundTag)
 }

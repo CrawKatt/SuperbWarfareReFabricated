@@ -1011,7 +1011,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             shootPosition,
             toVec,
             aabb,
-            { p -> !p.isSpectator && p.isAlive && p != shooter && p != shooter.vehicle},
+            { p -> !p.isSpectator && p.isAlive && p != shooter && p != shooter.vehicle },
             distance
         )
 
