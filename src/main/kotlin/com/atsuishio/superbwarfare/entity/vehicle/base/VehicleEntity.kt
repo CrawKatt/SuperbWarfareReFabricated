@@ -150,7 +150,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             val distance = pojo.distance
             val bakedModel = if (distance > 0) VehicleLODModelReloadListener.getModel(modelPath)
             else VehicleModelReloadListener.getModel(modelPath)
-            val instance = bakedModel?.createInstance() ?: return@mapNotNull null
+            val instance = bakedModel?.let { VehicleModelInstance(it) } ?: return@mapNotNull null
             VehicleModelEntry(instance, texture, pojo.emissiveTexture, distance)
         }
     }
