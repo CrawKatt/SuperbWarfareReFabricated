@@ -39,7 +39,6 @@ class ModEntityTypeTagProvider(
             ModEntities.SWARM_DRONE.get(),
             ModEntities.WIRE_GUIDE_MISSILE.get(),
             ModEntities.RU_3M14_MISSILE.get()
-
         )
 
         this.tag(ModTags.EntityTypes.DECOY).add(
@@ -101,11 +100,56 @@ class ModEntityTypeTagProvider(
             EntityType.WANDERING_TRADER,
             ModEntities.SENPAI.get()
         ).addOptional(ResourceLocation("touhou_little_maid", "maid"))
-    }
 
-    companion object {
-        fun forgeTag(name: String): TagKey<EntityType<*>> {
-            return TagKey.create(Registries.ENTITY_TYPE, ResourceLocation("forge", name))
-        }
+        this.tag(
+            TagKey.create(
+                Registries.ENTITY_TYPE,
+                ResourceLocation("touhou_little_maid", "maid_vehicle_rotate_blocklist")
+            )
+        ).add(
+            ModEntities.TYPE_63.get(),
+            ModEntities.MK_42.get(),
+            ModEntities.HPJ_11.get(),
+            ModEntities.MLE_1934.get(),
+            ModEntities.BL_132.get(),
+            ModEntities.ANNIHILATOR.get(),
+            ModEntities.LASER_TOWER.get(),
+            ModEntities.WAVEFORCE_TOWER.get(),
+            ModEntities.TOW.get(),
+            ModEntities.SPEEDBOAT.get(),
+            ModEntities.TINY_SPEEDBOAT.get(),
+            ModEntities.WHEEL_CHAIR.get(),
+            ModEntities.LAV_150.get(),
+            ModEntities.LAV_AD.get(),
+            ModEntities.LAV_25.get(),
+            ModEntities.BMP_2.get(),
+            ModEntities.BRADLEY.get(),
+            ModEntities.ZTZ_99A.get(),
+            ModEntities.T_90A.get(),
+            ModEntities.M_1A_2.get(),
+            ModEntities.YX_100.get(),
+            ModEntities.PRISM_TANK.get(),
+            ModEntities.PLZ_05.get(),
+            ModEntities.FH_77BW.get(),
+            ModEntities.TOM_6.get(),
+            ModEntities.AH_6.get(),
+            ModEntities.MI_28.get(),
+            ModEntities.KV_16.get(),
+            ModEntities.JU_87.get(),
+            ModEntities.A_10A.get(),
+            ModEntities.J_16.get(),
+            ModEntities.AC_130H.get(),
+            ModEntities.AIR_SHEEP.get(),
+            ModEntities.HAPPIEST_GHAST.get(),
+            ModEntities.KIROV.get(),
+            ModEntities.DRONE.get(),
+            ModEntities.MORTAR.get(),
+            ModEntities.VEHICLE_ASSEMBLING_TABLE.get(),
+            ModEntities.SODAYO_PICK_UP.get(),
+            ModEntities.SODAYO_PICK_UP_HMG.get(),
+            ModEntities.SODAYO_PICK_UP_ROCKET.get(),
+            ModEntities.SODAYO_PICK_UP_TOW.get(),
+            ModEntities.TRUCK.get(),
+        )
     }
 }
