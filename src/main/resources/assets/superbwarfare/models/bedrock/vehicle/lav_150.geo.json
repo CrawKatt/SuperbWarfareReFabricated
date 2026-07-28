@@ -6376,7 +6376,7 @@
 					]
 				},
 				{
-					"name": "body_left_dogTag",
+					"name": "body_left_dogTag_8x8",
 					"parent": "base",
 					"pivot": [18.80954, 32.93211, 18.12982],
 					"rotation": [0, -90, -26.5],
@@ -6391,7 +6391,7 @@
 					]
 				},
 				{
-					"name": "body_right_dogTag",
+					"name": "body_right_dogTag_8x8",
 					"parent": "base",
 					"pivot": [-18.80954, 32.93211, 18.12982],
 					"rotation": [0, 90, 26.5],

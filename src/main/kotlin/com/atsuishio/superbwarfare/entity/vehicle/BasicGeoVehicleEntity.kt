@@ -47,7 +47,21 @@ data class ModelBoneGroups(
         val TRACK_PATTERN: Pattern = Pattern.compile("^track(?<type>Mov|Rot)(?<direction>[LR])(?<id>\\d+)$")
         val FLARE_PATTERN: Pattern = Pattern.compile("^flare.*")
         val LASER_PATTERN: Pattern = Pattern.compile("^laser.*")
-        val DOG_TAG_PATTERN: Pattern = Pattern.compile("^.*_dogTag$")
+        val DOG_TAG_PATTERN: Pattern = Pattern.compile("^.*_dogTag_(?<w>\\d+)x(?<h>\\d+)$")
+
+        /**
+         * Parses the dog tag quad size from a bone name like "body_back_dogTag_10x10".
+         * Returns a pair of (width, height) in block units (Bedrock units / 16),
+         * or null if the name doesn't match.
+         */
+        @JvmStatic
+        fun parseDogTagSize(boneName: String): Pair<Float, Float>? {
+            val matcher = DOG_TAG_PATTERN.matcher(boneName)
+            if (!matcher.matches()) return null
+            val w = matcher.group("w")?.toFloatOrNull() ?: return null
+            val h = matcher.group("h")?.toFloatOrNull() ?: return null
+            return Pair(w / 16f, h / 16f)
+        }
 
         @JvmStatic
         fun compute(instance: BakedModelInstance): ModelBoneGroups {
