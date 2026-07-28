@@ -41,6 +41,13 @@ object SyncConfig {
     }
 
     @JvmField
+    val ENABLE_RENDER_SYNCED_ENTITIES = buildServerConfig {
+        comment("Set true to allow rendering synchronized entities")
+        comment("是否允许渲染超视距同步实体")
+        define("enable_render_synced_entities", false)
+    }
+
+    @JvmField
     val MAX_RENDER_DISTANCE = buildServerConfig {
         comment("The maximum distance for rendering synchronized entities")
         comment("允许渲染超视距同步实体的最大距离")

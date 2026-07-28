@@ -30,6 +30,7 @@ object SyncedEntityWorldRenderer {
     @SubscribeEvent
     fun onRenderLevelStage(event: RenderLevelStageEvent) {
         if (event.stage != RenderLevelStageEvent.Stage.AFTER_ENTITIES) return
+        if (!SyncConfig.ENABLE_RENDER_SYNCED_ENTITIES.get()) return
 
         val level = clientLevel ?: return
         val camera = event.camera

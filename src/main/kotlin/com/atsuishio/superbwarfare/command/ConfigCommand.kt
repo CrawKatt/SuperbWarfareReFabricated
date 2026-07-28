@@ -39,6 +39,7 @@ val CONFIG_COMMAND = buildCommand("config") {
     booleanConfig(MiscConfig::THROW_MEDICAL_KIT)
 
     booleanConfig(SyncConfig::SYNC_ENTITY_OVER_RANGE)
+    booleanConfig(SyncConfig::ENABLE_RENDER_SYNCED_ENTITIES)
 }
 
 private enum class DestroyType(
