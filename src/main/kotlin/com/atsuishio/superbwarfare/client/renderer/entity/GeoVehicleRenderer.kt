@@ -11,7 +11,9 @@ import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType
 import com.atsuishio.superbwarfare.data.vehicle_skin.VehicleSkin
 import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.BasicGeoVehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.ModelBoneGroups
 import com.atsuishio.superbwarfare.entity.vehicle.VehicleModelEntry
+import com.atsuishio.superbwarfare.entity.vehicle.VehicleModelInstance
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils
@@ -24,7 +26,6 @@ import com.atsuishio.superbwarfare.tools.SpritePixelHelper
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.mulPoseMatrix
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
-import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.baked.BakedBedrockModel
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BoneState
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
@@ -48,7 +49,6 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
 import org.joml.Quaternionf
-import java.util.regex.Pattern
 
 open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
     EntityRenderer<T>(manager) where T : VehicleEntity, T : BasicGeoVehicleEntity {
@@ -70,9 +70,6 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
     var hideForPassengerWeaponStationControllerWhileZooming = false
 
     private var seatsCache: MutableList<SeatInfo>? = null
-
-    private var boneGroupsCache: ModelBoneGroups? = null
-    private var boneGroupsCacheKey: BakedBedrockModel? = null
 
     override fun getTextureLocation(entity: T): ResourceLocation {
         val (_, namespace, id) = entity.type.descriptionId.split(".")
@@ -153,7 +150,7 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             waterMask.visible = false
         }
 
-        val boneGroups = getOrComputeBoneGroups(instance)
+        val boneGroups = entry.boneGroups
         val dogTagBones = boneGroups.dogTagBones
         val dogTagFlag = dogTagBones.isNotEmpty()
         if (dogTagFlag) {
@@ -311,20 +308,20 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             if (DisplayConfig.DOG_TAG_ICON_VISIBLE.get() && !flag) {
                 val dogTagTexture = SpritePixelHelper.getDogTagIcon(list, entity.uuid.toString())
 
+                // TODO bone大小？
                 for (bone in dogTagBones) {
                     poseStack.pushPose()
                     poseStack.mulPoseMatrix(bone.getGlobalTransform(instance))
-                    poseStack.mulPose(Axis.YP.rotationDegrees(180f))
-                    poseStack.mulPose(Axis.XP.rotationDegrees(90f))
+                    val def = bone.definition()
+                    poseStack.translate(def.pivotX() + bone.xScale / 2, def.pivotY(), def.pivotZ())
 
                     val pose = poseStack.last()
                     val lastMatrix = pose.pose()
                     val vertexConsumer =
                         buffer.getBuffer(RenderType.entityCutoutNoCull(dogTagTexture))
 
-                    // V2 BoneState doesn't expose cube dimensions; use 1f as default
-                    val xSize = 1f
-                    val ySize = 1f
+                    val xSize = bone.xScale
+                    val ySize = bone.yScale
 
                     vertex(vertexConsumer, lastMatrix, pose, packedLight, -0.5f * xSize, -0.5f * ySize, 0, 1)
                     vertex(vertexConsumer, lastMatrix, pose, packedLight, 0.5f * xSize, -0.5f * ySize, 1, 1)
@@ -473,6 +470,10 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
         }
     }
 
+    open fun getOrComputeBoneGroups(instance: BakedModelInstance): ModelBoneGroups {
+        return (instance as? VehicleModelInstance)?.boneGroups ?: ModelBoneGroups.compute(instance)
+    }
+
     open fun transformCustomModelPart(
         vehicle: T,
         instance: BakedModelInstance,
@@ -614,10 +615,14 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                         if (bone != null) {
                             // TODO 期待后人智慧，万一哪天正确实现了获取骨骼朝向
                             val diffY = Mth.wrapDegrees(
-                                -VehicleVecUtils.getYRotFromVector(targetVec) + VehicleVecUtils.getYRotFromVector(defaultVec)
+                                -VehicleVecUtils.getYRotFromVector(targetVec) + VehicleVecUtils.getYRotFromVector(
+                                    defaultVec
+                                )
                             ).toFloat()
                             val diffX = Mth.wrapDegrees(
-                                -VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(defaultVec)
+                                -VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(
+                                    defaultVec
+                                )
                             ).toFloat()
 
                             bone.rotation.rotationY(-diffY * Mth.DEG_TO_RAD)
@@ -631,7 +636,9 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                         val bone = instance.getBone(name)
                         if (bone != null) {
                             val diffY = Mth.wrapDegrees(
-                                -VehicleVecUtils.getYRotFromVector(targetVec) + VehicleVecUtils.getYRotFromVector(defaultVec)
+                                -VehicleVecUtils.getYRotFromVector(targetVec) + VehicleVecUtils.getYRotFromVector(
+                                    defaultVec
+                                )
                             ).toFloat()
 
                             bone.rotation.rotationY(-diffY * Mth.DEG_TO_RAD)
@@ -644,7 +651,9 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                         val bone = instance.getBone(name)
                         if (bone != null) {
                             val diffX = Mth.wrapDegrees(
-                                -VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(defaultVec)
+                                -VehicleVecUtils.getXRotFromVector(targetVec) + VehicleVecUtils.getXRotFromVector(
+                                    defaultVec
+                                )
                             ).toFloat()
 
                             bone.rotation.rotationX(-diffX * Mth.DEG_TO_RAD)
@@ -746,62 +755,12 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
 
     fun getDefaultWrapRange(vehicle: VehicleEntity) = vehicle.getTrackAnimationLength()
 
-    // --- Bone group computation for V2 ---
-
-    data class ModelBoneGroups(
-        val leftWheels: List<BoneState>,
-        val rightWheels: List<BoneState>,
-        val leftWheelsTurn: List<BoneState>,
-        val rightWheelsTurn: List<BoneState>,
-        val leftTrackMove: List<BoneState>,
-        val leftTrackRot: List<BoneState>,
-        val rightTrackMove: List<BoneState>,
-        val rightTrackRot: List<BoneState>,
-        val shell: List<BoneState>,
-        val flareBones: List<BoneState>,
-        val laserBones: List<BoneState>,
-        val dogTagBones: List<BoneState>,
-    )
-
-    open fun getOrComputeBoneGroups(instance: BakedModelInstance): ModelBoneGroups {
-        val baseModel = instance.baseModel()
-        if (boneGroupsCacheKey === baseModel && boneGroupsCache != null) {
-            return boneGroupsCache!!
-        }
-
-        val groups = computeBoneGroups(instance)
-        boneGroupsCache = groups
-        boneGroupsCacheKey = baseModel
-        return groups
-    }
-
     companion object {
         val BLENDER: EulerAdditiveBlender = SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }
         val MUZZLE_FLARE = Mod.loc("textures/particle/flare.png")
         val MUZZLE_FLARE_MODEL = Mod.loc("models/bedrock/vehicle/muzzle_flare.geo.json")
         val LASER_TEX_IN = Mod.loc("textures/bedrock/vehicle/laser_in.png")
         val LASER_TEX = Mod.loc("textures/bedrock/vehicle/laser.png")
-
-        @JvmField
-        val WHEEL_PATTERN: Pattern = Pattern.compile("^wheel(?<direction>[LR]).*$")
-
-        @JvmField
-        val W_PATTERN: Pattern = Pattern.compile("^w_(?<direction>[lLrR]).*$")
-
-        @JvmField
-        val SHELL_PATTERN: Pattern = Pattern.compile("^shell(?<id>\\d+)$")
-
-        @JvmField
-        val TRACK_PATTERN: Pattern = Pattern.compile("^track(?<type>Mov|Rot)(?<direction>[LR])(?<id>\\d+)$")
-
-        @JvmField
-        val FLARE_PATTERN: Pattern = Pattern.compile("^flare.*")
-
-        @JvmField
-        val LASER_PATTERN: Pattern = Pattern.compile("^laser.*")
-
-        @JvmField
-        val DOG_TAG_PATTERN: Pattern = Pattern.compile("^.*_dogTag$")
 
         val flareModelInstance by lazy {
             VehicleModelReloadListener.getModel(MUZZLE_FLARE_MODEL)?.createInstance()
@@ -819,129 +778,7 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             return entries.firstOrNull()
         }
 
-        fun computeBoneGroups(instance: BakedModelInstance): ModelBoneGroups {
-            val leftWheels = mutableListOf<BoneState>()
-            val rightWheels = mutableListOf<BoneState>()
-            val leftWheelsTurn = mutableListOf<BoneState>()
-            val rightWheelsTurn = mutableListOf<BoneState>()
-
-            val tempShell = hashMapOf<Int, BoneState>()
-
-            val leftTrackMove = hashMapOf<Int, BoneState>()
-            val leftTrackRot = hashMapOf<Int, BoneState>()
-            val rightTrackMove = hashMapOf<Int, BoneState>()
-            val rightTrackRot = hashMapOf<Int, BoneState>()
-
-            val flareBones = mutableListOf<BoneState>()
-            val laserBones = mutableListOf<BoneState>()
-
-            val dogTagBones = mutableListOf<BoneState>()
-
-            for (bone in instance.boneIndexes) {
-                val name = bone.name()
-
-                val wheelMatcher = WHEEL_PATTERN.matcher(name)
-                if (wheelMatcher.matches()) {
-                    val left = wheelMatcher.group("direction") == "L"
-                    val turn = name.endsWith("Turn")
-
-                    if (left) {
-                        if (turn) {
-                            leftWheelsTurn += bone
-                        } else {
-                            leftWheels += bone
-                        }
-                    } else {
-                        if (turn) {
-                            rightWheelsTurn += bone
-                        } else {
-                            rightWheels += bone
-                        }
-                    }
-                }
-
-                // Also match w_ prefix wheel bones (e.g. w_lb, w_rb, w_lr, w_rr)
-                val wMatcher = W_PATTERN.matcher(name)
-                if (wMatcher.matches()) {
-                    val left = wMatcher.group("direction").lowercase() == "l"
-                    val turn = name.endsWith("Turn")
-
-                    if (left) {
-                        if (turn) {
-                            leftWheelsTurn += bone
-                        } else {
-                            leftWheels += bone
-                        }
-                    } else {
-                        if (turn) {
-                            rightWheelsTurn += bone
-                        } else {
-                            rightWheels += bone
-                        }
-                    }
-                }
-
-                val shellMatcher = SHELL_PATTERN.matcher(name)
-                if (shellMatcher.matches()) {
-                    val index = shellMatcher.group("id").toInt()
-                    tempShell[index] = bone
-                }
-
-                val trackMatcher = TRACK_PATTERN.matcher(name)
-                if (trackMatcher.matches()) {
-                    val isRot = trackMatcher.group("type") == "Rot"
-                    val isL = trackMatcher.group("direction") == "L"
-                    val index = trackMatcher.group("id").toInt()
-
-                    if (isRot) {
-                        if (isL) {
-                            leftTrackRot[index] = bone
-                        } else {
-                            rightTrackRot[index] = bone
-                        }
-                    } else {
-                        if (isL) {
-                            leftTrackMove[index] = bone
-                        } else {
-                            rightTrackMove[index] = bone
-                        }
-                    }
-                }
-
-                val flareMatcher = FLARE_PATTERN.matcher(name)
-                if (flareMatcher.matches()) {
-                    flareBones += bone
-                }
-
-                val laserMatcher = LASER_PATTERN.matcher(name)
-                if (laserMatcher.matches()) {
-                    laserBones += bone
-                }
-
-                val dogTagMatcher = DOG_TAG_PATTERN.matcher(name)
-                if (dogTagMatcher.matches()) {
-                    dogTagBones += bone
-                }
-            }
-
-            return ModelBoneGroups(
-                leftWheels = leftWheels,
-                rightWheels = rightWheels,
-                leftWheelsTurn = leftWheelsTurn,
-                rightWheelsTurn = rightWheelsTurn,
-                leftTrackMove = leftTrackMove.toSortedMap().values.toMutableList(),
-                leftTrackRot = leftTrackRot.toSortedMap().values.toMutableList(),
-                rightTrackMove = rightTrackMove.toSortedMap().values.toMutableList(),
-                rightTrackRot = rightTrackRot.toSortedMap().values.toMutableList(),
-                shell = tempShell.toSortedMap().values.toMutableList(),
-                flareBones = flareBones,
-                laserBones = laserBones,
-                dogTagBones = dogTagBones,
-            )
-        }
-
-        @JvmStatic
-        fun vertex(
+        private fun vertex(
             pConsumer: VertexConsumer,
             pPose: Matrix4f,
             pNormal: PoseStack.Pose,
