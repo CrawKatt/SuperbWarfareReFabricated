@@ -44,6 +44,10 @@ open class RpgRocketStandardEntity : FastThrowableProjectile, BasicGeoProjectile
         }
     }
 
+    override fun forceLoadChunk(): Boolean {
+        return true
+    }
+
     override fun getDefaultItem(): Item {
         return ModItems.RPG_ROCKET_STANDARD.get()
     }
