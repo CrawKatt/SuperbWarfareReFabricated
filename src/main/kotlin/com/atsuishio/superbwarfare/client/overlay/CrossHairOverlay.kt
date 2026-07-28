@@ -10,18 +10,17 @@ import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
-import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.perk.AmmoPerk
 import com.atsuishio.superbwarfare.perk.IAmmoStat
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.TraceTool
+import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.math.Axis
 import net.minecraft.client.CameraType
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.util.Mth
@@ -91,6 +90,12 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
         var moveX = 0f
         var moveY = 0f
 
+        var r = 1
+
+        if (mc.options.cameraType != CameraType.FIRST_PERSON) {
+            r = 0
+        }
+
         // 平滑准星
         if (DisplayConfig.FLOAT_CROSS_HAIR.get() && player.vehicle == null) {
             moveX =
@@ -127,7 +132,7 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
 
         // Crosshair rendering — skipped entirely when server has disabled it
         // 第一人称下的准星
-        if (Minecraft.getInstance().options.cameraType == CameraType.FIRST_PERSON) {
+        if (mc.options.cameraType == CameraType.FIRST_PERSON) {
             when (crosshair) {
                 CROSSHAIR_GUN_DEFAULT -> renderGunDefaultCrosshair(
                     guiGraphics,
@@ -172,7 +177,7 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
         }
 
         // 第三人称下的准星
-        else if (Minecraft.getInstance().options.cameraType == CameraType.THIRD_PERSON_BACK && (ClientEventHandler.zoomTime > 0 || ClientEventHandler.bowPullPos > 0)) {
+        else if (mc.options.cameraType == CameraType.THIRD_PERSON_BACK && (ClientEventHandler.zoomTime > 0 || ClientEventHandler.bowPullPos > 0)) {
             renderGunDefaultCrosshair(
                 guiGraphics,
                 stack,
@@ -187,12 +192,8 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
                 spread
             )
         }
-        // Hit/kill indicators — hidden when server disables the crosshair.
-        // If the crosshair is off, showing indicators would reveal target info
-        // that the server operator deliberately wants hidden.
-        else if (DisplayConfig.KILL_INDICATION.get()
-            && !(vehicle?.type == ModEntities.AH_6.get() && vehicle.firstPassenger === player)
-        ) {
+
+        if (DisplayConfig.KILL_INDICATION.get()) {
             renderKillIndicatorDynamic(guiGraphics, screenWidth, screenHeight, moveX, moveY)
         }
 
@@ -293,7 +294,7 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
     ) {
         val data = from(stack)
 
-        if (Minecraft.getInstance().options.cameraType == CameraType.FIRST_PERSON) {
+        if (mc.options.cameraType == CameraType.FIRST_PERSON) {
             if (ClientEventHandler.zoomTime > 0.8 && GunResource.compute(stack).hideCrosshairWhenZoom) return
         }
 
@@ -383,7 +384,11 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
         )
         if (!player.isSprinting || ClientEventHandler.noSprintTicks > 0 || ClientEventHandler.bowPullPos > 0) {
             if (ClientEventHandler.zoomTime < 0.1) {
-                val isSlug = when (perk) { is AmmoPerk -> perk.slug; is IAmmoStat -> perk.slug; else -> false }
+                val isSlug = when (perk) {
+                    is AmmoPerk -> perk.slug
+                    is IAmmoStat -> perk.slug
+                    else -> false
+                }
                 if (isSlug) {
                     normalCrossHair(guiGraphics, screenWidth, screenHeight, spread, moveX, moveY)
                 } else {

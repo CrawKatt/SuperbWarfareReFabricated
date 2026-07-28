@@ -27,6 +27,7 @@ import com.atsuishio.superbwarfare.entity.setValue
 import com.atsuishio.superbwarfare.entity.vehicle.*
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.Companion.ENV_RATE_RECOMPUTE_INTERVAL
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.Companion.GUN_DATA_MAP
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.Companion.OBB_GROUND_CACHE_TICKS
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier
 import com.atsuishio.superbwarfare.entity.vehicle.utils.*
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleEngineUtils.aircraftLoiter
@@ -70,7 +71,6 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
-import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -127,26 +127,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     val anim: VehicleAnimationInstance<VehicleEntity>? =
         if (pLevel.isClientSide) VehicleAnimationInstance.create(this) else null
 
-    /**
-     * How many ticks the [cachedObbOnGround] result is considered valid.
-     *
-     * Ground contact changes at most once every physics step; a 2-tick window
-     * eliminates ~50% of the expensive [VehicleMotionUtils.checkObbOnGround] calls
-     * (which iterate block collision shapes over a full OBB search box) while
-     * remaining responsive to sudden terrain transitions.
-     */
-    private val OBB_GROUND_CACHE_TICKS = 2
-
-    /**
-     * Frequency divisor for the periodic backup-ammo safety-net scan.
-     *
-     * With event-driven updates covering all known mutation paths (consumption,
-     * ammo type switch, passenger mount, inventory changes), this periodic scan
-     * serves only as drift correction for unforeseen external modifications
-     * (e.g. mod compat, hopper edge cases). 100-tick (5 s) interval is sufficient.
-     */
-    private val BACKUP_AMMO_UPDATE_INTERVAL = 100
-
     override fun getAnimationInstance() = anim
 
     // ----- Client-side model entries -----
@@ -189,20 +169,20 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     private var gunDataMapWeaponKeys: Set<String>? = null
 
     /**
-     * Snapshot of each weapon slot's combined [NbtVersion] at the moment of the
-     * last successful [GUN_DATA_MAP] write to [entityData].
-     *
-     * Packed layout (single [Long] per slot):
-     * ```
-     *   bits 63–32  structural version  (Int, upper half)
-     *   bits 31– 0  state     version  (Int, lower half, zero-extended)
-     * ```
-     * Compared every server tick by [isGunDataDirty]; if no slot version has changed
-     * since the previous tick the [GUN_DATA_MAP] write — and the resulting client-side
-     * [onSyncedDataUpdated] cascade — is skipped entirely.
-     *
-     * Server-side only. Never serialized to NBT or sent over the network.
-     */
+    * Snapshot of each weapon slot's combined [com.atsuishio.superbwarfare.data.gun.NbtVersion] at the moment of the
+    * last successful [GUN_DATA_MAP] write to [entityData].
+    *
+    * Packed layout (single [Long] per slot):
+    * ```
+    *   bits 63–32  structural version  (Int, upper half)
+    *   bits 31– 0  state     version  (Int, lower half, zero-extended)
+    * ```
+    * Compared every server tick by [isGunDataDirty]; if no slot version has changed
+    * since the previous tick the [GUN_DATA_MAP] write — and the resulting client-side
+    * [onSyncedDataUpdated] cascade — is skipped entirely.
+    *
+    * Server-side only. Never serialized to NBT or sent over the network.
+    */
     private val lastSyncedGunVersions: HashMap<String, Long> = HashMap()
 
     /** Set to `true` by [setChanged] when vehicle inventory contents are modified. */
@@ -263,21 +243,21 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     }
 
     /**
-     * Returns `true` if at least one weapon slot's [NbtVersion] has changed since
-     * the last call to [snapshotGunVersions], meaning a [GUN_DATA_MAP] sync is needed.
-     *
-     * Each slot's structural and state counters are packed into a single [Long]
-     * (structural in the upper 32 bits, state in the lower 32 bits) to allow a
-     * single integer comparison per slot instead of two separate reads.
-     *
-     * The check is O(N) in the number of weapon slots (typically 1–3 per vehicle)
-     * and involves no allocations — it is negligibly cheap compared with the
-     * [entityData] write and network packet it replaces when the result is `false`.
-     *
-     * @param map the current weapon data map for this vehicle.
-     * @return `true` if any slot version has changed and a sync should be sent;
-     *         `false` if all slots are unchanged and the sync can be skipped.
-     */
+    * Returns `true` if at least one weapon slot's [com.atsuishio.superbwarfare.data.gun.NbtVersion] has changed since
+    * the last call to [snapshotGunVersions], meaning a [GUN_DATA_MAP] sync is needed.
+    *
+    * Each slot's structural and state counters are packed into a single [Long]
+    * (structural in the upper 32 bits, state in the lower 32 bits) to allow a
+    * single integer comparison per slot instead of two separate reads.
+    *
+    * The check is O(N) in the number of weapon slots (typically 1–3 per vehicle)
+    * and involves no allocations — it is negligibly cheap compared with the
+    * [entityData] write and network packet it replaces when the result is `false`.
+    *
+    * @param map the current weapon data map for this vehicle.
+    * @return `true` if any slot version has changed and a sync should be sent;
+    *         `false` if all slots are unchanged and the sync can be skipped.
+    */
     private fun isGunDataDirty(map: Map<String, GunData>): Boolean {
         // Slot count changed — weapons added or removed
         if (map.size != lastSyncedGunVersions.size) return true
@@ -295,13 +275,13 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     }
 
     /**
-     * Snapshots the current [NbtVersion] of every weapon slot into [lastSyncedGunVersions].
-     *
-     * Must be called immediately **after** a successful [GUN_DATA_MAP] write to [entityData]
-     * so that the next call to [isGunDataDirty] compares against a fresh baseline.
-     *
-     * @param map the weapon data map whose versions should be recorded.
-     */
+    * Snapshots the current [com.atsuishio.superbwarfare.data.gun.NbtVersion] of every weapon slot into [lastSyncedGunVersions].
+    *
+    * Must be called immediately **after** a successful [GUN_DATA_MAP] write to [entityData]
+    * so that the next call to [isGunDataDirty] compares against a fresh baseline.
+    *
+    * @param map the weapon data map whose versions should be recorded.
+    */
     private fun snapshotGunVersions(map: Map<String, GunData>) {
         // Clear stale entries for removed weapon slots
         lastSyncedGunVersions.clear()
@@ -588,13 +568,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         this.obbCache = null
         this.invalidateAABBCache()
         this.obb = data().getDefault().copy().obb.toList()
-    }
-
-    /**
-     * Batch synced-data update handler.
-     */
-    override fun onSyncedDataUpdated(dataValues: MutableList<DataValue<*>>) {
-        super.onSyncedDataUpdated(dataValues)
     }
 
     /**
@@ -2222,7 +2195,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
      *
      * <p>Throttle strategy:
      * <ul>
-     *   <li><b>Watercraft ([VehicleType.SHIP])</b>: Checked every 1 tick (full accuracy for buoyancy).</li>
+     *   <li><b>Watercraft ([EngineInfo.Ship])</b>: Checked every 1 tick (full accuracy for buoyancy).</li>
      *   <li><b>Airborne ([VehicleType.AIRPLANE], [VehicleType.HELICOPTER], [VehicleType.AIRSHIP])</b>: Checked every 20 ticks.</li>
      *   <li><b>Ground vehicles</b>: Checked every 4 ticks (0.2s lag is imperceptible).</li>
      * </ul>
@@ -2234,7 +2207,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
 
         val interval = when {
-            engineInfo is EngineInfo.Ship -> 1
+            engineInfo is Ship -> 1
             vehicleType == VehicleType.AIRPLANE ||
                     vehicleType == VehicleType.HELICOPTER ||
                     vehicleType == VehicleType.AIRSHIP -> 20
@@ -2940,14 +2913,14 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     }
 
     /**
-     * Keeps the vehicle's current chunk and the chunk ahead of it (based on
-     * current velocity) loaded, to prevent entity pop-in during fast movement.
-     *
-     * Only issues two distinct [addRegionTicket] calls when the two positions
-     * actually fall in different chunks — avoids a redundant ticket when the
-     * vehicle is stationary or moving slowly within one chunk boundary.
-     */
-    fun keepChunkLoaded(position: Vec3) {
+    * Keeps the vehicle's current chunk and the chunk ahead of it (based on
+    * current velocity) loaded, to prevent entity pop-in during fast movement.
+    *
+    * Only issues two distinct [net.minecraft.server.level.ServerChunkCache.addRegionTicket] calls when the two positions
+    * actually fall in different chunks — avoids a redundant ticket when the
+    * vehicle is stationary or moving slowly within one chunk boundary.
+    */
+    open fun keepChunkLoaded(position: Vec3) {
         val currentChunk = ChunkPos(BlockPos.containing(position))
         keepChunkLoaded(currentChunk)
 
@@ -5065,6 +5038,25 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
          */
         private const val ENV_RATE_RECOMPUTE_INTERVAL = 4
 
+        /**
+         * How many ticks the [cachedObbOnGround] result is considered valid.
+         *
+         * Ground contact changes at most once every physics step; a 2-tick window
+         * eliminates ~50% of the expensive [VehicleMotionUtils.checkObbOnGround] calls
+         * (which iterate block collision shapes over a full OBB search box) while
+         * remaining responsive to sudden terrain transitions.
+         */
+        private const val OBB_GROUND_CACHE_TICKS = 2
+
+        /**
+         * Frequency divisor for the periodic backup-ammo safety-net scan.
+         *
+         * With event-driven updates covering all known mutation paths (consumption,
+         * ammo type switch, passenger mount, inventory changes), this periodic scan
+         * serves only as drift correction for unforeseen external modifications
+         * (e.g. mod compat, hopper edge cases). 100-tick (5 s) interval is sufficient.
+         */
+        private const val BACKUP_AMMO_UPDATE_INTERVAL = 100
 
         @JvmField
         val HEALTH: EntityDataAccessor<Float> =
