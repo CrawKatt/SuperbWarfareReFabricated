@@ -1,9 +1,8 @@
-package com.atsuishio.superbwarfare.item.projectile
+package com.atsuishio.superbwarfare.item.misc
 
 import com.atsuishio.superbwarfare.block.AircraftCatapultBlock
 import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.init.ModBlocks
-import com.atsuishio.superbwarfare.item.misc.AbstractDeployerItem
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.stats.Stats
@@ -48,7 +47,7 @@ open class CatapultShuttleItem : AbstractDeployerItem(Properties().rarity(Rarity
 
             val entity = this.spawnDeployedEntity(level, player)
             entity.setPos(pos.x.toDouble() + 0.5, pos.y.toDouble() - 1, pos.z.toDouble() + 0.5)
-            entity.yRot = getWorldYRot(level, pos, blockstate)
+            entity.yRot = -getWorldYRot(level, pos, blockstate)
             level.addFreshEntity(entity)
 
             if (!player.abilities.instabuild) {
@@ -84,7 +83,7 @@ open class CatapultShuttleItem : AbstractDeployerItem(Properties().rarity(Rarity
                     blockpos.y.toDouble() - 1,
                     blockpos.z.toDouble() + 0.5
                 )
-                entity.yRot = getWorldYRot(level, blockpos, blockstate)
+                entity.yRot = -getWorldYRot(level, blockpos, blockstate)
                 level.addFreshEntity(entity)
 
                 if (!player.abilities.instabuild) {
