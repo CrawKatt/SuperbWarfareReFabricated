@@ -2905,8 +2905,9 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     open fun passengerPos(passenger: Entity, callback: MoveFunction, vec3: Vec3, string: String?) {
         val worldPosition = transformPosition(getTransformFromString(string), vec3.x, vec3.y, vec3.z)
-        passenger.setPos(worldPosition.x, worldPosition.y, worldPosition.z)
-        callback.accept(passenger, worldPosition.x, worldPosition.y, worldPosition.z)
+        val yOffset = VehicleConfig.getPassengerYOffset(passenger.type)
+        passenger.setPos(worldPosition.x, worldPosition.y + yOffset, worldPosition.z)
+        callback.accept(passenger, worldPosition.x, worldPosition.y + yOffset, worldPosition.z)
         copyEntityData(passenger)
     }
 
@@ -2914,11 +2915,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     protected var vectorTransform = HashMap<String, Function<Float, Vec3>>()
     protected var rotationTransform = HashMap<String, Function<Float, Quaterniond>>()
 
-    //    @Override
-    //    public void onAddedToWorld() {
-    //        super.onAddedToWorld();
-    //        this.setYRot(serverYaw);
-    //    }
     init {
         registerTransforms()
         initOBB()
