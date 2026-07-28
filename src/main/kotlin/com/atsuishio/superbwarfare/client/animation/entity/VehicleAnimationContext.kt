@@ -15,7 +15,10 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.Entity
 import org.joml.Vector3f
 
-class VehicleAnimationContext<T>(val entity: T, location: ResourceLocation) where T : Entity, T : BasicGeoVehicleEntity {
+class VehicleAnimationContext<T>(
+    val entity: T,
+    location: ResourceLocation
+) where T : Entity, T : BasicGeoVehicleEntity {
     val animations = hashMapOf<String, BedrockAnimation>()
     var partialTick: Float = 0f
 
@@ -93,10 +96,14 @@ class VehicleAnimationContext<T>(val entity: T, location: ResourceLocation) wher
         } else {
             key = "$weaponName#$index"
             val specificName = "animation.$weaponName.fire.$index"
-            fireAnimName = if (animations.containsKey(specificName)) {
-                specificName
+            if (animations.containsKey(specificName)) {
+                fireAnimName = specificName
             } else {
-                "animation.$weaponName.fire"
+                // No specific fire animation for this index — skip silently.
+                // Falling back to the generic "animation.X.fire" would animate the
+                // wrong bones (those belong to index 0), causing all weapons to
+                // show fire when only one fired.
+                return
             }
         }
 
@@ -105,9 +112,7 @@ class VehicleAnimationContext<T>(val entity: T, location: ResourceLocation) wher
         val runner = AnimationRunner(fireAnimation, AnimationContext(fireAnimation.specifiedEndTimeS))
         runner.state = AnimationPlayType.PLAY_ONCE_STOP.state()
         weaponRunners[key] = runner
-        if (index != 0) {
-            weaponIndices[key] = index
-        }
+        weaponIndices[key] = index
     }
 
     fun playAnimation(animationName: String?, type: AnimationPlayType, fadeInTicks: Int = 0) {
@@ -161,7 +166,7 @@ class VehicleAnimationContext<T>(val entity: T, location: ResourceLocation) wher
                 val base = weaponName.substringBeforeLast('#')
                 val idleExists = if (index != null && index > 0) {
                     animations.containsKey("animation.$base.idle.$index") ||
-                        animations.containsKey("animation.$base.idle")
+                            animations.containsKey("animation.$base.idle")
                 } else {
                     animations.containsKey("animation.$base.idle")
                 }
@@ -183,7 +188,7 @@ class VehicleAnimationContext<T>(val entity: T, location: ResourceLocation) wher
                 val base = weaponName.substringBeforeLast('#')
                 val idleExists = if (index != null && index > 0) {
                     animations.containsKey("animation.$base.idle.$index") ||
-                        animations.containsKey("animation.$base.idle")
+                            animations.containsKey("animation.$base.idle")
                 } else {
                     animations.containsKey("animation.$base.idle")
                 }
