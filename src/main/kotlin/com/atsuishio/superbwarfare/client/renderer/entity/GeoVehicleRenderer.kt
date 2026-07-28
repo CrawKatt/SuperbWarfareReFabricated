@@ -310,12 +310,13 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             if (DisplayConfig.DOG_TAG_ICON_VISIBLE.get() && !flag) {
                 val dogTagTexture = SpritePixelHelper.getDogTagIcon(list, entity.uuid.toString())
 
-                // TODO bone大小？
                 for (bone in dogTagBones) {
+                    val size = ModelBoneGroups.parseDogTagSize(bone.name()) ?: continue
+
                     poseStack.pushPose()
                     poseStack.mulPoseMatrix(bone.getGlobalTransform(instance))
                     val def = bone.definition()
-                    poseStack.translate(def.pivotX() + bone.xScale / 2, def.pivotY(), def.pivotZ())
+                    poseStack.translate(def.pivotX() + bone.xScale / 2, def.pivotY() + bone.yScale / 4, def.pivotZ())
 
                     val pose = poseStack.last()
                     val lastMatrix = pose.pose()
@@ -323,8 +324,7 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                     val vertexConsumer =
                         buffer.getBuffer(RenderType.entityCutoutNoCull(dogTagTexture))
 
-                    val xSize = bone.xScale
-                    val ySize = bone.yScale
+                    val (xSize, ySize) = size
 
                     vertex(vertexConsumer, lastMatrix, lastMatrix3f, packedLight, -0.5f * xSize, -0.5f * ySize, 0, 1)
                     vertex(vertexConsumer, lastMatrix, lastMatrix3f, packedLight, 0.5f * xSize, -0.5f * ySize, 1, 1)

@@ -9696,7 +9696,7 @@
 					"pivot": [31.6875, 12, 0.75]
 				},
 				{
-					"name": "body_right_dogTag",
+					"name": "body_right_dogTag_9x9",
 					"parent": "root",
 					"pivot": [-12.05953, 21.26428, -51.76419],
 					"rotation": [0, 84.5, 0],

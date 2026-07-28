@@ -19,7 +19,7 @@ object VehicleModelReloadListener : BasicModelReloadListener("vehicle") {
         "^wheel[LR].*", // alternative wheel naming
         "^track.*",     // track bones
         "^shell.*",     // shell bones
-        "^.*_dogTag$",
+        "^.*_dogTag_(?<w>\\d+)x(?<h>\\d+)$",
         "^dummy_.*",
         "^waterMask$",
         "^passengerWeaponStation$",

@@ -4808,7 +4808,7 @@
 					"pivot": [3.88621, 42.3269, -102.84975]
 				},
 				{
-					"name": "turret_left_dogTag",
+					"name": "turret_left_dogTag_9x9",
 					"parent": "turret",
 					"pivot": [19.74765, 40.62863, -19.20757],
 					"rotation": [-37.7619, -35.2052, -0.4532],
@@ -4823,7 +4823,7 @@
 					]
 				},
 				{
-					"name": "turret_right_dogTag",
+					"name": "turret_right_dogTag_9x9",
 					"parent": "turret",
 					"pivot": [-19.74765, 40.62863, -19.20757],
 					"rotation": [-37.7619, 35.2052, 0.4532],
