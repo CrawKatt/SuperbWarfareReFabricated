@@ -136,7 +136,10 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             val ani = entity.getAnimationInstance()!!
             ani.context.partialTick = partialTick
             ani.tick()
+            instance.resetPose()
             instance.applyPose(BLENDER.blend(instance.bindPose, ani.getPose()))
+        } else {
+            instance.resetPose()
         }
 
         this.tickVariables(entity, yaw, partialTick)

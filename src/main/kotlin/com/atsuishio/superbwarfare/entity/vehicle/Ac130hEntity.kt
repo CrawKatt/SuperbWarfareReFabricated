@@ -16,8 +16,10 @@ open class Ac130hEntity(type: EntityType<Ac130hEntity>, world: Level) : VehicleE
         if (level().isClientSide) {
             val ctx = anim?.context ?: return
             if (gearUp && !wasGearUp) {
+                ctx.stopAnimation("animation.ac_130h.gear_down")
                 ctx.playAnimation("animation.ac_130h.gear_up", AnimationPlayType.PLAY_ONCE_HOLD)
             } else if (gearDown && wasGearUp) {
+                ctx.stopAnimation("animation.ac_130h.gear_up")
                 ctx.playAnimation("animation.ac_130h.gear_down", AnimationPlayType.PLAY_ONCE_HOLD)
             }
             wasGearUp = gearUp
