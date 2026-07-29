@@ -20,6 +20,8 @@ class Ac130hRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRend
     ) {
         super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
 
+        if (entity.isWreck) return
+
         val wingFL = instance.getBone("move_wingFL")
         val wingFR = instance.getBone("move_wingFR")
         val xRotL = -1.5f * Mth.lerp(partialTicks, entity.flap2RRotO, entity.flap2RRot) * Mth.DEG_TO_RAD

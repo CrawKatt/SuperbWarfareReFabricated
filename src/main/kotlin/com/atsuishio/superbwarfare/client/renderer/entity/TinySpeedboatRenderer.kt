@@ -23,6 +23,9 @@ class TinySpeedboatRenderer(manager: EntityRendererProvider.Context) :
         partialTicks: Float
     ) {
         super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
+
+        if (entity.isWreck) return
+
         val control = instance.getBone("move_control")
         val rudder = instance.getBone("move_rudder")
 

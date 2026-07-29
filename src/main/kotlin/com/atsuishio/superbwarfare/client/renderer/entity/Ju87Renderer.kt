@@ -23,6 +23,8 @@ class Ju87Renderer(manager: EntityRendererProvider.Context) : GeoVehicleRenderer
                 && (entity.getWeaponIndex(0) == 1
                 || entity.getWeaponIndex(0) == 2))
 
+        if (entity.isWreck) return
+
         val wingLR = instance.getBone("move_wingLR")
         val wingLR2 = instance.getBone("move_wingLR2")
         val wingLR3 = instance.getBone("move_wingLR3")
