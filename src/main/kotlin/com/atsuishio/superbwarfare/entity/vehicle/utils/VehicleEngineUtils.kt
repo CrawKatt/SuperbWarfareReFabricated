@@ -449,7 +449,7 @@ object VehicleEngineUtils {
         }
 
         if (onGround()) {
-            deltaMovement = deltaMovement.multiply(0.2, 0.99, 0.2)
+            deltaMovement = deltaMovement.multiply(0.75, 0.99, 0.75)
         } else if (isInFluidType) {
             val f =
                 (0.835f - 0.04f * min(VehicleVecUtils.getSubmergedHeight(this), bbHeight.toDouble()) + 0.005f * Mth.abs(
@@ -600,7 +600,7 @@ object VehicleEngineUtils {
         val speed = engineInfo.speed
 
         if (onGround()) {
-            deltaMovement = deltaMovement.multiply(0.8, 1.0, 0.8)
+            deltaMovement = deltaMovement.multiply(0.85, 1.0, 0.85)
         } else {
             if (!sympatheticDetonated) {
                 setZRot(roll * (if (backInputDown) 0.9f else 0.99f))
