@@ -19,6 +19,8 @@ class A10Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRendere
         val root = instance.getBone("root")
         root?.visible = !(hideForTurretControllerWhileZooming && entity.getWeaponIndex(0) == 2)
 
+        if (entity.isWreck) return
+
         val wingLR = instance.getBone("move_wingLR")
         wingLR?.rotation?.rotateX(
             1.5f * Mth.lerp(

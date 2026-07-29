@@ -22,6 +22,8 @@ class SpeedBoatRenderer(manager: EntityRendererProvider.Context) : BasicVehicleR
     ) {
         super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
 
+        if (entity.isWreck) return
+
         val propeller = instance.getBone("move_propeller")
         val propeller2 = instance.getBone("move_propeller2")
         val turret = instance.getBone("turret")

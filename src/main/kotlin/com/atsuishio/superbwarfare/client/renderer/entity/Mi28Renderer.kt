@@ -14,8 +14,10 @@ class Mi28Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRender
         entityYaw: Float,
         partialTicks: Float
     ) {
-
         super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
+
+        if (entity.isWreck) return
+
         val propeller = instance.getBone("move_propeller")
         val tailPropeller = instance.getBone("move_tailPropeller")
 
