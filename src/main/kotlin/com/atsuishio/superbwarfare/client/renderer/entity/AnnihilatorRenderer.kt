@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.entity.vehicle.AnnihilatorEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity
-import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BoneState
@@ -22,27 +21,27 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
     }
 
     override fun transformCustomModelPart(
-        vehicle: ArtilleryEntity,
+        entity: ArtilleryEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
 
         val laser1 = instance.getBone("laser1")
         val laser2 = instance.getBone("laser2")
         val laser3 = instance.getBone("laser3")
 
-        laser1?.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_LEFT_LENGTH) * 10
-        laser2?.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_MIDDLE_LENGTH) * 10
-        laser3?.zScale = vehicle.entityData.get(AnnihilatorEntity.LASER_RIGHT_LENGTH) * 10
+        laser1?.zScale = entity.entityData.get(AnnihilatorEntity.LASER_LEFT_LENGTH) * 10
+        laser2?.zScale = entity.entityData.get(AnnihilatorEntity.LASER_MIDDLE_LENGTH) * 10
+        laser3?.zScale = entity.entityData.get(AnnihilatorEntity.LASER_RIGHT_LENGTH) * 10
 
-        val energy = vehicle.chargeProgress
+        val energy = entity.chargeProgress
 
         for (i in 1..5) {
-            val greenBoneName = "light_on$i"
-            val redBoneName = "light_off$i"
+            val greenBoneName = "move_light_on$i"
+            val redBoneName = "move_light_off$i"
             val greenBone = instance.getBone(greenBoneName)
             val redBone = instance.getBone(redBoneName)
 
@@ -53,7 +52,7 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
         }
     }
 
-    override fun customLaserLength(laserBones: List<BoneState>, entity: VehicleEntity, partialTicks: Float) {
+    override fun customLaserLength(laserBones: List<BoneState>, entity: ArtilleryEntity, partialTicks: Float) {
         for (laser in laserBones) {
             laser.visible = false
 
@@ -69,7 +68,7 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
     }
 
     override fun renderCustomPart(
-        vehicle: ArtilleryEntity,
+        entity: ArtilleryEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
@@ -77,12 +76,12 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
+        super.renderCustomPart(entity, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
 
         // power
 
-        val red = 1 - Mth.clamp(2.5f * vehicle.energy / vehicle.maxEnergy, 0f, 1f)
-        val green = Mth.clamp(2.5f * vehicle.energy / vehicle.maxEnergy, 0f, 1f)
+        val red = 1 - Mth.clamp(2.5f * entity.energy / entity.maxEnergy, 0f, 1f)
+        val green = Mth.clamp(2.5f * entity.energy / entity.maxEnergy, 0f, 1f)
 
         instance.renderToBuffer(
             poseStack,

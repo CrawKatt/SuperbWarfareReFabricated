@@ -20,7 +20,7 @@ class Yx100Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRende
     }
 
     override fun renderCustomPart(
-        vehicle: VehicleEntity,
+        entity: VehicleEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
@@ -28,7 +28,7 @@ class Yx100Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRende
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
+        super.renderCustomPart(entity, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
 
         instance.renderToBuffer(
             poseStack,

@@ -19,18 +19,18 @@ class Fh88bwRenderer(manager: EntityRendererProvider.Context) : BasicArtilleryRe
     }
 
     override fun transformCustomModelPart(
-        vehicle: ArtilleryEntity,
+        entity: ArtilleryEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
 
-        val pitch = Mth.clamp(-turretXRot, vehicle.turretMinPitch, vehicle.turretMaxPitch) * Mth.DEG_TO_RAD
+        val pitch = Mth.clamp(-turretXRot, entity.turretMinPitch, entity.turretMaxPitch) * Mth.DEG_TO_RAD
 
         val barrel = instance.getBone("barrel")
-        val angle = if (!vehicle.lockTurret) {
+        val angle = if (!entity.lockTurret) {
             pitch
         } else {
             0f
@@ -46,9 +46,9 @@ class Fh88bwRenderer(manager: EntityRendererProvider.Context) : BasicArtilleryRe
 
         instance.getBone("move_yeyagan")?.rotation?.rotationX(b.toFloat())
         instance.getBone("move_yeya")?.rotation?.rotationX((b - angle).toFloat())
-        instance.getBone("move_control")?.rotation?.rotationY(12 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        instance.getBone("move_control")?.rotation?.rotationY(12 * Mth.lerp(partialTicks, entity.rudderRotO, entity.rudderRot))
 
         instance.getBone("move_hmg")?.visible =
-            !(localPlayer == vehicle.getNthEntity(2) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
+            !(localPlayer == entity.getNthEntity(2) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
     }
 }

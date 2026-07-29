@@ -20,16 +20,16 @@ class Bmp2Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRender
     }
 
     override fun transformCustomModelPart(
-        vehicle: VehicleEntity,
+        entity: VehicleEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
 
         val player = localPlayer
-        val hide = player != null && vehicle === player.vehicle && vehicle.getFirstPassenger() !== player && vehicle.hasWeapon(vehicle.getSeatIndex(player)) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle)
+        val hide = player != null && entity === player.vehicle && entity.getFirstPassenger() !== player && entity.hasWeapon(entity.getSeatIndex(player)) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle)
 
         val base = instance.getBone("base")
         val track = instance.getBone("move_Track")

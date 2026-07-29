@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.entity.vehicle.PrismTankEntity
-import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BoneState
 import com.mojang.blaze3d.vertex.PoseStack
@@ -14,13 +13,13 @@ class PrismTankRenderer(manager: EntityRendererProvider.Context) : GeoVehicleRen
     }
 
     override fun transformCustomModelPart(
-        vehicle: PrismTankEntity,
+        entity: PrismTankEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
 
         val fanL = instance.getBone("move_fanL")
         val fanR = instance.getBone("move_fanR")
@@ -31,7 +30,7 @@ class PrismTankRenderer(manager: EntityRendererProvider.Context) : GeoVehicleRen
         fanR?.rotation?.rotationY(rot)
     }
 
-    override fun customLaserLength(laserBones: List<BoneState>, entity: VehicleEntity, partialTicks: Float) {
+    override fun customLaserLength(laserBones: List<BoneState>, entity: PrismTankEntity, partialTicks: Float) {
         for (laser in laserBones) {
             laser.visible = false
 

@@ -8,8 +8,8 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider
 
 class Type63Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
 
-    override fun transformCustomModelPart(vehicle: VehicleEntity, instance: BakedModelInstance, poseStack: PoseStack, entityYaw: Float, partialTicks: Float) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+    override fun transformCustomModelPart(entity: VehicleEntity, instance: BakedModelInstance, poseStack: PoseStack, entityYaw: Float, partialTicks: Float) {
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
         val shouLunX = instance.getBone("move_shoulunx")
         val shouLunY = instance.getBone("move_shouluny")
 
@@ -19,7 +19,7 @@ class Type63Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRend
         }
 
         getOrComputeBoneGroups(instance).shell.forEachIndexed { index, bone ->
-            val items = vehicle.entityData.get(Type63Entity.LOADED_AMMO)
+            val items = entity.entityData.get(Type63Entity.LOADED_AMMO)
             bone.visible = items[index] != -1
         }
     }

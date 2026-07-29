@@ -8,17 +8,17 @@ import net.minecraft.util.Mth
 
 class Ah6Renderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
     override fun transformCustomModelPart(
-        vehicle: VehicleEntity,
+        entity: VehicleEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
         val propeller = instance.getBone("move_propeller")
         val tailPropeller = instance.getBone("move_tailPropeller")
 
-        propeller?.rotation?.rotationY(Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
-        tailPropeller?.rotation?.rotationX(-6 * Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
+        propeller?.rotation?.rotationY(Mth.lerp(partialTicks, entity.propellerRotO, entity.propellerRot))
+        tailPropeller?.rotation?.rotationX(-6 * Mth.lerp(partialTicks, entity.propellerRotO, entity.propellerRot))
     }
 }

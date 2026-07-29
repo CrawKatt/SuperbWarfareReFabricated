@@ -12,14 +12,14 @@ class WheelChairRenderer(manager: EntityRendererProvider.Context) : BasicVehicle
     }
 
     override fun transformCustomModelPart(
-        vehicle: VehicleEntity,
+        entity: VehicleEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        val rightWheelRot = Mth.lerp(partialTicks, vehicle.rightWheelRotO, vehicle.rightWheelRot)
-        val leftWheelRot = Mth.lerp(partialTicks, vehicle.leftWheelRotO, vehicle.leftWheelRot)
+        val rightWheelRot = Mth.lerp(partialTicks, entity.rightWheelRotO, entity.rightWheelRot)
+        val leftWheelRot = Mth.lerp(partialTicks, entity.leftWheelRotO, entity.leftWheelRot)
 
         instance.getBone("w_rb")?.rotation?.rotationX(rightWheelRot)
         instance.getBone("w_lb")?.rotation?.rotationX(leftWheelRot)

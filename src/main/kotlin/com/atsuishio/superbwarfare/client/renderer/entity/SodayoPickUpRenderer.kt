@@ -14,34 +14,34 @@ import net.minecraft.util.Mth
 
 class SodayoPickUpRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
     override fun transformCustomModelPart(
-        vehicle: VehicleEntity,
+        entity: VehicleEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
         val control = instance.getBone("move_control")
         val head = instance.getBone("move_head")
 
-        control?.rotation?.rotationZ(8 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        control?.rotation?.rotationZ(8 * Mth.lerp(partialTicks, entity.rudderRotO, entity.rudderRot))
 
-        val pitch = -5f * vehicle.getAcceleration().toFloat() * Mth.DEG_TO_RAD
-        val roll = 0.5f * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot) * vehicle.deltaMovement.horizontalDistance().toFloat() * Mth.DEG_TO_RAD
+        val pitch = -5f * entity.getAcceleration().toFloat() * Mth.DEG_TO_RAD
+        val roll = 0.5f * Mth.lerp(partialTicks, entity.rudderRotO, entity.rudderRot) * entity.deltaMovement.horizontalDistance().toFloat() * Mth.DEG_TO_RAD
         head?.rotation?.rotateX(pitch)
         head?.rotation?.rotateZ(roll)
 
-        if (vehicle is SodayoPickUpRocketEntity) {
+        if (entity is SodayoPickUpRocketEntity) {
             getOrComputeBoneGroups(instance).shell.forEachIndexed { index, bone ->
-                val items = vehicle.entityData.get(SodayoPickUpRocketEntity.LOADED_AMMO)
+                val items = entity.entityData.get(SodayoPickUpRocketEntity.LOADED_AMMO)
                 bone.visible = items[index] != -1
             }
         }
 
-        if (vehicle is SodayoPickUpTowEntity) {
+        if (entity is SodayoPickUpTowEntity) {
             val guanMiao = instance.getBone("move_guanmiao")
             guanMiao?.visible =
-                !(vehicle.turretControllerIndex == vehicle.getSeatIndex(localPlayer) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
+                !(entity.turretControllerIndex == entity.getSeatIndex(localPlayer) && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
         }
     }
 }

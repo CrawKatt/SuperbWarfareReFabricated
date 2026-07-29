@@ -12,20 +12,20 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider
 
 class TowRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
     override fun transformCustomModelPart(
-        vehicle: VehicleEntity,
+        entity: VehicleEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
         val guanMiao = instance.getBone("move_guanmiao")
         val missile = instance.getBone("move_missile")
 
-        guanMiao?.visible = !(vehicle.turretControllerIndex == vehicle.getSeatIndex(localPlayer)
+        guanMiao?.visible = !(entity.turretControllerIndex == entity.getSeatIndex(localPlayer)
                 && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
 
-        missile?.visible = vehicle.entityData.get(TowEntity.LOADED)
+        missile?.visible = entity.entityData.get(TowEntity.LOADED)
 
     }
 }

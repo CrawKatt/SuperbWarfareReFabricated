@@ -15,20 +15,20 @@ class Plz05Renderer(manager: EntityRendererProvider.Context) : BasicArtilleryRen
     }
 
     override fun transformCustomModelPart(
-        vehicle: ArtilleryEntity,
+        entity: ArtilleryEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
 
         val tiTop1 = instance.getBone("move_titop1")
-        tiTop1?.visible = !(vehicle.getNthEntity(vehicle.turretControllerIndex) === localPlayer && options.cameraType == CameraType.FIRST_PERSON)
+        tiTop1?.visible = !(entity.getNthEntity(entity.turretControllerIndex) === localPlayer && options.cameraType == CameraType.FIRST_PERSON)
 
         val barrel = instance.getBone("barrel")
-        val angle = if (!vehicle.lockTurret) {
-            Mth.clamp(-turretXRot, vehicle.turretMinPitch, vehicle.turretMaxPitch) * Mth.DEG_TO_RAD
+        val angle = if (!entity.lockTurret) {
+            Mth.clamp(-turretXRot, entity.turretMinPitch, entity.turretMaxPitch) * Mth.DEG_TO_RAD
         } else {
             1.2f * Mth.DEG_TO_RAD
         }

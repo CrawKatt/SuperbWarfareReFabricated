@@ -8,7 +8,7 @@ import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
 
 class VehicleAssemblingTableVehicleRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
-    override fun rotateVehicleAxis(entityIn: VehicleEntity, poseStack: PoseStack, entityYaw: Float, partialTicks: Float) {
+    override fun rotateVehicleAxis(entity: VehicleEntity, poseStack: PoseStack, entityYaw: Float, partialTicks: Float) {
         poseStack.translate(0.5, 0.0, -0.5)
 
         val root = Vec3(-0.5, 0.5, 0.5)
@@ -19,13 +19,13 @@ class VehicleAssemblingTableVehicleRenderer(manager: EntityRendererProvider.Cont
             root.z.toFloat()
         )
         poseStack.rotateAround(
-            Axis.XP.rotationDegrees(-Mth.lerp(partialTicks, entityIn.xRotO, entityIn.xRot)),
+            Axis.XP.rotationDegrees(-Mth.lerp(partialTicks, entity.xRotO, entity.xRot)),
             root.x.toFloat(),
             root.y.toFloat(),
             root.z.toFloat()
         )
         poseStack.rotateAround(
-            Axis.ZP.rotationDegrees(-Mth.lerp(partialTicks, entityIn.prevRoll, entityIn.roll)),
+            Axis.ZP.rotationDegrees(-Mth.lerp(partialTicks, entity.prevRoll, entity.roll)),
             root.x.toFloat(),
             root.y.toFloat(),
             root.z.toFloat()
