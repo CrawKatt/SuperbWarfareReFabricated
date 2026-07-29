@@ -1,8 +1,8 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
+import com.atsuishio.superbwarfare.client.model.entity.VehicleModelInstance
 import com.atsuishio.superbwarfare.entity.vehicle.Ju87Entity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
-import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.entity.EntityRendererProvider
@@ -11,7 +11,7 @@ import net.minecraft.util.Mth
 class Ju87Renderer(manager: EntityRendererProvider.Context) : GeoVehicleRenderer<Ju87Entity>(manager) {
     override fun transformCustomModelPart(
         entity: Ju87Entity,
-        instance: BakedModelInstance,
+        instance: VehicleModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float

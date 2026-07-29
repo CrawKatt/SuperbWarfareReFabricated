@@ -1,6 +1,8 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.client.model.entity.VehicleModelBoneGroups
+import com.atsuishio.superbwarfare.client.model.entity.VehicleModelInstance
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.client.renderer.SmartTextureBrightener
 import com.atsuishio.superbwarfare.client.renderer.TextureBrightnessHandler
@@ -11,9 +13,7 @@ import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType
 import com.atsuishio.superbwarfare.data.vehicle_skin.VehicleSkin
 import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.BasicGeoVehicleEntity
-import com.atsuishio.superbwarfare.entity.vehicle.ModelBoneGroups
 import com.atsuishio.superbwarfare.entity.vehicle.VehicleModelEntry
-import com.atsuishio.superbwarfare.entity.vehicle.VehicleModelInstance
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils
@@ -26,7 +26,6 @@ import com.atsuishio.superbwarfare.tools.SpritePixelHelper
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.mulPoseMatrix
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
-import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BoneState
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
@@ -149,7 +148,7 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             waterMask.visible = false
         }
 
-        val boneGroups = entry.boneGroups
+        val boneGroups = entry.instance.boneGroups
         val dogTagBones = boneGroups.dogTagBones
         val dogTagFlag = dogTagBones.isNotEmpty()
         if (dogTagFlag) {
@@ -299,7 +298,7 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                 val dogTagTexture = SpritePixelHelper.getDogTagIcon(list, entity.uuid.toString())
 
                 for (bone in dogTagBones) {
-                    val size = ModelBoneGroups.parseDogTagSize(bone.name()) ?: continue
+                    val size = VehicleModelBoneGroups.parseDogTagSize(bone.name()) ?: continue
 
                     poseStack.pushPose()
                     poseStack.mulPoseMatrix(bone.getGlobalTransform(instance))
@@ -331,7 +330,7 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
 
     open fun renderEmissive(
         entity: T,
-        instance: BakedModelInstance,
+        instance: VehicleModelInstance,
         yaw: Float,
         partialTick: Float,
         poseStack: PoseStack,
@@ -406,7 +405,7 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
 
     open fun renderCustomPart(
         entity: T,
-        instance: BakedModelInstance,
+        instance: VehicleModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float,
@@ -482,18 +481,14 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
         }
     }
 
-    open fun getOrComputeBoneGroups(instance: BakedModelInstance): ModelBoneGroups {
-        return (instance as? VehicleModelInstance)?.boneGroups ?: ModelBoneGroups.compute(instance)
-    }
-
     open fun transformCustomModelPart(
         entity: T,
-        instance: BakedModelInstance,
+        instance: VehicleModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        val boneGroups = getOrComputeBoneGroups(instance)
+        val boneGroups = instance.boneGroups
 
         // 车轮
         boneGroups.leftWheels.forEach {
@@ -682,7 +677,7 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
 
     open fun transformCustomModelPartByScript(
         entity: T,
-        model: BakedModelInstance,
+        model: VehicleModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
