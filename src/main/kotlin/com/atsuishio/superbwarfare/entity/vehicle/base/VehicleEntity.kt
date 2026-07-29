@@ -4742,21 +4742,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                         this.deltaMovement.z()
                     ).opposite
                 )
-            } else if (this.vehicleType == VehicleType.HELICOPTER) {
-                this.hurt(
-                    ModDamageTypes.causeVehicleStrikeDamage(
-                        this.level().registryAccess(),
-                        this,
-                        driver ?: this
-                    ), if (isWreck) 0f else (10 * ((lastTickSpeed - 0.4) * (lastTickSpeed - 0.4))).toFloat()
-                )
-                this.bounceVertical(
-                    Direction.getNearest(
-                        this.deltaMovement.x(),
-                        this.deltaMovement.y(),
-                        this.deltaMovement.z()
-                    ).opposite
-                )
             } else if (Mth.abs(lastTickVerticalSpeed.toFloat()) > 0.4) {
                 this.hurt(
                     ModDamageTypes.causeVehicleStrikeDamage(

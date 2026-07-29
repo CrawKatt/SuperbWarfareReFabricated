@@ -117,7 +117,7 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
             return
         }
 
-        if (dist > 16 + longestSide) {
+        if (dist > 16 + minDist) {
             clearTowingInfo()
             return
         }
@@ -131,7 +131,7 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
         val ropeForce = -overshoot - relVelAlong
 
         val maxDeltaV = max(2.0, this.deltaMovement.length())
-        val pullForce = dir.scale((ropeForce / 6.0).coerceIn(-maxDeltaV, maxDeltaV))
+        val pullForce = dir.scale((ropeForce / 2.0).coerceIn(-maxDeltaV, maxDeltaV))
 
         if (towed is Player && towed.level().isClientSide) {
             towed.deltaMovement = towed.deltaMovement.add(pullForce)

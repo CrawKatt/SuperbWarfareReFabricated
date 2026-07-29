@@ -251,7 +251,10 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
         }
 
         val dist = targetEntity.position().distanceTo(shuttleWorldPos)
-        val maxDist = VehicleConfig.TOW_MAX_DISTANCE.get().toDouble()
+        val bb = targetEntity.boundingBox
+        val longestSide = maxOf(bb.xsize, bb.ysize, bb.zsize)
+
+        val maxDist = 17.5 + longestSide
         if (dist > maxDist) {
             player.displayClientMessage(
                 Component.translatable(
