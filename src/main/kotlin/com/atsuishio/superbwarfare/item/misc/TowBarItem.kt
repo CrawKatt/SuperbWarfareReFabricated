@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.item.misc
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils
 import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.NBTTool
@@ -246,10 +247,9 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
         }
 
         val dist = targetEntity.position().distanceTo(shuttleWorldPos)
-        val bb = targetEntity.boundingBox
-        val longestSide = maxOf(bb.xsize, bb.ysize, bb.zsize)
+        val longestSide = VehicleMotionUtils.calculateLongestSide(targetEntity)
 
-        val maxDist = VehicleConfig.TOW_MAX_DISTANCE.get().toDouble() + 1.5 + longestSide
+        val maxDist = VehicleConfig.TOW_BAR_EXTRA_LENGTH.get().toDouble() + 1.5 + longestSide
         if (dist > maxDist) {
             player.displayClientMessage(
                 Component.translatable(

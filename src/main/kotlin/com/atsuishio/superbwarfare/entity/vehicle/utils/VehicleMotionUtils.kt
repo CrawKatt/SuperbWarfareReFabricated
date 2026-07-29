@@ -1486,10 +1486,14 @@ object VehicleMotionUtils {
     }
 
     @JvmStatic
-    fun calculateLongestSide(vehicle: VehicleEntity): Double {
-        val obb = vehicle.getCollisionOBB()
-        if (obb == null || vehicle.enableAABB()) {
-            val bb = vehicle.boundingBox
+    fun calculateLongestSide(entity: Entity): Double {
+        val bb = entity.boundingBox
+        if (entity !is VehicleEntity) {
+            return maxOf(bb.xsize, bb.ysize, bb.zsize)
+        }
+
+        val obb = entity.getCollisionOBB()
+        if (obb == null || entity.enableAABB()) {
             return maxOf(bb.xsize, bb.ysize, bb.zsize)
         }
         return maxOf(obb.extents.x, obb.extents.y, obb.extents.z)

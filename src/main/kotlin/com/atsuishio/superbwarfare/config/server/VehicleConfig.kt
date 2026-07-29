@@ -168,9 +168,15 @@ object VehicleConfig {
                 "create:gantry_contraption",
                 "create:super_glue",
                 "zombiekit:flares"
-            ),
-            { "" }
-        ) { true }.also { pop() }
+            )
+        ) { true }
+    }
+
+    @JvmField
+    val TOW_BAR_EXTRA_LENGTH = buildServerConfig {
+        comment("The extra length of tow bar")
+        comment("牵引杆的额外长度（格）")
+        defineInRange("tow_bar_extra_length", 0, 0, 512).also { pop() }
     }
 
     @JvmField
