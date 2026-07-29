@@ -640,7 +640,7 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                                 )
                             ).toFloat()
 
-                            bone.rotation.rotationY(-diffY * Mth.DEG_TO_RAD)
+                            bone.rotation.rotateY(-diffY * Mth.DEG_TO_RAD)
                             bone.rotation.rotateX(-diffX * Mth.DEG_TO_RAD)
                         }
                     }
@@ -656,7 +656,7 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                                 )
                             ).toFloat()
 
-                            bone.rotation.rotationY(-diffY * Mth.DEG_TO_RAD)
+                            bone.rotation.rotateY(-diffY * Mth.DEG_TO_RAD)
                         }
                     }
                 }

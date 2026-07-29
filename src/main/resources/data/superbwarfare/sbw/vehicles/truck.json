@@ -61,7 +61,11 @@
       "MinPitch": -60,
       "MaxPitch": 60,
       "MinYaw": -95,
-      "MaxYaw": 95
+      "MaxYaw": 95,
+      "DismountInfo": {
+        "Transform": "Vehicle",
+        "Position": [2, 0.375, 4]
+      }
     },
     {
       "IsEnclosed": true,
@@ -75,7 +79,11 @@
       "MinPitch": -60,
       "MaxPitch": 60,
       "MinYaw": -95,
-      "MaxYaw": 95
+      "MaxYaw": 95,
+      "DismountInfo": {
+        "Transform": "Vehicle",
+        "Position": [-2, 0.375, 4]
+      }
     }
   ],
   "EngineType": "Wheel",
