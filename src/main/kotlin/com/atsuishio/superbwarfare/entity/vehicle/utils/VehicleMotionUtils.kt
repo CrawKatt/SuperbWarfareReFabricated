@@ -12,6 +12,9 @@ import com.atsuishio.superbwarfare.entity.projectile.SmokeDecoyEntity
 import com.atsuishio.superbwarfare.entity.vehicle.TurretWreckEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleEngineUtils.lerpAngle
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils.computeSupportedPosition
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils.isSearchBoxProvablyAirborne
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils.updateTerrainCompact
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.transformPosition
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.tools.OBB
@@ -1488,10 +1491,14 @@ object VehicleMotionUtils {
     }
 
     @JvmStatic
-    fun calculateLongestSide(vehicle: VehicleEntity): Double {
-        val obb = vehicle.getCollisionOBB()
-        if (obb == null || vehicle.enableAABB()) {
-            val bb = vehicle.boundingBox
+    fun calculateLongestSide(entity: Entity): Double {
+        val bb = entity.boundingBox
+        if (entity !is VehicleEntity) {
+            return maxOf(bb.xsize, bb.ysize, bb.zsize)
+        }
+
+        val obb = entity.getCollisionOBB()
+        if (obb == null || entity.enableAABB()) {
             return maxOf(bb.xsize, bb.ysize, bb.zsize)
         }
         return maxOf(obb.extents.x, obb.extents.y, obb.extents.z)

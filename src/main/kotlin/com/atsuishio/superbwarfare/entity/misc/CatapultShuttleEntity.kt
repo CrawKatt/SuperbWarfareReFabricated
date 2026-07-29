@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
@@ -105,10 +106,9 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
         val towedPos = towed.position()
 
         val dist = shuttleWorldPos.distanceTo(towedPos)
-        val bb = towed.boundingBox
-        val longestSide = maxOf(bb.xsize, bb.ysize, bb.zsize)
+        val longestSide = VehicleMotionUtils.calculateLongestSide(towed)
 
-        val minDist = longestSide + 1.5 + VehicleConfig.TOW_MAX_DISTANCE.get().toDouble()
+        val maxDist = VehicleConfig.TOW_BAR_EXTRA_LENGTH.get().toDouble() + 1.5 + longestSide
 
         val worldLookAngle = if (ValkyrienSkiesCompat.hasMod())
             ValkyrienSkiesCompat.toWorldDirection(this, lookAngle)
@@ -118,14 +118,14 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
             return
         }
 
-        if (dist > 16 + minDist) {
+        if (dist > 16 + maxDist) {
             clearTowingInfo()
             return
         }
 
-        if (dist <= minDist) return
+        if (dist <= maxDist) return
 
-        val overshoot = dist - minDist
+        val overshoot = dist - maxDist
         val dir = shuttleWorldPos.subtract(towedPos).reverse().normalize()
         val relVelAlong = towed.deltaMovement.subtract(this.deltaMovement).dot(dir)
 
