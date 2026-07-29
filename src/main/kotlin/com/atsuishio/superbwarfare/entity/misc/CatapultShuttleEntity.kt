@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.entity.misc
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.setValue
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
@@ -97,7 +98,7 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
         val bb = towed.boundingBox
         val longestSide = maxOf(bb.xsize, bb.ysize, bb.zsize)
 
-        val minDist = longestSide + 1.5
+        val minDist = longestSide + 1.5 + VehicleConfig.TOW_MAX_DISTANCE.get().toDouble()
 
         val worldLookAngle = this.lookAngle
         if (shuttleWorldPos.vectorTo(towedPos).dot(worldLookAngle) > 0) {

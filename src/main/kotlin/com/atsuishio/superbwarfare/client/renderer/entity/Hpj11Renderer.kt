@@ -20,30 +20,30 @@ class Hpj11Renderer(manager: EntityRendererProvider.Context) : BasicAutoAimableR
     }
 
     override fun transformCustomModelPart(
-        vehicle: AutoAimableEntity,
+        entity: AutoAimableEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
 
         val radar2 = instance.getBone("move_radar2")
 
         radar2?.visible =
-            !(vehicle.getNthEntity(vehicle.turretControllerIndex) === localPlayer && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
+            !(entity.getNthEntity(entity.turretControllerIndex) === localPlayer && (options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle))
 
         val rdr = instance.getBone("move_rdr")
         val rdr2 = instance.getBone("move_rdr2")
 
-        val rot = Mth.clamp(-turretXRot, vehicle.turretMinPitch, vehicle.turretMaxPitch) * Mth.DEG_TO_RAD
+        val rot = Mth.clamp(-turretXRot, entity.turretMinPitch, entity.turretMaxPitch) * Mth.DEG_TO_RAD
 
         rdr?.rotation?.rotationX(rot)
         rdr2?.rotation?.rotationX(rot)
     }
 
     override fun renderCustomPart(
-        vehicle: AutoAimableEntity,
+        entity: AutoAimableEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
@@ -51,9 +51,9 @@ class Hpj11Renderer(manager: EntityRendererProvider.Context) : BasicAutoAimableR
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
+        super.renderCustomPart(entity, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
 
-        val heat = Mth.clamp(vehicle.getWeaponHeat(0).toFloat(), 0f, 100f)
+        val heat = Mth.clamp(entity.getWeaponHeat(0).toFloat(), 0f, 100f)
 
         if (heat > 0) {
             instance.renderToBuffer(

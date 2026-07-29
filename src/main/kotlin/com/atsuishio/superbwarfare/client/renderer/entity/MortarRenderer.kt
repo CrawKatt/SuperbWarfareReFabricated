@@ -12,7 +12,7 @@ import net.minecraft.world.phys.Vec3
 class MortarRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
 
     override fun transformCustomModelPart(
-        vehicle: VehicleEntity,
+        entity: VehicleEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
@@ -21,15 +21,15 @@ class MortarRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRend
         val paoguan = instance.getBone("move_paoguan")
         val monitor = instance.getBone("move_monitor")
         val jiaojia = instance.getBone("move_jiaojia")
-        val headPitch = -Mth.lerp(partialTicks, vehicle.xRotO, vehicle.xRot)
+        val headPitch = -Mth.lerp(partialTicks, entity.xRotO, entity.xRot)
 
         paoguan?.rotation?.rotationX(headPitch * Mth.DEG_TO_RAD)
         jiaojia?.rotation?.rotationX(-2 * ((headPitch - (10 - headPitch * 0.1f)) * Mth.DEG_TO_RAD))
-        monitor?.visible = vehicle.entityData.get(MortarEntity.INTELLIGENT)
+        monitor?.visible = entity.entityData.get(MortarEntity.INTELLIGENT)
     }
 
-    override fun rotateVehicleAxis(entityIn: VehicleEntity, poseStack: PoseStack, entityYaw: Float, partialTicks: Float) {
-        val root = Vec3(0.0, entityIn.rotateOffsetHeight, 0.0)
+    override fun rotateVehicleAxis(entity: VehicleEntity, poseStack: PoseStack, entityYaw: Float, partialTicks: Float) {
+        val root = Vec3(0.0, entity.rotateOffsetHeight, 0.0)
         poseStack.rotateAround(
             Axis.YP.rotationDegrees(-entityYaw + 180),
             root.x.toFloat(),

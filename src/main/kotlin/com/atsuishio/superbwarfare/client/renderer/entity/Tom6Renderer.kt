@@ -15,7 +15,7 @@ class Tom6Renderer(manager: EntityRendererProvider.Context) : GeoVehicleRenderer
     private val blockRenderer: BlockRenderDispatcher = manager.blockRenderDispatcher
 
     override fun renderCustomPart(
-        vehicle: Tom6Entity,
+        entity: Tom6Entity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
@@ -23,7 +23,7 @@ class Tom6Renderer(manager: EntityRendererProvider.Context) : GeoVehicleRenderer
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        if (vehicle.hasMelon) {
+        if (entity.hasMelon) {
             poseStack.pushPose()
             poseStack.scale(0.85f, 0.85f, 0.85f)
 

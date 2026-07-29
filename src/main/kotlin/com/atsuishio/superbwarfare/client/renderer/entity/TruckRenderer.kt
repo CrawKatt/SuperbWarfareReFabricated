@@ -8,15 +8,15 @@ import net.minecraft.util.Mth
 
 class TruckRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
     override fun transformCustomModelPart(
-        vehicle: VehicleEntity,
+        entity: VehicleEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
         val control = instance.getBone("move_control")
 
-        control?.rotation?.rotationY(12 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        control?.rotation?.rotationY(12 * Mth.lerp(partialTicks, entity.rudderRotO, entity.rudderRot))
     }
 }

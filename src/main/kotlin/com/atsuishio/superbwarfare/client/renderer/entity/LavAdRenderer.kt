@@ -16,7 +16,7 @@ class LavAdRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRende
     }
 
     override fun renderCustomPart(
-        vehicle: VehicleEntity,
+        entity: VehicleEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
@@ -24,9 +24,9 @@ class LavAdRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRende
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
+        super.renderCustomPart(entity, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
 
-        val heat = Mth.clamp(vehicle.getWeaponHeat(0, 0).toFloat(), 0f, 100f)
+        val heat = Mth.clamp(entity.getWeaponHeat(0, 0).toFloat(), 0f, 100f)
 
         if (heat > 0) {
             instance.renderToBuffer(

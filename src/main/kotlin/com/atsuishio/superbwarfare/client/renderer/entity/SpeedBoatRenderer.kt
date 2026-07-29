@@ -14,13 +14,13 @@ class SpeedBoatRenderer(manager: EntityRendererProvider.Context) : BasicVehicleR
     }
 
     override fun transformCustomModelPart(
-        vehicle: VehicleEntity,
+        entity: VehicleEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
 
         val propeller = instance.getBone("move_propeller")
         val propeller2 = instance.getBone("move_propeller2")
@@ -28,10 +28,10 @@ class SpeedBoatRenderer(manager: EntityRendererProvider.Context) : BasicVehicleR
         val control = instance.getBone("move_control")
         val rudder = instance.getBone("move_rudder")
 
-        propeller?.rotation?.rotationZ(Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
-        propeller2?.rotation?.rotationZ(-Mth.lerp(partialTicks, vehicle.propellerRotO, vehicle.propellerRot))
-        turret?.visible = !(vehicle.getNthEntity(vehicle.turretControllerIndex) === localPlayer && ClientEventHandler.zoomVehicle)
-        control?.rotation?.rotationZ(-4 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
-        rudder?.rotation?.rotationY(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        propeller?.rotation?.rotationZ(Mth.lerp(partialTicks, entity.propellerRotO, entity.propellerRot))
+        propeller2?.rotation?.rotationZ(-Mth.lerp(partialTicks, entity.propellerRotO, entity.propellerRot))
+        turret?.visible = !(entity.getNthEntity(entity.turretControllerIndex) === localPlayer && ClientEventHandler.zoomVehicle)
+        control?.rotation?.rotationZ(-4 * Mth.lerp(partialTicks, entity.rudderRotO, entity.rudderRot))
+        rudder?.rotation?.rotationY(Mth.lerp(partialTicks, entity.rudderRotO, entity.rudderRot))
     }
 }

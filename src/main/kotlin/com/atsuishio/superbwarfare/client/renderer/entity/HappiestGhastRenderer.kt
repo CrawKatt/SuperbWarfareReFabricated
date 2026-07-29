@@ -19,28 +19,28 @@ import java.io.IOException
 class HappiestGhastRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
 
     override fun transformCustomModelPart(
-        vehicle: VehicleEntity,
+        entity: VehicleEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
         val turretRight = instance.getBone("move_turret_right")
         if (turretRight != null) {
             turretRight.rotation.rotationY(turretYRot * Mth.DEG_TO_RAD)
-            turretRight.visible = !(vehicle.isWreck && vehicle.hasTurret() && vehicle.sympatheticDetonated)
+            turretRight.visible = !(entity.isWreck && entity.hasTurret() && entity.sympatheticDetonated)
         }
 
         val controlP = instance.getBone("move_controlP")
-        controlP?.rotation?.rotationX(Mth.clamp(-vehicle.power * 40, -20f, 20f) * Mth.DEG_TO_RAD)
+        controlP?.rotation?.rotationX(Mth.clamp(-entity.power * 40, -20f, 20f) * Mth.DEG_TO_RAD)
 
         val controlT = instance.getBone("move_controlT")
-        controlT?.rotation?.rotationZ(Mth.clamp(vehicle.deltaRot * 16, -20f, 20f) * Mth.DEG_TO_RAD)
+        controlT?.rotation?.rotationZ(Mth.clamp(entity.deltaRot * 16, -20f, 20f) * Mth.DEG_TO_RAD)
     }
 
     override fun renderCustomPart(
-        vehicle: VehicleEntity,
+        entity: VehicleEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
@@ -48,12 +48,12 @@ class HappiestGhastRenderer(manager: EntityRendererProvider.Context) : BasicVehi
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
+        super.renderCustomPart(entity, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
 
         // 确保动态纹理已预计算，直接获取当前帧对应的预计算纹理
         ensureFlowTexturesLoaded()
-        val texLocation = if (flowTexturesReady && !vehicle.sympatheticDetonated) {
-            getFlowFrame(vehicle.tickCount)
+        val texLocation = if (flowTexturesReady && !entity.sympatheticDetonated) {
+            getFlowFrame(entity.tickCount)
         } else {
             GLASS
         }
@@ -68,7 +68,7 @@ class HappiestGhastRenderer(manager: EntityRendererProvider.Context) : BasicVehi
             1f, 1f, 1f, 1f
         )
 
-        if (!vehicle.sympatheticDetonated) {
+        if (!entity.sympatheticDetonated) {
             instance.renderToBuffer(
                 poseStack, buffer, renderTypeLight, polyMeshType,
                 packedLight, OverlayTexture.NO_OVERLAY,

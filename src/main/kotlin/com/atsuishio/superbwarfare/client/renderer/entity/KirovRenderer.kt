@@ -12,13 +12,13 @@ class KirovRenderer(manager: EntityRendererProvider.Context) : GeoVehicleRendere
     }
 
     override fun transformCustomModelPart(
-        vehicle: KirovEntity,
+        entity: KirovEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
 
         val propeller = instance.getBone("move_prop1")
         val propeller2 = instance.getBone("move_prop2")
@@ -27,16 +27,16 @@ class KirovRenderer(manager: EntityRendererProvider.Context) : GeoVehicleRendere
         val propeller4 = instance.getBone("move_prop4")
         val propeller5 = instance.getBone("move_prop5")
 
-        val rot = Mth.lerp(partialTicks, vehicle.propellerO, vehicle.propeller)
+        val rot = Mth.lerp(partialTicks, entity.propellerO, entity.propeller)
         propeller?.rotation?.rotateZ(rot)
 
-        val rotL = Mth.lerp(partialTicks, vehicle.propellerLO, vehicle.propellerL)
+        val rotL = Mth.lerp(partialTicks, entity.propellerLO, entity.propellerL)
         propeller2?.rotation?.rotateZ(rotL)
 
-        val rotR = Mth.lerp(partialTicks, vehicle.propellerRO, vehicle.propellerR)
+        val rotR = Mth.lerp(partialTicks, entity.propellerRO, entity.propellerR)
         propeller3?.rotation?.rotateZ(rotR)
 
-        val rotV = Mth.lerp(partialTicks, vehicle.propellerVO, vehicle.propellerV)
+        val rotV = Mth.lerp(partialTicks, entity.propellerVO, entity.propellerV)
 
         propeller4?.rotation?.rotateZ(rotV)
         propeller5?.rotation?.rotateZ(rotV)
@@ -44,13 +44,13 @@ class KirovRenderer(manager: EntityRendererProvider.Context) : GeoVehicleRendere
         val turretRight = instance.getBone("move_turret_right")
         if (turretRight != null) {
             turretRight.rotation.rotationY(turretYRot * Mth.DEG_TO_RAD)
-            turretRight.visible = !(vehicle.isWreck && vehicle.hasTurret() && vehicle.sympatheticDetonated)
+            turretRight.visible = !(entity.isWreck && entity.hasTurret() && entity.sympatheticDetonated)
         }
 
         val controlP = instance.getBone("move_controlP")
-        controlP?.rotation?.rotationX(Mth.clamp(-vehicle.power * 48, -20f, 20f) * Mth.DEG_TO_RAD)
+        controlP?.rotation?.rotationX(Mth.clamp(-entity.power * 48, -20f, 20f) * Mth.DEG_TO_RAD)
 
         val rudder = instance.getBone("move_rudder")
-        rudder?.rotation?.rotationZ(12 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        rudder?.rotation?.rotationZ(12 * Mth.lerp(partialTicks, entity.rudderRotO, entity.rudderRot))
     }
 }

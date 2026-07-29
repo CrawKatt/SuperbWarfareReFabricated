@@ -1061,7 +1061,7 @@
 					"pivot": [0, 91.72092, -117.08214]
 				},
 				{
-					"name": "light_on1",
+					"name": "move_light_on1",
 					"parent": "led",
 					"pivot": [0, 91.72092, -117.08214],
 					"cubes": [
@@ -1086,7 +1086,7 @@
 					]
 				},
 				{
-					"name": "light_on2",
+					"name": "move_light_on2",
 					"parent": "led",
 					"pivot": [0, 91.72092, -106.08214],
 					"cubes": [
@@ -1111,7 +1111,7 @@
 					]
 				},
 				{
-					"name": "light_on3",
+					"name": "move_light_on3",
 					"parent": "led",
 					"pivot": [0, 91.72092, -106.08214],
 					"cubes": [
@@ -1136,7 +1136,7 @@
 					]
 				},
 				{
-					"name": "light_on4",
+					"name": "move_light_on4",
 					"parent": "led",
 					"pivot": [0, 91.72092, -106.08214],
 					"cubes": [
@@ -1161,7 +1161,7 @@
 					]
 				},
 				{
-					"name": "light_on5",
+					"name": "move_light_on5",
 					"parent": "led",
 					"pivot": [0, 91.72092, -106.08214],
 					"cubes": [
@@ -1186,7 +1186,7 @@
 					]
 				},
 				{
-					"name": "light_off1",
+					"name": "move_light_off1",
 					"parent": "led",
 					"pivot": [0, 91.72092, -117.08214],
 					"cubes": [
@@ -1211,7 +1211,7 @@
 					]
 				},
 				{
-					"name": "light_off2",
+					"name": "move_light_off2",
 					"parent": "led",
 					"pivot": [0, 91.72092, -86.28214],
 					"cubes": [
@@ -1236,7 +1236,7 @@
 					]
 				},
 				{
-					"name": "light_off3",
+					"name": "move_light_off3",
 					"parent": "led",
 					"pivot": [0, 91.72092, -79.03214],
 					"cubes": [
@@ -1261,7 +1261,7 @@
 					]
 				},
 				{
-					"name": "light_off4",
+					"name": "move_light_off4",
 					"parent": "led",
 					"pivot": [0, 91.72092, -72.03214],
 					"cubes": [
@@ -1286,7 +1286,7 @@
 					]
 				},
 				{
-					"name": "light_off5",
+					"name": "move_light_off5",
 					"parent": "led",
 					"pivot": [0, 91.72092, -63.78214],
 					"cubes": [

@@ -16,22 +16,22 @@ import net.minecraft.world.item.DyeColor
 class TinySpeedboatRenderer(manager: EntityRendererProvider.Context) :
     GeoVehicleRenderer<TinySpeedboatEntity>(manager) {
     override fun transformCustomModelPart(
-        vehicle: TinySpeedboatEntity,
+        entity: TinySpeedboatEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        super.transformCustomModelPart(vehicle, instance, poseStack, entityYaw, partialTicks)
+        super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
         val control = instance.getBone("move_control")
         val rudder = instance.getBone("move_rudder")
 
-        control?.rotation?.rotationZ(-3 * Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
-        rudder?.rotation?.rotationY(Mth.lerp(partialTicks, vehicle.rudderRotO, vehicle.rudderRot))
+        control?.rotation?.rotationZ(-3 * Mth.lerp(partialTicks, entity.rudderRotO, entity.rudderRot))
+        rudder?.rotation?.rotationY(Mth.lerp(partialTicks, entity.rudderRotO, entity.rudderRot))
     }
 
     override fun renderCustomPart(
-        vehicle: TinySpeedboatEntity,
+        entity: TinySpeedboatEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
@@ -39,18 +39,18 @@ class TinySpeedboatRenderer(manager: EntityRendererProvider.Context) :
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
-        val emissive = this.getEmissiveTextureLocation(poseStack, vehicle) ?: return
+        super.renderCustomPart(entity, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
+        val emissive = this.getEmissiveTextureLocation(poseStack, entity) ?: return
 
         val renderType = RenderType.entityTranslucent(emissive)
         var packedLight = packedLight
 
-        val id: Int = vehicle.colorId
+        val id: Int = entity.colorId
 
         var color: FloatArray?
 
-        if (vehicle.customName != null && vehicle.customName!!.string == "jeb_") {
-            color = getRainbowColorHSL(vehicle.tickCount)
+        if (entity.customName != null && entity.customName!!.string == "jeb_") {
+            color = getRainbowColorHSL(entity.tickCount)
             packedLight = LightTexture.FULL_BRIGHT
         } else {
             val intColor = DyeColor.byId(id).textureDiffuseColor

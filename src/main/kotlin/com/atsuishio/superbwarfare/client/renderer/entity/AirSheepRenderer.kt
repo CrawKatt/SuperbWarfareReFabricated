@@ -16,7 +16,7 @@ class AirSheepRenderer(manager: EntityRendererProvider.Context) :
     GeoVehicleRenderer<AirSheepEntity>(manager) {
 
     override fun renderCustomPart(
-        vehicle: AirSheepEntity,
+        entity: AirSheepEntity,
         instance: BakedModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
@@ -24,18 +24,18 @@ class AirSheepRenderer(manager: EntityRendererProvider.Context) :
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        super.renderCustomPart(vehicle, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
-        val emissive = this.getEmissiveTextureLocation(poseStack, vehicle) ?: return
+        super.renderCustomPart(entity, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
+        val emissive = this.getEmissiveTextureLocation(poseStack, entity) ?: return
 
         val renderType = RenderType.entityTranslucent(emissive)
         var packedLight = packedLight
 
-        val id: Int = vehicle.colorId
+        val id: Int = entity.colorId
 
         var color: FloatArray?
 
-        if (vehicle.customName != null && vehicle.customName!!.string == "jeb_") {
-            color = getRainbowColorHSL(vehicle.tickCount)
+        if (entity.customName != null && entity.customName!!.string == "jeb_") {
+            color = getRainbowColorHSL(entity.tickCount)
             packedLight = LightTexture.FULL_BRIGHT
         } else {
             val intColor = DyeColor.byId(id).textureDiffuseColor
