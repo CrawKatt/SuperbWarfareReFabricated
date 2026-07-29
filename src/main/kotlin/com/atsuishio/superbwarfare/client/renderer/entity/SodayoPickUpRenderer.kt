@@ -26,8 +26,9 @@ class SodayoPickUpRenderer(manager: EntityRendererProvider.Context) : BasicVehic
 
         control?.rotation?.rotationZ(8 * Mth.lerp(partialTicks, entity.rudderRotO, entity.rudderRot))
 
-        val pitch = -5f * entity.getAcceleration().toFloat() * Mth.DEG_TO_RAD
-        val roll = 0.5f * Mth.lerp(partialTicks, entity.rudderRotO, entity.rudderRot) * entity.deltaMovement.horizontalDistance().toFloat() * Mth.DEG_TO_RAD
+        val pitch = -5f * entity.getAcceleration().toFloat()
+        val roll = 0.5f * Mth.lerp(partialTicks, entity.rudderRotO, entity.rudderRot) * entity.deltaMovement.horizontalDistance().toFloat()
+        head?.rotation?.set(head.definition().bindRotation())
         head?.rotation?.rotateX(pitch)
         head?.rotation?.rotateZ(roll)
 
