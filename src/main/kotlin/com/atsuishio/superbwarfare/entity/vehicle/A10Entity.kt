@@ -59,8 +59,10 @@ open class A10Entity(type: EntityType<A10Entity>, world: Level) : VehicleEntity(
         if (level().isClientSide) {
             val ctx = anim?.context ?: return
             if (gearUp && !wasGearUp) {
+                ctx.stopAnimation("animation.a_10.gear_down")
                 ctx.playAnimation("animation.a_10.gear_up", AnimationPlayType.PLAY_ONCE_HOLD)
             } else if (gearDown && wasGearUp) {
+                ctx.stopAnimation("animation.a_10.gear_up")
                 ctx.playAnimation("animation.a_10.gear_down", AnimationPlayType.PLAY_ONCE_HOLD)
             }
             wasGearUp = gearUp
