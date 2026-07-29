@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
+import com.atsuishio.superbwarfare.client.model.entity.VehicleModelInstance
 import com.atsuishio.superbwarfare.entity.vehicle.Tom6Entity
-import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
@@ -16,7 +16,7 @@ class Tom6Renderer(manager: EntityRendererProvider.Context) : GeoVehicleRenderer
 
     override fun renderCustomPart(
         entity: Tom6Entity,
-        instance: BakedModelInstance,
+        instance: VehicleModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float,

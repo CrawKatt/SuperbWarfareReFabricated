@@ -1,11 +1,11 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.client.model.entity.VehicleModelInstance
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.entity.vehicle.AnnihilatorEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
-import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BoneState
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
@@ -22,7 +22,7 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
 
     override fun transformCustomModelPart(
         entity: ArtilleryEntity,
-        instance: BakedModelInstance,
+        instance: VehicleModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
@@ -69,7 +69,7 @@ class AnnihilatorRenderer(manager: EntityRendererProvider.Context) : BasicArtill
 
     override fun renderCustomPart(
         entity: ArtilleryEntity,
-        instance: BakedModelInstance,
+        instance: VehicleModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float,

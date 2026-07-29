@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.annotation.ExcludeBvrSync
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage
 import com.atsuishio.superbwarfare.capability.energy.VehicleEnergyStorage
 import com.atsuishio.superbwarfare.client.animation.entity.VehicleAnimationInstance
+import com.atsuishio.superbwarfare.client.model.entity.VehicleModelInstance
 import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
@@ -407,13 +408,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     /** Tick on which [cachedObbOnGround] was last computed. */
     private var obbOnGroundCacheTick: Int = Int.MIN_VALUE
-
-    /**
-     * Set by [vCollide] when a step-up produced only vertical progress (horizontal
-     * still blocked). [vMove] reads it to skip zeroing horizontal deltaMovement so
-     * the vehicle keeps its momentum through a multi-tick climb instead of stalling.
-     */
-    private var verticalStepClippingOnly: Boolean = false
 
     open var obb = listOf<OBBInfo>()
         protected set
