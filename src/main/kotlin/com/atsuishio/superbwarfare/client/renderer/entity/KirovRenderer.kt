@@ -20,6 +20,8 @@ class KirovRenderer(manager: EntityRendererProvider.Context) : GeoVehicleRendere
     ) {
         super.transformCustomModelPart(entity, instance, poseStack, entityYaw, partialTicks)
 
+        if (entity.isWreck) return
+
         val propeller = instance.getBone("move_prop1")
         val propeller2 = instance.getBone("move_prop2")
         val propeller3 = instance.getBone("move_prop3")
