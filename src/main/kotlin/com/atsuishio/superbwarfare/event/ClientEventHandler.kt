@@ -422,6 +422,18 @@ object ClientEventHandler {
     @JvmField
     var loiterForwardTapCount: Int = 0
 
+    /** 卸载乘客双击：上次按下卸载乘客键的tick */
+    @JvmField
+    var unloadPassengersLastTapTick: Int = -20
+
+    /** 卸载乘客双击：卸载乘客键连击计数 */
+    @JvmField
+    var unloadPassengersTapCount: Int = 0
+
+    /** 卸载乘客双击：上一帧卸载乘客键是否按下，用于检测上升沿 */
+    @JvmField
+    var wasUnloadPassengersDown: Boolean = false
+
     @JvmField
     var tdmSavedData: TDMSavedData = TDMSavedData()
 
@@ -783,6 +795,32 @@ object ClientEventHandler {
             }
         } else {
             holdToEjection = 0
+        }
+
+        // 检测双击卸载乘客键在0.5s(10tick)内，强制让除主驾驶以外的乘客离开载具
+        if (vehicle is VehicleEntity && vehicle.firstPassenger == player && vehicle.passengers.size > 1) {
+            val unloadDown = ModKeyMappings.UNLOAD_PASSENGERS.isDown
+            val unloadJustPressed = unloadDown && !wasUnloadPassengersDown
+            wasUnloadPassengersDown = unloadDown
+            if (unloadJustPressed) {
+                val currentTick = player.tickCount
+                if (currentTick - unloadPassengersLastTapTick <= 10) {
+                    sendPacketToServer(VehicleUnloadPassengersMessage)
+                    unloadPassengersTapCount = 0
+                    unloadPassengersLastTapTick = -20
+                } else {
+                    unloadPassengersTapCount = 1
+                    unloadPassengersLastTapTick = currentTick
+                    player.displayClientMessage(
+                        Component.translatable(
+                            "tips.superbwarfare.unload_passengers_hint",
+                            ModKeyMappings.UNLOAD_PASSENGERS.key.displayName.string
+                        ), true
+                    )
+                }
+            }
+        } else {
+            wasUnloadPassengersDown = false
         }
     }
 
