@@ -774,10 +774,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
             // 清除牵引我方载具的实体
             towedByEntity?.let { tower ->
-                if (tower is VehicleEntity) {
-                    val filtered = tower.towingUUIDs.filter { it != this.stringUUID }
-                    tower.towingUUIDs = filtered.toMutableList()
-                }
+                val filtered = tower.towingUUIDs.filter { it != this.stringUUID }
+                tower.towingUUIDs = filtered.toMutableList()
             }
             towedByUUID = ""
         }
@@ -1782,7 +1780,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         if (compound.contains("TowingUUIDs")) {
             val listTag = compound.getList("TowingUUIDs", Tag.TAG_STRING.toInt())
             val list = mutableListOf<String>()
-            for (i in 0 until listTag.size) {
+            for (i in listTag.indices) {
                 list.add(listTag.getString(i))
             }
             towingUUIDs = list
@@ -4901,7 +4899,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             val tag = entityData.get(TOWING_UUIDS)
             val listTag = tag.getList("list", Tag.TAG_STRING.toInt())
             val result = mutableListOf<String>()
-            for (i in 0 until listTag.size) {
+            for (i in listTag.indices) {
                 result.add(listTag.getString(i))
             }
             return result
