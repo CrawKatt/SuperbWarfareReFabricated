@@ -141,6 +141,7 @@ private fun registerPayloads() {
     playToServer<LoiterConfigMessage>()
     playToServer<LoiterOverrideMessage>()
     playToServer<VehicleUnloadPassengersMessage>()
+    playToServer<VehicleDisconnectTowingMessage>()
     playToServer<EntityClearMessage>()
     playToServer<EntityAreaClearMessage>()
 }

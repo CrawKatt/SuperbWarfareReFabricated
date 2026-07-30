@@ -4,13 +4,16 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.clientLevel
 import com.atsuishio.superbwarfare.tools.mc
+import com.atsuishio.superbwarfare.tools.options
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
@@ -76,10 +79,13 @@ object TowingChainRenderer {
 
         val pose = poseStack.last().pose()
 
+        val range = options.simulationDistance().get().toDouble() * 8
+        val box = AABB.ofSize(camera.position, range, range, range)
         val vehicles = mutableListOf<VehicleEntity>()
         val shuttles = mutableListOf<CatapultShuttleEntity>()
-        level.entitiesForRendering().forEach {
-            if (it is VehicleEntity && it.towingUUID.isNotBlank()) {
+
+        EntityFindUtil.getEntities(level).get(box) {
+            if (it is VehicleEntity && it.towingUUIDs.isNotEmpty()) {
                 vehicles.add(it)
             }
             if (it is CatapultShuttleEntity && it.towingUUID.isNotBlank()) {
@@ -93,8 +99,9 @@ object TowingChainRenderer {
         // --- Vehicle towing chains ---
         val vehicleRenderType = ModRenderTypes.TOW_CHAIN.apply(CHAIN_TEXTURE)
         for (vehicle in vehicles) {
-            val towed = vehicle.towingEntity ?: continue
-            renderTowChain(pose, pt, bufferSource, vehicle, towed, vehicleRenderType)
+            for (towed in vehicle.towingEntities) {
+                renderTowChain(pose, partialTick.getGameTimeDeltaPartialTick(true), bufferSource, vehicle, towed, vehicleRenderType)
+            }
         }
 
         // --- Catapult shuttle towing chains ---
