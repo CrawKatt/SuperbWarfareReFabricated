@@ -428,7 +428,7 @@
   "des.superbwarfare.vehicle_deployer.fail": "Please click with a container!",
   "block.superbwarfare.aircraft_catapult": "Aircraft Catapult",
   "block.superbwarfare.catapult_controller": "Catapult Controller",
-  "message.superbwarfare.catapult_power": "Catapult Power: %s",
+  "message.superbwarfare.catapult_power": "Catapult Power: %1$s",
   "block.superbwarfare.superb_item_interface": "Superb Item Interface",
   "des.superbwarfare.superb_item_interface": "A fast omnidirectional hopper for transferring items to targeted entities",
   "block.superbwarfare.creative_superb_item_interface": "Superb Item Interface",
@@ -1145,6 +1145,7 @@
   "des.jade_plugin_superbwarfare.dps_generator.level": "Generator Level: %1$s",
   "des.jade_plugin_superbwarfare.dps_generator.health": "Maximum Health: %1$s",
   "config.jade.plugin_superbwarfare.vehicle_deployer": "Vehicle Deployer",
+  "config.jade.plugin_superbwarfare.catapult_controller": "Catapult Controller",
 
   "gamerule.sbwDoGenerateLoots": "Generate Superb Warfare Chest Loots",
 
