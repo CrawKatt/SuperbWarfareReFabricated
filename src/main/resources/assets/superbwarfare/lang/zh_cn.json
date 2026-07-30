@@ -428,7 +428,7 @@
   "des.superbwarfare.vehicle_deployer.fail": "请使用集装箱点击！",
   "block.superbwarfare.aircraft_catapult": "飞行器弹射装置",
   "block.superbwarfare.catapult_controller": "弹射器控制器",
-  "message.superbwarfare.catapult_power": "弹射力度：%s",
+  "message.superbwarfare.catapult_power": "弹射力度：%1$s",
   "block.superbwarfare.superb_item_interface": "卓越物品接口",
   "des.superbwarfare.superb_item_interface": "可快速给指向实体传输物品的全方向漏斗",
   "block.superbwarfare.creative_superb_item_interface": "创造模式卓越物品接口",
@@ -1145,6 +1145,7 @@
   "des.jade_plugin_superbwarfare.dps_generator.level": "发电机等级：%1$s",
   "des.jade_plugin_superbwarfare.dps_generator.health": "当前最大血量：%1$s",
   "config.jade.plugin_superbwarfare.vehicle_deployer": "载具部署器",
+  "config.jade.plugin_superbwarfare.catapult_controller": "弹射器控制器",
 
   "gamerule.sbwDoGenerateLoots": "生成卓越前线的箱子战利品",
 

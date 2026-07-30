@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.compat.jade
 
+import com.atsuishio.superbwarfare.block.CatapultControllerBlock
 import com.atsuishio.superbwarfare.block.ContainerBlock
 import com.atsuishio.superbwarfare.block.VehicleDeployerBlock
 import com.atsuishio.superbwarfare.block.entity.VehicleDeployerBlockEntity
@@ -24,5 +25,6 @@ class SbwJadePlugin : IWailaPlugin {
         registration.registerEntityComponent(DPSGeneratorProvider, DPSGeneratorEntity::class.java)
         registration.registerBlockComponent(ContainerEntityProvider, ContainerBlock::class.java)
         registration.registerBlockComponent(VehicleDeployerProvider, VehicleDeployerBlock::class.java)
+        registration.registerBlockComponent(CatapultControllerProvider, CatapultControllerBlock::class.java)
     }
 }

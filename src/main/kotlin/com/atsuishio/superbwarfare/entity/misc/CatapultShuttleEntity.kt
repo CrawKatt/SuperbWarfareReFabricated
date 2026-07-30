@@ -40,7 +40,7 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
     }
 
     override fun interact(player: Player, hand: InteractionHand): InteractionResult {
-        if (player.isShiftKeyDown && player.getItemInHand(hand).isEmpty) {
+        if (player.isShiftKeyDown && player.mainHandItem.isEmpty) {
             if (!this.level().isClientSide) {
                 clearTowingInfo()
                 this.discard()
