@@ -17,10 +17,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils.isSea
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleMotionUtils.updateTerrainCompact
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.transformPosition
 import com.atsuishio.superbwarfare.init.*
-import com.atsuishio.superbwarfare.tools.OBB
-import com.atsuishio.superbwarfare.tools.SpritePixelHelper
-import com.atsuishio.superbwarfare.tools.angleTo
-import com.atsuishio.superbwarfare.tools.forceHurt
+import com.atsuishio.superbwarfare.tools.*
 import com.mojang.math.Axis
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
@@ -1448,57 +1445,64 @@ object VehicleMotionUtils {
 
     @JvmStatic
     fun towingTick(vehicle: VehicleEntity) {
-        if (vehicle.towingUUID.isBlank()) return
+        if (!vehicle.isTowingAny()) return
 
-        val towed = vehicle.towingEntity
-        if (towed == null) {
-            vehicle.clearTowingInfo()
-            return
-        }
-        if (towed is VehicleEntity) return
-
-        val dist = vehicle.distanceTo(towed)
-        val bb = towed.boundingBox
-        val longestSide = maxOf(bb.xsize, bb.ysize, bb.zsize)
+        val maxDist = VehicleConfig.TOW_BREAK_DISTANCE.get().toDouble()
         val thisLongestSide = calculateLongestSide(vehicle)
 
-        val minDist = max(
-            VehicleConfig.TOW_PULL_DISTANCE.get().toDouble(),
-            longestSide + thisLongestSide + 1.0
-        )
-        val maxDist = VehicleConfig.TOW_BREAK_DISTANCE.get().toDouble()
+        for (uuid in vehicle.towingUUIDs.toList()) {
+            val towed = EntityFindUtil.findEntity(vehicle.level(), uuid)
+            if (towed == null) {
+                val filtered = vehicle.towingUUIDs.filter { it != uuid }
+                vehicle.towingUUIDs = filtered.toMutableList()
+                continue
+            }
+            // 载具对载具的牵引由被牵引载具的towedTick处理
+            if (towed is VehicleEntity) continue
 
-        if (dist > maxDist && maxDist > 0) {
-            vehicle.clearTowingInfo()
-            return
-        }
+            val dist = vehicle.distanceTo(towed)
+            val bb = towed.boundingBox
+            val longestSide = maxOf(bb.xsize, bb.ysize, bb.zsize)
 
-        if (dist <= minDist) return
-
-        val overshoot = dist - minDist
-        val dir = vehicle.position().subtract(towed.position()).reverse().normalize()
-        val relVelAlong = towed.deltaMovement.subtract(vehicle.deltaMovement).dot(dir)
-
-        val k = 0.2  // 钢索刚性
-        val d = 0.01 // 阻尼
-        val ropeForce = -k * overshoot - d * relVelAlong
-
-        val maxDeltaV = max(2.0, vehicle.deltaMovement.length())
-        val pullForce = dir.scale((ropeForce / 6.0).coerceIn(-maxDeltaV, maxDeltaV))
-
-        towed.fallDistance = 0f
-        val diffY = Mth.wrapDegrees(
-            -VehicleVecUtils.getYRotFromVector(pullForce) + VehicleVecUtils.getYRotFromVector(
-                towed.getViewVector(1f)
+            val minDist = max(
+                VehicleConfig.TOW_PULL_DISTANCE.get().toDouble(),
+                longestSide + thisLongestSide + 1.0
             )
-        ).toFloat()
 
-        if (towed is Player && towed.level().isClientSide) {
-            towed.deltaMovement = towed.deltaMovement.add(pullForce)
-            towed.yRot += 0.05f * diffY
-        } else {
-            towed.deltaMovement = towed.deltaMovement.add(pullForce)
-            towed.yRot += 0.05f * diffY
+            if (dist > maxDist && maxDist > 0) {
+                val filtered = vehicle.towingUUIDs.filter { it != uuid }
+                vehicle.towingUUIDs = filtered.toMutableList()
+                towed.persistentData.remove("TowedByUUID")
+                continue
+            }
+
+            if (dist <= minDist) continue
+
+            val overshoot = dist - minDist
+            val dir = vehicle.position().subtract(towed.position()).reverse().normalize()
+            val relVelAlong = towed.deltaMovement.subtract(vehicle.deltaMovement).dot(dir)
+
+            val k = 0.2  // 钢索刚性
+            val d = 0.01 // 阻尼
+            val ropeForce = -k * overshoot - d * relVelAlong
+
+            val maxDeltaV = max(2.0, vehicle.deltaMovement.length())
+            val pullForce = dir.scale((ropeForce / 6.0).coerceIn(-maxDeltaV, maxDeltaV))
+
+            towed.fallDistance = 0f
+            val diffY = Mth.wrapDegrees(
+                -VehicleVecUtils.getYRotFromVector(pullForce) + VehicleVecUtils.getYRotFromVector(
+                    towed.getViewVector(1f)
+                )
+            ).toFloat()
+
+            if (towed is Player && towed.level().isClientSide) {
+                towed.deltaMovement = towed.deltaMovement.add(pullForce)
+                towed.yRot += 0.05f * diffY
+            } else {
+                towed.deltaMovement = towed.deltaMovement.add(pullForce)
+                towed.yRot += 0.05f * diffY
+            }
         }
     }
 

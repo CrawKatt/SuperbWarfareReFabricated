@@ -25,6 +25,7 @@ import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo.*
 import com.atsuishio.superbwarfare.entity.IBvrSyncableEntity
 import com.atsuishio.superbwarfare.entity.OBBEntity
 import com.atsuishio.superbwarfare.entity.getValue
+import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter
 import com.atsuishio.superbwarfare.entity.setValue
 import com.atsuishio.superbwarfare.entity.vehicle.*
@@ -766,12 +767,25 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     open fun clearTowingInfo() {
         if (!this.level().isClientSide) {
-            towedByEntity?.towingUUID = ""
-            val towed = towingEntity
-            if (towed is VehicleEntity) {
-                towed.towedByUUID = ""
-            } else towed?.persistentData?.remove("TowedByUUID")
-            towingUUID = ""
+            // 清除所有被牵引实体
+            for (uuid in towingUUIDs.toList()) {
+                val towed = EntityFindUtil.findEntity(level(), uuid)
+                if (towed is VehicleEntity) {
+                    towed.towedByUUID = ""
+                } else {
+                    towed?.persistentData?.remove("TowedByUUID")
+                    towed?.persistentData?.remove(CatapultShuttleEntity.TOWED_BY_SHUTTLE_TAG_KEY)
+                }
+            }
+            towingUUIDs = mutableListOf()
+
+            // 清除牵引我方载具的实体
+            towedByEntity?.let { tower ->
+                if (tower is VehicleEntity) {
+                    val filtered = tower.towingUUIDs.filter { it != this.stringUUID }
+                    tower.towingUUIDs = filtered.toMutableList()
+                }
+            }
             towedByUUID = ""
         }
     }
@@ -1121,7 +1135,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             define(LOCKED, false)
             define(LOITER_PARAMS, Quaternionf(0f, 318f, 0f, 400f))
             define(LOITER_ACTIVE, false)
-            define(TOWING_UUID, "")
+            define(TOWING_UUIDS, CompoundTag())
             define(TOWED_BY_UUID, "")
         }
     }
@@ -1780,7 +1794,18 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             loiterActive = compound.getBoolean("LoiterActive")
         }
 
-        towingUUID = compound.getString("TowingUUID")
+        // 加载牵引列表：优先新格式，回退旧格式
+        if (compound.contains("TowingUUIDs")) {
+            val listTag = compound.getList("TowingUUIDs", Tag.TAG_STRING.toInt())
+            val list = mutableListOf<String>()
+            for (i in 0 until listTag.size) {
+                list.add(listTag.getString(i))
+            }
+            towingUUIDs = list
+        } else if (compound.contains("TowingUUID")) {
+            val oldUuid = compound.getString("TowingUUID")
+            towingUUIDs = if (oldUuid.isNotBlank()) mutableListOf(oldUuid) else mutableListOf()
+        }
         towedByUUID = compound.getString("TowedByUUID")
     }
 
@@ -1894,6 +1919,12 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         compound.putFloat("LoiterR", lp.w())
         compound.putBoolean("LoiterActive", loiterActive)
 
+        val towingListTag = ListTag()
+        for (uuid in towingUUIDs) {
+            towingListTag.add(StringTag.valueOf(uuid))
+        }
+        compound.put("TowingUUIDs", towingListTag)
+        // 向后兼容：同时保存第一个UUID到旧字段
         compound.putString("TowingUUID", towingUUID)
         compound.putString("TowedByUUID", towedByUUID)
     }
@@ -4934,13 +4965,59 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open var aiTurretTargetUUID by AI_TURRET_TARGET_UUID
     open var aiPassengerWeaponTargetUUID by AI_PASSENGER_WEAPON_TARGET_UUID
 
-    open var towingUUID by TOWING_UUID
+    /** 已牵引实体UUID列表（支持多目标），通过TOWING_UUIDS同步 */
+    open var towingUUIDs: MutableList<String>
+        get() {
+            val tag = entityData.get(TOWING_UUIDS)
+            val listTag = tag.getList("list", Tag.TAG_STRING.toInt())
+            val result = mutableListOf<String>()
+            for (i in 0 until listTag.size) {
+                result.add(listTag.getString(i))
+            }
+            return result
+        }
+        set(value) {
+            val tag = CompoundTag()
+            val listTag = ListTag()
+            for (uuid in value) {
+                listTag.add(StringTag.valueOf(uuid))
+            }
+            tag.put("list", listTag)
+            entityData.set(TOWING_UUIDS, tag)
+        }
+
+    /** 向后兼容：返回第一个被牵引实体的UUID，未牵引时返回空字符串 */
+    open var towingUUID: String
+        get() = towingUUIDs.firstOrNull() ?: ""
+        set(value) {
+            if (value.isBlank()) {
+                towingUUIDs = mutableListOf()
+            } else {
+                val current = towingUUIDs
+                if (current.isEmpty()) {
+                    towingUUIDs = mutableListOf(value)
+                } else {
+                    current[0] = value
+                    towingUUIDs = current
+                }
+            }
+        }
+
     open var towedByUUID by TOWED_BY_UUID
 
+    /** 所有被牵引实体列表 */
+    open val towingEntities: List<Entity>
+        get() = towingUUIDs.mapNotNull { uuid ->
+            if (uuid.isBlank()) null
+            else EntityFindUtil.findEntity(level(), uuid)
+        }
+
+    /** 向后兼容：返回第一个被牵引实体 */
     open val towingEntity: Entity?
         get() {
-            if (towingUUID.isBlank()) return null
-            return EntityFindUtil.findEntity(level(), towingUUID)
+            val uuid = towingUUID
+            if (uuid.isBlank()) return null
+            return EntityFindUtil.findEntity(level(), uuid)
         }
 
     open val towedByEntity: VehicleEntity?
@@ -4948,6 +5025,13 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             if (towedByUUID.isBlank()) return null
             return EntityFindUtil.findEntity(level(), towedByUUID) as? VehicleEntity
         }
+
+    /** 检查是否正在牵引指定实体 */
+    open fun isTowing(entity: Entity): Boolean =
+        entity.stringUUID in towingUUIDs
+
+    /** 是否有任何牵引目标 */
+    open fun isTowingAny(): Boolean = towingUUIDs.isNotEmpty()
 
     open var yawWhileShoot by YAW_WHILE_SHOOT
     open var hornVolume by HORN_VOLUME
@@ -5400,10 +5484,10 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         val LOITER_ACTIVE: EntityDataAccessor<Boolean> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.BOOLEAN)
 
-        /** 正在牵引的载具UUID */
+        /** 正在牵引的实体UUID列表（支持多目标牵引） */
         @JvmField
-        val TOWING_UUID: EntityDataAccessor<String> =
-            SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.STRING)
+        val TOWING_UUIDS: EntityDataAccessor<CompoundTag> =
+            SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.COMPOUND_TAG)
 
         /** 正在被牵引的载具UUID */
         @JvmField
