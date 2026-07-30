@@ -87,6 +87,9 @@ object ModKeyMappings {
     val UNLOAD = registerKey("unload", InputConstants.UNKNOWN.value)
 
     @JvmField
+    val UNLOAD_PASSENGERS = registerKey("unload_passengers", GLFW.GLFW_KEY_U)
+
+    @JvmField
     val FIRE = registerKey("fire", GLFW.GLFW_MOUSE_BUTTON_LEFT, type = InputConstants.Type.MOUSE)
 
     @JvmField
