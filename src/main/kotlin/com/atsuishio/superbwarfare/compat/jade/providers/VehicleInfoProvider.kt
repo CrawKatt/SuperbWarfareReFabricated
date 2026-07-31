@@ -30,7 +30,7 @@ object VehicleInfoProvider : IEntityComponentProvider, IServerDataProvider<Entit
         }
         if (uuid != null) {
             val name = CommonProxy.getLastKnownUsername(uuid) ?: return
-            data.putString("OwnerName", name)
+            data.putString("VehicleOwnerName", name)
         }
     }
 
@@ -41,7 +41,7 @@ object VehicleInfoProvider : IEntityComponentProvider, IServerDataProvider<Entit
         val maxHealth = vehicle.getMaxHealth()
         tooltip.add(WrenchHealthElement(maxHealth, health))
 
-        val ownerName = accessor.serverData.getString("OwnerName")
+        val ownerName = accessor.serverData.getString("VehicleOwnerName")
         if (!ownerName.isNullOrEmpty() && vehicle !is OwnableEntity) {
             tooltip.add(Component.translatable("jade.owner", ownerName))
         }
