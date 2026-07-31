@@ -17,6 +17,7 @@ import snownee.jade.api.WailaPlugin
 class SbwJadePlugin : IWailaPlugin {
     override fun register(registration: IWailaCommonRegistration) {
         registration.registerBlockDataProvider(VehicleDeployerProvider, VehicleDeployerBlockEntity::class.java)
+        registration.registerEntityDataProvider(VehicleInfoProvider, VehicleEntity::class.java)
     }
 
     override fun registerClient(registration: IWailaClientRegistration) {
