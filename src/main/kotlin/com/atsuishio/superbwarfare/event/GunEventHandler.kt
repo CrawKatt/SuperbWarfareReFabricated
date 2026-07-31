@@ -154,10 +154,6 @@ object GunEventHandler {
     fun autoReload(shooter: Entity?, data: GunData, inMainHand: Boolean) {
         val autoReload = data.get(GunProp.AUTO_RELOAD) ?: return
         if (!inMainHand || !autoReload) return
-
-        // Throttle check for vehicle weapons: 4-tick interval (5 Hz)
-        if (shooter is VehicleEntity && (shooter.tickCount % 4 != 0)) return
-
         if (!data.hasEnoughAmmoToShoot(shooter)) {
             tryStartReload(shooter, data, false)
         }
