@@ -911,7 +911,7 @@
   "tips.superbwarfare.hover_mode_on": "已开启悬停模式",
   "tips.superbwarfare.hover_mode_off": "已关闭悬停模式",
   "tips.superbwarfare.loiter_override_hint": "双击 [%s] 夺回操控权",
-  "tips.superbwarfare.unload_passengers_hint": "双击 [%s] 卸载乘客",
+  "tips.superbwarfare.unload_passengers_hint": "双击 [%s] 卸载全部乘客，按住 [%s] 逐位卸载",
   "tips.superbwarfare.disconnect_towing_hint": "双击 [%s] 断开牵引",
   "tips.superbwarfare.gear_retracted": "已收起起落架",
   "tips.superbwarfare.gear_extended": "已放下起落架",

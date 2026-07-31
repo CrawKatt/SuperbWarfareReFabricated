@@ -909,7 +909,7 @@
   "tips.superbwarfare.hover_mode_on": "HOVER ON",
   "tips.superbwarfare.hover_mode_off": "HOVER OFF",
   "tips.superbwarfare.loiter_override_hint": "Double tap [%s] to regain control",
-  "tips.superbwarfare.unload_passengers_hint": "Double tap [%s] to unload passengers",
+  "tips.superbwarfare.unload_passengers_hint": "Double tap [%s] to unload all, hold [%s] to unload one by one",
   "tips.superbwarfare.disconnect_towing_hint": "Double tap [%s] to disconnect towing",
   "tips.superbwarfare.flare.reloading": "FLARE RELOADING",
   "tips.superbwarfare.flare.none": "NO AVAILABLE FLARE AMMO",
