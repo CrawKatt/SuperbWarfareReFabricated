@@ -159,6 +159,15 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
             dogTagBones.forEach { it.visible = false }
         }
 
+        val flareBones = boneGroups.flareBones
+        val flareFlag = flareBones.isNotEmpty()
+        if (flareFlag) {
+            for (flare in flareBones) {
+                flare.visible = false
+                flare.rotation.rotateZ((0.15 * (Math.random() - 0.5)).toFloat())
+            }
+        }
+
         instance.renderToBuffer(
             poseStack,
             buffer,
@@ -183,15 +192,6 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                 1f, 1f, 1f, 1f,
                 true
             )
-        }
-
-        val flareBones = boneGroups.flareBones
-        val flareFlag = flareBones.isNotEmpty()
-        if (flareFlag) {
-            for (flare in flareBones) {
-                flare.visible = false
-                flare.rotation.rotateZ((0.15 * (Math.random() - 0.5)).toFloat())
-            }
         }
 
         if (!isLOD && !hideFlare && !entity.sympatheticDetonated && flareFlag && !(ClientEventHandler.zoomVehicle && (hideForTurretControllerWhileZooming || hideForPassengerWeaponStationControllerWhileZooming))) {
