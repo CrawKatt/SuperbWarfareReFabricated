@@ -14,6 +14,7 @@ import com.atsuishio.superbwarfare.item.misc.firingParameters
 import com.atsuishio.superbwarfare.item.projectile.MortarShellItem
 import com.atsuishio.superbwarfare.network.message.receive.VehicleShootClientMessage
 import com.atsuishio.superbwarfare.tools.*
+import com.atsuishio.superbwarfare.tools.FormatTool.format0D
 import net.minecraft.ChatFormatting
 import net.minecraft.commands.arguments.EntityAnchorArgument
 import net.minecraft.nbt.CompoundTag
@@ -284,14 +285,11 @@ open class MortarEntity(type: EntityType<MortarEntity>, level: Level) : Artiller
         )
 
         var component: Component = Component.literal("")
-        val location: Component = Component.translatable("tips.superbwarfare.mortar.position", this.displayName)
-            .append(
-                Component.literal(
-                    " X:" + FormatTool.format0D(x) + " Y:" + FormatTool.format0D(y) + " Z:" + FormatTool.format0D(
-                        z
-                    ) + " "
-                )
-            )
+        val location: Component = Component.translatable(
+            "tips.superbwarfare.mortar.position",
+            this.displayName,
+            "[${format0D(x)}, ${format0D(y)}, ${format0D(z)}]"
+        )
         var angle = xRot
 
         if (flatTrajectory == null || highTrajectory == null) {
@@ -305,7 +303,6 @@ open class MortarEntity(type: EntityType<MortarEntity>, level: Level) : Artiller
                     component = Component.translatable("tips.superbwarfare.ballistics.warn2")
                     canAim = false
                 } else {
-                    component = Component.translatable("tips.superbwarfare.mortar.warn", this.displayName)
                     if (entity is Player) {
                         entity.displayClientMessage(
                             location.copy().append(component).withStyle(ChatFormatting.RED),
