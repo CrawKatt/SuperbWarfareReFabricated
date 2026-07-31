@@ -33,16 +33,16 @@ import kotlin.math.max
 open class CannonShellEntity(type: EntityType<out CannonShellEntity>, level: Level) :
     FastThrowableProjectile(type, level), BasicGeoProjectileEntity {
 
-    var fireProbability = 0f
-    var fireTime = 0
+    private var fireProbability = 0f
+    private var fireTime = 0
 
     enum class Type(val tagName: String) {
         AP("AP"), HE("HE"), CM("CM"), WP("WP")
     }
 
-    var type: Type? = Type.AP
-    var spreadAmount = 50
-    var spreadAngle = 15
+    private var type: Type? = Type.AP
+    private var spreadAmount = 50
+    private var spreadAngle = 15
 
     override fun getDefaultItem(): Item {
         return ModItems.LARGE_SHELL_HE.get()
