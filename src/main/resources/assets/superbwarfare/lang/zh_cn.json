@@ -1390,5 +1390,7 @@
   "superbwarfare.page.resources.scheelite.3": "$(thing)钨锭$()只能使用$(thing)高炉$()进行熔炼。",
   "superbwarfare.entry.resources.silver": "银矿石",
   "superbwarfare.page.resources.silver.1": "$(thing)银矿石$()生成于主世界的$(thing)48 ~ 1$()层。",
-  "superbwarfare.page.resources.silver.2": "$(thing)深层银矿石$()生成于主世界的$(thing)0 ~ -64$()层。"
+  "superbwarfare.page.resources.silver.2": "$(thing)深层银矿石$()生成于主世界的$(thing)0 ~ -64$()层。",
+  "tips.superbwarfare.fh77bw.body_tilted": "车体倾斜，无法发射",
+  "tips.superbwarfare.fh77bw.not_stopped": "车未停稳，无法发射"
 }
