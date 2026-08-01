@@ -225,17 +225,8 @@ object ClientSyncedEntityHandler {
                         val ammoCost = gd.get(GunProp.AMMO_COST_PER_SHOOT)
                         // 无限弹药武器由 queryWeaponAmmo 直接返回 999，无需写入
                         if (ammoCost <= 0) continue
-                        // 反推弹药数，使 queryWeaponAmmo 得到与服务器一致的可用射击次数
-                        val before = gd.currentAvailableAmmo(null)
                         if (gd.useBackpackAmmo()) gd.virtualAmmo.set(shots * ammoCost)
                         else gd.ammo.set(shots * ammoCost)
-                        // TODO DEBUG: temporary diagnostic logging
-                        if (before != shots * ammoCost) {
-                            com.atsuishio.superbwarfare.Mod.LOGGER.info(
-                                "[SuperbAmmoDebug] phantom id={} weapon={} shots={} beforeAmmo={}",
-                                entity.id, name, shots, before
-                            )
-                        }
                     }
                 }
             }
