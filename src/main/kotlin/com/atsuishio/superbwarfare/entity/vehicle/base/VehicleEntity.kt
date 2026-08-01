@@ -1889,6 +1889,17 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         tag.putBoolean("EngineRunning", engineRunning())
         tag.putFloat("LaserScale", laserScale)
 
+        // 同步武器可用射击次数：超视距假实体没有同步的 GUN_DATA_MAP，
+        // 战术地图聚合远程打击武器时需要备弹数据，这里用轻量的
+        // <武器名, 可用射击次数> 映射补齐（弹药消耗系数已在服务器端折算）。
+        val gunAmmoTag = CompoundTag()
+        for ((name, gd) in gunDataMap) {
+            val ammoCost = gd.get(GunProp.AMMO_COST_PER_SHOOT)
+            val shots = if (ammoCost <= 0) 999 else gd.currentAvailableAmmo(null) / ammoCost
+            gunAmmoTag.putInt(name, shots)
+        }
+        tag.put("GunAmmo", gunAmmoTag)
+
         tag.putUUID("UUID", this.uuid)
     }
 
