@@ -11,6 +11,8 @@
     "ClientboundSetPassengersPacketMixin",
     "ClientLevelMixin",
     "EntityMixin",
+    "EntityOnGroundAccessor",
+    "EntitySetPosRawMixin",
     "ExplosionMixin",
     "FishingHookMixin",
     "GeoModelAccessor",
@@ -21,8 +23,7 @@
     "ProjectileUtilMixin",
     "SteelPipeFallMixin",
     "VillagerMixin",
-    "tacz.EntityUtilMixin",
-    "EntityOnGroundAccessor"
+    "tacz.EntityUtilMixin"
   ],
   "client": [
     "CameraMixin",
@@ -37,8 +38,8 @@
     "KeymappingMixin",
     "LevelRendererMixin",
     "LibraryMixin",
-    "LightTextureMixin",
     "LightEngineMixin",
+    "LightTextureMixin",
     "LivingEntityRendererMixin",
     "LocalPlayerMixin",
     "MinecraftMixin",

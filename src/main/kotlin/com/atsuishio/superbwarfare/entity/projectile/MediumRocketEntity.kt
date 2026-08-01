@@ -292,10 +292,6 @@ open class MediumRocketEntity : FastThrowableProjectile, BasicGeoProjectileEntit
         return 0.7f
     }
 
-    override fun forceLoadChunk(): Boolean {
-        return true
-    }
-
     fun setType(type: Type?) {
         this.type = type
     }

@@ -7,7 +7,6 @@ import com.atsuishio.superbwarfare.client.lighting.ClientLightingHandler
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
 import com.atsuishio.superbwarfare.client.particle.CustomFlareOption
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
-import com.atsuishio.superbwarfare.config.server.ProjectileConfig
 import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.projectile.IAdvancedHitDetection.Companion.rayTraceBlocks
 import com.atsuishio.superbwarfare.entity.setValue
@@ -614,12 +613,8 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
 
     open fun getVolume(): Float = 0.5f
 
-    open fun forceLoadChunk(): Boolean {
-        return false
-    }
-
     override fun isAlwaysTicking(): Boolean {
-        return !this.level().isClientSide && forceLoadChunk() && ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()
+        return !this.level().isClientSide
     }
 
     override fun getAddEntityPacket(): Packet<ClientGamePacketListener> {
@@ -776,7 +771,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         super.onAddedToWorld()
         if (level().isClientSide) {
             ClientLightingHandler.handleProjectileAdded(this)
-        } else if (forceLoadChunk() && ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()) {
+        } else {
             registerForManualTick(this)
         }
     }
@@ -785,7 +780,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         super.onRemovedFromWorld()
         if (level().isClientSide) {
             ClientLightingHandler.handleProjectileRemoved(this)
-        } else if (forceLoadChunk() && ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()) {
+        } else {
             unregisterForManualTick(this)
         }
     }

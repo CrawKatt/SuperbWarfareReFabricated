@@ -363,10 +363,6 @@ open class CannonShellEntity(type: EntityType<out CannonShellEntity>, level: Lev
         return 0.07f
     }
 
-    override fun forceLoadChunk(): Boolean {
-        return true
-    }
-
     fun setType(type: Type?) {
         this.type = type
     }
