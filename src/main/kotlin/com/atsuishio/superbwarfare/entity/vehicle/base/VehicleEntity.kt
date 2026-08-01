@@ -342,7 +342,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     protected var yO = 0.0
     protected var zO = 0.0
 
-    open var roll by ROLL
+    open var roll = 0f
     open var prevRoll = 0f
     open var repairCoolDown = maxRepairCoolDown()
     open var hurtWarnCoolDown = 0
@@ -1039,7 +1039,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             define(LASER_SCALE, 0f)
             define(LASER_SCALE_O, 0f)
             define(CHARGE_PROGRESS, 0f)
-            define(ROLL, 0f)
             define(LIFT_OFFSET, 0f)
             define(IS_WRECK, false)
             define(SYMPATHETIC_DETONATED, false)
@@ -1632,7 +1631,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         serverYaw = compound.getFloat("ServerYaw")
         serverPitch = compound.getFloat("ServerPitch")
-        roll = compound.getFloat("Roll")
 
         // Restore turret & gun orientation from NBT
         if (compound.contains("TurretYRot")) {
@@ -1788,7 +1786,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         compound.putFloat("ServerYaw", serverYaw)
         compound.putFloat("ServerPitch", serverPitch)
-        compound.putFloat("Roll", roll)
 
         // Save turret & gun orientation to NBT
         compound.putFloat("TurretYRot", turretYRot)
@@ -1859,7 +1856,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         // Rotation
         tag.putFloat("Yaw", yRot)
         tag.putFloat("Pitch", xRot)
-        tag.putFloat("Roll", roll)
 
         // Turrets
         tag.putFloat("TurretYRot", turretYRot)
@@ -5349,11 +5345,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         @JvmField
         val TOWED_BY_UUID: EntityDataAccessor<String> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.STRING)
-
-        /** ROLL */
-        @JvmField
-        val ROLL: EntityDataAccessor<Float> =
-            SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.FLOAT)
 
         /** LIFT_OFFSET */
         @JvmField
