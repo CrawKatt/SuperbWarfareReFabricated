@@ -2897,22 +2897,13 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
     }
 
-    /**
-     * Ticks the vehicle's radar systems, scanning for targets and sending
-     * BVR sync configs to the driver.
-     *
-     * Uses [lastDriverUuidParsed] to avoid re-parsing and exception-throwing
-     * on every tick when no driver has sat in the vehicle yet ("undefined").
-     */
     fun vehicleRadar() {
         if (!SyncConfig.SYNC_ENTITY_OVER_RANGE.get()) return
         val radars = computed().radar ?: return
         val level = this.level()
         if (level !is ServerLevel) return
 
-        // Fast path: skip UUID lookup entirely when no driver has ever been assigned.
-        val driverUuid = lastDriverUuidParsed ?: return
-        val player = EntityFindUtil.findPlayer(level, driverUuid.toString())
+        val player = EntityFindUtil.findPlayer(level(), lastDriverUUID)
         if (player !is Player) return
 
         for (radarInfo in radars) {
@@ -4855,34 +4846,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open var override by OVERRIDE
     open var skinId by SKIN_ID
     open var lastAttackerUUID by LAST_ATTACKER_UUID
-
-    // lastDriverUUID
-
-    /** Last known parsed form of [lastDriverUUID], or `null` if unparseable. */
-    private var lastDriverUuidParsed: UUID? = null
-
-    /**
-     * Backing field for [lastDriverUUID].
-     * Use the property setter to keep [lastDriverUuidParsed] in sync.
-     */
-    private var lastDriverUuidString: String = "undefined"
-
-    // Replace the existing plain var with this property.
-    // If VehicleEntity already declares lastDriverUUID via entityData / SynchedEntityData,
-    // rename the backing field accordingly and hook into the setter.
-    var lastDriverUUID: String
-        get() = lastDriverUuidString
-        set(value) {
-            if (value == lastDriverUuidString) return
-            lastDriverUuidString = value
-            // Parse once on write; catch is free when value is valid UUID.
-            lastDriverUuidParsed = try {
-                UUID.fromString(value)
-            } catch (_: IllegalArgumentException) {
-                null
-            }
-        }
-
+    open var lastDriverUUID by LAST_DRIVER_UUID
     open var dogTagIcon by DOG_TAG_ICON
     open var aiTurretTargetUUID by AI_TURRET_TARGET_UUID
     open var aiPassengerWeaponTargetUUID by AI_PASSENGER_WEAPON_TARGET_UUID
