@@ -11,6 +11,7 @@
     "EnchantedCountIncreaseFunctionMixin",
     "EntityMixin",
     "EntityOnGroundAccessor",
+    "EntitySetPosRawMixin",
     "ExplosionMixin",
     "FishingHookMixin",
     "LevelMixin",

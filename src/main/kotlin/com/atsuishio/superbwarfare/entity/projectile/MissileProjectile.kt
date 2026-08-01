@@ -155,10 +155,6 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
     override fun updateRotation() {
     }
 
-    override fun forceLoadChunk(): Boolean {
-        return true
-    }
-
     override fun isNoGravity(): Boolean {
         return true
     }
