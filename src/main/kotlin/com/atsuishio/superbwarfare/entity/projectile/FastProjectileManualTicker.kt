@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.config.server.ProjectileConfig
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.event.tick.ServerTickEvent
@@ -22,6 +23,7 @@ object FastProjectileManualTicker {
 
     @SubscribeEvent
     fun onServerTick(event: ServerTickEvent.Post) {
+        if (!ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()) return
         if (FastThrowableProjectile.manualTickRegistered().isEmpty()) return
 
         for (projectile in FastThrowableProjectile.manualTickRegistered()) {
