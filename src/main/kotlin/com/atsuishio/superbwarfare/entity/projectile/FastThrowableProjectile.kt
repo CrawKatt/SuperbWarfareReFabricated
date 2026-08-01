@@ -822,6 +822,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         internal fun unregisterForManualTickInternal(projectile: FastThrowableProjectile) {
             unregisterForManualTick(projectile)
         }
+
         internal fun lastManualTickCount(id: Int): Int? = lastTickCounts[id]
         internal fun setLastManualTickCount(id: Int, value: Int) {
             lastTickCounts[id] = value

@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.config.server.ProjectileConfig
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 
@@ -22,6 +23,7 @@ object FastProjectileManualTicker {
     @SubscribeEvent
     fun onServerTick(event: TickEvent.ServerTickEvent) {
         if (event.phase != TickEvent.Phase.END) return
+        if (!ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()) return
         if (FastThrowableProjectile.manualTickRegistered().isEmpty()) return
 
         for (projectile in FastThrowableProjectile.manualTickRegistered()) {
