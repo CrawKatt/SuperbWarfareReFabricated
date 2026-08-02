@@ -21,8 +21,6 @@ import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
-import net.minecraft.world.level.ClipContext
-import net.minecraft.world.phys.Vec3
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.api.distmarker.OnlyIn
 import org.joml.Math
@@ -128,23 +126,14 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
         val scale: Float = scopeScale
 
         var shootPos = entity.getShootPosForHud(player, partialTick)
-        var shootVec = entity.getShootDirectionForHud(player, partialTick)
         val nacelleCam = ClientEventHandler.isNacelleCam(player)
 
         if (nacelleCam) {
             shootPos = camera.position
-            shootVec = Vec3(camera.lookVector)
         }
 
-        val result = player.level().clip(
-            ClipContext(
-                shootPos, shootPos.add(shootVec),
-                ClipContext.Block.OUTLINE, ClipContext.Fluid.ANY, player
-            )
-        )
-
-        val hitPos = result.location
-
+        val result = OverlayTraceHandler.blockMaxRangeResult
+        val hitPos = result?.location ?: shootPos
         var dis = shootPos.distanceTo(hitPos)
 
         var lookingEntity = entity.getPlayerLookAtEntityOnVehicle(player, 512.0, partialTick)
