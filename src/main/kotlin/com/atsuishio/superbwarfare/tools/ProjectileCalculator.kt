@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.tools
 
 import com.atsuishio.superbwarfare.tools.ProjectileCalculator.HORIZONTAL_STEP
+import net.minecraft.core.BlockPos
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.levelgen.Heightmap
@@ -120,23 +121,43 @@ object ProjectileCalculator {
             return fallbackToWorldBottom(startPos, level.minBuildHeight)
         }
 
-        val terrainHeight = level.getHeight(Heightmap.Types.MOTION_BLOCKING, bx, bz).toDouble()
+        // 判断弹丸下方位置能否看到天空，决定是否使用高度图优化
+        val checkY = startPos.y.toInt().coerceIn(level.minBuildHeight, level.maxBuildHeight - 1)
+        if (level.canSeeSky(BlockPos(bx, checkY, bz))) {
+            // 室外：高度图可靠，使用高度图辅助的垂直射线
+            val terrainHeight = level.getHeight(Heightmap.Types.MOTION_BLOCKING, bx, bz).toDouble()
 
-        // 从地形上方垂直向下射线，精准捕获地形表面
-        val aboveY = max(startPos.y, terrainHeight) + 2
-        val belowY = level.minBuildHeight.toDouble() - 1
-        val hit = level.clip(
-            ClipContext(
-                Vec3(startPos.x, aboveY, startPos.z),
-                Vec3(startPos.x, belowY, startPos.z),
-                ClipContext.Block.COLLIDER,
-                ClipContext.Fluid.ANY,
-                CollisionContext.empty()
+            // 从地形上方垂直向下射线，精准捕获地形表面
+            val aboveY = max(startPos.y, terrainHeight) + 2
+            val belowY = level.minBuildHeight.toDouble() - 1
+            val hit = level.clip(
+                ClipContext(
+                    Vec3(startPos.x, aboveY, startPos.z),
+                    Vec3(startPos.x, belowY, startPos.z),
+                    ClipContext.Block.COLLIDER,
+                    ClipContext.Fluid.ANY,
+                    CollisionContext.empty()
+                )
             )
-        )
-        if (hit.type == HitResult.Type.BLOCK) return hit.location
+            if (hit.type == HitResult.Type.BLOCK) return hit.location
 
-        return Vec3(startPos.x, terrainHeight, startPos.z)
+            return Vec3(startPos.x, terrainHeight, startPos.z)
+        } else {
+            // 室内/遮挡：高度图显示的是天花板，直接从弹丸位置垂直向下做射线检测
+            val belowY = level.minBuildHeight.toDouble() - 1
+            val hit = level.clip(
+                ClipContext(
+                    startPos,
+                    Vec3(startPos.x, belowY, startPos.z),
+                    ClipContext.Block.COLLIDER,
+                    ClipContext.Fluid.ANY,
+                    CollisionContext.empty()
+                )
+            )
+            if (hit.type == HitResult.Type.BLOCK) return hit.location
+
+            return Vec3(startPos.x, level.minBuildHeight.toDouble(), startPos.z)
+        }
     }
 
     // ---- 辅助方法 ----
