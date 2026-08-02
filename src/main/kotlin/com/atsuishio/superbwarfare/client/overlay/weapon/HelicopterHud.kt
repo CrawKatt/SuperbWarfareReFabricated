@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.client.overlay.weapon
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.RenderHelper
+import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleHudOverlay.renderKillIndicatorDynamic
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay.renderEnergyInfo
@@ -11,9 +12,12 @@ import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotF
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.event.ClientMouseHandler
 import com.atsuishio.superbwarfare.init.ModKeyMappings
-import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.tools.FormatTool.format0D
 import com.atsuishio.superbwarfare.tools.MathTool.getGradientColor
+import com.atsuishio.superbwarfare.tools.canBeSeen
+import com.atsuishio.superbwarfare.tools.localPlayer
+import com.atsuishio.superbwarfare.tools.mc
+import com.atsuishio.superbwarfare.tools.worldToScreen
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.math.Axis
@@ -233,12 +237,7 @@ object HelicopterHud {
                 val blockRange = player.getEyePosition(1f).distanceTo(hitPos)
                 var entityRange = 0.0
 
-                val lookingEntity = TraceTool.cameraFindLookingEntity(
-                    player,
-                    vehicle.getShootPosForHud(player, partialTick),
-                    vehicle.getShootDirectionForHud(player, partialTick),
-                    512.0
-                )
+                val lookingEntity = OverlayTraceHandler.cameraMaxRangeEntity
                 if (lookingEntity != null) {
                     lookAtEntity = true
                     entityRange = player.distanceTo(lookingEntity).toDouble()

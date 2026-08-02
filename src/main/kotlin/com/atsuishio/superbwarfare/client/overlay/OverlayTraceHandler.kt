@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.client.overlay
 
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.tools.TraceTool
 import com.atsuishio.superbwarfare.tools.getEntityReach
 import com.atsuishio.superbwarfare.tools.localPlayer
@@ -26,6 +27,9 @@ object OverlayTraceHandler {
 
     @JvmField
     var cameraEntity: Entity? = null
+
+    @JvmField
+    var cameraMaxRangeEntity: Entity? = null
 
     @SubscribeEvent
     fun onOverlayTraceClientTick(event: ClientTickEvent.Post) {
@@ -65,7 +69,10 @@ object OverlayTraceHandler {
         }
 
         val vehicle = player.vehicle
-        if (vehicle is VehicleEntity && vehicle.hasWeapon(vehicle.getSeatIndex(player))) {
+        if (vehicle is VehicleEntity
+            && vehicle.hasWeapon(vehicle.getSeatIndex(player))
+            && !ClientEventHandler.isNacelleCam(player)
+        ) {
             viewVec = vehicle.getShootDirectionForHud(player, 1f)
             viewPos = vehicle.getShootPosForHud(player, 1f)
         }
@@ -75,10 +82,18 @@ object OverlayTraceHandler {
             val decoy = TraceTool.findLookDecoy(player, viewPos, viewVec, distance)
             if (decoy != null) {
                 cameraEntity = null
+                maxRangeEntity = null
                 return
             }
         }
         cameraEntity = cameraRes
+        if (cameraEntity != null) {
+            maxRangeEntity = cameraRes
+            return
+        }
+
+        val maxRangeRes = TraceTool.cameraFindLookingEntity(player, viewPos, viewVec, 512.0)
+        maxRangeEntity = maxRangeRes
     }
 
     @JvmStatic
@@ -86,5 +101,6 @@ object OverlayTraceHandler {
         playerReachEntity = null
         maxRangeEntity = null
         cameraEntity = null
+        maxRangeEntity = null
     }
 }
