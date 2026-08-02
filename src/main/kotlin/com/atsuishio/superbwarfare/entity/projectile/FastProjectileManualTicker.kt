@@ -27,6 +27,7 @@ object FastProjectileManualTicker {
         if (FastThrowableProjectile.manualTickRegistered().isEmpty()) return
 
         for (projectile in FastThrowableProjectile.manualTickRegistered()) {
+            if (projectile.tickCount < 1) continue
             // 已移除或客户端实体：清理
             if (projectile.isRemoved || projectile.level().isClientSide) {
                 FastThrowableProjectile.unregisterForManualTickInternal(projectile)
