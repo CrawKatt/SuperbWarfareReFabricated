@@ -385,7 +385,7 @@ object AircraftHud {
             )
 
             // 热诱弹
-            DecoyOverlayHelper.renderThirdPersonDecoyInfo(vehicle, guiGraphics, 72, 0, -1)
+            DecoyOverlayHelper.renderThirdPersonDecoyInfo(vehicle, guiGraphics, 72, 0, color)
 
             guiGraphics.drawString(mc.font, Component.literal("TGT"), 76, 78, color, false)
 
