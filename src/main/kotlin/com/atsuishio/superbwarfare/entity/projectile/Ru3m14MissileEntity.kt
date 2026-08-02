@@ -46,22 +46,22 @@ open class Ru3m14MissileEntity(type: EntityType<out Ru3m14MissileEntity>, level:
             val targetPos = this.getTargetPos()!!
             val d = targetPos.vectorTo(position()).horizontalDistance()
 
-            if (tickCount <= 10) {
+            toVec = if (tickCount <= 10) {
                 // 点火阶段：先水平对准目标方向
-                toVec = position().vectorTo(targetPos)
+                position().vectorTo(targetPos)
             } else if (d < 1024) {
                 // 末端冲刺段：水平距离目标小于 1024m，径直飞向目标
-                toVec = position().vectorTo(targetPos)
+                position().vectorTo(targetPos)
             } else if (y < 1024) {
                 // 爬升段：点火后尽可能爬高到 1024m 高度
-                toVec = position().vectorTo(targetPos).scale(0.15).add(position().vectorTo(Vec3(x, 1024.0, z)))
+                position().vectorTo(targetPos).scale(0.15).add(position().vectorTo(Vec3(x, 1024.0, z)))
             } else {
                 // 巡航段：在 1024m 高空平飞逼近目标
-                toVec = position().vectorTo(Vec3(targetPos.x, 1024.0, targetPos.z))
+                position().vectorTo(Vec3(targetPos.x, 1024.0, targetPos.z))
             }
         }
 
-        if (getTargetPos() == null && tickCount > 200) {
+        if (getTargetPos() == null && tickCount > 200 && level() is ServerLevel) {
             discard()
             causeExplode(position())
         }
@@ -96,8 +96,9 @@ open class Ru3m14MissileEntity(type: EntityType<out Ru3m14MissileEntity>, level:
                     } else {
                         turn(toVec, ((tickCount - 10) * 0.1f).coerceIn(0f, 30f))
                     }
+                } else {
+                    lostTargetTick++
                 }
-
             }
         } else {
             this.deltaMovement = this.deltaMovement.add(0.0, -0.1, 0.0)
