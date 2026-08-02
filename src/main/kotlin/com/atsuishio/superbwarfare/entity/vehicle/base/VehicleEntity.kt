@@ -599,7 +599,12 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open fun clearTowingInfo() {
         if (!this.level().isClientSide) {
             towedByEntity?.towingUUID = ""
-            towingEntity?.towedByUUID = ""
+            val towed = towingEntity
+            if (towed is VehicleEntity) {
+                towed.towedByUUID = ""
+            } else if (towed != null) {
+                towed.persistentData.remove("TowedByUUID")
+            }
             towingUUID = ""
             towedByUUID = ""
         }
@@ -607,8 +612,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     // Code based on Dragon Rise
     open fun towedTick() {
-//        if (this.level().isClientSide) return
-
         val tower = towedByEntity ?: return
 
         val dist = this.distanceTo(tower)
@@ -658,6 +661,49 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         val diffY = Mth.wrapDegrees(-getYRotFromVector(towerDir) + getYRotFromVector(this.getViewVector(1f))).toFloat()
         this.yRot += 0.05f * diffY
+    }
+
+    open fun towingTick() {
+        val towed = towingEntity ?: return
+        if (towed is VehicleEntity) return
+
+        val dist = this.distanceTo(towed)
+        val bb = towed.boundingBox
+        val thisBB = this.boundingBox
+        val longestSide = maxOf(bb.xsize, bb.ysize, bb.zsize)
+        val thisLongestSide = maxOf(thisBB.xsize, thisBB.ysize, thisBB.zsize)
+
+        val minDist = max(
+            VehicleConfig.TOW_PULL_DISTANCE.get().toDouble(),
+            longestSide + thisLongestSide + 1.0
+        )
+        val maxDist = VehicleConfig.TOW_BREAK_DISTANCE.get().toDouble()
+
+        if (dist > maxDist && maxDist > 0) {
+            this.clearTowingInfo()
+            return
+        }
+
+        if (dist <= minDist) return
+
+        val overshoot = dist - minDist
+        val dir = this.position().subtract(towed.position()).reverse().normalize()
+        val relVelAlong = towed.deltaMovement.subtract(this.deltaMovement).dot(dir)
+
+        val k = 0.2  // 钢索刚性
+        val d = 0.01 // 阻尼
+        val ropeForce = -k * overshoot - d * relVelAlong
+
+        val maxDeltaV = max(2.0, this.deltaMovement.length())
+        val pullForce = dir.scale((ropeForce / 6.0).coerceIn(-maxDeltaV, maxDeltaV))
+
+        towed.fallDistance = 0f
+
+        if (towed is Player && towed.level().isClientSide) {
+            towed.deltaMovement = towed.deltaMovement.add(pullForce)
+        } else {
+            towed.deltaMovement = towed.deltaMovement.add(pullForce)
+        }
     }
 
     override fun openCustomInventoryScreen(player: Player) {
@@ -2237,6 +2283,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         this.travel()
         this.towedTick()
+        this.towingTick()
         vehicleRadar()
 
         // 固定翼飞机自动盘旋：空中、引擎启动、有能量、未坠毁、有乘客、盘旋开关已开启
@@ -4403,10 +4450,10 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open var towingUUID by TOWING_UUID
     open var towedByUUID by TOWED_BY_UUID
 
-    open val towingEntity: VehicleEntity?
+    open val towingEntity: Entity?
         get() {
             if (towingUUID.isBlank()) return null
-            return EntityFindUtil.findEntity(level(), towingUUID) as? VehicleEntity
+            return EntityFindUtil.findEntity(level(), towingUUID)
         }
 
     open val towedByEntity: VehicleEntity?

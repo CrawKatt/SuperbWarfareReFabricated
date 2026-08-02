@@ -73,17 +73,11 @@ object TowingChainRenderer {
             val towedEntity = vehicle.towingEntity ?: continue
             val fromPos = getCenterPosition(vehicle, pt)
             val toPos = getCenterPosition(towedEntity, pt)
-            renderChain(builder, pose, fromPos, toPos, ribbon = 0)
-        }
-        bufferSource.endBatch()
+            renderChain(builder, pose, fromPos, toPos, 0)
+            bufferSource.endBatch()
 
-        // --- Pass 2: ribbon rotated 90°, forming X cross-section ---
-        builder = bufferSource.getBuffer(renderType)
-        for (vehicle in vehicles) {
-            val towedEntity = vehicle.towingEntity ?: continue
-            val fromPos = getCenterPosition(vehicle, pt)
-            val toPos = getCenterPosition(towedEntity, pt)
-            renderChain(builder, pose, fromPos, toPos, ribbon = 1)
+            builder = bufferSource.getBuffer(renderType)
+            renderChain(builder, pose, fromPos, toPos, 1)
         }
 
         poseStack.popPose()
