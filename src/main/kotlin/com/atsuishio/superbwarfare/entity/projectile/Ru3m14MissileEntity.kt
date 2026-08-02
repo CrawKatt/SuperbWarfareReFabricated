@@ -49,12 +49,12 @@ open class Ru3m14MissileEntity(type: EntityType<out Ru3m14MissileEntity>, level:
             toVec = if (tickCount <= 10) {
                 // 点火阶段：先水平对准目标方向
                 position().vectorTo(targetPos)
-            } else if (d < 1024) {
-                // 末端冲刺段：水平距离目标小于 1024m，径直飞向目标
+            } else if (d < 1400) {
+                // 末端冲刺段：水平距离目标小于 1400m，径直飞向目标
                 position().vectorTo(targetPos)
             } else if (y < 1024) {
                 // 爬升段：点火后尽可能爬高到 1024m 高度
-                position().vectorTo(targetPos).scale(0.15).add(position().vectorTo(Vec3(x, 1024.0, z)))
+                position().vectorTo(targetPos).multiply(1.0, 0.0, 1.0).normalize().scale((d * 0.1).coerceAtMost(4096.0)).add(position().vectorTo(Vec3(x, 1024.0, z)))
             } else {
                 // 巡航段：在 1024m 高空平飞逼近目标
                 position().vectorTo(Vec3(targetPos.x, 1024.0, targetPos.z))
