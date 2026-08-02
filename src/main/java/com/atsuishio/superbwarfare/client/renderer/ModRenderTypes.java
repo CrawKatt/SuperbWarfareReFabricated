@@ -65,7 +65,7 @@ public class ModRenderTypes extends RenderType {
 
     public static final Function<ResourceLocation, RenderType> TOW_CHAIN = Util.memoize((location) -> {
         RenderType.CompositeState state = RenderType.CompositeState.builder()
-                .setShaderState(RenderStateShard.POSITION_COLOR_TEX_LIGHTMAP_SHADER)
+                .setShaderState(new RenderStateShard.ShaderStateShard(GameRenderer::getPositionTexColorShader))
                 .setTextureState(new RenderStateShard.TextureStateShard(location, false, false))
                 .setCullState(RenderStateShard.NO_CULL)
                 .setLightmapState(RenderStateShard.NO_LIGHTMAP)

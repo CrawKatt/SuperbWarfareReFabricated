@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
+import com.atsuishio.superbwarfare.tools.NBTTool
 import com.atsuishio.superbwarfare.tools.getOrCreateTag
 import com.atsuishio.superbwarfare.tools.tag
 import net.minecraft.ChatFormatting
@@ -87,6 +88,7 @@ open class TowlineItem : Item(Properties().stacksTo(1)), IVehicleInteract {
         if (existingTarget.isBlank()) {
             // First click: select the towing vehicle
             tag.putString(TAG_TOW_TARGET, vehicle.stringUUID)
+            NBTTool.saveTag(stack, tag)
             player.displayClientMessage(
                 Component.translatable(
                     "tips.superbwarfare.towline.select_towing",
