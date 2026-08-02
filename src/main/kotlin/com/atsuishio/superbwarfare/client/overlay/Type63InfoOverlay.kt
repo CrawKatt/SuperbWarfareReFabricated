@@ -87,8 +87,8 @@ object Type63InfoOverlay : CommonOverlay("type_63_info") {
         )
 
         val items = lookingEntity.getEntityData().get(Type63Entity.LOADED_AMMO)
-        for (i in lookingEntity.barrel.indices) {
-            if (OBB.getLookingObb(player, player.entityInteractionRange()) === lookingEntity.barrel[i]) {
+        for (i in lookingEntity.barrelObbs.indices) {
+            if (OBB.getLookingObb(player, player.entityInteractionRange()) === lookingEntity.barrelObbs[i]) {
                 val type: Int = items[i]
 
                 val stack = when (type) {
@@ -98,7 +98,7 @@ object Type63InfoOverlay : CommonOverlay("type_63_info") {
                     else -> ItemStack.EMPTY
                 }
 
-                val pos = OBB.vector3dToVec3(lookingEntity.barrel[i].center)
+                val pos = OBB.vector3dToVec3(lookingEntity.barrelObbs[i].center)
                 val point = pos.worldToScreen()
 
                 poseStack.pushPose()

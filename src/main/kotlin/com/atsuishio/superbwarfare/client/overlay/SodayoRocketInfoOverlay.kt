@@ -24,8 +24,8 @@ object SodayoRocketInfoOverlay : CommonOverlay("sodayo_rocket_info") {
         if (lookingEntity !is SodayoPickUpRocketEntity) return
 
         val items = lookingEntity.getEntityData().get(SodayoPickUpRocketEntity.LOADED_AMMO)
-        for (i in lookingEntity.barrel.indices) {
-            if (OBB.getLookingObb(player, player.entityInteractionRange()) === lookingEntity.barrel[i]) {
+        for (i in lookingEntity.barrelObbs.indices) {
+            if (OBB.getLookingObb(player, player.entityInteractionRange()) === lookingEntity.barrelObbs[i]) {
                 val type: Int = items[i]!!
 
                 val stack = when (type) {
@@ -35,7 +35,7 @@ object SodayoRocketInfoOverlay : CommonOverlay("sodayo_rocket_info") {
                     else -> ItemStack.EMPTY
                 }
 
-                val pos = OBB.vector3dToVec3(lookingEntity.barrel[i].center)
+                val pos = OBB.vector3dToVec3(lookingEntity.barrelObbs[i].center)
                 val point = pos.worldToScreen()
 
                 poseStack.pushPose()

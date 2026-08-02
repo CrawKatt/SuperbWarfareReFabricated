@@ -15,12 +15,8 @@ import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.item.projectile.MediumRocketItem
 import com.atsuishio.superbwarfare.tools.OBB
 import com.atsuishio.superbwarfare.tools.OBB.Companion.getLookingObb
-import com.atsuishio.superbwarfare.tools.OBB.Companion.vec3ToVector3d
 import com.atsuishio.superbwarfare.tools.OBB.Companion.vector3dToVec3
 import com.atsuishio.superbwarfare.tools.ParticleTool.spawnMediumCannonMuzzleParticles
-import com.atsuishio.superbwarfare.tools.VectorTool.combineRotations
-import com.atsuishio.superbwarfare.tools.VectorTool.combineRotationsBarrel
-import com.atsuishio.superbwarfare.tools.VectorTool.combineRotationsTurret
 import com.atsuishio.superbwarfare.tools.getEntityReach
 import it.unimi.dsi.fastutil.ints.IntArrayList
 import net.minecraft.nbt.CompoundTag
@@ -42,118 +38,20 @@ import net.minecraft.world.level.entity.EntityTypeTest
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.joml.Math
-import org.joml.Quaterniond
-import org.joml.Vector3d
-import org.joml.Vector3f
 import kotlin.math.abs
 
 open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleEntity(type, level) {
-    var barrel: Array<OBB> = arrayOf(
-        OBB(
-            vec3ToVector3d(this.position()),
-            Vector3d(0.09375, 0.09375, 0.0625),
-            Quaterniond(),
-            OBB.Part.INTERACTIVE
-        ),
-        OBB(
-            vec3ToVector3d(this.position()),
-            Vector3d(0.09375, 0.09375, 0.0625),
-            Quaterniond(),
-            OBB.Part.INTERACTIVE
-        ),
-        OBB(
-            vec3ToVector3d(this.position()),
-            Vector3d(0.09375, 0.09375, 0.0625),
-            Quaterniond(),
-            OBB.Part.INTERACTIVE
-        ),
-        OBB(
-            vec3ToVector3d(this.position()),
-            Vector3d(0.09375, 0.09375, 0.0625),
-            Quaterniond(),
-            OBB.Part.INTERACTIVE
-        ),
-        OBB(
-            vec3ToVector3d(this.position()),
-            Vector3d(0.09375, 0.09375, 0.0625),
-            Quaterniond(),
-            OBB.Part.INTERACTIVE
-        ),
-        OBB(
-            vec3ToVector3d(this.position()),
-            Vector3d(0.09375, 0.09375, 0.0625),
-            Quaterniond(),
-            OBB.Part.INTERACTIVE
-        ),
-        OBB(
-            vec3ToVector3d(this.position()),
-            Vector3d(0.09375, 0.09375, 0.0625),
-            Quaterniond(),
-            OBB.Part.INTERACTIVE
-        ),
-        OBB(
-            vec3ToVector3d(this.position()),
-            Vector3d(0.09375, 0.09375, 0.0625),
-            Quaterniond(),
-            OBB.Part.INTERACTIVE
-        ),
-        OBB(
-            vec3ToVector3d(this.position()),
-            Vector3d(0.09375, 0.09375, 0.0625),
-            Quaterniond(),
-            OBB.Part.INTERACTIVE
-        ),
-        OBB(
-            vec3ToVector3d(this.position()),
-            Vector3d(0.09375, 0.09375, 0.0625),
-            Quaterniond(),
-            OBB.Part.INTERACTIVE
-        ),
-        OBB(
-            vec3ToVector3d(this.position()),
-            Vector3d(0.09375, 0.09375, 0.0625),
-            Quaterniond(),
-            OBB.Part.INTERACTIVE
-        ),
-        OBB(
-            vec3ToVector3d(this.position()),
-            Vector3d(0.09375, 0.09375, 0.0625),
-            Quaterniond(),
-            OBB.Part.INTERACTIVE
-        )
-    )
-    var pitchController: OBB = OBB(
-        vec3ToVector3d(this.position()),
-        Vector3d(0.15625, 0.21875, 0.21875),
-        Quaterniond(),
-        OBB.Part.INTERACTIVE
-    )
-    var yawController: OBB =
-        OBB(vec3ToVector3d(this.position()), Vector3d(0.125, 0.125, 0.125), Quaterniond(), OBB.Part.INTERACTIVE)
-    var hoe1: OBB =
-        OBB(vec3ToVector3d(this.position()), Vector3d(0.125, 0.125, 0.875), Quaterniond(), OBB.Part.INTERACTIVE)
-    var hoe2: OBB =
-        OBB(vec3ToVector3d(this.position()), Vector3d(0.125, 0.125, 0.875), Quaterniond(), OBB.Part.INTERACTIVE)
-    var wheel1: OBB = OBB(
-        vec3ToVector3d(this.position()),
-        Vector3d(0.125, 0.390625, 0.390625),
-        Quaterniond(),
-        OBB.Part.WHEEL_LEFT
-    )
-    var wheel2: OBB = OBB(
-        vec3ToVector3d(this.position()),
-        Vector3d(0.125, 0.390625, 0.390625),
-        Quaterniond(),
-        OBB.Part.WHEEL_RIGHT
-    )
-    var body1: OBB = OBB(
-        vec3ToVector3d(this.position()),
-        Vector3d(0.4765625, 0.3515625, 0.7578125),
-        Quaterniond(),
-        OBB.Part.BODY
-    )
-    var body2: OBB =
-        OBB(vec3ToVector3d(this.position()), Vector3d(0.771875, 0.109375, 0.296875), Quaterniond(), OBB.Part.BODY)
+
+    private val allInteractives: List<OBB>
+        get() = getOBBs().filter { it.part == OBB.Part.INTERACTIVE }
+
+    val barrelObbs: List<OBB>
+        get() = allInteractives.take(12)
+
+    val pitchController: OBB get() = allInteractives[12]
+    val yawController: OBB get() = allInteractives[13]
+    val hoe1: OBB get() = allInteractives[14]
+    val hoe2: OBB get() = allInteractives[15]
 
     var interactionTick: Double = 0.0
     var cooldown: Int = 0
@@ -274,10 +172,10 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
                 player.swing(InteractionHand.MAIN_HAND)
 
                 if (level is ServerLevel && cooldown == 0) {
-                    for (i in this.barrel.indices) {
-                        if (lookingObb === this.barrel[i] && !getItems()[i].isEmpty) {
+                    for (i in barrelObbs.indices) {
+                        if (lookingObb === barrelObbs[i] && !getItems()[i].isEmpty) {
                             player.addItem(getItems()[i].copyWithCount(1))
-                            val vec3 = vector3dToVec3(this.barrel[i].center)
+                            val vec3 = vector3dToVec3(barrelObbs[i].center)
                             level.playSound(
                                 null,
                                 vec3.x,
@@ -324,13 +222,13 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
         }
 
         if (stack.item is MediumRocketItem) {
-            for (i in this.barrel.indices) {
-                if (lookingObb === this.barrel[i] && getItems()[i].isEmpty && level is ServerLevel && cooldown == 0) {
+            for (i in barrelObbs.indices) {
+                if (lookingObb === barrelObbs[i] && getItems()[i].isEmpty && level is ServerLevel && cooldown == 0) {
                     this.setItem(i, stack.copyWithCount(1))
                     if (!player.isCreative) {
                         stack.shrink(1)
                     }
-                    val vec3 = vector3dToVec3(this.barrel[i].center)
+                    val vec3 = vector3dToVec3(barrelObbs[i].center)
                     level.playSound(
                         null,
                         vec3.x,
@@ -352,8 +250,8 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
             // 发射
             if (lookingAtBarrel(player)) {
                 // 精准发射
-                for (i in this.barrel.indices) {
-                    if (lookingObb === this.barrel[i] && getItems()[i].item is MediumRocketItem) {
+                for (i in barrelObbs.indices) {
+                    if (lookingObb === barrelObbs[i] && getItems()[i].item is MediumRocketItem) {
                         shoot(player, i)
                         getItems()[i] = ItemStack.EMPTY
                         setChanged()
@@ -383,7 +281,7 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
         val lookingObb = getLookingObb(player, player.getEntityReach())
 
         for (i in 0..11) {
-            if (lookingObb === barrel[i]) {
+            if (lookingObb === barrelObbs[i]) {
                 return true
             }
         }
@@ -425,7 +323,7 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
         val shootSpread = getProjectileSpread(gunData)
         val shootGravity = getProjectileGravity(gunData)
 
-        val obb = this.barrel[i]
+        val obb = barrelObbs[i]
         val shootPos = vector3dToVec3(obb.center)
 
         val entityToSpawn = MediumRocketEntity(
@@ -574,135 +472,6 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
 
     override fun canPlaceItem(slot: Int, stack: ItemStack): Boolean {
         return false
-    }
-
-    override fun getOBBs(): MutableList<OBB> {
-        return mutableListOf(
-            this.barrel[0],
-            this.barrel[1],
-            this.barrel[2],
-            this.barrel[3],
-            this.barrel[4],
-            this.barrel[5],
-            this.barrel[6],
-            this.barrel[7],
-            this.barrel[8],
-            this.barrel[9],
-            this.barrel[10],
-            this.barrel[11],
-            this.hoe1,
-            this.hoe2,
-            this.yawController,
-            this.pitchController,
-            this.wheel1,
-            this.wheel2,
-            this.body1,
-            this.body2
-        )
-    }
-
-    override fun updateOBB() {
-        val transform = getVehicleTransform(1f)
-
-        // 驻锄位置
-        val worldPosition = transformPosition(transform, 0.875, 0.1875, -1.625)
-        this.hoe1.center.set(Vector3f(worldPosition.x.toFloat(), worldPosition.y.toFloat(), worldPosition.z.toFloat()))
-        this.hoe1.updateRotation(combineRotations(1f, this))
-
-        val worldPosition2 = transformPosition(transform, -0.875, 0.1875, -1.625)
-        this.hoe2.center.set(
-            Vector3f(
-                worldPosition2.x.toFloat(),
-                worldPosition2.y.toFloat(),
-                worldPosition2.z.toFloat()
-            )
-        )
-        this.hoe2.updateRotation(combineRotations(1f, this))
-
-        val worldPositionW = transformPosition(transform, 0.90625, 0.390625, 0.1071875)
-        this.wheel1.center.set(
-            Vector3f(
-                worldPositionW.x.toFloat(),
-                worldPositionW.y.toFloat(),
-                worldPositionW.z.toFloat()
-            )
-        )
-        this.wheel1.updateRotation(combineRotations(1f, this))
-
-        val worldPositionW2 = transformPosition(transform, -0.90625, 0.390625, 0.1071875)
-        this.wheel2.center.set(
-            Vector3f(
-                worldPositionW2.x.toFloat(),
-                worldPositionW2.y.toFloat(),
-                worldPositionW2.z.toFloat()
-            )
-        )
-        this.wheel2.updateRotation(combineRotations(1f, this))
-
-        val worldPositionBody2 = transformPosition(transform, 0.0, 0.42546875, -0.090625)
-        this.body2.center.set(
-            Vector3f(
-                worldPositionBody2.x.toFloat(),
-                worldPositionBody2.y.toFloat(),
-                worldPositionBody2.z.toFloat()
-            )
-        )
-        this.body2.updateRotation(combineRotationsBarrel(1f, this))
-
-        val transformT = getTurretTransform(1f)
-
-        val worldPositionYaw = transformPosition(transformT, 0.62625, 0.0396875, -0.5)
-        this.yawController.center.set(
-            Vector3f(
-                worldPositionYaw.x.toFloat(),
-                worldPositionYaw.y.toFloat(),
-                worldPositionYaw.z.toFloat()
-            )
-        )
-        this.yawController.updateRotation(combineRotationsTurret(1f, this))
-
-        val worldPositionPitch = transformPosition(transformT, 0.7825, 0.5771875, -0.024375)
-        this.pitchController.center.set(
-            Vector3f(
-                worldPositionPitch.x.toFloat(),
-                worldPositionPitch.y.toFloat(),
-                worldPositionPitch.z.toFloat()
-            )
-        )
-        this.pitchController.updateRotation(combineRotationsTurret(1f, this))
-
-        val transformB = getBarrelTransform(1f)
-
-        val i = 0.24375
-
-        setBarrelOBB(0, -0.3659375, 0.244375)
-        setBarrelOBB(1, -0.3659375 + i, 0.244375)
-        setBarrelOBB(2, -0.3659375 + 2 * i, 0.244375)
-        setBarrelOBB(3, -0.3659375 + 3 * i, 0.244375)
-        setBarrelOBB(4, -0.3659375, 0.244375 - i)
-        setBarrelOBB(5, -0.3659375 + i, 0.244375 - i)
-        setBarrelOBB(6, -0.3659375 + 2 * i, 0.244375 - i)
-        setBarrelOBB(7, -0.3659375 + 3 * i, 0.244375 - i)
-        setBarrelOBB(8, -0.3659375, 0.244375 - 2 * i)
-        setBarrelOBB(9, -0.3659375 + i, 0.244375 - 2 * i)
-        setBarrelOBB(10, -0.3659375 + 2 * i, 0.244375 - 2 * i)
-        setBarrelOBB(11, -0.3659375 + 3 * i, 0.244375 - 2 * i)
-
-        val worldPositionBody1 = transformPosition(transformB, 0.0, 0.0, 0.3740625)
-        this.body1.center.set(
-            Vector3f(
-                worldPositionBody1.x.toFloat(),
-                worldPositionBody1.y.toFloat(),
-                worldPositionBody1.z.toFloat()
-            )
-        )
-        this.body1.updateRotation(combineRotationsBarrel(1f, this))
-    }
-
-    private fun setBarrelOBB(index: Int, x: Double, y: Double) {
-        val vec = transformPosition(getBarrelTransform(1f), x, y, -0.44625)
-        this.barrel[index].center.set(Vector3f(vec.x.toFloat(), vec.y.toFloat(), vec.z.toFloat()))
-        this.barrel[index].updateRotation(combineRotationsBarrel(1f, this))
     }
 
     override fun setChanged() {
