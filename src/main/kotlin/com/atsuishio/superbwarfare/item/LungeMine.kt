@@ -16,11 +16,15 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResultHolder
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.EquipmentSlotGroup
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.AttributeModifier
+import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.component.ItemAttributeModifiers
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.neoforged.bus.api.SubscribeEvent
@@ -115,6 +119,25 @@ open class LungeMine : Item(Properties().stacksTo(4)), GeoItem {
         player: Player
     ): Boolean {
         return false
+    }
+
+    override fun getDefaultAttributeModifiers(stack: ItemStack): ItemAttributeModifiers {
+        val list = ArrayList(super.getDefaultAttributeModifiers(stack).modifiers())
+
+        // 移速
+        list.add(
+            ItemAttributeModifiers.Entry(
+                Attributes.ENTITY_INTERACTION_RANGE,
+                AttributeModifier(
+                    Mod.ATTRIBUTE_MODIFIER,
+                    1.5,
+                    AttributeModifier.Operation.ADD_VALUE,
+                ),
+                EquipmentSlotGroup.MAINHAND
+            )
+        )
+
+        return ItemAttributeModifiers(list, true)
     }
 
     @EventBusSubscriber(modid = Mod.MODID)

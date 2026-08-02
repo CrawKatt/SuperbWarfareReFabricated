@@ -5,13 +5,13 @@ import com.atsuishio.superbwarfare.api.event.ClientVehicleFireEvent
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay
+import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
-import com.atsuishio.superbwarfare.entity.vehicle.BasicGeoVehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.gun.GunItem
@@ -732,8 +732,8 @@ object ClientEventHandler {
         if (keys != keysCache) {
             // 盘旋模式下阻止操控包发往服务端，但检测双击前进键夺回操控权
             val blockLoiter = vehicle is VehicleEntity
-                && vehicle.loiterActive
-                && vehicle.computed().engineType == EngineType.AIRCRAFT
+                    && vehicle.loiterActive
+                    && vehicle.computed().engineType == EngineType.AIRCRAFT
             if (!blockLoiter) {
                 sendPacketToServer(VehicleMovementMessage(keys))
             } else {
@@ -1330,7 +1330,7 @@ object ClientEventHandler {
         }
 
         if (!targetEntities.isEmpty()) {
-            val list = targetEntities.filter { it != null && it.isAlive && it != lookingEntity }
+            val list = targetEntities.filter { it.isAlive && it != lookingEntity }
                 .sortedBy {
                     player.lookAngle.angleTo(player.eyePosition.vectorTo(it.eyePosition))
                 }
@@ -1349,7 +1349,7 @@ object ClientEventHandler {
         }
 
         if (stack.`is`(ModItems.LUNGE_MINE.get()) && ((lungeAttack >= 9 && lungeAttack <= 10.5) || lungeSprint > 0)) {
-            val lookingEntity = TraceTool.findLookingEntity(player, player.getEntityReach() + 1.5)
+            val lookingEntity = OverlayTraceHandler.playerReachEntity
 
             val result = player.level().clip(
                 ClipContext(
@@ -2889,7 +2889,7 @@ object ClientEventHandler {
         if (aimVillagerCountdown > 0) return
 
         if (zoom) {
-            val entity = TraceTool.findLookingEntity(player, 10.0) as? AbstractVillager ?: return
+            val entity = OverlayTraceHandler.playerReachEntity as? AbstractVillager ?: return
             val entities = SeekTool.seekLivingEntities(entity, 16.0, 120.0)
             for (e in entities) {
                 if (e == player) {
@@ -3020,12 +3020,11 @@ object ClientEventHandler {
         val shooter = event.shooter
         val vehicle = event.entity
         val index = event.index
-        if (vehicle is BasicGeoVehicleEntity) {
-            val ani = vehicle.getAnimationInstance() ?: return
-            val name = event.weaponName
-                ?: vehicle.getGunName(vehicle.getSeatIndex(shooter))
-                ?: return
-            ani.fire(name.camelToSnake(), index)
-        }
+
+        val ani = vehicle.getAnimationInstance() ?: return
+        val name = event.weaponName
+            ?: vehicle.getGunName(vehicle.getSeatIndex(shooter))
+            ?: return
+        ani.fire(name.camelToSnake(), index)
     }
 }

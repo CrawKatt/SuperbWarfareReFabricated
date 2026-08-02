@@ -29,7 +29,6 @@ import net.neoforged.api.distmarker.OnlyIn
 import top.theillusivec4.curios.api.CuriosApi
 
 @OnlyIn(Dist.CLIENT)
-// @EventBusSubscriber(Dist.CLIENT)
 object IFFOverlay : CommonOverlay("iff") {
     val FRIENDLY_INDICATOR = loc("textures/overlay/teammate/friendly_indicator.png")
     val FRIENDLY_AIRCRAFT = loc("textures/overlay/teammate/friendly_aircraft.png")
@@ -48,7 +47,6 @@ object IFFOverlay : CommonOverlay("iff") {
     val FRIENDLY_AIRSHIP = loc("textures/overlay/teammate/friendly_airship.png")
 
     override fun shouldRender() = super.shouldRender() && DisplayConfig.IFF_HUD.get()
-
 
     override fun RenderContext.render() {
         val level = player.level()

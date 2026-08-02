@@ -2,15 +2,17 @@ package com.atsuishio.superbwarfare.client.overlay
 
 import com.atsuishio.superbwarfare.client.RenderHelper
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
-import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.init.ModItems
-import com.atsuishio.superbwarfare.tools.*
+import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.FormatTool.format1D
+import com.atsuishio.superbwarfare.tools.NBTTool
 import com.atsuishio.superbwarfare.tools.VectorTool.lerpGetEntityBoundingBoxCenter
+import com.atsuishio.superbwarfare.tools.canBeSeen
+import com.atsuishio.superbwarfare.tools.worldToScreen
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
@@ -21,68 +23,15 @@ import net.minecraft.world.scores.PlayerTeam
 import net.minecraft.world.scores.Team
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.ClientTickEvent
 import kotlin.math.max
 
 @OnlyIn(Dist.CLIENT)
-@EventBusSubscriber(Dist.CLIENT)
 object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
     override fun shouldRender() = super.shouldRender() && DisplayConfig.VEHICLE_INFO.get()
 
-    private var lookingEntity: Entity? = null
-    private var entityRange = 0.0
-    private var lookAtEntity = false
-
-    @SubscribeEvent
-    fun onVehicleTeamOverlayClientTick(event: ClientTickEvent.Post) {
-        val player = localPlayer ?: return
-        val camera = mc.gameRenderer.mainCamera
-        var viewPos = camera.position
-        var viewVec = Vec3(camera.lookVector)
-        val distance = try {
-            VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE.get().toDouble()
-        } catch (_: Exception) {
-            196.0
-        }
-
-        lookingEntity = TraceTool.cameraFindLookingEntity(
-            player,
-            viewPos,
-            viewVec,
-            distance
-        )
-
-        (player.vehicle as? VehicleEntity)?.let { vehicle ->
-            if (vehicle.hasWeapon(vehicle.getSeatIndex(player))) {
-                viewVec = vehicle.getShootDirectionForHud(player, 1f)
-                viewPos = vehicle.getShootPosForHud(player, 1f)
-                lookingEntity = TraceTool.cameraFindLookingEntity(
-                    player,
-                    viewPos,
-                    viewVec,
-                    distance
-                )
-            }
-        }
-
-        if (lookingEntity is VehicleEntity) {
-            val decoy = TraceTool.findLookDecoy(player, viewPos, viewVec, distance)
-            if (decoy == null) {
-                lookAtEntity = true
-                entityRange = player.distanceTo(lookingEntity!!).toDouble()
-            } else {
-                lookAtEntity = false
-            }
-        } else {
-            lookAtEntity = false
-        }
-    }
-
     override fun RenderContext.render() {
-        if (!lookAtEntity) return
-        val lookingEntity = lookingEntity as VehicleEntity
+        val lookingEntity = OverlayTraceHandler.cameraEntity as? VehicleEntity ?: return
+        val entityRange = player.distanceTo(lookingEntity).toDouble()
 
         val stack = player.mainHandItem
         val usingDrone = stack.`is`(ModItems.MONITOR.get())
