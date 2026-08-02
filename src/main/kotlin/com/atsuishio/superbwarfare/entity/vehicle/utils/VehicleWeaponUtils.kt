@@ -208,11 +208,18 @@ object VehicleWeaponUtils {
     fun reloadDecoy(vehicle: VehicleEntity) {
         if (vehicle.hasSmokeDecoy()) {
             vehicle.decoyCount = 1
-            InventoryTool.consumeItem(vehicle, ModItems.VEHICLE_SMOKE_AMMO.get(), 1)
+            // 存在创造弹药盒时不消耗诱饵物品
+            if (!vehicle.hasCreativeAmmoBoxCached()) {
+                InventoryTool.consumeItem(vehicle, ModItems.VEHICLE_SMOKE_AMMO.get(), 1)
+            }
         } else {
-            val decoyMagazineCount = vehicle.decoyItemCount.coerceAtMost(vehicle.computed().decoyMagazineSize)
-            vehicle.decoyCount += decoyMagazineCount
-            InventoryTool.consumeItem(vehicle, ModItems.FLYING_FLARE_AMMO.get(), decoyMagazineCount)
+            if (vehicle.hasCreativeAmmoBoxCached()) {
+                vehicle.decoyCount = vehicle.computed().decoyMagazineSize
+            } else {
+                val decoyMagazineCount = vehicle.decoyItemCount.coerceAtMost(vehicle.computed().decoyMagazineSize)
+                vehicle.decoyCount += decoyMagazineCount
+                InventoryTool.consumeItem(vehicle, ModItems.FLYING_FLARE_AMMO.get(), decoyMagazineCount)
+            }
         }
         vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELOAD.get(), vehicle.soundSource, 2f, 1f)
     }

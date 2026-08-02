@@ -29,7 +29,7 @@ object DecoyOverlayHelper {
                     false
                 )
             } else {
-                if (entity.decoyItemCount > 0) {
+                if (entity.decoyItemCount > 0 || entity.hasCreativeAmmoBoxCached()) {
                     guiGraphics.drawString(
                         font,
                         Component.translatable("tips.superbwarfare.$key.reloading"),
@@ -73,7 +73,7 @@ object DecoyOverlayHelper {
                     false
                 )
             } else {
-                val componentReloading = if (entity.decoyItemCount < 1) {
+                val componentReloading = if (entity.decoyItemCount < 1 && !entity.hasCreativeAmmoBoxCached()) {
                     Component.translatable("tips.superbwarfare.$key.none")
                 } else {
                     Component.translatable("tips.superbwarfare.$key.reloading")

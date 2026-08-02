@@ -2726,6 +2726,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         if (hasDecoy() && level() is ServerLevel) {
             decoyItemCount = countDecoyItem()
+            // 创造弹药盒可无限供弹：即使载具物品栏内没有诱饵物品也能装填。
+            val hasInfiniteDecoyAmmo = hasCreativeAmmoBoxCached()
             if (this.hasSmokeDecoy()) {
                 releaseSmokeDecoy(getTurretVector(1f))
             } else {
@@ -2733,14 +2735,14 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             }
 
             if (decoyReloadCoolDown > 0) {
-                if (decoyItemCount > 0 && decoyCount == 0) {
+                if ((decoyItemCount > 0 || hasInfiniteDecoyAmmo) && decoyCount == 0) {
                     decoyReloadCoolDown--
                 } else {
                     decoyReloadCoolDown = getDecoyReloadTime()
                 }
             }
 
-            if (decoyReloadCoolDown == 0 && decoyItemCount > 0 && decoyCount == 0) {
+            if (decoyReloadCoolDown == 0 && (decoyItemCount > 0 || hasInfiniteDecoyAmmo) && decoyCount == 0) {
                 reloadDecoy(this)
             }
         }
