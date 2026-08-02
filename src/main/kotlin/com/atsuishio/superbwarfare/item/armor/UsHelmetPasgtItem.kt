@@ -6,7 +6,7 @@ import com.atsuishio.superbwarfare.init.ModAttributes
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.resource.model.ArmorModelReloadListener
 import com.atsuishio.superbwarfare.tiers.ModArmorMaterial
-import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.GeoArmorRenderer
+import com.github.mcmodderanchor.simplebedrockmodel.v2.client.renderer.GeoArmorRendererV2
 import net.minecraft.client.model.HumanoidModel
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.EquipmentSlotGroup
@@ -31,7 +31,7 @@ class UsHelmetPasgtItem :
         @SubscribeEvent
         fun registerRender(event: RegisterClientExtensionsEvent) {
             event.registerItem(object : IClientItemExtensions {
-                private var renderer: GeoArmorRenderer? = null
+                private var renderer: GeoArmorRendererV2? = null
 
                 override fun getHumanoidArmorModel(
                     livingEntity: LivingEntity,
@@ -40,8 +40,9 @@ class UsHelmetPasgtItem :
                     original: HumanoidModel<*>
                 ): HumanoidModel<*> {
                     if (this.renderer == null) {
-                        this.renderer = GeoArmorRenderer(
+                        this.renderer = GeoArmorRendererV2(
                             ArmorModelReloadListener.getModel(MODEL),
+                            equipmentSlot,
                             TEXTURE
                         )
                     }
