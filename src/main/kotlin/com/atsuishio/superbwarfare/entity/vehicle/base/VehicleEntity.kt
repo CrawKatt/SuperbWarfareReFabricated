@@ -4235,6 +4235,10 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         return VehicleVecUtils.getZoomDirection(this, entity, partialTicks)
     }
 
+    override fun isAlwaysTicking(): Boolean {
+        return true
+    }
+
     open val mouseSensitivity: Double
         get() = computed().mouseSensitivity
 
