@@ -70,7 +70,7 @@ class TurretWreckRenderer(renderManager: EntityRendererProvider.Context) :
 
                 poseStack.pushPose()
 
-                if (turretPos != null) {
+                if (turretPos != null && entity.isWreck) {
                     poseStack.translate(turretPos.x, -turretPos.y, turretPos.z)
                 }
 

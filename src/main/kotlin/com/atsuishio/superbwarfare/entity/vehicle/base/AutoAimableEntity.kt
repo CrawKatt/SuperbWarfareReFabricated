@@ -10,6 +10,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.ai.TowerAI
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotFromVector
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
 import com.atsuishio.superbwarfare.tools.*
@@ -63,7 +64,8 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
         get() = TowerAI.ThreatConfig()
 
     override fun interact(player: Player, hand: InteractionHand): InteractionResult {
-        if (player.isCrouching && !isWreck && !this.locked ) {
+        val stack = player.mainHandItem
+        if (player.isCrouching && !isWreck && !this.locked && !stack.`is`(ModTags.Items.TOOLS_CROWBAR)) {
             if (this.optionalOwnerUUID.isEmpty) {
                 ownerUUID = player.getUUID()
             }
@@ -96,7 +98,7 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
         hand: InteractionHand
     ): InteractionResult? {
         if (!player.isShiftKeyDown || this.isWreck) return null
-        if (this.owner != null || player != this.owner) return null
+        if (this.owner != null && player != this.owner) return null
         if (player.level().isClientSide) return null
 
         val container = ContainerBlockItem.createInstance(this)
