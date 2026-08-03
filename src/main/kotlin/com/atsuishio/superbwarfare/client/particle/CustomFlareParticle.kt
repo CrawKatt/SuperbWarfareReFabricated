@@ -95,7 +95,7 @@ open class CustomFlareParticle protected constructor(
         val blockPos = BlockPos.containing(this.x, this.y, this.z)
         val worldBlockLight: Int
         val worldSkyLight: Int
-        if (this.level.hasChunkAt(blockPos)) {
+        if (this.level.getChunk(blockPos) != null) {
             worldBlockLight = this.level.getBrightness(LightLayer.BLOCK, blockPos)
             worldSkyLight = this.level.getBrightness(LightLayer.SKY, blockPos)
         } else {
@@ -122,5 +122,9 @@ open class CustomFlareParticle protected constructor(
         this.rCol = Mth.lerp(0.1f, rCol, targetR)
         this.gCol = Mth.lerp(0.15f, gCol, targetG)
         this.bCol = Mth.lerp(0.2f, bCol, targetB)
+
+        if (this.y > 1024) {
+            this.remove()
+        }
     }
 }
