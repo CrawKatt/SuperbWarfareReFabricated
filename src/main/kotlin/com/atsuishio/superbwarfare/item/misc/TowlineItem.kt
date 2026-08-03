@@ -264,7 +264,7 @@ open class TowlineItem : Item(Properties().stacksTo(1)), IVehicleInteract {
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
     companion object {
-        private const val TAG_TOW_TARGET = "TowTarget"
+        const val TAG_TOW_TARGET = "TowTarget"
         const val TOWED_BY_TAG_KEY = "TowedByUUID"
 
         @SubscribeEvent

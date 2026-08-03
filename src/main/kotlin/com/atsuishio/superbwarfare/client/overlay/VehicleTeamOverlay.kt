@@ -22,11 +22,9 @@ import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.PlayerTeam
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
-import net.minecraftforge.fml.common.Mod
 import kotlin.math.max
 
 @OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(Dist.CLIENT)
 object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
     override fun shouldRender() = super.shouldRender()
       && DisplayConfig.VEHICLE_INFO.get()
