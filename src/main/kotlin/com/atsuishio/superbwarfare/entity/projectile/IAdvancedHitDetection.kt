@@ -39,12 +39,12 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
-import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.chunk.LevelChunk
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
-import net.minecraft.world.phys.shapes.VoxelShape
 import java.util.*
 import java.util.function.BiFunction
 import java.util.function.Function
@@ -372,34 +372,7 @@ interface IAdvancedHitDetection {
             ignorePredicate: Predicate<BlockState>
         ): BlockHitResult {
             // 1. Vanilla ray trace against world blocks
-            val vanillaHit = performRayTrace(
-                context, { rayTraceContext, blockPos ->
-                    val blockState: BlockState = world.getBlockState(blockPos)
-                    if (ignorePredicate.test(blockState)) return@performRayTrace null
-                    val fluidState: FluidState = world.getFluidState(blockPos)
-                    val startVec: Vec3 = rayTraceContext.from
-                    val endVec: Vec3 = rayTraceContext.to
-                    val blockShape: VoxelShape = rayTraceContext.getBlockShape(blockState, world, blockPos)
-                    val blockResult: BlockHitResult? =
-                        world.clipWithInteractionOverride(startVec, endVec, blockPos, blockShape, blockState)
-                    val fluidShape: VoxelShape = rayTraceContext.getFluidShape(fluidState, world, blockPos)
-                    val fluidResult: BlockHitResult? = fluidShape.clip(startVec, endVec, blockPos)
-                    val blockDistance =
-                        if (blockResult == null) Double.MAX_VALUE else rayTraceContext.from
-                            .distanceToSqr(blockResult.getLocation())
-                    val fluidDistance =
-                        if (fluidResult == null) Double.MAX_VALUE else rayTraceContext.from
-                            .distanceToSqr(fluidResult.getLocation())
-                    if (blockDistance <= fluidDistance) blockResult else fluidResult
-                },
-                { rayTraceContext ->
-                    val vec3 = rayTraceContext.from.subtract(rayTraceContext.to)
-                    BlockHitResult.miss(
-                        rayTraceContext.to,
-                        Direction.getNearest(vec3.x, vec3.y, vec3.z),
-                        BlockPos.containing(rayTraceContext.to)
-                    )
-                })
+            val vanillaHit = rayTraceVanillaBlocks(world, context, ignorePredicate)
 
             // 2. Check for Valkyrien Skies ship block hits (closer hit wins)
             if (ValkyrienSkiesCompat.hasMod()) {
@@ -432,6 +405,168 @@ interface IAdvancedHitDetection {
 
             return vanillaHit
         }
+
+        @JvmStatic
+        fun rayTraceBlocksWithFluid(
+            world: Level,
+            context: ClipContext,
+            ignorePredicate: Predicate<BlockState>
+        ): Pair<BlockHitResult, BlockHitResult> {
+            val blockStateGetter = CachedBlockStateGetter(world)
+            var blockHit: BlockHitResult? = null
+            var fluidAnyHit: BlockHitResult? = null
+
+            val vanillaResult = performRayTrace<Pair<BlockHitResult, BlockHitResult>>(
+                context,
+                { rayTraceContext, blockPos ->
+                    val clipResult = clipAt(world, blockStateGetter, rayTraceContext, blockPos, ignorePredicate)
+                    if (blockHit == null && clipResult.blockHit != null) {
+                        blockHit = clipResult.blockHit
+                    }
+                    if (fluidAnyHit == null) {
+                        fluidAnyHit = chooseClosest(rayTraceContext.from, clipResult.blockHit, clipResult.fluidHit)
+                    }
+                    if (blockHit != null && fluidAnyHit != null) {
+                        return@performRayTrace Pair(blockHit, fluidAnyHit!!)
+                    }
+                    null
+                },
+                { rayTraceContext ->
+                    Pair(
+                        blockHit ?: missResult(rayTraceContext),
+                        fluidAnyHit ?: missResult(rayTraceContext)
+                    )
+                }
+            )
+
+            val shipHit = if (ValkyrienSkiesCompat.hasMod()) {
+                ValkyrienSkiesCompat.rayTraceShipBlocks(world, context.from, context.to, ignorePredicate)
+            } else {
+                null
+            }
+
+            return Pair(
+                applyShipHit(context, vanillaResult.first, shipHit),
+                applyShipHit(context, vanillaResult.second, shipHit)
+            )
+        }
+
+        private fun rayTraceVanillaBlocks(
+            world: Level,
+            context: ClipContext,
+            ignorePredicate: Predicate<BlockState>
+        ): BlockHitResult {
+            val blockStateGetter = CachedBlockStateGetter(world)
+            return performRayTrace(
+                context,
+                { rayTraceContext, blockPos ->
+                    val clipResult = clipAt(world, blockStateGetter, rayTraceContext, blockPos, ignorePredicate)
+                    chooseClosest(rayTraceContext.from, clipResult.blockHit, clipResult.fluidHit)
+                },
+                { rayTraceContext -> missResult(rayTraceContext) }
+            )
+        }
+
+        private fun clipAt(
+            world: Level,
+            blockStateGetter: CachedBlockStateGetter,
+            rayTraceContext: ClipContext,
+            blockPos: BlockPos,
+            ignorePredicate: Predicate<BlockState>
+        ): BlockClipResult {
+            val blockState = blockStateGetter.get(blockPos)
+            if (ignorePredicate.test(blockState)) {
+                return BlockClipResult(null, null)
+            }
+
+            val startVec = rayTraceContext.from
+            val endVec = rayTraceContext.to
+            val blockShape = rayTraceContext.getBlockShape(blockState, world, blockPos)
+            val blockResult = world.clipWithInteractionOverride(startVec, endVec, blockPos, blockShape, blockState)
+
+            val fluidState = blockState.fluidState
+            val fluidResult = if (fluidState.isEmpty) {
+                null
+            } else {
+                rayTraceContext.getFluidShape(fluidState, world, blockPos).clip(startVec, endVec, blockPos)
+            }
+
+            return BlockClipResult(blockResult, fluidResult)
+        }
+
+        private fun chooseClosest(
+            from: Vec3,
+            blockResult: BlockHitResult?,
+            fluidResult: BlockHitResult?
+        ): BlockHitResult? {
+            if (blockResult == null) return fluidResult
+            if (fluidResult == null) return blockResult
+            val blockDistance = from.distanceToSqr(blockResult.location)
+            val fluidDistance = from.distanceToSqr(fluidResult.location)
+            return if (blockDistance <= fluidDistance) blockResult else fluidResult
+        }
+
+        private fun missResult(rayTraceContext: ClipContext): BlockHitResult {
+            val vec3 = rayTraceContext.from.subtract(rayTraceContext.to)
+            return BlockHitResult.miss(
+                rayTraceContext.to,
+                Direction.getNearest(vec3.x, vec3.y, vec3.z),
+                BlockPos.containing(rayTraceContext.to)
+            )
+        }
+
+        private fun applyShipHit(
+            context: ClipContext,
+            vanillaHit: BlockHitResult,
+            shipHit: Pair<Vec3, BlockPos>?
+        ): BlockHitResult {
+            if (shipHit == null) return vanillaHit
+
+            val (shipHitPos, _) = shipHit
+            val shipDistSqr = context.from.distanceToSqr(shipHitPos)
+            val vanillaDistSqr = if (vanillaHit.type != HitResult.Type.MISS)
+                context.from.distanceToSqr(vanillaHit.location)
+            else
+                Double.MAX_VALUE
+
+            if (shipDistSqr < vanillaDistSqr) {
+                val dir = context.from.subtract(shipHitPos)
+                val projectileBlockPos = BlockPos.containing(context.from)
+                return BlockHitResult(
+                    shipHitPos,
+                    Direction.getNearest(dir.x, dir.y, dir.z),
+                    projectileBlockPos,
+                    false
+                )
+            }
+            return vanillaHit
+        }
+
+        private class CachedBlockStateGetter(private val world: Level) {
+            private var chunkX = Int.MIN_VALUE
+            private var chunkZ = Int.MIN_VALUE
+            private var chunk: LevelChunk? = null
+
+            fun get(blockPos: BlockPos): BlockState {
+                if (world.isOutsideBuildHeight(blockPos)) {
+                    return Blocks.VOID_AIR.defaultBlockState()
+                }
+
+                val x = blockPos.x shr 4
+                val z = blockPos.z shr 4
+                if (x != chunkX || z != chunkZ || chunk == null) {
+                    chunkX = x
+                    chunkZ = z
+                    chunk = world.getChunk(x, z)
+                }
+                return chunk!!.getBlockState(blockPos)
+            }
+        }
+
+        private class BlockClipResult(
+            val blockHit: BlockHitResult?,
+            val fluidHit: BlockHitResult?
+        )
 
         @JvmStatic
         fun <T> performRayTrace(
