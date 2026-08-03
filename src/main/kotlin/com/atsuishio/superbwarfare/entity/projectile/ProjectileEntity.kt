@@ -5,12 +5,12 @@ import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitBlock
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitEntity
 import com.atsuishio.superbwarfare.client.lighting.ClientLightingHandler
 import com.atsuishio.superbwarfare.client.particle.BulletDecalOption
-import com.atsuishio.superbwarfare.compat.sable.SableCompatHandler
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig
 import com.atsuishio.superbwarfare.entity.OBBEntity
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter
+import com.atsuishio.superbwarfare.entity.projectile.IAdvancedHitDetection.Companion.rayTraceBlocksWithFluid
 import com.atsuishio.superbwarfare.entity.projectile.IBulletProperties.Companion.DEFAULT_B
 import com.atsuishio.superbwarfare.entity.projectile.IBulletProperties.Companion.DEFAULT_G
 import com.atsuishio.superbwarfare.entity.projectile.IBulletProperties.Companion.DEFAULT_R
@@ -342,28 +342,14 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         if (!level.isClientSide()) {
             val startVec = this.position()
             var endVec = startVec.add(this.deltaMovement)
-
-            val ignorePredicate = if (this.isPenetrating() || this.isBeast()) Predicate { true }
-            else if (ProjectileConfig.PROJECTILE_DESTROY_BLOCKS.get()) IGNORE_LIST.and(
-                Predicate { input -> !input.`is`(ModTags.Blocks.BULLET_CAN_DESTROY) }) else IGNORE_LIST
-
-            val rayTracer: (Level, ClipContext, Predicate<BlockState>) -> BlockHitResult =
-                if (SableCompatHandler.hasMod()) SableCompatHandler::rayTraceBlocksWithSable
-                else IAdvancedHitDetection.Companion::rayTraceBlocks
-
-            var result: HitResult? =
-                rayTracer(
-                    this.level(),
-                    ClipContext(startVec, endVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this),
-                    ignorePredicate
-                )
-
-            val fluidResult: BlockHitResult =
-                rayTracer(
-                    this.level(),
+            val (blockHitResult, fluidResult) =
+                rayTraceBlocksWithFluid(
+                    level,
                     ClipContext(startVec, endVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, this),
-                    ignorePredicate
+                    if (this.isPenetrating() || this.isBeast()) Predicate { true } else if (ProjectileConfig.PROJECTILE_DESTROY_BLOCKS.get()) IGNORE_LIST.and(
+                        Predicate { input -> !input.`is`(ModTags.Blocks.BULLET_CAN_DESTROY) }) else IGNORE_LIST
                 )
+            var result: HitResult? = blockHitResult
 
             if (result != null && result.type != HitResult.Type.MISS) {
                 endVec = result.getLocation()
