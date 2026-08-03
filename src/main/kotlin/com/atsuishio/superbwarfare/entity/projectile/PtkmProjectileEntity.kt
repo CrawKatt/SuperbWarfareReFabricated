@@ -181,7 +181,8 @@ open class PtkmProjectileEntity : FastThrowableProjectile, BasicGeoProjectileEnt
     }
 
     override fun largeTrail() {
-        if (level().isClientSide && tickCount > 0) {
+        val level = this.level()
+        if (level.isClientSide && tickCount > 0 && this.y.toInt() in level.minBuildHeight..level.maxBuildHeight * 2) {
             val l = deltaMovement.length()
             var i = 0.0
             while (i < l) {

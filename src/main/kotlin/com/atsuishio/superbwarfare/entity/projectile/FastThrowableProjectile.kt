@@ -236,7 +236,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
             ClientLightingHandler.handleProjectileTick(this)
         }
 
-        if (!level.isClientSide() && this.tickCount > this.getNoHitTicks()) {
+        if (!level.isClientSide() && this.tickCount > this.getNoHitTicks() && this.y.toInt() in level.minBuildHeight..level.maxBuildHeight) {
             val startVec = this.position()
             val fullEndVec = startVec.add(this.deltaMovement)
 
@@ -279,7 +279,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
             }
         }
 
-        projectileMove(level())
+        projectileMove(level)
 
         // 同步动量与位置到客户端
         this.syncMotion()
@@ -634,9 +634,10 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
     }
 
     open fun hugeMissileTrail() {
-        if (level() is ServerLevel) {
+        val level = this.level()
+        if (level is ServerLevel && this.y.toInt() in level.minBuildHeight..level.maxBuildHeight * 2) {
             MissileTrailParticleMessage.sendToNearbyPlayers(
-                level() as ServerLevel,
+                level,
                 x, y, z,
                 bbHeight.toDouble(),
                 deltaMovement.x, deltaMovement.y, deltaMovement.z
@@ -645,14 +646,15 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
     }
 
     open fun largeTrail() {
-        if (level().isClientSide && tickCount > 2) {
+        val level = this.level()
+        if (level.isClientSide && tickCount > 2 && this.y.toInt() in level.minBuildHeight..level.maxBuildHeight * 2) {
             val l = deltaMovement.length()
             var i = 0.0
             while (i < l) {
                 val startPos = Vec3(xo, yo + bbHeight / 2, zo)
                 val pos = startPos.add(deltaMovement.normalize().scale(-i))
                 val random = 2 * (this.random.nextFloat() - 0.5f)
-                level().addParticle(
+                level.addParticle(
                     CustomFlareOption(
                         0.5f,
                         0.43f,
@@ -670,14 +672,15 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
     }
 
     open fun mediumTrail() {
-        if (level().isClientSide && tickCount > 2) {
+        val level = this.level()
+        if (level.isClientSide && tickCount > 2 && this.y.toInt() in level.minBuildHeight..level.maxBuildHeight * 2) {
             val l = deltaMovement.length()
             var i = 0.0
             while (i < l) {
                 val startPos = Vec3(xo, yo + bbHeight / 2, zo)
                 val pos = startPos.add(deltaMovement.normalize().scale(-i))
                 val random = 2 * (this.random.nextFloat() - 0.5f)
-                level().addParticle(
+                level.addParticle(
                     CustomFlareOption(
                         0.5f,
                         0.43f,
@@ -695,7 +698,8 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
     }
 
     open fun shellTrail() {
-        if (level().isClientSide && tickCount > 2) {
+        val level = this.level()
+        if (level.isClientSide && tickCount > 2 && this.y.toInt() in level.minBuildHeight..level.maxBuildHeight * 2) {
             val l = deltaMovement.length()
             var i = 0.0
             while (i < l) {
@@ -720,14 +724,15 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
     }
 
     open fun smallTrail() {
-        if (level().isClientSide && tickCount > 2) {
+        val level = this.level()
+        if (level.isClientSide && tickCount > 2 && this.y.toInt() in level.minBuildHeight..level.maxBuildHeight * 2) {
             val l = deltaMovement.length()
             var i = 0.0
             while (i < l) {
                 val startPos = Vec3(xo, yo + bbHeight / 2, zo)
                 val pos = startPos.add(deltaMovement.normalize().scale(-i))
                 val random = 2 * (this.random.nextFloat() - 0.5f)
-                level().addParticle(
+                level.addParticle(
                     CustomFlareOption(
                         0.5f,
                         0.43f,
