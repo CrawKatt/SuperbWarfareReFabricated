@@ -617,6 +617,10 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         return !this.level().isClientSide
     }
 
+    open fun forceLoadChunk(): Boolean {
+        return false
+    }
+
     override fun getAddEntityPacket(): Packet<ClientGamePacketListener> {
         return NetworkHooks.getEntitySpawningPacket(this)
     }
@@ -776,7 +780,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         super.onAddedToWorld()
         if (level().isClientSide) {
             ClientLightingHandler.handleProjectileAdded(this)
-        } else {
+        } else if (forceLoadChunk()) {
             registerForManualTick(this)
         }
     }
@@ -785,7 +789,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         super.onRemovedFromWorld()
         if (level().isClientSide) {
             ClientLightingHandler.handleProjectileRemoved(this)
-        } else {
+        } else if (forceLoadChunk()) {
             unregisterForManualTick(this)
         }
     }

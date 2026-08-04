@@ -209,6 +209,10 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
         super.remove(reason)
     }
 
+    override fun forceLoadChunk(): Boolean {
+        return true
+    }
+
     open fun distractedByDecoy() {
         if (this.isDistracted()) return
 

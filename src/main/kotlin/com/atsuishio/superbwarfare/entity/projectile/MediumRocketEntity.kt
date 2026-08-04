@@ -258,6 +258,10 @@ open class MediumRocketEntity : FastThrowableProjectile, BasicGeoProjectileEntit
         return true
     }
 
+    override fun forceLoadChunk(): Boolean {
+        return true
+    }
+
     open fun releaseClusterMunitions(shooter: Entity?) {
         val level = this.level()
         if (level is ServerLevel) {
