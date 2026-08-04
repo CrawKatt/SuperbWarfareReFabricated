@@ -634,6 +634,10 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         return !this.level().isClientSide
     }
 
+    open fun forceLoadChunk(): Boolean {
+        return false
+    }
+
     override fun shouldRenderAtSqrDistance(pDistance: Double): Boolean {
         return true
     }
@@ -789,7 +793,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         super.onAddedToLevel()
         if (level().isClientSide) {
             ClientLightingHandler.handleProjectileAdded(this)
-        } else {
+        } else if (forceLoadChunk()) {
             registerForManualTick(this)
         }
     }
@@ -798,7 +802,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         super.onRemovedFromLevel()
         if (level().isClientSide) {
             ClientLightingHandler.handleProjectileRemoved(this)
-        } else {
+        } else if (forceLoadChunk()) {
             unregisterForManualTick(this)
         }
     }

@@ -355,6 +355,10 @@ open class CannonShellEntity(type: EntityType<out CannonShellEntity>, level: Lev
         return true
     }
 
+    override fun forceLoadChunk(): Boolean {
+        return true
+    }
+
     override fun getSound(): SoundEvent {
         return ModSounds.SHELL_FLY.get()
     }

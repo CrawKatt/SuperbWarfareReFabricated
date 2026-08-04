@@ -225,6 +225,10 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
         }
     }
 
+    override fun forceLoadChunk(): Boolean {
+        return true
+    }
+
     override fun tick() {
         val level = this.level()
         if (tickCount > this.getLife()) {
