@@ -24,6 +24,12 @@ group = "com.atsuishio.superbwarfare"
 repositories {
     mavenLocal()
     mavenCentral()
+    maven {
+        url = uri("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
+    }
+    maven {
+        url = uri("https://maven.createmod.net")
+    }
     flatDir {
         dir("libs")
     }
@@ -212,6 +218,20 @@ dependencies {
 
     implementation("thedarkcolour:kotlinforforge-neoforge:5.10.0")
 
+    val ponderVersion = project.property("ponder_version") as String?
+    val ponder = implementation(
+        group = "net.createmod.ponder",
+        name = "Ponder-NeoForge-${project.property("minecraft_version")}",
+        version = ponderVersion,
+    )
+
+    jarJar(ponder) {
+        version {
+            strictly("[$ponderVersion,2.0.0)")
+            prefer(ponderVersion)
+        }
+    }
+
     implementation("software.bernie.geckolib:geckolib-neoforge-1.21.1:4.7.5")
 
     val curios = implementation(
@@ -270,17 +290,18 @@ dependencies {
     compileOnly("curse.maven:patchouli-306770:6164617")
     runtimeOnly("curse.maven:patchouli-306770:6164617")
 
+    val clothConfigVersion = project.property("cloth_config_version") as String?
     // Cloth Config相关
     val clothConfig = implementation(
         group = "me.shedaniel.cloth",
         name = "cloth-config-neoforge",
-        version = project.property("cloth_config_version") as String
+        version = clothConfigVersion
     )
 
     jarJar(clothConfig) {
         version {
-            strictly("[15.0.140,16.0.0)")
-            prefer("15.0.140")
+            strictly("[$clothConfigVersion,16.0.0)")
+            prefer(clothConfigVersion)
         }
     }
 
