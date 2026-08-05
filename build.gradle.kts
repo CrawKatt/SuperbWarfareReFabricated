@@ -214,6 +214,17 @@ dependencies {
 
     implementation("software.bernie.geckolib:geckolib-neoforge-1.21.1:4.7.5")
 
+    val curios = implementation(
+        group = "top.theillusivec4.curios",
+        name = "curios-neoforge",
+        version = "9.2.0+1.21.1"
+    )
+    jarJar(curios) {
+        version {
+            strictly("[9.2.0+1.21.1,10.0.0)")
+            prefer("9.2.0+1.21.1")
+        }
+    }
     runtimeOnly("top.theillusivec4.curios:curios-neoforge:9.2.0+1.21.1")
     compileOnly("top.theillusivec4.curios:curios-neoforge:9.2.0+1.21.1:api")
 
@@ -260,7 +271,18 @@ dependencies {
     runtimeOnly("curse.maven:patchouli-306770:6164617")
 
     // Cloth Config相关
-    implementation("me.shedaniel.cloth:cloth-config-neoforge:15.0.140")
+    val clothConfig = implementation(
+        group = "me.shedaniel.cloth",
+        name = "cloth-config-neoforge",
+        version = project.property("cloth_config_version") as String
+    )
+
+    jarJar(clothConfig) {
+        version {
+            strictly("[15.0.140,16.0.0)")
+            prefer("15.0.140")
+        }
+    }
 
     // Kubejs
     implementation("curse.maven:kubejs-238086:7278501")
