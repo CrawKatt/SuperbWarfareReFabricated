@@ -25,13 +25,6 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.superbwarfare]]
-modId = "curios"
-mandatory = true
-versionRange = "[5.4.0,)"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.superbwarfare]]
 modId = "geckolib"
 mandatory = true
 versionRange = "[4.4.6,)"

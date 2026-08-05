@@ -162,7 +162,10 @@ dependencies {
     minecraft("net.minecraftforge:forge:1.20.1-47.2.0")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
-    runtimeOnly(fg.deobf("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1"))
+    val curios = implementation(fg.deobf("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1"))
+    jarJar(curios) {
+        jarJar.ranged(curios, "[5.14.1,6.0.0)")
+    }
     compileOnly(fg.deobf("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1:api"))
 
     implementation(fg.deobf("software.bernie.geckolib:geckolib-forge-1.20.1:4.4.6"))
@@ -212,7 +215,11 @@ dependencies {
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:1.20.1-84-FORGE"))
 
     // Cloth Config相关
-    implementation(fg.deobf("me.shedaniel.cloth:cloth-config-forge:${project.property("cloth_config_version")}"))
+    val clothConfig =
+        implementation(fg.deobf("me.shedaniel.cloth:cloth-config-forge:${project.property("cloth_config_version")}"))
+    jarJar(clothConfig) {
+        jarJar.ranged(clothConfig, "[11.1.106,12.0.0)")
+    }
 
     // Jade相关
     implementation(fg.deobf("curse.maven:jade-324717:${project.property("jade_version")}"))
