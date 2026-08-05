@@ -89,6 +89,12 @@ sourceSets.main.get().resources {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven {
+        url = uri("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
+    }
+    maven {
+        url = uri("https://maven.createmod.net")
+    }
     flatDir {
         dir("libs")
     }
@@ -158,6 +164,11 @@ jarJar.enable()
 
 dependencies {
     implementation("thedarkcolour:kotlinforforge:4.11.0")
+
+    val ponder = implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${project.property("minecraft_version")}:${project.property("ponder_version")}"))
+    jarJar(ponder) {
+        jarJar.ranged(ponder, "[1.0.91,)")
+    }
 
     minecraft("net.minecraftforge:forge:1.20.1-47.2.0")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
