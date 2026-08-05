@@ -63,7 +63,7 @@ data class ShakeClientMessage(
         ) {
             val center = Vec3(x, y, z)
             val entitiesInRange = mutableListOf<ServerPlayer>()
-            EntityFindUtil.getEntities(level).get(AABB(center, center).inflate(sendRadius)) {
+            EntityFindUtil.getEntities(level)?.get(AABB(center, center).inflate(sendRadius)) {
                 if (it is ServerPlayer) entitiesInRange.add(it)
             }
             entitiesInRange.forEach { it.sendPacket(ShakeClientMessage(time, sendRadius, amplitude, x, y, z)) }

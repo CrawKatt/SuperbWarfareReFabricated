@@ -512,7 +512,7 @@ class TowerAI(private val tower: AutoAimableEntity) {
 
             val aabb = AABB(pos, pos).inflate(maxRange)
             val entitiesInRange = mutableListOf<Entity>()
-            EntityFindUtil.getEntities(tower.level()).get(aabb) { entity ->
+            EntityFindUtil.getEntities(tower.level())?.get(aabb) { entity ->
                 entitiesInRange.add(entity)
             }
             val candidates = entitiesInRange.filter { target ->
