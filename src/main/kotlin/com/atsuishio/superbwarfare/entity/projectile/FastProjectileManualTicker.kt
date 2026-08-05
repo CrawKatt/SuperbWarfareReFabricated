@@ -28,6 +28,10 @@ object FastProjectileManualTicker {
 
         for (projectile in FastThrowableProjectile.manualTickRegistered()) {
             if (projectile.tickCount < 1 || !projectile.forceLoadChunk()) continue
+            if (projectile.y <= projectile.level().maxBuildHeight) {
+                FastThrowableProjectile.unregisterForManualTickInternal(projectile)
+                continue
+            }
             // 已移除或客户端实体：清理
             if (projectile.isRemoved || projectile.level().isClientSide) {
                 FastThrowableProjectile.unregisterForManualTickInternal(projectile)
@@ -46,7 +50,9 @@ object FastProjectileManualTicker {
                 }
             }
 
-            FastThrowableProjectile.setLastManualTickCount(projectile.id, projectile.tickCount)
+            if (FastThrowableProjectile.manualTickRegistered().contains(projectile)) {
+                FastThrowableProjectile.setLastManualTickCount(projectile.id, projectile.tickCount)
+            }
         }
     }
 }
