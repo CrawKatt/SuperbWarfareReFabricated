@@ -85,7 +85,7 @@ object TowingChainRenderer {
         val box = AABB.ofSize(camera.position, range, range, range)
         val vehicles = mutableListOf<VehicleEntity>()
         val shuttles = mutableListOf<CatapultShuttleEntity>()
-        EntityFindUtil.getEntities(level).get(box) {
+        EntityFindUtil.getEntities(level)?.get(box) {
             if (it is VehicleEntity && it.towingUUIDs.isNotEmpty()) {
                 vehicles.add(it)
             }

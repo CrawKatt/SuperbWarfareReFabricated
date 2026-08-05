@@ -17,12 +17,14 @@ object EntityFindUtil {
      * @return 所有实体
      */
     @JvmStatic
-    fun getEntities(level: Level): LevelEntityGetter<Entity> {
+    fun getEntities(level: Level): LevelEntityGetter<Entity>? {
         if (level is ServerLevel) {
             return level.entities
         }
-        val clientLevel = level as ClientLevel
-        return clientLevel.entities
+        if (level is ClientLevel) {
+            return level.entities
+        }
+        return null
     }
 
     /**
@@ -53,7 +55,7 @@ object EntityFindUtil {
         return if (level is ServerLevel) {
             level.getEntity(uuid)
         } else {
-            (level as ClientLevel).entities.get(uuid)
+            (level as? ClientLevel)?.entities?.get(uuid)
         }
     }
 

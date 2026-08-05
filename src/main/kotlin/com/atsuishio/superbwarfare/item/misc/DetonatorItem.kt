@@ -36,8 +36,10 @@ open class DetonatorItem : Item(Properties().stacksTo(1)) {
     }
 
     companion object {
+        @JvmStatic
         fun getC4(player: Player?, level: Level): MutableList<Entity> {
-            return EntityFindUtil.getEntities(level).all.asSequence().filter { it is C4Entity && it.owner == player }.toMutableList()
+            return EntityFindUtil.getEntities(level)?.all?.asSequence()?.filter { it is C4Entity && it.owner == player }
+                ?.toMutableList() ?: mutableListOf()
         }
     }
 }

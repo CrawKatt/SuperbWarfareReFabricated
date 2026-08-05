@@ -121,7 +121,7 @@ object SeekTool {
             // 雷达超视距假实体：使用服务端预计算的高度，确保 heightRange 条件对其生效
             val entry = ClientSyncedEntityHandler.getSyncedEntry(level, entity.id)
             if (entry != null && entry.heightAboveGround >= 0) {
-                return@TriPredicate entry.heightAboveGround >= min && entry.heightAboveGround <= max
+                return@TriPredicate entry.heightAboveGround in min..max
             }
             return@TriPredicate true
         }
@@ -218,7 +218,8 @@ object SeekTool {
     @JvmStatic
     fun getEntitiesWithinRange(pos: BlockPos?, level: Level, range: Double): List<Entity> {
         if (pos == null) return emptyList()
-        return EntityFindUtil.getEntities(level).all.asSequence()
+        val entities = EntityFindUtil.getEntities(level) ?: return emptyList()
+        return entities.all.asSequence()
             .filter { e ->
                 e.distanceToSqr(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()) <= range * range
                         && BASIC_FILTER.test(e)
@@ -243,7 +244,7 @@ object SeekTool {
          * 只有这里关心 ClientSyncedEntityHandler 合并逻辑。
          */
         private fun entitySource(): Sequence<Entity> {
-            val base = EntityFindUtil.getEntities(entity.level()).all.asSequence()
+            val base = EntityFindUtil.getEntities(entity.level())?.all?.asSequence() ?: sequenceOf()
             if (!entity.level().isClientSide || !canGuidedByRadarFlag) return base
             val synced = ClientSyncedEntityHandler.getSyncedHostileEntities(entity.level())
             return if (synced.isEmpty()) base else base + synced.asSequence()
