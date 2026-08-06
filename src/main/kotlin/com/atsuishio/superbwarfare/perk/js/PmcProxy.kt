@@ -72,5 +72,5 @@ class PmcProxy(private val pmc: PMC<GunData, DefaultGunData>) {
         return coerced as Number
     }
 
-    fun isShotgun(): Boolean = pmc.data.isShotgun
+    fun isShotgun(): Boolean = pmc[GunProp.PROJECTILE_AMOUNT] > 1
 }
