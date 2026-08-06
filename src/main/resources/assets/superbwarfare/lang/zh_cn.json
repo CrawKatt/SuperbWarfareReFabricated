@@ -924,6 +924,8 @@
   "tips.superbwarfare.auto_aimable_entity.inactive": "未激活",
   "tips.superbwarfare.need.ammo": "弹药不足！需要",
   "tips.superbwarfare.not.enough.energy": "能量不足",
+  "tips.superbwarfare.fh77bw.body_tilted": "车体倾斜，无法发射",
+  "tips.superbwarfare.fh77bw.not_stopped": "车未停稳，无法发射",
 
   "tips.superbwarfare.vehicle_reset_kit_1": "[警告] 检测到卓越前线版本变化[%1$s=>%2$s]，之前版本的载具可能无法正常使用",
   "tips.superbwarfare.vehicle_reset_kit_2": "你可以在取出旧版本载具的所有物品后，使用%1$s与装有载具的集装箱进行合成，以完成重置",
@@ -1391,6 +1393,12 @@
   "superbwarfare.entry.resources.silver": "银矿石",
   "superbwarfare.page.resources.silver.1": "$(thing)银矿石$()生成于主世界的$(thing)48 ~ 1$()层。",
   "superbwarfare.page.resources.silver.2": "$(thing)深层银矿石$()生成于主世界的$(thing)0 ~ -64$()层。",
-  "tips.superbwarfare.fh77bw.body_tilted": "车体倾斜，无法发射",
-  "tips.superbwarfare.fh77bw.not_stopped": "车未停稳，无法发射"
+
+  "superbwarfare.ponder.target_intro.header": "标靶的使用简介",
+  "superbwarfare.ponder.target_intro.text_1": "标靶是卓越前线的第一个物品",
+  "superbwarfare.ponder.target_intro.text_2": "使用武器攻击标靶可以显示该次攻击的伤害",
+  "superbwarfare.ponder.target_intro.text_3": "标靶受到足够伤害会倒下，一段时间后恢复状态",
+  "superbwarfare.ponder.target_interact.header": "标靶的交互",
+  "superbwarfare.ponder.target_interact.text_1": "空手右击可以让标靶面朝自己",
+  "superbwarfare.ponder.target_interact.text_2": "潜行时空手右击能够拆除标靶"
 }

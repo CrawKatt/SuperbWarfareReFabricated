@@ -924,6 +924,8 @@
   "tips.superbwarfare.auto_aimable_entity.inactive": "INACTIVE",
   "tips.superbwarfare.need.ammo": "Not Enough Ammo! Need ",
   "tips.superbwarfare.not.enough.energy": "Not Enough Energy",
+  "tips.superbwarfare.fh77bw.body_tilted": "Vehicle body tilted, cannot fire",
+  "tips.superbwarfare.fh77bw.not_stopped": "Vehicle not fully stopped, cannot fire",
 
   "tips.superbwarfare.vehicle_reset_kit_1": "[Warning] Detected Superb Warfare version change [%1$s=>%2$s]. Vehicles from previous version may not work properly.",
   "tips.superbwarfare.vehicle_reset_kit_2": "After taking all items from the old vehicle, use %1$s to craft with the vehicle container to complete the reset.",
@@ -1391,6 +1393,12 @@
   "superbwarfare.entry.resources.silver": "Silver Ore",
   "superbwarfare.page.resources.silver.1": "$(thing)Silver Ore$() is generated in the overworld $(thing)from Y=48 to Y=1$().",
   "superbwarfare.page.resources.silver.2": "$(thing)Deepslate Silver Ore() is generated in the overworld $(thing)from Y=0 to Y=-64$().",
-  "tips.superbwarfare.fh77bw.body_tilted": "Vehicle body tilted, cannot fire",
-  "tips.superbwarfare.fh77bw.not_stopped": "Vehicle not fully stopped, cannot fire"
+
+  "superbwarfare.ponder.target_intro.header": "Target Introduction",
+  "superbwarfare.ponder.target_intro.text_1": "The Target is the first item in Superb Warfare",
+  "superbwarfare.ponder.target_intro.text_2": "Attacking the Target with a weapon will display the damage dealt by that attack",
+  "superbwarfare.ponder.target_intro.text_3": "The Target will fall down after taking enough damage, and will recover after a short time",
+  "superbwarfare.ponder.target_interact.header": "Target Interaction",
+  "superbwarfare.ponder.target_interact.text_1": "Right-click with an empty hand to make the Target face you",
+  "superbwarfare.ponder.target_interact.text_2": "Sneak + right-click with an empty hand to dismantle the Target"
 }

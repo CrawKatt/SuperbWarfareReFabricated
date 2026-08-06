@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation
 object TargetPonderScene {
     fun register(helper: PonderSceneRegistrationHelper<ResourceLocation>) {
         helper.forComponents(loc("target_deployer"))
-            .addStoryBoard("base_5x5", TargetStoryBoard::infoScene)
+            .addStoryBoard("basic_5x5", TargetStoryBoard::infoScene)
+            .addStoryBoard("basic_5x5", TargetStoryBoard::interactScene)
     }
 }
