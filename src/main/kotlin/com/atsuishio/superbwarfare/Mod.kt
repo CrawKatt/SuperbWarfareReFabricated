@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.MouseMovementHandler
 import com.atsuishio.superbwarfare.client.molang.MolangVariable
 import com.atsuishio.superbwarfare.client.renderer.ModParticleRenderTypes
 import com.atsuishio.superbwarfare.compat.coldsweat.ColdSweatCompatHandler
+import com.atsuishio.superbwarfare.compat.ponder.SBWPonderPlugin
 import com.atsuishio.superbwarfare.compat.tacz.TACZGunEventHandler
 import com.atsuishio.superbwarfare.config.CLIENT_CONFIG
 import com.atsuishio.superbwarfare.config.COMMON_CONFIG
@@ -13,6 +14,7 @@ import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.network.NetworkRegistry
 import com.atsuishio.superbwarfare.sound.SoundLimit
+import net.createmod.ponder.foundation.PonderIndex
 import net.minecraft.SharedConstants
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
@@ -129,6 +131,7 @@ class Mod {
         MolangVariable.register()
         event.enqueueWork { ModScreens.register() }
         event.enqueueWork { ModSoundInstances.init() }
+        PonderIndex.addPlugin(SBWPonderPlugin)
     }
 
     private fun onRegisterBuiltInResourcePacks(event: AddPackFindersEvent) {
