@@ -361,7 +361,12 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
 
             // --- VehicleEntity and LivingEntity are handled by onInteractVehicle / interactLivingEntity ---
             if (target is VehicleEntity) return
-            if (target is LivingEntity) return
+            if (target is LivingEntity) {
+                event.isCanceled = true
+                event.cancellationResult = if (player.level().isClientSide) InteractionResult.CONSUME
+                else item.interactLivingEntity(stack, player, target, event.hand)
+                return
+            }
 
             // Exclude certain entity types
             if (target is Display
