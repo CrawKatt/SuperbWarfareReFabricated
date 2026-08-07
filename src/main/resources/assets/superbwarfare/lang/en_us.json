@@ -1400,5 +1400,10 @@
   "superbwarfare.ponder.target_intro.text_3": "The Target will fall down after taking enough damage, and will recover after a short time",
   "superbwarfare.ponder.target_interact.header": "Target Interaction",
   "superbwarfare.ponder.target_interact.text_1": "Right-click with an empty hand to make the Target face you",
-  "superbwarfare.ponder.target_interact.text_2": "Sneak + right-click with an empty hand to dismantle the Target"
+  "superbwarfare.ponder.target_interact.text_2": "Sneak + right-click with an empty hand to dismantle the Target",
+  "superbwarfare.ponder.vehicle_assembling_table_intro.header": "Vehicle Assembling",
+  "superbwarfare.ponder.vehicle_assembling_table_intro.text_1": "Right-click to open assembling menu",
+  "superbwarfare.ponder.vehicle_assembling_table_intro.text_2": "You can craft items when you have enough materials in inventory",
+  "superbwarfare.ponder.vehicle_assembling_table_interaction.header": "Interact?",
+  "superbwarfare.ponder.vehicle_assembling_table_interaction.text_1": "Right-click with a crowbar..."
 }

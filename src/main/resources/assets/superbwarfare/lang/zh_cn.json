@@ -1400,5 +1400,10 @@
   "superbwarfare.ponder.target_intro.text_3": "标靶受到足够伤害会倒下，一段时间后恢复状态",
   "superbwarfare.ponder.target_interact.header": "标靶的交互",
   "superbwarfare.ponder.target_interact.text_1": "空手右击可以让标靶面朝自己",
-  "superbwarfare.ponder.target_interact.text_2": "潜行时空手右击能够拆除标靶"
+  "superbwarfare.ponder.target_interact.text_2": "潜行时空手右击能够拆除标靶",
+  "superbwarfare.ponder.vehicle_assembling_table_intro.header": "载具装配",
+  "superbwarfare.ponder.vehicle_assembling_table_intro.text_1": "右击可以打开装配界面",
+  "superbwarfare.ponder.vehicle_assembling_table_intro.text_2": "只要背包中有足够的材料，就可以直接合成物品",
+  "superbwarfare.ponder.vehicle_assembling_table_interaction.header": "交互?",
+  "superbwarfare.ponder.vehicle_assembling_table_interaction.text_1": "使用撬棍右击的话……",
 }

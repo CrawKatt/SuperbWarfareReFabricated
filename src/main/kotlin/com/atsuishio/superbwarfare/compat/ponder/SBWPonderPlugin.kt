@@ -1,7 +1,9 @@
 package com.atsuishio.superbwarfare.compat.ponder
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.compat.ponder.scene.ChargingStationPonderScene
 import com.atsuishio.superbwarfare.compat.ponder.scene.TargetPonderScene
+import com.atsuishio.superbwarfare.compat.ponder.scene.VehicleAssemblingTablePonderScene
 import net.createmod.ponder.api.registration.PonderPlugin
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper
 import net.minecraft.resources.ResourceLocation
@@ -13,5 +15,7 @@ object SBWPonderPlugin : PonderPlugin {
 
     override fun registerScenes(helper: PonderSceneRegistrationHelper<ResourceLocation>) {
         TargetPonderScene.register(helper)
+        ChargingStationPonderScene.register(helper)
+        VehicleAssemblingTablePonderScene.register(helper)
     }
 }
