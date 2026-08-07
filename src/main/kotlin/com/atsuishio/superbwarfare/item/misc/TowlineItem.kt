@@ -276,11 +276,15 @@ open class TowlineItem : Item(Properties().stacksTo(1)), IVehicleInteract {
             val originalTarget = event.target
             val target = if (originalTarget is PartEntity<*>) originalTarget.parent else originalTarget
 
-            if (player.level().isClientSide) return
-
             val item = stack.item as? TowlineItem ?: return
             if (target is VehicleEntity) return // Let onInteractVehicle handle
-            if (target is LivingEntity) return  // Let interactLivingEntity handle
+            if (target is LivingEntity) {
+                event.isCanceled = true
+                event.cancellationResult = if (player.level().isClientSide) InteractionResult.CONSUME
+                else item.interactLivingEntity(stack, player, target, event.hand)
+                return
+            }
+            if (player.level().isClientSide) return
             if (target is Display
                 || target is HangingEntity
                 || target is AreaEffectCloud
