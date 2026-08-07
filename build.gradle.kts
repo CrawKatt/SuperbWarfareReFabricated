@@ -218,20 +218,6 @@ dependencies {
 
     implementation("thedarkcolour:kotlinforforge-neoforge:5.10.0")
 
-    val ponderVersion = project.property("ponder_version") as String?
-    val ponder = implementation(
-        group = "net.createmod.ponder",
-        name = "Ponder-NeoForge-${project.property("minecraft_version")}",
-        version = ponderVersion,
-    )
-
-    jarJar(ponder) {
-        version {
-            strictly("[$ponderVersion,2.0.0)")
-            prefer(ponderVersion)
-        }
-    }
-
     implementation("software.bernie.geckolib:geckolib-neoforge-1.21.1:4.7.5")
 
     val curios = implementation(
@@ -278,6 +264,33 @@ dependencies {
         exclude("com.google.code.findbugs", "jsr305")
         exclude("it.unimi.dsi", "fastutil")
         exclude("org.joml", "joml")
+    }
+
+    val ponderVersion = project.property("ponder_version") as String?
+    val ponder = implementation(
+        group = "net.createmod.ponder",
+        name = "Ponder-NeoForge-${project.property("minecraft_version")}",
+        version = ponderVersion,
+    )
+
+    jarJar(ponder) {
+        version {
+            strictly("[$ponderVersion,2.0.0)")
+            prefer(ponderVersion)
+        }
+    }
+
+    val flywheelVersion = project.property("flywheel_version") as String?
+    val flywheel = runtimeOnly(
+        group = "dev.engine-room.flywheel",
+        name = "flywheel-neoforge-${project.property("minecraft_version")}",
+        version = flywheelVersion,
+    )
+    jarJar(flywheel) {
+        version {
+            strictly("[$flywheelVersion,2.0.0)")
+            prefer(flywheelVersion)
+        }
     }
 
     // 可选mod依赖
