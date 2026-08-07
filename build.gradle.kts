@@ -165,11 +165,6 @@ jarJar.enable()
 dependencies {
     implementation("thedarkcolour:kotlinforforge:4.11.0")
 
-    val ponder = implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${project.property("minecraft_version")}:${project.property("ponder_version")}"))
-    jarJar(ponder) {
-        jarJar.ranged(ponder, "[1.0.91,)")
-    }
-
     minecraft("net.minecraftforge:forge:1.20.1-47.2.0")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
@@ -198,6 +193,20 @@ dependencies {
         exclude("com.google.code.findbugs", "jsr305")
         exclude("it.unimi.dsi", "fastutil")
         exclude("org.joml", "joml")
+    }
+
+    // Ponder
+    val ponder = implementation(
+        fg.deobf("net.createmod.ponder:Ponder-Forge-${project.property("minecraft_version")}:${project.property("ponder_version")}")
+    )
+    jarJar(ponder) {
+        jarJar.ranged(ponder, "[1.0.91,)")
+    }
+    val flywheel = runtimeOnly(
+        fg.deobf("dev.engine-room.flywheel:flywheel-forge-${project.property("minecraft_version")}:${project.property("flywheel_version")}")
+    )
+    jarJar(flywheel) {
+        jarJar.ranged(flywheel, "[1.0,2.0)")
     }
 
     // TODO 我需要掌中明月 我需要掌中明月 我需要掌中明月 我需要掌中明月 我需要掌中明月 但是这个JIJ写法不对
