@@ -123,7 +123,7 @@ class TurretWreckRenderer(renderManager: EntityRendererProvider.Context) :
                 poseStack.pushPose()
 
                 if (turretPos != null) {
-                    poseStack.translate(turretPos.x, -turretPos.y, turretPos.z)
+                    poseStack.translate(-turretPos.x, -turretPos.y, -turretPos.z)
                 }
 
                 poseStack.mulPose(Axis.YP.rotationDegrees(180f))
