@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.model.entity.VehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.TurretWreckEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.tools.mc
+import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import com.mojang.math.Axis
@@ -128,11 +129,12 @@ class TurretWreckRenderer(renderManager: EntityRendererProvider.Context) :
                 poseStack.mulPose(Axis.YP.rotationDegrees(180f))
 
                 val turretIndex = instance.getIndex("turret")
-                instance.baseModel().renderBone(
-                    instance,
-                    turretIndex,
+                instance.renderSingleBone(
                     poseStack,
-                    bufferSource.getBuffer(RenderType.entityTranslucent(entry.texture)),
+                    turretIndex,
+                    bufferSource,
+                    RenderType.entityTranslucent(entry.texture),
+                    BedrockModelRenderTypes.polyMeshCutout(entry.texture),
                     packedLight,
                     OverlayTexture.NO_OVERLAY,
                     0.3f, 0.3f, 0.3f, 1f,

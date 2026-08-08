@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.projectile.BasicGeoProjectileEntity
 import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils
-import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
@@ -26,11 +25,6 @@ open class BasicProjectileRenderer<T>(manager: EntityRendererProvider.Context) :
     override fun getTextureLocation(entity: T): ResourceLocation {
         val (_, namespace, id) = entity.type.descriptionId.split(".")
         return ResourceLocation.fromNamespaceAndPath(namespace, "textures/bedrock/projectile/$id.png")
-    }
-
-    fun getModelLocation(entity: T): ResourceLocation {
-        val (_,  namespace, id) = entity.type.descriptionId.split(".")
-        return ResourceLocation.fromNamespaceAndPath(namespace, "models/bedrock/projectile/$id.geo.json")
     }
 
     override fun shouldShowName(pEntity: T): Boolean {
@@ -61,7 +55,6 @@ open class BasicProjectileRenderer<T>(manager: EntityRendererProvider.Context) :
             if (entity.tickCount <= entity.getHiddenTicks()) return
         }
 
-        val model = ProjectileModelReloadListener.getModel(getModelLocation(entity)) ?: return
         val instance = entity.getModelInstance() ?: return
 
         poseStack.pushPose()
@@ -119,15 +112,15 @@ open class BasicProjectileRenderer<T>(manager: EntityRendererProvider.Context) :
             flare.xScale = ((2 * Math.random() - 1) * 0.4f + 1.6).toFloat()
             flare.yScale = ((2 * Math.random() - 1) * 0.4f + 1.6).toFloat()
             flare.zScale = ((2 * Math.random() - 1) * 0.4f + 1.6).toFloat()
-            model.renderBone(
-                instance,
-                instance.getIndex("flare"),
+            instance.renderSingleBonePass(
                 poseStack,
+                instance.getIndex("flare"),
                 buffer.getBuffer(RenderType.eyes(FLARE_TEXTURE)),
                 packedLight,
                 OverlayTexture.NO_OVERLAY,
                 1f, 1f, 1f, 1f,
-                true
+                true,
+                false
             )
         }
 
