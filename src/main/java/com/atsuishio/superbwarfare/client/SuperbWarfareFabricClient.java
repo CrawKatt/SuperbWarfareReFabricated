@@ -20,8 +20,6 @@ import com.atsuishio.superbwarfare.network.NetworkRegistryKt;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.neoforged.fml.config.ModConfig;
 
 public class SuperbWarfareFabricClient implements ClientModInitializer {
@@ -57,29 +55,15 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         NetworkRegistryKt.registerClientReceivers();
 
         registerClientTicks();
-        registerClientConnectionEvents();
-        registerRenderFrames();
     }
 
     private static void registerClientTicks() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             Mod.tickClient();
             ClientEventHandler.handleClientTick();
-            ClientEventHandler.handleWeaponBreathSway();
             ClientMouseHandler.handleClientTick(client);
             KillMessageHandler.onClientTick();
             FuMO25ScreenHelper.onClientTick();
-        });
-    }
-
-    private static void registerClientConnectionEvents() {
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> ClientEventHandler.onPlayerLoggedIn());
-    }
-
-    private static void registerRenderFrames() {
-        WorldRenderEvents.START.register(context -> {
-            ClientEventHandler.handleWeaponFire();
-            ClientEventHandler.handleVehicleFire();
         });
     }
 }

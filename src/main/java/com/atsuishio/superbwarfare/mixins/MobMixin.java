@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.config.server.MiscConfig;
+import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.tools.SeekTool;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -8,6 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
@@ -18,6 +20,11 @@ public class MobMixin {
     @Shadow
     @Nullable
     private LivingEntity target;
+
+    @Inject(method = "setTarget", at = @At("HEAD"))
+    private void superbWarfare$onSetTarget(@Nullable LivingEntity target, CallbackInfo ci) {
+        LivingEventHandler.onLivingChangeTargetEvent((Mob) (Object) this, target);
+    }
 
     @Inject(method = "getTarget", at = @At("RETURN"), cancellable = true)
     public void getTarget(CallbackInfoReturnable<LivingEntity> cir) {

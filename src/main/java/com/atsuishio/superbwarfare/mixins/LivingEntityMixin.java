@@ -147,9 +147,37 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
         return LivingEventHandler.onEntityHurt(self, source, amount);
     }
 
+    @ModifyVariable(method = "knockback(DDD)V", at = @At("HEAD"), argsOnly = true, ordinal = 0)
+    private double superbwarfare$customKnockback(double strength) {
+        float customStrength = LivingEventHandler.onKnockback((LivingEntity) (Object) this);
+        return customStrength >= 0 ? customStrength : strength;
+    }
+
+    @Inject(method = "causeFallDamage", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$vehicleFallProtection(
+            float fallDistance,
+            float damageMultiplier,
+            DamageSource source,
+            CallbackInfoReturnable<Boolean> cir
+    ) {
+        if (LivingEventHandler.onEntityFall((LivingEntity) (Object) this, fallDistance, damageMultiplier)) {
+            cir.setReturnValue(false);
+        }
+    }
+
     @Override
     public Stack<DamageContainer> superbwarfare$getDamageContainers() {
         return this.damageContainers;
+    }
+
+    @Inject(method = "canBeAffected", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$vehicleEffectImmunity(
+            MobEffectInstance effectInstance,
+            CallbackInfoReturnable<Boolean> cir
+    ) {
+        if (LivingEventHandler.onEffectApply((LivingEntity) (Object) this, effectInstance)) {
+            cir.setReturnValue(false);
+        }
     }
 
     @Inject(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z", at = @At("TAIL"))
@@ -227,6 +255,7 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
     )
     private void superbwarfare$beginPowerfulAttractionDrops(ServerLevel level, DamageSource source, CallbackInfo ci) {
         PowerfulAttraction.beginDropCapture(source);
+        LivingEventHandler.beginLivingDrops();
     }
 
     @Inject(
@@ -235,6 +264,7 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
     )
     private void superbwarfare$endPowerfulAttractionDrops(ServerLevel level, DamageSource source, CallbackInfo ci) {
         PowerfulAttraction.endDropCapture();
+        LivingEventHandler.finishLivingDrops((LivingEntity) (Object) this, source, level);
     }
 
     @Inject(
@@ -247,14 +277,17 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
             Entity attackingEntity,
             CallbackInfoReturnable<Integer> cir
     ) {
-        if (!(attackingEntity instanceof Player player)) return;
-
         LivingEntity self = (LivingEntity) (Object) this;
+        Player player = attackingEntity instanceof Player attacker ? attacker : null;
         int result = PowerfulAttraction.handleExperienceDrop(
                 player,
                 self.getLastDamageSource(),
                 cir.getReturnValue()
         );
+
+        if (LivingEventHandler.onLivingExperienceDrop(self, player, result)) {
+            result = 0;
+        }
 
         cir.setReturnValue(result);
     }

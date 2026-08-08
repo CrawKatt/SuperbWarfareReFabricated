@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.client.animation;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.api.event.RenderPlayerArmEvent;
 import com.atsuishio.superbwarfare.client.renderer.CustomGunRenderer;
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -207,7 +208,13 @@ public class AnimationHelper {
             RenderUtil.translateAwayFromPivotPoint(stack, bone);
 
             HumanoidArm arm = "Lefthand".equals(name) ? HumanoidArm.LEFT : HumanoidArm.RIGHT;
-            // RenderPlayerArmEvent not available in Fabric - skipping NeoForge event
+            var event = new RenderPlayerArmEvent(localPlayer, transformType, stack, arm, bone, currentBuffer, renderType, packedLightIn, useOldHandRender);
+            RenderPlayerArmEvent.EVENT.invoker().onRenderPlayerArm(event);
+            if (event.isCanceled()) {
+                currentBuffer.getBuffer(renderType);
+                stack.popPose();
+                return;
+            }
 
             ResourceLocation loc = localPlayer.getSkin().texture();
             VertexConsumer armBuilder = currentBuffer.getBuffer(RenderType.entitySolid(loc));

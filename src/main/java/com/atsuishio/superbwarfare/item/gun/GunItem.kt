@@ -435,8 +435,6 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         val data = parameters.data
         val ammoSupplier = parameters.ammoSupplier
 
-        postEvent(ShootEvent.Pre(parameters))
-
         // 判断是否为栓动武器（BoltActionTime > 0），并在开火后给一个需要上膛的状态
         if (data.get(GunProp.BOLT_ACTION_TIME) > 0 && data.hasEnoughAmmoToShoot(ammoSupplier)) {
             data.bolt.needed.set(true)
@@ -593,6 +591,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         if (!data.canShoot(ammoSupplier)) return
 
         // 开火前事件
+        if (postEvent(ShootEvent.Pre(parameters)).isCanceled) return
         data.item.beforeShoot(parameters)
 
         val projectileAmount = data.get(GunProp.PROJECTILE_AMOUNT)

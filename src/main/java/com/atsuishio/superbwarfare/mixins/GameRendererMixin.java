@@ -37,6 +37,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
 
+    @Inject(method = "render", at = @At("HEAD"))
+    private void superbWarfare$renderFramePre(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) {
+        ClientEventHandler.handleWeaponFire();
+        ClientEventHandler.handleVehicleFire();
+        ClientEventHandler.handleWeaponBreathSway();
+    }
+
     @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
     private void superbWarfare$getFov(Camera camera, float partialTick, boolean changingFov, CallbackInfoReturnable<Double> cir) {
         ClientEventHandler.FovContext context = new ClientEventHandler.FovContext(
@@ -71,8 +78,8 @@ public class GameRendererMixin {
     @SuppressWarnings("ConstantValue")
     @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;bobHurt(Lcom/mojang/blaze3d/vertex/PoseStack;F)V"))
     public void superbWarfare$renderWorld(DeltaTracker deltaTracker, CallbackInfo ci,
-                                          @Local(name = "posestack") PoseStack matrices,
-                                          @Local(name = "f") float tickDelta) {
+                                          @Local(ordinal = 0) PoseStack matrices,
+                                          @Local(ordinal = 0) float tickDelta) {
         Entity entity = mainCamera.getEntity();
         if (!superbWarfare$isControllingDrone(entity)) {
             matrices.mulPose(Axis.ZP.rotationDegrees(ClientEventHandler.cameraRoll));

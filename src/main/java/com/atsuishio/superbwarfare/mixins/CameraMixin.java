@@ -213,7 +213,7 @@ public abstract class CameraMixin implements ICustomCamera {
                 tickDelta,
                 camera.getYRot(),
                 camera.getXRot(),
-                ClientEventHandler.cameraRoll
+                0f
         );
 
         ClientEventHandler.computeCameraAngles(context);

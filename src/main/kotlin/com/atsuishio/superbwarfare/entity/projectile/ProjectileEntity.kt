@@ -11,7 +11,6 @@ import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
-import com.atsuishio.superbwarfare.event.CustomEventHandler
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.init.ModDamageTypes.causeGunFireAbsoluteDamage
 import com.atsuishio.superbwarfare.init.ModDamageTypes.causeGunFireDamage
@@ -586,10 +585,6 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
             val face = result.direction
             val state = level().getBlockState(pos)
 
-            val event = HitBlock(pos, state, face, this.shooter, this, result.getLocation())
-            CustomEventHandler.onProjectileHitBlock(event)
-            if (event.isCanceled) return
-
             val vx = face.stepX.toDouble()
             val vy = face.stepY.toDouble()
             val vz = face.stepZ.toDouble()
@@ -682,6 +677,8 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
             val pos = result.blockPos
             val face = result.direction
             val state = level().getBlockState(pos)
+
+            if (postEvent(HitBlock(pos, state, face, this.shooter, this, result.getLocation())).isCanceled) return
 
             val vx = face.stepX.toDouble()
             val vy = face.stepY.toDouble()
@@ -817,9 +814,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         val headshot = result.headshot
         val legShot = result.legShot
 
-        val event = HitEntity(this.shooter, this, result)
-        CustomEventHandler.onProjectileHitEntity(event)
-        if (event.isCanceled) return
+        if (postEvent(HitEntity(this.shooter, this, result)).isCanceled) return
 
         if (entity is EnderDragonPart) {
             entity = entity.parentMob

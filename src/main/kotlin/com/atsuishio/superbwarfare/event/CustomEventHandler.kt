@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent
 import com.atsuishio.superbwarfare.api.event.ReloadEvent
+import com.atsuishio.superbwarfare.api.event.SuperbWarfareEvents
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
@@ -17,6 +18,12 @@ import net.minecraft.world.level.block.BellBlock
 import net.minecraft.world.level.block.TargetBlock
 
 object CustomEventHandler {
+    @JvmStatic
+    fun register() {
+        SuperbWarfareEvents.register(ProjectileHitEvent.HitEntity::class.java) { onProjectileHitEntity(it) }
+        SuperbWarfareEvents.register(ProjectileHitEvent.HitBlock::class.java) { onProjectileHitBlock(it) }
+    }
+
     @JvmStatic
     fun onPreReload(event: ReloadEvent.Pre) {
         val shooter = event.entity ?: return

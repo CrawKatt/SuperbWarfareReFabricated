@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.init
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.block.entity.ChargingStationBlockEntity
+import com.atsuishio.superbwarfare.block.entity.BlueprintResearchTableBlockEntity
 import com.atsuishio.superbwarfare.block.entity.CreativeChargingStationBlockEntity
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.block.entity.SuperbItemInterfaceBlockEntity
@@ -12,6 +13,7 @@ import com.atsuishio.superbwarfare.capability.api.SidedInvWrapper
 import com.atsuishio.superbwarfare.capability.energy.ItemEnergyStorage
 import com.atsuishio.superbwarfare.capability.laser.LaserCapability
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.atsuishio.superbwarfare.item.EnergyStorageItem
 import com.atsuishio.superbwarfare.item.blockitem.CreativeChargingStationBlockItem
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
@@ -124,6 +126,19 @@ object ModCapabilities {
             ModBlockEntities.SUPERB_ITEM_INTERFACE
         )
 
+        ITEM_HANDLER_BLOCK.registerForBlockEntity(
+            { be: BlueprintResearchTableBlockEntity, ctx: Direction? ->
+                if (be.isRemoved) null else SidedInvWrapper(
+                    be,
+                    when (ctx) {
+                        Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH -> ctx
+                        else -> Direction.EAST
+                    }
+                )
+            },
+            ModBlockEntities.BLUEPRINT_RESEARCH_TABLE
+        )
+
         for (item in BuiltInRegistries.ITEM) {
             if (item is EnergyStorageItem) {
                 ENERGY_ITEM.registerForItems(
@@ -159,10 +174,10 @@ object ModCapabilities {
         for (entity in BuiltInRegistries.ENTITY_TYPE) {
             ENERGY_ENTITY.registerForType(
                 { obj, _ ->
-                    if (obj is VehicleEntity && obj.hasEnergyStorage()) {
-                        obj.getEnergyStorage()
-                    } else {
-                        null
+                    when {
+                        obj is DPSGeneratorEntity -> obj.energyStorage
+                        obj is VehicleEntity && obj.hasEnergyStorage() -> obj.getEnergyStorage()
+                        else -> null
                     }
                 },
                 entity

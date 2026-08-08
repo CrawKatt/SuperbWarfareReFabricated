@@ -19,7 +19,7 @@ val TDM_COMMAND = buildCommand("tdm") {
                 )
 
                 entities.forEach { entity -> tdm.addEntity(entity.getStringUUID()) }
-                tdm.sync(source.level)
+                tdm.sync()
 
                 success {
                     if (entities.size == 1) {
@@ -49,7 +49,7 @@ val TDM_COMMAND = buildCommand("tdm") {
                 )
 
                 entities.forEach { entity -> tdm.removeEntity(entity.getStringUUID()) }
-                tdm.sync(source.level)
+                tdm.sync()
 
                 if (entities.size == 1) {
                     success {

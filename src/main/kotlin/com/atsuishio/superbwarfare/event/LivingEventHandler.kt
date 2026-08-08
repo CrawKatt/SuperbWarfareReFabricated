@@ -30,6 +30,7 @@ import com.atsuishio.superbwarfare.tools.FormatTool.format2D
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundStopSoundPacket
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.Mth
@@ -50,6 +51,8 @@ import kotlin.math.max
 import kotlin.math.pow
 
 object LivingEventHandler {
+    private val capturedDrops = ThreadLocal<MutableList<ItemEntity>?>()
+
     @JvmStatic
     fun onLivingChangeTargetEvent(entity: Mob, target: LivingEntity?) {
         val vehicle = entity.vehicle
@@ -596,7 +599,7 @@ object LivingEventHandler {
 
             pickUp.discard()
 
-            if (oldCount > count && entity is Player) {
+            if (oldCount > count) {
                 val item = ItemStack(stack.item, oldCount - count)
                 if (!entity.addItem(item)) {
                     entity.drop(item, false)
@@ -610,6 +613,27 @@ object LivingEventHandler {
     fun onLivingDrops(entity: LivingEntity, source: DamageSource, drops: MutableCollection<ItemEntity>) {
         playerDropAmmoBox(entity, source, drops)
         vehicleCollectDrops(entity, source, drops)
+    }
+
+    @JvmStatic
+    fun beginLivingDrops() {
+        capturedDrops.set(arrayListOf())
+    }
+
+    @JvmStatic
+    fun captureLivingDrop(drop: ItemEntity) {
+        capturedDrops.get()?.add(drop)
+    }
+
+    @JvmStatic
+    fun finishLivingDrops(entity: LivingEntity, source: DamageSource, level: ServerLevel) {
+        val drops = capturedDrops.get() ?: return
+        capturedDrops.remove()
+
+        val originalDrops = drops.toSet()
+        onLivingDrops(entity, source, drops)
+        (originalDrops - drops.toSet()).forEach(ItemEntity::discard)
+        (drops - originalDrops).forEach(level::addFreshEntity)
     }
 
     /**

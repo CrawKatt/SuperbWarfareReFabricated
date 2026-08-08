@@ -12,6 +12,8 @@ import com.atsuishio.superbwarfare.data.container.ContainerDataManager
 import com.atsuishio.superbwarfare.data.loot.WreckageLootDataManager
 import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
+import com.atsuishio.superbwarfare.event.CustomEventHandler
+import com.atsuishio.superbwarfare.event.ModVersionEventHandler
 import com.atsuishio.superbwarfare.event.PlayerEventHandler
 import com.atsuishio.superbwarfare.init.ModAttributes
 import com.atsuishio.superbwarfare.init.ModBlockEntities
@@ -25,6 +27,7 @@ import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModEventHandlers
 import com.atsuishio.superbwarfare.init.ModGameRules
 import com.atsuishio.superbwarfare.init.ModItems
+import com.atsuishio.superbwarfare.init.ModLootModifier
 import com.atsuishio.superbwarfare.init.ModMenuTypes
 import com.atsuishio.superbwarfare.init.ModMobEffects
 import com.atsuishio.superbwarfare.init.ModParticleTypes
@@ -36,6 +39,7 @@ import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTabs
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.init.ModVillagers
+import com.atsuishio.superbwarfare.init.ModWorldGen
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.item.trinket.IffItem
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect
@@ -74,10 +78,13 @@ class Mod : ModInitializer {
         registerClientBedrockModels()
         triggerInit()
         callInits()
+        ModWorldGen.init()
+        CustomEventHandler.register()
 
         registerPayloads()
         DataLoader.register()
         WreckageLootDataManager.register()
+        ModLootModifier.init()
         FastThrowableProjectile.init()
         IffItem.init()
         PhosphorusFireMobEffect.registerEvents()
@@ -92,6 +99,7 @@ class Mod : ModInitializer {
         ContainerDataManager.register()
         ChunkPosSavedData.register()
         TDMSavedData.register()
+        ModVersionEventHandler.register()
         ModDataComponents.init()
 
         ResourceOnceLogger.register()

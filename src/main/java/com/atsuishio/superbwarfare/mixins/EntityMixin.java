@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.capability.PersistentDataAccessor;
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import com.atsuishio.superbwarfare.tools.OBB;
@@ -194,6 +195,21 @@ public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
     ) {
         if (PowerfulAttraction.tryMoveCurrentDropToPlayer(stack)) {
             cir.setReturnValue(null);
+        }
+    }
+
+    @Inject(
+            method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
+            at = @At("RETURN")
+    )
+    private void superbwarfare$captureLivingDrop(
+            ItemStack stack,
+            float yOffset,
+            CallbackInfoReturnable<ItemEntity> cir
+    ) {
+        ItemEntity drop = cir.getReturnValue();
+        if (drop != null) {
+            LivingEventHandler.captureLivingDrop(drop);
         }
     }
 }

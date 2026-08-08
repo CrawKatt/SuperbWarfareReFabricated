@@ -36,21 +36,26 @@ public class ItemRendererMixin {
             argsOnly = true
     )
     public BakedModel renderItem(BakedModel bakedModel, @Local(argsOnly = true) ItemStack stack, @Local(argsOnly = true) ItemDisplayContext displayContext) {
-        if (usesGuiIconModel(stack) && (displayContext == ItemDisplayContext.GUI || displayContext == ItemDisplayContext.GROUND)) {
-            ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
-            ModelResourceLocation iconModelLocation = ModelResourceLocation.inventory(itemId.withPath(path -> path + "_icon"));
-            return this.itemModelShaper.getModelManager().getModel(iconModelLocation);
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        String suffix = null;
+
+        if (CUSTOM_GUI_ICON_ITEMS.contains(itemId)) {
+            suffix = switch (displayContext) {
+                case GUI, GROUND, FIXED, THIRD_PERSON_LEFT_HAND -> "_icon";
+                case THIRD_PERSON_RIGHT_HAND -> "_3d";
+                default -> null;
+            };
+        } else if (stack.getItem() instanceof GunGeoItem
+                && (displayContext == ItemDisplayContext.GUI || displayContext == ItemDisplayContext.GROUND)) {
+            suffix = "_icon";
+        }
+
+        if (suffix != null) {
+            String selectedSuffix = suffix;
+            ModelResourceLocation modelLocation = ModelResourceLocation.inventory(itemId.withPath(path -> path + selectedSuffix));
+            return this.itemModelShaper.getModelManager().getModel(modelLocation);
         }
 
         return bakedModel;
-    }
-
-    @Unique
-    private static boolean usesGuiIconModel(ItemStack stack) {
-        if (stack.getItem() instanceof GunGeoItem) {
-            return true;
-        }
-
-        return CUSTOM_GUI_ICON_ITEMS.contains(BuiltInRegistries.ITEM.getKey(stack.getItem()));
     }
 }

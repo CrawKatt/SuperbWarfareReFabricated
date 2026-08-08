@@ -1,12 +1,15 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
 import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
+import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitBlock
+import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent.HitEntity
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig
 import com.atsuishio.superbwarfare.network.message.receive.ClientMotionSyncMessage
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.ParticleTool
+import com.atsuishio.superbwarfare.tools.postEvent
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
@@ -162,10 +165,21 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, CustomSyncMoti
 
     override fun onHitEntity(result: EntityHitResult) {
         super.onHitEntity(result)
+        postEvent(HitEntity(this.owner, this, result.entity, result.getLocation()))
     }
 
     override fun onHitBlock(result: BlockHitResult) {
         super.onHitBlock(result)
+        postEvent(
+            HitBlock(
+                result.blockPos,
+                this.level().getBlockState(result.blockPos),
+                result.direction,
+                this.owner,
+                this,
+                result.getLocation()
+            )
+        )
     }
 
     open fun destroyBlock(blockHitResult: BlockHitResult) {

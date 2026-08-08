@@ -8,6 +8,8 @@ import org.jetbrains.annotations.ApiStatus
 
 @ApiStatus.AvailableSince("0.8.8")
 open class ShootEvent private constructor(val parameters: ShootParameters) {
+    var isCanceled: Boolean = false
+
     val shooter: Entity? = parameters.shooter
     val level: ServerLevel = parameters.level
     val data: GunData = parameters.data

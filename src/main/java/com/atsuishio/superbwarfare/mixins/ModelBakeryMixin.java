@@ -54,6 +54,12 @@ public abstract class ModelBakeryMixin {
                 UnbakedModel model = this.getModel(modelPath);
                 ModelResourceLocation inventoryLocation = ModelResourceLocation.inventory(iconId);
                 this.registerModelAndLoadDependencies(inventoryLocation, model);
+
+                if (CUSTOM_GUI_ICON_ITEMS.contains(itemId)) {
+                    ResourceLocation thirdPersonId = itemId.withPath(path -> path + "_3d");
+                    UnbakedModel thirdPersonModel = this.getModel(thirdPersonId.withPrefix("item/"));
+                    this.registerModelAndLoadDependencies(ModelResourceLocation.inventory(thirdPersonId), thirdPersonModel);
+                }
             }
         }
     }

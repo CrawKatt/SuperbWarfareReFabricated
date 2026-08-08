@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.world.saveddata
 
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.network.message.receive.TDMSyncMessage
+import com.atsuishio.superbwarfare.tools.sendPacketToAll
 import com.google.common.collect.Sets
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
@@ -55,12 +56,9 @@ class TDMSavedData : SavedData {
         return this.entities.contains(entity)
     }
 
-    fun sync(level: ServerLevel) {
+    fun sync() {
         this.setDirty()
-
-        for (player in level.players()) {
-            ServerPlayNetworking.send(player, TDMSyncMessage(this))
-        }
+        sendPacketToAll(TDMSyncMessage(this))
     }
 
     companion object {

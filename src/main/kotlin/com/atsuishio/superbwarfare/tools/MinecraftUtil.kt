@@ -3,6 +3,7 @@
 package com.atsuishio.superbwarfare.tools
 
 import com.atsuishio.superbwarfare.Mod.Companion.queueClientWork
+import com.atsuishio.superbwarfare.api.event.SuperbWarfareEvents
 import com.atsuishio.superbwarfare.tools.FormatTool.format0D
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -134,14 +135,7 @@ fun Entity.sendPacketToTrackingThis(packet: CustomPacketPayload) {
     sendPacketToTrackingEntity(this, packet)
 }
 
-/**
- * En Fabric esto depende de tu Event Wrapper.
- * Si ya porteaste tus eventos, conecta aquí tu bus propio.
- */
-fun <T> postEvent(event: T): T {
-    // FabricEventBus.post(event)
-    return event
-}
+fun <T : Any> postEvent(event: T): T = SuperbWarfareEvents.post(event)
 
 inline fun queueClientWorkIfDelayed(delay: Int, crossinline block: () -> Unit) {
     if (delay > 0) {
