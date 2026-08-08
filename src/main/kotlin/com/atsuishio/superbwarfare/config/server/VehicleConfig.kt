@@ -186,7 +186,21 @@ object VehicleConfig {
     val REPAIR_AMOUNT = buildServerConfig {
         comment("The default amount of health restored per tick when a vehicle is self-repairing")
         comment("载具每游戏刻自动回血的数值")
-        defineInRange("repair_amount", 0.05, -100000000.0, 100000000.0).also { pop(2) }
+        defineInRange("repair_amount", 0.05, -100000000.0, 100000000.0).also { pop() }
+    }
+
+    @JvmField
+    val PASSENGER_Y_OFFSET = buildServerConfig {
+        comment("Per-entity Y offset for passenger seating position")
+        comment("各实体在载具座位上的Y轴偏移量")
+        comment("Format: \"entity_registry_name, offset\"")
+        comment("格式: \"entity_registry_name, offset\"")
+        comment("Example: [\"touhou_little_maid:maid, 0.75\", \"minecraft:player, -0.2\"]")
+        defineList(
+            "passenger_y_offset",
+            listOf("touhou_little_maid:maid, 0.75"),
+            { "" }
+        ) { it is String }.also { pop() }
     }
 
     @JvmStatic
@@ -201,6 +215,19 @@ object VehicleConfig {
             }
         }
         return false
+    }
+
+    @JvmStatic
+    fun getPassengerYOffset(type: EntityType<*>): Double {
+        val path = BuiltInRegistries.ENTITY_TYPE.getKey(type)
+        val pathStr = path.toString()
+        PASSENGER_Y_OFFSET.get().forEach { entry ->
+            val parts = entry.split(",").map { it.trim() }
+            if (parts.size >= 2 && parts[0] == pathStr) {
+                return parts[1].toDoubleOrNull() ?: 0.0
+            }
+        }
+        return 0.0
     }
 
     @JvmStatic
