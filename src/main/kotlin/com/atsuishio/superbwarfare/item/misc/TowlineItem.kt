@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.item.misc
 
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
+import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
@@ -287,6 +288,7 @@ open class TowlineItem : Item(Properties().stacksTo(1)), IVehicleInteract {
                 || target is HangingEntity
                 || target is AreaEffectCloud
                 || target is LightningBolt
+                || target is CatapultShuttleEntity
             ) return
             if (VehicleConfig.inConfigList(target.type, VehicleConfig.TOW_BLACK_LIST.get())) return
 
