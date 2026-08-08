@@ -183,15 +183,15 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
         if (waterFlag) {
             waterMask.visible = true
             val waterMaskIndex = instance.getIndex("waterMask")
-            instance.baseModel().renderBone(
-                instance,
-                waterMaskIndex,
+            instance.renderSingleBonePass(
                 poseStack,
+                waterMaskIndex,
                 buffer.getBuffer(RenderType.waterMask()),
                 packedLight,
                 OverlayTexture.NO_OVERLAY,
                 1f, 1f, 1f, 1f,
-                true
+                true,
+                false
             )
         }
 
