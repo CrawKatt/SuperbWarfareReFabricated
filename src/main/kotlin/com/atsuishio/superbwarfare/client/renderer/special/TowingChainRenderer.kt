@@ -7,6 +7,8 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.tools.clientLevel
 import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.vertex.VertexConsumer
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
@@ -21,6 +23,7 @@ object TowingChainRenderer {
 
     // Length of each chain link in blocks
     private const val LINK_LENGTH = 0.5f
+
     // Chain ribbon half-width in blocks (total visible width = 2 * HALF_WIDTH)
     private const val HALF_WIDTH = 0.25f
 
@@ -34,6 +37,23 @@ object TowingChainRenderer {
         val y = Mth.lerp(partialTick.toDouble(), entity.yo, entity.y) + height
         val z = Mth.lerp(partialTick.toDouble(), entity.zo, entity.z)
         return Vec3(x, y, z)
+    }
+
+    fun renderTowChain(
+        pose: Matrix4f,
+        partialTick: Float,
+        bufferSource: MultiBufferSource.BufferSource,
+        from: Entity,
+        to: Entity,
+        renderType: RenderType
+    ) {
+        val fromPos = getCenterPosition(from, partialTick)
+        val toPos = getCenterPosition(to, partialTick)
+        val b1 = bufferSource.getBuffer(renderType)
+        renderChain(b1, pose, fromPos, toPos, 0)
+        bufferSource.endBatch()
+        val b2 = bufferSource.getBuffer(renderType)
+        renderChain(b2, pose, fromPos, toPos, 1)
     }
 
     @SubscribeEvent
@@ -69,28 +89,19 @@ object TowingChainRenderer {
 
         // Helper to render both ribbons for a towing pair
         val pt = partialTick.getGameTimeDeltaPartialTick(true)
-        fun renderTowChain(from: Entity, to: Entity, renderType: net.minecraft.client.renderer.RenderType) {
-            val fromPos = getCenterPosition(from, pt)
-            val toPos = getCenterPosition(to, pt)
-            val b1 = bufferSource.getBuffer(renderType)
-            renderChain(b1, pose, fromPos, toPos, 0)
-            bufferSource.endBatch()
-            val b2 = bufferSource.getBuffer(renderType)
-            renderChain(b2, pose, fromPos, toPos, 1)
-        }
 
         // --- Vehicle towing chains ---
         val vehicleRenderType = ModRenderTypes.TOW_CHAIN.apply(CHAIN_TEXTURE)
         for (vehicle in vehicles) {
             val towed = vehicle.towingEntity ?: continue
-            renderTowChain(vehicle, towed, vehicleRenderType)
+            renderTowChain(pose, pt, bufferSource, vehicle, towed, vehicleRenderType)
         }
 
         // --- Catapult shuttle towing chains ---
         val shuttleRenderType = ModRenderTypes.TOW_CHAIN.apply(TOW_BAR_CHAIN_TEXTURE)
         for (shuttle in shuttles) {
             val towed = shuttle.towingEntity ?: continue
-            renderTowChain(shuttle, towed, shuttleRenderType)
+            renderTowChain(pose, pt, bufferSource, shuttle, towed, shuttleRenderType)
         }
 
         poseStack.popPose()
@@ -160,6 +171,7 @@ object TowingChainRenderer {
                         .setColor(255, 255, 255, 255)
                         .setUv(u, 0.0f)
                 }
+
                 1 -> {
                     // Ribbon 1: width in perp2 direction (cross(dir, perp1)), forming X cross-section
                     consumer.addVertex(
