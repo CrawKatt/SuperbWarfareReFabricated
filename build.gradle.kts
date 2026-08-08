@@ -252,12 +252,12 @@ dependencies {
     val sbm = implementation(
         group = "com.github.MCModderAnchor",
         name = "SimpleBedrockModel",
-        version = "2.4.12-neoforge-mc1.21.1",
+        version = "2.5.1-neoforge-mc1.21.1",
     )
     jarJar(sbm) {
         version {
             strictly("[2.0,3.0)")
-            prefer("2.4.12-neoforge-mc1.21.1")
+            prefer("2.5.1-neoforge-mc1.21.1")
         }
     }
     compileOnly("com.maydaymemory:mae:1.1.2") {
