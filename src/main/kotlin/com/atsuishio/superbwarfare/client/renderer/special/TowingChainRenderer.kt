@@ -5,16 +5,13 @@ import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
-import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.clientLevel
 import com.atsuishio.superbwarfare.tools.mc
-import com.atsuishio.superbwarfare.tools.options
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.client.event.RenderLevelStageEvent
@@ -81,11 +78,9 @@ object TowingChainRenderer {
 
         val pose = poseStack.last().pose()
 
-        val range = options.simulationDistance().get().toDouble() * 8
-        val box = AABB.ofSize(camera.position, range, range, range)
         val vehicles = mutableListOf<VehicleEntity>()
         val shuttles = mutableListOf<CatapultShuttleEntity>()
-        EntityFindUtil.getEntities(level)?.get(box) {
+        level.entitiesForRendering().forEach {
             if (it is VehicleEntity && it.towingUUIDs.isNotEmpty()) {
                 vehicles.add(it)
             }
