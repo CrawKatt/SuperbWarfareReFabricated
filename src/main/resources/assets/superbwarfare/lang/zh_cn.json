@@ -371,6 +371,10 @@
   "des.superbwarfare.towline.hint": "右键载具选择牵引目标，Shift+右键清除连接",
   "des.superbwarfare.towline.target_selected": "已选择牵引目标",
 
+  "item.superbwarfare.tow_bar": "牵引杆",
+  "des.superbwarfare.tow_bar.hint": "右键弹射器滑块选择拖拽目标，Shift+右键清除连接",
+  "des.superbwarfare.tow_bar.target_selected": "已选择弹射器滑块",
+
   "attribute.superbwarfare.bullet_resistance": "子弹防护",
 
   "block.superbwarfare.jump_pad": "弹射台",
@@ -866,6 +870,17 @@
   "tips.superbwarfare.towline.linked": "已连接: %1$s 牵引 %2$s",
   "tips.superbwarfare.towline.unlinked": "已解除牵引连接",
   "tips.superbwarfare.towline.selection_cleared": "已清除牵引目标选择",
+
+  "tips.superbwarfare.tow_bar.select_shuttle": "已选择弹射器滑块: %1$s",
+  "tips.superbwarfare.tow_bar.target_lost": "拖拽目标丢失！先前选择的弹射器滑块已不存在",
+  "tips.superbwarfare.tow_bar.same_entity": "不能将实体连接到自身！",
+  "tips.superbwarfare.tow_bar.already_linked": "该实体已在拖拽关系中",
+  "tips.superbwarfare.tow_bar.too_far": "距离太远！当前距离: %1$s 格 (最大: %2$s)",
+  "tips.superbwarfare.tow_bar.linked": "已连接: %1$s 拖拽 %2$s",
+  "tips.superbwarfare.tow_bar.unlinked": "已解除拖拽连接",
+  "tips.superbwarfare.tow_bar.target_in_front": "目标位于弹射器滑块前方，无法连接",
+  "tips.superbwarfare.tow_bar.select_shuttle_first": "请先右键弹射器滑块选择拖拽源",
+  "tips.superbwarfare.tow_bar.selection_cleared": "已清除拖拽目标选择",
 
   "tips.superbwarfare.target.yaw": "目标偏航角: ",
   "tips.superbwarfare.target.pitch": "目标俯仰角: ",

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "minecraft:tripwire_hook"
+    },
+    "b": {
+      "tag": "c:ingots/steel"
+    },
+    "c": {
+      "item": "minecraft:copper_ingot"
+    },
+    "d": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "pattern": [
+    "ba ",
+    "bbb",
+    "dcd"
+  ],
+  "result": {
+    "count": 1,
+    "id": "superbwarfare:catapult_shuttle"
+  }
+}

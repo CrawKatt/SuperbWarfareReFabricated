@@ -800,8 +800,8 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         this.xRotO = this.xRot
     }
 
-    override fun onAddedToWorld() {
-        super.onAddedToWorld()
+    override fun onAddedToLevel() {
+        super.onAddedToLevel()
         if (level().isClientSide) {
             ClientLightingHandler.handleProjectileAdded(this)
         }

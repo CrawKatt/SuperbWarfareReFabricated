@@ -24,7 +24,7 @@ import kotlin.math.max
 
 @Suppress("OVERRIDE_DEPRECATION")
 open class AircraftCatapultBlock :
-    Block(Properties.of().sound(SoundType.METAL).strength(3.0f)) {
+    Block(Properties.of().sound(SoundType.METAL).strength(3.0f).requiresCorrectToolForDrops().friction(0.989f)) {
     init {
         this.registerDefaultState(
             this.stateDefinition.any()
@@ -137,13 +137,10 @@ open class AircraftCatapultBlock :
         if (power == 0) return
 
         val direction = state.getValue(FACING)
-        val rate = power / 75f
+        val rate = power / 50f
         val localDir = Vec3(direction.stepX.toDouble(), 0.0, direction.stepZ.toDouble())
-//        val worldDir = ValkyrienSkiesCompat.toWorldDirection(pLevel, Vec3.atCenterOf(pPos), localDir)
-        // TODO worldDir计算是否正确
-        val worldDir = localDir.add(pPos.x.toDouble(), pPos.y.toDouble(), pPos.z.toDouble())
-        val moveDir = if (state.getValue(REVERSED)) worldDir.scale(-1.0) else worldDir
-        if (pEntity.deltaMovement.dot(moveDir) < 0.2 * power) {
+        val moveDir = if (state.getValue(REVERSED)) localDir.scale(-1.0) else localDir
+        if (pEntity.deltaMovement.dot(moveDir) < 0.6 * power) {
             pEntity.addDeltaMovement(Vec3(moveDir.x * rate, moveDir.y * rate, moveDir.z * rate))
         }
     }

@@ -213,6 +213,7 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         handheldItem(ModItems.VEHICLE_KEY)
         handheldItem(ModItems.CREATIVE_VEHICLE_KEY)
         handheldItem(ModItems.TOWLINE)
+        handheldItem(ModItems.TOW_BAR)
         simpleItem(ModItems.CATAPULT_SHUTTLE)
 
         // cemented carbide tools

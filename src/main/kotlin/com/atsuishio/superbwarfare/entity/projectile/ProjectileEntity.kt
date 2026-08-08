@@ -907,8 +907,8 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         }
     }
 
-    override fun onAddedToWorld() {
-        super.onAddedToWorld()
+    override fun onAddedToLevel() {
+        super.onAddedToLevel()
         if (level().isClientSide) {
             ClientLightingHandler.handleProjectileAdded(this)
         }
