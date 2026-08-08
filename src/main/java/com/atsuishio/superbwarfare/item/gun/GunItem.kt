@@ -177,12 +177,9 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         data.tick(entity, inMainHand)
     }
 
-    /*
-    override fun shouldCauseReequipAnimation(oldStack: ItemStack, newStack: ItemStack, slotChanged: Boolean) = false
-
-    override fun getDefaultAttributeModifiers(stack: ItemStack): ItemAttributeModifiers {
-        val list = ArrayList<ItemAttributeModifiers.Entry?>(super.getDefaultAttributeModifiers(stack).modifiers())
-        val data = from(stack)
+    fun updateStackComponents(data: GunData) {
+        val stack = data.stack
+        val list = ArrayList<ItemAttributeModifiers.Entry>()
 
         // 移速
         list.add(
@@ -212,9 +209,24 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             )
         }
 
-        return ItemAttributeModifiers(list, true)
+        val modifiers = ItemAttributeModifiers(list, true)
+        if (stack.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY) != modifiers) {
+            stack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers)
+        }
+
+        val maxDurability = data.get(GunProp.MAX_DURABILITY)
+        if (maxDurability > 0) {
+            if (stack.getOrDefault(DataComponents.MAX_DAMAGE, 0) != maxDurability) {
+                stack.set(DataComponents.MAX_DAMAGE, maxDurability)
+            }
+            if (!stack.has(DataComponents.DAMAGE)) {
+                stack.set(DataComponents.DAMAGE, 0)
+            }
+        } else {
+            stack.remove(DataComponents.MAX_DAMAGE)
+            stack.remove(DataComponents.DAMAGE)
+        }
     }
-    */
 
     override fun getTooltipImage(pStack: ItemStack): Optional<TooltipComponent> {
         return Optional.of(GunImageComponent(pStack))
@@ -435,6 +447,8 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         val data = parameters.data
         val ammoSupplier = parameters.ammoSupplier
 
+        postEvent(ShootEvent.Pre(parameters))
+
         // 判断是否为栓动武器（BoltActionTime > 0），并在开火后给一个需要上膛的状态
         if (data.get(GunProp.BOLT_ACTION_TIME) > 0 && data.hasEnoughAmmoToShoot(ammoSupplier)) {
             data.bolt.needed.set(true)
@@ -590,8 +604,6 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
 
         if (!data.canShoot(ammoSupplier)) return
 
-        // 开火前事件
-        if (postEvent(ShootEvent.Pre(parameters)).isCanceled) return
         data.item.beforeShoot(parameters)
 
         val projectileAmount = data.get(GunProp.PROJECTILE_AMOUNT)
@@ -1226,18 +1238,9 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     }
 
     open fun getGunMaxDamage(stack: ItemStack): Int {
-        val maxDurability = from(stack).get(GunProp.MAX_DURABILITY)
-
-        if (maxDurability > 0) {
-            if (!stack.has(DataComponents.MAX_DAMAGE) || !stack.has(DataComponents.DAMAGE)) {
-                stack.set(DataComponents.MAX_DAMAGE, maxDurability)
-                stack.set(DataComponents.DAMAGE, 0)
-            }
-        } else {
-            stack.remove(DataComponents.MAX_DAMAGE)
-        }
-
-        return maxDurability
+        val data = from(stack)
+        updateStackComponents(data)
+        return data.get(GunProp.MAX_DURABILITY)
     }
 
     companion object {

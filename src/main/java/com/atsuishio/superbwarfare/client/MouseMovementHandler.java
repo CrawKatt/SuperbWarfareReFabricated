@@ -92,7 +92,7 @@ public class MouseMovementHandler {
         ensureInitialized();
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
-        player.turn((savedRot.y - player.getYRot()) / 0.15f, (savedRot.x - player.getXRot()) / 0.15f);
+        player.turn((savedRot.y - player.getYRot()) / 0.15, (savedRot.x - player.getXRot()) / 0.15);
         player.xBob = savedRot.x;
         player.yBob = savedRot.y;
         player.xBobO = savedRot.x;

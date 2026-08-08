@@ -1,13 +1,10 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.client.VehicleClientRenderState;
-import com.atsuishio.superbwarfare.item.gun.GunItem;
+import com.atsuishio.superbwarfare.client.ClientRenderHandler;
+import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,60 +13,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Gui.class)
 public class GuiMixin {
 
+    @Inject(method = "render", at = @At("HEAD"))
+    private void superbwarfare$renderOverlays(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+        ClientRenderHandler.renderOverlays(guiGraphics, deltaTracker);
+    }
+
     @Inject(method = "renderItemHotbar", at = @At("HEAD"), cancellable = true)
     private void superbWarfare$renderItemHotbar(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (VehicleClientRenderState.shouldHideHandsAndHotbar(Minecraft.getInstance().player)) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
-    private void superbWarfare$renderSelectedItemName(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (VehicleClientRenderState.shouldHideHandsAndHotbar(Minecraft.getInstance().player)) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "renderHearts", at = @At("HEAD"), cancellable = true)
-    private void superbWarfare$renderHearts(
-            GuiGraphics guiGraphics, Player player,
-            int x, int y,
-            int height, int offsetHeartIndex,
-            float maxHealth, int currentHealth,
-            int displayHealth, int absorptionAmount,
-            boolean renderHighlight, CallbackInfo ci
-    ) {
-        if (VehicleClientRenderState.shouldHideHandsAndHotbar(Minecraft.getInstance().player)) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "renderFood", at = @At("HEAD"), cancellable = true)
-    private void superbWarfare$renderFood(GuiGraphics guiGraphics, Player player, int y, int x, CallbackInfo ci) {
-        if (VehicleClientRenderState.shouldHideHandsAndHotbar(Minecraft.getInstance().player)) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "renderExperienceLevel", at = @At("HEAD"), cancellable = true)
-    private void superbWarfare$renderExperienceLevel(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (VehicleClientRenderState.shouldHideHandsAndHotbar(Minecraft.getInstance().player)) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
-    private void superbWarfare$renderExperienceBar(GuiGraphics guiGraphics, int x, CallbackInfo ci) {
-        if (VehicleClientRenderState.shouldHideHandsAndHotbar(Minecraft.getInstance().player)) {
+        if (ClientEventHandler.shouldCancelHotbar()) {
             ci.cancel();
         }
     }
 
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
     private void superbWarfare$hideCrosshair(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null) return;
-        if (VehicleClientRenderState.shouldHideHandsAndHotbar(player) || player.getMainHandItem().getItem() instanceof GunItem) {
+        if (ClientEventHandler.shouldCancelCrossHair()) {
             ci.cancel();
         }
     }

@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.animation.AnimationHelper;
 import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.client.model.item.SentinelItemModel;
 import com.atsuishio.superbwarfare.client.renderer.CustomGunRenderer;
+import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.item.gun.sniper.SentinelItem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -51,6 +52,10 @@ public class SentinelItemRenderer extends CustomGunRenderer<SentinelItem> {
                 if (name.equals("charge_illuminated")) {
                     bone.setHidden(!flag);
                     bone.setRotZ((System.currentTimeMillis() % 36000000) / 200f);
+                }
+
+                if (name.equals("chamber2")) {
+                    bone.setRotZ((float) (bone.getRotZ() + 5 * ClientEventHandler.recoilForce));
                 }
 
                 ItemModelHelper.handleGunAttachments(bone, itemStack, name);

@@ -43,10 +43,6 @@ open class HammerItem(tier: Tier, attackDamage: Int, attackSpeed: Float, propert
         )
     }
 
-    override fun isValidRepairItem(stack: ItemStack, repairCandidate: ItemStack): Boolean {
-        return true;
-    }
-
     override fun hurtEnemy(stack: ItemStack, target: LivingEntity, attacker: LivingEntity): Boolean {
         attacker.level().playSound(
             null,

@@ -1,10 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun.special;
 import com.atsuishio.superbwarfare.init.*;
-import com.atsuishio.superbwarfare.item.material.BatteryItem;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.client.renderer.gun.RepairToolItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
@@ -22,11 +22,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -34,10 +31,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
-import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.LAST_DRIVER_UUID;
 import static com.atsuishio.superbwarfare.tools.ParticleTool.sendParticle;
 
 public class RepairToolItem extends GunGeoItem {
@@ -60,34 +55,6 @@ public class RepairToolItem extends GunGeoItem {
     }
 
     @Override
-    @ParametersAreNonnullByDefault
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        super.inventoryTick(stack, world, entity, slot, selected);
-
-        if (entity instanceof Player player) {
-            for (var cell : player.getInventory().items) {
-                if (cell.getItem() instanceof BatteryItem) {
-                    var stackStorage = ModCapabilities.ENERGY_ITEM.find(stack, null);
-                    if (stackStorage == null) continue;
-                    int stackMaxEnergy = stackStorage.getMaxEnergyStored();
-                    int stackEnergy = stackStorage.getEnergyStored();
-
-                    var cellStorage = ModCapabilities.ENERGY_ITEM.find(cell, null);
-                    if (cellStorage == null) continue;
-                    int cellEnergy = cellStorage.getEnergyStored();
-
-                    int stackEnergyNeed = Math.min(cellEnergy, stackMaxEnergy - stackEnergy);
-
-                    if (cellEnergy > 0) {
-                        stackStorage.receiveEnergy(stackEnergyNeed, false);
-                    }
-                    cellStorage.extractEnergy(stackEnergyNeed, false);
-                }
-            }
-        }
-    }
-
-    @Override
     public SoundEvent getRayHitBlockSound(GunData data) {
         return ModSounds.REPAIRING;
     }
@@ -105,15 +72,17 @@ public class RepairToolItem extends GunGeoItem {
 
         // 修理实体（多重含义）
         if (target instanceof VehicleEntity vehicle) {
-            Entity lastDriver = EntityFindUtil.findEntity(level, vehicle.getEntityData().get(LAST_DRIVER_UUID));
+            Entity lastDriver = EntityFindUtil.findEntity(level, vehicle.getLastDriverUUID());
             if ((lastDriver != null && !SeekTool.IN_SAME_TEAM.test(shooter, lastDriver) && lastDriver.getTeam() != null) || shooter.isShiftKeyDown()) {
                 vehicle.hurt(ModDamageTypes.causeRepairToolDamage(level.registryAccess(), shooter), 0.5f);
                 if (shooter instanceof ServerPlayer player) {
                     player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 0.1f, 1);
                     ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                 }
-            } else {
+            } else if (!vehicle.isWreck()) {
                 vehicle.heal(0.5f + 0.0025f * vehicle.getMaxHealth());
+            } else {
+                vehicle.hurt(ModDamageTypes.causeRepairToolDamage(level.registryAccess(), shooter), 0.5f + 0.0025f * vehicle.getMaxHealth());
             }
             this.summonRayHitParticle(level, null, pos, shootDirection.scale(-1).normalize());
         } else if (target instanceof LivingEntity living) {
@@ -123,7 +92,7 @@ public class RepairToolItem extends GunGeoItem {
                 ICustomKnockback iCustomKnockback = ICustomKnockback.getInstance(living);
                 iCustomKnockback.superbWarfare$setKnockbackStrength(0);
 
-                float damage = (float) data.compute().damage;
+                float damage = data.get(GunProp.DAMAGE).floatValue();
                 DamageHandler.doDamage(living, ModDamageTypes.causeRepairToolDamage(level.registryAccess(), shooter), damage);
                 target.invulnerableTime = 0;
 
@@ -134,6 +103,17 @@ public class RepairToolItem extends GunGeoItem {
                     ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
                 }
             }
+            this.summonRayHitParticle(level, null, pos, shootDirection.scale(-1).normalize());
+        } else {
+            float damage = data.get(GunProp.DAMAGE).floatValue();
+            DamageHandler.doDamage(target, ModDamageTypes.causeRepairToolDamage(level.registryAccess(), shooter), damage);
+            target.invulnerableTime = 0;
+
+            if (shooter instanceof ServerPlayer player) {
+                player.level().playSound(null, player.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 0.1f, 1);
+                ServerPlayNetworking.send(player, new ClientIndicatorMessage(0, 5));
+            }
+
             this.summonRayHitParticle(level, null, pos, shootDirection.scale(-1).normalize());
         }
     }

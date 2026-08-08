@@ -16,6 +16,8 @@ import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.DEFAULT_ZOOM
 import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.MAGAZINE
 import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.MELEE_DAMAGE
 import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.PROJECTILE_AMOUNT
+import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.SHOOT_POS
+import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.SHOOT_SHAKE
 import com.atsuishio.superbwarfare.data.gun.subdata.*
 import com.atsuishio.superbwarfare.data.gun.value.*
 import com.atsuishio.superbwarfare.event.GunEventHandler
@@ -221,7 +223,7 @@ class GunData private constructor(
     }
 
     @JvmOverloads
-    fun selectedAmmoConsumer(consumers: List<AmmoConsumer>? = compute().getProcessedAmmoConsumers()): AmmoConsumer {
+    fun selectedAmmoConsumer(consumers: List<AmmoConsumer>? = get(AMMO_CONSUMER)): AmmoConsumer {
         if (consumers.isNullOrEmpty()) {
             return AmmoConsumer.INVALID
         }
@@ -229,7 +231,7 @@ class GunData private constructor(
     }
 
     fun changeAmmoConsumer(index: Int, ammoSupplier: Entity?) {
-        val consumers = this.compute().getProcessedAmmoConsumers()
+        val consumers = get(AMMO_CONSUMER)
         val targetIndex = Mth.clamp(index, 0, consumers.size - 1)
         if (targetIndex == selectedAmmoType.get()) return
 
@@ -237,11 +239,8 @@ class GunData private constructor(
             val currentConsumer = selectedAmmoConsumer()
             val targetConsumer = consumers[selectedAmmoType.get()]
 
-            var currentSlot = currentConsumer.ammoSlot
-            var targetSlot = targetConsumer.ammoSlot
-
-            if (currentSlot == null) currentSlot = "Default"
-            if (targetSlot == null) targetSlot = "Default"
+            val currentSlot = currentConsumer.ammoSlot
+            val targetSlot = targetConsumer.ammoSlot
 
             if (currentSlot == targetSlot && ammoSupplier != null && targetConsumer.shouldUnload) {
                 this.withdrawAmmo(ammoSupplier)
@@ -287,7 +286,7 @@ class GunData private constructor(
     }
 
     @JvmOverloads
-    fun selectedFireModeInfo(fireModes: List<FireModeInfo>? = compute().fireModes): FireModeInfo {
+    fun selectedFireModeInfo(fireModes: List<FireModeInfo>? = get(AVAILABLE_FIRE_MODES)): FireModeInfo {
         if (fireModes.isNullOrEmpty()) {
             return FireModeInfo()
         }
@@ -349,9 +348,8 @@ class GunData private constructor(
         if (entity is Player && entity.isCreative() || InventoryTool.hasCreativeAmmoBox(entity)) return Int.Companion.MAX_VALUE
 
         return Math.toIntExact(
-            Mth.clamp(
+            min(
                 countBackupAmmoItem(entity).toLong() * this.selectedAmmoConsumer().loadAmount + this.virtualAmmo.get(),
-                0,
                 Int.Companion.MAX_VALUE.toLong()
             )
         )
@@ -365,9 +363,8 @@ class GunData private constructor(
         if (InventoryTool.hasCreativeAmmoBox(handler)) return Int.Companion.MAX_VALUE
 
         return Math.toIntExact(
-            Mth.clamp(
+            min(
                 countBackupAmmoItem(handler).toLong() * this.selectedAmmoConsumer().loadAmount + this.virtualAmmo.get(),
-                0,
                 Int.Companion.MAX_VALUE.toLong()
             )
         )
@@ -600,47 +597,40 @@ class GunData private constructor(
         return get(PROJECTILE_AMOUNT) <= 0 && get(MELEE_DAMAGE) > 0
     }
 
-    fun isShotgun(gunData: DefaultGunData): Boolean {
-        return gunData.projectileAmount > 1
-    }
-
     val isShotgun: Boolean
-        get() = isShotgun(compute())
+        get() = get(PROJECTILE_AMOUNT) > 1
 
-    fun firePosition(): Vec3? {
-        val list = this.compute().shootPos.positions
+    fun firePosition(): Vec3 {
+        val shootPos = get(SHOOT_POS)
+        val list = shootPos.positions
         val size = list.size
         if (size == 0) {
             return Vec3.ZERO
         }
 
-        if (this.compute().shootPos.boundUpWithAmmoAmount) {
-            return list[Mth.clamp(this.ammo.get() - 1, 0, size)]
+        return if (shootPos.boundUpWithAmmoAmount) {
+            list.getOrNull(Mth.clamp(this.ammo.get() - 1, 0, size)) ?: Vec3.ZERO
         } else {
-            return list[this.fireIndex.get() % size]
+            list.getOrNull(this.fireIndex.get() % size) ?: Vec3.ZERO
         }
     }
 
-    fun firePositionForHud(): Vec3? {
-        if (this.compute().shootPos.shootPositionForHud != null) {
-            return this.compute().shootPos.shootPositionForHud
-        } else {
-            return firePosition()
-        }
+    fun firePositionForHud(): Vec3 {
+        return get(SHOOT_POS).shootPositionForHud ?: firePosition()
     }
 
     fun fireDirection(): StringOrVec3 {
-        val list = this.compute().shootPos.directions
+        val list = get(SHOOT_POS).directions
         val size = list.size
         if (size == 0) {
             return StringOrVec3("Default")
         }
 
-        return list[this.fireIndex.get() % size]
+        return list.getOrNull(this.fireIndex.get() % size) ?: StringOrVec3("Default")
     }
 
     fun fireDirectionForHud(): StringOrVec3? {
-        return this.compute().shootPos.shootDirectionForHud
+        return get(SHOOT_POS).shootDirectionForHud
     }
 
     fun getEnergyProvider(ammoSupplier: Entity?): IEnergyStorage? {
@@ -650,7 +640,7 @@ class GunData private constructor(
     fun shakePlayers(source: Entity?) {
         if (source == null) return
 
-        val shootShake = compute().shootShake ?: return
+        val shootShake = get(SHOOT_SHAKE) ?: return
 
         ShakeClientMessage.sendToNearbyPlayers(source, shootShake.x, shootShake.y, shootShake.z)
     }
@@ -749,6 +739,8 @@ class GunData private constructor(
     val perk: Perks
 
     fun save() {
+        item.updateStackComponents(this)
+
         val keysToRemove = ArrayList<String>()
         for (key in perkTag.allKeys) {
             val compoundTag = perkTag.get(key) as? CompoundTag
@@ -870,9 +862,9 @@ class GunData private constructor(
         overHeat = BooleanValue(gunDataTag, "OverHeat")
         zooming = BooleanValue(gunDataTag, "Zooming")
 
-        val defaultFireMode = compute(false).defaultFireMode
+        val defaultFireMode = get(GunProp.DEFAULT_FIRE_MODE)
 
-        val fireModes = compute(false).fireModes
+        val fireModes = get(AVAILABLE_FIRE_MODES)
         for (i in fireModes.indices) {
             if (fireModes[i].name == defaultFireMode) {
                 selectedFireMode.defaultValue = i

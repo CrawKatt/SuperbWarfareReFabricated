@@ -4,10 +4,8 @@ import com.atsuishio.superbwarfare.config.client.DisplayConfig;
 import com.atsuishio.superbwarfare.data.vehicle.VehicleData;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
-import com.atsuishio.superbwarfare.tools.NBTTool;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -28,7 +26,6 @@ import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -81,9 +78,7 @@ public class GameRendererMixin {
                                           @Local(ordinal = 0) PoseStack matrices,
                                           @Local(ordinal = 0) float tickDelta) {
         Entity entity = mainCamera.getEntity();
-        if (!superbWarfare$isControllingDrone(entity)) {
-            matrices.mulPose(Axis.ZP.rotationDegrees(ClientEventHandler.cameraRoll));
-        }
+        matrices.mulPose(Axis.ZP.rotationDegrees(ClientEventHandler.cameraRoll));
 
         if (entity instanceof Player player && !player.isSpectator() && player.hasEffect(ModMobEffects.SHOCK)) {
             float shakeStrength = (float) DisplayConfig.SHOCK_SCREEN_SHAKE.get() / 100.0f;
@@ -139,17 +134,6 @@ public class GameRendererMixin {
                 matrices.mulPose(Axis.XP.rotationDegrees(-mainCamera.getXRot()));
             }
         }
-    }
-
-    @Unique
-    private static boolean superbWarfare$isControllingDrone(Entity entity) {
-        if (!(entity instanceof Player player)) return false;
-
-        ItemStack stack = player.getMainHandItem();
-        if (!stack.is(ModItems.MONITOR)) return false;
-
-        var tag = NBTTool.getTag(stack);
-        return tag.getBoolean("Using") && tag.getBoolean("Linked");
     }
 
     @Inject(method = "getNightVisionScale(Lnet/minecraft/world/entity/LivingEntity;F)F",

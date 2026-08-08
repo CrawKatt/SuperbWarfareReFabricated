@@ -33,6 +33,7 @@ import software.bernie.geckolib.animation.PlayState
 import software.bernie.geckolib.renderer.GeoItemRenderer
 import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.function.Consumer
+import com.atsuishio.superbwarfare.tools.postEvent
 
 class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(1).fireResistant()), GeoItem {
     private val cache = GeckoLibUtil.createInstanceCache(this)
@@ -112,7 +113,6 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
             event.add(ModEntities.SODAYO_PICK_UP_ROCKET)
             event.add(ModEntities.TRUCK)
             event.add(ModEntities.TYPE_63)
-            event.add(ModEntities.TOW)
             event.add(ModEntities.MK_42)
             event.add(ModEntities.MLE_1934)
             event.add(ModEntities.BL_132)
@@ -139,6 +139,7 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
             event.add(ModEntities.KV_16)
             event.add(ModEntities.JU_87)
             event.add(ModEntities.A_10A)
+            postEvent(event)
         }
 
         @JvmStatic

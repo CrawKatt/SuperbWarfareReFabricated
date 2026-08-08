@@ -175,10 +175,6 @@ object ModSounds {
 
     @JvmField val STUKA = register("stuka")
 
-    // Presentes en tu Java actual
-    @JvmField val TERRAIN = register("terrain")
-    @JvmField val PULL_UP = register("pull_up")
-    @JvmField val MORTAR_SHELL_EXPLODE = register("mortar_shell_explode")
     // @formatter:on
 
     fun register(name: String): SoundEvent =

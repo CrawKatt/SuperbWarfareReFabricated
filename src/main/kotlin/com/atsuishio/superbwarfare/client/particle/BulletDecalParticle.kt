@@ -130,7 +130,7 @@ class BulletDecalParticle @JvmOverloads constructor(
         val v1 = this.v1
 
         val light = max(15 - this.age / 2, 0)
-        val lightColor = LightTexture.pack(light, light)
+        val lightColor = LightTexture.FULL_BRIGHT
 
         val colorPercent = light / 15.0f
         val red = this.rCol * colorPercent

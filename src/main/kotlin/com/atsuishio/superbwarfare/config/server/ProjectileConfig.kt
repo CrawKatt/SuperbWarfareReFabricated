@@ -13,9 +13,6 @@ object ProjectileConfig {
     }
 
     @JvmField
-    val ALLOW_PROJECTILE_DESTROY_BLOCKS = PROJECTILE_DESTROY_BLOCKS
-
-    @JvmField
     val PROJECTILE_CHUNK_LOADING = buildServerConfig {
         comment("Set true to allow projectiles to load chunks")
         comment("是否允许投射物加载区块")

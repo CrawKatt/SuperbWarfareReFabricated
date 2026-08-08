@@ -6,7 +6,6 @@ import fuzs.extensibleenums.api.v2.core.EnumAppender
 import net.minecraft.ChatFormatting
 import net.minecraft.client.model.HumanoidModel
 import net.minecraft.client.model.HumanoidModel.ArmPose
-import net.minecraft.network.chat.TextColor
 import net.minecraft.util.Mth
 import net.minecraft.world.item.Rarity
 
@@ -26,7 +25,7 @@ object ModEnumExtensions {
     @JvmField
     val SUPERBWARFARE_VIRTUAL: Rarity = BuiltInEnumFactories.INSTANCE.createRarity(
         Mod.loc("superbwarfare_virtual"),
-        ChatFormatting.WHITE // ToDo: Cambiar después
+        ChatFormatting.WHITE
     )
 
     @JvmStatic

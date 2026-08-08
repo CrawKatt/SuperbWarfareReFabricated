@@ -23,8 +23,6 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
 
     @JvmField
     var ammo: MutableMap<Ammo, Int> = EnumMap(Ammo::class.java)
-    var tacticalSprint = false;
-
     var activeThermalImaging: Boolean = false
 
     fun sync(entity: Entity) {
@@ -55,8 +53,6 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
         }
 
         map[(-1).toByte()] = if (this.activeThermalImaging) 1 else 0
-        map[(-2).toByte()] = if (this.tacticalSprint) 1 else 0
-
         return map
     }
 
@@ -77,10 +73,6 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
             map[(-1).toByte()] = if (this.activeThermalImaging) 1 else 0
         }
 
-        if (old.tacticalSprint != this.tacticalSprint) {
-            map[(-2).toByte()] = if (this.tacticalSprint) 1 else 0
-        }
-
         return map
     }
 
@@ -91,7 +83,6 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
             type.set(nbt, type.get(this))
         }
 
-        nbt.putBoolean("TacticalSprint", tacticalSprint)
         nbt.putBoolean("ActiveThermalImaging", activeThermalImaging)
 
         return nbt
@@ -102,7 +93,6 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
             type.set(this, type.get(tag))
         }
 
-        tacticalSprint = tag.getBoolean("TacticalSprint")
         activeThermalImaging = tag.getBoolean("ActiveThermalImaging")
     }
 
@@ -113,7 +103,6 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
             type.set(clone, type.get(this))
         }
 
-        clone.tacticalSprint = this.tacticalSprint
         clone.activeThermalImaging = this.activeThermalImaging
 
         return clone
@@ -136,7 +125,6 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
             type.set(this, type.get(original))
         }
 
-        this.tacticalSprint = original.tacticalSprint
         this.activeThermalImaging = original.activeThermalImaging
         this.old = original.old?.copy()
     }
@@ -148,13 +136,11 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
             if (type.get(this) != type.get(other)) return false
         }
 
-        return tacticalSprint == other.tacticalSprint &&
-                activeThermalImaging == other.activeThermalImaging
+        return activeThermalImaging == other.activeThermalImaging
     }
 
     override fun hashCode(): Int {
         var result = ammo.hashCode()
-        result = 31 * result + tacticalSprint.hashCode()
         result = 31 * result + activeThermalImaging.hashCode()
         return result
     }

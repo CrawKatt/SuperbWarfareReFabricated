@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.item.gun.sniper;
 
-import com.atsuishio.superbwarfare.item.material.BatteryItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
@@ -11,8 +10,7 @@ import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.init.ModCapabilities;
-import com.atsuishio.superbwarfare.init.ModEnumExtensions;
+import com.atsuishio.superbwarfare.init.ModRarities;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.GunsTool;
@@ -23,13 +21,10 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animation.*;
@@ -43,7 +38,7 @@ import java.util.function.Supplier;
 public class Ql1031Item extends GunGeoItem {
 
     public Ql1031Item() {
-        super(new Properties().rarity(ModEnumExtensions.getLegendary()));
+        super(new Properties().rarity(ModRarities.VIRTUAL));
     }
 
     @Override
@@ -122,34 +117,6 @@ public class Ql1031Item extends GunGeoItem {
         var chargeController = new AnimationController<>(this, "chargeController", 1, this::chargePredicate);
         data.add(editController);
         data.add(chargeController);
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        super.inventoryTick(stack, world, entity, slot, selected);
-
-        if (entity instanceof Player player) {
-            for (var cell : player.getInventory().items) {
-                if (cell.getItem() instanceof BatteryItem) {
-                    var stackCap = ModCapabilities.ENERGY_ITEM.find(stack, null);
-                    int stackMaxEnergy = stackCap != null ? stackCap.getMaxEnergyStored() : 0;
-                    int stackEnergy = stackCap != null ? stackCap.getEnergyStored() : 0;
-
-                    var cellStorage = ModCapabilities.ENERGY_ITEM.find(cell, null);
-                    int cellEnergy = cellStorage != null ? cellStorage.getEnergyStored() : 0;
-
-                    int stackEnergyNeed = Math.min(cellEnergy, stackMaxEnergy - stackEnergy);
-
-                    if (cellEnergy > 0 && stackCap != null) {
-                        stackCap.receiveEnergy(stackEnergyNeed, false);
-                    }
-                    if (cellStorage != null) {
-                        cellStorage.extractEnergy(stackEnergyNeed, false);
-                    }
-                }
-            }
-        }
     }
 
     @Override

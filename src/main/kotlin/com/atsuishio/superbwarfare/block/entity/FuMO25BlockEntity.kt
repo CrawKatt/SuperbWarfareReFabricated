@@ -105,7 +105,7 @@ open class FuMO25BlockEntity(
                 entity.addEffect(
                     MobEffectInstance(
                         MobEffects.GLOWING,
-                        100,
+                        110,
                         0,
                         true,
                         false

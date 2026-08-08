@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
 import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModCapabilities
+import com.atsuishio.superbwarfare.init.ModDataComponents
 import com.atsuishio.superbwarfare.inventory.menu.ChargingStationMenu
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData
 import com.atsuishio.superbwarfare.tools.isSameItemStack
@@ -109,7 +110,7 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
         if (this.level != null) {
             (this.energyStorage as EnergyStorage).deserializeNBT(
                 level!!.registryAccess(),
-                LongTag.valueOf(componentInput.getOrDefault(EnergyStorage.ENERGY_COMPONENT, 0L))
+                IntTag.valueOf(componentInput.getOrDefault(ModDataComponents.ENERGY, 0))
             )
         }
     }
@@ -117,7 +118,7 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
     override fun collectImplicitComponents(components: DataComponentMap.Builder) {
         super.collectImplicitComponents(components)
 
-        components.set(EnergyStorage.ENERGY_COMPONENT, this.energyStorage.energyStored.toLong())
+        components.set(ModDataComponents.ENERGY, this.energyStorage.energyStored)
     }
 
     override fun loadAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {

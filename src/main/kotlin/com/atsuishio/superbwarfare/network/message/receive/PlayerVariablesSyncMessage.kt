@@ -24,10 +24,6 @@ data class PlayerVariablesSyncMessage(
                     variables.activeThermalImaging = value == 1
                 }
 
-                (-2).toByte() -> {
-                    variables.tacticalSprint = value == 1
-                }
-
                 else -> {
                     val types = Ammo.entries.toTypedArray()
                     if (type >= 0 && type < types.size) {

@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent
+import com.atsuishio.superbwarfare.api.event.PreKillEvent
 import com.atsuishio.superbwarfare.api.event.ReloadEvent
 import com.atsuishio.superbwarfare.api.event.SuperbWarfareEvents
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig
@@ -20,8 +21,12 @@ import net.minecraft.world.level.block.TargetBlock
 object CustomEventHandler {
     @JvmStatic
     fun register() {
+        SuperbWarfareEvents.register(ReloadEvent.Pre::class.java) { onPreReload(it) }
+        SuperbWarfareEvents.register(ReloadEvent.Post::class.java) { onPostReload(it) }
         SuperbWarfareEvents.register(ProjectileHitEvent.HitEntity::class.java) { onProjectileHitEntity(it) }
         SuperbWarfareEvents.register(ProjectileHitEvent.HitBlock::class.java) { onProjectileHitBlock(it) }
+        SuperbWarfareEvents.register(PreKillEvent.SendKillMessage::class.java) { LivingEventHandler.onPreSendKillMessage(it) }
+        SuperbWarfareEvents.register(PreKillEvent.Indicator::class.java) { LivingEventHandler.onPreIndicator(it) }
     }
 
     @JvmStatic

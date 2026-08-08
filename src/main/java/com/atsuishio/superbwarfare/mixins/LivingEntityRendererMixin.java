@@ -74,4 +74,11 @@ public class LivingEntityRendererMixin<T extends LivingEntity> {
             cir.setReturnValue(true);
         }
     }
+
+    @Inject(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$shouldShowName(T entity, CallbackInfoReturnable<Boolean> cir) {
+        if (!ClientEventHandler.shouldRenderNameTag(entity)) {
+            cir.setReturnValue(false);
+        }
+    }
 }

@@ -43,6 +43,7 @@ import com.atsuishio.superbwarfare.item.projectile.Tm62Item
 import com.atsuishio.superbwarfare.item.weapon.*
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.tiers.ModItemTier
+import net.fabricmc.fabric.api.registry.FuelRegistry
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.*
@@ -524,5 +525,6 @@ object ModItems {
     @JvmStatic
     fun init() {
         registerPerkItems()
+        FuelRegistry.INSTANCE.add(C4_BOMB, 20000)
     }
 }

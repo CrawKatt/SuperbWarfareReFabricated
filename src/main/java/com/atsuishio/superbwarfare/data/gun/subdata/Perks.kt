@@ -14,7 +14,7 @@ class Perks(gun: GunData) {
 
     private fun findPerkByName(name: String): Perk? {
         val allPerks = ModPerks.AMMO_PERKS + ModPerks.FUNC_PERKS + ModPerks.DAMAGE_PERKS
-        return allPerks.firstOrNull { it.descriptionId == name }
+        return allPerks.firstOrNull { it.name == name }
     }
 
     fun getOrCreateList(type: Perk.Type): ListTag {

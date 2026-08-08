@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessag
 import com.atsuishio.superbwarfare.tools.DamageHandler
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.core.registries.Registries
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.damagesource.DamageSource
@@ -22,13 +23,6 @@ object BurnMobEffect : MobEffect(MobEffectCategory.HARMFUL, -12708330) {
     const val TAG_ATTACKER: String = "BurnAttacker"
 
     override fun applyEffectTick(entity: LivingEntity, amplifier: Int): Boolean {
-        if (entity.isInWater) {
-            entity.removeEffect(ModMobEffects.BURN)
-            return true
-        }
-
-        entity.remainingFireTicks = 40
-
         val attacker = getBurnAttacker(entity)
 
         DamageHandler.doDamage(
@@ -39,17 +33,19 @@ object BurnMobEffect : MobEffect(MobEffectCategory.HARMFUL, -12708330) {
 
         entity.invulnerableTime = 0
 
-        if (attacker is ServerPlayer) {
-            attacker.level().playSound(
+        val level = attacker?.level() ?: return false
+        val player = attacker as? ServerPlayer ?: return false
+        if (level is ServerLevel) {
+            level.playSound(
                 null,
-                attacker.blockPosition(),
+                player.blockPosition(),
                 ModSounds.INDICATION,
                 SoundSource.VOICE,
                 1f,
                 1f
             )
 
-            ServerPlayNetworking.send(attacker, ClientIndicatorMessage(0, 5))
+            ServerPlayNetworking.send(player, ClientIndicatorMessage(0, 5))
         }
 
         return true

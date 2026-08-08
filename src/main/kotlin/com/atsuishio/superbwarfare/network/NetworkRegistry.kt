@@ -170,7 +170,6 @@ fun registerPayloads() {
     playToServer<ShowChargingRangeMessage>()
     playToServer<SwitchScopeMessage>()
     playToServer<SwitchVehicleWeaponMessage>()
-    playToServer<TacticalSprintMessage>()
     playToServer<UnloadMessage>()
     playToServer<VehicleFireMessage>()
     playToServer<VehicleMovementMessage>()

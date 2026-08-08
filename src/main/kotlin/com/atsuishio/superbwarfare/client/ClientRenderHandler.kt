@@ -66,11 +66,12 @@ import com.mojang.blaze3d.vertex.PoseStack
 import dev.emi.trinkets.api.client.TrinketRendererRegistry
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback
+import net.minecraft.client.DeltaTracker
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.LayeredDraw
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
@@ -83,6 +84,31 @@ object ClientRenderHandler {
 
     private val containerDecorator = ContainerItemDecorator()
     private val luckyContainerDecorator = LuckyContainerItemDecorator()
+    private val overlays = listOf<LayeredDraw.Layer>(
+        SodayoRocketInfoOverlay,
+        Type63InfoOverlay,
+        MortarInfoOverlay,
+        TowOverlay,
+        SpyglassRangeOverlay,
+        HandsomeFrameOverlay,
+        RedTriangleOverlay,
+        DroneHudOverlay,
+        HeatBarOverlay,
+        CrossHairOverlay,
+        ItemRendererFixOverlay,
+        AmmoCountOverlay,
+        StaminaOverlay,
+        VehicleCrosshairOverlay,
+        VehicleMainWeaponHudOverlay,
+        VehicleHudOverlay,
+        IglaHudOverlay,
+        JavelinHudOverlay,
+        VehicleTeamOverlay,
+        IFFOverlay,
+        AmmoBarOverlay,
+        ArmorPlateOverlay,
+        KillMessageOverlay
+    )
 
     @JvmStatic
     fun transformVirtualRenderPosition(stack: PoseStack, projectile: Projectile, partialTick: Float) {
@@ -138,31 +164,17 @@ object ClientRenderHandler {
             OldAircraftHud.onOldAircraftHudClientTick()
         }
 
-        HudRenderCallback.EVENT.register { guiGraphics, deltaTracker ->
-            JavelinHudOverlay.render(guiGraphics, deltaTracker)
-            ArmorPlateOverlay.render(guiGraphics, deltaTracker)
-            AmmoBarOverlay.render(guiGraphics, deltaTracker)
-            IFFOverlay.render(guiGraphics, deltaTracker)
-            VehicleTeamOverlay.render(guiGraphics, deltaTracker)
-            IglaHudOverlay.render(guiGraphics, deltaTracker)
-            VehicleMainWeaponHudOverlay.render(guiGraphics, deltaTracker)
-            VehicleHudOverlay.render(guiGraphics, deltaTracker)
-            VehicleCrosshairOverlay.render(guiGraphics, deltaTracker)
-            StaminaOverlay.render(guiGraphics, deltaTracker)
-            AmmoCountOverlay.render(guiGraphics, deltaTracker)
-            ItemRendererFixOverlay.render(guiGraphics, deltaTracker)
-            CrossHairOverlay.render(guiGraphics, deltaTracker)
-            HeatBarOverlay.render(guiGraphics, deltaTracker)
-            DroneHudOverlay.render(guiGraphics, deltaTracker)
-            RedTriangleOverlay.render(guiGraphics, deltaTracker)
-            HandsomeFrameOverlay.render(guiGraphics, deltaTracker)
-            SpyglassRangeOverlay.render(guiGraphics, deltaTracker)
-            TowOverlay.render(guiGraphics, deltaTracker)
-            MortarInfoOverlay.render(guiGraphics, deltaTracker)
-            Type63InfoOverlay.render(guiGraphics, deltaTracker)
-            SodayoRocketInfoOverlay.render(guiGraphics, deltaTracker)
-            KillMessageOverlay.render(guiGraphics, deltaTracker)
+    }
+
+    @JvmStatic
+    fun renderOverlays(guiGraphics: GuiGraphics, deltaTracker: DeltaTracker) {
+        guiGraphics.pose().pushPose()
+        guiGraphics.pose().translate(0f, 0f, -LayeredDraw.Z_SEPARATION * overlays.size)
+        overlays.forEach {
+            it.render(guiGraphics, deltaTracker)
+            guiGraphics.pose().translate(0f, 0f, LayeredDraw.Z_SEPARATION)
         }
+        guiGraphics.pose().popPose()
     }
 
     @JvmStatic

@@ -1,12 +1,11 @@
 package com.atsuishio.superbwarfare.init;
 
-import com.atsuishio.superbwarfare.event.EntityUseGunEventHandler;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity;
 import com.atsuishio.superbwarfare.entity.living.TargetEntity;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -32,13 +31,17 @@ public class ModEventHandlers {
         ServerLivingEntityEvents.AFTER_DEATH.register(LivingEventHandler::onEntityDeath);
         ServerLivingEntityEvents.ALLOW_DEATH.register(TargetEntity::onTargetDown);
         ServerLivingEntityEvents.ALLOW_DEATH.register(DPSGeneratorEntity::onDPSGeneratorDown);
+        ServerEntityEvents.EQUIPMENT_CHANGE.register(LivingEventHandler::handleChangeSlot);
+        ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
+            if (entity instanceof ArtilleryEntity artillery) {
+                artillery.initializeShootVec();
+            }
+        });
 
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
             PlayerEventHandler.onAttackEntity(player, entity);
             return InteractionResult.PASS;
         });
-
-        ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> EntityUseGunEventHandler.entityJoin(entity));
     }
 
     public static void initClient() {

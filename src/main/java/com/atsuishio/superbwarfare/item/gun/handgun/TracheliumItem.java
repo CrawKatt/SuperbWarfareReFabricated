@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.client.renderer.gun.TracheliumItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.init.ModRarities;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.NBTTool;
@@ -29,7 +30,7 @@ import java.util.function.Supplier;
 public class TracheliumItem extends GunGeoItem {
 
     public TracheliumItem() {
-        super(new Properties().rarity(Rarity.EPIC));
+        super(new Properties().rarity(ModRarities.VIRTUAL));
     }
 
     @Override

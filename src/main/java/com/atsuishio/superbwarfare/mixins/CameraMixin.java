@@ -27,10 +27,24 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin implements ICustomCamera {
+
+    @Unique
+    private boolean superbWarfare$anglesComputed;
+
+    @Unique
+    private float superbWarfare$computedYaw;
+
+    @Unique
+    private float superbWarfare$computedPitch;
+
+    @Unique
+    private float superbWarfare$partialTicks;
 
     @Shadow
     @Final
@@ -43,6 +57,13 @@ public abstract class CameraMixin implements ICustomCamera {
     @Shadow
     protected abstract void setPosition(double x, double y, double z);
 
+    @Inject(method = "setup", at = @At("HEAD"))
+    private void superbWarfare$capturePartialTicks(BlockGetter level, Entity entity, boolean detached,
+                                                    boolean thirdPersonReverse, float partialTicks, CallbackInfo ci) {
+        superbWarfare$anglesComputed = false;
+        superbWarfare$partialTicks = partialTicks;
+    }
+
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0),
             method = "setup",
             cancellable = true)
@@ -51,7 +72,7 @@ public abstract class CameraMixin implements ICustomCamera {
         LocalPlayer player = mc.player;
         if (player == null) return;
 
-        ClientMouseHandler.handleClientTick((Camera) (Object) this, partialTicks);
+        superbWarfare$computeAngles(entity.getViewYRot(partialTicks), entity.getViewXRot(partialTicks));
 
         ItemStack stack = player.getMainHandItem();
         var tag = NBTTool.getTag(stack);
@@ -100,94 +121,25 @@ public abstract class CameraMixin implements ICustomCamera {
             }
 
             if (rotation != null || position != null) {
-                superbWarfare$applyComputedAngles(partialTicks, false);
                 info.cancel();
             }
 
         }
     }
 
-    /*
-    /// * 0.8.8 ReFabricated
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0),
+    @ModifyArgs(
             method = "setup",
-            cancellable = true)
-    private void onSetup(BlockGetter level, Entity entity, boolean detached, boolean thirdPersonReverse, float partialTicks, CallbackInfo info) {
-        Minecraft mc = Minecraft.getInstance();
-        LocalPlayer player = mc.player;
-        if (player == null) return;
-
-        ClientMouseHandler.handleClientTick((Camera) (Object) this, partialTicks);
-        ItemStack stack = player.getMainHandItem();
-        var tag = NBTTool.getTag(stack);
-
-        if (stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
-            DroneEntity drone = EntityFindUtil.findDrone(player.level(), tag.getString("LinkedDrone"));
-            if (drone != null) {
-                boolean firstPerson = Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON || Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK;
-                if (firstPerson) {
-                    Matrix4d transform = superbWarfare$getDroneTransform(drone, partialTicks);
-                    double x0 = 0;
-                    double y0 = 0.075;
-                    double z0 = 0.18;
-
-                    Vector4d worldPosition = superbWarfare$transformPosition(transform, x0, y0, z0);
-
-                    setRotation(drone.getYaw(partialTicks), drone.getPitch(partialTicks));
-                    setPosition(worldPosition.x, worldPosition.y, worldPosition.z);
-                    superbWarfare$applyComputedAngles(partialTicks, true);
-                    info.cancel();
-                } else {
-                    var rotation = drone.getCameraRotation(partialTicks, player, false, false);
-                    if (rotation != null) {
-                        setRotation(rotation.x, rotation.y);
-                    }
-                    var position = drone.getCameraPosition(partialTicks, player, false, false);
-                    if (position != null) {
-                        setPosition(position.x, position.y, position.z);
-                    }
-
-                    if (rotation != null || position != null) {
-                        superbWarfare$applyComputedAngles(partialTicks, true);
-                        info.cancel();
-                    }
-                }
-            }
-            return;
-        }
-
-        if (player.getVehicle() instanceof VehicleEntity vehicle) {
-//                // TODO 完善四元数相关
-//                var quat = vehicle.getCameraQuat(partialTicks, player, ClientEventHandler.zoomVehicle, Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON);
-//                if (quat != null) {
-//                    this.rotation.set(quat);
-//
-//                    this.xRot = quat.x;
-//                    this.yRot = quat.y;
-//
-//                    this.forwards.set(0, 0, 1F).rotate(this.rotation);
-//                    this.up.set(0, 1F, 0).rotate(this.rotation);
-//                    this.left.set(1F, 0, 0).rotate(this.rotation);
-//
-//                    info.cancel();
-//                }
-
-            var rotation = vehicle.getCameraRotation(partialTicks, player, ClientEventHandler.zoomVehicle, Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON);
-            if (rotation != null) {
-                setRotation(rotation.x, rotation.y);
-            }
-            var position = vehicle.getCameraPosition(partialTicks, player, ClientEventHandler.zoomVehicle, Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON);
-            if (position != null) {
-                setPosition(position.x, position.y, position.z);
-            }
-
-            if (rotation != null || position != null) {
-                info.cancel();
-            }
-
-        }
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/Camera;setRotation(FF)V",
+                    ordinal = 0
+            )
+    )
+    private void superbWarfare$applyComputedAngles(Args args) {
+        superbWarfare$computeAngles(args.get(0), args.get(1));
+        args.set(0, superbWarfare$computedYaw);
+        args.set(1, superbWarfare$computedPitch);
     }
-    */
 
     @Unique
     private static Matrix4d superbWarfare$getDroneTransform(DroneEntity vehicle, float ticks) {
@@ -205,39 +157,28 @@ public abstract class CameraMixin implements ICustomCamera {
     }
 
     @Unique
-    private void superbWarfare$applyComputedAngles(float tickDelta, boolean applyRollToCamera) {
+    private void superbWarfare$computeAngles(float yaw, float pitch) {
+        if (superbWarfare$anglesComputed) return;
+        superbWarfare$anglesComputed = true;
+
         Camera camera = (Camera) (Object) this;
+        ClientMouseHandler.handleClientTick(camera, superbWarfare$partialTicks);
 
         ClientEventHandler.CameraAnglesContext context = new ClientEventHandler.CameraAnglesContext(
                 camera,
-                tickDelta,
-                camera.getYRot(),
-                camera.getXRot(),
+                superbWarfare$partialTicks,
+                yaw,
+                pitch,
                 0f
         );
 
         ClientEventHandler.computeCameraAngles(context);
-
-        if (applyRollToCamera) {
-            superbWarfare$setRotation(context.getYaw(), context.getPitch(), -ClientEventHandler.cameraRoll);
-        } else {
-            setRotation(context.getYaw(), context.getPitch());
-        }
-    }
-
-    @Unique
-    private void superbWarfare$setRotation(float yRot, float xRot, float zRot) {
-        this.xRot = xRot;
-        this.yRot = yRot;
-        this.rotation.rotationYXZ(Mth.PI - yRot * Mth.DEG_TO_RAD, -xRot * Mth.DEG_TO_RAD, zRot * Mth.DEG_TO_RAD);
-        this.forwards.set(0.0F, 0.0F, 1.0F).rotate(this.rotation);
-        this.up.set(0.0F, 1.0F, 0.0F).rotate(this.rotation);
-        this.left.set(1.0F, 0.0F, 0.0F).rotate(this.rotation);
+        superbWarfare$computedYaw = context.getYaw();
+        superbWarfare$computedPitch = context.getPitch();
     }
 
     @Inject(method = "setup", at = @At("TAIL"))
     public void superbWarfare$setup(BlockGetter area, Entity entity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci) {
-        superbWarfare$applyComputedAngles(tickDelta, false);
         if (Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK
                 && entity instanceof Player player
                 && player.getMainHandItem().getItem() instanceof GunItem
@@ -258,24 +199,6 @@ public abstract class CameraMixin implements ICustomCamera {
 
     @Shadow
     protected abstract float getMaxZoom(float maxZoom);
-
-    @Shadow
-    @Final
-    private Vector3f forwards;
-
-    @Shadow
-    @Final
-    private Vector3f up;
-
-    @Shadow
-    @Final
-    private Vector3f left;
-
-    @Shadow
-    private float xRot;
-
-    @Shadow
-    private float yRot;
 
     @Override
     public Quaternionf superbwarfare$getRotation() {

@@ -2,7 +2,8 @@ package com.atsuishio.superbwarfare.capability.api;
 
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.LongTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.NumericTag;
 import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,23 +26,25 @@ public class EnergyStorage implements IEnergyStorage, team.reborn.energy.api.Ene
         this.capacity = capacity;
         this.maxReceive = maxReceive;
         this.maxExtract = maxExtract;
-        this.energy = energy;
+        this.energy = Math.max(0, Math.min(capacity, energy));
     }
 
     public Tag serializeNBT(HolderLookup.Provider provider) {
-        return LongTag.valueOf(this.energy);
+        return IntTag.valueOf(this.getEnergyStored());
     }
 
     public void deserializeNBT(HolderLookup.Provider provider, @NotNull Tag nbt) {
-        if (nbt instanceof LongTag longTag) {
-            this.energy = longTag.getAsLong();
+        if (nbt instanceof NumericTag numericTag) {
+            this.energy = numericTag.getAsLong();
         }
     }
 
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
+        if (!canReceive() || maxReceive <= 0) return 0;
+
         if (simulate) {
-            return (int) Math.min(capacity - energy, Math.min(this.maxReceive, (long) maxReceive));
+            return (int) Math.max(0, Math.min(capacity - energy, Math.min(this.maxReceive, (long) maxReceive)));
         }
         try (var t = net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
             long received = insert(maxReceive, t);
@@ -52,6 +55,8 @@ public class EnergyStorage implements IEnergyStorage, team.reborn.energy.api.Ene
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
+        if (!canExtract() || maxExtract <= 0) return 0;
+
         if (simulate) {
             return (int) Math.min(energy, Math.min(this.maxExtract, (long) maxExtract));
         }
@@ -86,9 +91,9 @@ public class EnergyStorage implements IEnergyStorage, team.reborn.energy.api.Ene
 
     @Override
     public long insert(long maxAmount, TransactionContext transaction) {
-        if (!supportsInsertion()) return 0;
+        if (!supportsInsertion() || maxAmount <= 0) return 0;
 
-        long energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, maxAmount));
+        long energyReceived = Math.max(0, Math.min(capacity - energy, Math.min(this.maxReceive, maxAmount)));
         if (energyReceived > 0) {
             final long prevEnergy = this.energy;
             this.energy += energyReceived;
@@ -103,7 +108,7 @@ public class EnergyStorage implements IEnergyStorage, team.reborn.energy.api.Ene
 
     @Override
     public long extract(long maxAmount, TransactionContext transaction) {
-        if (!supportsExtraction()) return 0;
+        if (!supportsExtraction() || maxAmount <= 0) return 0;
 
         long energyExtracted = Math.min(energy, Math.min(this.maxExtract, maxAmount));
         if (energyExtracted > 0) {

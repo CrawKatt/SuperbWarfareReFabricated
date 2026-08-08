@@ -41,8 +41,6 @@ open class ShockMobEffect : MobEffect(MobEffectCategory.HARMFUL, -256) {
             2f + 1.25f * amplifier
         )
 
-        entity.invulnerableTime = 0
-
         entity.level().playSound(
             null,
             entity.onPos,
@@ -52,29 +50,17 @@ open class ShockMobEffect : MobEffect(MobEffectCategory.HARMFUL, -256) {
             1f
         )
 
-        if (!entity.level().isClientSide && entity is Player) {
-            entity.level().playSound(
+        val player = attacker as? ServerPlayer ?: return false
+        player.level().playSound(
                 null,
-                BlockPos.containing(entity.x, entity.y, entity.z),
-                ModSounds.SHOCK,
-                SoundSource.HOSTILE,
-                1f,
-                1f
-            )
-        }
-
-        if (attacker is ServerPlayer) {
-            attacker.level().playSound(
-                null,
-                attacker.blockPosition(),
+                player.blockPosition(),
                 ModSounds.INDICATION,
                 SoundSource.VOICE,
                 1f,
                 1f
             )
 
-            ServerPlayNetworking.send(attacker, ClientIndicatorMessage(0, 5))
-        }
+        ServerPlayNetworking.send(player, ClientIndicatorMessage(0, 5))
 
         return true
     }
@@ -119,8 +105,6 @@ open class ShockMobEffect : MobEffect(MobEffectCategory.HARMFUL, -256) {
                 ModDamageTypes.causeShockDamage(living.level().registryAccess(), source),
                 2f + 1.25f * instance.amplifier
             )
-
-            living.invulnerableTime = 0
 
             if (source is LivingEntity) {
                 persistentData(living).putInt(TAG_ATTACKER, source.id)

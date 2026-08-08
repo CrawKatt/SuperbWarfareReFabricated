@@ -1,13 +1,10 @@
 package com.atsuishio.superbwarfare.event
 
-import com.atsuishio.superbwarfare.Mod
-import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.config.common.GameplayConfig
 import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
-import com.atsuishio.superbwarfare.init.ModComponents
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModParticleTypes
 import com.atsuishio.superbwarfare.init.ModSounds
@@ -15,23 +12,17 @@ import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.tools.*
 import net.minecraft.core.BlockPos
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.entity.ai.attributes.AttributeModifier
-import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import kotlin.math.ceil
 
 object PlayerEventHandler {
-    @JvmField
-    val TACTICAL_SPRINT: ResourceLocation = Mod.loc("tactical_sprint")
-
     @JvmStatic
     fun onPlayerLoggedIn(player: ServerPlayer) {
         val mainStack = player.mainHandItem
@@ -54,10 +45,6 @@ object PlayerEventHandler {
 
         if (stack.item is GunItem) {
             handleSpecialWeaponAmmo(player)
-        }
-
-        if (!player.level().isClientSide) {
-            handleTacticalAttribute(player)
         }
     }
 
@@ -136,26 +123,13 @@ object PlayerEventHandler {
     }
 
     @JvmStatic
-    fun handleTacticalAttribute(player: Player?) {
-        if (player == null) {
-            return
-        }
+    fun getShortcutPackAnvilOutput(left: ItemStack, right: ItemStack): ItemStack {
+        if (left.item !is GunItem || !right.`is`(ModItems.SHORTCUT_PACK)) return ItemStack.EMPTY
 
-        val attr = player.getAttribute(Attributes.MOVEMENT_SPEED) ?: return
-
-        if (attr.getModifier(TACTICAL_SPRINT) != null) {
-            attr.removeModifier(TACTICAL_SPRINT)
-        }
-
-        if (MiscConfig.ALLOW_TACTICAL_SPRINT.get() && ModComponents.PLAYER_VARIABLE.get(player).tacticalSprint) {
-            player.isSprinting = true
-            attr.addTransientModifier(
-                AttributeModifier(
-                    TACTICAL_SPRINT,
-                    0.25,
-                    AttributeModifier.Operation.ADD_MULTIPLIED_BASE
-                )
-            )
+        return left.copy().also { output ->
+            val data = from(output)
+            data.level.add(1)
+            data.save()
         }
     }
 

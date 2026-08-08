@@ -28,6 +28,8 @@ import team.reborn.energy.api.EnergyStorage
 @Suppress("unused")
 object ModTabs {
 
+    private val tabs = mutableMapOf<String, CreativeModeTab>()
+
     @JvmField
     val GUN_TAB: CreativeModeTab = register(
         "guns",
@@ -158,6 +160,10 @@ object ModTabs {
 
     @JvmStatic
     fun init() {
+        listOf("vehicle", "block", "item", "ammo", "perk", "guns").forEach { name ->
+            Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Mod.loc(name), tabs.getValue(name))
+        }
+
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register { entries ->
             entries.accept(ModItems.SENPAI_SPAWN_EGG)
             entries.accept(ModItems.STEEL_COIL_SPAWN_EGG)
@@ -165,7 +171,8 @@ object ModTabs {
     }
 
     private fun register(name: String, tab: CreativeModeTab): CreativeModeTab {
-        return Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Mod.loc(name), tab)
+        tabs[name] = tab
+        return tab
     }
 
     private fun CreativeModeTab.Output.acceptSingle(stack: ItemStack) {

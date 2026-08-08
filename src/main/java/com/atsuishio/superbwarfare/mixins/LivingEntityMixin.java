@@ -10,11 +10,9 @@ import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -205,18 +203,6 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
                 effectInstance,
                 source
         );
-    }
-
-    @Inject(method = "removeEffect", at = @At("HEAD"))
-    private void superbwarfare$onRemoveEffect(
-            Holder<MobEffect> effect,
-            CallbackInfoReturnable<Boolean> cir
-    ) {
-        LivingEntity self = (LivingEntity) (Object) this;
-
-        BurnMobEffect.onBurnRemoved(self, self.getEffect(effect));
-        PhosphorusFireMobEffect.onPhosphorusFireRemoved(self, self.getEffect(effect));
-        ShockMobEffect.onShockRemoved(self, self.getEffect(effect));
     }
 
     @Inject(method = "onEffectRemoved", at = @At("HEAD"))

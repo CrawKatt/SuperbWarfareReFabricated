@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.entity.mixin.DamageAccess
 import com.atsuishio.superbwarfare.entity.mixin.DamageContainer
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier.ModifyResult
+import com.atsuishio.superbwarfare.event.LivingEventHandler
 import com.atsuishio.superbwarfare.tools.DamageHandler.doDamage
 import com.atsuishio.superbwarfare.tools.FormatTool.format2D
 import net.minecraft.ChatFormatting
@@ -59,6 +60,14 @@ object DamageHandler {
                 val damageAccess = DamageAccess.of(entity)
                 val container = damageAccess.`superbwarfare$getDamageContainers`() ?: return false
                 container.push(DamageContainer(source, damage))
+
+                if (LivingEventHandler.onEntityAttacked(entity, source, damage)) {
+                    container.pop()
+                    return false
+                }
+
+                damage = LivingEventHandler.onEntityHurt(entity, source, damage)
+                container.peek().newDamage = damage
 
                 run {
                     if (entity.isSleeping && !entity.level().isClientSide) {

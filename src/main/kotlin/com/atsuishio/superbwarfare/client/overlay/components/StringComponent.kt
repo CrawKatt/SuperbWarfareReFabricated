@@ -8,11 +8,19 @@ import net.minecraft.network.chat.MutableComponent
 class StringComponent(
     baseAnchorPoint: AnchorPoint = CENTER,
     componentAnchorPoint: AnchorPoint = LEFT_TOP,
-    var font: Font = com.atsuishio.superbwarfare.tools.font,
+    font: Font? = null,
     var component: MutableComponent = Component.empty(),
     var color: Int = -1,
     var dropShadow: Boolean = false,
 ) : BaseComponent(baseAnchorPoint, componentAnchorPoint) {
+
+    private var fontOverride = font
+
+    var font: Font
+        get() = fontOverride ?: com.atsuishio.superbwarfare.tools.font
+        set(value) {
+            fontOverride = value
+        }
 
     override val width
         get() = font.splitter.stringWidth(component.visualOrderText)

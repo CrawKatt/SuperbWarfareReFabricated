@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.tools.InventoryTool
 import com.atsuishio.superbwarfare.tools.SoundTool
+import com.atsuishio.superbwarfare.tools.postEvent
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.Mth
@@ -228,12 +229,12 @@ object GunEventHandler {
             val count = ammoCount - magazine - (if (hasBulletInBarrel) 1 else 0)
 
             if (shooter is Player) {
-                val capability = ModComponents.PLAYER_VARIABLE.get(shooter)
+                val capability = ModComponents.PLAYER_VARIABLE.get(shooter).watch()
                 if (data.selectedAmmoConsumer().type == AmmoConsumer.AmmoConsumeType.PLAYER_AMMO) {
                     val ammoType = data.selectedAmmoConsumer().playerAmmoType
                     ammoType?.add(capability, count)
                 }
-                ModComponents.PLAYER_VARIABLE.sync(shooter)
+                capability.sync(shooter)
             }
 
             data.ammo.set(magazine + (if (hasBulletInBarrel) 1 else 0))
@@ -256,7 +257,7 @@ object GunEventHandler {
 
             // 启动换弹
             if (data.reload.reloadStarter.start()) {
-                CustomEventHandler.onPreReload(ReloadEvent.Pre(shooter, data))
+                postEvent(ReloadEvent.Pre(shooter, data))
                 startReload(shooter, data)
             }
 
@@ -333,13 +334,13 @@ object GunEventHandler {
     @JvmStatic
     fun finishGunNormalReload(shooter: Entity?, data: GunData) {
         data.reloadAmmo(shooter, data.item().hasBulletInBarrel(data))
-        CustomEventHandler.onPostReload(ReloadEvent.Post(shooter, data))
+        postEvent(ReloadEvent.Post(shooter, data))
     }
 
     @JvmStatic
     fun finishGunEmptyReload(shooter: Entity?, data: GunData) {
         data.reloadAmmo(shooter)
-        CustomEventHandler.onPostReload(ReloadEvent.Post(shooter, data))
+        postEvent(ReloadEvent.Post(shooter, data))
     }
 
     @JvmStatic
@@ -381,7 +382,7 @@ object GunEventHandler {
 
         // 一阶段
         if (reload.singleReloadStarter.start()) {
-            CustomEventHandler.onPreReload(ReloadEvent.Pre(shooter, data))
+            postEvent(ReloadEvent.Pre(shooter, data))
 
             if (data.get(GunProp.PREPARE_LOAD_TIME) != 0 && (!data.hasEnoughAmmoToShoot(shooter) || stack.`is`(
                     ModItems.SECONDARY_CATACLYSM
@@ -485,7 +486,7 @@ object GunEventHandler {
             reload.setState(ReloadState.NOT_RELOADING)
             reload.singleReloadStarter.finish()
 
-            CustomEventHandler.onPostReload(ReloadEvent.Post(shooter, data))
+            postEvent(ReloadEvent.Post(shooter, data))
         }
     }
 

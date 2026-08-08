@@ -17,14 +17,6 @@ object ModRecipes {
         registerSerializer("potion_mortar_shell", SimpleCraftingRecipeSerializer(::PotionMortarShellRecipe))
 
     @JvmField
-    val AMMO_BOX_ADD_AMMO_SERIALIZER: RecipeSerializer<AmmoBoxAddAmmoRecipe> =
-        registerSerializer("ammo_box_add_ammo", SimpleCraftingRecipeSerializer(::AmmoBoxAddAmmoRecipe))
-
-    @JvmField
-    val AMMO_BOX_EXTRACT_AMMO_SERIALIZER: RecipeSerializer<AmmoBoxExtractAmmoRecipe> =
-        registerSerializer("ammo_box_extract_ammo", SimpleCraftingRecipeSerializer(::AmmoBoxExtractAmmoRecipe))
-
-    @JvmField
     val SMOKE_DYE_SERIALIZER: RecipeSerializer<SmokeDyeRecipe> =
         registerSerializer("smoke_dye", SimpleCraftingRecipeSerializer(::SmokeDyeRecipe))
 

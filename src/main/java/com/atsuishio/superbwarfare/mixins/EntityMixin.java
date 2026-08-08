@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.entity.mixin.OBBHitter;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
+import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem;
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import com.atsuishio.superbwarfare.tools.OBB;
 import net.minecraft.core.BlockPos;
@@ -112,6 +113,20 @@ public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
         return this.superbwarfare$persistentData;
     }
 
+    @Inject(method = "saveWithoutId", at = @At("HEAD"))
+    private void superbwarfare$savePersistentData(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
+        if (this.superbwarfare$persistentData != null) {
+            tag.put("NeoForgeData", this.superbwarfare$persistentData.copy());
+        }
+    }
+
+    @Inject(method = "load", at = @At("HEAD"))
+    private void superbwarfare$loadPersistentData(CompoundTag tag, CallbackInfo ci) {
+        if (tag.contains("NeoForgeData", CompoundTag.TAG_COMPOUND)) {
+            this.superbwarfare$persistentData = tag.getCompound("NeoForgeData");
+        }
+    }
+
     @Inject(method = "turn(DD)V", at = @At("HEAD"), cancellable = true)
     public void turn(double pYRot, double pXRot, CallbackInfo ci) {
         var entity = (Entity) (Object) this;
@@ -137,6 +152,20 @@ public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
             if (player.getVehicle() != null) {
                 player.getVehicle().onPassengerTurned(player);
             }
+        }
+        if (entity instanceof Player player && player.getMainHandItem().getItem() instanceof SuperStarShooterItem) {
+            ci.cancel();
+            float f = (float) pXRot * 0.15F;
+            float f1 = (float) pYRot * 0.15F;
+            player.setXRot(Mth.clamp(player.getXRot() + f, -90.0F, 90.0F));
+            player.setYRot(player.getYRot() + f1);
+            player.xRotO = Mth.clamp(player.xRotO + f, -90.0F, 90.0F);
+            player.yRotO += f1;
+            if (player.getVehicle() != null) {
+                player.getVehicle().onPassengerTurned(player);
+            }
+            float diffY = Math.clamp(-90f, 90f, Mth.wrapDegrees(player.getYHeadRot() - player.yBodyRot));
+            player.setYBodyRot(player.yBodyRot + 0.5f * diffY);
         }
     }
 

@@ -11,7 +11,6 @@ import com.atsuishio.superbwarfare.capability.api.IItemHandler
 import com.atsuishio.superbwarfare.capability.api.InvWrapper
 import com.atsuishio.superbwarfare.capability.api.SidedInvWrapper
 import com.atsuishio.superbwarfare.capability.energy.ItemEnergyStorage
-import com.atsuishio.superbwarfare.capability.laser.LaserCapability
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.atsuishio.superbwarfare.item.EnergyStorageItem
@@ -21,15 +20,10 @@ import net.fabricmc.fabric.api.lookup.v1.entity.EntityApiLookup
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup
 import net.minecraft.core.Direction
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.player.Player
 import team.reborn.energy.api.EnergyStorage
 
 object ModCapabilities {
-    @JvmField
-    val LASER_CAPABILITY: EntityApiLookup<LaserCapability, Void?> =
-        EntityApiLookup.get(Mod.loc("laser_capability"), LaserCapability::class.java, Void::class.java)
-
     @JvmField
     val ENERGY_BLOCK: BlockApiLookup<IEnergyStorage, Direction?> =
         BlockApiLookup.get(Mod.loc("energy"), IEnergyStorage::class.java, Direction::class.java)
@@ -52,11 +46,6 @@ object ModCapabilities {
 
     @JvmStatic
     fun init() {
-        LASER_CAPABILITY.registerForType(
-            { player, _ -> LaserCapability() },
-            EntityType.PLAYER
-        )
-
         ENERGY_BLOCK.registerForBlockEntity(
             ChargingStationBlockEntity::getEnergyStorage,
             ModBlockEntities.CHARGING_STATION
@@ -145,9 +134,9 @@ object ModCapabilities {
                     { stack, _ ->
                         ItemEnergyStorage(
                             stack,
-                            item.getMaxEnergy(stack),
-                            item.getMaxReceiveEnergy(stack),
-                            item.getMaxExtractEnergy(stack)
+                            item::getMaxEnergy,
+                            item::getMaxReceiveEnergy,
+                            item::getMaxExtractEnergy
                         )
                     },
                     item
@@ -161,9 +150,9 @@ object ModCapabilities {
                     { stack, _ ->
                         ItemEnergyStorage(
                             stack,
-                            item.getMaxEnergy(stack),
-                            item.getMaxReceiveEnergy(stack),
-                            item.getMaxExtractEnergy(stack)
+                            item::getMaxEnergy,
+                            item::getMaxReceiveEnergy,
+                            item::getMaxExtractEnergy
                         )
                     },
                     item

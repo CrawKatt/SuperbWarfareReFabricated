@@ -44,11 +44,7 @@ import net.minecraft.world.level.block.CrossCollisionBlock
 import net.minecraft.world.level.block.DoorBlock
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
-import com.atsuishio.superbwarfare.config.server.MiscConfig
-import com.atsuishio.superbwarfare.mixins.LivingEntityAccessor
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.minecraft.client.Camera
 import org.joml.Matrix4f
 import org.lwjgl.glfw.GLFW
@@ -78,16 +74,6 @@ object ClientEventHandler {
 
     @JvmStatic
     fun register() {
-        ClientTickEvents.END_CLIENT_TICK.register {
-            handleClientTick()
-        }
-
-        WorldRenderEvents.START.register {
-            handleWeaponFire()
-            handleVehicleFire()
-            handleWeaponBreathSway()
-        }
-
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             onPlayerLoggedIn()
         }
@@ -265,9 +251,6 @@ object ClientEventHandler {
 
     @JvmField
     var breath: Boolean = false
-
-    @JvmField
-    var tacticalSprint: Boolean = false
 
     @JvmField
     var stamina: Float = 0f
@@ -1142,32 +1125,12 @@ object ClientEventHandler {
     }
 
     // 耐力
-    // 耐力
     fun staminaSystem() {
         if (mc.isPaused) return
-        val player = localPlayer ?: return
-
-        tacticalSprint = MiscConfig.ALLOW_TACTICAL_SPRINT.get()
-                && !exhaustion
-                && !zoom
-                && isMoving()
-                && player.isSprinting
-                && player.vehicle == null
-                && !player.abilities.flying
-
-        val stack = player.mainHandItem
-
-        val sprintCost: Float = if (stack.item is GunItem) {
-            val data = GunData.from(stack)
-            (0.5 + 0.02 * data.get(GunProp.WEIGHT)).toFloat()
-        } else {
-            0.5f
-        }
+        if (localPlayer == null) return
 
         if (breath) {
             stamina += 0.5f
-        } else if (tacticalSprint) {
-            stamina += sprintCost
         } else if (stamina > 0) {
             stamina = (stamina - 0.5f).coerceAtLeast(0f)
         }
@@ -1175,30 +1138,18 @@ object ClientEventHandler {
         if (stamina >= 100) {
             exhaustion = true
             breath = false
-            tacticalSprint = false
         }
 
         if (exhaustion && stamina <= 0) {
             exhaustion = false
         }
 
-        if ((ModKeyMappings.BREATH.isDown() && zoom) || tacticalSprint) {
+        if (ModKeyMappings.BREATH.isDown() && zoom) {
             switchTime = (switchTime + 0.65).coerceAtMost(5.0)
         } else if (switchTime > 0 && stamina == 0f) {
             switchTime = (switchTime - 0.15).coerceAtLeast(0.0)
         }
-
-        if (zoom) {
-            tacticalSprint = false
-        }
-
-        if (tacticalSprint && (player.onGround() || (player as LivingEntityAccessor).isJumping)) {
-            sendPacketToServer(TacticalSprintMessage(true))
-        } else {
-            sendPacketToServer(TacticalSprintMessage(false))
-        }
     }
-
 
     /**
      * 禁止玩家奔跑
@@ -1242,16 +1193,6 @@ object ClientEventHandler {
         if (switchVehicleWeaponCooldown > 0) {
             switchVehicleWeaponCooldown--
         }
-    }
-
-    private fun clearWeaponCameraTransforms() {
-        cameraRot[0] = 0.0
-        cameraRot[1] = 0.0
-        cameraRot[2] = 0.0
-
-        turnRot[0] = 0.0
-        turnRot[1] = 0.0
-        turnRot[2] = 0.0
     }
 
     @JvmStatic
@@ -1878,10 +1819,6 @@ object ClientEventHandler {
         shakeTime = Mth.lerp(0.05 * getDelta(), shakeTime, 0.0)
 
         val vehicle = player.vehicle
-        val blocksHand = vehicle is VehicleEntity && vehicle.banHand(player)
-        val baseRoll = if (blocksHand) 0f else roll
-        var appliedScreenShake = false
-
         if (shakeTime > 0) {
             val shakeRadiusAmplitude =
                 (1 - player.position().distanceTo(Vec3(shakePos[0], shakePos[1], shakePos[2])) / shakeRadius)
@@ -1896,7 +1833,7 @@ object ClientEventHandler {
                     (pitch - (shakeTime * sin(0.5 * Math.PI * shakeTime) * shakeAmplitude * shakeRadiusAmplitude * shakeType *
                             if (onVehicle) 0.1 else 1.0)).toFloat()
                 cameraRoll =
-                    (baseRoll - (shakeTime * sin(0.5 * Math.PI * shakeTime) * shakeAmplitude * shakeRadiusAmplitude *
+                    (roll - (shakeTime * sin(0.5 * Math.PI * shakeTime) * shakeAmplitude * shakeRadiusAmplitude *
                             if (onVehicle) 0.1 else 1.0)).toFloat()
             } else {
                 event.yaw =
@@ -1906,22 +1843,16 @@ object ClientEventHandler {
                     (pitch + (shakeTime * sin(0.5 * Math.PI * shakeTime) * shakeAmplitude * shakeRadiusAmplitude * shakeType *
                             if (onVehicle) 0.1 else 1.0)).toFloat()
                 cameraRoll =
-                    (baseRoll + (shakeTime * sin(0.5 * Math.PI * shakeTime) * shakeAmplitude * shakeRadiusAmplitude *
+                    (roll + (shakeTime * sin(0.5 * Math.PI * shakeTime) * shakeAmplitude * shakeRadiusAmplitude *
                             if (onVehicle) 0.1 else 1.0)).toFloat()
             }
-            appliedScreenShake = true
         }
 
         cameraPitch = event.pitch
         cameraYaw = event.yaw
-
-        if (blocksHand) {
-            clearWeaponCameraTransforms()
-            cameraRoll = if (appliedScreenShake) cameraRoll * 0.99f else 0f
-            return
-        }
-
         cameraRoll *= 0.99f
+
+        if (vehicle is VehicleEntity && vehicle.banHand(player)) return
 
         if (stack.item is GunItem) {
             handleWeaponSway(entity)

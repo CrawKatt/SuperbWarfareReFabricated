@@ -73,31 +73,6 @@ object ClickEventHandler {
     }
 
     @JvmStatic
-    fun shouldCancelMouseButton(button: Int): Boolean {
-        if (notInGame) return false
-
-        val player = localPlayer ?: return false
-        if (player.isSpectator) return false
-
-        val stack = player.mainHandItem
-
-        if (ModKeyMappings.FIRE.matchesMouse(button) && cancelFireKey(player, stack)) {
-            return true
-        }
-
-        if ((ModKeyMappings.HOLD_ZOOM.matchesMouse(button) || ModKeyMappings.SWITCH_ZOOM.matchesMouse(button))
-            && cancelZoomKey(player, stack)
-        ) {
-            return true
-        }
-
-        return button == GLFW.GLFW_MOUSE_BUTTON_MIDDLE
-                && (player.hasEffect(ModMobEffects.SHOCK)
-                || stack.`is`(ModItems.ARTILLERY_INDICATOR)
-                || (stack.`is`(ModItems.MONITOR) && player.offhandItem.`is`(ModItems.ARTILLERY_INDICATOR)))
-    }
-
-    @JvmStatic
     fun releaseVanillaMouseButton(button: Int) {
         val options = mc.options
 
@@ -344,10 +319,6 @@ object ClickEventHandler {
         val vehicle = player.vehicle
 
         if (action == GLFW.GLFW_PRESS) {
-            if (vehicle is VehicleEntity && handleVehicleSeatHotbarKey(player, vehicle, key, scanCode)) {
-                return true
-            }
-
             if (ModKeyMappings.ACTIVE_THERMAL_IMAGING.matches(key, scanCode)) {
                 if (vehicle is VehicleEntity) {
                     val index = vehicle.getSeatIndex(player)
@@ -532,26 +503,6 @@ object ClickEventHandler {
             }
         }
         return false
-    }
-
-    private fun handleVehicleSeatHotbarKey(player: Player, vehicle: VehicleEntity, key: Int, scanCode: Int): Boolean {
-        var index = -1
-        for (i in 0..<9) {
-            if (mc.options.keyHotbarSlots[i].matches(key, scanCode)) {
-                index = i
-                break
-            }
-        }
-
-        if (index == -1) return false
-        if (vehicle.maxPassengers <= 1) return false
-        if (!mc.options.keyShift.isDown && !Screen.hasShiftDown()) return false
-        if (index >= vehicle.maxPassengers) return false
-        if (vehicle.getNthEntity(index) != null) return false
-
-        sendPacketToServer(ChangeVehicleSeatMessage(index))
-        vehicle.changeSeat(player, index)
-        return true
     }
 
     private fun syncModKeyConflictState(key: Int, scanCode: Int, action: Int) {

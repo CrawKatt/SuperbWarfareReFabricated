@@ -44,7 +44,12 @@ object PowerfulAttraction : Perk("powerful_attraction", Type.FUNCTIONAL) {
         val copy = drop.copy()
 
         if (!player.addItem(copy)) {
-            player.drop(copy, false)
+            CURRENT_DROP_SOURCE.remove()
+            try {
+                player.drop(copy, false)
+            } finally {
+                CURRENT_DROP_SOURCE.set(source)
+            }
         }
 
         return true

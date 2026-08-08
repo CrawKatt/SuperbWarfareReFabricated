@@ -114,10 +114,6 @@ class CustomExplosion @JvmOverloads constructor(
         return this
     }
 
-    fun bulletExplode(): CustomExplosion {
-        return this
-    }
-
     @Suppress("DEPRECATION")
     override fun explode() {
         if (ExplosionConfig.EXPLOSION_DESTROY.get()) {

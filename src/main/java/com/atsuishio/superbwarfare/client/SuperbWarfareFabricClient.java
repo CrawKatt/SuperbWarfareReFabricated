@@ -14,12 +14,14 @@ import com.atsuishio.superbwarfare.data.DataLoader;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
+import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.projectile.PotionMortarShellItem;
 import com.atsuishio.superbwarfare.network.NetworkRegistryKt;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.neoforged.fml.config.ModConfig;
 
 public class SuperbWarfareFabricClient implements ClientModInitializer {
@@ -52,7 +54,13 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         ModSoundInstances.init();
         ThermalShaderHandler.register();
         ModEventHandlers.initClient();
+        ClientEventHandler.register();
         NetworkRegistryKt.registerClientReceivers();
+        ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> {
+            if (entity instanceof ArtilleryEntity artillery) {
+                artillery.initializeShootVec();
+            }
+        });
 
         registerClientTicks();
     }

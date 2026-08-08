@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.api.event.RenderPlayerArmEvent;
 import com.atsuishio.superbwarfare.client.renderer.CustomGunRenderer;
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes;
+import com.atsuishio.superbwarfare.client.renderer.SmartTextureBrightener;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -16,6 +17,7 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
@@ -30,6 +32,8 @@ import org.joml.Matrix4f;
 import software.bernie.geckolib.animation.AnimationProcessor;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.util.RenderUtil;
+
+import static com.atsuishio.superbwarfare.event.ClientEventHandler.activeThermalImaging;
 
 public class AnimationHelper {
 
@@ -111,7 +115,7 @@ public class AnimationHelper {
     public static void handleShootFlare(String name, PoseStack stack, ItemStack itemStack, GeoBone bone, MultiBufferSource buffer, int packedLightIn, double x, double y, double z, double size) {
         var data = GunData.from(itemStack);
 
-        if (name.equals("flare") && ClientEventHandler.firePosTimer > 0 && ClientEventHandler.firePosTimer < 0.5 && data.attachment.get(AttachmentType.BARREL) != 2) {
+        if (name.equals("flare") && ClientEventHandler.fireRotTimer > 0 && ClientEventHandler.fireRotTimer < 0.3 && data.attachment.get(AttachmentType.BARREL) != 2) {
             bone.setScaleX((float) (size + 0.8 * size * (Math.random() - 0.5)));
             bone.setScaleY((float) (size + 0.8 * size * (Math.random() - 0.5)));
             bone.setRotZ((float) (0.5 * (Math.random() - 0.5)));
@@ -166,7 +170,15 @@ public class AnimationHelper {
 
             int alpha = hasBlackPart ? a : (int) (0.12 * a);
 
-            VertexConsumer blackPart = buffer.getBuffer(RenderType.entityTranslucent(tex));
+            if (activeThermalImaging) {
+                r = 255;
+                g = 255;
+                b = 255;
+                a = 255;
+                tex = SmartTextureBrightener.getSmartBrightenedTexture(tex, 10);
+            }
+
+            VertexConsumer blackPart = buffer.getBuffer(RenderType.entityTranslucentEmissive(tex));
             vertexRGB(blackPart, $$7, pose, 255, 0, 0, 0, 1, r, g, b, alpha, size);
             vertexRGB(blackPart, $$7, pose, 255, size, 0, 1, 1, r, g, b, alpha, size);
             vertexRGB(blackPart, $$7, pose, 255, size, size, 1, 0, r, g, b, alpha, size);
@@ -217,8 +229,12 @@ public class AnimationHelper {
             }
 
             ResourceLocation loc = localPlayer.getSkin().texture();
-            VertexConsumer armBuilder = currentBuffer.getBuffer(RenderType.entitySolid(loc));
-            VertexConsumer sleeveBuilder = currentBuffer.getBuffer(RenderType.entityTranslucent(loc));
+            int overlayTexture = activeThermalImaging ? OverlayTexture.pack(15, 10) : OverlayTexture.NO_OVERLAY;
+
+            if (activeThermalImaging) {
+                packedLightIn = LightTexture.FULL_BRIGHT;
+            }
+
             if (arm == HumanoidArm.LEFT) {
                 if (!model.leftArm.visible) {
                     model.leftArm.visible = true;
@@ -229,11 +245,11 @@ public class AnimationHelper {
 
                 stack.translate(-1.0f * CustomGunRenderer.SCALE_RECIPROCAL, 2.0f * CustomGunRenderer.SCALE_RECIPROCAL, 0.0f);
                 if (useOldHandRender) {
-                    AnimationHelper.renderPartOverBone(model.leftArm, bone, stack, currentBuffer.getBuffer(RenderType.entitySolid(loc)), packedLightIn, OverlayTexture.NO_OVERLAY);
-                    AnimationHelper.renderPartOverBone(model.leftSleeve, bone, stack, currentBuffer.getBuffer(RenderType.entityTranslucent(loc)), packedLightIn, OverlayTexture.NO_OVERLAY);
+                    AnimationHelper.renderPartOverBone(model.leftArm, bone, stack, currentBuffer.getBuffer(RenderType.entitySolid(loc)), packedLightIn, overlayTexture);
+                    AnimationHelper.renderPartOverBone(model.leftSleeve, bone, stack, currentBuffer.getBuffer(RenderType.entityTranslucent(loc)), packedLightIn, overlayTexture);
                 } else {
-                    AnimationHelper.renderPartOverBone2(model.leftArm, bone, stack, currentBuffer.getBuffer(RenderType.entitySolid(loc)), packedLightIn, OverlayTexture.NO_OVERLAY);
-                    AnimationHelper.renderPartOverBone2(model.leftSleeve, bone, stack, currentBuffer.getBuffer(RenderType.entityTranslucent(loc)), packedLightIn, OverlayTexture.NO_OVERLAY);
+                    AnimationHelper.renderPartOverBone2(model.leftArm, bone, stack, currentBuffer.getBuffer(RenderType.entitySolid(loc)), packedLightIn, overlayTexture);
+                    AnimationHelper.renderPartOverBone2(model.leftSleeve, bone, stack, currentBuffer.getBuffer(RenderType.entityTranslucent(loc)), packedLightIn, overlayTexture);
                 }
             } else {
                 if (!model.rightArm.visible) {
@@ -245,11 +261,11 @@ public class AnimationHelper {
 
                 stack.translate(CustomGunRenderer.SCALE_RECIPROCAL, 2.0f * CustomGunRenderer.SCALE_RECIPROCAL, 0.0f);
                 if (useOldHandRender) {
-                    AnimationHelper.renderPartOverBoneR(model.leftArm, bone, stack, currentBuffer.getBuffer(RenderType.entitySolid(loc)), packedLightIn, OverlayTexture.NO_OVERLAY);
-                    AnimationHelper.renderPartOverBoneR(model.leftSleeve, bone, stack, currentBuffer.getBuffer(RenderType.entityTranslucent(loc)), packedLightIn, OverlayTexture.NO_OVERLAY);
+                    AnimationHelper.renderPartOverBone(model.rightArm, bone, stack, currentBuffer.getBuffer(RenderType.entitySolid(loc)), packedLightIn, overlayTexture);
+                    AnimationHelper.renderPartOverBone(model.rightSleeve, bone, stack, currentBuffer.getBuffer(RenderType.entityTranslucent(loc)), packedLightIn, overlayTexture);
                 } else {
-                    AnimationHelper.renderPartOverBone2R(model.leftArm, bone, stack, currentBuffer.getBuffer(RenderType.entitySolid(loc)), packedLightIn, OverlayTexture.NO_OVERLAY);
-                    AnimationHelper.renderPartOverBone2R(model.leftSleeve, bone, stack, currentBuffer.getBuffer(RenderType.entityTranslucent(loc)), packedLightIn, OverlayTexture.NO_OVERLAY);
+                    AnimationHelper.renderPartOverBone2(model.rightArm, bone, stack, currentBuffer.getBuffer(RenderType.entitySolid(loc)), packedLightIn, overlayTexture);
+                    AnimationHelper.renderPartOverBone2(model.rightSleeve, bone, stack, currentBuffer.getBuffer(RenderType.entityTranslucent(loc)), packedLightIn, overlayTexture);
                 }
             }
 

@@ -2,10 +2,14 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.event.ClickEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.tools.NBTTool;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import org.objectweb.asm.Opcodes;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,9 +41,7 @@ public class MouseHandlerMixin {
             cancellable = true
     )
     private void superbwarfare$onMousePressed(long window, int button, int action, int modifiers, CallbackInfo ci) {
-        ClickEventHandler.onButtonPressed(button, action, modifiers);
-
-        if (ClickEventHandler.shouldCancelMouseButton(button)) {
+        if (ClickEventHandler.onButtonPressed(button, action, modifiers)) {
             ClickEventHandler.releaseVanillaMouseButton(button);
             ci.cancel();
             return;
@@ -71,7 +73,27 @@ public class MouseHandlerMixin {
         if (superbwarfare$isControllingDrone()) {
             args.set(0, 0.0D);
             args.set(1, 0.0D);
+            return;
         }
+
+        Minecraft mc = Minecraft.getInstance();
+        Player player = mc.player;
+        if (player == null || mc.options.getCameraType() != CameraType.FIRST_PERSON) return;
+        if (!(player.getVehicle() instanceof VehicleEntity vehicle)) return;
+
+        double x = args.get(0);
+        double y = args.get(1);
+        double roll = vehicle.getRoll();
+        double absoluteRoll = Mth.abs((float) roll);
+        double horizontalSign = roll < 0 ? 1 : roll > 0 ? -1 : 0;
+
+        if (absoluteRoll > 90) {
+            horizontalSign *= 1 - (absoluteRoll - 90) / 90;
+        }
+
+        args.set(0, (1 - absoluteRoll / 90) * x + (absoluteRoll / 90) * superbwarfare$previousTurnY * horizontalSign);
+        args.set(1, (1 - absoluteRoll / 90) * y + (absoluteRoll / 90) * x * (roll < 0 ? -1 : 1));
+        superbwarfare$previousTurnY = y;
     }
 
     @Unique
@@ -86,54 +108,7 @@ public class MouseHandlerMixin {
         return tag.getBoolean("Using") && tag.getBoolean("Linked");
     }
 
-//    @Unique
-//    private static double sbw121$x;
-//    @Unique
-//    private static double sbw121$y;
-
-    // TODO 正确实现视角计算
-//    @ModifyVariable(method = "turnPlayer(D)V", at = @At(value = "STORE", opcode = Opcodes.DSTORE), ordinal = 3)
-//    private double modifyD0(double d) {
-//        Minecraft mc = Minecraft.getInstance();
-//        Player player = mc.player;
-//
-//        if (player == null) return d;
-//        if (mc.options.getCameraType() != CameraType.FIRST_PERSON) return d;
-//
-//        if (player.getVehicle() instanceof VehicleEntity vehicle) {
-//            sbw121$x = d;
-//
-//            double i = 0;
-//
-//            if (vehicle.getRoll() < 0) {
-//                i = 1;
-//            } else if (vehicle.getRoll() > 0) {
-//                i = -1;
-//            }
-//
-//            if (Mth.abs(vehicle.getRoll()) > 90) {
-//                i *= (1 - (Mth.abs(vehicle.getRoll()) - 90) / 90);
-//            }
-//
-//            return (1 - (Mth.abs(vehicle.getRoll()) / 90)) * d + ((Mth.abs(vehicle.getRoll()) / 90)) * sbw121$y * i;
-//        }
-//        return d;
-//    }
-//
-//    @ModifyVariable(method = "turnPlayer(D)V", at = @At(value = "STORE", opcode = Opcodes.DSTORE), ordinal = 4)
-//    private double modifyD1(double d) {
-//        Minecraft mc = Minecraft.getInstance();
-//        Player player = mc.player;
-//
-//        if (player == null) return d;
-//        if (mc.options.getCameraType() != CameraType.FIRST_PERSON) return d;
-//
-//        if (player.getVehicle() instanceof VehicleEntity vehicle) {
-//            sbw121$y = d;
-//            return (1 - (Mth.abs(vehicle.getRoll()) / 90)) * d + ((Mth.abs(vehicle.getRoll()) / 90)) * sbw121$x * (vehicle.getRoll() < 0 ? -1 : 1);
-//        }
-//
-//        return d;
-//    }
+    @Unique
+    private static double superbwarfare$previousTurnY;
 
 }

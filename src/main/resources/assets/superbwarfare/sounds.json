@@ -3295,22 +3295,6 @@
       }
     ]
   },
-  "aurelia_sceptre_fire_1p": {
-    "sounds": [
-      {
-        "name": "superbwarfare:gun/aurelia_sceptre/aurelia_sceptre_fire_1p",
-        "stream": false
-      }
-    ]
-  },
-  "aurelia_sceptre_fire_3p": {
-    "sounds": [
-      {
-        "name": "superbwarfare:gun/aurelia_sceptre/aurelia_sceptre_fire_3p",
-        "stream": false
-      }
-    ]
-  },
   "tom_6_engine": {
     "sounds": [
       {

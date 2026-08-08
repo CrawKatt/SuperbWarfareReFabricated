@@ -112,6 +112,7 @@ import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.entity.FakePlayer
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory
 import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
 import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
@@ -1485,12 +1486,14 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
             }
 
             if (this.getFirstPassenger() == null) {
+                if (player is FakePlayer) return InteractionResult.PASS
                 VehicleVecUtils.setDriverAngle(this, player)
                 player.isSprinting = false
                 if (player.level() is ServerLevel) {
                     return if (player.startRiding(this)) InteractionResult.CONSUME else InteractionResult.PASS
                 }
             } else if (this.getFirstPassenger() !is Player) {
+                if (player is FakePlayer) return InteractionResult.PASS
                 this.getFirstPassenger()!!.stopRiding()
                 VehicleVecUtils.setDriverAngle(this, player)
                 player.isSprinting = false
@@ -1499,6 +1502,7 @@ abstract class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity
                 }
             }
             if (this.canAddPassenger(player)) {
+                if (player is FakePlayer) return InteractionResult.PASS
                 player.isSprinting = false
                 if (player.level() is ServerLevel) {
                     return if (player.startRiding(this)) InteractionResult.CONSUME else InteractionResult.PASS

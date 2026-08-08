@@ -383,6 +383,33 @@ object ModEntities {
     val TURRET_WRECK: EntityType<TurretWreckEntity> =
         register("turret_wreck", vehicle(::TurretWreckEntity).sized(2.4f, 1.2f))
 
+    @JvmField
+    val NO_VELOCITY_UPDATES: Set<EntityType<*>> = setOf(
+        SUPER_STAR_PROJECTILE,
+        SMALL_CANNON_SHELL,
+        RPG_ROCKET_TBG,
+        RPG_ROCKET_STANDARD,
+        MORTAR_SHELL,
+        PROJECTILE,
+        CANNON_SHELL,
+        GUN_GRENADE,
+        GRAPESHOT,
+        MELON_BOMB,
+        PTKM_PROJECTILE,
+        JAVELIN_MISSILE,
+        IGLA_MISSILE,
+        RU_9M336_MISSILE,
+        AGM_65,
+        KH_39,
+        SMALL_ROCKET,
+        MEDIUM_ROCKET,
+        WIRE_GUIDE_MISSILE,
+        SWARM_DRONE,
+        MK_82,
+        SC_250,
+        SC_50
+    )
+
     private fun <T : Entity> register(
         name: String,
         entityTypeBuilder: EntityType.Builder<T>

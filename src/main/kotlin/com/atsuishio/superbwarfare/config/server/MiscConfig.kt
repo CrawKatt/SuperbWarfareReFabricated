@@ -20,16 +20,6 @@ object MiscConfig {
     }
 
     @JvmField
-    val ALLOW_FORCE_DAMAGE = FORCE_DAMAGE_MODE
-
-    @JvmField
-    val ALLOW_TACTICAL_SPRINT = buildServerConfig {
-        comment("Set true to allow tactical sprint")
-        comment("是否允许战术冲刺")
-        define("allow_tactical_sprint", true)
-    }
-
-    @JvmField
     val DROP_AMMO_BOX = buildServerConfig {
         comment("Whether to drop an ammo box after the player dies")
         comment("玩家在死亡时，是否掉落弹药")

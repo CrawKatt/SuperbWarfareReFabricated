@@ -27,6 +27,7 @@ import com.atsuishio.superbwarfare.tools.DamageTypeTool.isHeadshotDamage
 import com.atsuishio.superbwarfare.tools.DamageTypeTool.isModDamage
 import com.atsuishio.superbwarfare.tools.FormatTool.format1D
 import com.atsuishio.superbwarfare.tools.FormatTool.format2D
+import com.atsuishio.superbwarfare.tools.postEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundStopSoundPacket
 import net.minecraft.resources.ResourceLocation
@@ -109,10 +110,6 @@ object LivingEventHandler {
         handleGunPerksWhenDeath(entity, source)
         handlePlayerKillEntity(entity, source)
         giveKillExpToWeapon(entity, source)
-
-        if (entity is Player) {
-            handlePlayerBeamReset(entity)
-        }
     }
 
     fun handleVehicleHurt(entity: LivingEntity, source: DamageSource, amount: Float): Float {
@@ -300,9 +297,7 @@ object LivingEventHandler {
         }
 
         if (!sourceEntity.level().isClientSide() && sourceEntity is ServerPlayer) {
-            val event = Indicator(sourceEntity, source, entity)
-            onPreIndicator(event)
-            if (event.isCanceled) {
+            if (postEvent(Indicator(sourceEntity, source, entity)).isCanceled) {
                 return
             }
 
@@ -329,8 +324,6 @@ object LivingEventHandler {
     fun handleChangeSlot(entity: LivingEntity, slot: EquipmentSlot, oldStack: ItemStack, newStack: ItemStack) {
         if (entity is Player && slot == EquipmentSlot.MAINHAND) {
             if (entity.level().isClientSide) return
-
-            ModCapabilities.LASER_CAPABILITY.find(entity, null)?.stop()
 
             if (entity is ServerPlayer) {
                 if (newStack.item is GunItem) {
@@ -480,9 +473,7 @@ object LivingEventHandler {
 
         if (attacker == null) return
 
-        val event = SendKillMessage(attacker, source, entity)
-        onPreSendKillMessage(event)
-        if (event.isCanceled) {
+        if (postEvent(SendKillMessage(attacker, source, entity)).isCanceled) {
             return
         }
 
@@ -697,11 +688,6 @@ object LivingEventHandler {
             return true
         }
         return false
-    }
-
-    @JvmStatic
-    fun handlePlayerBeamReset(player: Player) {
-        ModCapabilities.LASER_CAPABILITY.find(player, null)?.end()
     }
 
     @JvmStatic
