@@ -71,6 +71,7 @@ open class Ru9m336MissileEntity(type: EntityType<out Ru9m336MissileEntity>, leve
 
                 if (isLostTarget()) {
                     this.setTargetUUID("none")
+                    lostTargetTick++
                 }
             }
         }

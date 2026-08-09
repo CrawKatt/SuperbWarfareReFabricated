@@ -83,8 +83,12 @@ open class Ru9m100MissileEntity(type: EntityType<out Ru9m100MissileEntity>, leve
 
                 if (isLostTarget()) {
                     this.setTargetUUID("none")
+                    lostTargetTick++
                 }
             }
+        } else if (tickCount >= 200) {
+            causeExplode(position())
+            discard()
         }
 
         if (this.tickCount == 8) {
