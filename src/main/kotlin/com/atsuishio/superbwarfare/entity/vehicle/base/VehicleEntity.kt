@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.annotation.ExcludeBvrSync
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage
 import com.atsuishio.superbwarfare.capability.energy.VehicleEnergyStorage
 import com.atsuishio.superbwarfare.client.animation.entity.VehicleAnimationInstance
+import com.atsuishio.superbwarfare.client.lighting.VehicleLightingHandler
 import com.atsuishio.superbwarfare.client.model.entity.VehicleModelInstance
 import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
@@ -17,7 +18,7 @@ import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.gun.ShootParameters
 import com.atsuishio.superbwarfare.data.vehicle.DefaultVehicleData
 import com.atsuishio.superbwarfare.data.vehicle.VehicleData
-import com.atsuishio.superbwarfare.data.vehicle.VehiclePropertyModifier
+import com.atsuishio.superbwarfare.data.vehicle.VehiclePropertyModifier 
 import com.atsuishio.superbwarfare.data.vehicle.subdata.*
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo.*
 import com.atsuishio.superbwarfare.entity.IBvrSyncableEntity
@@ -507,6 +508,12 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         if (key == GUN_DATA_MAP) {
             gunDataMapCache = null
             gunDataMapWeaponKeys = null
+        }
+
+        if (key == IS_WRECK) {
+            if (this.isWreck && level().isClientSide && this.tickCount > 1) {
+                VehicleLightingHandler.emitVehicleExplosionLight(this)
+            }
         }
     }
 

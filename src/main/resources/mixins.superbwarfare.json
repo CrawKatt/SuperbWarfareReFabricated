@@ -23,7 +23,9 @@
     "VillagerMixin"
   ],
   "client": [
+    "BlockLightEngineMixin",
     "CameraMixin",
+    "ClientLevelMixin",
     "ClientPacketListenerMixin",
     "ClientPlayerEntityMixin",
     "EntityRenderDispatcherMixin",
