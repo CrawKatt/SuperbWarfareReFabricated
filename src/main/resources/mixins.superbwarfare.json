@@ -9,7 +9,6 @@
     "BeastMixin",
     "BlockStateMixin",
     "ClientboundSetPassengersPacketMixin",
-    "ClientLevelMixin",
     "EntityMixin",
     "EntityOnGroundAccessor",
     "EntitySetPosRawMixin",
@@ -26,7 +25,9 @@
     "tacz.EntityUtilMixin"
   ],
   "client": [
+    "BlockLightEngineMixin",
     "CameraMixin",
+    "ClientLevelMixin",
     "ClientPacketListenerMixin",
     "ClientPlayerEntityMixin",
     "EntityRenderDispatcherMixin",
