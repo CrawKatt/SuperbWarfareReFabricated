@@ -7,7 +7,6 @@ import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.RangeTool.calculateFiringSolution
-import com.atsuishio.superbwarfare.tools.VectorTool.checkNoClip
 import com.atsuishio.superbwarfare.tools.angleTo
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
@@ -80,7 +79,7 @@ open class IglaMissileEntity : MissileProjectile, BasicGeoProjectileEntity {
                 if (owner is Player && owner.mainHandItem.`is`(ModItems.IGLA_9K38.get()) && !isLost()) {
                     val handItem = owner.mainHandItem
                     val data = from(handItem)
-                    setLost(!data.zooming.get() || !checkNoClip(owner.eyePosition, targetPos, this.level()))
+                    setLost(!data.zooming.get())
                 }
 
                 if (!isLostTarget() && !isLost()) {
@@ -97,6 +96,10 @@ open class IglaMissileEntity : MissileProjectile, BasicGeoProjectileEntity {
         if (isLost()) {
             deltaMovement = deltaMovement.add(0.0, 0.03, 0.0)
             this.setTargetUUID("none")
+        }
+
+        if (isLostTarget() || isLost()) {
+            lostTargetTick++
         }
     }
 

@@ -5,13 +5,11 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.mojang.math.Axis
 import net.minecraft.core.BlockPos
 import net.minecraft.util.Mth
+import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
-import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
-import net.minecraft.util.RandomSource
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 import org.joml.Quaterniond
@@ -222,25 +220,6 @@ object VectorTool {
             ),
             Mth.lerp(partialTick.toDouble(), entity.zo, entity.z)
         )
-    }
-
-    @JvmStatic
-    fun checkNoClip(pos1: Vec3, pos2: Vec3, level: Level): Boolean {
-        val check1 = level.clip(
-            ClipContext(
-                pos1, pos1.add(pos1.vectorTo(pos2).normalize().scale(128.0)),
-                ClipContext.Block.VISUAL, ClipContext.Fluid.ANY, null
-            )
-        ).type != HitResult.Type.BLOCK
-
-        val check2 = level.clip(
-            ClipContext(
-                pos2, pos2.add(pos2.vectorTo(pos1).normalize().scale(128.0)),
-                ClipContext.Block.VISUAL, ClipContext.Fluid.ANY, null
-            )
-        ).type != HitResult.Type.BLOCK
-
-        return check1 && check2
     }
 
     /**

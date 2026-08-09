@@ -26,6 +26,8 @@ open class Ru3m14MissileEntity(type: EntityType<out Ru3m14MissileEntity>, level:
         return this.anim
     }
 
+    var distance: Double = 0.0
+
     init {
         this.damageValue = 3000f
         this.explosionDamageValue = 1400f
@@ -45,6 +47,10 @@ open class Ru3m14MissileEntity(type: EntityType<out Ru3m14MissileEntity>, level:
         if (getTargetPos() != null && level is ServerLevel) {
             val targetPos = this.getTargetPos()!!
             val d = targetPos.vectorTo(position()).horizontalDistance()
+
+            if (tickCount == 1) {
+                distance = position().vectorTo(targetPos).horizontalDistance()
+            }
 
             toVec = if (tickCount <= 10) {
                 // 点火阶段：先水平对准目标方向
@@ -67,13 +73,13 @@ open class Ru3m14MissileEntity(type: EntityType<out Ru3m14MissileEntity>, level:
         }
 
         if (tickCount in 2..10 && toVec != lookAngle) {
-            turnYaw(toVec, 30f)
+            turnYaw(toVec, 10f)
         }
 
         if (this.tickCount > 10) {
             hugeMissileTrail()
             if (level is ServerLevel) {
-                val lostTarget = (VectorTool.calculateAngle(lookAngle, toVec) > 60 && tickCount > 50)
+                val lostTarget = VectorTool.calculateAngle(lookAngle, toVec) > 90 && tickCount > 100
 
                 this.deltaMovement =
                     this.deltaMovement.add(lookAngle.scale(Mth.clamp(0.06 * (tickCount - 10), 0.15, 2.0)))
@@ -88,14 +94,22 @@ open class Ru3m14MissileEntity(type: EntityType<out Ru3m14MissileEntity>, level:
                         Double.MAX_VALUE
                     }
 
-                    if (getTargetPos() != null && d < 1024) {
-                        // 末端冲刺：径直向目标加速
-                        toVec = position().vectorTo(getTargetPos()!!)
-                        this.deltaMovement = this.deltaMovement.multiply(1.01, 1.01, 1.01).add(toVec.normalize().scale(2.0))
-                        turn(toVec, 90f)
-                    } else {
-                        turn(toVec, ((tickCount - 10) * 0.1f).coerceIn(0f, 30f))
+                    if (getTargetPos() != null) {
+                        if (d < 1024 && distance > 2048) {
+                            // 末端冲刺：径直向目标加速
+                            toVec = position().vectorTo(getTargetPos()!!)
+                            this.deltaMovement = this.deltaMovement.multiply(1.01, 1.01, 1.01).add(toVec.normalize().scale(2.0))
+                            turn(toVec, 90f)
+                        }
+
+                        if (d < 256 && tickCount > 15) {
+                            toVec = position().vectorTo(getTargetPos()!!)
+                            turn(toVec, 4f)
+                        }
                     }
+
+                    turn(toVec, ((tickCount - 10) * 0.15f).coerceIn(0f, 36f))
+
                 } else {
                     lostTargetTick++
                 }
