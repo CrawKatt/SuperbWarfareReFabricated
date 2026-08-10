@@ -730,7 +730,7 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
 
     open fun getCurrentModelEntry(poseStack: PoseStack, entity: T): VehicleModelEntry? {
         val entries = entity.getModelEntries()
-        return selectModelEntry(entries, poseStack)
+        return selectModelEntry(entity, entries, poseStack)
     }
 
     override fun shouldRender(entity: T, pCamera: Frustum, pCamX: Double, pCamY: Double, pCamZ: Double): Boolean {
@@ -782,11 +782,11 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
         }
 
         @JvmStatic
-        fun selectModelEntry(entries: List<VehicleModelEntry>, poseStack: PoseStack): VehicleModelEntry? {
+        fun selectModelEntry(entity: VehicleEntity, entries: List<VehicleModelEntry>, poseStack: PoseStack): VehicleModelEntry? {
             if (entries.isEmpty()) return null
             entries.forEachIndexed { index, entry ->
                 if (index == 0) return@forEachIndexed  // skip main model (distance = 0)
-                if (RenderDistanceHelper.shouldRenderLOD(poseStack, entry.lodDistance.toDouble())) {
+                if (RenderDistanceHelper.shouldRenderLOD(entity, poseStack, entry.lodDistance.toDouble())) {
                     return entry
                 }
             }
