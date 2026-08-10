@@ -127,35 +127,6 @@ object HelicopterHud {
                     color
                 )
 
-                // 指南针
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    COMPASS,
-                    screenWidth.toFloat() / 2 - 128,
-                    10f,
-                    128 - (64f / 45 * VehicleVecUtils.getYRotFromVector(Vec3(mc.gameRenderer.mainCamera.lookVector))
-                        .toFloat()),
-                    0f,
-                    256f,
-                    16f,
-                    512f,
-                    16f,
-                    color
-                )
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    ROLL_IND,
-                    screenWidth / 2f - 8,
-                    30f,
-                    0f,
-                    0f,
-                    16f,
-                    16f,
-                    16f,
-                    16f,
-                    color
-                )
-
                 RenderSystem.disableDepthTest()
                 RenderSystem.depthMask(false)
                 RenderSystem.enableBlend()
@@ -195,6 +166,35 @@ object HelicopterHud {
                     1f,
                     128f,
                     1f,
+                    color
+                )
+
+                // 指南针
+                RenderHelper.preciseBlitWithColor(
+                    guiGraphics,
+                    COMPASS,
+                    screenWidth.toFloat() / 2 - 128,
+                    10f,
+                    128 - (64f / 45 * VehicleVecUtils.getYRotFromVector(Vec3(mc.gameRenderer.mainCamera.lookVector))
+                        .toFloat()),
+                    0f,
+                    256f,
+                    16f,
+                    512f,
+                    16f,
+                    color
+                )
+                RenderHelper.preciseBlitWithColor(
+                    guiGraphics,
+                    ROLL_IND,
+                    screenWidth / 2f - 8,
+                    30f,
+                    0f,
+                    0f,
+                    16f,
+                    16f,
+                    16f,
+                    16f,
                     color
                 )
 
