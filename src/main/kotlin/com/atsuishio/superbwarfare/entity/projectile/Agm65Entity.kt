@@ -67,6 +67,7 @@ open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : Missil
                             entity.y + (if (entity is EnderDragon) -2 else 0) + height,
                             entity.z
                         )
+                        setTargetPos(targetPos)
                         toVec = calculateFiringSolution(
                             position(),
                             targetPos,
@@ -76,9 +77,8 @@ open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : Missil
                         )
                     }
                 }
-            } else if (tickCount > 200) {
-                discard()
-                causeExplode(position())
+            } else {
+                lostTargetTick ++
             }
         } else {
             if (level is ServerLevel && getTargetPos() != null) {
@@ -87,10 +87,10 @@ open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : Missil
                 val targetPos = this.getTargetPos()!!.add(0.0, height, 0.0)
                 toVec = calculateFiringSolution(position(), targetPos, Vec3.ZERO, deltaMovement.length(), 0.0)
             }
-            if (getTargetPos() == null && tickCount > 200) {
-                discard()
-                causeExplode(position())
-            }
+        }
+
+        if (getTargetPos() == null) {
+            lostTargetTick ++
         }
 
         if (this.tickCount > 8) {
