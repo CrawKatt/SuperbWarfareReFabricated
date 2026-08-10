@@ -141,23 +141,6 @@ object HelicopterHud {
                 )
                 RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
 
-                // 指南针
-                RenderHelper.blit(
-                    poseStack,
-                    COMPASS,
-                    screenWidth.toFloat() / 2 - 128,
-                    10f,
-                    128 - (64f / 45 * VehicleVecUtils.getYRotFromVector(Vec3(mc.gameRenderer.mainCamera.lookVector))
-                        .toFloat()),
-                    0f,
-                    256f,
-                    16f,
-                    512f,
-                    16f,
-                    color
-                )
-                RenderHelper.blit(poseStack, ROLL_IND, screenWidth / 2f - 8, 30f, 0f, 0f, 16f, 16f, 16f, 16f, color)
-
                 // 电视
                 val addW = (screenWidth / screenHeight) * 48
                 val addH = (screenWidth / screenHeight) * 27
@@ -187,6 +170,23 @@ object HelicopterHud {
                     1f,
                     color
                 )
+
+                // 指南针
+                RenderHelper.blit(
+                    poseStack,
+                    COMPASS,
+                    screenWidth.toFloat() / 2 - 128,
+                    10f,
+                    128 - (64f / 45 * VehicleVecUtils.getYRotFromVector(Vec3(mc.gameRenderer.mainCamera.lookVector))
+                        .toFloat()),
+                    0f,
+                    256f,
+                    16f,
+                    512f,
+                    16f,
+                    color
+                )
+                RenderHelper.blit(poseStack, ROLL_IND, screenWidth / 2f - 8, 30f, 0f, 0f, 16f, 16f, 16f, 16f, color)
 
                 // 时速
                 guiGraphics.drawString(
