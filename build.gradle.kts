@@ -231,7 +231,7 @@ fun DependencyHandler.jijImplement(dependency: String, maxVersion: String? = nul
 
 //    println("$name [$version,$maximumVersion)")
 
-    val dependencyImpl = runtimeOnly(group = group, name = name, version = version)
+    val dependencyImpl = implementation(group = group, name = name, version = version)
     jarJar(dependencyImpl) {
         version {
             strictly("[$version,$maximumVersion)")
@@ -265,10 +265,13 @@ dependencies {
     }
 
     // ponder
-    jijImplement("net.createmod.ponder:Ponder-NeoForge-${project.property("minecraft_version")}:${project.property("ponder_version")}")
+    jijImplement("net.createmod.ponder:ponder-neoforge:${project.property("ponder_version")}+mc${project.property("minecraft_version")}")
 
     // 飞轮
     jijImplement("dev.engine-room.flywheel:flywheel-neoforge-${project.property("minecraft_version")}:${project.property("flywheel_version")}")
+
+    // Cloth Config
+    jijImplement("me.shedaniel.cloth:cloth-config-neoforge:${project.property("cloth_config_version")}")
 
     // 可选mod依赖
     compileOnly("mezz.jei:jei-1.21.1-common-api:${project.property("jei_version")}")
@@ -279,21 +282,6 @@ dependencies {
     // 帕秋莉手册
     compileOnly("curse.maven:patchouli-306770:6164617")
     runtimeOnly("curse.maven:patchouli-306770:6164617")
-
-    val clothConfigVersion = project.property("cloth_config_version") as String?
-    // Cloth Config相关
-    val clothConfig = implementation(
-        group = "me.shedaniel.cloth",
-        name = "cloth-config-neoforge",
-        version = clothConfigVersion
-    )
-
-    jarJar(clothConfig) {
-        version {
-            strictly("[$clothConfigVersion,16.0.0)")
-            prefer(clothConfigVersion)
-        }
-    }
 
     // Kubejs
     implementation("curse.maven:kubejs-238086:7278501")
