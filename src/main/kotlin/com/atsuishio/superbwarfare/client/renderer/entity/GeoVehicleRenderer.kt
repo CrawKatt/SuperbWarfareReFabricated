@@ -419,69 +419,71 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        val seats = this.seatsCache ?: entity.computed().seats().also { this.seatsCache = it }
 
-        for ((index, seat) in seats.withIndex()) {
-            for (k in seat.weapons().indices) {
-                val data = entity.getGunData(index, k) ?: continue
-                val dummyInfo = data.get(GunProp.PROJECTILE_DUMMY_INFO) ?: continue
-                val ammo = data.ammo.get()
-                if (ammo <= 0) continue
+        if (entity.health >= 0) {
+            val seats = this.seatsCache ?: entity.computed().seats().also { this.seatsCache = it }
+            for ((index, seat) in seats.withIndex()) {
+                for (k in seat.weapons().indices) {
+                    val data = entity.getGunData(index, k) ?: continue
+                    val dummyInfo = data.get(GunProp.PROJECTILE_DUMMY_INFO) ?: continue
+                    val ammo = data.ammo.get()
+                    if (ammo <= 0) continue
 
-                val projectileInfo = data.get(GunProp.PROJECTILE)
-                val projectileType = projectileInfo.itemId
+                    val projectileInfo = data.get(GunProp.PROJECTILE)
+                    val projectileType = projectileInfo.itemId
 
-                EntityType.byString(projectileType).ifPresent { entityType ->
-                    val projectile = entityType.create(entity.level()) ?: return@ifPresent
-                    projectile.tickCount = 1
-                    if (projectile is FastThrowableProjectile) {
-                        projectile.syncedTick = 1
-                    }
-
-                    val size = data.get(GunProp.SHOOT_POS).positions.size
-                    if (size <= 0) return@ifPresent
-
-                    for (j in 0..<size) {
-                        if (j >= ammo) continue
-
-                        val dummyName = "dummy_${index}_${k}_${j + 1}"
-                        val bone = instance.getBone(dummyName) ?: continue
-
-                        poseStack.pushPose()
-                        poseStack.mulPoseMatrix(bone.getGlobalTransform(instance))
-                        val boneDef = bone.definition()
-                        poseStack.translate(boneDef.pivotX(), boneDef.pivotY(), boneDef.pivotZ())
-
-                        val scale = dummyInfo.scale
-                        poseStack.scale(scale.x.toFloat(), scale.y.toFloat(), scale.z.toFloat())
-                        poseStack.mulPose(Axis.YP.rotationDegrees(180f))
-
-                        val rotate = dummyInfo.rotate
-                        val quaternion = Quaternionf()
-                            .rotateZ(rotate.z.toFloat() * Mth.DEG_TO_RAD)
-                            .rotateX(rotate.x.toFloat() * Mth.DEG_TO_RAD)
-                            .rotateY(rotate.y.toFloat() * Mth.DEG_TO_RAD)
-                        poseStack.mulPose(quaternion)
-
-                        val offset = dummyInfo.offset
-
-                        val flag = dummyInfo.hideDummyWhileZooming && ClientEventHandler.zoomVehicle
-
-                        if (!flag) {
-                            entityRenderDispatcher.render(
-                                projectile,
-                                offset.x,
-                                offset.y,
-                                offset.z,
-                                entityYaw,
-                                partialTicks,
-                                poseStack,
-                                buffer,
-                                packedLight
-                            )
+                    EntityType.byString(projectileType).ifPresent { entityType ->
+                        val projectile = entityType.create(entity.level()) ?: return@ifPresent
+                        projectile.tickCount = 1
+                        if (projectile is FastThrowableProjectile) {
+                            projectile.syncedTick = 1
                         }
 
-                        poseStack.popPose()
+                        val size = data.get(GunProp.SHOOT_POS).positions.size
+                        if (size <= 0) return@ifPresent
+
+                        for (j in 0..<size) {
+                            if (j >= ammo) continue
+
+                            val dummyName = "dummy_${index}_${k}_${j + 1}"
+                            val bone = instance.getBone(dummyName) ?: continue
+
+                            poseStack.pushPose()
+                            poseStack.mulPoseMatrix(bone.getGlobalTransform(instance))
+                            val boneDef = bone.definition()
+                            poseStack.translate(boneDef.pivotX(), boneDef.pivotY(), boneDef.pivotZ())
+
+                            val scale = dummyInfo.scale
+                            poseStack.scale(scale.x.toFloat(), scale.y.toFloat(), scale.z.toFloat())
+                            poseStack.mulPose(Axis.YP.rotationDegrees(180f))
+
+                            val rotate = dummyInfo.rotate
+                            val quaternion = Quaternionf()
+                                .rotateZ(rotate.z.toFloat() * Mth.DEG_TO_RAD)
+                                .rotateX(rotate.x.toFloat() * Mth.DEG_TO_RAD)
+                                .rotateY(rotate.y.toFloat() * Mth.DEG_TO_RAD)
+                            poseStack.mulPose(quaternion)
+
+                            val offset = dummyInfo.offset
+
+                            val flag = dummyInfo.hideDummyWhileZooming && ClientEventHandler.zoomVehicle
+
+                            if (!flag) {
+                                entityRenderDispatcher.render(
+                                    projectile,
+                                    offset.x,
+                                    offset.y,
+                                    offset.z,
+                                    entityYaw,
+                                    partialTicks,
+                                    poseStack,
+                                    buffer,
+                                    packedLight
+                                )
+                            }
+
+                            poseStack.popPose()
+                        }
                     }
                 }
             }
