@@ -173,6 +173,8 @@ open class Fh77bwEntity(type: EntityType<Fh77bwEntity>, world: Level) : SpArtill
     }
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        super.defineSynchedData(builder)
+
         with(builder) {
             define(CLOSE, true)
             define(OPENED, false)
