@@ -212,6 +212,34 @@ configurations {
     getByName("runtimeClasspath").extendsFrom(getByName("localRuntime"))
 }
 
+fun DependencyHandler.jijImplement(dependency: String, maxVersion: String? = null) {
+    val (group, name, version) = dependency.split(":")
+
+    val maximumVersion = maxVersion ?: run {
+        val versions = version.split(".")
+        val firstVersionNumber = versions[0].toIntOrNull()
+        val firstVersion = if (firstVersionNumber != null) {
+            (firstVersionNumber + 1).toString()
+        } else {
+            versions[0]
+        }
+
+        return@run "$firstVersion." + versions.drop(1).joinToString(".") {
+            it.replace(Regex("""^\d+"""), "0")
+        }
+    }
+
+//    println("$name [$version,$maximumVersion)")
+
+    val dependencyImpl = runtimeOnly(group = group, name = name, version = version)
+    jarJar(dependencyImpl) {
+        version {
+            strictly("[$version,$maximumVersion)")
+            prefer(version)
+        }
+    }
+}
+
 dependencies {
     ksp(project(":ksp"))
     implementation(project(":ksp"))
@@ -220,78 +248,27 @@ dependencies {
 
     implementation("software.bernie.geckolib:geckolib-neoforge-1.21.1:4.7.5")
 
-    val curios = implementation(
-        group = "top.theillusivec4.curios",
-        name = "curios-neoforge",
-        version = "9.2.0+1.21.1"
-    )
-    jarJar(curios) {
-        version {
-            strictly("[9.2.0+1.21.1,10.0.0)")
-            prefer("9.2.0+1.21.1")
-        }
-    }
-    runtimeOnly("top.theillusivec4.curios:curios-neoforge:9.2.0+1.21.1")
-    compileOnly("top.theillusivec4.curios:curios-neoforge:9.2.0+1.21.1:api")
+    // curios
+    jijImplement("top.theillusivec4.curios:curios-neoforge:9.2.0+1.21.1")
 
     // 从ywzj毛来的Rhino
     add("additionalRuntimeClasspath", "org.ywzj:rhino:1.8.1-SNAPSHOT")
-    val rhino = implementation(
-        group = "org.ywzj",
-        name = "rhino",
-        version = "1.8.1-SNAPSHOT"
-    )
-    jarJar(rhino) {
-        version {
-            strictly("[1.8.0, 2.0.0)")
-            prefer("1.8.1-SNAPSHOT")
-        }
-    }
+    jijImplement("org.ywzj:rhino:1.8.1-SNAPSHOT")
 
     // SBM
-    val sbm = implementation(
-        group = "com.github.MCModderAnchor",
-        name = "SimpleBedrockModel",
-        version = "2.5.1-neoforge-mc1.21.1",
-    )
-    jarJar(sbm) {
-        version {
-            strictly("[2.0,3.0)")
-            prefer("2.5.1-neoforge-mc1.21.1")
-        }
-    }
+    jijImplement("com.github.MCModderAnchor:SimpleBedrockModel:2.5.1-neoforge-mc1.21.1")
+
     compileOnly("com.maydaymemory:mae:1.1.2") {
         exclude("com.google.code.findbugs", "jsr305")
         exclude("it.unimi.dsi", "fastutil")
         exclude("org.joml", "joml")
     }
 
-    val ponderVersion = project.property("ponder_version") as String?
-    val ponder = implementation(
-        group = "net.createmod.ponder",
-        name = "Ponder-NeoForge-${project.property("minecraft_version")}",
-        version = ponderVersion,
-    )
+    // ponder
+    jijImplement("net.createmod.ponder:Ponder-NeoForge-${project.property("minecraft_version")}:${project.property("ponder_version")}")
 
-    jarJar(ponder) {
-        version {
-            strictly("[$ponderVersion,2.0.0)")
-            prefer(ponderVersion)
-        }
-    }
-
-    val flywheelVersion = project.property("flywheel_version") as String?
-    val flywheel = runtimeOnly(
-        group = "dev.engine-room.flywheel",
-        name = "flywheel-neoforge-${project.property("minecraft_version")}",
-        version = flywheelVersion,
-    )
-    jarJar(flywheel) {
-        version {
-            strictly("[$flywheelVersion,2.0.0)")
-            prefer(flywheelVersion)
-        }
-    }
+    // 飞轮
+    jijImplement("dev.engine-room.flywheel:flywheel-neoforge-${project.property("minecraft_version")}:${project.property("flywheel_version")}")
 
     // 可选mod依赖
     compileOnly("mezz.jei:jei-1.21.1-common-api:${project.property("jei_version")}")
