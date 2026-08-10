@@ -14,18 +14,18 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.Items
 import net.minecraft.world.phys.Vec3
 
-object TargetPonderScene {
+object TargetDeployerPonderScene {
     fun register(helper: PonderSceneRegistrationHelper<ResourceLocation>) {
         helper.forComponents(loc("target_deployer"))
-            .addStoryBoard("basic_5x5", TargetPonderScene::introScene)
-            .addStoryBoard("basic_5x5", TargetPonderScene::interactScene)
+            .addStoryBoard("basic_5x5", TargetDeployerPonderScene::introScene)
+            .addStoryBoard("basic_5x5", TargetDeployerPonderScene::interactScene)
     }
 
     private fun introScene(scene: SceneBuilder, util: SceneBuildingUtil) {
         with(scene) {
             configureBasePlate(0, 0, 5)
 
-            title("target_intro", "Target Introduction")
+            title("target_deployer_intro", "Target Introduction")
 
             showBasePlate()
             world().showSection(util.select().everywhere(), Direction.UP)
@@ -73,7 +73,7 @@ object TargetPonderScene {
         with(scene) {
             configureBasePlate(0, 0, 5)
 
-            title("target_interact", "Target Interaction")
+            title("target_deployer_interact", "Target Interaction")
 
             showBasePlate()
             world().showSection(util.select().everywhere(), Direction.UP)
