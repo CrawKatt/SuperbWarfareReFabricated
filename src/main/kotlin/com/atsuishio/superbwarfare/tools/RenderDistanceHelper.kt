@@ -1,7 +1,9 @@
 package com.atsuishio.superbwarfare.tools
 
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.mojang.blaze3d.vertex.PoseStack
+import net.createmod.ponder.api.level.PonderLevel
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 
@@ -20,8 +22,9 @@ object RenderDistanceHelper {
     }
 
     @JvmStatic
-    fun shouldRenderLOD(poseStack: PoseStack, distance: Double): Boolean {
+    fun shouldRenderLOD(entity: VehicleEntity, poseStack: PoseStack, distance: Double): Boolean {
         if (isInGui()) return false
+        if (entity.level() is PonderLevel) return false
         val globalLODDistance = try {
             DisplayConfig.VEHICLE_LOD_DISTANCE.get()
         } catch (_: Exception) {
