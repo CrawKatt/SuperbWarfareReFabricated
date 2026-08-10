@@ -215,7 +215,7 @@
       "AvailableFireModes": "Semi",
       "Magazine": 8,
       "EmptyReloadTime": 260,
-      "Projectile": "superbwarfare:ru_9m336_missile",
+      "Projectile": "superbwarfare:fim_92_missile",
       "Name": "weapon.superbwarfare.fim_92_missile",
       "Damage": 260,
       "RPM": 30,
