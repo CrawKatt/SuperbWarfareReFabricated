@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.entity.vehicle.utils
 
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo
+import com.atsuishio.superbwarfare.entity.vehicle.Ac130hEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleEngineUtils.aircraftLoiter
 import com.atsuishio.superbwarfare.init.ModDamageTypes
@@ -1052,7 +1053,11 @@ object VehicleEngineUtils {
             if (onGround()) {
                 destroyRot *= 0.95f
             } else {
-                destroyRot += 0.1f
+                destroyRot += if (vehicle is Ac130hEntity) {
+                    0.02f
+                } else {
+                    0.1f
+                }
             }
 
             val diffX: Float = 90 - xRot
