@@ -35,7 +35,7 @@ open class Ru9m336MissileEntity(type: EntityType<out Ru9m336MissileEntity>, leve
 
         val entity = EntityFindUtil.findEntity(this.level(), this.getTargetUUID())
         if (entity != null && this.getTargetUUID() != "none") {
-            if ((!entity.getPassengers().isEmpty() || entity is VehicleEntity)
+            if ((entity.getPassengers().isNotEmpty() || entity is VehicleEntity)
                 && entity.tickCount % (max(0.04 * this.distanceTo(entity), 2.0).toInt()) == 0
             ) {
                 entity.level().playSound(
@@ -74,6 +74,9 @@ open class Ru9m336MissileEntity(type: EntityType<out Ru9m336MissileEntity>, leve
                     lostTargetTick++
                 }
             }
+        } else if (tickCount >= 200) {
+            causeExplode(position())
+            discard()
         }
     }
 

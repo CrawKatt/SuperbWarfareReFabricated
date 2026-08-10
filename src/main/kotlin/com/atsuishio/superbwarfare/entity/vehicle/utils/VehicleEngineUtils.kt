@@ -486,7 +486,7 @@ object VehicleEngineUtils {
             addRandomParticle(
                 ParticleTypes.BUBBLE_COLUMN_UP, position().add(
                     -4.5 * lookAngle.x,
-                    -0.25,
+                    y - 0.25,
                     -4.5 * lookAngle.z
                 ), 0.3f, level(), 0f, (40 * Mth.abs(power)).toInt()
             )
