@@ -160,6 +160,34 @@ repositories {
     }
 }
 
+fun DependencyHandler.jijImplement(dependency: String, maxVersion: String? = null) {
+    val (name, _, version) = dependency.split(":")
+
+    val firstVersion = version.split(".")
+        .takeWhile { Regex("""^\d+$""").matches(it) }
+        .joinToString(".")
+
+    val maximumVersion = maxVersion ?: run {
+        val versions = firstVersion.split(".")
+        val firstVersionNumber = versions[0].toIntOrNull()
+        val firstVersion = if (firstVersionNumber != null) {
+            (firstVersionNumber + 1).toString()
+        } else {
+            versions[0]
+        }
+
+        return@run "$firstVersion." + versions.drop(1).joinToString(".") { "0" }
+    }
+
+    println("$name [$firstVersion,$maximumVersion)")
+
+    val dependencyImpl = implementation(fg.deobf(dependency))
+    jarJar(dependencyImpl) {
+        jarJar.ranged(dependencyImpl, "[$firstVersion,$maximumVersion)")
+    }
+}
+
+
 jarJar.enable()
 
 dependencies {
@@ -168,11 +196,7 @@ dependencies {
     minecraft("net.minecraftforge:forge:1.20.1-47.2.0")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
-    val curios = implementation(fg.deobf("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1"))
-    jarJar(curios) {
-        jarJar.ranged(curios, "[5.14.1,6.0.0)")
-    }
-    compileOnly(fg.deobf("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1:api"))
+    jijImplement("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1")
 
     implementation(fg.deobf("software.bernie.geckolib:geckolib-forge-1.20.1:4.4.6"))
     implementation(fg.deobf("com.eliotlash.mclib:mclib:20"))
@@ -185,10 +209,7 @@ dependencies {
     }
 
     // SBM
-    val sbm = implementation(fg.deobf("com.github.mcmodderanchor:simplebedrockmodel:2.5.1-forge-mc1.20.1"))
-    jarJar(sbm) {
-        jarJar.ranged(sbm, "[2.5.1,)")
-    }
+    jijImplement("com.github.mcmodderanchor:simplebedrockmodel:2.5.1-forge-mc1.20.1")
     compileOnly("com.maydaymemory:mae:1.1.2") {
         exclude("com.google.code.findbugs", "jsr305")
         exclude("it.unimi.dsi", "fastutil")
@@ -196,30 +217,16 @@ dependencies {
     }
 
     // Ponder
-    val ponder = implementation(
-        fg.deobf("net.createmod.ponder:Ponder-Forge-${project.property("minecraft_version")}:${project.property("ponder_version")}")
-    )
-    jarJar(ponder) {
-        jarJar.ranged(ponder, "[1.0.91,)")
-    }
-    val flywheel = runtimeOnly(
-        fg.deobf("dev.engine-room.flywheel:flywheel-forge-${project.property("minecraft_version")}:${project.property("flywheel_version")}")
-    )
-    jarJar(flywheel) {
-        jarJar.ranged(flywheel, "[1.0,2.0)")
-    }
+    jijImplement("net.createmod.ponder:Ponder-Forge-${project.property("minecraft_version")}:${project.property("ponder_version")}")
+
+    // 飞轮
+    jijImplement("dev.engine-room.flywheel:flywheel-forge-${project.property("minecraft_version")}:${project.property("flywheel_version")}")
 
     // TODO 我需要掌中明月 我需要掌中明月 我需要掌中明月 我需要掌中明月 我需要掌中明月 但是这个JIJ写法不对
-//    val moon = implementation(fg.deobf("curse.maven:handheld-moon-1398036:7300858"))
-//    jarJar(moon) {
-//        jarJar.ranged(moon, "[1.0.0,)")
-//    }
+//    jijImplement("curse.maven:handheld-moon-1398036:7300858")
 
     // AUI
-//    val aui = implementation("com.sighs:ApricityUI-forge-1.20.1:1.1.4")
-//    jarJar(aui) {
-//        jarJar.ranged(aui, "[1.1.4,)")
-//    }
+//    jijImplement("com.sighs:ApricityUI-forge-1.20.1:1.1.4")
 
     // 可选 mod 依赖
 
@@ -235,11 +242,7 @@ dependencies {
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:1.20.1-84-FORGE"))
 
     // Cloth Config相关
-    val clothConfig =
-        implementation(fg.deobf("me.shedaniel.cloth:cloth-config-forge:${project.property("cloth_config_version")}"))
-    jarJar(clothConfig) {
-        jarJar.ranged(clothConfig, "[11.1.106,12.0.0)")
-    }
+    jijImplement("me.shedaniel.cloth:cloth-config-forge:${project.property("cloth_config_version")}")
 
     // Jade相关
     implementation(fg.deobf("curse.maven:jade-324717:${project.property("jade_version")}"))
