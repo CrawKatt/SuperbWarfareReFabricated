@@ -138,7 +138,7 @@ object PlayerEventHandler {
         val left = event.left
         val right = event.right
 
-        if (left.item is GunItem && right.item === ModItems.SHORTCUT_PACK.get()) {
+        if (left.item is GunItem && right.item == ModItems.SHORTCUT_PACK.get()) {
             val output = left.copy()
 
             val data = from(output)

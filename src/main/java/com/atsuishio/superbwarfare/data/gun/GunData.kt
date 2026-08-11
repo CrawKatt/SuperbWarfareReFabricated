@@ -39,6 +39,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.energy.IEnergyStorage
 import net.neoforged.neoforge.items.IItemHandler
@@ -1009,26 +1010,38 @@ class GunData private constructor(
         val currentCombined = nbtVersion.structural + nbtVersion.state
         if (currentCombined == initialCombinedVersion) return
 
-        // TODO Implement proper empty tag removal
-//        var keysToRemove = new ArrayList<String>();
-//        for (var key : perkTag.getAllKeys()) {
-//            if (perkTag.get(key) instanceof CompoundTag compoundTag && compoundTag.isEmpty()) {
-//                keysToRemove.add(key);
-//            }
-//        }
-//        keysToRemove.forEach(perkTag::remove);
-//
-//        if (perkTag.isEmpty()) {
-//            stack.removeTagKey("Perks");
-//        }
-//
-//        if (attachmentTag.isEmpty()) {
-//            stack.removeTagKey("Attachments");
-//        }
-//
-//        if (gunDataTag.isEmpty()) {
-//            stack.removeTagKey("GunData");
-//        }
+        val keysToRemove = mutableListOf<String>()
+        for (key in perkTag.allKeys) {
+            val compoundTag = perkTag.get(key) as? CompoundTag
+            if (compoundTag?.isEmpty ?: false) {
+                keysToRemove.add(key)
+            }
+        }
+        keysToRemove.forEach { key -> perkTag.remove(key) }
+
+        val cleanedTag = tag.copy()
+
+        if (perkTag.isEmpty) {
+            cleanedTag.remove("Perks")
+        }
+
+        if (attachmentTag.isEmpty) {
+            cleanedTag.remove("Attachments")
+        }
+
+        if (gunDataTag.isEmpty) {
+            cleanedTag.remove("GunData")
+        }
+
+        if (!tag.isEmpty) {
+            val current = stack.get(DataComponents.CUSTOM_DATA)?.copyTag()
+            if (current == cleanedTag) return
+
+            stack.set(DataComponents.CUSTOM_DATA, CustomData.of(cleanedTag))
+        } else {
+            if (!stack.has(DataComponents.CUSTOM_DATA)) return
+            stack.remove(DataComponents.CUSTOM_DATA)
+        }
     }
 
     /**
