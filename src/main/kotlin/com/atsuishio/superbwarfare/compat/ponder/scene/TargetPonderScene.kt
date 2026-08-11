@@ -25,7 +25,7 @@ object TargetPonderScene {
         with(scene) {
             configureBasePlate(0, 0, 5)
 
-            title("target_intro", "Target Introduction")
+            title("target_deployer_intro", "Target Introduction")
 
             showBasePlate()
             world().showSection(util.select().everywhere(), Direction.UP)
@@ -73,7 +73,7 @@ object TargetPonderScene {
         with(scene) {
             configureBasePlate(0, 0, 5)
 
-            title("target_interact", "Target Interaction")
+            title("target_deployer_interact", "Target Interaction")
 
             showBasePlate()
             world().showSection(util.select().everywhere(), Direction.UP)
