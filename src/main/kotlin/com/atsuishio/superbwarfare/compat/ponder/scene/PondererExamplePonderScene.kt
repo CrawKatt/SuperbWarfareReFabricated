@@ -13,13 +13,13 @@ object PondererExamplePonderScene {
     fun register(helper: PonderSceneRegistrationHelper<ResourceLocation>) {
         helper.forComponents(ResourceLocation.fromNamespaceAndPath("minecraft", "writable_book"))
             .addStoryBoard("basic_5x5", PondererExamplePonderScene::introScene)
-            .addStoryBoard("basic_5x5", PondererExamplePonderScene::interactScene)
-            .addStoryBoard("basic_9x9", PondererExamplePonderScene::thirdScene)
-            .addStoryBoard("basic_5x5", PondererExamplePonderScene::fourthScene)
+            .addStoryBoard("basic_5x5", PondererExamplePonderScene::worldBlocksScene)
+            .addStoryBoard("basic_9x9", PondererExamplePonderScene::sectionsScene)
+            .addStoryBoard("basic_5x5", PondererExamplePonderScene::entitiesScene)
     }
 
     private fun introScene(scene: SceneBuilder, util: SceneBuildingUtil) {
-        scene.title("ponderer_example_page_1_structure_overlay", "Page 1/4 - Structure & Overlay")
+        scene.title("ponderer_example_intro", "Ponderer Example: Structure & Overlay")
         val context = GeneratedPonderSupport.Context()
         GeneratedPonderSupport.preScanBounds(scene, BlockPos(0, 0, 0), BlockPos(5, 4, 5))
         scene.addKeyframe()
@@ -41,8 +41,8 @@ object PondererExamplePonderScene {
     }
 
 
-    private fun interactScene(scene: SceneBuilder, util: SceneBuildingUtil) {
-        scene.title("ponderer_example_page_2_world_blocks", "Page 2/4 - Block Operations")
+    private fun worldBlocksScene(scene: SceneBuilder, util: SceneBuildingUtil) {
+        scene.title("ponderer_example_world_blocks", "Ponderer Example: World Blocks")
         val context = GeneratedPonderSupport.Context()
         GeneratedPonderSupport.preScanBounds(scene, BlockPos(0, 0, 0), BlockPos(4, 1, 4))
         scene.addKeyframe()
@@ -83,8 +83,8 @@ object PondererExamplePonderScene {
     }
 
 
-    private fun thirdScene(scene: SceneBuilder, util: SceneBuildingUtil) {
-        scene.title("ponderer_example_page_3_sections", "Page 3/4 - Section Operations")
+    private fun sectionsScene(scene: SceneBuilder, util: SceneBuildingUtil) {
+        scene.title("ponderer_example_sections", "Ponderer Example: Sections")
         val context = GeneratedPonderSupport.Context()
         GeneratedPonderSupport.preScanBounds(scene, BlockPos(0, 0, 0), BlockPos(2, 3, 2))
         scene.addKeyframe()
@@ -114,8 +114,8 @@ object PondererExamplePonderScene {
     }
 
 
-    private fun fourthScene(scene: SceneBuilder, util: SceneBuildingUtil) {
-        scene.title("ponderer_example_page_4_entities_camera_sound", "Page 4/4 - Entity, Camera & Sound")
+    private fun entitiesScene(scene: SceneBuilder, util: SceneBuildingUtil) {
+        scene.title("ponderer_example_entities", "Ponderer Example: Entities, Camera & Sound")
         val context = GeneratedPonderSupport.Context()
         scene.addKeyframe()
         GeneratedPonderSupport.showStructure(scene, context, null, null, null, null)

@@ -1,15 +1,20 @@
 ﻿package com.atsuishio.superbwarfare.compat.ponder.scene
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
-import com.atsuishio.superbwarfare.compat.ponder.GeneratedPonderSupport
+import com.atsuishio.superbwarfare.entity.living.TargetEntity
+import com.atsuishio.superbwarfare.init.ModEntities
+import net.createmod.catnip.math.Pointing
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper
 import net.createmod.ponder.api.scene.SceneBuilder
 import net.createmod.ponder.api.scene.SceneBuildingUtil
+import net.minecraft.commands.arguments.EntityAnchorArgument
+import net.minecraft.core.Direction
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.item.Items
 import net.minecraft.world.phys.Vec3
 
 object TargetDeployerPonderScene {
-
     fun register(helper: PonderSceneRegistrationHelper<ResourceLocation>) {
         helper.forComponents(loc("target_deployer"))
             .addStoryBoard("basic_5x5", TargetDeployerPonderScene::introScene)
@@ -17,44 +22,103 @@ object TargetDeployerPonderScene {
     }
 
     private fun introScene(scene: SceneBuilder, util: SceneBuildingUtil) {
-        scene.title("target_deployer_scene_1", "Introduction")
-        val context = GeneratedPonderSupport.Context()
-        scene.addKeyframe()
-        GeneratedPonderSupport.showStructure(scene, context, null, null, null, null)
-        GeneratedPonderSupport.createEntity(scene, context, "superbwarfare:target", Vec3(2.5, 1.0, 2.5), null, null, null, null, "1", "simultaneous", null, "down")
-        GeneratedPonderSupport.showText(scene, "标靶是卓越前线的第一个物品", Vec3(3.5, 1.0, 3.5), 40, null, true)
-        scene.idle(60)
-        scene.addKeyframe()
-        GeneratedPonderSupport.showText(scene, "使用武器攻击标靶可以显示该次攻击的伤害", Vec3(3.5, 1.0, 4.5), 60, null, true)
-        scene.idle(20)
-        GeneratedPonderSupport.showControls(scene, Vec3(2.5, 2.0, 2.5), "right", 40, "left", "minecraft:diamond_sword", null, false, false)
-        scene.idle(60)
-    }
+        with(scene) {
+            configureBasePlate(0, 0, 5)
 
+            title("target_deployer_intro", "Target Introduction")
+
+            showBasePlate()
+            world().showSection(util.select().everywhere(), Direction.UP)
+
+            val centerPos = util.grid().at(2, 0, 2)
+            val pos = util.vector().topOf(centerPos)
+            val entity = world().createEntity {
+                val target = ModEntities.TARGET.get().create(it) ?: return@createEntity null
+                target.setPosRaw(pos.x, pos.y, pos.z)
+                target.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3(pos.x, pos.y, pos.z - 1))
+                target.xRot = 0f
+                target.xRotO = 0f
+                target
+            }
+
+            idle(20)
+            overlay().showText(40).pointAt(Vec3(3.5, 1.0, 3.5)).placeNearTarget()
+                .text("The Target is the first item in Superb Warfare")
+            idle(40)
+
+            idle(20)
+            addKeyframe()
+            overlay().showText(40).pointAt(Vec3(3.5, 1.0, 4.5)).placeNearTarget()
+                .text("Attacking the Target with a weapon will display the damage dealt by that attack")
+            idle(20)
+
+            overlay().showControls(Vec3(2.5, 2.0, 2.5), Pointing.RIGHT, 40)
+                .withItem(Items.DIAMOND_SWORD.defaultInstance)
+                .leftClick()
+            idle(25)
+            world().modifyEntity(entity) {
+                val target = it as? TargetEntity ?: return@modifyEntity
+                target.downTime = 40
+            }
+
+            overlay().showText(40).pointAt(Vec3(3.5, 1.0, 4.5)).placeNearTarget()
+                .text("The Target will fall down after taking enough damage, and will recover after a short time")
+            idle(55)
+
+            markAsFinished()
+        }
+    }
 
     private fun interactScene(scene: SceneBuilder, util: SceneBuildingUtil) {
-        scene.title("target_deployer_s_c3454", "交互")
-        val context = GeneratedPonderSupport.Context()
-        GeneratedPonderSupport.showStructure(scene, context, null, null, null, null)
-        GeneratedPonderSupport.createEntity(scene, context, "superbwarfare:target", Vec3(2.5, 1.0, 2.5), Vec3(1.5, 1.0, 2.5), null, null, null, "1", "simultaneous", null, "down")
-        scene.idle(20)
-        scene.addKeyframe()
-        GeneratedPonderSupport.showText(scene, "空手右击可以让标靶面朝自己", Vec3(2.5, 2.0, 2.5), 40, null, true)
-        scene.idle(20)
-        GeneratedPonderSupport.showControls(scene, Vec3(2.5, 2.0, 2.5), "right", 20, "right", null, null, false, false)
-        scene.idle(20)
-        GeneratedPonderSupport.modifyEntitiesNbt(scene, context, false, "superbwarfare:target", "1", "{Rotation:[180f,0f]}", null, null, null, null, null)
-        scene.idle(20)
-        scene.addKeyframe()
-        scene.idle(20)
-        scene.addKeyframe()
-        GeneratedPonderSupport.showText(scene, "潜行时空手右击能够拆除标靶", Vec3(2.5, 2.0, 2.5), 40, null, true)
-        scene.idle(20)
-        GeneratedPonderSupport.showControls(scene, Vec3(2.5, 2.0, 2.5), "right", 20, "right", null, null, true, false)
-        scene.idle(20)
-        GeneratedPonderSupport.clearEntities(scene, context, false, "superbwarfare:target", "1", null, null, null, null, null)
-        scene.idle(20)
+        with(scene) {
+            configureBasePlate(0, 0, 5)
+
+            title("target_deployer_interact", "Target Interaction")
+
+            showBasePlate()
+            world().showSection(util.select().everywhere(), Direction.UP)
+
+            val centerPos = util.grid().at(2, 0, 2)
+            val pos = util.vector().topOf(centerPos)
+            val entity = world().createEntity {
+                val target = ModEntities.TARGET.get().create(it) ?: return@createEntity null
+                target.setPosRaw(pos.x, pos.y, pos.z)
+                target.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3(pos.x - 1, pos.y, pos.z))
+                target.xRot = 0f
+                target.xRotO = 0f
+                target
+            }
+
+            idle(20)
+            overlay().showText(40).pointAt(Vec3(2.5, 1.0, 2.5)).placeNearTarget()
+                .text("Right-click with an empty hand to make the Target face you")
+            idle(20)
+
+            overlay().showControls(Vec3(2.5, 2.0, 2.5), Pointing.RIGHT, 20)
+                .rightClick()
+
+            idle(20)
+            world().modifyEntity(entity) {
+                it.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3(pos.x, pos.y, pos.z - 1))
+                it.xRot = 0f
+                it.xRotO = 0f
+            }
+            idle(10)
+
+            idle(20)
+            addKeyframe()
+            overlay().showText(40).pointAt(Vec3(2.5, 2.0, 2.5)).placeNearTarget()
+                .text("Sneak + right-click with an empty hand to dismantle the Target")
+            idle(20)
+
+            overlay().showControls(Vec3(2.5, 2.0, 2.5), Pointing.RIGHT, 30)
+                .rightClick()
+                .whileSneaking()
+            idle(10)
+            world().modifyEntity(entity, Entity::discard)
+            idle(30)
+
+            markAsFinished()
+        }
     }
-
-
 }

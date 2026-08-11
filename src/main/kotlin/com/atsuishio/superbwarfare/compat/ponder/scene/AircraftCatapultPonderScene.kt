@@ -1,4 +1,4 @@
-package com.atsuishio.superbwarfare.compat.ponder.scene
+﻿package com.atsuishio.superbwarfare.compat.ponder.scene
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.compat.ponder.GeneratedPonderSupport
@@ -25,7 +25,7 @@ object AircraftCatapultPonderScene {
     }
 
     private fun introScene(scene: SceneBuilder, util: SceneBuildingUtil) {
-        scene.title("aircraft_catapult", "Scene 1")
+        scene.title("aircraft_catapult_intro", "Aircraft Catapult Introduction")
         val context = GeneratedPonderSupport.Context()
         preScanBounds(scene, BlockPos(6, 0, 0), BlockPos(7, 1, 14))
         scene.addKeyframe()
@@ -39,14 +39,14 @@ object AircraftCatapultPonderScene {
             BlockPos(7, 0, 0),
             BlockPos(7, 0, 13),
             null,
-            false,
-            false,
-            "simultaneous",
-            20,
-            1,
-            false,
-            null,
-            "down"
+            immediateDisplay = false,
+            spawnParticles = false,
+            entranceAnimation = "simultaneous",
+            entranceDuration = 20,
+            entranceInterval = 1,
+            smartDisplay = false,
+            linkId = null,
+            direction = "down"
         )
         setBlock(
             scene,
@@ -56,14 +56,14 @@ object AircraftCatapultPonderScene {
             BlockPos(7, 0, 14),
             null,
             null,
-            false,
-            false,
-            "down",
-            20,
-            1,
-            false,
-            null,
-            "down"
+            immediateDisplay = false,
+            spawnParticles = false,
+            entranceAnimation = "down",
+            entranceDuration = 20,
+            entranceInterval = 1,
+            smartDisplay = false,
+            linkId = null,
+            direction = "down"
         )
         setBlock(
             scene,
@@ -77,26 +77,30 @@ object AircraftCatapultPonderScene {
             null,
             null,
             false,
-            false,
-            "down",
-            20,
-            1,
-            false,
-            null,
-            "down"
+            spawnParticles = false,
+            entranceAnimation = "down",
+            entranceDuration = 20,
+            entranceInterval = 1,
+            smartDisplay = false,
+            linkId = null,
+            direction = "down"
         )
         scene.idle(20)
         scene.addKeyframe()
-        showText(scene, "这是一个完整的飞行器弹射系统", Vec3(7.5, 1.0, 7.5), 60, null, true)
+        showText(scene, "This is a complete aircraft catapult system", Vec3(7.5, 1.0, 7.5), 60, null, true)
         scene.idle(80)
         scene.addKeyframe()
-        showText(scene, "可以通过弹射器控制器shift+右键来调节弹射力度", Vec3(7.5, 1.0, 14.5), 60, null, false)
+        showText(scene, "Sneak + right-click the catapult controller to adjust the launch strength", Vec3(7.5, 1.0, 14.5), 60, null, false)
         scene.idle(80)
         scene.addKeyframe()
-        showControls(scene, Vec3(7.5, 1.0, 14.5), "right", 60, "right", null, null, true, false)
+        showControls(
+            scene, Vec3(7.5, 1.0, 14.5), "right", 60, "right", null, null,
+            whileSneaking = true,
+            whileCtrl = false
+        )
         scene.idle(80)
         scene.addKeyframe()
-        showText(scene, "安装弹射器滑块", Vec3(7.5, 1.0, 13.5), 60, null, false)
+        showText(scene, "Install the catapult shuttle", Vec3(7.5, 1.0, 13.5), 60, null, false)
         scene.idle(60)
         scene.addKeyframe()
         showControls(
@@ -107,8 +111,8 @@ object AircraftCatapultPonderScene {
             "right",
             "superbwarfare:catapult_shuttle",
             null,
-            false,
-            false
+            whileSneaking = false,
+            whileCtrl = false
         )
         createEntity(
             scene,
@@ -125,9 +129,13 @@ object AircraftCatapultPonderScene {
             null
         )
         scene.idle(80)
-        showControls(scene, Vec3(6.0, 1.5, 14.0), "down", 60, "right", null, null, false, false)
+        showControls(
+            scene, Vec3(6.0, 1.5, 14.0), "down", 60, "right", null, null,
+            whileSneaking = false,
+            whileCtrl = false
+        )
         scene.addKeyframe()
-        showText(scene, "拉下拉杆", Vec3(6.5, 1.5, 14.0), 60, null, true)
+        showText(scene, "Pull the lever", Vec3(6.5, 1.5, 14.0), 60, null, true)
         modifyBlockEntity(
             scene,
             Map.ofEntries<String, String>(
@@ -142,9 +150,13 @@ object AircraftCatapultPonderScene {
         modifyEntitiesNbt(scene, context, true, null, null, null, null, null, Vec3(0.0, 0.0, -13.0), 5, null)
         scene.idle(80)
         scene.addKeyframe()
-        showText(scene, "弹射器模块就会启动", Vec3(7.5, 1.0, 0.5), 60, null, true)
+        showText(scene, "The catapult module starts", Vec3(7.5, 1.0, 0.5), 60, null, true)
         scene.idle(80)
-        showControls(scene, Vec3(6.0, 1.5, 14.0), "down", 60, "right", null, null, false, false)
+        showControls(
+            scene, Vec3(6.0, 1.5, 14.0), "down", 60, "right", null, null,
+            whileSneaking = false,
+            whileCtrl = false
+        )
         modifyBlockEntity(
             scene,
             Map.ofEntries<String, String>(
@@ -173,15 +185,27 @@ object AircraftCatapultPonderScene {
             "south"
         )
         scene.addKeyframe()
-        showText(scene, "使用牵引杠通过右键让载具连接弹射器模块", Vec3(7.5, 1.0, 13.5), 60, null, true)
+        showText(scene, "Use a tow bar to connect the vehicle to the catapult module with right-click", Vec3(7.5, 1.0, 13.5), 60, null, true)
         scene.idle(60)
-        showControls(scene, Vec3(7.5, 1.0, 13.5), "right", 60, "right", "superbwarfare:tow_bar", null, false, false)
+        showControls(
+            scene, Vec3(7.5, 1.0, 13.5), "right", 60, "right", "superbwarfare:tow_bar", null,
+            whileSneaking = false,
+            whileCtrl = false
+        )
         scene.idle(60)
-        showControls(scene, Vec3(7.5, 1.5, 14.5), "down", 60, "right", "superbwarfare:tow_bar", null, false, false)
+        showControls(
+            scene, Vec3(7.5, 1.5, 14.5), "down", 60, "right", "superbwarfare:tow_bar", null,
+            whileSneaking = false,
+            whileCtrl = false
+        )
         scene.idle(80)
-        showControls(scene, Vec3(6.0, 1.5, 14.0), "down", 60, "right", null, null, false, false)
+        showControls(
+            scene, Vec3(6.0, 1.5, 14.0), "down", 60, "right", null, null,
+            whileSneaking = false,
+            whileCtrl = false
+        )
         scene.addKeyframe()
-        showText(scene, "拉下拉杆", Vec3(6.5, 1.5, 14.0), 60, null, true)
+        showText(scene, "Pull the lever", Vec3(6.5, 1.5, 14.0), 60, null, true)
         modifyBlockEntity(
             scene,
             Map.ofEntries<String, String>(
@@ -221,7 +245,7 @@ object AircraftCatapultPonderScene {
         )
         scene.idle(80)
         scene.addKeyframe()
-        showText(scene, "即可完成弹射", Vec3(7.5, 1.0, 0.5), 60, null, true)
+        showText(scene, "Launch complete", Vec3(7.5, 1.0, 0.5), 60, null, true)
         scene.idle(80)
     }
 }

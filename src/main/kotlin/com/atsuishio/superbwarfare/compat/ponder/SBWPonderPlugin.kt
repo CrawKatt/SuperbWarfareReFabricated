@@ -23,7 +23,6 @@ object SBWPonderPlugin : PonderPlugin {
         JumpPadPonderScene.register(helper)
         PondererExamplePonderScene.register(helper)
         TargetDeployerPonderScene.register(helper)
-        TargetPonderScene.register(helper)
         VehicleAssemblingTablePonderScene.register(helper)
     }
 }
