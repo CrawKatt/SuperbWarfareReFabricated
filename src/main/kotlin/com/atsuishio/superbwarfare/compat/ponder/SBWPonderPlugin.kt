@@ -14,7 +14,6 @@ object SBWPonderPlugin : PonderPlugin {
     override fun registerScenes(helper: PonderSceneRegistrationHelper<ResourceLocation>) {
         AircraftCatapultPonderScene.register(helper)
         BiogasGeneratorPonderScene.register(helper)
-        CatapultControllerPonderScene.register(helper)
         ChargingStationPonderScene.register(helper)
         ContainerPonderScene.register(helper)
         CreativeChargingStationPonderScene.register(helper)
