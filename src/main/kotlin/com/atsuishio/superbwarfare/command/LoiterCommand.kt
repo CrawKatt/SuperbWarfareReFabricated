@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.command
 
+import com.atsuishio.superbwarfare.command.builder.boolArg
+import com.atsuishio.superbwarfare.command.builder.buildCommand
+import com.atsuishio.superbwarfare.command.builder.intArg
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import net.minecraft.network.chat.Component
@@ -15,16 +18,11 @@ val LOITER_COMMAND = buildCommand("loiter") {
     // 子命令：loiter true/false 开关盘旋
     boolArg("enabled") {
         execute {
-            val player = source.player
-            if (player == null) {
-                fail(Component.translatable("commands.superbwarfare.loiter.player_only"))
-                return@execute 0
-            }
+            val player = source.player ?: fail { Component.translatable("commands.superbwarfare.loiter.player_only") }
 
             val vehicle = player.vehicle as? VehicleEntity
             if (vehicle == null || vehicle.computed().engineType != EngineType.AIRCRAFT) {
-                fail(Component.translatable("commands.superbwarfare.loiter.not_aircraft"))
-                return@execute 0
+                fail { Component.translatable("commands.superbwarfare.loiter.not_aircraft") }
             }
 
             val enabled = boolArg
@@ -44,7 +42,7 @@ val LOITER_COMMAND = buildCommand("loiter") {
 
             vehicle.loiterActive = enabled
 
-            success {
+            success(result = 1) {
                 if (enabled) {
                     Component.translatable(
                         "commands.superbwarfare.loiter.enabled",
@@ -57,7 +55,6 @@ val LOITER_COMMAND = buildCommand("loiter") {
                     Component.translatable("commands.superbwarfare.loiter.disabled")
                 }
             }
-            return@execute 1
         }
     }
 
@@ -71,14 +68,12 @@ val LOITER_COMMAND = buildCommand("loiter") {
                     intArg("radius", min = 200, max = 10000) {
                         // 无 force → 地形安全检查
                         execute {
-                            val player = source.player ?: run {
-                                fail(Component.translatable("commands.superbwarfare.loiter.player_only"))
-                                return@execute 0
+                            val player = source.player ?: fail {
+                                Component.translatable("commands.superbwarfare.loiter.player_only")
                             }
                             val vehicle = player.vehicle as? VehicleEntity
                             if (vehicle == null || vehicle.computed().engineType != EngineType.AIRCRAFT) {
-                                fail(Component.translatable("commands.superbwarfare.loiter.not_aircraft"))
-                                return@execute 0
+                                fail { Component.translatable("commands.superbwarfare.loiter.not_aircraft") }
                             }
 
                             val x = getArg(this@centerX).toFloat()
@@ -89,27 +84,25 @@ val LOITER_COMMAND = buildCommand("loiter") {
                             vehicle.loiterParams = Quaternionf(x, safeY, z, r)
                             vehicle.loiterActive = true
 
-                            success {
-                                val hint = if (safeY != getArg(this@centerY).toFloat()) " §7(已自动抬升至地形+50)" else ""
+                            success(result = 1) {
+                                val hint =
+                                    if (safeY != getArg(this@centerY).toFloat()) " §7(已自动抬升至地形+50)" else ""
                                 Component.translatable(
                                     "commands.superbwarfare.loiter.success",
                                     x.toInt(), safeY.toInt(), z.toInt(), r.toInt()
                                 ).append(hint)
                             }
-                            return@execute 1
                         }
 
                         // force → 跳过地形检查，强制使用输入值
                         "force" {
                             execute {
-                                val player = source.player ?: run {
-                                    fail(Component.translatable("commands.superbwarfare.loiter.player_only"))
-                                    return@execute 0
+                                val player = source.player ?: fail {
+                                    Component.translatable("commands.superbwarfare.loiter.player_only")
                                 }
                                 val vehicle = player.vehicle as? VehicleEntity
                                 if (vehicle == null || vehicle.computed().engineType != EngineType.AIRCRAFT) {
-                                    fail(Component.translatable("commands.superbwarfare.loiter.not_aircraft"))
-                                    return@execute 0
+                                    fail { Component.translatable("commands.superbwarfare.loiter.not_aircraft") }
                                 }
 
                                 val x = getArg(this@centerX).toFloat()
@@ -120,13 +113,12 @@ val LOITER_COMMAND = buildCommand("loiter") {
                                 vehicle.loiterParams = Quaternionf(x, y, z, r)
                                 vehicle.loiterActive = true
 
-                                success {
+                                success(result = 1) {
                                     Component.translatable(
                                         "commands.superbwarfare.loiter.success",
                                         x.toInt(), y.toInt(), z.toInt(), r.toInt()
                                     )
                                 }
-                                return@execute 1
                             }
                         }
                     }
@@ -138,17 +130,12 @@ val LOITER_COMMAND = buildCommand("loiter") {
     // 子命令：loiter get —— 查看当前盘旋参数
     "get" {
         execute {
-            val player = source.player
-            if (player == null) {
-                fail(Component.translatable("commands.superbwarfare.loiter.player_only"))
-                return@execute 0
-            }
+            val player = source.player ?: fail { Component.translatable("commands.superbwarfare.loiter.player_only") }
             val vehicle = player.vehicle as? VehicleEntity
             if (vehicle == null || vehicle.computed().engineType != EngineType.AIRCRAFT) {
-                fail(Component.translatable("commands.superbwarfare.loiter.not_aircraft"))
-                return@execute 0
+                fail { Component.translatable("commands.superbwarfare.loiter.not_aircraft") }
             }
-            success {
+            success(result = 1) {
                 Component.translatable(
                     "commands.superbwarfare.loiter.get",
                     vehicle.loiterCenterX.toInt(),
@@ -158,7 +145,6 @@ val LOITER_COMMAND = buildCommand("loiter") {
                     if (vehicle.loiterActive) "§aON" else "§cOFF"
                 )
             }
-            return@execute 1
         }
     }
 
@@ -169,11 +155,11 @@ val LOITER_COMMAND = buildCommand("loiter") {
         "X" {
             intArg("value") {
                 execute {
-                    editLoiterParam(source.player, { fail(it) }, newX = intArg.toFloat())
+                    editLoiterParam(source.player, { fail { it } }, newX = intArg.toFloat())
                 }
                 "force" {
                     execute {
-                        editLoiterParam(source.player, { fail(it) }, newX = intArg.toFloat(), skipTerrain = true)
+                        editLoiterParam(source.player, { fail { it } }, newX = intArg.toFloat(), skipTerrain = true)
                     }
                 }
             }
@@ -182,11 +168,11 @@ val LOITER_COMMAND = buildCommand("loiter") {
         "Y" {
             intArg("value") {
                 execute {
-                    editLoiterParam(source.player, { fail(it) }, newY = intArg.toFloat())
+                    editLoiterParam(source.player, { fail { it } }, newY = intArg.toFloat())
                 }
                 "force" {
                     execute {
-                        editLoiterParam(source.player, { fail(it) }, newY = intArg.toFloat(), skipTerrain = true)
+                        editLoiterParam(source.player, { fail { it } }, newY = intArg.toFloat(), skipTerrain = true)
                     }
                 }
             }
@@ -195,11 +181,11 @@ val LOITER_COMMAND = buildCommand("loiter") {
         "Z" {
             intArg("value") {
                 execute {
-                    editLoiterParam(source.player, { fail(it) }, newZ = intArg.toFloat())
+                    editLoiterParam(source.player, { fail { it } }, newZ = intArg.toFloat())
                 }
                 "force" {
                     execute {
-                        editLoiterParam(source.player, { fail(it) }, newZ = intArg.toFloat(), skipTerrain = true)
+                        editLoiterParam(source.player, { fail { it } }, newZ = intArg.toFloat(), skipTerrain = true)
                     }
                 }
             }
@@ -208,7 +194,7 @@ val LOITER_COMMAND = buildCommand("loiter") {
         "R" {
             intArg("value", min = 200, max = 10000) {
                 execute {
-                    editLoiterParam(source.player, { fail(it) }, newR = intArg.toFloat())
+                    editLoiterParam(source.player, { fail { it } }, newR = intArg.toFloat())
                 }
             }
         }

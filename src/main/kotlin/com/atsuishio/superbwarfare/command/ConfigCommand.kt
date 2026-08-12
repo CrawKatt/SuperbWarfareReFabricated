@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.command
 
+import com.atsuishio.superbwarfare.command.builder.CommandNode
+import com.atsuishio.superbwarfare.command.builder.boolArg
+import com.atsuishio.superbwarfare.command.builder.buildCommand
 import com.atsuishio.superbwarfare.config.server.*
 import net.minecraft.network.chat.Component
 import net.minecraftforge.common.ForgeConfigSpec
@@ -58,7 +61,7 @@ private enum class DestroyType(
     BEASTLY("beastly", true, true, true, true)
 }
 
-private fun SingleCommand.buildDestroyTypesCommand() {
+private fun CommandNode.buildDestroyTypesCommand() {
     "collisionDestroy" {
         requirePermission(2)
 
@@ -73,8 +76,6 @@ private fun SingleCommand.buildDestroyTypesCommand() {
                     saveCollisionConfigs()
 
                     success { Component.translatable("commands.superbwarfare.config.collision_destroy.${type.commandName}") }
-
-                    return@execute 0
                 }
             }
         }
@@ -88,7 +89,7 @@ private fun saveCollisionConfigs() {
     VehicleConfig.COLLISION_DESTROY_BLOCKS_BEASTLY.save()
 }
 
-private fun SingleCommand.booleanConfig(
+private fun CommandNode.booleanConfig(
     prop: KProperty0<ForgeConfigSpec.BooleanValue>,
     effect: (Boolean) -> Unit = {}
 ) {
@@ -116,7 +117,7 @@ private fun SingleCommand.booleanConfig(
     booleanConfig(name, prop.get(), effect)
 }
 
-private fun SingleCommand.booleanConfig(
+private fun CommandNode.booleanConfig(
     name: String,
     config: ForgeConfigSpec.BooleanValue,
     effect: (Boolean) -> Unit = {}
@@ -135,8 +136,6 @@ private fun SingleCommand.booleanConfig(
                 success {
                     Component.translatable("commands.superbwarfare.config.${if (value) "enabled" else "disabled"}", name)
                 }
-
-                return@execute 0
             }
         }
     }

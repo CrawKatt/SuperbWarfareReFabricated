@@ -1,5 +1,7 @@
 package com.atsuishio.superbwarfare.command
 
+import com.atsuishio.superbwarfare.command.builder.buildCommand
+import com.atsuishio.superbwarfare.command.builder.entitiesArg
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
 import net.minecraft.network.chat.Component
 
@@ -28,8 +30,6 @@ val TDM_COMMAND = buildCommand("tdm") {
                         Component.translatable("commands.superbwarfare.tdm.add.multiple", entities.size)
                     }
                 }
-
-                return@execute 0
             }
         }
     }
@@ -53,8 +53,6 @@ val TDM_COMMAND = buildCommand("tdm") {
                 } else {
                     success { Component.translatable("commands.superbwarfare.tdm.remove.multiple", entities.size) }
                 }
-
-                return@execute 0
             }
         }
     }

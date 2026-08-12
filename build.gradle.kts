@@ -179,7 +179,7 @@ fun DependencyHandler.jijImplement(dependency: String, maxVersion: String? = nul
         return@run "$firstVersion." + versions.drop(1).joinToString(".") { "0" }
     }
 
-    println("$name [$firstVersion,$maximumVersion)")
+//    println("$name [$firstVersion,$maximumVersion)")
 
     val dependencyImpl = implementation(fg.deobf(dependency))
     jarJar(dependencyImpl) {
