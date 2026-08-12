@@ -20,7 +20,7 @@ import java.util.Map
 
 object AircraftCatapultPonderScene {
     fun register(helper: PonderSceneRegistrationHelper<ResourceLocation>) {
-        helper.forComponents(loc("aircraft_catapult"))
+        helper.forComponents(loc("aircraft_catapult"), loc("catapult_controller"))
             .addStoryBoard("basic_15x15", AircraftCatapultPonderScene::introScene)
     }
 
@@ -29,7 +29,7 @@ object AircraftCatapultPonderScene {
         val context = GeneratedPonderSupport.Context()
         preScanBounds(scene, BlockPos(6, 0, 0), BlockPos(7, 1, 14))
         scene.addKeyframe()
-        showStructure(scene, context, null, null, null, null)
+        showStructure(scene, context, null, null, 0.5f, null)
         scene.idle(20)
         setBlock(
             scene,
