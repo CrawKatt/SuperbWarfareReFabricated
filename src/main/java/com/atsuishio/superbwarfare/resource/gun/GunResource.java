@@ -2,6 +2,8 @@ package com.atsuishio.superbwarfare.resource.gun;
 
 import com.atsuishio.superbwarfare.data.CustomData;
 import com.atsuishio.superbwarfare.data.DefaultDataSupplier;
+import com.atsuishio.superbwarfare.init.ModItems;
+import com.atsuishio.superbwarfare.item.gun.EmptyGunItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -26,13 +28,12 @@ public class GunResource implements DefaultDataSupplier<DefaultGunResource> {
     public final String id;
 
     private GunResource(ItemStack stack) {
-        if (!(stack.getItem() instanceof GunItem gunItem)) {
-            throw new IllegalArgumentException("stack is not GunItem!");
-        }
-
-        this.item = gunItem;
+        var item = stack.getItem();
+        var gunItem = item instanceof GunItem ? (GunItem) item : null;
+        var useEmpty = gunItem == null || stack.isEmpty();
+        this.item = useEmpty ? ModItems.EMPTY_GUN.get() : gunItem;
         this.stack = stack;
-        this.id = getRegistryId(stack.getItem());
+        this.id = useEmpty ? EmptyGunItem.EMPTY_GUN_ID : getRegistryId(stack.getItem());
     }
 
     public static DefaultGunResource compute(ItemStack stack) {

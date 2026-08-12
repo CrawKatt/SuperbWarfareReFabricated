@@ -15,6 +15,7 @@ import com.atsuishio.superbwarfare.item.container.LuckyContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
 import com.atsuishio.superbwarfare.item.curio.*
 import com.atsuishio.superbwarfare.item.food.CrustItem
+import com.atsuishio.superbwarfare.item.gun.EmptyGunItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.item.gun.handgun.*
 import com.atsuishio.superbwarfare.item.gun.launcher.*
@@ -110,6 +111,7 @@ object ModItems {
     @JvmField val SUPER_STAR_SHOOTER = registerGun("super_star_shooter") { SuperStarShooterItem() }
 
     @JvmField val VEHICLE_GUN = registerGun("vehicle_gun") { VehicleGun() }
+    @JvmField val EMPTY_GUN = registerGun("empty_gun") { EmptyGunItem() }
     // @formatter:on
 
     /**

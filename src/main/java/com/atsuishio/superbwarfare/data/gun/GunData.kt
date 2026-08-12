@@ -21,6 +21,7 @@ import com.atsuishio.superbwarfare.data.gun.subdata.*
 import com.atsuishio.superbwarfare.data.gun.value.*
 import com.atsuishio.superbwarfare.event.GunEventHandler
 import com.atsuishio.superbwarfare.init.ModItems
+import com.atsuishio.superbwarfare.item.gun.EmptyGunItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.network.message.receive.ShakeClientMessage
 import com.atsuishio.superbwarfare.perk.Perk
@@ -1073,17 +1074,25 @@ class GunData private constructor(
     }
 
     init {
-        require(stack.item is GunItem) { "stack is not GunItem!" }
-
-        val gunItem = stack.item as GunItem
+        val realGunItem = stack.item as? GunItem
+        val useEmptyGunData = realGunItem == null || stack.isEmpty
+        val gunItem = if (useEmptyGunData) ModItems.EMPTY_GUN.get() as GunItem else realGunItem
         this.item = gunItem
         this.stack = stack
-        this.id = getRegistryId(stack.item)
+        this.id = if (useEmptyGunData) EmptyGunItem.EMPTY_GUN_ID else getRegistryId(stack.item)
 
-        this.defaultDataSupplier = initialDefaultDataSupplier ?: { gunItem.getDefaultData(this) }
+        this.defaultDataSupplier = if (useEmptyGunData) {
+            { EmptyGunItem.EMPTY_GUN_DATA }
+        } else {
+            initialDefaultDataSupplier ?: { gunItem.getDefaultData(this) }
+        }
 
-        val customData = stack.get(DataComponents.CUSTOM_DATA)
-        this.tag = if (customData != null) customData.copyTag() else CompoundTag()
+        if (useEmptyGunData) {
+            this.tag = CompoundTag()
+        } else {
+            val customData = stack.get(DataComponents.CUSTOM_DATA)
+            this.tag = if (customData != null) customData.copyTag() else CompoundTag()
+        }
 
         gunDataTag = getOrPut("GunData")
         perkTag = getOrPut("Perks")
