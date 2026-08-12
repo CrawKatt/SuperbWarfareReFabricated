@@ -20,7 +20,7 @@ import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.energy.IEnergyStorage
 
-open class VehicleGun : GunItem(Properties()) {
+open class VehicleGunItem : GunItem(Properties()) {
     override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) {
         if (modifier[GunProp.AUTO_RELOAD] == null) {
             modifier[GunProp.AUTO_RELOAD] = true

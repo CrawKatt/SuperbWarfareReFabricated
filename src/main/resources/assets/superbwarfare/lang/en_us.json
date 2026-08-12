@@ -64,6 +64,9 @@
   "item.superbwarfare.reforging": "Reforging",
   "item.superbwarfare.vehicle_gun": "Vehicle Gun",
   "des.superbwarfare.vehicle_gun": "You should not have got this",
+  "item.superbwarfare.empty_gun": "Empty Gun",
+  "des.superbwarfare.empty_gun": "Warning: You have obtained a gun that does not exist",
+
   "des.superbwarfare.guns.damage": "Damage: ",
   "des.superbwarfare.guns.level": "Level: ",
   "des.superbwarfare.guns.bypass": "Armor Piercing: ",
