@@ -53,8 +53,8 @@ open class CommandNode(val argumentBuilder: ArgumentBuilder<CommandSourceStack, 
     }
 
     fun CommandContext<CommandSourceStack>.success(
-        allowLogging: Boolean = true,
         result: Int = 0,
+        allowLogging: Boolean = true,
         msg: (() -> Component)? = null
     ): Nothing {
         msg?.let { source.sendSuccess(it, allowLogging) }
