@@ -21,7 +21,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.energy.IEnergyStorage
 
-open class VehicleGun : GunItem(Properties()) {
+open class VehicleGunItem : GunItem(Properties()) {
     override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) {
         if (modifier[GunProp.AUTO_RELOAD] == null) {
             modifier[GunProp.AUTO_RELOAD] = true

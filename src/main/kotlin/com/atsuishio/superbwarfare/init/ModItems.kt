@@ -33,7 +33,7 @@ import com.atsuishio.superbwarfare.item.gun.sniper.*
 import com.atsuishio.superbwarfare.item.gun.special.BocekItem
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem
 import com.atsuishio.superbwarfare.item.gun.special.TaserItem
-import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGun
+import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGunItem
 import com.atsuishio.superbwarfare.item.material.*
 import com.atsuishio.superbwarfare.item.misc.*
 import com.atsuishio.superbwarfare.item.projectile.*
@@ -111,7 +111,7 @@ object ModItems {
     @JvmField val BOCEK = registerGun("bocek") { BocekItem() }
     @JvmField val SUPER_STAR_SHOOTER = registerGun("super_star_shooter") { SuperStarShooterItem() }
 
-    @JvmField val VEHICLE_GUN = registerGun("vehicle_gun") { VehicleGun() }
+    @JvmField val VEHICLE_GUN = registerGun("vehicle_gun") { VehicleGunItem() }
     @JvmField val EMPTY_GUN = registerGun("empty_gun") { EmptyGunItem() }
     // @formatter:on
 

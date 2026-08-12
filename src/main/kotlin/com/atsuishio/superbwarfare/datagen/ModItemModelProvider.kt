@@ -70,6 +70,8 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         gunItem(ModItems.SUPER_STAR_SHOOTER)
 
         simpleItem(ModItems.VEHICLE_GUN)
+        withExistingParent(ModItems.EMPTY_GUN.id.path, ResourceLocation("item/generated"))
+            .texture("layer0", loc("item/vehicle_gun"))
         simpleItem(ModItems.MORTAR_SHELL)
         simpleItem(ModItems.LARGE_SHELL_AP)
         simpleItem(ModItems.LARGE_SHELL_HE)

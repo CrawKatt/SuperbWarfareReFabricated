@@ -2,12 +2,23 @@ package com.atsuishio.superbwarfare.item.gun
 
 import com.atsuishio.superbwarfare.data.ObjectToList
 import com.atsuishio.superbwarfare.data.StringToObject
-import com.atsuishio.superbwarfare.data.gun.DefaultGunData
-import com.atsuishio.superbwarfare.data.gun.GunData
-import com.atsuishio.superbwarfare.data.gun.ProjectileInfo
-import com.atsuishio.superbwarfare.data.gun.ShootPos
+import com.atsuishio.superbwarfare.data.gun.*
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.level.Level
 
 class EmptyGunItem : GunItem(Properties()) {
+
+    override fun appendHoverText(
+        stack: ItemStack,
+        pLevel: Level?,
+        tooltipComponents: MutableList<Component>,
+        tooltipFlag: TooltipFlag
+    ) {
+        tooltipComponents.add(Component.translatable("des.superbwarfare.empty_gun").withStyle(ChatFormatting.RED))
+    }
 
     companion object {
 
@@ -69,7 +80,14 @@ class EmptyGunItem : GunItem(Properties()) {
         clearHoldProgressAfterShoot = false
         burstAmount = 0
         bypassesArmor = 0.0
-        ammoConsumers = ObjectToList()
+        ammoConsumers = ObjectToList(
+            mutableListOf(
+                StringToObject(AmmoConsumer().apply {
+                    ammo = "empty"
+                    init()
+                })
+            )
+        )
         useNacelleCamera = false
 
         normalReloadTime = 0
