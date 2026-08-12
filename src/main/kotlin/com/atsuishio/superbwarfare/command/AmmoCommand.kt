@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.command
 
+import com.atsuishio.superbwarfare.command.builder.*
 import com.atsuishio.superbwarfare.config.server.AmmoConfig
 import com.atsuishio.superbwarfare.data.gun.Ammo
 import net.minecraft.network.chat.Component
@@ -14,14 +15,13 @@ val AMMO_COMMAND = buildCommand("ammo") {
                 execute {
                     // 权限不足时，只允许玩家查询自己的弹药数量
                     if (source.isPlayer && !source.hasPermission(2)) {
-                        if (source.player != null && source.player?.getUUID() != player.getUUID()) {
-                            fail(Component.translatable("commands.superbwarfare.ammo.no_permission"))
-                            return@execute 0
+                        if (source.player != null && source.player?.getUUID() != playerArg.getUUID()) {
+                            fail { Component.translatable("commands.superbwarfare.ammo.no_permission") }
                         }
                     }
 
                     val type = enumArg
-                    val value = type.get(player)
+                    val value = type.get(playerArg)
                     success {
                         Component.translatable(
                             "commands.superbwarfare.ammo.get",
@@ -29,7 +29,6 @@ val AMMO_COMMAND = buildCommand("ammo") {
                             value
                         )
                     }
-                    return@execute 0
                 }
             }
         }
@@ -44,7 +43,7 @@ val AMMO_COMMAND = buildCommand("ammo") {
                     execute {
                         val type = enumArg
 
-                        for (player in players) {
+                        for (player in playersArg) {
                             type.set(player, intArg)
                         }
 
@@ -53,10 +52,9 @@ val AMMO_COMMAND = buildCommand("ammo") {
                                 "commands.superbwarfare.ammo.set",
                                 Component.translatable(type.translationKey),
                                 intArg,
-                                players.size
+                                playersArg.size
                             )
                         }
-                        return@execute 0
                     }
                 }
             }
@@ -72,7 +70,7 @@ val AMMO_COMMAND = buildCommand("ammo") {
                     execute {
                         val type = enumArg
 
-                        for (player in players) {
+                        for (player in playersArg) {
                             type.add(player, intArg)
                         }
 
@@ -81,10 +79,9 @@ val AMMO_COMMAND = buildCommand("ammo") {
                                 "commands.superbwarfare.ammo.add",
                                 Component.translatable(type.translationKey),
                                 intArg,
-                                players.size
+                                playersArg.size
                             )
                         }
-                        return@execute 0
                     }
                 }
             }
@@ -101,7 +98,7 @@ val AMMO_COMMAND = buildCommand("ammo") {
     }
 }
 
-private fun SingleCommand.buildAmmoLimitCommand(isAmmoBox: Boolean) {
+private fun CommandNode.buildAmmoLimitCommand(isAmmoBox: Boolean) {
     "get" {
         enumArg<Ammo> {
             execute {
@@ -111,7 +108,6 @@ private fun SingleCommand.buildAmmoLimitCommand(isAmmoBox: Boolean) {
                 success {
                     Component.translatable("commands.superbwarfare.ammo.limit.get", Component.translatable(type.translationKey), limit)
                 }
-                return@execute 0
             }
         }
     }
@@ -130,8 +126,6 @@ private fun SingleCommand.buildAmmoLimitCommand(isAmmoBox: Boolean) {
                     success {
                         Component.translatable("commands.superbwarfare.ammo.limit.set", Component.translatable(type.translationKey), intArg)
                     }
-
-                    return@execute 0
                 }
             }
         }

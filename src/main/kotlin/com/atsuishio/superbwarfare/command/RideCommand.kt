@@ -1,5 +1,9 @@
 package com.atsuishio.superbwarfare.command
 
+import com.atsuishio.superbwarfare.command.builder.boolArg
+import com.atsuishio.superbwarfare.command.builder.buildCommand
+import com.atsuishio.superbwarfare.command.builder.entityArg
+import com.atsuishio.superbwarfare.command.builder.intArg
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
@@ -12,15 +16,13 @@ val RIDE_COMMAND = buildCommand("ride") {
         entityArg("vehicle") vehicle@{
             execute {
                 val res = ride(getArg(this@passenger), getArg(this@vehicle))
-                if (res.success) success { res.message } else fail { res.message }
-                return@execute res.index
+                if (res.success) success(result = res.index) { res.message } else fail(result = res.index) { res.message }
             }
 
             intArg("seatIndex", min = 1) {
                 execute {
                     val res = ride(getArg(this@passenger), getArg(this@vehicle), intArg)
-                    if (res.success) success { res.message } else fail { res.message }
-                    return@execute res.index
+                    if (res.success) success(result = res.index) { res.message } else fail(result = res.index) { res.message }
                 }
 
                 boolArg("forceRide") {
@@ -31,8 +33,7 @@ val RIDE_COMMAND = buildCommand("ride") {
                             intArg,
                             boolArg
                         )
-                        if (res.success) success { res.message } else fail { res.message }
-                        return@execute res.index
+                        if (res.success) success(result = res.index) { res.message } else fail(result = res.index) { res.message }
                     }
                 }
             }
