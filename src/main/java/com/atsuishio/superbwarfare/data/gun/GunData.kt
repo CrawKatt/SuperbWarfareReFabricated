@@ -1,9 +1,6 @@
 package com.atsuishio.superbwarfare.data.gun
 
-import com.atsuishio.superbwarfare.data.DefaultDataSupplier
-import com.atsuishio.superbwarfare.data.JsonPropertyModifier
-import com.atsuishio.superbwarfare.data.PMC
-import com.atsuishio.superbwarfare.data.StringOrVec3
+import com.atsuishio.superbwarfare.data.*
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.BACKUP_AMMO_CACHE_TICKS
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.get
 import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.AMMO_CONSUMER
@@ -20,6 +17,8 @@ import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.SHOOT_SHAKE
 import com.atsuishio.superbwarfare.data.gun.subdata.*
 import com.atsuishio.superbwarfare.data.gun.value.*
 import com.atsuishio.superbwarfare.event.GunEventHandler
+import com.atsuishio.superbwarfare.init.ModItems
+import com.atsuishio.superbwarfare.item.gun.EmptyGunItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.network.message.receive.ShakeClientMessage
 import com.atsuishio.superbwarfare.perk.Perk
@@ -1056,16 +1055,20 @@ class GunData private constructor(
     }
 
     init {
-        require(stack.item is GunItem) { "stack is not GunItem!" }
-
-        val gunItem = stack.item as GunItem
+        val realGunItem = stack.item as? GunItem
+        val useEmptyGunData = realGunItem == null || stack.isEmpty
+        val gunItem = if (useEmptyGunData) ModItems.EMPTY_GUN.get() as GunItem else realGunItem
         this.item = gunItem
         this.stack = stack
-        this.id = getRegistryId(stack.item)
+        this.id = if (useEmptyGunData) EmptyGunItem.EMPTY_GUN_ID else getRegistryId(stack.item)
 
-        this.defaultDataSupplier = initialDefaultDataSupplier ?: { gunItem.getDefaultData(this) }
+        this.defaultDataSupplier = if (useEmptyGunData) {
+            { EmptyGunItem.EMPTY_GUN_DATA }
+        } else {
+            initialDefaultDataSupplier ?: { gunItem.getDefaultData(this) }
+        }
 
-        this.tag = stack.getOrCreateTag()
+        this.tag = if (useEmptyGunData) CompoundTag() else stack.getOrCreateTag()
 
         gunDataTag = getOrPut("GunData")
         perkTag = getOrPut("Perks")
@@ -1170,8 +1173,8 @@ class GunData private constructor(
         /** Retrieves default un-modified properties by item registry identifier. */
         @JvmStatic
         fun getDefault(id: String): DefaultGunData {
-            val isDefault = !com.atsuishio.superbwarfare.data.CustomData.GUN_DATA.containsKey(id)
-            val data = com.atsuishio.superbwarfare.data.CustomData.GUN_DATA.getOrElseGet(id) { DefaultGunData() }
+            val isDefault = !CustomData.GUN_DATA.containsKey(id)
+            val data = CustomData.GUN_DATA.getOrElseGet(id) { DefaultGunData() }
             data.isDefaultData = isDefault
             return data
         }

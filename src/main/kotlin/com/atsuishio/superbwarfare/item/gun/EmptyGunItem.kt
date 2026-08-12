@@ -1,0 +1,126 @@
+package com.atsuishio.superbwarfare.item.gun
+
+import com.atsuishio.superbwarfare.data.ObjectToList
+import com.atsuishio.superbwarfare.data.StringToObject
+import com.atsuishio.superbwarfare.data.gun.DefaultGunData
+import com.atsuishio.superbwarfare.data.gun.GunData
+import com.atsuishio.superbwarfare.data.gun.ProjectileInfo
+import com.atsuishio.superbwarfare.data.gun.ShootPos
+
+class EmptyGunItem : GunItem(Properties()) {
+
+    companion object {
+
+        const val EMPTY_GUN_ID = "superbwarfare:empty_gun"
+
+        @JvmField
+        val EMPTY_GUN_DATA: DefaultGunData = DefaultGunData().apply {
+            itemId = EMPTY_GUN_ID
+            isDefaultData = true
+
+            maxDurability = 0
+            durabilityPerShoot = 0
+            maxEnergy = 0
+            maxReceiveEnergy = 0
+            maxExtractEnergy = 0
+
+            recoilX = 0.0
+            recoilY = 0.0
+            recoil = 0.0
+            recoilTime = 0
+            recoilForce = 0f
+            shootShake = null
+
+            defaultZoom = 0.0
+            minZoom = 0.0
+            maxZoom = 0.0
+            spread = 0.0
+            damage = 0.0
+            headshot = 0.0
+            velocity = 0.0
+            magazine = 0
+            range = 0
+            meleeDamage = 0.0
+            meleeDuration = 0
+            meleeDamageTime = 0
+            meleeAngle = 0
+            meleeRange = 0.0
+
+            projectile = StringToObject(ProjectileInfo().apply { itemId = "empty" })
+            shootPos = ShootPos().apply {
+                positions = arrayListOf()
+                directions = arrayListOf()
+        }
+        seekWeaponInfo = null
+        projectileDummyInfo = null
+
+        ammoCostPerShoot = 0
+        projectileAmount = 0
+        weight = 0.0
+
+        defaultFireMode = ""
+        availableFireModes = ObjectToList()
+        reloadTypes = emptySet()
+        seekType = null
+
+        autoReload = null
+        withdrawAmmoWhenChangeSlot = false
+        zoomReload = false
+        clearHoldProgressAfterShoot = false
+        burstAmount = 0
+        bypassesArmor = 0.0
+        ammoConsumers = ObjectToList()
+        useNacelleCamera = false
+
+        normalReloadTime = 0
+        emptyReloadTime = 0
+        boltActionTime = 0
+        prepareTime = 0
+        prepareLoadTime = 0
+        prepareAmmoLoadTime = 0
+        prepareEmptyTime = 0
+        iterativeTime = 0
+        iterativeAmmoLoadTime = 0
+        iterativeLoadAmount = 0
+        finishTime = 0
+        burstCooldown = 0
+        soundRadius = 0.0
+        rpm = 0
+        explosionDamage = 0.0
+        explosionRadius = 0.0
+        gravity = 0.0
+        shootDelay = 0
+        shootDelayTime = 0
+        heatPerShoot = 0.0
+        availablePerks = ObjectToList()
+
+        naturalCooldown = 0.0
+        inWaterCooldownRate = 0.0
+        inSnowCooldownRate = 0.0
+        inFireCooldownRate = 0.0
+        inLavaCooldownRate = 0.0
+        zoomSpreadRate = 0.0
+
+        seekTime = 0
+        seekAngle = 0.0
+        seekRange = 0.0
+        maxGuidedRange = 0.0
+        canGuidedByRadar = false
+        affectedByStealthTarget = false
+        minTargetHeight = 0.0
+        maxTargetHeight = 0.0
+
+        shootAnimationTime = 0
+        spreadAmount = 0
+        spreadAngle = 0
+        apDurability = 0
+        projectileLife = 0
+        addShooterDeltaMovement = false
+        underwaterMotionScale = 0f
+        explosionDestroy = false
+        }
+
+    }
+
+    override fun getDefaultData(data: GunData): DefaultGunData = EMPTY_GUN_DATA
+}

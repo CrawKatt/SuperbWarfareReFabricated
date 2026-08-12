@@ -39,7 +39,7 @@ open class BatteryItem(var maxEnergy: Int, properties: Properties) : Item(proper
     override fun getBarWidth(pStack: ItemStack): Int {
         val energy = pStack.getCapability(ForgeCapabilities.ENERGY)
             .map { it.energyStored }
-            .orElse(0)
+            .orElseGet { 0 }
 
         return (energy * 13f / maxEnergy).roundToInt()
     }
