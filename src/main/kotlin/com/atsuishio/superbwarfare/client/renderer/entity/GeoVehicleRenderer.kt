@@ -247,9 +247,6 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
                 val lastPose = poseStack.last()
                 val pose = lastPose.pose()
 
-                val consumerOut = buffer.getBuffer(RenderType.eyes(LASER_TEX))
-                val consumerIn = buffer.getBuffer(RenderType.eyes(LASER_TEX_IN))
-
                 val c = entity.laserColor
 
                 val color = Quaternionf(
@@ -262,33 +259,17 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
 
                 val scale = entity.laserBaseScale.toFloat()
 
-                renderLaser(consumerOut, pose, lastPose, scale, color)
-                renderLaser(consumerIn, pose, lastPose, scale, colorW)
+                val consumerOut = buffer.getBuffer(RenderType.eyes(LASER_TEX))
+                repeat(6) {
+                    renderLaser(consumerOut, pose, lastPose, scale, color)
+                    poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
+                }
 
-                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
-
-                renderLaser(consumerOut, pose, lastPose, scale, color)
-                renderLaser(consumerIn, pose, lastPose, scale, colorW)
-
-                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
-
-                renderLaser(consumerOut, pose, lastPose, scale, color)
-                renderLaser(consumerIn, pose, lastPose, scale, colorW)
-
-                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
-
-                renderLaser(consumerOut, pose, lastPose, scale, color)
-                renderLaser(consumerIn, pose, lastPose, scale, colorW)
-
-                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
-
-                renderLaser(consumerOut, pose, lastPose, scale, color)
-                renderLaser(consumerIn, pose, lastPose, scale, colorW)
-
-                poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
-
-                renderLaser(consumerOut, pose, lastPose, scale, color)
-                renderLaser(consumerIn, pose, lastPose, scale, colorW)
+                val consumerIn = buffer.getBuffer(RenderType.eyes(LASER_TEX_IN))
+                repeat(6) {
+                    renderLaser(consumerIn, pose, lastPose, scale, colorW)
+                    poseStack.mulPose(Axis.ZP.rotationDegrees(60f))
+                }
 
                 poseStack.popPose()
             }
