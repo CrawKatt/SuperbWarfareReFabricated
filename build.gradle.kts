@@ -160,7 +160,7 @@ repositories {
     }
 }
 
-fun DependencyHandler.jijImplement(dependency: String, maxVersion: String? = null) {
+fun DependencyHandler.jijImplement(dependency: String, maxVersion: String? = null, transitive: Boolean = true) {
     val (name, _, version) = dependency.split(":")
 
     val firstVersion = version.split(".")
@@ -182,6 +182,7 @@ fun DependencyHandler.jijImplement(dependency: String, maxVersion: String? = nul
 //    println("$name [$firstVersion,$maximumVersion)")
 
     val dependencyImpl = implementation(fg.deobf(dependency))
+    (dependencyImpl as ModuleDependency).isTransitive = transitive
     jarJar(dependencyImpl) {
         jarJar.ranged(dependencyImpl, "[$firstVersion,$maximumVersion)")
     }
@@ -217,7 +218,7 @@ dependencies {
     }
 
     // Ponder
-    jijImplement("net.createmod.ponder:Ponder-Forge-${project.property("minecraft_version")}:${project.property("ponder_version")}")
+    jijImplement("net.createmod.ponder:Ponder-Forge-${project.property("minecraft_version")}:${project.property("ponder_version")}", transitive = false)
 
     // 飞轮
     jijImplement("dev.engine-room.flywheel:flywheel-forge-${project.property("minecraft_version")}:${project.property("flywheel_version")}")
@@ -242,7 +243,7 @@ dependencies {
     runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:1.20.1-84-FORGE"))
 
     // Cloth Config相关
-    jijImplement("me.shedaniel.cloth:cloth-config-forge:${project.property("cloth_config_version")}")
+    jijImplement("me.shedaniel.cloth:cloth-config-forge:${project.property("cloth_config_version")}", transitive = false)
 
     // Jade相关
     implementation(fg.deobf("curse.maven:jade-324717:${project.property("jade_version")}"))
