@@ -20,7 +20,7 @@ import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.gun.ShootParameters
 import com.atsuishio.superbwarfare.data.vehicle.DefaultVehicleData
 import com.atsuishio.superbwarfare.data.vehicle.VehicleData
-import com.atsuishio.superbwarfare.data.vehicle.VehiclePropertyModifier 
+import com.atsuishio.superbwarfare.data.vehicle.VehiclePropertyModifier
 import com.atsuishio.superbwarfare.data.vehicle.subdata.*
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo.*
 import com.atsuishio.superbwarfare.entity.IBvrSyncableEntity
@@ -329,6 +329,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     /** Number of valid entries (each = 6 doubles) in [blockCollisionCoords]. */
     @JvmField
     internal var blockCollisionCount: Int = 0
+
     @JvmField
     internal var blockCollisionCacheTick: Int = -1
 
@@ -2030,7 +2031,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             && entity.team != null
             && entity.team === lastDriver.team
             && !entity.team!!.isAllowFriendlyFire
-            && (entity === lastDriver && !source.`is`(ModDamageTypes.VEHICLE_STRIKE)
+            || (entity === lastDriver
+                    && !source.`is`(ModDamageTypes.VEHICLE_STRIKE)
                     && !source.`is`(ModDamageTypes.CUSTOM_EXPLOSION))
         ) {
             return false
