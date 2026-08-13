@@ -256,7 +256,7 @@ dependencies {
     jijImplement("org.ywzj:rhino:1.8.1-SNAPSHOT")
 
     // SBM
-    jijImplement("com.github.MCModderAnchor:SimpleBedrockModel:2.5.1-neoforge-mc1.21.1")
+    jijImplement("com.github.MCModderAnchor:SimpleBedrockModel:2.5.1.1-neoforge-mc1.21.1")
 
     compileOnly("com.maydaymemory:mae:1.1.2") {
         exclude("com.google.code.findbugs", "jsr305")
