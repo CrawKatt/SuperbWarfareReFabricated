@@ -17,7 +17,9 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.levelgen.Heightmap
+import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import org.joml.Math
 import kotlin.math.*
@@ -1556,11 +1558,17 @@ object VehicleEngineUtils {
             liftSpeed -= 0.01f * deltaMovement.y.toFloat()
 
             if (!hasPassenger) {
-                val groundY = level().getHeight(
-                    Heightmap.Types.MOTION_BLOCKING,
-                    blockX,
-                    blockZ
-                ).toDouble()
+                val origin = position()
+                val rayHit = level().clip(
+                    ClipContext(
+                        origin,
+                        origin.add(0.0, -floatHeight, 0.0),
+                        ClipContext.Block.COLLIDER,
+                        ClipContext.Fluid.ANY,
+                        this
+                    )
+                )
+                val groundY = if (rayHit.type == HitResult.Type.BLOCK) rayHit.location.y else level().minBuildHeight - 1.0
                 liftSpeed = if (groundY > level().minBuildHeight) {
                     val distToGround = y - groundY
                     val diff = (distToGround - floatHeight) * 0.05f
