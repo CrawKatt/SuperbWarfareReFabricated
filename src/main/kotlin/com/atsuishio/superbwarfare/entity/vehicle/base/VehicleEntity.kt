@@ -2002,13 +2002,15 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     override fun hurt(source: DamageSource, amount: Float): Boolean {
         if (source.`is`(ModTags.DamageTypes.VEHICLE_IMMUNE)) return false
 
-        if (DamageTypeTool.isGunDamage(source) && source.entity != null && source.entity!!
-                .vehicle === this && !source.`is`(ModDamageTypes.CUSTOM_EXPLOSION)
+        if (DamageTypeTool.isGunDamage(source)
+            && source.entity != null
+            && source.entity!!.vehicle === this
+            && !source.`is`(ModDamageTypes.CUSTOM_EXPLOSION)
         ) {
             return false
         }
 
-        val lastDriver = this.lastDriver
+        val lastDriver = if (this is OwnableEntity) this.owner else this.lastDriver
         val entity = source.entity
         if (entity != null && lastDriver != null
             && SeekTool.IS_FRIENDLY.test(lastDriver, entity)
