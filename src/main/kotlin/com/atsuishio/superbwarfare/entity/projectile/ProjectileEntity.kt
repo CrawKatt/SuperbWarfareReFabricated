@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.client.lighting.ClientLightingHandler
 import com.atsuishio.superbwarfare.client.particle.BulletDecalOption
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig
 import com.atsuishio.superbwarfare.entity.OBBEntity
+import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter
@@ -14,6 +15,7 @@ import com.atsuishio.superbwarfare.entity.projectile.IAdvancedHitDetection.Compa
 import com.atsuishio.superbwarfare.entity.projectile.IBulletProperties.Companion.DEFAULT_B
 import com.atsuishio.superbwarfare.entity.projectile.IBulletProperties.Companion.DEFAULT_G
 import com.atsuishio.superbwarfare.entity.projectile.IBulletProperties.Companion.DEFAULT_R
+import com.atsuishio.superbwarfare.entity.setValue
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModDamageTypes.causeGunFireAbsoluteDamage
 import com.atsuishio.superbwarfare.init.ModDamageTypes.causeGunFireDamage
@@ -82,7 +84,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
     protected var beastValue = false
     protected var isZoomValue: Boolean = false
     protected var explosionDamageValue = 0.0f
-    protected var explosionRadiusValue = 0.0f
+    protected var explosionRadiusValue by EXPLOSION_RADIUS
     protected var fireLevelValue = 0
     protected var dragonBreathValue = false
     protected var knockbackValue = 0.05f
@@ -132,12 +134,9 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         explosionDamageValue = value
     }
 
-    override fun getExplosionRadius(): Float =
-        this.entityData.get(EXPLOSION_RADIUS)
-
+    override fun getExplosionRadius(): Float = explosionRadiusValue
     override fun setExplosionRadius(value: Float) {
-        // Write to SynchedEntityData so the client always has the correct value
-        this.entityData.set(EXPLOSION_RADIUS, value)
+        explosionRadiusValue = value
     }
 
     override fun getFireLevel(): Int = fireLevelValue
@@ -536,7 +535,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
                 CustomExplosion.Builder(this)
                     .attacker(this.owner)
                     .damage(this.explosionDamageValue)
-                    .radius(this.getExplosionRadius())
+                    .radius(this.explosionRadiusValue)
                     .position(location)
                     .beast(this.isBeast())
                     .destroyBlock(this.explosionDestroyValue)
