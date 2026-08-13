@@ -99,7 +99,7 @@ open class AutoAimableEntity(type: EntityType<*>, world: Level) : VehicleEntity(
         hand: InteractionHand
     ): InteractionResult? {
         if (!player.isShiftKeyDown || this.isWreck) return null
-        if (this.owner != null && player != this.owner) return null
+        if (this.ownerUUID != null && player.uuid != this.ownerUUID) return null
         if (player.level().isClientSide) return null
 
         val container = ContainerBlockItem.createInstance(this)
