@@ -33,6 +33,10 @@ object GunEventHandler {
     private fun handleGunBolt(data: GunData) {
         if (data.item.useSpecialFireProcedure(data)) return
 
+        if (data.bolt.actionTimer.get() > 0) {
+            data.nbtVersion.invalidateStructural()
+        }
+
         data.bolt.actionTimer.reduce()
 
         // 执行拉栓期间额外行为
@@ -120,6 +124,8 @@ object GunEventHandler {
         data.reload.setState(ReloadState.NOT_RELOADING)
 
         data.reload.reloadStarter.finish()
+
+        data.nbtVersion.invalidateStructural()
     }
 
     /**
@@ -188,6 +194,8 @@ object GunEventHandler {
                 }
             } else if (canSingleReload && data.ammo.get() < data.get(GunProp.MAGAZINE)) {
                 data.reload.singleReloadStarter.markStart()
+
+                data.nbtVersion.invalidateStructural()
             } else {
                 return
             }
@@ -343,6 +351,9 @@ object GunEventHandler {
                 }
             }
 
+            if (data.reload.time() > 0) {
+                data.nbtVersion.invalidateStructural()
+            }
             // Reduce remaining reload timer
             data.reload.reduce()
 
@@ -374,6 +385,8 @@ object GunEventHandler {
 
     private fun startReload(shooter: Entity?, data: GunData) {
         val reload = data.reload
+
+        data.nbtVersion.invalidateStructural()
 
         if (data.item.isOpenBolt(data)) {
             if (!data.hasEnoughAmmoToShoot(shooter)) {
@@ -462,6 +475,8 @@ object GunEventHandler {
             data.stopped.set(false)
             reload.setStage(1)
             reload.setState(ReloadState.NORMAL_RELOADING)
+
+            data.nbtVersion.invalidateStructural()
         }
 
         if (reload.prepareLoadTimer.get() == data.get(GunProp.PREPARE_AMMO_LOAD_TIME)) {
