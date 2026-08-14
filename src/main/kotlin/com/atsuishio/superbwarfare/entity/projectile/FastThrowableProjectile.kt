@@ -654,9 +654,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
     open fun getVolume(): Float = 0.5f
 
     override fun isAlwaysTicking(): Boolean {
-        val level = this.level()
-        return !level.isClientSide && forceLoadChunk() &&
-            ProjectileConfig.PROJECTILE_CHUNK_LOADING.get() && this.y > level.maxBuildHeight
+        return !this.level().isClientSide && forceLoadChunk()
     }
 
     open fun forceLoadChunk(): Boolean {
