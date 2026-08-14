@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.annotation.ServerOnly
 import com.atsuishio.superbwarfare.data.*
 import com.atsuishio.superbwarfare.data.gun.ammo_consumer_strategy.AmmoConsumeStrategy
+import com.atsuishio.superbwarfare.data.gun.ammo_consumer_strategy.InvalidAmmoStrategy
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedGsonObject
 import com.atsuishio.superbwarfare.tools.isSameItemStack
 import com.google.gson.annotations.SerializedName
@@ -52,7 +53,7 @@ class AmmoConsumer : DeserializeFromString, PropertyModifier<GunData, DefaultGun
 
     @Transient
     @kotlinx.serialization.Transient
-    lateinit var strategy: AmmoConsumeStrategy
+    var strategy: AmmoConsumeStrategy = InvalidAmmoStrategy
 
     @Transient
     @kotlinx.serialization.Transient

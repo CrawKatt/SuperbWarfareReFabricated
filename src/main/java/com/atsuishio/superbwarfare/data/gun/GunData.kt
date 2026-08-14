@@ -164,6 +164,8 @@ class GunData private constructor(
      */
     fun initialize() {
         item.init(this)
+
+        nbtVersion.invalidateStructural()
     }
 
     /** Returns the underlying [GunItem]. */
@@ -455,6 +457,8 @@ class GunData private constructor(
         this.bolt.needed.reset()
         this.charge.starter.finish()
         this.charge.timer.reset()
+
+        nbtVersion.invalidateStructural()
     }
 
     /**
@@ -507,11 +511,15 @@ class GunData private constructor(
     /** Starts reload sequence in next tick update. */
     fun startReload() {
         this.reload.reloadStarter.markStart()
+
+        nbtVersion.invalidateStructural()
     }
 
     /** Starts manual bolt-action sequence. */
     fun startBolt() {
         this.bolt.actionTimer.set(get(BOLT_ACTION_TIME) + 1)
+
+        nbtVersion.invalidateStructural()
     }
 
     /**
@@ -723,6 +731,8 @@ class GunData private constructor(
 
         reload.setState(ReloadState.NOT_RELOADING)
         this.fireIndex.reset()
+
+        nbtVersion.invalidateStructural()
     }
 
     /**
@@ -1150,7 +1160,7 @@ class GunData private constructor(
 
     companion object {
         /** Tick interval between backup ammo inventory re-computations. */
-        const val BACKUP_AMMO_CACHE_TICKS: Long = 4L
+        const val BACKUP_AMMO_CACHE_TICKS: Long = 10L
 
         /**
          * Cached array of all [Perk.Type] entries.
