@@ -29,13 +29,6 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.superbwarfare]]
-modId = "geckolib"
-type = "required"
-versionRange = "[4.4.6,)"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.superbwarfare]]
 modId = "optifine"
 type = "discouraged"
 
