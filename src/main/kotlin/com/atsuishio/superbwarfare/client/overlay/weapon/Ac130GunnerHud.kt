@@ -134,6 +134,8 @@ class Ac130GunnerHud {
                     color
                 )
 
+                RenderSystem.enableBlend()
+
                 // 电视
                 val addW = (screenWidth / screenHeight) * 48
                 val addH = (screenWidth / screenHeight) * 27
