@@ -304,7 +304,7 @@
     "ExplosionRadius": 42,
     "CrashPassengers": true
   },
-  "VehicleIcon": "superbwarfare:textures/vehicle_icon/happiest_ghast_icon.png",
+  "VehicleIcon": "superbwarfare:textures/vehicle_icon/kirov_icon.png",
   "ContainerIcon": "superbwarfare:textures/gui/vehicle/type/aircraft.png",
   "VehicleContainerType": "Huge",
   "Type": "AirShip",
