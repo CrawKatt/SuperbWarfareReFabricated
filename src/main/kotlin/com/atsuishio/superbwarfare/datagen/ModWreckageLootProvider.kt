@@ -28,11 +28,11 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 3, 1.0),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.LARGE_BATTERY_PACK.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.WHEEL.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_BATTERY_PACK.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.WHEEL.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.COMPLETE)
                         .addEntry(
@@ -49,23 +49,23 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 15, 1.0),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.LARGE_BATTERY_PACK.get(),1, 0.5),
-                            Entry(ModItems.LARGE_BATTERY_PACK.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.WHEEL.get(),2, 0.5),
-                            Entry(ModItems.WHEEL.get(),2, 0.5),
-                            Entry(ModItems.WHEEL.get(),2, 0.5),
-                            Entry(ModItems.WHEEL.get(),2, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_BATTERY_PACK.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_BATTERY_PACK.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.WHEEL.get(), 2, 0.5),
+                            Entry(ModItems.WHEEL.get(), 2, 0.5),
+                            Entry(ModItems.WHEEL.get(), 2, 0.5),
+                            Entry(ModItems.WHEEL.get(), 2, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.COMPLETE)
                         .addEntry(
@@ -108,21 +108,21 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                             Entry(ModItems.STEEL_BLOCK.get(), 20, 1.0),
                             Entry(Items.FLOWER_POT, 1, 1.0),
                             Entry(Items.BLACK_WOOL, 64, 1.0),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.LARGE_BATTERY_PACK.get(),1, 0.5),
-                            Entry(ModItems.LARGE_BATTERY_PACK.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_BATTERY_PACK.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_BATTERY_PACK.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.COMPLETE)
                         .addEntry(
@@ -144,11 +144,11 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 1, 1.0),
-                            Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.MEDIUM_BATTERY_PACK.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.COMPLETE)
                         .addEntry(
@@ -165,14 +165,14 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 12, 1.0),
-                            Entry(ModItems.LASER_UNIT.get(),16, 0.5),
-                            Entry(ModItems.LARGE_BATTERY_PACK.get(),1, 0.5),
-                            Entry(Items.NETHERITE_BLOCK,3, 1.0),
+                            Entry(ModItems.LASER_UNIT.get(), 16, 0.5),
+                            Entry(ModItems.LARGE_BATTERY_PACK.get(), 1, 0.5),
+                            Entry(Items.NETHERITE_BLOCK, 3, 1.0),
                         ).build(),
                     PoolBuilder(type = Type.COMPLETE)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 12, 0.5),
-                            Entry(Items.NETHERITE_BLOCK,1, 0.25),
+                            Entry(Items.NETHERITE_BLOCK, 1, 0.25),
                         ).build()
                 )
         )
@@ -185,7 +185,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 5, 1.0),
-                            Entry(ModItems.CANNON_CORE.get(),2, 0.5)
+                            Entry(ModItems.CANNON_CORE.get(), 2, 0.5)
                         ).build(),
                     PoolBuilder(type = Type.COMPLETE)
                         .addEntry(
@@ -202,7 +202,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 4, 1.0),
-                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(), 1, 0.5),
                             Entry(ModItems.TRACK.get(), 1, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2),
@@ -215,7 +215,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 1, 1.0),
-                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.TURRET_ONLY)
                         .addEntry(
@@ -244,7 +244,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 4, 1.0),
-                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(), 1, 0.5),
                             Entry(ModItems.TRACK.get(), 1, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2),
@@ -257,7 +257,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 1, 1.0),
-                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.TURRET_ONLY)
                         .addEntry(
@@ -286,7 +286,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 3, 1.0),
-                            Entry(ModItems.CANNON_CORE.get(),1, 0.5),
+                            Entry(ModItems.CANNON_CORE.get(), 1, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2)
                         ).build(),
@@ -305,10 +305,10 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 2, 1.0),
-                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.MEDIUM_BATTERY_PACK.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.COMPLETE)
                         .addEntry(
@@ -326,10 +326,10 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .addEntry(
                             Entry(Items.BUCKET, 2, 1.0),
                             Entry(ModItems.STEEL_INGOT.get(), 4, 1.0),
-                            Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.SMALL_BATTERY_PACK.get(),1, 0.5),
-                            Entry(ModItems.PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.SMALL_BATTERY_PACK.get(), 1, 0.5),
+                            Entry(ModItems.PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.COMPLETE)
                         .addEntry(
@@ -347,7 +347,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 4, 1.0),
-                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(), 1, 0.5),
                             Entry(ModItems.WHEEL.get(), 4, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2),
@@ -360,7 +360,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 1, 1.0),
-                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.TURRET_ONLY)
                         .addEntry(
@@ -389,7 +389,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 3, 1.0),
-                            Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(), 1, 0.5),
                             Entry(ModItems.WHEEL.get(), 2, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2),
@@ -402,7 +402,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 1, 1.0),
-                            Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.TURRET_ONLY)
                         .addEntry(
@@ -431,7 +431,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 4, 1.0),
-                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(), 1, 0.5),
                             Entry(ModItems.WHEEL.get(), 4, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2),
@@ -444,7 +444,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 1, 1.0),
-                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.TURRET_ONLY)
                         .addEntry(
@@ -473,7 +473,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 6, 1.0),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
                             Entry(ModItems.TRACK.get(), 1, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2),
@@ -486,7 +486,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 2, 1.0),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.TURRET_ONLY)
                         .addEntry(
@@ -515,7 +515,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 6, 1.0),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
                             Entry(ModItems.TRACK.get(), 1, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2),
@@ -528,7 +528,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 2, 1.0),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.TURRET_ONLY)
                         .addEntry(
@@ -557,10 +557,10 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 3, 1.0),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.LARGE_BATTERY_PACK.get(),1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
-                            Entry(ModItems.LARGE_MOTOR.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_BATTERY_PACK.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.COMPLETE)
                         .addEntry(
@@ -577,7 +577,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 3, 1.0),
-                            Entry(ModItems.CANNON_CORE.get(),1, 0.5)
+                            Entry(ModItems.CANNON_CORE.get(), 1, 0.5)
                         ).build(),
                     PoolBuilder(type = Type.COMPLETE)
                         .addEntry(
@@ -594,7 +594,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 4, 1.0),
-                            Entry(ModItems.CANNON_CORE.get(),2, 0.5)
+                            Entry(ModItems.CANNON_CORE.get(), 2, 0.5)
                         ).build(),
                     PoolBuilder(type = Type.COMPLETE)
                         .addEntry(
@@ -611,10 +611,10 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 5, 1.0),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
                             Entry(ModItems.TRACK.get(), 1, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
-                            Entry(ModItems.CANNON_CORE.get(),2, 0.5),
+                            Entry(ModItems.CANNON_CORE.get(), 2, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2),
                         ).build(),
                     PoolBuilder(type = Type.COMPLETE)
@@ -625,7 +625,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 2, 1.0),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
                         ).build(),
                     PoolBuilder(type = Type.TURRET_ONLY)
                         .addEntry(
@@ -637,7 +637,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                             Entry(ModItems.STEEL_BLOCK.get(), 3, 1.0),
                             Entry(ModItems.TRACK.get(), 1, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
-                            Entry(ModItems.CANNON_CORE.get(),2, 0.5),
+                            Entry(ModItems.CANNON_CORE.get(), 2, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2),
                         ).build(),
                     PoolBuilder(type = Type.VEHICLE_ONLY)
@@ -655,8 +655,8 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 4, 1.0),
-                            Entry(ModItems.TRACK.get(),1, 0.5),
-                            Entry(ModItems.LASER_UNIT.get(),8, 0.5),
+                            Entry(ModItems.TRACK.get(), 1, 0.5),
+                            Entry(ModItems.LASER_UNIT.get(), 8, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.LARGE_BATTERY_PACK.get(), 1, 0.2)
                         ).build(),
@@ -675,7 +675,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 1, 1.0),
-                            Entry(ModItems.WHEEL.get(),2, 0.5),
+                            Entry(ModItems.WHEEL.get(), 2, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2)
                         ).build(),
@@ -695,7 +695,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 1, 1.0),
                             Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(), 1, 0.5),
-                            Entry(ModItems.WHEEL.get(),2, 0.5),
+                            Entry(ModItems.WHEEL.get(), 2, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2)
                         ).build(),
@@ -715,7 +715,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 1, 1.0),
                             Entry(ModItems.MORTAR_BARREL.get(), 6, 1.0),
-                            Entry(ModItems.WHEEL.get(),2, 0.5),
+                            Entry(ModItems.WHEEL.get(), 2, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2)
                         ).build(),
@@ -736,7 +736,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                             Entry(ModItems.STEEL_BLOCK.get(), 1, 1.0),
                             Entry(ModItems.MORTAR_BARREL.get(), 1, 0.5),
                             Entry(ModItems.ARTILLERY_INDICATOR.get(), 1, 0.5),
-                            Entry(ModItems.WHEEL.get(),2, 0.5),
+                            Entry(ModItems.WHEEL.get(), 2, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2)
                         ).build(),
@@ -756,7 +756,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 1, 1.0),
                             Entry(ModItems.LIGHT_ARMAMENT_MODULE.get(), 1, 0.5),
-                            Entry(ModItems.LARGE_PROPELLER.get(),1, 0.5),
+                            Entry(ModItems.LARGE_PROPELLER.get(), 1, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.SMALL_BATTERY_PACK.get(), 1, 0.2)
                         ).build(),
@@ -775,7 +775,7 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 4, 1.0),
-                            Entry(ModItems.WHEEL.get(),3, 0.5),
+                            Entry(ModItems.WHEEL.get(), 3, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2)
                         ).build(),
@@ -794,9 +794,9 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 5, 1.0),
-                            Entry(ModItems.CEMENTED_CARBIDE_BLOCK.get(),1, 0.5),
-                            Entry(Items.REDSTONE_BLOCK,4, 0.5),
-                            Entry(ModItems.LASER_UNIT.get(),4, 0.5),
+                            Entry(ModItems.CEMENTED_CARBIDE_BLOCK.get(), 1, 0.5),
+                            Entry(Items.REDSTONE_BLOCK, 4, 0.5),
+                            Entry(ModItems.LASER_UNIT.get(), 4, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.LARGE_BATTERY_PACK.get(), 1, 0.2)
                         ).build(),
@@ -816,8 +816,8 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 4, 1.0),
                             Entry(ModItems.CEMENTED_CARBIDE_BLOCK.get(), 12, 1.0),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(), 1, 0.5),
                             Entry(ModItems.TRACK.get(), 1, 0.5),
                             Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
                             Entry(ModItems.LARGE_BATTERY_PACK.get(), 1, 0.2),
@@ -831,8 +831,8 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                         .source(ModDamageTypes.REPAIR_TOOL)
                         .addEntry(
                             Entry(ModItems.STEEL_BLOCK.get(), 2, 1.0),
-                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(),1, 0.5),
-                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(),1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.5),
+                            Entry(ModItems.MEDIUM_ARMAMENT_MODULE.get(), 1, 0.5),
                             Entry(ModItems.CEMENTED_CARBIDE_BLOCK.get(), 3, 1.0)
                         ).build(),
                     PoolBuilder(type = Type.TURRET_ONLY)
@@ -854,6 +854,27 @@ class ModWreckageLootProvider(output: PackOutput, existingFileHelper: ExistingFi
                             Entry(ModItems.STEEL_BLOCK.get(), 2, 0.5),
                             Entry(ModItems.CEMENTED_CARBIDE_BLOCK.get(), 9, 0.5)
                         ).build(),
+                )
+        )
+
+        this.add(
+            ModEntities.FH_77BW.get(),
+            LootBuilder()
+                .addPool(
+                    PoolBuilder(type = Type.COMPLETE)
+                        .source(ModDamageTypes.REPAIR_TOOL)
+                        .addEntry(
+                            Entry(ModItems.STEEL_BLOCK.get(), 10, 1.0),
+                            Entry(ModItems.WHEEL.get(), 2, 1.0),
+                            Entry(ModItems.CANNON_CORE.get(), 1, 0.5),
+                            Entry(ModItems.HEAVY_ARMAMENT_MODULE.get(), 1, 0.3),
+                            Entry(ModItems.LARGE_MOTOR.get(), 1, 0.5),
+                            Entry(ModItems.MEDIUM_BATTERY_PACK.get(), 1, 0.2)
+                        ).build(),
+                    PoolBuilder(type = Type.COMPLETE)
+                        .addEntry(
+                            Entry(ModItems.STEEL_BLOCK.get(), 8, 0.5)
+                        ).build()
                 )
         )
     }
