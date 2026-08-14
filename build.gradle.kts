@@ -161,7 +161,7 @@ repositories {
 }
 
 fun DependencyHandler.jijImplement(dependency: String, maxVersion: String? = null, transitive: Boolean = true) {
-    val (name, _, version) = dependency.split(":")
+    val (_, _, version) = dependency.split(":")
 
     val firstVersion = version.split(".")
         .takeWhile { Regex("""^\d+$""").matches(it) }
@@ -170,13 +170,13 @@ fun DependencyHandler.jijImplement(dependency: String, maxVersion: String? = nul
     val maximumVersion = maxVersion ?: run {
         val versions = firstVersion.split(".")
         val firstVersionNumber = versions[0].toIntOrNull()
-        val firstVersion = if (firstVersionNumber != null) {
+        val firstVersionString = if (firstVersionNumber != null) {
             (firstVersionNumber + 1).toString()
         } else {
             versions[0]
         }
 
-        return@run "$firstVersion." + versions.drop(1).joinToString(".") { "0" }
+        return@run "$firstVersionString." + versions.drop(1).joinToString(".") { "0" }
     }
 
 //    println("$name [$firstVersion,$maximumVersion)")
@@ -199,7 +199,7 @@ dependencies {
 
     jijImplement("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1")
 
-    implementation(fg.deobf("software.bernie.geckolib:geckolib-forge-1.20.1:4.4.6"))
+    jijImplement("software.bernie.geckolib:geckolib-forge-1.20.1:4.4.6")
     implementation(fg.deobf("com.eliotlash.mclib:mclib:20"))
 
     // 从ywzj毛来的Rhino
