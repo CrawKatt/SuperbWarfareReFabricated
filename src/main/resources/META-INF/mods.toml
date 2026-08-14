@@ -25,6 +25,34 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.superbwarfare]]
+modId = "simplebedrockmodel"
+mandatory = true
+versionRange = "[2.5.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.superbwarfare]]
+modId = "geckolib"
+mandatory = false
+versionRange = "[4.4.6,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.superbwarfare]]
+modId = "curios"
+mandatory = false
+versionRange = "[5.4.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.superbwarfare]]
+modId = "cloth_config"
+mandatory = false
+versionRange = "[11.1.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.superbwarfare]]
 modId = "geckoanimfix"
 mandatory = false
 versionRange = "[114.514.Remove Iris/Oculus & GeckoLib Compat as it is incompatible with Superb Warfare and does nothing along with the latest version of GeckoLib!,)"
