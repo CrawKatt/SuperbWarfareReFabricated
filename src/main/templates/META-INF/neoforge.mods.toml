@@ -29,6 +29,20 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.superbwarfare]]
+modId = "geckolib"
+type = "optional"
+versionRange = "[4.7.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.superbwarfare]]
+modId = "curios"
+type = "optional"
+versionRange = "[9.2.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.superbwarfare]]
 modId = "optifine"
 type = "discouraged"
 
