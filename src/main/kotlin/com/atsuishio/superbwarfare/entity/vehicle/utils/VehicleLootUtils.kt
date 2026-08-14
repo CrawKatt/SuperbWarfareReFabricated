@@ -64,7 +64,7 @@ object VehicleLootUtils {
 
                     if (random > chance) return@forEach
                     val name = entry.name
-                    val item = BuiltInRegistries.ITEM.get(ResourceLocation.withDefaultNamespace(name))
+                    val item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(name))
                     val count = entry.count
                     val entity =
                         ItemEntity(vehicle.level(), vehicle.x, (vehicle.y + 1), vehicle.z, ItemStack(item, count))
