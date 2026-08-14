@@ -29,6 +29,13 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.superbwarfare]]
+modId = "simplebedrockmodel"
+type = "required"
+versionRange = "[2.5.1.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.superbwarfare]]
 modId = "geckolib"
 type = "optional"
 versionRange = "[4.7.0,)"
@@ -38,7 +45,14 @@ side = "BOTH"
 [[dependencies.superbwarfare]]
 modId = "curios"
 type = "optional"
-versionRange = "[9.2.0,)"
+versionRange = "[9.0.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.superbwarfare]]
+modId = "cloth_config"
+type = "optional"
+versionRange = "[15.0.0,)"
 ordering = "NONE"
 side = "BOTH"
 
