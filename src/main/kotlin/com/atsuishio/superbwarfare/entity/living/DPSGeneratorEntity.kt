@@ -35,6 +35,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent
 import kotlin.math.max
@@ -308,6 +309,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
 
     override fun getPickResult() = ItemStack(ModItems.DPS_GENERATOR_DEPLOYER.get())
 
+    @EventBusSubscriber
     companion object {
         @JvmField
         val DOWN_TIME: EntityDataAccessor<Int> =
