@@ -342,6 +342,7 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
 
                 if (existingTarget.isBlank()) {
                     tag.putString(TAG_TOW_TARGET, target.stringUUID)
+                    stack.tag = tag
                     player.displayClientMessage(
                         Component.translatable(
                             "tips.superbwarfare.tow_bar.select_shuttle",
