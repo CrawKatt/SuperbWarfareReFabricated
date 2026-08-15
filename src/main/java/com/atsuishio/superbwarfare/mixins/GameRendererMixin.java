@@ -51,8 +51,8 @@ public abstract class GameRendererMixin {
     @SuppressWarnings("ConstantValue")
     @Inject(method = "bobHurt(Lcom/mojang/blaze3d/vertex/PoseStack;F)V", at = @At("HEAD"))
     public void superbWarfare$renderWorld(PoseStack matrices, float tickDelta, CallbackInfo ci) {
-        // Reset flag from previous frame in case hand event didn't fire
-        ClientEventHandler.vehiclePosePushed = false;
+        // Reset pushed stack from previous frame in case hand event didn't fire
+        ClientEventHandler.vehiclePoseStack = null;
 
         Entity entity = mainCamera.getEntity();
         matrices.mulPose(Axis.ZP.rotationDegrees(ClientEventHandler.cameraRoll));
@@ -70,7 +70,7 @@ public abstract class GameRendererMixin {
 
             // Push before applying vehicle transforms so hand rendering can be isolated
             matrices.pushPose();
-            ClientEventHandler.vehiclePosePushed = true;
+            ClientEventHandler.vehiclePoseStack = matrices;
 
             // rotate camera
             float a = Mth.wrapDegrees(mainCamera.getYRot() - Mth.lerp(tickDelta, vehicle.yRotO, vehicle.getYRot()));

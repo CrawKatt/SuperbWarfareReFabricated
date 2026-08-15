@@ -26,6 +26,7 @@ import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
+import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.ChatFormatting
 import net.minecraft.client.CameraType
 import net.minecraft.client.Minecraft
@@ -339,9 +340,9 @@ object ClientEventHandler {
     @JvmField
     var cameraRoll: Float = 0f
 
-    // Tracks whether pushPose was called in bobHurt for vehicle camera rotation
+    // Tracks the PoseStack that received the vehicle push in bobHurt.
     @JvmField
-    var vehiclePosePushed: Boolean = false
+    var vehiclePoseStack: PoseStack? = null
 
     // 禁止冲刺♿时长tick
     @JvmField
@@ -2083,10 +2084,10 @@ object ClientEventHandler {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderHand(event: RenderHandEvent) {
-        // Pop vehicle camera transforms before hand rendering to prevent arm tilt
-        if (vehiclePosePushed) {
+        // Pop only the stack that actually received the push in bobHurt.
+        if (vehiclePoseStack === event.poseStack) {
             event.poseStack.popPose()
-            vehiclePosePushed = false
+            vehiclePoseStack = null
         }
 
         val player = localPlayer ?: return
