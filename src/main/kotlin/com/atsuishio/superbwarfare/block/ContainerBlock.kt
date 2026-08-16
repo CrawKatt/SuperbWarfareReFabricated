@@ -190,7 +190,8 @@ open class ContainerBlock :
                 if (sponsor != null) {
                     tooltip.add(
                         Component.translatable(
-                            "des.superbwarfare.container.sponsor", sponsor
+                            "des.superbwarfare.container.sponsor",
+                            Component.literal("[${sponsor.name}]").withStyle(Style.EMPTY.withColor(sponsor.color.color))
                         ).withStyle(Style.EMPTY.withColor(0x7DEA79))
                     )
                 }
