@@ -10,6 +10,7 @@
   "item.superbwarfare.ammo.rifle": "步枪弹药",
   "item.superbwarfare.ammo.sniper": "狙击枪弹药",
   "item.superbwarfare.ammo.heavy": "重型弹药",
+
   "item.superbwarfare.sentinel": "哨兵狙击步枪",
   "item.superbwarfare.rpk": "RPK轻机枪",
   "item.superbwarfare.m_870": "M870霰弹枪",
@@ -62,8 +63,10 @@
   "des.superbwarfare.ql_1031_2": "倾澜Chiram",
   "item.superbwarfare.super_star_shooter": "超级星星炮",
   "item.superbwarfare.reforging": "重塑",
+
   "item.superbwarfare.vehicle_gun": "载具武器",
   "des.superbwarfare.vehicle_gun": "你不应该拿到这个的",
+
   "item.superbwarfare.empty_gun": "空枪",
   "des.superbwarfare.empty_gun": "警告：你拿到了一把不存在的枪",
 
@@ -74,6 +77,7 @@
   "des.superbwarfare.guns.rpm": "射速: ",
   "des.superbwarfare.guns.headshot": "爆头倍率: ",
   "des.superbwarfare.guns.edit": "按下 %1$s 键打开改装界面",
+
   "item.superbwarfare.ammo_box": "弹药盒",
   "des.superbwarfare.ammo_box.rifle": "已存储的步枪弹药: ",
   "des.superbwarfare.ammo_box.handgun": "已存储的手枪弹药: ",
@@ -87,6 +91,7 @@
   "des.superbwarfare.ammo_box.type.sniper": "已选择狙击弹药",
   "des.superbwarfare.ammo_box.type.heavy": "已选择重型弹药",
   "des.superbwarfare.ammo_box": "潜行时，左击选择弹药类型，右击存入该类型的弹药，非潜行时右击取出对应类型的弹药",
+
   "item.superbwarfare.vector_blueprint": "短剑冲锋枪蓝图",
   "item.superbwarfare.m_60_blueprint": "M60通用机枪蓝图",
   "item.superbwarfare.hk_416_blueprint": "Hk-416突击步枪蓝图",
@@ -120,7 +125,7 @@
   "item.superbwarfare.k_98_blueprint": "KAR-98K蓝图",
   "item.superbwarfare.mosin_nagant_blueprint": "莫辛纳甘蓝图",
   "item.superbwarfare.javelin_blueprint": "标枪导弹蓝图",
-  "item.superbwarfare.mk_42_blueprint": "5\u0027\u0027/54 Mk42蓝图",
+  "item.superbwarfare.mk_42_blueprint": "5''/54 Mk42蓝图",
   "item.superbwarfare.mle_1934_blueprint": "138.6mm50 Mle1934 R1938蓝图",
   "item.superbwarfare.annihilator_blueprint": "歼灭者能量炮蓝图",
   "item.superbwarfare.m_2_hb_blueprint": "M2HB重机枪蓝图",
@@ -133,6 +138,7 @@
   "item.superbwarfare.igla_9k38_blueprint": "IGLA-9K38便携式地空导弹发射器蓝图",
   "item.superbwarfare.ql_1031_blueprint": "QL-1031 “轻岚”蓝图",
   "item.superbwarfare.super_star_shooter_blueprint": "超级星星炮蓝图",
+
   "item.superbwarfare.common_material_pack": "普通材料包",
   "item.superbwarfare.rare_material_pack": "稀有材料包",
   "item.superbwarfare.epic_material_pack": "史诗材料包",
@@ -159,6 +165,7 @@
   "item.superbwarfare.crystal_action": "水晶枪机",
   "item.superbwarfare.crystal_spring": "水晶弹簧",
   "item.superbwarfare.crystal_trigger": "水晶扳机",
+
   "item.superbwarfare.buckshot": "霰弹弹丸",
   "item.superbwarfare.taser_electrode": "泰瑟枪电极",
   "item.superbwarfare.mortar_shell": "迫击炮弹",
@@ -366,10 +373,13 @@
   "item.superbwarfare.towline": "拖绳",
   "des.superbwarfare.towline.hint": "右键载具选择牵引目标，Shift+右键清除连接",
   "des.superbwarfare.towline.target_selected": "已选择牵引目标",
+
   "item.superbwarfare.tow_bar": "牵引杆",
   "des.superbwarfare.tow_bar.hint": "右键弹射器滑块选择拖拽目标，Shift+右键清除连接",
   "des.superbwarfare.tow_bar.target_selected": "已选择弹射器滑块",
+
   "attribute.superbwarfare.bullet_resistance": "子弹防护",
+
   "block.superbwarfare.jump_pad": "弹射台",
   "block.superbwarfare.sandbag": "沙袋",
   "block.superbwarfare.barbed_wire": "铁丝网",
@@ -441,6 +451,7 @@
   "block.superbwarfare.raw_galena_block": "粗方铅块",
   "block.superbwarfare.raw_scheelite_block": "粗白钨块",
   "block.superbwarfare.raw_silver_block": "粗银块",
+
   "item.superbwarfare.high_energy_explosives": "高能炸药",
   "item.superbwarfare.grain": "推进药柱",
   "item.superbwarfare.tungsten_rod": "钨棒",
@@ -461,10 +472,12 @@
   "item.superbwarfare.galena": "粗方铅",
   "item.superbwarfare.scheelite": "粗白钨",
   "item.superbwarfare.raw_silver": "粗银",
+
   "item.superbwarfare.armor_plate": "防弹插板",
   "des.superbwarfare.armor_plate.infinite": "无限",
   "item.superbwarfare.crust": "饼皮",
   "des.superbwarfare.crust": "它可不会飞……",
+
   "item.superbwarfare.ru_helmet_6b47": "俄罗斯6B47头盔",
   "item.superbwarfare.ru_chest_6b43": "俄罗斯6B43防弹胸甲",
   "item.superbwarfare.us_helmet_pasgt": "美制PASGT头盔",
@@ -472,6 +485,7 @@
   "item.superbwarfare.ge_helmet_m_35": "德国M35头盔",
   "item.superbwarfare.parachute": "降落伞",
   "item.superbwarfare.thermal_imaging_goggles": "热成像护目镜",
+
   "item.superbwarfare.ap_bullet": "穿甲弹",
   "des.superbwarfare.ap_bullet": "增加子弹的穿甲比例",
   "item.superbwarfare.silver_bullet": "银弹",
@@ -502,6 +516,7 @@
   "des.superbwarfare.phase_penetrating_bullet": "允许子弹穿透任何方块",
   "item.superbwarfare.aqua_bullet": "海王弹",
   "des.superbwarfare.aqua_bullet": "降低子弹在水下的阻力，对水生生物造成额外伤害",
+
   "item.superbwarfare.heal_clip": "治疗弹匣",
   "des.superbwarfare.heal_clip": "最后一击后短时间内填装，可治疗自身和附近队友",
   "item.superbwarfare.fourth_times_charm": "事不过四",
@@ -526,6 +541,7 @@
   "des.superbwarfare.cast_no_shadows": "造成近战伤害会从备弹中填装部分弹药并治疗自身",
   "item.superbwarfare.eager_edge": "急切刀锋",
   "des.superbwarfare.eager_edge": "切换到此武器后，立即按下近战能够向前冲刺",
+
   "item.superbwarfare.kill_clip": "杀戮弹匣",
   "des.superbwarfare.kill_clip": "完成击杀后填装可提升武器伤害",
   "item.superbwarfare.killing_tally": "击杀记录",
@@ -558,15 +574,18 @@
   "des.superbwarfare.battle_of_wits": "发送消息会提升下一次射击的伤害",
   "item.superbwarfare.target_lock": "勿移视",
   "des.superbwarfare.target_lock": "随着此武器准星在目标上停留的时间增加伤害",
+
   "item.superbwarfare.empty_perk": "空白模组",
   "item.superbwarfare.shortcut_pack": "捷径包",
   "des.superbwarfare.shortcut_pack_1": "真的吗?",
   "des.superbwarfare.shortcut_pack_2": "将枪械和捷径包在铁砧处合成，可直接提升1级枪械等级",
+
   "perk.superbwarfare.tips": "[武器模组]",
   "perk.superbwarfare.slot": "类型: ",
   "perk.superbwarfare.slot_Ammo": "子弹模组",
   "perk.superbwarfare.slot_Functional": "功能模组",
   "perk.superbwarfare.slot_Damage": "伤害模组",
+
   "death.attack.gunfire": "%1$s被%2$s射爆了",
   "death.attack.gunfire.entity": "%1$s被%2$s射爆了",
   "death.attack.gunfire.item": "%1$s被%2$s用%3$s射爆了",
@@ -628,6 +647,7 @@
   "death.attack.ammo_consumption": "%1$s弹尽粮绝了",
   "death.attack.ammo_consumption.entity": "%1$s弹尽粮绝了",
   "death.attack.ammo_consumption.item": "%1$s弹尽粮绝了",
+
   "entity.superbwarfare.projectile": "子弹",
   "entity.superbwarfare.mortar_shell": "迫击炮弹",
   "entity.superbwarfare.gun_grenade": "枪榴弹",
@@ -648,7 +668,7 @@
   "entity.superbwarfare.claymore": "阔剑地雷",
   "entity.superbwarfare.c4": "C4",
   "entity.superbwarfare.senpai": "野兽先辈",
-  "entity.superbwarfare.mk_42": "5\u0027\u0027/54 Mk42",
+  "entity.superbwarfare.mk_42": "5''/54 Mk42",
   "entity.superbwarfare.mle_1934": "138.6mm50 Mle1934 R1938",
   "entity.superbwarfare.bl_132": "130mm/58 BL-132",
   "entity.superbwarfare.drone": "无人机",
@@ -719,6 +739,7 @@
   "entity.superbwarfare.ac_130h": "AC-130H 空中炮艇",
   "entity.superbwarfare.air_sheep": "飞羊羊",
   "entity.superbwarfare.fh_77bw": "FH-77BW “弓箭手”自行火炮",
+
   "key.categories.superbwarfare": "卓越前线",
   "key.superbwarfare.move_forward": "前进/提升油门",
   "key.superbwarfare.move_backward": "后退/降低油门",
@@ -756,6 +777,7 @@
   "key.superbwarfare.loiter_config": "自动盘旋配置",
   "key.superbwarfare.toggle_tactical_map": "打开战术地图",
   "key.superbwarfare.change_seat": "切换座位(+数字)",
+
   "effect.superbwarfare.shock": "电击",
   "effect.superbwarfare.burn": "点燃",
   "effect.superbwarfare.strike_protection": "撞击保护",
@@ -800,11 +822,12 @@
   "commands.superbwarfare.skin.success.clear": "已清除载具%1$s的皮肤",
   "commands.superbwarfare.loiter.player_only": "该指令只能由玩家执行",
   "commands.superbwarfare.loiter.not_aircraft": "你未乘坐固定翼飞机",
-  "commands.superbwarfare.loiter.success": "盘旋参数已设置: X\u003d%1$s Y\u003d%2$s Z\u003d%3$s R\u003d%4$s",
-  "commands.superbwarfare.loiter.enabled": "盘旋已开启，中心: X\u003d%1$s Y\u003d%2$s Z\u003d%3$s R\u003d%4$s",
+  "commands.superbwarfare.loiter.success": "盘旋参数已设置: X=%1$s Y=%2$s Z=%3$s R=%4$s",
+  "commands.superbwarfare.loiter.enabled": "盘旋已开启，中心: X=%1$s Y=%2$s Z=%3$s R=%4$s",
   "commands.superbwarfare.loiter.disabled": "盘旋已关闭",
-  "commands.superbwarfare.loiter.get": "盘旋参数: X\u003d%1$s Y\u003d%2$s Z\u003d%3$s R\u003d%4$s 状态\u003d%5$s",
-  "commands.superbwarfare.loiter.edit": "盘旋参数已更新: X\u003d%1$s Y\u003d%2$s Z\u003d%3$s R\u003d%4$s",
+  "commands.superbwarfare.loiter.get": "盘旋参数: X=%1$s Y=%2$s Z=%3$s R=%4$s 状态=%5$s",
+  "commands.superbwarfare.loiter.edit": "盘旋参数已更新: X=%1$s Y=%2$s Z=%3$s R=%4$s",
+
   "tips.superbwarfare.sensitivity": "当前枪械的灵敏度为：%1$s",
   "tips.superbwarfare.monitor.linked": "连接成功！",
   "tips.superbwarfare.monitor.already_linked": "这个遥控器已连接到一个设备！",
@@ -844,6 +867,7 @@
   "tips.superbwarfare.vehicle.lock_hurt": "你的位于[%1$s, %2$s, %3$s]的载具%4$s正在遭受攻击",
   "tips.superbwarfare.vehicle.lock_destroy": "你的位于[%1$s, %2$s, %3$s]的载具%4$s已被损毁",
   "tips.superbwarfare.vehicle.lock_not_empty": "只有空车才能上锁",
+
   "tips.superbwarfare.towline.select_towing": "已选择牵引载具: %1$s",
   "tips.superbwarfare.towline.target_lost": "牵引目标丢失！先前选择的载具已不存在",
   "tips.superbwarfare.towline.same_entity": "不能将载具连接到自身！",
@@ -852,6 +876,7 @@
   "tips.superbwarfare.towline.linked": "已连接: %1$s 牵引 %2$s",
   "tips.superbwarfare.towline.unlinked": "已解除牵引连接",
   "tips.superbwarfare.towline.selection_cleared": "已清除牵引目标选择",
+
   "tips.superbwarfare.tow_bar.select_shuttle": "已选择弹射器滑块: %1$s",
   "tips.superbwarfare.tow_bar.target_lost": "拖拽目标丢失！先前选择的弹射器滑块已不存在",
   "tips.superbwarfare.tow_bar.same_entity": "不能将实体连接到自身！",
@@ -862,23 +887,27 @@
   "tips.superbwarfare.tow_bar.target_in_front": "目标位于弹射器滑块前方，无法连接",
   "tips.superbwarfare.tow_bar.select_shuttle_first": "请先右键弹射器滑块选择拖拽源",
   "tips.superbwarfare.tow_bar.selection_cleared": "已清除拖拽目标选择",
+
   "tips.superbwarfare.target.yaw": "目标偏航角: ",
   "tips.superbwarfare.target.pitch": "目标俯仰角: ",
   "tips.superbwarfare.barrel_empty": "空",
   "tips.superbwarfare.mortar.out_of_range": "超出射程",
   "tips.superbwarfare.vehicle_assembling_table.warn": "没有足够的空间拆卸载具",
+
   "tips.superbwarfare.modify_result.function": "[自定计算]",
   "tips.superbwarfare.modify_result.all": "[全局减伤]",
-  "tips.superbwarfare.modify_result.resource_key": "[伤害类型] \u003c%1$s\u003e",
-  "tips.superbwarfare.modify_result.tag_key": "[伤害标签] \u003c%1$s\u003e",
-  "tips.superbwarfare.modify_result.entity_type": "[实体类型] \u003c%1$s\u003e",
-  "tips.superbwarfare.modify_result.entity_id": "[实体ID] \u003c%1$s\u003e",
+  "tips.superbwarfare.modify_result.resource_key": "[伤害类型] <%1$s>",
+  "tips.superbwarfare.modify_result.tag_key": "[伤害标签] <%1$s>",
+  "tips.superbwarfare.modify_result.entity_type": "[实体类型] <%1$s>",
+  "tips.superbwarfare.modify_result.entity_id": "[实体ID] <%1$s>",
+
   "tips.superbwarfare.category.land": "地面载具",
   "tips.superbwarfare.category.defense": "固定武器",
   "tips.superbwarfare.category.aircraft": "飞行器",
   "tips.superbwarfare.category.civilian": "民用载具",
   "tips.superbwarfare.category.water": "水上载具",
   "tips.superbwarfare.category.misc": "杂项",
+
   "tips.superbwarfare.switch_ammo": "切换",
   "tips.superbwarfare.flare.ready": "干扰弹 就绪",
   "tips.superbwarfare.flare.reloading": "干扰弹 装填中",
@@ -901,11 +930,14 @@
   "tips.superbwarfare.not.enough.energy": "能量不足",
   "tips.superbwarfare.fh77bw.body_tilted": "车体倾斜，无法发射",
   "tips.superbwarfare.fh77bw.not_stopped": "车未停稳，无法发射",
-  "tips.superbwarfare.vehicle_reset_kit_1": "[警告] 检测到卓越前线版本变化[%1$s\u003d\u003e%2$s]，之前版本的载具可能无法正常使用",
+
+  "tips.superbwarfare.vehicle_reset_kit_1": "[警告] 检测到卓越前线版本变化[%1$s=>%2$s]，之前版本的载具可能无法正常使用",
   "tips.superbwarfare.vehicle_reset_kit_2": "你可以在取出旧版本载具的所有物品后，使用%1$s与装有载具的集装箱进行合成，以完成重置",
   "tips.superbwarfare.vehicle_reset_kit_3": "如果你不想看到此警告，可以在客户端配置中关闭",
+
   "tips.superbwarfare.battle_of_wits.active": "你的这句话为下一次射击增加了%1$s的伤害",
   "tips.superbwarfare.battle_of_wits.cooldown": "唇枪舌剑现已可用",
+
   "container.superbwarfare.reforging_table": "枪械重塑台",
   "container.superbwarfare.charging_station": "充电站",
   "container.superbwarfare.charging_station.show_range": "显示范围",
@@ -921,6 +953,7 @@
   "container.superbwarfare.loiter_config.skip_terrain": "跳过地形Y轴检查",
   "container.superbwarfare.loiter_config.loiter_on": "盘旋功能已开启",
   "container.superbwarfare.loiter_config.loiter_off": "盘旋功能已关闭",
+
   "info.superbwarfare.mod_id": "卓越前线",
   "info.superbwarfare.no_info": "[暂无信息]",
   "info.superbwarfare.prism_tank": "光棱坦克是一款能向敌人发射高能激光的特种坦克，可搭载2人，不具备浮渡能力",
@@ -962,6 +995,7 @@
   "info.superbwarfare.ac_130h": "AC-130H“幽灵”是美军重型空中炮艇。主武器为两门20毫米加特林机炮、一门40毫米博福斯机炮及一门105毫米榴弹炮，专为长时间盘旋压制地面目标设计，擅长摧毁据点和轻型装甲，以凶猛火力和持久滞空能力著称",
   "info.superbwarfare.air_sheep": "一只真正的会飞的羊",
   "info.superbwarfare.fh_77bw": "FH77BW“弓箭手”是瑞典的轮式自行火炮。主武器为一门155毫米/L52榴弹炮，配全自动装填系统。专为快速反应与精确火力支援设计，具备高机动性和自动化操作能力",
+
   "weapon.superbwarfare.20mm_cannon": "20毫米机炮 %1$s",
   "weapon.superbwarfare.20mm_cannon_ap": "20毫米机炮 穿甲弹 %1$s",
   "weapon.superbwarfare.20mm_cannon_he": "20毫米机炮 高爆弹 %1$s",
@@ -1016,6 +1050,7 @@
   "weapon.superbwarfare.laser_semi": "激光炮 %1$s 爆发",
   "weapon.superbwarfare.laser_auto": "激光炮 %1$s 速射",
   "weapon.superbwarfare.mortar_shell": "迫击炮弹 %1$s",
+
   "config.superbwarfare.title": "卓越前线",
   "config.superbwarfare.client.reload": "换弹配置",
   "config.superbwarfare.client.reload.left_click_reload": "快捷换弹",
@@ -1085,6 +1120,7 @@
   "config.superbwarfare.client.control.invert_aircraft_control.des": "开启飞行器鼠标反转",
   "config.superbwarfare.client.control.mouse_sensitivity": "鼠标灵敏度",
   "config.superbwarfare.client.control.mouse_sensitivity.des": "调整持枪时的鼠标灵敏度",
+
   "config.superbwarfare.common.gameplay": "游戏内容配置",
   "config.superbwarfare.common.gameplay.respawn_reload": "重生换弹",
   "config.superbwarfare.common.gameplay.respawn_reload.des": "开启时，玩家在重生时会自动装填全部武器的弹药",
@@ -1092,18 +1128,22 @@
   "config.superbwarfare.common.gameplay.global_indication.des": "是否在仅使用本模组的伤害类型击杀生物时，在准星周围显示击杀提示",
   "config.superbwarfare.common.gameplay.respawn_auto_armor": "重生自动装备防弹插板",
   "config.superbwarfare.common.gameplay.respawn_auto_armor.des": "开启时，玩家在重生时会自动补满防弹插板",
+
   "des.superbwarfare.perk_damage_reduce": "伤害 -",
   "des.superbwarfare.perk_damage_plus": "伤害 +",
   "des.superbwarfare.perk_speed_reduce": "子弹初速 -",
   "des.superbwarfare.perk_speed_plus": "子弹初速 +",
   "des.superbwarfare.perk_slug": "独头弹",
+
   "des.superbwarfare.developing": "本物品还在开发中",
+
   "jei.superbwarfare.ancient_cpu": "神秘的古代科技，可以在古城找到。",
   "jei.superbwarfare.charging_station": "使用燃料或食物进行发电，也可以接收主动输入的FE能量。能够为相邻的方块提供FE能量，为周围一定范围内的可充能载具充能。",
   "jei.superbwarfare.gun_perks": "武器可用模组",
   "jei.superbwarfare.vehicle_assembling": "载具装配",
   "jei.superbwarfare.researching": "蓝图研究",
   "jei.superbwarfare.researching.selectable": "[可自选]",
+
   "config.jade.plugin_superbwarfare.vehicle_energy": "载具能量",
   "config.jade.plugin_superbwarfare.vehicle_info": "载具信息",
   "config.jade.plugin_superbwarfare.vehicle_skin": "载具皮肤：%1$s",
@@ -1116,7 +1156,9 @@
   "des.jade_plugin_superbwarfare.dps_generator.health": "当前最大血量：%1$s",
   "config.jade.plugin_superbwarfare.vehicle_deployer": "载具部署器",
   "config.jade.plugin_superbwarfare.catapult_controller": "弹射器控制器",
+
   "gamerule.sbwDoGenerateLoots": "生成卓越前线的箱子战利品",
+
   "superbwarfare.advancement.main.root": "卓越前线",
   "superbwarfare.advancement.main.root.des": "欢迎来到卓越前线！",
   "superbwarfare.advancement.main.best_friend": "永恒的“伙伴”",
@@ -1169,6 +1211,7 @@
   "superbwarfare.advancement.main.critical_hit.des": "已经到了无法停下的程度，直入脑髓的一击",
   "superbwarfare.advancement.main.eat_crust": "画饼充“机”",
   "superbwarfare.advancement.main.eat_crust.des": "谁不想驾驶一张会飞的饼呢？",
+
   "context.superbwarfare.tactical_map.create_marker": "创建标记点",
   "context.superbwarfare.tactical_map.edit_marker": "编辑",
   "context.superbwarfare.tactical_map.delete_marker": "删除",
@@ -1221,15 +1264,19 @@
   "context.superbwarfare.tactical_map.relation.friendly": "友方",
   "context.superbwarfare.tactical_map.relation.hostile": "敌对",
   "context.superbwarfare.tactical_map.relation.neutral": "中立",
+
   "warning.superbwarfare.title.mod_sell": "【卓越前线 警示声明】",
-  "warning.superbwarfare.content.mod_sell": "\u003d\u003d 本模组完全免费开源，禁止用于任何商业行为 \u003d\u003d\n本模组代码采用GPL-3协议开源，美术资源私有禁止商用\n禁止付费下载、充值获取道具等违反协议和Mojang EULA的行为\n如遇以上行为，请到本模组仓库处提交Issue进行举报",
+  "warning.superbwarfare.content.mod_sell": "== 本模组完全免费开源，禁止用于任何商业行为 ==\n本模组代码采用GPL-3协议开源，美术资源私有禁止商用\n禁止付费下载、充值获取道具等违反协议和Mojang EULA的行为\n如遇以上行为，请到本模组仓库处提交Issue进行举报",
   "warning.superbwarfare.check.mod_sell": "我已阅读并同意，不再显示此警告",
   "warning.superbwarfare.title.snapshot": "【卓越前线 游玩警告】",
   "warning.superbwarfare.content.snapshot": "检测到Minecraft加载了测试版本的卓越前线模组，该版本可能会不兼容部分附属模组，或出现未知的BUG，甚至对已有的存档产生不可逆的影响。如果你希望继续游玩此版本，请创建新的存档进行游玩！",
+
   "pack.superbwarfare.sbw_legacy": "卓越前线旧版材质包",
+
   "skin.superbwarfare.truck.green": "来自永无止境载具的原版绿色大运皮肤",
   "skin.superbwarfare.bl_132.black": "黑色彩蛋涂装",
   "skin.superbwarfare.mortar.firework": "民用节庆一次性发射器",
+
   "superbwarfare.book.superb_warfare_manual": "卓越单兵手册",
   "superbwarfare.book.superb_warfare_manual.des": "卓越前线模组的教程，教你如何成为一名卓越的士兵（编写中）",
   "superbwarfare.category.weapon": "武器",
@@ -1242,6 +1289,7 @@
   "superbwarfare.category.misc.des": "了解卓越前线的其他物品用法",
   "superbwarfare.category.resources": "资源",
   "superbwarfare.category.resources.des": "了解如何获取卓越前线的资源材料",
+
   "superbwarfare.entry.weapon.intro": "武器基础",
   "superbwarfare.page.weapon.intro.1": "卓越前线的大多数武器需要使用$(item)蓝图$()、对应稀有度的$(item)材料包$()和$(thing)其他材料$()合成。",
   "superbwarfare.page.weapon.intro.2": "本手册无法将锻造的配方完全显示，制造$(item)枪械$()除了需要图中显示的材料外，还需要该枪械所对应的$(item)蓝图$()。",
@@ -1252,6 +1300,7 @@
   "superbwarfare.page.weapon.control.1": "本章节会对卓越前线的武器操作进行简单介绍，让你了解如何使用武器。",
   "superbwarfare.page.weapon.control.2": "$(l)基础操作：$()$(p)$(thing)$(k:key.superbwarfare.fire)$() - 开火$(br)$(thing)$(k:key.superbwarfare.hold_zoom) / $(k:key.superbwarfare.switch_zoom)$() - 瞄准$(br)$(thing)$(k:key.superbwarfare.reload)$() - 装填子弹$(br)$(thing)$(k:key.superbwarfare.unload)$() - 卸载子弹$(br)$(thing)$(k:key.superbwarfare.breath)$() - 屏息$(br)$(thing)$(k:key.superbwarfare.sensitivity_increase)$() - 增加灵敏度$(br)$(thing)$(k:key.superbwarfare.sensitivity_reduce)$() - 减少灵敏度$(br)$(thing)$(k:key.superbwarfare.fire_mode)$() - 切换开火模式$(p)对于可以近战的武器$(br)$(thing)$(k:key.superbwarfare.melee)$() - 近战",
   "superbwarfare.page.weapon.control.3": "$(l)改装：$()$(p)对于可以改装的武器：$(br)$(thing)$(k:key.superbwarfare.edit_mode)$() - 进入改装界面$(br)$(thing)$(k:key.superbwarfare.change_ammo_forward) / $(k:key.superbwarfare.change_ammo_backward)$() - 切换弹药种类",
+
   "superbwarfare.entry.vehicle.intro": "载具基础",
   "superbwarfare.page.vehicle.intro.1": "卓越前线的载具平时被储存在$(item)集装箱$()中，需要使用$(item)撬棍$()打开。$(p)开启集装箱需要足够的空间，手持撬棍时瞄准集装箱，即可查看集装箱所需空间大小。集装箱可以直接放置在水面上。",
   "superbwarfare.page.vehicle.intro.2": "使用撬棍对准无人的载具$(thing)潜行右击$()，即可将载具回收到集装箱中。",
@@ -1302,6 +1351,7 @@
   "superbwarfare.page.vehicle.wheel_chair.1": "$(thing)轮椅$()是一款轻型代步工具，几乎没有装甲防护。$(p)没有能量时可以点按 $(thing)$(k:key.forward)$() 前进。$(br)有能量时按住 $(thing)$(k:key.forward)$() 快速冲刺,按 $(thing)$(k:key.jump)$() 跳跃。",
   "superbwarfare.page.vehicle.wheel_chair.2": "$(l)基础属性：$()$(p)耐久值 - 10$(br)最大乘员数 - 1$(br)爬坡高度 - 1.1m$(br)最大能量 - 24,000FE$(br)能耗 - 1FE/tick$(br)",
   "superbwarfare.page.vehicle.wheel_chair.3": "$(o)“冲刺！冲刺！冲！”$()",
+
   "superbwarfare.entry.perk.reforging_table": "枪械重塑台",
   "superbwarfare.page.perk.reforging_table.1": "$(item)枪械重塑台$()可以为卓越前线的枪械安装模组，提升枪械的强度。$(p)每个枪械可以安装三种不同的模组，分别为$(thing)子弹模组$()、$(thing)功能模组$()和$(thing)伤害模组$()。",
   "superbwarfare.page.perk.reforging_table.2": "枪械拥有$(thing)等级$()和$(thing)升级点数$()属性，射击生物或击杀生物时会获得经验值，每提升2级可以获得1点升级点数。升级点数用于提升$(thing)枪械模组$()的等级，最高提升至20级。",
@@ -1310,6 +1360,7 @@
   "superbwarfare.page.perk.ap_bullet.1": "$(l)武器伤害：$()-10%%$(br)$(l)子弹初速：$()+20%%$(br)$(l)护甲穿透：$()+(35 + 5 x $(thing)模组等级$())%%$(br)使霰弹枪发射独头弹$(br)$(l)子弹颜色：$()$(#E64623)#E64623$()",
   "superbwarfare.entry.perk.jhp_bullet": "空尖弹",
   "superbwarfare.page.perk.jhp_bullet.1": "$(l)武器伤害：$()+10%%$(br)$(l)子弹初速：$()-5%%$(br)$(l)护甲穿透：$()-20%%$(br)使霰弹枪发射独头弹$(br)$(l)子弹颜色：$()$(#E68341)#E68341$()$(br)$(l)功能：$()命中生物时，根据目标的盔甲造成额外的伤害，盔甲越低伤害越高。",
+
   "superbwarfare.entry.misc.aircraft_catapult": "飞行器弹射装置",
   "superbwarfare.page.misc.aircraft_catapult.1": "$(item)飞行器弹射装置$()是一个能够运输站在上面的$(thing)实体$()的方块，运输方向和方块上方箭头的朝向有关。$(p)需要红石信号激活才有运输能力，红石信号强度越高，运输速度越快。$(p)$(l)红石信号需要在整条装置的最前端！$()",
   "superbwarfare.page.misc.aircraft_catapult.2": "$(o)也是一种传送带。$()",
@@ -1335,6 +1386,7 @@
   "superbwarfare.page.misc.drone.2": "$(l)无人机操作：$()$(p)$(thing)$(k:key.use)$() - 进入/离开无人机视角$(br)$(thing)$(k:key.forward) / $(k:key.back)$() - 前进/后退$(br)$(thing)$(k:key.left) / $(k:key.right)$() - 左/右平移$(br)$(thing)$(k:key.jump)$() - 抬升高度$(br)$(thing)$(k:key.sneak)$() - 降低高度$(br)$(thing)鼠标滚轮$() - 缩放$(br)$(thing)$(k:key.superbwarfare.interact)$() - 交互/攻击$(br)$(thing)$(k:key.superbwarfare.fire)$() - 投弹/自爆",
   "superbwarfare.page.misc.drone.3": "对无人机使用$(item)RGO手榴弹$()或$(item)迫击炮弹$()等物品（可使用数据包配置）能将其挂载至无人机上，此时按下$(thing)$(k:key.superbwarfare.fire)$()投弹或自爆。",
   "superbwarfare.page.misc.drone.4": "$(o)不需要电力的核能飞机！$()",
+
   "superbwarfare.entry.resources.galena": "方铅矿石",
   "superbwarfare.page.resources.galena.1": "$(thing)方铅矿石$()生成于主世界的$(thing)36 ~ 1$()层。",
   "superbwarfare.page.resources.galena.2": "$(thing)深层方铅矿石$()生成于主世界的$(thing)0 ~ -64$()层。",

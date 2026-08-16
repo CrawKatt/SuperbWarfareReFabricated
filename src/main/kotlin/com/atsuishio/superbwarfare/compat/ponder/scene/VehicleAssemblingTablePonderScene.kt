@@ -67,7 +67,7 @@ object VehicleAssemblingTablePonderScene {
     }
 
     private fun interactScene(scene: SceneBuilder, util: SceneBuildingUtil) {
-        scene.title("vehicle_assembling_table_interact", "Vehicle Assembling Table Interaction")
+        scene.title("vehicle_assembling_table_interaction", "Interact?")
         val context: GeneratedPonderSupport.Context = GeneratedPonderSupport.Context()
         GeneratedPonderSupport.preScanBounds(scene, BlockPos(2, 1, 3), BlockPos(3, 2, 4))
         GeneratedPonderSupport.showStructure(scene, context, null, null, null, null)
