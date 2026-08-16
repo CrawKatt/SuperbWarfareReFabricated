@@ -51,7 +51,7 @@ class DefaultVehicleResource : IDBasedData<DefaultVehicleResource> {
     private val script: SerializedResourceLocation? = null
 
     @SerialName("Sponsor")
-    val sponsor: String? = null
+    val sponsor: SponsorInfo? = null
 
     @Transient
     @kotlin.jvm.Transient

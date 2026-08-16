@@ -5,5 +5,9 @@
       "Model": "superbwarfare:models/bedrock/vehicle/fh_77bw.geo.json",
       "Texture": "superbwarfare:textures/bedrock/vehicle/fh_77bw.png"
     }
-  ]
+  ],
+  "Sponsor": {
+    "Name": "七海冰璃",
+    "Color": "0x5EFBB5"
+  }
 }

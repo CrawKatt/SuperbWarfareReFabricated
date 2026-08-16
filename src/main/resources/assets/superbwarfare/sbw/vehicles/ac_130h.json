@@ -6,5 +6,8 @@
       "Texture": "superbwarfare:textures/bedrock/vehicle/ac_130h.png"
     }
   ],
-  "Sponsor": "丿小年糕丿"
+  "Sponsor": {
+    "Name": "丿小年糕丿",
+    "Color": "0x7DEA79"
+  }
 }
