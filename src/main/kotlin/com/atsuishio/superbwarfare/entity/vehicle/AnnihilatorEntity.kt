@@ -108,24 +108,13 @@ open class AnnihilatorEntity(type: EntityType<AnnihilatorEntity>, world: Level) 
 
         val hitPos = result.location
         val blockPos = result.blockPos
+        causeLaserExplode(hitPos, data, living)
 
         val hardness = this.level().getBlockState(blockPos).block.defaultDestroyTime()
 
         if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get() && hardness != -1f) {
             Block.dropResources(this.level().getBlockState(blockPos), this.level(), blockPos, null)
             this.level().destroyBlock(blockPos, true)
-        }
-
-        if (level().getBlockState(blockPos).canOcclude()) {
-            causeLaserExplode(hitPos, data, living)
-            this.level().explode(
-                living,
-                hitPos.x,
-                hitPos.y,
-                hitPos.z,
-                (data.get(GunProp.EXPLOSION_RADIUS) * 0.5f).toFloat(),
-                if (ExplosionConfig.EXPLOSION_DESTROY.get()) Level.ExplosionInteraction.BLOCK else Level.ExplosionInteraction.NONE
-            )
         }
 
         return pos.distanceTo(hitPos).toFloat()
@@ -136,10 +125,10 @@ open class AnnihilatorEntity(type: EntityType<AnnihilatorEntity>, world: Level) 
             var distance = (512 * 512).toDouble()
             var hitResult = TraceTool.pickNew(pos, 512.0, getBarrelVector(1f), this)
             if (hitResult.type != HitResult.Type.MISS) {
-                distance = hitResult.getLocation().distanceToSqr(pos)
+                distance = hitResult.location.distanceToSqr(pos)
                 val blockReach = 5.0
                 if (distance > blockReach * blockReach) {
-                    val posB = hitResult.getLocation()
+                    val posB = hitResult.location
                     hitResult =
                         BlockHitResult.miss(posB, Direction.getNearest(pos.x, pos.y, pos.z), BlockPos.containing(posB))
                 }
@@ -156,7 +145,7 @@ open class AnnihilatorEntity(type: EntityType<AnnihilatorEntity>, world: Level) 
                 distance
             )
             if (result != null) {
-                val targetPos = result.getLocation()
+                val targetPos = result.location
                 val distanceToTarget = pos.distanceToSqr(targetPos)
                 if (distanceToTarget > distance || distanceToTarget > 512 * 512) {
                     hitResult = BlockHitResult.miss(

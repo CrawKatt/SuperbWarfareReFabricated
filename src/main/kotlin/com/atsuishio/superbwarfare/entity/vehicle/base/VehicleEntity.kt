@@ -2632,12 +2632,12 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
 
         val deltaT = abs(this.turretYRot - turretYRotO)
-        while (this.turretYRot > 180f) {
-            this.turretYRot -= 360f
+        while (this.turretYRot > 360f) {
+            this.turretYRot -= 720f
             turretYRotO = this.turretYRot - deltaT
         }
-        while (this.turretYRot <= -180f) {
-            this.turretYRot += 360f
+        while (this.turretYRot <= -360f) {
+            this.turretYRot += 720f
             turretYRotO = deltaT + this.turretYRot
         }
 
