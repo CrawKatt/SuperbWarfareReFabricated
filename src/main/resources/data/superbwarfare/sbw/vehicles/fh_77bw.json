@@ -5,7 +5,7 @@
   "TurretPos": [0, 1.990975, -6.3822125],
   "TurretTurnSpeed": [1.5, 1.5],
   "TurretPitchRange": [0, 55],
-  "TurretYawRange": [-75, 75],
+  "TurretYawRange": [-225, 225],
   "BarrelPos": [0, 0.32813125, -0.75793125],
   "TurretControllerIndex": 1,
   "Seats": [
@@ -62,7 +62,8 @@
       "DismountInfo": {
         "Transform": "Vehicle",
         "Position": [3.2, 0.375, 4]
-      }
+      },
+      "HasThermalImaging": true
     },
     {
       "Transform": "Vehicle",
@@ -76,8 +77,7 @@
       "DismountInfo": {
         "Transform": "Vehicle",
         "Position": [3.2, 0.375, 4]
-      },
-      "HasThermalImaging": true
+      }
     },
     {
       "Transform": "Vehicle",
