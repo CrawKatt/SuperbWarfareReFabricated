@@ -123,7 +123,7 @@ class LoiterConfigScreen(private val vehicle: VehicleEntity) :
             guiGraphics.blit(TEXTURE, toggleButton.x, toggleButton.y, 177f, 100f, 51, 24, 256, 256)
             guiGraphics.renderTooltip(
                 this.font,
-                Component.translatable(if (active) "screen.superbwarfare.loiter_config.loiter_on" else "screen.superbwarfare.loiter_config.loiter_off"),
+                Component.translatable(if (active) "container.superbwarfare.loiter_config.loiter_on" else "container.superbwarfare.loiter_config.loiter_off"),
                 mouseX, mouseY
             )
         }
