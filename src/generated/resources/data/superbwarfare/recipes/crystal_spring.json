@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "tag": "c:gems/amethyst"
+    },
+    "B": {
+      "item": "superbwarfare:cemented_carbide_spring"
+    },
+    "C": {
+      "tag": "c:diamonds"
+    }
+  },
+  "pattern": [
+    " C ",
+    "ABA",
+    " C "
+  ],
+  "result": {
+    "item": "superbwarfare:crystal_spring"
+  },
+  "show_notification": true
+}

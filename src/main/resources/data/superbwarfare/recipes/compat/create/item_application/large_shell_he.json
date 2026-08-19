@@ -1,0 +1,24 @@
+{
+  "type": "create:item_application",
+  "ingredients": [
+    {
+      "item": "superbwarfare:grain"
+    },
+    {
+      "item": "superbwarfare:he_head"
+    }
+  ],
+  "results": [
+    {
+      "item": "superbwarfare:large_shell_he"
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "create"
+      ]
+    }
+  ]
+}
