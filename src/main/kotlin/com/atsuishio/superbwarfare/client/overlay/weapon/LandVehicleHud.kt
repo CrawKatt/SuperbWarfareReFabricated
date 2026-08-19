@@ -176,7 +176,7 @@ object LandVehicleHud {
                 32f,
                 getGradientColor(color, 0xFF0000, bodyHeal, 2)
             )
-            val leftWheelHeal = (100 - (100 * vehicle.leftWheelHealth / vehicle.getWheelMaxHealth())).toInt()
+            val leftWheelHeal = (100 - (100 * vehicle.leftWheelHealth / vehicle.getLeftWheelMaxHealth())).toInt()
             RenderHelper.blit(
                 poseStack,
                 LEFT_WHEEL,
@@ -190,7 +190,7 @@ object LandVehicleHud {
                 32f,
                 getGradientColor(color, 0xFF0000, leftWheelHeal, 2)
             )
-            val rightWheelHeal = (100 - (100 * vehicle.rightWheelHealth / vehicle.getWheelMaxHealth())).toInt()
+            val rightWheelHeal = (100 - (100 * vehicle.rightWheelHealth / vehicle.getRightWheelMaxHealth())).toInt()
             RenderHelper.blit(
                 poseStack,
                 RIGHT_WHEEL,
@@ -204,7 +204,7 @@ object LandVehicleHud {
                 32f,
                 getGradientColor(color, 0xFF0000, rightWheelHeal, 2)
             )
-            val engineHeal = (100 - (100 * vehicle.mainEngineHealth / vehicle.getEngineMaxHealth())).toInt()
+            val engineHeal = (100 - (100 * vehicle.mainEngineHealth / vehicle.getMainEngineMaxHealth())).toInt()
             RenderHelper.blit(
                 poseStack,
                 ENGINE,
