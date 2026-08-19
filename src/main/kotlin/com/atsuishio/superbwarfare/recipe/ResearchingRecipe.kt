@@ -1,0 +1,214 @@
+package com.atsuishio.superbwarfare.recipe
+
+import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.data.DataLoader
+import com.atsuishio.superbwarfare.init.ModRecipes
+import com.atsuishio.superbwarfare.tools.TagDataParser
+import com.google.gson.JsonObject
+import com.google.gson.annotations.SerializedName
+import net.minecraft.core.RegistryAccess
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.Registries
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.FriendlyByteBuf
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.TagKey
+import net.minecraft.util.GsonHelper
+import net.minecraft.world.SimpleContainer
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.crafting.Ingredient
+import net.minecraft.world.item.crafting.Recipe
+import net.minecraft.world.item.crafting.RecipeSerializer
+import net.minecraft.world.item.crafting.RecipeType
+import net.minecraft.world.level.Level
+import kotlin.jvm.optionals.getOrNull
+
+class ResearchingRecipe(
+    val recipeId: ResourceLocation,
+    val input: Ingredient,
+    val base: Ingredient,
+    val addition: Ingredient,
+    val special: Ingredient,
+    val selectable: Boolean,
+    val color: Int,
+    val time: Int,
+    val result: Result
+) : Recipe<SimpleContainer> {
+    override fun matches(
+        container: SimpleContainer,
+        level: Level
+    ): Boolean {
+        if (container.containerSize < 4) {
+            return false
+        }
+        return input.test(container.getItem(0))
+                && base.test(container.getItem(1))
+                && addition.test(container.getItem(2))
+                && special.test(container.getItem(3))
+    }
+
+    override fun assemble(
+        pContainer: SimpleContainer,
+        pRegistryAccess: RegistryAccess
+    ): ItemStack = this.result.getResult().copy()
+
+    override fun isSpecial() = true
+
+    override fun canCraftInDimensions(pWidth: Int, pHeight: Int) = true
+
+    override fun getResultItem(pRegistryAccess: RegistryAccess): ItemStack = this.result.getResult().copy()
+
+    override fun getId() = this.recipeId
+
+    override fun getSerializer(): RecipeSerializer<*> = ModRecipes.RESEARCHING_SERIALIZER
+
+    override fun getType(): RecipeType<*> = ModRecipes.RESEARCHING_TYPE
+
+    class Result(
+        @SerializedName("item") var item: String = "",
+        @SerializedName("tag") var tag: String = "",
+        @SerializedName("count") var count: Int = 1,
+        @SerializedName("nbt") var nbt: JsonObject? = null,
+    ) {
+        @Transient
+        var resultStack: ItemStack? = null
+
+        @Transient
+        var list: MutableList<Item>? = null
+
+        fun getResult(): ItemStack {
+            if (this.resultStack != null) return this.resultStack!!
+            if (!item.isEmpty()) {
+                val item = BuiltInRegistries.ITEM.getOptional(ResourceLocation(item)).orElse(null)
+                if (item == null) {
+                    Mod.LOGGER.warn("invalid item: $item")
+                    this.resultStack = ItemStack.EMPTY
+                } else {
+                    if (nbt != null) {
+                        val tag = TagDataParser.parse(nbt)
+                        val tmp = CompoundTag()
+                        if (tag.contains("ForgeCaps")) {
+                            tmp.put("ForgeCaps", tag.get("ForgeCaps"))
+                            tag.remove("ForgeCaps")
+                        }
+
+                        tmp.put("tag", tag)
+                        tmp.putString("id", this.item)
+                        tmp.putInt("Count", count)
+                        this.resultStack = ItemStack.of(tmp)
+                    } else {
+                        this.resultStack = ItemStack(item, count)
+                    }
+                }
+            } else if (!this.getResultList().isEmpty()) {
+                this.resultStack = ItemStack(this.getResultList().random(), count)
+            } else {
+                this.resultStack = ItemStack.EMPTY
+            }
+
+            return this.resultStack!!
+        }
+
+        fun getResultList(): MutableList<Item> {
+            if (this.list != null && !this.list!!.isEmpty()) return this.list!!
+            if (this.tag.isEmpty()) return mutableListOf()
+
+            val tagKey = TagKey.create(Registries.ITEM, ResourceLocation(this.tag))
+            val itemTag = BuiltInRegistries.ITEM.getTag(tagKey)
+                .map { items -> items.map { it.value() } }.getOrNull() ?: return mutableListOf()
+
+            val list = mutableListOf<Item>()
+            itemTag.forEach { list.add(it) }
+            list.sortBy { it.descriptionId }
+            this.list = list
+            return this.list!!
+        }
+
+        fun getItemByIndex(index: Int): ItemStack {
+            if (this.isRandom() && this.getResultList().size > index) {
+                return ItemStack(this.getResultList()[index], count)
+            }
+            return this.getResult()
+        }
+
+        fun isRandom() = this.tag.isNotEmpty()
+
+        fun rollItem(): ItemStack {
+            if (this.isRandom() && !this.getResultList().isEmpty()) {
+                return ItemStack(this.getResultList().random(), count)
+            }
+            return this.getResult()
+        }
+    }
+
+    class Serializer : RecipeSerializer<ResearchingRecipe> {
+        private fun ingredientOf(json: JsonObject, name: String): Ingredient {
+            if (!json.has(name)) return Ingredient.EMPTY
+            return Ingredient.fromJson(
+                if (GsonHelper.isArrayNode(json, name))
+                    GsonHelper.getAsJsonArray(json, name)
+                else GsonHelper.getAsJsonObject(json, name)
+            )
+        }
+
+        override fun fromJson(
+            id: ResourceLocation,
+            json: JsonObject
+        ): ResearchingRecipe {
+            val input = ingredientOf(json, "input")
+            val base = ingredientOf(json, "base")
+            val addition = ingredientOf(json, "addition")
+            val special = ingredientOf(json, "special")
+            val selectable = if (json.has("selectable")) GsonHelper.getAsBoolean(json, "selectable") else false
+            val color = (if (json.has("color")) GsonHelper.getAsInt(json, "color") else 0).coerceIn(0, 4)
+            val time = if (json.has("time")) GsonHelper.getAsInt(json, "time") else 1200
+            val result = DataLoader.GSON.fromJson(json.get("result"), Result::class.java)
+            return ResearchingRecipe(id, input, base, addition, special, selectable, color, time, result)
+        }
+
+        override fun fromNetwork(
+            id: ResourceLocation,
+            buffer: FriendlyByteBuf
+        ): ResearchingRecipe {
+            val input = Ingredient.fromNetwork(buffer)
+            val base = Ingredient.fromNetwork(buffer)
+            val addition = Ingredient.fromNetwork(buffer)
+            val special = Ingredient.fromNetwork(buffer)
+            val selectable = buffer.readBoolean()
+            val color = buffer.readInt()
+            val time = buffer.readInt()
+
+            val res = Result()
+            val flag = buffer.readBoolean()
+            if (flag) {
+                res.tag = buffer.readUtf()
+            } else {
+                res.resultStack = buffer.readItem()
+            }
+            return ResearchingRecipe(id, input, base, addition, special, selectable, color, time, res)
+        }
+
+        override fun toNetwork(
+            buffer: FriendlyByteBuf,
+            recipe: ResearchingRecipe
+        ) {
+            recipe.input.toNetwork(buffer)
+            recipe.base.toNetwork(buffer)
+            recipe.addition.toNetwork(buffer)
+            recipe.special.toNetwork(buffer)
+            buffer.writeBoolean(recipe.selectable)
+            buffer.writeInt(recipe.color)
+            buffer.writeInt(recipe.time)
+
+            val res = recipe.result
+            val flag = res.tag.isNotEmpty()
+            buffer.writeBoolean(flag)
+            if (flag) {
+                buffer.writeUtf(res.tag)
+            } else {
+                buffer.writeItem(res.getResult())
+            }
+        }
+    }
+}

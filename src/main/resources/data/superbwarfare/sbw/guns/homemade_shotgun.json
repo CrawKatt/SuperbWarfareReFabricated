@@ -1,5 +1,4 @@
 {
-  "ID": "superbwarfare:homemade_shotgun",
   "MaxDurability": 24,
   "Spread": 4,
   "RecoilX": 0.005,
@@ -33,9 +32,9 @@
     "superbwarfare:gutshot_straight",
     "superbwarfare:monster_hunter",
     "superbwarfare:vorpal_weapon",
+    "superbwarfare:brain_storm",
     "!superbwarfare:micro_missile",
     "!superbwarfare:longer_wire",
-    "!superbwarfare:butterfly_bullet",
     "!superbwarfare:cupid_arrow"
   ],
   "SoundInfo": {

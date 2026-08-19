@@ -30,11 +30,11 @@ public class AttributeMapMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void superbwarfare$addModAttributes(AttributeSupplier supplier, CallbackInfo ci) {
-        this.superbwarfare$addAttribute(supplier, ModAttributes.BULLET_RESISTANCE.get());
+        this.superbwarfare$addAttribute(supplier, ModAttributes.BULLET_RESISTANCE);
 
         if (supplier.hasAttribute(Attributes.LUCK)) {
-            this.superbwarfare$addAttribute(supplier, ModAttributes.BLOCK_REACH.get());
-            this.superbwarfare$addAttribute(supplier, ModAttributes.ENTITY_REACH.get());
+            this.superbwarfare$addAttribute(supplier, ModAttributes.BLOCK_REACH);
+            this.superbwarfare$addAttribute(supplier, ModAttributes.ENTITY_REACH);
         }
     }
 

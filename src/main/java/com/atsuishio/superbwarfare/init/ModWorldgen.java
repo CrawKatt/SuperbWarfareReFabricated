@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -43,7 +44,7 @@ public class ModWorldgen {
     public static void register() {
         for (var feature : OVERWORLD_ORES) {
             BiomeModifications.addFeature(
-                    BiomeSelectors.foundInOverworld(),
+                    BiomeSelectors.tag(BiomeTags.IS_OVERWORLD),
                     GenerationStep.Decoration.UNDERGROUND_ORES,
                     feature
             );
@@ -52,8 +53,15 @@ public class ModWorldgen {
         BiomeModifications.addSpawn(
                 BiomeSelectors.includeByKey(SENPAI_BIOMES),
                 MobCategory.MONSTER,
-                ModEntities.SENPAI.get(),
+                ModEntities.SENPAI,
                 20, 4, 4
+        );
+
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(SENPAI_BIOMES),
+                MobCategory.MONSTER,
+                ModEntities.STEEL_COIL,
+                5, 1, 3
         );
     }
 }

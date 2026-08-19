@@ -18,7 +18,7 @@ public class ItemEntityMixin {
             return;
         }
 
-        if (LivingEventHandler.onPickup(player, item)) {
+        if (!LivingEventHandler.onPickup(item, player)) {
             ci.cancel();
         }
     }

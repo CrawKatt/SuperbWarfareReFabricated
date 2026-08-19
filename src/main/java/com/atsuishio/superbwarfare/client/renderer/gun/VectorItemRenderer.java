@@ -45,12 +45,14 @@ public class VectorItemRenderer extends CustomGunRenderer<VectorItem> {
 
         if (itemStack.getItem() instanceof GunItem && GeoItem.getId(itemStack) == this.getInstanceId(animatable)) {
             if (this.renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND || this.renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
-                int scopeType = GunData.from(itemStack).attachment.get(AttachmentType.SCOPE);
-                switch (scopeType) {
-                    case 1 ->
-                            AnimationHelper.handleZoomCrossHair(currentBuffer, renderType, name, stack, bone, buffer, 0, 0.29, 18, 1, 255, 0, 0, 255, "dot", false);
-                    case 2 ->
-                            AnimationHelper.handleZoomCrossHair(currentBuffer, renderType, name, stack, bone, buffer, 0, 0.3, 16, 1, 255, 0, 0, 255, "apex_2x", true);
+                if (this.renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
+                    int scopeType = GunData.from(itemStack).attachment.get(AttachmentType.SCOPE);
+                    switch (scopeType) {
+                        case 1 ->
+                                AnimationHelper.handleZoomCrossHair(currentBuffer, renderType, name, stack, bone, buffer, 0, 0.29, 18, 1, 255, 0, 0, 255, "dot", false);
+                        case 2 ->
+                                AnimationHelper.handleZoomCrossHair(currentBuffer, renderType, name, stack, bone, buffer, 0, 0.3, 16, 1, 255, 0, 0, 255, "apex_2x", true);
+                    }
                 }
 
                 AnimationHelper.handleShootFlare(name, stack, itemStack, bone, buffer, packedLightIn);

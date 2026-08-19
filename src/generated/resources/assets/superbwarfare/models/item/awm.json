@@ -1,5 +1,6 @@
 {
   "parent": "superbwarfare:item/awm_base",
+  "gui_light": "front",
   "textures": {
     "particle": "superbwarfare:item/awm_icon"
   }

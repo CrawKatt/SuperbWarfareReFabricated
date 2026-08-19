@@ -1,0 +1,165 @@
+package com.atsuishio.superbwarfare.event
+
+import com.atsuishio.superbwarfare.config.common.GameplayConfig
+import com.atsuishio.superbwarfare.config.server.MiscConfig
+import com.atsuishio.superbwarfare.data.gun.GunData
+import com.atsuishio.superbwarfare.data.gun.GunProp
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.init.ModItems
+import com.atsuishio.superbwarfare.init.ModParticleTypes
+import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.item.gun.GunItem
+import com.atsuishio.superbwarfare.tools.InventoryTool
+import com.atsuishio.superbwarfare.tools.NBTTool
+import com.atsuishio.superbwarfare.tools.ParticleTool
+import com.atsuishio.superbwarfare.tools.PlayerReachTool
+import com.atsuishio.superbwarfare.tools.TraceTool
+import net.minecraft.core.BlockPos
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.sounds.SoundEvents
+import net.minecraft.sounds.SoundSource
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
+import kotlin.math.ceil
+
+object PlayerEventHandler {
+    @JvmStatic
+    fun onPlayerLoggedIn(player: ServerPlayer) {
+        val mainStack = player.mainHandItem
+        val tag = NBTTool.getTag(mainStack)
+        if (mainStack.`is`(ModItems.MONITOR) && tag.getBoolean("Using")) {
+            tag.putBoolean("Using", false)
+            NBTTool.saveTag(mainStack, tag)
+        }
+    }
+
+    @JvmStatic
+    fun onPlayerRespawned(player: ServerPlayer, conquered: Boolean) {
+        handleRespawnReload(player)
+        handleRespawnAutoArmor(player)
+    }
+
+    @JvmStatic
+    fun onPlayerTick(player: Player) {
+        val stack = player.mainHandItem
+
+        if (stack.item is GunItem) {
+            handleSpecialWeaponAmmo(player)
+        }
+    }
+
+    private fun handleSpecialWeaponAmmo(player: Player) {
+        val stack = player.mainHandItem
+        val data = GunData.from(stack)
+
+        if ((stack.`is`(ModItems.RPG) || stack.`is`(ModItems.BOCEK)) && data.hasEnoughAmmoToShoot(player)) {
+            data.isEmpty.set(false)
+        }
+    }
+
+    private fun handleRespawnReload(player: Player) {
+        if (!GameplayConfig.RESPAWN_RELOAD.get()) return
+
+        for (stack in player.inventory.items) {
+            if (stack.item is GunItem) {
+                val data = GunData.from(stack)
+                if (!InventoryTool.hasCreativeAmmoBox(player)) {
+                    data.reloadAmmo(player)
+                } else {
+                    data.ammo.set(data.get(GunProp.MAGAZINE))
+                }
+                data.holdOpen.set(false)
+                data.save()
+            }
+        }
+    }
+
+    private fun handleRespawnAutoArmor(player: Player) {
+        if (!GameplayConfig.RESPAWN_AUTO_ARMOR.get()) return
+
+        val armor = player.getItemBySlot(EquipmentSlot.CHEST)
+        if (armor == ItemStack.EMPTY) return
+
+        val armorPlate = armor.getOrCreateTag().getDouble("ArmorPlate")
+
+        var armorLevel = MiscConfig.DEFAULT_ARMOR_LEVEL.get()
+        if (armor.`is`(ModTags.Items.MILITARY_ARMOR)) {
+            armorLevel = MiscConfig.MILITARY_ARMOR_LEVEL.get()
+        } else if (armor.`is`(ModTags.Items.MILITARY_ARMOR_HEAVY)) {
+            armorLevel = MiscConfig.HEAVY_MILITARY_ARMOR_LEVEL.get()
+        }
+
+        if (armorPlate < armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get()) {
+            for (stack in player.inventory.items) {
+                if (stack.`is`(ModItems.ARMOR_PLATE)) {
+                    val tag = stack.tag
+                    if (tag != null && tag.getBoolean("Infinite")) {
+                        armor.getOrCreateTag()
+                            .putDouble("ArmorPlate", armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get().toDouble())
+
+                        if (player is ServerPlayer) {
+                            player.level().playSound(
+                                null,
+                                player.onPos,
+                                SoundEvents.ARMOR_EQUIP_IRON,
+                                SoundSource.PLAYERS,
+                                0.5f,
+                                1f
+                            )
+                        }
+                    } else {
+                        repeat(
+                            ceil(((armorLevel * MiscConfig.ARMOR_POINT_PER_LEVEL.get()) - armorPlate) / MiscConfig.ARMOR_POINT_PER_LEVEL.get()).toInt()
+                        ) {
+                            stack.finishUsingItem(player.level(), player)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @JvmStatic
+    fun getShortcutPackAnvilOutput(left: ItemStack, right: ItemStack): ItemStack {
+        if (left.item !is GunItem || !right.`is`(ModItems.SHORTCUT_PACK)) return ItemStack.EMPTY
+
+        return left.copy().also { output ->
+            val data = GunData.from(output)
+            data.level.add(1)
+            data.save()
+        }
+    }
+
+    @JvmStatic
+    fun onAttackEntity(player: Player, target: Entity) {
+        if (target is VehicleEntity) {
+            val position =
+                TraceTool.playerFindLookingPos(player, target, PlayerReachTool.getEntityReach(player))
+
+            if (position != null) {
+                if (target.shouldSendHitSounds()) {
+                    target.level().playSound(
+                        null,
+                        BlockPos.containing(position),
+                        ModSounds.HIT,
+                        SoundSource.PLAYERS,
+                        1f,
+                        1f
+                    )
+                }
+
+                val level = target.level()
+                if (target.shouldSendHitParticles() && level is ServerLevel) {
+                    ParticleTool.sendParticle(
+                        level, ModParticleTypes.FIRE_STAR, position.x, position.y, position.z,
+                        2, 0.0, 0.0, 0.0, 0.2, false
+                    )
+                }
+            }
+        }
+    }
+}

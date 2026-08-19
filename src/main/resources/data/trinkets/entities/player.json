@@ -6,6 +6,7 @@
   "slots": [
     "chest/back",
     "chest/dog_tag",
-    "chest/iff"
+    "chest/iff",
+    "head/face"
   ]
 }

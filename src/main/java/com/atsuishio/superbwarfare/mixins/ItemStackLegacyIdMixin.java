@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.item.Beast;
-import com.atsuishio.superbwarfare.item.NetheriteHammer;
+import com.atsuishio.superbwarfare.item.weapon.BeastItem;
+import com.atsuishio.superbwarfare.item.weapon.NetheriteHammerItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
@@ -24,7 +24,7 @@ public class ItemStackLegacyIdMixin {
     @Inject(method = "isDamageableItem", at = @At("HEAD"), cancellable = true)
     private void superbwarfare$isStackSensitiveDamageable(CallbackInfoReturnable<Boolean> cir) {
         ItemStack stack = (ItemStack) (Object) this;
-        if (stack.getItem() instanceof Beast || stack.getItem() instanceof NetheriteHammer) {
+        if (stack.getItem() instanceof BeastItem || stack.getItem() instanceof NetheriteHammerItem) {
             cir.setReturnValue(false);
             return;
         }
@@ -52,6 +52,7 @@ public class ItemStackLegacyIdMixin {
             case "superbwarfare:us_helmet_pastg" -> "superbwarfare:us_helmet_pasgt";
             case "superbwarfare:agm" -> "superbwarfare:large_anti_ground_missile";
             case "superbwarfare:wire_guide_missile" -> "superbwarfare:medium_anti_ground_missile";
+            case "superbwarfare:aurelia_sceptre" -> "superbwarfare:super_star_shooter";
             default -> null;
         };
 

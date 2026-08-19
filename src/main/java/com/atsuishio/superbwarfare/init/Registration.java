@@ -21,73 +21,59 @@ import java.util.function.Supplier;
 
 public class Registration {
 
-    public static <T extends Item> Supplier<T> item(String name, Supplier<T> item) {
-        var registered = Registry.register(BuiltInRegistries.ITEM, Mod.loc(name), item.get());
-        return () -> registered;
+    public static <T extends Item> T item(String name, Supplier<T> item) {
+        return Registry.register(BuiltInRegistries.ITEM, Mod.loc(name), item.get());
     }
 
-    public static <T extends Block> Supplier<T> block(String name, Supplier<T> block) {
-        var registered = Registry.register(BuiltInRegistries.BLOCK, Mod.loc(name), block.get());
-        return () -> registered;
+    public static <T extends Block> T block(String name, Supplier<T> block) {
+        return Registry.register(BuiltInRegistries.BLOCK, Mod.loc(name), block.get());
     }
 
-    public static <T extends EntityType<?>> Supplier<T> entity(String name, Supplier<T> type) {
-        var registered = Registry.register(BuiltInRegistries.ENTITY_TYPE, Mod.loc(name), type.get());
-        return () -> registered;
+    public static <T extends EntityType<?>> T entity(String name, Supplier<T> type) {
+        return Registry.register(BuiltInRegistries.ENTITY_TYPE, Mod.loc(name), type.get());
     }
 
-    public static <T extends BlockEntityType<?>> Supplier<T> blockEntity(String name, Supplier<T> type) {
-        var registered = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Mod.loc(name), type.get());
-        return () -> registered;
+    public static <T extends BlockEntityType<?>> T blockEntity(String name, Supplier<T> type) {
+        return Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Mod.loc(name), type.get());
     }
 
-    public static <T extends MenuType<?>> Supplier<T> menu(String name, Supplier<T> type) {
-        var registered = Registry.register(BuiltInRegistries.MENU, Mod.loc(name), type.get());
-        return () -> registered;
+    public static <T extends MenuType<?>> T menu(String name, Supplier<T> type) {
+        return Registry.register(BuiltInRegistries.MENU, Mod.loc(name), type.get());
     }
 
-    public static <T extends SoundEvent> Supplier<T> sound(String name, Supplier<T> event) {
-        var registered = Registry.register(BuiltInRegistries.SOUND_EVENT, Mod.loc(name), event.get());
-        return () -> (T) registered;
+    public static <T extends SoundEvent> T sound(String name, Supplier<T> event) {
+        return Registry.register(BuiltInRegistries.SOUND_EVENT, Mod.loc(name), event.get());
     }
 
-    public static <T extends MobEffect> Supplier<T> effect(String name, Supplier<T> effect) {
-        var registered = Registry.register(BuiltInRegistries.MOB_EFFECT, Mod.loc(name), effect.get());
-        return () -> registered;
+    public static <T extends MobEffect> T effect(String name, Supplier<T> effect) {
+        return Registry.register(BuiltInRegistries.MOB_EFFECT, Mod.loc(name), effect.get());
     }
 
-    public static <T extends ParticleType<?>> Supplier<T> particle(String name, Supplier<T> type) {
-        var registered = Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mod.loc(name), type.get());
-        return () -> (T) registered;
+    public static <T extends ParticleType<?>> T particle(String name, Supplier<T> type) {
+        return Registry.register(BuiltInRegistries.PARTICLE_TYPE, Mod.loc(name), type.get());
     }
 
-    public static <T extends Potion> Supplier<T> potion(String name, Supplier<T> potion) {
-        var registered = Registry.register(BuiltInRegistries.POTION, Mod.loc(name), potion.get());
-        return () -> registered;
+    public static <T extends Potion> T potion(String name, Supplier<T> potion) {
+        return Registry.register(BuiltInRegistries.POTION, Mod.loc(name), potion.get());
     }
 
-    public static <T extends RecipeSerializer<?>> Supplier<T> recipeSerializer(String name, Supplier<T> serializer) {
-        var registered = Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Mod.loc(name), serializer.get());
-        return () -> registered;
+    public static <T extends RecipeSerializer<?>> T recipeSerializer(String name, Supplier<T> serializer) {
+        return Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Mod.loc(name), serializer.get());
     }
 
-    public static <T extends RecipeType<?>> Supplier<T> recipeType(String name, Supplier<T> type) {
-        var registered = Registry.register(BuiltInRegistries.RECIPE_TYPE, Mod.loc(name), type.get());
-        return () -> registered;
+    public static <T extends RecipeType<?>> T recipeType(String name, Supplier<T> type) {
+        return Registry.register(BuiltInRegistries.RECIPE_TYPE, Mod.loc(name), type.get());
     }
 
-    public static <T extends Attribute> Supplier<T> attribute(String name, Supplier<T> attribute) {
-        var registered = Registry.register(BuiltInRegistries.ATTRIBUTE, Mod.loc(name), attribute.get());
-        return () -> registered;
+    public static <T extends Attribute> T attribute(String name, Supplier<T> attribute) {
+        return Registry.register(BuiltInRegistries.ATTRIBUTE, Mod.loc(name), attribute.get());
     }
 
-    public static <T extends CreativeModeTab> Supplier<T> creativeTab(String name, Supplier<T> tab) {
-        var registered = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Mod.loc(name), tab.get());
-        return () -> registered;
+    public static <T extends CreativeModeTab> T creativeTab(String name, Supplier<T> tab) {
+        return Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Mod.loc(name), tab.get());
     }
 
-    public static <T> Supplier<T> custom(Registry<T> registry, String name, Supplier<T> entry) {
-        var registered = Registry.register(registry, Mod.loc(name), entry.get());
-        return () -> registered;
+    public static <T> T custom(Registry<T> registry, String name, Supplier<T> entry) {
+        return Registry.register(registry, Mod.loc(name), entry.get());
     }
 }

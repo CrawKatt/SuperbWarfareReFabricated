@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.client.item;
 
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.item.Monitor;
 import com.atsuishio.superbwarfare.tools.FormatTool;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

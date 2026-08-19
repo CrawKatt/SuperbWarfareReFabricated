@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -26,7 +25,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityCommonMixin implements LivingDropsCapture {
@@ -63,14 +61,19 @@ public class LivingEntityCommonMixin implements LivingDropsCapture {
         LivingTickCallback.EVENT.invoker().onLivingTick(entity);
     }
 
-    @Inject(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"), cancellable = true)
-    private void superbwarfare$onAddEffect(MobEffectInstance effectInstance, Entity entity, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "canBeAffected", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$allowEffect(MobEffectInstance effectInstance, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
-        if (LivingEventHandler.onEffectApply(effectInstance, livingEntity)) {
+        if (LivingEventHandler.onEffectApply(livingEntity, effectInstance)) {
             cir.setReturnValue(false);
-            return;
         }
-        MobEffectAddedCallback.EVENT.invoker().onAdded(livingEntity, effectInstance, entity);
+    }
+
+    @Inject(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z", at = @At("TAIL"))
+    private void superbwarfare$onAddEffect(MobEffectInstance effectInstance, Entity source, CallbackInfoReturnable<Boolean> cir) {
+        if (cir.getReturnValue()) {
+            MobEffectAddedCallback.EVENT.invoker().onAdded((LivingEntity) (Object) this, effectInstance, source);
+        }
     }
 
     @Inject(method = "heal", at = @At("HEAD"), cancellable = true)
@@ -86,44 +89,16 @@ public class LivingEntityCommonMixin implements LivingDropsCapture {
 
     @ModifyVariable(method = "knockback", at = @At("HEAD"), argsOnly = true, ordinal = 0)
     private double superbwarfare$modifyKnockbackStrength(double strength) {
-        return LivingEventHandler.onKnockback((LivingEntity) (Object) this, (float) strength);
+        float customStrength = LivingEventHandler.onKnockback((LivingEntity) (Object) this);
+        return customStrength >= 0 ? customStrength : strength;
     }
 
     @Inject(method = "causeFallDamage", at = @At("HEAD"), cancellable = true)
     private void superbwarfare$onCauseFallDamage(float fallDistance, float damageMultiplier,
                                                   DamageSource source, CallbackInfoReturnable<Boolean> cir) {
-        if (LivingEventHandler.onEntityFall((LivingEntity) (Object) this)) {
+        if (LivingEventHandler.onEntityFall((LivingEntity) (Object) this, fallDistance, damageMultiplier)) {
             cir.setReturnValue(false);
         }
-    }
-
-    @Shadow
-    private ItemStack getLastArmorItem(EquipmentSlot slot) {
-        throw new AssertionError();
-    }
-
-    @Shadow
-    private ItemStack getLastHandItem(EquipmentSlot slot) {
-        throw new AssertionError();
-    }
-
-    @Inject(method = "collectEquipmentChanges", at = @At("RETURN"))
-    private void superbwarfare$onEquipmentChanged(CallbackInfoReturnable<Map<EquipmentSlot, ItemStack>> cir) {
-        if (!((Object) this instanceof Player player)) {
-            return;
-        }
-
-        Map<EquipmentSlot, ItemStack> changes = cir.getReturnValue();
-        if (changes == null) {
-            return;
-        }
-
-        changes.forEach((slot, newStack) -> {
-            ItemStack oldStack = slot.getType() == EquipmentSlot.Type.ARMOR
-                    ? this.getLastArmorItem(slot)
-                    : this.getLastHandItem(slot);
-            LivingEventHandler.handleChangeSlot(player, slot, oldStack, newStack);
-        });
     }
 
     @Shadow

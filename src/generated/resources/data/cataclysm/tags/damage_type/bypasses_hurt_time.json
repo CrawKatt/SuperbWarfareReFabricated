@@ -17,6 +17,9 @@
     "superbwarfare:projectile_explosion",
     "superbwarfare:shock",
     "superbwarfare:vehicle_explosion",
-    "superbwarfare:vehicle_strike"
+    "superbwarfare:vehicle_strike",
+    "superbwarfare:super_star_hit",
+    "superbwarfare:super_star_slash",
+    "superbwarfare:phosphorus_fire"
   ]
 }

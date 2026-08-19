@@ -1,5 +1,6 @@
 {
   "parent": "superbwarfare:item/m_1911_base",
+  "gui_light": "front",
   "textures": {
     "particle": "superbwarfare:item/m_1911_icon"
   }

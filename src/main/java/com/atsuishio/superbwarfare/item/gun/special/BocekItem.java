@@ -1,13 +1,9 @@
 package com.atsuishio.superbwarfare.item.gun.special;
 
-import net.fabricmc.loader.api.FabricLoader;
-
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
 import com.atsuishio.superbwarfare.client.renderer.gun.BocekItemRenderer;
 import com.atsuishio.superbwarfare.client.tooltip.component.BocekImageComponent;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
 import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -21,16 +17,19 @@ import com.atsuishio.superbwarfare.perk.AmmoPerk;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.tools.SoundTool;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -50,12 +49,10 @@ public class BocekItem extends GunGeoItem {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return BocekItemRenderer::new;
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState idlePredicate(AnimationState<BocekItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -69,17 +66,12 @@ public class BocekItem extends GunGeoItem {
         }
 
         if (player.isSprinting() && player.onGround() && ClientEventHandler.noSprintTicks == 0 && ClientEventHandler.drawTime < 0.01) {
-            if (ClientEventHandler.tacticalSprint) {
-                return event.setAndContinue(RawAnimation.begin().thenLoop("animation.bocek.run_fast"));
-            } else {
-                return event.setAndContinue(RawAnimation.begin().thenLoop("animation.bocek.run"));
-            }
+            return event.setAndContinue(RawAnimation.begin().thenLoop("animation.bocek.run"));
         }
 
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.bocek.idle"));
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState firePredicate(AnimationState<BocekItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -97,7 +89,6 @@ public class BocekItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.bocek.idle"));
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState reloadPredicate(AnimationState<BocekItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -116,7 +107,6 @@ public class BocekItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
         var idleController = new AnimationController<>(this, "idleController", 3, this::idlePredicate);
         data.add(idleController);
         var fireController = new AnimationController<>(this, "fireController", 0, this::firePredicate);
@@ -126,7 +116,7 @@ public class BocekItem extends GunGeoItem {
     }
 
     @Override
-    public boolean useSpecialFireProcedure(GunData data) {
+    public boolean useSpecialFireProcedure(@NotNull GunData data) {
         return true;
     }
 
@@ -140,7 +130,7 @@ public class BocekItem extends GunGeoItem {
     }
 
     @Override
-    public void onFireKeyRelease(GunData data, Player player, double power, boolean zoom) {
+    public void onFireKeyRelease(@NotNull GunData data, @NotNull Player player, double power, boolean zoom) {
         super.onFireKeyRelease(data, player, power, zoom);
 
         if (!data.hasEnoughAmmoToShoot(player)) return;
@@ -148,35 +138,35 @@ public class BocekItem extends GunGeoItem {
         var perk = data.perk.get(Perk.Type.AMMO);
 
         if (player instanceof ServerPlayer serverPlayer) {
-            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_1P.get().getLocation(), SoundSource.PLAYERS);
-            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_3P.get().getLocation(), SoundSource.PLAYERS);
-            NetworkRegistry.sendToPlayer(serverPlayer, new ShootClientMessage(10));
+            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_1P.getLocation(), SoundSource.PLAYERS);
+            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_3P.getLocation(), SoundSource.PLAYERS);
+            NetworkRegistry.sendToPlayer(serverPlayer, ShootClientMessage.INSTANCE);
         }
 
         if (power * 12 >= 6) {
             if (zoom) {
                 spawnBullet(data, player, power, true);
 
-                SoundTool.playLocalSound(player, ModSounds.BOCEK_ZOOM_FIRE_1P.get(), 10, 1);
-                player.playSound(ModSounds.BOCEK_ZOOM_FIRE_3P.get(), 2, 1);
+                SoundTool.playLocalSound(player, ModSounds.BOCEK_ZOOM_FIRE_1P, 10, 1);
+                player.playSound(ModSounds.BOCEK_ZOOM_FIRE_3P, 2, 1);
             } else {
                 for (int i = 0; i < (perk instanceof AmmoPerk ammoPerk && ammoPerk.slug ? 1 : 10); i++) {
                     spawnBullet(data, player, power, false);
                 }
 
-                SoundTool.playLocalSound(player, ModSounds.BOCEK_SHATTER_CAP_FIRE_1P.get(), 10, 1);
-                player.playSound(ModSounds.BOCEK_SHATTER_CAP_FIRE_3P.get(), 2, 1);
+                SoundTool.playLocalSound(player, ModSounds.BOCEK_SHATTER_CAP_FIRE_1P, 10, 1);
+                player.playSound(ModSounds.BOCEK_SHATTER_CAP_FIRE_3P, 2, 1);
             }
 
-            if (perk == ModPerks.BEAST_BULLET.get()) {
-                player.playSound(ModSounds.HENG.get(), 4f, 1f);
+            if (perk == ModPerks.BEAST_BULLET) {
+                player.playSound(ModSounds.HENG, 4f, 1f);
 
                 if (player instanceof ServerPlayer serverPlayer) {
-                    SoundTool.playLocalSound(serverPlayer, ModSounds.HENG.get(), 4f, 1f);
+                    SoundTool.playLocalSound(serverPlayer, ModSounds.HENG, 4f, 1f);
                 }
             }
 
-            data.ammo.set(data.ammo.get() - data.compute().ammoCostPerShoot);
+            data.ammo.set(data.ammo.get() - data.get(GunProp.AMMO_COST_PER_SHOOT));
             data.save();
         }
     }
@@ -184,20 +174,22 @@ public class BocekItem extends GunGeoItem {
     public void spawnBullet(GunData data, Player player, double power, boolean zoom) {
         ItemStack stack = data.stack;
 
-        var computed = data.compute();
-        float headshot = (float) computed.headshot;
-        float velocity = (float) (computed.velocity * power);
-        float bypassArmorRate = (float) computed.bypassesArmor;
-        float explosionRadius = (float) computed.explosionRadius;
-        float explosionDamage = (float) computed.explosionDamage;
-        int projectileAmount = computed.projectileAmount;
+        float headshot = data.get(GunProp.HEADSHOT).floatValue();
+        float velocity = (float) (data.get(GunProp.VELOCITY) * power);
+        float bypassArmorRate = data.get(GunProp.BYPASSES_ARMOR).floatValue();
+        float explosionRadius = data.get(GunProp.EXPLOSION_RADIUS).floatValue();
+        float explosionDamage = data.get(GunProp.EXPLOSION_DAMAGE).floatValue();
+//        int projectileAmount = data.get(GunProp.PROJECTILE_AMOUNT);
+        int projectileAmount = 10;
 
-        double damage = computed.damage * power;
+        double damage = data.get(GunProp.DAMAGE) * power;
         float spread = 0.01f;
 
         if (!zoom) {
-            spread = projectileAmount <= 1 ? 0.5f : 2.5f;
-            damage /= Math.max(1, projectileAmount);
+//            spread = projectileAmount <= 1 ? 0.5f : 2.5f;
+//            damage /= Math.max(1, projectileAmount);
+            spread = 2.5f;
+            damage /= projectileAmount;
         }
 
         ProjectileEntity projectile = new ProjectileEntity(player.level())
@@ -211,18 +203,15 @@ public class BocekItem extends GunGeoItem {
         projectile.setExplosionDamage(explosionDamage);
         projectile.setExplosionRadius(explosionRadius);
 
-        for (Perk.Type type : Perk.Type.values()) {
-            var instance = data.perk.getInstance(type);
-            if (instance != null) {
-                instance.perk().modifyProjectile(data, instance, projectile);
-            }
+        for (Perk.Type type : Perk.Type.getEntries()) {
+            var instance = data.perk.getInstances(type);
+            instance.forEach(perk -> perk.perk().modifyProjectile(data, perk, projectile));
         }
 
         projectile.setPos(player.getX() - 0.1 * player.getLookAngle().x, player.getEyeY() - 0.1 - 0.1 * player.getLookAngle().y, player.getZ() + -0.1 * player.getLookAngle().z);
-        projectile.shoot(player, player.getLookAngle().x, player.getLookAngle().y, player.getLookAngle().z, velocity, spread);
+        projectile.shoot(player.getLookAngle().x, player.getLookAngle().y, player.getLookAngle().z, velocity, spread);
         projectile.damage((float) damage);
 
         player.level().addFreshEntity(projectile);
     }
-
 }

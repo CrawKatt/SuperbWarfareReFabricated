@@ -1,0 +1,154 @@
+package com.atsuishio.superbwarfare.datagen
+
+import com.atsuishio.superbwarfare.init.ModDamageTypes
+import com.atsuishio.superbwarfare.init.ModTags
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.registries.Registries
+import net.minecraft.data.PackOutput
+import net.minecraft.data.tags.DamageTypeTagsProvider
+import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.DamageTypeTags
+import net.minecraft.tags.TagKey
+import net.minecraft.world.damagesource.DamageType
+import net.minecraft.world.damagesource.DamageTypes
+import java.util.concurrent.CompletableFuture
+
+class ModDamageTypeTagProvider(
+    pOutput: PackOutput,
+    pLookupProvider: CompletableFuture<HolderLookup.Provider>
+) : DamageTypeTagsProvider(pOutput, pLookupProvider) {
+    override fun addTags(pProvider: HolderLookup.Provider) {
+        val mod = { key: ResourceKey<DamageType> -> key.location() }
+
+        this.tag(ModTags.DamageTypes.PROJECTILE)
+            .addOptional(mod(ModDamageTypes.GUN_FIRE))
+            .addOptional(mod(ModDamageTypes.GUN_FIRE_HEADSHOT))
+            .addOptional(mod(ModDamageTypes.SUPER_STAR_HIT))
+            .addOptional(mod(ModDamageTypes.SUPER_STAR_SLASH))
+            .add(DamageTypes.ARROW, DamageTypes.TRIDENT, DamageTypes.THROWN)
+            .addOptional(ResourceLocation("tacz", "bullet"))
+            .addOptional(ResourceLocation("tacz", "bullet_void"))
+            .addOptional(ResourceLocation("virtuarealcraft", "rain_crystal"))
+            .addOptional(ResourceLocation("virtuarealcraft", "rain_shower_butterfly"))
+            .addOptional(ResourceLocation("virtuarealcraft", "sparkle_butterfly"))
+            .addOptional(ResourceLocation("dreamaticvoyage", "blood_crystal"))
+            .addOptional(ResourceLocation("dreamaticvoyage", "leviy_beam"))
+        this.tag(ModTags.DamageTypes.PROJECTILE_ABSOLUTE)
+            .addOptional(mod(ModDamageTypes.GUN_FIRE_ABSOLUTE))
+            .addOptional(mod(ModDamageTypes.GUN_FIRE_HEADSHOT_ABSOLUTE))
+            .addOptional(ResourceLocation("tacz", "bullet_ignore_armor"))
+            .addOptional(ResourceLocation("tacz", "bullet_void_ignore_armor"))
+            .addOptional(ResourceLocation("dreamaticvoyage", "leviy_beam_absolute"))
+        this.tag(ModTags.DamageTypes.VEHICLE_IGNORE)
+            .addOptional(ResourceLocation("sona", "injury"))
+        this.tag(ModTags.DamageTypes.VEHICLE_NOT_ABSORB)
+            .add(DamageTypes.EXPLOSION, DamageTypes.PLAYER_EXPLOSION)
+            .addOptional(mod(ModDamageTypes.CUSTOM_EXPLOSION))
+            .addOptional(mod(ModDamageTypes.MINE))
+            .addOptional(mod(ModDamageTypes.PROJECTILE_EXPLOSION))
+        this.tag(ModTags.DamageTypes.VEHICLE_IMMUNE)
+            .add(DamageTypes.CACTUS, DamageTypes.SWEET_BERRY_BUSH, DamageTypes.IN_WALL)
+            .addOptional(ResourceLocation("iceandfire", "gorgon"))
+        this.tag(ModTags.DamageTypes.GUN_DAMAGE)
+            .addOptional(mod(ModDamageTypes.GUN_FIRE))
+            .addOptional(mod(ModDamageTypes.GUN_FIRE_HEADSHOT))
+            .addOptional(mod(ModDamageTypes.GUN_FIRE_ABSOLUTE))
+            .addOptional(mod(ModDamageTypes.GUN_FIRE_HEADSHOT_ABSOLUTE))
+            .addOptional(mod(ModDamageTypes.LASER))
+            .addOptional(mod(ModDamageTypes.LASER_HEADSHOT))
+            .addOptional(mod(ModDamageTypes.SHOCK))
+            .addOptional(mod(ModDamageTypes.BURN))
+            .addOptional(mod(ModDamageTypes.REPAIR_TOOL))
+            .addOptional(mod(ModDamageTypes.PROJECTILE_HIT))
+            .addOptional(mod(ModDamageTypes.PROJECTILE_EXPLOSION))
+            .addOptional(mod(ModDamageTypes.SUPER_STAR_HIT))
+            .addOptional(mod(ModDamageTypes.SUPER_STAR_SLASH))
+            .addOptional(mod(ModDamageTypes.PHOSPHORUS_FIRE))
+            .addOptional(mod(ModDamageTypes.CUSTOM_EXPLOSION))
+
+        this.tag(DamageTypeTags.ALWAYS_HURTS_ENDER_DRAGONS)
+            .addOptional(mod(ModDamageTypes.PROJECTILE_EXPLOSION))
+            .addOptional(mod(ModDamageTypes.CUSTOM_EXPLOSION))
+            .addOptional(mod(ModDamageTypes.PROJECTILE_HIT))
+            .addOptional(mod(ModDamageTypes.GRAPESHOT_HIT))
+            .addOptional(mod(ModDamageTypes.LASER))
+            .addOptional(mod(ModDamageTypes.LASER_HEADSHOT))
+            .addOptional(mod(ModDamageTypes.LASER_STATIC))
+            .addOptional(mod(ModDamageTypes.REPAIR_TOOL))
+            .addOptional(mod(ModDamageTypes.SUPER_STAR_HIT))
+            .addOptional(mod(ModDamageTypes.SUPER_STAR_SLASH))
+            .addOptional(mod(ModDamageTypes.PHOSPHORUS_FIRE))
+        this.tag(DamageTypeTags.BYPASSES_ARMOR)
+            .addOptional(mod(ModDamageTypes.GUN_FIRE_ABSOLUTE))
+            .addOptional(mod(ModDamageTypes.GUN_FIRE_HEADSHOT_ABSOLUTE))
+            .addOptional(mod(ModDamageTypes.SHOCK))
+            .addOptional(mod(ModDamageTypes.PROJECTILE_HIT))
+            .addOptional(mod(ModDamageTypes.GRAPESHOT_HIT))
+            .addOptional(mod(ModDamageTypes.LASER))
+            .addOptional(mod(ModDamageTypes.LASER_HEADSHOT))
+            .addOptional(mod(ModDamageTypes.LASER_STATIC))
+            .addOptional(mod(ModDamageTypes.VEHICLE_STRIKE))
+            .addOptional(mod(ModDamageTypes.VEHICLE_EXPLOSION))
+            .addOptional(mod(ModDamageTypes.AIR_CRASH))
+            .addOptional(mod(ModDamageTypes.REPAIR_TOOL))
+            .addOptional(mod(ModDamageTypes.SUPER_STAR_HIT))
+            .addOptional(mod(ModDamageTypes.SUPER_STAR_SLASH))
+            .addOptional(mod(ModDamageTypes.PHOSPHORUS_FIRE))
+        this.tag(DamageTypeTags.BYPASSES_EFFECTS)
+            .addOptional(mod(ModDamageTypes.SHOCK))
+            .addOptional(mod(ModDamageTypes.PHOSPHORUS_FIRE))
+        this.tag(DamageTypeTags.BYPASSES_ENCHANTMENTS)
+            .addOptional(mod(ModDamageTypes.GUN_FIRE_ABSOLUTE))
+            .addOptional(mod(ModDamageTypes.GUN_FIRE_HEADSHOT_ABSOLUTE))
+            .addOptional(mod(ModDamageTypes.SHOCK))
+            .addOptional(mod(ModDamageTypes.PROJECTILE_HIT))
+            .addOptional(mod(ModDamageTypes.GRAPESHOT_HIT))
+            .addOptional(mod(ModDamageTypes.LASER))
+            .addOptional(mod(ModDamageTypes.LASER_HEADSHOT))
+            .addOptional(mod(ModDamageTypes.LASER_STATIC))
+            .addOptional(mod(ModDamageTypes.VEHICLE_STRIKE))
+            .addOptional(mod(ModDamageTypes.VEHICLE_EXPLOSION))
+            .addOptional(mod(ModDamageTypes.AIR_CRASH))
+            .addOptional(mod(ModDamageTypes.REPAIR_TOOL))
+            .addOptional(mod(ModDamageTypes.SUPER_STAR_HIT))
+            .addOptional(mod(ModDamageTypes.SUPER_STAR_SLASH))
+            .addOptional(mod(ModDamageTypes.PHOSPHORUS_FIRE))
+        this.tag(DamageTypeTags.IS_EXPLOSION)
+            .addOptional(mod(ModDamageTypes.PROJECTILE_EXPLOSION))
+            .addOptional(mod(ModDamageTypes.CUSTOM_EXPLOSION))
+            .addOptional(mod(ModDamageTypes.LUNGE_MINE))
+        this.tag(DamageTypeTags.IS_FIRE).addOptional(mod(ModDamageTypes.BURN))
+        this.tag(ModTags.DamageTypes.BYPASSES_VEHICLE).addOptional(mod(ModDamageTypes.REPAIR_TOOL))
+
+        val cataclysm = otherModTag("cataclysm", "bypasses_hurt_time")
+        this.tag(cataclysm)
+            .addOptional(mod(ModDamageTypes.GUN_FIRE_ABSOLUTE))
+            .addOptional(mod(ModDamageTypes.GUN_FIRE_HEADSHOT_ABSOLUTE))
+            .addOptional(mod(ModDamageTypes.AIR_CRASH))
+            .addOptional(mod(ModDamageTypes.BURN))
+            .addOptional(mod(ModDamageTypes.REPAIR_TOOL))
+            .addOptional(mod(ModDamageTypes.PROJECTILE_HIT))
+            .addOptional(mod(ModDamageTypes.GRAPESHOT_HIT))
+            .addOptional(mod(ModDamageTypes.CUSTOM_EXPLOSION))
+            .addOptional(mod(ModDamageTypes.DRONE_HIT))
+            .addOptional(mod(ModDamageTypes.LASER))
+            .addOptional(mod(ModDamageTypes.LASER_HEADSHOT))
+            .addOptional(mod(ModDamageTypes.LASER_STATIC))
+            .addOptional(mod(ModDamageTypes.LUNGE_MINE))
+            .addOptional(mod(ModDamageTypes.MINE))
+            .addOptional(mod(ModDamageTypes.PROJECTILE_EXPLOSION))
+            .addOptional(mod(ModDamageTypes.SHOCK))
+            .addOptional(mod(ModDamageTypes.VEHICLE_EXPLOSION))
+            .addOptional(mod(ModDamageTypes.VEHICLE_STRIKE))
+            .addOptional(mod(ModDamageTypes.SUPER_STAR_HIT))
+            .addOptional(mod(ModDamageTypes.SUPER_STAR_SLASH))
+            .addOptional(mod(ModDamageTypes.PHOSPHORUS_FIRE))
+    }
+
+    companion object {
+        fun otherModTag(modId: String, name: String): TagKey<DamageType> {
+            return TagKey.create(Registries.DAMAGE_TYPE, ResourceLocation(modId, name))
+        }
+    }
+}

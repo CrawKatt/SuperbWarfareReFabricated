@@ -6,12 +6,16 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.client.PoseTool;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.item.CustomRendererItem;
 import com.atsuishio.superbwarfare.resource.gun.GunResource;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -49,6 +53,11 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
+    }
+
+    @Environment(EnvType.CLIENT)
+    public HumanoidModel.ArmPose getArmPose(LivingEntity entity, InteractionHand hand, ItemStack stack) {
+        return PoseTool.pose(entity, hand, stack);
     }
 
     @Override
@@ -124,11 +133,9 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
             return event.setAndContinue(RawAnimation.begin().thenLoop(animation.fire));
         }
 
-        // Run & Sprint
+        // Run
         if (player.isSprinting() && player.onGround() && ClientEventHandler.noSprintTicks == 0 && ClientEventHandler.drawTime < 0.01) {
-            if (animation.sprint != null && ClientEventHandler.tacticalSprint) {
-                return event.setAndContinue(RawAnimation.begin().thenLoop(animation.sprint));
-            } else if (animation.run != null) {
+            if (animation.run != null) {
                 return event.setAndContinue(RawAnimation.begin().thenLoop(animation.run));
             }
         }

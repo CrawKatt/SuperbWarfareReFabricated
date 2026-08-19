@@ -1,17 +1,18 @@
 package com.atsuishio.superbwarfare.tools;
 
+import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.capability.api.IItemHandler;
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper;
 import com.atsuishio.superbwarfare.data.gun.Ammo;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.item.common.ammo.AmmoBoxItem;
-import com.atsuishio.superbwarfare.item.common.ammo.AmmoSupplierItem;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
+import com.atsuishio.superbwarfare.item.ammo.AmmoBoxItem;
+import com.atsuishio.superbwarfare.item.ammo.AmmoSupplierItem;
 import net.minecraft.core.NonNullList;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -23,18 +24,27 @@ import java.util.function.Predicate;
 
 public class InventoryTool {
 
-    public static int countItem(@Nullable Player player, @NotNull Item item) {
-        return countItem(player, stack -> stack.is(item));
+    public static int countItem(@Nullable IItemHandler handler, @NotNull Item item) {
+        return countItem(handler, stack -> stack.is(item));
     }
 
-    public static int countItem(@Nullable Player player, @NotNull TagKey<Item> item) {
-        return countItem(player, stack -> stack.is(item));
+    public static int countItem(@Nullable IItemHandler handler, @NotNull TagKey<Item> item) {
+        return countItem(handler, stack -> stack.is(item));
     }
 
-    public static int countItem(@Nullable Player player, @NotNull Predicate<ItemStack> predicate) {
-        if (player == null) return 0;
-        return countContainerItems(player.getInventory(), predicate);
+    public static int countItem(@Nullable IItemHandler handler, @NotNull Predicate<ItemStack> predicate) {
+        if (handler == null) return 0;
+
+        int count = 0;
+        for (int i = 0; i < handler.getSlots(); i++) {
+            var stack = handler.getStackInSlot(i);
+            if (predicate.test(stack)) {
+                count += stack.getCount();
+            }
+        }
+        return count;
     }
+
 
     /**
      * 计算物品列表内指定物品的数量
@@ -58,42 +68,23 @@ public class InventoryTool {
      * @param item   物品类型
      */
     public static int countItem(@Nullable Entity entity, @NotNull Item item) {
-        return countItem(entity, stack -> stack.is(item));
+        if (entity == null) return 0;
+        var cap = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null);
+        if (cap == null) return 0;
+
+        return countItem(cap, item);
     }
 
-    public static int countItem(@Nullable Entity entity, @NotNull Predicate<ItemStack> predicate) {
-        if (entity instanceof Player player) {
-            return countItem(player, predicate);
-        }
-        if (entity instanceof Container container) {
-            return countContainerItems(container, predicate);
-        }
-        return 0;
-    }
+    public static int countAmmoItem(@Nullable IItemHandler handler, @Nullable Ammo type) {
+        if (handler == null || type == null) return 0;
 
-    public static int countAmmoItem(@Nullable Player player, @Nullable Ammo type) {
-        if (player == null || type == null) return 0;
-        return countContainerAmmo(player.getInventory(), type);
-    }
-
-    private static int countContainerItems(Container container, Predicate<ItemStack> predicate) {
         int count = 0;
-        for (int i = 0; i < container.getContainerSize(); i++) {
-            ItemStack stack = container.getItem(i);
-            if (predicate.test(stack)) {
-                count += stack.getCount();
-            }
-        }
-        return count;
-    }
+        for (int i = 0; i < handler.getSlots(); i++) {
+            var stack = handler.getStackInSlot(i);
 
-    private static int countContainerAmmo(Container container, Ammo type) {
-        int count = 0;
-        for (int i = 0; i < container.getContainerSize(); i++) {
-            ItemStack stack = container.getItem(i);
             // AmmoSupplier Item
-            if (stack.getItem() instanceof AmmoSupplierItem ammoSupplierItem && ammoSupplierItem.type == type) {
-                count += ammoSupplierItem.ammoToAdd * stack.getCount();
+            if (stack.getItem() instanceof AmmoSupplierItem ammoSupplierItem && ammoSupplierItem.getType() == type) {
+                count += ammoSupplierItem.getAmmoToAdd() * stack.getCount();
             }
 
             // AmmoBox
@@ -109,34 +100,28 @@ public class InventoryTool {
     }
 
     public static int countAmmoItem(@Nullable Entity entity, @Nullable Ammo type) {
-        if (entity instanceof Player player) {
-            return countAmmoItem(player, type);
-        }
-        if (entity instanceof Container container && type != null) {
-            return countContainerAmmo(container, type);
-        }
-        return 0;
+        if (entity == null || type == null) return 0;
+        var cap = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null);
+        if (cap == null) return 0;
+
+        return countAmmoItem(cap, type);
     }
 
     public static int consumeAmmoItem(@Nullable Entity entity, @Nullable Ammo type, int count) {
-        if (entity instanceof Player player) {
-            return consumeAmmoItem(player, type, count);
-        }
-        if (entity instanceof Container container && type != null && count > 0) {
-            return consumeContainerAmmo(container, type, count);
-        }
-        return 0;
+        if (entity == null || type == null || count <= 0) return 0;
+        var cap = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null);
+        if (cap == null) return 0;
+
+        return consumeAmmoItem(cap, type, count);
     }
 
-    public static int consumeAmmoItem(@Nullable Player player, @Nullable Ammo type, int count) {
-        if (player == null || type == null || count <= 0) return 0;
-        return consumeContainerAmmo(player.getInventory(), type, count);
-    }
+    public static int consumeAmmoItem(@Nullable IItemHandler handler, @Nullable Ammo type, int count) {
+        if (handler == null || type == null) return 0;
 
-    private static int consumeContainerAmmo(Container container, Ammo type, int count) {
         int initialCount = count;
-        for (int i = 0; i < container.getContainerSize(); i++) {
-            ItemStack stack = container.getItem(i);
+        for (int i = 0; i < handler.getSlots(); i++) {
+            var stack = handler.getStackInSlot(i);
+
             // AmmoBox
             if (stack.getItem() instanceof AmmoBoxItem) {
                 var stackAmmo = type.get(stack);
@@ -149,22 +134,19 @@ public class InventoryTool {
             }
 
             // AmmoSupplier Item
-            if (!(stack.getItem() instanceof AmmoSupplierItem ammoSupplierItem && ammoSupplierItem.type == type))
+            if (!(stack.getItem() instanceof AmmoSupplierItem ammoSupplierItem && ammoSupplierItem.getType() == type))
                 continue;
 
-            var supplyCount = ammoSupplierItem.ammoToAdd;
+            var supplyCount = ammoSupplierItem.getAmmoToAdd();
             var required = (count % supplyCount == 0) ? count / supplyCount : count / supplyCount + 1;
 
             var countToShrink = Math.min(stack.getCount(), required);
-            stack.shrink(countToShrink);
+            handler.extractItem(i, countToShrink, false);
             count -= countToShrink * supplyCount;
             if (count <= 0) break;
         }
-        int consumed = initialCount - count;
-        if (consumed > 0) {
-            container.setChanged();
-        }
-        return consumed;
+
+        return initialCount - count;
     }
 
     /**
@@ -188,17 +170,13 @@ public class InventoryTool {
     }
 
     public static ItemStack findFirst(@Nullable Entity entity, @NotNull Item item) {
-        if (entity instanceof Player player) {
-            return findFirst(player, item);
-        }
-        if (entity instanceof Container container) {
-            return findFirstInContainer(container, stack -> stack.is(item));
-        }
-        return ItemStack.EMPTY;
+        if (entity == null) return ItemStack.EMPTY;
+
+        return findFirst(ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null), stack -> stack.is(item));
     }
 
-    public static ItemStack findFirst(@Nullable Player player, @NotNull Item item) {
-        return findFirst(player, stack -> stack.is(item));
+    public static ItemStack findFirst(@Nullable IItemHandler handler, @NotNull Item item) {
+        return findFirst(handler, stack -> stack.is(item));
     }
 
     public static ItemStack findFirst(@Nullable NonNullList<ItemStack> list, @NotNull Item item) {
@@ -211,14 +189,11 @@ public class InventoryTool {
         return list.stream().filter(predicate).findFirst().orElse(ItemStack.EMPTY);
     }
 
-    public static ItemStack findFirst(@Nullable Player player, @NotNull Predicate<ItemStack> predicate) {
-        if (player == null) return ItemStack.EMPTY;
-        return findFirstInContainer(player.getInventory(), predicate);
-    }
+    public static ItemStack findFirst(@Nullable IItemHandler handler, @NotNull Predicate<ItemStack> predicate) {
+        if (handler == null) return ItemStack.EMPTY;
 
-    private static ItemStack findFirstInContainer(Container container, Predicate<ItemStack> predicate) {
-        for (int i = 0; i < container.getContainerSize(); i++) {
-            ItemStack stack = container.getItem(i);
+        for (int i = 0; i < handler.getSlots(); i++) {
+            var stack = handler.getStackInSlot(i);
             if (predicate.test(stack)) {
                 return stack;
             }
@@ -226,8 +201,9 @@ public class InventoryTool {
         return ItemStack.EMPTY;
     }
 
-    public static boolean hasCreativeAmmoBox(@Nullable Player player) {
-        return !findFirst(player, ModItems.CREATIVE_AMMO_BOX.get()).isEmpty();
+
+    public static boolean hasCreativeAmmoBox(@Nullable IItemHandler handler) {
+        return !findFirst(handler, ModItems.CREATIVE_AMMO_BOX).isEmpty();
     }
 
     /**
@@ -236,7 +212,7 @@ public class InventoryTool {
      * @param itemList 物品列表
      */
     public static boolean hasCreativeAmmoBox(@Nullable NonNullList<ItemStack> itemList) {
-        return !findFirst(itemList, ModItems.CREATIVE_AMMO_BOX.get()).isEmpty();
+        return !findFirst(itemList, ModItems.CREATIVE_AMMO_BOX).isEmpty();
     }
 
     /**
@@ -247,16 +223,15 @@ public class InventoryTool {
     public static boolean hasCreativeAmmoBox(@Nullable Entity entity) {
         if (entity instanceof VehicleEntity vehicle) {
             return hasCreativeAmmoBoxForVehicle(vehicle);
-        } else if (entity instanceof Player player) {
-            return hasCreativeAmmoBox(player);
+        } else {
+            return hasItem(entity, ModItems.CREATIVE_AMMO_BOX);
         }
-        return false;
     }
 
     public static boolean hasCreativeAmmoBoxForVehicle(@NotNull VehicleEntity vehicle) {
         var passengers = vehicle.getPassengers();
-        boolean flag = passengers.stream().anyMatch(e -> InventoryTool.hasItem(e, ModItems.CREATIVE_AMMO_BOX.get())) && vehicle.data().compute().usePassengerCreativeAmmoBox;
-        return flag || hasItem(vehicle, ModItems.CREATIVE_AMMO_BOX.get());
+        boolean flag = passengers.stream().anyMatch(e -> InventoryTool.hasItem(e, ModItems.CREATIVE_AMMO_BOX)) && vehicle.data().compute().usePassengerCreativeAmmoBox;
+        return flag || hasItem(vehicle, ModItems.CREATIVE_AMMO_BOX);
     }
 
     /**
@@ -278,10 +253,12 @@ public class InventoryTool {
      * @param count  要消耗的数量
      */
     public static void consumeItem(LivingEntity living, Item item, int count) {
-        if (living instanceof Player player) {
-            InventoryTool.consumeItem(player, item, count);
-        }
+        var cap = ModCapabilities.ITEM_HANDLER_ENTITY.find(living, null);
+        if (cap == null) return;
+
+        consumeItem(cap, item, count);
     }
+
 
     public static int consumeItem(@Nullable NonNullList<ItemStack> itemList, Predicate<ItemStack> predicate, int count) {
         if (itemList == null || count <= 0) return 0;
@@ -297,138 +274,25 @@ public class InventoryTool {
         return initialCount - count;
     }
 
-    public static int consumeItem(@Nullable Player player, Item item, int count) {
-        return consumeItem(player, stack -> stack.is(item), count);
+    public static int consumeItem(@Nullable IItemHandler handler, Item item, int count) {
+        return consumeItem(handler, stack -> stack.is(item), count);
     }
 
-    public static int consumeItem(@Nullable Player player, Predicate<ItemStack> predicate, int count) {
-        if (player == null || count <= 0) return 0;
-
-        return consumeContainerItem(player.getInventory(), predicate, count);
-    }
-
-    public static int consumeItem(@Nullable Entity entity, Predicate<ItemStack> predicate, int count) {
-        if (entity instanceof Player player) {
-            return consumeItem(player, predicate, count);
-        }
-        if (entity instanceof Container container) {
-            return consumeContainerItem(container, predicate, count);
-        }
-        return 0;
-    }
-
-    private static int consumeContainerItem(Container container, Predicate<ItemStack> predicate, int count) {
-        if (count <= 0) return 0;
-
+    public static int consumeItem(@Nullable IItemHandler handler, Predicate<ItemStack> predicate, int count) {
+        if (handler == null || count <= 0) return 0;
         int initialCount = count;
-        for (int i = 0; i < container.getContainerSize(); i++) {
-            ItemStack stack = container.getItem(i);
+
+        for (int i = 0; i < handler.getSlots(); i++) {
+            var stack = handler.getStackInSlot(i);
             if (!predicate.test(stack)) continue;
 
             var countToShrink = Math.min(stack.getCount(), count);
-            stack.shrink(countToShrink);
+            handler.extractItem(i, countToShrink, false);
             count -= countToShrink;
             if (count <= 0) break;
         }
-        int consumed = initialCount - count;
-        if (consumed > 0) {
-            container.setChanged();
-        }
-        return consumed;
-    }
 
-    public static int insertItem(@Nullable Container container, @NotNull ItemStack stack) {
-        if (container == null || stack.isEmpty()) return 0;
-
-        int originalCount = stack.getCount();
-
-        for (int i = 0; i < container.getContainerSize() && !stack.isEmpty(); i++) {
-            ItemStack existing = container.getItem(i);
-            if (existing.isEmpty() || !ItemStack.isSameItemSameTags(existing, stack)) continue;
-
-            int limit = Math.min(container.getMaxStackSize(), existing.getMaxStackSize());
-            int toInsert = Math.min(limit - existing.getCount(), stack.getCount());
-            if (toInsert <= 0) continue;
-
-            ItemStack candidate = stack.copyWithCount(toInsert);
-            if (!canInsertIntoSlot(container, i, candidate)) continue;
-
-            existing.grow(toInsert);
-            stack.shrink(toInsert);
-        }
-
-        for (int i = 0; i < container.getContainerSize() && !stack.isEmpty(); i++) {
-            if (!container.getItem(i).isEmpty()) continue;
-
-            int limit = Math.min(container.getMaxStackSize(), stack.getMaxStackSize());
-            int toInsert = Math.min(limit, stack.getCount());
-            if (toInsert <= 0) continue;
-
-            ItemStack candidate = stack.copyWithCount(toInsert);
-            if (!canInsertIntoSlot(container, i, candidate)) continue;
-
-            container.setItem(i, candidate);
-            stack.shrink(toInsert);
-        }
-
-        int inserted = originalCount - stack.getCount();
-        if (inserted > 0) {
-            container.setChanged();
-        }
-        return inserted;
-    }
-
-    public static int insertItemInSlotOrder(@Nullable Container container, @NotNull ItemStack stack) {
-        if (container == null || stack.isEmpty()) return 0;
-
-        int originalCount = stack.getCount();
-        for (int i = 0; i < container.getContainerSize() && !stack.isEmpty(); i++) {
-            ItemStack existing = container.getItem(i);
-            int limit;
-            int toInsert;
-
-            if (existing.isEmpty()) {
-                limit = Math.min(container.getMaxStackSize(), stack.getMaxStackSize());
-                toInsert = Math.min(limit, stack.getCount());
-            } else if (ItemStack.isSameItemSameTags(existing, stack)) {
-                limit = Math.min(container.getMaxStackSize(), existing.getMaxStackSize());
-                toInsert = Math.min(limit - existing.getCount(), stack.getCount());
-            } else {
-                continue;
-            }
-
-            if (toInsert <= 0) continue;
-            ItemStack candidate = stack.copyWithCount(toInsert);
-            if (!canInsertIntoSlot(container, i, candidate)) continue;
-
-            if (existing.isEmpty()) {
-                container.setItem(i, candidate);
-            } else {
-                existing.grow(toInsert);
-            }
-            stack.shrink(toInsert);
-        }
-
-        int inserted = originalCount - stack.getCount();
-        if (inserted > 0) {
-            container.setChanged();
-        }
-        return inserted;
-    }
-
-    private static boolean canInsertIntoSlot(Container container, int slot, ItemStack stack) {
-        if (!container.canPlaceItem(slot, stack)) return false;
-
-        if (container instanceof Inventory inventory) {
-            int armorStart = inventory.items.size();
-            int armorIndex = slot - armorStart;
-            if (armorIndex >= 0 && armorIndex < inventory.armor.size()) {
-                EquipmentSlot equipmentSlot = EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, armorIndex);
-                return LivingEntity.getEquipmentSlotForItem(stack) == equipmentSlot;
-            }
-        }
-
-        return true;
+        return initialCount - count;
     }
 
     /**
@@ -442,7 +306,7 @@ public class InventoryTool {
         if (itemList == null || count <= 0) return count;
 
         var defaultStack = new ItemStack(item);
-        maxStackSize = Math.min(maxStackSize, item.getMaxStackSize());
+        maxStackSize = Math.min(maxStackSize, defaultStack.getMaxStackSize());
 
         for (int i = 0; i < itemList.size(); i++) {
             var stack = itemList.get(i);
@@ -477,15 +341,45 @@ public class InventoryTool {
                 currentStack.grow(countToAdd);
                 stack.setCount(stack.getCount() - countToAdd);
             } else if (currentStack.isEmpty()) {
-                int inserted = stack.getCount();
-                itemList.set(i, stack.copy());
-                stack.setCount(0);
-                return inserted;
+                itemList.set(i, stack);
+                return stack.getCount();
             }
 
             if (stack.getCount() <= 0) break;
         }
 
         return originalCount - stack.getCount();
+    }
+
+    public static int insertItem(IItemHandler handler, ItemStack stack, int count) {
+        int inserted = 0;
+        while (count > 0) {
+            var limit = stack.getMaxStackSize();
+            var toInsert = java.lang.Math.min(limit, count);
+            var result = ItemHandlerHelper.insertItemStacked(handler, stack.copyWithCount(toInsert), false);
+
+            count -= toInsert - result.getCount();
+            inserted += toInsert - result.getCount();
+
+            if (!result.isEmpty()) {
+                Mod.LOGGER.warn("trying to withdraw ammo {} with count {}, but only {} is inserted", stack, count, inserted);
+                break;
+            }
+        }
+
+        return inserted;
+    }
+
+    public static int insertItem(Player player, ItemStack stack, int count) {
+        int inserted = 0;
+        while (count > 0) {
+            var limit = stack.getMaxStackSize();
+            var toInsert = java.lang.Math.min(limit, count);
+            ItemHandlerHelper.giveItemToPlayer(player, stack.copyWithCount(toInsert));
+            count -= toInsert;
+            inserted += toInsert;
+        }
+
+        return inserted;
     }
 }

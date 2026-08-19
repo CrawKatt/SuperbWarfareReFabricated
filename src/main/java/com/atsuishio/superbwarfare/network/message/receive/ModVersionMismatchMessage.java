@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.network.message.receive;
 
-import com.atsuishio.superbwarfare.network.ClientPacketHandler;
+import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.ModVersionEventHandler;
 import net.minecraft.network.FriendlyByteBuf;
 
 public record ModVersionMismatchMessage(String previousVersion, String currentVersion) {
@@ -15,6 +16,8 @@ public record ModVersionMismatchMessage(String previousVersion, String currentVe
     }
 
     public static void handler(ModVersionMismatchMessage message) {
-        ClientPacketHandler.handleModVersionMismatch(message);
+        if (ModVersionEventHandler.updateClient(message.previousVersion(), message.currentVersion())) {
+            ClientEventHandler.onPlayerLoggedIn();
+        }
     }
 }

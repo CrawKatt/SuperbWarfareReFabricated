@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.item.Hammer;
+import com.atsuishio.superbwarfare.item.weapon.HammerItem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ResultSlot;
@@ -27,6 +27,6 @@ public class ResultSlotMixin {
                     target = "Lnet/minecraft/world/item/ItemStack;onCraftedBy(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;I)V",
                     shift = At.Shift.AFTER))
     private void superbwarfare$onItemCrafted(ItemStack stack, CallbackInfo ci) {
-        Hammer.onItemCrafted(stack, this.craftSlots, player);
+        HammerItem.onItemCrafted(stack, this.craftSlots, player);
     }
 }

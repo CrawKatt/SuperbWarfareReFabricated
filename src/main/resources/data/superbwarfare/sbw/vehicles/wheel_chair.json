@@ -1,12 +1,16 @@
 {
-  "ID": "superbwarfare:wheel_chair",
   "MaxHealth": 30,
   "MaxEnergy": 24000,
+  "KeepChunkLoaded": false,
   "Seats": {
     "Transform": "Vehicle",
     "Position": [0, 0.35, 0],
     "MinYaw": -90,
-    "MaxYaw": 90
+    "MaxYaw": 90,
+    "DismountInfo": {
+      "Transform": "Vehicle",
+      "Position": [0, 0.375, 1.5]
+    }
   },
   "UpStep": 1.1,
   "RotateOffsetHeight": 0.4,
@@ -25,7 +29,8 @@
     "ExplosionDamage": 10,
     "ExplosionRadius": 2,
     "ExplodePassengers": false,
-    "ExplodeBlocks": false
+    "ExplodeBlocks": false,
+    "NoWreck": true
   },
   "ThirdPersonCameraPos": [0, 0, 0.1],
   "HasLowHealthWarning": false,
@@ -46,7 +51,6 @@
     "Increment": 0.025,
     "Decrement": 0.015,
     "SteeringSpeed": 1,
-    "BodyRollRate": 1,
     "CanJump": true,
     "JumpEnergyCost": 400,
     "JumpCoolDown": 3,
@@ -54,5 +58,5 @@
   },
   "TerrainCompat": [[0.4375, 0, 0.5625], [-0.4375, 0, 0.5625], [0.5156, 0, -0.3125], [-0.5156, 0, -0.3125]],
   "TerrainCompatRotateRate" : 6,
-  "InertiaRotateRate": 10
+  "InertiaRotateRate": 0.75
 }

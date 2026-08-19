@@ -1,10 +1,11 @@
-import java.io.ByteArrayOutputStream
 import java.time.Instant
 
 plugins {
     eclipse
     idea
     id("fabric-loom") version "1.13.6"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.serialization") version "2.1.20"
 }
 
 fun getGitCommitHash(): String {
@@ -39,7 +40,6 @@ loom {
             vmArg("-XX:+IgnoreUnrecognizedVMOptions")
             vmArg("-XX:+AllowEnhancedClassRedefinition")
 
-            property("mixin.env.remapRefMap", "true")
             //property("geckolib.disable_examples", "true")
         }
 
@@ -72,7 +72,11 @@ sourceSets.main {
 }
 
 repositories {
+    mavenCentral()
     mavenLocal()
+    flatDir {
+        dirs("libs")
+    }
 
     maven {
         name = "ParchmentMC"
@@ -157,6 +161,18 @@ dependencies {
 
     modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_api_version")}")
+    modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("fabric_kotlin_version")}")
+
+    // Built from Sh1roCu/SimpleBedrockModel-Fabric@926992e (the upstream JitPack build is broken).
+    include(modImplementation(":simplebedrockmodel-fabric:2.4.6+mc1.20.1")!!)
+
+    include(implementation("com.maydaymemory:mae:1.1.4") {
+        exclude("com.google.code.findbugs", "jsr305")
+        exclude("it.unimi.dsi", "fastutil")
+        exclude("org.joml", "joml")
+    })!!
+
+    include(modImplementation("fuzs.extensibleenums:extensibleenums-fabric:${project.property("extensibleenums_version")}")!!)
 
     // CuriosAPI -> Trinkets
     modImplementation("dev.emi:trinkets:3.7.1")
@@ -191,6 +207,9 @@ dependencies {
     // compile its guarded compatibility mixin.
     modCompileOnly("maven.modrinth:nvQzSEkH:oJx1UoWN") // Jade 11.12.3 Fabric
     modCompileOnly("curse.maven:timeless-and-classics-zero-1028108:6518539")
+    modCompileOnly("maven.modrinth:lhGA9TYQ:WbL7MStR") // Architectury API 9.2.14 Fabric
+    modCompileOnly("maven.modrinth:sk9knFPE:MLIu0Tct") // Rhino 2001.2.3-build.10 Fabric
+    modCompileOnly("maven.modrinth:umyGl7zF:kPLHkyoJ") // KubeJS 2001.6.5-build.16 Fabric
 
     modApi("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:8.0.3")
 
@@ -209,6 +228,7 @@ tasks.named<ProcessResources>("processResources") {
         "minecraft_version" to project.property("minecraft_version"),
         "loader_version" to project.property("loader_version"),
         "fabric_api_version" to project.property("fabric_api_version"),
+        "fabric_kotlin_version" to project.property("fabric_kotlin_version"),
         "mod_id" to project.property("mod_id"),
         "mod_name" to project.property("mod_name"),
         "mod_license" to project.property("mod_license"),
@@ -252,6 +272,13 @@ tasks.named<Jar>("jar") {
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+}
+
+kotlin {
+    jvmToolchain(17)
+    sourceSets.named("main") {
+        kotlin.srcDirs("src/main/kotlin", "src/main/java")
+    }
 }
 
 idea {

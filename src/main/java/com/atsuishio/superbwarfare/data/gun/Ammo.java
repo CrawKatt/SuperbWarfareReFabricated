@@ -1,52 +1,39 @@
 package com.atsuishio.superbwarfare.data.gun;
 
-import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.capability.ModCapabilities;
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
+import com.atsuishio.superbwarfare.config.server.AmmoConfigKt;
+import com.atsuishio.superbwarfare.init.ModItems;
+import com.atsuishio.superbwarfare.item.ammo.AmmoSupplierItem;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Locale;
+import java.util.function.Supplier;
 
 public enum Ammo {
-    HANDGUN(ChatFormatting.GREEN, Mod.loc("handgun_ammo")),
-    RIFLE(ChatFormatting.AQUA, Mod.loc("rifle_ammo")),
-    SHOTGUN(ChatFormatting.RED, Mod.loc("shotgun_ammo")),
-    SNIPER(ChatFormatting.GOLD, Mod.loc("sniper_ammo")),
-    HEAVY(ChatFormatting.LIGHT_PURPLE, Mod.loc("heavy_ammo"));
+    HANDGUN(ChatFormatting.GREEN, () -> (AmmoSupplierItem) ModItems.HANDGUN_AMMO),
+    RIFLE(ChatFormatting.AQUA, () -> (AmmoSupplierItem) ModItems.RIFLE_AMMO),
+    SHOTGUN(ChatFormatting.RED, () -> (AmmoSupplierItem) ModItems.SHOTGUN_AMMO),
+    SNIPER(ChatFormatting.GOLD, () -> (AmmoSupplierItem) ModItems.SNIPER_AMMO),
+    HEAVY(ChatFormatting.LIGHT_PURPLE, () -> (AmmoSupplierItem) ModItems.HEAVY_AMMO);
 
     /**
      * 翻译字段名称，如 item.superbwarfare.ammo.rifle
      */
     public final String translationKey;
-    /**
-     * 大驼峰格式命名的序列化字段名称，如 RifleAmmo
-     */
     public final String serializationName;
-    /**
-     * 下划线格式命名的小写名称，如 rifle
-     */
     public final String name;
-
-    /**
-     * 大驼峰格式命名的显示名称，如 Rifle Ammo
-     */
     public final String displayName;
 
-    /**
-     * 该类型弹药默认的Item ID
-     */
-    private final ResourceLocation itemId;
+    public final Supplier<AmmoSupplierItem> defaultItemSupplier;
 
     public final ChatFormatting color;
 
-    Ammo(ChatFormatting color, ResourceLocation itemId) {
+    Ammo(ChatFormatting color, Supplier<AmmoSupplierItem> defaultItemSupplier) {
         this.color = color;
-        this.itemId = itemId;
+        this.defaultItemSupplier = defaultItemSupplier;
 
         var name = name().toLowerCase(Locale.ROOT);
         this.name = name;
@@ -70,12 +57,24 @@ public enum Ammo {
         this.serializationName = builder + "Ammo";
     }
 
+    public int getLimit() {
+        return AmmoConfigKt.limit(this);
+    }
+
+    public int getAmmoBoxLimit() {
+        return AmmoConfigKt.ammoBoxLimit(this);
+    }
+
     public ItemStack getItemStack() {
         return getItemStack(1);
     }
 
     public ItemStack getItemStack(int count) {
-        return new ItemStack(BuiltInRegistries.ITEM.get(itemId), count);
+        return new ItemStack(getItem(), count);
+    }
+
+    public AmmoSupplierItem getItem() {
+        return defaultItemSupplier.get();
     }
 
     public static Ammo getType(String name) {
@@ -92,38 +91,51 @@ public enum Ammo {
         return get(stack.getOrCreateTag());
     }
 
-    public void set(ItemStack stack, int count) {
-        set(stack.getOrCreateTag(), count);
+    public boolean set(ItemStack stack, int count) {
+        if (count > getAmmoBoxLimit()) {
+            return false;
+        }
+
+        return set(stack.getOrCreateTag(), count);
     }
 
-    public void add(ItemStack stack, int count) {
-        add(stack.getOrCreateTag(), count);
+    public boolean add(ItemStack stack, int count) {
+        return add(stack.getOrCreateTag(), count);
     }
 
-    // NBTTag
+    // NBT
     public int get(CompoundTag tag) {
         return tag.getInt(this.serializationName);
     }
 
-    public void set(CompoundTag tag, int count) {
-        if (count < 0) count = 0;
-        tag.putInt(this.serializationName, count);
+    public boolean set(CompoundTag tag, int count) {
+        if (count > getAmmoBoxLimit()) return false;
+
+        if (count <= 0) {
+            tag.remove(this.serializationName);
+        } else {
+            tag.putInt(this.serializationName, count);
+        }
+
+        return true;
     }
 
-    public void add(CompoundTag tag, int count) {
-        set(tag, safeAdd(get(tag), count));
+    public boolean add(CompoundTag tag, int count) {
+        return set(tag, safeAdd(get(tag), count));
     }
 
     public int get(Player player) {
-        return get(ModCapabilities.PLAYER_VARIABLE.get(player));
+        return get(PlayerVariable.getOrDefault(player));
     }
 
-    public void set(Player player, int count) {
-        PlayerVariable.modify(player, variable -> set(variable, Math.max(0, count)));
+    public boolean set(Player player, int count) {
+        if (count > getLimit()) return false;
+        PlayerVariable.modify(player, c -> set(c, Math.max(0, count)));
+        return true;
     }
 
-    public void add(Player player, int count) {
-        set(player, safeAdd(get(player), count));
+    public boolean add(Player player, int count) {
+        return set(player, safeAdd(get(player), count));
     }
 
 
@@ -132,14 +144,16 @@ public enum Ammo {
         return variable.ammo.getOrDefault(this, 0);
     }
 
-    public void set(PlayerVariable variable, int count) {
+    public boolean set(PlayerVariable variable, int count) {
         if (count < 0) count = 0;
+        if (count > getLimit()) return false;
 
         variable.ammo.put(this, count);
+        return true;
     }
 
-    public void add(PlayerVariable variable, int count) {
-        set(variable, safeAdd(get(variable), count));
+    public boolean add(PlayerVariable variable, int count) {
+        return set(variable, safeAdd(get(variable), count));
     }
 
     private int safeAdd(int a, int b) {

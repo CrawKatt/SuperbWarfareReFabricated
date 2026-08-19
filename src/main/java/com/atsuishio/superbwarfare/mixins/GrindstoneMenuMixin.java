@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.item.Beast;
-import com.atsuishio.superbwarfare.item.NetheriteHammer;
+import com.atsuishio.superbwarfare.item.weapon.BeastItem;
+import com.atsuishio.superbwarfare.item.weapon.NetheriteHammerItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AnvilMenu;
@@ -87,12 +87,12 @@ public class GrindstoneMenuMixin {
 
     private static boolean superbwarfare$isStackAware(ItemStack stack) {
         return stack.getItem() instanceof GunItem
-                || stack.getItem() instanceof Beast
-                || stack.getItem() instanceof NetheriteHammer;
+                || stack.getItem() instanceof BeastItem
+                || stack.getItem() instanceof NetheriteHammerItem;
     }
 
     private static boolean superbwarfare$isRepairable(ItemStack stack) {
-        if (stack.getItem() instanceof Beast || stack.getItem() instanceof NetheriteHammer) {
+        if (stack.getItem() instanceof BeastItem || stack.getItem() instanceof NetheriteHammerItem) {
             return false;
         }
         if (stack.getItem() instanceof GunItem gun) {

@@ -7,24 +7,14 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.entity.player.Player;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Map;
-import java.util.function.Consumer;
 
 @Mixin(KeyMapping.class)
 public class KeymappingMixin {
-
-    @Shadow
-    @Final
-    private static Map<InputConstants.Key, KeyMapping> MAP;
 
     @Shadow
     private InputConstants.Key key;
@@ -61,35 +51,4 @@ public class KeymappingMixin {
         }
     }
 
-    @Inject(method = "set(Lcom/mojang/blaze3d/platform/InputConstants$Key;Z)V", at = @At("TAIL"))
-    private static void superbwarfare$setVanillaMouseMappings(InputConstants.Key key, boolean isDown, CallbackInfo ci) {
-        superbwarfare$forSharedVanillaMouseMapping(key, mapping -> mapping.setDown(isDown));
-    }
-
-    @Inject(method = "click(Lcom/mojang/blaze3d/platform/InputConstants$Key;)V", at = @At("TAIL"))
-    private static void superbwarfare$clickVanillaMouseMappings(InputConstants.Key key, CallbackInfo ci) {
-        superbwarfare$forSharedVanillaMouseMapping(key, mapping -> {
-            KeyMappingAccessor accessor = (KeyMappingAccessor) mapping;
-            accessor.superbwarfare$setClickCount(accessor.superbwarfare$getClickCount() + 1);
-        });
-    }
-
-    @Unique
-    private static void superbwarfare$forSharedVanillaMouseMapping(InputConstants.Key key, Consumer<KeyMapping> action) {
-        if (key.getType() != InputConstants.Type.MOUSE) return;
-
-        Minecraft mc = Minecraft.getInstance();
-
-        superbwarfare$acceptIfShared(key, mc.options.keyAttack, action);
-        superbwarfare$acceptIfShared(key, mc.options.keyUse, action);
-        superbwarfare$acceptIfShared(key, mc.options.keyPickItem, action);
-    }
-
-    @Unique
-    private static void superbwarfare$acceptIfShared(InputConstants.Key key, KeyMapping mapping, Consumer<KeyMapping> action) {
-        if (MAP.get(key) == mapping) return;
-        if (((KeyMappingAccessor) mapping).superbwarfare$getKey().equals(key)) {
-            action.accept(mapping);
-        }
-    }
 }

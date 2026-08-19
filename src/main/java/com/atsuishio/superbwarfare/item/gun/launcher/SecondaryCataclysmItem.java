@@ -1,22 +1,21 @@
 package com.atsuishio.superbwarfare.item.gun.launcher;
 
-import net.fabricmc.loader.api.FabricLoader;
-
+import com.atsuishio.superbwarfare.init.ModSounds;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.TooltipTool;
 import com.atsuishio.superbwarfare.client.model.item.SecondaryCataclysmItemModel;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.init.ModRarities;
-import com.atsuishio.superbwarfare.init.ModSounds;
-import com.atsuishio.superbwarfare.item.BatteryItem;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
-import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -25,7 +24,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -48,7 +46,7 @@ import java.util.function.Supplier;
 public class SecondaryCataclysmItem extends GunGeoItem {
 
     public SecondaryCataclysmItem() {
-        super(new Properties().fireResistant().rarity(ModRarities.LEGENDARY));
+        super(new Properties().fireResistant().rarity(ModRarities.VIRTUAL));
     }
 
     @Override
@@ -63,7 +61,6 @@ public class SecondaryCataclysmItem extends GunGeoItem {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return GunRendererBuilder.simple(SecondaryCataclysmItemModel::new);
     }
@@ -112,7 +109,7 @@ public class SecondaryCataclysmItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var reloadAnimController = new AnimationController<>(this, "reloadAnimController", 1, this::reloadAnimPredicate);
         data.add(reloadAnimController);
         var meleeController = new AnimationController<>(this, "meleeController", 0, this::meleePredicate);
@@ -120,52 +117,28 @@ public class SecondaryCataclysmItem extends GunGeoItem {
     }
 
     @Override
-    @ParametersAreNonnullByDefault
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        super.inventoryTick(stack, world, entity, slot, selected);
-
-        if (entity instanceof Player player) {
-            for (var cell : player.getInventory().items) {
-                if (cell.getItem() instanceof BatteryItem) {
-                    assert ModEnergyApi.get(stack) != null;
-                    int stackMaxEnergy = ModEnergyApi.getMaxEnergyStored(stack);
-                    int stackEnergy = ModEnergyApi.getEnergyStored(stack);
-
-                    assert ModEnergyApi.get(cell) != null;
-                    int cellEnergy = ModEnergyApi.getEnergyStored(cell);
-
-                    int stackEnergyNeed = Math.min(cellEnergy, stackMaxEnergy - stackEnergy);
-
-                    if (cellEnergy > 0) {
-                        ModEnergyApi.receiveEnergy(stack, stackEnergyNeed, false);
-                    }
-                    ModEnergyApi.extractEnergy(cell, stackEnergyNeed, false);
-                }
-            }
+    public double getCustomDamage(GunData data) {
+        var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
+        if (cap != null && cap.getEnergyStored() > 0) {
+            return 2.5 * data.getDefault().damage;
         }
+        return 0;
     }
 
     @Override
     public boolean shootBullet(@NotNull ShootParameters parameters) {
-        var data = parameters.data();
-        var level = parameters.level();
-        var shootPosition = parameters.shootPosition();
-        var shootDirection = parameters.shootDirection();
-        var zoom = parameters.zoom();
+        var data = parameters.data;
+        var level = parameters.level;
+        var shootPosition = parameters.shootPosition;
+        var shootDirection = parameters.shootDirection;
+        var zoom = parameters.zoom;
 
         var stack = data.stack;
 
-        var hasEnoughEnergy = ModEnergyApi.getEnergyStored(stack) >= 3000;
+        var stackCap = ModCapabilities.ENERGY_ITEM.find(stack, null);
+        var hasEnoughEnergy = stackCap != null && stackCap.getEnergyStored() >= 3000;
 
-        boolean isChargedFire = zoom && hasEnoughEnergy;
-
-        if (isChargedFire) {
-            data.setTempModifications(rawData -> {
-                rawData.damage *= 1.25F;
-                rawData.velocity *= 4;
-                return rawData;
-            });
-        }
+        boolean isChargedFire = hasEnoughEnergy;
 
         if (!super.shootBullet(parameters)) return false;
 
@@ -175,7 +148,10 @@ public class SecondaryCataclysmItem extends GunGeoItem {
                 4, 0.1, 0.1, 0.1, 0.002, true);
 
         if (isChargedFire) {
-            ModEnergyApi.extractEnergy(stack, 3000, false);
+            var itemCap = ModCapabilities.ENERGY_ITEM.find(stack, null);
+            if (itemCap != null) {
+                itemCap.extractEnergy(3000, false);
+            }
         }
 
         return true;
@@ -183,16 +159,16 @@ public class SecondaryCataclysmItem extends GunGeoItem {
 
     @Override
     public void playFireSounds(GunData data, Entity shooter, boolean zoom) {
-        var storage = ModEnergyApi.get(data.stack);
-        if (storage != null && storage.getAmount() > 3000 && zoom) {
-            float soundRadius = (float) data.compute().soundRadius;
+        var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
 
-            shooter.playSound(ModSounds.SECONDARY_CATACLYSM_FIRE_3P_CHARGE.get(), soundRadius * 0.4f, 1f);
-            shooter.playSound(ModSounds.SECONDARY_CATACLYSM_FAR_CHARGE.get(), soundRadius * 0.7f, 1f);
-            shooter.playSound(ModSounds.SECONDARY_CATACLYSM_VERYFAR_CHARGE.get(), soundRadius, 1f);
+        if (cap != null && cap.getEnergyStored() > 3000) {
+            float soundRadius = data.get(GunProp.SOUND_RADIUS).floatValue();
+
+            shooter.playSound(ModSounds.SECONDARY_CATACLYSM_FIRE_3P_CHARGE, soundRadius * 0.4f, 1f);
+            shooter.playSound(ModSounds.SECONDARY_CATACLYSM_FAR_CHARGE, soundRadius * 0.7f, 1f);
+            shooter.playSound(ModSounds.SECONDARY_CATACLYSM_VERYFAR_CHARGE, soundRadius, 1f);
         } else {
             super.playFireSounds(data, shooter, zoom);
         }
     }
-
 }

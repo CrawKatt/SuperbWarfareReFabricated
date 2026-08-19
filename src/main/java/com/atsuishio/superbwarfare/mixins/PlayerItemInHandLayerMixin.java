@@ -34,7 +34,7 @@ public abstract class PlayerItemInHandLayerMixin<T extends Player, M extends Ent
     @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)
     public void renderArmWithItem(LivingEntity pLivingEntity, ItemStack pItemStack, ItemDisplayContext pDisplayContext,
                                   HumanoidArm pArm, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, CallbackInfo ci) {
-        if (pItemStack.is(ModItems.ARTILLERY_INDICATOR.get()) && pLivingEntity.getUseItem() == pItemStack && pLivingEntity.swingTime == 0) {
+        if (pItemStack.is(ModItems.ARTILLERY_INDICATOR) && pLivingEntity.getUseItem() == pItemStack && pLivingEntity.swingTime == 0) {
             ci.cancel();
             this.renderArmWithSpyglass(pLivingEntity, pItemStack, pArm, pPoseStack, pBuffer, pPackedLight);
         }

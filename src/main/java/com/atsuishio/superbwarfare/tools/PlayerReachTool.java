@@ -11,7 +11,7 @@ public final class PlayerReachTool {
     private static final ResourceLocation ATTACK_RANGE_ATTRIBUTE = new ResourceLocation("reach-entity-attributes", "attack_range");
 
     public static double getBlockReach(Player player) {
-        double reach = player.getAttributeValue(ModAttributes.BLOCK_REACH.get());
+        double reach = player.getAttributeValue(ModAttributes.BLOCK_REACH);
         Attribute reachAttribute = BuiltInRegistries.ATTRIBUTE.get(REACH_ATTRIBUTE);
         if (reachAttribute != null && player.getAttributes().hasAttribute(reachAttribute)) {
             reach += player.getAttributeValue(reachAttribute);
@@ -20,7 +20,7 @@ public final class PlayerReachTool {
     }
 
     public static double getEntityReach(Player player) {
-        double reach = player.getAttributeValue(ModAttributes.ENTITY_REACH.get());
+        double reach = player.getAttributeValue(ModAttributes.ENTITY_REACH);
         Attribute attackRangeAttribute = BuiltInRegistries.ATTRIBUTE.get(ATTACK_RANGE_ATTRIBUTE);
         if (attackRangeAttribute != null && player.getAttributes().hasAttribute(attackRangeAttribute)) {
             reach += player.getAttributeValue(attackRangeAttribute);

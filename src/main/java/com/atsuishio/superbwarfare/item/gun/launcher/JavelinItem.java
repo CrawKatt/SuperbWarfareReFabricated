@@ -1,10 +1,8 @@
 package com.atsuishio.superbwarfare.item.gun.launcher;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
 import com.atsuishio.superbwarfare.client.renderer.gun.JavelinItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
 import com.atsuishio.superbwarfare.entity.projectile.JavelinMissileEntity;
 import com.atsuishio.superbwarfare.init.ModRarities;
@@ -12,6 +10,7 @@ import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.network.message.receive.ShootClientMessage;
+import com.atsuishio.superbwarfare.network.message.send.ShootMessage;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
@@ -23,7 +22,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
-
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -37,23 +35,22 @@ public class JavelinItem extends GunGeoItem {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return JavelinItemRenderer::new;
     }
 
     @Override
-    public boolean useSpecialFireProcedure(GunData data) {
+    public boolean useSpecialFireProcedure(@NotNull GunData data) {
         return true;
     }
 
     @Override
     public void shoot(@NotNull ShootParameters parameters) {
-        var data = parameters.data();
-        var shooter = parameters.shooter();
-        var targetUUID = parameters.targetEntityUUID();
-        var targetPos = parameters.targetPos();
-        var zoom = parameters.zoom();
+        var data = parameters.data;
+        var shooter = parameters.shooter;
+        var targetUUID = parameters.targetEntityUUID;
+        var targetPos = parameters.targetPos;
+        var zoom = parameters.zoom;
 
         if (shooter == null) return;
         if (!zoom || !data.hasEnoughAmmoToShoot(shooter)) return;
@@ -72,17 +69,15 @@ public class JavelinItem extends GunGeoItem {
             int guideType = targetEntity == null ? 1 : 0;
 
             JavelinMissileEntity missileEntity = new JavelinMissileEntity(shooter, level,
-                    (float) data.compute().damage,
-                    (float) data.compute().explosionDamage,
-                    (float) data.compute().explosionRadius,
+                    data.get(GunProp.DAMAGE).floatValue(),
+                    data.get(GunProp.EXPLOSION_DAMAGE).floatValue(),
+                    data.get(GunProp.EXPLOSION_RADIUS).floatValue(),
                     guideType,
                     targetPos);
 
-            for (Perk.Type type : Perk.Type.values()) {
-                var instance = data.perk.getInstance(type);
-                if (instance != null) {
-                    instance.perk().modifyProjectile(data, instance, missileEntity);
-                }
+            for (Perk.Type type : Perk.Type.getEntries()) {
+                var instance = data.perk.getInstances(type);
+                instance.forEach(perk -> perk.perk().modifyProjectile(data, perk, missileEntity));
             }
 
             missileEntity.setPos(shooter.getX() + firePos.x, shooter.getEyeY() + firePos.y, shooter.getZ() + firePos.z);
@@ -100,15 +95,15 @@ public class JavelinItem extends GunGeoItem {
                     30, 0.4, 0.4, 0.4, 0.005, true);
 
             if (shooter instanceof ServerPlayer serverPlayer) {
-                SoundTool.playLocalSound(serverPlayer, ModSounds.JAVELIN_FIRE_1P.get(), 2, 1);
-                NetworkRegistry.sendToPlayer(serverPlayer, new ShootClientMessage(10));
+                SoundTool.playLocalSound(serverPlayer, ModSounds.JAVELIN_FIRE_1P, 2, 1);
+                NetworkRegistry.sendToPlayer(serverPlayer, ShootClientMessage.INSTANCE);
             }
 
-            SoundTool.playDistantSound(serverLevel, ModSounds.JAVELIN_FIRE_3P.get(), shooter.position(), 4, 1, shooter);
-            SoundTool.playDistantSound(serverLevel, ModSounds.JAVELIN_FAR.get(), shooter.position(), 10, 1, shooter);
+            SoundTool.playDistantSound(serverLevel, ModSounds.JAVELIN_FIRE_3P, shooter.position(), 4, 1, shooter);
+            SoundTool.playDistantSound(serverLevel, ModSounds.JAVELIN_FAR, shooter.position(), 10, 1, shooter);
         }
 
-        data.ammo.set(data.ammo.get() - data.compute().ammoCostPerShoot);
+        data.ammo.set(data.ammo.get() - data.get(GunProp.AMMO_COST_PER_SHOOT));
         data.save();
     }
 }

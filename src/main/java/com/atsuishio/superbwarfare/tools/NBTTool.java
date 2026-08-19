@@ -2,8 +2,37 @@ package com.atsuishio.superbwarfare.tools;
 
 import com.google.gson.*;
 import net.minecraft.nbt.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.function.Consumer;
 
 public class NBTTool {
+
+    public static CompoundTag getTag(ItemStack stack) {
+        return stack.hasTag() ? stack.getTag().copy() : new CompoundTag();
+    }
+
+    /** Do not use this to save gun data; use GunData.save(). */
+    public static void saveTag(ItemStack stack, CompoundTag tag) {
+        CompoundTag merged = stack.hasTag() ? stack.getTag().copy() : new CompoundTag();
+        stack.setTag(merged.merge(tag));
+    }
+
+    public static ItemStack withTag(Item item, int count, Consumer<CompoundTag> setter) {
+        return withTag(new ItemStack(item, count), setter);
+    }
+
+    public static ItemStack withTag(Item item, Consumer<CompoundTag> setter) {
+        return withTag(item, 1, setter);
+    }
+
+    public static ItemStack withTag(ItemStack stack, Consumer<CompoundTag> setter) {
+        CompoundTag tag = new CompoundTag();
+        setter.accept(tag);
+        saveTag(stack, tag);
+        return stack;
+    }
 
     public static JsonObject convertToJson(CompoundTag nbt) {
         JsonObject json = new JsonObject();

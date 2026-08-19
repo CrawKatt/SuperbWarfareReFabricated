@@ -1,13 +1,12 @@
 package com.atsuishio.superbwarfare.entity.mixin;
 
-import net.minecraft.nbt.CompoundTag;
+import com.atsuishio.superbwarfare.capability.PersistentDataAccessor;
 import net.minecraft.world.entity.Entity;
 
-public interface EntityPersistentDataAccess {
+public interface EntityPersistentDataAccess extends PersistentDataAccessor {
 
     static EntityPersistentDataAccess of(Entity entity) {
         return (EntityPersistentDataAccess) entity;
     }
 
-    CompoundTag superbwarfare$getPersistentData();
 }

@@ -1,11 +1,10 @@
 {
-  "ID": "superbwarfare:javelin",
   "DefaultZoom": 3,
   "Spread": 5,
   "Magazine": 1,
   "Weight": 10,
   "EmptyReloadTime": 78,
-  "Damage": 500,
+  "Damage": 650,
   "ExplosionDamage": 120,
   "ExplosionRadius": 9,
   "Headshot": 0,
@@ -13,9 +12,12 @@
   "SeekTime": 20,
   "SeekAngle": 10,
   "SeekRange": 256,
+  "CanGuidedByRadar": false,
+  "AffectedByStealthTarget": false,
   "MaxTargetHeight": 64,
   "SeekType": "HoldFire",
   "GunType": "DirectLauncher",
+  "Projectile": "superbwarfare:javelin_missile",
   "AvailableFireModes": [
     "Dir",
     "Top"
@@ -26,7 +28,8 @@
     "superbwarfare:powerful_attraction",
     "superbwarfare:intelligent_chip",
     "superbwarfare:monster_hunter",
-    "superbwarfare:vorpal_weapon"
+    "superbwarfare:vorpal_weapon",
+    "superbwarfare:battle_of_wits"
   ],
   "SoundInfo": {
     "Fire1P": "superbwarfare:javelin_fire_1p",

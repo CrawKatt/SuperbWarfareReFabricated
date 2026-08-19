@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -68,6 +69,18 @@ public class ClientNetworkRegistry {
         ClientPlayNetworking.registerGlobalReceiver(id, (client, handlerNet, buf, responseSender) -> {
             T message = decoder.apply(buf);
             client.execute(() -> handler.accept(message));
+        });
+    }
+
+    static <T> void registerS2C(ResourceLocation id, Function<FriendlyByteBuf, T> decoder,
+                                BiConsumer<T, PayloadContext> handler) {
+        ClientPlayNetworking.registerGlobalReceiver(id, (client, handlerNet, buf, responseSender) -> {
+            T message = decoder.apply(buf);
+            client.execute(() -> {
+                if (client.player != null) {
+                    handler.accept(message, new PayloadContext(client.player));
+                }
+            });
         });
     }
 

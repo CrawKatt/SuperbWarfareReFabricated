@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.config.client.DisplayConfig;
 import com.atsuishio.superbwarfare.data.vehicle.VehicleData;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.event.custom.ComputeFovCallback;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -15,7 +14,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
@@ -23,6 +24,7 @@ import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -30,6 +32,37 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
+
+    @Inject(method = "render", at = @At("HEAD"))
+    private void superbWarfare$renderFramePre(float partialTick, long finishTimeNano, boolean renderLevel, CallbackInfo ci) {
+        superbwarfare$handleRenderTick();
+    }
+
+    @Inject(method = "render", at = @At("TAIL"))
+    private void superbWarfare$renderFramePost(float partialTick, long finishTimeNano, boolean renderLevel, CallbackInfo ci) {
+        superbwarfare$handleRenderTick();
+    }
+
+    @Unique
+    private static void superbwarfare$handleRenderTick() {
+        ClientEventHandler.handleWeaponFire();
+        ClientEventHandler.handleVehicleFire();
+        ClientEventHandler.handleWeaponBreathSway();
+    }
+
+    @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
+    private void superbWarfare$getFov(Camera camera, float partialTick, boolean changingFov, CallbackInfoReturnable<Double> cir) {
+        ClientEventHandler.FovContext context = new ClientEventHandler.FovContext(
+                cir.getReturnValue(),
+                partialTick,
+                changingFov
+        );
+
+        ClientEventHandler.onFovUpdate(context);
+        ClientEventHandler.captureFov(context);
+
+        cir.setReturnValue(context.getFov());
+    }
 
     @Inject(method = "bobView(Lcom/mojang/blaze3d/vertex/PoseStack;F)V", at = @At("HEAD"), cancellable = true)
     public void bobView(PoseStack p_109139_, float p_109140_, CallbackInfo ci) {
@@ -49,21 +82,17 @@ public class GameRendererMixin {
     private Camera mainCamera;
 
     @SuppressWarnings("ConstantValue")
-    @Inject(
-            method = "renderLevel",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/Camera;setup(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/world/entity/Entity;ZZF)V",
-                    shift = At.Shift.AFTER
-            )
-    )
+    @Inject(method = "renderLevel", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/Camera;setup(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/world/entity/Entity;ZZF)V",
+            shift = At.Shift.AFTER
+    ))
     public void superbWarfare$renderWorld(float tickDelta, long limitTime, PoseStack matrices, CallbackInfo ci) {
         Entity entity = mainCamera.getEntity();
 
         matrices.mulPose(Axis.ZP.rotationDegrees(ClientEventHandler.cameraRoll));
 
-
-        if (entity instanceof Player player && !player.isSpectator() && player.hasEffect(ModMobEffects.SHOCK.get())) {
+        if (entity instanceof Player player && !player.isSpectator() && player.hasEffect(ModMobEffects.SHOCK)) {
             float shakeStrength = (float) DisplayConfig.SHOCK_SCREEN_SHAKE.get() / 100.0f;
             if (shakeStrength <= 0.0f) return;
             matrices.mulPose(Axis.ZP.rotationDegrees((float) Mth.nextDouble(RandomSource.create(), 8, 12) * shakeStrength));
@@ -119,10 +148,25 @@ public class GameRendererMixin {
         }
     }
 
-    @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
-    private void superbwarfare$onGetFov(Camera camera, float partialTick, boolean usedConfiguredFov, CallbackInfoReturnable<Double> cir) {
-        ComputeFovCallback.Event event = new ComputeFovCallback.Event(camera, partialTick, cir.getReturnValue(), usedConfiguredFov);
-        ComputeFovCallback.EVENT.invoker().onComputeFov(event);
-        cir.setReturnValue(event.getFOV());
+    @Inject(method = "getNightVisionScale(Lnet/minecraft/world/entity/LivingEntity;F)F",
+            at = @At("RETURN"), cancellable = true)
+    private static void getNightVisionScale(LivingEntity pLivingEntity, float pNanoTime, CallbackInfoReturnable<Float> cir) {
+        boolean hasThermalImagingVehicle = false;
+
+        if (pLivingEntity.getVehicle() instanceof VehicleEntity vehicle) {
+            var index = vehicle.getSeatIndex(pLivingEntity);
+            var seats = vehicle.computed().seats();
+            if (index < 0 || index >= seats.size()) return;
+
+            var seat = seats.get(index);
+            if (seat.hasThermalImaging) {
+                hasThermalImagingVehicle = true;
+            }
+        }
+
+        if (ClientEventHandler.activeThermalImaging || ClientEventHandler.hasThermalImagingGoggles() || hasThermalImagingVehicle) {
+            cir.cancel();
+            cir.setReturnValue(pLivingEntity.hasEffect(MobEffects.NIGHT_VISION) ? 1f : 0f);
+        }
     }
 }

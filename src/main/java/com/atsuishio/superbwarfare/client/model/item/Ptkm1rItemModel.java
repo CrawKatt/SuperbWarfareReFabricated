@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.client.model.item;
 
 import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.item.Ptkm1rItem;
+import com.atsuishio.superbwarfare.item.projectile.Ptkm1rItem;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.model.GeoModel;
 
@@ -19,6 +19,6 @@ public class Ptkm1rItemModel extends GeoModel<Ptkm1rItem> {
 
     @Override
     public ResourceLocation getTextureResource(Ptkm1rItem animatable) {
-        return Mod.loc("textures/entity/ptkm_1r.png");
+        return Mod.loc("textures/item/ptkm_1r.png");
     }
 }

@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AnvilMenu.class)
-public abstract class AnvilMenuMixin {
+public class AnvilMenuMixin {
 
     @Shadow
     @Final
@@ -22,17 +22,19 @@ public abstract class AnvilMenuMixin {
     private int repairItemCountCost;
 
     @Inject(method = "createResult", at = @At("HEAD"), cancellable = true)
-    private void superbwarfare$createCustomResult(CallbackInfo ci) {
+    private void superbWarfare$createShortcutPackResult(CallbackInfo ci) {
         AnvilMenu menu = (AnvilMenu) (Object) this;
-        ItemStack left = menu.getSlot(AnvilMenu.INPUT_SLOT).getItem();
-        ItemStack right = menu.getSlot(AnvilMenu.ADDITIONAL_SLOT).getItem();
+        ItemStack output = PlayerEventHandler.getShortcutPackAnvilOutput(
+                menu.getSlot(AnvilMenu.INPUT_SLOT).getItem(),
+                menu.getSlot(AnvilMenu.ADDITIONAL_SLOT).getItem()
+        );
 
-        PlayerEventHandler.onAnvilUpdate(left, right, (output, experienceCost, materialCost) -> {
+        if (!output.isEmpty()) {
             menu.getSlot(AnvilMenu.RESULT_SLOT).set(output);
-            this.cost.set(experienceCost);
-            this.repairItemCountCost = materialCost;
+            this.cost.set(10);
+            this.repairItemCountCost = 1;
             menu.broadcastChanges();
             ci.cancel();
-        });
+        }
     }
 }

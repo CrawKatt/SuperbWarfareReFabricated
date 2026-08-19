@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.mixins;
 
+import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.custom.LivingDeathCallback;
 import com.atsuishio.superbwarfare.item.EntitySwingHook;
 import net.minecraft.world.InteractionHand;
@@ -31,6 +32,11 @@ public class LivingEntitySwingMixin {
 
         if (event.isCanceled()) {
             ci.cancel();
+            return;
+        }
+
+        if (!entity.level().isClientSide) {
+            LivingEventHandler.onEntityDeath(entity, source);
         }
     }
 }

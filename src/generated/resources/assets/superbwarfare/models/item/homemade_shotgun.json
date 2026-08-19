@@ -1,5 +1,6 @@
 {
   "parent": "superbwarfare:item/homemade_shotgun_base",
+  "gui_light": "front",
   "textures": {
     "particle": "superbwarfare:item/homemade_shotgun_icon"
   }

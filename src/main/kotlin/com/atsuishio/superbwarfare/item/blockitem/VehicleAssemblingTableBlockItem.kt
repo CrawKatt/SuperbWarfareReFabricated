@@ -1,0 +1,108 @@
+package com.atsuishio.superbwarfare.item.blockitem
+
+import com.atsuishio.superbwarfare.block.VehicleAssemblingTableBlock
+import com.atsuishio.superbwarfare.block.property.BlockPart
+import com.atsuishio.superbwarfare.client.renderer.item.VehicleAssemblingTableBlockItemRenderer
+import com.atsuishio.superbwarfare.init.ModBlocks
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
+import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.context.BlockPlaceContext
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.shapes.CollisionContext
+import software.bernie.geckolib.animatable.GeoItem
+import software.bernie.geckolib.animatable.client.RenderProvider
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
+import software.bernie.geckolib.core.animation.AnimatableManager
+import software.bernie.geckolib.util.GeckoLibUtil
+import java.util.function.Consumer
+import java.util.function.Supplier
+
+class VehicleAssemblingTableBlockItem : BlockItem(ModBlocks.VEHICLE_ASSEMBLING_TABLE, Properties()), GeoItem {
+    private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
+    private val renderProvider: Supplier<Any> = GeoItem.makeRenderer(this)
+
+    // 多方块额外碰撞检测
+    override fun canPlace(context: BlockPlaceContext, state: BlockState): Boolean {
+        val facing = state.getValue(VehicleAssemblingTableBlock.FACING)
+        val initialPos = findInitialPos(context, context.clickedPos, facing) ?: return false
+
+        val player = context.player
+        val collisionContext = if (player == null) CollisionContext.empty() else CollisionContext.of(player)
+
+        // 检测是否所有位置都不会被实体挡住
+        for (blockPart in BlockPart.entries) {
+            val blockPos = blockPart.relative(initialPos, facing)
+            if (!context.level.isUnobstructed(state, blockPos, collisionContext)) {
+                return false
+            }
+        }
+
+        return super.canPlace(context, state)
+    }
+
+    override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) = Unit
+
+    @Environment(EnvType.CLIENT)
+    override fun createRenderer(consumer: Consumer<Any>) {
+        consumer.accept(object : RenderProvider {
+            private var renderer: BlockEntityWithoutLevelRenderer? = null
+
+            override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
+                if (this.renderer == null) {
+                    this.renderer = VehicleAssemblingTableBlockItemRenderer()
+                }
+                return this.renderer!!
+            }
+        })
+    }
+
+    override fun getRenderProvider(): Supplier<Any> = renderProvider
+
+    override fun getAnimatableInstanceCache(): AnimatableInstanceCache {
+        return this.cache
+    }
+
+    companion object {
+        // 根据当前状态尝试找到合适的初始放置位置
+        fun findInitialPos(context: BlockPlaceContext, currentPos: BlockPos, facing: Direction): BlockPos? {
+            var availablePart: BlockPart? = null
+            for (part in BlockPart.entries) {
+                val placePos = part.relativeNegative(currentPos, facing)
+                if (canPlace(context, placePos, facing)) {
+                    availablePart = part
+                    break
+                }
+            }
+
+            if (availablePart == null) return null
+            return availablePart.relativeNegative(currentPos, facing)
+        }
+
+        fun canPlace(context: BlockPlaceContext, pos: BlockPos, direction: Direction): Boolean {
+            for (part in BlockPart.entries) {
+                val detectPos = part.relative(pos, direction)
+                if (!context.level.getBlockState(detectPos).canBeReplaced(context)) {
+                    return false
+                }
+            }
+            return true
+        }
+
+        fun canPlace(level: Level, pos: BlockPos, direction: Direction, skipPos: BlockPos?): Boolean {
+            for (part in BlockPart.entries) {
+                val detectPos = part.relative(pos, direction)
+                if (detectPos == skipPos) continue
+
+                if (!level.getBlockState(detectPos).canBeReplaced()) {
+                    return false
+                }
+            }
+            return true
+        }
+    }
+}

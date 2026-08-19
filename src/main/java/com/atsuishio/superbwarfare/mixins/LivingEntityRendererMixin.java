@@ -1,51 +1,85 @@
 package com.atsuishio.superbwarfare.mixins;
 
+import com.atsuishio.superbwarfare.client.VehicleClientRenderState;
+import com.atsuishio.superbwarfare.client.renderer.special.PhosphorusFireRenderer;
 import com.atsuishio.superbwarfare.data.vehicle.VehicleData;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils;
+import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import org.joml.Quaterniond;
+import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 // From Immersive_Aircraft
 @Mixin(LivingEntityRenderer.class)
 public class LivingEntityRendererMixin<T extends LivingEntity> {
 
-    @Inject(method = "setupRotations", at = @At("TAIL"))
-    public void render(T entity, PoseStack matrices, float animationProgress, float bodyYaw, float tickDelta, CallbackInfo ci) {
-        if (entity.getRootVehicle() != entity && entity.getRootVehicle() instanceof VehicleEntity vehicle) {
-            float a = Mth.wrapDegrees(Mth.lerp(tickDelta, entity.yBodyRotO, entity.yBodyRot) - Mth.lerp(tickDelta, vehicle.yRotO, vehicle.getYRot()));
+    @Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+            at = @At("HEAD"), cancellable = true)
+    public void render(T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, CallbackInfo ci) {
+        PhosphorusFireRenderer.render(entity, poseStack, bufferSource);
 
+        if (!(entity instanceof Player player)) return;
+
+        if (VehicleClientRenderState.shouldHideVehiclePassenger(player)) {
+            ci.cancel();
+        } else if (ClientEventHandler.zoomVehicle && player == Minecraft.getInstance().player) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
+            at = @At("TAIL"))
+    private void superbwarfare$renderPhosphorusFirePost(T entity, float entityYaw, float partialTick,
+                                                         PoseStack poseStack, MultiBufferSource bufferSource,
+                                                         int packedLight, CallbackInfo ci) {
+        PhosphorusFireRenderer.render(entity, poseStack, bufferSource);
+    }
+
+    @Inject(method = "setupRotations(Lnet/minecraft/world/entity/LivingEntity;Lcom/mojang/blaze3d/vertex/PoseStack;FFF)V", at = @At("HEAD"), cancellable = true)
+    protected void setupRotations(T entity, PoseStack matrices, float pAgeInTicks, float pRotationYaw, float tickDelta, CallbackInfo ci) {
+        if (entity.getRootVehicle() != entity && entity.getRootVehicle() instanceof VehicleEntity vehicle) {
             var seats = VehicleData.compute(vehicle).seats();
             int index = vehicle.getSeatIndex(entity);
             if (index < 0 || index >= seats.size()) return;
 
+            ci.cancel();
             var seat = seats.get(index);
-            if (seat.transform.equals("VehicleFlat")) return;
 
-            if (entity.yBodyRot == vehicle.getYRot()) {
-                a = 0;
+            float transformYaw = (float) VehicleVecUtils.getYRotFromVector(vehicle.getTransformDirectionNoOrientation(tickDelta, entity));
+            var passengerWeaponStationYawRot = Axis.YP.rotationDegrees(-transformYaw);
+
+            Quaterniond quaterniond = vehicle.getRotationFromString(seat.transform, tickDelta).mul(new Quaterniond(passengerWeaponStationYawRot));
+            Quaternionf quaternionf = new Quaternionf(quaterniond.x, quaterniond.y, quaterniond.z, quaterniond.w);
+
+            matrices.mulPose(quaternionf);
+            matrices.mulPose(Axis.YP.rotationDegrees(180.0F - pRotationYaw));
+
+            float scale = vehicle.getPassengerRenderScale();
+
+            if (Minecraft.getInstance().player != null && ClientEventHandler.zoomVehicle && entity.getRootVehicle() == Minecraft.getInstance().player.getRootVehicle()) {
+                scale = 0;
             }
 
-            float r = (Mth.abs(a) - 90f) / 90f;
-            float r2;
-            if (Mth.abs(a) <= 90f) {
-                r2 = a / 90f;
-            } else {
-                if (a < 0) {
-                    r2 = -(180f + a) / 90f;
-                } else {
-                    r2 = (180f - a) / 90f;
-                }
-            }
+            matrices.scale(scale, scale, scale);
+        }
+    }
 
-            matrices.mulPose(Axis.XP.rotationDegrees(r * vehicle.getViewXRot(tickDelta) - r2 * vehicle.getRoll(tickDelta)));
-            matrices.mulPose(Axis.ZP.rotationDegrees(r * vehicle.getRoll(tickDelta) + r2 * vehicle.getViewXRot(tickDelta)));
+    @Inject(method = "isBodyVisible(Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)
+    private void superbWarfare$isBodyVisible(T livingEntity, CallbackInfoReturnable<Boolean> cir) {
+        if (ClientEventHandler.activeThermalImaging) {
+            cir.setReturnValue(true);
         }
     }
 

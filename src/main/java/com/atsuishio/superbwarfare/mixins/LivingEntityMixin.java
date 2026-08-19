@@ -27,16 +27,16 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
     protected abstract float getSoundVolume();
 
     @Shadow
-    protected abstract void playHurtSound(DamageSource pSource);
+    protected abstract void playHurtSound(DamageSource source);
 
     @Shadow
-    protected abstract void actuallyHurt(DamageSource pDamageSource, float pDamageAmount);
+    protected abstract void actuallyHurt(DamageSource source, float amount);
 
     @Shadow
-    protected abstract void hurtHelmet(DamageSource pDamageSource, float pDamageAmount);
+    protected abstract void hurtHelmet(DamageSource source, float amount);
 
     @Shadow
-    protected abstract boolean checkTotemDeathProtection(DamageSource pDamageSource);
+    protected abstract boolean checkTotemDeathProtection(DamageSource source);
 
     @Unique
     private double superbwarfare$knockbackStrength = -1;
@@ -67,29 +67,29 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
     }
 
     @Override
-    public void superbWarfare$playHurtSound(DamageSource pSource) {
-        this.playHurtSound(pSource);
+    public void superbWarfare$playHurtSound(DamageSource source) {
+        this.playHurtSound(source);
     }
 
     @Override
-    public void superbWarfare$actuallyHurt(DamageSource pDamageSource, float pDamageAmount) {
-        this.actuallyHurt(pDamageSource, pDamageAmount);
+    public void superbWarfare$actuallyHurt(DamageSource source, float amount) {
+        this.actuallyHurt(source, amount);
     }
 
     @Override
-    public void superbWarfare$hurtHelmet(DamageSource pDamageSource, float pDamageAmount) {
-        this.hurtHelmet(pDamageSource, pDamageAmount);
+    public void superbWarfare$hurtHelmet(DamageSource source, float amount) {
+        this.hurtHelmet(source, amount);
     }
 
     @Override
-    public boolean superbWarfare$checkTotemDeathProtection(DamageSource pDamageSource) {
-        return this.checkTotemDeathProtection(pDamageSource);
+    public boolean superbWarfare$checkTotemDeathProtection(DamageSource source) {
+        return this.checkTotemDeathProtection(source);
     }
 
     @Inject(method = "dismountVehicle", at = @At("RETURN"))
-    private void dismountVehicle(Entity pVehicle, CallbackInfo ci) {
-        if (pVehicle instanceof VehicleEntity vehicle) {
-            vehicle.removeSeatIndexTag(((LivingEntity) (Object) this));
+    private void superbwarfare$dismountVehicle(Entity vehicle, CallbackInfo ci) {
+        if (vehicle instanceof VehicleEntity vehicleEntity) {
+            vehicleEntity.removeSeatIndexTag((LivingEntity) (Object) this);
         }
     }
 }

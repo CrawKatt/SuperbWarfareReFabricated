@@ -1,9 +1,8 @@
 package com.atsuishio.superbwarfare.item.gun.sniper;
 
-import net.fabricmc.loader.api.FabricLoader;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 
 import com.atsuishio.superbwarfare.client.TooltipTool;
 import com.atsuishio.superbwarfare.client.renderer.gun.Ql1031ItemRenderer;
@@ -12,11 +11,9 @@ import com.atsuishio.superbwarfare.data.gun.ShootParameters;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.init.ModRarities;
-import com.atsuishio.superbwarfare.item.BatteryItem;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.GunsTool;
-import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -24,8 +21,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -49,11 +44,10 @@ import java.util.function.Supplier;
 public class Ql1031Item extends GunGeoItem {
 
     public Ql1031Item() {
-        super(new Properties().rarity(ModRarities.LEGENDARY));
+        super(new Properties().rarity(ModRarities.VIRTUAL));
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return Ql1031ItemRenderer::new;
     }
@@ -106,10 +100,10 @@ public class Ql1031Item extends GunGeoItem {
     @Override
     public void afterShoot(@NotNull ShootParameters parameters) {
         super.afterShoot(parameters);
-        var data = parameters.data();
-        var level = parameters.level();
-        var shootPosition = parameters.shootPosition();
-        var shootDirection = parameters.shootDirection();
+        var data = parameters.data;
+        var level = parameters.level;
+        var shootPosition = parameters.shootPosition;
+        var shootDirection = parameters.shootDirection;
 
         if (data.selectedFireModeInfo().name.equals("Hold")) {
             for (int i = 0;i < 40;i += 2) {
@@ -121,37 +115,11 @@ public class Ql1031Item extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var editController = new AnimationController<>(this, "editController", 1, this::editPredicate);
         var chargeController = new AnimationController<>(this, "chargeController", 1, this::chargePredicate);
         data.add(editController);
         data.add(chargeController);
-    }
-
-    @Override
-    @ParametersAreNonnullByDefault
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        super.inventoryTick(stack, world, entity, slot, selected);
-
-        if (entity instanceof Player player) {
-            for (var cell : player.getInventory().items) {
-                if (cell.getItem() instanceof BatteryItem) {
-                    assert ModEnergyApi.get(stack) != null;
-                    int stackMaxEnergy = ModEnergyApi.getMaxEnergyStored(stack);
-                    int stackEnergy = ModEnergyApi.getEnergyStored(stack);
-
-                    assert ModEnergyApi.get(cell) != null;
-                    int cellEnergy = ModEnergyApi.getEnergyStored(cell);
-
-                    int stackEnergyNeed = Math.min(cellEnergy, stackMaxEnergy - stackEnergy);
-
-                    if (cellEnergy > 0) {
-                        ModEnergyApi.receiveEnergy(stack, stackEnergyNeed, false);
-                    }
-                    ModEnergyApi.extractEnergy(cell, stackEnergyNeed, false);
-                }
-            }
-        }
     }
 
     @Override

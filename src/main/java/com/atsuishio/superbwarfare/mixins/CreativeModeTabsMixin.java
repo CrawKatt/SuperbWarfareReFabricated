@@ -21,12 +21,12 @@ public class CreativeModeTabsMixin {
     @Inject(method = "validate", at = @At("RETURN"))
     private static void superbwarfare$restoreForgeTabOrder(CallbackInfo ci) {
         List<CreativeModeTab> forgeOrder = List.of(
-                ModTabs.GUN_TAB.get(),
-                ModTabs.PERK_TAB.get(),
-                ModTabs.AMMO_TAB.get(),
-                ModTabs.ITEM_TAB.get(),
-                ModTabs.BLOCK_TAB.get(),
-                ModTabs.VEHICLE_TAB.get()
+                ModTabs.VEHICLE_TAB,
+                ModTabs.BLOCK_TAB,
+                ModTabs.ITEM_TAB,
+                ModTabs.AMMO_TAB,
+                ModTabs.PERK_TAB,
+                ModTabs.GUN_TAB
         );
 
         List<TabPosition> assignedPositions = new ArrayList<>(forgeOrder.size());

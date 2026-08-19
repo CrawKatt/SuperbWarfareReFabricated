@@ -17,13 +17,16 @@
     "client": [
       "com.atsuishio.superbwarfare.ClientMod"
     ],
+    "fabric-datagen": [
+      "com.atsuishio.superbwarfare.datagen.DataGenerators"
+    ],
     "cardinal-components-entity": [
       "com.atsuishio.superbwarfare.capability.ModCapabilities"
     ]
   },
   "custom": {
     "cardinal-components": [
-      "superbwarfare:laser_capability",
+      "superbwarfare:phosphorus_fire_capability",
       "superbwarfare:player_variables"
     ]
   },
@@ -34,10 +37,12 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric-api": ">=${fabric_api_version}",
+    "fabric-language-kotlin": ">=${fabric_kotlin_version}",
     "minecraft": "~${minecraft_version}",
     "java": ">=17",
     "geckolib": ">=4.4.6",
     "trinkets": ">=3.7.1",
+    "extensibleenums": ">=20.1.1",
     "forgeconfigapiport": ">=8.0.0"
   },
   "recommends": {

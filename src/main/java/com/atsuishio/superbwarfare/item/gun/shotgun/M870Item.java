@@ -1,13 +1,12 @@
 package com.atsuishio.superbwarfare.item.gun.shotgun;
 
-import net.fabricmc.loader.api.FabricLoader;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 
-import com.atsuishio.superbwarfare.client.GunRendererBuilder;
-import com.atsuishio.superbwarfare.client.model.item.M870ItemModel;
+import com.atsuishio.superbwarfare.client.renderer.gun.M870ItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
@@ -17,6 +16,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -34,9 +34,8 @@ public class M870Item extends GunGeoItem {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
-        return GunRendererBuilder.simple(M870ItemModel::new);
+        return M870ItemRenderer::new;
     }
 
     @Environment(EnvType.CLIENT)
@@ -78,6 +77,17 @@ public class M870Item extends GunGeoItem {
     }
 
     @Environment(EnvType.CLIENT)
+    private PlayState editPredicate(AnimationState<M870Item> event) {
+        if (event.getData(DataTickets.ITEM_RENDER_PERSPECTIVE) != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
+            return event.setAndContinue(RawAnimation.begin().thenLoop("animation.m_870.idle"));
+
+        if (ClientEventHandler.isEditing) {
+            return event.setAndContinue(RawAnimation.begin().thenPlay("animation.m_870.edit"));
+        }
+        return event.setAndContinue(RawAnimation.begin().thenLoop("animation.m_870.idle"));
+    }
+
+    @Environment(EnvType.CLIENT)
     private PlayState meleePredicate(AnimationState<M870Item> event) {
         if (event.getData(DataTickets.ITEM_RENDER_PERSPECTIVE) != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
             return event.setAndContinue(RawAnimation.begin().thenLoop("animation.m_870.idle"));
@@ -91,10 +101,54 @@ public class M870Item extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var fireAnimController = new AnimationController<>(this, "fireAnimController", 1, this::fireAnimPredicate);
         data.add(fireAnimController);
         var meleeController = new AnimationController<>(this, "meleeController", 0, this::meleePredicate);
         data.add(meleeController);
+        var editController = new AnimationController<>(this, "editController", 1, this::editPredicate);
+        data.add(editController);
+    }
+
+    @Override
+    public int[] getValidScopes() {
+        return new int[]{0, 1};
+    }
+
+    @Override
+    public int[] getValidBarrels() {
+        return new int[]{0, 2};
+    }
+
+    @Override
+    public int[] getValidGrips() {
+        return new int[]{0, 1};
+    }
+
+    @Override
+    public int getCustomBoltActionTime(@NotNull GunData data) {
+        int gripType = data.attachment.get(AttachmentType.GRIP);
+        if (gripType == 1) return -2;
+        return super.getCustomBoltActionTime(data);
+    }
+
+    @Override
+    public boolean hasCustomBarrel(GunData data) {
+        return true;
+    }
+
+    @Override
+    public boolean hasCustomScope(GunData data) {
+        return true;
+    }
+
+    @Override
+    public boolean hasCustomGrip(GunData data) {
+        return true;
+    }
+
+    @Override
+    public boolean canEditAttachments(GunData data) {
+        return true;
     }
 }

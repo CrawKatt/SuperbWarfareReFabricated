@@ -1,7 +1,7 @@
 {
-  "ID": "superbwarfare:tom_6",
   "MaxHealth": 40,
   "MaxEnergy": 100000,
+  "KeepChunkLoaded": false,
   "Seats": {
     "Transform": "Vehicle",
     "Position": [0, 0.6, -0.4],
@@ -15,11 +15,16 @@
   },
   "Weapons": {
     "MelonBomb": {
+      "Projectile": "superbwarfare:melon_bomb",
+      "AmmoType": "minecraft:melon",
+      "Magazine": 1,
+      "Velocity": 1,
+      "addShooterDeltaMovement": true,
+      "AutoReload": false,
       "ExplosionDamage": 500,
       "ExplosionRadius": 11
     }
   },
-  "HasDecoy": true,
   "UpStep": 1.1,
   "Mass": 0.02,
   "RotateOffsetHeight": 0.5,
@@ -37,7 +42,8 @@
     "ParticleType": "Medium",
     "ExplosionDamage": 15,
     "ExplosionRadius": 2,
-    "CrashPassengers": true
+    "CrashPassengers": true,
+    "NoWreck": true
   },
   "ThirdPersonCameraPos": [-0.5, 0, 1],
   "VehicleIcon": "superbwarfare:textures/vehicle_icon/tom_6_icon.png",

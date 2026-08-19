@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.recipe;
 
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.init.ModRecipes;
-import com.atsuishio.superbwarfare.item.C4BombItem;
+import com.atsuishio.superbwarfare.item.projectile.C4BombItem;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -17,7 +17,6 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 public class C4BombRcRecipe extends CustomRecipe {
-
     public C4BombRcRecipe(ResourceLocation id, CraftingBookCategory category) {
         super(id, category);
     }
@@ -32,7 +31,7 @@ public class C4BombRcRecipe extends CustomRecipe {
             ItemStack stack = container.getItem(slot);
             if (slot == 4) {
                 if (!stack.is(Items.COMPARATOR)) return false;
-            } else if (!stack.is(ModItems.HIGH_ENERGY_EXPLOSIVES.get())) {
+            } else if (!stack.is(ModItems.HIGH_ENERGY_EXPLOSIVES)) {
                 return false;
             }
         }
@@ -50,16 +49,15 @@ public class C4BombRcRecipe extends CustomRecipe {
     }
 
     private static ItemStack createResult() {
-        var result = new ItemStack(ModItems.C4_BOMB.get(), 2);
+        ItemStack result = new ItemStack(ModItems.C4_BOMB, 2);
         result.getOrCreateTag().putBoolean(C4BombItem.TAG_CONTROL, true);
         return result;
     }
 
     @Override
-    @NotNull
-    public NonNullList<Ingredient> getIngredients() {
+    public @NotNull NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> ingredients = NonNullList.withSize(9, Ingredient.EMPTY);
-        Ingredient explosive = Ingredient.of(ModItems.HIGH_ENERGY_EXPLOSIVES.get());
+        Ingredient explosive = Ingredient.of(ModItems.HIGH_ENERGY_EXPLOSIVES);
         for (int slot = 0; slot < ingredients.size(); slot++) {
             ingredients.set(slot, slot == 4 ? Ingredient.of(Items.COMPARATOR) : explosive);
         }
@@ -78,6 +76,6 @@ public class C4BombRcRecipe extends CustomRecipe {
 
     @Override
     public @NotNull RecipeSerializer<?> getSerializer() {
-        return ModRecipes.C4_BOMB_RC_SERIALIZER.get();
+        return ModRecipes.C4_BOMB_RC_SERIALIZER;
     }
 }

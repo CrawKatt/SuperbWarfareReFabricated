@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.item.Beast;
-import com.atsuishio.superbwarfare.item.NetheriteHammer;
+import com.atsuishio.superbwarfare.item.weapon.BeastItem;
+import com.atsuishio.superbwarfare.item.weapon.NetheriteHammerItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -97,8 +97,8 @@ public class RepairItemRecipeMixin {
     private static boolean superbwarfare$containsStackAwareItem(List<ItemStack> inputs) {
         return inputs.stream().anyMatch(stack ->
                 stack.getItem() instanceof GunItem
-                        || stack.getItem() instanceof Beast
-                        || stack.getItem() instanceof NetheriteHammer);
+                        || stack.getItem() instanceof BeastItem
+                        || stack.getItem() instanceof NetheriteHammerItem);
     }
 
     private static boolean superbwarfare$canRepair(List<ItemStack> inputs) {
@@ -115,7 +115,7 @@ public class RepairItemRecipeMixin {
     }
 
     private static boolean superbwarfare$isRepairable(ItemStack stack) {
-        if (stack.getItem() instanceof Beast || stack.getItem() instanceof NetheriteHammer) {
+        if (stack.getItem() instanceof BeastItem || stack.getItem() instanceof NetheriteHammerItem) {
             return false;
         }
         if (stack.getItem() instanceof GunItem gun) {

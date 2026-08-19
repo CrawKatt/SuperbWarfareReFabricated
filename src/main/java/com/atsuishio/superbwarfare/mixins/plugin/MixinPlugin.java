@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.mixins.plugin;
 
+import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -21,20 +22,8 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (mixinClassName.contains("tacz")) return getClass("com.tacz.guns.GunMod");
+        if (mixinClassName.contains(".tacz.")) return FabricLoader.getInstance().isModLoaded("tacz");
         return true;
-    }
-
-    /**
-     * Code based on Sona-Survival-101
-     */
-    private boolean getClass(String className) {
-        try {
-            Class.forName(className, false, this.getClass().getClassLoader());
-            return true;
-        } catch (Exception ignored) {
-        }
-        return false;
     }
 
     @Override

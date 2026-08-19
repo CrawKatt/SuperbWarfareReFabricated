@@ -16,7 +16,6 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4d;
 import org.joml.Vector4d;
 
-import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.DECOY_READY;
 import static com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity.TURRET_DAMAGED;
 import static com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.transformPosition;
 
@@ -31,31 +30,17 @@ public final class VehicleWeaponUtils {
      * @param vehicle 载具
      */
     public static void adjustTurretAngle(VehicleEntity vehicle) {
-        float ySpeed = vehicle.getTurretTurnYSpeed();
-        float xSpeed = vehicle.getTurretTurnXSpeed();
-
+        if (vehicle.isWreck()) return;
         Entity driver = vehicle.getNthEntity(vehicle.getTurretControllerIndex());
-        if (driver == null) {
-            vehicle.turretYRotLock = 0;
-        } else {
-            float turretAngle = -Mth.wrapDegrees(driver.getYHeadRot() - vehicle.getYRot());
+        var pos = vehicle.getBarrelPosition();
+        if (driver != null && pos != null) {
+            Vec3 aimPos = vehicle.getBoundingBox().getCenter().add(driver.getViewVector(1).scale(512));
 
-            float diffY = Mth.wrapDegrees(turretAngle - vehicle.getTurretYRot());
-            float diffX = Mth.wrapDegrees(driver.getXRot() - vehicle.getTurretXRot());
+            var transform = vehicle.getTurretTransform(1);
+            var worldPosition = transformPosition(transform, pos.x, pos.y, pos.z);
 
-            vehicle.turretTurnSound(diffX, diffY, 0.95f);
-
-            if (vehicle.getEntityData().get(TURRET_DAMAGED)) {
-                ySpeed *= 0.2f;
-                xSpeed *= 0.2f;
-            }
-
-            float min = -ySpeed;
-            float max = ySpeed;
-
-            vehicle.setTurretXRot(Mth.clamp(vehicle.getTurretXRot() + Mth.clamp(0.95f * diffX, -xSpeed, xSpeed), -89.5f, 89.5f));
-            vehicle.setTurretYRot(vehicle.getTurretYRot() + Mth.clamp(0.9f * diffY, min, max));
-            vehicle.turretYRotLock = Mth.clamp(0.9f * diffY, min, max);
+            Vec3 aimVec = new Vec3(worldPosition.x, worldPosition.y, worldPosition.z).vectorTo(aimPos);
+            turretAutoAimFromVector(vehicle, aimVec);
         }
     }
 
@@ -65,6 +50,7 @@ public final class VehicleWeaponUtils {
      * @param shootVec 需要让炮塔以这个角度发射的向量
      */
     public static void turretAutoAimFromVector(VehicleEntity vehicle, Vec3 shootVec) {
+        if (vehicle.isWreck()) return;
         float ySpeed = vehicle.getTurretTurnYSpeed();
         float xSpeed = vehicle.getTurretTurnXSpeed();
 
@@ -82,9 +68,9 @@ public final class VehicleWeaponUtils {
         float min = -ySpeed;
         float max = ySpeed;
 
-        vehicle.setTurretXRot(Mth.clamp(vehicle.getTurretXRot() + Mth.clamp(0.99f * diffX, -xSpeed, xSpeed), -vehicle.getTurretMaxPitch(), -vehicle.getTurretMinPitch()));
-        vehicle.setTurretYRot(Mth.clamp(vehicle.getTurretYRot() - Mth.clamp(0.99f * diffY, min, max), -vehicle.getTurretMaxYaw(), -vehicle.getTurretMinYaw()));
-        vehicle.turretYRotLock = Mth.clamp(0.9f * diffY, min, max);
+        vehicle.setTurretXRot(Mth.clamp(vehicle.getTurretXRot() + Mth.clamp(1f * diffX, -xSpeed, xSpeed), -vehicle.getTurretMaxPitch(), -vehicle.getTurretMinPitch()));
+        vehicle.setTurretYRot(Mth.clamp(vehicle.getTurretYRot() - Mth.clamp(1f * diffY, min, max), -vehicle.getTurretMaxYaw(), -vehicle.getTurretMinYaw()));
+        vehicle.setTurretYRotLock(Mth.clamp(-1f * diffY, min, max));
     }
 
     /**
@@ -94,6 +80,7 @@ public final class VehicleWeaponUtils {
      * @param pLiving 操控载具的实体
      */
     public static void turretAutoAimFromUuid(VehicleEntity vehicle, String uuid, LivingEntity pLiving) {
+        if (vehicle.isWreck()) return;
         Entity target = EntityFindUtil.findEntity(vehicle.level(), uuid);
         if (target == null) return;
 
@@ -126,7 +113,7 @@ public final class VehicleWeaponUtils {
      */
     public static void releaseSmokeDecoy(VehicleEntity vehicle, Vec3 vec3) {
         if (vehicle.decoyInputDown()) {
-            if (vehicle.getEntityData().get(DECOY_READY) && vehicle.level() instanceof ServerLevel) {
+            if (vehicle.getDecoyReady() && vehicle.level() instanceof ServerLevel) {
                 for (int i = 0; i < 8; i++) {
                     SmokeDecoyEntity smokeDecoyEntity = new SmokeDecoyEntity(vehicle.level());
                     smokeDecoyEntity.setPos(vehicle.getX(), vehicle.getY() + vehicle.getBbHeight(), vehicle.getZ());
@@ -134,17 +121,17 @@ public final class VehicleWeaponUtils {
                     vehicle.level().addFreshEntity(smokeDecoyEntity);
                 }
 
-                vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELEASE.get(), vehicle.getSoundSource(), 1, 1);
-                vehicle.decoyReloadCoolDown = 500;
-                vehicle.getEntityData().set(DECOY_READY, false);
+                vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELEASE, vehicle.getSoundSource(), 1, 1);
+                vehicle.setDecoyReloadCoolDown(500);
+                vehicle.setDecoyReady(false);
             }
             vehicle.setDecoyInputDown(false);
         }
 
-        if (!vehicle.getEntityData().get(DECOY_READY) && vehicle.decoyReloadCoolDown == 0 && vehicle.level() instanceof ServerLevel) {
-            vehicle.getEntityData().set(DECOY_READY, true);
-            vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELOAD.get(), vehicle.getSoundSource(), 1, 1);
-            vehicle.decoyReloadCoolDown = 500;
+        if (!vehicle.getDecoyReady() && vehicle.getDecoyReloadCoolDown() == 0 && vehicle.level() instanceof ServerLevel) {
+            vehicle.setDecoyReady(true);
+            vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELOAD, vehicle.getSoundSource(), 1, 1);
+            vehicle.setDecoyReloadCoolDown(500);
         }
     }
 
@@ -155,7 +142,7 @@ public final class VehicleWeaponUtils {
      */
     public static void releaseDecoy(VehicleEntity vehicle) {
         if (vehicle.decoyInputDown()) {
-            if (vehicle.getEntityData().get(DECOY_READY) && vehicle.level() instanceof ServerLevel) {
+            if (vehicle.getDecoyReady() && vehicle.level() instanceof ServerLevel) {
                 for (int i = 0; i < 54; i += 6) {
                     int finalI = i;
                     Mod.queueServerWork(i, () -> {
@@ -174,15 +161,15 @@ public final class VehicleWeaponUtils {
                     });
                 }
 
-                vehicle.decoyReloadCoolDown = 400;
-                vehicle.getEntityData().set(DECOY_READY, false);
+                vehicle.setDecoyReloadCoolDown(400);
+                vehicle.setDecoyReady(false);
             }
             vehicle.setDecoyInputDown(false);
         }
-        if (!vehicle.getEntityData().get(DECOY_READY) && vehicle.decoyReloadCoolDown == 0 && vehicle.level() instanceof ServerLevel) {
-            vehicle.getEntityData().set(DECOY_READY, true);
-            vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELOAD.get(), vehicle.getSoundSource(), 1, 1);
-            vehicle.decoyReloadCoolDown = 400;
+        if (!vehicle.getDecoyReady() && vehicle.getDecoyReloadCoolDown() == 0 && vehicle.level() instanceof ServerLevel) {
+            vehicle.setDecoyReady(true);
+            vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELOAD, vehicle.getSoundSource(), 1, 1);
+            vehicle.setDecoyReloadCoolDown(400);
         }
     }
 
@@ -193,6 +180,6 @@ public final class VehicleWeaponUtils {
         flareDecoyEntity.decoyShoot(vehicle, shootVec, (float) (vehicle.getDeltaMovement().length() * 0.3f + 0.7), 8);
 
         vehicle.level().addFreshEntity(flareDecoyEntity);
-        vehicle.level().playSound(null, vehicle, first ? ModSounds.DECOY_RELEASE_FIRST.get(): ModSounds.DECOY_RELEASE.get(), vehicle.getSoundSource(), 2, 1);
+        vehicle.level().playSound(null, vehicle, first ? ModSounds.DECOY_RELEASE_FIRST: ModSounds.DECOY_RELEASE, vehicle.getSoundSource(), 2, 1);
     }
 }

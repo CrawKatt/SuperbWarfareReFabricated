@@ -23,6 +23,11 @@
     "superbwarfare:superb_item_interface",
     "superbwarfare:creative_superb_item_interface",
     "superbwarfare:lucky_container",
-    "superbwarfare:vehicle_assembling_table"
+    "superbwarfare:vehicle_assembling_table",
+    "superbwarfare:biogas_generator",
+    "superbwarfare:blueprint_research_table",
+    "superbwarfare:raw_galena_block",
+    "superbwarfare:raw_scheelite_block",
+    "superbwarfare:raw_silver_block"
   ]
 }

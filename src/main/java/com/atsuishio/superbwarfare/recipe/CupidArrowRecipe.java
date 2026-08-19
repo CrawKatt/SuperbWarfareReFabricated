@@ -20,7 +20,6 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 public class CupidArrowRecipe extends CustomRecipe {
-
     private static final ItemStack HEALING_POTION = PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.HEALING);
 
     public CupidArrowRecipe(ResourceLocation id, CraftingBookCategory category) {
@@ -39,13 +38,10 @@ public class CupidArrowRecipe extends CustomRecipe {
                 case 0, 2, 6, 8 -> stack.is(ItemTags.ARROWS);
                 case 1, 7 -> stack.is(Items.BOW);
                 case 3, 5 -> ItemStack.isSameItemSameTags(HEALING_POTION, stack);
-                case 4 -> stack.is(ModItems.EMPTY_PERK.get());
+                case 4 -> stack.is(ModItems.EMPTY_PERK);
                 default -> false;
             };
-
-            if (!matches) {
-                return false;
-            }
+            if (!matches) return false;
         }
         return true;
     }
@@ -61,18 +57,14 @@ public class CupidArrowRecipe extends CustomRecipe {
     }
 
     private static ItemStack createResult() {
-        if (ModItems.PERK_ITEMS.get(ModPerks.CUPID_ARROW) == null) {
-            return ItemStack.EMPTY;
-        }
-        return new ItemStack(ModItems.PERK_ITEMS.get(ModPerks.CUPID_ARROW).get());
+        return new ItemStack(ModItems.PERK_ITEMS.getOrDefault(ModPerks.CUPID_ARROW, Items.AIR));
     }
 
     @Override
-    @NotNull
-    public NonNullList<Ingredient> getIngredients() {
+    public @NotNull NonNullList<Ingredient> getIngredients() {
         return NonNullList.of(Ingredient.EMPTY,
                 Ingredient.of(ItemTags.ARROWS), Ingredient.of(Items.BOW), Ingredient.of(ItemTags.ARROWS),
-                Ingredient.of(HEALING_POTION), Ingredient.of(ModItems.EMPTY_PERK.get()), Ingredient.of(HEALING_POTION),
+                Ingredient.of(HEALING_POTION), Ingredient.of(ModItems.EMPTY_PERK), Ingredient.of(HEALING_POTION),
                 Ingredient.of(ItemTags.ARROWS), Ingredient.of(Items.BOW), Ingredient.of(ItemTags.ARROWS));
     }
 
@@ -88,6 +80,6 @@ public class CupidArrowRecipe extends CustomRecipe {
 
     @Override
     public @NotNull RecipeSerializer<?> getSerializer() {
-        return ModRecipes.CUPID_ARROW_SERIALIZER.get();
+        return ModRecipes.CUPID_ARROW_SERIALIZER;
     }
 }

@@ -1,10 +1,8 @@
 package com.atsuishio.superbwarfare.item.gun.launcher;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
 import com.atsuishio.superbwarfare.client.renderer.gun.IglaItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
 import com.atsuishio.superbwarfare.entity.projectile.IglaMissileEntity;
 import com.atsuishio.superbwarfare.init.ModSounds;
@@ -23,7 +21,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
-
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -37,22 +34,21 @@ public class IglaItem extends GunGeoItem {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return IglaItemRenderer::new;
     }
 
     @Override
-    public boolean useSpecialFireProcedure(GunData data) {
+    public boolean useSpecialFireProcedure(@NotNull GunData data) {
         return true;
     }
 
     @Override
     public void shoot(@NotNull ShootParameters parameters) {
-        var data = parameters.data();
-        var shooter = parameters.shooter();
-        var targetUUID = parameters.targetEntityUUID();
-        var zoom = parameters.zoom();
+        var data = parameters.data;
+        var shooter = parameters.shooter;
+        var targetUUID = parameters.targetEntityUUID;
+        var zoom = parameters.zoom;
 
         if (shooter == null) return;
         if (!zoom || !data.hasEnoughAmmoToShoot(shooter)) return;
@@ -70,15 +66,14 @@ public class IglaItem extends GunGeoItem {
             Entity targetEntity = EntityFindUtil.findEntity(serverLevel, String.valueOf(targetUUID));
 
             IglaMissileEntity iglaMissileEntity = new IglaMissileEntity(shooter, level,
-                    (float) data.compute().damage,
-                    (float) data.compute().explosionDamage,
-                    (float) data.compute().explosionRadius);
+                    data.get(GunProp.DAMAGE).floatValue(),
+                    data.get(GunProp.EXPLOSION_DAMAGE).floatValue(),
+                    data.get(GunProp.EXPLOSION_RADIUS).floatValue()
+            );
 
-            for (Perk.Type type : Perk.Type.values()) {
-                var instance = data.perk.getInstance(type);
-                if (instance != null) {
-                    instance.perk().modifyProjectile(data, instance, iglaMissileEntity);
-                }
+            for (Perk.Type type : Perk.Type.getEntries()) {
+                var instance = data.perk.getInstances(type);
+                instance.forEach(perk -> perk.perk().modifyProjectile(data, perk, iglaMissileEntity));
             }
 
             iglaMissileEntity.setPos(shooter.getX() + firePos.x, shooter.getEyeY() + firePos.y, shooter.getZ() + firePos.z);
@@ -95,15 +90,15 @@ public class IglaItem extends GunGeoItem {
                     30, 0.4, 0.4, 0.4, 0.005, true);
 
             if (shooter instanceof ServerPlayer serverPlayer) {
-                SoundTool.playLocalSound(serverPlayer, ModSounds.IGLA_FIRE_1P.get(), 2, 1);
-                NetworkRegistry.sendToPlayer(serverPlayer, new ShootClientMessage(10));
+                SoundTool.playLocalSound(serverPlayer, ModSounds.IGLA_FIRE_1P, 2, 1);
+                NetworkRegistry.sendToPlayer(serverPlayer, ShootClientMessage.INSTANCE);
             }
 
-            SoundTool.playDistantSound(serverLevel, ModSounds.IGLA_FIRE_3P.get(), shooter.position(), 4, 1, shooter);
-            SoundTool.playDistantSound(serverLevel, ModSounds.IGLA_FAR.get(), shooter.position(), 10, 1, shooter);
+            SoundTool.playDistantSound(serverLevel, ModSounds.IGLA_FIRE_3P, shooter.position(), 4, 1, shooter);
+            SoundTool.playDistantSound(serverLevel, ModSounds.IGLA_FAR, shooter.position(), 10, 1, shooter);
         }
 
-        data.ammo.set(data.ammo.get() - data.compute().ammoCostPerShoot);
+        data.ammo.set(data.ammo.get() - data.get(GunProp.AMMO_COST_PER_SHOOT));
         data.save();
     }
 }

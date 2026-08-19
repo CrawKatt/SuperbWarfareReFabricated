@@ -1,7 +1,7 @@
 {
   "replace": false,
   "icon": "superbwarfare:slot/dog_tag_slot",
-  "order": -508,
+  "order": 114,
   "validator_predicates": [
     "trinkets:tag"
   ],

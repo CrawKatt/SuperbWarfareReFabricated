@@ -34,7 +34,7 @@ public class Mk14ItemModel extends CustomGunModel<Mk14Item> {
         double zt = ClientEventHandler.zoomTime;
         double zp = ClientEventHandler.zoomPos;
         double zpz = ClientEventHandler.zoomPosZ;
-        double fp = ClientEventHandler.firePos;
+        double fp = ClientEventHandler.boltMove;
 
         int type = GunData.from(stack).attachment.get(AttachmentType.SCOPE);
 
@@ -81,7 +81,7 @@ public class Mk14ItemModel extends CustomGunModel<Mk14Item> {
             };
         }
 
-        ClientEventHandler.handleShootAnimation(shen, 1, -0.4f, 1.2f, 1.3f, 1, 1, 0.5f, 0.7f);
+        ClientEventHandler.handleShootAnimation(shen, 1, -0.4f, 1f, 1.1f, 1, 1, 0.5f, 0.7f);
 
         CrossHairOverlay.gunRot = shen.getRotZ();
 

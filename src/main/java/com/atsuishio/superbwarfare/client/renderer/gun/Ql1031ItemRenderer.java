@@ -5,8 +5,10 @@ import com.atsuishio.superbwarfare.client.animation.AnimationHelper;
 import com.atsuishio.superbwarfare.client.model.item.Ql1031ItemModel;
 import com.atsuishio.superbwarfare.client.renderer.CustomGunRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.item.gun.sniper.Ql1031Item;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -60,12 +62,12 @@ public class Ql1031ItemRenderer extends CustomGunRenderer<Ql1031Item> {
                 int energy = ModEnergyApi.getEnergyStored(itemStack);
 
                 if (name.equals("energy2_illuminated") || name.equals("energy3_illuminated") || name.equals("energy4_illuminated")) {
-                    bone.setScaleX((float) energy / data.compute().maxEnergy);
+                    bone.setScaleX((float) energy / data.get(GunProp.MAX_ENERGY));
                     bone.setHidden(ClientEventHandler.zoomPos < 0.7);
                 }
 
                 if (name.equals("energy_illuminated")) {
-                    bone.setScaleX((float) energy / data.compute().maxEnergy);
+                    bone.setScaleX((float) energy / data.get(GunProp.MAX_ENERGY));
                 }
 
                 if (name.equals("kuang_illuminated") || name.equals("kuang2_illuminated") || name.equals("kuang3_illuminated")) {
@@ -88,7 +90,7 @@ public class Ql1031ItemRenderer extends CustomGunRenderer<Ql1031Item> {
                             AnimationHelper.handleZoomCrossHair(currentBuffer, renderType, name, stack, bone, buffer, 0, 0.264, 0.85, 0.06f, 255, 0, 0, 255, "dot", false);
                             AnimationHelper.handleZoomCrossHair(currentBuffer, renderType, name, stack, bone, buffer, 0, 0.264, 0.85, 0.05f, 255, 255, 255, 255, "ql_front", false);
                             stack.pushPose();
-                            float spread = (float) (ClientEventHandler.gunSpread + 1 * ClientEventHandler.firePos);
+                            float spread = (float) (ClientEventHandler.gunSpread + 1 * ClientEventHandler.boltMove);
                             int gb = 255 - (int) (data.heat.get() * 2.55);
                             stack.rotateAround(Axis.ZP.rotationDegrees(45), 0, 0.264f, 0);
                             AnimationHelper.handleZoomCrossHair(currentBuffer, renderType, name, stack, bone, buffer, 0, 0.264, -0.2, 0.025f + 0.003f * spread, 255, gb, gb, 255, "ql_back", false);

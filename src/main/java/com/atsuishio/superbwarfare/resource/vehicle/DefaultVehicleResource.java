@@ -16,6 +16,11 @@ public class DefaultVehicleResource implements IDBasedData<DefaultVehicleResourc
         return this.id;
     }
 
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @SerializedName("Model")
     private ModelResource model = new ModelResource();
 

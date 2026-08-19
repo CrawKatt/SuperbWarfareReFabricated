@@ -23,10 +23,10 @@ public class GuiGraphicsMixin {
     private void renderSuperbWarfareDecorators(Font font, ItemStack stack, int x, int y) {
         GuiGraphics guiGraphics = (GuiGraphics) (Object) this;
 
-        if (ContainerItemDecorator.render(guiGraphics, font, stack, x, y)) {
+        if (new ContainerItemDecorator().render(guiGraphics, font, stack, x, y)) {
             return;
         }
 
-        LuckyContainerItemDecorator.render(guiGraphics, font, stack, x, y);
+        new LuckyContainerItemDecorator().render(guiGraphics, font, stack, x, y);
     }
 }

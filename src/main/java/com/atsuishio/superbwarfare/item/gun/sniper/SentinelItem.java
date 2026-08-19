@@ -1,17 +1,17 @@
 package com.atsuishio.superbwarfare.item.gun.sniper;
 
-import net.fabricmc.loader.api.FabricLoader;
-
+import com.atsuishio.superbwarfare.init.ModSounds;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 
 import com.atsuishio.superbwarfare.client.renderer.gun.SentinelItemRenderer;
 import com.atsuishio.superbwarfare.client.tooltip.component.SentinelImageComponent;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
-import com.atsuishio.superbwarfare.init.ModSounds;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
-import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -42,7 +42,6 @@ public class SentinelItem extends GunGeoItem {
     }
 
     @Override
-    @Environment(EnvType.CLIENT)
     public Supplier<? extends GeoItemRenderer<? extends Item>> getRenderer() {
         return SentinelItemRenderer::new;
     }
@@ -77,27 +76,27 @@ public class SentinelItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) return;
+        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var fireAnimController = new AnimationController<>(this, "fireAnimController", 1, this::fireAnimPredicate);
         data.add(fireAnimController);
     }
 
     @Override
     public double getCustomDamage(GunData data) {
-        var stack = data.stack;
-        var storage = ModEnergyApi.get(stack);
-        return storage != null && storage.getAmount() > 0
-                ? 0.2857142857142857 * data.getDefault().damage : 0D;
+        var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
+        if (cap != null && cap.getEnergyStored() > 0) {
+            return 0.2857142857142857 * data.getDefault().damage;
+        }
+        return 0;
     }
 
     @Override
     @ParametersAreNonnullByDefault
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, level, entity, slot, selected);
-
-        var storage = ModEnergyApi.get(stack);
-        if (storage != null && storage.getAmount() > 0) {
-            ModEnergyApi.extractEnergy(stack, 1, false);
+        var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
+        if (cap != null && cap.getEnergyStored() > 0) {
+            cap.extractEnergy(1, false);
         }
     }
 
@@ -120,21 +119,24 @@ public class SentinelItem extends GunGeoItem {
     public void afterShoot(@NotNull ShootParameters parameters) {
         super.afterShoot(parameters);
 
-        var data = parameters.data();
+        var data = parameters.data;
 
-        ModEnergyApi.extractEnergy(data.stack, 3000, false);
+        var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
+        if (cap != null) {
+            cap.extractEnergy(3000, false);
+        }
     }
 
     @Override
     public void playFireSounds(GunData data, Entity shooter, boolean zoom) {
-        var storage = ModEnergyApi.get(data.stack);
+        var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
 
-        if (storage != null && storage.getAmount() > 0) {
-            float soundRadius = (float) data.compute().soundRadius;
+        if (cap != null && cap.getEnergyStored() > 0) {
+            float soundRadius = data.get(GunProp.SOUND_RADIUS).floatValue();
 
-            shooter.playSound(ModSounds.SENTINEL_CHARGE_FAR.get(), soundRadius * 0.7f, 1f);
-            shooter.playSound(ModSounds.SENTINEL_CHARGE_FIRE_3P.get(), soundRadius * 0.4f, 1f);
-            shooter.playSound(ModSounds.SENTINEL_CHARGE_VERYFAR.get(), soundRadius, 1f);
+            shooter.playSound(ModSounds.SENTINEL_CHARGE_FAR, soundRadius * 0.7f, 1f);
+            shooter.playSound(ModSounds.SENTINEL_CHARGE_FIRE_3P, soundRadius * 0.4f, 1f);
+            shooter.playSound(ModSounds.SENTINEL_CHARGE_VERYFAR, soundRadius, 1f);
         } else {
             super.playFireSounds(data, shooter, zoom);
         }

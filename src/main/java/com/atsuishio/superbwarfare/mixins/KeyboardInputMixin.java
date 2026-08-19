@@ -25,7 +25,7 @@ public abstract class KeyboardInputMixin extends Input {
 
         ItemStack stack = player.getMainHandItem();
 
-        if (stack.is(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using") && stack.getOrCreateTag().getBoolean("Linked")) {
+        if (stack.is(ModItems.MONITOR) && stack.getOrCreateTag().getBoolean("Using") && stack.getOrCreateTag().getBoolean("Linked")) {
             this.up = false;
             this.down = false;
             this.left = false;
@@ -37,7 +37,7 @@ public abstract class KeyboardInputMixin extends Input {
         }
 
         if (Minecraft.getInstance().player == null
-                || !Minecraft.getInstance().player.hasEffect(ModMobEffects.SHOCK.get())
+                || !Minecraft.getInstance().player.hasEffect(ModMobEffects.SHOCK)
                 || Minecraft.getInstance().player.isSpectator()) {
             return;
         }

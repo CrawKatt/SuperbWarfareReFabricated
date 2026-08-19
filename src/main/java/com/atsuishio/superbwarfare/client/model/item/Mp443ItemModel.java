@@ -28,7 +28,7 @@ public class Mp443ItemModel extends CustomGunModel<Mp443Item> {
         double zt = ClientEventHandler.zoomTime;
         double zp = ClientEventHandler.zoomPos;
         double zpz = ClientEventHandler.zoomPosZ;
-        double fp = ClientEventHandler.firePos;
+        double fp = ClientEventHandler.boltMove;
 
         gun.setPosX(1.23f * (float) zp);
         gun.setPosY(1.53f * (float) zp - (float) (0.2f * zpz));
@@ -43,7 +43,7 @@ public class Mp443ItemModel extends CustomGunModel<Mp443Item> {
         hammer.setRotX((120 * Mth.DEG_TO_RAD * (float) fp));
 
         CoreGeoBone huatao = getAnimationProcessor().getBone("huatao");
-        huatao.setPosZ(1.5f * (float) ClientEventHandler.firePos);
+        huatao.setPosZ(1.5f * (float) ClientEventHandler.boltMove);
         var data = GunData.from(stack);
         if (data.holdOpen.get()) {
             huatao.setPosZ(1.5f);

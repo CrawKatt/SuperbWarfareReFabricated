@@ -1,5 +1,4 @@
 {
-  "ID": "superbwarfare:ntw_20",
   "MinZoom": 1.25,
   "MaxZoom": 6,
   "Spread": 8,
@@ -36,9 +35,10 @@
     "superbwarfare:vorpal_weapon",
     "superbwarfare:fair_means",
     "superbwarfare:high_impact_reserves",
+    "superbwarfare:brain_storm",
+    "superbwarfare:battle_of_wits",
     "!superbwarfare:micro_missile",
     "!superbwarfare:longer_wire",
-    "!superbwarfare:butterfly_bullet",
     "!superbwarfare:cupid_arrow"
   ],
   "SoundInfo": {

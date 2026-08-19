@@ -23,8 +23,8 @@ public abstract class SteelPipeFallMixin {
         if (!onGround || onGround()) return;
 
         var entity = (Entity) (Object) this;
-        if (entity instanceof ItemEntity itemEntity && itemEntity.getItem().getItem() == ModItems.STEEL_PIPE.get()) {
-            entity.level().playSound(null, entity.getOnPos(), ModSounds.STEEL_PIPE_DROP.get(), SoundSource.PLAYERS, 2, 1);
+        if (entity instanceof ItemEntity itemEntity && itemEntity.getItem().getItem() == ModItems.STEEL_PIPE) {
+            entity.level().playSound(null, entity.getOnPos(), ModSounds.STEEL_PIPE_DROP, SoundSource.PLAYERS, 2, 1);
         }
     }
 }
