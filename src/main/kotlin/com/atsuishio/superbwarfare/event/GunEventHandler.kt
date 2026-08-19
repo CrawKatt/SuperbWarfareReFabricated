@@ -229,6 +229,8 @@ object GunEventHandler {
         if (data.heat.get() < 80 && data.overHeat.get()) {
             data.overHeat.set(false)
         }
+
+        data.nbtVersion.invalidateStructural()
     }
 
     /**
