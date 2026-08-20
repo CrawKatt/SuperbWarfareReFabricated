@@ -69,6 +69,8 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         gunItem(ModItems.QL_1031)
         gunItem(ModItems.SUPER_STAR_SHOOTER)
 
+        gunItem(ModItems.BEAST_GUN_TEST)
+
         simpleItem(ModItems.VEHICLE_GUN)
         withExistingParent(ModItems.EMPTY_GUN.id.path, ResourceLocation.withDefaultNamespace("item/generated"))
             .texture("layer0", loc("item/vehicle_gun"))
