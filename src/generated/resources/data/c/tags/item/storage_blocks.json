@@ -6,6 +6,7 @@
     "#c:storage_blocks/silver",
     "#c:storage_blocks/uranium",
     "#c:storage_blocks/sulfur",
+    "#c:storage_blocks/niter",
     "#c:storage_blocks/raw_lead",
     "#c:storage_blocks/raw_tungsten",
     "#c:storage_blocks/raw_silver",

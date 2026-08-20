@@ -458,6 +458,9 @@
   "block.superbwarfare.sulfur_ore": "Sulfur Ore",
   "block.superbwarfare.deepslate_sulfur_ore": "Deepslate Sulfur Ore",
   "block.superbwarfare.sulfur_block": "Sulfur Block",
+  "block.superbwarfare.niter_ore": "Niter Ore",
+  "block.superbwarfare.deepslate_niter_ore": "Deepslate Niter Ore",
+  "block.superbwarfare.niter_block": "Niter Block",
 
   "item.superbwarfare.high_energy_explosives": "High Energy Explosives",
   "item.superbwarfare.grain": "Grain",
@@ -482,6 +485,7 @@
   "item.superbwarfare.uranium_ingot": "Uranium Ingot",
   "item.superbwarfare.raw_uranium": "Raw Uranium",
   "item.superbwarfare.sulfur": "Sulfur",
+  "item.superbwarfare.niter": "Niter",
 
   "item.superbwarfare.armor_plate": "Armor Plate",
   "des.superbwarfare.armor_plate.infinite": "Infinite",
