@@ -3,6 +3,7 @@
     "#c:ores/lead",
     "#c:ores/tungsten",
     "#c:ores/silver",
-    "#c:ores/uranium"
+    "#c:ores/uranium",
+    "#c:ores/sulfur"
   ]
 }
