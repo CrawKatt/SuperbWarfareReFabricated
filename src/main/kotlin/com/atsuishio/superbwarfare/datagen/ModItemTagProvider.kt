@@ -29,13 +29,15 @@ class ModItemTagProvider(
             commonItemTag("dusts/coal"),
             commonItemTag("dusts/iron"),
             commonItemTag("dusts/tungsten"),
-            commonItemTag("dusts/scheelite")
+            commonItemTag("dusts/scheelite"),
+            commonItemTag("dusts/sulfur")
         )
         this.tag(commonItemTag("dusts/coal_coke")).add(ModItems.COAL_POWDER.get())
         this.tag(commonItemTag("dusts/coal")).add(ModItems.COAL_POWDER.get())
         this.tag(commonItemTag("dusts/iron")).add(ModItems.IRON_POWDER.get())
         this.tag(commonItemTag("dusts/tungsten")).add(ModItems.TUNGSTEN_POWDER.get())
         this.tag(commonItemTag("dusts/scheelite")).add(ModItems.TUNGSTEN_POWDER.get())
+        this.tag(commonItemTag("dusts/sulfur")).add(ModItems.SULFUR.get())
 
         this.tag(Tags.Items.INGOTS).addTags(
             commonItemTag("ingots/lead"),
@@ -61,6 +63,7 @@ class ModItemTagProvider(
             commonItemTag("storage_blocks/tungsten"),
             commonItemTag("storage_blocks/silver"),
             commonItemTag("storage_blocks/uranium"),
+            commonItemTag("storage_blocks/sulfur"),
             commonItemTag("storage_blocks/raw_lead"),
             commonItemTag("storage_blocks/raw_tungsten"),
             commonItemTag("storage_blocks/raw_silver"),
@@ -73,6 +76,7 @@ class ModItemTagProvider(
         this.tag(commonItemTag("storage_blocks/scheelite")).add(ModItems.TUNGSTEN_BLOCK.get())
         this.tag(commonItemTag("storage_blocks/silver")).add(ModItems.SILVER_BLOCK.get())
         this.tag(commonItemTag("storage_blocks/uranium")).add(ModItems.URANIUM_BLOCK.get())
+        this.tag(commonItemTag("storage_blocks/sulfur")).add(ModItems.SULFUR_BLOCK.get())
 
         this.tag(commonItemTag("storage_blocks/raw_lead")).add(ModItems.RAW_GALENA_BLOCK.get())
         this.tag(commonItemTag("storage_blocks/raw_tungsten")).add(ModItems.RAW_SCHEELITE_BLOCK.get())
@@ -88,7 +92,8 @@ class ModItemTagProvider(
                 commonItemTag("ores/tungsten"),
                 commonItemTag("ores/scheelite"),
                 commonItemTag("ores/silver"),
-                commonItemTag("ores/uranium")
+                commonItemTag("ores/uranium"),
+                commonItemTag("ores/sulfur")
             )
         this.tag(commonItemTag("ores/lead")).add(ModItems.GALENA_ORE.get(), ModItems.DEEPSLATE_GALENA_ORE.get())
         this.tag(commonItemTag("ores/tungsten"))
@@ -97,6 +102,7 @@ class ModItemTagProvider(
             .add(ModItems.SCHEELITE_ORE.get(), ModItems.DEEPSLATE_SCHEELITE_ORE.get())
         this.tag(commonItemTag("ores/silver")).add(ModItems.SILVER_ORE.get(), ModItems.DEEPSLATE_SILVER_ORE.get())
         this.tag(commonItemTag("ores/uranium")).add(ModItems.URANIUM_ORE.get(), ModItems.DEEPSLATE_URANIUM_ORE.get())
+        this.tag(commonItemTag("ores/sulfur")).add(ModItems.SULFUR_ORE.get(), ModItems.DEEPSLATE_SULFUR_ORE.get())
 
         this.tag(Tags.Items.RAW_MATERIALS).addTags(
             commonItemTag("raw_materials/lead"),
@@ -115,20 +121,23 @@ class ModItemTagProvider(
             ModItems.GALENA_ORE.get(), ModItems.DEEPSLATE_GALENA_ORE.get(),
             ModItems.SCHEELITE_ORE.get(), ModItems.DEEPSLATE_SCHEELITE_ORE.get(),
             ModItems.SILVER_ORE.get(), ModItems.DEEPSLATE_SILVER_ORE.get(),
-            ModItems.URANIUM_ORE.get(), ModItems.DEEPSLATE_URANIUM_ORE.get()
+            ModItems.URANIUM_ORE.get(), ModItems.DEEPSLATE_URANIUM_ORE.get(),
+            ModItems.SULFUR_ORE.get(), ModItems.DEEPSLATE_SULFUR_ORE.get()
         )
 
         this.tag(Tags.Items.ORES_IN_GROUND_STONE).add(
-                ModItems.GALENA_ORE.get(),
-                ModItems.SCHEELITE_ORE.get(),
-                ModItems.SILVER_ORE.get(),
-                ModItems.URANIUM_ORE.get()
-            )
+            ModItems.GALENA_ORE.get(),
+            ModItems.SCHEELITE_ORE.get(),
+            ModItems.SILVER_ORE.get(),
+            ModItems.URANIUM_ORE.get(),
+            ModItems.SULFUR_ORE.get()
+        )
         this.tag(Tags.Items.ORES_IN_GROUND_DEEPSLATE).add(
             ModItems.DEEPSLATE_GALENA_ORE.get(),
             ModItems.DEEPSLATE_SCHEELITE_ORE.get(),
             ModItems.DEEPSLATE_SILVER_ORE.get(),
-            ModItems.DEEPSLATE_URANIUM_ORE.get()
+            ModItems.DEEPSLATE_URANIUM_ORE.get(),
+            ModItems.DEEPSLATE_SULFUR_ORE.get()
         )
 
         this.tag(commonItemTag("plates"))

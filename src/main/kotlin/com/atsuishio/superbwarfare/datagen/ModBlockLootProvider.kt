@@ -10,16 +10,20 @@ import net.minecraft.advancements.critereon.StatePropertiesPredicate
 import net.minecraft.data.loot.BlockLootSubProvider
 import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.item.Item
+import net.minecraft.world.item.enchantment.Enchantments
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.properties.BedPart
 import net.minecraft.world.level.storage.loot.LootPool
 import net.minecraft.world.level.storage.loot.LootTable
 import net.minecraft.world.level.storage.loot.entries.LootItem
+import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount
 import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator
 
 class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureFlags.REGISTRY.allFlags()) {
     override fun generate() {
@@ -45,6 +49,7 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
         this.dropSelf(ModBlocks.RAW_SCHEELITE_BLOCK.get())
         this.dropSelf(ModBlocks.RAW_SILVER_BLOCK.get())
         this.dropSelf(ModBlocks.RAW_URANIUM_BLOCK.get())
+        this.dropSelf(ModBlocks.SULFUR_BLOCK.get())
         this.add(
             ModBlocks.BLUEPRINT_RESEARCH_TABLE.get(),
             this.applyExplosionDecay(
@@ -97,7 +102,11 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
             this.createOreDrop(ModBlocks.SCHEELITE_ORE.get(), ModItems.SCHEELITE.get())
         )
         this.add(ModBlocks.SILVER_ORE.get(), this.createOreDrop(ModBlocks.SILVER_ORE.get(), ModItems.RAW_SILVER.get()))
-        this.add(ModBlocks.URANIUM_ORE.get(), this.createOreDrop(ModBlocks.URANIUM_ORE.get(), ModItems.RAW_URANIUM.get()))
+        this.add(
+            ModBlocks.URANIUM_ORE.get(),
+            this.createOreDrop(ModBlocks.URANIUM_ORE.get(), ModItems.RAW_URANIUM.get())
+        )
+        this.add(ModBlocks.SULFUR_ORE.get(), this.createSulfurDrop(ModBlocks.SULFUR_ORE.get()))
 
         this.add(
             ModBlocks.DEEPSLATE_GALENA_ORE.get(),
@@ -115,6 +124,7 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
             ModBlocks.DEEPSLATE_URANIUM_ORE.get(),
             this.createOreDrop(ModBlocks.DEEPSLATE_URANIUM_ORE.get(), ModItems.RAW_URANIUM.get())
         )
+        this.add(ModBlocks.DEEPSLATE_SULFUR_ORE.get(), this.createSulfurDrop(ModBlocks.DEEPSLATE_SULFUR_ORE.get()))
 
         this.add(
             ModBlocks.CONTAINER.get(), LootTable.lootTable().withPool(
@@ -174,5 +184,17 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
             pool.apply(copy)
         }
         return LootTable.lootTable().withPool(this.applyExplosionCondition(pBlock, pool))
+    }
+
+    private fun createSulfurDrop(block: Block): LootTable.Builder {
+        return createSilkTouchDispatchTable(
+            block,
+            this.applyExplosionDecay(
+                block,
+                LootItem.lootTableItem(ModItems.SULFUR.get())
+                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0f, 5.0f)))
+                    .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE))
+            )
+        )
     }
 }

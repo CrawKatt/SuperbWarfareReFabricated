@@ -19,6 +19,11 @@ class ModBlockTagProvider(
     existingFileHelper: ExistingFileHelper
 ) : BlockTagsProvider(output, lookupProvider, Mod.MODID, existingFileHelper) {
     override fun addTags(pProvider: HolderLookup.Provider) {
+        this.tag(BlockTags.NEEDS_STONE_TOOL).add(
+            ModBlocks.SULFUR_ORE.get(), ModBlocks.DEEPSLATE_SULFUR_ORE.get(),
+            ModBlocks.SULFUR_BLOCK.get()
+        )
+
         this.tag(BlockTags.NEEDS_IRON_TOOL).add(
             ModBlocks.GALENA_ORE.get(), ModBlocks.SCHEELITE_ORE.get(),
             ModBlocks.DEEPSLATE_GALENA_ORE.get(), ModBlocks.DEEPSLATE_SCHEELITE_ORE.get(),
@@ -64,7 +69,10 @@ class ModBlockTagProvider(
             ModBlocks.URANIUM_ORE.get(),
             ModBlocks.DEEPSLATE_URANIUM_ORE.get(),
             ModBlocks.URANIUM_BLOCK.get(),
-            ModBlocks.RAW_URANIUM_BLOCK.get()
+            ModBlocks.RAW_URANIUM_BLOCK.get(),
+            ModBlocks.SULFUR_ORE.get(),
+            ModBlocks.DEEPSLATE_SULFUR_ORE.get(),
+            ModBlocks.SULFUR_BLOCK.get()
         )
         this.tag(BlockTags.MINEABLE_WITH_SHOVEL).add(ModBlocks.SANDBAG.get())
 
@@ -127,13 +135,15 @@ class ModBlockTagProvider(
                 commonBlockTag("ores/lead"),
                 commonBlockTag("ores/tungsten"),
                 commonBlockTag("ores/silver"),
-                commonBlockTag("ores/uranium")
+                commonBlockTag("ores/uranium"),
+                commonBlockTag("ores/sulfur")
             )
         this.tag(commonBlockTag("ores/lead")).add(ModBlocks.GALENA_ORE.get(), ModBlocks.DEEPSLATE_GALENA_ORE.get())
         this.tag(commonBlockTag("ores/tungsten"))
             .add(ModBlocks.SCHEELITE_ORE.get(), ModBlocks.DEEPSLATE_SCHEELITE_ORE.get())
         this.tag(commonBlockTag("ores/silver")).add(ModBlocks.SILVER_ORE.get(), ModBlocks.DEEPSLATE_SILVER_ORE.get())
         this.tag(commonBlockTag("ores/uranium")).add(ModBlocks.URANIUM_ORE.get(), ModBlocks.DEEPSLATE_URANIUM_ORE.get())
+        this.tag(commonBlockTag("ores/sulfur")).add(ModBlocks.SULFUR_ORE.get(), ModBlocks.DEEPSLATE_SULFUR_ORE.get())
 
         // 这个tag仅用于其他mod配方兼容，自己家配方不用这个
         this.tag(commonBlockTag("ores/scheelite"))
@@ -145,6 +155,7 @@ class ModBlockTagProvider(
         this.tag(commonBlockTag("storage_blocks/scheelite")).add(ModBlocks.TUNGSTEN_BLOCK.get())
         this.tag(commonBlockTag("storage_blocks/silver")).add(ModBlocks.SILVER_BLOCK.get())
         this.tag(commonBlockTag("storage_blocks/uranium")).add(ModBlocks.URANIUM_BLOCK.get())
+        this.tag(commonBlockTag("storage_blocks/sulfur")).add(ModBlocks.SULFUR_BLOCK.get())
 
         this.tag(commonBlockTag("storage_blocks/raw_lead")).add(ModBlocks.RAW_GALENA_BLOCK.get())
         this.tag(commonBlockTag("storage_blocks/raw_tungsten")).add(ModBlocks.RAW_SCHEELITE_BLOCK.get())
@@ -156,13 +167,15 @@ class ModBlockTagProvider(
             ModBlocks.GALENA_ORE.get(),
             ModBlocks.SCHEELITE_ORE.get(),
             ModBlocks.SILVER_ORE.get(),
-            ModBlocks.URANIUM_ORE.get()
+            ModBlocks.URANIUM_ORE.get(),
+            ModBlocks.SULFUR_ORE.get()
         )
         this.tag(Tags.Blocks.ORES_IN_GROUND_DEEPSLATE).add(
             ModBlocks.DEEPSLATE_GALENA_ORE.get(),
             ModBlocks.DEEPSLATE_SCHEELITE_ORE.get(),
             ModBlocks.DEEPSLATE_SILVER_ORE.get(),
-            ModBlocks.DEEPSLATE_URANIUM_ORE.get()
+            ModBlocks.DEEPSLATE_URANIUM_ORE.get(),
+            ModBlocks.DEEPSLATE_SULFUR_ORE.get()
         )
     }
 }

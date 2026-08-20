@@ -4,6 +4,7 @@
     "#forge:ores/tungsten",
     "#forge:ores/scheelite",
     "#forge:ores/silver",
-    "#forge:ores/uranium"
+    "#forge:ores/uranium",
+    "#forge:ores/sulfur"
   ]
 }

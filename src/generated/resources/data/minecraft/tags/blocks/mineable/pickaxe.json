@@ -33,6 +33,9 @@
     "superbwarfare:uranium_ore",
     "superbwarfare:deepslate_uranium_ore",
     "superbwarfare:uranium_block",
-    "superbwarfare:raw_uranium_block"
+    "superbwarfare:raw_uranium_block",
+    "superbwarfare:sulfur_ore",
+    "superbwarfare:deepslate_sulfur_ore",
+    "superbwarfare:sulfur_block"
   ]
 }

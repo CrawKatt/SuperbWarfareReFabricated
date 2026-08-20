@@ -128,6 +128,7 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         simpleItem(ModItems.RAW_CEMENTED_CARBIDE_POWDER)
         simpleItem(ModItems.GALENA)
         simpleItem(ModItems.SCHEELITE)
+        simpleItem(ModItems.SULFUR)
         simpleItem(ModItems.DOG_TAG)
         simpleItem(ModItems.IFF)
         simpleItem(ModItems.TRANSCRIPT)
