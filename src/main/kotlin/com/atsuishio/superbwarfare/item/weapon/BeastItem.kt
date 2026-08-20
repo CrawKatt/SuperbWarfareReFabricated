@@ -37,7 +37,7 @@ import javax.annotation.ParametersAreNonnullByDefault
 open class BeastItem : SwordItem(
     Tiers.NETHERITE, CustomDamageProperty(false)
         .stacksTo(1)
-        .rarity(ModRarities.LEGENDARY)
+        .rarity(ModRarities.BEAST)
         .setNoRepair()
 ) {
     override fun isDamageable(stack: ItemStack): Boolean {
