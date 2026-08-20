@@ -37,7 +37,7 @@ import net.minecraft.world.phys.AABB
 open class BeastItem : SwordItem(
     Tiers.NETHERITE, 0, 0f, Properties()
         .stacksTo(1)
-        .rarity(ModRarities.LEGENDARY)
+        .rarity(ModRarities.BEAST)
         .setNoRepair()
         .durability(114514)
 ) {

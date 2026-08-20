@@ -20,7 +20,7 @@ import software.bernie.geckolib.renderer.GeoItemRenderer
 import java.util.function.Supplier
 import javax.annotation.ParametersAreNonnullByDefault
 
-open class BeastGunTestItem : GunGeoItem(Properties().rarity(ModRarities.LEGENDARY)) {
+open class BeastGunTestItem : GunGeoItem(Properties().rarity(ModRarities.BEAST)) {
     override fun isDamageable(stack: ItemStack?): Boolean {
         return false
     }

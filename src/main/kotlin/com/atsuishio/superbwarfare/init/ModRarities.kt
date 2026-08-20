@@ -11,5 +11,8 @@ object ModRarities {
     val SUPERB: Rarity = Rarity.create("superbwarfare_superb", ChatFormatting.RED)
 
     @JvmField
+    val BEAST: Rarity = Rarity.create("superbwarfare_beast") { s -> s.withColor(0xa56855) }
+
+    @JvmField
     val VIRTUAL: Rarity = Rarity.create("superbwarfare_virtual") { it.withColor(0xFF9AAF) }
 }
