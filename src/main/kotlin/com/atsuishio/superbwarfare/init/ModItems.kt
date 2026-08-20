@@ -30,6 +30,7 @@ import com.atsuishio.superbwarfare.item.gun.shotgun.M870Item
 import com.atsuishio.superbwarfare.item.gun.smg.Mp5Item
 import com.atsuishio.superbwarfare.item.gun.smg.VectorItem
 import com.atsuishio.superbwarfare.item.gun.sniper.*
+import com.atsuishio.superbwarfare.item.gun.special.BeastGunTestItem
 import com.atsuishio.superbwarfare.item.gun.special.BocekItem
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem
 import com.atsuishio.superbwarfare.item.gun.special.TaserItem
@@ -110,6 +111,8 @@ object ModItems {
     @JvmField val IGLA_9K38 = registerGun("igla_9k38") { IglaItem() }
     @JvmField val BOCEK = registerGun("bocek") { BocekItem() }
     @JvmField val SUPER_STAR_SHOOTER = registerGun("super_star_shooter") { SuperStarShooterItem() }
+
+    @JvmField val BEAST_GUN_TEST = registerGun("beast_gun_test") { BeastGunTestItem() }
 
     @JvmField val VEHICLE_GUN = registerGun("vehicle_gun") { VehicleGunItem() }
     @JvmField val EMPTY_GUN = registerGun("empty_gun") { EmptyGunItem() }
