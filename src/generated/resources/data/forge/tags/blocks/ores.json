@@ -2,6 +2,7 @@
   "values": [
     "#forge:ores/lead",
     "#forge:ores/tungsten",
-    "#forge:ores/silver"
+    "#forge:ores/silver",
+    "#forge:ores/uranium"
   ]
 }

@@ -4,6 +4,7 @@
     "#forge:ingots/steel",
     "#forge:ingots/tungsten",
     "#forge:ingots/silver",
-    "#forge:ingots/scheelite"
+    "#forge:ingots/scheelite",
+    "#forge:ingots/uranium"
   ]
 }

@@ -33,6 +33,7 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
         this.dropSelf(ModBlocks.TUNGSTEN_BLOCK.get())
         this.dropSelf(ModBlocks.CEMENTED_CARBIDE_BLOCK.get())
         this.dropSelf(ModBlocks.SILVER_BLOCK.get())
+        this.dropSelf(ModBlocks.URANIUM_BLOCK.get())
         this.dropSelf(ModBlocks.CREATIVE_CHARGING_STATION.get())
         this.dropSelf(ModBlocks.FUMO_25.get())
         this.dropSelf(ModBlocks.VEHICLE_DEPLOYER.get())
@@ -43,6 +44,7 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
         this.dropSelf(ModBlocks.RAW_GALENA_BLOCK.get())
         this.dropSelf(ModBlocks.RAW_SCHEELITE_BLOCK.get())
         this.dropSelf(ModBlocks.RAW_SILVER_BLOCK.get())
+        this.dropSelf(ModBlocks.RAW_URANIUM_BLOCK.get())
         this.add(
             ModBlocks.BLUEPRINT_RESEARCH_TABLE.get(),
             this.applyExplosionDecay(
@@ -95,6 +97,8 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
             this.createOreDrop(ModBlocks.SCHEELITE_ORE.get(), ModItems.SCHEELITE.get())
         )
         this.add(ModBlocks.SILVER_ORE.get(), this.createOreDrop(ModBlocks.SILVER_ORE.get(), ModItems.RAW_SILVER.get()))
+        this.add(ModBlocks.URANIUM_ORE.get(), this.createOreDrop(ModBlocks.URANIUM_ORE.get(), ModItems.RAW_URANIUM.get()))
+
         this.add(
             ModBlocks.DEEPSLATE_GALENA_ORE.get(),
             this.createOreDrop(ModBlocks.DEEPSLATE_GALENA_ORE.get(), ModItems.GALENA.get())
@@ -106,6 +110,10 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
         this.add(
             ModBlocks.DEEPSLATE_SILVER_ORE.get(),
             this.createOreDrop(ModBlocks.DEEPSLATE_SILVER_ORE.get(), ModItems.RAW_SILVER.get())
+        )
+        this.add(
+            ModBlocks.DEEPSLATE_URANIUM_ORE.get(),
+            this.createOreDrop(ModBlocks.DEEPSLATE_URANIUM_ORE.get(), ModItems.RAW_URANIUM.get())
         )
 
         this.add(

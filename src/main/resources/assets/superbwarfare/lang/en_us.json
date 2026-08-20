@@ -451,6 +451,10 @@
   "block.superbwarfare.raw_galena_block": "Raw Galena Block",
   "block.superbwarfare.raw_scheelite_block": "Raw Scheelite Block",
   "block.superbwarfare.raw_silver_block": "Raw Silver Block",
+  "block.superbwarfare.uranium_ore": "Uranium Ore",
+  "block.superbwarfare.deepslate_uranium_ore": "Deepslate Uranium Ore",
+  "block.superbwarfare.uranium_block": "Uranium Block",
+  "block.superbwarfare.raw_uranium_block": "Raw Uranium Block",
 
   "item.superbwarfare.high_energy_explosives": "High Energy Explosives",
   "item.superbwarfare.grain": "Grain",
@@ -472,6 +476,8 @@
   "item.superbwarfare.galena": "Raw Galena",
   "item.superbwarfare.scheelite": "Raw Scheelite",
   "item.superbwarfare.raw_silver": "Raw Silver",
+  "item.superbwarfare.uranium_ingot": "Uranium Ingot",
+  "item.superbwarfare.raw_uranium": "Raw Uranium",
 
   "item.superbwarfare.armor_plate": "Armor Plate",
   "des.superbwarfare.armor_plate.infinite": "Infinite",

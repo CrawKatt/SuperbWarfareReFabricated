@@ -117,6 +117,8 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         simpleItem(ModItems.LEAD_INGOT)
         simpleItem(ModItems.TUNGSTEN_INGOT)
         simpleItem(ModItems.CEMENTED_CARBIDE_INGOT)
+        simpleItem(ModItems.URANIUM_INGOT)
+        simpleItem(ModItems.RAW_URANIUM)
         simpleItem(ModItems.HIGH_ENERGY_EXPLOSIVES)
         simpleItem(ModItems.GRAIN)
         simpleItem(ModItems.IRON_POWDER)
