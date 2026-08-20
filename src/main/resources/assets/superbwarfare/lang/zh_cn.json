@@ -458,6 +458,9 @@
   "block.superbwarfare.sulfur_ore": "硫磺矿石",
   "block.superbwarfare.deepslate_sulfur_ore": "深层硫磺矿石",
   "block.superbwarfare.sulfur_block": "硫磺块",
+  "block.superbwarfare.niter_ore": "硝石矿石",
+  "block.superbwarfare.deepslate_niter_ore": "深层硝石矿石",
+  "block.superbwarfare.niter_block": "硝石块",
 
   "item.superbwarfare.high_energy_explosives": "高能炸药",
   "item.superbwarfare.grain": "推进药柱",
@@ -482,6 +485,7 @@
   "item.superbwarfare.uranium_ingot": "铀锭",
   "item.superbwarfare.raw_uranium": "粗铀",
   "item.superbwarfare.sulfur": "硫磺",
+  "item.superbwarfare.niter": "硝石",
 
   "item.superbwarfare.armor_plate": "防弹插板",
   "des.superbwarfare.armor_plate.infinite": "无限",

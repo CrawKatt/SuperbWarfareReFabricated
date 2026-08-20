@@ -9,6 +9,8 @@
     "superbwarfare:uranium_ore",
     "superbwarfare:deepslate_uranium_ore",
     "superbwarfare:sulfur_ore",
-    "superbwarfare:deepslate_sulfur_ore"
+    "superbwarfare:deepslate_sulfur_ore",
+    "superbwarfare:niter_ore",
+    "superbwarfare:deepslate_niter_ore"
   ]
 }

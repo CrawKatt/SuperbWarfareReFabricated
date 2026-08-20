@@ -39,6 +39,11 @@ class ModItemTagProvider(
         this.tag(commonItemTag("dusts/scheelite")).add(ModItems.TUNGSTEN_POWDER.get())
         this.tag(commonItemTag("dusts/sulfur")).add(ModItems.SULFUR.get())
 
+        this.tag(Tags.Items.GEMS).addTags(
+            commonItemTag("gems/niter")
+        )
+        this.tag(commonItemTag("gems/niter")).add(ModItems.NITER.get())
+
         this.tag(Tags.Items.INGOTS).addTags(
             commonItemTag("ingots/lead"),
             commonItemTag("ingots/steel"),
@@ -64,6 +69,7 @@ class ModItemTagProvider(
             commonItemTag("storage_blocks/silver"),
             commonItemTag("storage_blocks/uranium"),
             commonItemTag("storage_blocks/sulfur"),
+            commonItemTag("storage_blocks/niter"),
             commonItemTag("storage_blocks/raw_lead"),
             commonItemTag("storage_blocks/raw_tungsten"),
             commonItemTag("storage_blocks/raw_silver"),
@@ -77,6 +83,7 @@ class ModItemTagProvider(
         this.tag(commonItemTag("storage_blocks/silver")).add(ModItems.SILVER_BLOCK.get())
         this.tag(commonItemTag("storage_blocks/uranium")).add(ModItems.URANIUM_BLOCK.get())
         this.tag(commonItemTag("storage_blocks/sulfur")).add(ModItems.SULFUR_BLOCK.get())
+        this.tag(commonItemTag("storage_blocks/niter")).add(ModItems.NITER_BLOCK.get())
 
         this.tag(commonItemTag("storage_blocks/raw_lead")).add(ModItems.RAW_GALENA_BLOCK.get())
         this.tag(commonItemTag("storage_blocks/raw_tungsten")).add(ModItems.RAW_SCHEELITE_BLOCK.get())
@@ -93,7 +100,8 @@ class ModItemTagProvider(
                 commonItemTag("ores/scheelite"),
                 commonItemTag("ores/silver"),
                 commonItemTag("ores/uranium"),
-                commonItemTag("ores/sulfur")
+                commonItemTag("ores/sulfur"),
+                commonItemTag("ores/niter")
             )
         this.tag(commonItemTag("ores/lead")).add(ModItems.GALENA_ORE.get(), ModItems.DEEPSLATE_GALENA_ORE.get())
         this.tag(commonItemTag("ores/tungsten"))
@@ -103,6 +111,7 @@ class ModItemTagProvider(
         this.tag(commonItemTag("ores/silver")).add(ModItems.SILVER_ORE.get(), ModItems.DEEPSLATE_SILVER_ORE.get())
         this.tag(commonItemTag("ores/uranium")).add(ModItems.URANIUM_ORE.get(), ModItems.DEEPSLATE_URANIUM_ORE.get())
         this.tag(commonItemTag("ores/sulfur")).add(ModItems.SULFUR_ORE.get(), ModItems.DEEPSLATE_SULFUR_ORE.get())
+        this.tag(commonItemTag("ores/niter")).add(ModItems.NITER_ORE.get(), ModItems.DEEPSLATE_NITER_ORE.get())
 
         this.tag(Tags.Items.RAW_MATERIALS).addTags(
             commonItemTag("raw_materials/lead"),
@@ -122,7 +131,8 @@ class ModItemTagProvider(
             ModItems.SCHEELITE_ORE.get(), ModItems.DEEPSLATE_SCHEELITE_ORE.get(),
             ModItems.SILVER_ORE.get(), ModItems.DEEPSLATE_SILVER_ORE.get(),
             ModItems.URANIUM_ORE.get(), ModItems.DEEPSLATE_URANIUM_ORE.get(),
-            ModItems.SULFUR_ORE.get(), ModItems.DEEPSLATE_SULFUR_ORE.get()
+            ModItems.SULFUR_ORE.get(), ModItems.DEEPSLATE_SULFUR_ORE.get(),
+            ModItems.NITER_ORE.get(), ModItems.DEEPSLATE_NITER_ORE.get()
         )
 
         this.tag(Tags.Items.ORES_IN_GROUND_STONE).add(
@@ -130,14 +140,16 @@ class ModItemTagProvider(
             ModItems.SCHEELITE_ORE.get(),
             ModItems.SILVER_ORE.get(),
             ModItems.URANIUM_ORE.get(),
-            ModItems.SULFUR_ORE.get()
+            ModItems.SULFUR_ORE.get(),
+            ModItems.NITER_ORE.get()
         )
         this.tag(Tags.Items.ORES_IN_GROUND_DEEPSLATE).add(
             ModItems.DEEPSLATE_GALENA_ORE.get(),
             ModItems.DEEPSLATE_SCHEELITE_ORE.get(),
             ModItems.DEEPSLATE_SILVER_ORE.get(),
             ModItems.DEEPSLATE_URANIUM_ORE.get(),
-            ModItems.DEEPSLATE_SULFUR_ORE.get()
+            ModItems.DEEPSLATE_SULFUR_ORE.get(),
+            ModItems.DEEPSLATE_NITER_ORE.get()
         )
 
         this.tag(commonItemTag("plates"))

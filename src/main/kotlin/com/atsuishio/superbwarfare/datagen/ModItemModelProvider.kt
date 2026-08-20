@@ -131,6 +131,7 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         simpleItem(ModItems.GALENA)
         simpleItem(ModItems.SCHEELITE)
         simpleItem(ModItems.SULFUR)
+        simpleItem(ModItems.NITER)
         simpleItem(ModItems.DOG_TAG)
         simpleItem(ModItems.IFF)
         simpleItem(ModItems.TRANSCRIPT)

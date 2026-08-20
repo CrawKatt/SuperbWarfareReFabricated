@@ -5,6 +5,7 @@
     "#forge:ores/scheelite",
     "#forge:ores/silver",
     "#forge:ores/uranium",
-    "#forge:ores/sulfur"
+    "#forge:ores/sulfur",
+    "#forge:ores/niter"
   ]
 }
