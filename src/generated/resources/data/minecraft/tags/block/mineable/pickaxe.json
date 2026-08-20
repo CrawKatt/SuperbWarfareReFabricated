@@ -29,6 +29,10 @@
     "superbwarfare:blueprint_research_table",
     "superbwarfare:raw_galena_block",
     "superbwarfare:raw_scheelite_block",
-    "superbwarfare:raw_silver_block"
+    "superbwarfare:raw_silver_block",
+    "superbwarfare:uranium_ore",
+    "superbwarfare:deepslate_uranium_ore",
+    "superbwarfare:uranium_block",
+    "superbwarfare:raw_uranium_block"
   ]
 }
