@@ -26,7 +26,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin implements ICustomCamera {
@@ -84,7 +86,7 @@ public abstract class CameraMixin implements ICustomCamera {
 
                         setRotation(drone.getYaw(partialTicks), drone.getPitch(partialTicks));
                         setPosition(worldPosition.x, worldPosition.y, worldPosition.z);
-                        superbWarfare$applyComputedAngles();
+                        superbWarfare$applyComputedAnglesToCustomCamera();
                         info.cancel();
                     } else {
                         var rotation = drone.getCameraRotation(partialTicks, player, false, false);
@@ -97,7 +99,7 @@ public abstract class CameraMixin implements ICustomCamera {
                         }
 
                         if (rotation != null || position != null) {
-                            superbWarfare$applyComputedAngles();
+                            superbWarfare$applyComputedAnglesToCustomCamera();
                             info.cancel();
                         }
                     }
@@ -116,7 +118,7 @@ public abstract class CameraMixin implements ICustomCamera {
                 }
 
                 if (rotation != null || position != null) {
-                    superbWarfare$applyComputedAngles();
+                    superbWarfare$applyComputedAnglesToCustomCamera();
                     info.cancel();
                 }
 
@@ -137,6 +139,13 @@ public abstract class CameraMixin implements ICustomCamera {
     @Unique
     private static Vector4d superbWarfare$transformPosition(Matrix4d transform, double x, double y, double z) {
         return transform.transform(new Vector4d(x, y, z, 1));
+    }
+
+    @ModifyArgs(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0))
+    private void superbWarfare$applyComputedAngles(Args args) {
+        superbWarfare$computeAngles(args.get(0), args.get(1));
+        args.set(0, superbWarfare$computedYaw);
+        args.set(1, superbWarfare$computedPitch);
     }
 
     @Unique
@@ -161,7 +170,7 @@ public abstract class CameraMixin implements ICustomCamera {
     }
 
     @Unique
-    private void superbWarfare$applyComputedAngles() {
+    private void superbWarfare$applyComputedAnglesToCustomCamera() {
         superbWarfare$computeAngles(yRot, xRot);
         setRotation(superbWarfare$computedYaw, superbWarfare$computedPitch);
     }
@@ -179,7 +188,6 @@ public abstract class CameraMixin implements ICustomCamera {
             move(-getMaxZoom(cameraPosition.x()), cameraPosition.y(), cameraPosition.z());
         }
 
-        superbWarfare$applyComputedAngles();
     }
 
     @Shadow

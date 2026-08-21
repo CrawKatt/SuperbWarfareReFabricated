@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.advancement.CriteriaRegister
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.command.CommandRegister
+import com.atsuishio.superbwarfare.compat.tacz.TACZGunEventHandler
 import com.atsuishio.superbwarfare.config.CommonConfig
 import com.atsuishio.superbwarfare.config.ServerConfig
 import com.atsuishio.superbwarfare.data.CustomData
@@ -97,6 +98,9 @@ class Mod : ModInitializer {
         callInits()
         ModWorldgen.register()
         CustomEventHandler.register()
+        if (FabricLoader.getInstance().isModLoaded("tacz")) {
+            TACZGunEventHandler.registerEvents()
+        }
 
         NetworkRegistry.register()
         DataLoader.register()

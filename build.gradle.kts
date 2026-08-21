@@ -166,6 +166,20 @@ dependencies {
     // Built from Sh1roCu/SimpleBedrockModel-Fabric@926992e (the upstream JitPack build is broken).
     include(modImplementation(":simplebedrockmodel-fabric:2.4.6+mc1.20.1")!!)
 
+    include(modImplementation("maven.modrinth:modernkeybinding:1.20.X-1.2.0")!!)
+    include(implementation("org.apache.commons:commons-math3:3.6.1")!!)
+    include(implementation("com.github.FiguraMC.luaj:luaj-core:3.0.8-figura") {
+        exclude("org.apache.commons", "commons-lang3")
+    })!!
+
+    include(implementation("com.github.FiguraMC.luaj:luaj-jse:3.0.8-figura") {
+        exclude("org.apache.commons", "commons-lang3")
+    })!!
+
+    include(implementation("org.apache.bcel:bcel:6.6.1") {
+        exclude("org.apache.commons", "commons-lang3")
+    })!!
+
     include(implementation("com.maydaymemory:mae:1.1.4") {
         exclude("com.google.code.findbugs", "jsr305")
         exclude("it.unimi.dsi", "fastutil")
@@ -202,11 +216,10 @@ dependencies {
     // Cloth Config Fabric
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:${project.property("cloth_config_version")}")
 
-    // Optional integrations. Use the Fabric Jade API and keep the Forge-only
-    // TaCZ artifact off the runtime classpath; the latter is needed solely to
-    // compile its guarded compatibility mixin.
+    // Optional integrations.
     modCompileOnly("maven.modrinth:nvQzSEkH:oJx1UoWN") // Jade 11.12.3 Fabric
-    modCompileOnly("curse.maven:timeless-and-classics-zero-1028108:6518539")
+    modCompileOnly("maven.modrinth:1j76DVHU:c6sOTqZb")
+    modLocalRuntime("maven.modrinth:1j76DVHU:c6sOTqZb")
     modCompileOnly("maven.modrinth:lhGA9TYQ:WbL7MStR") // Architectury API 9.2.14 Fabric
     modCompileOnly("maven.modrinth:sk9knFPE:MLIu0Tct") // Rhino 2001.2.3-build.10 Fabric
     modCompileOnly("maven.modrinth:umyGl7zF:kPLHkyoJ") // KubeJS 2001.6.5-build.16 Fabric

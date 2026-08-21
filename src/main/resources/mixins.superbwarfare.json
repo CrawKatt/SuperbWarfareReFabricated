@@ -47,6 +47,7 @@
   ],
   "client": [
     "CameraMixin",
+    "tacz.CameraEventHandlerMixin",
     "ClientLevelMixin",
     "ClientPacketListenerMixin",
     "ClientPlayerEntityMixin",

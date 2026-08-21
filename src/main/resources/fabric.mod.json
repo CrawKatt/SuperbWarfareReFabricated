@@ -50,7 +50,8 @@
     "jei": "*"
   },
   "suggests": {
-    "cloth-config": "*"
+    "cloth-config": "*",
+    "tacz": "*"
   },
   "breaks": {
     "optifabric": "*"
