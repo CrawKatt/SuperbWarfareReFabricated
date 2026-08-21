@@ -41,6 +41,7 @@ import com.atsuishio.superbwarfare.item.projectile.*
 import com.atsuishio.superbwarfare.item.weapon.*
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.tiers.ModItemTier
+import com.atsuishio.superbwarfare.tools.camelToSnake
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.item.*
 import net.minecraft.world.item.Item.Properties
@@ -197,6 +198,12 @@ object ModItems {
      */
     private fun registerItem(id: String) = registerItem(id) { Item(Properties()) }
     private fun registerItem(id: String, item: () -> Item): RegistryObject<Item> = ITEMS.register(id, item)
+    private inline fun <reified T : Item> registerItem(noinline item: () -> T): RegistryObject<Item> {
+        val name = T::class.java.simpleName.substringBeforeLast("Item")
+        val id = name.camelToSnake()
+        return registerItem(id, item)
+    }
+
     private fun registerBlueprint(id: String, rarity: Rarity) = registerItem(id) { BlueprintItem(rarity) }
 
     @JvmField
@@ -256,6 +263,8 @@ object ModItems {
     @JvmField val THERMAL_IMAGING_GOGGLES = registerItem("thermal_imaging_goggles") { ThermalImagingGogglesItem() }
     @JvmField val HANDSOME_GOGGLES = registerItem("handsome_goggles") { HandsomeGogglesItem() }
     @JvmField val TACTICAL_TERMINAL = registerItem("tactical_terminal") { TacticalTerminalItem() }
+
+    @JvmField val SONIC_ABSORBER = registerItem { SonicAbsorberItem() }
 
     @JvmField val CRUST = registerItem("crust") { CrustItem() }
 
@@ -347,7 +356,7 @@ object ModItems {
     @JvmField val AMMO_PERK_DATA_CHIP = registerItem("ammo_perk_data_chip")
     @JvmField val FUNCTIONAL_PERK_DATA_CHIP = registerItem("functional_perk_data_chip")
     @JvmField val DAMAGE_PERK_DATA_CHIP = registerItem("damage_perk_data_chip")
-    
+
     @JvmField val DIRECTIONAL_RESEARCH_MODULE = registerItem("directional_research_module") { Item(Properties().rarity(Rarity.EPIC)) }
     @JvmField val ENLARGEMENT_RESEARCH_MODULE = registerItem("enlargement_research_module") { Item(Properties().rarity(Rarity.EPIC)) }
     @JvmField val EFFECTIVE_RESEARCH_MODULE = registerItem("effective_research_module") { Item(Properties().rarity(Rarity.RARE)) }

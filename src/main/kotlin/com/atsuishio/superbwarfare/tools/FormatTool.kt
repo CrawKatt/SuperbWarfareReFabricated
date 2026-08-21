@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.tools
 
 import java.text.DecimalFormat
-import java.util.*
 
 /**
  * Extension function to convert camelCase string into snake_case.
@@ -57,6 +56,7 @@ object FormatTool {
      * Converts camelCase string to snake_case format safely.
      * Use lowercaseChar() for efficient char mutations.
      */
+    @JvmStatic
     fun camelToSnake(camel: String): String {
         if (camel.isEmpty()) return camel
         val result = StringBuilder()

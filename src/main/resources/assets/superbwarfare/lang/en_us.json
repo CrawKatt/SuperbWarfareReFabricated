@@ -368,6 +368,7 @@
   "curios.identifier.tactical_terminal": "Personal Tactical Terminal",
   "des.superbwarfare.tactical_terminal": "Right-click to use, or press %1$s when equipped to open the tactical map.",
   "des.superbwarfare.tactical_terminal.disabled": "Disabled, please check the server config file",
+  "item.superbwarfare.sonic_absorber": "Sonic Absorber",
   "item.superbwarfare.creative_vehicle_key": "Creative Vehicle Key",
   "des.superbwarfare.creative_vehicle_key": "Locks and unlocks any vehicle",
   "item.superbwarfare.towline": "Towline",
