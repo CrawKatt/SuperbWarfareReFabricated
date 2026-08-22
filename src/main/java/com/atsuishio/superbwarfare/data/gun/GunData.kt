@@ -37,7 +37,6 @@ import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.energy.IEnergyStorage
 import net.minecraftforge.items.IItemHandler
-import org.jetbrains.annotations.ApiStatus
 import java.util.*
 import java.util.function.Function
 import kotlin.math.max
@@ -214,55 +213,6 @@ class GunData private constructor(
     private val jsonPropModifier = JsonPropertyModifier(GunProp.entries)
     private var cache: DefaultGunData? = null
     private var tempModifications: Function<DefaultGunData, DefaultGunData>? = null
-
-    /**
-     * Computes modified property values into a standalone [DefaultGunData] snapshot.
-     *
-     * @param useCache whether to re-use cached result if available.
-     * @return computed gun data properties.
-     * @deprecated Use [get] with [GunProp] keys instead for optimized property resolution.
-     */
-    @JvmOverloads
-    @Deprecated("Use get() instead")
-    @ApiStatus.ScheduledForRemoval
-    fun compute(useCache: Boolean = true): DefaultGunData {
-        if (cache != null && useCache) return cache!!
-
-        var rawData = getDefault().copy()
-//
-//        // property override tag
-//        jsonPropModifier.update(propertyOverrideString.get())
-//        rawData = jsonPropModifier.computeProperties(this, rawData)
-//
-//        // gun modifiers
-//        rawData = item.computeProperties(this, rawData)
-//
-//        // FireMode
-//        rawData = selectedFireModeInfo(rawData.availableFireModes()).computeProperties(this, rawData)
-//
-//        // AmmoConsumer
-//        rawData = selectedAmmoConsumer(rawData.getProcessedAmmoConsumers()).computeProperties(this, rawData)
-//
-//        // perk
-//        for (type in PERK_TYPES) {
-//            val instance = perk.get(type) ?: continue
-//
-//            rawData = instance.computeProperties(this, rawData)
-//        }
-//
-//        // Temporary property modifications
-//        if (tempModifications != null) {
-//            rawData = tempModifications!!.apply(rawData)
-//        }
-//
-//        rawData.limit()
-//        if (useCache) {
-//            cache = rawData
-//        }
-
-        return rawData
-    }
-
     private val pmcInstance: PMC<GunData, DefaultGunData> by lazy { PMC(this) }
     private var cachedStructuralVersion: Int = -1
 
@@ -1204,14 +1154,6 @@ class GunData private constructor(
             var id = item.descriptionId
             id = id.substring(id.indexOf(".") + 1).replace('.', ':')
             return id
-        }
-
-        @JvmStatic
-        @Suppress("unused")
-        @Deprecated("use get() instead", level = DeprecationLevel.ERROR)
-        @ApiStatus.ScheduledForRemoval
-        fun compute(stack: ItemStack): DefaultGunData {
-            error("use get() instead!")
         }
 
         /** Priority mapping helper for perk execution order. */

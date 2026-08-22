@@ -2019,11 +2019,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open val lastDriver: Entity?
         get() = EntityFindUtil.findEntity(level(), lastDriverUUID)
 
-    @Deprecated("")
-    open fun setDriverAngle(player: Player) {
-        VehicleVecUtils.setDriverAngle(this, player)
-    }
-
     override fun hurt(source: DamageSource, amount: Float): Boolean {
         if (source.`is`(ModTags.DamageTypes.VEHICLE_IMMUNE)) return false
 
@@ -2276,18 +2271,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open fun getRightWheelMaxHealth() = computed().partHealth.rightWheel
     open fun getMainEngineMaxHealth() = computed().partHealth.mainEngine
     open fun getSubEngineMaxHealth() = computed().partHealth.subEngine
-
-    @Deprecated(
-        "Use vehicle data or getLeft/RightWheelMaxHealth() instead",
-        replaceWith = ReplaceWith("computed().partHealth.leftWheel")
-    )
-    open fun getWheelMaxHealth() = 50f
-
-    @Deprecated(
-        "Use vehicle data or getMain/SubEngineMaxHealth() instead",
-        replaceWith = ReplaceWith("computed().partHealth.mainEngine")
-    )
-    open fun getEngineMaxHealth() = 50f
 
     override fun lavaHurt() {
         if (tickCount % 10 == 0) {
@@ -4060,11 +4043,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         this.serverYaw = yaw
         this.serverPitch = pitch
         this.interpolationSteps = 10
-    }
-
-    @Deprecated("")
-    protected fun getDismountOffset(vehicleWidth: Double, passengerWidth: Double): Vec3 {
-        return VehicleMiscUtils.getDismountOffset(this, vehicleWidth, passengerWidth)
     }
 
     override fun getDismountLocationForPassenger(passenger: LivingEntity): Vec3 {
