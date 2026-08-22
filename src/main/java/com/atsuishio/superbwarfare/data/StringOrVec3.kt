@@ -21,9 +21,7 @@ import java.io.IOException
 
 @Serializable(StringOrVec3Serializer::class)
 class StringOrVec3 {
-    @JvmField
     val string: String?
-    @JvmField
     val vec3: Vec3?
 
     constructor(string: String?) {

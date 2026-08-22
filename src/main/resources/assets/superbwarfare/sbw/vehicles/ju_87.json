@@ -1,7 +1,9 @@
 {
-  "Model": {
-    "Animation": "superbwarfare:animations/ju_87.animation.json",
-    "Model": "superbwarfare:geo/ju_87.geo.json",
-    "Texture": "superbwarfare:textures/entity/ju_87.png"
-  }
+  "Animation": "superbwarfare:animations/bedrock/vehicle/ju_87.animation.json",
+  "Models": [
+    {
+      "Model": "superbwarfare:models/bedrock/vehicle/ju_87.geo.json",
+      "Texture": "superbwarfare:textures/bedrock/vehicle/ju_87.png"
+    }
+  ]
 }

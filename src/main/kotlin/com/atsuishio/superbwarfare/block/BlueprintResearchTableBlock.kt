@@ -287,7 +287,7 @@ class BlueprintResearchTableBlock :
         }
     }
 
-    private val blockCodec: MapCodec<BlueprintResearchTableBlock> = simpleCodec { _ -> BlueprintResearchTableBlock() }
+    val codec: MapCodec<BlueprintResearchTableBlock> = simpleCodec { _ -> BlueprintResearchTableBlock() }
 
-    override fun codec(): MapCodec<out BaseEntityBlock> = blockCodec
+    override fun codec(): MapCodec<out BaseEntityBlock> = codec
 }

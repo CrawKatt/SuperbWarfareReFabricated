@@ -4,9 +4,9 @@ import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.init.ModAttributes
 import com.atsuishio.superbwarfare.init.ModItems
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
+import com.atsuishio.superbwarfare.resource.model.ArmorModelReloadListener
 import com.atsuishio.superbwarfare.tiers.ModArmorMaterials
-import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.GeoArmorRenderer
+import com.github.mcmodderanchor.simplebedrockmodel.v2.client.renderer.GeoArmorRendererV2
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer
@@ -40,9 +40,10 @@ class UsHelmetPasgtItem :
 
     companion object {
         val TEXTURE = loc("textures/bedrock/armor/us_helmet_pasgt.png")
+        val MODEL = loc("models/bedrock/armor/us_helmet_pasgt.geo.json")
 
         @Environment(EnvType.CLIENT)
-        private var renderer: GeoArmorRenderer? = null
+        private var renderer: GeoArmorRendererV2? = null
 
         @Environment(EnvType.CLIENT)
         @JvmStatic
@@ -52,10 +53,10 @@ class UsHelmetPasgtItem :
                     var armorRenderer = renderer
 
                     if (armorRenderer == null) {
-                        val model = BedrockModelLoader.getArmorModel(BedrockModelLoader.US_HELMET_PASGT_MODEL)
+                        val model = ArmorModelReloadListener.getModel(MODEL)
                             ?: return@register
 
-                        armorRenderer = GeoArmorRenderer(model, TEXTURE)
+                        armorRenderer = GeoArmorRendererV2(model, slot, TEXTURE)
                         renderer = armorRenderer
                     }
 

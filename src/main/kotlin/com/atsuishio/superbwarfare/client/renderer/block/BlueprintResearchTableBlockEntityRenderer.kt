@@ -3,7 +3,6 @@ package com.atsuishio.superbwarfare.client.renderer.block
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.BlueprintResearchTableBlock
 import com.atsuishio.superbwarfare.block.entity.BlueprintResearchTableBlockEntity
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
@@ -23,10 +22,12 @@ class BlueprintResearchTableBlockEntityRenderer : BlockEntityRenderer<BlueprintR
         packedLight: Int,
         packedOverlay: Int
     ) {
-        val model = BedrockModelLoader.getModel(BedrockModelLoader.BLUEPRINT_RESEARCH_TABLE_MODEL) ?: return
-        val bone = model.getBone("rolling") ?: return
+        val instance = blockEntity.modelInstance ?: return
+        val bone = instance.getBone("rolling") ?: return
 
         poseStack.pushPose()
+
+        instance.resetPose()
 
         val rot = when (blockEntity.blockState.getValue(BlueprintResearchTableBlock.FACING)) {
             Direction.EAST -> -90f
@@ -42,21 +43,19 @@ class BlueprintResearchTableBlockEntityRenderer : BlockEntityRenderer<BlueprintR
             bone.rotation.mul(Axis.XP.rotationDegrees(blockEntity.tick * 8 % 360f))
         }
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.entityTranslucent(TEXTURE)),
             packedLight,
             packedOverlay
         )
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.eyes(TEXTURE_E)),
             packedLight,
             packedOverlay
         )
-
-        model.applyPose(model.bindPose)
 
         poseStack.popPose()
     }
@@ -75,5 +74,6 @@ class BlueprintResearchTableBlockEntityRenderer : BlockEntityRenderer<BlueprintR
     companion object {
         val TEXTURE = loc("textures/bedrock/block/blueprint_research_table.png")
         val TEXTURE_E = loc("textures/bedrock/block/blueprint_research_table_e.png")
+        val MODEL = loc("models/bedrock/block/blueprint_research_table.geo.json")
     }
 }

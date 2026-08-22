@@ -1,13 +1,10 @@
 package com.atsuishio.superbwarfare.item.container
 
 import com.atsuishio.superbwarfare.api.event.RegisterContainersEvent
-import com.atsuishio.superbwarfare.client.renderer.item.ContainerBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
@@ -24,19 +21,9 @@ import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.HitResult
-import software.bernie.geckolib.animatable.GeoItem
-import software.bernie.geckolib.animatable.client.GeoRenderProvider
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.PlayState
-import software.bernie.geckolib.renderer.GeoItemRenderer
-import software.bernie.geckolib.util.GeckoLibUtil
-import java.util.function.Consumer
 import com.atsuishio.superbwarfare.tools.postEvent
 
-class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(1).fireResistant()), GeoItem {
-    private val cache = GeckoLibUtil.createInstanceCache(this)
+class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(1).fireResistant()) {
 
     override fun useOn(context: UseOnContext) = InteractionResult.PASS
 
@@ -82,26 +69,6 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
         return Component.translatable("item.superbwarfare.container", args)
     }
 
-    override fun registerControllers(data: ControllerRegistrar) {
-        data.add(AnimationController(this, "controller", 0) { _ -> PlayState.CONTINUE })
-    }
-
-    @Environment(EnvType.CLIENT)
-    override fun createGeoRenderer(consumer: Consumer<GeoRenderProvider>) {
-        consumer.accept(object : GeoRenderProvider {
-            private var renderer: ContainerBlockItemRenderer? = null
-
-            override fun getGeoItemRenderer(): GeoItemRenderer<*> {
-                if (this.renderer == null) {
-                    this.renderer = ContainerBlockItemRenderer()
-                }
-                return this.renderer!!
-            }
-        })
-    }
-
-    override fun getAnimatableInstanceCache(): AnimatableInstanceCache = this.cache
-
     companion object {
         @JvmStatic
         fun registerContainers() {
@@ -113,6 +80,7 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
             event.add(ModEntities.SODAYO_PICK_UP_ROCKET)
             event.add(ModEntities.TRUCK)
             event.add(ModEntities.TYPE_63)
+            event.add(ModEntities.TOW)
             event.add(ModEntities.MK_42)
             event.add(ModEntities.MLE_1934)
             event.add(ModEntities.BL_132)
@@ -133,6 +101,7 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
             event.add(ModEntities.M_1A_2)
             event.add(ModEntities.YX_100)
             event.add(ModEntities.PLZ_05)
+            event.add(ModEntities.FH_77BW)
             event.add(ModEntities.AH_6)
             event.add(ModEntities.MI_28)
             event.add(ModEntities.TOM_6)

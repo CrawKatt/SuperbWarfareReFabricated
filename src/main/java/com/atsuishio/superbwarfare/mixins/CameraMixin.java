@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.client.ICustomCamera;
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -19,9 +18,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
-import org.joml.*;
 import org.joml.Math;
-import org.spongepowered.asm.mixin.Final;
+import org.joml.Matrix4d;
+import org.joml.Vector4d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -32,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(Camera.class)
-public abstract class CameraMixin implements ICustomCamera {
+public abstract class CameraMixin {
 
     @Unique
     private boolean superbWarfare$anglesComputed;
@@ -45,10 +44,6 @@ public abstract class CameraMixin implements ICustomCamera {
 
     @Unique
     private float superbWarfare$partialTicks;
-
-    @Shadow
-    @Final
-    private Quaternionf rotation;
 
     @Shadow
     @Deprecated
@@ -199,9 +194,4 @@ public abstract class CameraMixin implements ICustomCamera {
 
     @Shadow
     protected abstract float getMaxZoom(float maxZoom);
-
-    @Override
-    public Quaternionf superbwarfare$getRotation() {
-        return this.rotation;
-    }
 }

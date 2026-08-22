@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import com.atsuishio.superbwarfare.client.animation.entity.Ptkm1rAnimationInstance
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
@@ -11,6 +12,7 @@ import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.ParticleTool
@@ -42,6 +44,7 @@ open class Ptkm1rEntity : Entity, OwnableEntity {
     var target: String? = "none"
     open val animationInstance: Ptkm1rAnimationInstance? =
         if (this.level().isClientSide) Ptkm1rAnimationInstance(this) else null
+    open val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
 
     constructor(type: EntityType<Ptkm1rEntity>, world: Level) : super(type, world)
 
@@ -65,13 +68,12 @@ open class Ptkm1rEntity : Entity, OwnableEntity {
     }
 
     override fun hurt(source: DamageSource, amount: Float): Boolean {
-        var amount = amount
-        amount = DAMAGE_MODIFIER.compute(source, amount)
+        val damage = DAMAGE_MODIFIER.compute(this, source, amount)
         if (source.entity != null) {
             this.entityData.set(LAST_ATTACKER_UUID, source.entity!!.getStringUUID())
         }
-        this.entityData.set(HEALTH, this.entityData.get(HEALTH) - amount)
-        return super.hurt(source, amount)
+        this.entityData.set(HEALTH, this.entityData.get(HEALTH) - damage)
+        return super.hurt(source, damage)
     }
 
     fun setOwnerUUID(pUuid: UUID?) {
@@ -112,16 +114,16 @@ open class Ptkm1rEntity : Entity, OwnableEntity {
             uuid = compound.getUUID("Owner")
         } else {
             val s = compound.getString("Owner")
+            val server = this.server
 
-            try {
-                uuid = if (this.server == null) {
+            uuid = if (server == null) {
+                try {
                     UUID.fromString(s)
-                } else {
-                    OldUsersConverter.convertMobOwnerIfNecessary(this.server!!, s)
+                } catch (_: Exception) {
+                    null
                 }
-            } catch (exception: Exception) {
-                Mod.LOGGER.error("Couldn't load owner UUID of {}: {}", this, exception)
-                uuid = null
+            } else {
+                OldUsersConverter.convertMobOwnerIfNecessary(server, s)
             }
         }
 
@@ -295,13 +297,14 @@ open class Ptkm1rEntity : Entity, OwnableEntity {
             .damage(ExplosionConfig.PTKM_1R_EXPLOSION_DAMAGE.get().toFloat())
             .radius(ExplosionConfig.PTKM_1R_EXPLOSION_RADIUS.get().toFloat())
             .attacker(this.owner)
-            .withParticleType(ParticleTool.ParticleType.HUGE)
             .explode()
 
         this.discard()
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/projectile/ptkm_1r.geo.json")
+
         @JvmField
         protected val OWNER_UUID: EntityDataAccessor<Optional<UUID>> =
             SynchedEntityData.defineId(Ptkm1rEntity::class.java, EntityDataSerializers.OPTIONAL_UUID)

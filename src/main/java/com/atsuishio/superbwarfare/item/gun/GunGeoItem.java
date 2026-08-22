@@ -1,10 +1,5 @@
 package com.atsuishio.superbwarfare.item.gun;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
-
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.PoseTool;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -12,12 +7,14 @@ import com.atsuishio.superbwarfare.item.CustomRendererItem;
 import com.atsuishio.superbwarfare.resource.gun.GunResource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
@@ -27,7 +24,6 @@ import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
 
 public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRendererItem {
@@ -50,13 +46,11 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
         return this.cache;
     }
 
-    
     @Environment(EnvType.CLIENT)
     public HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
         return PoseTool.pose(entityLiving, hand, stack);
     }
 
-    
     @Environment(EnvType.CLIENT)
     protected PlayState animationPredicate(AnimationState<GunGeoItem> event) {
         var player = Minecraft.getInstance().player;
@@ -109,7 +103,7 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
             return event.setAndContinue(RawAnimation.begin().thenLoop(animation.fire));
         }
 
-        // Run
+        // Run & Sprint
         if (player.isSprinting() && player.onGround() && ClientEventHandler.noSprintTicks == 0 && ClientEventHandler.drawTime < 0.01) {
             if (animation.run != null) {
                 return event.setAndContinue(RawAnimation.begin().thenLoop(animation.run));
@@ -140,5 +134,4 @@ public abstract class GunGeoItem extends GunItem implements GeoItem, CustomRende
             }
         });
     }
-
 }

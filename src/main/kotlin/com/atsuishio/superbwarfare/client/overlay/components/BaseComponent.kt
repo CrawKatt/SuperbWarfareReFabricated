@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.client.overlay.components
 
 import com.atsuishio.superbwarfare.client.overlay.RenderContext
 
+
 abstract class BaseComponent(
     val baseAnchorPoint: AnchorPoint = CENTER,
     val componentAnchorPoint: AnchorPoint = LEFT_TOP
@@ -16,12 +17,6 @@ abstract class BaseComponent(
         get() = this@BaseComponent.baseAnchorPoint.getY(screenHeight.toFloat()) +
                 this@BaseComponent.componentAnchorPoint.componentY(height) +
                 yOffset
-
-    val RenderContext.xInt
-        get() = x.toInt()
-
-    val RenderContext.yInt
-        get() = y.toInt()
 
     var xOffset = 0F
     var yOffset = 0F

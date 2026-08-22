@@ -2,6 +2,8 @@ package com.atsuishio.superbwarfare.client.overlay.weapon
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.RenderHelper
+import com.atsuishio.superbwarfare.client.overlay.DecoyOverlayHelper
+import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleHudOverlay.renderKillIndicatorDynamic
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay.renderEnergyInfo
@@ -10,10 +12,12 @@ import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotFromVector
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.event.ClientMouseHandler
-import com.atsuishio.superbwarfare.init.ModKeyMappings
-import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.tools.FormatTool.format0D
 import com.atsuishio.superbwarfare.tools.MathTool.getGradientColor
+import com.atsuishio.superbwarfare.tools.canBeSeen
+import com.atsuishio.superbwarfare.tools.localPlayer
+import com.atsuishio.superbwarfare.tools.mc
+import com.atsuishio.superbwarfare.tools.worldToScreen
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.math.Axis
@@ -115,34 +119,6 @@ object HelicopterHud {
                     color
                 )
 
-                // 指南针
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    COMPASS,
-                    screenWidth.toFloat() / 2 - 128,
-                    10f,
-                    128 - (64f / 45 * VehicleVecUtils.getYRotFromVector(Vec3(mc.gameRenderer.mainCamera.lookVector)).toFloat()),
-                    0f,
-                    256f,
-                    16f,
-                    512f,
-                    16f,
-                    color
-                )
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    ROLL_IND,
-                    screenWidth / 2f - 8,
-                    30f,
-                    0f,
-                    0f,
-                    16f,
-                    16f,
-                    16f,
-                    16f,
-                    color
-                )
-
                 RenderSystem.disableDepthTest()
                 RenderSystem.depthMask(false)
                 RenderSystem.enableBlend()
@@ -182,6 +158,35 @@ object HelicopterHud {
                     1f,
                     128f,
                     1f,
+                    color
+                )
+
+                // 指南针
+                RenderHelper.preciseBlitWithColor(
+                    guiGraphics,
+                    COMPASS,
+                    screenWidth.toFloat() / 2 - 128,
+                    10f,
+                    128 - (64f / 45 * VehicleVecUtils.getYRotFromVector(Vec3(mc.gameRenderer.mainCamera.lookVector))
+                        .toFloat()),
+                    0f,
+                    256f,
+                    16f,
+                    512f,
+                    16f,
+                    color
+                )
+                RenderHelper.preciseBlitWithColor(
+                    guiGraphics,
+                    ROLL_IND,
+                    screenWidth / 2f - 8,
+                    30f,
+                    0f,
+                    0f,
+                    16f,
+                    16f,
+                    16f,
+                    16f,
                     color
                 )
 
@@ -225,12 +230,7 @@ object HelicopterHud {
                 val blockRange = player.getEyePosition(1f).distanceTo(hitPos)
                 var entityRange = 0.0
 
-                val lookingEntity = TraceTool.camerafFindLookingEntity(
-                    player,
-                    vehicle.getShootPosForHud(player, partialTick),
-                    vehicle.getShootDirectionForHud(player, partialTick),
-                    512.0
-                )
+                val lookingEntity = OverlayTraceHandler.cameraMaxRangeEntity
                 if (lookingEntity != null) {
                     lookAtEntity = true
                     entityRange = player.distanceTo(lookingEntity).toDouble()
@@ -296,7 +296,8 @@ object HelicopterHud {
             val pos = shootPos.add(vehicle.getShootDirectionForHud(player, partialTick).scale(dis))
             val screenPos = pos.worldToScreen()
             val speed = vehicle.deltaMovement.length() * 72
-            lerpVy = Mth.lerp((0.021f * partialTick).toDouble(), lerpVy.toDouble(), vehicle.deltaMovement.y() * 20).toFloat()
+            lerpVy =
+                Mth.lerp((0.021f * partialTick).toDouble(), lerpVy.toDouble(), vehicle.deltaMovement.y() * 20).toFloat()
 
             val x = screenPos.x.toFloat()
             val y = screenPos.y.toFloat()
@@ -459,31 +460,14 @@ object HelicopterHud {
                     screenWidth / 2 - 140, screenHeight / 2, color, false
                 )
 
-                if (vehicle.hasDecoy()) {
-                    if (vehicle.decoyReady) {
-                        guiGraphics.drawString(
-                            Minecraft.getInstance().font,
-                            Component.translatable("tips.superbwarfare.flare.ready").append(
-                                Component.literal(
-                                    " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
-                                )
-                            ),
-                            screenWidth / 2 - 160,
-                            screenHeight / 2 - 50,
-                            color,
-                            false
-                        )
-                    } else {
-                        guiGraphics.drawString(
-                            Minecraft.getInstance().font,
-                            Component.translatable("tips.superbwarfare.flare.reloading"),
-                            screenWidth / 2 - 160,
-                            screenHeight / 2 - 50,
-                            0xFF0000,
-                            false
-                        )
-                    }
-                }
+                DecoyOverlayHelper.renderThirdPersonDecoyInfo(
+                    vehicle,
+                    guiGraphics,
+                    screenWidth / 2 - 160,
+                    screenHeight / 2 - 50,
+                    color
+                )
+
                 val component = vehicle.firstPersonAmmoComponent(data, player)
 
                 val heat = vehicle.getWeaponHeat(player)
@@ -631,37 +615,7 @@ object HelicopterHud {
 
                 VehicleMainWeaponHudOverlay.renderWeaponInfoThirdAir(guiGraphics, vehicle, player, data, font)
 
-                if (vehicle.hasDecoy()) {
-                    if (vehicle.decoyReady) {
-                        val componentReady = Component.translatable("tips.superbwarfare.flare.ready").append(
-                            Component.literal(
-                                " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
-                            )
-                        )
-                        val length = font.width(componentReady)
-
-                        guiGraphics.drawString(
-                            Minecraft.getInstance().font,
-                            componentReady,
-                            -length / 2,
-                            1,
-                            -1,
-                            false
-                        )
-                    } else {
-                        val componentReloading = Component.translatable("tips.superbwarfare.flare.reloading")
-                        val length = font.width(componentReloading)
-
-                        guiGraphics.drawString(
-                            Minecraft.getInstance().font,
-                            componentReloading,
-                            -length / 2,
-                            1,
-                            0xFF0000,
-                            false
-                        )
-                    }
-                }
+                DecoyOverlayHelper.renderFirstPersonDecoyInfo(vehicle, guiGraphics, 1, -1)
 
                 poseStack.popPose()
             }

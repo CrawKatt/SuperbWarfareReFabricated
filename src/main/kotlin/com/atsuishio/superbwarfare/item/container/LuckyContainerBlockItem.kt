@@ -1,12 +1,9 @@
 package com.atsuishio.superbwarfare.item.container
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
-import com.atsuishio.superbwarfare.client.renderer.item.LuckyContainerBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModItems
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.DamageTypeTags
@@ -23,20 +20,9 @@ import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.HitResult
-import software.bernie.geckolib.animatable.GeoItem
-import software.bernie.geckolib.animatable.client.GeoRenderProvider
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.animation.AnimationController
-import software.bernie.geckolib.animation.AnimationState
-import software.bernie.geckolib.animation.PlayState
-import software.bernie.geckolib.renderer.GeoItemRenderer
-import software.bernie.geckolib.util.GeckoLibUtil
-import java.util.function.Consumer
 
 class LuckyContainerBlockItem :
-    BlockItem(ModBlocks.LUCKY_CONTAINER, Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()), GeoItem {
-    private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
+    BlockItem(ModBlocks.LUCKY_CONTAINER, Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()) {
 
     override fun useOn(context: UseOnContext): InteractionResult {
         return InteractionResult.PASS
@@ -50,34 +36,6 @@ class LuckyContainerBlockItem :
         val blockHitResult = playerPOVHitResult.withPosition(playerPOVHitResult.blockPos.above())
         val interactionResult = super.useOn(UseOnContext(player, hand, blockHitResult))
         return InteractionResultHolder(interactionResult, player.getItemInHand(hand))
-    }
-
-    private fun predicate(event: AnimationState<LuckyContainerBlockItem>): PlayState {
-        return PlayState.CONTINUE
-    }
-
-    @Environment(EnvType.CLIENT)
-    override fun createGeoRenderer(consumer: Consumer<GeoRenderProvider>) {
-        consumer.accept(object : GeoRenderProvider {
-            private var renderer: LuckyContainerBlockItemRenderer? = null
-
-            override fun getGeoItemRenderer(): GeoItemRenderer<*> {
-                if (this.renderer == null) {
-                    this.renderer = LuckyContainerBlockItemRenderer()
-                }
-                return this.renderer!!
-            }
-        })
-    }
-
-    override fun registerControllers(data: AnimatableManager.ControllerRegistrar) {
-        data.add(
-            AnimationController(this, "controller", 0) { this.predicate(it) }
-        )
-    }
-
-    override fun getAnimatableInstanceCache(): AnimatableInstanceCache {
-        return this.cache
     }
 
     companion object {

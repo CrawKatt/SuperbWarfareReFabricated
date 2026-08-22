@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.client
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.decorator.ContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.LuckyContainerItemDecorator
+import com.atsuishio.superbwarfare.client.decorator.VehicleKeyItemDecorator
 import com.atsuishio.superbwarfare.client.model.trinket.ParachuteModel
 import com.atsuishio.superbwarfare.client.model.trinket.ThermalImagingGogglesModel
 import com.atsuishio.superbwarfare.client.overlay.AmmoBarOverlay
@@ -10,6 +11,7 @@ import com.atsuishio.superbwarfare.client.overlay.AmmoCountOverlay
 import com.atsuishio.superbwarfare.client.overlay.ArmorPlateOverlay
 import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay
 import com.atsuishio.superbwarfare.client.overlay.DroneHudOverlay
+import com.atsuishio.superbwarfare.client.overlay.GPWSOverlay
 import com.atsuishio.superbwarfare.client.overlay.HandsomeFrameOverlay
 import com.atsuishio.superbwarfare.client.overlay.HeatBarOverlay
 import com.atsuishio.superbwarfare.client.overlay.IFFOverlay
@@ -18,6 +20,7 @@ import com.atsuishio.superbwarfare.client.overlay.ItemRendererFixOverlay
 import com.atsuishio.superbwarfare.client.overlay.JavelinHudOverlay
 import com.atsuishio.superbwarfare.client.overlay.KillMessageOverlay
 import com.atsuishio.superbwarfare.client.overlay.MortarInfoOverlay
+import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.RedTriangleOverlay
 import com.atsuishio.superbwarfare.client.overlay.SodayoRocketInfoOverlay
 import com.atsuishio.superbwarfare.client.overlay.SpyglassRangeOverlay
@@ -40,8 +43,7 @@ import com.atsuishio.superbwarfare.client.renderer.block.SmallContainerBlockEnti
 import com.atsuishio.superbwarfare.client.renderer.block.VehicleAssemblingTableBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
-import com.atsuishio.superbwarfare.client.renderer.item.BlueprintResearchingTableBlockItemRenderer
-import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
+import com.atsuishio.superbwarfare.client.renderer.item.*
 import com.atsuishio.superbwarfare.client.tooltip.ClientBocekImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
@@ -57,6 +59,7 @@ import com.atsuishio.superbwarfare.client.tooltip.component.SentinelImageCompone
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.item.armor.GeHelmetM35Item
+import com.atsuishio.superbwarfare.item.armor.HandsomeGogglesItem
 import com.atsuishio.superbwarfare.item.armor.RuChest6b43Item
 import com.atsuishio.superbwarfare.item.armor.RuHelmet6b47Item
 import com.atsuishio.superbwarfare.item.armor.UsChestIotvItem
@@ -73,6 +76,7 @@ import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.LayeredDraw
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
@@ -84,6 +88,7 @@ object ClientRenderHandler {
 
     private val containerDecorator = ContainerItemDecorator()
     private val luckyContainerDecorator = LuckyContainerItemDecorator()
+    private val vehicleKeyDecorator = VehicleKeyItemDecorator()
     private val overlays = listOf<LayeredDraw.Layer>(
         SodayoRocketInfoOverlay,
         Type63InfoOverlay,
@@ -99,6 +104,7 @@ object ClientRenderHandler {
         AmmoCountOverlay,
         StaminaOverlay,
         VehicleCrosshairOverlay,
+        GPWSOverlay,
         VehicleMainWeaponHudOverlay,
         VehicleHudOverlay,
         IglaHudOverlay,
@@ -155,10 +161,9 @@ object ClientRenderHandler {
     @JvmStatic
     fun registerOverlays() {
         ClientTickEvents.END_CLIENT_TICK.register {
-            VehicleTeamOverlay.onVehicleTeamOverlayClientTick()
-            IFFOverlay.onIFFClientTick()
+            OverlayTraceHandler.onOverlayTraceClientTick()
             VehicleMainWeaponHudOverlay.onVehicleMainWeaponHudOverlayClientTick()
-            Type63InfoOverlay.tracingEntity()
+            GPWSOverlay.onClientTick()
             AircraftHud.onAircraftHudClientTick()
             HelicopterHud.onHelicopterHudClientTick()
             OldAircraftHud.onOldAircraftHudClientTick()
@@ -184,36 +189,34 @@ object ClientRenderHandler {
     @JvmStatic
     fun renderItemDecorations(guiGraphics: GuiGraphics, font: Font, stack: ItemStack, x: Int, y: Int) {
         if (containerDecorator.render(guiGraphics, font, stack, x, y)) return
-        luckyContainerDecorator.render(guiGraphics, font, stack, x, y)
+        if (luckyContainerDecorator.render(guiGraphics, font, stack, x, y)) return
+        vehicleKeyDecorator.render(guiGraphics, font, stack, x, y)
     }
 
     @JvmStatic
     fun onClientSetup() {
-        val tm62Renderer = lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
-        BuiltinItemRendererRegistry.INSTANCE.register(
-            ModItems.TM_62
-        ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
-            tm62Renderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
-        }
-
-        val blueprintResearchTableRenderer =
-            lazy { BlueprintResearchingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
-        BuiltinItemRendererRegistry.INSTANCE.register(
-            ModItems.BLUEPRINT_RESEARCH_TABLE
-        ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
-            blueprintResearchTableRenderer.value.renderByItem(
-                stack,
-                displayContext,
-                poseStack,
-                buffer,
-                packedLight,
-                packedOverlay
-            )
+        val renderers: List<Pair<net.minecraft.world.item.Item, Lazy<BlockEntityWithoutLevelRenderer>>> = listOf(
+            ModItems.TM_62 to lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
+            ModItems.BLUEPRINT_RESEARCH_TABLE to lazy { BlueprintResearchingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
+            ModItems.CONTAINER to lazy { ContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
+            ModItems.LUCKY_CONTAINER to lazy { LuckyContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
+            ModItems.SMALL_CONTAINER to lazy { SmallContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
+            ModItems.VEHICLE_ASSEMBLING_TABLE to lazy { VehicleAssemblingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
+            ModItems.HAND_GRENADE to lazy { HandGrenadeRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
+            ModItems.SKIN_SPRAY to lazy { SkinSprayRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
+            ModItems.PTKM_1R to lazy { Ptkm1rItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
+            ModItems.MILITARY_SHOVEL to lazy { MilitaryShovelRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+        )
+        renderers.forEach { (item, renderer) ->
+            BuiltinItemRendererRegistry.INSTANCE.register(item) { stack, displayContext, poseStack, buffer, light, overlay ->
+                renderer.value.renderByItem(stack, displayContext, poseStack, buffer, light, overlay)
+            }
         }
 
         TrinketRendererRegistry.registerRenderer(ModItems.PARACHUTE, ParachuteRenderer())
         TrinketRendererRegistry.registerRenderer(ModItems.THERMAL_IMAGING_GOGGLES, ThermalImagingGogglesRenderer())
         GeHelmetM35Item.registerRenderer()
+        HandsomeGogglesItem.registerRenderer()
         RuChest6b43Item.registerRenderer()
         RuHelmet6b47Item.registerRenderer()
         UsChestIotvItem.registerRenderer()

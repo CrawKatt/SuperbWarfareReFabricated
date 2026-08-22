@@ -1,9 +1,5 @@
 package com.atsuishio.superbwarfare.item.gun.sniper;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
-
 import com.atsuishio.superbwarfare.client.TooltipTool;
 import com.atsuishio.superbwarfare.client.renderer.gun.Ql1031ItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -26,6 +22,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.phys.Vec3;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.constant.DataTickets;
@@ -48,7 +46,6 @@ public class Ql1031Item extends GunGeoItem {
 
     @Override
     @ParametersAreNonnullByDefault
-    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.empty());
         tooltipComponents.add(Component.translatable("des.superbwarfare.ql_1031_1").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
@@ -58,7 +55,6 @@ public class Ql1031Item extends GunGeoItem {
         TooltipTool.addHideText(tooltipComponents, Component.translatable("des.superbwarfare.ql_1031_2").withStyle(Style.EMPTY.withColor(0xFFECE7)));
     }
 
-    
     @Environment(EnvType.CLIENT)
     private PlayState editPredicate(AnimationState<Ql1031Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
@@ -75,7 +71,6 @@ public class Ql1031Item extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.ql_1031.idle"));
     }
 
-    
     @Environment(EnvType.CLIENT)
     private PlayState chargePredicate(AnimationState<Ql1031Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
@@ -112,7 +107,6 @@ public class Ql1031Item extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var editController = new AnimationController<>(this, "editController", 1, this::editPredicate);
         var chargeController = new AnimationController<>(this, "chargeController", 1, this::chargePredicate);
         data.add(editController);
@@ -140,32 +134,32 @@ public class Ql1031Item extends GunGeoItem {
     }
 
     @Override
-    public boolean hasBulletInBarrel(GunData data) {
+    public boolean hasBulletInBarrel(@NotNull GunData data) {
         return true;
     }
 
     @Override
-    public boolean hasCustomBarrel(GunData data) {
+    public boolean hasCustomBarrel(@NotNull GunData data) {
         return true;
     }
 
     @Override
-    public boolean hasCustomGrip(GunData data) {
+    public boolean hasCustomGrip(@NotNull GunData data) {
         return true;
     }
 
     @Override
-    public boolean hasCustomScope(GunData data) {
+    public boolean hasCustomScope(@NotNull GunData data) {
         return true;
     }
 
     @Override
-    public boolean hasCustomStock(GunData data) {
+    public boolean hasCustomStock(@NotNull GunData data) {
         return true;
     }
 
     @Override
-    public boolean canEditAttachments(GunData data) {
+    public boolean canEditAttachments(@NotNull GunData data) {
         return true;
     }
 }

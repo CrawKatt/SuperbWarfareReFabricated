@@ -1,9 +1,5 @@
 package com.atsuishio.superbwarfare.item.gun.sniper;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
-
 import com.atsuishio.superbwarfare.client.renderer.gun.MosinNagantItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
@@ -14,6 +10,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -31,7 +29,6 @@ public class MosinNagantItem extends GunGeoItem {
         return MosinNagantItemRenderer::new;
     }
 
-    
     @Environment(EnvType.CLIENT)
     private PlayState fireAnimPredicate(AnimationState<MosinNagantItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
@@ -72,7 +69,6 @@ public class MosinNagantItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var fireAnimController = new AnimationController<>(this, "fireAnimController", 1, this::fireAnimPredicate);
         data.add(fireAnimController);
     }

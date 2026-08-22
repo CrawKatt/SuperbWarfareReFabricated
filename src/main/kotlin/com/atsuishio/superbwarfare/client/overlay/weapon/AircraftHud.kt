@@ -2,13 +2,14 @@ package com.atsuishio.superbwarfare.client.overlay.weapon
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.RenderHelper
+import com.atsuishio.superbwarfare.client.overlay.DecoyOverlayHelper
 import com.atsuishio.superbwarfare.client.overlay.VehicleHudOverlay.renderKillIndicatorDynamic
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.data.gun.GunProp
+import com.atsuishio.superbwarfare.entity.vehicle.Ac130hEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.event.ClientMouseHandler
-import com.atsuishio.superbwarfare.init.ModKeyMappings
 import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.tools.FormatTool.format0D
 import com.atsuishio.superbwarfare.tools.MathTool.getGradientColor
@@ -61,6 +62,8 @@ object AircraftHud {
 
     private var dis = 512.0
 
+    private val ac130GunnerHud = Ac130GunnerHud()
+
     fun onAircraftHudClientTick() {
         val player = localPlayer ?: return
         val vehicle = player.vehicle
@@ -94,15 +97,20 @@ object AircraftHud {
         screenWidth: Int,
         screenHeight: Int
     ) {
+
+        if (vehicle is Ac130hEntity) {
+            ac130GunnerHud.render(vehicle, player, guiGraphics, partialTick, screenWidth, screenHeight)
+        }
+
         if (player !== vehicle.getFirstPassenger()) return
         val camera = mc.gameRenderer.mainCamera
         val cameraPos = camera.position
         val poseStack = guiGraphics.pose()
-        val gunData = vehicle.getGunData(player) ?: return
+        val gunData = vehicle.getGunData(player)
 
         poseStack.pushPose()
 
-        val bomb = gunData.get(GunProp.CROSSHAIR) == "@AirBomb"
+        val bomb = gunData?.get(GunProp.CROSSHAIR) == "@AirBomb"
 
         val color = vehicle.hudColor
         RenderSystem.disableDepthTest()
@@ -194,6 +202,10 @@ object AircraftHud {
             }
         }
 
+        if (ClientEventHandler.isNacelleCam(player)) {
+            return
+        }
+
         poseStack.pushPose()
 
         if ((mc.options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle) && pos.canBeSeen()) {
@@ -212,7 +224,7 @@ object AircraftHud {
             )
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
 
-            if (gunData.get(GunProp.CROSSHAIR) == "@AirCraftMissile") {
+            if (gunData?.get(GunProp.CROSSHAIR) == "@AirCraftMissile") {
                 RenderHelper.preciseBlitWithColor(
                     guiGraphics,
                     HUD_BASE_MISSILE,
@@ -350,7 +362,8 @@ object AircraftHud {
             )
             //加速度
             lerpG =
-                Mth.lerp((0.25f * partialTick).toDouble(), lerpG.toDouble(), (400 * vehicle.getAcceleration()) / 9.8).toFloat()
+                Mth.lerp((0.25f * partialTick).toDouble(), lerpG.toDouble(), (400 * vehicle.getAcceleration()) / 9.8)
+                    .toFloat()
             guiGraphics.drawString(mc.font, Component.literal("M"), -105, 70, color, false)
             guiGraphics.drawString(mc.font, Component.literal("0.2"), -96, 70, color, false)
             guiGraphics.drawString(mc.font, Component.literal("G"), -105, 78, color, false)
@@ -364,41 +377,20 @@ object AircraftHud {
             )
 
             // 热诱弹
-            if (vehicle.hasDecoy()) {
-                if (vehicle.decoyReady) {
-                    guiGraphics.drawString(
-                        Minecraft.getInstance().font,
-                        Component.translatable("tips.superbwarfare.flare.ready").append(
-                            Component.literal(
-                                " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
-                            )
-                        ),
-                        72,
-                        0,
-                        color,
-                        false
-                    )
-                } else {
-                    guiGraphics.drawString(
-                        Minecraft.getInstance().font,
-                        Component.translatable("tips.superbwarfare.flare.reloading"),
-                        72,
-                        0,
-                        0xFF0000,
-                        false
-                    )
-                }
-            }
+            DecoyOverlayHelper.renderThirdPersonDecoyInfo(vehicle, guiGraphics, 72, 0, color)
+
             guiGraphics.drawString(mc.font, Component.literal("TGT"), 76, 78, color, false)
 
             // 武器名
-            val heat = vehicle.getWeaponHeat(player)
-            val component = vehicle.firstPersonAmmoComponent(gunData, player)
+            if (gunData != null) {
+                val heat = vehicle.getWeaponHeat(player)
+                val component = vehicle.firstPersonAmmoComponent(gunData, player)
 
-            guiGraphics.drawString(
-                mc.font, component, -mc.font.width(component) / 2, 91,
-                getGradientColor(color, 0xFF0000, heat, 2), false
-            )
+                guiGraphics.drawString(
+                    mc.font, component, -mc.font.width(component) / 2, 91,
+                    getGradientColor(color, 0xFF0000, heat, 2), false
+                )
+            }
 
             // 能量警告
             if (vehicle.hasEnergyStorage()) {
@@ -517,9 +509,9 @@ object AircraftHud {
             val xCross = x
             val yCross = y
 
-            if ((mc.options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle) && (gunData.get(
-                    GunProp.CROSSHAIR
-                ) != "@AirBomb") && (gunData.get(GunProp.CROSSHAIR) != "@AirCraftMissile")
+            if ((mc.options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle)
+                && (gunData?.get(GunProp.CROSSHAIR) != "@AirBomb")
+                && (gunData?.get(GunProp.CROSSHAIR) != "@AirCraftMissile")
             ) {
                 RenderSystem.disableDepthTest()
                 RenderSystem.depthMask(false)
@@ -546,7 +538,7 @@ object AircraftHud {
                     color
                 )
             } else if (mc.options.cameraType != CameraType.FIRST_PERSON && !ClientEventHandler.zoomVehicle) {
-                if (gunData.get(GunProp.CROSSHAIR) == "@AirBomb") {
+                if (gunData?.get(GunProp.CROSSHAIR) == "@AirBomb") {
                     bombHitPosX = Mth.lerp(0.25 * partialTick.toDouble(), bombHitPosX, xCross.toDouble())
                     bombHitPosY = Mth.lerp(0.25 * partialTick.toDouble(), bombHitPosY, yCross.toDouble())
 
@@ -568,8 +560,10 @@ object AircraftHud {
 
                 mouseX = Mth.lerp(0.1f * partialTick, mouseX, ClientMouseHandler.lerpSpeedX.toFloat())
                 mouseY = Mth.lerp(0.1f * partialTick, mouseY, ClientMouseHandler.lerpSpeedY.toFloat())
-                RenderHelper.preciseBlit(guiGraphics,
-                    HelicopterHud.RING, x - 2 + mouseX, y - 2 + mouseY, 0f, 0f, 4f, 4f, 4f, 4f)
+                RenderHelper.preciseBlit(
+                    guiGraphics,
+                    HelicopterHud.RING, x - 2 + mouseX, y - 2 + mouseY, 0f, 0f, 4f, 4f, 4f, 4f
+                )
 
                 val originPos = Vec3(x.toDouble(), y.toDouble(), 0.0)
                 val ringPos = Vec3(x + mouseX.toDouble(), y + mouseY.toDouble(), 0.0)
@@ -626,8 +620,10 @@ object AircraftHud {
 
                 poseStack.pushPose()
                 poseStack.rotateAround(Axis.ZP.rotationDegrees(vehicle.getRoll(partialTick)), x, y, 0f)
-                RenderHelper.preciseBlit(guiGraphics,
-                    HelicopterHud.CROSSHAIR_3P, x - 34, y - 8.5f, 0f, 0f, 68f, 17f, 68f, 17f)
+                RenderHelper.preciseBlit(
+                    guiGraphics,
+                    HelicopterHud.CROSSHAIR_3P, x - 34, y - 8.5f, 0f, 0f, 68f, 17f, 68f, 17f
+                )
                 renderKillIndicatorDynamic(
                     guiGraphics,
                     x - 7.5f + (2 * (Math.random() - 0.5f)).toFloat(),
@@ -661,7 +657,6 @@ object AircraftHud {
                 poseStack.popPose()
 
                 // 时速
-                //
                 poseStack.pushPose()
                 poseStack.translate(x, y, 0f)
                 poseStack.scale(0.75f, 0.75f, 1f)
@@ -684,39 +679,11 @@ object AircraftHud {
                 poseStack.translate(x, y + 50, 0f)
                 poseStack.scale(0.75f, 0.75f, 1f)
 
-                VehicleMainWeaponHudOverlay.renderWeaponInfoThirdAir(guiGraphics, vehicle, player, gunData, font)
-
-                if (vehicle.hasDecoy()) {
-                    if (vehicle.decoyReady) {
-                        val componentReady = Component.translatable("tips.superbwarfare.flare.ready").append(
-                            Component.literal(
-                                " [" + ModKeyMappings.RELEASE_DECOY.key.displayName.string + "]"
-                            )
-                        )
-                        val length = font.width(componentReady)
-
-                        guiGraphics.drawString(
-                            Minecraft.getInstance().font,
-                            componentReady,
-                            -length / 2,
-                            1,
-                            -1,
-                            false
-                        )
-                    } else {
-                        val componentReloading = Component.translatable("tips.superbwarfare.flare.reloading")
-                        val length = font.width(componentReloading)
-
-                        guiGraphics.drawString(
-                            Minecraft.getInstance().font,
-                            componentReloading,
-                            -length / 2,
-                            1,
-                            0xFF0000,
-                            false
-                        )
-                    }
+                if (gunData != null) {
+                    VehicleMainWeaponHudOverlay.renderWeaponInfoThirdAir(guiGraphics, vehicle, player, gunData, font)
                 }
+
+                DecoyOverlayHelper.renderFirstPersonDecoyInfo(vehicle, guiGraphics, 1, -1)
 
                 poseStack.popPose()
             }

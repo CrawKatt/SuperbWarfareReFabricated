@@ -2,8 +2,11 @@ package com.atsuishio.superbwarfare.client.particle
 
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.min
 
+@Environment(EnvType.CLIENT)
 open class CustomSmokeParticle protected constructor(
     level: ClientLevel,
     x: Double,
@@ -32,6 +35,7 @@ open class CustomSmokeParticle protected constructor(
         this.bCol = bCol
     }
 
+    @Environment(EnvType.CLIENT)
     class Provider(private val spriteSet: SpriteSet) : ParticleProvider<CustomSmokeOption> {
         override fun createParticle(
             pType: CustomSmokeOption,

@@ -15,19 +15,7 @@ import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
 public class RenderHelper {
-
-    private static long GUI_RENDER_TIMESTAMP = -1L;
-
-    public static void markGuiRenderTimestamp() {
-        GUI_RENDER_TIMESTAMP = System.currentTimeMillis();
-    }
-
-    public static boolean isInGui() {
-        return System.currentTimeMillis() - GUI_RENDER_TIMESTAMP < 100L;
-    }
-
     // code from GuiGraphics
-
     /**
      * Blits a portion of the texture specified by the atlas location onto the screen at the given coordinates.
      *
@@ -339,6 +327,23 @@ public class RenderHelper {
             pGuiGraphics.disableScissor();
         } else {
             pGuiGraphics.drawString(pFont, pText, pMinX, pMinY, pColor);
+        }
+    }
+
+    public static void renderCenteredScrollingString(GuiGraphics pGuiGraphics, Font pFont, Component pText, float scale, int pMinX, int pMinY, int pMaxX, int pMaxY, int pColor) {
+        int width = pFont.width(pText);
+        int borderWidth = pMaxX - pMinX;
+        if (width > borderWidth) {
+            int l = width - borderWidth;
+            double rate = (double) Util.getMillis() / 1000;
+            double d1 = Math.max((double) l * 0.5, 3);
+            double d2 = Math.sin((Math.PI / 2) * Math.cos((Math.PI * 2) * rate / d1)) / 2 + 0.5;
+            double d3 = Mth.lerp(d2, 0, l);
+            pGuiGraphics.enableScissor((int) (pMinX * scale), (int) (pMinY * scale), (int) (pMaxX * scale), (int) (pMaxY * scale));
+            pGuiGraphics.drawString(pFont, pText, pMinX - (int) d3, pMinY, pColor);
+            pGuiGraphics.disableScissor();
+        } else {
+            pGuiGraphics.drawCenteredString(pFont, pText, (pMinX + pMaxX) / 2, pMinY, pColor);
         }
     }
 

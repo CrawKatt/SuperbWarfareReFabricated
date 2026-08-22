@@ -3,8 +3,10 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.init.ModKeyMappings;
 import com.atsuishio.superbwarfare.network.message.send.ChangeVehicleSeatMessage;
 import com.atsuishio.superbwarfare.network.message.send.SwitchVehicleWeaponMessage;
+import com.atsuishio.superbwarfare.tools.MinecraftUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.player.LocalPlayer;
@@ -47,14 +49,14 @@ public class MinecraftMixin {
 
         // shift+数字键 座位更改
         if (vehicle.getMaxPassengers() > 1
-                && options.keyShift.isDown()
+                && ModKeyMappings.CHANGE_SEAT.isDown()
                 && index < vehicle.getMaxPassengers()
                 && vehicle.getNthEntity(index) == null
         ) {
             ci.cancel();
             options.keyHotbarSlots[index].consumeClick();
 
-            ClientPlayNetworking.send(new ChangeVehicleSeatMessage(index));
+            MinecraftUtil.sendPacketToServer(new ChangeVehicleSeatMessage(index));
             vehicle.changeSeat(player, index);
 
             return;
@@ -67,11 +69,11 @@ public class MinecraftMixin {
             options.keyHotbarSlots[index].consumeClick();
 
             // 数字键 武器切换
-            if (!options.keyShift.isDown()
+            if (!ModKeyMappings.CHANGE_SEAT.isDown()
                     && vehicle.hasWeapon(seatIndex)
                     && vehicle.getWeaponIndex(seatIndex) != index) {
                 if (ClientEventHandler.switchVehicleWeaponCooldown <= 0) {
-                    ClientPlayNetworking.send(new SwitchVehicleWeaponMessage(seatIndex, index, false));
+                    MinecraftUtil.sendPacketToServer(new SwitchVehicleWeaponMessage(seatIndex, index, false));
                     ClientEventHandler.switchVehicleWeaponCooldown = 3;
                 }
             }

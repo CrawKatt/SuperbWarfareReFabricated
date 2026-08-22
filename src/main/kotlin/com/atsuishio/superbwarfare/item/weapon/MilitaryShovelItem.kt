@@ -1,11 +1,8 @@
 package com.atsuishio.superbwarfare.item.weapon
 
-import com.atsuishio.superbwarfare.client.renderer.item.MilitaryShovelRenderer
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.item.CustomDamageProperty
 import com.atsuishio.superbwarfare.tiers.ModItemTier
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
 import net.minecraft.ChatFormatting
 import net.minecraft.advancements.CriteriaTriggers
 import net.minecraft.core.Direction
@@ -26,18 +23,10 @@ import net.minecraft.world.level.block.RotatedPillarBlock
 import net.minecraft.world.level.block.WeatheringCopper
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.gameevent.GameEvent
-import software.bernie.geckolib.animatable.GeoItem
-import software.bernie.geckolib.animatable.client.GeoRenderProvider
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.renderer.GeoItemRenderer
-import software.bernie.geckolib.util.GeckoLibUtil
-import java.util.function.Consumer
 
 open class MilitaryShovelItem :
-    DiggerItem(
+    AxeItem(
         ModItemTier.CEMENTED_CARBIDE,
-        ModTags.Blocks.MINEABLE_WITH_MILITARY_SHOVEL,
         CustomDamageProperty(810).rarity(Rarity.RARE)
             .component(
                 DataComponents.TOOL, Tool(
@@ -52,8 +41,7 @@ open class MilitaryShovelItem :
                 )
             )
             .attributes(createAttributes(ModItemTier.CEMENTED_CARBIDE, 2f, -2.6f))
-    ), GeoItem {
-    private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
+    ) {
 
     override fun appendHoverText(
         stack: ItemStack,
@@ -155,21 +143,4 @@ open class MilitaryShovelItem :
         return ModItemTier.CEMENTED_CARBIDE.enchantmentValue
     }
 
-    override fun registerControllers(data: AnimatableManager.ControllerRegistrar) {}
-
-    @Environment(EnvType.CLIENT)
-    override fun createGeoRenderer(consumer: Consumer<GeoRenderProvider>) {
-        consumer.accept(object : GeoRenderProvider {
-            private var renderer: MilitaryShovelRenderer? = null
-
-            override fun getGeoItemRenderer(): GeoItemRenderer<*> {
-                if (this.renderer == null) {
-                    this.renderer = MilitaryShovelRenderer()
-                }
-                return this.renderer!!
-            }
-        })
-    }
-
-    override fun getAnimatableInstanceCache() = this.cache
 }

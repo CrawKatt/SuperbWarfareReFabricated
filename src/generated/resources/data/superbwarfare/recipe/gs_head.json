@@ -6,10 +6,7 @@
       "item": "minecraft:gunpowder"
     },
     "b": {
-      "tag": "c:ingots/iron"
-    },
-    "c": {
-      "tag": "superbwarfare:ingots/steel"
+      "tag": "c:plates/steel"
     },
     "d": {
       "tag": "c:ingots/lead"
@@ -18,7 +15,7 @@
   "pattern": [
     "ddd",
     "bdb",
-    "cac"
+    " a "
   ],
   "result": {
     "count": 2,

@@ -1,8 +1,9 @@
 package com.atsuishio.superbwarfare.block.entity
 
+import com.atsuishio.superbwarfare.init.ModCapabilities
+
 import com.atsuishio.superbwarfare.block.SuperbItemInterfaceBlock
 import com.atsuishio.superbwarfare.init.ModBlockEntities
-import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.inventory.menu.SuperbItemInterfaceMenu
 import com.atsuishio.superbwarfare.tools.isSameItemStack
 import net.minecraft.core.BlockPos
@@ -135,7 +136,7 @@ open class SuperbItemInterfaceBlockEntity(type: BlockEntityType<*>, pPos: BlockP
             val list = level.getEntities(
                 null as Entity?,
                 AABB(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y + 0.5, z + 0.5)
-            ) { entity -> ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null) != null }
+            ) { entity -> entity?.let { ModCapabilities.ITEM_HANDLER_ENTITY.find(it, null) } != null }
 
             if (list.isEmpty()) return
             val target = list[level.random.nextInt(list.size)]
@@ -147,9 +148,9 @@ open class SuperbItemInterfaceBlockEntity(type: BlockEntityType<*>, pPos: BlockP
 
                 val originalStack = stack.copy()
 
-                val itemHandler = ModCapabilities.ITEM_HANDLER_ENTITY.find(target, null) ?: return
+                val itemHandler = checkNotNull(ModCapabilities.ITEM_HANDLER_ENTITY.find(target, null))
                 var totalInserted = 0
-                for (ii in 0..<itemHandler.getSlots()) {
+                for (ii in 0..<itemHandler.slots) {
                     var inserted = stack.count
                     while (inserted > 0) {
                         val insertedStack = itemHandler.insertItem(ii, stack.copyWithCount(inserted), true)

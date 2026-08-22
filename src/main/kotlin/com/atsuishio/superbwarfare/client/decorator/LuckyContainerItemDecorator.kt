@@ -7,7 +7,10 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.component.DataComponents
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
+@Environment(EnvType.CLIENT)
 class LuckyContainerItemDecorator {
     fun render(guiGraphics: GuiGraphics, font: Font, stack: ItemStack, xOffset: Int, yOffset: Int): Boolean {
         if (stack.item !is LuckyContainerBlockItem) return false

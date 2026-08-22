@@ -8,7 +8,6 @@ import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModComponents
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
-import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.tools.InventoryTool
 import com.atsuishio.superbwarfare.tools.SoundTool
 import com.atsuishio.superbwarfare.tools.postEvent
@@ -28,6 +27,10 @@ object GunEventHandler {
      */
     private fun handleGunBolt(data: GunData) {
         if (data.item.useSpecialFireProcedure(data)) return
+
+        if (data.bolt.actionTimer.get() > 0) {
+            data.nbtVersion.invalidateStructural()
+        }
 
         data.bolt.actionTimer.reduce()
 
@@ -117,6 +120,8 @@ object GunEventHandler {
         data.reload.setState(ReloadState.NOT_RELOADING)
 
         data.reload.reloadStarter.finish()
+
+        data.nbtVersion.invalidateStructural()
     }
 
     /**
@@ -133,29 +138,36 @@ object GunEventHandler {
     }
 
     /**
-     * 更新perk相关属性
+     * Ticks all active perk instances on the given [GunData].
+     *
+     * @param shooter the entity holding the weapon, may be null.
+     * @param data    the gun data whose perks should be ticked.
      */
     @JvmStatic
     fun tickPerk(shooter: Entity?, data: GunData) {
-        for (type in Perk.Type.entries.toTypedArray()) {
+        // GunData.PERK_TYPES is a cached static array — no allocation here.
+        for (type in GunData.PERK_TYPES) {
             val instance = data.perk.getInstances(type)
-            instance.forEach {
-                it.perk.tick(data, it, shooter)
-            }
+            instance.forEach { it.perk.tick(data, it, shooter) }
         }
     }
 
-    @JvmStatic
+    /**
+     * Triggers an auto-reload cycle if the weapon is empty and backup ammo is available.
+     *
+     * @param shooter entity holding the weapon.
+     * @param data target gun data container.
+     * @param inMainHand whether weapon is in main hand.
+     */
     fun autoReload(shooter: Entity?, data: GunData, inMainHand: Boolean) {
         val autoReload = data.get(GunProp.AUTO_RELOAD) ?: return
-
-        if (inMainHand && autoReload && !data.hasEnoughAmmoToShoot(shooter)) {
-            tryStartReload(shooter, data)
+        if (!inMainHand || !autoReload) return
+        if (!data.hasEnoughAmmoToShoot(shooter)) {
+            tryStartReload(shooter, data, false)
         }
     }
 
-    @JvmStatic
-    fun tryStartReload(shooter: Entity?, data: GunData) {
+    fun tryStartReload(shooter: Entity?, data: GunData, save: Boolean = true) {
         if (data.useBackpackAmmo() || data.meleeOnly()) return
 
         if ((shooter == null || !shooter.isSpectator)
@@ -180,38 +192,72 @@ object GunEventHandler {
                 }
             } else if (canSingleReload && data.ammo.get() < data.get(GunProp.MAGAZINE)) {
                 data.reload.singleReloadStarter.markStart()
+
+                data.nbtVersion.invalidateStructural()
             } else {
                 return
             }
 
             data.burstAmount.reset()
-            data.save()
+            if (save) {
+                data.save()
+            }
         }
     }
 
     /**
-     * 减少过热值
+     * Reduces accumulated barrel heat based on environmental conditions.
+     *
+     * <p><b>Performance note:</b> fluid-state checks ({@code isInLava},
+     * {@code isInWaterOrRain}) are expensive for large vehicles because they
+     * scan every block in the bounding box. Callers should cache the result
+     * per entity per tick and pass it via the [environmentRate] parameter
+     * instead of letting each GunData re-query the entity's fluid state.
+     *
+     * @param shooter         the entity holding the weapon, may be null.
+     * @param data            the gun data whose heat should be reduced.
+     * @param environmentRate pre-computed environment cooldown multiplier
+     *                        (1.0 = normal, or the result of the active
+     *                        environment modifier). When `null`, the method
+     *                        queries the shooter's environment directly
+     *                        (legacy path for non-vehicle callers).
      */
-    @JvmStatic
-    fun handleCooldown(shooter: Entity?, data: GunData) {
-        var rate = 1.0
+    @JvmOverloads
+    fun handleCooldown(shooter: Entity?, data: GunData, environmentRate: Double? = null) {
+        val rate = environmentRate ?: computeEnvironmentRate(shooter, data)
 
-        if (shooter != null) {
-            if (shooter.wasInPowderSnow) {
-                rate = data.get(GunProp.IN_SNOW_COOLDOWN_RATE)
-            } else if (shooter.isInWaterOrRain) {
-                rate = data.get(GunProp.IN_WATER_COOLDOWN_RATE)
-            } else if (shooter.isOnFire) {
-                rate = data.get(GunProp.IN_FIRE_COOLDOWN_RATE)
-            } else if (shooter.isInLava) {
-                rate = data.get(GunProp.IN_LAVA_COOLDOWN_RATE)
-            }
+        val heatO = data.heat.get()
+        val heat = max(heatO - data.get(GunProp.NATURAL_COOLDOWN) * rate, 0.0)
+        if (heat != heatO) {
+            data.nbtVersion.invalidateStructural()
+            data.heat.set(heat)
         }
-
-        data.heat.set(max(data.heat.get() - data.get(GunProp.NATURAL_COOLDOWN) * rate, 0.0))
 
         if (data.heat.get() < 80 && data.overHeat.get()) {
             data.overHeat.set(false)
+        }
+    }
+
+    /**
+     * Computes the cooldown rate multiplier from the shooter's environment.
+     *
+     * Extracted so that [VehicleEntity] can call this once per tick and reuse
+     * the result across all mounted weapons, avoiding redundant fluid-state
+     * queries for every [GunData].
+     *
+     * @param shooter the entity to query.
+     * @param data    the gun data (used to read environment-specific props).
+     * @return the environment-based cooldown rate multiplier.
+     */
+    fun computeEnvironmentRate(shooter: Entity?, data: GunData): Double {
+        if (shooter == null) return 1.0
+
+        return when {
+            shooter.wasInPowderSnow -> data.get(GunProp.IN_SNOW_COOLDOWN_RATE)
+            shooter.isInWaterOrRain -> data.get(GunProp.IN_WATER_COOLDOWN_RATE)
+            shooter.isOnFire        -> data.get(GunProp.IN_FIRE_COOLDOWN_RATE)
+            shooter.isInLava        -> data.get(GunProp.IN_LAVA_COOLDOWN_RATE)
+            else                    -> 1.0
         }
     }
 
@@ -241,21 +287,48 @@ object GunEventHandler {
         }
     }
 
-    @JvmStatic
+    /**
+     * Executes tick update logic for firearm data.
+     *
+     * <p>Automatically called via [com.atsuishio.superbwarfare.item.gun.GunItem.inventoryTick]
+     * when in a player's inventory. When used elsewhere (e.g. vehicles or custom entities),
+     * call this method manually once per tick.
+     *
+     * @param shooter    entity holding the weapon.
+     * @param data       gun data container.
+     * @param inMainHand whether weapon is in main hand, controlling main-hand tick routines.
+     */
     fun gunTick(shooter: Entity?, data: GunData, inMainHand: Boolean) {
+        // Fallback: compute environment rate on-the-fly for single item callers
+        val envRate = computeEnvironmentRate(shooter, data)
+        gunTick(shooter, data, inMainHand, envRate)
+    }
+
+    /**
+     * Overloaded tick update method that accepts a pre-computed environment rate.
+     *
+     * Used by vehicles to avoid redundant fluid-state lookups across multiple weapons.
+     *
+     * @param shooter         entity holding the weapon.
+     * @param data            gun data container.
+     * @param inMainHand      whether weapon is in main hand, controlling main-hand tick routines.
+     * @param environmentRate pre-computed environmental cooldown rate multiplier.
+     */
+    fun gunTick(shooter: Entity?, data: GunData, inMainHand: Boolean, environmentRate: Double) {
         init(shooter, data)
         autoReload(shooter, data, inMainHand)
         tickPerk(shooter, data)
-        handleCooldown(shooter, data)
+        handleCooldown(shooter, data, environmentRate)
         redrawExtraAmmo(shooter, data)
 
+        // Decrement animation and firing cooldown timers
         data.shootAnimationTimer.set(max(data.shootAnimationTimer.get() - 1, 0))
         data.shootTimer.set(max(data.shootTimer.get() - 1, 0))
 
         if (inMainHand) {
             handleGunBolt(data)
 
-            // 启动换弹
+            // Start reload process
             if (data.reload.reloadStarter.start()) {
                 postEvent(ReloadEvent.Pre(shooter, data))
                 startReload(shooter, data)
@@ -282,13 +355,16 @@ object GunEventHandler {
                 }
             }
 
-            // 减少换弹剩余时间
+            if (data.reload.time() > 0) {
+                data.nbtVersion.invalidateStructural()
+            }
+            // Reduce remaining reload timer
             data.reload.reduce()
 
-            // 执行换弹期间额外行为
+            // Execute extra behaviors during reload duration
             data.item.reloadTimeBehaviors[data.reload.time()]?.accept(data)
 
-            // 换弹完成
+            // Reload complete
             if (data.reload.time() == 1) {
                 finishReload(shooter, data)
             }
@@ -313,6 +389,8 @@ object GunEventHandler {
 
     private fun startReload(shooter: Entity?, data: GunData) {
         val reload = data.reload
+
+        data.nbtVersion.invalidateStructural()
 
         if (data.item.isOpenBolt(data)) {
             if (!data.hasEnoughAmmoToShoot(shooter)) {
@@ -384,9 +462,8 @@ object GunEventHandler {
         if (reload.singleReloadStarter.start()) {
             postEvent(ReloadEvent.Pre(shooter, data))
 
-            if (data.get(GunProp.PREPARE_LOAD_TIME) != 0 && (!data.hasEnoughAmmoToShoot(shooter) || stack.`is`(
-                    ModItems.SECONDARY_CATACLYSM
-                ))
+            if (data.get(GunProp.PREPARE_LOAD_TIME) != 0 &&
+                (!data.hasEnoughAmmoToShoot(shooter) || stack.`is`(ModItems.SECONDARY_CATACLYSM))
             ) {
                 // 此处判断空仓换弹的时候，是否在准备阶段就需要装填一发，如M870
                 playGunPrepareLoadReloadSounds(shooter, data)
@@ -407,6 +484,8 @@ object GunEventHandler {
             data.stopped.set(false)
             reload.setStage(1)
             reload.setState(ReloadState.NORMAL_RELOADING)
+
+            data.nbtVersion.invalidateStructural()
         }
 
         if (reload.prepareLoadTimer.get() == data.get(GunProp.PREPARE_AMMO_LOAD_TIME)) {
@@ -429,9 +508,8 @@ object GunEventHandler {
 
         // 二阶段
         if ((reload.prepareTimer.get() == 0 || reload.iterativeLoadTimer.get() == 0)
-            && reload.stage() == 2 && reload.iterativeLoadTimer.get() == 0 && !data.stopped.get() && data.ammo.get() < data.get(
-                GunProp.MAGAZINE
-            )
+            && reload.stage() == 2 && reload.iterativeLoadTimer.get() == 0
+            && !data.stopped.get() && data.ammo.get() < data.get(GunProp.MAGAZINE)
         ) {
             playGunLoopReloadSounds(shooter, data)
             val iterativeTime = data.get(GunProp.ITERATIVE_TIME)
@@ -439,6 +517,7 @@ object GunEventHandler {
 
             // 动画播放nbt
             data.loadIndex.set(if (data.loadIndex.get() == 1) 0 else 1)
+            data.nbtVersion.invalidateStructural()
         }
 
         // 装填
@@ -482,6 +561,7 @@ object GunEventHandler {
             reload.setStage(0)
             if (data.get(GunProp.BOLT_ACTION_TIME) > 0) {
                 data.bolt.needed.set(false)
+                data.nbtVersion.invalidateStructural()
             }
             reload.setState(ReloadState.NOT_RELOADING)
             reload.singleReloadStarter.finish()
@@ -495,6 +575,7 @@ object GunEventHandler {
         val required = min(data.get(GunProp.MAGAZINE) - data.ammo.get(), 1)
         val available = min(required, data.countBackupAmmo(shooter))
         data.ammo.add(available)
+        data.nbtVersion.invalidateStructural()
 
         if (!InventoryTool.hasCreativeAmmoBox(shooter)) {
             data.consumeBackupAmmo(shooter, available)
@@ -509,6 +590,7 @@ object GunEventHandler {
         )
         val available = min(required, data.countBackupAmmo(shooter))
         data.ammo.add(available)
+        data.nbtVersion.invalidateStructural()
 
         if (!InventoryTool.hasCreativeAmmoBox(shooter)) {
             data.consumeBackupAmmo(shooter, available)
@@ -723,9 +805,9 @@ object GunEventHandler {
             val stackEnergyNeed = min(cellEnergy, stackMaxEnergy - stackEnergy)
 
             if (cellEnergy > 0) {
-                stackStorage.receiveEnergy(stackEnergyNeed, false)
+                val received = stackStorage.receiveEnergy(stackEnergyNeed, false)
+                cellStorage.extractEnergy(received, false)
             }
-            cellStorage.extractEnergy(stackEnergyNeed, false)
         }
     }
 
@@ -736,16 +818,16 @@ object GunEventHandler {
     //            if (Mod.MODID.equals(mapping.getKey().getNamespace())) {
     //                var item = mapping.getKey().getPath();
     //                if (item.equals("abekiri")) {
-    //                    mapping.remap(ModItems.HOMEMADE_SHOTGUN.get());
+    //                    mapping.remap(ModItems.HOMEMADE_SHOTGUN);
     //                }
     //                if (item.equals("m2hb_blueprint")) {
-    //                    mapping.remap(ModItems.M_2_HB_BLUEPRINT.get());
+    //                    mapping.remap(ModItems.M_2_HB_BLUEPRINT);
     //                }
     //                if (item.equals("rocket_70")) {
-    //                    mapping.remap(ModItems.SMALL_ROCKET.get());
+    //                    mapping.remap(ModItems.SMALL_ROCKET);
     //                }
     //                if (item.equals("us_helmet_pastg")) {
-    //                    mapping.remap(ModItems.US_HELMET_PASGT.get());
+    //                    mapping.remap(ModItems.US_HELMET_PASGT);
     //                }
     //            }
     //        }

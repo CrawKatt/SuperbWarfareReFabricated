@@ -13,8 +13,3 @@ val COMMON_CONFIG = buildConfig(
 
     GameplayConfig,
 )
-
-object CommonConfig {
-    @JvmStatic
-    fun init() = COMMON_CONFIG
-}

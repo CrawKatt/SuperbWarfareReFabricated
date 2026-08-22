@@ -14,7 +14,10 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
+@Environment(EnvType.CLIENT)
 object HandsomeFrameOverlay : CommonOverlay("handsome_frame") {
     private val FRAME = loc("textures/overlay/frame/frame.png")
     private val FRAME_WEAK = loc("textures/overlay/frame/frame_weak.png")

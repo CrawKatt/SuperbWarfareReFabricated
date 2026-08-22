@@ -8,9 +8,10 @@ import net.minecraft.advancements.critereon.ContextAwarePredicate
 import net.minecraft.advancements.critereon.EntityPredicate
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger
 import net.minecraft.server.level.ServerPlayer
-import java.util.Optional
+import java.util.*
 
 class OttoSprintTrigger : SimpleCriterionTrigger<OttoSprintTrigger.TriggerInstance>() {
+
     fun trigger(pPlayer: ServerPlayer) {
         this.trigger(pPlayer) { true }
     }

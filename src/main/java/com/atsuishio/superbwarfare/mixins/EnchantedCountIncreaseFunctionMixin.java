@@ -46,7 +46,7 @@ public abstract class EnchantedCountIncreaseFunctionMixin {
             ItemStack mainHandItem = living.getMainHandItem();
             if (!(mainHandItem.getItem() instanceof GunItem)) return;
 
-            int level = GunData.from(mainHandItem).perk.getLevel(ModPerks.POWERFUL_ATTRACTION);
+            int level = GunData.from(mainHandItem).perk.getLevel(ModPerks.INSTANCE.getPOWERFUL_ATTRACTION());
             if (level > 0) {
                 float f = (float) level * this.value.getFloat(context);
                 stack.grow(Math.round(f));

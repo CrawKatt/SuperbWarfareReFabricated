@@ -38,7 +38,7 @@ object ModTabs {
             .icon { ItemStack(ModItems.TASER) }
             .displayItems { _, output ->
                 ModItems.GUNS.forEach { item ->
-                    if (item === ModItems.VEHICLE_GUN) return@forEach
+                    if (item === ModItems.VEHICLE_GUN || item === ModItems.EMPTY_GUN) return@forEach
 
                     output.accept(ItemStack(item))
 

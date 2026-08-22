@@ -1,17 +1,14 @@
 package com.atsuishio.superbwarfare.entity.vehicle
 
-import com.atsuishio.superbwarfare.entity.buildControllers
-import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity
+import com.atsuishio.superbwarfare.client.animation.AnimationPlayType
+import com.atsuishio.superbwarfare.entity.vehicle.base.SpArtilleryEntity
 import com.atsuishio.superbwarfare.tools.angleTo
 import com.atsuishio.superbwarfare.tools.toVec3
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
-import software.bernie.geckolib.animation.AnimatableManager.ControllerRegistrar
 
-class Plz05Entity(type: EntityType<Plz05Entity>, world: Level) : ArtilleryEntity(type, world) {
-
-    override fun getDamageModifier() = super.getDamageModifier()
-        .custom { source, damage -> getSourceAngle(source, 0.3f) * damage }
+open class Plz05Entity(type: EntityType<Plz05Entity>, world: Level) : SpArtilleryEntity(type, world) {
+    private var wasLockTurret = false
 
     override fun baseTick() {
         super.baseTick()
@@ -26,24 +23,21 @@ class Plz05Entity(type: EntityType<Plz05Entity>, world: Level) : ArtilleryEntity
         } else {
             lockTurret = false
         }
-    }
 
-    override fun registerControllers(data: ControllerRegistrar) = buildControllers(data) {
-        "shoot" {
-            if (getShootAnimationTimer(1, 0) > 0) {
-                thenPlay("animation.plz_05.shoot")
-            } else {
-                thenLoop("animation.plz_05.idle")
+        if (level().isClientSide) {
+            val ctx = anim?.context ?: return
+            if (lockTurret && !wasLockTurret) {
+                ctx.playAnimation(
+                    "animation.plz_05.lock_turret", AnimationPlayType.LOOP,
+                    fadeInTicks = 40
+                )
+            } else if (!lockTurret && wasLockTurret) {
+                ctx.stopAnimation(
+                    "animation.plz_05.lock_turret",
+                    fadeOutTicks = 80
+                )
             }
-        }
-        "lockTurret"(10) {
-            if (lockTurret) {
-                thenPlay("animation.plz_05.lock_turret")
-            } else {
-                thenLoop("animation.plz_05.idle")
-            }
+            wasLockTurret = lockTurret
         }
     }
-
-    override fun canBind() = true
 }

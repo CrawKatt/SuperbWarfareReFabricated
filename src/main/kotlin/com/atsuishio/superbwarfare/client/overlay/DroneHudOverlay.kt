@@ -161,8 +161,7 @@ object DroneHudOverlay : CommonOverlay("drone_hud") {
                             mc.font, Component.translatable("tips.superbwarfare.drone.ammo")
                                 .append(
                                     Component.literal(
-                                        entity.ammo.toString() + " / " + entity.getEntityData()
-                                            .get<Int?>(DroneEntity.MAX_AMMO)
+                                        entity.getAmmo().toString() + " / " + entity.getEntityData().get(DroneEntity.MAX_AMMO)
                                     )
                                 ),
                             screenWidth / 2 + 12, screenHeight / 2 - 37, -1, false

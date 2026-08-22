@@ -1,7 +1,10 @@
 package com.atsuishio.superbwarfare.block.entity
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.SmallContainerBlock
+import com.atsuishio.superbwarfare.client.animation.block.SmallContainerBlockAnimationInstance
 import com.atsuishio.superbwarfare.init.ModBlockEntities
+import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import net.minecraft.advancements.CriteriaTriggers
 import net.minecraft.core.BlockPos
@@ -32,38 +35,19 @@ import net.minecraft.world.level.storage.loot.LootTable
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams
 import net.minecraft.world.phys.Vec3
-import software.bernie.geckolib.animatable.GeoBlockEntity
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.animation.*
-import software.bernie.geckolib.util.GeckoLibUtil
 
 open class SmallContainerBlockEntity(pos: BlockPos, state: BlockState) :
-    BlockEntity(ModBlockEntities.SMALL_CONTAINER, pos, state), GeoBlockEntity {
+    BlockEntity(ModBlockEntities.SMALL_CONTAINER, pos, state) {
+
+    open val modelInstance = BlockModelReloadListener.getModel(MODEL)?.createInstance()
+
     var lootTable: ResourceKey<LootTable>? = null
     var lootTableSeed: Long = 0
     var tick: Int = 0
     var player: Player? = null
     var opened: Boolean = false
 
-    private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
-
-    private fun predicate(event: AnimationState<SmallContainerBlockEntity>): PlayState? {
-        return if (this.blockState.getValue(SmallContainerBlock.OPENED)) {
-            event.setAndContinue(RawAnimation.begin().thenPlay("animation.container.open"))
-        } else {
-            PlayState.STOP
-        }
-    }
-
-    override fun registerControllers(data: AnimatableManager.ControllerRegistrar) {
-        data.add(
-            AnimationController(this, "controller", 0) { this.predicate(it) }
-        )
-    }
-
-    override fun getAnimatableInstanceCache(): AnimatableInstanceCache {
-        return this.cache
-    }
+    var animationInstance: SmallContainerBlockAnimationInstance? = null
 
     override fun applyImplicitComponents(componentInput: DataComponentInput) {
         super.applyImplicitComponents(componentInput)
@@ -159,6 +143,8 @@ open class SmallContainerBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/block/small_container.geo.json")
+
         fun serverTick(pLevel: Level, pPos: BlockPos, pState: BlockState, blockEntity: SmallContainerBlockEntity) {
             if (!pState.getValue(SmallContainerBlock.OPENED)) {
                 return

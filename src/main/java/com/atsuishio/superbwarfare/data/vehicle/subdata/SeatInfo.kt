@@ -36,6 +36,9 @@ class SeatInfo {
     @SerialName("CanRotateHead")
     var canRotateHead: Boolean = true
 
+    @SerialName("RotateWithVehicle")
+    var rotateWithVehicle: Boolean = false
+
     @JvmField
     @SerialName("HasThermalImaging")
     var hasThermalImaging: Boolean = false
@@ -68,4 +71,7 @@ class SeatInfo {
 
     @SerialName("DismountInfo")
     var dismountInfo: DismountInfo? = null
+
+    @SerialName("DamageAbsorbRate")
+    var damageAbsorbRate: Float = 0.7f
 }

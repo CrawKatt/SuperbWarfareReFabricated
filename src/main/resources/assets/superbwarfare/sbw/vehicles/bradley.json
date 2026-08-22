@@ -1,7 +1,9 @@
 {
-  "Model": {
-    "Animation": "superbwarfare:animations/lav_150.animation.json",
-    "Model": "superbwarfare:geo/bradley.geo.json",
-    "Texture": "superbwarfare:textures/entity/bradley.png"
-  }
+  "Animation": "superbwarfare:animations/bedrock/vehicle/bradley.animation.json",
+  "Models": [
+    {
+      "Model": "superbwarfare:models/bedrock/vehicle/bradley.geo.json",
+      "Texture": "superbwarfare:textures/bedrock/vehicle/bradley.png"
+    }
+  ]
 }

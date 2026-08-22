@@ -3,6 +3,11 @@
   "MaxEnergy": 5000000,
   "OBB": [
     {
+      "Part": "Collision",
+      "Size": [1.375, 1.1875, 3.1875],
+      "Position": [0, 1.1875, -0.125]
+    },
+    {
       "Size": [0.3, 0.75, 0.75],
       "Position": [-1.140625, 0.75, 1.584375],
       "Part": "WheelRight"
@@ -69,6 +74,7 @@
       "BanHand": true,
       "Transform": "Vehicle",
       "Position": [0, 1, 0],
+      "RotateWithVehicle": true,
       "CameraPos": {
         "UseSimulate3P": true,
         "Simulate3PPos": [6, 1]
@@ -79,6 +85,7 @@
       "BanHand": true,
       "Transform": "Vehicle",
       "Position": [0, 1, 0],
+      "RotateWithVehicle": true,
       "CameraPos": {
         "UseSimulate3P": true,
         "Simulate3PPos": [6, 1]
@@ -89,6 +96,7 @@
       "BanHand": true,
       "Transform": "Vehicle",
       "Position": [0, 1, 0],
+      "RotateWithVehicle": true,
       "CameraPos": {
         "UseSimulate3P": true,
         "Simulate3PPos": [6, 1]
@@ -98,6 +106,7 @@
       "HidePassenger": true,
       "BanHand": true,
       "Transform": "Vehicle",
+      "RotateWithVehicle": true,
       "Position": [0, 1, 0],
       "CameraPos": {
         "UseSimulate3P": true,
@@ -176,6 +185,7 @@
       "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/gun_7_62mm.png",
       "DefaultFireMode": "Auto",
       "AvailableFireModes": "Auto",
+      "DefaultZoom": 3,
       "Spread": 0.5,
       "CrosshairColor": "0x66FF00",
       "Projectile": "superbwarfare:projectile",
@@ -227,6 +237,7 @@
   "UpStep": 1.5,
   "RotateOffsetHeight": 2.2,
   "Mass": 13.6,
+  "TowForceFactor": 2.0,
   "DamageModifiers": [
     "All - 11",
     "minecraft:lava + 11",
@@ -248,11 +259,14 @@
     "@#superbwarfare:aerial_bomb * 3",
     "#superbwarfare:projectile * 0.25",
     "#superbwarfare:projectile_absolute * 0.85",
+    "@superbwarfare:small_cannon_shell * 0.5",
+    "@superbwarfare:c4 * 1.5",
     "superbwarfare:vehicle_strike * 4",
     "@superbwarfare:mortar_shell * 1.25",
     "@superbwarfare:gun_grenade * 1.5",
     "@superbwarfare:javelin_missile * 0.8",
-    "@#superbwarfare:aa_missile * 0.75"
+    "@#superbwarfare:aa_missile * 0.75",
+    "$entity.getSourceAngle(source, 0.15) * damage"
   ],
   "VehicleContainerType": "Medium",
   "DestroyInfo": {

@@ -11,15 +11,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class OverlayTextureMixin {
 
     @Inject(method = "u(F)I", at = @At("HEAD"), cancellable = true)
-    private static void superbWarfare$u(float u, CallbackInfoReturnable<Integer> cir) {
+    private static void u(float pU, CallbackInfoReturnable<Integer> cir) {
         if (ClientEventHandler.activeThermalImaging) {
+            cir.cancel();
             cir.setReturnValue(15);
         }
+
     }
 
     @Inject(method = "v(Z)I", at = @At("HEAD"), cancellable = true)
-    private static void superbWarfare$v(boolean hurt, CallbackInfoReturnable<Integer> cir) {
+    private static void v(boolean pHurt, CallbackInfoReturnable<Integer> cir) {
         if (ClientEventHandler.activeThermalImaging) {
+            cir.cancel();
             cir.setReturnValue(10);
         }
     }

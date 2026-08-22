@@ -6,42 +6,33 @@ import com.atsuishio.superbwarfare.data.Prop
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.getPerkPriority
 import com.atsuishio.superbwarfare.init.ModPerks
 import com.atsuishio.superbwarfare.perk.Perk
-import com.atsuishio.superbwarfare.serialization.kserializer.ResourceLocationSerializer
-import kotlinx.serialization.KSerializer
 import kotlin.math.min
 import kotlin.reflect.KMutableProperty1
 
 @Suppress("UNUSED")
 class GunProp<T, R>(
-    private val rawProp: KMutableProperty1<DefaultGunData, T>,
+    prop: KMutableProperty1<DefaultGunData, T>,
     transform: (T) -> R,
-    serializerOverride: KSerializer<T>? = null,
-) : Prop<GunData, DefaultGunData, T, R, GunProp<T, R>>(rawProp, transform, serializerOverride) {
+) : Prop<GunData, DefaultGunData, T, R, GunProp<T, R>>(prop, transform) {
 
     override fun toString() = "GunProp[$serializationName]"
-
-    @Suppress("UNCHECKED_CAST")
-    fun writeTo(data: DefaultGunData, value: Any?) {
-        (rawProp as KMutableProperty1<DefaultGunData, Any?>).set(data, value)
-    }
 
     companion object {
         val entries = mutableListOf<GunProp<*, *>>()
 
         inline fun <reified T> plainProp(
             prop: KMutableProperty1<DefaultGunData, T>,
-            serializerOverride: KSerializer<T>? = null,
         ): GunProp<T, T> {
-            return GunProp(prop, { it }, serializerOverride).also { entries.add(it) }
+            return GunProp(prop) { it }.also { entries.add(it) }
         }
 
         inline fun <reified T, R> complexProp(
             prop: KMutableProperty1<DefaultGunData, T>,
-            serializerOverride: KSerializer<T>? = null,
             noinline transform: (T) -> R
         ): GunProp<T, R> {
-            return GunProp(prop, transform, serializerOverride).also { entries.add(it) }
+            return GunProp(prop, transform).also { entries.add(it) }
         }
+
 
         @JvmField
         val MAX_DURABILITY = plainProp(DefaultGunData::maxDurability)
@@ -131,7 +122,8 @@ class GunProp<T, R>(
         val RANGE = plainProp(DefaultGunData::range)
 
         @JvmField
-        val MELEE_DAMAGE_TIME = plainProp(DefaultGunData::meleeDamageTime)
+        val MELEE_DAMAGE_TIME =
+            plainProp(DefaultGunData::meleeDamageTime)
 
         @JvmField
         val PROJECTILE = complexProp(DefaultGunData::projectile) { it.value }
@@ -165,6 +157,7 @@ class GunProp<T, R>(
         @JvmField
         val GUN_TYPE = complexProp(DefaultGunData::gunType) { it }
 
+        // 注意Nullable
         @JvmField
         val AUTO_RELOAD = plainProp(DefaultGunData::autoReload)
 
@@ -181,15 +174,24 @@ class GunProp<T, R>(
         val DEFAULT_ZOOM = plainProp(DefaultGunData::defaultZoom)
 
         @JvmField
+        val BOUND_BONES = plainProp(DefaultGunData::boundBones)
+
+        @JvmField
+        val BOUND_BONES_YAW = plainProp(DefaultGunData::boundBonesYaw)
+
+        @JvmField
+        val BOUND_BONES_PITCH = plainProp(DefaultGunData::boundBonesPitch)
+
+        @JvmField
         val BURST_AMOUNT = plainProp(DefaultGunData::burstAmount)
 
         @JvmField
         val BYPASSES_ARMOR = plainProp(DefaultGunData::bypassesArmor)
 
         @JvmField
-        val AMMO_CONSUMER = complexProp(DefaultGunData::ammoConsumers) {
-            it.list.map { l -> l.value.also { consumer -> consumer.init() } }
-        }
+        val AMMO_CONSUMER = complexProp(
+            DefaultGunData::ammoConsumers
+        ) { it.list.map { l -> l.value.also { consumer -> consumer.init() } } }
 
         @JvmField
         val NORMAL_RELOAD_TIME = plainProp(DefaultGunData::normalReloadTime)
@@ -246,6 +248,9 @@ class GunProp<T, R>(
         val SHOOT_DELAY = plainProp(DefaultGunData::shootDelay)
 
         @JvmField
+        val SHOOT_DELAY_TIME = plainProp(DefaultGunData::shootDelayTime)
+
+        @JvmField
         val HEAT_PER_SHOOT = plainProp(DefaultGunData::heatPerShoot)
 
         @JvmField
@@ -264,6 +269,9 @@ class GunProp<T, R>(
         val IN_LAVA_COOLDOWN_RATE = plainProp(DefaultGunData::inLavaCooldownRate)
 
         @JvmField
+        val USE_NACELLE_CAMERA = plainProp(DefaultGunData::useNacelleCamera)
+
+        @JvmField
         val AVAILABLE_PERKS = complexProp(DefaultGunData::availablePerks) {
             val availablePerks = mutableListOf<Perk>()
             val perkNames = it.list.ifEmpty { return@complexProp availablePerks }
@@ -271,25 +279,17 @@ class GunProp<T, R>(
             val sortedNames = perkNames.distinct().sortedWith { s1, s2 ->
                 val p1 = getPerkPriority(s1)
                 val p2 = getPerkPriority(s2)
-
                 if (p1 != p2) {
-                    p1.compareTo(p2)
+                    return@sortedWith p1.compareTo(p2)
                 } else {
-                    s1.compareTo(s2)
+                    return@sortedWith s1.compareTo(s2)
                 }
             }
 
-            val perkValues = (ModPerks.AMMO_PERKS + ModPerks.FUNC_PERKS + ModPerks.DAMAGE_PERKS).distinct()
-            val perkMap = mutableMapOf<String, Perk>()
+            val perks = ModPerks.PERK_REGISTRY.entrySet()
 
-            for (perk in perkValues) {
-                val key = ModPerks.PERK_REGISTRY.getKey(perk)
-
-                if (key != null) {
-                    perkMap[key.toString()] = perk
-                    perkMap[key.path] = perk
-                }
-            }
+            val perkValues = perks.mapNotNull { obj -> obj?.value }
+            val perkKeys = perks.mapNotNull { perk -> perk?.key?.location().toString() }
 
             for (name in sortedNames) {
                 if (name.startsWith("@")) {
@@ -303,29 +303,26 @@ class GunProp<T, R>(
                     }
                 } else if (name.startsWith("!")) {
                     val n = name.substring(1)
-                    val perk = perkMap[n]
-
-                    if (perk != null) {
-                        availablePerks.remove(perk)
+                    val index = perkKeys.indexOf(n)
+                    if (index != -1) {
+                        availablePerks.remove(perkValues[index])
                     } else {
                         Mod.LOGGER.info("Perk {} not found", n)
                     }
                 } else {
-                    val perk = perkMap[name]
-
-                    if (perk != null) {
-                        availablePerks.add(perk)
+                    val index = perkKeys.indexOf(name)
+                    if (index != -1) {
+                        availablePerks.add(perkValues[index])
                     } else {
                         Mod.LOGGER.info("Perk {} not found", name)
                     }
                 }
             }
-
             return@complexProp availablePerks.toList()
         }
 
         @JvmField
-        val ICON = complexProp(DefaultGunData::icon, ResourceLocationSerializer) { it }
+        val ICON = complexProp(DefaultGunData::icon) { it }
 
         @JvmField
         val CROSSHAIR = complexProp(DefaultGunData::crosshair) { it.ifEmpty { "@GunDefault" } }
@@ -336,6 +333,7 @@ class GunProp<T, R>(
         @JvmField
         val CROSSHAIR_COLOR = complexProp(DefaultGunData::crosshairColor) { it }
 
+        // 注意Nullable
         @JvmField
         val NAME = plainProp(DefaultGunData::name)
 
@@ -344,6 +342,9 @@ class GunProp<T, R>(
 
         @JvmField
         val SEEK_WEAPON_INFO = plainProp(DefaultGunData::seekWeaponInfo)
+
+        @JvmField
+        val PROJECTILE_DUMMY_INFO = plainProp(DefaultGunData::projectileDummyInfo)
 
         @JvmField
         val SOUND_INFO = complexProp(DefaultGunData::soundInfo) { it }
@@ -369,18 +370,22 @@ class GunProp<T, R>(
         @JvmField
         val AP_DURABILITY = plainProp(DefaultGunData::apDurability)
 
+        @JvmField
+        val UNDERWATER_MOTION_SCALE = plainProp(DefaultGunData::underwaterMotionScale)
+
+        @JvmField
+        val EXPLOSION_DESTROY = plainProp(DefaultGunData::explosionDestroy)
+
+        // TODO 会不会有点屎...
         fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) = with(modifier) {
             modify(MAX_DURABILITY) { it.coerceAtLeast(0) }
             modify(DURABILITY_PER_SHOOT) { it.coerceAtLeast(0) }
-
             modify(MAX_ENERGY) { it.coerceAtLeast(0) }
-
             modify(MAX_RECEIVE_ENERGY) {
                 val maxEnergy = modifier[MAX_ENERGY]
                 val value = it.coerceIn(-1, maxEnergy)
                 if (value < 0) maxEnergy else value
             }
-
             modify(MAX_EXTRACT_ENERGY) {
                 val maxEnergy = modifier[MAX_ENERGY]
                 val value = it.coerceIn(-1, maxEnergy)
@@ -393,21 +398,17 @@ class GunProp<T, R>(
 
             modify(RANGE) { it.coerceAtLeast(1) }
             modify(MELEE_DAMAGE_TIME) { min(modifier[MELEE_DURATION] - 1, it) }
-
             modify(AMMO_COST_PER_SHOOT) { it.coerceAtLeast(0) }
             modify(PROJECTILE_AMOUNT) { it.coerceAtLeast(0) }
             modify(WEIGHT) { it.coerceAtLeast(1.0) }
 
             modify(MAGAZINE) {
-                if (modifier[PROJECTILE_AMOUNT] <= 0 && modifier[MELEE_DAMAGE] > 0) {
-                    0
-                } else {
-                    it.coerceAtLeast(0)
-                }
+                if (modifier[PROJECTILE_AMOUNT] <= 0 && modifier[MELEE_DAMAGE] > 0) 0 else it.coerceAtLeast(0)
             }
 
             modify(BURST_AMOUNT) { it.coerceAtLeast(0) }
             modify(RPM) { it.coerceIn(1, 114514) }
+            modify(UNDERWATER_MOTION_SCALE) { it.coerceIn(0.0f, 1.0f) }
         }
     }
 }

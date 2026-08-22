@@ -1,5 +1,7 @@
 package com.atsuishio.superbwarfare.client.renderer.gun;
 
+import com.atsuishio.superbwarfare.init.ModCapabilities;
+
 import com.atsuishio.superbwarfare.client.ItemModelHelper;
 import com.atsuishio.superbwarfare.client.animation.AnimationHelper;
 import com.atsuishio.superbwarfare.client.model.item.Ql1031ItemModel;
@@ -8,7 +10,6 @@ import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.item.gun.sniper.Ql1031Item;
 import com.mojang.blaze3d.vertex.PoseStack;

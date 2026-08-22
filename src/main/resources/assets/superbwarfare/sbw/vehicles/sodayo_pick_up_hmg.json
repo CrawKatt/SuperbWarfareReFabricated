@@ -1,7 +1,9 @@
 {
-  "Model": {
-    "Animation": "superbwarfare:animations/sodayo_pick_up_hmg.animation.json",
-    "Model": "superbwarfare:geo/sodayo_pick_up_hmg.geo.json",
-    "Texture": "superbwarfare:textures/entity/sodayo_pick_up.png"
-  }
+  "Animation": "superbwarfare:animations/bedrock/vehicle/sodayo_pick_up_hmg.animation.json",
+  "Models": [
+    {
+      "Model": "superbwarfare:models/bedrock/vehicle/sodayo_pick_up_hmg.geo.json",
+      "Texture": "superbwarfare:textures/bedrock/vehicle/sodayo_pick_up_hmg.png"
+    }
+  ]
 }

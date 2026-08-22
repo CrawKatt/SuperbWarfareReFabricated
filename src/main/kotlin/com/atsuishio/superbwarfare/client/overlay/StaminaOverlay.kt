@@ -9,7 +9,10 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Mth
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
+@Environment(EnvType.CLIENT)
 object StaminaOverlay : CommonOverlay("stamina") {
 
     override fun shouldRender() =

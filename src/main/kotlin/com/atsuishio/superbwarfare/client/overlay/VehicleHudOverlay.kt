@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.RenderHelper
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.animation.AnimationTimer
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
+import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.data.gun.AmmoConsumer
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo.Aircraft
@@ -217,9 +218,11 @@ object VehicleHudOverlay : CommonOverlay("vehicle_hud") {
     }
 
     @JvmStatic
-    fun renderKillIndicator(guiGraphics: GuiGraphics?, screenWidth: Float, screenHeight: Float) {
-        val posX = screenWidth / 2f - 7.5f + (2 * (Math.random() - 0.5f)).toFloat()
-        val posY = screenHeight / 2f - 7.5f + (2 * (Math.random() - 0.5f)).toFloat()
+    fun renderKillIndicator(guiGraphics: GuiGraphics?, w: Float, h: Float) {
+        if (MiscConfig.HIDE_COMBAT_HUD.get()) return
+
+        val posX = w / 2f - 7.5f + (2 * (Math.random() - 0.5f)).toFloat()
+        val posY = h / 2f - 7.5f + (2 * (Math.random() - 0.5f)).toFloat()
         val rate = (40 - CrossHairOverlay.killIndicator * 5) / 5.5f
 
         if (CrossHairOverlay.hitIndicator > 0) {
@@ -235,10 +238,10 @@ object VehicleHudOverlay : CommonOverlay("vehicle_hud") {
         }
 
         if (CrossHairOverlay.killIndicator > 0) {
-            val posX1 = screenWidth / 2f - 7.5f - 2 + rate
-            val posY1 = screenHeight / 2f - 7.5f - 2 + rate
-            val posX2 = screenWidth / 2f - 7.5f + 2 - rate
-            val posY2 = screenHeight / 2f - 7.5f + 2 - rate
+            val posX1 = w / 2f - 7.5f - 2 + rate
+            val posY1 = h / 2f - 7.5f - 2 + rate
+            val posX2 = w / 2f - 7.5f + 2 - rate
+            val posY2 = h / 2f - 7.5f + 2 - rate
 
             RenderHelper.preciseBlit(guiGraphics, KILL_MARKER_1, posX1, posY1, 0f, 0f, 16f, 16f, 16f, 16f)
             RenderHelper.preciseBlit(guiGraphics, KILL_MARKER_2, posX2, posY1, 0f, 0f, 16f, 16f, 16f, 16f)
@@ -249,6 +252,8 @@ object VehicleHudOverlay : CommonOverlay("vehicle_hud") {
 
     @JvmStatic
     fun renderKillIndicatorDynamic(guiGraphics: GuiGraphics?, posX: Float, posY: Float) {
+        if (MiscConfig.HIDE_COMBAT_HUD.get()) return
+
         val rate = (40 - CrossHairOverlay.killIndicator * 5) / 5.5f
 
         if (CrossHairOverlay.hitIndicator > 0) {
@@ -554,7 +559,12 @@ object VehicleHudOverlay : CommonOverlay("vehicle_hud") {
                 )
 
                 var ammoCount = vehicle.getAmmoCount(player)
-                val backUpAmmoCount = data.countBackupAmmo(vehicle)
+                // Read the pre-computed, server-synced counter instead of scanning
+                // inventory directly — eliminates the 4-tick countBackupAmmo cache lag.
+                val backUpAmmoCount = if (data.backupAmmoCount.get() != 0 || data.useBackpackAmmo())
+                    data.backupAmmoCount.get()
+                else
+                    data.countBackupAmmo(vehicle)
 
                 if (ammoCount == Int.MAX_VALUE) {
                     RenderHelper.preciseBlit(

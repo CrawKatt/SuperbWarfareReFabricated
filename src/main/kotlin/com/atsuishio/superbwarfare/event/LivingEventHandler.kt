@@ -50,6 +50,7 @@ import net.minecraft.world.item.ItemStack
 import java.util.*
 import kotlin.math.max
 import kotlin.math.pow
+import kotlin.math.sqrt
 
 object LivingEventHandler {
     private val capturedDrops = ThreadLocal<MutableList<ItemEntity>?>()
@@ -122,6 +123,7 @@ object LivingEventHandler {
                     return 0f
                 }
             } else {
+                val rate = vehicle.getSeat(entity)?.damageAbsorbRate ?: 0.0f
                 if (!source.`is`(ModTags.DamageTypes.VEHICLE_NOT_ABSORB)) {
                     vehicle.hurt(source, 0.7f * amount)
                 }
@@ -583,8 +585,6 @@ object LivingEventHandler {
         if (!vehicle.level().isClientSide) {
             val stack = pickUp.item.copy()
             val oldCount = stack.count
-
-            // TODO 正确实现setCanPickup
 
             val count = InventoryTool.insertItem(vehicle.inventory.getItems(), stack)
 

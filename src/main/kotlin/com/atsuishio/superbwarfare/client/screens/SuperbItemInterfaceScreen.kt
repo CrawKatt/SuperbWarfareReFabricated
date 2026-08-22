@@ -6,6 +6,10 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.player.Inventory
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+
+@Environment(EnvType.CLIENT)
 class SuperbItemInterfaceScreen(menu: SuperbItemInterfaceMenu, playerInventory: Inventory, title: Component) :
     AbstractContainerScreen<SuperbItemInterfaceMenu>(menu, playerInventory, title) {
     init {

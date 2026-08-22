@@ -17,7 +17,7 @@ open class SyncedEntityEnergyStorage(
     maxExtract: Int,
     protected var entityData: SynchedEntityData,
     protected var energyDataAccessor: EntityDataAccessor<Int>
-) : EnergyStorage(capacity.toLong(), maxReceive.toLong(), maxExtract.toLong(), 0) {
+) : EnergyStorage(capacity.toLong(), maxReceive.toLong(), maxExtract.toLong(), 0L) {
 
     constructor(
         capacity: Int,
@@ -30,6 +30,11 @@ open class SyncedEntityEnergyStorage(
         data,
         energyDataAccessor
     )
+
+    init {
+        // 从entityData同步初始能量值，避免reviveCaps()后内部energy字段与entityData不一致
+        this.energy = entityData.get(energyDataAccessor).toLong()
+    }
 
     fun setEnergy(energy: Int) {
         this.energy = energy.toLong()

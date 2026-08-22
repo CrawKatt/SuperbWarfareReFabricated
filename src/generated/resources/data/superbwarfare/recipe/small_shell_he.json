@@ -3,7 +3,7 @@
   "category": "equipment",
   "key": {
     "a": {
-      "tag": "superbwarfare:ingots/steel"
+      "tag": "c:ingots/steel"
     },
     "b": {
       "tag": "c:ingots/copper"

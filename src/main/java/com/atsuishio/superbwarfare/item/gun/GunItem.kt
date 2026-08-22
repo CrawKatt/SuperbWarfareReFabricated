@@ -32,6 +32,7 @@ import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.tools.VectorTool.isInLiquid
+import com.atsuishio.superbwarfare.tools.VectorTool.randomSpreadVec
 import com.atsuishio.superbwarfare.world.phys.EntityResult
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -771,28 +772,24 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
 
             // SBW子弹弹射物专属属性
             if (entity is ProjectileEntity) {
-                entity.shooter(shooter)
-                    .damage(damage.toFloat())
-                    .headShot(headshot.toFloat())
-                    .zoom(zoom)
-                    .bypassArmorRate(bypassArmorRate.toFloat())
-                    .setGunItemId(stack)
-                    .velocity(finalVelocity)
+                entity.setGunItemId(stack)
             }
 
             // SBW弹射物专属属性
-            if (entity is CustomDamageProjectile) {
-                entity.setDamage(damage.toFloat())
-            }
-
-            if (entity is CustomGravityEntity) {
-                entity.setGravity(data.get(GunProp.GRAVITY).toFloat())
-            }
-
-            if (entity is ExplosiveProjectile) {
-                entity.setExplosionDamage(data.get(GunProp.EXPLOSION_DAMAGE).toFloat())
-                entity.setExplosionRadius(data.get(GunProp.EXPLOSION_RADIUS).toFloat())
-                entity.setLife(data.get(GunProp.PROJECTILE_LIFE))
+            if (entity is IBulletProperties) {
+                with(entity) {
+                    setDamage(damage.toFloat())
+                    setCustomGravity(data.get(GunProp.GRAVITY).toFloat())
+                    setExplosionDamage(data.get(GunProp.EXPLOSION_DAMAGE).toFloat())
+                    setExplosionRadius(data.get(GunProp.EXPLOSION_RADIUS).toFloat())
+                    setLife(data.get(GunProp.PROJECTILE_LIFE))
+                    setHeadShot(headshot.toFloat())
+                    setZoom(zoom)
+                    setBypassArmorRate(bypassArmorRate.toFloat())
+                    setVelocity(finalVelocity)
+                    setUnderwaterMotionScale(data.get(GunProp.UNDERWATER_MOTION_SCALE))
+                    setExplosionDestroy(data.get(GunProp.EXPLOSION_DESTROY))
+                }
             }
 
             if (entity is WireGuideMissileEntity && shooter != null && shooter.vehicle != null) {
@@ -908,7 +905,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             return false
         }
 
-        for (type in Perk.Type.entries.toTypedArray()) {
+        for (type in GunData.PERK_TYPES) {
             val instance = data.perk.getInstances(type)
             instance.forEach {
                 it.perk.modifyProjectile(data, it, entity)
@@ -1012,7 +1009,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             shootPosition,
             toVec,
             aabb,
-            { p -> !p.isSpectator && p.isAlive },
+            { p -> !p.isSpectator && p.isAlive && p != shooter && p != shooter.vehicle },
             distance
         )
 
@@ -1197,13 +1194,8 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         )
     }
 
-    protected fun randomVec(vec3: Vec3, spread: Double): Vec3 {
-        return vec3.normalize().add(
-            random.triangle(0.0, 0.0172275 * spread),
-            this.random.triangle(0.0, 0.0172275 * spread),
-            this.random.triangle(0.0, 0.0172275 * spread)
-        )
-    }
+    protected fun randomVec(vec3: Vec3, spread: Double): Vec3 =
+        randomSpreadVec(this.random, vec3, spread)
 
     open fun canEditAttachments(data: GunData) = data.get(GunProp.AMMO_CONSUMER).size > 1
 

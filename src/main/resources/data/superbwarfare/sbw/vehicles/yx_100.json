@@ -4,6 +4,11 @@
   "TrackDistanceMultiply": 0.5,
   "OBB": [
     {
+      "Part": "Collision",
+      "Size": [3, 1.438, 5.906],
+      "Position": [0, 1.438, 0.281]
+    },
+    {
       "Size": [2.969, 0.898, 5.0],
       "Position": [0.0, 1.758, -0.469]
     },
@@ -99,6 +104,7 @@
       "BanHand": true,
       "Transform": "Vehicle",
       "Position": [1.406, 1.14, -6.2],
+      "RotateWithVehicle": true,
       "MinYaw": -95,
       "MaxYaw": 95,
       "Pose": "Climb",
@@ -111,6 +117,7 @@
       "BanHand": true,
       "Transform": "Vehicle",
       "Position": [-1.406, 1.14, -6.2],
+      "RotateWithVehicle": true,
       "MinYaw": -95,
       "MaxYaw": 95,
       "Pose": "Climb",
@@ -301,6 +308,7 @@
       "DefaultZoom": 2,
       "CrosshairColor": "0x00ff66",
       "Projectile": "superbwarfare:swarm_drone",
+      "ProjectileLife": 600,
       "RPM": 600,
       "ExplosionDamage": 150,
       "ExplosionRadius": 5,
@@ -396,6 +404,7 @@
   "UpStep": 2.6,
   "RotateOffsetHeight": 3.5,
   "Mass": 100,
+  "TowForceFactor": 2.0,
   "DamageModifiers": [
     "minecraft:arrow 0",
     "minecraft:trident 0",
@@ -415,14 +424,16 @@
     "superbwarfare:lunge_mine * 0.2",
     "superbwarfare:projectile_hit * 1.1",
     "superbwarfare:grapeshot_hit * 0.1",
+    "superbwarfare:laser * 0.15",
     "#superbwarfare:projectile_absolute * 0.15",
     "@#superbwarfare:aa_missile * 0.3",
     "@superbwarfare:small_cannon_shell * 0.25",
-    "@superbwarfare:c4 * 2",
+    "@superbwarfare:c4 * 6",
     "@#superbwarfare:at_rocket * 0.9",
     "@superbwarfare:gun_grenade * 0.25",
     "@superbwarfare:mortar_shell * 0.25",
-    "@superbwarfare:tm_62 * 1.5"
+    "@superbwarfare:tm_62 * 1.5",
+    "$entity.getSourceAngle(source, 0.3) * damage"
   ],
   "DestroyInfo": {
     "ParticleType": "Giant",
@@ -464,5 +475,12 @@
     [-2.5, 0.0, -2.266],
     [2.5, 0.0, -3.516],
     [-2.5, 0.0, -3.516]
-  ]
+  ],
+  "PartHealth": {
+    "Turret": 200,
+    "LeftWheel": 200,
+    "RightWheel": 200,
+    "MainEngine": 300,
+    "SubEngine": 300
+  }
 }

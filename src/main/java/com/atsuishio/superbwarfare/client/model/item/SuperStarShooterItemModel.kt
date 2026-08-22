@@ -44,10 +44,6 @@ class SuperStarShooterItemModel : CustomGunModel<SuperStarShooterItem>() {
         val numP = (1 - 0.78 * zt).toFloat()
 
         AnimationHelper.handleReloadShakeAnimation(stack, main, camera, numR, numP)
-        ClientEventHandler.handleReloadShake(
-            (Mth.RAD_TO_DEG * camera.rotX).toDouble(),
-            (Mth.RAD_TO_DEG * camera.rotY).toDouble(),
-            (Mth.RAD_TO_DEG * camera.rotZ).toDouble()
-        )
+        ClientEventHandler.handleReloadShake((Mth.RAD_TO_DEG * camera.rotX).toDouble(), (Mth.RAD_TO_DEG * camera.rotY).toDouble(), (Mth.RAD_TO_DEG * camera.rotZ).toDouble())
     }
 }

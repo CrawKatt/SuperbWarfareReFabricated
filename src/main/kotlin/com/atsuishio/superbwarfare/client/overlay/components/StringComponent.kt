@@ -29,6 +29,6 @@ class StringComponent(
         get() = font.lineHeight.toFloat()
 
     override fun RenderContext.renderComponent() {
-        guiGraphics.drawString(font, component.visualOrderText, xInt, yInt, color, dropShadow)
+        guiGraphics.drawString(font, component.visualOrderText, x.toInt(), y.toInt(), color, dropShadow)
     }
 }

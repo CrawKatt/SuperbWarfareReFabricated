@@ -1,46 +1,26 @@
 package com.atsuishio.superbwarfare
 
-import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
+import com.atsuishio.superbwarfare.init.ModCapabilities
+
+import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.command.CommandRegister
 import com.atsuishio.superbwarfare.compat.thermoo.ThermooCompatHandler
-import com.atsuishio.superbwarfare.config.CommonConfig
-import com.atsuishio.superbwarfare.config.ServerConfig
-import com.atsuishio.superbwarfare.capability.player.PlayerVariable
+import com.atsuishio.superbwarfare.config.CLIENT_CONFIG
+import com.atsuishio.superbwarfare.config.COMMON_CONFIG
+import com.atsuishio.superbwarfare.config.SERVER_CONFIG
 import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.DataLoader
 import com.atsuishio.superbwarfare.data.container.ContainerDataManager
 import com.atsuishio.superbwarfare.data.loot.WreckageLootDataManager
-import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
-import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
 import com.atsuishio.superbwarfare.event.CustomEventHandler
+import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
 import com.atsuishio.superbwarfare.event.ModVersionEventHandler
 import com.atsuishio.superbwarfare.event.PlayerEventHandler
-import com.atsuishio.superbwarfare.init.ModAttributes
-import com.atsuishio.superbwarfare.init.ModBlockEntities
-import com.atsuishio.superbwarfare.init.ModBlocks
-import com.atsuishio.superbwarfare.init.ModCapabilities
-import com.atsuishio.superbwarfare.init.ModCommandArguments
-import com.atsuishio.superbwarfare.init.ModCriteriaTriggers
-import com.atsuishio.superbwarfare.init.ModDamageTypes
-import com.atsuishio.superbwarfare.init.ModDataComponents
-import com.atsuishio.superbwarfare.init.ModEntities
-import com.atsuishio.superbwarfare.init.ModEventHandlers
-import com.atsuishio.superbwarfare.init.ModGameRules
-import com.atsuishio.superbwarfare.init.ModItems
-import com.atsuishio.superbwarfare.init.ModLootModifier
-import com.atsuishio.superbwarfare.init.ModMenuTypes
-import com.atsuishio.superbwarfare.init.ModMobEffects
-import com.atsuishio.superbwarfare.init.ModParticleTypes
-import com.atsuishio.superbwarfare.init.ModPerks
-import com.atsuishio.superbwarfare.init.ModPotions
-import com.atsuishio.superbwarfare.init.ModRecipes
-import com.atsuishio.superbwarfare.init.ModSerializers
-import com.atsuishio.superbwarfare.init.ModSounds
-import com.atsuishio.superbwarfare.init.ModTabs
-import com.atsuishio.superbwarfare.init.ModTags
-import com.atsuishio.superbwarfare.init.ModVillagers
-import com.atsuishio.superbwarfare.init.ModWorldGen
+import com.atsuishio.superbwarfare.entity.projectile.FastProjectileManualTicker
+import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
+import com.atsuishio.superbwarfare.item.misc.TowBarItem
+import com.atsuishio.superbwarfare.item.misc.TowlineItem
 import com.atsuishio.superbwarfare.item.trinket.IffItem
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect
 import com.atsuishio.superbwarfare.network.registerPayloads
@@ -51,6 +31,7 @@ import com.atsuishio.superbwarfare.tiers.ModArmorMaterials
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger
 import com.atsuishio.superbwarfare.tools.registerMinecraftUtil
 import com.atsuishio.superbwarfare.world.saveddata.ChunkPosSavedData
+import com.atsuishio.superbwarfare.world.saveddata.ProjectileChunkSavedData
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry
 import net.fabricmc.api.EnvType
@@ -64,8 +45,6 @@ import net.minecraft.resources.ResourceLocation
 import net.neoforged.fml.config.ModConfig
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import software.bernie.geckolib.constant.dataticket.SerializableDataTicket
-import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.AbstractMap
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -85,12 +64,14 @@ class Mod : ModInitializer {
         DataLoader.register()
         WreckageLootDataManager.register()
         ModLootModifier.init()
-        FastThrowableProjectile.init()
         IffItem.init()
         PhosphorusFireMobEffect.registerEvents()
         PlayerVariable.registerEvents()
 
         ContainerBlockItem.registerContainers()
+        TowlineItem.init()
+        TowBarItem.init()
+        ProjectileChunkSavedData.init()
         ModCapabilities.init()
         CustomData.load()
         registerMinecraftUtil()
@@ -100,16 +81,13 @@ class Mod : ModInitializer {
         ChunkPosSavedData.register()
         TDMSavedData.register()
         ModVersionEventHandler.register()
-        ModDataComponents.init()
-
         ResourceOnceLogger.register()
         ThermooCompatHandler.init()
         registerBuiltinResourcePacks()
-        registerDataTickets()
         registerTicks()
     }
 
-    // Necessary for load SBM Models
+    // Necessary for loading SBM models before common content initializes.
     private fun registerClientBedrockModels() {
         if (FabricLoader.getInstance().environmentType == EnvType.CLIENT) {
             BedrockModelLoader.init()
@@ -117,11 +95,14 @@ class Mod : ModInitializer {
     }
 
     private fun triggerInit() {
+        ModPerks.init()
+        ModDataComponents.init()
         ModItems.init()
         ModItems.registerDispenserBehavior()
 
-        NeoForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.COMMON, CommonConfig.init())
-        NeoForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.SERVER, ServerConfig.init())
+        NeoForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.CLIENT, CLIENT_CONFIG)
+        NeoForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.COMMON, COMMON_CONFIG)
+        NeoForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.SERVER, SERVER_CONFIG)
     }
 
     private fun callInits() {
@@ -140,12 +121,12 @@ class Mod : ModInitializer {
         ModCriteriaTriggers.init()
         ModCommandArguments.init()
         ModTabs.init()
-        ModPerks.init()
         BattleOfWits.register()
         ModVillagers.init()
         ModSerializers.init()
         ModDamageTypes.init()
         ModEventHandlers.init()
+        FastProjectileManualTicker.init()
         ModTags.init()
         ModGameRules.bootstrap()
     }
@@ -165,12 +146,6 @@ class Mod : ModInitializer {
                 HitboxHelperEventHandler.onPlayerTick(player)
             }
         }
-    }
-
-    private fun registerDataTickets() {
-        FuMO25BlockEntity.FUMO25_TICK = GeckoLibUtil.addDataTicket(
-            SerializableDataTicket.ofInt(loc("fumo25_tick"))
-        )
     }
 
     private fun registerBuiltinResourcePacks() {
@@ -194,9 +169,7 @@ class Mod : ModInitializer {
         val LOGGER: Logger = LogManager.getLogger(Mod::class.java)
 
         @JvmStatic
-        fun loc(path: String): ResourceLocation {
-            return ResourceLocation.fromNamespaceAndPath(MODID, path)
-        }
+        fun loc(path: String): ResourceLocation = ResourceLocation.fromNamespaceAndPath(MODID, path)
 
         private val SERVER_QUEUE: MutableCollection<Task> = ConcurrentLinkedQueue()
         private val CLIENT_QUEUE: MutableCollection<Task> = ConcurrentLinkedQueue()
@@ -212,14 +185,10 @@ class Mod : ModInitializer {
         }
 
         @JvmStatic
-        fun tickServer() {
-            executeWork(SERVER_QUEUE)
-        }
+        fun tickServer() = executeWork(SERVER_QUEUE)
 
         @JvmStatic
-        fun tickClient() {
-            executeWork(CLIENT_QUEUE)
-        }
+        fun tickClient() = executeWork(CLIENT_QUEUE)
 
         private fun executeWork(workQueue: MutableCollection<Task>) {
             val actions = workQueue

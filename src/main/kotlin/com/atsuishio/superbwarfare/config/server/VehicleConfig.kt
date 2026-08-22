@@ -119,7 +119,64 @@ object VehicleConfig {
     val SCAN_WHITE_LIST = buildServerConfig {
         comment("List of entity types that can be scanned by radar")
         comment("能够被雷达扫描的实体类型白名单")
-        defineList("scan_white_list", listOf("ywzj_vehicle:*")) { true }
+        defineList("scan_white_list", listOf("ywzj_vehicle:*"), { "" }) { true }
+    }
+
+    @JvmField
+    val TOW_MAX_DISTANCE = buildServerConfig {
+        push("towing")
+
+        comment("Maximum straight-line distance for towing two vehicles together")
+        comment("两个载具能被拖绳连接的最大直线距离（格）")
+        defineInRange("tow_max_distance", 16, 1, 512)
+    }
+
+    @JvmField
+    val TOW_PULL_DISTANCE = buildServerConfig {
+        comment("Minimum distance before a towing vehicle starts pulling the towed vehicle")
+        comment("牵引载具开始拉动被牵引载具的最小距离（格）")
+        defineInRange("tow_pull_distance", 10, 5, 512)
+    }
+
+    @JvmField
+    val TOW_BREAK_DISTANCE = buildServerConfig {
+        comment("Maximum distance that towline breaks when a vehicle is pulling the towed vehicle. Set to 0 to make it unbreakable")
+        comment("拖绳会断裂的最大距离（格），设置成0则不会断裂")
+        defineInRange("tow_break_distance", 0, 0, Int.MAX_VALUE)
+    }
+
+    @JvmField
+    val TOW_BLACK_LIST = buildServerConfig {
+        comment("List of entity types that can not be towed by vehicle")
+        comment("不能被载具牵引的实体类型名单")
+        defineList(
+            "tow_black_list", listOf(
+                "minecraft:experience_orb",
+                "minecraft:primed_tnt",
+                "minecraft:ender_pearl",
+                "minecraft:interaction",
+                "minecraft:marker",
+                "minecraft:end_crystal",
+                "minecraft:evoker_fangs",
+                "minecraft:eye_of_ender",
+                "minecraft:falling_block",
+                "mts:builder_rendering",
+                "evilcraft:vengeance_spirit",
+                "touhou_little_maid:power_point",
+                "create:carriage_contraption",
+                "create:stationary_contraption",
+                "create:gantry_contraption",
+                "create:super_glue",
+                "zombiekit:flares"
+            )
+        ) { true }
+    }
+
+    @JvmField
+    val TOW_BAR_EXTRA_LENGTH = buildServerConfig {
+        comment("The extra length of tow bar")
+        comment("牵引杆的额外长度（格）")
+        defineInRange("tow_bar_extra_length", 2, 0, 512).also { pop() }
     }
 
     @JvmField
@@ -135,12 +192,27 @@ object VehicleConfig {
     val REPAIR_AMOUNT = buildServerConfig {
         comment("The default amount of health restored per tick when a vehicle is self-repairing")
         comment("载具每游戏刻自动回血的数值")
-        defineInRange("repair_amount", 0.05, -100000000.0, 100000000.0).also { pop(2) }
+        defineInRange("repair_amount", 0.05, -100000000.0, 100000000.0).also { pop() }
     }
 
-    fun inScanList(type: EntityType<*>): Boolean {
+    @JvmField
+    val PASSENGER_Y_OFFSET = buildServerConfig {
+        comment("Per-entity Y offset for passenger seating position")
+        comment("各实体在载具座位上的Y轴偏移量")
+        comment("Format: \"entity_registry_name, offset\"")
+        comment("格式: \"entity_registry_name, offset\"")
+        comment("Example: [\"touhou_little_maid:maid, 0.75\", \"minecraft:player, -0.2\"]")
+        defineList(
+            "passenger_y_offset",
+            listOf("touhou_little_maid:maid, 0.75"),
+            { "" }
+        ) { it is String }.also { pop() }
+    }
+
+    @JvmStatic
+    fun inConfigList(type: EntityType<*>, list: List<String>): Boolean {
         val path = BuiltInRegistries.ENTITY_TYPE.getKey(type)
-        SCAN_WHITE_LIST.get().forEach {
+        list.forEach {
             if (it.contains(":*")) {
                 val namespace = it.split(":*")[0]
                 if (path.toString().startsWith(namespace)) return true
@@ -149,5 +221,23 @@ object VehicleConfig {
             }
         }
         return false
+    }
+
+    @JvmStatic
+    fun getPassengerYOffset(type: EntityType<*>): Double {
+        val path = BuiltInRegistries.ENTITY_TYPE.getKey(type)
+        val pathStr = path.toString()
+        PASSENGER_Y_OFFSET.get().forEach { entry ->
+            val parts = entry.split(",").map { it.trim() }
+            if (parts.size >= 2 && parts[0] == pathStr) {
+                return parts[1].toDoubleOrNull() ?: 0.0
+            }
+        }
+        return 0.0
+    }
+
+    @JvmStatic
+    fun inScanList(type: EntityType<*>): Boolean {
+        return inConfigList(type, SCAN_WHITE_LIST.get())
     }
 }

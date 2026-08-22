@@ -1,8 +1,9 @@
 package com.atsuishio.superbwarfare.block
 
+import com.atsuishio.superbwarfare.init.ModCapabilities
+
 import com.atsuishio.superbwarfare.block.entity.CreativeChargingStationBlockEntity
 import com.atsuishio.superbwarfare.init.ModBlockEntities
-import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.mojang.serialization.MapCodec
 import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos

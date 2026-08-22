@@ -37,12 +37,12 @@ public class Mp443ItemModel extends CustomGunModel<Mp443Item> {
 
         GeoBone body = getAnimationProcessor().getBone("gun");
 
-        ClientEventHandler.handleShootAnimation(body, 1.25f, -2f, 1.35f, 4.5f, 1.3f, 1f, 0.2f, 1);
+        ClientEventHandler.handleShootAnimation(body, 1.25f, -2f, 1.35f, 2.5f, 1.3f, 1f, 0.2f, 1.2f);
 
         CrossHairOverlay.gunRot = body.getRotZ();
         hammer.setRotX((120 * Mth.DEG_TO_RAD * (float) fp));
 
-        GeoBone huatao = getAnimationProcessor().getBone("huatao");
+        var huatao = getAnimationProcessor().getBone("huatao");
         huatao.setPosZ(1.5f * (float) ClientEventHandler.boltMove);
         var data = GunData.from(stack);
         if (data.holdOpen.get()) {

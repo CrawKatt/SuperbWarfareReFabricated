@@ -2,10 +2,7 @@ package com.atsuishio.superbwarfare.item.blockitem
 
 import com.atsuishio.superbwarfare.block.VehicleAssemblingTableBlock
 import com.atsuishio.superbwarfare.block.property.BlockPart
-import com.atsuishio.superbwarfare.client.renderer.item.VehicleAssemblingTableBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlocks
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.item.BlockItem
@@ -13,16 +10,8 @@ import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.shapes.CollisionContext
-import software.bernie.geckolib.animatable.GeoItem
-import software.bernie.geckolib.animatable.client.GeoRenderProvider
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.renderer.GeoItemRenderer
-import software.bernie.geckolib.util.GeckoLibUtil
-import java.util.function.Consumer
 
-class VehicleAssemblingTableBlockItem : BlockItem(ModBlocks.VEHICLE_ASSEMBLING_TABLE, Properties()), GeoItem {
-    private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
+class VehicleAssemblingTableBlockItem : BlockItem(ModBlocks.VEHICLE_ASSEMBLING_TABLE, Properties()) {
 
     // 多方块额外碰撞检测
     override fun canPlace(context: BlockPlaceContext, state: BlockState): Boolean {
@@ -41,26 +30,6 @@ class VehicleAssemblingTableBlockItem : BlockItem(ModBlocks.VEHICLE_ASSEMBLING_T
         }
 
         return super.canPlace(context, state)
-    }
-
-    override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {}
-
-    @Environment(EnvType.CLIENT)
-    override fun createGeoRenderer(consumer: Consumer<GeoRenderProvider>) {
-        consumer.accept(object : GeoRenderProvider {
-            private var renderer: VehicleAssemblingTableBlockItemRenderer? = null
-
-            override fun getGeoItemRenderer(): GeoItemRenderer<*> {
-                if (this.renderer == null) {
-                    this.renderer = VehicleAssemblingTableBlockItemRenderer()
-                }
-                return this.renderer!!
-            }
-        })
-    }
-
-    override fun getAnimatableInstanceCache(): AnimatableInstanceCache {
-        return this.cache
     }
 
     companion object {

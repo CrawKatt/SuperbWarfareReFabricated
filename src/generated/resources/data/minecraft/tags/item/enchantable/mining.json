@@ -1,5 +1,8 @@
 {
   "values": [
-    "superbwarfare:military_shovel"
+    "superbwarfare:military_shovel",
+    "superbwarfare:cemented_carbide_axe",
+    "superbwarfare:cemented_carbide_shovel",
+    "superbwarfare:cemented_carbide_pickaxe"
   ]
 }

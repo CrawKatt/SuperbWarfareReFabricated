@@ -1,9 +1,5 @@
 package com.atsuishio.superbwarfare.item.gun.rifle;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
-
 import com.atsuishio.superbwarfare.client.renderer.gun.Hk416ItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
@@ -35,7 +31,6 @@ public class Hk416Item extends GunGeoItem {
         return Hk416ItemRenderer::new;
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState idlePredicate(AnimationState<Hk416Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -87,7 +82,6 @@ public class Hk416Item extends GunGeoItem {
         }
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState editPredicate(AnimationState<Hk416Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -105,7 +99,6 @@ public class Hk416Item extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var idleController = new AnimationController<>(this, "idleController", 3, this::idlePredicate);
         data.add(idleController);
         var editController = new AnimationController<>(this, "editController", 1, this::editPredicate);

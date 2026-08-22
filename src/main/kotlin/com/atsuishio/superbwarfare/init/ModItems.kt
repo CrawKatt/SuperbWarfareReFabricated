@@ -13,9 +13,12 @@ import com.atsuishio.superbwarfare.item.blockitem.VehicleAssemblingTableBlockIte
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.LuckyContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
+import com.atsuishio.superbwarfare.item.food.CrustItem
+import com.atsuishio.superbwarfare.item.gun.EmptyGunItem
 import com.atsuishio.superbwarfare.item.trinket.DogTagItem
 import com.atsuishio.superbwarfare.item.trinket.IffItem
 import com.atsuishio.superbwarfare.item.trinket.ParachuteItem
+import com.atsuishio.superbwarfare.item.trinket.TacticalTerminalItem
 import com.atsuishio.superbwarfare.item.trinket.ThermalImagingGogglesItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.item.gun.handgun.*
@@ -31,7 +34,7 @@ import com.atsuishio.superbwarfare.item.gun.sniper.*
 import com.atsuishio.superbwarfare.item.gun.special.BocekItem
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem
 import com.atsuishio.superbwarfare.item.gun.special.TaserItem
-import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGun
+import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGunItem
 import com.atsuishio.superbwarfare.item.material.*
 import com.atsuishio.superbwarfare.item.misc.*
 import com.atsuishio.superbwarfare.item.misc.PerkItem
@@ -125,7 +128,8 @@ object ModItems {
     @JvmField val BOCEK = registerGun("bocek") { BocekItem() }
     @JvmField val SUPER_STAR_SHOOTER = registerGun("super_star_shooter") { SuperStarShooterItem() }
 
-    @JvmField val VEHICLE_GUN = registerGun("vehicle_gun") { VehicleGun() }
+    @JvmField val VEHICLE_GUN = registerGun("vehicle_gun") { VehicleGunItem() }
+    @JvmField val EMPTY_GUN = registerGun("empty_gun") { EmptyGunItem() }
     // @formatter:on
 
     /**
@@ -153,9 +157,12 @@ object ModItems {
     @JvmField val AMMO_BOX = registerAmmo("ammo_box") { AmmoBoxItem() }
     @JvmField val TASER_ELECTRODE = registerAmmo("taser_electrode")
     @JvmField val GRENADE_40MM = registerAmmo("grenade_40mm")
+    @JvmField val FLYING_FLARE_AMMO = registerAmmo("flying_flare_ammo")
+    @JvmField val VEHICLE_SMOKE_AMMO = registerAmmo("vehicle_smoke_ammo")
 
     @JvmField val MORTAR_SHELL = registerAmmo("mortar_shell") { MortarShellItem() }
     @JvmField val MORTAR_SHELL_WP = registerAmmo("mortar_shell_wp") { MortarShellItem() }
+    @JvmField val MORTAR_SHELL_SMOKE = registerAmmo("mortar_shell_smoke") { SmokeMortarShellItem() }
     @JvmField val POTION_MORTAR_SHELL = registerAmmo("potion_mortar_shell") { PotionMortarShellItem() }
     @JvmField val RPG_ROCKET_STANDARD = registerAmmo("rpg_rocket_standard") { RpgRocketStandardItem() }
     @JvmField val RPG_ROCKET_TBG = registerAmmo("rpg_rocket_tbg") { RpgRocketTBGItem() }
@@ -165,6 +172,10 @@ object ModItems {
     @JvmField val SMALL_SHELL_HE = registerAmmo("small_shell_he")
     @JvmField val SMALL_SHELL_GS = registerAmmo("small_shell_gs")
     @JvmField val SMALL_SHELL_AA = registerAmmo("small_shell_aa")
+    @JvmField val MEDIUM_SHELL_AP = registerAmmo("medium_shell_ap")
+    @JvmField val MEDIUM_SHELL_HE = registerAmmo("medium_shell_he")
+    @JvmField val MEDIUM_SHELL_GS = registerAmmo("medium_shell_gs")
+    @JvmField val MEDIUM_SHELL_AA = registerAmmo("medium_shell_aa")
     @JvmField val LARGE_SHELL_AP = registerAmmo("large_shell_ap") { Item(Properties().rarity(Rarity.RARE)) }
     @JvmField val LARGE_SHELL_HE = registerAmmo("large_shell_he") { Item(Properties().rarity(Rarity.RARE)) }
     @JvmField val LARGE_SHELL_CM = registerAmmo("large_shell_cm") { Item(Properties().rarity(Rarity.RARE)) }
@@ -185,10 +196,13 @@ object ModItems {
     @JvmField val MEDIUM_ROCKET_CM = registerAmmo("medium_rocket_cm") { MediumRocketItem(300f, 12f, 300f, 0f, 0, MediumRocketEntity.Type.CM, 20) }
     @JvmField val MEDIUM_ANTI_AIR_MISSILE = registerAmmo("medium_anti_air_missile") { Item(Properties().stacksTo(4)) }
     @JvmField val MEDIUM_ANTI_GROUND_MISSILE = registerAmmo("medium_anti_ground_missile") { Item(Properties().stacksTo(4)) }
+    @JvmField val LARGE_ANTI_AIR_MISSILE = registerAmmo("large_anti_air_missile") { Item(Properties().stacksTo(2)) }
     @JvmField val LARGE_ANTI_GROUND_MISSILE = registerAmmo("large_anti_ground_missile") { Item(Properties().stacksTo(2)) }
+    @JvmField val EXTRA_LARGE_ANTI_GROUND_MISSILE = registerAmmo("extra_large_anti_ground_missile") { Item(Properties().stacksTo(1)) }
     @JvmField val SWARM_DRONE = registerAmmo("swarm_drone") { Item(Properties().stacksTo(14)) }
     @JvmField val SMALL_AERIAL_BOMB = registerAmmo("small_aerial_bomb") { Item(Properties().stacksTo(4)) }
     @JvmField val MEDIUM_AERIAL_BOMB = registerAmmo("medium_aerial_bomb") { Item(Properties().stacksTo(2)) }
+    @JvmField val LARGE_AERIAL_BOMB = registerAmmo("large_aerial_bomb") { Item(Properties().stacksTo(1)) }
     // @formatter:on
 
     /**
@@ -229,7 +243,7 @@ object ModItems {
     @JvmField val KNIFE = registerItem("knife") {
         SwordItem(
             ModItemTier.STEEL,
-            CustomDamageProperty(1200).attributes(SwordItem.createAttributes(ModItemTier.STEEL, 0, -1.8f))
+            CustomDamageProperty(1600).attributes(SwordItem.createAttributes(ModItemTier.STEEL, 4, -1.8f))
         )
     }
     @JvmField val HAMMER = registerItem("hammer") { HammerItem(Tiers.IRON, 11, -3.2f, Properties().durability(400)) }
@@ -238,6 +252,11 @@ object ModItems {
     @JvmField val DIAMOND_HAMMER = registerItem("diamond_hammer") { HammerItem(Tiers.DIAMOND, 12, -3.2f, Properties().durability(1500)) }
     @JvmField val CEMENTED_CARBIDE_HAMMER = registerItem("cemented_carbide_hammer") { HammerItem(ModItemTier.CEMENTED_CARBIDE, 8, -3.2f, Properties().durability(2000)) }
     @JvmField val NETHERITE_HAMMER = registerItem("netherite_hammer") { NetheriteHammerItem() }
+    @JvmField val CEMENTED_CARBIDE_SWORD = registerItem("cemented_carbide_sword") { SwordItem(ModItemTier.CEMENTED_CARBIDE, Properties().attributes(SwordItem.createAttributes(ModItemTier.CEMENTED_CARBIDE, -2, -2.4f))) }
+    @JvmField val CEMENTED_CARBIDE_PICKAXE = registerItem("cemented_carbide_pickaxe") { PickaxeItem(ModItemTier.CEMENTED_CARBIDE, Properties().attributes(SwordItem.createAttributes(ModItemTier.CEMENTED_CARBIDE, -4, -2.8f))) }
+    @JvmField val CEMENTED_CARBIDE_AXE = registerItem("cemented_carbide_axe") { AxeItem(ModItemTier.CEMENTED_CARBIDE, Properties().attributes(SwordItem.createAttributes(ModItemTier.CEMENTED_CARBIDE, 0, -3.0f))) }
+    @JvmField val CEMENTED_CARBIDE_SHOVEL = registerItem("cemented_carbide_shovel") { ShovelItem(ModItemTier.CEMENTED_CARBIDE, Properties().attributes(SwordItem.createAttributes(ModItemTier.CEMENTED_CARBIDE, -3, -3.0f))) }
+    @JvmField val CEMENTED_CARBIDE_HOE = registerItem("cemented_carbide_hoe") { HoeItem(ModItemTier.CEMENTED_CARBIDE, Properties().attributes(SwordItem.createAttributes(ModItemTier.CEMENTED_CARBIDE, -8, 0.0f))) }
 
     @JvmField val T_BATON = registerItem("t_baton") { TBatonItem() }
     @JvmField val ELECTRIC_BATON = registerItem("electric_baton") { ElectricBatonItem() }
@@ -254,12 +273,15 @@ object ModItems {
     @JvmField val GE_HELMET_M_35 = registerItem("ge_helmet_m_35") { GeHelmetM35Item() }
     @JvmField val PARACHUTE = registerItem("parachute") { ParachuteItem() }
     @JvmField val THERMAL_IMAGING_GOGGLES = registerItem("thermal_imaging_goggles") { ThermalImagingGogglesItem() }
+    @JvmField val HANDSOME_GOGGLES = registerItem("handsome_goggles") { HandsomeGogglesItem() }
+    @JvmField val TACTICAL_TERMINAL = registerItem("tactical_terminal") { TacticalTerminalItem() }
+
+    @JvmField val CRUST = registerItem("crust") { CrustItem() }
 
     @JvmField val MORTAR_DEPLOYER = registerItem("mortar_deployer") { MortarDeployerItem() }
     @JvmField val MORTAR_BARREL = registerItem("mortar_barrel")
     @JvmField val MORTAR_BASE_PLATE = registerItem("mortar_base_plate")
     @JvmField val MORTAR_BIPOD = registerItem("mortar_bipod")
-    @JvmField val TOW_DEPLOYER = registerItem("tow_deployer") { TowDeployerItem() }
     @JvmField val SEEKER = registerItem("seeker")
     @JvmField val MISSILE_ENGINE = registerItem("missile_engine")
     @JvmField val FUSEE = registerItem("fusee")
@@ -271,6 +293,8 @@ object ModItems {
     @JvmField val WP_HEAD = registerItem("wp_head")
     @JvmField val CANNON_CORE = registerItem("cannon_core")
     @JvmField val COPPER_PLATE = registerItem("copper_plate")
+    @JvmField val STEEL_PLATE = registerItem("steel_plate")
+    @JvmField val ENGINEERING_PLASTIC = registerItem("engineering_plastic")
     @JvmField val STEEL_INGOT = registerItem("steel_ingot")
     @JvmField val LEAD_INGOT = registerItem("lead_ingot")
     @JvmField val SILVER_INGOT = registerItem("silver_ingot")
@@ -286,6 +310,7 @@ object ModItems {
     @JvmField val GALENA = registerItem("galena")
     @JvmField val SCHEELITE = registerItem("scheelite")
     @JvmField val RAW_SILVER = registerItem("raw_silver")
+    @JvmField val SLIME_COVERED_LEATHER = registerItem("slime_covered_leather")
     @JvmField val DOG_TAG = registerItem("dog_tag") { DogTagItem() }
     @JvmField val IFF = registerItem("iff") { IffItem() }
     @JvmField val CELL = registerItem("cell") { BatteryItem(24000, Properties()) }
@@ -300,6 +325,12 @@ object ModItems {
     @JvmField val MEDICAL_KIT = registerItem("medical_kit") { MedicalKitItem() }
     @JvmField val VEHICLE_DAMAGE_ANALYZER = registerItem("vehicle_damage_analyzer") { VehicleDamageAnalyzerItem() }
     @JvmField val VEHICLE_RESET_KIT = registerItem("vehicle_reset_kit") { VehicleResetKitItem() }
+    @JvmField val SKIN_SPRAY = registerItem("skin_spray") { SkinSprayItem() }
+    @JvmField val VEHICLE_KEY = registerItem("vehicle_key") { VehicleKeyItem() }
+    @JvmField val CREATIVE_VEHICLE_KEY = registerItem("creative_vehicle_key") { CreativeVehicleKeyItem() }
+    @JvmField val TOWLINE = registerItem("towline") { TowlineItem() }
+    @JvmField val TOW_BAR = registerItem("tow_bar") { TowBarItem() }
+    @JvmField val CATAPULT_SHUTTLE = registerItem("catapult_shuttle") { CatapultShuttleItem() }
 
     @JvmField val TUNGSTEN_ROD = registerItem("tungsten_rod")
 
@@ -429,6 +460,7 @@ object ModItems {
         BlockItem(ModBlocks.VEHICLE_DEPLOYER, Properties().stacksTo(1).rarity(Rarity.EPIC))
     }
     @JvmField val AIRCRAFT_CATAPULT = registerBlock(ModBlocks.AIRCRAFT_CATAPULT)
+    @JvmField val CATAPULT_CONTROLLER = registerBlock(ModBlocks.CATAPULT_CONTROLLER)
     @JvmField val SUPERB_ITEM_INTERFACE = registerBlock(ModBlocks.SUPERB_ITEM_INTERFACE)
     @JvmField val CREATIVE_SUPERB_ITEM_INTERFACE = registerBlock(BuiltInRegistries.BLOCK.getKey(ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE).path) {
         BlockItem(ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE, Properties().rarity(Rarity.EPIC))

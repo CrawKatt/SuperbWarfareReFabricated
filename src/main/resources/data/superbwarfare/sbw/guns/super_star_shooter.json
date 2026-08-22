@@ -1,9 +1,9 @@
 {
-  "Spread": 2,
-  "RecoilX": 0.0006,
-  "RecoilY": 0.0009,
+  "Spread": 0,
+  "RecoilX": 0,
+  "RecoilY": 0,
   "Damage": 60,
-  "Headshot": 1,
+  "Headshot": 2,
   "ExplosionDamage": 45,
   "Projectile": "superbwarfare:super_star_projectile",
   "Velocity": 3,
@@ -22,7 +22,9 @@
     "superbwarfare:powerful_attraction",
     "superbwarfare:intelligent_chip",
     "superbwarfare:monster_hunter",
-    "superbwarfare:vorpal_weapon"
+    "superbwarfare:vorpal_weapon",
+    "superbwarfare:brain_storm",
+    "superbwarfare:target_lock"
   ],
   "SoundInfo": {
     "Fire1P": "superbwarfare:star_shoot_1p",

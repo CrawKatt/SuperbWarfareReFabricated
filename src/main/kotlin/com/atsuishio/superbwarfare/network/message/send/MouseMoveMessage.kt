@@ -24,6 +24,9 @@ data class MouseMoveMessage(val speedX: Double, val speedY: Double) : ServerPack
         if (stack.`is`(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
             val drone = EntityFindUtil.findDrone(player.level(), tag.getString("LinkedDrone"))
             if (drone != null) {
+                if (drone.getController() == null) {
+                    drone.setController(player)
+                }
                 drone.mouseInput(speedX, speedY)
             }
         }

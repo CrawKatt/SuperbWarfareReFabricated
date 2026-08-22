@@ -14,7 +14,10 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.util.FastColor
 import net.minecraft.util.Mth
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
+@Environment(EnvType.CLIENT)
 object HeatBarOverlay : CommonOverlay("heat_bar") {
     private val TEXTURE = loc("textures/overlay/heat_bar/heat_bar.png")
 

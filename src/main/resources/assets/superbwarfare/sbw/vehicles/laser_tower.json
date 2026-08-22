@@ -1,12 +1,21 @@
 {
-  "Model": {
-    "Animation": "superbwarfare:animations/laser_tower.animation.json",
-    "Model": "superbwarfare:geo/laser_tower.geo.json",
-    "LODModel": [
-      "superbwarfare:geo/vehicle_lod/laser_tower_lod1.geo.json",
-      "superbwarfare:geo/vehicle_lod/laser_tower_lod2.geo.json"
-    ],
-    "Texture": "superbwarfare:textures/entity/laser_tower.png"
-  },
-  "LODDistance": [24, 48]
+  "Models": [
+    {
+      "Model": "superbwarfare:models/bedrock/vehicle/laser_tower.geo.json",
+      "Texture": "superbwarfare:textures/bedrock/vehicle/laser_tower.png",
+      "EmissiveTexture": "superbwarfare:textures/bedrock/vehicle/laser_tower_e.png"
+    },
+    {
+      "Model": "superbwarfare:models/bedrock/vehicle_lod/laser_tower.lod1.geo.json",
+      "Texture": "superbwarfare:textures/bedrock/vehicle_lod/laser_tower.lod.png",
+      "EmissiveTexture": "superbwarfare:textures/bedrock/vehicle/laser_tower_e.png",
+      "LODDistance": 32
+    },
+    {
+      "Model": "superbwarfare:models/bedrock/vehicle_lod/laser_tower.lod2.geo.json",
+      "Texture": "superbwarfare:textures/bedrock/vehicle_lod/laser_tower.lod.png",
+      "EmissiveTexture": "superbwarfare:textures/bedrock/vehicle/laser_tower_e.png",
+      "LODDistance": 64
+    }
+  ]
 }

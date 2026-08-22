@@ -1,9 +1,5 @@
 package com.atsuishio.superbwarfare.item.gun.machinegun;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
-
 import com.atsuishio.superbwarfare.client.renderer.gun.RpkItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
@@ -38,7 +34,6 @@ public class RpkItem extends GunGeoItem {
         return RpkItemRenderer::new;
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState idlePredicate(AnimationState<RpkItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -90,7 +85,6 @@ public class RpkItem extends GunGeoItem {
         }
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState editPredicate(AnimationState<RpkItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -108,7 +102,6 @@ public class RpkItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var idleController = new AnimationController<>(this, "idleController", 3, this::idlePredicate);
         data.add(idleController);
         var editController = new AnimationController<>(this, "editController", 1, this::editPredicate);

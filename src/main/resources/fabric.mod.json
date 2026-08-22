@@ -47,16 +47,18 @@
     "cloth-config": "*",
     "forgeconfigapiport": "*",
     "extensibleenums": "*",
-    "trinkets": "*"
+    "trinkets": "*",
+    "mkb": "*"
   },
   "suggests": {
     "jei": "*",
     "jade": "*",
-    "kubejs": "*",
     "patchouli": "*",
     "realcamera": "*",
     "thermoo": "*",
     "scorchful": "*",
-    "frostiful": "*"
+    "frostiful": "*",
+    "ponder": "*",
+    "sable": "*"
   }
 }

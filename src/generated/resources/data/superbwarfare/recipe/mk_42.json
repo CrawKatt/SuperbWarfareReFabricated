@@ -2,7 +2,7 @@
   "type": "superbwarfare:vehicle_assembling",
   "category": "defense",
   "inputs": [
-    "6 #superbwarfare:storage_blocks/steel",
+    "6 #c:storage_blocks/steel",
     "superbwarfare:mk_42_blueprint",
     "superbwarfare:cannon_core"
   ],

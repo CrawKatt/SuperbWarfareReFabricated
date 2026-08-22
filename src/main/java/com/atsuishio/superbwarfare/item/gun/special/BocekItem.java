@@ -151,7 +151,7 @@ public class BocekItem extends GunGeoItem {
                 player.playSound(ModSounds.BOCEK_SHATTER_CAP_FIRE_3P, 2, 1);
             }
 
-            if (perk == ModPerks.BEAST_BULLET) {
+            if (perk == ModPerks.INSTANCE.getBEAST_BULLET()) {
                 player.playSound(ModSounds.HENG, 4f, 1f);
 
                 if (player instanceof ServerPlayer serverPlayer) {
@@ -160,6 +160,7 @@ public class BocekItem extends GunGeoItem {
             }
 
             data.ammo.set(data.ammo.get() - data.get(GunProp.AMMO_COST_PER_SHOOT));
+            data.nbtVersion.invalidateStructural();
             data.save();
         }
     }

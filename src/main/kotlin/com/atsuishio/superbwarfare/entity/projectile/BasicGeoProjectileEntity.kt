@@ -1,11 +1,17 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.animation.entity.BasicProjectileAnimationInstance
+import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.Entity
 
 interface BasicGeoProjectileEntity {
-    fun getModel(): ResourceLocation
+    @Deprecated("Model location is auto loaded now")
+    fun getModel(): ResourceLocation = loc("projectile/projectile")
 
+    @Deprecated("Animation location is auto loaded now")
     fun getAnimation(): ResourceLocation? = null
 
     fun getAnimationInstance(): BasicProjectileAnimationInstance<*>? = null
@@ -15,4 +21,12 @@ interface BasicGeoProjectileEntity {
     fun getHiddenTicks(): Int = 0
 
     fun getFlareHiddenTicks(): Int = 3
+
+    fun getModelInstance(): BakedModelInstance? {
+        val entity = this as Entity
+        val (_, namespace, id) = entity.type.descriptionId.split(".")
+        return ProjectileModelReloadListener.getModel(
+            ResourceLocation.fromNamespaceAndPath(namespace, "models/bedrock/projectile/$id.geo.json")
+        )?.createInstance()
+    }
 }

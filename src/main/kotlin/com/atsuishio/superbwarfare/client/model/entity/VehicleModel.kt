@@ -2,11 +2,11 @@ package com.atsuishio.superbwarfare.client.model.entity
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.Companion.loc
-import com.atsuishio.superbwarfare.client.RenderHelper
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.resource.vehicle.DefaultVehicleResource
 import com.atsuishio.superbwarfare.resource.vehicle.VehicleResource
+import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger
 import net.minecraft.client.Minecraft
 import net.minecraft.resources.ResourceLocation
@@ -21,6 +21,7 @@ import software.bernie.geckolib.model.GeoModel
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+@Deprecated("Geckolib will be removed since 0.8.10", ReplaceWith("BedrockVehicleModel"))
 open class VehicleModel<T> : GeoModel<T>() where T : VehicleEntity, T : GeoAnimatable {
     protected var pitch = 0f
     protected var yaw = 0f
@@ -42,19 +43,19 @@ open class VehicleModel<T> : GeoModel<T>() where T : VehicleEntity, T : GeoAnima
     private val LOGGER = ResourceOnceLogger()
 
     override fun getAnimationResource(vehicle: T): ResourceLocation? {
-        return getDefault(vehicle).model.animation
+        return getDefault(vehicle).getModel().animation
     }
 
     protected var modelCache: ResourceLocation? = null
 
     @Deprecated("Deprecated in Java")
     override fun getModelResource(vehicle: T): ResourceLocation? {
-        if (RenderHelper.isInGui()) {
-            return getDefault(vehicle).model.model
+        if (RenderDistanceHelper.isInGui()) {
+            return getDefault(vehicle).getModel().model
         }
 
         val lodLevel = getLODLevel(vehicle)
-        val lodModel: ResourceLocation? = getDefault(vehicle).model.getLODModel(lodLevel)
+        val lodModel: ResourceLocation? = getDefault(vehicle).getModel().getLODModel(lodLevel)
 
         if (lodModel == null) {
             if (modelCache != null) {
@@ -71,18 +72,18 @@ open class VehicleModel<T> : GeoModel<T>() where T : VehicleEntity, T : GeoAnima
         return lodModel
     }
 
-    fun getPreciseModelResource(vehicle: T): ResourceLocation? = getDefault(vehicle).model.model
+    fun getPreciseModelResource(vehicle: T): ResourceLocation? = getDefault(vehicle).getModel().model
 
     protected var textureCache: ResourceLocation? = null
 
     @Deprecated("Deprecated in Java")
     override fun getTextureResource(vehicle: T): ResourceLocation? {
-        if (RenderHelper.isInGui()) {
-            return getDefault(vehicle).model.texture
+        if (RenderDistanceHelper.isInGui()) {
+            return getDefault(vehicle).getModel().texture
         }
 
         val lodLevel = getLODLevel(vehicle)
-        val lodTexture: ResourceLocation? = getDefault(vehicle).model.getLODTexture(lodLevel)
+        val lodTexture: ResourceLocation? = getDefault(vehicle).getModel().getLODTexture(lodLevel)
 
         if (lodTexture == null) {
             if (textureCache != null) {
@@ -99,11 +100,11 @@ open class VehicleModel<T> : GeoModel<T>() where T : VehicleEntity, T : GeoAnima
         return lodTexture
     }
 
-    fun getPreciseTextureResource(vehicle: T): ResourceLocation? = getDefault(vehicle).model.texture
+    fun getPreciseTextureResource(vehicle: T): ResourceLocation? = getDefault(vehicle).getModel().texture
 
     fun getLODLevel(vehicle: T): Int {
         val defaultData: DefaultVehicleResource = getDefault(vehicle)
-        val model = defaultData.model
+        val model = defaultData.getModel()
         if (defaultData.lodDistance == null || defaultData.lodDistance.list.isEmpty() || !model.hasLOD()) return 0
 
         val player: Player? = Minecraft.getInstance().player
@@ -125,7 +126,6 @@ open class VehicleModel<T> : GeoModel<T>() where T : VehicleEntity, T : GeoAnima
 
     protected var init = false
 
-    // TODO 在重载资源包时清空缓存
     protected val TRANSFORMS = mutableListOf<Pair<String, TransformContext<T>>>()
 
     open fun collectTransform(boneName: String): TransformContext<T>? {
@@ -327,7 +327,6 @@ open class VehicleModel<T> : GeoModel<T>() where T : VehicleEntity, T : GeoAnima
             val name = pair.getA()
             val bone = animationProcessor.getBone(name)
 
-            // TODO 这里怎么可能为空？
             if (bone != null) {
                 pair.getB().transform(bone, vehicle, animationState)
             }

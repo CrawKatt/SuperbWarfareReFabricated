@@ -44,6 +44,7 @@ public class VectorItemRenderer extends CustomGunRenderer<VectorItem> {
 
         if (itemStack.getItem() instanceof GunItem && GeoItem.getId(itemStack) == this.getInstanceId(animatable)) {
             if (this.renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND || this.renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
+
                 if (this.renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
                     int scopeType = GunData.from(itemStack).attachment.get(AttachmentType.SCOPE);
                     switch (scopeType) {

@@ -1,9 +1,5 @@
 package com.atsuishio.superbwarfare.item.gun.machinegun;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
-
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.model.item.M60ItemModel;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -35,7 +31,6 @@ public class M60Item extends GunGeoItem {
         return GunRendererBuilder.simple(M60ItemModel::new);
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState fireAnimPredicate(AnimationState<M60Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -51,7 +46,6 @@ public class M60Item extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.m_60.idle"));
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState idlePredicate(AnimationState<M60Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -73,7 +67,6 @@ public class M60Item extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var fireAnimController = new AnimationController<>(this, "fireAnimController", 0, this::fireAnimPredicate);
         data.add(fireAnimController);
         var idleController = new AnimationController<>(this, "idleController", 4, this::idlePredicate);

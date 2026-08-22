@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.data.gun.DefaultGunData
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModPerks
+import com.atsuishio.superbwarfare.item.misc.PerkItem
 import net.minecraft.ChatFormatting
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
@@ -23,16 +24,13 @@ open class Perk(val descriptionId: String, val type: Type) : PropertyModifier<Gu
         .filter { it.isNotEmpty() }
         .joinToString("") { word -> word.replaceFirstChar { it.uppercase(Locale.ROOT) } }
 
+    fun getId(): ResourceLocation = Mod.loc(descriptionId)
+
     // 默认不进行修改
     override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) {}
 
-    fun getId(): ResourceLocation {
-        return Mod.loc(descriptionId)
-    }
-
-    fun getItem(): Item {
-        return ModItems.PERK_ITEMS[this] ?: throw IllegalStateException("Perk " + this.name + " not found")
-    }
+    fun getItem(): Item =
+        ModItems.PERK_ITEMS[this] ?: throw IllegalStateException("Perk $name not found")
 
     /**
      * 在背包中每Tick触发
@@ -85,14 +83,19 @@ open class Perk(val descriptionId: String, val type: Type) : PropertyModifier<Gu
     }
 
     /**
-     * 用于处理武器近战攻击后的逻辑
+     * 用于处理武器近战攻击后的逻辑（命中实体时触发）
      */
     open fun onMeleeAttack(data: GunData, instance: PerkInstance, target: Entity, source: DamageSource) {}
+
+    /**
+     * 用于处理武器按下近战键的逻辑（无论是否命中实体都会触发）
+     */
+    open fun onMeleeSwing(data: GunData, instance: PerkInstance, entity: Entity?) {}
 
     private val perkKey = ResourceKey.create(ModPerks.PERK_KEY, ResourceLocation.parse(this.descriptionId))
 
     open fun `is`(tag: TagKey<Perk>): Boolean {
-        return ModPerks.PERK_REGISTRY.getHolder(perkKey).map { it.`is`(tag) }.orElse(false)!!
+        return ModPerks.PERK_REGISTRY.getHolder(perkKey).map { it.`is`(tag) }.orElseGet { false }
     }
 
     enum class Type(val typeName: String, val color: ChatFormatting) {

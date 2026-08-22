@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.compat.clothconfig.common
 
+import com.atsuishio.superbwarfare.compat.clothconfig.ClothConfigHelper.save
 import com.atsuishio.superbwarfare.config.common.GameplayConfig
 import me.shedaniel.clothconfig2.api.ConfigBuilder
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder
@@ -16,10 +17,7 @@ object GameplayClothConfig {
                     GameplayConfig.RESPAWN_RELOAD.get()
                 )
                 .setDefaultValue(true)
-                .setSaveConsumer { v ->
-                    GameplayConfig.RESPAWN_RELOAD.set(v)
-                    GameplayConfig.RESPAWN_RELOAD.save()
-                }
+                .setSaveConsumer(save(GameplayConfig.RESPAWN_RELOAD))
                 .setTooltip(Component.translatable("config.superbwarfare.common.gameplay.respawn_reload.des"))
                 .build()
         )
@@ -31,10 +29,7 @@ object GameplayClothConfig {
                     GameplayConfig.GLOBAL_INDICATION.get()
                 )
                 .setDefaultValue(false)
-                .setSaveConsumer { v ->
-                    GameplayConfig.GLOBAL_INDICATION.set(v)
-                    GameplayConfig.GLOBAL_INDICATION.save()
-                }
+                .setSaveConsumer(save(GameplayConfig.GLOBAL_INDICATION))
                 .setTooltip(Component.translatable("config.superbwarfare.common.gameplay.global_indication.des"))
                 .build()
         )
@@ -46,10 +41,7 @@ object GameplayClothConfig {
                     GameplayConfig.RESPAWN_AUTO_ARMOR.get()
                 )
                 .setDefaultValue(true)
-                .setSaveConsumer { v ->
-                    GameplayConfig.RESPAWN_AUTO_ARMOR.set(v)
-                    GameplayConfig.RESPAWN_AUTO_ARMOR.save()
-                }
+                .setSaveConsumer(save(GameplayConfig.RESPAWN_AUTO_ARMOR))
                 .setTooltip(Component.translatable("config.superbwarfare.common.gameplay.respawn_auto_armor.des"))
                 .build()
         )

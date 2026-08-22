@@ -1,11 +1,14 @@
 package com.atsuishio.superbwarfare.client.animation.entity
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.living.SenpaiEntity
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
 import kotlin.math.abs
 
-class SenpaiContext(entity: SenpaiEntity) :
-    BasicEntityContext<SenpaiEntity>(entity, BedrockModelLoader.SENPAI_MA.second) {
+class SenpaiContext(entity: SenpaiEntity) : BasicEntityContext<SenpaiEntity>(entity, ANIM) {
+    companion object {
+        val ANIM = loc("animations/bedrock/entity/senpai.animation.json")
+    }
+
     fun isRunner(): Boolean {
         return entity.runner
     }

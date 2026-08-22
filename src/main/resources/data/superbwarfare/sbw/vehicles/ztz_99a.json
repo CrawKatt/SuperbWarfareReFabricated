@@ -3,6 +3,11 @@
   "MaxEnergy": 10000000,
   "OBB": [
     {
+      "Part": "Collision",
+      "Size": [2.25, 1.094, 4.406],
+      "Position": [0, 1.0938, -0.094]
+    },
+    {
       "Size": [2.25, 0.813, 1.531],
       "Position": [0, 1.438, -2.906]
     },
@@ -82,6 +87,7 @@
       "Transform": "Turret",
       "Position": [0.75, 0.15, -0.5],
       "CanRotateBody": true,
+      "RotateWithVehicle": true,
       "MinPitch": -45,
       "MaxPitch": 90,
       "DismountInfo": {
@@ -93,6 +99,7 @@
       "BanHand": true,
       "Transform": "Vehicle",
       "Position": [1.75, 0.6, -4.98],
+      "RotateWithVehicle": true,
       "MinYaw": -95,
       "MaxYaw": 95,
       "Pose": "Climb",
@@ -105,6 +112,7 @@
       "BanHand": true,
       "Transform": "Vehicle",
       "Position": [-1.75, 0.6, -4.98],
+      "RotateWithVehicle": true,
       "MinYaw": -95,
       "MaxYaw": 95,
       "Pose": "Climb",
@@ -284,6 +292,7 @@
   "UpStep": 2.25,
   "RotateOffsetHeight": 2.75,
   "Mass": 55,
+  "TowForceFactor": 1.5,
   "DamageModifiers": [
     "minecraft:arrow 0",
     "minecraft:trident 0",
@@ -310,11 +319,12 @@
     "#superbwarfare:projectile_absolute * 0.15",
     "@#superbwarfare:aa_missile * 0.3",
     "@superbwarfare:small_cannon_shell * 0.25",
-    "@superbwarfare:c4 * 4",
+    "@superbwarfare:c4 * 6",
     "@#superbwarfare:at_rocket * 1.1",
     "@superbwarfare:gun_grenade * 1.25",
     "@superbwarfare:mortar_shell * 1.25",
-    "@superbwarfare:tm_62 * 2.5"
+    "@superbwarfare:tm_62 * 2.5",
+    "$entity.getSourceAngle(source, 0.3) * damage"
   ],
   "DestroyInfo": {
     "ParticleType": "Giant",
@@ -347,5 +357,12 @@
     [2.05, 0, -0.52], [-2.05, 0, -0.52],
     [2.05, 0, -1.653], [-2.05, 0, -1.653],
     [2.05, 0, -2.786], [-2.05, 0, -2.786]
-  ]
+  ],
+  "PartHealth": {
+    "Turret": 100,
+    "LeftWheel": 100,
+    "RightWheel": 100,
+    "MainEngine": 150,
+    "SubEngine": 150
+  }
 }

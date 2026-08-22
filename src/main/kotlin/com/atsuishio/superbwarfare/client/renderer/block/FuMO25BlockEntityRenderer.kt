@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.client.renderer.block
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
@@ -19,10 +18,12 @@ class FuMO25BlockEntityRenderer : BlockEntityRenderer<FuMO25BlockEntity> {
         packedLight: Int,
         packedOverlay: Int
     ) {
-        val model = BedrockModelLoader.getModel(BedrockModelLoader.FUMO_25_MODEL) ?: return
-        val bone = model.getBone("rolling") ?: return
+        val instance = blockEntity.modelInstance ?: return
+        val bone = instance.getBone("rolling") ?: return
 
         poseStack.pushPose()
+
+        instance.resetPose()
 
         poseStack.translate(0.5, 0.0, 0.5)
 
@@ -36,23 +37,22 @@ class FuMO25BlockEntityRenderer : BlockEntityRenderer<FuMO25BlockEntity> {
             )
         )
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.entityTranslucent(TEXTURE)),
             packedLight,
             packedOverlay
         )
 
-        model.applyPose(model.bindPose)
-
         poseStack.popPose()
-    }
-
-    companion object {
-        val TEXTURE = loc("textures/bedrock/block/fumo_25.png")
     }
 
     override fun getViewDistance(): Int {
         return 256
+    }
+
+    companion object {
+        val TEXTURE = loc("textures/bedrock/block/fumo_25.png")
+        val MODEL = loc("models/bedrock/block/fumo_25.geo.json")
     }
 }

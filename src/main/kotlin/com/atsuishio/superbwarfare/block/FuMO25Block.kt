@@ -19,7 +19,6 @@ import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityTicker
 import net.minecraft.world.level.block.entity.BlockEntityType
-import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BooleanProperty
@@ -77,15 +76,15 @@ open class FuMO25Block :
         return RenderShape.ENTITYBLOCK_ANIMATED
     }
 
-    override fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity {
+    override fun newBlockEntity(pPos: BlockPos, pState: BlockState): BlockEntity? {
         return FuMO25BlockEntity(pPos, pState)
     }
 
-    override fun <T : BlockEntity> getTicker(
+    override fun <T : BlockEntity?> getTicker(
         pLevel: Level,
         pState: BlockState,
-        pBlockEntityType: BlockEntityType<T>
-    ): BlockEntityTicker<T>? {
+        pBlockEntityType: BlockEntityType<T?>
+    ): BlockEntityTicker<T?>? {
         if (!pLevel.isClientSide) {
             return createTickerHelper(
                 pBlockEntityType,
@@ -105,7 +104,6 @@ open class FuMO25Block :
     ) {
         super.setPlacedBy(level, pos, state, placer, stack)
         if (placer == null) return
-
         val entity = level.getBlockEntity(pos) as? FuMO25BlockEntity ?: return
         entity.ownerUUID = placer.uuid
     }
@@ -127,22 +125,21 @@ open class FuMO25Block :
         super.onRemove(pState, pLevel, pPos, pNewState, pMovedByPiston)
     }
 
-    override fun createBlockStateDefinition(pBuilder: StateDefinition.Builder<Block, BlockState>) {
+    override fun createBlockStateDefinition(pBuilder: StateDefinition.Builder<Block?, BlockState?>) {
         pBuilder.add(POWERED)
     }
 
-    override fun getStateForPlacement(pContext: BlockPlaceContext): BlockState {
+    override fun getStateForPlacement(pContext: BlockPlaceContext): BlockState? {
         return this.defaultBlockState().setValue(POWERED, false)
     }
-
-    override fun codec(): MapCodec<out BaseEntityBlock> = CODEC
 
     companion object {
         @JvmField
         val POWERED: BooleanProperty = BooleanProperty.create("powered")
 
-        @JvmField
-        val CODEC: MapCodec<FuMO25Block> =
-            BlockBehaviour.simpleCodec { _ -> FuMO25Block() }
+        @JvmStatic
+        val CODEC: MapCodec<FuMO25Block> = simpleCodec { _ -> FuMO25Block() }
     }
+
+    override fun codec() = CODEC
 }

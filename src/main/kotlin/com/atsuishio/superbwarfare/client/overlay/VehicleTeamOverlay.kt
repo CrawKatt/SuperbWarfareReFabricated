@@ -2,15 +2,18 @@ package com.atsuishio.superbwarfare.client.overlay
 
 import com.atsuishio.superbwarfare.client.RenderHelper
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
-import com.atsuishio.superbwarfare.config.server.VehicleConfig
+import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.init.ModItems
-import com.atsuishio.superbwarfare.tools.*
+import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.FormatTool.format1D
+import com.atsuishio.superbwarfare.tools.NBTTool
 import com.atsuishio.superbwarfare.tools.VectorTool.lerpGetEntityBoundingBoxCenter
+import com.atsuishio.superbwarfare.tools.canBeSeen
+import com.atsuishio.superbwarfare.tools.worldToScreen
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
@@ -19,62 +22,19 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.PlayerTeam
 import net.minecraft.world.scores.Team
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.max
 
+@Environment(EnvType.CLIENT)
 object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
-    override fun shouldRender() = super.shouldRender() && DisplayConfig.VEHICLE_INFO.get()
-
-    private var lookingEntity: Entity? = null
-    private var entityRange = 0.0
-    private var lookAtEntity = false
-
-    fun onVehicleTeamOverlayClientTick() {
-        val player = localPlayer ?: return
-        val camera = mc.gameRenderer.mainCamera
-        var viewPos = camera.position
-        var viewVec = Vec3(camera.lookVector)
-        val distance = try {
-            VehicleConfig.VEHICLE_INFO_DISPLAY_DISTANCE.get().toDouble()
-        } catch (_: Exception) {
-            196.0
-        }
-
-        lookingEntity = TraceTool.camerafFindLookingEntity(
-            player,
-            viewPos,
-            viewVec,
-            distance
-        )
-
-        (player.vehicle as? VehicleEntity)?.let { vehicle ->
-            if (vehicle.hasWeapon(vehicle.getSeatIndex(player))) {
-                viewVec = vehicle.getShootDirectionForHud(player, 1f)
-                viewPos = vehicle.getShootPosForHud(player, 1f)
-                lookingEntity = TraceTool.camerafFindLookingEntity(
-                    player,
-                    viewPos,
-                    viewVec,
-                    distance
-                )
-            }
-        }
-
-        if (lookingEntity is VehicleEntity) {
-            val decoy = TraceTool.findLookDecoy(player, viewPos, viewVec, distance)
-            if (decoy == null) {
-                lookAtEntity = true
-                entityRange = player.distanceTo(lookingEntity!!).toDouble()
-            } else {
-                lookAtEntity = false
-            }
-        } else {
-            lookAtEntity = false
-        }
-    }
+    override fun shouldRender() = super.shouldRender()
+            && DisplayConfig.VEHICLE_INFO.get()
+            && !MiscConfig.HIDE_COMBAT_HUD.get()
 
     override fun RenderContext.render() {
-        if (!lookAtEntity) return
-        val lookingEntity = lookingEntity as VehicleEntity
+        val lookingEntity = OverlayTraceHandler.cameraEntity as? VehicleEntity ?: return
+        val entityRange = player.distanceTo(lookingEntity).toDouble()
 
         val stack = player.mainHandItem
         val usingDrone = stack.`is`(ModItems.MONITOR)
@@ -97,7 +57,7 @@ object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
                 poseStack.pushPose()
                 poseStack.translate(x, y - 12, 0f)
 
-                val size = ((50 / ClientEventHandler.fov) * 0.9f * max((512 - entityRange) / 512, 0.1)
+                val size = ((30 / ClientEventHandler.fov) * 0.9f * max((512 - entityRange) / 512, 0.1)
                     .coerceIn(0.4, 1.0)).toFloat()
                 poseStack.scale(size, size, size)
                 val font = mc.font

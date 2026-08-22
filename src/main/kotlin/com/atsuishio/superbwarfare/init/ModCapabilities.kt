@@ -57,7 +57,7 @@ object ModCapabilities {
         )
 
         ENERGY_BLOCK.registerForBlockEntity(
-            FuMO25BlockEntity::getEnergyStorage,
+            { be, _ -> be.getEnergyStorage() },
             ModBlockEntities.FUMO_25
         )
 
@@ -84,7 +84,7 @@ object ModCapabilities {
 
         EnergyStorage.SIDED.registerForBlockEntity(
             { be: FuMO25BlockEntity, dir: Direction? ->
-                be.getEnergyStorage(dir) as EnergyStorage
+                be.getEnergyStorage() as EnergyStorage
             },
             ModBlockEntities.FUMO_25
         )

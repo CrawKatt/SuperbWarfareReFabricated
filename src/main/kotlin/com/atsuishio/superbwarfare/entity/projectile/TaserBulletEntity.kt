@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.init.ModDamageTypes.causeShockDamage
 import com.atsuishio.superbwarfare.init.ModMobEffects
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
 import com.atsuishio.superbwarfare.tools.forceHurt
 import com.atsuishio.superbwarfare.tools.sendPacketTo
 import net.minecraft.server.level.ServerLevel
@@ -25,24 +24,16 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
 open class TaserBulletEntity(type: EntityType<out TaserBulletEntity>, level: Level) : AbstractArrow(type, level),
-    BasicGeoProjectileEntity, CustomDamageProjectile {
+    BasicGeoProjectileEntity {
 
     private var initialPos: Vec3? = null
-    private var damage = 1f
+    var damage = 1f
     var volt: Int = 0
     var wireLength: Int = 0
     private var stopped = false
 
     init {
         this.noCulling = true
-    }
-
-    fun getDamage(): Float {
-        return damage
-    }
-
-    override fun setDamage(damage: Float) {
-        this.damage = damage
     }
 
     override fun playerTouch(pEntity: Player) {
@@ -113,7 +104,5 @@ open class TaserBulletEntity(type: EntityType<out TaserBulletEntity>, level: Lev
             this.discard()
         }
     }
-
-    override fun getModel() = BedrockModelLoader.TASER_BULLET_MODEL
 }
 

@@ -2,7 +2,7 @@
   "type": "superbwarfare:vehicle_assembling",
   "category": "land",
   "inputs": [
-    "9 #superbwarfare:storage_blocks/steel",
+    "9 #c:storage_blocks/steel",
     "16 superbwarfare:laser_unit",
     "superbwarfare:large_battery_pack",
     "2 superbwarfare:track",

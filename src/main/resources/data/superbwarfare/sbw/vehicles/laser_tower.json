@@ -15,6 +15,8 @@
     "MinTargetSize": 0.1,
     "SeekEnergyCost": 500
   },
+  "LaserColor": "0xFF0000",
+  "LaserScale": 0.035,
   "Weapons": {
     "Main": {
       "DefaultFireMode": "Auto",
@@ -67,7 +69,6 @@
   "SelfHurtPercent": 0,
   "VehicleContainerType": "Empty",
   "DestroyInfo": {
-    "ParticleType": "Medium",
     "ExplosionDamage": 10,
     "ExplosionRadius": 3,
     "ExplodeBlocks": false,

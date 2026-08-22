@@ -12,7 +12,9 @@
     "EnchantedCountIncreaseFunctionMixin",
     "EntityAccessor",
     "EntityMixin",
+    "EntityOnGroundAccessor",
     "EntityTypeMixin",
+    "ExplosionMixin",
     "FishingHookMixin",
     "ItemEntityMixin",
     "ItemStackMixin",
@@ -32,6 +34,7 @@
     "VillagerMixin"
   ],
   "client": [
+    "BlockLightEngineMixin",
     "CameraMixin",
     "ClientLevelMixin",
     "ClientPacketListenerAccessor",
@@ -51,8 +54,11 @@
     "KeyMappingAccessor",
     "KeymappingMixin",
     "LevelRendererMixin",
+    "LibraryMixin",
+    "LightEngineMixin",
     "LightTextureMixin",
     "LivingEntityRendererMixin",
+    "LocalPlayerMixin",
     "MinecraftAccessor",
     "MinecraftMixin",
     "ModelBakeryMixin",
@@ -61,6 +67,7 @@
     "OverlayTextureMixin",
     "PlayerItemInHandLayerMixin",
     "PlayerRendererMixin",
+    "PostPassMixin",
     "RenderTargetMixin",
     "ScreenAccessor"
   ],

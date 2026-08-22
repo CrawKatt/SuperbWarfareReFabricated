@@ -3,10 +3,8 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.capability.PersistentDataAccessor;
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
-import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem;
-import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import com.atsuishio.superbwarfare.tools.OBB;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -14,12 +12,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Math;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,78 +25,30 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static com.atsuishio.superbwarfare.event.ClientEventHandler.isProne;
+import javax.annotation.Nullable;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
 
-    /**
-     * From Automobility
-     */
-    @Unique
-    private boolean sbw$cacheOnGround;
+    @Shadow
+    @Nullable
+    public abstract Entity getVehicle();
 
     @Shadow
-    private boolean onGround;
-
+    private AABB bb;
     @Shadow
-    public abstract Level level();
-
-    @Shadow
-    public abstract AABB getBoundingBox();
+    private float eyeHeight;
 
     @Shadow
     public abstract Vec3 position();
 
     @Shadow
-    public abstract void setDeltaMovement(Vec3 pDeltaMovement);
-
-    @Shadow
-    public abstract Vec3 getDeltaMovement();
-
-    @Shadow
-    public abstract Entity getVehicle();
-
-    @Shadow
-    private AABB bb;
-
-    @Shadow
-    private float eyeHeight;
-
-    @Shadow
     private Vec3 position;
-
-    @Shadow
-    public abstract EntityDimensions getDimensions(Pose pose);
-
-    @Inject(method = "collide", at = @At("HEAD"))
-    private void sbw$spoofGroundStart(Vec3 movement, CallbackInfoReturnable<Vec3> cir) {
-        if (VehicleEntity.ignoreEntityGroundCheckStepping) {
-            this.sbw$cacheOnGround = this.onGround;
-            this.onGround = true;
-        }
-    }
-
-    @Inject(method = "collide", at = @At("TAIL"))
-    private void sbw$spoofGroundEnd(Vec3 movement, CallbackInfoReturnable<Vec3> cir) {
-        if (VehicleEntity.ignoreEntityGroundCheckStepping) {
-            this.onGround = this.sbw$cacheOnGround;
-            VehicleEntity.ignoreEntityGroundCheckStepping = false;
-        }
-    }
-
     @Unique
     public OBB.Part sbw$currentHitPart;
 
-    @Override
-    public OBB.Part sbw$getCurrentHitPart() {
-        return this.sbw$currentHitPart;
-    }
-
-    @Override
-    public void sbw$setCurrentHitPart(OBB.Part part) {
-        this.sbw$currentHitPart = part;
-    }
+    @Shadow
+    public abstract EntityDimensions getDimensions(Pose pose);
 
     @Unique
     private CompoundTag superbwarfare$persistentData;
@@ -127,10 +75,20 @@ public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
         }
     }
 
+    @Override
+    public OBB.Part sbw$getCurrentHitPart() {
+        return this.sbw$currentHitPart;
+    }
+
+    @Override
+    public void sbw$setCurrentHitPart(OBB.@NotNull Part part) {
+        this.sbw$currentHitPart = part;
+    }
+
     @Inject(method = "turn(DD)V", at = @At("HEAD"), cancellable = true)
     public void turn(double pYRot, double pXRot, CallbackInfo ci) {
         var entity = (Entity) (Object) this;
-        if (entity instanceof Player player && player.getMainHandItem().getItem() instanceof GunItem && isProne(player) && !player.isSwimming()) {
+        if (entity instanceof Player player && player.getMainHandItem().getItem() instanceof GunItem && player.getPose() == Pose.SWIMMING && !player.isSwimming()) {
             ci.cancel();
             float f = (float) pXRot * 0.15F;
             float f1 = (float) pYRot * 0.15F;
@@ -157,10 +115,12 @@ public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
             ci.cancel();
             float f = (float) pXRot * 0.15F;
             float f1 = (float) pYRot * 0.15F;
-            player.setXRot(Mth.clamp(player.getXRot() + f, -90.0F, 90.0F));
+            player.setXRot(player.getXRot() + f);
             player.setYRot(player.getYRot() + f1);
-            player.xRotO = Mth.clamp(player.xRotO + f, -90.0F, 90.0F);
+            player.setXRot(Mth.clamp(player.getXRot(), -90.0F, 90.0F));
+            player.xRotO += f;
             player.yRotO += f1;
+            player.xRotO = Mth.clamp(player.xRotO, -90.0F, 90.0F);
             if (player.getVehicle() != null) {
                 player.getVehicle().onPassengerTurned(player);
             }
@@ -209,36 +169,6 @@ public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
             cir.cancel();
             var s = vehicle.getPassengerRenderScale();
             cir.setReturnValue(getDimensions(pose).height() * 0.85f * s);
-        }
-    }
-
-    @Inject(
-            method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private void superbwarfare$powerfulAttractionDrop(
-            ItemStack stack,
-            float yOffset,
-            CallbackInfoReturnable<ItemEntity> cir
-    ) {
-        if (PowerfulAttraction.tryMoveCurrentDropToPlayer(stack)) {
-            cir.setReturnValue(null);
-        }
-    }
-
-    @Inject(
-            method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
-            at = @At("RETURN")
-    )
-    private void superbwarfare$captureLivingDrop(
-            ItemStack stack,
-            float yOffset,
-            CallbackInfoReturnable<ItemEntity> cir
-    ) {
-        ItemEntity drop = cir.getReturnValue();
-        if (drop != null) {
-            LivingEventHandler.captureLivingDrop(drop);
         }
     }
 }

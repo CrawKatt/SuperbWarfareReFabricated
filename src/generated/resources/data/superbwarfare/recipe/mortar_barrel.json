@@ -3,16 +3,13 @@
   "category": "misc",
   "key": {
     "a": {
-      "tag": "c:ingots/iron"
-    },
-    "b": {
-      "tag": "c:dyes/green"
+      "tag": "c:plates/steel"
     }
   },
   "pattern": [
-    "a a",
-    "a a",
-    "aba"
+    "a",
+    "a",
+    "a"
   ],
   "result": {
     "count": 1,

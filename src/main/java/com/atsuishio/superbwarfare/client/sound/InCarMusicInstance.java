@@ -5,10 +5,10 @@
 //import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 //import net.minecraft.sounds.SoundEvent;
 //import net.minecraft.sounds.SoundSource;
-//import net.neoforged.api.distmarker.Dist;
-//import net.neoforged.api.distmarker.OnlyIn;
+//import net.fabricmc.api.EnvType;
+//import net.fabricmc.api.Environment;
 //
-//
+//@Environment(EnvType.CLIENT)
 //public abstract class InCarMusicInstance extends AbstractTickableSoundInstance {
 //
 //    private final Minecraft client;
@@ -69,7 +69,7 @@
 //        }
 //    }
 //
-//    
+//    @Environment(EnvType.CLIENT)
 //    public static class InCarMusicSound extends InCarMusicInstance {
 //
 //        public InCarMusicSound(VehicleEntity entity) {

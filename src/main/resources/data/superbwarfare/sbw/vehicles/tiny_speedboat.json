@@ -5,6 +5,7 @@
   "Seats": {
     "Transform": "Vehicle",
     "Position": [0, -0.3, -0.0625],
+    "RotateWithVehicle": true,
     "MinYaw": -90,
     "MaxYaw": 90,
     "DismountInfo": {
@@ -19,6 +20,7 @@
     }
   ],
   "Mass": 0.07,
+  "TowForceFactor": 10.0,
   "RotateOffsetHeight": 0.5,
   "DamageModifiers": [
     "All - 2",

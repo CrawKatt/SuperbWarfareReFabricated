@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.client.animation.entity
 
 import com.atsuishio.superbwarfare.client.animation.AnimationPlayType
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader.getAnimations
+import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.animation.BedrockAnimation
 import com.maydaymemory.mae.basic.DummyPose
 import com.maydaymemory.mae.basic.Keyframe
@@ -19,7 +19,11 @@ open class BasicEntityContext<T : Entity>(val entity: T, location: ResourceLocat
     private var animationRunner: AnimationRunner? = null
 
     init {
-        val ani = getAnimations(location)
+        init(location)
+    }
+
+    open fun init(location: ResourceLocation) {
+        val ani = EntityModelReloadListener.getAnimation(location)
         for (entry in ani!!) {
             animations[entry.name] = entry
         }

@@ -6,22 +6,14 @@
       "item": "minecraft:string"
     },
     "b": {
-      "tag": "minecraft:terracotta"
-    },
-    "c": {
-      "tag": "superbwarfare:ingots/steel"
-    },
-    "d": {
-      "tag": "minecraft:wool"
+      "tag": "c:plates/steel"
     }
   },
   "pattern": [
-    "aba",
-    "ccc",
-    "ada"
+    "aba"
   ],
   "result": {
-    "count": 4,
+    "count": 2,
     "id": "superbwarfare:armor_plate"
   }
 }

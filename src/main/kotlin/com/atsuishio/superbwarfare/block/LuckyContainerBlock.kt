@@ -34,10 +34,9 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
-import javax.annotation.ParametersAreNonnullByDefault
 
 @Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
-class LuckyContainerBlock :
+open class LuckyContainerBlock :
     BaseEntityBlock(Properties.of().sound(SoundType.METAL).strength(3.0f).noOcclusion().requiresCorrectToolForDrops()) {
     init {
         this.registerDefaultState(
@@ -47,7 +46,6 @@ class LuckyContainerBlock :
         )
     }
 
-    @ParametersAreNonnullByDefault
     override fun useItemOn(
         stack: ItemStack,
         state: BlockState,
@@ -59,7 +57,8 @@ class LuckyContainerBlock :
     ): ItemInteractionResult {
         if (level.isClientSide
             || state.getValue(OPENED)
-            || (level.getBlockEntity(pos) !is LuckyContainerBlockEntity)
+            || level.getBlockEntity(pos) !is LuckyContainerBlockEntity
+            || hand == InteractionHand.OFF_HAND
         ) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
 
         if (!stack.`is`(ModTags.Items.TOOLS_CROWBAR)) {
@@ -86,7 +85,7 @@ class LuckyContainerBlock :
         pBlockEntityType: BlockEntityType<T?>
     ): BlockEntityTicker<T?>? {
         if (!pLevel.isClientSide) {
-            return createTickerHelper<LuckyContainerBlockEntity?, T?>(
+            return createTickerHelper<LuckyContainerBlockEntity, T>(
                 pBlockEntityType,
                 ModBlockEntities.LUCKY_CONTAINER
             ) { pLevel, pPos, pState, blockEntity ->
@@ -101,7 +100,6 @@ class LuckyContainerBlock :
         return null
     }
 
-    @ParametersAreNonnullByDefault
     override fun appendHoverText(
         stack: ItemStack,
         context: TooltipContext,
@@ -125,7 +123,6 @@ class LuckyContainerBlock :
         }
     }
 
-    @ParametersAreNonnullByDefault
     override fun getShape(state: BlockState, world: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape {
         return if (state.getValue(OPENED)) box(1.0, 0.0, 1.0, 15.0, 14.0, 15.0)
         else box(0.0, 0.0, 0.0, 16.0, 15.0, 16.0)
@@ -149,7 +146,6 @@ class LuckyContainerBlock :
             .setValue(OPENED, false)
     }
 
-    @ParametersAreNonnullByDefault
     override fun getCloneItemStack(level: LevelReader, pos: BlockPos, state: BlockState): ItemStack {
         val itemstack = super.getCloneItemStack(level, pos, state)
         level.getBlockEntity(pos, ModBlockEntities.LUCKY_CONTAINER)

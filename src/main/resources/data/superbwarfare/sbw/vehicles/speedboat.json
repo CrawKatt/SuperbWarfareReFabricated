@@ -3,6 +3,11 @@
   "MaxEnergy": 500000,
   "OBB": [
     {
+      "Part": "Collision",
+      "Size": [1.15, 0.9, 4.87],
+      "Position": [0, 0.906, 1.063]
+    },
+    {
       "Size": [1.188, 0.906, 4.875],
       "Position": [0, 0.906, 1.063]
     },
@@ -23,6 +28,7 @@
     {
       "Transform": "Vehicle",
       "Position": [0, 0.5875, 0],
+      "RotateWithVehicle": true,
       "MinPitch": -60,
       "MaxPitch": 60,
       "MinYaw": -90,
@@ -38,6 +44,7 @@
       "MinPitch": -20,
       "MaxPitch": 60,
       "CanRotateBody": true,
+      "Sensitivity": [0.57, 0.75, 0.9],
       "CameraPos": {
         "Transform": "Turret",
         "UseFixedCameraPos": true,
@@ -53,6 +60,7 @@
     {
       "Transform": "Vehicle",
       "Position": [-0.875, 0.5625, -2.1875],
+      "RotateWithVehicle": true,
       "Orientation": -90,
       "MinYaw": -90,
       "MaxYaw": 90,
@@ -64,6 +72,7 @@
     {
       "Transform": "Vehicle",
       "Position": [0.875, 0.5625, -2.1875],
+      "RotateWithVehicle": true,
       "Orientation": 90,
       "MinYaw": -90,
       "MaxYaw": 90,
@@ -75,6 +84,7 @@
     {
       "Transform": "Vehicle",
       "Position": [0, 0.688, -3.188],
+      "RotateWithVehicle": true,
       "MinYaw": -90,
       "MaxYaw": 90,
       "DismountInfo": {
@@ -119,7 +129,6 @@
       "SoundRadius": 16
     }
   },
-
   "TurretPos": [0, 3.112, -0.365],
   "TurretTurnSpeed": [25, 25],
   "TurretPitchRange": [-20, 60],
@@ -145,10 +154,12 @@
     "superbwarfare:projectile_hit * 1.1",
     "superbwarfare:grapeshot_hit * 0.8",
     "@#superbwarfare:aerial_bomb * 2",
-    "#superbwarfare:projectile * 0.7",
+    "#superbwarfare:projectile * 0.4",
+    "#superbwarfare:projectile_absolute * 0.6",
     "superbwarfare:vehicle_strike * 1.4",
     "@superbwarfare:cannon_shell * 1.3",
-    "@superbwarfare:small_cannon_shell * 1.3",
+    "@superbwarfare:c4 * 2",
+    "@superbwarfare:small_cannon_shell * 0.75",
     "@superbwarfare:gun_grenade * 3",
     "@superbwarfare:rgo_grenade * 6",
     "@superbwarfare:hand_grenade * 5",

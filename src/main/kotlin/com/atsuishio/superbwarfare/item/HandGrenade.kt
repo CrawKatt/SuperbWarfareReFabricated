@@ -6,7 +6,6 @@ import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.projectile.AbstractProjectileDispenseBehavior
 import com.atsuishio.superbwarfare.tools.CustomExplosion
-import com.atsuishio.superbwarfare.tools.ParticleTool
 import net.minecraft.core.Position
 import net.minecraft.core.dispenser.BlockSource
 import net.minecraft.core.dispenser.DispenseItemBehavior
@@ -26,7 +25,11 @@ import net.minecraft.world.level.Level
 import kotlin.math.min
 
 open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLaunchable {
-    override fun use(worldIn: Level, playerIn: Player, handIn: InteractionHand): InteractionResultHolder<ItemStack> {
+    override fun use(
+        worldIn: Level,
+        playerIn: Player,
+        handIn: InteractionHand
+    ): InteractionResultHolder<ItemStack> {
         val stack = playerIn.getItemInHand(handIn)
         playerIn.startUsingItem(handIn)
         if (playerIn is ServerPlayer) {
@@ -86,8 +89,6 @@ open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLa
                 .attacker(pLivingEntity)
                 .damage(ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE.get().toFloat())
                 .radius(ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS.get().toFloat())
-                .damageMultiplier(1.25f)
-                .withParticleType(ParticleTool.ParticleType.MEDIUM)
                 .explode()
 
             if (pLivingEntity is Player) {

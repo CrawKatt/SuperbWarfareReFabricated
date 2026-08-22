@@ -1,11 +1,12 @@
 package com.atsuishio.superbwarfare.block
 
+import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
@@ -14,22 +15,24 @@ import net.minecraft.world.level.block.RenderShape
 import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
-import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.block.state.properties.DirectionProperty
 import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.phys.Vec3
+import kotlin.math.atan2
 import kotlin.math.max
 
 @Suppress("OVERRIDE_DEPRECATION")
 open class AircraftCatapultBlock :
-    Block(Properties.of().sound(SoundType.METAL).strength(3.0f).requiresCorrectToolForDrops()) {
+    Block(Properties.of().sound(SoundType.METAL).strength(3.0f).requiresCorrectToolForDrops().friction(0.989f)) {
     init {
         this.registerDefaultState(
             this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
-                .setValue(POWER, 0)
+                .setValue(LAUNCH_POWER, 0)
                 .setValue(UPDATING, false)
+                .setValue(CONTROLLED, false)
+                .setValue(REVERSED, false)
         )
     }
 
@@ -41,15 +44,26 @@ open class AircraftCatapultBlock :
         pMovedByPiston: Boolean
     ) {
         if (level is ServerLevel) {
-            val receivedPower = level.getBestNeighborSignal(pos)
-            val maxNeighborPower = this.getFacingPower(level, pos, state)
-            val newPower = max(receivedPower, maxNeighborPower)
-            level.setBlock(pos, state.setValue(POWER, newPower), 3)
+            val behind = pos.relative(state.getValue(FACING).opposite)
+            if (level.getBlockState(behind).block is CatapultControllerBlock) {
+                val controllerState = level.getBlockState(behind)
+                level.setBlock(
+                    pos, state
+                        .setValue(LAUNCH_POWER, controllerState.getValue(CatapultControllerBlock.LAUNCH_POWER))
+                        .setValue(CONTROLLED, true)
+                        .setValue(REVERSED, !controllerState.getValue(CatapultControllerBlock.POWERED)), 3
+                )
+                return
+            }
+            val neighborPower = this.getFacingPower(level, pos, state)
+            if (neighborPower > 0) {
+                level.setBlock(pos, state.setValue(LAUNCH_POWER, neighborPower), 3)
+            }
         }
     }
 
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block?, BlockState?>) {
-        builder.add(FACING).add(POWER).add(UPDATING)
+        builder.add(FACING).add(LAUNCH_POWER).add(UPDATING).add(CONTROLLED).add(REVERSED)
     }
 
     override fun getRenderShape(pState: BlockState): RenderShape {
@@ -75,27 +89,27 @@ open class AircraftCatapultBlock :
     }
 
     override fun tick(state: BlockState, level: ServerLevel, pos: BlockPos, pRandom: RandomSource) {
-        this.updateSignal(state, level, pos)
+        val currentState = level.getBlockState(pos)
+        if (currentState.getValue(CONTROLLED)) {
+            val behind = pos.relative(currentState.getValue(FACING).opposite)
+            if (level.getBlockState(behind).block !is CatapultControllerBlock) {
+                level.setBlock(pos, currentState.setValue(CONTROLLED, false), 3)
+            }
+            return
+        }
+        this.updateSignal(currentState, level, pos)
     }
 
     private fun updateSignal(state: BlockState, level: ServerLevel, pos: BlockPos) {
-        if (state.getValue(UPDATING)) return  // 防止重入
-
-        // 标记正在更新
+        if (state.getValue(UPDATING) || state.getValue(CONTROLLED)) return
         level.setBlock(pos, state.setValue(UPDATING, true), 2)
 
-        // 计算新能量
-        val receivedPower = level.getBestNeighborSignal(pos)
-        val maxNeighborPower = this.getFacingPower(level, pos, state)
-        val newPower = max(receivedPower, maxNeighborPower)
-
-        // 仅当能量变化时更新
-        if (newPower != state.getValue(POWER)) {
+        val neighborPower = this.getFacingPower(level, pos, state)
+        if (neighborPower != state.getValue(LAUNCH_POWER)) {
             val newState = level.getBlockState(pos)
-            level.setBlock(pos, newState.setValue(POWER, newPower), 3)
+            level.setBlock(pos, newState.setValue(LAUNCH_POWER, neighborPower), 3)
         }
 
-        // 清除更新标记
         val newState = level.getBlockState(pos)
         level.setBlock(pos, newState.setValue(UPDATING, false), 2)
     }
@@ -105,32 +119,44 @@ open class AircraftCatapultBlock :
         val relative = pos.relative(state.getValue(FACING))
         val blockState = level.getBlockState(relative)
         if (blockState.block is AircraftCatapultBlock) {
-            max = max(max, blockState.getValue(POWER))
+            max = max(max, blockState.getValue(LAUNCH_POWER))
         }
         return max
     }
 
-    override fun stepOn(pLevel: Level, pPos: BlockPos, pState: BlockState, pEntity: Entity) {
-        super.stepOn(pLevel, pPos, pState, pEntity)
-        val direction = pState.getValue(FACING)
-        val power = pState.getValue(POWER)
+    override fun entityInside(pState: BlockState, pLevel: Level, pPos: BlockPos, pEntity: Entity) {
+        super.entityInside(pState, pLevel, pPos, pEntity)
+        if (pEntity !is CatapultShuttleEntity) return
+
+        val diffY = Mth.wrapDegrees(-getWorldYRot(pState) - pEntity.yRot)
+        pEntity.yRot += 0.9f * diffY
+        pEntity.yRotO += 0.9f * diffY
+
+        val state = pLevel.getBlockState(pPos)
+        val power = state.getValue(LAUNCH_POWER)
         if (power == 0) return
 
-        var rate = power / 400f
-        if (pEntity is LivingEntity) {
-            rate = power / 50f
+        val direction = state.getValue(FACING)
+        val rate = power / 50f
+        val localDir = Vec3(direction.stepX.toDouble(), 0.0, direction.stepZ.toDouble())
+        val moveDir = if (state.getValue(REVERSED)) localDir.scale(-1.0) else localDir
+        if (pEntity.deltaMovement.dot(moveDir) < 0.6 * power) {
+            pEntity.addDeltaMovement(Vec3(moveDir.x * rate, moveDir.y * rate, moveDir.z * rate))
         }
-        if (pEntity.deltaMovement
-                .dot(Vec3(direction.stepX.toDouble(), 0.0, direction.stepZ.toDouble())) < 0.2 * power
-        ) {
-            pEntity.addDeltaMovement(
-                Vec3(
-                    (direction.stepX * rate).toDouble(),
-                    0.0,
-                    (direction.stepZ * rate).toDouble()
-                )
-            )
-        }
+    }
+
+    private fun getWorldYRot(blockstate: BlockState): Float {
+        val facing = blockstate.getValue(FACING)
+        val stepX = facing.stepX.toDouble()
+        val stepZ = facing.stepZ.toDouble()
+
+//        return if (ValkyrienSkiesCompat.hasMod()) {
+//            // Shipyard entity 使用船舶局部 yaw
+//            Math.toDegrees(atan2(stepX, stepZ)).toFloat()
+//        } else {
+        val localDir = Vec3(stepX, 0.0, stepZ)
+        return Math.toDegrees(atan2(localDir.x, localDir.z)).toFloat()
+//        }
     }
 
     companion object {
@@ -138,9 +164,15 @@ open class AircraftCatapultBlock :
         val FACING: DirectionProperty = HorizontalDirectionalBlock.FACING
 
         @JvmField
-        val POWER: IntegerProperty = BlockStateProperties.POWER
+        val LAUNCH_POWER: IntegerProperty = IntegerProperty.create("launch_power", 0, 15)
 
         @JvmField
         val UPDATING: BooleanProperty = BooleanProperty.create("updating")
+
+        @JvmField
+        val CONTROLLED: BooleanProperty = BooleanProperty.create("controlled")
+
+        @JvmField
+        val REVERSED: BooleanProperty = BooleanProperty.create("reversed")
     }
 }

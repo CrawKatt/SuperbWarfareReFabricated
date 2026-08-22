@@ -12,7 +12,7 @@
       "item": "minecraft:redstone"
     },
     "d": {
-      "tag": "superbwarfare:ingots/steel"
+      "tag": "c:ingots/steel"
     },
     "e": {
       "item": "minecraft:copper_ingot"

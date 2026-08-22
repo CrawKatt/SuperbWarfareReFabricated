@@ -18,8 +18,11 @@ import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.min
 
+@Environment(EnvType.CLIENT)
 object IglaHudOverlay : CommonOverlay("igla_9k38_hud") {
     private val FRAME = loc("textures/overlay/frame/frame_diamond.png")
     private val PART_1 = loc("textures/overlay/igla_9k38/part_1.png")

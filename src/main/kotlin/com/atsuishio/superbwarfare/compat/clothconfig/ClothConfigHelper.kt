@@ -8,6 +8,8 @@ import com.atsuishio.superbwarfare.compat.clothconfig.common.GameplayClothConfig
 import me.shedaniel.clothconfig2.api.ConfigBuilder
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
+import net.neoforged.neoforge.common.ModConfigSpec
+import java.util.function.Consumer
 
 object ClothConfigHelper {
     val configBuilder: ConfigBuilder
@@ -30,5 +32,10 @@ object ClothConfigHelper {
     @JvmStatic
     fun getConfigScreen(parent: Screen?): Screen {
         return configBuilder.setParentScreen(parent).build()
+    }
+
+    fun <T : Any> save(spec: ModConfigSpec.ConfigValue<T>): Consumer<T> = Consumer { value ->
+        spec.set(value)
+        spec.save()
     }
 }

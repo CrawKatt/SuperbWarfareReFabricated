@@ -58,7 +58,7 @@ class TDMSavedData : SavedData {
 
     fun sync() {
         this.setDirty()
-        sendPacketToAll(TDMSyncMessage(this))
+        sendPacketToAll(TDMSyncMessage(entities))
     }
 
     companion object {
@@ -108,7 +108,7 @@ class TDMSavedData : SavedData {
                     FILE_ID
                 ) ?: return@join
 
-                ServerPlayNetworking.send(player, TDMSyncMessage(data))
+                ServerPlayNetworking.send(player, TDMSyncMessage(data.entities))
             }
         }
     }

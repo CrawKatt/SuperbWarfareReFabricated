@@ -1,10 +1,7 @@
 package com.atsuishio.superbwarfare.init
 
 import com.atsuishio.superbwarfare.Mod
-import com.atsuishio.superbwarfare.client.particle.BulletDecalOption
-import com.atsuishio.superbwarfare.client.particle.CannonMuzzleFlareOption
-import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
-import com.atsuishio.superbwarfare.client.particle.CustomSmokeOption
+import com.atsuishio.superbwarfare.client.particle.*
 import com.mojang.serialization.MapCodec
 import net.minecraft.core.Registry
 import net.minecraft.core.particles.ParticleOptions
@@ -17,6 +14,12 @@ import net.minecraft.network.codec.StreamCodec
 object ModParticleTypes {
     @JvmField
     val FIRE_STAR: SimpleParticleType = registerSimpleParticle("fire_star")
+
+    @JvmField
+    val EXPLOSION_DEBRIS: ParticleType<ExplosionDebrisOption> = register(
+        "explosion_debris",
+        createOptions(ExplosionDebrisOption.CODEC, true, ExplosionDebrisOption.STREAM_CODEC)
+    )
 
     @JvmField
     val WHITE_STAR: SimpleParticleType = registerSimpleParticle("white_star")
@@ -40,6 +43,12 @@ object ModParticleTypes {
     val CANNON_MUZZLE_FLARE: ParticleType<CannonMuzzleFlareOption> = register(
         "cannon_muzzle_flare",
         createOptions(CannonMuzzleFlareOption.CODEC, true, CannonMuzzleFlareOption.STREAM_CODEC)
+    )
+
+    @JvmField
+    val CUSTOM_FLARE: ParticleType<CustomFlareOption> = register(
+        "custom_flare",
+        createOptions(CustomFlareOption.CODEC, true, CustomFlareOption.STREAM_CODEC)
     )
 
     @JvmField

@@ -82,6 +82,13 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         gunItem(ModItems.SUPER_STAR_SHOOTER)
 
         simpleItem(ModItems.VEHICLE_GUN)
+        addModel(
+            loc("item/${itemPath(ModItems.EMPTY_GUN)}"),
+            model(
+                ResourceLocation.withDefaultNamespace("item/generated"),
+                mapOf("layer0" to loc("item/vehicle_gun"))
+            )
+        )
         simpleItem(ModItems.MORTAR_SHELL)
         simpleItem(ModItems.LARGE_SHELL_AP)
         simpleItem(ModItems.LARGE_SHELL_HE)
@@ -120,6 +127,9 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.GS_HEAD)
         simpleItem(ModItems.CANNON_CORE)
         simpleItem(ModItems.COPPER_PLATE)
+        simpleItem(ModItems.STEEL_PLATE)
+        simpleItem(ModItems.SLIME_COVERED_LEATHER)
+        simpleItem(ModItems.ENGINEERING_PLASTIC)
         simpleItem(ModItems.STEEL_INGOT)
         simpleItem(ModItems.LEAD_INGOT)
         simpleItem(ModItems.TUNGSTEN_INGOT)
@@ -147,12 +157,15 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.SNIPER_AMMO)
         simpleItem(ModItems.SHOTGUN_AMMO)
         simpleItem(ModItems.HEAVY_AMMO)
+        simpleItem(ModItems.FLYING_FLARE_AMMO)
+        simpleItem(ModItems.VEHICLE_SMOKE_AMMO)
         simpleItem(ModItems.SMALL_ROCKET)
         simpleItem(ModItems.MEDIUM_ROCKET_AP)
         simpleItem(ModItems.MEDIUM_ROCKET_HE)
         simpleItem(ModItems.MEDIUM_ROCKET_CM)
         simpleItem(ModItems.MEDIUM_ANTI_GROUND_MISSILE)
         simpleItem(ModItems.LARGE_ANTI_GROUND_MISSILE)
+        simpleItem(ModItems.EXTRA_LARGE_ANTI_GROUND_MISSILE)
         simpleItem(ModItems.SMALL_SHELL_AP)
         simpleItem(ModItems.SMALL_SHELL_HE)
         simpleItem(ModItems.SMALL_SHELL_GS)
@@ -160,6 +173,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.SWARM_DRONE)
         simpleItem(ModItems.SMALL_AERIAL_BOMB)
         simpleItem(ModItems.MEDIUM_AERIAL_BOMB)
+        simpleItem(ModItems.LARGE_AERIAL_BOMB)
         simpleItem(ModItems.SMALL_BATTERY_PACK)
         simpleItem(ModItems.MEDIUM_BATTERY_PACK)
         simpleItem(ModItems.LARGE_BATTERY_PACK)
@@ -168,15 +182,22 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.THERMAL_IMAGING_GOGGLES)
         simpleItem(ModItems.VEHICLE_DAMAGE_ANALYZER)
         simpleItem(ModItems.MEDIUM_ANTI_AIR_MISSILE)
+        simpleItem(ModItems.LARGE_ANTI_AIR_MISSILE)
         simpleItem(ModItems.LASER_UNIT)
-        simpleItem(ModItems.TOW_DEPLOYER)
         simpleItem(ModItems.VEHICLE_RESET_KIT)
         handheldItem(ModItems.RPG_ROCKET_STANDARD)
         handheldItem(ModItems.RPG_ROCKET_TBG)
         simpleItem(ModItems.MORTAR_SHELL_WP)
+        simpleItem(ModItems.MORTAR_SHELL_SMOKE)
         simpleItem(ModItems.WP_HEAD)
         simpleItem(ModItems.TUNGSTEN_ROD)
         simpleItem(ModItems.GRENADE_40MM)
+        simpleItem(ModItems.MEDIUM_SHELL_AP)
+        simpleItem(ModItems.MEDIUM_SHELL_HE)
+        simpleItem(ModItems.MEDIUM_SHELL_GS)
+        simpleItem(ModItems.MEDIUM_SHELL_AA)
+        simpleItem(ModItems.TACTICAL_TERMINAL)
+        simpleItem(ModItems.CRUST)
 
         simpleMaterials(ModItems.IRON_MATERIALS)
         simpleMaterials(ModItems.STEEL_MATERIALS)
@@ -208,6 +229,19 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.EFFECTIVE_RESEARCH_MODULE)
         simpleItem(ModItems.BOOST_RESEARCH_MODULE)
 
+        handheldItem(ModItems.VEHICLE_KEY)
+        handheldItem(ModItems.CREATIVE_VEHICLE_KEY)
+        handheldItem(ModItems.TOWLINE)
+        handheldItem(ModItems.TOW_BAR)
+        simpleItem(ModItems.CATAPULT_SHUTTLE)
+
+        // cemented carbide tools
+        handheldItem(ModItems.CEMENTED_CARBIDE_SWORD)
+        handheldItem(ModItems.CEMENTED_CARBIDE_PICKAXE)
+        handheldItem(ModItems.CEMENTED_CARBIDE_AXE)
+        handheldItem(ModItems.CEMENTED_CARBIDE_SHOVEL)
+        handheldItem(ModItems.CEMENTED_CARBIDE_HOE)
+
         // perk
         simpleItem(ModItems.SHORTCUT_PACK)
         simpleItem(ModItems.EMPTY_PERK)
@@ -227,6 +261,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.US_HELMET_PASGT)
         simpleItem(ModItems.US_CHEST_IOTV)
         simpleItem(ModItems.GE_HELMET_M_35)
+        simpleItem(ModItems.HANDSOME_GOGGLES)
 
         // blueprints
         gunBlueprintItem(ModItems.TRACHELIUM_BLUEPRINT)
@@ -284,6 +319,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         evenSimplerBlockItem(ModBlocks.CREATIVE_CHARGING_STATION)
         evenSimplerBlockItem(ModBlocks.VEHICLE_DEPLOYER)
         evenSimplerBlockItem(ModBlocks.AIRCRAFT_CATAPULT)
+        evenSimplerBlockItem(ModBlocks.CATAPULT_CONTROLLER)
         evenSimplerBlockItem(ModBlocks.SUPERB_ITEM_INTERFACE)
         evenSimplerBlockItem(ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE)
         evenSimplerBlockItem(ModBlocks.BIOGAS_GENERATOR)

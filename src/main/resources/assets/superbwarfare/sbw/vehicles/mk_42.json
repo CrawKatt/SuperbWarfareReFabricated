@@ -1,12 +1,9 @@
 {
-  "Model": {
-    "Animation": "superbwarfare:animations/mk_42.animation.json",
-    "Model": "superbwarfare:geo/mk_42.geo.json",
-    "LODModel": [
-      "superbwarfare:geo/vehicle_lod/mk_42_lod1.geo.json",
-      "superbwarfare:geo/vehicle_lod/mk_42_lod2.geo.json"
-    ],
-    "Texture": "superbwarfare:textures/entity/mk_42.png"
-  },
-  "LODDistance": [32, 64]
+  "Animation": "superbwarfare:animations/bedrock/vehicle/mk_42.animation.json",
+  "Models": [
+    {
+      "Model": "superbwarfare:models/bedrock/vehicle/mk_42.geo.json",
+      "Texture": "superbwarfare:textures/bedrock/vehicle/mk_42.png"
+    }
+  ]
 }

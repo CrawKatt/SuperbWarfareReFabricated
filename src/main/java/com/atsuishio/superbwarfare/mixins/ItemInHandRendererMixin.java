@@ -22,12 +22,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemInHandRenderer.class)
 public class ItemInHandRendererMixin {
-
     @Shadow
     private ItemStack mainHandItem;
 
     @Inject(method = "renderHandsWithItems", at = @At("HEAD"), cancellable = true)
-    private void superbWarfare$renderHandsWithItems(
+    private void superbwarfare$renderHandsWithItems(
             float partialTick, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource,
             LocalPlayer player, int packedLight, CallbackInfo ci
     ) {
@@ -45,7 +44,7 @@ public class ItemInHandRendererMixin {
                     target = "Lnet/minecraft/world/item/ItemStack;matches(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z"
             )
     )
-    private boolean superbWarfare$monitorMatchesForEquipAnimation(ItemStack oldStack, ItemStack newStack) {
+    private boolean superbwarfare$skipEquipAnimation(ItemStack oldStack, ItemStack newStack) {
         if (!oldStack.isEmpty() && !newStack.isEmpty()
                 && (oldStack.getItem() instanceof GunItem
                 || oldStack.getItem() instanceof MonitorItem
@@ -62,7 +61,7 @@ public class ItemInHandRendererMixin {
     }
 
     @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)
-    private void superbWarfare$renderArmWithItem(
+    private void superbwarfare$renderArmWithItem(
             AbstractClientPlayer player, float partialTick, float pitch,
             InteractionHand hand, float swingProgress, ItemStack stack,
             float equipProgress, PoseStack poseStack,

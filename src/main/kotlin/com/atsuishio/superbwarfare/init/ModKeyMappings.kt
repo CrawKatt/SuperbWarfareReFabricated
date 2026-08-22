@@ -52,6 +52,9 @@ object ModKeyMappings {
     val BREATH = registerKey("breath", GLFW.GLFW_KEY_LEFT_CONTROL)
 
     @JvmField
+    val CHANGE_SEAT = registerKey("change_seat", GLFW.GLFW_KEY_LEFT_SHIFT)
+
+    @JvmField
     val CONFIG = KeyBindingHelper.registerKeyBinding(KeyMapping(
         "key.superbwarfare.config",
         InputConstants.Type.KEYSYM,
@@ -76,6 +79,12 @@ object ModKeyMappings {
 
     @JvmField
     val UNLOAD = registerKey("unload", InputConstants.UNKNOWN.value)
+
+    @JvmField
+    val UNLOAD_PASSENGERS = registerKey("unload_passengers", GLFW.GLFW_KEY_U)
+
+    @JvmField
+    val DISCONNECT_TOWING = registerKey("disconnect_towing", GLFW.GLFW_KEY_Y)
 
     @JvmField
     val FIRE = registerKey("fire", GLFW.GLFW_MOUSE_BUTTON_LEFT, type = InputConstants.Type.MOUSE)
@@ -103,6 +112,12 @@ object ModKeyMappings {
 
     @JvmField
     val ACTIVE_THERMAL_IMAGING = registerKey("active_thermal_imaging", GLFW.GLFW_KEY_K)
+
+    @JvmField
+    val LOITER_CONFIG = registerKey("loiter_config", GLFW.GLFW_KEY_J)
+
+    @JvmField
+    val TOGGLE_TACTICAL_MAP = registerKey("toggle_tactical_map", GLFW.GLFW_KEY_M)
 
     private fun registerKey(
         name: String,

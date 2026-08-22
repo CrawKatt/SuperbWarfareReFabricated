@@ -3,9 +3,11 @@ package com.atsuishio.superbwarfare.datagen
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModTags
 import net.minecraft.core.HolderLookup
+import net.minecraft.core.registries.Registries
 import net.minecraft.data.PackOutput
 import net.minecraft.data.tags.EntityTypeTagsProvider
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.TagKey
 import net.minecraft.world.entity.EntityType
 import java.util.concurrent.CompletableFuture
 
@@ -17,8 +19,11 @@ class ModEntityTypeTagProvider(
         this.tag(ModTags.EntityTypes.AERIAL_BOMB).add(
             ModEntities.MELON_BOMB,
             ModEntities.MK_82,
+            ModEntities.MK_84,
+            ModEntities.BOR_57,
             ModEntities.SC_50,
-            ModEntities.SC_250
+            ModEntities.SC_250,
+            ModEntities.RU_3M14_MISSILE
         )
 
         this.tag(ModTags.EntityTypes.DESTROYABLE_PROJECTILE).add(
@@ -26,8 +31,12 @@ class ModEntityTypeTagProvider(
             ModEntities.JAVELIN_MISSILE,
             ModEntities.MELON_BOMB,
             ModEntities.MK_82,
+            ModEntities.MK_84,
+            ModEntities.BOR_57,
             ModEntities.SWARM_DRONE,
-            ModEntities.WIRE_GUIDE_MISSILE
+            ModEntities.WIRE_GUIDE_MISSILE,
+            ModEntities.RU_3M14_MISSILE
+
         )
 
         this.tag(ModTags.EntityTypes.DECOY).add(
@@ -58,7 +67,9 @@ class ModEntityTypeTagProvider(
 
         this.tag(ModTags.EntityTypes.AA_MISSILE).add(
             ModEntities.IGLA_MISSILE,
-            ModEntities.RU_9M336_MISSILE
+            ModEntities.RU_9M336_MISSILE,
+            ModEntities.RU_9M100_MISSILE,
+            ModEntities.FIM_92_MISSILE
         )
 
         this.tag(ModTags.EntityTypes.SEEK_BLACKLIST).add(
@@ -88,5 +99,56 @@ class ModEntityTypeTagProvider(
             EntityType.WANDERING_TRADER,
             ModEntities.SENPAI
         ).addOptional(ResourceLocation.fromNamespaceAndPath("touhou_little_maid", "maid"))
+
+        this.tag(
+            TagKey.create(
+                Registries.ENTITY_TYPE,
+                ResourceLocation.fromNamespaceAndPath("touhou_little_maid", "maid_vehicle_rotate_blocklist")
+            )
+        ).add(
+            ModEntities.TYPE_63,
+            ModEntities.MK_42,
+            ModEntities.HPJ_11,
+            ModEntities.MLE_1934,
+            ModEntities.BL_132,
+            ModEntities.ANNIHILATOR,
+            ModEntities.LASER_TOWER,
+            ModEntities.WAVEFORCE_TOWER,
+            ModEntities.TOW,
+            ModEntities.SPEEDBOAT,
+            ModEntities.TINY_SPEEDBOAT,
+            ModEntities.WHEEL_CHAIR,
+            ModEntities.LAV_150,
+            ModEntities.LAV_AD,
+            ModEntities.LAV_25,
+            ModEntities.BMP_2,
+            ModEntities.BRADLEY,
+            ModEntities.ZTZ_99A,
+            ModEntities.T_90A,
+            ModEntities.M_1A_2,
+            ModEntities.YX_100,
+            ModEntities.PRISM_TANK,
+            ModEntities.PLZ_05,
+            ModEntities.FH_77BW,
+            ModEntities.TOM_6,
+            ModEntities.AH_6,
+            ModEntities.MI_28,
+            ModEntities.KV_16,
+            ModEntities.JU_87,
+            ModEntities.A_10A,
+            ModEntities.J_16,
+            ModEntities.AC_130H,
+            ModEntities.AIR_SHEEP,
+            ModEntities.HAPPIEST_GHAST,
+            ModEntities.KIROV,
+            ModEntities.DRONE,
+            ModEntities.MORTAR,
+            ModEntities.VEHICLE_ASSEMBLING_TABLE,
+            ModEntities.SODAYO_PICK_UP,
+            ModEntities.SODAYO_PICK_UP_HMG,
+            ModEntities.SODAYO_PICK_UP_ROCKET,
+            ModEntities.SODAYO_PICK_UP_TOW,
+            ModEntities.TRUCK,
+        )
     }
 }

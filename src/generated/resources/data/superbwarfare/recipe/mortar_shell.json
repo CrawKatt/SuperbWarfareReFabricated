@@ -6,7 +6,7 @@
       "item": "superbwarfare:fusee"
     },
     "b": {
-      "tag": "superbwarfare:ingots/steel"
+      "tag": "c:ingots/steel"
     },
     "c": {
       "item": "superbwarfare:high_energy_explosives"
@@ -21,7 +21,7 @@
     " d "
   ],
   "result": {
-    "count": 4,
+    "count": 8,
     "id": "superbwarfare:mortar_shell"
   }
 }

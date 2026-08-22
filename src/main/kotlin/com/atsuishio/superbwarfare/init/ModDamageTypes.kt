@@ -24,6 +24,7 @@ object ModDamageTypes {
     @JvmField val BURN = registerDamageType("burn")
     @JvmField val SHOCK = registerDamageType("shock")
     @JvmField val PROJECTILE_HIT = registerDamageType("projectile_hit")
+    @JvmField val PROJECTILE_HIT_HEADSHOT = registerDamageType("projectile_hit_headshot")
     @JvmField val PROJECTILE_EXPLOSION = registerDamageType("projectile_explosion")
     @JvmField val REPAIR_TOOL = registerDamageType("repair_tool")
     @JvmField val SUPER_STAR_HIT = registerDamageType("super_star_hit")
@@ -43,6 +44,7 @@ object ModDamageTypes {
     @JvmField val VEHICLE_EXPLOSION = registerDamageType("vehicle_explosion")
     @JvmField val GRAPESHOT_HIT = registerDamageType("grapeshot_hit")
     @JvmField val PHOSPHORUS_FIRE = registerDamageType("phosphorus_fire")
+    @JvmField val AMMO_CONSUMPTION = registerDamageType("ammo_consumption")
     // @formatter:on
 
     // @formatter:off
@@ -90,6 +92,11 @@ object ModDamageTypes {
     @JvmStatic
     fun causeProjectileHitDamage(registryAccess: RegistryAccess, directEntity: Entity?, attacker: Entity?): DamageSource {
         return DamageMessages(registryAccess.registry(Registries.DAMAGE_TYPE).get().getHolderOrThrow(PROJECTILE_HIT), directEntity, attacker)
+    }
+
+    @JvmStatic
+    fun causeProjectileHitHeadshotDamage(registryAccess: RegistryAccess, directEntity: Entity?, attacker: Entity?): DamageSource {
+        return DamageMessages(registryAccess.registry(Registries.DAMAGE_TYPE).get().getHolderOrThrow(PROJECTILE_HIT_HEADSHOT), directEntity, attacker)
     }
 
     @JvmStatic
@@ -173,6 +180,11 @@ object ModDamageTypes {
     @JvmStatic
     fun causePhosphorusFireDamage(registryAccess: RegistryAccess, directEntity: Entity?, attacker: Entity?): DamageSource {
         return DamageMessages(registryAccess.registry(Registries.DAMAGE_TYPE).get().getHolderOrThrow(PHOSPHORUS_FIRE), directEntity, attacker)
+    }
+
+    @JvmStatic
+    fun causeAmmoConsumptionDamage(registryAccess: RegistryAccess, attacker: Entity?): DamageSource {
+        return DamageMessages(registryAccess.registry(Registries.DAMAGE_TYPE).get().getHolderOrThrow(AMMO_CONSUMPTION), attacker)
     }
     // @formatter:on
 

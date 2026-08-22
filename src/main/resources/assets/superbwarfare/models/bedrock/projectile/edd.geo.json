@@ -17,7 +17,7 @@
 					"rotation": [-90, 0, 90]
 				},
 				{
-					"name": "laser",
+					"name": "move_laser",
 					"parent": "edd",
 					"pivot": [0.25, 2.25, 0.55],
 					"cubes": [

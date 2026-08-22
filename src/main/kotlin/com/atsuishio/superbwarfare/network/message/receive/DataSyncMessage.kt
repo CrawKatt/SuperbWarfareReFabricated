@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.data.DataLoader
 import com.atsuishio.superbwarfare.network.ClientPacketPayload
 import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.serialization.kserializer.CompressedString
+import com.atsuishio.superbwarfare.tools.invoke
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.serializer
 
@@ -14,7 +15,7 @@ data class DataSyncMessage(
     val jsonData: CompressedString,
 ) : ClientPacketPayload() {
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     override fun PayloadContext.handler() {
         val data = DataLoader.LOADED_DATA[path] ?: run {
             Mod.LOGGER.error("unknown data path $path!")
@@ -29,6 +30,6 @@ data class DataSyncMessage(
 
         data.dataMap.clear()
         data.dataMap.putAll(map)
-        data.onReload?.accept(map)
+        data.onReload?.invoke(map)
     }
 }

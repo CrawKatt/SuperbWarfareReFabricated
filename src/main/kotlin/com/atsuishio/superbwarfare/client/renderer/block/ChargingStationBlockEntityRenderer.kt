@@ -8,7 +8,10 @@ import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
+@Environment(EnvType.CLIENT)
 class ChargingStationBlockEntityRenderer : BlockEntityRenderer<ChargingStationBlockEntity> {
     override fun render(
         pBlockEntity: ChargingStationBlockEntity,

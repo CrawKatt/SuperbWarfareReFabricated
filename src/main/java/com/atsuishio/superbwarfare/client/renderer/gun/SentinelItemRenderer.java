@@ -1,8 +1,9 @@
 package com.atsuishio.superbwarfare.client.renderer.gun;
 
+import com.atsuishio.superbwarfare.init.ModCapabilities;
+
 import com.atsuishio.superbwarfare.client.ItemModelHelper;
 import com.atsuishio.superbwarfare.client.animation.AnimationHelper;
-import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.client.model.item.SentinelItemModel;
 import com.atsuishio.superbwarfare.client.renderer.CustomGunRenderer;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -48,6 +49,10 @@ public class SentinelItemRenderer extends CustomGunRenderer<SentinelItem> {
                 var cap = ModCapabilities.ENERGY_ITEM.find(itemStack, null);
                 var flag = cap != null && cap.getEnergyStored() > 0;
 
+                if (name.equals("charge_illuminated")) {
+                    bone.setHidden(!flag);
+                    bone.setRotZ((System.currentTimeMillis() % 36000000) / 200f);
+                }
 
                 if (name.equals("charge_illuminated")) {
                     bone.setHidden(!flag);

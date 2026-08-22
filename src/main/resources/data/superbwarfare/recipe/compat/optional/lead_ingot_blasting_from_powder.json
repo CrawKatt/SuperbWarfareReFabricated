@@ -9,13 +9,9 @@
     "count": 1,
     "id": "superbwarfare:lead_ingot"
   },
-  "neoforge:conditions": [
-    {
-      "type": "neoforge:not",
-      "value": {
-        "type": "neoforge:tag_empty",
-        "tag": "c:dusts/lead"
-      }
-    }
-  ]
+  "fabric:load_conditions": {
+    "condition": "fabric:tags_populated",
+    "registry": "minecraft:item",
+    "values": ["c:dusts/lead"]
+  }
 }

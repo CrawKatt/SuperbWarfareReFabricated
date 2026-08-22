@@ -1,9 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.launcher;
 
-import com.atsuishio.superbwarfare.init.ModSounds;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
+import com.atsuishio.superbwarfare.init.ModCapabilities;
 
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.TooltipTool;
@@ -12,8 +9,8 @@ import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.init.ModRarities;
+import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
@@ -45,7 +42,6 @@ public class SecondaryCataclysmItem extends GunGeoItem {
 
     @Override
     @ParametersAreNonnullByDefault
-    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.empty());
         tooltipComponents.add(Component.translatable("des.superbwarfare.secondary_cataclysm_1").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
@@ -60,7 +56,6 @@ public class SecondaryCataclysmItem extends GunGeoItem {
         return GunRendererBuilder.simple(SecondaryCataclysmItemModel::new);
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState reloadAnimPredicate(AnimationState<SecondaryCataclysmItem> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -90,7 +85,6 @@ public class SecondaryCataclysmItem extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.secondary_cataclysm.idle"));
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState meleePredicate(AnimationState<SecondaryCataclysmItem> event) {
         if (event.getData(DataTickets.ITEM_RENDER_PERSPECTIVE) != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
             return event.setAndContinue(RawAnimation.begin().thenLoop("animation.secondary_cataclysm.idle"));
@@ -104,16 +98,17 @@ public class SecondaryCataclysmItem extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var reloadAnimController = new AnimationController<>(this, "reloadAnimController", 1, this::reloadAnimPredicate);
         data.add(reloadAnimController);
         var meleeController = new AnimationController<>(this, "meleeController", 0, this::meleePredicate);
         data.add(meleeController);
     }
 
+    // TODO 复活临时修改，而不是现在这套
     @Override
     public double getCustomDamage(GunData data) {
-        var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
+        var stack = data.stack;
+        var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
         if (cap != null && cap.getEnergyStored() > 0) {
             return 2.5 * data.getDefault().damage;
         }
@@ -131,9 +126,18 @@ public class SecondaryCataclysmItem extends GunGeoItem {
         var stack = data.stack;
 
         var stackCap = ModCapabilities.ENERGY_ITEM.find(stack, null);
-        var hasEnoughEnergy = stackCap != null && stackCap.getEnergyStored() >= 3000; 
+        var hasEnoughEnergy = stackCap != null && stackCap.getEnergyStored() >= 3000;
 
         boolean isChargedFire = hasEnoughEnergy;
+//                zoom && hasEnoughEnergy;
+//
+//        if (isChargedFire) {
+//            data.setTempModifications(rawData -> {
+//                rawData.damage *= 1.25F;
+//                rawData.velocity *= 4;
+//                return rawData;
+//            });
+//        }
 
         if (!super.shootBullet(parameters)) return false;
 

@@ -3,8 +3,11 @@ package com.atsuishio.superbwarfare.client.particle
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
 import net.minecraft.util.Mth
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.max
 
+@Environment(EnvType.CLIENT)
 open class CannonMuzzleFlareParticle protected constructor(
     world: ClientLevel,
     x: Double,
@@ -26,6 +29,7 @@ open class CannonMuzzleFlareParticle protected constructor(
     var animationSpeed: Int
     var sizeAdd: Float
 
+    @Environment(EnvType.CLIENT)
     @JvmRecord
     data class Provider(val spriteSet: SpriteSet) : ParticleProvider<CannonMuzzleFlareOption> {
         override fun createParticle(

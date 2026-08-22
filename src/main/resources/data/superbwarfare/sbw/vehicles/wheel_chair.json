@@ -15,6 +15,7 @@
   "UpStep": 1.1,
   "RotateOffsetHeight": 0.4,
   "Mass": 0.03,
+  "TowForceFactor": 10.0,
   "SendHitParticles": false,
   "DamageModifiers": [
     "@minecraft:tnt * 3",
@@ -57,6 +58,6 @@
     "JumpForce": 0.6
   },
   "TerrainCompat": [[0.4375, 0, 0.5625], [-0.4375, 0, 0.5625], [0.5156, 0, -0.3125], [-0.5156, 0, -0.3125]],
-  "TerrainCompatRotateRate": 6,
+  "TerrainCompatRotateRate" : 6,
   "InertiaRotateRate": 0.75
 }

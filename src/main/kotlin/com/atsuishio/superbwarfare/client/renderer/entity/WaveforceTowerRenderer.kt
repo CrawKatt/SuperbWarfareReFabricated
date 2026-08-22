@@ -1,16 +1,26 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
-import com.atsuishio.superbwarfare.client.layer.vehicle.WaveforceTowerGlowLayer
-import com.atsuishio.superbwarfare.client.layer.vehicle.WaveforceTowerLaserLayer
-import com.atsuishio.superbwarfare.client.model.entity.WaveforceTowerModel
-import com.atsuishio.superbwarfare.entity.vehicle.WaveforceTowerEntity
+import com.atsuishio.superbwarfare.client.model.entity.VehicleModelInstance
+import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 
-class WaveforceTowerRenderer(renderManager: EntityRendererProvider.Context) :
-    VehicleRenderer<WaveforceTowerEntity>(renderManager, WaveforceTowerModel()) {
+class WaveforceTowerRenderer(manager: EntityRendererProvider.Context) : BasicAutoAimableRenderer(manager) {
 
-    init {
-        this.addRenderLayer(WaveforceTowerGlowLayer(this))
-        this.addRenderLayer(WaveforceTowerLaserLayer(this))
+    @Suppress("unused")
+    var energy0: Float = 0f
+
+    override fun renderEmissive(
+        entity: AutoAimableEntity,
+        instance: VehicleModelInstance,
+        yaw: Float,
+        partialTick: Float,
+        poseStack: PoseStack,
+        buffer: MultiBufferSource,
+        packedLight: Int
+    ) {
+        if (entity.energy <= 0 || !entity.active) return
+        super.renderEmissive(entity, instance, yaw, partialTick, poseStack, buffer, packedLight)
     }
 }

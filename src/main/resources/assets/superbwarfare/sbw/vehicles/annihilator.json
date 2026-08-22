@@ -1,9 +1,9 @@
 {
-  "Model": {
-    "Animation": "superbwarfare:animations/annihilator.animation.json",
-    "Model": "superbwarfare:geo/annihilator.geo.json",
-    "LODModel": "superbwarfare:geo/vehicle_lod/annihilator_lod1.geo.json",
-    "Texture": "superbwarfare:textures/entity/annihilator.png"
-  },
-  "LODDistance": 64
+  "Animation": "superbwarfare:animations/bedrock/vehicle/annihilator.animation.json",
+  "Models": [
+    {
+      "Model": "superbwarfare:models/bedrock/vehicle/annihilator.geo.json",
+      "Texture": "superbwarfare:textures/bedrock/vehicle/annihilator.png"
+    }
+  ]
 }

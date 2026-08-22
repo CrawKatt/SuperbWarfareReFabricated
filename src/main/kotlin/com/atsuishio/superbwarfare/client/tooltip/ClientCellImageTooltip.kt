@@ -1,7 +1,8 @@
 package com.atsuishio.superbwarfare.client.tooltip
 
-import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
 import com.atsuishio.superbwarfare.init.ModCapabilities
+
+import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
 import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics

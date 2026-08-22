@@ -13,6 +13,7 @@ import com.atsuishio.superbwarfare.init.ModRecipes
 import com.atsuishio.superbwarfare.inventory.menu.VehicleAssemblingMenu
 import com.atsuishio.superbwarfare.network.message.send.AssembleVehicleMessage
 import com.atsuishio.superbwarfare.recipe.vehicle.VehicleAssemblingRecipe
+import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.atsuishio.superbwarfare.tools.clientLevel
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.sendPacketToServer
@@ -281,9 +282,11 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
         }
     }
 
+    @Suppress("unchecked_cast")
     private val scaleAnimator = ValueAnimator(300, DEFAULT_MODEL_SCALE)
         .animation(AnimationCurves.EASE_OUT_EXPO) as ValueAnimator<Float>
 
+    @Suppress("unchecked_cast")
     private val modelPosAnimator = ValueAnimator(300, Vec2(DEFAULT_MODEL_X.toFloat(), DEFAULT_MODEL_Y.toFloat()))
         .animation(AnimationCurves.EASE_OUT_EXPO) as ValueAnimator<Vec2>
 
@@ -409,7 +412,7 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
                     return@OnPress
                 }
             }
-            sendPacketToServer(AssembleVehicleMessage(currentRecipe.id(), this.menu.containerId))
+            sendPacketToServer(AssembleVehicleMessage(this.currentRecipe!!.id, this.menu.containerId))
         }))
     }
 
@@ -462,10 +465,9 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
 
     fun renderModel(holder: RecipeHolder<VehicleAssemblingRecipe>, guiGraphics: GuiGraphics) {
         val mc = Minecraft.getInstance()
-        val level = mc.level
-        if (level == null) return
+        val level = mc.level ?: return
 
-        RenderHelper.markGuiRenderTimestamp()
+        RenderDistanceHelper.markGuiRenderTimestamp()
         val stack = holder.value().result.getResult()
         var renderEntity: Entity? = null
 

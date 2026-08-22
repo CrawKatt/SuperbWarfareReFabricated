@@ -1,9 +1,9 @@
 package com.atsuishio.superbwarfare.block.entity
 
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
+import com.atsuishio.superbwarfare.init.ModCapabilities
+
 import com.atsuishio.superbwarfare.entity.living.SenpaiEntity
 import com.atsuishio.superbwarfare.init.ModBlockEntities
-import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModTags
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
+import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
 
 open class BiogasGeneratorBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(ModBlockEntities.BIOGAS_GENERATOR, pos, state) {

@@ -1,15 +1,18 @@
 package com.atsuishio.superbwarfare.item.gun.special;
-import com.atsuishio.superbwarfare.init.*;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import com.atsuishio.superbwarfare.client.renderer.gun.RepairToolItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.init.ModDamageTypes;
+import com.atsuishio.superbwarfare.init.ModParticleTypes;
+import com.atsuishio.superbwarfare.init.ModSounds;
+import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage;
 import com.atsuishio.superbwarfare.tools.DamageHandler;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
 import com.atsuishio.superbwarfare.tools.SeekTool;
 import com.atsuishio.superbwarfare.world.phys.EntityResult;
@@ -47,7 +50,7 @@ public class RepairToolItem extends GunGeoItem {
     }
 
     @Override
-    public void onRayHitBlock(Entity shooter, ServerLevel level, @Nullable Entity target, @NotNull GunData data, Vec3 shootDirection, BlockHitResult result, @NotNull Vec3 pos) {
+    public void onRayHitBlock(Entity shooter, @NotNull ServerLevel level, @Nullable Entity target, @NotNull GunData data, Vec3 shootDirection, @NotNull BlockHitResult result, @NotNull Vec3 pos) {
         super.onRayHitBlock(shooter, level, target, data, shootDirection, result, pos);
         BlockPos blockPos = result.getBlockPos();
         BlockState state = level.getBlockState(blockPos);
@@ -55,18 +58,18 @@ public class RepairToolItem extends GunGeoItem {
     }
 
     @Override
-    public SoundEvent getRayHitBlockSound(GunData data) {
+    public @NotNull SoundEvent getRayHitBlockSound(@NotNull GunData data) {
         return ModSounds.REPAIRING;
     }
 
     @Override
-    public SoundEvent getRayHitEntitySound(GunData data) {
+    public @NotNull SoundEvent getRayHitEntitySound(@NotNull GunData data) {
         return ModSounds.REPAIRING;
     }
 
     @Override
     public void onRayHitEntity(Entity shooter, ServerLevel level, @NotNull GunData data, EntityResult result, Vec3 shootPosition, Vec3 shootDirection) {
-        var target = result.entity;
+        var target = result.getEntity();
         var pos = result.getHitPos();
         level.playSound(null, result.getHitPos().x, result.getHitPos().y, result.getHitPos().z, this.getRayHitEntitySound(data), SoundSource.PLAYERS, 0.7F, (float) ((2 * Math.random() - 1) * 0.05f + 1.0f));
 
@@ -84,6 +87,7 @@ public class RepairToolItem extends GunGeoItem {
             } else {
                 vehicle.hurt(ModDamageTypes.causeRepairToolDamage(level.registryAccess(), shooter), 0.5f + 0.0025f * vehicle.getMaxHealth());
             }
+
             this.summonRayHitParticle(level, null, pos, shootDirection.scale(-1).normalize());
         } else if (target instanceof LivingEntity living) {
             if (target.getType().is(ModTags.EntityTypes.CAN_REPAIR) && !shooter.isShiftKeyDown()) {

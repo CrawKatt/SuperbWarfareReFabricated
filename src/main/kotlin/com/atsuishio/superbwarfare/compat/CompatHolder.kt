@@ -12,6 +12,7 @@ object CompatHolder {
     const val FROSTIFUL: String = "frostiful"
     const val REALCAMERA: String = "realcamera"
     const val NET_MUSIC: String = "netmusic"
+    const val SABLE: String = "sable"
 
     @JvmStatic
     fun hasMod(modid: String, runnable: Runnable) {

@@ -1,8 +1,9 @@
 package com.atsuishio.superbwarfare.client.tooltip
 
+import com.atsuishio.superbwarfare.init.ModCapabilities
+
 import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent
 import com.atsuishio.superbwarfare.data.gun.GunProp
-import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.tools.FormatTool.format1D
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component

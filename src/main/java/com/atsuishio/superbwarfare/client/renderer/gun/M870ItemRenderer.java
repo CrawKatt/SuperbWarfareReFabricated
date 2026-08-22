@@ -42,6 +42,7 @@ public class M870ItemRenderer extends CustomGunRenderer<M870Item> {
 
         if (itemStack.getItem() instanceof GunItem && GeoItem.getId(itemStack) == this.getInstanceId(animatable)) {
             if (this.renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND || this.renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
+
                 if (this.renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
                     int scopeType = GunData.from(itemStack).attachment.get(AttachmentType.SCOPE);
                     if (scopeType == 1 && !GunData.from(itemStack).reloading()) {

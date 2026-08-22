@@ -5,11 +5,15 @@ package com.atsuishio.superbwarfare.tools
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import org.joml.Matrix4d
 import org.joml.Vector4d
 
+@Environment(EnvType.CLIENT)
 fun Vector4d.maxZoom(transform: Matrix4d): Vec3 = getMaxZoom(transform, this)
 
+@Environment(EnvType.CLIENT)
 fun getMaxZoom(transform: Matrix4d, maxCameraPos: Vector4d): Vec3 {
     val vehiclePos = transform.transform(Vector4d(0.0, 0.0, 0.0, 1.0))
     val maxCameraPosVec3 = Vec3(maxCameraPos.x, maxCameraPos.y, maxCameraPos.z)

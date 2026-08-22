@@ -1,28 +1,37 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
-import com.atsuishio.superbwarfare.client.model.entity.MortarModel
+import com.atsuishio.superbwarfare.client.model.entity.VehicleModelInstance
 import com.atsuishio.superbwarfare.entity.vehicle.MortarEntity
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
 
-class MortarRenderer(renderManager: EntityRendererProvider.Context) :
-    VehicleRenderer<MortarEntity>(renderManager, MortarModel()) {
+class MortarRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
 
-    init {
-        this.shadowRadius = 0f
-    }
-
-    override fun vehicleAxis(
-        entityIn: MortarEntity,
+    override fun transformCustomModelPart(
+        entity: VehicleEntity,
+        instance: VehicleModelInstance,
         poseStack: PoseStack,
         entityYaw: Float,
         partialTicks: Float
     ) {
-        val root = Vec3(0.0, entityIn.rotateOffsetHeight, 0.0)
+        val paoguan = instance.getBone("move_paoguan")
+        val monitor = instance.getBone("move_monitor")
+        val jiaojia = instance.getBone("move_jiaojia")
+        val headPitch = -Mth.lerp(partialTicks, entity.xRotO, entity.xRot)
+
+        paoguan?.rotation?.rotationX(headPitch * Mth.DEG_TO_RAD)
+        jiaojia?.rotation?.rotationX(-2 * ((headPitch - (10 - headPitch * 0.1f)) * Mth.DEG_TO_RAD))
+        monitor?.visible = entity.entityData.get(MortarEntity.INTELLIGENT)
+    }
+
+    override fun rotateVehicleAxis(entity: VehicleEntity, poseStack: PoseStack, entityYaw: Float, partialTicks: Float) {
+        val root = Vec3(0.0, entity.rotateOffsetHeight, 0.0)
         poseStack.rotateAround(
-            Axis.YP.rotationDegrees(-entityYaw),
+            Axis.YP.rotationDegrees(-entityYaw + 180),
             root.x.toFloat(),
             root.y.toFloat(),
             root.z.toFloat()

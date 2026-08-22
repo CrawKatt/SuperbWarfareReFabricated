@@ -5,12 +5,13 @@ import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils.getXRotF
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.item.misc.FiringParametersItem
 import com.atsuishio.superbwarfare.item.misc.firingParameters
-import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.tools.FormatTool.format0D
 import com.atsuishio.superbwarfare.tools.FormatTool.format1D
 import com.atsuishio.superbwarfare.tools.FormatTool.format2D
+import com.atsuishio.superbwarfare.tools.OBB
 import com.atsuishio.superbwarfare.tools.RangeTool.getRange
 import com.atsuishio.superbwarfare.tools.TrajectoryCalculator.calculateLaunchVector
+import com.atsuishio.superbwarfare.tools.worldToScreen
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.commands.arguments.EntityAnchorArgument
@@ -18,23 +19,18 @@ import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.max
 
+@Environment(EnvType.CLIENT)
 object Type63InfoOverlay : CommonOverlay("type_63_info") {
     private val AP by lazy { ItemStack(ModItems.MEDIUM_ROCKET_AP) }
     private val HE by lazy { ItemStack(ModItems.MEDIUM_ROCKET_HE) }
     private val CM by lazy { ItemStack(ModItems.MEDIUM_ROCKET_CM) }
 
-    private var lookingEntity: Type63Entity? = null
-
-    fun tracingEntity() {
-        val player = localPlayer ?: return
-        val entity = TraceTool.findLookingEntity(player, player.getEntityReach())
-        lookingEntity = entity as? Type63Entity
-    }
-
     override fun RenderContext.render() {
-        val lookingEntity = lookingEntity ?: return
+        val lookingEntity = OverlayTraceHandler.playerReachEntity as? Type63Entity ?: return
 
         val poseStack = guiGraphics.pose()
 
@@ -79,9 +75,9 @@ object Type63InfoOverlay : CommonOverlay("type_63_info") {
         )
 
         val items = lookingEntity.getEntityData().get(Type63Entity.LOADED_AMMO)
-        for (i in lookingEntity.barrel.indices) {
-            if (OBB.getLookingObb(player, player.entityInteractionRange()) === lookingEntity.barrel[i]) {
-                val type: Int = items[i]!!
+        for (i in lookingEntity.barrelObbs.indices) {
+            if (OBB.getLookingObb(player, player.entityInteractionRange()) === lookingEntity.barrelObbs[i]) {
+                val type: Int = items[i]
 
                 val stack = when (type) {
                     0 -> AP
@@ -90,7 +86,7 @@ object Type63InfoOverlay : CommonOverlay("type_63_info") {
                     else -> ItemStack.EMPTY
                 }
 
-                val pos = OBB.vector3dToVec3(lookingEntity.barrel[i].center)
+                val pos = OBB.vector3dToVec3(lookingEntity.barrelObbs[i].center)
                 val point = pos.worldToScreen()
 
                 poseStack.pushPose()

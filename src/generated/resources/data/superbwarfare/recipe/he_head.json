@@ -6,10 +6,10 @@
       "item": "superbwarfare:high_energy_explosives"
     },
     "b": {
-      "tag": "c:ingots/iron"
+      "tag": "c:plates/steel"
     },
     "c": {
-      "tag": "superbwarfare:ingots/steel"
+      "item": "minecraft:gunpowder"
     },
     "e": {
       "item": "superbwarfare:fusee"
@@ -18,7 +18,7 @@
   "pattern": [
     " e ",
     "bab",
-    "cac"
+    " c "
   ],
   "result": {
     "count": 2,

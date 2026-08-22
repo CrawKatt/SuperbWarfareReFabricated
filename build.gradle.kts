@@ -19,6 +19,10 @@ repositories {
     mavenCentral()
     mavenLocal()
 
+    flatDir {
+        dirs("libs")
+    }
+
     maven("https://maven.fabricmc.net/")
 
     maven {
@@ -32,6 +36,14 @@ repositories {
 
     maven("https://maven.shedaniel.me") {
         name = "Shedaniel"
+    }
+
+    maven("https://maven.createmod.net") {
+        name = "CreateMod"
+    }
+
+    maven("https://maven.ryanhcode.dev/releases") {
+        name = "RyanHCode"
     }
 
     maven("https://maven.ladysnake.org/releases") {
@@ -99,6 +111,35 @@ sourceSets {
             srcDir("src/generated/resources")
         }
     }
+
+    // Stub de compilación para la clase SubLevel del mod Sable (ver dependencias).
+    register("sableStub")
+}
+
+// El stub compila contra el mismo classpath de compilación que main. Como el output del stub
+// se agrega a main como directorio plano (files), no hay dependencia de tareas entre ambos
+// y el orden queda garantizado por los dependsOn de más abajo.
+configurations {
+    named("sableStubCompileClasspath") {
+        extendsFrom(compileClasspath.get())
+    }
+}
+
+val sableStubOutput = layout.buildDirectory.dir("classes/java/sableStub")
+
+dependencies {
+    // Clase SubLevel solo para compilar; en runtime la aporta el mod Sable.
+    compileOnly(files(sableStubOutput))
+}
+
+tasks.named("compileJava") {
+    dependsOn("sableStubClasses")
+}
+tasks.named("compileKotlin") {
+    dependsOn("sableStubClasses")
+}
+tasks.named("remapSourcesJar") {
+    dependsOn("sableStubClasses")
 }
 
 dependencies {
@@ -120,6 +161,23 @@ dependencies {
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:15.0.140")
 
     include(modImplementation("com.github.Sh1roCu:SimpleBedrockModel-Fabric:${project.property("simple_bedrock_model_version")}")!!)
+
+    // ModernKeyBinding (contextos de conflicto y modificadores de teclas estilo NeoForge)
+    // Pin al commit 17bf4f7: el HEAD de Fabric/1.21 tiene un fabric.mod.json con JSON inválido.
+    include(modImplementation("com.github.Nova-Committee:ModernKeyBinding:17bf4f794ae3ce31aee90e0df67e2757c3533d10")!!)
+
+    // Ponder (escenas de investigación)
+    modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("parchment_minecraft_version")}:${project.property("ponder_version")}")
+
+    // Sable (física)
+    // El companion-common se publica con nombres Mojang y sin atributo de versión de Loom, por lo que
+    // se usa como compileOnly plano. SubLevel (que vive en el mod Sable, publicado remapeado a
+    // intermediary con Loom 1.16) se provee mediante el source set "sableStub", que solo participa
+    // en la compilación y nunca se empaqueta: en runtime la clase real la aporta Sable.
+    compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-${project.property("parchment_minecraft_version")}:${project.property("sable_companion_version")}")
+    // Rhino (motor JS para scripts de vehículos; fork de ywzj, namespace org.mozillaa)
+    implementation("org.ywzj:rhino:1.8.1-SNAPSHOT")
+    include("org.ywzj:rhino:1.8.1-SNAPSHOT")
 
     modCompileOnly("mezz.jei:jei-1.21.1-fabric-api:${project.property("jei_version")}")
     modRuntimeOnly("mezz.jei:jei-1.21.1-fabric:${project.property("jei_version")}")

@@ -1,7 +1,8 @@
 package com.atsuishio.superbwarfare.inventory.menu
 
-import com.atsuishio.superbwarfare.entity.vehicle.VehicleAssemblingTableVehicleEntity
 import com.atsuishio.superbwarfare.init.ModCapabilities
+
+import com.atsuishio.superbwarfare.entity.vehicle.VehicleAssemblingTableVehicleEntity
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModMenuTypes
 import com.atsuishio.superbwarfare.network.message.receive.FinishAssemblingVehicleMessage

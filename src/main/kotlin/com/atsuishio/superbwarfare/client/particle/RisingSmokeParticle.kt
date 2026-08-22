@@ -3,8 +3,11 @@ package com.atsuishio.superbwarfare.client.particle
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
 import net.minecraft.core.particles.SimpleParticleType
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.min
 
+@Environment(EnvType.CLIENT)
 class RisingSmokeParticle protected constructor(
     world: ClientLevel,
     x: Double,

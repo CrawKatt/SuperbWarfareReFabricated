@@ -1,7 +1,7 @@
 {
   "type": "minecraft:smithing_transform",
   "addition": {
-    "item": "minecraft:gold_ingot"
+    "tag": "c:plates/plastic"
   },
   "base": {
     "item": "superbwarfare:rare_material_pack"

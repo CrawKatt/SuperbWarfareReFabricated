@@ -2,6 +2,7 @@
   "values": [
     "#c:raw_materials/lead",
     "#c:raw_materials/tungsten",
+    "#c:raw_materials/scheelite",
     "#c:raw_materials/silver"
   ]
 }

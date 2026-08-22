@@ -8,7 +8,6 @@ import com.atsuishio.superbwarfare.init.ModPerks;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -18,7 +17,7 @@ import java.util.function.Supplier;
 public class TaserItem extends GunGeoItem {
 
     public TaserItem() {
-        super(new Properties().rarity(Rarity.COMMON));
+        super(new Properties());
     }
 
     @Override
@@ -33,7 +32,7 @@ public class TaserItem extends GunGeoItem {
         var data = parameters.data;
 
         var stack = data.stack;
-        int perkLevel = data.perk.getLevel(ModPerks.VOLT_OVERLOAD);
+        int perkLevel = data.perk.getLevel(ModPerks.INSTANCE.getVOLT_OVERLOAD());
 
         var energyStorage = ModCapabilities.ENERGY_ITEM.find(stack, null);
         if (energyStorage != null) {
@@ -43,7 +42,7 @@ public class TaserItem extends GunGeoItem {
 
     @Override
     public boolean canShoot(GunData data, @Nullable Entity shooter) {
-        int perkLevel = data.perk.getLevel(ModPerks.VOLT_OVERLOAD);
+        int perkLevel = data.perk.getLevel(ModPerks.INSTANCE.getVOLT_OVERLOAD());
 
         var energyStorage = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
         var hasEnoughEnergy = energyStorage != null && energyStorage.getEnergyStored() >= 400 + 100 * perkLevel;
@@ -52,5 +51,4 @@ public class TaserItem extends GunGeoItem {
 
         return super.canShoot(data, shooter);
     }
-
 }

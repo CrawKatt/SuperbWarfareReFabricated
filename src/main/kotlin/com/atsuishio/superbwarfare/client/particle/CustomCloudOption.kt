@@ -1,16 +1,15 @@
 package com.atsuishio.superbwarfare.client.particle
 
 import com.atsuishio.superbwarfare.init.ModParticleTypes
-import com.mojang.serialization.Codec
-import com.mojang.serialization.MapCodec
-import com.mojang.serialization.codecs.RecordCodecBuilder
-import io.netty.buffer.ByteBuf
+import com.atsuishio.superbwarfare.ksp.annotation.GenerateMapCodec
+import com.atsuishio.superbwarfare.tools.createStreamCodec
+import kotlinx.serialization.Serializable
 import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.core.particles.ParticleType
-import net.minecraft.network.codec.ByteBufCodecs
-import net.minecraft.network.codec.StreamCodec
 import kotlin.math.roundToInt
 
+@GenerateMapCodec
+@Serializable
 class CustomCloudOption(
     val color: Int,
     val life: Int,
@@ -51,33 +50,6 @@ class CustomCloudOption(
     }
 
     companion object {
-        @JvmField
-        val CODEC: MapCodec<CustomCloudOption> = RecordCodecBuilder.mapCodec { builder ->
-            builder.group(
-                Codec.INT.fieldOf("color").forGetter { it.color },
-                Codec.INT.fieldOf("life").forGetter { it.life },
-                Codec.FLOAT.fieldOf("size").forGetter { it.size },
-                Codec.FLOAT.fieldOf("gravity").forGetter { it.gravity },
-                Codec.BOOL.fieldOf("cooldown").forGetter { it.cooldown },
-                Codec.BOOL.fieldOf("light").forGetter { it.light }
-            ).apply(builder, ::CustomCloudOption)
-        }
-
-        @JvmField
-        val STREAM_CODEC: StreamCodec<ByteBuf, CustomCloudOption> = StreamCodec.composite(
-            ByteBufCodecs.INT,
-            CustomCloudOption::color,
-            ByteBufCodecs.INT,
-            CustomCloudOption::life,
-            ByteBufCodecs.FLOAT,
-            CustomCloudOption::size,
-            ByteBufCodecs.FLOAT,
-            CustomCloudOption::gravity,
-            ByteBufCodecs.BOOL,
-            CustomCloudOption::cooldown,
-            ByteBufCodecs.BOOL,
-            CustomCloudOption::light,
-            ::CustomCloudOption
-        )
+        val STREAM_CODEC = createStreamCodec<CustomCloudOption>()
     }
 }

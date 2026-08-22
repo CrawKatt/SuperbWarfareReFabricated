@@ -46,6 +46,7 @@ class ModBlockTagProvider(
             ModBlocks.SMALL_CONTAINER,
             ModBlocks.VEHICLE_DEPLOYER,
             ModBlocks.AIRCRAFT_CATAPULT,
+            ModBlocks.CATAPULT_CONTROLLER,
             ModBlocks.SUPERB_ITEM_INTERFACE,
             ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE,
             ModBlocks.LUCKY_CONTAINER,

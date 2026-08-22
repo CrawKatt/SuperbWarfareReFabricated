@@ -61,7 +61,7 @@ class VehicleAssemblingResult {
             val location = ResourceLocation.parse(itemString)
             val item = BuiltInRegistries.ITEM.get(location)
             if (nbt != null) {
-                val tag = TagDataParser.parse(nbt)
+                val tag = TagDataParser.parseObject(nbt)
                 tag.putString("id", location.toString())
                 tag.putInt("count", 1)
                 ItemStack.parse(RegistryAccess.EMPTY, tag).ifPresent { this.result = it }

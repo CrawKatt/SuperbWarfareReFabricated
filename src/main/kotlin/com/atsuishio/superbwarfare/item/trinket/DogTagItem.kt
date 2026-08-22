@@ -3,7 +3,9 @@ package com.atsuishio.superbwarfare.item.trinket
 import com.atsuishio.superbwarfare.client.TooltipTool
 import com.atsuishio.superbwarfare.client.screens.DogTagEditorScreen
 import com.atsuishio.superbwarfare.client.tooltip.component.DogTagImageComponent
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModDataComponents
+import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
 import dev.emi.trinkets.api.SlotReference
 import dev.emi.trinkets.api.TrinketItem
@@ -13,6 +15,7 @@ import net.fabricmc.api.Environment
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.tooltip.TooltipComponent
@@ -21,7 +24,7 @@ import net.minecraft.world.item.TooltipFlag
 import java.util.Arrays
 import java.util.Optional
 
-class DogTagItem : TrinketItem(Properties().stacksTo(1)), ItemScreenProvider {
+class DogTagItem : TrinketItem(Properties().stacksTo(1)), ItemScreenProvider, IVehicleInteract {
     @Environment(EnvType.CLIENT)
     override fun appendHoverText(
         stack: ItemStack,
@@ -45,6 +48,17 @@ class DogTagItem : TrinketItem(Properties().stacksTo(1)), ItemScreenProvider {
     @Environment(EnvType.CLIENT)
     override fun getItemScreen(stack: ItemStack, player: Player, hand: InteractionHand): Screen {
         return DogTagEditorScreen(stack, hand)
+    }
+
+    override fun onInteractVehicle(
+        vehicle: VehicleEntity,
+        stack: ItemStack,
+        player: Player,
+        hand: InteractionHand
+    ): InteractionResult? {
+        if (!player.isShiftKeyDown) return null
+        vehicle.dogTagIcon = getColors(stack).map { it.toList() }.toList()
+        return InteractionResult.SUCCESS
     }
 
     companion object {

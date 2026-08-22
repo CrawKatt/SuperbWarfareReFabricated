@@ -41,7 +41,7 @@ object SetFiringParametersMessage : ServerPacketPayload() {
 
             if (lookAtEntity) {
                 stack.firingParameters =
-                    FiringParametersItem.Parameters(lookingEntity.blockPosition(), radius, isDepressed)
+                    FiringParametersItem.Parameters(lookingEntity!!.blockPosition(), radius, isDepressed)
             } else {
                 stack.firingParameters = FiringParametersItem.Parameters(hitPos, radius, isDepressed)
             }

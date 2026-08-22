@@ -8,8 +8,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TDMSyncMessage(@JvmField val data: Set<String>) : ClientPacketPayload() {
-    constructor(savedData: TDMSavedData) : this(savedData.entities)
-
     override fun PayloadContext.handler() {
         ClientEventHandler.tdmSavedData = TDMSavedData(data)
     }

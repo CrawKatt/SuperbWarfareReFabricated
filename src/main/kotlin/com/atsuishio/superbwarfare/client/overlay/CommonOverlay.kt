@@ -10,7 +10,10 @@ import net.minecraft.client.DeltaTracker
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.LayeredDraw
 import net.minecraft.world.phys.Vec3
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
+@Environment(EnvType.CLIENT)
 class RenderContext(var guiGraphics: GuiGraphics, var deltaTracker: DeltaTracker) {
     val screenWidth get() = guiGraphics.guiWidth()
     val screenHeight get() = guiGraphics.guiHeight()
@@ -32,6 +35,7 @@ class RenderContext(var guiGraphics: GuiGraphics, var deltaTracker: DeltaTracker
     val deltaFrame by ::partialTick
 }
 
+@Environment(EnvType.CLIENT)
 abstract class CommonOverlay(id: String) : LayeredDraw.Layer {
     val ID = loc(id)
 

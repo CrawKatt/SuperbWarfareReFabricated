@@ -1,33 +1,28 @@
 package com.atsuishio.superbwarfare.block.entity
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.FuMO25Block
-import com.atsuishio.superbwarfare.capability.api.EnergyStorage
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
-import com.atsuishio.superbwarfare.config.server.MiscConfig
-import com.atsuishio.superbwarfare.config.server.VehicleConfig
-import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.inventory.menu.FuMO25Menu
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData
-import com.atsuishio.superbwarfare.network.message.receive.EntitySyncMessage
+import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
+import com.atsuishio.superbwarfare.tools.RadarScanner
 import com.atsuishio.superbwarfare.tools.SeekTool
-import com.atsuishio.superbwarfare.tools.VectorTool
-import com.atsuishio.superbwarfare.tools.sendPacketTo
 import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
 import net.minecraft.core.HolderLookup
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.Connection
 import net.minecraft.network.chat.Component
+import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientGamePacketListener
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundSource
-import net.minecraft.util.Mth
 import net.minecraft.world.MenuProvider
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
@@ -37,23 +32,18 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
-import software.bernie.geckolib.animatable.GeoBlockEntity
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.animation.AnimatableManager
-import software.bernie.geckolib.constant.dataticket.SerializableDataTicket
-import software.bernie.geckolib.util.GeckoLibUtil
-import java.util.UUID
+import com.atsuishio.superbwarfare.capability.api.EnergyStorage
+import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
+import java.util.*
 import javax.annotation.ParametersAreNonnullByDefault
 import kotlin.math.abs
 
-open class FuMO25BlockEntity(
-    pos: BlockPos,
-    state: BlockState
-) : BlockEntity(ModBlockEntities.FUMO_25, pos, state), MenuProvider, GeoBlockEntity {
-
-    private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
+open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
+    BlockEntity(ModBlockEntities.FUMO_25, pPos, pBlockState), MenuProvider {
 
     private val energyStorage: IEnergyStorage = EnergyStorage(MAX_ENERGY.toLong())
+
+    open val modelInstance = BlockModelReloadListener.getModel(MODEL)?.createInstance()
 
     var type: FuncType = FuncType.NORMAL
     var powered: Boolean = false
@@ -88,29 +78,14 @@ open class FuMO25BlockEntity(
         }
     }
 
-    fun getEnergyStorage(direction: Direction?): IEnergyStorage {
-        return this.energyStorage
-    }
-
     private fun setGlowEffect() {
         if (this.type != FuncType.GLOW) return
-
         val level = this.level ?: return
         val pos = this.blockPos
-
-        val entities: List<Entity> = SeekTool.getEntitiesWithinRange(pos, level, GLOW_RANGE)
-
-        entities.forEach { entity ->
-            if (entity is LivingEntity) {
-                entity.addEffect(
-                    MobEffectInstance(
-                        MobEffects.GLOWING,
-                        110,
-                        0,
-                        true,
-                        false
-                    )
-                )
+        val entities = SeekTool.getEntitiesWithinRange(pos, level, GLOW_RANGE.toDouble())
+        entities.forEach {
+            if (it is LivingEntity) {
+                it.addEffect(MobEffectInstance(MobEffects.GLOWING, 110, 0, true, false))
             }
         }
     }
@@ -149,11 +124,11 @@ open class FuMO25BlockEntity(
         return Component.empty()
     }
 
-    override fun createMenu(containerId: Int, playerInventory: Inventory, player: Player): AbstractContainerMenu? {
+    override fun createMenu(pContainerId: Int, pPlayerInventory: Inventory, pPlayer: Player): AbstractContainerMenu? {
         val level = this.level ?: return null
         return FuMO25Menu(
-            containerId,
-            playerInventory,
+            pContainerId,
+            pPlayerInventory,
             ContainerLevelAccess.create(level, this.blockPos),
             this.dataAccess
         )
@@ -172,16 +147,11 @@ open class FuMO25BlockEntity(
         return tag
     }
 
-    override fun getUpdatePacket(): ClientboundBlockEntityDataPacket {
+    override fun getUpdatePacket(): Packet<ClientGamePacketListener> {
         return ClientboundBlockEntityDataPacket.create(this)
     }
 
-    override fun registerControllers(data: AnimatableManager.ControllerRegistrar) {
-    }
-
-    override fun getAnimatableInstanceCache(): AnimatableInstanceCache {
-        return this.cache
-    }
+    fun getEnergyStorage() = this.energyStorage
 
     enum class FuncType {
         NORMAL,
@@ -191,14 +161,14 @@ open class FuMO25BlockEntity(
     }
 
     companion object {
-        @JvmField
-        var FUMO25_TICK: SerializableDataTicket<Int>? = null
+        val MODEL = loc("models/bedrock/block/fumo_25.geo.json")
 
         const val MAX_ENERGY: Int = 1000000
 
+        // 固定距离，以后有人改动这个需要自行解决GUI渲染问题
         const val DEFAULT_RANGE: Int = 96
         const val MAX_RANGE: Int = 128
-        const val GLOW_RANGE: Double = 64.0
+        const val GLOW_RANGE: Int = 64
 
         const val DEFAULT_ENERGY_COST: Int = 256
         const val MAX_ENERGY_COST: Int = 1024
@@ -207,22 +177,15 @@ open class FuMO25BlockEntity(
 
         const val MAX_DATA_COUNT: Int = 5
 
-        @JvmStatic
-        fun serverTick(
-            level: Level,
-            pos: BlockPos,
-            state: BlockState,
-            blockEntity: FuMO25BlockEntity
-        ) {
-            if (!MiscConfig.SYNC_ENTITY_OVER_RANGE.get()) return
-            val energyStorage = blockEntity.getEnergyStorage(null)
+        fun serverTick(level: Level, pos: BlockPos, state: BlockState, blockEntity: FuMO25BlockEntity) {
+            if (!SyncConfig.SYNC_ENTITY_OVER_RANGE.get()) return
+            val energyStorage = blockEntity.getEnergyStorage()
             val energy = energyStorage.energyStored
 
             blockEntity.tickO = blockEntity.tick
 
             if (state.getValue(FuMO25Block.POWERED)) {
                 blockEntity.tick++
-                blockEntity.setAnimData(FUMO25_TICK, blockEntity.tick)
                 blockEntity.sync()
             }
 
@@ -233,62 +196,25 @@ open class FuMO25BlockEntity(
                 DEFAULT_ENERGY_COST
             }
 
-            val f = Mth.sin(blockEntity.tick * (Math.PI.toFloat() / 180f)).toDouble()
-            val f1 = -Mth.cos(blockEntity.tick * (Math.PI.toFloat() / 180f)).toDouble()
-
-            val direct = Vec3(f, 0.0, f1)
-
             if (energy < energyCost) {
                 if (state.getValue(FuMO25Block.POWERED)) {
-                    level.setBlockAndUpdate(
-                        pos,
-                        state.setValue(FuMO25Block.POWERED, false)
-                    )
-
-                    level.playSound(
-                        null,
-                        pos,
-                        ModSounds.RADAR_SEARCH_END,
-                        SoundSource.BLOCKS,
-                        1f,
-                        1f
-                    )
-
+                    level.setBlockAndUpdate(pos, state.setValue(FuMO25Block.POWERED, false))
+                    level.playSound(null, pos, ModSounds.RADAR_SEARCH_END, SoundSource.BLOCKS, 1f, 1f)
                     blockEntity.powered = false
                     setChanged(level, pos, state)
                 }
             } else {
                 if (!state.getValue(FuMO25Block.POWERED)) {
                     if (energy >= DEFAULT_MIN_ENERGY) {
-                        level.setBlockAndUpdate(
-                            pos,
-                            state.setValue(FuMO25Block.POWERED, true)
-                        )
-
-                        level.playSound(
-                            null,
-                            pos,
-                            ModSounds.RADAR_SEARCH_START,
-                            SoundSource.BLOCKS,
-                            1f,
-                            1f
-                        )
-
+                        level.setBlockAndUpdate(pos, state.setValue(FuMO25Block.POWERED, true))
+                        level.playSound(null, pos, ModSounds.RADAR_SEARCH_START, SoundSource.BLOCKS, 1f, 1f)
                         blockEntity.powered = true
                         setChanged(level, pos, state)
                     }
                 } else {
                     energyStorage.extractEnergy(energyCost, false)
-
                     if (blockEntity.tick == 360) {
-                        level.playSound(
-                            null,
-                            pos,
-                            ModSounds.RADAR_SEARCH_IDLE,
-                            SoundSource.BLOCKS,
-                            1f,
-                            1f
-                        )
+                        level.playSound(null, pos, ModSounds.RADAR_SEARCH_IDLE, SoundSource.BLOCKS, 1f, 1f)
                     }
 
                     if (blockEntity.tick % 100 == 0) {
@@ -299,7 +225,22 @@ open class FuMO25BlockEntity(
                     if (uuid != null) {
                         val owner = level.getPlayerByUUID(uuid)
                         if (owner != null && level is ServerLevel) {
-                            scanEntities(level, pos, blockEntity, owner, direct)
+                            // 每 tick 同步雷达配置到客户端（自旋模式保证旋转流畅）
+                            val range = if (blockEntity.type == FuncType.WIDER) 2048 else 1024
+                            val sourceId = "block_${pos.x}_${pos.y}_${pos.z}"
+                            RadarScanner.sendRadarConfig(
+                                RadarScanner.RadarConfig(
+                                    owner = owner,
+                                    center = Vec3(pos.x + 0.5, pos.y + 2.5, pos.z + 0.5),
+                                    radius = range.toDouble(),
+                                    sweepAngle = 120.0,
+                                    yRot = blockEntity.tick.toDouble(),
+                                    searchType = RadarScanner.SearchType.VEHICLES,
+                                    sourceId = sourceId,
+                                ), level
+                            )
+                            // 每 SYNC_ENTITY_INTERVAL 扫描实体
+                            scanEntities(level, pos, blockEntity, owner)
                         }
                     }
                 }
@@ -314,6 +255,48 @@ open class FuMO25BlockEntity(
                 blockEntity.tick += 360
                 blockEntity.tickO = deltaT + blockEntity.tick
             }
+
+
+//            // 测试粒子
+//            if (level is ServerLevel) {
+//
+//                val f2 = Mth.sin((blockEntity.tick - 60) * (Math.PI.toFloat() / 180f)).toDouble()
+//                val f3 = -Mth.cos((blockEntity.tick - 60) * (Math.PI.toFloat() / 180f)).toDouble()
+//
+//                val dir1 = Vec3(f2, 0.0, f3)
+//
+//                val f4 = Mth.sin((blockEntity.tick + 60) * (Math.PI.toFloat() / 180f)).toDouble()
+//                val f5 = -Mth.cos((blockEntity.tick + 60) * (Math.PI.toFloat() / 180f)).toDouble()
+//
+//                val dir2 = Vec3(f4, 0.0, f5)
+//
+//                ParticleTool.sendParticle(
+//                    level,
+//                    ModParticleTypes.FIRE_STAR.get(),
+//                    pos.x.toDouble() + 0.5,
+//                    pos.y.toDouble() + 2.5,
+//                    pos.z.toDouble() + 0.5,
+//                    0,
+//                    dir1.x,
+//                    dir1.y,
+//                    dir1.z,
+//                    2.0,
+//                    false
+//                )
+//                ParticleTool.sendParticle(
+//                    level,
+//                    ModParticleTypes.FIRE_STAR.get(),
+//                    pos.x.toDouble() + 0.5,
+//                    pos.y.toDouble() + 2.5,
+//                    pos.z.toDouble() + 0.5,
+//                    0,
+//                    dir2.x,
+//                    dir2.y,
+//                    dir2.z,
+//                    2.0,
+//                    false
+//                )
+//            }
         }
 
         fun scanEntities(
@@ -321,45 +304,39 @@ open class FuMO25BlockEntity(
             pos: BlockPos,
             blockEntity: FuMO25BlockEntity,
             player: Player,
-            vec3: Vec3
         ) {
-            if (level.server.tickCount % MiscConfig.SYNC_ENTITY_INTERVAL.get() != 0) return
 
             val range = if (blockEntity.type == FuncType.WIDER) 2048 else 1024
-            val hostileList = level.allEntities.asSequence().mapNotNull {
-                val seekRange =
-                    range * range * if (it is VehicleEntity && !it.isWreck) it.computed().trackDistanceMultiply * it.computed().trackDistanceMultiply else 1.0
-                val flag = (it is VehicleEntity || VehicleConfig.inScanList(it.type))
-                        && SeekTool.NOT_IN_SMOKE.test(it)
-                        && it.distanceToSqr(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble()) <= seekRange
-                        && !SeekTool.IS_FRIENDLY.test(player, it)
-                        && SeekTool.calculateAngle(
-                    Vec3(
-                        pos.x.toDouble() + 0.5,
-                        pos.y.toDouble() + 2.5,
-                        pos.z.toDouble() + 0.5
-                    ), vec3, it
-                ) < 60 && VectorTool.checkNoClip(
-                    Vec3(
-                        pos.x.toDouble() + 0.5,
-                        pos.y.toDouble() + 2.5,
-                        pos.z.toDouble() + 0.5
-                    ), it.eyePosition, level
-                )
-                if (!flag) return@mapNotNull null
-                EntitySyncMessage.SyncedEntity(
-                    it.id,
-                    BuiltInRegistries.ENTITY_TYPE.getKey(it.type),
-                    it.position(),
-                    it.deltaMovement,
-                    CompoundTag().also { tag -> it.saveWithoutId(tag) }
-                )
-            }.toList()
+            val radarPos = Vec3(pos.x + 0.5, pos.y + 2.5, pos.z + 0.5)
 
-            level.players()
-                .asSequence()
-                .filter { SeekTool.IS_FRIENDLY.test(player, it) }
-                .forEach { sendPacketTo(it, EntitySyncMessage(level.dimension().location(), hostileList, false)) }
+            val sourceId = "block_${pos.x}_${pos.y}_${pos.z}"
+            val config = RadarScanner.RadarConfig(
+                owner = player,
+                center = radarPos,
+                radius = range.toDouble(),
+                sweepAngle = 120.0,
+                yRot = blockEntity.tick.toDouble(),
+                searchType = RadarScanner.SearchType.VEHICLES,
+                sourceId = sourceId,
+                affectedByStealthTarget = true
+            )
+
+            val result = RadarScanner.scan(level, config)
+            result.sendToClients(player, level, config.shareWithTeammates)
+
+            val rangeLiving = if (blockEntity.type == FuncType.WIDER) 96 else 128
+            val configLiving = RadarScanner.RadarConfig(
+                owner = player,
+                center = radarPos,
+                radius = rangeLiving.toDouble(),
+                sweepAngle = 120.0,
+                yRot = blockEntity.tick.toDouble(),
+                searchType = RadarScanner.SearchType.LIVING,
+                sourceId = sourceId,
+            )
+
+            val resultLiving = RadarScanner.scan(level, configLiving)
+            resultLiving.sendToClients(player, level, configLiving.shareWithTeammates)
         }
     }
 }

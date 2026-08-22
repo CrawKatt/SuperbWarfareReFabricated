@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.living
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage
 import com.atsuishio.superbwarfare.client.animation.entity.DPSGeneratorAnimationInstance
 import com.atsuishio.superbwarfare.entity.getValue
@@ -10,6 +11,7 @@ import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
 import com.atsuishio.superbwarfare.tools.FormatTool.format1DZ
 import com.atsuishio.superbwarfare.tools.playLocalSound
 import net.minecraft.commands.arguments.EntityAnchorArgument
@@ -41,6 +43,7 @@ import kotlin.math.roundToInt
 open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level) : LivingEntity(type, level){
     val animationInstance: DPSGeneratorAnimationInstance? =
         if (this.level().isClientSide) DPSGeneratorAnimationInstance(this) else null
+    open val modelInstance = EntityModelReloadListener.getModel(MODEL)?.createInstance()
 
     private var damageDealt = 0f
     open var downTime by DOWN_TIME
@@ -55,7 +58,6 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
             .define(LEVEL, 0)
     }
 
-
     override fun getArmorSlots(): Iterable<ItemStack> {
         return NonNullList.withSize(1, ItemStack.EMPTY)
     }
@@ -67,7 +69,6 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
     override fun causeFallDamage(l: Float, d: Float, source: DamageSource) = false
 
     override fun shouldRenderAtSqrDistance(pDistance: Double) = true
-
 
     override fun addAdditionalSaveData(compound: CompoundTag) {
         super.addAdditionalSaveData(compound)
@@ -91,7 +92,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
 
     override fun hurt(source: DamageSource, amount: Float): Boolean {
         // 不处理/kill伤害
-        var amount = DAMAGE_MODIFIER.compute(source, amount)
+        var amount = DAMAGE_MODIFIER.compute(this, source, amount)
         if (source.`is`(DamageTypes.GENERIC_KILL)) {
             this.remove(RemovalReason.KILLED)
             return super.hurt(source, amount)
@@ -307,10 +308,16 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
         @JvmField
         val DOWN_TIME: EntityDataAccessor<Int> =
             SynchedEntityData.defineId(DPSGeneratorEntity::class.java, EntityDataSerializers.INT)
+
+        @JvmField
         val ENERGY: EntityDataAccessor<Int> =
             SynchedEntityData.defineId(DPSGeneratorEntity::class.java, EntityDataSerializers.INT)
+
+        @JvmField
         val LEVEL: EntityDataAccessor<Int> =
             SynchedEntityData.defineId(DPSGeneratorEntity::class.java, EntityDataSerializers.INT)
+
+        val MODEL = loc("models/bedrock/entity/dps_generator.geo.json")
 
         @JvmStatic
         fun onDPSGeneratorDown(entity: LivingEntity, source: DamageSource, amount: Float): Boolean {

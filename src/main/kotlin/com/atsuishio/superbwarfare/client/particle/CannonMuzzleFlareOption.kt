@@ -1,16 +1,15 @@
 package com.atsuishio.superbwarfare.client.particle
 
 import com.atsuishio.superbwarfare.init.ModParticleTypes
-import com.mojang.serialization.Codec
-import com.mojang.serialization.MapCodec
-import com.mojang.serialization.codecs.RecordCodecBuilder
-import io.netty.buffer.ByteBuf
+import com.atsuishio.superbwarfare.ksp.annotation.GenerateMapCodec
+import com.atsuishio.superbwarfare.tools.createStreamCodec
+import kotlinx.serialization.Serializable
 import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.core.particles.ParticleType
-import net.minecraft.network.codec.ByteBufCodecs
-import net.minecraft.network.codec.StreamCodec
 import kotlin.math.roundToInt
 
+@GenerateMapCodec
+@Serializable
 data class CannonMuzzleFlareOption(
     val color: Int,
     val life: Int,
@@ -41,30 +40,6 @@ data class CannonMuzzleFlareOption(
     override fun getType(): ParticleType<*> = ModParticleTypes.CANNON_MUZZLE_FLARE
 
     companion object {
-        @JvmField
-        val CODEC: MapCodec<CannonMuzzleFlareOption> = RecordCodecBuilder.mapCodec { builder ->
-            builder.group(
-                Codec.INT.fieldOf("color").forGetter { it.color },
-                Codec.INT.fieldOf("life").forGetter { it.life },
-                Codec.FLOAT.fieldOf("fade").forGetter { it.fade },
-                Codec.INT.fieldOf("animationSpeed").forGetter { it.animationSpeed },
-                Codec.FLOAT.fieldOf("sizeAdd").forGetter { it.sizeAdd }
-            ).apply(builder, ::CannonMuzzleFlareOption)
-        }
-
-        @JvmField
-        val STREAM_CODEC: StreamCodec<ByteBuf, CannonMuzzleFlareOption> = StreamCodec.composite(
-            ByteBufCodecs.INT,
-            CannonMuzzleFlareOption::color,
-            ByteBufCodecs.INT,
-            CannonMuzzleFlareOption::life,
-            ByteBufCodecs.FLOAT,
-            CannonMuzzleFlareOption::fade,
-            ByteBufCodecs.INT,
-            CannonMuzzleFlareOption::animationSpeed,
-            ByteBufCodecs.FLOAT,
-            CannonMuzzleFlareOption::sizeAdd,
-            ::CannonMuzzleFlareOption
-        )
+        val STREAM_CODEC = createStreamCodec<CannonMuzzleFlareOption>()
     }
 }

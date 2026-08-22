@@ -1,14 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun.sniper;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
-
 import com.atsuishio.superbwarfare.client.renderer.gun.Ntw20Renderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.init.ModEnumExtensions;
+import com.atsuishio.superbwarfare.init.ModRarities;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.GunsTool;
@@ -18,6 +14,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
@@ -27,7 +24,7 @@ import java.util.function.Supplier;
 public class Ntw20Item extends GunGeoItem {
 
     public Ntw20Item() {
-        super(new Properties().rarity(ModEnumExtensions.getLegendary()));
+        super(new Properties().rarity(ModRarities.LEGENDARY));
     }
 
     @Override
@@ -35,7 +32,6 @@ public class Ntw20Item extends GunGeoItem {
         return Ntw20Renderer::new;
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState fireAnimPredicate(AnimationState<Ntw20Item> event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return PlayState.STOP;
@@ -60,7 +56,6 @@ public class Ntw20Item extends GunGeoItem {
         return event.setAndContinue(RawAnimation.begin().thenLoop("animation.ntw_20.idle"));
     }
 
-    @Environment(EnvType.CLIENT)
     private PlayState editPredicate(AnimationState<Ntw20Item> event) {
         if (event.getData(DataTickets.ITEM_RENDER_PERSPECTIVE) != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
             return event.setAndContinue(RawAnimation.begin().thenLoop("animation.ntw_20.idle"));
@@ -73,7 +68,6 @@ public class Ntw20Item extends GunGeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar data) {
-        if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT) return;
         var fireAnimController = new AnimationController<>(this, "fireAnimController", 0, this::fireAnimPredicate);
         data.add(fireAnimController);
         var editController = new AnimationController<>(this, "editController", 1, this::editPredicate);
@@ -105,32 +99,32 @@ public class Ntw20Item extends GunGeoItem {
     }
 
     @Override
-    public boolean isOpenBolt(GunData data) {
+    public boolean isOpenBolt(@NotNull GunData data) {
         return true;
     }
 
     @Override
-    public boolean hasBulletInBarrel(GunData data) {
+    public boolean hasBulletInBarrel(@NotNull GunData data) {
         return true;
     }
 
     @Override
-    public boolean hasCustomMagazine(GunData data) {
+    public boolean hasCustomMagazine(@NotNull GunData data) {
         return true;
     }
 
     @Override
-    public boolean hasCustomScope(GunData data) {
+    public boolean hasCustomScope(@NotNull GunData data) {
         return true;
     }
 
     @Override
-    public boolean hasBipod(GunData data) {
+    public boolean hasBipod(@NotNull GunData data) {
         return true;
     }
 
     @Override
-    public boolean canEditAttachments(GunData data) {
+    public boolean canEditAttachments(@NotNull GunData data) {
         return true;
     }
 }

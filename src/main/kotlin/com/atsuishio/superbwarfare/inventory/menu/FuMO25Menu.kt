@@ -8,11 +8,7 @@ import com.atsuishio.superbwarfare.item.misc.FiringParametersItem
 import com.atsuishio.superbwarfare.item.misc.firingParameters
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData
 import com.atsuishio.superbwarfare.network.dataslot.SimpleEnergyData
-import com.atsuishio.superbwarfare.network.message.receive.RadarMenuCloseMessage
-import com.atsuishio.superbwarfare.network.message.receive.RadarMenuOpenMessage
-import com.atsuishio.superbwarfare.tools.sendPacket
 import net.minecraft.core.BlockPos
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.Container
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
@@ -162,24 +158,12 @@ open class FuMO25Menu(
         }, true)
     }
 
-    override fun onOpened(player: ServerPlayer) {
-        super.onOpened(player)
-        this.selfPos.ifPresent { pos ->
-            player.sendPacket(RadarMenuOpenMessage(pos))
-        }
-    }
-
-    override fun onClosed(player: ServerPlayer) {
-        super.onClosed(player)
-        player.sendPacket(RadarMenuCloseMessage)
-    }
-
-    override fun removed(player: Player) {
-        super.removed(player)
+    override fun removed(pPlayer: Player) {
+        super.removed(pPlayer)
         this.access.execute { _, _ ->
             val para = this.container.getItem(0)
             if (!para.isEmpty) {
-                player.getInventory().placeItemBackInInventory(para)
+                pPlayer.getInventory().placeItemBackInInventory(para)
             }
             this.container.removeItemNoUpdate(0)
             resetPos()

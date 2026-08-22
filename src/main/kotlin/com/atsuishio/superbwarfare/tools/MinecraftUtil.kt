@@ -2,9 +2,10 @@
 
 package com.atsuishio.superbwarfare.tools
 
-import com.atsuishio.superbwarfare.Mod.Companion.queueClientWork
+import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.api.event.SuperbWarfareEvents
 import com.atsuishio.superbwarfare.tools.FormatTool.format0D
+import com.mojang.blaze3d.vertex.PoseStack
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
@@ -32,6 +33,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.phys.Vec3
+import org.joml.Matrix4f
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -93,12 +95,24 @@ fun Vec3?.toFormattedString(): String {
     return "[ " + format0D(x) + ", " + format0D(y) + ", " + format0D(z) + " ]"
 }
 
-fun isSameItemStack(a: ItemStack, b: ItemStack) = a sameWith b
-
+/**
+ * Returns `true` when [this] and [that] represent the same item type with
+ * identical NBT data, treating `null` and empty [CompoundTag] as equivalent.
+ *
+ * Unlike [ItemStack.isSameItemSameTags], this method **never** triggers
+ * capability-gathering or posts to the Forge event bus, making it safe to
+ * call in tight per-tick loops (ammo scanning, inventory searches).
+ *
+ * @param that the stack to compare against; `null` returns `false`
+ * @return `true` if item type and NBT are equivalent
+ */
 infix fun ItemStack.sameWith(that: ItemStack?): Boolean {
-    return if (that == null) false
-    else ItemStack.isSameItemSameComponents(this, that)
+    if (that == null) return false
+    return ItemStack.isSameItemSameComponents(this, that)
 }
+
+// Keeps the existing public alias working without changes at call sites.
+fun isSameItemStack(a: ItemStack, b: ItemStack) = a sameWith b
 
 fun Player.sendPacket(packet: CustomPacketPayload) = sendPacketTo(this, packet)
 fun Player.sendPacket(packet: Packet<*>) = sendPacketTo(this, packet)
@@ -139,7 +153,7 @@ fun <T : Any> postEvent(event: T): T = SuperbWarfareEvents.post(event)
 
 inline fun queueClientWorkIfDelayed(delay: Int, crossinline block: () -> Unit) {
     if (delay > 0) {
-        queueClientWork(delay) { block() }
+        Mod.queueClientWork(delay) { block() }
     } else {
         block()
     }
@@ -164,13 +178,16 @@ var ItemStack.tag
     }
 
 fun LivingEntity.hasEffect(effect: MobEffect) = hasEffect(Holder.direct(effect))
-
+val Entity.stepHeight get() = this.maxUpStep()
+fun Entity.setOnGroundWithKnownMovement(onGround: Boolean, movement: Vec3) = setOnGroundWithMovement(onGround, movement)
 val ItemStack.isEdible get() = this.get(DataComponents.FOOD) != null
 
 fun Player.getEntityReach() = entityInteractionRange()
 
 fun Player.getBlockReach() = blockInteractionRange()
-
+val ServerPlayer.latency get() = connection.latency()
 val Minecraft.deltaFrameTime get() = timer.gameTimeDeltaTicks
 
 fun ItemStack.hasCustomHoverName() = this.has(DataComponents.CUSTOM_NAME)
+
+fun PoseStack.mulPoseMatrix(pose: Matrix4f) = mulPose(pose)

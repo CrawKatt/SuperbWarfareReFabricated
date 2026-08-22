@@ -2,8 +2,7 @@ package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader.getModel
+import com.atsuishio.superbwarfare.tools.renderSingleBonePass
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
 import com.maydaymemory.mae.blend.EulerAdditiveBlender
@@ -31,8 +30,8 @@ class DPSGeneratorRenderer(renderManager: EntityRendererProvider.Context) :
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        val model = getModel(BedrockModelLoader.DPS_GENERATOR_MA.first) ?: return
         val ani = entity.animationInstance ?: return
+        val instance = entity.modelInstance ?: return
 
         poseStack.pushPose()
         poseStack.mulPose(Axis.YP.rotationDegrees(180f))
@@ -43,9 +42,9 @@ class DPSGeneratorRenderer(renderManager: EntityRendererProvider.Context) :
 
         ani.context.partialTick = partialTick
         ani.tick()
-        model.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+        instance.applyPose(BLENDER.blend(instance.bindPose, ani.getPose()))
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             vertexConsumer,
             packedLight,
@@ -53,9 +52,21 @@ class DPSGeneratorRenderer(renderManager: EntityRendererProvider.Context) :
         )
 
         poseStack.pushPose()
-        val bone = model.getBone("ba")
+        val boneIndex = instance.getIndex("move_ba")
         val boneConsumer = buffer.getBuffer(RenderType.eyes(TEXTURE_E))
-        bone.render(poseStack, boneConsumer, packedLight, OverlayTexture.NO_OVERLAY)
+        instance.renderSingleBonePass(
+            poseStack,
+            boneIndex,
+            boneConsumer,
+            packedLight,
+            OverlayTexture.NO_OVERLAY,
+            1f,
+            1f,
+            1f,
+            1f,
+            true,
+            false
+        )
         poseStack.popPose()
 
         poseStack.popPose()

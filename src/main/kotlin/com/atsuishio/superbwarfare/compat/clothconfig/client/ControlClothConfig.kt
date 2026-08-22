@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.compat.clothconfig.client
 
+import com.atsuishio.superbwarfare.compat.clothconfig.ClothConfigHelper.save
 import com.atsuishio.superbwarfare.config.client.ControlConfig
 import me.shedaniel.clothconfig2.api.ConfigBuilder
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder
@@ -16,10 +17,7 @@ object ControlClothConfig {
                     ControlConfig.INVERT_AIRCRAFT_CONTROL.get()
                 )
                 .setDefaultValue(true)
-                .setSaveConsumer { v ->
-                    ControlConfig.INVERT_AIRCRAFT_CONTROL.set(v)
-                    ControlConfig.INVERT_AIRCRAFT_CONTROL.save()
-                }
+                .setSaveConsumer(save(ControlConfig.INVERT_AIRCRAFT_CONTROL))
                 .setTooltip(Component.translatable("config.superbwarfare.client.control.invert_aircraft_control.des"))
                 .build()
         )
@@ -33,10 +31,7 @@ object ControlClothConfig {
                     200
                 )
                 .setDefaultValue(100)
-                .setSaveConsumer { v ->
-                    ControlConfig.MOUSE_SENSITIVITY.set(v)
-                    ControlConfig.MOUSE_SENSITIVITY.save()
-                }
+                .setSaveConsumer(save(ControlConfig.MOUSE_SENSITIVITY))
                 .setTooltip(Component.translatable("config.superbwarfare.client.control.mouse_sensitivity.des")).build()
         )
     }

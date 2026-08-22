@@ -39,11 +39,11 @@ class ModItemTagProvider(
         this.tag(commonItemTag("ingots/tungsten")).add(ModItems.TUNGSTEN_INGOT)
         this.tag(commonItemTag("ingots/silver")).add(ModItems.SILVER_INGOT)
 
-        this.tag(ModTags.Items.INGOTS_STEEL).addTag(commonItemTag("ingots/steel"))
+        this.tag(commonItemTag("ingots/steel")).add(ModItems.STEEL_INGOT)
             .addOptional(ResourceLocation.fromNamespaceAndPath("dreamaticvoyage", "fukamizu_bread_ingot"))
         this.tag(ModTags.Items.INGOTS_CEMENTED_CARBIDE).add(ModItems.CEMENTED_CARBIDE_INGOT)
             .addOptional(ResourceLocation.fromNamespaceAndPath("dreamaticvoyage", "hqss_bread_ingot"))
-        this.tag(ModTags.Items.INGOTS_LEAD).addTag(commonItemTag("ingots/lead"))
+        this.tag(commonItemTag("ingots/lead")).add(ModItems.LEAD_INGOT)
 
         this.tag(ModTags.Items.STORAGE_BLOCKS)
             .addTag(commonItemTag("storage_blocks/lead"))
@@ -64,7 +64,7 @@ class ModItemTagProvider(
         this.tag(commonItemTag("storage_blocks/raw_silver")).add(ModItems.RAW_SILVER_BLOCK)
         this.tag(commonItemTag("storage_blocks/raw_scheelite")).add(ModItems.RAW_SCHEELITE_BLOCK)
 
-        this.tag(ModTags.Items.STORAGE_BLOCK_STEEL).addTag(commonItemTag("storage_blocks/steel"))
+        this.tag(commonItemTag("storage_blocks/steel")).add(ModItems.STEEL_BLOCK)
             .addOptional(ResourceLocation.fromNamespaceAndPath("dreamaticvoyage", "fukamizu_bread_bricks"))
         this.tag(ModTags.Items.STORAGE_BLOCK_CEMENTED_CARBIDE).add(ModItems.CEMENTED_CARBIDE_BLOCK)
             .addOptional(ResourceLocation.fromNamespaceAndPath("dreamaticvoyage", "hqss_bread_bricks"))
@@ -357,7 +357,7 @@ class ModItemTagProvider(
 
         ModItems.PERKS.forEach {
             val item = it
-            if (item is PerkItem<*>) {
+            if (item is PerkItem) {
                 when (item.perk.type) {
                     Perk.Type.AMMO -> {
                         this.tag(ModTags.Items.AMMO_PERK).add(item)

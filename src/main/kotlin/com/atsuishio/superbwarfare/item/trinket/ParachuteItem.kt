@@ -88,7 +88,7 @@ class ParachuteItem : TrinketItem(Properties().stacksTo(1).durability(600)) {
             }
 
             if (entity.tickCount % 40 == 0 && level is ServerLevel) {
-                stack.hurtAndBreak(1, level, entity as ServerPlayer?) { }
+                stack.hurtAndBreak(1, level, entity as? ServerPlayer) { }
             }
 
             entity.resetFallDistance()

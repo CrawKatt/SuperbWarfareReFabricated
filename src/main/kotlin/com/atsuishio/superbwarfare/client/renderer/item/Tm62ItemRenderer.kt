@@ -2,9 +2,8 @@ package com.atsuishio.superbwarfare.client.renderer.item
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.item.projectile.Tm62Item
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
+import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.math.Axis
 import net.minecraft.client.model.geom.EntityModelSet
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.client.renderer.MultiBufferSource
@@ -24,22 +23,12 @@ class Tm62ItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityModel
         packedOverlay: Int
     ) {
         if (stack.item !is Tm62Item) return
-        val model = BedrockModelLoader.getModel(BedrockModelLoader.TM_62_MODEL) ?: return
+        val instance = modelInstance ?: return
         poseStack.pushPose()
 
-        if (displayContext == ItemDisplayContext.GUI) {
-            poseStack.translate(0.45f, 0.45f, 0f)
-            poseStack.mulPose(Axis.XP.rotationDegrees(55f))
-            poseStack.mulPose(Axis.YP.rotationDegrees(30f))
-            poseStack.mulPose(Axis.ZP.rotationDegrees(-35f))
-            poseStack.scale(1.9f, 1.9f, 1.9f)
-        } else if (displayContext.firstPerson() || displayContext == ItemDisplayContext.GROUND) {
-            poseStack.translate(0.5f, 0.5f, 0.45f)
-        } else {
-            poseStack.translate(0.5f, 0.35f, 0.35f)
-        }
+        poseStack.translate(0.5f, 0.5f, 0.5f)
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.entityCutout(TEXTURE)),
             packedLight,
@@ -51,5 +40,7 @@ class Tm62ItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityModel
 
     companion object {
         val TEXTURE = loc("textures/bedrock/projectile/tm_62.png")
+        val MODEL = loc("models/bedrock/projectile/tm_62.geo.json")
+        val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
     }
 }

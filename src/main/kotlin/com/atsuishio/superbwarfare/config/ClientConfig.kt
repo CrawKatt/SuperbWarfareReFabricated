@@ -17,8 +17,3 @@ val CLIENT_CONFIG = buildConfig(
     ControlConfig,
     EnvironmentChecksumConfig,
 )
-
-object ClientConfig {
-    @JvmStatic
-    fun init() = CLIENT_CONFIG
-}

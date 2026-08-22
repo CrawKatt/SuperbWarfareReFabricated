@@ -1,17 +1,24 @@
 package com.atsuishio.superbwarfare.event
 
+import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
+import com.atsuishio.superbwarfare.client.screens.LoiterConfigScreen
+import com.atsuishio.superbwarfare.client.screens.MissilePosInputScreen
+import com.atsuishio.superbwarfare.client.screens.TacticalMapScreen
 import com.atsuishio.superbwarfare.client.screens.WeaponEditScreen
 import com.atsuishio.superbwarfare.compat.CompatHolder
 import com.atsuishio.superbwarfare.compat.clothconfig.ClothConfigHelper
 import com.atsuishio.superbwarfare.config.client.ReloadConfig
+import com.atsuishio.superbwarfare.config.server.MapConfig
 import com.atsuishio.superbwarfare.data.gun.FireMode
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.gun.SeekType
+import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
 import com.atsuishio.superbwarfare.entity.vehicle.MortarEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
+import com.atsuishio.superbwarfare.item.trinket.TacticalTerminalItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.mixins.KeyMappingAccessor
 import com.atsuishio.superbwarfare.mixins.MinecraftAccessor
@@ -247,7 +254,7 @@ object ClickEventHandler {
         var canceled = false
 
         // 按下自由视角键时，为载具调整相机距离
-        if (vehicle is VehicleEntity && player == vehicle.firstPassenger && ModKeyMappings.FREE_CAMERA.isDown()) {
+        if (vehicle is VehicleEntity && ModKeyMappings.FREE_CAMERA.isDown()) {
             ClientMouseHandler.custom3pDistance =
                 (ClientMouseHandler.custom3pDistance - verticalAmount).coerceIn(-3.0, 8.0)
             return true
@@ -293,7 +300,7 @@ object ClickEventHandler {
             canceled = true
         }
 
-        val looking = TraceTool.findLookingEntity(player, 6.0)
+        val looking = OverlayTraceHandler.playerReachEntity
         if (looking is MortarEntity && player.isShiftKeyDown) {
             sendPacketToServer(AdjustMortarAngleMessage(scroll))
             canceled = true
@@ -330,6 +337,7 @@ object ClickEventHandler {
                         } else {
                             player.playSound(ModSounds.CANNON_ZOOM_OUT)
                         }
+                        return true
                     }
                     return true
                 }
@@ -349,6 +357,12 @@ object ClickEventHandler {
 
             if (key == ModKeyMappings.DISMOUNT.key.value) {
                 handleDismountPress(player)
+            }
+
+            if (key == ModKeyMappings.TOGGLE_TACTICAL_MAP.key.value && MapConfig.ENABLE_TACTICAL_MAP.get()) {
+                if (TacticalTerminalItem.isTerminalEquipped(player) && mc.screen == null) {
+                    mc.setScreen(TacticalMapScreen())
+                }
             }
 
             if (key == Minecraft.getInstance().options.keyJump.key.value) {
@@ -418,9 +432,26 @@ object ClickEventHandler {
                         ClientEventHandler.burstFireAmount = 0
                     }
                 }
+
+                if (key == ModKeyMappings.LOITER_CONFIG.key.value) {
+                    if (vehicle.computed().engineType == EngineType.AIRCRAFT && mc.screen == null) {
+                        mc.setScreen(LoiterConfigScreen(vehicle))
+                    }
+                }
             }
 
             if (key == ModKeyMappings.EDIT_MODE.key.value) {
+                if (vehicle is VehicleEntity) {
+                    val data = vehicle.getGunData(player)
+                    if (data != null) {
+                        val input = data.get(GunProp.SEEK_WEAPON_INFO)?.inputBlockPos
+                        if (input == true) {
+                            Minecraft.getInstance().setScreen(MissilePosInputScreen())
+                            return true
+                        }
+                    }
+                }
+
                 val item = stack.item
                 if (item is ItemScreenProvider) {
                     val screen = item.getItemScreen(stack, player, InteractionHand.MAIN_HAND)
@@ -684,6 +715,14 @@ object ClickEventHandler {
 
         val vehicle = player.vehicle
         if (vehicle is VehicleEntity && vehicle.hasWeapon(vehicle.getSeatIndex(player)) && vehicle.banHand(player)) {
+            val data = vehicle.getGunData(player)
+            if (data != null) {
+                val input = data.get(GunProp.SEEK_WEAPON_INFO)?.inputBlockPos
+                if (input == true) {
+                    Minecraft.getInstance().setScreen(MissilePosInputScreen())
+                    return
+                }
+            }
             ClientEventHandler.zoomVehicle = true
             return
         }

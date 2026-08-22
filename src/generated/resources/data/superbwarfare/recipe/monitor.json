@@ -9,7 +9,7 @@
       "item": "minecraft:lever"
     },
     "c": {
-      "tag": "c:ingots/iron"
+      "tag": "c:plates/plastic"
     },
     "d": {
       "item": "minecraft:amethyst_shard"
@@ -20,8 +20,8 @@
   },
   "pattern": [
     "a a",
-    "bcb",
-    "ded"
+    "beb",
+    "dcd"
   ],
   "result": {
     "count": 1,

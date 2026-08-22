@@ -23,7 +23,11 @@ data class PlayerInfoSyncMessage(
         val pos: SerializedVec3,
         val name: String,
         val onVehicle: Boolean,
-        val isDriver: Boolean
+        val isDriver: Boolean,
+        /** 关系标识："friendly" / "hostile" / "neutral" */
+        val relation: String = "friendly",
+        /** 服务端实体 ID，用于管理员清除等操作（-1 表示未知） */
+        val entityId: Int = -1,
     )
 
 }

@@ -9,8 +9,10 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import com.atsuishio.superbwarfare.tools.ServerSyncedEntityHandler;
 import net.minecraft.world.InteractionResult;
 
 public class ModEventHandlers {
@@ -42,8 +44,7 @@ public class ModEventHandlers {
             PlayerEventHandler.onAttackEntity(player, entity);
             return InteractionResult.PASS;
         });
-    }
 
-    public static void initClient() {
+        ServerTickEvents.END_SERVER_TICK.register(ServerSyncedEntityHandler::onServerTick);
     }
 }

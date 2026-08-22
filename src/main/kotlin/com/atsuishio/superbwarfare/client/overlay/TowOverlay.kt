@@ -10,8 +10,11 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.CameraType
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.util.Mth
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.min
 
+@Environment(EnvType.CLIENT)
 object TowOverlay : CommonOverlay("tow") {
     private val SPYGLASS = loc("textures/overlay/spyglass/spyglass.png")
 

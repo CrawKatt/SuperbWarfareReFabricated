@@ -17,9 +17,6 @@ val SERVER_CONFIG = buildConfig(
     VehicleConfig,
     MiscConfig,
     AmmoConfig,
+    MapConfig,
+    SyncConfig,
 )
-
-object ServerConfig {
-    @JvmStatic
-    fun init() = SERVER_CONFIG
-}

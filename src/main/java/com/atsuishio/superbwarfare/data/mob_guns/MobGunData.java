@@ -89,7 +89,7 @@ public class MobGunData {
         var stack = new ItemStack(item);
 
         if (selectedData.data != null) {
-            NBTTool.saveTag(stack, TagDataParser.parse(selectedData.data));
+            NBTTool.saveTag(stack, TagDataParser.parseObject(selectedData.data));
         }
 
         var data = GunData.from(stack);

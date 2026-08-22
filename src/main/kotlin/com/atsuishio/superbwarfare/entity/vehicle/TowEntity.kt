@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.entity.vehicle
 
 import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.setValue
-import com.atsuishio.superbwarfare.entity.vehicle.base.GeoVehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
@@ -31,7 +31,7 @@ import net.minecraft.world.phys.Vec3
 import org.joml.Math
 import java.util.*
 
-class TowEntity(type: EntityType<TowEntity>, world: Level) : GeoVehicleEntity(type, world) {
+class TowEntity(type: EntityType<TowEntity>, world: Level) : VehicleEntity(type, world) {
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
         super.defineSynchedData(builder)
@@ -106,21 +106,6 @@ class TowEntity(type: EntityType<TowEntity>, world: Level) : GeoVehicleEntity(ty
         if (reloadCooldown > 0) {
             reloadCooldown--
         }
-    }
-
-    override fun getRetrieveItems(): List<ItemStack> {
-        val list = arrayListOf<ItemStack>()
-        list.add(ItemStack(ModItems.TOW_DEPLOYER))
-
-        val data = getGunData(0)
-        if (loaded && data != null) {
-            val stack = data.selectedAmmoConsumer().stack().copyWithCount(data.withdrawAmmoCount())
-            if (!stack.isEmpty) {
-                list.add(stack.copy())
-            }
-        }
-
-        return list
     }
 
     override fun vehicleShoot(living: LivingEntity?, uuid: UUID?, targetPos: Vec3?) {
