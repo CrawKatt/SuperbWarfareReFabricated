@@ -24,14 +24,14 @@ object DisplayConfig {
     val WEAPON_HUD_X_OFFSET = buildClientConfig {
         comment("The x offset of weapon hud")
         comment("枪械HUD的水平方向偏移量")
-        defineInRange("weapon_hud_x_offset", 0, -1000, 1000)
+        defineInRange("weapon_hud_x_offset", -30, -1000, 1000)
     }
 
     @JvmField
     val WEAPON_HUD_Y_OFFSET = buildClientConfig {
         comment("The y offset of weapon hud")
         comment("枪械HUD的竖直方向偏移量")
-        defineInRange("weapon_hud_y_offset", 0, -1000, 1000)
+        defineInRange("weapon_hud_y_offset", -20, -1000, 1000)
     }
 
     @JvmField
