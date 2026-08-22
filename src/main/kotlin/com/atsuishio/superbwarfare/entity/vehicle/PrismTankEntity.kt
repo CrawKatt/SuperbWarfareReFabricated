@@ -225,8 +225,6 @@ open class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : Ve
         }
     }
 
-    override fun getWheelMaxHealth() = 100f
-    override fun getEngineMaxHealth() = 150f
     override fun firstPersonAmmoComponent(data: GunData, player: Player?): Component {
         val name = data.get(GunProp.NAME)
         if (name.isNullOrBlank()) return Component.empty()
