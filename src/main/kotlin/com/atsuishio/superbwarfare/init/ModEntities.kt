@@ -420,6 +420,16 @@ object ModEntities {
             },
             SpawnPlacementRegisterEvent.Operation.OR
         )
+        event.register(
+            CREEPING_SENPAI.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+            { entityType, world, reason, pos, random ->
+                world.difficulty != Difficulty.PEACEFUL
+                        && SpawnConfig.SPAWN_CREEPING_SENPAI.get()
+                        && Monster.isDarkEnoughToSpawn(world, pos, random)
+                        && Mob.checkMobSpawnRules(entityType, world, reason, pos, random)
+            },
+            SpawnPlacementRegisterEvent.Operation.OR
+        )
     }
 
     @SubscribeEvent
