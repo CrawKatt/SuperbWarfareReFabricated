@@ -1,0 +1,162 @@
+package com.atsuishio.superbwarfare.entity.living
+
+import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.client.animation.entity.CreepingSenpaiAnimationInstance
+import com.atsuishio.superbwarfare.entity.getValue
+import com.atsuishio.superbwarfare.entity.setValue
+import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
+import net.minecraft.core.BlockPos
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.world.DifficultyInstance
+import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.entity.SpawnGroupData
+import net.minecraft.world.entity.ai.attributes.AttributeModifier
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.ai.goal.FloatGoal
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal
+import net.minecraft.world.entity.ai.goal.RandomStrollGoal
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
+import net.minecraft.world.entity.monster.Monster
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.ServerLevelAccessor
+import net.minecraft.world.level.block.state.BlockState
+
+open class CreepingSenpaiEntity(type: EntityType<CreepingSenpaiEntity>, level: Level) : Monster(type, level) {
+    open val animationInstance = if (this.level().isClientSide) CreepingSenpaiAnimationInstance(this) else null
+    open val modelInstance = EntityModelReloadListener.getModel(MODEL)?.createInstance()
+    open var runner by RUNNER
+
+    init {
+        xpReward = 40
+        isNoAi = false
+    }
+
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
+        super.defineSynchedData(builder)
+        builder.define(RUNNER, false)
+    }
+
+    @Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
+    override fun finalizeSpawn(
+        pLevel: ServerLevelAccessor,
+        pDifficulty: DifficultyInstance,
+        pReason: MobSpawnType,
+        pSpawnData: SpawnGroupData?
+    ): SpawnGroupData? {
+        this.runner = Math.random() < 0.3
+
+        if (this.runner) {
+            this.getAttribute(Attributes.MOVEMENT_SPEED)?.addPermanentModifier(
+                AttributeModifier(
+                    Mod.ATTRIBUTE_MODIFIER,
+                    0.4,
+                    AttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                )
+            )
+        } else {
+            this.getAttribute(Attributes.ATTACK_DAMAGE)?.addPermanentModifier(
+                AttributeModifier(
+                    Mod.ATTRIBUTE_MODIFIER,
+                    3.0,
+                    AttributeModifier.Operation.ADD_VALUE
+                )
+            )
+        }
+
+        return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData)
+    }
+
+    override fun addAdditionalSaveData(compound: CompoundTag) {
+        super.addAdditionalSaveData(compound)
+        compound.putBoolean("Runner", this.runner)
+    }
+
+    override fun readAdditionalSaveData(compound: CompoundTag) {
+        super.readAdditionalSaveData(compound)
+        this.runner = compound.getBoolean("Runner")
+    }
+
+    override fun getEyeY() = 0.65
+
+    override fun registerGoals() {
+        super.registerGoals()
+        // TODO reach
+        this.goalSelector.addGoal(1, MeleeAttackGoal(this, 1.4, false))
+//        this.goalSelector.addGoal(1, object : MeleeAttackGoal(this, 1.4, false) {
+//            override fun getAttackReachSqr(entity: LivingEntity): Double {
+//                return (this.mob.bbWidth * this.mob.bbWidth + entity.bbWidth).toDouble()
+//            }
+//        })
+        this.targetSelector.addGoal(2, HurtByTargetGoal(this).setAlertOthers())
+        this.goalSelector.addGoal(3, RandomLookAroundGoal(this))
+        this.goalSelector.addGoal(4, FloatGoal(this))
+        this.goalSelector.addGoal(5, RandomStrollGoal(this, 0.8))
+        this.targetSelector.addGoal(6, NearestAttackableTargetGoal(this, Player::class.java, false, false))
+    }
+
+    // TODO type
+//    override fun getMobType(): MobType = MobType.ILLAGER
+
+    public override fun getAmbientSound(): SoundEvent? {
+        return ModSounds.IDLE.get()
+    }
+
+    public override fun playStepSound(pos: BlockPos, blockIn: BlockState) {
+        this.playSound(ModSounds.STEP.get(), 0.25f, 1f)
+    }
+
+    public override fun getHurtSound(ds: DamageSource): SoundEvent {
+        return ModSounds.OUCH.get()
+    }
+
+    public override fun getDeathSound(): SoundEvent {
+        return ModSounds.GROWL.get()
+    }
+
+    override fun baseTick() {
+        super.baseTick()
+        this.refreshDimensions()
+    }
+
+    override fun aiStep() {
+        super.aiStep()
+        this.updateSwingTime()
+    }
+
+    override fun tickDeath() {
+        ++this.deathTime
+        if (this.deathTime == 540) {
+            this.remove(RemovalReason.KILLED)
+            this.dropExperience(this)
+        }
+    }
+
+    companion object {
+        val RUNNER: EntityDataAccessor<Boolean> =
+            SynchedEntityData.defineId(CreepingSenpaiEntity::class.java, EntityDataSerializers.BOOLEAN)
+
+        fun createAttributes(): AttributeSupplier.Builder {
+            return createMobAttributes()
+                .add(Attributes.MOVEMENT_SPEED, 0.23)
+                .add(Attributes.MAX_HEALTH, 24.0)
+                .add(Attributes.ARMOR, 0.0)
+                .add(Attributes.ATTACK_DAMAGE, 5.0)
+                .add(Attributes.FOLLOW_RANGE, 64.0)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 0.5)
+        }
+
+        val MODEL = loc("models/bedrock/entity/creeping_senpai.geo.json")
+    }
+}

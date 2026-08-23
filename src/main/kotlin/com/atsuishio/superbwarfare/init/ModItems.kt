@@ -60,6 +60,8 @@ private typealias ItemRegistry<T> = DeferredHolder<Item, T>
 private typealias BlockRegistry<T> = DeferredHolder<Block, T>
 private typealias PerkRegistry<T> = DeferredHolder<Perk, T>
 
+private typealias SpawnEggItem = DeferredSpawnEggItem
+
 @Suppress("unused")
 object ModItems {
 
@@ -247,15 +249,18 @@ object ModItems {
 
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
-        DeferredSpawnEggItem(
+        SpawnEggItem(
             Supplier { ModEntities.SENPAI.value() },
             -11584987,
             -14014413,
             Properties()
         )
     }
+    @JvmField val CREEPING_SENPAI_SPAWN_EGG = registerItem("creeping_senpai_spawn_egg") {
+        SpawnEggItem(ModEntities.CREEPING_SENPAI, -11584987, 3288889, Properties())
+    }
     @JvmField val STEEL_COIL_SPAWN_EGG = registerItem("steel_coil_spawn_egg") {
-        DeferredSpawnEggItem(ModEntities.STEEL_COIL, 0, 0xc0c0c0, Properties())
+        SpawnEggItem(ModEntities.STEEL_COIL, 0, 0xc0c0c0, Properties())
     }
     @JvmField val ANCIENT_CPU = registerItem("ancient_cpu") { Item(Properties().rarity(Rarity.RARE)) }
     @JvmField val PROPELLER = registerItem("propeller")
