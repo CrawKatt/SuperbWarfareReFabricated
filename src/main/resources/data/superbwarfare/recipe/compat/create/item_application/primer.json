@@ -1,0 +1,25 @@
+{
+  "type": "create:item_application",
+  "ingredients": [
+    {
+      "tag": "c:plates/copper"
+    },
+    {
+      "item": "minecraft:flint"
+    }
+  ],
+  "results": [
+    {
+      "id": "superbwarfare:primer",
+      "count": 4
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "create"
+      ]
+    }
+  ]
+}

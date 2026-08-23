@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
+import net.minecraft.world.ItemInteractionResult
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item.TooltipContext
@@ -145,6 +146,23 @@ open class VehicleAssemblingTableBlock : BaseEntityBlock(
         }
 
         return super.playerWillDestroy(level, pos, state, player)
+    }
+
+    override fun useItemOn(
+        stack: ItemStack,
+        state: BlockState,
+        level: Level,
+        pos: BlockPos,
+        player: Player,
+        hand: InteractionHand,
+        hitResult: BlockHitResult
+    ): ItemInteractionResult {
+        if (player.mainHandItem.`is`(ModTags.Items.TOOLS_CROWBAR)) {
+            interact(state, level, pos, player, hand, hitResult)
+            return ItemInteractionResult.SUCCESS
+        }
+
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
     }
 
     override fun useWithoutItem(

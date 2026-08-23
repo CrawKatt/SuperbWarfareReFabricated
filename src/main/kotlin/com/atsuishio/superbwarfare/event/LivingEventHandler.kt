@@ -40,6 +40,7 @@ import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffectCategory
 import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.OwnableEntity
@@ -47,6 +48,7 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Explosion
 import java.util.*
 import kotlin.math.max
 import kotlin.math.pow
@@ -125,10 +127,10 @@ object LivingEventHandler {
             } else {
                 val rate = vehicle.getSeat(entity)?.damageAbsorbRate ?: 0.0f
                 if (!source.`is`(ModTags.DamageTypes.VEHICLE_NOT_ABSORB)) {
-                    vehicle.hurt(source, 0.7f * amount)
+                    vehicle.hurt(source, rate.coerceIn(0f, 1f) * amount)
                 }
 
-                return amount * 0.3f
+                return amount * (1 - rate).coerceIn(0f, 1f)
             }
         }
         return amount
@@ -728,5 +730,41 @@ object LivingEventHandler {
             return true
         }
         return false
+    }
+
+    @JvmStatic
+    fun onExplosionDetonate(explosion: CustomExplosion, affectedEntities: MutableList<Entity>) {
+        val iterator = affectedEntities.iterator()
+        while (iterator.hasNext()) {
+            val entity = iterator.next() as? VehicleEntity ?: continue
+
+            iterator.remove()
+            val explosionPos = explosion.position
+            val explosionRadius = explosion.radius * 2.0F
+            if (!entity.ignoreExplosion(explosion)) {
+                val distanceRatio = sqrt(entity.distanceToSqr(explosionPos)) / explosionRadius
+                if (distanceRatio <= 1.0) {
+                    val dx = entity.x - explosionPos.x
+                    val dy = entity.eyeY - explosionPos.y
+                    val dz = entity.z - explosionPos.z
+                    val distance = sqrt(dx * dx + dy * dy + dz * dz)
+                    if (distance != 0.0) {
+                        val visibilityFactor = if (!entity.enableAABB())
+                            CustomExplosion.getSeenPercentOptimized(entity.level(), explosionPos, entity)
+                        else
+                            Explosion.getSeenPercent(explosionPos, entity)
+                        val impactStrength = (1.0 - distanceRatio) * visibilityFactor
+                        val damage = (impactStrength * impactStrength + impactStrength) / 2.0 * explosion.damage
+
+                        entity.hurt(explosion.damageSource, damage.toFloat())
+                    }
+                }
+            }
+        }
+    }
+
+    @JvmStatic
+    fun onExplosionKnockback(entity: Entity): Boolean {
+        return entity is VehicleEntity
     }
 }

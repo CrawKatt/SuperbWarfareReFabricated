@@ -11,6 +11,10 @@
     {
       "id": "superbwarfare:lunge_mine",
       "required": false
+    },
+    {
+      "id": "superbwarfare:ammo_consumption",
+      "required": false
     }
   ]
 }

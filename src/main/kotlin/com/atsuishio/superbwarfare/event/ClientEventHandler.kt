@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.api.event.ClientVehicleFireEvent
+import com.atsuishio.superbwarfare.api.event.SuperbWarfareEvents
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.lighting.LightPositionRegistry
@@ -82,6 +83,7 @@ object ClientEventHandler {
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             onPlayerLoggedIn()
         }
+        SuperbWarfareEvents.register(ClientVehicleFireEvent::class.java) { onClientVehicleFire(it) }
     }
 
     @JvmField
@@ -3128,6 +3130,21 @@ object ClientEventHandler {
         } else {
             floatArrayOf(red, green, blue)
         }
+    }
+
+    @JvmStatic
+    fun onClientVehicleFire(event: ClientVehicleFireEvent) {
+        val shooter = event.shooter
+        val vehicle = event.vehicle
+        val index = event.index
+
+        VehicleLightingHandler.onVehicleFire(event)
+
+        val ani = vehicle.getAnimationInstance() ?: return
+        val name = event.weaponName
+            ?: vehicle.getGunName(vehicle.getSeatIndex(shooter))
+            ?: return
+        ani.fire(name.camelToSnake(), index)
     }
 
 }

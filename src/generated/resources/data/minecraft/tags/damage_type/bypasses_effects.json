@@ -7,6 +7,10 @@
     {
       "id": "superbwarfare:phosphorus_fire",
       "required": false
+    },
+    {
+      "id": "superbwarfare:ammo_consumption",
+      "required": false
     }
   ]
 }

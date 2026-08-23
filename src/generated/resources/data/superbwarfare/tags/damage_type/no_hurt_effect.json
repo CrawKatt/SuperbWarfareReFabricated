@@ -1,5 +1,8 @@
 {
   "values": [
-    "superbwarfare:ammo_consumption"
+    {
+      "id": "superbwarfare:ammo_consumption",
+      "required": false
+    }
   ]
 }

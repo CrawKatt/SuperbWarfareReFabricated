@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "experience": 0.7,
+  "cookingtime": 100,
+  "ingredient": {
+    "item": "create:crushed_raw_silver"
+  },
+  "result": {
+    "id": "superbwarfare:silver_ingot"
+  },
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "create"
+      ]
+    }
+  ]
+}

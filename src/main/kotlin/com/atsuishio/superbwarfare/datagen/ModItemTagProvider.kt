@@ -24,10 +24,15 @@ class ModItemTagProvider(
     override fun addTags(pProvider: HolderLookup.Provider) {
         this.tag(ModTags.Items.DUSTS)
             .addTag(commonItemTag("dusts/coal_coke"))
+            .addTag(commonItemTag("dusts/coal"))
+            .addTag(commonItemTag("dusts/iron"))
             .addTag(commonItemTag("dusts/tungsten"))
+            .addTag(commonItemTag("dusts/scheelite"))
         this.tag(commonItemTag("dusts/coal_coke")).add(ModItems.COAL_POWDER)
+        this.tag(commonItemTag("dusts/coal")).add(ModItems.COAL_POWDER)
         this.tag(commonItemTag("dusts/iron")).add(ModItems.IRON_POWDER)
         this.tag(commonItemTag("dusts/tungsten")).add(ModItems.TUNGSTEN_POWDER)
+        this.tag(commonItemTag("dusts/scheelite")).add(ModItems.TUNGSTEN_POWDER)
 
         this.tag(ModTags.Items.INGOTS)
             .addTag(commonItemTag("ingots/lead"))
@@ -36,14 +41,12 @@ class ModItemTagProvider(
             .addTag(commonItemTag("ingots/silver"))
         this.tag(commonItemTag("ingots/lead")).add(ModItems.LEAD_INGOT)
         this.tag(commonItemTag("ingots/steel")).add(ModItems.STEEL_INGOT)
+            .addOptional(ResourceLocation.fromNamespaceAndPath("dreamaticvoyage", "fukamizu_bread_ingot"))
         this.tag(commonItemTag("ingots/tungsten")).add(ModItems.TUNGSTEN_INGOT)
         this.tag(commonItemTag("ingots/silver")).add(ModItems.SILVER_INGOT)
 
-        this.tag(commonItemTag("ingots/steel")).add(ModItems.STEEL_INGOT)
-            .addOptional(ResourceLocation.fromNamespaceAndPath("dreamaticvoyage", "fukamizu_bread_ingot"))
         this.tag(ModTags.Items.INGOTS_CEMENTED_CARBIDE).add(ModItems.CEMENTED_CARBIDE_INGOT)
             .addOptional(ResourceLocation.fromNamespaceAndPath("dreamaticvoyage", "hqss_bread_ingot"))
-        this.tag(commonItemTag("ingots/lead")).add(ModItems.LEAD_INGOT)
 
         this.tag(ModTags.Items.STORAGE_BLOCKS)
             .addTag(commonItemTag("storage_blocks/lead"))
@@ -56,6 +59,7 @@ class ModItemTagProvider(
             .addTag(commonItemTag("storage_blocks/raw_scheelite"))
         this.tag(commonItemTag("storage_blocks/lead")).add(ModItems.LEAD_BLOCK)
         this.tag(commonItemTag("storage_blocks/steel")).add(ModItems.STEEL_BLOCK)
+            .addOptional(ResourceLocation.fromNamespaceAndPath("dreamaticvoyage", "fukamizu_bread_bricks"))
         this.tag(commonItemTag("storage_blocks/tungsten")).add(ModItems.TUNGSTEN_BLOCK)
         this.tag(commonItemTag("storage_blocks/silver")).add(ModItems.SILVER_BLOCK)
 
@@ -64,8 +68,6 @@ class ModItemTagProvider(
         this.tag(commonItemTag("storage_blocks/raw_silver")).add(ModItems.RAW_SILVER_BLOCK)
         this.tag(commonItemTag("storage_blocks/raw_scheelite")).add(ModItems.RAW_SCHEELITE_BLOCK)
 
-        this.tag(commonItemTag("storage_blocks/steel")).add(ModItems.STEEL_BLOCK)
-            .addOptional(ResourceLocation.fromNamespaceAndPath("dreamaticvoyage", "fukamizu_bread_bricks"))
         this.tag(ModTags.Items.STORAGE_BLOCK_CEMENTED_CARBIDE).add(ModItems.CEMENTED_CARBIDE_BLOCK)
             .addOptional(ResourceLocation.fromNamespaceAndPath("dreamaticvoyage", "hqss_bread_bricks"))
 
@@ -91,7 +93,6 @@ class ModItemTagProvider(
         this.tag(commonItemTag("ores/scheelite"))
             .add(ModItems.SCHEELITE_ORE, ModItems.DEEPSLATE_SCHEELITE_ORE)
         this.tag(commonItemTag("raw_materials/scheelite")).add(ModItems.SCHEELITE)
-        this.tag(commonItemTag("dusts/scheelite")).add(ModItems.TUNGSTEN_POWDER)
         this.tag(commonItemTag("storage_blocks/scheelite")).add(ModItems.TUNGSTEN_BLOCK)
 
         this.tag(ModTags.Items.ORE_RATES_SINGULAR).add(
@@ -108,8 +109,13 @@ class ModItemTagProvider(
             ModItems.DEEPSLATE_SILVER_ORE
         )
 
-        this.tag(commonItemTag("plates")).addTag(commonItemTag("plates/copper"))
+        this.tag(commonItemTag("plates"))
+            .addTag(commonItemTag("plates/copper"))
+            .addTag(commonItemTag("plates/steel"))
+            .addTag(commonItemTag("plates/plastic"))
         this.tag(commonItemTag("plates/copper")).add(ModItems.COPPER_PLATE)
+        this.tag(commonItemTag("plates/steel")).add(ModItems.STEEL_PLATE)
+        this.tag(commonItemTag("plates/plastic")).add(ModItems.ENGINEERING_PLASTIC)
 
         this.tag(commonItemTag("tools/crowbar")).add(ModItems.CROWBAR)
 
@@ -337,7 +343,8 @@ class ModItemTagProvider(
             ModItems.T_BATON,
             ModItems.ELECTRIC_BATON,
             ModItems.STEEL_PIPE,
-            ModItems.CROWBAR
+            ModItems.CROWBAR,
+            ModItems.CEMENTED_CARBIDE_SWORD
         ).addTag(ModTags.Items.HAMMER)
         this.tag(ItemTags.SWORD_ENCHANTABLE).add(
             ModItems.MILITARY_SHOVEL,
@@ -345,15 +352,37 @@ class ModItemTagProvider(
             ModItems.T_BATON,
             ModItems.ELECTRIC_BATON,
             ModItems.STEEL_PIPE,
-            ModItems.CROWBAR
+            ModItems.CROWBAR,
+            ModItems.CEMENTED_CARBIDE_SWORD
         ).addTag(ModTags.Items.HAMMER)
 
-        this.tag(ItemTags.AXES).add(ModItems.MILITARY_SHOVEL)
-        this.tag(ItemTags.SHOVELS).add(ModItems.MILITARY_SHOVEL)
-        this.tag(ItemTags.HOES).add(ModItems.MILITARY_SHOVEL)
-        this.tag(ItemTags.MINING_ENCHANTABLE).add(ModItems.MILITARY_SHOVEL)
-        this.tag(ItemTags.VANISHING_ENCHANTABLE).add(ModItems.MILITARY_SHOVEL)
-        this.tag(ItemTags.DURABILITY_ENCHANTABLE).add(ModItems.MILITARY_SHOVEL)
+        this.tag(ItemTags.AXES).add(ModItems.MILITARY_SHOVEL, ModItems.CEMENTED_CARBIDE_AXE)
+        this.tag(ItemTags.SHOVELS).add(ModItems.MILITARY_SHOVEL, ModItems.CEMENTED_CARBIDE_SHOVEL)
+        this.tag(ItemTags.HOES).add(ModItems.MILITARY_SHOVEL, ModItems.CEMENTED_CARBIDE_HOE)
+        this.tag(ItemTags.PICKAXES).add(ModItems.CEMENTED_CARBIDE_PICKAXE)
+
+        this.tag(ItemTags.MINING_ENCHANTABLE).add(
+            ModItems.MILITARY_SHOVEL,
+            ModItems.CEMENTED_CARBIDE_AXE,
+            ModItems.CEMENTED_CARBIDE_SHOVEL,
+            ModItems.CEMENTED_CARBIDE_PICKAXE
+        )
+        this.tag(ItemTags.VANISHING_ENCHANTABLE).add(
+            ModItems.MILITARY_SHOVEL,
+            ModItems.CEMENTED_CARBIDE_AXE,
+            ModItems.CEMENTED_CARBIDE_SHOVEL,
+            ModItems.CEMENTED_CARBIDE_PICKAXE,
+            ModItems.CEMENTED_CARBIDE_HOE,
+            ModItems.CEMENTED_CARBIDE_SWORD
+        )
+        this.tag(ItemTags.DURABILITY_ENCHANTABLE).add(
+            ModItems.MILITARY_SHOVEL,
+            ModItems.CEMENTED_CARBIDE_AXE,
+            ModItems.CEMENTED_CARBIDE_SHOVEL,
+            ModItems.CEMENTED_CARBIDE_PICKAXE,
+            ModItems.CEMENTED_CARBIDE_HOE,
+            ModItems.CEMENTED_CARBIDE_SWORD
+        )
 
         ModItems.PERKS.forEach {
             val item = it

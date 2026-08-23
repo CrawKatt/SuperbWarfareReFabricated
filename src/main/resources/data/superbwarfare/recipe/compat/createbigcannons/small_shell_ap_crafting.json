@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "createbigcannons:autocannon_cartridge"
+    }
+  ],
+  "result": {
+    "id": "superbwarfare:small_shell_ap",
+    "count": 1
+  },
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "createbigcannons"
+      ]
+    }
+  ]
+}

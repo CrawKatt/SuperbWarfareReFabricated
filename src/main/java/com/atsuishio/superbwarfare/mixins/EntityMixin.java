@@ -3,8 +3,10 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.capability.PersistentDataAccessor;
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem;
+import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import com.atsuishio.superbwarfare.tools.OBB;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -12,7 +14,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -169,6 +173,36 @@ public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
             cir.cancel();
             var s = vehicle.getPassengerRenderScale();
             cir.setReturnValue(getDimensions(pose).height() * 0.85f * s);
+        }
+    }
+
+    @Inject(
+            method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void superbwarfare$powerfulAttractionDrop(
+            ItemStack stack,
+            float yOffset,
+            CallbackInfoReturnable<ItemEntity> cir
+    ) {
+        if (PowerfulAttraction.tryMoveCurrentDropToPlayer(stack)) {
+            cir.setReturnValue(null);
+        }
+    }
+
+    @Inject(
+            method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
+            at = @At("RETURN")
+    )
+    private void superbwarfare$captureLivingDrop(
+            ItemStack stack,
+            float yOffset,
+            CallbackInfoReturnable<ItemEntity> cir
+    ) {
+        ItemEntity drop = cir.getReturnValue();
+        if (drop != null) {
+            LivingEventHandler.captureLivingDrop(drop);
         }
     }
 }

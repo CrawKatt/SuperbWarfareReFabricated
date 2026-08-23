@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.compat.sable.SableCompatHandler
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.OBBEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.event.LivingEventHandler
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.weapon.BeastItem.Companion.beastKill
@@ -341,6 +342,8 @@ class CustomExplosion @JvmOverloads constructor(
             this.entity,
             AABB(x0.toDouble(), y0.toDouble(), z0.toDouble(), x1.toDouble(), y1.toDouble(), z1.toDouble())
         )
+
+        LivingEventHandler.onExplosionDetonate(this, list)
 
         val position = Vec3(this.x, this.y, this.z)
         var hit = false

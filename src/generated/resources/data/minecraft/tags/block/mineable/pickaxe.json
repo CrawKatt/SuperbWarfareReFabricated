@@ -404,6 +404,7 @@
     "superbwarfare:small_container",
     "superbwarfare:vehicle_deployer",
     "superbwarfare:aircraft_catapult",
+    "superbwarfare:catapult_controller",
     "superbwarfare:superb_item_interface",
     "superbwarfare:creative_superb_item_interface",
     "superbwarfare:lucky_container",

@@ -196,4 +196,5 @@ fun registerPayloads() {
     playToServer<VehicleDisconnectTowingMessage>()
     playToServer<EntityClearMessage>()
     playToServer<EntityAreaClearMessage>()
+    playToServer<CreativeContainerStackMessage>()
 }

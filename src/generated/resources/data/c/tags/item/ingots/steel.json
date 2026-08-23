@@ -1,5 +1,9 @@
 {
   "values": [
-    "superbwarfare:steel_ingot"
+    "superbwarfare:steel_ingot",
+    {
+      "id": "dreamaticvoyage:fukamizu_bread_ingot",
+      "required": false
+    }
   ]
 }

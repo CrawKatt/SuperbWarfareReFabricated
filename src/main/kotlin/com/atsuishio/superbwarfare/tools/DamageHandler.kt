@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.entity.mixin.DamageContainer
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier.ModifyResult
 import com.atsuishio.superbwarfare.event.LivingEventHandler
+import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect
 import com.atsuishio.superbwarfare.tools.DamageHandler.doDamage
 import com.atsuishio.superbwarfare.tools.FormatTool.format2D
 import net.minecraft.ChatFormatting
@@ -66,7 +67,7 @@ object DamageHandler {
                     return false
                 }
 
-                damage = LivingEventHandler.onEntityHurt(entity, source, damage)
+                damage = TraumaMobEffect.modifyIncomingDamage(entity, LivingEventHandler.onEntityHurt(entity, source, damage))
                 container.peek().newDamage = damage
 
                 run {

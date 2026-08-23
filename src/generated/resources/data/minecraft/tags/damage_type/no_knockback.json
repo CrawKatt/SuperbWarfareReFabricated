@@ -1,20 +1,68 @@
 {
   "values": [
-    "superbwarfare:ammo_consumption",
-    "superbwarfare:gunfire",
-    "superbwarfare:gunfire_headshot",
-    "superbwarfare:gunfire_absolute",
-    "superbwarfare:gunfire_headshot_absolute",
-    "superbwarfare:laser",
-    "superbwarfare:laser_static",
-    "superbwarfare:laser_headshot",
-    "superbwarfare:burn",
-    "superbwarfare:shock",
-    "superbwarfare:projectile_hit",
-    "superbwarfare:repair_tool",
-    "superbwarfare:super_star_hit",
-    "superbwarfare:super_star_slash",
-    "superbwarfare:air_crash",
-    "superbwarfare:phosphorus_fire"
+    {
+      "id": "superbwarfare:ammo_consumption",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:gunfire",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:gunfire_headshot",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:gunfire_absolute",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:gunfire_headshot_absolute",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:laser",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:laser_static",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:laser_headshot",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:burn",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:shock",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:projectile_hit",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:repair_tool",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:super_star_hit",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:super_star_slash",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:air_crash",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:phosphorus_fire",
+      "required": false
+    }
   ]
 }

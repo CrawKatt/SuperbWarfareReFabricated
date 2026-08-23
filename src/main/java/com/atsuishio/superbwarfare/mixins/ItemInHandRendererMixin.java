@@ -32,6 +32,12 @@ public class ItemInHandRendererMixin {
     ) {
         ClientEventHandler.handleWeaponTurn(partialTick);
 
+        // Pop only the stack that actually received the push in bobHurt.
+        if (ClientEventHandler.vehiclePoseStack != null && ClientEventHandler.vehiclePoseStack == poseStack) {
+            poseStack.popPose();
+            ClientEventHandler.vehiclePoseStack = null;
+        }
+
         if (VehicleClientRenderState.shouldHideHandsAndHotbar(player)) {
             ci.cancel();
         }

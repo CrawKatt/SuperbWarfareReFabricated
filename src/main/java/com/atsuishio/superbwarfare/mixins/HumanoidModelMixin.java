@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.init.ModEnumExtensions;
 import com.atsuishio.superbwarfare.item.trinket.ParachuteItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.minecraft.client.model.HumanoidModel;
@@ -45,6 +46,11 @@ public class HumanoidModelMixin {
     @Shadow
     @Final
     public ModelPart hat;
+
+    @Inject(method = "poseRightArm(Lnet/minecraft/world/entity/LivingEntity;)V", at = @At("TAIL"))
+    private void superbwarfare$applyCustomArmPose(LivingEntity livingEntity, CallbackInfo ci) {
+        ModEnumExtensions.Client.applyArmPose((HumanoidModel<?>) (Object) this);
+    }
 
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At(value = "TAIL"))
     private void setupAnim(LivingEntity livingEntity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {

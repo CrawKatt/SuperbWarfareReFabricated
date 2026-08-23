@@ -82,6 +82,20 @@ class ModBlockStateProvider(private val output: PackOutput) : DataProvider {
             )
         )
 
+        horizontalBlock(
+            ModBlocks.CATAPULT_CONTROLLER,
+            cube(
+                "catapult_controller",
+                texture("vehicle_deployer_bottom"),
+                texture("aircraft_catapult_controller_top"),
+                texture("aircraft_catapult_controller_side"),
+                texture("aircraft_catapult_controller_side"),
+                texture("aircraft_catapult_side2"),
+                texture("aircraft_catapult_side2"),
+                texture("aircraft_catapult_top")
+            )
+        )
+
         directionalBlock(
             ModBlocks.SUPERB_ITEM_INTERFACE,
             cubeBottomTop(

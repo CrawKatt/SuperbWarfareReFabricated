@@ -1,5 +1,9 @@
 {
   "values": [
-    "superbwarfare:steel_block"
+    "superbwarfare:steel_block",
+    {
+      "id": "dreamaticvoyage:fukamizu_bread_bricks",
+      "required": false
+    }
   ]
 }

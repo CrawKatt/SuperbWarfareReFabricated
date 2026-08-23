@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "c",
+    "a",
+    "b"
+  ],
+  "key": {
+    "a": {
+      "item": "createbigcannons:he_shell"
+    },
+    "b": {
+      "tag": "createbigcannons:big_cannon_propellant_bags"
+    },
+    "c": {
+      "item": "createbigcannons:impact_fuze"
+    }
+  },
+  "result": {
+    "id": "superbwarfare:large_shell_he",
+    "count": 1
+  },
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "createbigcannons"
+      ]
+    }
+  ]
+}
