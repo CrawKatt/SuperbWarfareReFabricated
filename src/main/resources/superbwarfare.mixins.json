@@ -41,6 +41,7 @@
     "ClientPacketListenerMixin",
     "ClientPlayerEntityMixin",
     "EntityRenderDispatcherMixin",
+    "EffectInstanceMixin",
     "FogRendererMixin",
     "GameRendererMixin",
     "GuiGraphicsMixin",
