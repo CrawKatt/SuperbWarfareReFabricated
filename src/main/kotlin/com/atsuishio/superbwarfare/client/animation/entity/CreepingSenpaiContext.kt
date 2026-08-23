@@ -9,13 +9,9 @@ class CreepingSenpaiContext(entity: CreepingSenpaiEntity) : BasicEntityContext<C
         val ANIM = loc("animations/bedrock/entity/creeping_senpai.animation.json")
     }
 
-    fun isRunner(): Boolean {
-        return entity.runner
-    }
-
     fun isMoving(): Boolean {
         val velocity = entity.deltaMovement
-        val avgVelocity = (abs(velocity.x) + abs(velocity.z)).toFloat() / 2f
+        val avgVelocity = (abs(velocity.x) + abs(velocity.y) + abs(velocity.z)).toFloat() / 3f
         return avgVelocity > 0.015f
     }
 }
