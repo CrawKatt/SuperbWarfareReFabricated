@@ -108,6 +108,10 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
             event.add(ModEntities.KV_16)
             event.add(ModEntities.JU_87)
             event.add(ModEntities.A_10A)
+            event.add(ModEntities.AC_130H)
+            event.add(ModEntities.AIR_SHEEP)
+            event.add(ModEntities.HAPPIEST_GHAST)
+            event.add(ModEntities.KIROV)
             postEvent(event)
         }
 
