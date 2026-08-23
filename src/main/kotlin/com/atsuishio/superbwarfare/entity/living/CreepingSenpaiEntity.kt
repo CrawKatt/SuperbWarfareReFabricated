@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.entity.living
 
-import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.animation.entity.CreepingSenpaiAnimationInstance
 import com.atsuishio.superbwarfare.entity.getValue
@@ -8,84 +7,65 @@ import com.atsuishio.superbwarfare.entity.setValue
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
 import net.minecraft.core.BlockPos
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.core.Direction
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.sounds.SoundEvent
-import net.minecraft.world.DifficultyInstance
+import net.minecraft.util.Mth
 import net.minecraft.world.damagesource.DamageSource
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.MobSpawnType
-import net.minecraft.world.entity.SpawnGroupData
-import net.minecraft.world.entity.ai.attributes.AttributeModifier
+import net.minecraft.world.entity.Mob
+import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier
 import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.ai.control.MoveControl
 import net.minecraft.world.entity.ai.goal.FloatGoal
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
+import net.minecraft.world.entity.ai.navigation.PathNavigation
+import net.minecraft.world.entity.ai.navigation.WallClimberNavigation
 import net.minecraft.world.entity.monster.Monster
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.ServerLevelAccessor
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.pathfinder.Path
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
+import kotlin.math.abs
 
 open class CreepingSenpaiEntity(type: EntityType<CreepingSenpaiEntity>, level: Level) : Monster(type, level) {
     open val animationInstance = if (this.level().isClientSide) CreepingSenpaiAnimationInstance(this) else null
     open val modelInstance = EntityModelReloadListener.getModel(MODEL)?.createInstance()
-    open var runner by RUNNER
+
+    open var attachedFace by ATTACHED_FACE
+    var renderStartFace: Direction = Direction.UP
+        private set
+    var renderTargetFace: Direction = Direction.UP
+        private set
+    var renderFaceChangeTick: Long = 0L
+        private set
+    private var navigationTargetSince = 0L
+    private var lastNavigationTarget: BlockPos? = null
+    private var navigationRetargetCooldown = 0
 
     init {
         xpReward = 40
         isNoAi = false
+        this.moveControl = ClimbingMoveControl()
     }
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
         super.defineSynchedData(builder)
-        builder.define(RUNNER, false)
+        builder.define(ATTACHED_FACE, Direction.UP)
     }
 
-    @Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
-    override fun finalizeSpawn(
-        pLevel: ServerLevelAccessor,
-        pDifficulty: DifficultyInstance,
-        pReason: MobSpawnType,
-        pSpawnData: SpawnGroupData?
-    ): SpawnGroupData? {
-        this.runner = Math.random() < 0.3
-
-        if (this.runner) {
-            this.getAttribute(Attributes.MOVEMENT_SPEED)?.addPermanentModifier(
-                AttributeModifier(
-                    Mod.ATTRIBUTE_MODIFIER,
-                    0.4,
-                    AttributeModifier.Operation.ADD_MULTIPLIED_BASE
-                )
-            )
-        } else {
-            this.getAttribute(Attributes.ATTACK_DAMAGE)?.addPermanentModifier(
-                AttributeModifier(
-                    Mod.ATTRIBUTE_MODIFIER,
-                    3.0,
-                    AttributeModifier.Operation.ADD_VALUE
-                )
-            )
-        }
-
-        return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData)
-    }
-
-    override fun addAdditionalSaveData(compound: CompoundTag) {
-        super.addAdditionalSaveData(compound)
-        compound.putBoolean("Runner", this.runner)
-    }
-
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        super.readAdditionalSaveData(compound)
-        this.runner = compound.getBoolean("Runner")
+    override fun createNavigation(level: Level): PathNavigation {
+        return CreepingSenpaiNavigation(this, level)
     }
 
     override fun getEyeY() = 0.65
@@ -103,11 +83,15 @@ open class CreepingSenpaiEntity(type: EntityType<CreepingSenpaiEntity>, level: L
         this.goalSelector.addGoal(3, RandomLookAroundGoal(this))
         this.goalSelector.addGoal(4, FloatGoal(this))
         this.goalSelector.addGoal(5, RandomStrollGoal(this, 0.8))
-        this.targetSelector.addGoal(6, NearestAttackableTargetGoal(this, Player::class.java, false, false))
+        this.targetSelector.addGoal(6, CreepingSenpaiTargetGoal())
     }
 
     // TODO type
 //    override fun getMobType(): MobType = MobType.ILLAGER
+
+    override fun onClimbable(): Boolean {
+        return this.attachedFace != Direction.UP
+    }
 
     public override fun getAmbientSound(): SoundEvent? {
         return ModSounds.IDLE.get()
@@ -127,11 +111,29 @@ open class CreepingSenpaiEntity(type: EntityType<CreepingSenpaiEntity>, level: L
 
     override fun baseTick() {
         super.baseTick()
+        if (this.level().isClientSide) {
+            val current = this.attachedFace
+            if (current != this.renderTargetFace) {
+                this.renderStartFace = this.renderTargetFace
+                this.renderTargetFace = current
+                this.renderFaceChangeTick = this.tickCount.toLong()
+            }
+        }
         this.refreshDimensions()
     }
 
     override fun aiStep() {
+        if (!this.level().isClientSide) {
+            this.updateSurfaceAttachment()
+            if (this.navigationRetargetCooldown > 0) {
+                this.navigationRetargetCooldown--
+            }
+        }
         super.aiStep()
+        if (!this.level().isClientSide) {
+            this.updateNavigationTimeout()
+            this.maintainSurfaceAttachment()
+        }
         this.updateSwingTime()
     }
 
@@ -143,20 +145,217 @@ open class CreepingSenpaiEntity(type: EntityType<CreepingSenpaiEntity>, level: L
         }
     }
 
+    fun renderFaceProgress(partialTick: Float): Float {
+        val elapsed = this.tickCount.toFloat() + partialTick - this.renderFaceChangeTick.toFloat()
+        return Mth.clamp(elapsed / RENDER_FACE_TRANSITION_TICKS, 0f, 1f)
+    }
+
+    private fun updateNavigationTimeout() {
+        val navigation = this.navigation
+        val target = navigation.targetPos
+
+        if (!navigation.isInProgress || target == null) {
+            this.lastNavigationTarget = null
+            return
+        }
+
+        if (target != this.lastNavigationTarget) {
+            this.lastNavigationTarget = target
+            this.navigationTargetSince = this.tickCount.toLong()
+            return
+        }
+
+        if (this.tickCount.toLong() - this.navigationTargetSince < NAVIGATION_TIMEOUT_TICKS) {
+            return
+        }
+
+        if (this.position().distanceToSqr(Vec3.atBottomCenterOf(target)) < 2.25) {
+            return
+        }
+
+        navigation.stop()
+        this.setTarget(null)
+        this.navigationRetargetCooldown = NAVIGATION_RETARGET_COOLDOWN
+        this.lastNavigationTarget = null
+    }
+
+    inner class CreepingSenpaiTargetGoal :
+        NearestAttackableTargetGoal<Player>(this@CreepingSenpaiEntity, Player::class.java, false, false) {
+        override fun canUse(): Boolean {
+            return if (this@CreepingSenpaiEntity.navigationRetargetCooldown > 0) {
+                false
+            } else {
+                super.canUse()
+            }
+        }
+
+        override fun getTargetSearchArea(targetDistance: Double): AABB {
+            return this.mob.boundingBox.inflate(targetDistance, targetDistance, targetDistance)
+        }
+    }
+
+    private fun updateSurfaceAttachment() {
+        if (this.onGround() || this.isDeadOrDying) {
+            this.attachedFace = Direction.UP
+            this.isNoGravity = false
+            return
+        }
+
+        val face = this.findAttachedFace()
+        this.attachedFace = face
+        this.isNoGravity = face != Direction.UP
+
+        if (face.axis.isHorizontal) {
+            val yaw = faceWallYaw(face)
+            this.yRot = yaw
+            this.setYHeadRot(yaw)
+            this.setYBodyRot(yaw)
+        }
+    }
+
+    private fun findAttachedFace(): Direction {
+        val level = this.level()
+        val box = this.boundingBox
+        val midY = (box.minY + box.maxY) / 2.0
+
+        val ceilingPos = BlockPos.containing(this.x, box.maxY + 0.1, this.z)
+        if (level.getBlockState(ceilingPos).isCollisionShapeFullBlock(level, ceilingPos)) {
+            return Direction.DOWN
+        }
+
+        for (direction in Direction.entries) {
+            if (!direction.axis.isHorizontal) continue
+            val sampleX = this.x + direction.stepX * (box.xsize / 2.0 + 0.1)
+            val sampleZ = this.z + direction.stepZ * (box.zsize / 2.0 + 0.1)
+            val samplePos = BlockPos.containing(sampleX, midY, sampleZ)
+            if (level.getBlockState(samplePos).isCollisionShapeFullBlock(level, samplePos)) {
+                return direction.opposite
+            }
+        }
+
+        val floorPos = BlockPos.containing(this.x, box.minY - 0.1, this.z)
+        if (this.onGround() || level.getBlockState(floorPos).isCollisionShapeFullBlock(level, floorPos)) {
+            return Direction.UP
+        }
+
+        return Direction.UP
+    }
+
+    private fun maintainSurfaceAttachment() {
+        if (this.attachedFace != Direction.DOWN) return
+
+        val ceilingPos = BlockPos.containing(this.x, this.boundingBox.maxY + 0.05, this.z)
+        if (!this.level().getBlockState(ceilingPos).isCollisionShapeFullBlock(this.level(), ceilingPos)) return
+
+        val desiredY = ceilingPos.y.toDouble() - this.bbHeight - 0.01
+        val diff = desiredY - this.y
+        if (abs(diff) > 0.02) {
+            this.move(MoverType.SELF, Vec3(0.0, diff.coerceIn(-0.12, 0.12), 0.0))
+        }
+        this.setDeltaMovement(this.deltaMovement.x, 0.0, this.deltaMovement.z)
+    }
+
+    private fun faceWallYaw(face: Direction): Float {
+        val radians = Mth.atan2(face.stepX.toDouble(), (-face.stepZ).toDouble())
+        return (radians * (180.0 / Math.PI)).toFloat()
+    }
+
+    inner class ClimbingMoveControl : MoveControl(this@CreepingSenpaiEntity) {
+        override fun tick() {
+            val entity = this@CreepingSenpaiEntity
+            val face = entity.attachedFace
+
+            if (face == Direction.UP) {
+                entity.isNoGravity = false
+                super.tick()
+                return
+            }
+
+            if (!this.hasWanted() || entity.isDeadOrDying) {
+                entity.setSpeed(0f)
+                entity.setYya(0f)
+                return
+            }
+
+            val toTarget = Vec3(this.wantedX, this.wantedY, this.wantedZ).subtract(entity.position())
+            val normal = Vec3.atLowerCornerOf(face.normal)
+            val surfaceMove = if (face == Direction.DOWN) {
+                Vec3(toTarget.x, 0.0, toTarget.z)
+            } else {
+                toTarget.subtract(normal.scale(toTarget.dot(normal)))
+            }
+
+            if (surfaceMove.lengthSqr() < 1.0E-6) {
+                entity.setSpeed(0f)
+                entity.setYya(0f)
+                return
+            }
+
+            val speed = (this.speedModifier * entity.getAttributeValue(Attributes.MOVEMENT_SPEED)).toFloat()
+            entity.deltaMovement = surfaceMove.normalize().scale(speed.toDouble())
+            entity.setSpeed(0f)
+            entity.setYya(0f)
+
+            if (face == Direction.DOWN) {
+                val targetYaw =
+                    (Mth.atan2(toTarget.z, toTarget.x) * (180.0 / Math.PI) - 90.0).toFloat()
+                val yaw = this.rotlerp(entity.yRot, targetYaw, 90f)
+                entity.yRot = yaw
+                entity.setYHeadRot(yaw)
+                entity.setYBodyRot(yaw)
+            }
+        }
+    }
+
     companion object {
-        val RUNNER: EntityDataAccessor<Boolean> =
-            SynchedEntityData.defineId(CreepingSenpaiEntity::class.java, EntityDataSerializers.BOOLEAN)
+        @JvmField
+        val ATTACHED_FACE: EntityDataAccessor<Direction> =
+            SynchedEntityData.defineId(CreepingSenpaiEntity::class.java, EntityDataSerializers.DIRECTION)
+
+        const val RENDER_FACE_TRANSITION_TICKS: Float = 8f
+        const val NAVIGATION_TIMEOUT_TICKS: Long = 300L
+        const val NAVIGATION_RETARGET_COOLDOWN: Int = 40
 
         fun createAttributes(): AttributeSupplier.Builder {
             return createMobAttributes()
-                .add(Attributes.MOVEMENT_SPEED, 0.23)
+                .add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.MAX_HEALTH, 24.0)
                 .add(Attributes.ARMOR, 0.0)
-                .add(Attributes.ATTACK_DAMAGE, 5.0)
+                .add(Attributes.ATTACK_DAMAGE, 4.0)
                 .add(Attributes.FOLLOW_RANGE, 64.0)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 0.5)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 0.0)
         }
 
         val MODEL = loc("models/bedrock/entity/creeping_senpai.geo.json")
+    }
+
+}
+
+private class CreepingSenpaiNavigation(mob: Mob, level: Level) : WallClimberNavigation(mob, level) {
+    private var stopped = false
+
+    override fun createPath(pPos: BlockPos, pAccuracy: Int): Path? {
+        this.stopped = false
+        return super.createPath(pPos, pAccuracy)
+    }
+
+    override fun createPath(pEntity: Entity, pAccuracy: Int): Path? {
+        this.stopped = false
+        return super.createPath(pEntity, pAccuracy)
+    }
+
+    override fun moveTo(pEntity: Entity, pSpeed: Double): Boolean {
+        this.stopped = false
+        return super.moveTo(pEntity, pSpeed)
+    }
+
+    override fun stop() {
+        this.stopped = true
+        super.stop()
+    }
+
+    override fun tick() {
+        if (this.stopped) return
+        super.tick()
     }
 }
