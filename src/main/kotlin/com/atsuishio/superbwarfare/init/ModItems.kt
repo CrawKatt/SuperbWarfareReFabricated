@@ -213,6 +213,9 @@ object ModItems {
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
          ForgeSpawnEggItem(ModEntities.SENPAI, -11584987, -14014413, Properties())
     }
+    @JvmField val CREEPING_SENPAI_SPAWN_EGG = registerItem("creeping_senpai_spawn_egg") {
+        ForgeSpawnEggItem(ModEntities.CREEPING_SENPAI, -11584987, 3288889, Properties())
+    }
     @JvmField val STEEL_COIL_SPAWN_EGG = registerItem("steel_coil_spawn_egg") {
         ForgeSpawnEggItem(ModEntities.STEEL_COIL, 0, 0xc0c0c0, Properties())
     }
