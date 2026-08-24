@@ -107,7 +107,6 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         } ?: return
 
         model.renderHand = transformType.firstPerson()
-        model.resetPose()
         if (transformType.firstPerson()) {
             val hand = if (transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
                 InteractionHand.OFF_HAND
@@ -120,6 +119,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
             }
         }
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
+        model.resetPose()
     }
 
     private fun applyItemDisplayTransform(poseStack: PoseStack, display: DefaultGunResource.ItemDisplayInfo) {

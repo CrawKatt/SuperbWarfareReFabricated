@@ -242,8 +242,8 @@ open class GeoGunModel @JvmOverloads constructor(
         protected const val CAMERA_BONE = "camera"
         protected const val MAIN_BONE = "main"
         protected const val MOVE_BONE = "move"
-        protected const val LEFT_HAND_BONE = "Lefthand"
-        protected const val RIGHT_HAND_BONE = "Righthand"
+        protected const val LEFT_HAND_BONE = "lefthand_pos"
+        protected const val RIGHT_HAND_BONE = "righthand_pos"
 
         @JvmStatic
         fun create(modelPath: ResourceLocation): GeoGunModel? {

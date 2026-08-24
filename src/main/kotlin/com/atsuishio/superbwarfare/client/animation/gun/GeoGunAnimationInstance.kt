@@ -4,13 +4,13 @@ import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.resource.model.GunModelReloadListener
+import com.atsuishio.superbwarfare.tools.localPlayer
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnimationInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.animation.BedrockAnimation
 import com.maydaymemory.mae.basic.DummyPose
 import com.maydaymemory.mae.basic.Pose
 import com.maydaymemory.mae.control.runner.AnimationContext
 import com.maydaymemory.mae.control.runner.AnimationRunner
-import net.minecraft.client.Minecraft
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
@@ -21,7 +21,7 @@ open class GeoGunAnimationInstance(
     entity: Entity,
     hand: InteractionHand
 ) : IFPAnimationInstance {
-    private val animations = HashMap<String, BedrockAnimation>()
+    private val animations = hashMapOf<String, BedrockAnimation>()
     private var runner: AnimationRunner? = null
     private var currentState: GunAnimationState? = null
     private var cachedPose: Pose = DummyPose.INSTANCE
@@ -39,7 +39,7 @@ open class GeoGunAnimationInstance(
     }
 
     private fun resolveState(): GunAnimationState? {
-        val player = Minecraft.getInstance().player ?: return null
+        val player = localPlayer ?: return null
         val animation = GunResource.compute(stack).animation ?: return null
         val data = GunData.from(stack)
 
@@ -138,5 +138,9 @@ open class GeoGunAnimationInstance(
         runner = null
         currentState = null
         cachedPose = DummyPose.INSTANCE
+    }
+
+    override fun shouldRenderHand(): Boolean {
+        return true
     }
 }
