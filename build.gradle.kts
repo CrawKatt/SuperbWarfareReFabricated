@@ -178,6 +178,8 @@ dependencies {
 
     modCompileOnly("com.github.thedeathlycow:thermoo:v4.8.0")
     modRuntimeOnly("com.github.thedeathlycow:thermoo:v4.8.0")
+    modRuntimeOnly("maven.modrinth:touhoulittlemaid-orihime:0.6.2-neo1.5.0")
+    runtimeOnly("org.openjdk.nashorn:nashorn-core:15.4")
 
     include(modImplementation("fuzs.extensibleenums:extensibleenums-fabric:${project.property("extensibleenums_version")}")!!)
     include(modImplementation("org.ladysnake.cardinal-components-api:cardinal-components-base:${property("cardinal_components_version")}")!!)
