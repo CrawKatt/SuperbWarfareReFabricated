@@ -27,10 +27,7 @@ import com.atsuishio.superbwarfare.item.gun.shotgun.M870Item
 import com.atsuishio.superbwarfare.item.gun.smg.Mp5Item
 import com.atsuishio.superbwarfare.item.gun.smg.VectorItem
 import com.atsuishio.superbwarfare.item.gun.sniper.*
-import com.atsuishio.superbwarfare.item.gun.special.BeastGunTestItem
-import com.atsuishio.superbwarfare.item.gun.special.BocekItem
-import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem
-import com.atsuishio.superbwarfare.item.gun.special.TaserItem
+import com.atsuishio.superbwarfare.item.gun.special.*
 import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGunItem
 import com.atsuishio.superbwarfare.item.material.*
 import com.atsuishio.superbwarfare.item.misc.*
@@ -101,6 +98,7 @@ object ModItems {
     // @formatter:off
     @JvmField val REPAIR_TOOL = registerGun<RepairToolItem>("repair_tool")
     @JvmField val TASER = registerGun<TaserItem>("taser")
+    @JvmField val TASER_V2 = registerGun<TaserV2Item>("taser_v2")
     @JvmField val GLOCK_17 = registerGun<Glock17Item>("glock_17")
     @JvmField val GLOCK_18 = registerGun<Glock18Item>("glock_18")
     @JvmField val MP_443 = registerGun<Mp443Item>("mp_443")
