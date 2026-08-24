@@ -14,6 +14,10 @@ object SuperbWarfareEvents {
     @JvmStatic
     fun <T : Any> post(event: T): T {
         listeners.forEach { it.post(event) }
+        when (event) {
+            is ProjectileHitEvent.HitEntity -> ProjectileHitEvent.HIT_ENTITY.invoker().post(event)
+            is ProjectileHitEvent.HitBlock -> ProjectileHitEvent.HIT_BLOCK.invoker().post(event)
+        }
         return event
     }
 
