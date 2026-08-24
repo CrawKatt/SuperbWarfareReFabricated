@@ -52,6 +52,12 @@ public abstract class CameraMixin {
     @Shadow
     protected abstract void setPosition(double x, double y, double z);
 
+    @Shadow
+    private float xRot;
+
+    @Shadow
+    private float yRot;
+
     @Inject(method = "setup", at = @At("HEAD"))
     private void superbWarfare$capturePartialTicks(BlockGetter level, Entity entity, boolean detached,
                                                     boolean thirdPersonReverse, float partialTicks, CallbackInfo ci) {
@@ -66,8 +72,6 @@ public abstract class CameraMixin {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null) return;
-
-        superbWarfare$computeAngles(entity.getViewYRot(partialTicks), entity.getViewXRot(partialTicks));
 
         ItemStack stack = player.getMainHandItem();
         var tag = NBTTool.getTag(stack);
@@ -86,6 +90,7 @@ public abstract class CameraMixin {
 
                     setRotation(drone.getYaw(partialTicks), drone.getPitch(partialTicks));
                     setPosition(worldPosition.x, worldPosition.y, worldPosition.z);
+                    superbWarfare$applyComputedAnglesToCustomCamera();
                     info.cancel();
                 } else {
                     var rotation = drone.getCameraRotation(partialTicks, player, false, false);
@@ -98,6 +103,7 @@ public abstract class CameraMixin {
                     }
 
                     if (rotation != null || position != null) {
+                        superbWarfare$applyComputedAnglesToCustomCamera();
                         info.cancel();
                     }
                 }
@@ -116,6 +122,7 @@ public abstract class CameraMixin {
             }
 
             if (rotation != null || position != null) {
+                superbWarfare$applyComputedAnglesToCustomCamera();
                 info.cancel();
             }
 
@@ -170,6 +177,12 @@ public abstract class CameraMixin {
         ClientEventHandler.computeCameraAngles(context);
         superbWarfare$computedYaw = context.getYaw();
         superbWarfare$computedPitch = context.getPitch();
+    }
+
+    @Unique
+    private void superbWarfare$applyComputedAnglesToCustomCamera() {
+        superbWarfare$computeAngles(yRot, xRot);
+        setRotation(superbWarfare$computedYaw, superbWarfare$computedPitch);
     }
 
     @Inject(method = "setup", at = @At("TAIL"))
