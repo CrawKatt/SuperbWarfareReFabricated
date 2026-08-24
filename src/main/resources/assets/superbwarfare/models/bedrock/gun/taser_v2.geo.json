@@ -12,36 +12,12 @@
 			},
 			"bones": [
 				{
-					"name": "camera",
-					"pivot": [2.27141, 4.01276, 9.57702]
-				},
-				{
 					"name": "root",
-					"pivot": [0, -1, -1]
-				},
-				{
-					"name": "move",
-					"parent": "root",
-					"pivot": [0, 0, 0]
-				},
-				{
-					"name": "move_shen",
-					"parent": "move",
-					"pivot": [0, 0, 0]
-				},
-				{
-					"name": "move_bone",
-					"parent": "move_shen",
-					"pivot": [8, 10, -8]
-				},
-				{
-					"name": "move_0",
-					"parent": "move_bone",
 					"pivot": [0, 0, 0]
 				},
 				{
 					"name": "head",
-					"parent": "move_0",
+					"parent": "root",
 					"pivot": [0, 0.32257, -5.37042],
 					"cubes": [
 						{
@@ -165,48 +141,8 @@
 					]
 				},
 				{
-					"name": "Righthand",
-					"parent": "move_0",
-					"pivot": [-1.15468, -2.08634, -0.45413],
-					"rotation": [-76.32882, 10.3564, 179.6036],
-					"cubes": [
-						{
-							"origin": [-3.15468, -3.08634, -2.45413],
-							"size": [4, 12, 4],
-							"uv": {
-								"north": {"uv": [1.25, 30], "uv_size": [-1.25, 2]},
-								"east": {"uv": [1.25, 30], "uv_size": [-1.25, 2]},
-								"south": {"uv": [1.25, 30], "uv_size": [-1.25, 2]},
-								"west": {"uv": [1.25, 30], "uv_size": [-1.25, 2]},
-								"up": {"uv": [0, 32], "uv_size": [1.25, -2]},
-								"down": {"uv": [0, 32], "uv_size": [1.25, -2]}
-							}
-						}
-					]
-				},
-				{
-					"name": "Lefthand",
-					"parent": "move_0",
-					"pivot": [0.4046, -2.34567, -1.07012],
-					"rotation": [-68.00049, -19.4896, 179.16409],
-					"cubes": [
-						{
-							"origin": [-1.5954, -3.34567, -3.07012],
-							"size": [4, 12, 4],
-							"uv": {
-								"north": {"uv": [1.25, 32], "uv_size": [-1.25, -2]},
-								"east": {"uv": [1.25, 32], "uv_size": [-1.25, -2]},
-								"south": {"uv": [1.25, 32], "uv_size": [-1.25, -2]},
-								"west": {"uv": [1.25, 32], "uv_size": [-1.25, -2]},
-								"up": {"uv": [0, 30], "uv_size": [1.25, 2]},
-								"down": {"uv": [0, 30], "uv_size": [1.25, 2]}
-							}
-						}
-					]
-				},
-				{
 					"name": "gun",
-					"parent": "move_0",
+					"parent": "root",
 					"pivot": [-0.00238, 0.35352, 0.03753]
 				},
 				{
@@ -747,6 +683,104 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "Righthand",
+					"parent": "root",
+					"pivot": [-6.01875, 11, 0],
+					"cubes": [
+						{
+							"origin": [-8.01875, 0, -2],
+							"size": [4, 12, 4],
+							"uv": {
+								"north": {"uv": [12, 0], "uv_size": [4, 12]},
+								"east": {"uv": [4, 12], "uv_size": [4, 12]},
+								"south": {"uv": [8, 12], "uv_size": [4, 12]},
+								"west": {"uv": [12, 12], "uv_size": [4, 12]},
+								"up": {"uv": [16, 8], "uv_size": [4, 4]},
+								"down": {"uv": [16, 16], "uv_size": [4, -4]}
+							}
+						}
+					]
+				},
+				{
+					"name": "Lefthand",
+					"parent": "root",
+					"pivot": [5.98125, 11, 0],
+					"cubes": [
+						{
+							"origin": [3.98125, 0, -2],
+							"size": [4, 12, 4],
+							"uv": {
+								"north": {"uv": [0, 0], "uv_size": [4, 12]},
+								"east": {"uv": [4, 0], "uv_size": [4, 12]},
+								"south": {"uv": [8, 0], "uv_size": [4, 12]},
+								"west": {"uv": [0, 12], "uv_size": [4, 12]},
+								"up": {"uv": [16, 0], "uv_size": [4, 4]},
+								"down": {"uv": [16, 8], "uv_size": [4, -4]}
+							}
+						}
+					]
+				},
+				{
+					"name": "positioning",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "thirdperson_hand",
+					"parent": "positioning",
+					"pivot": [0, 4.225, -0.35]
+				},
+				{
+					"name": "ground",
+					"parent": "positioning",
+					"pivot": [0, -1.9, -0.35]
+				},
+				{
+					"name": "fixed",
+					"parent": "positioning",
+					"pivot": [0.7, 3.6, -0.175],
+					"rotation": [0, -90, 0]
+				},
+				{
+					"name": "idle_view",
+					"pivot": [0.85, 9, 14]
+				},
+				{
+					"name": "iron_view",
+					"pivot": [0, 6, 14.75]
+				},
+				{
+					"name": "camera",
+					"pivot": [0.85, 9, 14]
+				},
+				{
+					"name": "refit",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "refit_view",
+					"parent": "refit",
+					"pivot": [13, 5, 0],
+					"rotation": [0, 90, 0]
+				},
+				{
+					"name": "refit_extended_mag_view",
+					"parent": "refit",
+					"pivot": [7, 1, 0],
+					"rotation": [0, 112.5, 0]
+				},
+				{
+					"name": "refit_scope_view",
+					"parent": "refit",
+					"pivot": [5, 7, 6],
+					"rotation": [0, 47.5, 0]
+				},
+				{
+					"name": "refit_muzzle_view",
+					"parent": "refit",
+					"pivot": [7, 5.35, -12],
+					"rotation": [0, 120, 0]
 				}
 			]
 		}

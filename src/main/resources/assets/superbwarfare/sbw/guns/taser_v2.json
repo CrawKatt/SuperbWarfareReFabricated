@@ -3,8 +3,8 @@
   "SlotIcon": "superbwarfare:textures/item/taser_icon.png",
   "ItemDisplay": {
     "firstperson_righthand": {
-      "translation": [-1.75, -4.75, -20.75],
-      "scale": [4, 4, 4]
+      "translation": [1.75, -4.75, -20.75],
+      "scale": [1, 1, 1]
     }
   },
   "Animation": {
