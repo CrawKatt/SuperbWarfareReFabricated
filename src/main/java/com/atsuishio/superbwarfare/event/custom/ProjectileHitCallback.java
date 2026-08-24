@@ -42,11 +42,17 @@ public interface ProjectileHitCallback {
 
     static boolean postHitEntity(ProjectileHitEvent.HitEntity event) {
         HIT_ENTITY.invoker().onHitEntity(event);
+        if (!event.isCanceled()) {
+            ProjectileHitEvent.HIT_ENTITY.invoker().post(event);
+        }
         return event.isCanceled();
     }
 
     static boolean postHitBlock(ProjectileHitEvent.HitBlock event) {
         HIT_BLOCK.invoker().onHitBlock(event);
+        if (!event.isCanceled()) {
+            ProjectileHitEvent.HIT_BLOCK.invoker().post(event);
+        }
         return event.isCanceled();
     }
 }

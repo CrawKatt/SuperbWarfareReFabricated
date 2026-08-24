@@ -98,6 +98,12 @@ repositories {
         url = uri("https://maven.ladysnake.org/releases")
     }
 
+    maven("https://maven.jamieswhiteshirt.com/libs-release") {
+        content {
+            includeGroup("com.jamieswhiteshirt")
+        }
+    }
+
     maven {
         name = "TechReborn"
         url = uri("https://maven.fabricmc.net/")
@@ -166,6 +172,11 @@ dependencies {
     // Built from Sh1roCu/SimpleBedrockModel-Fabric@926992e (the upstream JitPack build is broken).
     include(modImplementation(":simplebedrockmodel-fabric:2.4.6+mc1.20.1")!!)
 
+    modRuntimeOnly("maven.modrinth:touhoulittlemaid-orihime:0.6.2-forge1.5.0")
+    modRuntimeOnly("com.jamieswhiteshirt:reach-entity-attributes:2.4.0")
+    modRuntimeOnly("io.github.fabricators_of_create.Porting-Lib:base:2.3.8+1.20.1")
+    runtimeOnly("org.openjdk.nashorn:nashorn-core:15.4")
+
     include(modImplementation("maven.modrinth:modernkeybinding:1.20.X-1.2.0")!!)
     include(implementation("org.apache.commons:commons-math3:3.6.1")!!)
     include(implementation("com.github.FiguraMC.luaj:luaj-core:3.0.8-figura") {
@@ -195,8 +206,8 @@ dependencies {
     // the same built-in capabilities that Forge provides without requiring
     // users to discover undeclared libraries after a startup crash.
     include(modImplementation("teamreborn:energy:3.0.0")!!)
-    include(modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.0")!!)
-    include(modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.0")!!)
+    include(modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.2.3")!!)
+    include(modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.2.3")!!)
 
     // JSR-305 (javax.annotation @ParametersAreNonnullByDefault)
     implementation("com.google.code.findbugs:jsr305:3.0.2")

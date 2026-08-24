@@ -51,7 +51,8 @@
   },
   "suggests": {
     "cloth-config": "*",
-    "tacz": "*"
+    "tacz": "*",
+    "touhou_little_maid": "*"
   },
   "breaks": {
     "optifabric": "*"

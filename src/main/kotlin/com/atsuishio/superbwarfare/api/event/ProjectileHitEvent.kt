@@ -2,6 +2,8 @@ package com.atsuishio.superbwarfare.api.event
 
 import com.atsuishio.superbwarfare.world.phys.EntityResult
 import com.atsuishio.superbwarfare.world.phys.ExtendedEntityRayTraceResult
+import net.fabricmc.fabric.api.event.Event
+import net.fabricmc.fabric.api.event.EventFactory
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.Entity
@@ -16,6 +18,14 @@ import org.jetbrains.annotations.ApiStatus
 @ApiStatus.AvailableSince("0.8.7")
 open class ProjectileHitEvent private constructor(val owner: Entity?, val projectile: Projectile, val hitVec: Vec3?) {
     var isCanceled: Boolean = false
+
+    fun interface HitEntityCallback {
+        fun post(event: HitEntity)
+    }
+
+    fun interface HitBlockCallback {
+        fun post(event: HitBlock)
+    }
 
     class HitEntity(owner: Entity?, projectile: Projectile, val result: ExtendedEntityRayTraceResult) :
         ProjectileHitEvent(owner, projectile, result.location) {
@@ -42,4 +52,26 @@ open class ProjectileHitEvent private constructor(val owner: Entity?, val projec
         projectile: Projectile,
         hitVec: Vec3?
     ) : ProjectileHitEvent(owner, projectile, hitVec)
+
+    companion object {
+        @JvmField
+        val HIT_ENTITY: Event<HitEntityCallback> = EventFactory.createArrayBacked(HitEntityCallback::class.java) { callbacks ->
+            HitEntityCallback { event ->
+                callbacks.forEach {
+                    it.post(event)
+                    if (event.isCanceled) return@HitEntityCallback
+                }
+            }
+        }
+
+        @JvmField
+        val HIT_BLOCK: Event<HitBlockCallback> = EventFactory.createArrayBacked(HitBlockCallback::class.java) { callbacks ->
+            HitBlockCallback { event ->
+                callbacks.forEach {
+                    it.post(event)
+                    if (event.isCanceled) return@HitBlockCallback
+                }
+            }
+        }
+    }
 }

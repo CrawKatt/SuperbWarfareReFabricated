@@ -22,6 +22,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.equals("com.atsuishio.superbwarfare.mixins.ClipContextMixin") && FabricLoader.getInstance().isModLoaded("porting_lib_base")) return false;
         if (mixinClassName.contains(".tacz.")) return FabricLoader.getInstance().isModLoaded("tacz");
         return true;
     }
