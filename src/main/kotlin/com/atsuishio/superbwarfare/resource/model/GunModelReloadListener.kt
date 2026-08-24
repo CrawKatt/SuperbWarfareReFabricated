@@ -21,8 +21,8 @@ object GunModelReloadListener : BedrockModelReloadListener<GeoGunModel>(
         "^root$",
         "^move$",
         "^move_.*",
-        "^Lefthand$",
-        "^Righthand$"
+        "^lefthand_pos$",
+        "^righthand_pos$"
     )
 
     override fun apply(
