@@ -1,0 +1,21 @@
+{
+  "Icon": "superbwarfare:textures/gun_icon/taser_icon.png",
+  "SlotIcon": "superbwarfare:textures/item/taser_icon.png",
+  "ItemDisplay": {
+    "firstperson_righthand": {
+      "translation": [-1.75, -4.75, -20.75],
+      "scale": [4, 4, 4]
+    }
+  },
+  "Animation": {
+    "Idle": "animation.taser.idle",
+    "Reload": "animation.taser.reload"
+  },
+  "Model": {
+    "Animation": "superbwarfare:animations/bedrock/gun/taser_v2.animation.json",
+    "Model": "superbwarfare:models/bedrock/gun/taser_v2.geo.json",
+    "Texture": "superbwarfare:textures/item/taser.png",
+    "LODModel": "superbwarfare:models/bedrock/gun_lod/taser_v2.geo.json"
+  },
+  "EnergyBarColor": "0xFFFF00"
+}

@@ -46,7 +46,7 @@ open class GeoGunModel @JvmOverloads constructor(
     protected val rightHandBoneIndex: Int = baseModel.getIndex(RIGHT_HAND_BONE)
 
     protected val bindGlobalTransformCache = hashMapOf<String, Matrix4f?>()
-    protected var modelCenter: Vector3f? = null
+    protected var modelCenterCache: Vector3f? = null
 
     fun getBone(boneName: String): BoneState? = instance.getBone(boneName)
 
@@ -123,12 +123,12 @@ open class GeoGunModel @JvmOverloads constructor(
      * to visible bone bind positions when bounds are unavailable.
      */
     open fun getModelCenter(): Vector3f {
-        modelCenter?.let { return it }
+        modelCenterCache?.let { return it }
 
         val box = baseModel.renderBoundingBox
         if (box != null) {
-            modelCenter = Vector3f(box.center.x.toFloat(), box.center.y.toFloat(), box.center.z.toFloat())
-            return modelCenter!!
+            modelCenterCache = Vector3f(box.center.x.toFloat(), box.center.y.toFloat(), box.center.z.toFloat())
+            return modelCenterCache!!
         }
 
         val currentPose = instance.pose
@@ -158,12 +158,12 @@ open class GeoGunModel @JvmOverloads constructor(
 
         instance.applyPose(currentPose)
 
-        modelCenter = if (any) {
+        modelCenterCache = if (any) {
             Vector3f((minX + maxX) / 2f, (minY + maxY) / 2f, (minZ + maxZ) / 2f)
         } else {
             Vector3f()
         }
-        return modelCenter!!
+        return modelCenterCache!!
     }
 
     open fun renderToBuffer(

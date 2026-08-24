@@ -9,6 +9,8 @@ import com.google.gson.annotations.SerializedName;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DefaultGunResource implements IDBasedData<DefaultGunResource> {
 
@@ -26,6 +28,12 @@ public class DefaultGunResource implements IDBasedData<DefaultGunResource> {
 
     @SerializedName("Icon")
     public String icon = Mod.loc("textures/gun_icon/default_icon.png").toString();
+
+    @SerializedName("SlotIcon")
+    public String slotIcon = "";
+
+    @SerializedName("ItemDisplay")
+    public Map<String, ItemDisplayInfo> itemDisplay = new HashMap<>();
 
     @SerializedName("Model")
     public ModelResource model = new ModelResource();
@@ -61,4 +69,15 @@ public class DefaultGunResource implements IDBasedData<DefaultGunResource> {
     public boolean ejectShell = false;
     @SerializedName("CanZoom")
     public boolean canZoom = true;
+
+    public static class ItemDisplayInfo {
+        @SerializedName("translation")
+        public float[] translation = new float[]{0, 0, 0};
+
+        @SerializedName("rotation")
+        public float[] rotation = new float[]{0, 0, 0};
+
+        @SerializedName("scale")
+        public float[] scale = new float[]{1, 1, 1};
+    }
 }
