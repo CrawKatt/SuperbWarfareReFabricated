@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
 import com.atsuishio.superbwarfare.client.map.TacticalMapChunkListener;
 import com.atsuishio.superbwarfare.client.model.DragonTeethObjModelLoader;
-import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler;
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
 import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
@@ -64,7 +63,6 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         if (FabricLoader.getInstance().isModLoaded("ponder")) {
             PonderIndex.addPlugin(SBWPonderPlugin.INSTANCE);
         }
-        ThermalShaderHandler.register();
         ClientEventHandler.register();
         NetworkRegistryKt.registerClientReceivers();
         ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> {
