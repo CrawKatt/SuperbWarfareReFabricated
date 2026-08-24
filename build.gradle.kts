@@ -161,21 +161,10 @@ dependencies {
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:15.0.140")
 
     include(modImplementation("com.github.Sh1roCu:SimpleBedrockModel-Fabric:${project.property("simple_bedrock_model_version")}")!!)
-
-    // ModernKeyBinding (contextos de conflicto y modificadores de teclas estilo NeoForge)
-    // Pin al commit 17bf4f7: el HEAD de Fabric/1.21 tiene un fabric.mod.json con JSON inválido.
     include(modImplementation("com.github.Nova-Committee:ModernKeyBinding:17bf4f794ae3ce31aee90e0df67e2757c3533d10")!!)
-
-    // Ponder (escenas de investigación)
     modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("parchment_minecraft_version")}:${project.property("ponder_version")}")
 
-    // Sable (física)
-    // El companion-common se publica con nombres Mojang y sin atributo de versión de Loom, por lo que
-    // se usa como compileOnly plano. SubLevel (que vive en el mod Sable, publicado remapeado a
-    // intermediary con Loom 1.16) se provee mediante el source set "sableStub", que solo participa
-    // en la compilación y nunca se empaqueta: en runtime la clase real la aporta Sable.
     compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-${project.property("parchment_minecraft_version")}:${project.property("sable_companion_version")}")
-    // Rhino (motor JS para scripts de vehículos; fork de ywzj, namespace org.mozillaa)
     implementation("org.ywzj:rhino:1.8.1-SNAPSHOT")
     include("org.ywzj:rhino:1.8.1-SNAPSHOT")
 
