@@ -2,6 +2,7 @@
   "required": true,
   "package": "com.atsuishio.superbwarfare.mixins",
   "compatibilityLevel": "JAVA_21",
+  "plugin": "com.atsuishio.superbwarfare.mixins.plugin.MixinPlugin",
   "refmap": "superbwarfare.mixins.refmap.json",
   "mixins": [
     "AnvilMenuMixin",
@@ -62,7 +63,8 @@
     "PlayerItemInHandLayerMixin",
     "PlayerRendererMixin",
     "RenderTargetMixin",
-    "ScreenAccessor"
+    "ScreenAccessor",
+    "tacz.CameraEventHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

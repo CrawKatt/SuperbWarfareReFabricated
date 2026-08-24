@@ -38,7 +38,7 @@
     "superbwarfare.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16.9",
+    "fabricloader": ">=${loader_version}",
     "minecraft": "~1.21.1",
     "java": ">=21",
     "fabric-api": "*",
@@ -55,6 +55,7 @@
     "kubejs": "*",
     "patchouli": "*",
     "realcamera": "*",
+    "tacz": "*",
     "thermoo": "*",
     "touhou_little_maid": "*",
     "scorchful": "*",

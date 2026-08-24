@@ -57,6 +57,12 @@ public abstract class CameraMixin implements ICustomCamera {
     @Shadow
     protected abstract void setPosition(double x, double y, double z);
 
+    @Shadow
+    private float xRot;
+
+    @Shadow
+    private float yRot;
+
     @Inject(method = "setup", at = @At("HEAD"))
     private void superbWarfare$capturePartialTicks(BlockGetter level, Entity entity, boolean detached,
                                                     boolean thirdPersonReverse, float partialTicks, CallbackInfo ci) {
@@ -91,6 +97,7 @@ public abstract class CameraMixin implements ICustomCamera {
 
                     setRotation(drone.getYaw(partialTicks), drone.getPitch(partialTicks));
                     setPosition(worldPosition.x, worldPosition.y, worldPosition.z);
+                    superbWarfare$applyComputedAnglesToCustomCamera();
                     info.cancel();
                 } else {
                     var rotation = drone.getCameraRotation(partialTicks, player, false, false);
@@ -103,6 +110,7 @@ public abstract class CameraMixin implements ICustomCamera {
                     }
 
                     if (rotation != null || position != null) {
+                        superbWarfare$applyComputedAnglesToCustomCamera();
                         info.cancel();
                     }
                 }
@@ -121,6 +129,7 @@ public abstract class CameraMixin implements ICustomCamera {
             }
 
             if (rotation != null || position != null) {
+                superbWarfare$applyComputedAnglesToCustomCamera();
                 info.cancel();
             }
 
@@ -175,6 +184,12 @@ public abstract class CameraMixin implements ICustomCamera {
         ClientEventHandler.computeCameraAngles(context);
         superbWarfare$computedYaw = context.getYaw();
         superbWarfare$computedPitch = context.getPitch();
+    }
+
+    @Unique
+    private void superbWarfare$applyComputedAnglesToCustomCamera() {
+        superbWarfare$computeAngles(this.yRot, this.xRot);
+        setRotation(superbWarfare$computedYaw, superbWarfare$computedPitch);
     }
 
     @Inject(method = "setup", at = @At("TAIL"))

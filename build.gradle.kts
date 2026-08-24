@@ -131,6 +131,12 @@ dependencies {
 
     modCompileOnly("com.github.thedeathlycow:thermoo:v4.8.0")
     modRuntimeOnly("com.github.thedeathlycow:thermoo:v4.8.0")
+    modCompileOnly("maven.modrinth:1j76DVHU:sqMweCpe")
+    modRuntimeOnly("maven.modrinth:1j76DVHU:sqMweCpe")
+    runtimeOnly("org.apache.commons:commons-math3:3.6.1")
+    runtimeOnly("com.github.FiguraMC.luaj:luaj-core:3.0.8-figura")
+    runtimeOnly("com.github.FiguraMC.luaj:luaj-jse:3.0.8-figura")
+    runtimeOnly("org.apache.bcel:bcel:6.6.1")
     modRuntimeOnly("maven.modrinth:touhoulittlemaid-orihime:0.6.2-neo1.5.0")
     runtimeOnly("org.openjdk.nashorn:nashorn-core:15.4")
 
