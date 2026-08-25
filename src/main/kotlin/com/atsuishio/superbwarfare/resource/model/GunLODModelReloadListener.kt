@@ -3,8 +3,7 @@ package com.atsuishio.superbwarfare.resource.model
 import com.atsuishio.superbwarfare.client.model.gun.GeoGunModel
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.animation.BedrockAnimation
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.resource.pojo.BedrockModelPOJO
-import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.baked.BakedBedrockModel
-import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.baked.BakerOptions
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.tree.TreeBedrockModel
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.ResourceManager
 import net.minecraft.util.profiling.ProfilerFiller
@@ -22,16 +21,7 @@ object GunLODModelReloadListener : BedrockModelReloadListener<GeoGunModel>(
         this.animations.clear()
 
         map.forEach { (location, pojo) ->
-            val id = this.idToModelPaths.entries.firstOrNull { it.value == location }?.key
-            val animPath = id?.let { i -> this.animPathToIds.entries.firstOrNull { it.value == i }?.key }
-            val anim = animPath?.let { this.animFiles[it] }
-            val options = if (anim != null) {
-                BakerOptions.ofAnimationFile(anim)
-            } else {
-                BakerOptions.defaults()
-            }.withPreservedBoneRegexes(GunModelReloadListener.PATTERNS)
-
-            val baseModel = BakedBedrockModel.bake(pojo, options)
+            val baseModel = TreeBedrockModel.bake(pojo)
             this.models[location] = GeoGunModel(baseModel)
         }
 

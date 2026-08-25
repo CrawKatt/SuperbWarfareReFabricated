@@ -6,9 +6,9 @@ import com.atsuishio.superbwarfare.resource.model.GunModelReloadListener
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.mc
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
-import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.baked.BakedBedrockModel
-import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BoneState
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.TreeModelInstance
+import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.tree.TreeBedrockModel
 import com.maydaymemory.mae.basic.Pose
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.player.LocalPlayer
@@ -23,19 +23,19 @@ import org.joml.Vector3f
 import java.util.*
 
 /**
- * Baked SBM gun model wrapper used by the first-person gun renderer.
+ * Tree SBM gun model wrapper used by the first-person gun renderer.
  *
- * The baked model is immutable and shared between guns of the same type; the
+ * The tree model is immutable and shared between guns of the same type; the
  * runtime instance carries per-render pose state. Hand bones are kept separate
  * from the gun geometry so the renderer can choose to draw real player arms.
  *
- * Code based on TAC-Z-Respawn
+ * Code based on TAC-Z-Respawn.
  */
 open class GeoGunModel @JvmOverloads constructor(
-    val baseModel: BakedBedrockModel,
+    val baseModel: TreeBedrockModel,
     var renderHand: Boolean = true
 ) {
-    val instance: BakedModelInstance = baseModel.createInstance()
+    val instance: TreeModelInstance = baseModel.createInstance()
 
     protected val rootBoneIndex: Int = baseModel.getIndex(ROOT_BONE)
     protected val gunBoneIndex: Int = baseModel.getIndex(GUN_BONE)

@@ -1,12 +1,6 @@
 {
   "Icon": "superbwarfare:textures/gun_icon/taser_icon.png",
   "SlotIcon": "superbwarfare:textures/item/taser_icon.png",
-  "ItemDisplay": {
-    "firstperson_righthand": {
-      "translation": [1.75, -4.75, -30.75],
-      "scale": [1, 1, 1]
-    }
-  },
   "Animation": {
     "Idle": "animation.taser.idle",
     "Reload": "animation.taser.reload"
