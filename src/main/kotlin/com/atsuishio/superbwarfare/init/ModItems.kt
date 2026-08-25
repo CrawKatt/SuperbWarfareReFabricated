@@ -49,6 +49,11 @@ import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.registries.DeferredRegister
 import net.minecraftforge.registries.ForgeRegistries
 import net.minecraftforge.registries.RegistryObject
+import kotlin.reflect.full.createInstance
+
+private typealias ItemRegistry = RegistryObject<Item>
+private typealias BlockRegistry = RegistryObject<Block>
+private typealias PerkRegistry = RegistryObject<Perk>
 
 @Suppress("unused")
 object ModItems {
@@ -60,7 +65,7 @@ object ModItems {
     /**
      * guns
      */
-    private fun registerGun(id: String, gun: () -> GunItem): RegistryObject<Item> = GUNS.register(id, gun)
+    private fun <T : GunItem> registerGun(id: String, gun: () -> T): ItemRegistry = GUNS.register(id, gun)
 
     @JvmField
     val GUNS: DeferredRegister<Item> = DeferredRegister.create(ForgeRegistries.ITEMS, Mod.MODID)
@@ -121,7 +126,7 @@ object ModItems {
      * Ammo
      */
     private fun registerAmmo(id: String) = registerAmmo(id) { Item(Properties()) }
-    private fun registerAmmo(id: String, ammo: () -> Item): RegistryObject<Item> = AMMO.register(id, ammo)
+    private fun <T : Item> registerAmmo(id: String, ammo: () -> T): ItemRegistry = AMMO.register(id, ammo)
 
     @JvmField
     val AMMO: DeferredRegister<Item> = DeferredRegister.create(ForgeRegistries.ITEMS, Mod.MODID)
@@ -195,11 +200,13 @@ object ModItems {
      * items
      */
     private fun registerItem(id: String) = registerItem(id) { Item(Properties()) }
-    private fun registerItem(id: String, item: () -> Item): RegistryObject<Item> = ITEMS.register(id, item)
-    private inline fun <reified T : Item> registerItem(noinline item: () -> T): RegistryObject<Item> {
-        val name = T::class.java.simpleName.substringBeforeLast("Item")
-        val id = name.camelToSnake()
-        return registerItem(id, item)
+    private fun registerItem(id: String, item: () -> Item): ItemRegistry = ITEMS.register(id, item)
+
+    @JvmName("registerItemByClass")
+    private inline fun <reified T : Item> registerItem(
+        id: String = T::class.java.simpleName.substringBeforeLast("Item").camelToSnake()
+    ): ItemRegistry {
+        return registerItem(id) { T::class.objectInstance ?: T::class.createInstance() }
     }
 
     private fun registerBlueprint(id: String, rarity: Rarity) = registerItem(id) { BlueprintItem(rarity) }
@@ -265,7 +272,7 @@ object ModItems {
     @JvmField val HANDSOME_GOGGLES = registerItem("handsome_goggles") { HandsomeGogglesItem() }
     @JvmField val TACTICAL_TERMINAL = registerItem("tactical_terminal") { TacticalTerminalItem() }
 
-    @JvmField val SONIC_ABSORBER = registerItem { SonicAbsorberItem() }
+    @JvmField val SONIC_ABSORBER = registerItem<SonicAbsorberItem>()
 
     @JvmField val CRUST = registerItem("crust") { CrustItem() }
 
@@ -416,10 +423,10 @@ object ModItems {
      * Block
      */
 
-    private fun registerBlock(block: RegistryObject<Block>) =
+    private fun registerBlock(block: BlockRegistry) =
         registerBlock(block.id.path) { BlockItem(block.get(), Properties()) }
 
-    private fun registerBlock(id: String, block: () -> BlockItem): RegistryObject<Item> =
+    private fun registerBlock(id: String, block: () -> BlockItem): ItemRegistry =
         BLOCKS.register(id, block)
 
     @JvmField
@@ -476,7 +483,7 @@ object ModItems {
      * Vehicle
      */
     private fun registerVehicle(id: String) = registerVehicle(id) { Item(Properties()) }
-    private fun registerVehicle(id: String, item: () -> Item): RegistryObject<Item> =
+    private fun <T : Item> registerVehicle(id: String, item: () -> T): ItemRegistry =
         VEHICLES.register(id, item)
 
     // @formatter:off
@@ -490,10 +497,10 @@ object ModItems {
     @JvmRecord
     data class Materials(
         val name: String,
-        val barrel: RegistryObject<Item>,
-        val action: RegistryObject<Item>,
-        val spring: RegistryObject<Item>,
-        val trigger: RegistryObject<Item>,
+        val barrel: ItemRegistry,
+        val action: ItemRegistry,
+        val spring: ItemRegistry,
+        val trigger: ItemRegistry,
     )
 
     private fun registerMaterials(name: String): Materials {
@@ -510,11 +517,12 @@ object ModItems {
      * Perk Items
      */
 
-    private fun registerPerkItem(id: String, item: () -> Item): RegistryObject<Item> =
+    private fun <T : Item> registerPerkItem(id: String, item: () -> T): ItemRegistry =
         PERKS.register(id, item)
 
     @JvmField
-    val PERK_ITEMS: MutableMap<RegistryObject<Perk>, RegistryObject<Item>> = mutableMapOf()
+    val PERK_ITEMS: MutableMap<PerkRegistry, ItemRegistry> =
+        mutableMapOf()
 
     @JvmField
     val PERKS: DeferredRegister<Item> = DeferredRegister.create(ForgeRegistries.ITEMS, Mod.MODID)
@@ -523,8 +531,8 @@ object ModItems {
      * 单独注册，用于Tab图标，不要删
      */
     // @formatter:off
-    @JvmField var AP_BULLET: RegistryObject<Item>? = null
-    @JvmField var INTELLIGENT_CHIP: RegistryObject<Item>? = null
+    @JvmField var AP_BULLET: ItemRegistry? = null
+    @JvmField var INTELLIGENT_CHIP: ItemRegistry? = null
     // @formatter:on
 
     private fun registerPerkItems() {
@@ -536,7 +544,7 @@ object ModItems {
         INTELLIGENT_CHIP = PERK_ITEMS[ModPerks.INTELLIGENT_CHIP]
     }
 
-    private fun registerSinglePerkItem(perk: RegistryObject<Perk>) {
+    private fun registerSinglePerkItem(perk: PerkRegistry) {
         PERK_ITEMS[perk] = registerPerkItem(perk.id.path) { PerkItem(perk) }
     }
 
@@ -546,7 +554,7 @@ object ModItems {
     // @formatter:on
 
     fun registerDispenserBehavior() {
-        val list: MutableList<RegistryObject<Item>> = mutableListOf()
+        val list = mutableListOf<ItemRegistry>()
         list.addAll(AMMO.entries)
         list.addAll(ITEMS.entries)
 

@@ -180,3 +180,5 @@ class Mod {
         fun queueClientWork(tick: Int, action: Runnable) = CLIENT_QUEUE.add(Task(action, tick))
     }
 }
+
+fun registerToEventBus(obj: Any) = MinecraftForge.EVENT_BUS.register(obj)
