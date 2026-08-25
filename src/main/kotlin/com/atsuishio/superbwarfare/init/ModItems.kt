@@ -59,6 +59,8 @@ private typealias ItemRegistry = RegistryObject<Item>
 private typealias BlockRegistry = RegistryObject<Block>
 private typealias PerkRegistry = RegistryObject<Perk>
 
+private typealias SpawnEggItem = ForgeSpawnEggItem
+
 @Suppress("unused")
 object ModItems {
 
@@ -248,13 +250,13 @@ object ModItems {
 
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
-         ForgeSpawnEggItem(ModEntities.SENPAI, -11584987, -14014413, Properties())
+         SpawnEggItem(ModEntities.SENPAI, -11584987, -14014413, Properties())
     }
     @JvmField val CREEPING_SENPAI_SPAWN_EGG = registerItem("creeping_senpai_spawn_egg") {
-        ForgeSpawnEggItem(ModEntities.CREEPING_SENPAI, -11584987, 3288889, Properties())
+        SpawnEggItem(ModEntities.CREEPING_SENPAI, -11584987, 3288889, Properties())
     }
     @JvmField val STEEL_COIL_SPAWN_EGG = registerItem("steel_coil_spawn_egg") {
-        ForgeSpawnEggItem(ModEntities.STEEL_COIL, 0, 0xc0c0c0, Properties())
+        SpawnEggItem(ModEntities.STEEL_COIL, 0, 0xc0c0c0, Properties())
     }
     @JvmField val ANCIENT_CPU = registerItem("ancient_cpu") { Item(Properties().rarity(Rarity.RARE)) }
     @JvmField val PROPELLER = registerItem("propeller")
