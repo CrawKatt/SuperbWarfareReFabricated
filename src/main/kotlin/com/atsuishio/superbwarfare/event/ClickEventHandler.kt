@@ -96,7 +96,7 @@ object ClickEventHandler {
 
     @JvmStatic
     fun forwardVanillaMouseButtonIfNeeded(button: Int, action: Int) {
-        if (notInGame || !hasModMouseConflict(button)) {
+        if (FabricLoader.getInstance().isModLoaded("kilt") || notInGame || !hasModMouseConflict(button)) {
             return
         }
 
