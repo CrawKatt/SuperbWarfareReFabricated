@@ -23,6 +23,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
+import org.joml.Matrix4f
 
 open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 
@@ -58,11 +59,6 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         packedLight: Int,
         partialTick: Float
     ) {
-        if (GunResource.compute(stack).itemDisplay[displayKey(transformType)] == null) {
-            super.renderFirstPerson(player, stack, transformType, poseStack, bufferSource, packedLight, partialTick)
-            return
-        }
-
         render(stack, transformType, poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY, partialTick)
     }
 
@@ -73,7 +69,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         partialTick: Float
     ) {
         val display = GunResource.compute(stack).itemDisplay[displayKey(transformType)]
-        if (display != null) {
+        if (display != null && !transformType.firstPerson()) {
             applyItemDisplayTransform(poseStack, display)
         }
         super.beforeRender(poseStack, transformType, stack, partialTick)
@@ -91,7 +87,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val resource = GunResource.compute(stack)
         val modelResource = resource.model ?: return
 
-        val useLod = transformType != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
+        val useLod = !transformType.firstPerson()
                 && DisplayConfig.ENABLE_GUN_LOD.get()
                 && !RenderDistanceHelper.isInGui()
         val model = if (useLod) {
@@ -117,9 +113,15 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
             if (pose != null) {
                 model.applyPose(BLENDER.blend(model.getBindPose(), pose))
             }
+            applyFirstPersonPositioningTransform(poseStack, model)
         }
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         model.resetPose()
+    }
+
+    private fun applyFirstPersonPositioningTransform(poseStack: PoseStack, model: GeoGunModel) {
+        val idleViewTransform = model.getGlobalTransform(IDLE_VIEW_BONE) ?: return
+        poseStack.mulPoseMatrix(Matrix4f(idleViewTransform).invert())
     }
 
     private fun applyItemDisplayTransform(poseStack: PoseStack, display: DefaultGunResource.ItemDisplayInfo) {
@@ -156,6 +158,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
     }
 
     companion object {
+        private const val IDLE_VIEW_BONE = "idle_view"
+
         private val BLENDER: EulerAdditiveBlender =
             SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }
     }
