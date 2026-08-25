@@ -71,8 +71,7 @@ object ModItems {
      * 支持 object 或 class 两种物品类写法，失败时给出明确的注册错误信息。
      */
     private fun <T : Any> getInstanceOrCreate(cls: KClass<T>): T {
-        cls.objectInstance?.let { return it }
-        return try {
+        return cls.objectInstance ?: try {
             cls.createInstance()
         } catch (e: Exception) {
             throw IllegalStateException(
