@@ -51,6 +51,11 @@ import net.neoforged.neoforge.common.DeferredSpawnEggItem
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 import java.util.function.Supplier
+import kotlin.reflect.full.createInstance
+
+private typealias ItemRegistry<T> = DeferredHolder<Item, T>
+private typealias BlockRegistry<T> = DeferredHolder<Block, T>
+private typealias PerkRegistry<T> = DeferredHolder<Perk, T>
 
 @Suppress("unused")
 object ModItems {
@@ -62,7 +67,7 @@ object ModItems {
     /**
      * guns
      */
-    private fun <T : GunItem> registerGun(id: String, gun: () -> T): DeferredHolder<Item, T> = GUNS.register(id, gun)
+    private fun <T : GunItem> registerGun(id: String, gun: () -> T): ItemRegistry<T> = GUNS.register(id, gun)
 
     @JvmField
     val GUNS: DeferredRegister<Item> = DeferredRegister.create(BuiltInRegistries.ITEM, Mod.MODID)
@@ -122,7 +127,7 @@ object ModItems {
      * Ammo
      */
     private fun registerAmmo(id: String) = registerAmmo(id) { Item(Properties()) }
-    private fun <T : Item> registerAmmo(id: String, ammo: () -> T): DeferredHolder<Item, T> = AMMO.register(id, ammo)
+    private fun <T : Item> registerAmmo(id: String, ammo: () -> T): ItemRegistry<T> = AMMO.register(id, ammo)
 
     @JvmField
     val AMMO: DeferredRegister<Item> = DeferredRegister.create(BuiltInRegistries.ITEM, Mod.MODID)
@@ -196,11 +201,13 @@ object ModItems {
      * items
      */
     private fun registerItem(id: String) = registerItem(id) { Item(Properties()) }
-    private fun <T : Item> registerItem(id: String, item: () -> T): DeferredHolder<Item, T> = ITEMS.register(id, item)
-    private inline fun <reified T : Item> registerItem(noinline item: () -> T): DeferredHolder<Item, T> {
-        val name = T::class.java.simpleName.substringBeforeLast("Item")
-        val id = name.camelToSnake()
-        return registerItem(id, item)
+    private fun <T : Item> registerItem(id: String, item: () -> T): ItemRegistry<T> = ITEMS.register(id, item)
+
+    @JvmName("registerItemByClass")
+    private inline fun <reified T : Item> registerItem(
+        id: String = T::class.java.simpleName.substringBeforeLast("Item").camelToSnake()
+    ): ItemRegistry<T> {
+        return registerItem(id) { T::class.objectInstance ?: T::class.createInstance() }
     }
 
     private fun registerBlueprint(id: String, rarity: Rarity) = registerItem(id) { BlueprintItem(rarity) }
@@ -271,7 +278,7 @@ object ModItems {
     @JvmField val HANDSOME_GOGGLES = registerItem("handsome_goggles") { HandsomeGogglesItem() }
     @JvmField val TACTICAL_TERMINAL = registerItem("tactical_terminal") { TacticalTerminalItem() }
 
-    @JvmField val SONIC_ABSORBER = registerItem { SonicAbsorberItem() }
+    @JvmField val SONIC_ABSORBER = registerItem<SonicAbsorberItem>()
 
     @JvmField val CRUST = registerItem("crust") { CrustItem() }
 
@@ -422,10 +429,10 @@ object ModItems {
      * Block
      */
 
-    private fun <T : Block> registerBlock(block: DeferredHolder<Block, T>) =
+    private fun <T : Block> registerBlock(block: BlockRegistry<T>) =
         registerBlock(block.id.path) { BlockItem(block.get(), Properties()) }
 
-    private fun registerBlock(id: String, block: () -> BlockItem): DeferredHolder<Item, BlockItem> =
+    private fun registerBlock(id: String, block: () -> BlockItem): ItemRegistry<BlockItem> =
         BLOCKS.register(id, block)
 
     @JvmField
@@ -482,7 +489,7 @@ object ModItems {
      * Vehicle
      */
     private fun registerVehicle(id: String) = registerVehicle(id) { Item(Properties()) }
-    private fun <T : Item> registerVehicle(id: String, item: () -> T): DeferredHolder<Item, T> =
+    private fun <T : Item> registerVehicle(id: String, item: () -> T): ItemRegistry<T> =
         VEHICLES.register(id, item)
 
     // @formatter:off
@@ -496,10 +503,10 @@ object ModItems {
     @JvmRecord
     data class Materials(
         val name: String,
-        val barrel: DeferredHolder<Item, Item>,
-        val action: DeferredHolder<Item, Item>,
-        val spring: DeferredHolder<Item, Item>,
-        val trigger: DeferredHolder<Item, Item>,
+        val barrel: ItemRegistry<Item>,
+        val action: ItemRegistry<Item>,
+        val spring: ItemRegistry<Item>,
+        val trigger: ItemRegistry<Item>,
     )
 
     private fun registerMaterials(name: String): Materials {
@@ -516,11 +523,11 @@ object ModItems {
      * Perk Items
      */
 
-    private fun <T : Item> registerPerkItem(id: String, item: () -> T): DeferredHolder<Item, T> =
+    private fun <T : Item> registerPerkItem(id: String, item: () -> T): ItemRegistry<T> =
         PERKS.register(id, item)
 
     @JvmField
-    val PERK_ITEMS: MutableMap<DeferredHolder<Perk, out Perk>, DeferredHolder<Item, out PerkItem>> =
+    val PERK_ITEMS: MutableMap<PerkRegistry<out Perk>, ItemRegistry<out PerkItem>> =
         mutableMapOf()
 
     @JvmField
@@ -530,8 +537,8 @@ object ModItems {
      * 单独注册，用于Tab图标，不要删
      */
     // @formatter:off
-    @JvmField var AP_BULLET: DeferredHolder<Item, out PerkItem>? = null
-    @JvmField var INTELLIGENT_CHIP: DeferredHolder<Item, out PerkItem>? = null
+    @JvmField var AP_BULLET: ItemRegistry<out PerkItem>? = null
+    @JvmField var INTELLIGENT_CHIP: ItemRegistry<out PerkItem>? = null
     // @formatter:on
 
     private fun registerPerkItems() {
@@ -543,7 +550,7 @@ object ModItems {
         INTELLIGENT_CHIP = PERK_ITEMS[ModPerks.INTELLIGENT_CHIP]
     }
 
-    private fun registerSinglePerkItem(perk: DeferredHolder<Perk, out Perk>) {
+    private fun registerSinglePerkItem(perk: PerkRegistry<out Perk>) {
         PERK_ITEMS[perk] = registerPerkItem(perk.id.path) { PerkItem { perk.get() } }
     }
 
@@ -553,7 +560,7 @@ object ModItems {
     // @formatter:on
 
     fun registerDispenserBehavior() {
-        val list = mutableListOf<DeferredHolder<Item, out Item>>()
+        val list = mutableListOf<ItemRegistry<out Item>>()
         list.addAll(AMMO.entries)
         list.addAll(ITEMS.entries)
 

@@ -166,3 +166,5 @@ class Mod(bus: IEventBus, container: ModContainer) {
         fun queueClientWork(tick: Int, action: Runnable) = CLIENT_QUEUE.add(AbstractMap.SimpleEntry(action, tick))
     }
 }
+
+fun registerToEventBus(obj: Any) = NeoForge.EVENT_BUS.register(obj)
