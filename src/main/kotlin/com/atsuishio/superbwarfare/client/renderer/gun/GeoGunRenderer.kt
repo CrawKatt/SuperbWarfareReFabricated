@@ -117,6 +117,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
             if (pose != null) {
                 model.applyPose(BLENDER.blend(model.getBindPose(), pose))
             }
+            ClientEventHandler.gunRootMoveV2(poseStack, 0f, 0f, 0f, false)
             applyFirstPersonPositioningTransform(poseStack, model)
         }
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
