@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.item.gun.special
 
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.item.gun.GunItem
-import com.atsuishio.superbwarfare.registerToEventBus
+import com.atsuishio.superbwarfare.registerToModBus
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent
@@ -10,7 +10,7 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 object TaserV2Item : GunItem(Properties()) {
 
     init {
-        registerToEventBus(this)
+        registerToModBus(this)
     }
 
     @SubscribeEvent

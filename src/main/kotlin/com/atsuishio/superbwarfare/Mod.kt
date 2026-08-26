@@ -40,6 +40,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
 import net.neoforged.neoforge.registries.DataPackRegistryEvent
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -168,3 +169,5 @@ class Mod(bus: IEventBus, container: ModContainer) {
 }
 
 fun registerToEventBus(obj: Any) = NeoForge.EVENT_BUS.register(obj)
+
+fun registerToModBus(obj: Any) = MOD_BUS.register(obj)

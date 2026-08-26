@@ -4,7 +4,7 @@ import com.atsuishio.superbwarfare.client.renderer.item.SkinSprayRenderer
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.network.message.receive.OpenVehicleSkinScreenMessage
-import com.atsuishio.superbwarfare.registerToEventBus
+import com.atsuishio.superbwarfare.registerToModBus
 import com.atsuishio.superbwarfare.tools.mc
 import com.atsuishio.superbwarfare.tools.sendPacket
 import net.minecraft.world.InteractionHand
@@ -19,7 +19,7 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 object SkinSprayItem : Item(Properties().stacksTo(1)), IVehicleInteract {
 
     init {
-        registerToEventBus(this)
+        registerToModBus(this)
     }
 
     override fun onInteractVehicle(
