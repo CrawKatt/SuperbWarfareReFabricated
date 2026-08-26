@@ -52,6 +52,7 @@
     "ClientLevelMixin",
     "ClientPacketListenerMixin",
     "ClientPlayerEntityMixin",
+    "EffectInstanceMixin",
     "EntityRenderDispatcherMixin",
     "EntityRendererMixin",
     "FogRendererMixin",

@@ -15,7 +15,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -58,8 +60,8 @@ public class GameRendererMixin {
                 changingFov
         );
 
-        ClientEventHandler.onFovUpdate(context);
         ClientEventHandler.captureFov(context);
+        ClientEventHandler.onFovUpdate(context);
 
         cir.setReturnValue(context.getFov());
     }
@@ -156,6 +158,28 @@ public class GameRendererMixin {
             if (source != null && source.is(ModTags.DamageTypes.NO_HURT_EFFECT)) {
                 ci.cancel();
             }
+        }
+    }
+
+    @Inject(method = "getNightVisionScale(Lnet/minecraft/world/entity/LivingEntity;F)F",
+            at = @At("RETURN"), cancellable = true)
+    private static void superbwarfare$getNightVisionScale(LivingEntity living, float nanoTime, CallbackInfoReturnable<Float> cir) {
+        boolean hasThermalImagingVehicle = false;
+
+        if (living.getVehicle() instanceof VehicleEntity vehicle) {
+            var index = vehicle.getSeatIndex(living);
+            var seats = vehicle.computed().seats();
+            if (index < 0 || index >= seats.size()) return;
+
+            var seat = seats.get(index);
+            if (seat.hasThermalImaging) {
+                hasThermalImagingVehicle = true;
+            }
+        }
+
+        if (ClientEventHandler.activeThermalImaging || ClientEventHandler.hasThermalImagingGoggles() || hasThermalImagingVehicle) {
+            cir.cancel();
+            cir.setReturnValue(living.hasEffect(MobEffects.NIGHT_VISION) ? 1f : 0f);
         }
     }
 }

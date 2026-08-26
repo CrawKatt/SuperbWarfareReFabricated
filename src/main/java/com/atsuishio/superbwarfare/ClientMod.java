@@ -14,7 +14,6 @@ import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
 import com.atsuishio.superbwarfare.client.renderer.special.TowingChainRenderer;
 import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.screens.SnapshotWarningScreen;
-import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler;
 import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.data.DataLoader;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -92,7 +91,7 @@ public class ClientMod implements ClientModInitializer {
         SyncedEntityWorldRenderer.register();
         TowingChainRenderer.register();
         OverlayTraceHandler.register();
-        ThermalShaderHandler.register();
+        //ThermalShaderHandler.register();
         ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> {
             if (entity instanceof ArtilleryEntity artillery) {
                 artillery.initializeShootVector();
