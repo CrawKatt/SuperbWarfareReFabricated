@@ -134,9 +134,4 @@ fun ItemStack.`is`(vararg items: Item): Boolean {
     return items.any { `is`(it) }
 }
 
-// 1.20 compat
-fun Player.getEntityReach() = PlayerReachTool.getEntityReach(this)
-
-fun Player.getBlockReach() = PlayerReachTool.getBlockReach(this)
-
 val Minecraft.deltaFrameTime get() = getDeltaFrameTime()

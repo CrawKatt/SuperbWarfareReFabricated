@@ -1,5 +1,9 @@
 {
+  "replace": false,
   "values": [
-    "superbwarfare:repair_tool"
+    {
+      "id": "superbwarfare:repair_tool",
+      "required": false
+    }
   ]
 }

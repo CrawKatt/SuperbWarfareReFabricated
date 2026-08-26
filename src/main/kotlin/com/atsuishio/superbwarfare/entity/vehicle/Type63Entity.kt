@@ -17,6 +17,7 @@ import com.atsuishio.superbwarfare.tools.OBB
 import com.atsuishio.superbwarfare.tools.OBB.Companion.getLookingObb
 import com.atsuishio.superbwarfare.tools.OBB.Companion.vector3dToVec3
 import com.atsuishio.superbwarfare.tools.ParticleTool.spawnMediumCannonMuzzleParticles
+import com.atsuishio.superbwarfare.tools.PlayerReachTool
 import it.unimi.dsi.fastutil.ints.IntArrayList
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -113,7 +114,7 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
         if (result != InteractionResult.PASS) return result
 
         val stack = player.mainHandItem
-        val lookingObb = getLookingObb(player, player.getEntityReach())
+        val lookingObb = getLookingObb(player, PlayerReachTool.getEntityReach(player))
         val level = this.level()
 
         if (stack.isEmpty) {
@@ -275,7 +276,7 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
     }
 
     fun lookingAtBarrel(player: Player): Boolean {
-        val lookingObb = getLookingObb(player, player.getEntityReach())
+        val lookingObb = getLookingObb(player, PlayerReachTool.getEntityReach(player))
 
         for (i in 0..11) {
             if (lookingObb === barrelObbs[i]) {

@@ -51,7 +51,7 @@
   },
   "suggests": {
     "cloth-config": "*",
-    "tacz": "*",
+    "tacz": "=0.7.0-forge1.1.8-hotfix",
     "touhou_little_maid": "*"
   },
   "breaks": {

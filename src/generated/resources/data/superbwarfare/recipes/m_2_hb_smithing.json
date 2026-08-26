@@ -1,7 +1,7 @@
 {
   "type": "minecraft:smithing_transform",
   "addition": {
-    "tag": "forge:storage_blocks/steel"
+    "tag": "c:storage_blocks/steel"
   },
   "base": {
     "item": "superbwarfare:rare_material_pack"

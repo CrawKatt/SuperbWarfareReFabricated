@@ -81,6 +81,13 @@ open class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), Trink
 
     companion object {
         const val TAG_OPEN: String = "Open"
+        const val TAG_VISIBLE: String = "Visible"
+
+        @JvmStatic
+        fun isVisible(stack: ItemStack): Boolean {
+            val tag = stack.tag ?: return true
+            return !tag.contains(TAG_VISIBLE) || tag.getBoolean(TAG_VISIBLE)
+        }
 
         @JvmStatic
         fun isParachuteOpen(entity: LivingEntity?): Boolean {
@@ -101,7 +108,13 @@ open class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), Trink
         fun isParachuteVisible(entity: LivingEntity?): Boolean {
             if (entity == null) return false
             return TrinketsApi.getTrinketComponent(entity)
-                .map { it.isEquipped(ModItems.PARACHUTE) }
+                .map {
+                    it.getEquipped(ModItems.PARACHUTE)
+                        .firstOrNull()
+                        ?.b
+                        ?.let { stack -> isVisible(stack) }
+                        ?: false
+                }
                 .orElse(false)
         }
     }

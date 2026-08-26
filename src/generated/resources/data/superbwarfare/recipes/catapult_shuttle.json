@@ -6,7 +6,7 @@
       "item": "minecraft:tripwire_hook"
     },
     "b": {
-      "tag": "forge:ingots/steel"
+      "tag": "c:ingots/steel"
     },
     "c": {
       "item": "minecraft:copper_ingot"

@@ -6,10 +6,10 @@
       "item": "minecraft:gunpowder"
     },
     "b": {
-      "tag": "forge:plates/steel"
+      "tag": "c:plates/steel"
     },
     "d": {
-      "tag": "forge:ingots/lead"
+      "tag": "c:ingots/lead"
     }
   },
   "pattern": [

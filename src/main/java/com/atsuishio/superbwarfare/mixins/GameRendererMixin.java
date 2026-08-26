@@ -18,7 +18,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
@@ -26,7 +25,6 @@ import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -37,18 +35,15 @@ public class GameRendererMixin {
 
     @Inject(method = "render", at = @At("HEAD"))
     private void superbWarfare$renderFramePre(float partialTick, long finishTimeNano, boolean renderLevel, CallbackInfo ci) {
-        superbwarfare$handleRenderTick();
+        if (Minecraft.getInstance().getFps() > 20) {
+            ClientEventHandler.handleWeaponFire();
+            ClientEventHandler.handleVehicleFire();
+        }
+        ClientEventHandler.handleWeaponBreathSway();
     }
 
     @Inject(method = "render", at = @At("TAIL"))
     private void superbWarfare$renderFramePost(float partialTick, long finishTimeNano, boolean renderLevel, CallbackInfo ci) {
-        superbwarfare$handleRenderTick();
-    }
-
-    @Unique
-    private static void superbwarfare$handleRenderTick() {
-        ClientEventHandler.handleWeaponFire();
-        ClientEventHandler.handleVehicleFire();
         ClientEventHandler.handleWeaponBreathSway();
     }
 
@@ -60,8 +55,8 @@ public class GameRendererMixin {
                 changingFov
         );
 
-        ClientEventHandler.captureFov(context);
         ClientEventHandler.onFovUpdate(context);
+        ClientEventHandler.captureFov(context);
 
         cir.setReturnValue(context.getFov());
     }

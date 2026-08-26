@@ -97,6 +97,7 @@ private fun registerPayloads() {
     playToServer<MeleeAttackMessage>()
     playToServer<MouseMoveMessage>()
     playToServer<ParachuteMessage>()
+    playToServer<ParachuteVisibilityMessage>()
     playToServer<PlayerStopRidingMessage>()
     playToServer<RadarChangeModeMessage>()
     playToServer<RadarSetPosMessage>()

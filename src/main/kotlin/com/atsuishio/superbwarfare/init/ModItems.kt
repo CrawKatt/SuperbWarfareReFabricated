@@ -567,5 +567,6 @@ object ModItems {
         TrinketsApi.registerTrinket(DOG_TAG, DOG_TAG as Trinket)
         TrinketsApi.registerTrinket(IFF, IFF as Trinket)
         TrinketsApi.registerTrinket(THERMAL_IMAGING_GOGGLES, THERMAL_IMAGING_GOGGLES as Trinket)
+        TrinketsApi.registerTrinket(TACTICAL_TERMINAL, TACTICAL_TERMINAL as Trinket)
     }
 }

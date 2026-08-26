@@ -3,7 +3,7 @@
   "category": "aircraft",
   "inputs": [
     "2 minecraft:bucket",
-    "#forge:storage_blocks/steel",
+    "#c:storage_blocks/steel",
     "2 #minecraft:planks",
     "superbwarfare:light_armament_module",
     "superbwarfare:small_battery_pack",

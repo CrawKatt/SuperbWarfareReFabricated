@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.tacz.guns.api.TimelessAPI
 import com.tacz.guns.api.event.common.EntityHurtByGunEvent
 import com.tacz.guns.api.item.IGun
-import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 
@@ -20,11 +19,11 @@ object TACZGunEventHandler {
     }
 
     fun hasMod(): Boolean {
-        return FabricLoader.getInstance().isModLoaded("tacz")
+        return TaczCompat.isLoaded()
     }
 
     fun compatCondition(): Boolean {
-        return hasMod()
+        return TaczCompat.isCompatible()
     }
 
     fun getTaczCompatIcon(stack: ItemStack): ResourceLocation? {

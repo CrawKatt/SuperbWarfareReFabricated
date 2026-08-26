@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.inventory.menu
 
-import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModItems
@@ -72,12 +71,6 @@ open class FuMO25Menu(
             this.addSlot(Slot(inventory, k, 8 + k * 18 + X_OFFSET, 142 + Y_OFFSET))
         }
 
-        val player = inventory.player
-        if (player is ServerPlayer) {
-            queueServerWork(1) {
-                if (player.containerMenu === this) onOpened(player)
-            }
-        }
     }
 
     fun setPos(x: Int, y: Int, z: Int) {

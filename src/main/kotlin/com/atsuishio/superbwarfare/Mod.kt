@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.command.CommandRegister
 import com.atsuishio.superbwarfare.compat.tacz.TACZGunEventHandler
+import com.atsuishio.superbwarfare.compat.tacz.TaczCompat
 import com.atsuishio.superbwarfare.config.CommonConfig
 import com.atsuishio.superbwarfare.config.ServerConfig
 import com.atsuishio.superbwarfare.data.CustomData
@@ -30,12 +31,14 @@ import com.atsuishio.superbwarfare.event.custom.LivingTickCallback
 import com.atsuishio.superbwarfare.event.custom.LootingLevelCallback
 import com.atsuishio.superbwarfare.event.custom.MobEffectAddedCallback
 import com.atsuishio.superbwarfare.event.custom.MobEffectRemovedCallback
+import com.atsuishio.superbwarfare.event.custom.PlayerMenuOpenedCallback
 import com.atsuishio.superbwarfare.init.ModAttributes
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModCommandArguments
 import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModDamageTypes
+import com.atsuishio.superbwarfare.init.ModDatapackRegistries
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModGameRules
 import com.atsuishio.superbwarfare.init.ModItems
@@ -53,6 +56,7 @@ import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.init.ModVillagers
 import com.atsuishio.superbwarfare.init.ModWorldgen
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
+import com.atsuishio.superbwarfare.inventory.menu.EnergyMenu
 import com.atsuishio.superbwarfare.item.weapon.BeastItem
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect
@@ -95,6 +99,7 @@ private typealias Task = AbstractMap.SimpleEntry<Runnable, Int>
 class Mod : ModInitializer {
     override fun onInitialize() {
         LOGGER.info("Initializing Superb Warfare (Fabric)")
+        ModDatapackRegistries.init()
         WelcomeProcedure.onCommonSetup()
 
         registerClientBedrockModels()
@@ -102,8 +107,13 @@ class Mod : ModInitializer {
         callInits()
         ModWorldgen.register()
         CustomEventHandler.register()
-        if (FabricLoader.getInstance().isModLoaded("tacz")) {
+        if (TaczCompat.isCompatible()) {
             TACZGunEventHandler.registerEvents()
+        } else if (TaczCompat.isLoaded()) {
+            LOGGER.warn(
+                "Unsupported TACZ Fabric version; integration disabled (supported: {})",
+                TaczCompat.SUPPORTED_VERSION
+            )
         }
 
         NetworkRegistry.register()
@@ -180,6 +190,10 @@ class Mod : ModInitializer {
     }
 
     private fun registerCommonEvents() {
+        PlayerMenuOpenedCallback.EVENT.register { player, menu ->
+            if (menu is EnergyMenu) menu.onOpened(player)
+        }
+
         ServerPlayConnectionEvents.JOIN.register { handler, _, _ ->
             PlayerEventHandler.onPlayerLoggedIn(handler.player)
         }

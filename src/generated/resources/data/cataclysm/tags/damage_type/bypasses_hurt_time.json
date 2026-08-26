@@ -1,25 +1,89 @@
 {
+  "replace": false,
   "values": [
-    "superbwarfare:gunfire_absolute",
-    "superbwarfare:gunfire_headshot_absolute",
-    "superbwarfare:air_crash",
-    "superbwarfare:burn",
-    "superbwarfare:repair_tool",
-    "superbwarfare:projectile_hit",
-    "superbwarfare:grapeshot_hit",
-    "superbwarfare:custom_explosion",
-    "superbwarfare:drone_hit",
-    "superbwarfare:laser",
-    "superbwarfare:laser_headshot",
-    "superbwarfare:laser_static",
-    "superbwarfare:lunge_mine",
-    "superbwarfare:mine",
-    "superbwarfare:projectile_explosion",
-    "superbwarfare:shock",
-    "superbwarfare:vehicle_explosion",
-    "superbwarfare:vehicle_strike",
-    "superbwarfare:super_star_hit",
-    "superbwarfare:super_star_slash",
-    "superbwarfare:phosphorus_fire"
+    {
+      "id": "superbwarfare:gunfire_absolute",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:gunfire_headshot_absolute",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:air_crash",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:burn",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:repair_tool",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:projectile_hit",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:grapeshot_hit",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:custom_explosion",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:drone_hit",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:laser",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:laser_headshot",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:laser_static",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:lunge_mine",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:mine",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:projectile_explosion",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:shock",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:vehicle_explosion",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:vehicle_strike",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:super_star_hit",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:super_star_slash",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:phosphorus_fire",
+      "required": false
+    }
   ]
 }

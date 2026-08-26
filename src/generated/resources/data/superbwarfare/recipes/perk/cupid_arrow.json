@@ -1,4 +1,34 @@
 {
-  "type": "superbwarfare:cupid_arrow",
-  "category": "misc"
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "item": "superbwarfare:empty_perk"
+    },
+    "b": {
+      "item": "minecraft:bow"
+    },
+    "c": {
+      "tag": "minecraft:arrows"
+    },
+    "d": {
+      "fabric:type": "fabric:nbt",
+      "base": {
+        "item": "minecraft:potion"
+      },
+      "nbt": {
+        "Potion": "minecraft:healing"
+      },
+      "strict": true
+    }
+  },
+  "pattern": [
+    "cbc",
+    "dad",
+    "cbc"
+  ],
+  "result": {
+    "item": "superbwarfare:cupid_arrow"
+  },
+  "show_notification": true
 }

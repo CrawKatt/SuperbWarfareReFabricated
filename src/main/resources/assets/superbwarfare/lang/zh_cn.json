@@ -851,6 +851,7 @@
   "item.superbwarfare.ntw_20_blueprint": "NTW-20反器材狙击步枪蓝图",
   "item.superbwarfare.one_two_punch": "雪上加霜",
   "item.superbwarfare.parachute": "降落伞",
+  "gui.superbwarfare.parachute_visibility": "可见性：%s（鼠标中键）",
   "item.superbwarfare.phase_penetrating_bullet": "相位穿透弹",
   "item.superbwarfare.phosphorus_flame_bullet": "磷火弹",
   "item.superbwarfare.poisonous_bullet": "淬毒弹",

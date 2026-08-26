@@ -1,6 +1,9 @@
 {
   "variants": {
-    "": {
+    "powered=false": {
+      "model": "superbwarfare:block/fumo_25"
+    },
+    "powered=true": {
       "model": "superbwarfare:block/fumo_25"
     }
   }

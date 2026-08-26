@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "superbwarfare:cemented_carbide_ingot",
+    {
+      "id": "dreamaticvoyage:hqss_bread_ingot",
+      "required": false
+    }
+  ]
+}

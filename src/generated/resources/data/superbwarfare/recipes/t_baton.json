@@ -6,7 +6,7 @@
       "tag": "c:iron_ingots"
     },
     "b": {
-      "tag": "forge:ingots/steel"
+      "tag": "c:ingots/steel"
     }
   },
   "pattern": [

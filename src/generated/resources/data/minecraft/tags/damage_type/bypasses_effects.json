@@ -1,7 +1,17 @@
 {
+  "replace": false,
   "values": [
-    "superbwarfare:shock",
-    "superbwarfare:phosphorus_fire",
-    "superbwarfare:ammo_consumption"
+    {
+      "id": "superbwarfare:shock",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:phosphorus_fire",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:ammo_consumption",
+      "required": false
+    }
   ]
 }

@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.mixins.plugin;
 
+import com.atsuishio.superbwarfare.compat.tacz.TaczCompat;
 import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -23,7 +24,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.equals("com.atsuishio.superbwarfare.mixins.ClipContextMixin") && FabricLoader.getInstance().isModLoaded("porting_lib_base")) return false;
-        if (mixinClassName.contains(".tacz.")) return FabricLoader.getInstance().isModLoaded("tacz");
+        if (mixinClassName.contains(".tacz.")) return TaczCompat.isCompatible();
         return true;
     }
 

@@ -44,6 +44,8 @@ class ParachuteRenderer : TrinketRenderer {
         headYaw: Float,
         headPitch: Float
     ) {
+        if (!ParachuteItem.isVisible(stack)) return
+
         matrices.pushPose()
         matrices.scale(0.5f, 0.5f, 0.5f)
         matrices.translate(0.0, 1.25, 0.0)

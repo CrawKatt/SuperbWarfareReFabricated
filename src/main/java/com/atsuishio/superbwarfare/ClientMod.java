@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare;
 
 import com.atsuishio.superbwarfare.client.ClientRenderHandler;
 import com.atsuishio.superbwarfare.client.MouseMovementHandler;
+import com.atsuishio.superbwarfare.client.ParachuteVisibilityHandler;
 import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
 import com.atsuishio.superbwarfare.client.lighting.ClientLightingHandler;
 import com.atsuishio.superbwarfare.client.map.TacticalMapChunkListener;
@@ -10,11 +11,13 @@ import com.atsuishio.superbwarfare.client.molang.MolangVariable;
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
 import com.atsuishio.superbwarfare.client.renderer.SyncedEntityWorldRenderer;
+import com.atsuishio.superbwarfare.client.renderer.ModParticleRenderTypes;
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
 import com.atsuishio.superbwarfare.client.renderer.special.TowingChainRenderer;
 import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.screens.SnapshotWarningScreen;
 import com.atsuishio.superbwarfare.config.ClientConfig;
+import com.atsuishio.superbwarfare.compat.ponder.SBWPonderPlugin;
 import com.atsuishio.superbwarfare.data.DataLoader;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
@@ -39,6 +42,7 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.createmod.ponder.foundation.PonderIndex;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -56,6 +60,8 @@ public class ClientMod implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        PonderIndex.addPlugin(SBWPonderPlugin.INSTANCE);
+        ModParticleRenderTypes.INSTANCE.register();
         DragonTeethObjModelLoader.register();
         registerGuiIconModels();
         registerBuiltinResourcePacks();
@@ -79,6 +85,7 @@ public class ClientMod implements ClientModInitializer {
         ClientRenderHandler.registerItemDecorations();
         PotionMortarShellItem.registerColorHandler();
         ParachuteRenderer.onRenderLevelStage();
+        ParachuteVisibilityHandler.INSTANCE.register();
         ContainerBlockPreview.init();
         SnapshotWarningScreen.register();
 

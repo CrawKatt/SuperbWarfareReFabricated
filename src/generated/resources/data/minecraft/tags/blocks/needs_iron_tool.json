@@ -1,0 +1,27 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:diamond_block",
+    "minecraft:diamond_ore",
+    "minecraft:deepslate_diamond_ore",
+    "minecraft:emerald_ore",
+    "minecraft:deepslate_emerald_ore",
+    "minecraft:emerald_block",
+    "minecraft:gold_block",
+    "minecraft:raw_gold_block",
+    "minecraft:gold_ore",
+    "minecraft:deepslate_gold_ore",
+    "minecraft:redstone_ore",
+    "minecraft:deepslate_redstone_ore",
+    "superbwarfare:galena_ore",
+    "superbwarfare:scheelite_ore",
+    "superbwarfare:deepslate_galena_ore",
+    "superbwarfare:deepslate_scheelite_ore",
+    "superbwarfare:silver_ore",
+    "superbwarfare:deepslate_silver_ore",
+    "superbwarfare:raw_galena_block",
+    "superbwarfare:raw_scheelite_block",
+    "superbwarfare:raw_silver_block",
+    "superbwarfare:dragon_teeth"
+  ]
+}

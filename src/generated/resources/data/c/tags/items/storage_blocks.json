@@ -1,4 +1,5 @@
 {
+  "replace": false,
   "values": [
     "#c:storage_blocks/lead",
     "#c:storage_blocks/steel",

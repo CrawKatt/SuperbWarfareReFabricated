@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.client
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.decorator.ContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.LuckyContainerItemDecorator
+import com.atsuishio.superbwarfare.client.decorator.VehicleKeyItemDecorator
 import com.atsuishio.superbwarfare.client.model.curio.ParachuteModel
 import com.atsuishio.superbwarfare.client.model.curio.ThermalImagingGogglesModel
 import com.atsuishio.superbwarfare.client.overlay.*
@@ -61,6 +62,7 @@ object ClientRenderHandler {
 
     private val containerDecorator = ContainerItemDecorator()
     private val luckyContainerDecorator = LuckyContainerItemDecorator()
+    private val vehicleKeyDecorator = VehicleKeyItemDecorator()
 
     // Matches the 0.8.9 NeoForge below-overlay chain from bottom to top.
     private val overlays = listOf(
@@ -159,7 +161,8 @@ object ClientRenderHandler {
     @JvmStatic
     fun renderItemDecorations(guiGraphics: GuiGraphics, font: Font, stack: ItemStack, x: Int, y: Int) {
         if (containerDecorator.render(guiGraphics, font, stack, x, y)) return
-        luckyContainerDecorator.render(guiGraphics, font, stack, x, y)
+        if (luckyContainerDecorator.render(guiGraphics, font, stack, x, y)) return
+        vehicleKeyDecorator.render(guiGraphics, font, stack, x, y)
     }
 
     @JvmStatic

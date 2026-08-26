@@ -1,5 +1,4 @@
 {
-  "parent": "minecraft:recipes/root",
   "criteria": {
     "has_high_energy_explosives": {
       "conditions": {
@@ -26,10 +25,5 @@
       "has_the_recipe"
     ]
   ],
-  "rewards": {
-    "recipes": [
-      "superbwarfare:c4_bomb_rc"
-    ]
-  },
   "sends_telemetry_event": false
 }

@@ -448,6 +448,7 @@
   "item.superbwarfare.netherite_trigger": "Gatillo de Netherita",
   "item.superbwarfare.ntw_20_blueprint": "Plano de NTW-20",
   "item.superbwarfare.parachute": "Paracaídas",
+  "gui.superbwarfare.parachute_visibility": "Visibilidad: %s (clic central)",
   "item.superbwarfare.poisonous_bullet": "Bala Venenosa",
   "item.superbwarfare.potion_mortar_shell": "Proyectil de Mortero de Poción",
   "item.superbwarfare.powerful_attraction": "Atracción Poderosa",

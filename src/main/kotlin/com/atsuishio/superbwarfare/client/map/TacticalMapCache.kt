@@ -167,6 +167,14 @@ object TacticalMapCache {
     }
 
     fun clear() {
+        flushPendingDiskWrites()
+
+        for (pos in tileTextures.keys) {
+            try {
+                mc.textureManager.release(loc("map_tile_${pos.rx}_${pos.rz}"))
+            } catch (_: Exception) {
+            }
+        }
         tileImages.clear()
         tileTextures.clear()
         dirtyTiles.clear()
@@ -209,6 +217,7 @@ object TacticalMapCache {
         // LevelEvent.Unload handler may be skipped (config unavailable
         // during teardown), leaving stale data keyed to the old world.
         if (worldId != currentWorldId || dim != currentDimension) {
+            clear()
             initForDimension(dim, worldId)
         }
     }

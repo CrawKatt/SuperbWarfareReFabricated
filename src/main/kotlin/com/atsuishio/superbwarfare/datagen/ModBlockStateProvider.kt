@@ -45,8 +45,32 @@ class ModBlockStateProvider(private val output: PackOutput) : DataProvider {
         horizontalBlock(ModBlocks.CONTAINER, blockModel("container"))
         horizontalBlock(ModBlocks.SMALL_CONTAINER, blockModel("small_container"))
         horizontalBlock(ModBlocks.LUCKY_CONTAINER, blockModel("container"))
-        horizontalBlock(ModBlocks.CHARGING_STATION, blockModel("charging_station"))
-        horizontalBlock(ModBlocks.CREATIVE_CHARGING_STATION, blockModel("creative_charging_station"))
+        horizontalBlock(
+            ModBlocks.CHARGING_STATION,
+            cube(
+                "charging_station",
+                texture("charging_station_bottom"),
+                texture("charging_station_top"),
+                texture("charging_station_front"),
+                texture("charging_station_side"),
+                texture("charging_station_side"),
+                texture("charging_station_side"),
+                texture("charging_station_front")
+            )
+        )
+        horizontalBlock(
+            ModBlocks.CREATIVE_CHARGING_STATION,
+            cube(
+                "creative_charging_station",
+                texture("creative_charging_station_bottom"),
+                texture("creative_charging_station_top"),
+                texture("creative_charging_station_front"),
+                texture("creative_charging_station_side"),
+                texture("creative_charging_station_side"),
+                texture("creative_charging_station_side"),
+                texture("creative_charging_station_front")
+            )
+        )
         horizontalBlock(
             ModBlocks.VEHICLE_DEPLOYER,
             cubeBottomTop(

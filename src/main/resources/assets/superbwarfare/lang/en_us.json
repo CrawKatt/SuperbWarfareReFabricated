@@ -851,6 +851,7 @@
   "item.superbwarfare.ntw_20_blueprint": "NTW-20 Blueprint",
   "item.superbwarfare.one_two_punch": "One-Two Punch",
   "item.superbwarfare.parachute": "Parachute",
+  "gui.superbwarfare.parachute_visibility": "Visibility: %s (middle click)",
   "item.superbwarfare.phase_penetrating_bullet": "Phase Penetrating Bullet",
   "item.superbwarfare.phosphorus_flame_bullet": "Phosphorus Flame Bullet",
   "item.superbwarfare.poisonous_bullet": "Poisonous Bullet",

@@ -3,7 +3,7 @@
   "category": "equipment",
   "key": {
     "a": {
-      "tag": "forge:ingots/steel"
+      "tag": "c:ingots/steel"
     },
     "b": {
       "tag": "c:black_dyes"

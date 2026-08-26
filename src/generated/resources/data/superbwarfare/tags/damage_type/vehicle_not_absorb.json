@@ -1,10 +1,23 @@
 {
+  "replace": false,
   "values": [
     "minecraft:explosion",
     "minecraft:player_explosion",
-    "superbwarfare:custom_explosion",
-    "superbwarfare:mine",
-    "superbwarfare:projectile_explosion",
-    "superbwarfare:ammo_consumption"
+    {
+      "id": "superbwarfare:custom_explosion",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:mine",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:projectile_explosion",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:ammo_consumption",
+      "required": false
+    }
   ]
 }

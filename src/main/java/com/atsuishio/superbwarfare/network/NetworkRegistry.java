@@ -1,12 +1,10 @@
 package com.atsuishio.superbwarfare.network;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.event.custom.EntityPairingCallback;
 import com.atsuishio.superbwarfare.network.message.receive.EntitySpawnDataMessage;
 import com.atsuishio.superbwarfare.network.message.receive.ModVersionMismatchMessage;
 import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
@@ -23,8 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -34,12 +30,8 @@ public class NetworkRegistry {
     private static final String PROTOCOL_VERSION = "2";
     private static final ResourceLocation PROTOCOL_CHANNEL = new ResourceLocation(Mod.MODID, Mod.MODID);
     private static final Map<Class<?>, MessageEntry<?>> MESSAGES = new HashMap<>();
-    private static final Queue<PendingSpawnData> PENDING_SPAWN_DATA = new ConcurrentLinkedQueue<>();
 
     private record MessageEntry<T>(ResourceLocation id, BiConsumer<T, FriendlyByteBuf> encoder) {
-    }
-
-    private record PendingSpawnData(Entity entity, ServerPlayer player, EntitySpawnDataMessage message) {
     }
 
     private NetworkRegistry() {
@@ -104,24 +96,11 @@ public class NetworkRegistry {
     }
 
     private static void registerSpawnDataSync() {
-        EntityTrackingEvents.START_TRACKING.register((entity, player) -> {
+        EntityPairingCallback.EVENT.register((entity, player) -> {
             if (entity instanceof CustomSpawnDataEntity) {
-                PENDING_SPAWN_DATA.add(new PendingSpawnData(
-                        entity, player, new EntitySpawnDataMessage(entity)));
+                sendToPlayer(player, new EntitySpawnDataMessage(entity));
             }
         });
-
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            PendingSpawnData pending;
-            while ((pending = PENDING_SPAWN_DATA.poll()) != null) {
-                if (!pending.entity().isRemoved()
-                        && PlayerLookup.tracking(pending.entity()).contains(pending.player())) {
-                    sendToPlayer(pending.player(), pending.message());
-                }
-            }
-        });
-
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> PENDING_SPAWN_DATA.clear());
     }
 
     /** Registers a Kotlin-serialization payload sent from the server to the client. */

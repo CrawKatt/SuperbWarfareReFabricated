@@ -9,13 +9,13 @@
       "item": "minecraft:lever"
     },
     "c": {
-      "tag": "forge:plates/plastic"
+      "tag": "c:plates/plastic"
     },
     "d": {
       "item": "minecraft:amethyst_shard"
     },
     "e": {
-      "tag": "forge:glass_panes"
+      "tag": "c:glass_panes"
     }
   },
   "pattern": [

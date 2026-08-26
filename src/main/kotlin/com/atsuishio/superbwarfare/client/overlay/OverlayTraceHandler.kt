@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.tools.TraceTool
+import com.atsuishio.superbwarfare.tools.PlayerReachTool
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.mc
 import net.minecraft.world.entity.Entity
@@ -48,7 +49,7 @@ object OverlayTraceHandler {
 
     @JvmStatic
     fun handlePlayerTrace(player: Player) {
-        val reachDistance = player.getEntityReach()
+        val reachDistance = PlayerReachTool.getEntityReach(player)
         val reachEntity = TraceTool.findLookingEntity(player, reachDistance)
         playerReachEntity = reachEntity
         if (reachEntity != null) {

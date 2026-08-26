@@ -1,8 +1,10 @@
 {
+  "replace": false,
   "values": [
     "#c:ingots/lead",
     "#c:ingots/steel",
     "#c:ingots/tungsten",
-    "#c:ingots/silver"
+    "#c:ingots/silver",
+    "#c:ingots/scheelite"
   ]
 }

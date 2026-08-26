@@ -1,5 +1,8 @@
 {
+  "replace": false,
   "values": [
-    "#c:plates/copper"
+    "#c:plates/copper",
+    "#c:plates/steel",
+    "#c:plates/plastic"
   ]
 }

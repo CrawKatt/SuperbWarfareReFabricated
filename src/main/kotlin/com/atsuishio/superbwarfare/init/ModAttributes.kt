@@ -1,9 +1,9 @@
 package com.atsuishio.superbwarfare.init
 
 import com.atsuishio.superbwarfare.Mod
+import io.github.fabricators_of_create.porting_lib.attributes.PortingLibAttributes
 import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.RangedAttribute
-import java.util.function.Supplier
 
 object ModAttributes {
     @JvmField
@@ -12,14 +12,10 @@ object ModAttributes {
     }
 
     @JvmField
-    val BLOCK_REACH: Attribute = Registration.attribute("block_reach") {
-        RangedAttribute("attribute.${Mod.MODID}.block_reach", 4.5, 0.0, 1024.0).setSyncable(true)
-    }
+    val BLOCK_REACH: Attribute = PortingLibAttributes.BLOCK_REACH
 
     @JvmField
-    val ENTITY_REACH: Attribute = Registration.attribute("entity_reach") {
-        RangedAttribute("attribute.${Mod.MODID}.entity_reach", 3.0, 0.0, 1024.0).setSyncable(true)
-    }
+    val ENTITY_REACH: Attribute = PortingLibAttributes.ENTITY_REACH
 
     @JvmStatic
     fun init() = Unit

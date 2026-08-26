@@ -9,7 +9,7 @@
       "item": "minecraft:stone_button"
     },
     "c": {
-      "tag": "forge:plates/plastic"
+      "tag": "c:plates/plastic"
     }
   },
   "pattern": [

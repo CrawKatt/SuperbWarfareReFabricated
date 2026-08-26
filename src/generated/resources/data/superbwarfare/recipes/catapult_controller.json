@@ -6,10 +6,10 @@
       "item": "minecraft:comparator"
     },
     "c": {
-      "tag": "forge:ingots/copper"
+      "tag": "c:copper_ingots"
     },
     "d": {
-      "tag": "forge:ingots/iron"
+      "tag": "c:iron_ingots"
     }
   },
   "pattern": [

@@ -1,12 +1,25 @@
 {
+  "replace": false,
   "values": [
-    "superbwarfare:gunfire",
-    "superbwarfare:gunfire_headshot",
+    {
+      "id": "superbwarfare:gunfire",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:gunfire_headshot",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:super_star_hit",
+      "required": false
+    },
+    {
+      "id": "superbwarfare:super_star_slash",
+      "required": false
+    },
     "minecraft:arrow",
     "minecraft:trident",
     "minecraft:thrown",
-    "superbwarfare:super_star_hit",
-    "superbwarfare:super_star_slash",
     {
       "id": "tacz:bullet",
       "required": false

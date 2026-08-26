@@ -12,12 +12,10 @@ import com.atsuishio.superbwarfare.perk.js.JsPerk
 import com.atsuishio.superbwarfare.perk.js.PerkDescriptor
 import com.google.gson.JsonParser
 import com.mojang.serialization.JsonOps
-import com.mojang.serialization.Lifecycle
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.core.MappedRegistry
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder
+import net.fabricmc.fabric.api.event.registry.RegistryAttribute
 import net.minecraft.core.Registry
-import net.minecraft.core.WritableRegistry
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.effect.MobEffects
 import java.nio.file.Files
@@ -30,19 +28,11 @@ object ModPerks {
     @JvmField
     val PERK_KEY: ResourceKey<Registry<Perk>> = ResourceKey.createRegistryKey(LOCATION)
 
-    private val INTERNAL_PERK_REGISTRY = MappedRegistry(PERK_KEY, Lifecycle.stable())
-
     @JvmField
-    val PERK_REGISTRY: WritableRegistry<Perk> = INTERNAL_PERK_REGISTRY
-
-    @Suppress("UNCHECKED_CAST")
-    private fun registerRegistry() {
-        Registry.register(
-            BuiltInRegistries.REGISTRY as Registry<Registry<*>>,
-            LOCATION,
-            INTERNAL_PERK_REGISTRY as Registry<*>
-        )
-    }
+    val PERK_REGISTRY: Registry<Perk> = FabricRegistryBuilder
+        .createDefaulted(PERK_KEY, loc("ap_bullet"))
+        .attribute(RegistryAttribute.SYNCED)
+        .buildAndRegister()
 
     private val registeredIds = mutableSetOf<String>()
     private val autoRegistryObjects = mutableMapOf<String, Perk>()
@@ -214,7 +204,5 @@ object ModPerks {
     }
 
     @JvmStatic
-    fun init() {
-        registerRegistry()
-    }
+    fun init() = Unit
 }

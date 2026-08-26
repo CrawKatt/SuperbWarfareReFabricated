@@ -1,7 +1,7 @@
 {
   "type": "minecraft:smithing_transform",
   "addition": {
-    "tag": "forge:plates/plastic"
+    "tag": "c:plates/plastic"
   },
   "base": {
     "item": "superbwarfare:rare_material_pack"

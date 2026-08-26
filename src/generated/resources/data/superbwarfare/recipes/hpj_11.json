@@ -2,7 +2,7 @@
   "type": "superbwarfare:vehicle_assembling",
   "category": "defense",
   "inputs": [
-    "5 #forge:storage_blocks/steel",
+    "5 #c:storage_blocks/steel",
     "superbwarfare:hpj_11_blueprint",
     "superbwarfare:cannon_core",
     "superbwarfare:medium_battery_pack",

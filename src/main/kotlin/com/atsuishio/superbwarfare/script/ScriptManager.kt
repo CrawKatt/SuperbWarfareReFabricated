@@ -1,9 +1,9 @@
 package com.atsuishio.superbwarfare.script
 
-import org.mozilla.javascript.Context
-import org.mozilla.javascript.Function
-import org.mozilla.javascript.Script
-import org.mozilla.javascript.ScriptableObject
+import org.mozillaa.javascript.Context
+import org.mozillaa.javascript.Function
+import org.mozillaa.javascript.Script
+import org.mozillaa.javascript.ScriptableObject
 
 /**
  * Rhino JS 脚本管理器。

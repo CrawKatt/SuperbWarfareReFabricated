@@ -2,7 +2,7 @@
   "type": "superbwarfare:vehicle_assembling",
   "category": "misc",
   "inputs": [
-    "#forge:ingots/steel",
+    "#c:ingots/steel",
     "4 minecraft:paper"
   ],
   "result": {

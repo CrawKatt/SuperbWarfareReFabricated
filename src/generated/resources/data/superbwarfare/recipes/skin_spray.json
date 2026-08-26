@@ -9,10 +9,10 @@
       "item": "minecraft:tripwire_hook"
     },
     "c": {
-      "tag": "forge:plates/steel"
+      "tag": "c:plates/steel"
     },
     "d": {
-      "tag": "forge:dyes"
+      "tag": "c:dyes"
     }
   },
   "pattern": [

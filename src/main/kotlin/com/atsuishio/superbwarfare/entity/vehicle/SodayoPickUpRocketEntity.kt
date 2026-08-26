@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.item.projectile.MediumRocketItem
 import com.atsuishio.superbwarfare.tools.OBB
 import com.atsuishio.superbwarfare.tools.OBB.Companion.getLookingObb
+import com.atsuishio.superbwarfare.tools.PlayerReachTool
 import com.atsuishio.superbwarfare.tools.OBB.Companion.vector3dToVec3
 import com.atsuishio.superbwarfare.tools.ParticleTool.spawnMediumCannonMuzzleParticles
 import it.unimi.dsi.fastutil.ints.IntArrayList
@@ -56,7 +57,7 @@ open class SodayoPickUpRocketEntity(type: EntityType<SodayoPickUpRocketEntity>, 
 
     override fun interact(player: Player, hand: InteractionHand): InteractionResult {
         val stack = player.mainHandItem
-        val lookingObb = getLookingObb(player, player.getEntityReach())
+        val lookingObb = getLookingObb(player, PlayerReachTool.getEntityReach(player))
         val level = this.level()
 
         if (stack.isEmpty) {
@@ -150,7 +151,7 @@ open class SodayoPickUpRocketEntity(type: EntityType<SodayoPickUpRocketEntity>, 
     }
 
     fun lookingAtBarrel(player: Player): Boolean {
-        val lookingObb = getLookingObb(player, player.getEntityReach())
+        val lookingObb = getLookingObb(player, PlayerReachTool.getEntityReach(player))
 
         for (i in 0..11) {
             if (lookingObb === barrelObbs[i]) {

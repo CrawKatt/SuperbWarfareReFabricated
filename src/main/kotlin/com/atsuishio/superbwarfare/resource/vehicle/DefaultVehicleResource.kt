@@ -13,8 +13,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
-import org.mozilla.javascript.NativeJavaClass
-import org.mozilla.javascript.ScriptableObject
+import org.mozillaa.javascript.NativeJavaClass
+import org.mozillaa.javascript.ScriptableObject
 
 @Serializable
 class DefaultVehicleResource : IDBasedData<DefaultVehicleResource> {

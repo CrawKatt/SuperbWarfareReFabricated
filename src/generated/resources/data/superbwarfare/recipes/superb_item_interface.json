@@ -9,7 +9,7 @@
       "item": "minecraft:dropper"
     },
     "c": {
-      "tag": "forge:ingots/steel"
+      "tag": "c:ingots/steel"
     }
   },
   "pattern": [

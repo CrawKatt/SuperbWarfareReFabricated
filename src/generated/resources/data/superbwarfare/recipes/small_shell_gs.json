@@ -3,7 +3,7 @@
   "category": "equipment",
   "key": {
     "a": {
-      "tag": "forge:ingots/lead"
+      "tag": "c:ingots/lead"
     },
     "b": {
       "tag": "c:copper_ingots"

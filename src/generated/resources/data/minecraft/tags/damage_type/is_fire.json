@@ -1,5 +1,9 @@
 {
+  "replace": false,
   "values": [
-    "superbwarfare:burn"
+    {
+      "id": "superbwarfare:burn",
+      "required": false
+    }
   ]
 }

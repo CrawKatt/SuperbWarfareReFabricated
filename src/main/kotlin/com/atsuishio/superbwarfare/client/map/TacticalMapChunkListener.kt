@@ -1,8 +1,8 @@
 package com.atsuishio.superbwarfare.client.map
 
 import com.atsuishio.superbwarfare.config.server.MapConfig
+import com.atsuishio.superbwarfare.event.custom.ClientLevelLifecycleCallback
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.minecraft.world.level.chunk.LevelChunk
 
 object TacticalMapChunkListener {
@@ -24,15 +24,13 @@ object TacticalMapChunkListener {
             }
         }
 
-        ClientLifecycleEvents.CLIENT_STARTED.register { client ->
-            val level = client.level ?: return@register
+        ClientLevelLifecycleCallback.LOAD.register { _, level ->
+            if (!isEnabled()) return@register
             val dim = level.dimension().location().toString()
             TacticalMapCache.initForDimension(dim, TacticalMapCache.getWorldIdentifier())
         }
 
-        ClientLifecycleEvents.CLIENT_STOPPING.register { _ ->
-            // Always clear — config may already be inaccessible during world
-            // teardown, and stale data bleeds into the next world otherwise.
+        ClientLevelLifecycleCallback.UNLOAD.register { _, _ ->
             TacticalMapCache.clear()
         }
     }

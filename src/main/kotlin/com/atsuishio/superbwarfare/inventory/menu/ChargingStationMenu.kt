@@ -1,13 +1,11 @@
 package com.atsuishio.superbwarfare.inventory.menu
 
-import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
 import com.atsuishio.superbwarfare.block.entity.ChargingStationBlockEntity
 import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModMenuTypes
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData
 import com.atsuishio.superbwarfare.network.dataslot.SimpleEnergyData
 import net.fabricmc.fabric.api.registry.FuelRegistry
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.Container
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
@@ -44,13 +42,6 @@ open class ChargingStationMenu @JvmOverloads constructor(
 
         for (k in 0..8) {
             this.addSlot(Slot(inventory, k, 8 + k * 18 + X_OFFSET, 142 + Y_OFFSET))
-        }
-
-        val player = inventory.player
-        if (player is ServerPlayer) {
-            queueServerWork(1) {
-                if (player.containerMenu === this) onOpened(player)
-            }
         }
     }
 

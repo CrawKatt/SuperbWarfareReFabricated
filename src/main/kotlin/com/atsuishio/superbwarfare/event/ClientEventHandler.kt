@@ -1468,8 +1468,8 @@ object ClientEventHandler {
     fun doGunMeleeAttack(player: Player, angle: Double, customRange: Double) {
         player.playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1f, 1f)
 
-        val lookingEntity = TraceTool.findMeleeEntity(player, player.getEntityReach() + customRange)
-        val targetEntities = SeekTool.seekLivingEntities(player, player.getEntityReach() + customRange, angle / 2)
+        val lookingEntity = TraceTool.findMeleeEntity(player, PlayerReachTool.getEntityReach(player) + customRange)
+        val targetEntities = SeekTool.seekLivingEntities(player, PlayerReachTool.getEntityReach(player) + customRange, angle / 2)
         val attackList = mutableListOf<Entity>()
 
         if (lookingEntity != null) {
@@ -1501,7 +1501,7 @@ object ClientEventHandler {
             val result = player.level().clip(
                 ClipContext(
                     player.eyePosition,
-                    player.eyePosition.add(player.lookAngle.scale(player.getBlockReach() + 0.5)),
+                    player.eyePosition.add(player.lookAngle.scale(PlayerReachTool.getBlockReach(player) + 0.5)),
                     ClipContext.Block.OUTLINE,
                     ClipContext.Fluid.NONE,
                     player
@@ -1512,7 +1512,7 @@ object ClientEventHandler {
                 player.level().clip(
                     ClipContext(
                         player.eyePosition,
-                        player.eyePosition.add(player.lookAngle.scale(player.getBlockReach() + 0.5)),
+                        player.eyePosition.add(player.lookAngle.scale(PlayerReachTool.getBlockReach(player) + 0.5)),
                         ClipContext.Block.OUTLINE,
                         ClipContext.Fluid.NONE,
                         player
@@ -2957,6 +2957,9 @@ object ClientEventHandler {
 
         val vehicle = player.vehicle
         if (vehicle is VehicleEntity && vehicle.hasWeapon(vehicle.getSeatIndex(player))) {
+            return true
+        }
+        if (vehicle is VehicleEntity && vehicle.banHand(player)) {
             return true
         }
 

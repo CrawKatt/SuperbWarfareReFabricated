@@ -129,7 +129,7 @@ class HandsomeGogglesItem :
 
     companion object {
         val MODEL = loc("models/bedrock/armor/handsome_goggles.geo.json")
-        val TEXTURE = HandsomeGogglesRenderer.TEXTURE
+        val TEXTURE = loc("textures/bedrock/vehicle/happiest_ghast.png")
 
         @Environment(EnvType.CLIENT)
         private var renderer: HandsomeGogglesRenderer? = null

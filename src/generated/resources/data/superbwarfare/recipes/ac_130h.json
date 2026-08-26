@@ -3,7 +3,7 @@
   "category": "aircraft",
   "inputs": [
     "2 superbwarfare:large_battery_pack",
-    "16 #forge:storage_blocks/steel",
+    "16 #c:storage_blocks/steel",
     "superbwarfare:heavy_armament_module",
     "superbwarfare:medium_armament_module",
     "superbwarfare:light_armament_module",

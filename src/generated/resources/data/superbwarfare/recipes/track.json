@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "a": {
-      "tag": "forge:ingots/steel"
+      "tag": "c:ingots/steel"
     },
     "b": {
       "item": "superbwarfare:wheel"

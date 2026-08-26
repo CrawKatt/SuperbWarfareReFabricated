@@ -5,7 +5,6 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,11 +30,6 @@ public class AttributeMapMixin {
     @Inject(method = "<init>", at = @At("TAIL"))
     private void superbwarfare$addModAttributes(AttributeSupplier supplier, CallbackInfo ci) {
         this.superbwarfare$addAttribute(supplier, ModAttributes.BULLET_RESISTANCE);
-
-        if (supplier.hasAttribute(Attributes.LUCK)) {
-            this.superbwarfare$addAttribute(supplier, ModAttributes.BLOCK_REACH);
-            this.superbwarfare$addAttribute(supplier, ModAttributes.ENTITY_REACH);
-        }
     }
 
     @Unique

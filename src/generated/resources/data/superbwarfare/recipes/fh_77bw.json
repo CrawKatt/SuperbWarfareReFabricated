@@ -2,7 +2,7 @@
   "type": "superbwarfare:vehicle_assembling",
   "category": "land",
   "inputs": [
-    "12 #forge:storage_blocks/steel",
+    "12 #c:storage_blocks/steel",
     "superbwarfare:cannon_core",
     "superbwarfare:heavy_armament_module",
     "superbwarfare:medium_battery_pack",

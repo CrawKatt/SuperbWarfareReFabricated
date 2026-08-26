@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.init.ModKeyMappings;
 import com.atsuishio.superbwarfare.event.custom.InteractionKeyMappingTriggeredCallback;
+import com.atsuishio.superbwarfare.event.custom.ClientLevelLifecycleCallback;
 import com.atsuishio.superbwarfare.event.custom.ScreenOpeningCallback;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.network.message.send.ChangeVehicleSeatMessage;
@@ -12,6 +13,7 @@ import com.atsuishio.superbwarfare.network.message.send.SwitchVehicleWeaponMessa
 import com.atsuishio.superbwarfare.tools.MinecraftUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
@@ -34,6 +36,10 @@ public class MinecraftMixin {
     @Shadow
     @Nullable
     public LocalPlayer player;
+
+    @Shadow
+    @Nullable
+    public ClientLevel level;
 
     @Shadow
     @Final
@@ -97,6 +103,25 @@ public class MinecraftMixin {
         if (replacement != newScreen) {
             ci.cancel();
             ((Minecraft) (Object) this).setScreen(replacement);
+        }
+    }
+
+    @Inject(method = "setLevel", at = @At("HEAD"))
+    private void superbwarfare$beforeSetLevel(ClientLevel newLevel, CallbackInfo ci) {
+        if (this.level != null && this.level != newLevel) {
+            ClientLevelLifecycleCallback.UNLOAD.invoker().onLevel((Minecraft) (Object) this, this.level);
+        }
+    }
+
+    @Inject(method = "setLevel", at = @At("TAIL"))
+    private void superbwarfare$afterSetLevel(ClientLevel newLevel, CallbackInfo ci) {
+        ClientLevelLifecycleCallback.LOAD.invoker().onLevel((Minecraft) (Object) this, newLevel);
+    }
+
+    @Inject(method = "clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V", at = @At("HEAD"))
+    private void superbwarfare$beforeClearLevel(Screen screen, CallbackInfo ci) {
+        if (this.level != null) {
+            ClientLevelLifecycleCallback.UNLOAD.invoker().onLevel((Minecraft) (Object) this, this.level);
         }
     }
 

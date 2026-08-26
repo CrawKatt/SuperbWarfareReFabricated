@@ -71,6 +71,25 @@ sourceSets.main {
     }
 }
 
+val sbwRecipeResources = fileTree("src/generated/resources/data/superbwarfare") {
+    include("recipes/**/*.json", "advancements/recipes/**/*.json")
+}
+
+tasks.register("verifyNoForgeRecipeTags") {
+    inputs.files(sbwRecipeResources)
+    doLast {
+        val offenders = sbwRecipeResources.files.filter { "\"forge:" in it.readText() }
+        check(offenders.isEmpty()) {
+            "Obsolete forge: tags found in generated SBW recipes:\n" +
+                    offenders.joinToString("\n") { it.relativeTo(projectDir).path }
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn("verifyNoForgeRecipeTags")
+}
+
 repositories {
     mavenCentral()
     mavenLocal()
@@ -193,10 +212,9 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("fabric_kotlin_version")}")
 
     // Built from Sh1roCu/SimpleBedrockModel-Fabric@926992e (the upstream JitPack build is broken).
-    include(modImplementation(":simplebedrockmodel-fabric:2.4.6+mc1.20.1")!!)
+    include(modImplementation(":simplebedrockmodel-fabric:2.5.1+mc1.20.1-sbw1")!!)
 
     modRuntimeOnly("maven.modrinth:touhoulittlemaid-orihime:0.6.2-forge1.5.0")
-    modRuntimeOnly("com.jamieswhiteshirt:reach-entity-attributes:2.4.0")
     modRuntimeOnly("io.github.fabricators_of_create.Porting-Lib:base:2.3.8+1.20.1")
     runtimeOnly("org.openjdk.nashorn:nashorn-core:15.4")
 
@@ -250,8 +268,8 @@ dependencies {
         isTransitive = false
     }
 
-    // Mozilla Rhino for perk/vehicle scripts (upstream uses a private fork; standard Rhino is API-compatible)
-    include(implementation("org.mozilla:rhino:1.7.15")!!)
+    // Same relocated Rhino fork used by the NeoForge build.
+    include(implementation(":rhino:1.8.1-SNAPSHOT")!!)
 
     // Ponder (bundled, same as upstream jij's the Forge variant)
     include(modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("minecraft_version")}:${project.property("ponder_version")}")!!)
