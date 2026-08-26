@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.client.renderer.item
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.item.blockitem.BlueprintResearchTableBlockItem
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
+import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.model.geom.EntityModelSet
@@ -15,6 +15,9 @@ import net.minecraft.world.item.ItemStack
 
 class BlueprintResearchingTableBlockItemRenderer(dispatcher: BlockEntityRenderDispatcher, set: EntityModelSet) :
     BlockEntityWithoutLevelRenderer(dispatcher, set) {
+
+    private val modelInstance by lazy { BlockModelReloadListener.getModel(MODEL)?.createInstance() }
+
     override fun renderByItem(
         stack: ItemStack,
         displayContext: ItemDisplayContext,
@@ -24,7 +27,7 @@ class BlueprintResearchingTableBlockItemRenderer(dispatcher: BlockEntityRenderDi
         packedOverlay: Int
     ) {
         if (stack.item !is BlueprintResearchTableBlockItem) return
-        val model = BedrockModelLoader.getModel(BedrockModelLoader.BLUEPRINT_RESEARCH_TABLE_MODEL) ?: return
+        val instance = modelInstance ?: return
 
         poseStack.pushPose()
 
@@ -46,7 +49,7 @@ class BlueprintResearchingTableBlockItemRenderer(dispatcher: BlockEntityRenderDi
             }
         }
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             buffer.getBuffer(RenderType.entityCutout(TEXTURE)),
             packedLight,
@@ -58,5 +61,6 @@ class BlueprintResearchingTableBlockItemRenderer(dispatcher: BlockEntityRenderDi
 
     companion object {
         val TEXTURE = loc("textures/bedrock/block/blueprint_research_table.png")
+        val MODEL = loc("models/bedrock/block/blueprint_research_table.geo.json")
     }
 }

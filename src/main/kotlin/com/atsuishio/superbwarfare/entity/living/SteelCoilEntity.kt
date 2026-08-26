@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.living
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.vehicle.TurretWreckEntity
@@ -9,6 +10,7 @@ import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModMobEffects
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
 import com.atsuishio.superbwarfare.tools.angleTo
 import com.atsuishio.superbwarfare.tools.forceHurt
 import net.minecraft.core.NonNullList
@@ -40,6 +42,7 @@ import java.util.*
 import java.util.function.Consumer
 
 open class SteelCoilEntity(type: EntityType<SteelCoilEntity>, level: Level) : PathfinderMob(type, level), NeutralMob {
+    open val modelInstance = EntityModelReloadListener.getModel(MODEL)?.createInstance()
     var wheelRot = 0f
     var wheelRotO = 0f
     open var targetPosition = Vec3(0.0, 0.0, 0.0)
@@ -63,7 +66,7 @@ open class SteelCoilEntity(type: EntityType<SteelCoilEntity>, level: Level) : Pa
     }
 
     override fun hurt(source: DamageSource, amount: Float): Boolean {
-        return super.hurt(source, DAMAGE_MODIFIER.compute(source, amount))
+        return super.hurt(source, DAMAGE_MODIFIER.compute(this, source, amount))
     }
 
     override fun registerGoals() {
@@ -197,6 +200,8 @@ open class SteelCoilEntity(type: EntityType<SteelCoilEntity>, level: Level) : Pa
                 .add(Attributes.FOLLOW_RANGE, 64.0)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0)
         }
+
+        val MODEL = loc("models/bedrock/entity/steel_coil.geo.json")
 
         private val DAMAGE_MODIFIER = createDefaultModifier()
             .immuneTo(DamageTypes.IN_WALL)

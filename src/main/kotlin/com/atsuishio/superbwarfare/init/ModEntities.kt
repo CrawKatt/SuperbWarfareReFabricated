@@ -5,8 +5,11 @@ import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.atsuishio.superbwarfare.entity.living.SenpaiEntity
 import com.atsuishio.superbwarfare.entity.living.SteelCoilEntity
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
+import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.entity.projectile.*
 import com.atsuishio.superbwarfare.entity.vehicle.*
+import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilder
 import net.minecraft.world.Difficulty
@@ -60,6 +63,12 @@ object ModEntities {
     )
 
     @JvmField
+    val CATAPULT_SHUTTLE: EntityType<CatapultShuttleEntity> = register(
+        "catapult_shuttle",
+        misc(::CatapultShuttleEntity).trackRangeChunks(64).trackedUpdateRate(1).dimensions(EntityDimensions.scalable(1.0f, 1.2f))
+    )
+
+    @JvmField
     val PRISMATIC_BOLT: EntityType<PrismaticBoltEntity> = register(
         "prismatic_bolt",
         misc(::PrismaticBoltEntity).trackRangeChunks(64).trackedUpdateRate(1).disableSaving().disableSummon().fireImmune()
@@ -96,7 +105,7 @@ object ModEntities {
 
     @JvmField
     val C4: EntityType<C4Entity> =
-        register("c4", misc(::C4Entity).trackRangeChunks(64).trackedUpdateRate(1).dimensions(EntityDimensions.scalable(0.5f, 0.5f)))
+        register("c4", misc(::C4Entity).trackRangeChunks(64).trackedUpdateRate(1).dimensions(EntityDimensions.scalable(0.25f, 0.25f)))
 
     @JvmField
     val MEDICAL_KIT: EntityType<MedicalKitEntity> = register(
@@ -141,7 +150,7 @@ object ModEntities {
 
     @JvmField
     val PROJECTILE: EntityType<ProjectileEntity> =
-        register("projectile", fastProjectile(::ProjectileEntity).dimensions(EntityDimensions.scalable(0.25f, 0.25f)))
+        register("projectile", fastProjectile(::ProjectileEntity).dimensions(EntityDimensions.scalable(0.25f, 0.25f)).disableSaving())
 
     @JvmField
     val CANNON_SHELL: EntityType<CannonShellEntity> =
@@ -188,6 +197,18 @@ object ModEntities {
         register("ru_9m336_missile", fastProjectile(::Ru9m336MissileEntity).dimensions(EntityDimensions.scalable(0.5f, 0.5f)))
 
     @JvmField
+    val RU_9M100_MISSILE: EntityType<Ru9m100MissileEntity> =
+        register("ru_9m100_missile", fastProjectile(::Ru9m100MissileEntity).dimensions(EntityDimensions.scalable(0.75f, 0.75f)))
+
+    @JvmField
+    val RU_3M14_MISSILE: EntityType<Ru3m14MissileEntity> =
+        register("ru_3m14_missile", fastProjectile(::Ru3m14MissileEntity).dimensions(EntityDimensions.scalable(1f, 1f)))
+
+    @JvmField
+    val FIM_92_MISSILE: EntityType<Fim92MissileEntity> =
+        register("fim_92_missile", fastProjectile(::Fim92MissileEntity).dimensions(EntityDimensions.scalable(0.5f, 0.5f)))
+
+    @JvmField
     val AGM_65: EntityType<Agm65Entity> =
         register("agm_65", fastProjectile(::Agm65Entity).dimensions(EntityDimensions.scalable(0.75f, 0.75f)))
 
@@ -223,6 +244,14 @@ object ModEntities {
     val SC_50: EntityType<Sc50Entity> =
         register("sc_50", fastProjectile(::Sc50Entity).dimensions(EntityDimensions.scalable(0.4f, 0.4f)))
 
+    @JvmField
+    val MK_84: EntityType<Mk84Entity> =
+        register("mk_84", fastProjectile(::Mk84Entity).dimensions(EntityDimensions.scalable(0.8f, 0.8f)))
+
+    @JvmField
+    val BOR_57: EntityType<Bor57Entity> =
+        register("bor_57", fastProjectile(::Bor57Entity).dimensions(EntityDimensions.scalable(0.8f, 0.8f)))
+
     // Vehicles
     // Turrets
     @JvmField
@@ -234,8 +263,8 @@ object ModEntities {
         register("mk_42", vehicle(::Mk42Entity).dimensions(EntityDimensions.scalable(3.4f, 3.5f)))
 
     @JvmField
-    val HPJ_11: EntityType<Hpj11Entity> =
-        register("hpj_11", vehicle(::Hpj11Entity).dimensions(EntityDimensions.scalable(2.8f, 2.4f)))
+    val HPJ_11: EntityType<AutoAimableEntity> =
+        register("hpj_11", vehicle(::AutoAimableEntity).dimensions(EntityDimensions.scalable(2.8f, 2.4f)))
 
     @JvmField
     val MLE_1934: EntityType<Mle1934Entity> =
@@ -250,12 +279,12 @@ object ModEntities {
         register("annihilator", vehicle(::AnnihilatorEntity).dimensions(EntityDimensions.scalable(13f, 4.2f)))
 
     @JvmField
-    val LASER_TOWER: EntityType<LaserTowerEntity> =
-        register("laser_tower", vehicle(::LaserTowerEntity).dimensions(EntityDimensions.scalable(0.9f, 1.65f)))
+    val LASER_TOWER: EntityType<AutoAimableEntity> =
+        register("laser_tower", vehicle(::AutoAimableEntity).dimensions(EntityDimensions.scalable(0.9f, 1.65f)))
 
     @JvmField
-    val WAVEFORCE_TOWER: EntityType<WaveforceTowerEntity> =
-        register("waveforce_tower", vehicle(::WaveforceTowerEntity).dimensions(EntityDimensions.scalable(1.75f, 3.3f)))
+    val WAVEFORCE_TOWER: EntityType<AutoAimableEntity> =
+        register("waveforce_tower", vehicle(::AutoAimableEntity).dimensions(EntityDimensions.scalable(1.75f, 3.3f)))
 
     @JvmField
     val TOW: EntityType<TowEntity> =
@@ -276,24 +305,24 @@ object ModEntities {
         register("wheel_chair", vehicle(::WheelChairEntity).dimensions(EntityDimensions.scalable(1.0f, 1.0f)))
 
     @JvmField
-    val LAV_150: EntityType<Lav150Entity> =
-        register("lav_150", vehicle(::Lav150Entity).dimensions(EntityDimensions.scalable(2.8f, 2.45f)))
+    val LAV_150: EntityType<VehicleEntity> =
+        register("lav_150", vehicle().dimensions(EntityDimensions.scalable(2.8f, 2.45f)))
 
     @JvmField
-    val LAV_AD: EntityType<LavAdEntity> =
-        register("lav_ad", vehicle(::LavAdEntity).dimensions(EntityDimensions.scalable(2.8f, 2.35f)))
+    val LAV_AD: EntityType<VehicleEntity> =
+        register("lav_ad", vehicle().dimensions(EntityDimensions.scalable(2.8f, 2.35f)))
 
     @JvmField
-    val LAV_25: EntityType<Lav25Entity> =
-        register("lav_25", vehicle(::Lav25Entity).dimensions(EntityDimensions.scalable(2.8f, 2.35f)))
+    val LAV_25: EntityType<VehicleEntity> =
+        register("lav_25", vehicle().dimensions(EntityDimensions.scalable(2.8f, 2.35f)))
 
     @JvmField
-    val BMP_2: EntityType<Bmp2Entity> =
-        register("bmp_2", vehicle(::Bmp2Entity).dimensions(EntityDimensions.scalable(3.6f, 2.1f)))
+    val BMP_2: EntityType<VehicleEntity> =
+        register("bmp_2", vehicle().dimensions(EntityDimensions.scalable(3.6f, 2.1f)))
 
     @JvmField
-    val BRADLEY: EntityType<BradleyEntity> =
-        register("bradley", vehicle(::BradleyEntity).dimensions(EntityDimensions.scalable(3.6f, 2.3f)))
+    val BRADLEY: EntityType<VehicleEntity> =
+        register("bradley", vehicle().dimensions(EntityDimensions.scalable(3.6f, 2.3f)))
 
     @JvmField
     val ZTZ_99A: EntityType<Ztz99aEntity> =
@@ -319,22 +348,26 @@ object ModEntities {
     val PLZ_05: EntityType<Plz05Entity> =
         register("plz_05", vehicle(::Plz05Entity).dimensions(EntityDimensions.scalable(4.6f, 3.25f)))
 
+    @JvmField
+    val FH_77BW: EntityType<Fh77bwEntity> =
+        register("fh_77bw", vehicle(::Fh77bwEntity).dimensions(EntityDimensions.scalable(13f, 4f)))
+
     // Aircraft
     @JvmField
     val TOM_6: EntityType<Tom6Entity> =
         register("tom_6", vehicle(::Tom6Entity).dimensions(EntityDimensions.scalable(1.05f, 1.0f)))
 
     @JvmField
-    val AH_6: EntityType<Ah6Entity> =
-        register("ah_6", vehicle(::Ah6Entity).dimensions(EntityDimensions.scalable(2.25f, 2.175f)))
+    val AH_6: EntityType<VehicleEntity> =
+        register("ah_6", vehicle().dimensions(EntityDimensions.scalable(2.25f, 2.175f)))
 
     @JvmField
-    val MI_28: EntityType<Mi28Entity> =
-        register("mi_28", vehicle(::Mi28Entity).dimensions(EntityDimensions.scalable(3.375f, 3.375f)))
+    val MI_28: EntityType<VehicleEntity> =
+        register("mi_28", vehicle().dimensions(EntityDimensions.scalable(3.375f, 3.375f)))
 
     @JvmField
-    val KV_16: EntityType<Kv16Entity> =
-        register("kv_16", vehicle(::Kv16Entity).dimensions(EntityDimensions.scalable(1f, 1f)))
+    val KV_16: EntityType<VehicleEntity> =
+        register("kv_16", vehicle().dimensions(EntityDimensions.scalable(1f, 1f)))
 
     @JvmField
     val JU_87: EntityType<Ju87Entity> =
@@ -343,6 +376,26 @@ object ModEntities {
     @JvmField
     val A_10A: EntityType<A10Entity> =
         register("a_10a", vehicle(::A10Entity).dimensions(EntityDimensions.scalable(3.375f, 2.625f)))
+
+    @JvmField
+    val J_16: EntityType<VehicleEntity> =
+        register("j_16", vehicle().dimensions(EntityDimensions.scalable(3.375f, 2.625f)))
+
+    @JvmField
+    val AC_130H: EntityType<Ac130hEntity> =
+        register("ac_130h", vehicle(::Ac130hEntity).dimensions(EntityDimensions.scalable(12.5f, 6.8125f)))
+
+    @JvmField
+    val AIR_SHEEP: EntityType<AirSheepEntity> =
+        register("air_sheep", vehicle(::AirSheepEntity).dimensions(EntityDimensions.scalable(3f, 5.25f)))
+
+    @JvmField
+    val HAPPIEST_GHAST: EntityType<HappiestGhastEntity> =
+        register("happiest_ghast", vehicle(::HappiestGhastEntity).dimensions(EntityDimensions.scalable(4f, 4f)))
+
+    @JvmField
+    val KIROV: EntityType<KirovEntity> =
+        register("kirov", vehicle(::KirovEntity).dimensions(EntityDimensions.scalable(22f, 26f)))
 
     // Special
     @JvmField
@@ -392,6 +445,11 @@ object ModEntities {
         MobCategory.MISC,
         EntityType.EntityFactory { type, level -> entity(type, level) }
     )
+
+    private fun vehicle(): FabricEntityTypeBuilder<VehicleEntity> = misc(::VehicleEntity)
+        .trackRangeChunks(512)
+        .trackedUpdateRate(1)
+        .fireImmune()
 
     private fun <T : Entity> vehicle(
         entity: (EntityType<T>, Level) -> T

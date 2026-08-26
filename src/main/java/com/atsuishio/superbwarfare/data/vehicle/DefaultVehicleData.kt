@@ -74,6 +74,8 @@ class DefaultVehicleData : IDBasedData<DefaultVehicleData> {
     @SerialName("Seats")
     private var seats: ObjectToList<SeatInfo>? = ObjectToList()
 
+    @SerialName("Radar")
+    var radar: ObjectToList<RadarInfo>? = ObjectToList()
     fun seats(): MutableList<SeatInfo> {
         if (seats == null) return mutableListOf()
         return Collections.unmodifiableList(seats!!.list)
@@ -101,6 +103,10 @@ class DefaultVehicleData : IDBasedData<DefaultVehicleData> {
     @SerialName("HasDecoy")
     var hasDecoy: Boolean = false
 
+    // 用于判断诱饵弹类型是烟雾弹还是干扰弹
+    @SerialName("SmokeDecoy")
+    var smokeDecoy: Boolean = true
+
     @JvmField
     @ServerOnly
     @SerialName("ApplyDefaultDamageModifiers")
@@ -118,6 +124,18 @@ class DefaultVehicleData : IDBasedData<DefaultVehicleData> {
     @ServerOnly
     @SerialName("Mass")
     var mass: Float = 1f
+
+    @ServerOnly
+    @SerialName("TowForceFactor")
+    var towForceFactor: Float = 1f
+
+    @ServerOnly
+    @SerialName("DecoyMagazineSize")
+    var decoyMagazineSize: Int = 8
+
+    @ServerOnly
+    @SerialName("DecoyReloadTime")
+    var decoyReloadTime: Int = 500
 
     @ServerOnly
     @SerialName("DestroyInfo")
@@ -140,6 +158,12 @@ class DefaultVehicleData : IDBasedData<DefaultVehicleData> {
 
     @SerialName("HUDColor")
     var hudColor: ModColor = ModColor(0x66FF00)
+
+    @SerialName("LaserColor")
+    var laserColor: ModColor = ModColor(0xFF0000)
+
+    @SerialName("LaserScale")
+    var laserScale: Float = 0.035f
 
     @SerialName("Type")
     var type: VehicleType = VehicleType.EMPTY
@@ -164,6 +188,9 @@ class DefaultVehicleData : IDBasedData<DefaultVehicleData> {
 
     @SerialName("HasLowHealthWarning")
     var hasLowHealthWarning: Boolean = true
+
+    @SerialName("ForwardTowed")
+    var forwardTowed: Boolean = true
 
     @SerialName("RotateOffsetHeight")
     var rotateOffsetHeight: Float = 0f

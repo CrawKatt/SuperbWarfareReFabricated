@@ -3,13 +3,10 @@ package com.atsuishio.superbwarfare.entity.projectile
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
-import com.atsuishio.superbwarfare.init.ModTags
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import com.atsuishio.superbwarfare.tools.RangeTool.calculateFiringSolution
-import com.atsuishio.superbwarfare.tools.SeekTool
-import com.atsuishio.superbwarfare.tools.angleTo
+import com.atsuishio.superbwarfare.tools.VectorTool
 import net.minecraft.core.BlockPos
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
@@ -27,11 +24,10 @@ import kotlin.math.max
 open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : MissileProjectile(type, level),
     BasicGeoProjectileEntity {
     init {
-        this.noCulling = true
         this.damageValue = 1100f
         this.explosionDamageValue = 180f
         this.explosionRadiusValue = 12f
-        this.distracted = false
+        this.setDistracted(false)
         this.durability = 25
     }
 
@@ -42,27 +38,17 @@ open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : Missil
     override fun tick() {
         super.tick()
 
-        largeTrail()
+        hugeMissileTrail()
 
-        val entity = EntityFindUtil.findEntity(this.level(), this.targetUUID)
-        val decoy = SeekTool.seekLivingEntities(this, 32.0, 90.0)
-
-        for (e in decoy) {
-            if (e.type.`is`(ModTags.EntityTypes.DECOY) && !this.distracted) {
-                this.targetUUID = e.getStringUUID()
-                this.distracted = true
-                break
-            }
-        }
-
+        val entity = EntityFindUtil.findEntity(this.level(), this.getTargetUUID())
         var toVec = lookAngle
         val level = this.level()
 
-        if (guideType == 0) {
-            if (this.targetUUID != "none") {
+        if (getGuideType() == 0) {
+            if (this.getTargetUUID() != "none") {
                 if (entity != null) {
                     if (level is ServerLevel) {
-                        if ((!entity.getPassengers().isEmpty() || entity is VehicleEntity)
+                        if ((entity.getPassengers().isNotEmpty() || entity is VehicleEntity)
                             && entity.tickCount % (max(0.04 * this.distanceTo(entity), 2.0).toInt()) == 0
                         ) {
                             level.playSound(
@@ -81,6 +67,7 @@ open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : Missil
                             entity.y + (if (entity is EnderDragon) -2 else 0) + height,
                             entity.z
                         )
+                        setTargetPos(targetPos)
                         toVec = calculateFiringSolution(
                             position(),
                             targetPos,
@@ -90,22 +77,30 @@ open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : Missil
                         )
                     }
                 }
+            } else {
+                lostTargetTick ++
             }
         } else {
-            if (level is ServerLevel && targetPos != null) {
-                val dis = targetPos!!.vectorTo(position()).horizontalDistance()
+            if (level is ServerLevel && getTargetPos() != null) {
+                val dis = getTargetPos()!!.vectorTo(position()).horizontalDistance()
                 val height = if (dis > 30) 0.4 * (dis - 30) else 0.0
-                val targetPos = this.targetPos!!.add(0.0, height, 0.0)
+                val targetPos = this.getTargetPos()!!.add(0.0, height, 0.0)
                 toVec = calculateFiringSolution(position(), targetPos, Vec3.ZERO, deltaMovement.length(), 0.0)
             }
+        }
+
+        if (getTargetPos() == null) {
+            lostTargetTick ++
         }
 
         if (this.tickCount > 8) {
             this.deltaMovement = this.deltaMovement.scale(0.05).add(lookAngle.scale(8.0))
             this.deltaMovement = this.deltaMovement.multiply(0.85, 0.85, 0.85)
-            val lostTarget = lookAngle.angleTo(toVec) > 170
+            val lostTarget = (VectorTool.calculateAngle(lookAngle, toVec) > 90 && tickCount > 40)
             if (!lostTarget) {
                 turn(toVec, ((tickCount - 8) * 0.5f).coerceIn(0f, 15f))
+            } else {
+                lostTargetTick++
             }
         } else {
             this.deltaMovement = this.deltaMovement.add(0.0, -0.06, 0.0)
@@ -152,8 +147,8 @@ open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : Missil
         }
     }
 
-    override fun getGravity(): Float {
-        return if (tickCount < 8) 0.15f else super.getGravity()
+    override fun getCustomGravity(): Float {
+        return if (tickCount < 8) 0.15f else super.getCustomGravity()
     }
 
     override fun getSound(): SoundEvent {
@@ -166,6 +161,4 @@ open class Agm65Entity(type: EntityType<out Agm65Entity>, level: Level) : Missil
 
     override val maxHealth: Float
         get() = 70f
-
-    override fun getModel() = BedrockModelLoader.AGM_65_MODEL
 }

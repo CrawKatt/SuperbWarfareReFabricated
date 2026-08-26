@@ -1,9 +1,9 @@
 {
-  "Model": {
-    "Animation": "superbwarfare:animations/mortar.animation.json",
-    "Model": "superbwarfare:geo/mortar.geo.json",
-    "LODModel": "superbwarfare:geo/vehicle_lod/mortar_lod1.geo.json",
-    "Texture": "superbwarfare:textures/entity/mortar.png"
-  },
-  "LODDistance": 48
+  "Animation": "superbwarfare:animations/bedrock/vehicle/mortar.animation.json",
+  "Models": [
+    {
+      "Model": "superbwarfare:models/bedrock/vehicle/mortar.geo.json",
+      "Texture": "superbwarfare:textures/bedrock/vehicle/mortar.png"
+    }
+  ]
 }

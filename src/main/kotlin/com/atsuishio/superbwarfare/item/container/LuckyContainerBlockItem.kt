@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.renderer.item.LuckyContainerBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModBlocks
+import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.loader.api.FabricLoader
@@ -71,7 +72,9 @@ class LuckyContainerBlockItem :
             private var renderer: BlockEntityWithoutLevelRenderer? = null
 
             override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                if (renderer == null) renderer = LuckyContainerBlockItemRenderer()
+                if (renderer == null) {
+                    renderer = LuckyContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
+                }
                 return renderer!!
             }
         })

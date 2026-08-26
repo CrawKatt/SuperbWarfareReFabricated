@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.data.vehicle.VehicleData;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
+import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -14,7 +15,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -28,7 +28,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
@@ -148,25 +147,14 @@ public class GameRendererMixin {
         }
     }
 
-    @Inject(method = "getNightVisionScale(Lnet/minecraft/world/entity/LivingEntity;F)F",
-            at = @At("RETURN"), cancellable = true)
-    private static void getNightVisionScale(LivingEntity pLivingEntity, float pNanoTime, CallbackInfoReturnable<Float> cir) {
-        boolean hasThermalImagingVehicle = false;
-
-        if (pLivingEntity.getVehicle() instanceof VehicleEntity vehicle) {
-            var index = vehicle.getSeatIndex(pLivingEntity);
-            var seats = vehicle.computed().seats();
-            if (index < 0 || index >= seats.size()) return;
-
-            var seat = seats.get(index);
-            if (seat.hasThermalImaging) {
-                hasThermalImagingVehicle = true;
+    @Inject(method = "bobHurt", at = @At("HEAD"), cancellable = true)
+    private void bobHurt(PoseStack pMatrixStack, float pPartialTicks, CallbackInfo ci) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.getCameraEntity() instanceof LivingEntity living) {
+            var source = living.getLastDamageSource();
+            if (source != null && source.is(ModTags.DamageTypes.NO_HURT_EFFECT)) {
+                ci.cancel();
             }
-        }
-
-        if (ClientEventHandler.activeThermalImaging || ClientEventHandler.hasThermalImagingGoggles() || hasThermalImagingVehicle) {
-            cir.cancel();
-            cir.setReturnValue(pLivingEntity.hasEffect(MobEffects.NIGHT_VISION) ? 1f : 0f);
         }
     }
 }

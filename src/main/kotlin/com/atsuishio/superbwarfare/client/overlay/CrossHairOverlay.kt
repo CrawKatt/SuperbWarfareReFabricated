@@ -4,22 +4,23 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.RenderHelper
 import com.atsuishio.superbwarfare.compat.realcamera.RealCameraCompatHolder
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
+import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.GunProp
-import com.atsuishio.superbwarfare.entity.vehicle.Ah6Entity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.perk.AmmoPerk
+import com.atsuishio.superbwarfare.perk.IAmmoStat
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.TraceTool
+import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.math.Axis
 import net.minecraft.client.CameraType
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.util.Mth
@@ -67,7 +68,10 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
 
     private var scopeScale = 1f
 
-    override fun shouldRender() = super.shouldRender() && !ClientEventHandler.isEditing
+    override fun shouldRender(): Boolean {
+        if (MiscConfig.HIDE_COMBAT_HUD.get()) return false
+        return super.shouldRender() && !ClientEventHandler.isEditing
+    }
 
     override fun RenderContext.render() {
         val stack = player.mainHandItem
@@ -85,7 +89,7 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
 
         var r = 1
 
-        if (com.atsuishio.superbwarfare.tools.mc.options.cameraType != CameraType.FIRST_PERSON) {
+        if (mc.options.cameraType != CameraType.FIRST_PERSON) {
             r = 0
         }
 
@@ -123,8 +127,9 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
         val finPosX = (screenWidth - finLength) / 2 + moveX
         val finPosY = (screenHeight - finLength) / 2 + moveY
 
+        // Crosshair rendering — skipped entirely when server has disabled it
         // 第一人称下的准星
-        if (Minecraft.getInstance().options.cameraType == CameraType.FIRST_PERSON) {
+        if (mc.options.cameraType == CameraType.FIRST_PERSON) {
             when (crosshair) {
                 CROSSHAIR_GUN_DEFAULT -> renderGunDefaultCrosshair(
                     guiGraphics,
@@ -169,7 +174,7 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
         }
 
         // 第三人称下的准星
-        if (Minecraft.getInstance().options.cameraType == CameraType.THIRD_PERSON_BACK && (ClientEventHandler.zoomTime > 0 || ClientEventHandler.bowPullPos > 0)) {
+        else if (mc.options.cameraType == CameraType.THIRD_PERSON_BACK && (ClientEventHandler.zoomTime > 0 || ClientEventHandler.bowPullPos > 0)) {
             renderGunDefaultCrosshair(
                 guiGraphics,
                 stack,
@@ -185,8 +190,7 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
             )
         }
 
-        // 在开启伤害指示器时才进行渲染
-        if (DisplayConfig.KILL_INDICATION.get() && !(vehicle is Ah6Entity && vehicle.getFirstPassenger() === player)) {
+        if (DisplayConfig.KILL_INDICATION.get()) {
             renderKillIndicatorDynamic(guiGraphics, screenWidth, screenHeight, moveX, moveY)
         }
 
@@ -196,7 +200,6 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
         RenderSystem.disableBlend()
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
     }
-
 
     /**
      * 渲染标准十字准星
@@ -288,7 +291,7 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
     ) {
         val data = from(stack)
 
-        if (Minecraft.getInstance().options.cameraType == CameraType.FIRST_PERSON) {
+        if (mc.options.cameraType == CameraType.FIRST_PERSON) {
             if (ClientEventHandler.zoomTime > 0.8 && GunResource.compute(stack).hideCrosshairWhenZoom) return
         }
 
@@ -378,7 +381,12 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
         )
         if (!player.isSprinting || ClientEventHandler.noSprintTicks > 0 || ClientEventHandler.bowPullPos > 0) {
             if (ClientEventHandler.zoomTime < 0.1) {
-                if (perk is AmmoPerk && perk.slug) {
+                val isSlug = when (perk) {
+                    is AmmoPerk -> perk.slug
+                    is IAmmoStat -> perk.slug
+                    else -> false
+                }
+                if (isSlug) {
                     normalCrossHair(guiGraphics, screenWidth, screenHeight, spread, moveX, moveY)
                 } else {
                     shotgunCrossHair(guiGraphics, finPosX, finPosY, finLength)

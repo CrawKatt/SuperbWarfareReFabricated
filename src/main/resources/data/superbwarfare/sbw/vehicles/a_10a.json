@@ -90,7 +90,7 @@
       "Velocity": 24,
       "Damage": 35,
       "ExplosionDamage": 10,
-      "ExplosionRadius": 4,
+      "ExplosionRadius": 3,
       "HeatPerShoot": 1.5,
       "NaturalCooldown": 0.5,
       "Spread": 0.5,
@@ -123,7 +123,7 @@
       "Damage": 80,
       "ExplosionDamage": 40,
       "ExplosionRadius": 5,
-      "Gravity": 0.02,
+      "Gravity": 0.001,
       "ProjectileLife": 60,
       "Velocity": 11,
       "ShootPos": {
@@ -145,8 +145,42 @@
       "SoundRadius": 12
     },
     "Bomb": {
-      "AmmoType": "superbwarfare:medium_aerial_bomb",
       "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/mk_82.png",
+      "AmmoType": [
+        {
+          "Ammo": "superbwarfare:medium_aerial_bomb",
+          "ShouldUnload": true
+        },
+        {
+          "Ammo": "superbwarfare:large_aerial_bomb",
+          "ShouldUnload": true,
+          "Override": {
+            "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/mk_84.png",
+            "Name": "weapon.superbwarfare.mk_84_bomb",
+            "Projectile": "superbwarfare:mk_84",
+            "ShootPos": {
+              "Transform": "Vehicle",
+              "ShootPositionForHud": [0, 0.77, 0.047],
+              "ShootDirectionForHud": "Bomb",
+              "Positions": [[0, 0.77, 0.047]],
+              "BoundUpWithAmmoAmount": true,
+              "Directions": ["DeltaMovement"],
+              "ViewPosition": [0, 0.77, 0.047],
+              "ViewDirection": "Bomb"
+            },
+            "ProjectileDummyInfo": {
+              "Offset": [0, -0.59, 0.125],
+              "Rotate": [0, 0, 0],
+              "Scale": [0.85, 0.85, 0.85],
+              "HideDummyWhileZooming": true
+            },
+            "Magazine": 1,
+            "EmptyReloadTime": 300,
+            "ExplosionDamage": 1600,
+            "ExplosionRadius": 40
+          }
+        }
+      ],
       "DefaultZoom": 2,
       "DefaultFireMode": "Auto",
       "AvailableFireModes": "Semi",
@@ -164,11 +198,17 @@
         "Transform": "Vehicle",
         "ShootPositionForHud": [0, 0.88, 0.047],
         "ShootDirectionForHud": "Bomb",
-        "Positions": [[-0.418, 0.88, 0.047], [0, 0.88, 0.047], [-0.418, 0.88, 0.047]],
+        "Positions": [[0, 0.88, 0.047], [0.418, 0.88, 0.047], [-0.418, 0.88, 0.047]],
         "BoundUpWithAmmoAmount": true,
         "Directions": ["DeltaMovement"],
         "ViewPosition": [0, 0.88, 0.047],
         "ViewDirection": "Bomb"
+      },
+      "ProjectileDummyInfo": {
+        "Offset": [0, -0.55, -0.25],
+        "Rotate": [0, 0, 0],
+        "Scale": [0.75, 0.75, 0.75],
+        "HideDummyWhileZooming": true
       },
       "SoundInfo": {
         "Fire1P": "superbwarfare:bomb_release",
@@ -183,28 +223,34 @@
     },
     "Missile": {
       "Icon": "superbwarfare:textures/overlay/vehicle/weapon/icons/agm_65.png",
-      "DefaultZoom": 2,
+      "DefaultZoom": 1.25,
+      "UseNacelleCamera": true,
       "DefaultFireMode": "Semi",
       "AvailableFireModes": "Semi",
       "Magazine": 4,
       "EmptyReloadTime": 200,
       "Projectile": "superbwarfare:agm_65",
-      "Name": "weapon.superbwarfare.agm_65_missile_entity",
+      "Name": "weapon.superbwarfare.agm_65_missile",
       "Damage": 1100,
       "ExplosionDamage": 180,
       "ExplosionRadius": 12,
       "AddShooterDeltaMovement": true,
       "Velocity": 1.05,
-      "ProjectileLife": 1200,
+      "ProjectileLife": 3600,
       "SeekWeaponInfo": {
-        "SeekDirection": "Default",
-        "MaxGuidedRange": 8192,
+        "SeekDirection": "ClientCamera",
+        "MaxGuidedRange": 48000,
         "SeekRange": 1024,
         "SeekAngle": 20,
         "SeekTime": 10,
         "MaxTargetHeight": 32,
         "MinTargetSize": 0.9,
         "OnlyLockEntity": true
+      },
+      "ProjectileDummyInfo": {
+        "Offset": [0, -0.65, -1.85],
+        "Rotate": [0, 0, 0],
+        "Scale": [0.75, 0.75, 0.75]
       },
       "AmmoType": [
         {
@@ -215,9 +261,8 @@
           "Ammo": "superbwarfare:large_anti_ground_missile",
           "ShouldUnload": false,
           "Override": {
-            "Name": "weapon.superbwarfare.agm_65_missile_block",
             "SeekWeaponInfo": {
-              "SeekDirection": "Default",
+              "SeekDirection": "ClientCamera",
               "SeekRange": 512,
               "SeekAngle": 20,
               "SeekTime": 10,
@@ -226,13 +271,24 @@
               "OnlyLockBlock": true
             }
           }
+        },
+        {
+          "Ammo": "superbwarfare:large_anti_ground_missile",
+          "ShouldUnload": false,
+          "Override": {
+            "SeekWeaponInfo": {
+              "SeekDirection": "ClientCamera",
+              "InputBlockPos": true
+            }
+          }
         }
       ],
       "ShootPos": {
         "Transform": "Vehicle",
         "ShootPositionForHud": [0, 1.1475, 0],
-        "Positions": [[-4.97, 1.19, 0], [-3.96, 1.1166, 0], [3.96, 1.1166, 0], [4.97, 1.19, 0]],
-        "BoundUpWithAmmoAmount": true
+        "Positions": [[4.97, 1.19, 0], [3.96, 1.1166, 0], [-3.96, 1.1166, 0], [-4.97, 1.19, 0]],
+        "BoundUpWithAmmoAmount": true,
+        "ViewPosition": [0, 0.88, 0.047]
       },
       "SoundInfo": {
         "Fire1P": "superbwarfare:bomb_release",
@@ -244,6 +300,7 @@
         "Locked": "superbwarfare:missile_locked"
       },
       "Crosshair": "@AirCraftMissile",
+      "CrosshairZooming": "@AirCraftNacelle",
       "CrosshairColor": "0x66FF00",
       "SoundRadius": 8
     }
@@ -252,6 +309,7 @@
   "Mass": 20,
   "AllowFreeCam": true,
   "HasDecoy": true,
+  "SmokeDecoy": false,
   "SendHitParticles": false,
   "DamageModifiers": [
     "All - 7",
@@ -273,18 +331,18 @@
     "superbwarfare:vehicle_strike * 7",
     "superbwarfare:laser * 0.4",
     "@superbwarfare:cannon_shell * 2",
-    "@superbwarfare:small_cannon_shell * 1.1",
+    "@superbwarfare:small_cannon_shell * 0.5",
     "@superbwarfare:gun_grenade * 2.2",
     "@superbwarfare:rgo_grenade * 6",
     "@superbwarfare:hand_grenade * 5",
     "@superbwarfare:mortar_shell * 3",
+    "@superbwarfare:c4 * 2.5",
     "@#superbwarfare:at_rocket * 3",
     "@#superbwarfare:aerial_bomb * 2",
     "All * 0.65"
   ],
   "RotateOffsetHeight": 1.78,
   "DestroyInfo": {
-    "ParticleType": "Giant",
     "ExplosionDamage": 800,
     "ExplosionRadius": 16,
     "CrashPassengers": true
@@ -295,7 +353,7 @@
   "Type": "Airplane",
   "EngineType": "Aircraft",
   "EngineInfo": {
-    "EnergyCostRate": 512,
+    "EnergyCostRate": 256,
     "Increment": 1,
     "Decrement": 1,
     "PitchSpeed": 1,

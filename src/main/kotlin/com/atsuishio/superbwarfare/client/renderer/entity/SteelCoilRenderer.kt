@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.living.SteelCoilEntity
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
+import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
@@ -23,8 +23,8 @@ class SteelCoilRenderer(renderManager: EntityRendererProvider.Context) :
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        val model = BedrockModelLoader.getModel(BedrockModelLoader.STEEL_COIL_MODEL) ?: return
-        val bone = model.getBone("main") ?: return
+        val instance = entity.modelInstance ?: return
+        val bone = instance.getBone("move_main") ?: return
 
         poseStack.pushPose()
 
@@ -33,14 +33,14 @@ class SteelCoilRenderer(renderManager: EntityRendererProvider.Context) :
 
         bone.rotation.mul(Axis.XP.rotationDegrees(-entity.getRotation(partialTick)))
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
-            buffer.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity))),
+            buffer,
+            RenderType.entityCutout(getTextureLocation(entity)),
+            BedrockModelRenderTypes.polyMeshCutout(getTextureLocation(entity)),
             packedLight,
             OverlayTexture.NO_OVERLAY
         )
-
-        model.applyPose(model.bindPose)
 
         poseStack.popPose()
     }

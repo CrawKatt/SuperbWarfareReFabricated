@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.command
 
+import com.atsuishio.superbwarfare.command.builder.buildCommand
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.commands.CommandSourceStack
@@ -15,6 +16,8 @@ object CommandRegister {
                 add(TDM_COMMAND)
                 add(RIDE_COMMAND)
                 add(DISMOUNT_COMMAND)
+                add(SKIN_COMMAND)
+                add(LOITER_COMMAND)
             }
 
             val result = dispatcher.register(command as LiteralArgumentBuilder<CommandSourceStack>)

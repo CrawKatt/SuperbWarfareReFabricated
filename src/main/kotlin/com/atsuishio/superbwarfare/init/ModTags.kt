@@ -54,9 +54,6 @@ object ModTags {
         @JvmField val MILITARY_ARMOR = modItemTag("military_armor")
         @JvmField val MILITARY_ARMOR_HEAVY = modItemTag("military_armor_heavy")
 
-        @JvmField val INGOTS_STEEL = modItemTag("ingots/steel")
-        @JvmField val INGOTS_LEAD = modItemTag("ingots/lead")
-        @JvmField val STORAGE_BLOCK_STEEL = modItemTag("storage_blocks/steel")
         @JvmField val INGOTS_CEMENTED_CARBIDE = modItemTag("ingots/cemented_carbide")
         @JvmField val STORAGE_BLOCK_CEMENTED_CARBIDE = modItemTag("storage_blocks/cemented_carbide")
 
@@ -197,7 +194,18 @@ object ModTags {
         @JvmField val VEHICLE_IMMUNE = modDamageTag("vehicle_immune")
 
         @JvmField val GUN_DAMAGE = modDamageTag("gun_damage")
-        @JvmField val BYPASSES_VEHICLE = modDamageTag("bypasses_vehicle")
+
+        // 能够由卓越前线的枪械造成的伤害，可用于进度的伤害类型判断
+        @JvmField
+        val SBW_GUN_FIRE_DAMAGE = modDamageTag("sbw_gun_fire_damage")
+
+        // 载具减伤不会计算的伤害类型
+        @JvmField
+        val BYPASSES_VEHICLE = modDamageTag("bypasses_vehicle")
+
+        // 没有任何受伤提示的伤害类型
+        @JvmField
+        val NO_HURT_EFFECT = modDamageTag("no_hurt_effect")
     }
 
     object EntityTypes {

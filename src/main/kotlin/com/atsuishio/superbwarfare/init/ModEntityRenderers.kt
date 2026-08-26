@@ -5,7 +5,6 @@ import com.atsuishio.superbwarfare.client.renderer.projectile.*
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 
 object ModEntityRenderers {
-
     @JvmStatic
     fun init() {
         EntityRendererRegistry.register(ModEntities.MORTAR, ::MortarRenderer)
@@ -31,11 +30,12 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.MLE_1934, ::Mle1934Renderer)
         EntityRendererRegistry.register(ModEntities.JAVELIN_MISSILE, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.ANNIHILATOR, ::AnnihilatorRenderer)
-        EntityRendererRegistry.register(ModEntities.SPEEDBOAT, ::SpeedboatRenderer)
+        EntityRendererRegistry.register(ModEntities.SPEEDBOAT, ::SpeedBoatRenderer)
         EntityRendererRegistry.register(ModEntities.TINY_SPEEDBOAT, ::TinySpeedboatRenderer)
         EntityRendererRegistry.register(ModEntities.WHEEL_CHAIR, ::WheelChairRenderer)
         EntityRendererRegistry.register(ModEntities.AH_6, ::Ah6Renderer)
         EntityRendererRegistry.register(ModEntities.FLARE_DECOY, ::FlareDecoyEntityRenderer)
+        EntityRendererRegistry.register(ModEntities.CATAPULT_SHUTTLE, ::CatapultShuttleRenderer)
         EntityRendererRegistry.register(
             ModEntities.WHITE_PHOSPHORUS_PROJECTILE,
             ::WhitePhosphorusProjectileEntityRenderer
@@ -54,7 +54,12 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.SWARM_DRONE, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.HPJ_11, ::Hpj11Renderer)
         EntityRendererRegistry.register(ModEntities.A_10A, ::A10Renderer)
+        EntityRendererRegistry.register(ModEntities.AIR_SHEEP, ::AirSheepRenderer)
+        EntityRendererRegistry.register(ModEntities.HAPPIEST_GHAST, ::HappiestGhastRenderer)
+        EntityRendererRegistry.register(ModEntities.KIROV, ::KirovRenderer)
         EntityRendererRegistry.register(ModEntities.MK_82, ::BasicProjectileRenderer)
+        EntityRendererRegistry.register(ModEntities.MK_84, ::BasicProjectileRenderer)
+        EntityRendererRegistry.register(ModEntities.BOR_57, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.SC_50, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.SC_250, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.AGM_65, ::BasicProjectileRenderer)
@@ -71,16 +76,19 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.WAVEFORCE_TOWER, ::WaveforceTowerRenderer)
         EntityRendererRegistry.register(ModEntities.IGLA_MISSILE, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.RU_9M336_MISSILE, ::BasicProjectileRenderer)
+        EntityRendererRegistry.register(ModEntities.RU_9M100_MISSILE, ::BasicProjectileRenderer)
+        EntityRendererRegistry.register(ModEntities.RU_3M14_MISSILE, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.TRUCK, ::TruckRenderer)
         EntityRendererRegistry.register(ModEntities.SODAYO_PICK_UP, ::SodayoPickUpRenderer)
-        EntityRendererRegistry.register(ModEntities.SODAYO_PICK_UP_HMG, ::SodayoPickUpHmgRenderer)
-        EntityRendererRegistry.register(ModEntities.SODAYO_PICK_UP_ROCKET, ::SodayoPickUpRocketRenderer)
-        EntityRendererRegistry.register(ModEntities.SODAYO_PICK_UP_TOW, ::SodayoPickUpTowRenderer)
+        EntityRendererRegistry.register(ModEntities.SODAYO_PICK_UP_HMG, ::SodayoPickUpRenderer)
+        EntityRendererRegistry.register(ModEntities.SODAYO_PICK_UP_ROCKET, ::SodayoPickUpRenderer)
+        EntityRendererRegistry.register(ModEntities.SODAYO_PICK_UP_TOW, ::SodayoPickUpRenderer)
         EntityRendererRegistry.register(ModEntities.TOW, ::TowRenderer)
         EntityRendererRegistry.register(ModEntities.STEEL_COIL, ::SteelCoilRenderer)
         EntityRendererRegistry.register(ModEntities.MI_28, ::Mi28Renderer)
         EntityRendererRegistry.register(ModEntities.KH_39, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.PLZ_05, ::Plz05Renderer)
+        EntityRendererRegistry.register(ModEntities.FH_77BW, ::Fh88bwRenderer)
         EntityRendererRegistry.register(ModEntities.LAV_AD, ::LavAdRenderer)
         EntityRendererRegistry.register(ModEntities.KV_16, ::Kv16Renderer)
         EntityRendererRegistry.register(ModEntities.JU_87, ::Ju87Renderer)
@@ -91,5 +99,8 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.LAV_25, ::Lav25Renderer)
         EntityRendererRegistry.register(ModEntities.ZTZ_99A, ::Ztz99aRenderer)
         EntityRendererRegistry.register(ModEntities.EDD, ::EDDRenderer)
+        EntityRendererRegistry.register(ModEntities.AC_130H, ::Ac130hRenderer)
+        EntityRendererRegistry.register(ModEntities.J_16, ::J16Renderer)
+        EntityRendererRegistry.register(ModEntities.FIM_92_MISSILE, ::BasicProjectileRenderer)
     }
 }

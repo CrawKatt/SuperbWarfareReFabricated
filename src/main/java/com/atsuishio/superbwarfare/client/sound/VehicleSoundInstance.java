@@ -55,7 +55,7 @@ public abstract class VehicleSoundInstance extends AbstractTickableSoundInstance
             this.fade++;
         }
 
-        this.volume = this.getVolume(this.mobileVehicle) * fade;
+        this.volume = this.getVolume(this.mobileVehicle) * fade * Mth.clamp(0.01f * player.tickCount, 0, 1);
 
         this.x = this.mobileVehicle.getX();
         this.y = this.mobileVehicle.getY();
@@ -101,7 +101,18 @@ public abstract class VehicleSoundInstance extends AbstractTickableSoundInstance
             } else {
                 pitch = Math.min(power, 1.5f);
             }
-            return pitch;
+
+            if (mobileVehicle.getVehicleType() == VehicleType.AIRSHIP) {
+                if (power < 0.5) {
+                    pitch = 0.8f + power * 0.2f;
+                } else if (power <= 1) {
+                    pitch = 0.9f + ((power - 0.5f) * 0.2f);
+                } else {
+                    pitch = Math.min(power, 1.5f);
+                }
+            }
+
+            return Mth.abs(pitch);
         }
 
         @Override

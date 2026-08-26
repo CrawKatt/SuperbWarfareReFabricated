@@ -5,6 +5,7 @@ import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.Vec3
 
 object ModSerializers {
 
@@ -27,12 +28,30 @@ object ModSerializers {
         })
 
     @JvmField
+    @JvmField
+    val VEC3_SERIALIZER: EntityDataSerializer<Vec3> =
+        EntityDataSerializer.simple({ buf, v ->
+            buf.writeDouble(v.x)
+            buf.writeDouble(v.y)
+            buf.writeDouble(v.z)
+        }, { buf ->
+            Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble())
+        })
+
+    @JvmField
     val VEHICLE_GUN_DATA_MAP_SERIALIZER: EntityDataSerializer<Map<String, GunData>> =
         EntityDataSerializer.simple({ buf, map ->
             buf.writeVarInt(map.size)
             map.forEach { (name, data) ->
                 buf.writeUtf(name)
-                buf.writeNbt(data.stack.tag)
+                // Snapshot the tag before handing it to the Netty IO thread.
+                // The tag is a live reference to the ItemStack's internal
+                // CompoundTag; if the server thread mutates it concurrently with
+                // Netty serializing it, a ConcurrentModificationException is thrown
+                // inside CompoundTag.copy() / NbtIo.write(). The defensive copy
+                // here is cheap (one weapon's worth of NBT data) and eliminates
+                // the race entirely.
+                buf.writeNbt(data.stack.tag?.copy())
             }
         }, { buf ->
             buildMap {

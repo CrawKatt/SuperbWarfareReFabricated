@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.renderer.item.SmallContainerBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModBlocks
+import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.loader.api.FabricLoader
@@ -48,7 +49,9 @@ class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER, Properties(
             private var renderer: BlockEntityWithoutLevelRenderer? = null
 
             override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                if (renderer == null) renderer = SmallContainerBlockItemRenderer()
+                if (renderer == null) {
+                    renderer = SmallContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
+                }
                 return renderer!!
             }
         })

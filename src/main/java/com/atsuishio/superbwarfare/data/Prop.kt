@@ -20,6 +20,9 @@ abstract class Prop<DATA : DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA, FIEL
     val transform: (FIELD) -> RESULT,
     private val serializerOverride: KSerializer<FIELD>? = null,
 ) {
+    @JvmField
+    val type: Type = prop.returnType.javaType
+
     val serializer by lazy { serializerOverride ?: prop.serializer() }
 
     override fun toString() = "Prop[$serializationName]"
@@ -68,5 +71,15 @@ class PMC<DATA : DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA>(val data: DATA
         modifier: (RESULT) -> RESULT
     ) {
         this[prop] = modifier(this[prop])
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun getUnchecked(prop: Prop<*, *, *, *, *>): Any? {
+        return (this as PMC<Any, Any?>)[prop as Prop<Any, Any?, *, Any?, *>]
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun setUnchecked(prop: Prop<*, *, *, *, *>, value: Any?) {
+        (this as PMC<Any?, Any?>)[prop as Prop<Any?, Any?, *, Any?, *>] = value
     }
 }

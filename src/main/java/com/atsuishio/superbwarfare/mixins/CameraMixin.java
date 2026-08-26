@@ -1,10 +1,8 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.client.ICustomCamera;
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
@@ -19,48 +17,22 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import org.joml.Math;
-import org.joml.*;
-import org.spongepowered.asm.mixin.Final;
+import org.joml.Matrix4d;
+import org.joml.Vector4d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(Camera.class)
-public abstract class CameraMixin implements ICustomCamera {
-
-    @Unique
-    private boolean superbWarfare$anglesComputed;
-
-    @Unique
-    private float superbWarfare$computedYaw;
-
-    @Unique
-    private float superbWarfare$computedPitch;
-
-    @Unique
-    private float superbWarfare$partialTicks;
-
-    @Shadow
-    @Final
-    private Quaternionf rotation;
-
+public abstract class CameraMixin {
     @Shadow(aliases = "Lnet/minecraft/client/Camera;setRotation(FF)V")
     protected abstract void setRotation(float p_90573_, float p_90574_);
 
     @Shadow(aliases = "Lnet/minecraft/client/Camera;setPosition(DDD)V")
     protected abstract void setPosition(double p_90585_, double p_90586_, double p_90587_);
-
-    @Inject(method = "setup", at = @At("HEAD"))
-    private void superbWarfare$capturePartialTicks(BlockGetter level, Entity entity, boolean detached,
-                                                    boolean mirrored, float partialTicks, CallbackInfo ci) {
-        superbWarfare$anglesComputed = false;
-        superbWarfare$partialTicks = partialTicks;
-    }
 
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0),
             method = "setup(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/world/entity/Entity;ZZF)V",
@@ -86,7 +58,6 @@ public abstract class CameraMixin implements ICustomCamera {
 
                         setRotation(drone.getYaw(partialTicks), drone.getPitch(partialTicks));
                         setPosition(worldPosition.x, worldPosition.y, worldPosition.z);
-                        superbWarfare$applyComputedAnglesToCustomCamera();
                         info.cancel();
                     } else {
                         var rotation = drone.getCameraRotation(partialTicks, player, false, false);
@@ -99,7 +70,6 @@ public abstract class CameraMixin implements ICustomCamera {
                         }
 
                         if (rotation != null || position != null) {
-                            superbWarfare$applyComputedAnglesToCustomCamera();
                             info.cancel();
                         }
                     }
@@ -118,7 +88,6 @@ public abstract class CameraMixin implements ICustomCamera {
                 }
 
                 if (rotation != null || position != null) {
-                    superbWarfare$applyComputedAnglesToCustomCamera();
                     info.cancel();
                 }
 
@@ -141,40 +110,6 @@ public abstract class CameraMixin implements ICustomCamera {
         return transform.transform(new Vector4d(x, y, z, 1));
     }
 
-    @ModifyArgs(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0))
-    private void superbWarfare$applyComputedAngles(Args args) {
-        superbWarfare$computeAngles(args.get(0), args.get(1));
-        args.set(0, superbWarfare$computedYaw);
-        args.set(1, superbWarfare$computedPitch);
-    }
-
-    @Unique
-    private void superbWarfare$computeAngles(float yaw, float pitch) {
-        if (superbWarfare$anglesComputed) return;
-        superbWarfare$anglesComputed = true;
-
-        Camera camera = (Camera) (Object) this;
-        ClientMouseHandler.handleClientTick(camera, superbWarfare$partialTicks);
-
-        ClientEventHandler.CameraAnglesContext context = new ClientEventHandler.CameraAnglesContext(
-                camera,
-                superbWarfare$partialTicks,
-                yaw,
-                pitch,
-                0f
-        );
-
-        ClientEventHandler.computeCameraAngles(context);
-        superbWarfare$computedYaw = context.getYaw();
-        superbWarfare$computedPitch = context.getPitch();
-    }
-
-    @Unique
-    private void superbWarfare$applyComputedAnglesToCustomCamera() {
-        superbWarfare$computeAngles(yRot, xRot);
-        setRotation(superbWarfare$computedYaw, superbWarfare$computedPitch);
-    }
-
     @Inject(method = "setup", at = @At("TAIL"))
     public void superbWarfare$setup(BlockGetter area, Entity entity, boolean thirdPerson, boolean inverseView, float tickDelta, CallbackInfo ci) {
         if (Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK
@@ -183,11 +118,13 @@ public abstract class CameraMixin implements ICustomCamera {
                 && Math.max(ClientEventHandler.bowPullPos, ClientEventHandler.zoomPos) > 0
         ) {
             move(-getMaxZoom(-2.9 * Math.max(ClientEventHandler.bowPullPos, ClientEventHandler.zoomPos)), 0, -ClientEventHandler.cameraLocation * Math.max(ClientEventHandler.bowPullPos, ClientEventHandler.zoomPos));
-        } else if (thirdPerson && entity.getVehicle() instanceof VehicleEntity vehicle) {
-            var cameraPosition = vehicle.getThirdPersonCameraPosition();
-            move(-getMaxZoom(cameraPosition.x()), cameraPosition.y(), cameraPosition.z());
+            return;
         }
 
+        if (!thirdPerson || !(entity.getVehicle() instanceof VehicleEntity vehicle)) return;
+
+        var cameraPosition = vehicle.getThirdPersonCameraPosition();
+        move(-getMaxZoom(cameraPosition.x()), cameraPosition.y(), cameraPosition.z());
     }
 
     @Shadow
@@ -195,19 +132,4 @@ public abstract class CameraMixin implements ICustomCamera {
 
     @Shadow
     protected abstract double getMaxZoom(double desiredCameraDistance);
-
-    @Shadow @Final private Vector3f forwards;
-
-    @Shadow @Final private Vector3f up;
-
-    @Shadow @Final private Vector3f left;
-
-    @Shadow private float xRot;
-
-    @Shadow private float yRot;
-
-    @Override
-    public Quaternionf superbwarfare$getRotation() {
-        return this.rotation;
-    }
 }

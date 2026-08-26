@@ -77,6 +77,7 @@ object ClientRenderHandler {
         AmmoCountOverlay,
         StaminaOverlay,
         VehicleCrosshairOverlay,
+        GPWSOverlay,
         VehicleMainWeaponHudOverlay,
         VehicleHudOverlay,
         IglaHudOverlay,
@@ -134,7 +135,6 @@ object ClientRenderHandler {
     fun registerOverlays() {
         ClientTickEvents.END_CLIENT_TICK.register {
             VehicleTeamOverlay.onVehicleTeamOverlayClientTick()
-            IFFOverlay.onIFFClientTick()
             VehicleMainWeaponHudOverlay.onVehicleMainWeaponHudOverlayClientTick()
             Type63InfoOverlay.tracingEntity()
             AircraftHud.onAircraftHudClientTick()

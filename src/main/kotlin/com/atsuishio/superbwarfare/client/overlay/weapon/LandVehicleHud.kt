@@ -2,14 +2,14 @@ package com.atsuishio.superbwarfare.client.overlay.weapon
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.RenderHelper
+import com.atsuishio.superbwarfare.client.overlay.DecoyOverlayHelper
+import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay.renderEnergyInfo
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
-import com.atsuishio.superbwarfare.init.ModKeyMappings
 import com.atsuishio.superbwarfare.tools.FormatTool.format0D
 import com.atsuishio.superbwarfare.tools.MathTool.getGradientColor
-import com.atsuishio.superbwarfare.tools.TraceTool
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.math.Axis
@@ -21,7 +21,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
-import net.minecraft.world.phys.Vec3
 import org.joml.Math
 
 object LandVehicleHud {
@@ -53,20 +52,16 @@ object LandVehicleHud {
         if (vehicle.getSeatIndex(player) != vehicle.computed().turretControllerIndex) return
 
         val poseStack = guiGraphics.pose()
-
-        val camera = mc.gameRenderer.mainCamera
-        val cameraPos = camera.position
-        val viewVec = Vec3(camera.lookVector)
-
         val color = vehicle.hudColor
 
         poseStack.pushPose()
 
         val recoil = Mth.lerp(partialTick, vehicle.recoilShakeO.toFloat(), vehicle.recoilShake.toFloat())
         lerpRecoil = Mth.lerp(0.1f * partialTick, lerpRecoil, recoil * (2 * (Math.random() - 0.5f)).toFloat())
+        val pitch = Mth.lerp(partialTick, vehicle.fakePitchO, vehicle.fakePitch)
         poseStack.translate(
             lerpRecoil * 6 + screenWidth * 0.025f * recoil,
-            recoil * 3 + screenHeight * 0.025f * recoil,
+            recoil * 3 + screenHeight * 0.025f * recoil - pitch,
             0f
         )
         poseStack.scale(1 - recoil * 0.05f, 1 - recoil * 0.05f, 1f)
@@ -251,7 +246,7 @@ object LandVehicleHud {
             val blockRange = player.getEyePosition(1f).distanceTo(hitPos)
             var entityRange = 0.0
 
-            val lookingEntity = TraceTool.camerafFindLookingEntity(player, cameraPos, viewVec, 512.0)
+            val lookingEntity = OverlayTraceHandler.cameraMaxRangeEntity
             if (lookingEntity != null) {
                 lookAtEntity = true
                 entityRange = player.distanceTo(lookingEntity).toDouble()
@@ -303,30 +298,14 @@ object LandVehicleHud {
             )
 
             // 诱饵
-            if (vehicle.hasDecoy() && player === vehicle.getFirstPassenger()) {
-                if (vehicle.decoyReady) {
-                    guiGraphics.drawString(
-                        Minecraft.getInstance().font,
-                        Component.translatable("tips.superbwarfare.smoke.ready").append(
-                            Component.literal(
-                                " [" + ModKeyMappings.RELEASE_DECOY.translatedKeyMessage.string + "]"
-                            )
-                        ),
-                        screenWidth / 2 - 165,
-                        screenHeight / 2 - 36,
-                        color,
-                        false
-                    )
-                } else {
-                    guiGraphics.drawString(
-                        Minecraft.getInstance().font,
-                        Component.translatable("tips.superbwarfare.smoke.reloading"),
-                        screenWidth / 2 - 165,
-                        screenHeight / 2 - 36,
-                        0xFF0000,
-                        false
-                    )
-                }
+            if (player === vehicle.getFirstPassenger()) {
+                DecoyOverlayHelper.renderThirdPersonDecoyInfo(
+                    vehicle,
+                    guiGraphics,
+                    screenWidth / 2 - 165,
+                    screenHeight / 2 - 36,
+                    color
+                )
             }
 
             VehicleMainWeaponHudOverlay.renderWeaponInfoFirst(

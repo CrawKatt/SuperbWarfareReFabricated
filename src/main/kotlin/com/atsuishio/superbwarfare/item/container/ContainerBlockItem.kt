@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.event.custom.RegisterContainersCallback
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModEntities
+import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.loader.api.FabricLoader
@@ -102,7 +103,9 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
             private var renderer: BlockEntityWithoutLevelRenderer? = null
 
             override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                if (renderer == null) renderer = ContainerBlockItemRenderer()
+                if (renderer == null) {
+                    renderer = ContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
+                }
                 return renderer!!
             }
         })
@@ -134,6 +137,7 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
             event.add(ModEntities.SODAYO_PICK_UP_ROCKET)
             event.add(ModEntities.TRUCK)
             event.add(ModEntities.TYPE_63)
+            event.add(ModEntities.TOW)
             event.add(ModEntities.MK_42)
             event.add(ModEntities.MLE_1934)
             event.add(ModEntities.BL_132)
@@ -154,12 +158,17 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
             event.add(ModEntities.M_1A_2)
             event.add(ModEntities.YX_100)
             event.add(ModEntities.PLZ_05)
+            event.add(ModEntities.FH_77BW)
             event.add(ModEntities.AH_6)
             event.add(ModEntities.MI_28)
             event.add(ModEntities.TOM_6)
             event.add(ModEntities.KV_16)
             event.add(ModEntities.JU_87)
             event.add(ModEntities.A_10A)
+            event.add(ModEntities.AC_130H)
+            event.add(ModEntities.AIR_SHEEP)
+            event.add(ModEntities.HAPPIEST_GHAST)
+            event.add(ModEntities.KIROV)
             RegisterContainersCallback.EVENT.invoker().register(event)
         }
 

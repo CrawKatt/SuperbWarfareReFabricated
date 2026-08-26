@@ -111,29 +111,6 @@ object MiscConfig {
     }
 
     @JvmField
-    val SYNC_ENTITY_OVER_RANGE = buildServerConfig {
-        push("sync")
-
-        comment("Set true to enable synchronizing client entities with the server")
-        comment("是否允许服务端同步超视距的客户端实体")
-        define("sync_entity_over_range", true)
-    }
-
-    @JvmField
-    val SYNC_ENTITY_INTERVAL = buildServerConfig {
-        comment("The interval for synchronizing client entities with the server (tick)")
-        comment("服务端同步客户端实体的间隔（单位为刻）")
-        defineInRange("sync_entity_interval", 10, 1, Int.MAX_VALUE)
-    }
-
-    @JvmField
-    val CLIENT_SYNC_EXPIRE_TIME = buildServerConfig {
-        comment("The expire time for synchronized client entities (ms)")
-        comment("同步到客户端的实体的数据失效时间（单位为毫秒）")
-        defineInRange("client_sync_expire_time", 1000, 1, Int.MAX_VALUE).also { pop() }
-    }
-
-    @JvmField
     val STEEL_COIL_AWAKE_PERCENTAGE = buildServerConfig {
         comment("The minimum health percentage for activating steel coils")
         comment("激怒钢卷所需的最小生命值比例")
@@ -175,6 +152,13 @@ object MiscConfig {
         comment("The percentage of the player's health restored picking up medical kit entity")
         comment("拾取医疗包实体治疗的玩家生命值比例")
         defineInRange("medical_kit_entity_heal_percentage", 0.25, 0.0, 1.0).also { pop() }
+    }
+
+    @JvmField
+    val HIDE_COMBAT_HUD = buildServerConfig {
+        comment("Set true to hide all combat HUD elements (crosshair, hit markers, kill indicators, lock-on frames)")
+        comment("是否隐藏所有战斗HUD元素（准星、命中标记、击杀指示器、锁定框）")
+        define("hide_combat_hud", false)
     }
 
     @JvmField

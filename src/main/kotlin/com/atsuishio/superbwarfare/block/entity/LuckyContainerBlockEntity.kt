@@ -1,9 +1,12 @@
 package com.atsuishio.superbwarfare.block.entity
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.LuckyContainerBlock
+import com.atsuishio.superbwarfare.client.animation.block.LuckyContainerBlockAnimationInstance
 import com.atsuishio.superbwarfare.data.container.ContainerDataManager
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModBlockEntities
+import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import net.minecraft.core.BlockPos
 import net.minecraft.core.particles.ParticleTypes
@@ -22,23 +25,18 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import org.joml.Math
-import software.bernie.geckolib.animatable.GeoBlockEntity
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
-import software.bernie.geckolib.core.animation.AnimatableManager.ControllerRegistrar
-import software.bernie.geckolib.core.animation.AnimationController
-import software.bernie.geckolib.core.animation.AnimationState
-import software.bernie.geckolib.core.animation.RawAnimation
-import software.bernie.geckolib.core.`object`.PlayState
-import software.bernie.geckolib.util.GeckoLibUtil
 
 open class LuckyContainerBlockEntity(pos: BlockPos, state: BlockState) :
-    BlockEntity(ModBlockEntities.LUCKY_CONTAINER, pos, state), GeoBlockEntity {
+    BlockEntity(ModBlockEntities.LUCKY_CONTAINER, pos, state) {
+
+    open val modelInstance = BlockModelReloadListener.getModel(MODEL)?.createInstance()
+
     var location: ResourceLocation? = null
     var icon: ResourceLocation? = null
     var tick: Int = 0
     var opened: Boolean = false
 
-    private val cache: AnimatableInstanceCache? = GeckoLibUtil.createInstanceCache(this)
+    var animationInstance: LuckyContainerBlockAnimationInstance? = null
 
     fun unpackEntities(): EntityType<*>? {
         if (this.location != null && this.level != null && this.level!!.server != null) {
@@ -60,26 +58,6 @@ open class LuckyContainerBlockEntity(pos: BlockPos, state: BlockState) :
             }
         }
         return null
-    }
-
-    private fun predicate(event: AnimationState<LuckyContainerBlockEntity?>): PlayState? {
-        return if (this.blockState.getValue(LuckyContainerBlock.OPENED)) {
-            event.setAndContinue(RawAnimation.begin().thenPlay("animation.container.open"))
-        } else PlayState.STOP
-    }
-
-    override fun registerControllers(data: ControllerRegistrar) {
-        data.add(
-            AnimationController<LuckyContainerBlockEntity?>(
-                this,
-                "controller",
-                0
-            ) { this.predicate(it) }
-        )
-    }
-
-    override fun getAnimatableInstanceCache(): AnimatableInstanceCache? {
-        return this.cache
     }
 
     override fun load(compound: CompoundTag) {
@@ -126,6 +104,8 @@ open class LuckyContainerBlockEntity(pos: BlockPos, state: BlockState) :
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/block/lucky_container.geo.json")
+
         fun serverTick(pLevel: Level, pPos: BlockPos, pState: BlockState, blockEntity: LuckyContainerBlockEntity) {
             if (!pState.getValue(LuckyContainerBlock.OPENED)) {
                 return

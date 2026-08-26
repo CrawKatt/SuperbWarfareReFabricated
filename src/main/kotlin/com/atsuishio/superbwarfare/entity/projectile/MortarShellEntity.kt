@@ -1,20 +1,15 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
-import com.atsuishio.superbwarfare.init.ModDamageTypes.causeProjectileHitDamage
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModMobEffects
 import com.atsuishio.superbwarfare.init.ModSounds
-import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
 import com.atsuishio.superbwarfare.tools.*
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
-import net.minecraft.sounds.SoundSource
+import net.minecraft.util.Mth
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.AreaEffectCloud
 import net.minecraft.world.entity.Entity
@@ -28,7 +23,6 @@ import net.minecraft.world.item.alchemy.PotionUtils
 import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.BellBlock
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
@@ -38,19 +32,26 @@ import kotlin.math.max
 
 open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity {
     enum class Type {
-        NORMAL, WP
+        NORMAL, WP, SMOKE
     }
 
     private var type: Type? = Type.NORMAL
+    private var smokeCount: Int = 12
     private var potion: Potion = Potions.EMPTY
-    private val effects: MutableSet<MobEffectInstance> = hashSetOf()
+    var red: Float = 1.0f
+        private set
+    var green: Float = 1.0f
+        private set
+    var blue: Float = 1.0f
+        private set
 
-    constructor(type: EntityType<out MortarShellEntity>, level: Level) : super(type, level) {
-        this.noCulling = true
+    init {
         this.damageValue = 60f
         this.explosionDamageValue = 100f
         this.explosionRadiusValue = 8f
     }
+
+    constructor(type: EntityType<out MortarShellEntity>, level: Level) : super(type, level)
 
     constructor(
         type: EntityType<out MortarShellEntity>,
@@ -60,10 +61,6 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
         level: Level,
         gravity: Float
     ) : super(type, x, y, z, level) {
-        this.noCulling = true
-        this.damageValue = 60f
-        this.explosionDamageValue = 100f
-        this.explosionRadiusValue = 8f
         this.gravityValue = gravity
     }
 
@@ -73,13 +70,16 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
         damage: Float,
         explosionDamage: Float,
         explosionRadius: Float
-    ) : super(
-        ModEntities.MORTAR_SHELL, entity, level
-    ) {
-        this.noCulling = true
+    ) : super(ModEntities.MORTAR_SHELL, entity, level) {
         this.damageValue = damage
         this.explosionDamageValue = explosionDamage
         this.explosionRadiusValue = explosionRadius
+    }
+
+    override fun setRGB(rgb: FloatArray) {
+        this.red = rgb[0] / 255f
+        this.green = rgb[1] / 255f
+        this.blue = rgb[2] / 255f
     }
 
     fun setEffectsFromItem(pStack: ItemStack) {
@@ -88,17 +88,25 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
             val collection = PotionUtils.getCustomEffects(pStack)
             if (!collection.isEmpty()) {
                 for (instance in collection) {
-                    this.effects.add(MobEffectInstance(instance))
+                    this.effectsValue.add(MobEffectInstance(instance))
                 }
             }
-        } else if (pStack.`is`(ModItems.MORTAR_SHELL)) {
+        } else {
             this.potion = Potions.EMPTY
-            this.effects.clear()
+            this.effectsValue.clear()
         }
     }
 
-    fun setType(type: Type?) {
+    open fun setType(type: Type?) {
         this.type = type
+        if (type == Type.SMOKE) {
+            this.damageValue /= 10f
+            this.explosionDamageValue /= 10f
+        }
+    }
+
+    override fun getDefaultItem(): Item {
+        return ModItems.MORTAR_SHELL
     }
 
     override fun addAdditionalSaveData(compound: CompoundTag) {
@@ -108,13 +116,9 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
             compound.putString("Potion", BuiltInRegistries.POTION.getKey(this.potion)?.toString() ?: "empty")
         }
 
-        if (!this.effects.isEmpty()) {
-            val list = ListTag()
-            for (instance in this.effects) {
-                list.add(instance.save(CompoundTag()))
-            }
-            compound.put("CustomPotionEffects", list)
-        }
+        compound.putFloat("RColor", this.red)
+        compound.putFloat("GColor", this.green)
+        compound.putFloat("BColor", this.blue)
     }
 
     override fun readAdditionalSaveData(compound: CompoundTag) {
@@ -124,54 +128,41 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
             this.potion = PotionUtils.getPotion(compound)
         }
 
-        this.effects.addAll(PotionUtils.getCustomEffects(compound))
-    }
-
-    override fun getDefaultItem(): Item {
-        return ModItems.MORTAR_SHELL
-    }
-
-    public override fun onHitEntity(result: EntityHitResult) {
-        super.onHitEntity(result)
-        val entity = result.entity
-        val owner = this.owner
-        if (owner != null && owner.vehicle != null && entity == owner.vehicle) return
-        if (this.level() is ServerLevel && this.tickCount > 1) {
-            if (owner is ServerPlayer) {
-                owner.level()
-                    .playSound(null, owner.blockPosition(), ModSounds.INDICATION, SoundSource.VOICE, 1f, 1f)
-                sendPacketTo(owner, ClientIndicatorMessage(0, 5))
-            }
-
-            entity.forceHurt(
-                causeProjectileHitDamage(this.level().registryAccess(), this, owner),
-                this.damageValue
-            )
-
-            if (type == Type.WP) {
-                findNearEntity(result.getLocation(), getOwner()!!)
-            }
-
-            if (this.level() is ServerLevel) {
-                causeExplode(result.getLocation())
-                this.createAreaCloud(this.level(), result.getLocation())
-            }
-            this.discard()
+        if (compound.contains("RColor")) {
+            this.red = compound.getFloat("RColor")
+        }
+        if (compound.contains("GColor")) {
+            this.green = compound.getFloat("GColor")
+        }
+        if (compound.contains("BColor")) {
+            this.blue = compound.getFloat("BColor")
         }
     }
 
-    public override fun onHitBlock(result: BlockHitResult) {
-        super.onHitBlock(result)
-        val resultPos = result.blockPos
-        val state = this.level().getBlockState(resultPos)
-        val block = state.block
+    override fun afterHitEntity(result: EntityHitResult) {
+        if (this.tickCount <= 1) return
+        if (this.owner == null) return
 
-        if (block is BellBlock) {
-            block.attemptToRing(this.level(), resultPos, result.direction)
+        if (!this.level().isClientSide()) {
+            when (type) {
+                Type.WP -> this.causeWPEffect(result.getLocation(), this.owner!!)
+                Type.SMOKE -> this.releaseSmoke()
+                else -> {}
+            }
+
+            this.causeExplode(result.getLocation())
+            this.createAreaCloud(this.level(), result.getLocation())
         }
+        this.discard()
+    }
 
-        if (type == Type.WP && this.owner != null) {
-            findNearEntity(result.getLocation(), this.owner!!)
+    override fun afterHitBlock(result: BlockHitResult) {
+        if (!this.level().isClientSide() && this.owner != null) {
+            when (type) {
+                Type.WP -> causeWPEffect(result.getLocation(), this.owner!!)
+                Type.SMOKE -> releaseSmoke()
+                else -> {}
+            }
         }
 
         if (!this.level().isClientSide()) {
@@ -183,7 +174,7 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
         this.discard()
     }
 
-    fun findNearEntity(pos: Vec3, shooter: Entity) {
+    open fun causeWPEffect(pos: Vec3, shooter: Entity) {
         if (this.level() is ServerLevel) {
             val entities = SeekTool.Builder(shooter)
                 .withinRange(pos, explosionRadiusValue.toDouble())
@@ -192,30 +183,43 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
                 .noVehicle()
                 .build()
 
-            for (e in entities) {
-                val dis = pos.distanceTo(e.position())
-
-                if (e is LivingEntity && checkNoClip(e, pos)) {
-                    if (e is Player && e.isCreative) {
-                        return
-                    }
-                    if (!e.level().isClientSide()) {
-                        e.addEffect(
-                            MobEffectInstance(
-                                ModMobEffects.PHOSPHORUS_FIRE,
-                                (300 - 30 * dis).toInt(),
-                                max(explosionRadiusValue - dis, 0.0).toInt()
-                            ), this.owner
-                        )
-                    }
+            entities.asSequence()
+                .filter { it is LivingEntity && !(it is Player && it.isCreative) }
+                .forEach {
+                    val dis = pos.distanceTo(it.position())
+                    if (!checkNoClip(it, pos)) return@forEach
+                    (it as LivingEntity).addEffect(
+                        MobEffectInstance(
+                            ModMobEffects.PHOSPHORUS_FIRE,
+                            (300 - 30 * dis).toInt(),
+                            max(explosionRadiusValue - dis, 0.0).toInt()
+                        ), this.owner
+                    )
                 }
+        }
+    }
+
+    open fun releaseSmoke() {
+        val level = this.level()
+        if (level is ServerLevel) {
+            val vec3 = Vec3(1.0, 0.05, 0.0)
+            for (i in 0..<this.smokeCount) {
+                val decoy = SmokeDecoyEntity(ModEntities.SMOKE_DECOY, level, true)
+                    .setColor(this.red, this.green, this.blue)
+                decoy.setPos(this.x, this.y + bbHeight, this.z)
+                decoy.decoyShoot(this, vec3.yRot(i * (360f / this.smokeCount) * Mth.DEG_TO_RAD), 2f, 5f)
+                level.addFreshEntity(decoy)
             }
         }
     }
 
+    override fun forceLoadChunk(): Boolean {
+        return true
+    }
+
     override fun tick() {
         val level = this.level()
-        if (tickCount > getLife()) {
+        if (tickCount > this.getLife()) {
             if (level is ServerLevel) {
                 this.createAreaCloud(level, position())
             }
@@ -264,15 +268,15 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
         }
     }
 
-    override fun buildExplosion(vec3: Vec3): CustomExplosion.Builder {
-        return super.buildExplosion(vec3).damageMultiplier(1.25f)
-    }
-
-    fun createAreaCloud(level: Level, pos: Vec3) {
-        if (this.potion === Potions.EMPTY) return
+    open fun createAreaCloud(level: Level, pos: Vec3) {
+        if (this.potion === Potions.EMPTY && this.getEffects().isEmpty()) return
 
         val cloud = AreaEffectCloud(level, pos.x, pos.y, pos.z)
         cloud.setPotion(this.potion)
+        if (this.getEffects().isNotEmpty()) {
+            this.getEffects().forEach { cloud.addEffect(it) }
+        }
+
         cloud.duration = this.explosionDamageValue.toInt()
         cloud.radius = this.explosionRadiusValue
         val owner = this.owner
@@ -289,10 +293,4 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
     override fun getVolume(): Float {
         return 0.06f
     }
-
-    override fun forceLoadChunk(): Boolean {
-        return true
-    }
-
-    override fun getModel() = BedrockModelLoader.MORTAR_SHELL_MODEL
 }

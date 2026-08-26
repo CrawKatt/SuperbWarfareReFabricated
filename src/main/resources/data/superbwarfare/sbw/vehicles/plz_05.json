@@ -11,6 +11,7 @@
     {
       "Transform": "Vehicle",
       "Position": [1, 0.8375, 2.656],
+      "RotateWithVehicle": true,
       "MinPitch": -60,
       "MaxPitch": 60,
       "MinYaw": -95,
@@ -43,6 +44,7 @@
       "Transform": "Turret",
       "Position": [1.1525, 0.75, -0.51145],
       "CanRotateBody": true,
+      "RotateWithVehicle": true,
       "MinPitch": -50,
       "MaxPitch": 90,
       "DismountInfo": {
@@ -54,6 +56,7 @@
       "Transform": "Turret",
       "Position": [-1.1525, 0.75, -0.51145],
       "CanRotateBody": true,
+      "RotateWithVehicle": true,
       "MinPitch": -50,
       "MaxPitch": 90,
       "DismountInfo": {
@@ -171,11 +174,12 @@
     "#superbwarfare:projectile_absolute * 0.18",
     "@#superbwarfare:aa_missile * 0.3",
     "@superbwarfare:small_cannon_shell * 0.29",
-    "@superbwarfare:c4 * 4",
+    "@superbwarfare:c4 * 6",
     "@#superbwarfare:at_rocket * 1.4",
     "@superbwarfare:gun_grenade * 1.45",
     "@superbwarfare:mortar_shell * 1.45",
-    "@superbwarfare:tm_62 * 2.8"
+    "@superbwarfare:tm_62 * 2.8",
+    "$entity.getSourceAngle(source, 0.3) * damage"
   ],
   "HUDColor": "0x00ff66",
   "EngineType": "Track",
@@ -209,7 +213,6 @@
     ]
   },
   "DestroyInfo": {
-    "ParticleType": "Giant",
     "ExplosionDamage": 250,
     "ExplosionRadius": 18,
     "SympatheticDetonation": true,
@@ -220,6 +223,11 @@
   "InertiaRotateRate": 0.8,
   "HasDecoy": true,
   "OBB": [
+    {
+      "Part": "Collision",
+      "Size": [2.1875, 0.969, 4.469],
+      "Position": [0, 0.969, 0.906]
+    },
     {
       "Size": [2.1875, 0.34375, 3.78125],
       "Position": [0, 1.65625, 0.34375]

@@ -5,10 +5,9 @@ import com.atsuishio.superbwarfare.data.gun.ShootParameters
 import com.atsuishio.superbwarfare.data.vehicle.DefaultVehicleData
 import com.atsuishio.superbwarfare.data.vehicle.VehicleData
 import com.atsuishio.superbwarfare.data.vehicle.subdata.DestroyInfo
-import com.atsuishio.superbwarfare.entity.vehicle.base.GeoVehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.init.ModKeyMappings
-import com.atsuishio.superbwarfare.tools.ParticleTool
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
@@ -20,8 +19,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import org.joml.Math
 
-open class Tom6Entity(type: EntityType<Tom6Entity>, world: Level) : GeoVehicleEntity(type, world) {
-
+open class Tom6Entity(type: EntityType<Tom6Entity>, world: Level) : VehicleEntity(type, world) {
     val hasMelon
         get() = weaponData?.hasEnoughAmmoToShoot(this) ?: false
 
@@ -32,8 +30,7 @@ open class Tom6Entity(type: EntityType<Tom6Entity>, world: Level) : GeoVehicleEn
                 rawData.destroyInfo.explodePassengers,
                 rawData.destroyInfo.explodeBlocks,
                 this.melonExplosionDamage,
-                this.melonExplosionRadius,
-                ParticleTool.ParticleType.HUGE
+                this.melonExplosionRadius
             )
         }
         return super.computeProperties(data, rawData)

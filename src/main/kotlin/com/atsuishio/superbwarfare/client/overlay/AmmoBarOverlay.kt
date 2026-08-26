@@ -17,7 +17,6 @@ import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.tools.FormatTool.format1DZZ
 import net.minecraft.Util
 import net.minecraft.client.Minecraft
-import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.player.Player
@@ -220,6 +219,7 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
                                 24f
                             )
                         }
+
                         AmmoConsumeType.ENERGY -> {
                             RenderHelper.preciseBlit(
                                 guiGraphics, AMMO_STACK,
@@ -233,6 +233,7 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
                                 24f
                             )
                         }
+
                         else -> {
                             RenderHelper.preciseBlit(
                                 guiGraphics, AMMO_STACK,
@@ -344,8 +345,8 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
     private fun toUnderScores(str: String): String {
         val builder = StringBuilder()
 
-        for (i in 0..<str.length) {
-            val c = str[i]
+        for ((i, element) in str.withIndex()) {
+            val c = element
             if (Character.isUpperCase(c)) {
                 if (i != 0) {
                     builder.append('_')
@@ -391,25 +392,8 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
     }
 
     private fun getAmmoDisplayName(data: GunData): String {
+        if (data.meleeOnly()) return "Melee"
         val consumer = data.selectedAmmoConsumer()
-        if (consumer.type == AmmoConsumeType.PLAYER_AMMO) {
-            return consumer.playerAmmoType?.displayName ?: "Error"
-        } else if (consumer.type == AmmoConsumeType.INFINITE) {
-            return "Infinity"
-        } else if (data.meleeOnly()) {
-            return "Melee"
-        } else if (consumer.type == AmmoConsumeType.ENERGY) {
-            return "Energy"
-        } else if (!consumer.stack().isEmpty) {
-            val nameComponent = consumer.stack().hoverName
-            val contents = nameComponent.contents
-            if (contents is TranslatableContents) {
-                return ClientLanguageGetter.EN_US.getOrDefault(contents.key)
-            }
-
-            return ClientLanguageGetter.EN_US.getOrDefault(consumer.stack().descriptionId)
-        } else {
-            return ""
-        }
+        return consumer.strategy.getDisplayName(consumer)
     }
 }

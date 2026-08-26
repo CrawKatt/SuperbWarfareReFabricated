@@ -15,6 +15,7 @@
   "UpStep": 1.1,
   "RotateOffsetHeight": 0.4,
   "Mass": 0.03,
+  "TowForceFactor": 10.0,
   "SendHitParticles": false,
   "DamageModifiers": [
     "@minecraft:tnt * 3",
@@ -25,7 +26,6 @@
   ],
   "VehicleContainerType": "Empty",
   "DestroyInfo": {
-    "ParticleType": "Small",
     "ExplosionDamage": 10,
     "ExplosionRadius": 2,
     "ExplodePassengers": false,

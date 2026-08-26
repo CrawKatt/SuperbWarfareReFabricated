@@ -29,7 +29,7 @@ import software.bernie.geckolib.model.GeoModel
 import software.bernie.geckolib.renderer.GeoEntityRenderer
 import software.bernie.geckolib.util.RenderUtils
 
-
+@Deprecated("Geckolib will be removed since 0.8.10", replaceWith = ReplaceWith("SbmVehicleRenderer"))
 abstract class VehicleRenderer<T>(renderManager: EntityRendererProvider.Context, model: GeoModel<T>) :
     GeoEntityRenderer<T>(renderManager, model) where T : VehicleEntity, T : GeoAnimatable {
 
@@ -154,13 +154,13 @@ abstract class VehicleRenderer<T>(renderManager: EntityRendererProvider.Context,
             root.z.toFloat()
         )
         poseStack.rotateAround(
-            Axis.XP.rotationDegrees(Mth.lerp(partialTicks, entityIn.xRotO, entityIn.xRot)),
+            Axis.XP.rotationDegrees(Mth.lerp(partialTicks, entityIn.xRotO + entityIn.fakePitchO, entityIn.xRot + entityIn.fakePitch)),
             root.x.toFloat(),
             root.y.toFloat(),
             root.z.toFloat()
         )
         poseStack.rotateAround(
-            Axis.ZP.rotationDegrees(Mth.lerp(partialTicks, entityIn.prevRoll, entityIn.roll)),
+            Axis.ZP.rotationDegrees(Mth.lerp(partialTicks, entityIn.prevRoll + entityIn.fakeRollO, entityIn.roll + entityIn.fakeRoll)),
             root.x.toFloat(),
             root.y.toFloat(),
             root.z.toFloat()
@@ -204,7 +204,7 @@ abstract class VehicleRenderer<T>(renderManager: EntityRendererProvider.Context,
         if (ClientEventHandler.activeThermalImaging) {
             return SmartTextureBrightener.getSmartBrightenedTexture(res, 3f)
         } else if (animatable.isWreck) {
-            return if ((animatable.vehicleType == VehicleType.AIRPLANE || animatable.vehicleType == VehicleType.HELICOPTER)) {
+            return if ((animatable.vehicleType == VehicleType.AIRPLANE || animatable.vehicleType == VehicleType.HELICOPTER || animatable.vehicleType == VehicleType.AIRSHIP)) {
                 if (animatable.sympatheticDetonated) {
                     TextureBrightnessHandler.getBrightenedTexture(res, 0.3f)
                 } else {

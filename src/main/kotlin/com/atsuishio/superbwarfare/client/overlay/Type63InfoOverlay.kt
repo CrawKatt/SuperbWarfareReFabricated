@@ -38,7 +38,7 @@ object Type63InfoOverlay : CommonOverlay("type_63_info") {
     }
 
     override fun RenderContext.render() {
-        val lookingEntity = lookingEntity ?: return
+        val lookingEntity = OverlayTraceHandler.playerReachEntity as? Type63Entity ?: return
 
         val poseStack = guiGraphics.pose()
 
@@ -83,9 +83,9 @@ object Type63InfoOverlay : CommonOverlay("type_63_info") {
         )
 
         val items = lookingEntity.getEntityData().get(Type63Entity.LOADED_AMMO)
-        for (i in lookingEntity.barrel.indices) {
-            if (OBB.getLookingObb(player, PlayerReachTool.getEntityReach(player)) === lookingEntity.barrel[i]) {
-                val type: Int = items[i]!!
+        for (i in lookingEntity.barrelObbs.indices) {
+            if (OBB.getLookingObb(player, player.getEntityReach()) === lookingEntity.barrelObbs[i]) {
+                val type: Int = items[i]
 
                 val stack = when (type) {
                     0 -> AP
@@ -94,7 +94,7 @@ object Type63InfoOverlay : CommonOverlay("type_63_info") {
                     else -> ItemStack.EMPTY
                 }
 
-                val pos = OBB.vector3dToVec3(lookingEntity.barrel[i].center)
+                val pos = OBB.vector3dToVec3(lookingEntity.barrelObbs[i].center)
                 val point = pos.worldToScreen()
 
                 poseStack.pushPose()

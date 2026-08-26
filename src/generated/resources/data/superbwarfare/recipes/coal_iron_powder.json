@@ -3,11 +3,16 @@
   "category": "misc",
   "ingredients": [
     {
-      "tag": "c:dusts/iron"
+      "tag": "forge:dusts/iron"
     },
-    {
-      "tag": "c:dusts/coal_coke"
-    }
+    [
+      {
+        "tag": "forge:dusts/coal_coke"
+      },
+      {
+        "tag": "forge:dusts/coal"
+      }
+    ]
   ],
   "result": {
     "item": "superbwarfare:coal_iron_powder"

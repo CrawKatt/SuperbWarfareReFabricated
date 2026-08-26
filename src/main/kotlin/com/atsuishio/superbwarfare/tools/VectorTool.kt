@@ -5,10 +5,9 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.mojang.math.Axis
 import net.minecraft.core.BlockPos
 import net.minecraft.util.Mth
+import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
-import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
@@ -42,8 +41,14 @@ fun Vec3.worldToScreen(): Vec3 {
     val window = mc.window
     val camera = mc.gameRenderer.mainCamera
     val worldPosRel = Vector4d(camera.position.reverse().add(this).toVector3f(), 1.0)
-    worldPosRel.mul(ClientEventHandler.modelViewMatrix)
-    worldPosRel.mul(ClientEventHandler.projectionMatrix)
+    
+    // Handle matrix nullability checks securely before multiplying
+    val modelView = ClientEventHandler.modelViewMatrix
+    val projection = ClientEventHandler.projectionMatrix
+    if (modelView != null && projection != null) {
+        worldPosRel.mul(modelView)
+        worldPosRel.mul(projection)
+    }
 
     val depth = worldPosRel.w
 
@@ -195,14 +200,9 @@ object VectorTool {
      * @param v0 平面法向量（朝向向量）。
      * @return 反射向量 v2。
      */
+    @JvmStatic
     fun calculateReflection(v1: Vec3, v0: Vec3): Vec3 {
-        // 归一化法向量（确保单位长度）
-
-        // 计算点积 v1 · n
-
         val dot = v1.dot(v0)
-
-        // 计算反射向量: v2 = v1 - 2 * (v1 · n) * n
         return v1 - v0 * (2 * dot)
     }
 
@@ -219,22 +219,21 @@ object VectorTool {
         )
     }
 
-    @JvmStatic
-    fun checkNoClip(pos1: Vec3, pos2: Vec3, level: Level): Boolean {
-        val check1 = level.clip(
-            ClipContext(
-                pos1, pos1.add(pos1.vectorTo(pos2).normalize().scale(128.0)),
-                ClipContext.Block.VISUAL, ClipContext.Fluid.ANY, null
-            )
-        ).type != HitResult.Type.BLOCK
-
-        val check2 = level.clip(
-            ClipContext(
-                pos2, pos2.add(pos2.vectorTo(pos1).normalize().scale(128.0)),
-                ClipContext.Block.VISUAL, ClipContext.Fluid.ANY, null
-            )
-        ).type != HitResult.Type.BLOCK
-
-        return check1 && check2
-    }
+    /**
+    * Returns a randomly spread direction vector around [dir].
+    *
+    * Extracted from ProjectileEntity/GrapeshotEntity/GunItem — previously each
+    * class carried its own copy of this identical logic.
+    *
+    * @param rng    random source (use entity.getRandom() or item's random)
+    * @param dir    base direction vector
+    * @param spread spread angle in degrees (0 = no spread, 40 = wide scatter)
+    * @return normalised direction with applied random spread
+    */
+    fun randomSpreadVec(rng: RandomSource, dir: Vec3, spread: Double): Vec3 =
+        dir.normalize().add(
+            rng.triangle(0.0, 0.0172275 * spread),
+            rng.triangle(0.0, 0.0172275 * spread),
+            rng.triangle(0.0, 0.0172275 * spread)
+        )
 }

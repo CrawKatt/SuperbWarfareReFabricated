@@ -24,6 +24,20 @@ object DisplayClothConfig {
         category.addEntry(
             entryBuilder
                 .startIntSlider(
+                    Component.translatable("config.superbwarfare.client.display.vehicle_lod_distance"),
+                    DisplayConfig.VEHICLE_LOD_DISTANCE.get(),
+                    -1,
+                    512
+                )
+                .setDefaultValue(64)
+                .setSaveConsumer { DisplayConfig.VEHICLE_LOD_DISTANCE.set(it) }
+                .setTooltip(Component.translatable("config.superbwarfare.client.display.vehicle_lod_distance.des"))
+                .build()
+        )
+
+        category.addEntry(
+            entryBuilder
+                .startIntSlider(
                     Component.translatable("config.superbwarfare.client.display.weapon_hud_x_offset"),
                     DisplayConfig.WEAPON_HUD_X_OFFSET.get(),
                     -1000,
@@ -263,6 +277,18 @@ object DisplayClothConfig {
                 .setDefaultValue(100)
                 .setSaveConsumer { DisplayConfig.SHOCK_SCREEN_SHAKE.set(it) }
                 .setTooltip(Component.translatable("config.superbwarfare.client.display.shock_screen_shake.des"))
+                .build()
+        )
+
+        category.addEntry(
+            entryBuilder
+                .startBooleanToggle(
+                    Component.translatable("config.superbwarfare.client.display.enable_fire_flash_light"),
+                    DisplayConfig.ENABLE_FIRE_FLASH_LIGHT.get()
+                )
+                .setDefaultValue(true)
+                .setSaveConsumer { DisplayConfig.ENABLE_FIRE_FLASH_LIGHT.set(it) }
+                .setTooltip(Component.translatable("config.superbwarfare.client.display.enable_fire_flash_light.des"))
                 .build()
         )
     }

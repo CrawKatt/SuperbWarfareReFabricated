@@ -6,15 +6,12 @@ import com.atsuishio.superbwarfare.client.overlay.VehicleHudOverlay.renderKillIn
 import com.atsuishio.superbwarfare.client.overlay.VehicleHudOverlay.renderKillIndicatorDynamic
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay.renderWeaponInfoThird
 import com.atsuishio.superbwarfare.client.overlay.weapon.LandVehicleHud
+import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.vehicle.subdata.VehicleType
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
-import com.atsuishio.superbwarfare.init.ModKeyMappings
-import com.atsuishio.superbwarfare.tools.ResourceOnceLogger
-import com.atsuishio.superbwarfare.tools.canBeSeen
-import com.atsuishio.superbwarfare.tools.toFormattedString
-import com.atsuishio.superbwarfare.tools.worldToScreen
+import com.atsuishio.superbwarfare.tools.*
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.math.Axis
@@ -24,7 +21,6 @@ import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
-import net.minecraft.world.level.ClipContext
 import org.joml.Math
 import kotlin.math.roundToInt
 
@@ -49,8 +45,10 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
         "@VehicleCommonCannonZooming" to loc("textures/overlay/vehicle/crosshair/common_cannon_zooming.png"),
         "@VehicleLaserCannon" to loc("textures/overlay/vehicle/crosshair/laser_cannon.png"),
         "@AirCraftCommon" to loc("textures/overlay/vehicle/aircraft/common.png"),
+        "@AirCraftNacelle" to loc("textures/overlay/vehicle/crosshair/nacelle.png"),
+        "@AC130Gun" to loc("textures/overlay/vehicle/crosshair/ac_130_gun.png"),
+        "@AC130Cannon" to loc("textures/overlay/vehicle/crosshair/ac_130_cannon.png"),
         "@NoCross" to loc("textures/overlay/vehicle/crosshair/empty.png")
-
     )
 
     private val CROSSHAIR_THIRD_CAMERA = loc("textures/overlay/vehicle/crosshair/third_camera.png")
@@ -96,9 +94,10 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
         poseStack.pushPose()
 
         val recoil = Mth.lerp(partialTick, entity.recoilShakeO.toFloat(), entity.recoilShake.toFloat())
+        val pitch = Mth.lerp(partialTick, entity.fakePitchO, entity.fakePitch)
         poseStack.translate(
             LandVehicleHud.lerpRecoil * 6 + screenWidth * 0.025f * recoil,
-            recoil * 3 + screenHeight * 0.025f * recoil,
+            recoil * 3 + screenHeight * 0.025f * recoil - pitch,
             0f
         )
         poseStack.scale(1 - recoil * 0.05f, 1 - recoil * 0.05f, 1f)
@@ -124,19 +123,21 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
         scopeScale = Mth.lerp(partialTick, scopeScale, 1f)
         val scale: Float = scopeScale
 
-        val shootPos = entity.getShootPosForHud(player, partialTick)
+        var shootPos = entity.getShootPosForHud(player, partialTick)
+        val nacelleCam = ClientEventHandler.isNacelleCam(player)
 
-        val result = player.level().clip(
-            ClipContext(
-                shootPos, shootPos.add(entity.getShootDirectionForHud(player, partialTick).scale(512.0)),
-                ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player
-            )
-        )
-        val hitPos = result.getLocation()
+        if (nacelleCam) {
+            shootPos = camera.position
+        }
 
+        val result = OverlayTraceHandler.blockMaxRangeResult
+        val hitPos = result?.location ?: shootPos
         var dis = shootPos.distanceTo(hitPos)
 
-        val lookingEntity = entity.getPlayerLookAtEntityOnVehicle(player, 512.0, partialTick)
+        var lookingEntity = entity.getPlayerLookAtEntityOnVehicle(player, 512.0, partialTick)
+        if (nacelleCam) {
+            lookingEntity = OverlayTraceHandler.cameraMaxRangeEntity
+        }
 
         if (lookingEntity != null) {
             dis = shootPos.distanceTo(lookingEntity.position())
@@ -148,24 +149,17 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
         // 渲染第一人称
         if (Minecraft.getInstance().options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle) {
             poseStack.pushPose()
-
-            val texture: ResourceLocation?
-            if (crosshairPath.startsWith("@")) {
-                texture = CROSSHAIR_MAP.get(crosshairPath)
+            val texture = if (crosshairPath.startsWith("@")) {
+                CROSSHAIR_MAP[crosshairPath]
             } else {
-                texture = ResourceLocation.tryParse(crosshairPath)
+                ResourceLocation.tryParse(crosshairPath)
             }
 
             if (texture == null) {
                 val finalCrosshairPath = crosshairPath
                 if (finalCrosshairPath != "@Custom") {
-                    LOGGER.log(
-                        crosshairPath
-                    ) { logger ->
-                        logger!!.error(
-                            "Failed to load crosshair texture for {}",
-                            finalCrosshairPath
-                        )
+                    LOGGER.log(crosshairPath) { logger ->
+                        logger.error("Failed to load crosshair texture for {}", finalCrosshairPath)
                     }
                 }
             } else {
@@ -209,7 +203,13 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                         scaledMinWH,
                         color
                     )
-                } else if ((crosshairPath == "@AirCraftCommon" || crosshairPath == "@VehicleLaserCannon" || crosshairPath == "@VehicleCommonGunDynamic") && pos.canBeSeen()) {
+                } else if ((crosshairPath == "@AirCraftCommon"
+                            || crosshairPath == "@VehicleLaserCannon"
+                            || crosshairPath == "@VehicleCommonGunDynamic"
+                            || crosshairPath == "@AC130Gun"
+                            || crosshairPath == "@AC130Cannon"
+                            ) && pos.canBeSeen()
+                ) {
                     RenderHelper.blit(
                         poseStack,
                         texture,
@@ -228,8 +228,46 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                         x - 7.5f + (2 * (Math.random() - 0.5f)).toFloat(),
                         y - 7.5f + (2 * (Math.random() - 0.5f)).toFloat()
                     )
+
+                } else if (crosshairPath == "@AirCraftNacelle") {
+                    RenderHelper.blit(
+                        poseStack,
+                        texture,
+                        centerW,
+                        centerH,
+                        0f,
+                        0f,
+                        scaledMinWH,
+                        scaledMinWH,
+                        scaledMinWH,
+                        scaledMinWH,
+                        color
+                    )
+                    renderKillIndicator(guiGraphics, screenWidth.toFloat(), screenHeight.toFloat())
+
+                    val width = Minecraft.getInstance().font.width(FormatTool.format0D(dis, " m"))
+                    guiGraphics.drawString(
+                        Minecraft.getInstance().font,
+                        Component.literal(FormatTool.format0D(dis, " m")),
+                        screenWidth / 2 - width / 2,
+                        screenHeight / 2 + 30,
+                        color,
+                        false
+                    )
+
+                    val heat = entity.getWeaponHeat(player)
+                    val component = entity.firstPersonAmmoComponent(data, player)
+                    guiGraphics.drawString(
+                        font,
+                        component,
+                        (screenWidth) / 2 - 50 - font.width(component),
+                        screenHeight / 2 + 2,
+                        MathTool.getGradientColor(color, 0xFF0000, heat, 2),
+                        false
+                    )
+
                 } else if (crosshairPath == "@VehicleCnHpjZooming") {
-                    val dynamicTexture: ResourceLocation? = CROSSHAIR_MAP.get("@VehicleDynamicCross")
+                    val dynamicTexture: ResourceLocation? = CROSSHAIR_MAP["@VehicleDynamicCross"]
                     RenderHelper.blit(
                         poseStack,
                         dynamicTexture,
@@ -248,6 +286,7 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                         x - 7.5f + (2 * (Math.random() - 0.5f)).toFloat(),
                         y - 7.5f + (2 * (Math.random() - 0.5f)).toFloat()
                     )
+
                 } else if (crosshairPath == "@VehicleCommonCannonZooming") {
                     val fovAdjust = 60f / Minecraft.getInstance().options.fov().get()
                     val f = Math.min(screenWidth, screenHeight).toFloat()
@@ -269,14 +308,13 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                         j.toFloat()
                     )
                     renderKillIndicator(guiGraphics, screenWidth.toFloat(), screenHeight.toFloat())
-                } else if (crosshairPath == "@VehicleCommonSeekMissile" && data.get(GunProp.SEEK_WEAPON_INFO) != null && data.get(
-                        GunProp.SEEK_WEAPON_INFO
-                    )?.onlyLockBlock ?: false
+
+                } else if (crosshairPath == "@VehicleCommonSeekMissile"
+                    && data.get(GunProp.SEEK_WEAPON_INFO) != null
+                    && data.get(GunProp.SEEK_WEAPON_INFO)?.onlyLockBlock ?: false
                 ) {
                     var vec3 = ClientEventHandler.seekingPosVehicle
-                    if (ClientEventHandler.seekingTimeVehicle > 0) {
-                        vec3 = ClientEventHandler.lockingPosVehicle
-                    }
+                    if (ClientEventHandler.seekingTimeVehicle > 0) vec3 = ClientEventHandler.lockingPosVehicle
                     if (vec3 != null) {
                         val string = vec3.toFormattedString()
                         val width = Minecraft.getInstance().font.width(string)
@@ -302,6 +340,7 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                             false
                         )
                     }
+
                 } else {
                     RenderHelper.blit(
                         poseStack,
@@ -321,9 +360,16 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
             }
 
             poseStack.popPose()
-        } else if (Minecraft.getInstance().options.cameraType == CameraType.THIRD_PERSON_BACK && !ClientEventHandler.zoomVehicle) {
+        } else if (Minecraft.getInstance().options.cameraType == CameraType.THIRD_PERSON_BACK && !ClientEventHandler.zoomVehicle && !MiscConfig.HIDE_COMBAT_HUD.get()) {
+            val seekInfo = data.get(GunProp.SEEK_WEAPON_INFO)
+            val flag = seekInfo != null && seekInfo.inputBlockPos
             // 渲染第三人称
-            if (pos.canBeSeen() && !((entity.vehicleType == VehicleType.AIRPLANE || entity.vehicleType == VehicleType.HELICOPTER) && player === entity.getFirstPassenger())) {
+            if (!flag && pos.canBeSeen() &&
+                !((entity.vehicleType == VehicleType.AIRPLANE
+                        || entity.vehicleType == VehicleType.HELICOPTER
+                        || data.get(GunProp.CROSSHAIR) == "@AirBomb")
+                        && player === entity.getFirstPassenger())
+            ) {
                 val x = p.x.toFloat()
                 val y = p.y.toFloat()
 
@@ -346,38 +392,12 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                 )
 
                 poseStack.pushPose()
-
                 poseStack.translate(x, y, 0f)
                 poseStack.scale(0.75f, 0.75f, 1f)
-
                 renderWeaponInfoThird(guiGraphics, entity, player, data, mc.font)
 
                 if (player === entity.getFirstPassenger()) {
-                    if (entity.hasDecoy()) {
-                        if (entity.decoyReady) {
-                            guiGraphics.drawString(
-                                Minecraft.getInstance().font,
-                                Component.translatable("tips.superbwarfare.smoke.ready").append(
-                                    Component.literal(
-                                        " [" + ModKeyMappings.RELEASE_DECOY.translatedKeyMessage.string + "]"
-                                    )
-                                ),
-                                30,
-                                1,
-                                -1,
-                                false
-                            )
-                        } else {
-                            guiGraphics.drawString(
-                                Minecraft.getInstance().font,
-                                Component.translatable("tips.superbwarfare.smoke.reloading"),
-                                30,
-                                1,
-                                0xFF0000,
-                                false
-                            )
-                        }
-                    }
+                    DecoyOverlayHelper.renderThirdPersonDecoyInfo(entity, guiGraphics, 30, 1, -1)
                 }
 
                 poseStack.popPose()

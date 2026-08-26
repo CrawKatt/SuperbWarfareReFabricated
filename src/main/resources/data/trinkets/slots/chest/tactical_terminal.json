@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "icon": "superbwarfare:slot/tactical_terminal_slot",
+  "order": 810,
+  "validator_predicates": [
+    "trinkets:tag"
+  ],
+  "quick_move_predicates": [],
+  "tooltip_predicates": []
+}

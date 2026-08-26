@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.projectile.Blu43Entity
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
@@ -25,7 +24,7 @@ class Blu43Renderer(renderManager: EntityRendererProvider.Context) : EntityRende
         bufferIn: MultiBufferSource,
         packedLightIn: Int
     ) {
-        val model = BedrockModelLoader.getModel(BedrockModelLoader.BLU_43_MODEL) ?: return
+        val instance = entityIn.modelInstance ?: return
 
         poseStack.pushPose()
 
@@ -34,7 +33,7 @@ class Blu43Renderer(renderManager: EntityRendererProvider.Context) : EntityRende
         val renderType = RenderType.entityTranslucent(getTextureLocation(entityIn))
         val vertexConsumer = bufferIn.getBuffer(renderType)
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             vertexConsumer,
             packedLightIn,

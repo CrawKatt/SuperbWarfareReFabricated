@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.client.renderer.projectile
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.projectile.ClaymoreEntity
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
@@ -25,7 +24,7 @@ class ClaymoreRenderer(renderManager: EntityRendererProvider.Context) : EntityRe
         bufferIn: MultiBufferSource,
         packedLightIn: Int
     ) {
-        val model = BedrockModelLoader.getModel(BedrockModelLoader.CLAYMORE_MODEL) ?: return
+        val instance = entityIn.modelInstance ?: return
 
         poseStack.pushPose()
 
@@ -35,7 +34,7 @@ class ClaymoreRenderer(renderManager: EntityRendererProvider.Context) : EntityRe
         val renderType = RenderType.entityTranslucent(getTextureLocation(entityIn))
         val vertexConsumer = bufferIn.getBuffer(renderType)
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             vertexConsumer,
             packedLightIn,

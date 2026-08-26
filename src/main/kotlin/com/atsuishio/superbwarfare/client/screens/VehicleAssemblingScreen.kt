@@ -16,10 +16,7 @@ import com.atsuishio.superbwarfare.init.ModRecipes
 import com.atsuishio.superbwarfare.inventory.menu.VehicleAssemblingMenu
 import com.atsuishio.superbwarfare.network.message.send.AssembleVehicleMessage
 import com.atsuishio.superbwarfare.recipe.vehicle.VehicleAssemblingRecipe
-import com.atsuishio.superbwarfare.tools.clientLevel
-import com.atsuishio.superbwarfare.tools.localPlayer
-import com.atsuishio.superbwarfare.tools.mc
-import com.atsuishio.superbwarfare.tools.sendPacketToServer
+import com.atsuishio.superbwarfare.tools.*
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.systems.RenderSystem
@@ -272,11 +269,12 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
         }
     }
 
-    // TODO 这俩是什么玩意
-    private val scaleAnimator = ValueAnimator<Float>(300, DEFAULT_MODEL_SCALE)
+    @Suppress("unchecked_cast")
+    private val scaleAnimator = ValueAnimator(300, DEFAULT_MODEL_SCALE)
         .animation(AnimationCurves.EASE_OUT_EXPO) as ValueAnimator<Float>
 
-    private val modelPosAnimator = ValueAnimator<Vec2>(300, Vec2(DEFAULT_MODEL_X.toFloat(), DEFAULT_MODEL_Y.toFloat()))
+    @Suppress("unchecked_cast")
+    private val modelPosAnimator = ValueAnimator(300, Vec2(DEFAULT_MODEL_X.toFloat(), DEFAULT_MODEL_Y.toFloat()))
         .animation(AnimationCurves.EASE_OUT_EXPO) as ValueAnimator<Vec2>
 
     init {
@@ -321,16 +319,16 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
             if (pDelta > 0) {
                 targetScale = min(
                     scaleAnimator.lerp(
-                        scaleAnimator.oldValue()!!,
-                        scaleAnimator.newValue()!!,
+                        scaleAnimator.oldValue(),
+                        scaleAnimator.newValue(),
                         System.currentTimeMillis()
                     ) + 20, MAX_MODEL_SCALE
                 )
             } else {
                 targetScale = max(
                     scaleAnimator.lerp(
-                        scaleAnimator.oldValue()!!,
-                        scaleAnimator.newValue()!!,
+                        scaleAnimator.oldValue(),
+                        scaleAnimator.newValue(),
                         System.currentTimeMillis()
                     ) - 20, MIN_MODEL_SCALE
                 )
@@ -400,7 +398,7 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
                     return@AssembleButton
                 }
             }
-            sendPacketToServer(AssembleVehicleMessage(this.currentRecipe!!.id, this.menu!!.containerId))
+            sendPacketToServer(AssembleVehicleMessage(this.currentRecipe!!.id, this.menu.containerId))
         })
     }
 
@@ -432,8 +430,8 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
                 scaleAnimator.update(
                     max(
                         scaleAnimator.lerp(
-                            scaleAnimator.oldValue()!!,
-                            scaleAnimator.newValue()!!,
+                            scaleAnimator.oldValue(),
+                            scaleAnimator.newValue(),
                             System.currentTimeMillis()
                         ) - 20,
                         MIN_MODEL_SCALE
@@ -450,8 +448,8 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
                 scaleAnimator.update(
                     min(
                         scaleAnimator.lerp(
-                            scaleAnimator.oldValue()!!,
-                            scaleAnimator.newValue()!!,
+                            scaleAnimator.oldValue(),
+                            scaleAnimator.newValue(),
                             System.currentTimeMillis()
                         ) + 20, MAX_MODEL_SCALE
                     )
@@ -465,7 +463,7 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
         val mc = Minecraft.getInstance()
         val level = mc.level ?: return
 
-        RenderHelper.markGuiRenderTimestamp()
+        RenderDistanceHelper.markGuiRenderTimestamp()
         val stack = recipe.result.getResult()
         var renderEntity: Entity? = null
 
@@ -525,7 +523,7 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
         posestack.translate(8.0, 8.0, 0.0)
         posestack.scale(1f, -1f, 1f)
         val currentScale =
-            scaleAnimator.lerp(scaleAnimator.oldValue()!!, scaleAnimator.newValue()!!, System.currentTimeMillis())
+            scaleAnimator.lerp(scaleAnimator.oldValue(), scaleAnimator.newValue(), System.currentTimeMillis())
         posestack.scale(currentScale, currentScale, currentScale)
 
         val rot =
@@ -581,7 +579,7 @@ class VehicleAssemblingScreen(pMenu: VehicleAssemblingMenu, pPlayerInventory: In
         val yOffset = modelPosAnimator.lerp(oldVec.y, newVec.y, System.currentTimeMillis())
         posestack.translate(this.leftPos + xOffset, this.topPos + yOffset, 50f)
         val currentScale =
-            scaleAnimator.lerp(scaleAnimator.oldValue()!!, scaleAnimator.newValue()!!, System.currentTimeMillis())
+            scaleAnimator.lerp(scaleAnimator.oldValue(), scaleAnimator.newValue(), System.currentTimeMillis())
         posestack.scale(currentScale, currentScale, -currentScale)
 
         val size = renderEntity.boundingBox.getSize().toFloat()

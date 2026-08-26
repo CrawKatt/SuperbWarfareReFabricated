@@ -2416,6 +2416,54 @@
       }
     ]
   },
+  "epic_explosion_close": {
+    "sounds": [
+      {
+        "name": "superbwarfare:explosion/epic_explosion_close_01",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:explosion/epic_explosion_close_02",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:explosion/epic_explosion_close_03",
+        "stream": false
+      }
+    ]
+  },
+  "epic_explosion_far": {
+    "sounds": [
+      {
+        "name": "superbwarfare:explosion/epic_explosion_far_01",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:explosion/epic_explosion_far_02",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:explosion/epic_explosion_far_03",
+        "stream": false
+      }
+    ]
+  },
+  "epic_explosion_very_far": {
+    "sounds": [
+      {
+        "name": "superbwarfare:explosion/epic_explosion_very_far_01",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:explosion/epic_explosion_very_far_02",
+        "stream": false
+      },
+      {
+        "name": "superbwarfare:explosion/epic_explosion_very_far_03",
+        "stream": false
+      }
+    ]
+  },
   "open": {
     "sounds": [
       {
@@ -2585,7 +2633,7 @@
   "ah_6_engine": {
     "sounds": [
       {
-        "attenuation_distance": 160,
+        "attenuation_distance": 384,
         "stream": true,
         "name": "superbwarfare:vehicle/ah_6/ah_6_engine"
       }
@@ -2932,7 +2980,7 @@
     "sounds": [
       {
         "attenuation_distance": 32,
-        "stream": true,
+        "stream": false,
         "name": "superbwarfare:vehicle/common/wheel_vehicle_skip"
       }
     ]
@@ -2941,7 +2989,7 @@
     "sounds": [
       {
         "attenuation_distance": 32,
-        "stream": true,
+        "stream": false,
         "name": "superbwarfare:vehicle/common/track_vehicle_skip"
       }
     ]
@@ -3153,7 +3201,7 @@
     "sounds": [
       {
         "attenuation_distance": 32,
-        "stream": true,
+        "stream": false,
         "name": "superbwarfare:vehicle/common/track_vehicle_step"
       }
     ]
@@ -3162,7 +3210,7 @@
     "sounds": [
       {
         "attenuation_distance": 128,
-        "stream": true,
+        "stream": false,
         "name": "superbwarfare:rocket_fly"
       }
     ]
@@ -3171,7 +3219,7 @@
     "sounds": [
       {
         "attenuation_distance": 96,
-        "stream": true,
+        "stream": false,
         "name": "superbwarfare:shell_fly"
       }
     ]
@@ -3179,8 +3227,8 @@
   "rocket_engine": {
     "sounds": [
       {
-        "attenuation_distance": 32,
-        "stream": true,
+        "attenuation_distance": 128,
+        "stream": false,
         "name": "superbwarfare:rocket_engine"
       }
     ]
@@ -3197,7 +3245,7 @@
   "a_10a_engine": {
     "sounds": [
       {
-        "attenuation_distance": 256,
+        "attenuation_distance": 768,
         "stream": true,
         "name": "superbwarfare:vehicle/a_10a/a_10a_engine"
       }
@@ -3224,8 +3272,6 @@
   "bomb_release": {
     "sounds": [
       {
-        "attenuation_distance": 32,
-        "stream": true,
         "name": "superbwarfare:bomb_release"
       }
     ]
@@ -3240,8 +3286,6 @@
   "bomb_reload": {
     "sounds": [
       {
-        "attenuation_distance": 16,
-        "stream": true,
         "name": "superbwarfare:bomb_reload"
       }
     ]
@@ -3979,7 +4023,7 @@
   "mi_28_engine": {
     "sounds": [
       {
-        "attenuation_distance": 160,
+        "attenuation_distance": 384,
         "stream": true,
         "name": "superbwarfare:vehicle/mi_28/mi_28_engine"
       }
@@ -4144,7 +4188,7 @@
   "kv_16_engine": {
     "sounds": [
       {
-        "attenuation_distance": 128,
+        "attenuation_distance": 384,
         "stream": true,
         "name": "superbwarfare:vehicle/kv_16/kv_16_engine"
       }
@@ -4162,7 +4206,7 @@
   "stuka": {
     "sounds": [
       {
-        "attenuation_distance": 384,
+        "attenuation_distance": 1024,
         "stream": true,
         "name": "superbwarfare:vehicle/common/stuka"
       }
@@ -4211,7 +4255,7 @@
   "ju_87_engine": {
     "sounds": [
       {
-        "attenuation_distance": 256,
+        "attenuation_distance": 512,
         "stream": true,
         "name": "superbwarfare:vehicle/ju_87/ju_87_engine"
       }
@@ -4374,7 +4418,7 @@
   "heli_crash": {
     "sounds": [
       {
-        "attenuation_distance": 160,
+        "attenuation_distance": 256,
         "stream": true,
         "name": "superbwarfare:vehicle/common/heli_crash"
       }
@@ -4435,6 +4479,194 @@
         "attenuation_distance": 48,
         "stream": false,
         "name": "superbwarfare:steel_coil_move"
+      }
+    ]
+  },
+  "pull_up": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:gpws/pull_up"
+      }
+    ]
+  },
+  "sink_rate": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:gpws/sink_rate"
+      }
+    ]
+  },
+  "terrain": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:gpws/terrain"
+      }
+    ]
+  },
+  "terrain_ahead": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:gpws/terrain_ahead"
+      }
+    ]
+  },
+  "too_low_gear": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:gpws/too_low_gear"
+      }
+    ]
+  },
+  "too_low_terrain": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:gpws/too_low_terrain"
+      }
+    ]
+  },
+  "happiest_ghast_kalibr_missile_fire": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/happiest_ghast/happiest_ghast_kalibr_missile_fire"
+      }
+    ]
+  },
+  "happiest_ghast_missile_fire": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/happiest_ghast/happiest_ghast_missile_fire"
+      }
+    ]
+  },
+  "happiest_ghast_door_open": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/happiest_ghast/happiest_ghast_door_open"
+      }
+    ]
+  },
+  "happiest_ghast_door_close": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/happiest_ghast/happiest_ghast_door_close"
+      }
+    ]
+  },
+  "happiest_ghast_engine": {
+    "sounds": [
+      {
+        "attenuation_distance": 24,
+        "stream": true,
+        "name": "superbwarfare:vehicle/happiest_ghast/happiest_ghast_engine"
+      }
+    ]
+  },
+  "kirov_engine": {
+    "sounds": [
+      {
+        "attenuation_distance": 128,
+        "stream": true,
+        "name": "superbwarfare:vehicle/kirov/kirov_engine"
+      }
+    ]
+  },
+  "ac_130h_engine": {
+    "sounds": [
+      {
+        "attenuation_distance": 768,
+        "stream": true,
+        "name": "superbwarfare:vehicle/ac_130h/ac_130h_engine"
+      }
+    ]
+  },
+  "ac_130h_engine_start": {
+    "sounds": [
+      {
+        "attenuation_distance": 128,
+        "stream": true,
+        "name": "superbwarfare:vehicle/ac_130h/ac_130h_engine_start"
+      }
+    ]
+  },
+  "bofos_fire_1p": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/ac_130h/bofos_fire_1p_1"
+      },
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/ac_130h/bofos_fire_1p_2"
+      },
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/ac_130h/bofos_fire_1p_3"
+      }
+    ]
+  },
+  "bofos_fire_3p": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/ac_130h/bofos_fire_3p"
+      }
+    ]
+  },
+  "bofos_fire_far": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/ac_130h/bofos_fire_far"
+      }
+    ]
+  },
+  "bofos_fire_veryfar": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/ac_130h/bofos_fire_veryfar"
+      }
+    ]
+  },
+  "m102_fire_1p": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/ac_130h/m102_fire_1p"
+      }
+    ]
+  },
+  "m102_fire_3p": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/ac_130h/m102_fire_3p"
+      }
+    ]
+  },
+  "fh_77bw_fire_1p": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/fh_77bw/fh_77bw_fire_1p"
+      }
+    ]
+  },
+  "fh_77bw_fire_3p": {
+    "sounds": [
+      {
+        "stream": false,
+        "name": "superbwarfare:vehicle/fh_77bw/fh_77bw_fire_3p"
       }
     ]
   }

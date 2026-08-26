@@ -1,14 +1,11 @@
 package com.atsuishio.superbwarfare.init
 
-import com.atsuishio.superbwarfare.client.sound.FastProjectileSoundInstance
-import com.atsuishio.superbwarfare.client.sound.HornSoundInstance
-import com.atsuishio.superbwarfare.client.sound.SteelCoilMoveSoundInstance
-import com.atsuishio.superbwarfare.client.sound.VehicleFireSoundInstance
-import com.atsuishio.superbwarfare.client.sound.VehicleSoundInstance
+import com.atsuishio.superbwarfare.client.sound.*
 import com.atsuishio.superbwarfare.entity.living.SteelCoilEntity
 import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.tools.mc
+import java.util.function.BiConsumer
 import java.util.function.Consumer
 
 object ModSoundInstances {
@@ -36,7 +33,9 @@ object ModSoundInstances {
 //            }
 //        };
         VehicleEntity.playFireSound =
-            Consumer { mc.soundManager.play(VehicleFireSoundInstance.VehicleFireSound(it)) }
+            BiConsumer { vehicle, weaponName ->
+                mc.soundManager.play(VehicleFireSoundInstance.VehicleFireSound(vehicle, weaponName))
+            }
         FastThrowableProjectile.playFlySound =
             Consumer { mc.soundManager.play(FastProjectileSoundInstance.FlySound(it)) }
         SteelCoilEntity.playMoveSound =

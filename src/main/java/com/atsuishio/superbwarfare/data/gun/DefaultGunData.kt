@@ -74,6 +74,15 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
     @SerialName("DefaultZoom")
     var defaultZoom = 1.25
 
+    @SerialName("BoundBones")
+    var boundBones: ObjectToList<String>? = ObjectToList()
+
+    @SerialName("BoundBonesYaw")
+    var boundBonesYaw: ObjectToList<String>? = ObjectToList()
+
+    @SerialName("BoundBonesPitch")
+    var boundBonesPitch: ObjectToList<String>? = ObjectToList()
+
     @SerialName("MinZoom")
     var minZoom = defaultZoom
 
@@ -131,6 +140,9 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
     @SerialName("SeekWeaponInfo")
     var seekWeaponInfo: SeekWeaponInfo? = null
 
+    @SerialName("ProjectileDummyInfo")
+    var projectileDummyInfo: ProjectileDummyInfo? = null
+
     @SerialName("AmmoCostPerShoot")
     var ammoCostPerShoot = 1
 
@@ -178,6 +190,9 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
 
     @SerialName("AmmoType")
     var ammoConsumers: ObjectToList<StringToObject<AmmoConsumer>> = ObjectToList()
+
+    @SerialName("UseNacelleCamera")
+    var useNacelleCamera = false
 
     @Transient
     @kotlinx.serialization.Transient
@@ -280,6 +295,9 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
 
     @SerialName("ShootDelay")
     var shootDelay = 0
+
+    @SerialName("ShootDelayTime")
+    var shootDelayTime = 0
 
     @ServerOnly
     @SerialName("HeatPerShoot")
@@ -413,6 +431,12 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
     @SerialName("Name")
     var name: String? = null
 
+    @SerialName("UnderwaterMotionScale")
+    var underwaterMotionScale = 0.75f
+
+    @SerialName("ExplosionDestroy")
+    var explosionDestroy = true
+
     override fun limit() {
         maxDurability = max(0, maxDurability)
         durabilityPerShoot = max(0, durabilityPerShoot)
@@ -449,6 +473,7 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
 
         burstAmount = max(0, burstAmount)
         rpm = rpm.coerceIn(1, 114514)
+        underwaterMotionScale = underwaterMotionScale.coerceIn(0.0f, 1.0f)
     }
 
     companion object {

@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.phys.Vec3
 
-class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), Trinket {
+open class ParachuteItem : Item(Properties().stacksTo(1).durability(600)), Trinket {
     override fun isValidRepairItem(pStack: ItemStack, pRepairCandidate: ItemStack): Boolean {
         return pRepairCandidate.`is`(Items.PHANTOM_MEMBRANE)
     }

@@ -2,12 +2,13 @@ package com.atsuishio.superbwarfare.client.overlay.weapon
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.RenderHelper
+import com.atsuishio.superbwarfare.client.overlay.CompassHud
+import com.atsuishio.superbwarfare.client.overlay.DecoyOverlayHelper
 import com.atsuishio.superbwarfare.client.overlay.VehicleHudOverlay.renderKillIndicatorDynamic
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.event.ClientMouseHandler
-import com.atsuishio.superbwarfare.init.ModKeyMappings
 import com.atsuishio.superbwarfare.tools.canBeSeen
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.mc
@@ -16,10 +17,8 @@ import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.math.Axis
 import net.minecraft.client.CameraType
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.GameRenderer
-import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
@@ -46,6 +45,12 @@ object OldAircraftHud {
     private var mouseY = 0f
 
     private var dis = 512.0
+
+    private val compassHud = CompassHud().apply {
+        x = 130f
+        y = -76f  // 距底部 72+4 = 76 像素
+        size = 72f
+    }
 
     fun onOldAircraftHudClientTick() {
         val player = localPlayer ?: return
@@ -180,6 +185,9 @@ object OldAircraftHud {
             }
         }
 
+        // 指南针
+        compassHud.render(guiGraphics, vehicle, screenWidth, screenHeight, partialTick)
+
         poseStack.pushPose()
 
         if ((mc.options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle) && pos.canBeSeen()) {
@@ -205,7 +213,6 @@ object OldAircraftHud {
                     x - 7.5f + (2 * (Math.random() - 0.5f)).toFloat(),
                     y - 1.5f + (2 * (Math.random() - 0.5f)).toFloat()
             )
-
         }
 
         poseStack.pushPose()
@@ -247,31 +254,8 @@ object OldAircraftHud {
                 val component = vehicle.thirdPersonAmmoComponent(gunData, player)
 
                 guiGraphics.drawString(mc.font, component, 25, -9, Mth.hsvToRgb(0f, heat, 1f), false)
-                if (vehicle.hasDecoy()) {
-                    if (vehicle.decoyReady) {
-                        guiGraphics.drawString(
-                            Minecraft.getInstance().font,
-                            Component.translatable("tips.superbwarfare.flare.ready").append(
-                                Component.literal(
-                                    " [" + ModKeyMappings.RELEASE_DECOY.translatedKeyMessage.string + "]"
-                                )
-                            ),
-                            25,
-                            1,
-                            -1,
-                            false
-                        )
-                    } else {
-                        guiGraphics.drawString(
-                            Minecraft.getInstance().font,
-                            Component.translatable("tips.superbwarfare.flare.reloading"),
-                            25,
-                            1,
-                            0xFF0000,
-                            false
-                        )
-                    }
-                }
+
+                DecoyOverlayHelper.renderThirdPersonDecoyInfo(vehicle, guiGraphics, 25, 1, -1)
 
                 poseStack.popPose()
 

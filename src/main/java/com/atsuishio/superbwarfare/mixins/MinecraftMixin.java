@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.event.custom.ScreenOpeningCallback;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.network.message.send.ChangeVehicleSeatMessage;
 import com.atsuishio.superbwarfare.network.message.send.SwitchVehicleWeaponMessage;
+import com.atsuishio.superbwarfare.tools.MinecraftUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.Screen;
@@ -56,7 +57,7 @@ public class MinecraftMixin {
 
         // shift+数字键 座位更改
         if (vehicle.getMaxPassengers() > 1
-                && options.keyShift.isDown()
+                && ModKeyMappings.CHANGE_SEAT.isDown()
                 && index < vehicle.getMaxPassengers()
                 && vehicle.getNthEntity(index) == null
         ) {
@@ -76,7 +77,7 @@ public class MinecraftMixin {
             options.keyHotbarSlots[index].consumeClick();
 
             // 数字键 武器切换
-            if (!options.keyShift.isDown()
+            if (!ModKeyMappings.CHANGE_SEAT.isDown()
                     && vehicle.hasWeapon(seatIndex)
                     && vehicle.getWeaponIndex(seatIndex) != index) {
                 if (ClientEventHandler.switchVehicleWeaponCooldown <= 0) {

@@ -10,6 +10,8 @@ import com.atsuishio.superbwarfare.tools.ParticleTool
 import com.atsuishio.superbwarfare.tools.forceHurt
 import com.atsuishio.superbwarfare.tools.plus
 import com.atsuishio.superbwarfare.tools.sendPacket
+import com.atsuishio.superbwarfare.tools.VectorTool.randomSpreadVec
+import com.atsuishio.superbwarfare.world.phys.ExtendedEntityRayTraceResult
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -43,11 +45,11 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         this.noCulling = true
     }
 
-    override fun getDefaultItem(): Item = Items.AIR
+    override fun canPassThroughFluid() = true
+
+    override fun getDefaultItem(): Item = Items.NETHER_STAR
 
     override fun onHitEntity(result: EntityHitResult) {
-        super.onHitEntity(result)
-
         val entity = result.entity
         if (entity === this.owner?.vehicle) return
 
@@ -57,10 +59,23 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
             this.currentTarget = entity
         }
 
-        this.hitAndSlash(entity)
+        super.onHitEntity(result)
     }
 
-    private fun hitAndSlash(entity: Entity) {
+    override fun performDamage(
+        entity: Entity,
+        damage: Float,
+        isHeadshot: Boolean
+    ) {
+    }
+
+    override fun afterHitEntity(result: EntityHitResult) {
+        if (result !is ExtendedEntityRayTraceResult) return
+        this.hitAndSlash(result.entity, result.headshot)
+    }
+
+    @JvmOverloads
+    open fun hitAndSlash(entity: Entity, headshot: Boolean = false) {
         val level = level() as? ServerLevel ?: return
 
         var hitVec = entity.position()
@@ -74,9 +89,10 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         })
 
         // 命中伤害
+        val headShotModifier = if (headshot) this.getHeadShot() else 1f
         entity.forceHurt(
             ModDamageTypes.causeSuperStarHitDamage(level.registryAccess(), this, this.owner),
-            damageValue
+            damageValue * headShotModifier
         )
         entity.invulnerableTime = 0
 
@@ -98,33 +114,36 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         }
     }
 
-    public override fun onHitBlock(result: BlockHitResult) {
-        super.onHitBlock(result)
-
+    override fun afterHitBlock(result: BlockHitResult) {
         val resultPos = result.blockPos
         val level = this.level()
         val state = level.getBlockState(resultPos)
 
         val event = state.soundType.breakSound
         val volume = min(4f, deltaMovement.length().toFloat() / 4f + 0.5f)
+
+        val location = result.location
         level.playSound(
             null,
-            result.getLocation().x,
-            result.getLocation().y,
-            result.getLocation().z,
+            location.x,
+            location.y,
+            location.z,
             event,
             SoundSource.AMBIENT,
             volume,
             1f
         )
-        val hitVec = result.getLocation()
 
-        this.hitBlock(hitVec, result)
-        this.discard()
-    }
+        if (level is ServerLevel) {
+            val pos = result.blockPos
+            val face = result.direction
+            val state = level.getBlockState(pos)
 
-    fun hitBlock(location: Vec3, result: BlockHitResult) {
-        val level = this.level() as? ServerLevel ?: return
+            val vx = face.stepX.toDouble()
+            val vy = face.stepY.toDouble()
+            val vz = face.stepZ.toDouble()
+            val dir = Vec3(vx, vy, vz)
+            summonVectorParticle(level, state, location, dir)
 
         val pos = result.blockPos
         val face = result.direction
@@ -147,7 +166,7 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         )
     }
 
-    fun summonVectorParticle(serverLevel: ServerLevel, state: BlockState, pos: Vec3, dir: Vec3) {
+    open fun summonVectorParticle(serverLevel: ServerLevel, state: BlockState, pos: Vec3, dir: Vec3) {
         repeat(2) {
             val vec3 = randomVec(dir, 80.0)
             ParticleTool.sendParticle(
@@ -171,7 +190,7 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         }
     }
 
-    fun onHitWater(location: Vec3, result: BlockHitResult) {
+    open fun onHitWater(location: Vec3, result: BlockHitResult) {
         val serverLevel = this.level() as? ServerLevel ?: return
 
         val pos = result.blockPos
@@ -185,7 +204,7 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         val dir = Vec3(vx, vy, vz) + deltaMovement.normalize().scale(-0.1)
 
         if (state.block === Blocks.WATER && !isInWater) {
-            val particleData = CustomCloudOption(1f, 1f, 1f, 80, 0.5f, 1f, false, false)
+            val particleData = CustomCloudOption(1f, 1f, 1f, 80, 0.5f, 1f, cooldown = false, light = false)
             repeat(9) { i ->
                 val vec3 = randomVec(dir, 40.0)
                 ParticleTool.sendParticle(
@@ -215,11 +234,8 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         }
     }
 
-    fun randomVec(vec3: Vec3, spread: Double): Vec3 = vec3.normalize().add(
-        this.random.triangle(0.0, 0.0172275 * spread),
-        this.random.triangle(0.0, 0.0172275 * spread),
-        this.random.triangle(0.0, 0.0172275 * spread)
-    )
+    fun randomVec(vec3: Vec3, spread: Double): Vec3 =
+        randomSpreadVec(this.random, vec3, spread)
 
     override fun tick() {
         tickO = tick
@@ -230,7 +246,7 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         if (!level.isClientSide) {
             val startVec = this.position()
             val endVec = startVec.add(this.deltaMovement)
-            val fluidResult = ProjectileEntity.rayTraceBlocks(
+            val fluidResult = IAdvancedHitDetection.rayTraceBlocks(
                 level,
                 ClipContext(startVec, endVec, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, this)
             ) { _ -> false }

@@ -28,8 +28,14 @@ open class SyncedEntityEnergyStorage(
         energyDataAccessor
     )
 
+    init {
+        // 从entityData同步初始能量值，避免reviveCaps()后内部energy字段与entityData不一致
+        this.energy = entityData.get(energyDataAccessor).toLong()
+    }
+
     override fun onFinalCommit() {
         entityData.set(energyDataAccessor, energy.toInt())
+    }
     }
 
     override fun getEnergyStored(): Int {

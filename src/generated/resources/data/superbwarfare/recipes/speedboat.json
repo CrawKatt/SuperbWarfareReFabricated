@@ -2,7 +2,7 @@
   "type": "superbwarfare:vehicle_assembling",
   "category": "water",
   "inputs": [
-    "2 #superbwarfare:storage_blocks/steel",
+    "2 #forge:storage_blocks/steel",
     "#minecraft:boats",
     "superbwarfare:light_armament_module",
     "superbwarfare:small_battery_pack",

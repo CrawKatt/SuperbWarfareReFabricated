@@ -5,8 +5,10 @@ import com.atsuishio.superbwarfare.client.model.entity.VehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.TurretWreckEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.tools.mc
+import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
+import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.entity.EntityRenderer
@@ -40,57 +42,101 @@ class TurretWreckRenderer(renderManager: EntityRendererProvider.Context) :
         if (type.isEmpty) return
         val entity = type.get().create(wreckEntity.level()) ?: return
         val renderer = mc.entityRenderDispatcher.getRenderer(entity)
-        if (entity is VehicleEntity && entity is GeoAnimatable && renderer is GeoEntityRenderer) {
-            val model = renderer.getGeoModel()
-            if (model !is VehicleModel) return
+        if (entity is VehicleEntity) {
+            if (entity is GeoAnimatable && renderer is GeoEntityRenderer) {
+                val model = renderer.geoModel
+                if (model !is VehicleModel) return
 
-            val modelResource = model.getPreciseModelResource(entity) ?: return
-            val textureResource = model.getPreciseTextureResource(entity) ?: return
+                val modelResource = model.getPreciseModelResource(entity) ?: return
+                val textureResource = model.getPreciseTextureResource(entity) ?: return
 
-            val bakedModel = model.getBakedModel(modelResource)
-            val optionalBone = bakedModel.getBone("turret")
-            if (optionalBone.isEmpty) return
+                val bakedModel = model.getBakedModel(modelResource)
+                val optionalBone = bakedModel.getBone("turret")
+                if (optionalBone.isEmpty) return
 
-            val barrelBone = bakedModel.getBone("barrel")
-            barrelBone.ifPresent { it.setRotX(-wreckEntity.xRotO * Mth.DEG_TO_RAD) }
+                val barrelBone = bakedModel.getBone("barrel")
+                barrelBone.ifPresent { it.setRotX(-wreckEntity.xRotO * Mth.DEG_TO_RAD) }
 
-            val passerWeaponPitch = bakedModel.getBone("passengerWeaponStationPitch")
-            passerWeaponPitch.ifPresent { it.setRotX(0f) }
+                val passerWeaponPitch = bakedModel.getBone("passengerWeaponStationPitch")
+                passerWeaponPitch.ifPresent { it.setRotX(0f) }
 
-            val passerWeaponYaw = bakedModel.getBone("passengerWeaponStationYaw")
-            passerWeaponYaw.ifPresent { it.setRotY(0f) }
+                val passerWeaponYaw = bakedModel.getBone("passengerWeaponStationYaw")
+                passerWeaponYaw.ifPresent { it.setRotY(0f) }
 
-            optionalBone.get().setHidden(false)
+                optionalBone.get().setHidden(false)
 
-            val turretPos = entity.turretPos
+                val turretPos = entity.turretPos
 
-            poseStack.pushPose()
+                poseStack.pushPose()
 
-            if (turretPos != null) {
-                poseStack.translate(turretPos.x, -turretPos.y, turretPos.z)
+                if (turretPos != null) {
+                    poseStack.translate(turretPos.x, -turretPos.y, turretPos.z)
+                }
+
+                val tBone = optionalBone.get()
+                val renderType = RenderType.entityTranslucent(textureResource)
+                val source = bufferSource.getBuffer(renderType)
+                renderer.renderCubesOfBone(poseStack, tBone, source, packedLight, packedOverlay, 0.3f, 0.3f, 0.3f, 1.0f)
+                renderer.renderChildBones(
+                    poseStack,
+                    entity,
+                    tBone,
+                    renderType,
+                    bufferSource,
+                    source,
+                    false,
+                    partialTick,
+                    packedLight,
+                    packedOverlay,
+                    0.3f,
+                    0.3f,
+                    0.3f,
+                    1.0f
+                )
+                poseStack.popPose()
+            } else if (renderer is GeoVehicleRenderer) {
+                val entries = entity.getModelEntries()
+                if (entries.isEmpty()) return
+                val entry = entries.first()
+                val instance = entry.instance
+
+                val turret = instance.getBone("turret") ?: return
+
+                val barrelBone = instance.getBone("barrel")
+                barrelBone?.rotation?.rotationX((-wreckEntity.xRotO * Mth.DEG_TO_RAD))
+
+                val passerWeaponPitch = instance.getBone("passengerWeaponStationPitch")
+                passerWeaponPitch?.rotation?.rotationX(0f)
+
+                val passerWeaponYaw = instance.getBone("passengerWeaponStationYaw")
+                passerWeaponYaw?.rotation?.rotationY(0f)
+
+                turret.visible = true
+
+                val turretPos = entity.turretPos
+
+                poseStack.pushPose()
+
+                if (turretPos != null) {
+                    poseStack.translate(-turretPos.x, -turretPos.y, -turretPos.z)
+                }
+
+                poseStack.mulPose(Axis.YP.rotationDegrees(180f))
+
+                val turretIndex = instance.getIndex("turret")
+                instance.renderSingleBone(
+                    poseStack,
+                    turretIndex,
+                    bufferSource,
+                    RenderType.entityTranslucent(entry.texture),
+                    BedrockModelRenderTypes.polyMeshCutout(entry.texture),
+                    packedLight,
+                    OverlayTexture.NO_OVERLAY,
+                    0.3f, 0.3f, 0.3f, 1f,
+                    true
+                )
+                poseStack.popPose()
             }
-
-            val tBone = optionalBone.get()
-            val renderType = RenderType.entityTranslucent(textureResource)
-            val source = bufferSource.getBuffer(renderType)
-            renderer.renderCubesOfBone(poseStack, tBone, source, packedLight, packedOverlay, 0.3f, 0.3f, 0.3f, 1.0f)
-            renderer.renderChildBones(
-                poseStack,
-                entity,
-                tBone,
-                renderType,
-                bufferSource,
-                source,
-                false,
-                partialTick,
-                packedLight,
-                packedOverlay,
-                0.3f,
-                0.3f,
-                0.3f,
-                1.0f
-            )
-            poseStack.popPose()
         }
     }
 

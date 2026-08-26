@@ -51,7 +51,7 @@ class VehicleAssemblingResult {
                 this.result = ItemStack.EMPTY
             } else {
                 if (nbt != null) {
-                    val tag = TagDataParser.parse(nbt)
+                    val tag = TagDataParser.parseObject(nbt)
                     val tmp = CompoundTag()
                     tmp.put("tag", tag)
                     tmp.putString("id", itemString)

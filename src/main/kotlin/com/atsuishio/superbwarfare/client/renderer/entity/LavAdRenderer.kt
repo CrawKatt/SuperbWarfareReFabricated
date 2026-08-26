@@ -1,14 +1,48 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
-import com.atsuishio.superbwarfare.client.layer.vehicle.LavAdLayer
-import com.atsuishio.superbwarfare.client.model.entity.LavAdModel
-import com.atsuishio.superbwarfare.entity.vehicle.LavAdEntity
+import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.client.model.entity.VehicleModelInstance
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.util.Mth
 
-class LavAdRenderer(renderManager: EntityRendererProvider.Context) :
-    VehicleRenderer<LavAdEntity>(renderManager, LavAdModel()) {
+class LavAdRenderer(manager: EntityRendererProvider.Context) : BasicVehicleRenderer(manager) {
+    override fun hideForTurretControllerWhileZooming(): Boolean {
+        return true
+    }
 
-    init {
-        this.addRenderLayer(LavAdLayer(this))
+    override fun renderCustomPart(
+        entity: VehicleEntity,
+        instance: VehicleModelInstance,
+        poseStack: PoseStack,
+        entityYaw: Float,
+        partialTicks: Float,
+        buffer: MultiBufferSource,
+        packedLight: Int
+    ) {
+        super.renderCustomPart(entity, instance, poseStack, entityYaw, partialTicks, buffer, packedLight)
+
+        val heat = Mth.clamp(entity.getWeaponHeat(0, 0).toFloat(), 0f, 100f)
+
+        if (heat > 0) {
+            instance.renderToBuffer(
+                poseStack,
+                buffer.getBuffer(RenderType.eyes(HEAT)),
+                packedLight,
+                OverlayTexture.NO_OVERLAY,
+                heat / 100,
+                heat / 100,
+                heat / 100,
+                1f
+            )
+        }
+    }
+
+    companion object {
+        val HEAT = loc("textures/bedrock/vehicle/lav_ad_heat.png")
     }
 }

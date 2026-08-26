@@ -3,6 +3,8 @@ package com.atsuishio.superbwarfare.item.curio
 import com.atsuishio.superbwarfare.client.TooltipTool
 import com.atsuishio.superbwarfare.client.screens.DogTagEditorScreen
 import com.atsuishio.superbwarfare.client.tooltip.component.DogTagImageComponent
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
 import dev.emi.trinkets.api.SlotReference
 import dev.emi.trinkets.api.Trinket
@@ -12,6 +14,7 @@ import net.fabricmc.api.Environment
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.tooltip.TooltipComponent
@@ -21,7 +24,7 @@ import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 import java.util.*
 
-class DogTagItem : Item(Properties().stacksTo(1)), Trinket, ItemScreenProvider {
+open class DogTagItem : Item(Properties().stacksTo(1)), Trinket, ItemScreenProvider, IVehicleInteract {
     @Environment(EnvType.CLIENT)
     override fun appendHoverText(
         pStack: ItemStack,
@@ -40,6 +43,17 @@ class DogTagItem : Item(Properties().stacksTo(1)), Trinket, ItemScreenProvider {
 
     override fun getTooltipImage(pStack: ItemStack): Optional<TooltipComponent> {
         return Optional.of(DogTagImageComponent(pStack))
+    }
+
+    override fun onInteractVehicle(
+        vehicle: VehicleEntity,
+        stack: ItemStack,
+        player: Player,
+        hand: InteractionHand
+    ): InteractionResult? {
+        if (!player.isShiftKeyDown) return null
+        vehicle.dogTagIcon = getColors(stack).map { it.toList() }.toList()
+        return InteractionResult.SUCCESS
     }
 
     @Environment(EnvType.CLIENT)

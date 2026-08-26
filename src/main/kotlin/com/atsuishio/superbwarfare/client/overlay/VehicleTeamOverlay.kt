@@ -2,15 +2,21 @@ package com.atsuishio.superbwarfare.client.overlay
 
 import com.atsuishio.superbwarfare.client.RenderHelper
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
+import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.init.ModItems
-import com.atsuishio.superbwarfare.tools.*
+import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.FormatTool.format1D
+import com.atsuishio.superbwarfare.tools.TraceTool
 import com.atsuishio.superbwarfare.tools.VectorTool.lerpGetEntityBoundingBoxCenter
+import com.atsuishio.superbwarfare.tools.canBeSeen
+import com.atsuishio.superbwarfare.tools.localPlayer
+import com.atsuishio.superbwarfare.tools.mc
+import com.atsuishio.superbwarfare.tools.worldToScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.network.chat.Component
@@ -19,11 +25,12 @@ import net.minecraft.world.entity.OwnableEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.scores.PlayerTeam
-import net.minecraft.world.scores.Team
 import kotlin.math.max
 
 object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
-    override fun shouldRender() = super.shouldRender() && DisplayConfig.VEHICLE_INFO.get()
+    override fun shouldRender() = super.shouldRender()
+        && DisplayConfig.VEHICLE_INFO.get()
+        && !MiscConfig.HIDE_COMBAT_HUD.get()
 
     private var lookingEntity: Entity? = null
     private var entityRange = 0.0
@@ -40,7 +47,7 @@ object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
             196.0
         }
 
-        lookingEntity = TraceTool.camerafFindLookingEntity(
+        lookingEntity = TraceTool.cameraFindLookingEntity(
             player,
             viewPos,
             viewVec,
@@ -51,7 +58,7 @@ object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
             if (vehicle.hasWeapon(vehicle.getSeatIndex(player))) {
                 viewVec = vehicle.getShootDirectionForHud(player, 1f)
                 viewPos = vehicle.getShootPosForHud(player, 1f)
-                lookingEntity = TraceTool.camerafFindLookingEntity(
+                lookingEntity = TraceTool.cameraFindLookingEntity(
                     player,
                     viewPos,
                     viewVec,
@@ -74,8 +81,8 @@ object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
     }
 
     override fun RenderContext.render() {
-        if (!lookAtEntity) return
-        val lookingEntity = lookingEntity as VehicleEntity
+        val lookingEntity = OverlayTraceHandler.cameraEntity as? VehicleEntity ?: return
+        val entityRange = player.distanceTo(lookingEntity).toDouble()
 
         val stack = player.mainHandItem
         val usingDrone = stack.`is`(ModItems.MONITOR)
@@ -98,7 +105,7 @@ object VehicleTeamOverlay : CommonOverlay("vehicle_team") {
                 poseStack.pushPose()
                 poseStack.translate(x, y - 12, 0f)
 
-                val size = ((50 / ClientEventHandler.fov) * 0.9f * max((512 - entityRange) / 512, 0.1)
+                val size = ((30 / ClientEventHandler.fov) * 0.9f * max((512 - entityRange) / 512, 0.1)
                     .coerceIn(0.4, 1.0)).toFloat()
                 poseStack.scale(size, size, size)
                 val font = mc.font

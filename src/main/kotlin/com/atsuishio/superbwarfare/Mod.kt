@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare
 
-import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.advancement.CriteriaRegister
+import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.command.CommandRegister
 import com.atsuishio.superbwarfare.compat.tacz.TACZGunEventHandler
@@ -56,6 +56,7 @@ import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect
 import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect
 import com.atsuishio.superbwarfare.network.NetworkRegistry
+import com.atsuishio.superbwarfare.sound.SoundLimit
 import com.atsuishio.superbwarfare.perk.damage.BattleOfWits
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction
 import com.atsuishio.superbwarfare.procedures.WelcomeProcedure
@@ -137,6 +138,10 @@ class Mod : ModInitializer {
 
         ModItems.init()
         ModItems.registerDispenserBehavior()
+
+        if (FabricLoader.getInstance().environmentType == EnvType.CLIENT) {
+            SoundLimit.init()
+        }
     }
 
     private fun callInits() {
@@ -257,7 +262,7 @@ class Mod : ModInitializer {
         const val ATTRIBUTE_MODIFIER = "superbwarfare_attribute_modifier"
 
         @JvmField
-        val LOGGER: Logger = LogManager.getLogger(Mod::class.java)
+        val LOGGER: Logger = LogManager.getLogger(com.atsuishio.superbwarfare.Mod::class.java)
 
         @JvmStatic
         fun loc(path: String): ResourceLocation {

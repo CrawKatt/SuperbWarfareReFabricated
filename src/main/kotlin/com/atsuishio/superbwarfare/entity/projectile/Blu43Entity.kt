@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier.Companion.createDefaultModifier
@@ -8,8 +9,8 @@ import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.atsuishio.superbwarfare.tools.CustomExplosion
-import com.atsuishio.superbwarfare.tools.ParticleTool
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData.Companion.enabledTDM
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -35,6 +36,8 @@ import java.util.*
 import kotlin.math.max
 
 open class Blu43Entity : Entity, OwnableEntity {
+    open val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
+
     constructor(type: EntityType<Blu43Entity>, world: Level) : super(type, world)
 
     constructor(owner: LivingEntity?, level: Level) : super(ModEntities.BLU_43, level) {
@@ -54,13 +57,12 @@ open class Blu43Entity : Entity, OwnableEntity {
     }
 
     override fun hurt(source: DamageSource, amount: Float): Boolean {
-        var amount = amount
-        amount = DAMAGE_MODIFIER.compute(source, amount)
+        val damage = DAMAGE_MODIFIER.compute(this, source, amount)
         if (source.entity != null) {
             this.entityData.set(LAST_ATTACKER_UUID, source.entity!!.getStringUUID())
         }
-        this.entityData.set(HEALTH, this.entityData.get(HEALTH) - amount)
-        return super.hurt(source, amount)
+        this.entityData.set(HEALTH, this.entityData.get(HEALTH) - damage)
+        return super.hurt(source, damage)
     }
 
     fun setOwnerUUID(pUuid: UUID?) {
@@ -97,16 +99,16 @@ open class Blu43Entity : Entity, OwnableEntity {
             uuid = compound.getUUID("Owner")
         } else {
             val s = compound.getString("Owner")
+            val server = this.server
 
-            try {
-                uuid = if (this.server == null) {
+            uuid = if (server == null) {
+                try {
                     UUID.fromString(s)
-                } else {
-                    OldUsersConverter.convertMobOwnerIfNecessary(this.server!!, s)
+                } catch (_: Exception) {
+                    null
                 }
-            } catch (exception: Exception) {
-                Mod.LOGGER.error("Couldn't load owner UUID of {}: {}", this, exception)
-                uuid = null
+            } else {
+                OldUsersConverter.convertMobOwnerIfNecessary(server, s)
             }
         }
 
@@ -253,7 +255,6 @@ open class Blu43Entity : Entity, OwnableEntity {
             .damage(ExplosionConfig.BLU_43_EXPLOSION_DAMAGE.get().toFloat())
             .radius(ExplosionConfig.BLU_43_EXPLOSION_RADIUS.get().toFloat())
             .keepBlock()
-            .withParticleType(ParticleTool.ParticleType.SMALL)
             .explode()
 
         this.discard()
@@ -273,6 +274,8 @@ open class Blu43Entity : Entity, OwnableEntity {
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/projectile/blu_43.geo.json")
+
         @JvmField
         protected val OWNER_UUID: EntityDataAccessor<Optional<UUID>> =
             SynchedEntityData.defineId(Blu43Entity::class.java, EntityDataSerializers.OPTIONAL_UUID)

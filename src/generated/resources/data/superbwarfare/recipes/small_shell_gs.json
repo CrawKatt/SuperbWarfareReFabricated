@@ -3,7 +3,7 @@
   "category": "equipment",
   "key": {
     "a": {
-      "tag": "superbwarfare:ingots/lead"
+      "tag": "forge:ingots/lead"
     },
     "b": {
       "tag": "c:copper_ingots"

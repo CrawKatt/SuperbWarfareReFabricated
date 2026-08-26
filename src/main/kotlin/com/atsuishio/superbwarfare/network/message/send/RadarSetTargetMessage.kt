@@ -15,9 +15,10 @@ data class RadarSetTargetMessage(val target: SerializedUUID) : ServerPacketPaylo
 
         val menu = player.containerMenu as? FuMO25Menu ?: return
         if (!menu.stillValid(player)) return
+        val entities = EntityFindUtil.getEntities(player.level()) ?: return
 
         menu.selfPos.ifPresent {
-            EntityFindUtil.getEntities(player.level()).getAll()
+            entities.getAll()
                 .asSequence()
                 .filterIsInstance<AutoAimableEntity>()
                 .filter { it.owner === player && it.distanceTo(player) <= 24 }

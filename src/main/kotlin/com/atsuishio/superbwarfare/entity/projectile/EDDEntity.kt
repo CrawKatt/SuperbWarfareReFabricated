@@ -1,12 +1,14 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import com.atsuishio.superbwarfare.tools.toVec3
@@ -41,6 +43,7 @@ import java.util.*
 open class EDDEntity : HangingEntity, OwnableEntity {
     // 0 - Left Top; 1 - Left Bottom; 2 - Right Bottom; 3 - Right Top
     var corner: Int
+    open val modelInstance = ProjectileModelReloadListener.getModel(MODEL)?.createInstance()
 
     @JvmOverloads
     constructor(
@@ -123,16 +126,16 @@ open class EDDEntity : HangingEntity, OwnableEntity {
             uuid = tag.getUUID("Owner")
         } else {
             val s = tag.getString("Owner")
+            val server = this.server
 
-            try {
-                uuid = if (this.server == null) {
+            uuid = if (server == null) {
+                try {
                     UUID.fromString(s)
-                } else {
-                    OldUsersConverter.convertMobOwnerIfNecessary(this.server!!, s)
+                } catch (_: Exception) {
+                    null
                 }
-            } catch (exception: Exception) {
-                Mod.LOGGER.error("Couldn't load owner UUID of {}: {}", this, exception)
-                uuid = null
+            } else {
+                OldUsersConverter.convertMobOwnerIfNecessary(server, s)
             }
         }
 
@@ -303,7 +306,6 @@ open class EDDEntity : HangingEntity, OwnableEntity {
             .damage(ExplosionConfig.EDD_EXPLOSION_DAMAGE.get().toFloat())
             .radius(ExplosionConfig.EDD_EXPLOSION_RADIUS.get().toFloat())
             .keepBlock()
-            .withParticleType(ParticleTool.ParticleType.MINI)
             .explode()
 
         this.discard()
@@ -364,6 +366,8 @@ open class EDDEntity : HangingEntity, OwnableEntity {
     }
 
     companion object {
+        val MODEL = loc("models/bedrock/projectile/edd.geo.json")
+
         @JvmField
         val OWNER_UUID: EntityDataAccessor<Optional<UUID>> =
             SynchedEntityData.defineId(EDDEntity::class.java, EntityDataSerializers.OPTIONAL_UUID)

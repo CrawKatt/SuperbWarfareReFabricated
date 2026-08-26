@@ -3,16 +3,13 @@
   "category": "misc",
   "key": {
     "a": {
-      "tag": "c:iron_ingots"
-    },
-    "b": {
-      "tag": "c:green_dyes"
+      "tag": "forge:plates/steel"
     }
   },
   "pattern": [
-    "a a",
-    "a a",
-    "aba"
+    "a",
+    "a",
+    "a"
   ],
   "result": {
     "item": "superbwarfare:mortar_barrel"

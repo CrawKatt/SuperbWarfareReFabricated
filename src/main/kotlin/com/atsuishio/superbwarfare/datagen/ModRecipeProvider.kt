@@ -54,9 +54,13 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
 
     companion object {
         val PLATES_COPPER: TagKey<Item> = commonItemTag("plates/copper")
+        val PLATES_STEEL: TagKey<Item> = commonItemTag("plates/steel")
+        val PLATES_PLASTIC: TagKey<Item> = commonItemTag("plates/plastic")
+        val INGOTS_STEEL: TagKey<Item> = commonItemTag("ingots/steel")
         val INGOTS_LEAD: TagKey<Item> = commonItemTag("ingots/lead")
         val INGOTS_SILVER: TagKey<Item> = commonItemTag("ingots/silver")
         val INGOTS_TUNGSTEN: TagKey<Item> = commonItemTag("ingots/tungsten")
+        val STORAGE_BLOCK_STEEL = commonItemTag("storage_blocks/steel")
 
         private fun buildToolRecipes(writer: Consumer<FinishedRecipe>) {
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.ARTILLERY_INDICATOR)
@@ -89,14 +93,10 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('c', Items.GOLDEN_APPLE)
                 .unlockedBy(getHasName(Items.GOLDEN_APPLE), has(Items.GOLDEN_APPLE))
                 .save(writer, loc(getItemName(ModItems.MEDICAL_KIT)))
-            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.ARMOR_PLATE, 4)
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.ARMOR_PLATE, 2)
                 .pattern("aba")
-                .pattern("ccc")
-                .pattern("ada")
                 .define('a', Items.STRING)
-                .define('b', ItemTags.TERRACOTTA)
-                .define('c', ModTags.Items.INGOTS_STEEL)
-                .define('d', ItemTags.WOOL)
+                .define('b', PLATES_STEEL)
                 .unlockedBy(getHasName(Items.STRING), has(Items.STRING))
                 .save(writer, loc(getItemName(ModItems.ARMOR_PLATE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.VEHICLE_DAMAGE_ANALYZER)
@@ -131,10 +131,10 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern("aba")
                 .pattern(" c ")
                 .pattern(" c ")
-                .define('a', ModTags.Items.INGOTS_STEEL)
-                .define('b', ModTags.Items.STORAGE_BLOCK_STEEL)
+                .define('a', INGOTS_STEEL)
+                .define('b', STORAGE_BLOCK_STEEL)
                 .define('c', Items.STICK)
-                .unlockedBy(getHasName(ModItems.STEEL_BLOCK), has(ModTags.Items.STORAGE_BLOCK_STEEL))
+                .unlockedBy(getHasName(ModItems.STEEL_BLOCK), has(STORAGE_BLOCK_STEEL))
                 .save(writer, loc(getItemName(ModItems.STEEL_HAMMER)))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.DIAMOND_HAMMER)
                 .pattern("aba")
@@ -173,37 +173,93 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                     has(ModItems.CEMENTED_CARBIDE_HAMMER)
                 )
                 .save(writer, loc(getItemName(ModItems.NETHERITE_HAMMER)))
+            // cemented carbide tools
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.CEMENTED_CARBIDE_SWORD)
+                .pattern("a")
+                .pattern("a")
+                .pattern("b")
+                .define('a', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
+                .define('b', Items.STICK)
+                .unlockedBy(
+                    getHasName(ModItems.CEMENTED_CARBIDE_INGOT),
+                    has(ModItems.CEMENTED_CARBIDE_INGOT)
+                )
+                .save(writer, loc(getItemName(ModItems.CEMENTED_CARBIDE_SWORD)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CEMENTED_CARBIDE_PICKAXE)
+                .pattern("aaa")
+                .pattern(" b ")
+                .pattern(" b ")
+                .define('a', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
+                .define('b', Items.STICK)
+                .unlockedBy(
+                    getHasName(ModItems.CEMENTED_CARBIDE_INGOT),
+                    has(ModItems.CEMENTED_CARBIDE_INGOT)
+                )
+                .save(writer, loc(getItemName(ModItems.CEMENTED_CARBIDE_PICKAXE)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CEMENTED_CARBIDE_AXE)
+                .pattern("aa")
+                .pattern("ab")
+                .pattern(" b")
+                .define('a', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
+                .define('b', Items.STICK)
+                .unlockedBy(
+                    getHasName(ModItems.CEMENTED_CARBIDE_INGOT),
+                    has(ModItems.CEMENTED_CARBIDE_INGOT)
+                )
+                .save(writer, loc(getItemName(ModItems.CEMENTED_CARBIDE_AXE)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CEMENTED_CARBIDE_SHOVEL)
+                .pattern("a")
+                .pattern("b")
+                .pattern("b")
+                .define('a', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
+                .define('b', Items.STICK)
+                .unlockedBy(
+                    getHasName(ModItems.CEMENTED_CARBIDE_INGOT),
+                    has(ModItems.CEMENTED_CARBIDE_INGOT)
+                )
+                .save(writer, loc(getItemName(ModItems.CEMENTED_CARBIDE_SHOVEL)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.CEMENTED_CARBIDE_HOE)
+                .pattern("aa")
+                .pattern(" b")
+                .pattern(" b")
+                .define('a', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
+                .define('b', Items.STICK)
+                .unlockedBy(
+                    getHasName(ModItems.CEMENTED_CARBIDE_INGOT),
+                    has(ModItems.CEMENTED_CARBIDE_INGOT)
+                )
+                .save(writer, loc(getItemName(ModItems.CEMENTED_CARBIDE_HOE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.CROWBAR)
                 .pattern("  a")
                 .pattern(" b ")
                 .pattern("b  ")
-                .define('a', ModTags.Items.INGOTS_STEEL)
+                .define('a', INGOTS_STEEL)
                 .define('b', ModTags.Items.INGOTS_IRON)
-                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(ModTags.Items.INGOTS_STEEL))
+                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(INGOTS_STEEL))
                 .save(writer, loc(getItemName(ModItems.CROWBAR)))
             ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.MILITARY_SHOVEL)
                 .pattern(" aa")
                 .pattern(" ba")
                 .pattern("a  ")
-                .define('a', ModTags.Items.INGOTS_STEEL)
+                .define('a', INGOTS_STEEL)
                 .define('b', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
-                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(ModTags.Items.INGOTS_STEEL))
+                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(INGOTS_STEEL))
                 .save(writer, loc(getItemName(ModItems.MILITARY_SHOVEL)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.DEFUSER)
                 .pattern("  a")
                 .pattern("cb ")
                 .pattern(" c ")
-                .define('a', ModTags.Items.INGOTS_STEEL)
+                .define('a', INGOTS_STEEL)
                 .define('b', ModTags.Items.NUGGETS_IRON)
                 .define('c', Items.STICK)
-                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(ModTags.Items.INGOTS_STEEL))
+                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(INGOTS_STEEL))
                 .save(writer, loc(getItemName(ModItems.DEFUSER)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.DETONATOR)
                 .pattern(" a")
                 .pattern("bc")
                 .define('a', Items.REDSTONE_TORCH)
                 .define('b', Items.STONE_BUTTON)
-                .define('c', ModTags.Items.INGOTS_IRON)
+                .define('c', PLATES_PLASTIC)
                 .unlockedBy(getHasName(Items.REDSTONE_TORCH), has(Items.REDSTONE_TORCH))
                 .save(writer, loc(getItemName(ModItems.DETONATOR)))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.ELECTRIC_BATON)
@@ -212,24 +268,24 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern("c  ")
                 .define('a', Items.LIGHTNING_ROD)
                 .define('b', ModItems.BATTERY)
-                .define('c', ModTags.Items.INGOTS_STEEL)
+                .define('c', INGOTS_STEEL)
                 .unlockedBy(getHasName(Items.LIGHTNING_ROD), has(Items.LIGHTNING_ROD))
                 .unlockedBy(getHasName(ModItems.BATTERY), has(ModItems.BATTERY))
                 .save(writer, loc(getItemName(ModItems.ELECTRIC_BATON)))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.KNIFE)
                 .pattern(" a")
                 .pattern("b ")
-                .define('a', ModTags.Items.INGOTS_STEEL)
+                .define('a', INGOTS_STEEL)
                 .define('b', Items.STICK)
-                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(ModTags.Items.INGOTS_STEEL))
+                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(INGOTS_STEEL))
                 .save(writer, loc(getItemName(ModItems.KNIFE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MONITOR)
                 .pattern("a a")
-                .pattern("bcb")
-                .pattern("ded")
+                .pattern("beb")
+                .pattern("dcd")
                 .define('a', Items.LIGHTNING_ROD)
                 .define('b', Items.LEVER)
-                .define('c', ModTags.Items.INGOTS_IRON)
+                .define('c', PLATES_PLASTIC)
                 .define('d', Items.AMETHYST_SHARD)
                 .define('e', ModTags.Items.GLASS_PANES)
                 .unlockedBy(getHasName(Items.LIGHTNING_ROD), has(Items.LIGHTNING_ROD))
@@ -253,8 +309,8 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern(" a ")
                 .pattern("ab ")
                 .define('a', ModTags.Items.INGOTS_IRON)
-                .define('b', ModTags.Items.INGOTS_STEEL)
-                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(ModTags.Items.INGOTS_STEEL))
+                .define('b', INGOTS_STEEL)
+                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(INGOTS_STEEL))
                 .save(writer, loc(getItemName(ModItems.T_BATON)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.DPS_GENERATOR_DEPLOYER)
                 .pattern("a")
@@ -270,29 +326,19 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern("b")
                 .pattern("c")
                 .define('a', Items.TARGET)
-                .define('b', ModTags.Items.INGOTS_STEEL)
+                .define('b', PLATES_STEEL)
                 .define('c', Items.ARMOR_STAND)
                 .unlockedBy(getHasName(Items.TARGET), has(Items.TARGET))
                 .save(writer, loc(getItemName(ModItems.TARGET_DEPLOYER)))
-            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.TOW_DEPLOYER)
-                .pattern("c ")
-                .pattern("ab")
-                .pattern("d ")
-                .define('a', Items.DISPENSER)
-                .define('b', ModItems.MORTAR_BARREL)
-                .define('c', ModItems.ARTILLERY_INDICATOR)
-                .define('d', ModTags.Items.STORAGE_BLOCK_STEEL)
-                .unlockedBy(getHasName(Items.DISPENSER), has(Items.DISPENSER))
-                .save(writer, loc(getItemName(ModItems.TOW_DEPLOYER)))
         }
 
         private fun buildArmorRecipes(writer: Consumer<FinishedRecipe>) {
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.GE_HELMET_M_35)
                 .pattern("aaa")
                 .pattern("aba")
-                .define('a', ModTags.Items.INGOTS_STEEL)
+                .define('a', INGOTS_STEEL)
                 .define('b', ModTags.Items.DYES_BLACK)
-                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(ModTags.Items.INGOTS_STEEL))
+                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(INGOTS_STEEL))
                 .save(writer, loc(getItemName(ModItems.GE_HELMET_M_35)))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.RU_HELMET_6B47)
                 .pattern("aca")
@@ -340,6 +386,22 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                     has(ModItems.CEMENTED_CARBIDE_INGOT)
                 )
                 .save(writer, loc(getItemName(ModItems.US_CHEST_IOTV)))
+
+            VehicleAssemblingRecipeBuilder.item(
+                ModItems.HANDSOME_GOGGLES,
+                1,
+                VehicleAssemblingRecipe.Category.AIRCRAFT
+            )
+                .require(Items.DISPENSER, 8)
+                .require(Items.IRON_TRAPDOOR, 8)
+                .require(ModItems.LIGHT_ARMAMENT_MODULE, 2)
+                .require(ModItems.HEAVY_ARMAMENT_MODULE)
+                .require(ModItems.MEDIUM_BATTERY_PACK)
+                .require(Items.LEVER, 2)
+                .require(INGOTS_STEEL, 4)
+                .require(commonItemTag("stained_glass_panes"), 3)
+                .unlockedBy(getHasName(ModItems.HEAVY_ARMAMENT_MODULE), has(ModItems.HEAVY_ARMAMENT_MODULE))
+                .save(writer, loc(getItemName(ModItems.HANDSOME_GOGGLES) + "_assembling"))
         }
 
         private fun buildAmmoRecipes(writer: Consumer<FinishedRecipe>) {
@@ -361,6 +423,26 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('e', ModItems.MISSILE_ENGINE)
                 .unlockedBy(getHasName(ModItems.MISSILE_ENGINE), has(ModItems.MISSILE_ENGINE))
                 .save(writer, loc(getItemName(ModItems.LARGE_ANTI_GROUND_MISSILE)))
+
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.EXTRA_LARGE_ANTI_GROUND_MISSILE)
+                .requires(ModItems.LARGE_ANTI_GROUND_MISSILE, 2)
+                .unlockedBy(
+                    getHasName(ModItems.LARGE_ANTI_GROUND_MISSILE),
+                    has(ModItems.LARGE_ANTI_GROUND_MISSILE)
+                )
+                .save(writer, loc(getItemName(ModItems.EXTRA_LARGE_ANTI_GROUND_MISSILE)))
+
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.LARGE_ANTI_GROUND_MISSILE, 2)
+                .requires(ModItems.EXTRA_LARGE_ANTI_GROUND_MISSILE)
+                .unlockedBy(
+                    getHasName(ModItems.LARGE_ANTI_GROUND_MISSILE),
+                    has(ModItems.LARGE_ANTI_GROUND_MISSILE)
+                )
+                .save(
+                    writer,
+                    loc(getItemName(ModItems.LARGE_ANTI_GROUND_MISSILE) + "_from_extra_large_anti_ground_missile")
+                )
+
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.SMALL_ROCKET, 4)
                 .pattern(" a ")
                 .pattern("bcb")
@@ -403,8 +485,18 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                     has(ModItems.HIGH_ENERGY_EXPLOSIVES)
                 )
                 .save(writer, loc(getItemName(ModItems.C4_BOMB)))
-            SpecialRecipeBuilder.special(ModRecipes.C4_BOMB_RC_SERIALIZER)
-                .save(writer, loc(getItemName(ModItems.C4_BOMB) + "_rc").toString())
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.C4_BOMB, 2)
+                .withNBT { tag -> tag.putBoolean("Control", true) }
+                .pattern("aaa")
+                .pattern("aba")
+                .pattern("aaa")
+                .define('a', ModItems.HIGH_ENERGY_EXPLOSIVES)
+                .define('b', Items.COMPARATOR)
+                .unlockedBy(
+                    getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES),
+                    has(ModItems.HIGH_ENERGY_EXPLOSIVES)
+                )
+                .save(writer, loc(getItemName(ModItems.C4_BOMB) + "_rc"))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.LARGE_SHELL_AP)
                 .pattern("a")
                 .pattern("b")
@@ -418,7 +510,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern("c")
                 .define('a', Items.STONE_PRESSURE_PLATE)
                 .define('b', ModItems.HIGH_ENERGY_EXPLOSIVES)
-                .define('c', Items.GREEN_CONCRETE)
+                .define('c', PLATES_PLASTIC)
                 .unlockedBy(
                     getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES),
                     has(ModItems.HIGH_ENERGY_EXPLOSIVES)
@@ -519,7 +611,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern(" a ")
                 .pattern("bcb")
                 .pattern(" d ")
-                .define('a', ModTags.Items.INGOTS_STEEL)
+                .define('a', INGOTS_STEEL)
                 .define('b', ModTags.Items.INGOTS_COPPER)
                 .define('c', Items.GUNPOWDER)
                 .define('d', ModItems.PRIMER)
@@ -551,6 +643,22 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 )
                 .unlockedBy(getHasName(ModItems.MISSILE_ENGINE), has(ModItems.MISSILE_ENGINE))
                 .save(writer, loc(getItemName(ModItems.MEDIUM_ANTI_AIR_MISSILE)))
+
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.LARGE_ANTI_AIR_MISSILE)
+                .requires(ModItems.MEDIUM_ANTI_AIR_MISSILE, 2)
+                .unlockedBy(
+                    getHasName(ModItems.MEDIUM_ANTI_AIR_MISSILE),
+                    has(ModItems.MEDIUM_ANTI_AIR_MISSILE)
+                )
+                .save(writer, loc(getItemName(ModItems.LARGE_ANTI_AIR_MISSILE)))
+
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.MEDIUM_ANTI_AIR_MISSILE, 2)
+                .requires(ModItems.LARGE_ANTI_AIR_MISSILE)
+                .unlockedBy(
+                    getHasName(ModItems.MEDIUM_ANTI_AIR_MISSILE),
+                    has(ModItems.MEDIUM_ANTI_AIR_MISSILE)
+                )
+                .save(writer, loc(getItemName(ModItems.MEDIUM_ANTI_AIR_MISSILE) + "_from_large_anti_air_missile"))
 
             ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.MEDIUM_ANTI_GROUND_MISSILE)
                 .requires(ModItems.JAVELIN_MISSILE)
@@ -587,6 +695,29 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('d', Items.GUNPOWDER)
                 .unlockedBy(getHasName(Items.TRIPWIRE_HOOK), has(Items.TRIPWIRE_HOOK))
                 .save(writer, loc(getItemName(ModItems.M18_SMOKE_GRENADE)))
+
+            // vehicle_smoke_ammo <-> m18_smoke_grenade
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.VEHICLE_SMOKE_AMMO, 1)
+                .requires(ModItems.M18_SMOKE_GRENADE, 1)
+                .unlockedBy(
+                    getHasName(ModItems.M18_SMOKE_GRENADE),
+                    has(ModItems.M18_SMOKE_GRENADE)
+                )
+                .save(writer, loc(getItemName(ModItems.VEHICLE_SMOKE_AMMO) + "_from_m18_smoke_grenade"))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.M18_SMOKE_GRENADE, 1)
+                .requires(ModItems.VEHICLE_SMOKE_AMMO, 1)
+                .unlockedBy(
+                    getHasName(ModItems.VEHICLE_SMOKE_AMMO),
+                    has(ModItems.VEHICLE_SMOKE_AMMO)
+                )
+                .save(writer, loc(getItemName(ModItems.M18_SMOKE_GRENADE) + "_from_vehicle_smoke_ammo"))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.FLYING_FLARE_AMMO, 16)
+                .requires(Items.BLAZE_POWDER)
+                .requires(Items.GUNPOWDER)
+                .requires(commonItemTag("dusts/iron"))
+                .unlockedBy(getHasName(Items.BLAZE_POWDER), has(Items.BLAZE_POWDER))
+                .save(writer, loc(getItemName(ModItems.FLYING_FLARE_AMMO)))
+
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.MEDIUM_AERIAL_BOMB)
                 .pattern(" c ")
                 .pattern("dad")
@@ -630,7 +761,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern("bcb")
                 .pattern(" d ")
                 .define('a', ModItems.FUSEE)
-                .define('b', ModTags.Items.INGOTS_STEEL)
+                .define('b', INGOTS_STEEL)
                 .define('c', ModItems.HIGH_ENERGY_EXPLOSIVES)
                 .define('d', ModItems.GRAIN)
                 .unlockedBy(
@@ -644,7 +775,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern("bcb")
                 .pattern("fde")
                 .define('a', ModItems.FUSEE)
-                .define('b', ModTags.Items.INGOTS_STEEL)
+                .define('b', INGOTS_STEEL)
                 .define('c', Items.GUNPOWDER)
                 .define('d', ModItems.GRAIN)
                 .define('e', Items.BLAZE_POWDER)
@@ -655,6 +786,17 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 )
                 .unlockedBy(getHasName(ModItems.GRAIN), has(ModItems.GRAIN))
                 .save(writer, loc(getItemName(ModItems.MORTAR_SHELL_WP)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.MORTAR_SHELL_SMOKE, 8)
+                .pattern(" a ")
+                .pattern("bcb")
+                .pattern(" d ")
+                .define('a', ModItems.FUSEE)
+                .define('b', INGOTS_STEEL)
+                .define('c', Items.WHEAT)
+                .define('d', ModItems.GRAIN)
+                .unlockedBy(getHasName(Items.WHEAT), has(Items.WHEAT))
+                .unlockedBy(getHasName(ModItems.GRAIN), has(ModItems.GRAIN))
+                .save(writer, loc(getItemName(ModItems.MORTAR_SHELL_SMOKE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.PTKM_1R)
                 .pattern(" b ")
                 .pattern("dad")
@@ -684,7 +826,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern(" a ")
                 .pattern("bcb")
                 .pattern(" d ")
-                .define('a', ModTags.Items.INGOTS_STEEL)
+                .define('a', INGOTS_STEEL)
                 .define('b', PLATES_COPPER)
                 .define('c', Items.GUNPOWDER)
                 .define('d', ModItems.PRIMER)
@@ -725,7 +867,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern(" a ")
                 .pattern("bcb")
                 .pattern(" d ")
-                .define('a', ModTags.Items.INGOTS_STEEL)
+                .define('a', INGOTS_STEEL)
                 .define('b', ModTags.Items.INGOTS_COPPER)
                 .define('c', ModItems.HIGH_ENERGY_EXPLOSIVES)
                 .define('d', ModItems.PRIMER)
@@ -739,7 +881,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern(" a ")
                 .pattern("bcb")
                 .pattern(" d ")
-                .define('a', ModTags.Items.INGOTS_LEAD)
+                .define('a', INGOTS_LEAD)
                 .define('b', ModTags.Items.INGOTS_COPPER)
                 .define('c', Items.GUNPOWDER)
                 .define('d', ModItems.PRIMER)
@@ -757,6 +899,54 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.PRIMER), has(ModItems.PRIMER))
                 .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
                 .save(writer, loc(getItemName(ModItems.SMALL_SHELL_AA)))
+
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.MEDIUM_SHELL_AP, 4)
+                .pattern(" a ")
+                .pattern("bcb")
+                .pattern(" d ")
+                .define('a', ModItems.TUNGSTEN_ROD)
+                .define('b', INGOTS_STEEL)
+                .define('c', Items.GUNPOWDER)
+                .define('d', ModItems.PRIMER)
+                .unlockedBy(getHasName(ModItems.PRIMER), has(ModItems.PRIMER))
+                .unlockedBy(getHasName(ModItems.TUNGSTEN_ROD), has(ModItems.TUNGSTEN_ROD))
+                .save(writer, loc(getItemName(ModItems.MEDIUM_SHELL_AP)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.MEDIUM_SHELL_HE, 4)
+                .pattern(" a ")
+                .pattern("aca")
+                .pattern(" d ")
+                .define('a', INGOTS_STEEL)
+                .define('c', ModItems.HIGH_ENERGY_EXPLOSIVES)
+                .define('d', ModItems.PRIMER)
+                .unlockedBy(getHasName(ModItems.PRIMER), has(ModItems.PRIMER))
+                .unlockedBy(
+                    getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES),
+                    has(ModItems.HIGH_ENERGY_EXPLOSIVES)
+                )
+                .save(writer, loc(getItemName(ModItems.MEDIUM_SHELL_HE)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.MEDIUM_SHELL_GS, 6)
+                .pattern(" a ")
+                .pattern("bcb")
+                .pattern(" d ")
+                .define('a', INGOTS_LEAD)
+                .define('b', INGOTS_STEEL)
+                .define('c', Items.GUNPOWDER)
+                .define('d', ModItems.PRIMER)
+                .unlockedBy(getHasName(ModItems.PRIMER), has(ModItems.PRIMER))
+                .unlockedBy(getHasName(ModItems.LEAD_INGOT), has(ModItems.LEAD_INGOT))
+                .save(writer, loc(getItemName(ModItems.MEDIUM_SHELL_GS)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.MEDIUM_SHELL_AA, 8)
+                .pattern(" a ")
+                .pattern("bcb")
+                .pattern(" d ")
+                .define('a', ModItems.FUSEE)
+                .define('b', ModTags.Items.INGOTS_COPPER)
+                .define('c', Items.GUNPOWDER)
+                .define('d', ModItems.PRIMER)
+                .unlockedBy(getHasName(ModItems.PRIMER), has(ModItems.PRIMER))
+                .unlockedBy(getHasName(ModItems.FUSEE), has(ModItems.FUSEE))
+                .save(writer, loc(getItemName(ModItems.MEDIUM_SHELL_AA)))
+
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.SWARM_DRONE, 4)
                 .pattern(" a ")
                 .pattern("bcb")
@@ -799,7 +989,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             generateMaterialRecipes(
                 writer,
                 ModItems.STEEL_MATERIALS,
-                ModTags.Items.INGOTS_STEEL,
+                INGOTS_STEEL,
                 ModItems.STEEL_INGOT
             )
             generateMaterialRecipes(
@@ -862,16 +1052,12 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.AP_HEAD, 2)
                 .pattern(" e ")
                 .pattern("bdb")
-                .pattern("cac")
-                .define('a', ModItems.HIGH_ENERGY_EXPLOSIVES)
-                .define('b', ModTags.Items.INGOTS_IRON)
-                .define('c', ModTags.Items.INGOTS_STEEL)
+                .pattern(" a ")
+                .define('a', Items.GUNPOWDER)
+                .define('b', PLATES_STEEL)
                 .define('d', ModItems.TUNGSTEN_ROD)
                 .define('e', ModItems.FUSEE)
-                .unlockedBy(
-                    getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES),
-                    has(ModItems.HIGH_ENERGY_EXPLOSIVES)
-                )
+                .unlockedBy(getHasName(ModItems.ENGINEERING_PLASTIC), has(PLATES_STEEL))
                 .save(writer, loc(getItemName(ModItems.AP_HEAD)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.BATTERY)
                 .pattern(" b ")
@@ -902,11 +1088,28 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                     has(ModItems.MEDIUM_AERIAL_BOMB)
                 )
                 .save(writer, loc(getItemName(ModItems.SMALL_AERIAL_BOMB) + "_from_medium_aerial_bomb"))
+
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.LARGE_AERIAL_BOMB)
+                .requires(ModItems.MEDIUM_AERIAL_BOMB, 2)
+                .unlockedBy(
+                    getHasName(ModItems.MEDIUM_AERIAL_BOMB),
+                    has(ModItems.MEDIUM_AERIAL_BOMB)
+                )
+                .save(writer, loc(getItemName(ModItems.LARGE_AERIAL_BOMB)))
+
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.MEDIUM_AERIAL_BOMB, 2)
+                .requires(ModItems.LARGE_AERIAL_BOMB)
+                .unlockedBy(
+                    getHasName(ModItems.MEDIUM_AERIAL_BOMB),
+                    has(ModItems.MEDIUM_AERIAL_BOMB)
+                )
+                .save(writer, loc(getItemName(ModItems.MEDIUM_AERIAL_BOMB) + "_from_large_aerial_bomb"))
+
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.CANNON_CORE)
                 .pattern("aaa")
                 .pattern("bcd")
                 .pattern("aaa")
-                .define('a', ModTags.Items.INGOTS_STEEL)
+                .define('a', INGOTS_STEEL)
                 .define('b', Items.DISPENSER)
                 .define('c', ModItems.CEMENTED_CARBIDE_MATERIALS.action)
                 .define('d', Items.PISTON)
@@ -931,7 +1134,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('a', Items.AMETHYST_SHARD)
                 .define('b', Items.DIAMOND)
                 .define('c', Items.REDSTONE)
-                .define('d', ModTags.Items.INGOTS_STEEL)
+                .define('d', INGOTS_STEEL)
                 .define('e', Items.COPPER_INGOT)
                 .unlockedBy(getHasName(Items.REDSTONE), has(Items.REDSTONE))
                 .save(writer, loc(getItemName(ModItems.LASER_UNIT)))
@@ -958,16 +1161,22 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.CM_HEAD, 2)
                 .pattern("ddd")
                 .pattern("bdb")
-                .pattern("cac")
+                .pattern(" a ")
                 .define('a', Items.GUNPOWDER)
-                .define('b', ModTags.Items.INGOTS_IRON)
-                .define('c', ModTags.Items.INGOTS_STEEL)
+                .define('b', PLATES_STEEL)
                 .define('d', ModItems.GRENADE_40MM)
                 .unlockedBy(getHasName(ModItems.GRENADE_40MM), has(ModItems.GRENADE_40MM))
                 .save(writer, loc(getItemName(ModItems.CM_HEAD)))
             ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.COAL_IRON_POWDER)
                 .requires(commonItemTag("dusts/iron"))
-                .requires(commonItemTag("dusts/coal_coke"))
+                .requires(
+                    Ingredient.merge(
+                        listOf(
+                            Ingredient.of(commonItemTag("dusts/coal_coke")),
+                            Ingredient.of(commonItemTag("dusts/coal"))
+                        )
+                    )
+                )
                 .unlockedBy(getHasName(ModItems.IRON_POWDER), has(ModItems.IRON_POWDER))
                 .unlockedBy(getHasName(ModItems.COAL_POWDER), has(ModItems.COAL_POWDER))
                 .save(writer, loc(getItemName(ModItems.COAL_IRON_POWDER)))
@@ -986,6 +1195,30 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .requires(ModTags.Items.HAMMER)
                 .unlockedBy(getHasName(ModItems.HAMMER), has(ModTags.Items.HAMMER))
                 .save(writer, loc(getItemName(ModItems.COPPER_PLATE)))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.STEEL_PLATE)
+                .requires(INGOTS_STEEL)
+                .requires(ModTags.Items.HAMMER)
+                .unlockedBy(getHasName(ModItems.HAMMER), has(ModTags.Items.HAMMER))
+                .save(writer, loc(getItemName(ModItems.STEEL_PLATE)))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.SLIME_COVERED_LEATHER)
+                .requires(Items.LEATHER)
+                .requires(Items.SLIME_BALL)
+                .requires(Items.BLAZE_POWDER)
+                .unlockedBy(getHasName(Items.SLIME_BALL), has(Items.SLIME_BALL))
+                .save(writer, loc(getItemName(ModItems.SLIME_COVERED_LEATHER)))
+            SimpleCookingRecipeBuilder.generic(
+                Ingredient.of(ModItems.SLIME_COVERED_LEATHER),
+                RecipeCategory.MISC,
+                ModItems.ENGINEERING_PLASTIC,
+                0.3f,
+                200,
+                RecipeSerializer.SMELTING_RECIPE
+            )
+                .unlockedBy(
+                    getHasName(ModItems.SLIME_COVERED_LEATHER),
+                    has(ModItems.SLIME_COVERED_LEATHER)
+                )
+                .save(writer, loc(getItemName(ModItems.ENGINEERING_PLASTIC)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.FUSEE, 4)
                 .pattern("a")
                 .pattern("b")
@@ -1007,20 +1240,18 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.GS_HEAD, 2)
                 .pattern("ddd")
                 .pattern("bdb")
-                .pattern("cac")
+                .pattern(" a ")
                 .define('a', Items.GUNPOWDER)
-                .define('b', ModTags.Items.INGOTS_IRON)
-                .define('c', ModTags.Items.INGOTS_STEEL)
+                .define('b', PLATES_STEEL)
                 .define('d', INGOTS_LEAD)
                 .unlockedBy(getHasName(Items.GUNPOWDER), has(Items.GUNPOWDER))
                 .save(writer, loc(getItemName(ModItems.GS_HEAD)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.WP_HEAD, 2)
                 .pattern("ede")
                 .pattern("bdb")
-                .pattern("cac")
+                .pattern(" a ")
                 .define('a', Items.GUNPOWDER)
-                .define('b', ModTags.Items.INGOTS_IRON)
-                .define('c', ModTags.Items.INGOTS_STEEL)
+                .define('b', PLATES_STEEL)
                 .define('d', Items.BONE_MEAL)
                 .define('e', Items.BLAZE_POWDER)
                 .unlockedBy(getHasName(Items.GUNPOWDER), has(Items.GUNPOWDER))
@@ -1028,10 +1259,10 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.HE_HEAD, 2)
                 .pattern(" e ")
                 .pattern("bab")
-                .pattern("cac")
+                .pattern(" c ")
                 .define('a', ModItems.HIGH_ENERGY_EXPLOSIVES)
-                .define('b', ModTags.Items.INGOTS_IRON)
-                .define('c', ModTags.Items.INGOTS_STEEL)
+                .define('b', PLATES_STEEL)
+                .define('c', Items.GUNPOWDER)
                 .define('e', ModItems.FUSEE)
                 .unlockedBy(
                     getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES),
@@ -1158,7 +1389,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('a', ModItems.STEEL_MATERIALS.barrel)
                 .define('b', ModItems.RARE_MATERIAL_PACK)
                 .define('c', Items.DISPENSER)
-                .define('d', ModTags.Items.INGOTS_STEEL)
+                .define('d', INGOTS_STEEL)
                 .unlockedBy(getHasName(ModItems.RARE_MATERIAL_PACK), has(ModItems.RARE_MATERIAL_PACK))
                 .save(writer, loc(getItemName(ModItems.LIGHT_ARMAMENT_MODULE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MEDIUM_ARMAMENT_MODULE)
@@ -1189,28 +1420,24 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.GRAIN), has(ModItems.GRAIN))
                 .save(writer, loc(getItemName(ModItems.MISSILE_ENGINE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MORTAR_BARREL)
-                .pattern("a a")
-                .pattern("a a")
-                .pattern("aba")
-                .define('a', ModTags.Items.INGOTS_IRON)
-                .define('b', ModTags.Items.DYES_GREEN)
-                .unlockedBy(getHasName(Items.IRON_INGOT), has(ModTags.Items.INGOTS_IRON))
+                .pattern("a")
+                .pattern("a")
+                .pattern("a")
+                .define('a', PLATES_STEEL)
+                .unlockedBy(getHasName(ModItems.ENGINEERING_PLASTIC), has(PLATES_STEEL))
                 .save(writer, loc(getItemName(ModItems.MORTAR_BARREL)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MORTAR_BASE_PLATE)
-                .pattern(" b ")
-                .pattern("aaa")
-                .define('a', ModTags.Items.INGOTS_IRON)
-                .define('b', ModTags.Items.DYES_GREEN)
-                .unlockedBy(getHasName(Items.IRON_INGOT), has(ModTags.Items.INGOTS_IRON))
+                .pattern("b")
+                .pattern("a")
+                .define('a', PLATES_STEEL)
+                .define('b', Items.IRON_NUGGET)
+                .unlockedBy(getHasName(Items.IRON_NUGGET), has(ModTags.Items.NUGGETS_IRON))
                 .save(writer, loc(getItemName(ModItems.MORTAR_BASE_PLATE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MORTAR_BIPOD)
                 .pattern(" a ")
                 .pattern("bbb")
-                .pattern("cdc")
-                .define('a', ModTags.Items.INGOTS_IRON)
-                .define('b', ModTags.Items.NUGGETS_IRON)
-                .define('c', Items.IRON_BARS)
-                .define('d', ModTags.Items.DYES_GREEN)
+                .define('a', INGOTS_STEEL)
+                .define('b', Items.IRON_BARS)
                 .unlockedBy(getHasName(Items.IRON_BARS), has(Items.IRON_BARS))
                 .save(writer, loc(getItemName(ModItems.MORTAR_BIPOD)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.MOTOR, 2)
@@ -1240,9 +1467,23 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(Items.IRON_NUGGET), has(ModTags.Items.NUGGETS_IRON))
                 .save(writer, loc(getItemName(ModItems.PROPELLER)))
             ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.RAW_CEMENTED_CARBIDE_POWDER, 8)
-                .requires(Ingredient.of(commonItemTag("dusts/tungsten")), 7)
+                .requires(
+                    Ingredient.merge(
+                        listOf(
+                            Ingredient.of(commonItemTag("dusts/tungsten")),
+                            Ingredient.of(commonItemTag("dusts/scheelite"))
+                        )
+                    ), 7
+                )
                 .requires(commonItemTag("dusts/iron"))
-                .requires(commonItemTag("dusts/coal_coke"))
+                .requires(
+                    Ingredient.merge(
+                        listOf(
+                            Ingredient.of(commonItemTag("dusts/coal_coke")),
+                            Ingredient.of(commonItemTag("dusts/coal"))
+                        )
+                    )
+                )
                 .unlockedBy(getHasName(ModItems.TUNGSTEN_POWDER), has(commonItemTag("dusts/tungsten")))
                 .save(writer, loc(getItemName(ModItems.RAW_CEMENTED_CARBIDE_POWDER)))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SEEKER, 4)
@@ -1343,7 +1584,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern("aaa")
                 .pattern("b b")
                 .pattern("aaa")
-                .define('a', ModTags.Items.INGOTS_STEEL)
+                .define('a', INGOTS_STEEL)
                 .define('b', ModItems.WHEEL)
                 .unlockedBy(getHasName(ModItems.WHEEL), has(ModItems.WHEEL))
                 .save(writer, loc(getItemName(ModItems.TRACK)))
@@ -1413,13 +1654,22 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('d', ModTags.Items.INGOTS_IRON)
                 .unlockedBy(getHasName(Items.POWERED_RAIL), has(Items.POWERED_RAIL))
                 .save(writer, loc(getItemName(ModItems.AIRCRAFT_CATAPULT)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, ModItems.CATAPULT_CONTROLLER, 1)
+                .pattern("ddd")
+                .pattern("cac")
+                .pattern("ddd")
+                .define('a', Items.COMPARATOR)
+                .define('c', ModTags.Items.INGOTS_COPPER)
+                .define('d', ModTags.Items.INGOTS_IRON)
+                .unlockedBy(getHasName(Items.POWERED_RAIL), has(Items.POWERED_RAIL))
+                .save(writer, loc(getItemName(ModItems.CATAPULT_CONTROLLER)))
             ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, ModItems.SUPERB_ITEM_INTERFACE)
                 .pattern("cac")
                 .pattern("aba")
                 .pattern("cac")
                 .define('a', Items.HOPPER)
                 .define('b', Items.DROPPER)
-                .define('c', ModTags.Items.INGOTS_STEEL)
+                .define('c', INGOTS_STEEL)
                 .unlockedBy(getHasName(Items.HOPPER), has(Items.DROPPER))
                 .save(writer, loc(getItemName(ModItems.SUPERB_ITEM_INTERFACE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, ModItems.VEHICLE_ASSEMBLING_TABLE)
@@ -1430,7 +1680,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('b', ModTags.Items.STORAGE_BLOCKS_IRON)
                 .define('c', Items.SMITHING_TABLE)
                 .define('d', ModTags.Items.GLASS_PANES)
-                .define('e', ModTags.Items.INGOTS_STEEL)
+                .define('e', INGOTS_STEEL)
                 .unlockedBy(getHasName(Items.SMITHING_TABLE), has(Items.SMITHING_TABLE))
                 .save(writer, loc(getItemName(ModItems.VEHICLE_ASSEMBLING_TABLE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModItems.BARBED_WIRE, 2)
@@ -1513,8 +1763,8 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern("aaa")
                 .pattern("aaa")
                 .pattern("aaa")
-                .define('a', ModTags.Items.INGOTS_STEEL)
-                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(ModTags.Items.INGOTS_STEEL))
+                .define('a', INGOTS_STEEL)
+                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(INGOTS_STEEL))
                 .save(writer, loc(getItemName(ModItems.STEEL_BLOCK)))
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModItems.TUNGSTEN_BLOCK)
                 .pattern("aaa")
@@ -1539,7 +1789,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern("aba")
                 .pattern("cdc")
                 .pattern("efe")
-                .define('a', ModTags.Items.INGOTS_STEEL)
+                .define('a', INGOTS_STEEL)
                 .define('b', Items.HOPPER)
                 .define('c', Items.TINTED_GLASS)
                 .define('d', Items.CAULDRON)
@@ -1555,7 +1805,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('b', ModItems.BATTERY)
                 .define('c', Items.CARTOGRAPHY_TABLE)
                 .define('d', ModTags.Items.STORAGE_BLOCKS_REDSTONE)
-                .define('e', ModTags.Items.INGOTS_STEEL)
+                .define('e', INGOTS_STEEL)
                 .unlockedBy(getHasName(Items.CARTOGRAPHY_TABLE), has(Items.CARTOGRAPHY_TABLE))
                 .save(writer, loc(getItemName(ModItems.BLUEPRINT_RESEARCH_TABLE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModItems.RAW_GALENA_BLOCK)
@@ -1592,7 +1842,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 ModEntities.ANNIHILATOR,
                 VehicleAssemblingRecipe.Category.DEFENSE
             )
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 24)
+                .require(STORAGE_BLOCK_STEEL, 24)
                 .require(Items.NETHERITE_BLOCK, 3)
                 .require(ModItems.LASER_UNIT, 32)
                 .require(ModItems.LARGE_BATTERY_PACK)
@@ -1600,31 +1850,31 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.ANNIHILATOR_BLUEPRINT), has(ModItems.ANNIHILATOR_BLUEPRINT))
                 .save(writer, loc(getEntityTypeName(ModEntities.ANNIHILATOR)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.BL_132, VehicleAssemblingRecipe.Category.DEFENSE)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 10)
+                .require(STORAGE_BLOCK_STEEL, 10)
                 .require(ModItems.BL_132_BLUEPRINT)
                 .require(ModItems.CANNON_CORE, 4)
                 .unlockedBy(getHasName(ModItems.BL_132_BLUEPRINT), has(ModItems.BL_132_BLUEPRINT))
                 .save(writer, loc(getEntityTypeName(ModEntities.BL_132)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.MLE_1934, VehicleAssemblingRecipe.Category.DEFENSE)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 8)
+                .require(STORAGE_BLOCK_STEEL, 8)
                 .require(ModItems.MLE_1934_BLUEPRINT)
                 .require(ModItems.CANNON_CORE, 2)
                 .unlockedBy(getHasName(ModItems.MLE_1934_BLUEPRINT), has(ModItems.MLE_1934_BLUEPRINT))
                 .save(writer, loc(getEntityTypeName(ModEntities.MLE_1934)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.MK_42, VehicleAssemblingRecipe.Category.DEFENSE)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 6)
+                .require(STORAGE_BLOCK_STEEL, 6)
                 .require(ModItems.MK_42_BLUEPRINT)
                 .require(ModItems.CANNON_CORE)
                 .unlockedBy(getHasName(ModItems.MK_42_BLUEPRINT), has(ModItems.MK_42_BLUEPRINT))
                 .save(writer, loc(getEntityTypeName(ModEntities.MK_42)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.TYPE_63, VehicleAssemblingRecipe.Category.DEFENSE)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 1)
+                .require(STORAGE_BLOCK_STEEL, 1)
                 .require(ModItems.MORTAR_BARREL, 12)
                 .require(ModItems.WHEEL, 2)
                 .unlockedBy(getHasName(ModItems.MORTAR_BARREL), has(ModItems.MORTAR_BARREL))
                 .save(writer, loc(getEntityTypeName(ModEntities.TYPE_63)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.HPJ_11, VehicleAssemblingRecipe.Category.DEFENSE)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 5)
+                .require(STORAGE_BLOCK_STEEL, 5)
                 .require(ModItems.HPJ_11_BLUEPRINT)
                 .require(ModItems.CANNON_CORE)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
@@ -1636,17 +1886,27 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 ModEntities.LASER_TOWER,
                 VehicleAssemblingRecipe.Category.DEFENSE
             )
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 1)
+                .require(STORAGE_BLOCK_STEEL, 1)
                 .require(ModItems.LASER_UNIT)
                 .require(ModItems.SMALL_BATTERY_PACK)
                 .require(ModItems.MOTOR)
                 .unlockedBy(getHasName(ModItems.LASER_UNIT), has(ModItems.LASER_UNIT))
                 .save(writer, loc(getEntityTypeName(ModEntities.LASER_TOWER)))
             VehicleAssemblingRecipeBuilder.entity(
+                ModEntities.TOW,
+                VehicleAssemblingRecipe.Category.DEFENSE
+            )
+                .require(Items.DISPENSER)
+                .require(ModItems.MORTAR_BARREL)
+                .require(ModItems.ARTILLERY_INDICATOR)
+                .require(ModItems.MORTAR_BIPOD)
+                .unlockedBy(getHasName(ModItems.ARTILLERY_INDICATOR), has(ModItems.ARTILLERY_INDICATOR))
+                .save(writer, loc(getEntityTypeName(ModEntities.TOW)))
+            VehicleAssemblingRecipeBuilder.entity(
                 ModEntities.WAVEFORCE_TOWER,
                 VehicleAssemblingRecipe.Category.DEFENSE
             )
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 10)
+                .require(STORAGE_BLOCK_STEEL, 10)
                 .require(ModItems.CEMENTED_CARBIDE_BLOCK, 2)
                 .require(Items.REDSTONE_BLOCK, 8)
                 .require(ModItems.LASER_UNIT, 9)
@@ -1665,7 +1925,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(Items.MINECART), has(Items.MINECART))
                 .save(writer, loc(getEntityTypeName(ModEntities.WHEEL_CHAIR)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.LAV_150, VehicleAssemblingRecipe.Category.LAND)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 6)
+                .require(STORAGE_BLOCK_STEEL, 6)
                 .require(ModItems.LIGHT_ARMAMENT_MODULE)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
                 .require(ModItems.WHEEL, 4)
@@ -1673,7 +1933,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.LAV_150)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.LAV_AD, VehicleAssemblingRecipe.Category.LAND)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 7)
+                .require(STORAGE_BLOCK_STEEL, 7)
                 .require(ModItems.MEDIUM_ARMAMENT_MODULE)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
                 .require(ModItems.WHEEL, 8)
@@ -1681,7 +1941,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.LAV_AD)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.LAV_25, VehicleAssemblingRecipe.Category.LAND)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 7)
+                .require(STORAGE_BLOCK_STEEL, 7)
                 .require(ModItems.MEDIUM_ARMAMENT_MODULE)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
                 .require(ModItems.WHEEL, 8)
@@ -1689,7 +1949,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.LAV_25)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.BMP_2, VehicleAssemblingRecipe.Category.LAND)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 8)
+                .require(STORAGE_BLOCK_STEEL, 8)
                 .require(ModItems.MEDIUM_ARMAMENT_MODULE)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
                 .require(ModItems.TRACK, 2)
@@ -1697,7 +1957,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.BMP_2)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.BRADLEY, VehicleAssemblingRecipe.Category.LAND)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 8)
+                .require(STORAGE_BLOCK_STEEL, 8)
                 .require(ModItems.MEDIUM_ARMAMENT_MODULE)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
                 .require(ModItems.TRACK, 2)
@@ -1705,7 +1965,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.BRADLEY)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.PRISM_TANK, VehicleAssemblingRecipe.Category.LAND)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 9)
+                .require(STORAGE_BLOCK_STEEL, 9)
                 .require(ModItems.LASER_UNIT, 16)
                 .require(ModItems.LARGE_BATTERY_PACK)
                 .require(ModItems.TRACK, 2)
@@ -1713,7 +1973,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.PRISM_TANK)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.T_90A, VehicleAssemblingRecipe.Category.LAND)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 10)
+                .require(STORAGE_BLOCK_STEEL, 10)
                 .require(ModItems.HEAVY_ARMAMENT_MODULE)
                 .require(ModItems.MEDIUM_BATTERY_PACK, 2)
                 .require(ModItems.TRACK, 2)
@@ -1722,7 +1982,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.T_90A)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.ZTZ_99A, VehicleAssemblingRecipe.Category.LAND)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 10)
+                .require(STORAGE_BLOCK_STEEL, 10)
                 .require(ModItems.HEAVY_ARMAMENT_MODULE)
                 .require(ModItems.MEDIUM_BATTERY_PACK, 2)
                 .require(ModItems.TRACK, 2)
@@ -1731,7 +1991,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.ZTZ_99A)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.M_1A_2, VehicleAssemblingRecipe.Category.LAND)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 10)
+                .require(STORAGE_BLOCK_STEEL, 10)
                 .require(ModItems.HEAVY_ARMAMENT_MODULE)
                 .require(ModItems.MEDIUM_BATTERY_PACK, 2)
                 .require(ModItems.TRACK, 2)
@@ -1740,7 +2000,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.M_1A_2)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.YX_100, VehicleAssemblingRecipe.Category.LAND)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 8)
+                .require(STORAGE_BLOCK_STEEL, 8)
                 .require(ModItems.CEMENTED_CARBIDE_BLOCK, 24)
                 .require(ModItems.HEAVY_ARMAMENT_MODULE)
                 .require(ModItems.MEDIUM_ARMAMENT_MODULE)
@@ -1750,7 +2010,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.YX_100)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.PLZ_05, VehicleAssemblingRecipe.Category.LAND)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 10)
+                .require(STORAGE_BLOCK_STEEL, 10)
                 .require(ModItems.CANNON_CORE, 1)
                 .require(ModItems.HEAVY_ARMAMENT_MODULE)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
@@ -1758,8 +2018,17 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .require(ModItems.LARGE_MOTOR)
                 .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.PLZ_05)))
+            VehicleAssemblingRecipeBuilder.entity(ModEntities.FH_77BW, VehicleAssemblingRecipe.Category.LAND)
+                .require(STORAGE_BLOCK_STEEL, 12)
+                .require(ModItems.CANNON_CORE, 1)
+                .require(ModItems.HEAVY_ARMAMENT_MODULE)
+                .require(ModItems.MEDIUM_BATTERY_PACK)
+                .require(ModItems.WHEEL, 6)
+                .require(ModItems.LARGE_MOTOR)
+                .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
+                .save(writer, loc(getEntityTypeName(ModEntities.FH_77BW)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.SPEEDBOAT, VehicleAssemblingRecipe.Category.WATER)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 2)
+                .require(STORAGE_BLOCK_STEEL, 2)
                 .require(ItemTags.BOATS)
                 .require(ModItems.LIGHT_ARMAMENT_MODULE)
                 .require(ModItems.SMALL_BATTERY_PACK)
@@ -1779,7 +2048,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.MOTOR), has(ModItems.MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.TINY_SPEEDBOAT)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.AH_6, VehicleAssemblingRecipe.Category.AIRCRAFT)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 3)
+                .require(STORAGE_BLOCK_STEEL, 3)
                 .require(ModItems.LIGHT_ARMAMENT_MODULE)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
                 .require(ModItems.LARGE_PROPELLER)
@@ -1789,7 +2058,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .save(writer, loc(getEntityTypeName(ModEntities.AH_6)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.KV_16, VehicleAssemblingRecipe.Category.AIRCRAFT)
                 .require(Items.BUCKET, 2)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 1)
+                .require(STORAGE_BLOCK_STEEL, 1)
                 .require(ItemTags.PLANKS, 2)
                 .require(ModItems.LIGHT_ARMAMENT_MODULE)
                 .require(ModItems.SMALL_BATTERY_PACK)
@@ -1798,7 +2067,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_PROPELLER), has(ModItems.LARGE_PROPELLER))
                 .save(writer, loc(getEntityTypeName(ModEntities.KV_16)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.JU_87, VehicleAssemblingRecipe.Category.AIRCRAFT)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 3)
+                .require(STORAGE_BLOCK_STEEL, 3)
                 .require(ModItems.MEDIUM_ARMAMENT_MODULE, 1)
                 .require(Items.GOAT_HORN, 1)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
@@ -1808,7 +2077,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_PROPELLER), has(ModItems.LARGE_PROPELLER))
                 .save(writer, loc(getEntityTypeName(ModEntities.JU_87)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.A_10A, VehicleAssemblingRecipe.Category.AIRCRAFT)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 6)
+                .require(STORAGE_BLOCK_STEEL, 6)
                 .require(ModItems.HEAVY_ARMAMENT_MODULE)
                 .require(ModItems.LARGE_BATTERY_PACK)
                 .require(ModItems.LARGE_PROPELLER, 2)
@@ -1817,7 +2086,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.LARGE_PROPELLER), has(ModItems.LARGE_PROPELLER))
                 .save(writer, loc(getEntityTypeName(ModEntities.A_10A)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.TRUCK, VehicleAssemblingRecipe.Category.CIVILIAN)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 8)
+                .require(STORAGE_BLOCK_STEEL, 8)
                 .require(Items.CHEST, 4)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
                 .require(ModItems.WHEEL, 6)
@@ -1828,7 +2097,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 ModEntities.SODAYO_PICK_UP,
                 VehicleAssemblingRecipe.Category.CIVILIAN
             )
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 2)
+                .require(STORAGE_BLOCK_STEEL, 2)
                 .require(Items.CHEST, 1)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
                 .require(ModItems.WHEEL, 4)
@@ -1839,7 +2108,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 ModEntities.SODAYO_PICK_UP_HMG,
                 VehicleAssemblingRecipe.Category.CIVILIAN
             )
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 2)
+                .require(STORAGE_BLOCK_STEEL, 2)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
                 .require(ModItems.WHEEL, 4)
                 .require(ModItems.LARGE_MOTOR)
@@ -1850,7 +2119,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 ModEntities.SODAYO_PICK_UP_ROCKET,
                 VehicleAssemblingRecipe.Category.CIVILIAN
             )
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 3)
+                .require(STORAGE_BLOCK_STEEL, 3)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
                 .require(ModItems.WHEEL, 4)
                 .require(ModItems.LARGE_MOTOR)
@@ -1861,15 +2130,18 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 ModEntities.SODAYO_PICK_UP_TOW,
                 VehicleAssemblingRecipe.Category.CIVILIAN
             )
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 3)
+                .require(STORAGE_BLOCK_STEEL, 3)
                 .require(ModItems.MEDIUM_BATTERY_PACK)
                 .require(ModItems.WHEEL, 4)
                 .require(ModItems.LARGE_MOTOR)
-                .require(ModItems.TOW_DEPLOYER)
+                .require(Items.DISPENSER)
+                .require(ModItems.MORTAR_BARREL)
+                .require(ModItems.ARTILLERY_INDICATOR)
+                .require(ModItems.MORTAR_BIPOD)
                 .unlockedBy(getHasName(ModItems.LARGE_MOTOR), has(ModItems.LARGE_MOTOR))
                 .save(writer, loc(getEntityTypeName(ModEntities.SODAYO_PICK_UP_TOW)))
             VehicleAssemblingRecipeBuilder.entity(ModEntities.MI_28, VehicleAssemblingRecipe.Category.AIRCRAFT)
-                .require(ModTags.Items.STORAGE_BLOCK_STEEL, 5)
+                .require(STORAGE_BLOCK_STEEL, 5)
                 .require(ModItems.HEAVY_ARMAMENT_MODULE)
                 .require(ModItems.MEDIUM_BATTERY_PACK, 2)
                 .require(ModItems.WHEEL, 3)
@@ -1878,6 +2150,28 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .require(ModItems.LARGE_MOTOR)
                 .unlockedBy(getHasName(ModItems.HEAVY_ARMAMENT_MODULE), has(ModItems.HEAVY_ARMAMENT_MODULE))
                 .save(writer, loc(getEntityTypeName(ModEntities.MI_28)))
+            VehicleAssemblingRecipeBuilder.entity(ModEntities.KIROV, VehicleAssemblingRecipe.Category.AIRCRAFT)
+                .require(ModItems.LARGE_BATTERY_PACK, 2)
+                .require(STORAGE_BLOCK_STEEL, 24)
+                .require(ModItems.HEAVY_ARMAMENT_MODULE, 3)
+                .require(ItemTags.WOOL, 640)
+                .require(ModItems.LARGE_MOTOR, 5)
+                .require(ModItems.LARGE_PROPELLER, 5)
+                .require(Items.FLOWER_POT)
+                .require(Items.WHITE_TULIP)
+                .unlockedBy(getHasName(ModItems.LARGE_PROPELLER), has(ModItems.LARGE_PROPELLER))
+                .save(writer, loc(getEntityTypeName(ModEntities.KIROV)))
+            VehicleAssemblingRecipeBuilder.entity(ModEntities.AC_130H, VehicleAssemblingRecipe.Category.AIRCRAFT)
+                .require(ModItems.LARGE_BATTERY_PACK, 2)
+                .require(STORAGE_BLOCK_STEEL, 16)
+                .require(ModItems.HEAVY_ARMAMENT_MODULE)
+                .require(ModItems.MEDIUM_ARMAMENT_MODULE)
+                .require(ModItems.LIGHT_ARMAMENT_MODULE)
+                .require(ModItems.LARGE_MOTOR, 4)
+                .require(ModItems.LARGE_PROPELLER, 4)
+                .require(ModItems.WHEEL, 10)
+                .unlockedBy(getHasName(ModItems.HEAVY_ARMAMENT_MODULE), has(ModItems.HEAVY_ARMAMENT_MODULE))
+                .save(writer, loc(getEntityTypeName(ModEntities.AC_130H)))
 
             VehicleAssemblingRecipeBuilder.item(
                 ModItems.SMALL_BATTERY_PACK,
@@ -1917,10 +2211,20 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 1,
                 VehicleAssemblingRecipe.Category.MISC
             )
-                .require(ModTags.Items.INGOTS_STEEL)
+                .require(INGOTS_STEEL)
                 .require(Items.PAPER, 4)
                 .unlockedBy(getHasName(Items.PAPER), has(Items.PAPER))
                 .save(writer, loc(getItemName(ModItems.VEHICLE_RESET_KIT) + "_assembling"))
+            // TODO 临时配方
+            VehicleAssemblingRecipeBuilder.entity(
+                ModEntities.AIR_SHEEP,
+                VehicleAssemblingRecipe.Category.AIRCRAFT
+            )
+                .require(ItemTags.WOOL, 16)
+                .require(ItemTags.BOATS)
+                .require(Items.MUTTON, 8)
+                .unlockedBy(getHasName(Items.WHITE_WOOL), has(ItemTags.WOOL))
+                .save(writer, loc(getEntityTypeName(ModEntities.AIR_SHEEP)))
         }
 
         private fun buildGunRecipes(writer: Consumer<FinishedRecipe>) {
@@ -1935,7 +2239,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 writer,
                 ModItems.GLOCK_17_BLUEPRINT,
                 GunRarity.COMMON,
-                Items.IRON_INGOT,
+                PLATES_PLASTIC,
                 ModItems.GLOCK_17
             )
             gunSmithing(
@@ -1949,7 +2253,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 writer,
                 ModItems.GLOCK_18_BLUEPRINT,
                 GunRarity.RARE,
-                Items.GOLD_INGOT,
+                PLATES_PLASTIC,
                 ModItems.GLOCK_18
             )
             gunSmithing(
@@ -1966,7 +2270,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 writer,
                 ModItems.M_4_BLUEPRINT,
                 GunRarity.RARE,
-                ModTags.Items.INGOTS_STEEL,
+                INGOTS_STEEL,
                 ModItems.M_4
             )
             gunSmithing(
@@ -1980,7 +2284,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 writer,
                 ModItems.HK_416_BLUEPRINT,
                 GunRarity.RARE,
-                ModTags.Items.INGOTS_STEEL,
+                INGOTS_STEEL,
                 ModItems.HK_416
             )
             gunSmithing(writer, ModItems.RPK_BLUEPRINT, GunRarity.EPIC, ItemTags.LOGS, ModItems.RPK)
@@ -2040,7 +2344,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 writer,
                 ModItems.M_870_BLUEPRINT,
                 GunRarity.RARE,
-                ModTags.Items.INGOTS_STEEL,
+                INGOTS_STEEL,
                 ModItems.M_870
             )
             gunSmithing(writer, ModItems.M_98B_BLUEPRINT, GunRarity.EPIC, Items.SPYGLASS, ModItems.M_98B)
@@ -2049,7 +2353,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 writer,
                 ModItems.AK_12_BLUEPRINT,
                 GunRarity.RARE,
-                ModTags.Items.INGOTS_STEEL,
+                INGOTS_STEEL,
                 ModItems.AK_12
             )
             gunSmithing(
@@ -2063,21 +2367,21 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 writer,
                 ModItems.TASER_BLUEPRINT,
                 GunRarity.COMMON,
-                Items.YELLOW_CONCRETE,
+                PLATES_PLASTIC,
                 ModItems.TASER
             )
             gunSmithing(
                 writer,
                 ModItems.M_1911_BLUEPRINT,
                 GunRarity.COMMON,
-                ModTags.Items.INGOTS_STEEL,
+                INGOTS_STEEL,
                 ModItems.M_1911
             )
             gunSmithing(
                 writer,
                 ModItems.QBZ_95_BLUEPRINT,
                 GunRarity.RARE,
-                ModTags.Items.INGOTS_STEEL,
+                PLATES_PLASTIC,
                 ModItems.QBZ_95
             )
             gunSmithing(
@@ -2114,7 +2418,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 writer,
                 ModItems.M_2_HB_BLUEPRINT,
                 GunRarity.RARE,
-                ModTags.Items.STORAGE_BLOCK_STEEL,
+                STORAGE_BLOCK_STEEL,
                 ModItems.M_2_HB
             )
             gunSmithing(
@@ -2226,8 +2530,16 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('c', INGOTS_TUNGSTEN)
                 .unlockedBy(getHasName(ModItems.EMPTY_PERK), has(ModItems.EMPTY_PERK))
                 .save(writer, perkLoc(ModPerks.AP_BULLET))
-            SpecialRecipeBuilder.special(ModRecipes.CUPID_ARROW_SERIALIZER)
-                .save(writer, perkLoc(ModPerks.CUPID_ARROW).toString())
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.PERK_ITEMS[ModPerks.CUPID_ARROW]!!)
+                .pattern("cbc")
+                .pattern("dad")
+                .pattern("cbc")
+                .define('a', ModItems.EMPTY_PERK)
+                .define('b', Items.BOW)
+                .define('c', ItemTags.ARROWS)
+                .define('d', getPotionIngredient(Potions.HEALING))
+                .unlockedBy(getHasName(ModItems.EMPTY_PERK), has(ModItems.EMPTY_PERK))
+                .save(writer, perkLoc(ModPerks.CUPID_ARROW))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.PERK_ITEMS[ModPerks.FIREFLY]!!)
                 .pattern("cbc")
                 .pattern("bab")
@@ -2358,7 +2670,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern("cbc")
                 .define('a', ModItems.EMPTY_PERK)
                 .define('b', Items.PISTON)
-                .define('c', ModTags.Items.INGOTS_STEEL)
+                .define('c', INGOTS_STEEL)
                 .unlockedBy(getHasName(ModItems.EMPTY_PERK), has(ModItems.EMPTY_PERK))
                 .save(writer, perkLoc(ModPerks.TURBO_CHARGER))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.PERK_ITEMS[ModPerks.VOLT_OVERLOAD]!!)
@@ -2403,13 +2715,24 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern("cac")
                 .pattern("ebe")
                 .define('a', ModItems.EMPTY_PERK)
-                .define('b', ModTags.Items.STORAGE_BLOCK_STEEL)
+                .define('b', STORAGE_BLOCK_STEEL)
                 .define('c', ModItems.BARBED_WIRE)
                 .define('d', ModItems.KNIFE)
                 .define('e', ModItems.CLAYMORE_MINE)
                 .unlockedBy(getHasName(ModItems.EMPTY_PERK), has(ModItems.EMPTY_PERK))
                 .unlockedBy(getHasName(ModItems.CLAYMORE_MINE), has(ModItems.CLAYMORE_MINE))
                 .save(writer, perkLoc(ModPerks.BLADE_BULLET))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.PERK_ITEMS[ModPerks.AQUA_BULLET]!!)
+                .pattern("dbd")
+                .pattern("cac")
+                .pattern("dcd")
+                .define('a', ModItems.EMPTY_PERK)
+                .define('b', Items.TRIDENT)
+                .define('c', Items.PRISMARINE_SHARD)
+                .define('d', ItemTags.FISHES)
+                .unlockedBy(getHasName(ModItems.EMPTY_PERK), has(ModItems.EMPTY_PERK))
+                .unlockedBy(getHasName(Items.TRIDENT), has(Items.TRIDENT))
+                .save(writer, perkLoc(ModPerks.AQUA_BULLET))
         }
 
         private fun buildMiscRecipes(writer: Consumer<FinishedRecipe>) {
@@ -2423,11 +2746,10 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.DRONE, 4)
                 .pattern("a a")
                 .pattern("bcb")
-                .pattern("ded")
+                .pattern(" e ")
                 .define('a', ModItems.PROPELLER)
                 .define('b', ModItems.MOTOR)
-                .define('c', Items.COMPASS)
-                .define('d', ModTags.Items.NUGGETS_IRON)
+                .define('c', PLATES_PLASTIC)
                 .define('e', ModItems.CELL)
                 .unlockedBy(getHasName(ModItems.PROPELLER), has(ModItems.PROPELLER))
                 .unlockedBy(getHasName(ModItems.MOTOR), has(ModItems.MOTOR))
@@ -2504,7 +2826,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .pattern(" d ")
                 .define('a', ModTags.Items.GLASS_BLOCKS)
                 .define('b', ModItems.DATA_CHIP_SUBSTRATE)
-                .define('c', ModTags.Items.INGOTS_STEEL)
+                .define('c', INGOTS_STEEL)
                 .define('d', ModTags.Items.NUGGETS_GOLD)
                 .unlockedBy(getHasName(ModItems.DATA_CHIP_SUBSTRATE), has(ModItems.DATA_CHIP_SUBSTRATE))
                 .save(writer, loc(getItemName(ModItems.RARE_BLUEPRINT_DATA_CHIP)))
@@ -2611,25 +2933,84 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('d', ModTags.Items.NUGGETS_GOLD)
                 .unlockedBy(getHasName(ModItems.DATA_CHIP_SUBSTRATE), has(ModItems.DATA_CHIP_SUBSTRATE))
                 .save(writer, loc(getItemName(ModItems.DAMAGE_PERK_DATA_CHIP)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SKIN_SPRAY)
+                .pattern(" ab")
+                .pattern("cdc")
+                .pattern(" c ")
+                .define('a', Items.IRON_NUGGET)
+                .define('b', Items.TRIPWIRE_HOOK)
+                .define('c', PLATES_STEEL)
+                .define('d', commonItemTag("dyes"))
+                .unlockedBy(getHasName(Items.TRIPWIRE_HOOK), has(Items.TRIPWIRE_HOOK))
+                .save(writer, loc(getItemName(ModItems.SKIN_SPRAY)))
             ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.GALENA, 9)
                 .requires(commonItemTag("storage_blocks/raw_lead"))
                 .unlockedBy(getHasName(ModItems.RAW_GALENA_BLOCK), has(commonItemTag("storage_blocks/raw_lead")))
                 .save(writer, loc("${getItemName(ModItems.GALENA)}_from_raw_block"))
             ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.SCHEELITE, 9)
                 .requires(commonItemTag("storage_blocks/raw_tungsten"))
-                .unlockedBy(getHasName(ModItems.RAW_SCHEELITE_BLOCK), has(commonItemTag("storage_blocks/raw_tungsten")))
+                .unlockedBy(
+                    getHasName(ModItems.RAW_SCHEELITE_BLOCK),
+                    has(commonItemTag("storage_blocks/raw_tungsten"))
+                )
                 .save(writer, loc("${getItemName(ModItems.SCHEELITE)}_from_raw_block"))
             ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.RAW_SILVER, 9)
                 .requires(commonItemTag("storage_blocks/raw_silver"))
-                .unlockedBy(getHasName(ModItems.RAW_SILVER_BLOCK), has(commonItemTag("storage_blocks/raw_silver")))
+                .unlockedBy(
+                    getHasName(ModItems.RAW_SILVER_BLOCK),
+                    has(commonItemTag("storage_blocks/raw_silver"))
+                )
                 .save(writer, loc("${getItemName(ModItems.RAW_SILVER)}_from_raw_block"))
+
+            VehicleAssemblingRecipeBuilder.item(
+                ModItems.VEHICLE_KEY,
+                1,
+                VehicleAssemblingRecipe.Category.MISC
+            )
+                .require(INGOTS_STEEL, 1)
+                .require(ModTags.Items.INGOTS_IRON, 2)
+                .require(ModTags.Items.INGOTS_COPPER, 2)
+                .unlockedBy(getHasName(ModItems.STEEL_INGOT), has(INGOTS_STEEL))
+                .save(writer, loc(getItemName(ModItems.VEHICLE_KEY) + "_assembling"))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.VEHICLE_KEY, 1)
+                .requires(ModItems.VEHICLE_KEY)
+                .unlockedBy(getHasName(ModItems.VEHICLE_KEY), has(ModItems.VEHICLE_KEY))
+                .save(writer, loc("${getItemName(ModItems.VEHICLE_KEY)}_reset"))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.TOWLINE, 1)
+                .pattern(" a ")
+                .pattern("cbc")
+                .pattern(" a ")
+                .define('a', Items.CHAIN)
+                .define('b', Items.LEAD)
+                .define('c', INGOTS_STEEL)
+                .unlockedBy(getHasName(Items.LEAD), has(Items.LEAD))
+                .save(writer, loc("${getItemName(ModItems.TOWLINE)}"))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.TOW_BAR, 1)
+                .pattern("a")
+                .pattern("b")
+                .pattern("a")
+                .define('a', Items.TRIPWIRE_HOOK)
+                .define('b', INGOTS_STEEL)
+                .unlockedBy(getHasName(Items.TRIPWIRE_HOOK), has(Items.TRIPWIRE_HOOK))
+                .save(writer, loc("${getItemName(ModItems.TOW_BAR)}"))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.CATAPULT_SHUTTLE, 1)
+                .pattern("ba ")
+                .pattern("bbb")
+                .pattern("dcd")
+                .define('a', Items.TRIPWIRE_HOOK)
+                .define('b', INGOTS_STEEL)
+                .define('c', Items.COPPER_INGOT)
+                .define('d', Items.REDSTONE)
+                .unlockedBy(getHasName(Items.TRIPWIRE_HOOK), has(Items.TRIPWIRE_HOOK))
+                .save(writer, loc("${getItemName(ModItems.CATAPULT_SHUTTLE)}"))
         }
 
         private fun buildSpecialRecipes(writer: Consumer<FinishedRecipe>) {
             SpecialRecipeBuilder.special(ModRecipes.POTION_MORTAR_SHELL_SERIALIZER)
                 .save(writer, "superbwarfare:potion_mortar_shell")
             SpecialRecipeBuilder.special(ModRecipes.SMOKE_DYE_SERIALIZER).save(writer, "superbwarfare:smoke_dye")
-            SpecialRecipeBuilder.special(ModRecipes.VEHICLE_RESET_SERIALIZER).save(writer, "superbwarfare:vehicle_reset")
+            SpecialRecipeBuilder.special(ModRecipes.VEHICLE_RESET_SERIALIZER)
+                .save(writer, "superbwarfare:vehicle_reset")
         }
 
         private fun buildResearchRecipes(writer: Consumer<FinishedRecipe>) {

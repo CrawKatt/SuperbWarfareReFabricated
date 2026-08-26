@@ -125,11 +125,12 @@ object LivingEventHandler {
                     return 0f
                 }
             } else {
+                val rate = vehicle.getSeat(entity)?.damageAbsorbRate ?: 0.0f
                 if (!source.`is`(ModTags.DamageTypes.VEHICLE_NOT_ABSORB)) {
-                    vehicle.hurt(source, 0.7f * amount)
+                    vehicle.hurt(source, rate.coerceIn(0f, 1f) * amount)
                 }
 
-                return amount * 0.3f
+                return amount * (1 - rate.coerceIn(0f, 1f))
             }
         }
         return amount
@@ -592,8 +593,9 @@ object LivingEventHandler {
 
             pickUp.discard()
 
-            if (oldCount > count) {
-                val item = ItemStack(stack.item, oldCount - count)
+            if (oldCount > count && entity is Player) {
+                val item = stack.copy()
+                item.count = oldCount - count
                 if (!entity.addItem(item)) {
                     entity.drop(item, false)
                 }
@@ -711,35 +713,43 @@ object LivingEventHandler {
         return false
     }
 
+    /**
+     * 取消原版爆炸对载具的影响，改为单独计算
+     * Code based on YWZJ-Vehicle
+     */
     @JvmStatic
     fun onExplosionDetonate(explosion: Explosion, affectedEntities: MutableList<Entity>) {
-        val customExplosion = explosion as? CustomExplosion ?: return
-        val access = ExplosionAccess.of(explosion)
-        val explosionPos = net.minecraft.world.phys.Vec3(
-            access.`superbwarfare$getX`(),
-            access.`superbwarfare$getY`(),
-            access.`superbwarfare$getZ`()
-        )
-        val explosionRadius = access.`superbwarfare$getRadius`() * 2.0f
-
         val iterator = affectedEntities.iterator()
+        val isCustom = explosion is CustomExplosion
+
         while (iterator.hasNext()) {
             val entity = iterator.next() as? VehicleEntity ?: continue
             iterator.remove()
-            if (entity.ignoreExplosion()) continue
+            val explosionPos = explosion.position
+            val explosionRadius = if (isCustom) explosion.radius * 2.0F
+            else (explosion as ExplosionAccess).`superbwarfare$getRadius`() * 2.0F
 
-            val distanceRatio = sqrt(entity.distanceToSqr(explosionPos)) / explosionRadius
-            if (distanceRatio > 1.0) continue
+            if (!entity.ignoreExplosion()) {
+                val distanceRatio = sqrt(entity.distanceToSqr(explosionPos)) / explosionRadius
+                if (distanceRatio <= 1.0) {
+                    val dx = entity.x - explosionPos.x
+                    val dy = entity.eyeY - explosionPos.y
+                    val dz = entity.z - explosionPos.z
+                    val distance = sqrt(dx * dx + dy * dy + dz * dz)
+                    if (distance != 0.0) {
+                        val visibilityFactor = if (!entity.enableAABB())
+                            CustomExplosion.getSeenPercentOptimized(entity.level(), explosionPos, entity)
+                        else
+                            Explosion.getSeenPercent(explosionPos, entity)
+                        val impactStrength = (1.0 - distanceRatio) * visibilityFactor
+                        val damage =
+                            if (isCustom) (impactStrength * impactStrength + impactStrength) / 2.0 * explosion.damage
+                            else (impactStrength * impactStrength + impactStrength) / 2.0 * 7.0 * explosionRadius + 1.0
 
-            val dx = entity.x - explosionPos.x
-            val dy = entity.eyeY - explosionPos.y
-            val dz = entity.z - explosionPos.z
-            if (sqrt(dx * dx + dy * dy + dz * dz) == 0.0) continue
-
-            val visibilityFactor = Explosion.getSeenPercent(explosionPos, entity)
-            val impactStrength = (1.0 - distanceRatio) * visibilityFactor
-            val damage = (impactStrength * impactStrength + impactStrength) / 2.0 * 7.0 * explosionRadius + 1.0
-            entity.hurt((customExplosion as Explosion).damageSource, damage.toFloat())
+                        entity.hurt(explosion.damageSource, damage.toFloat())
+                    }
+                }
+            }
         }
     }
 }

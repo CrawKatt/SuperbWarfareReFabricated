@@ -1,39 +1,15 @@
 package com.atsuishio.superbwarfare.entity.vehicle
 
+import com.atsuishio.superbwarfare.client.animation.AnimationPlayType
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
-import com.atsuishio.superbwarfare.entity.vehicle.base.GeoVehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModParticleTypes
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 
-class A10Entity(type: EntityType<A10Entity>, world: Level) : GeoVehicleEntity(type, world) {
-
-    override fun baseTick() {
-        super.baseTick()
-
-        //测试粒子
-//        if (level().isClientSide) {
-//            val pos1 = Vec3(6.6, 1.66, -0.68)
-//            val pos2 = Vec3(-6.6, 1.66, -0.68)
-//
-//            val worldPosition1 = transformPosition(
-//                getVehicleTransform(1f),
-//                pos1.x, pos1.y, pos1.z
-//            )
-//
-//            val worldPosition2 = transformPosition(
-//                getVehicleTransform(1f),
-//                pos2.x, pos2.y, pos2.z
-//            )
-//
-//            addRandomParticle(ParticleTypes.CLOUD, Vec3(worldPosition1.x, worldPosition1.y, worldPosition1.z), 0f, level(), 0f, 1)
-//            addRandomParticle(ParticleTypes.CLOUD, Vec3(worldPosition2.x, worldPosition2.y, worldPosition2.z), 0f, level(), 0f, 1)
-//        }
-
-    }
-
+open class A10Entity(type: EntityType<A10Entity>, world: Level) : VehicleEntity(type, world) {
     override fun onEngine1Damaged(pos: Vec3) {
         if (level().isClientSide) {
             val random = 2 * (this.random.nextFloat() - 0.5f)
@@ -71,6 +47,25 @@ class A10Entity(type: EntityType<A10Entity>, world: Level) : GeoVehicleEntity(ty
                     true
                 ), pos, 0.5f, level(), 1.5f, 1
             )
+        }
+    }
+
+    override fun baseTick() {
+        super.baseTick()
+
+        val gearUp = (this.gearUp && synchedGearRot > 0 && synchedGearRot < 1) || synchedGearRot == 1f
+        val gearDown = (!this.gearUp && synchedGearRot > 0 && synchedGearRot < 1) || synchedGearRot == 0f
+
+        if (level().isClientSide) {
+            val ctx = anim?.context ?: return
+            if (gearUp && !wasGearUp) {
+                ctx.stopAnimation("animation.a_10.gear_down")
+                ctx.playAnimation("animation.a_10.gear_up", AnimationPlayType.PLAY_ONCE_HOLD)
+            } else if (gearDown && wasGearUp) {
+                ctx.stopAnimation("animation.a_10.gear_up")
+                ctx.playAnimation("animation.a_10.gear_down", AnimationPlayType.PLAY_ONCE_HOLD)
+            }
+            wasGearUp = gearUp
         }
     }
 }

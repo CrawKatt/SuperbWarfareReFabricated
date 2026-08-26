@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.item.weapon
 import com.atsuishio.superbwarfare.client.renderer.item.MilitaryShovelRenderer
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.tiers.ModItemTier
+import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.ChatFormatting
@@ -127,7 +128,7 @@ open class MilitaryShovelItem :
             private var renderer: net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer? = null
 
             override fun getCustomRenderer(): net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer {
-                if (renderer == null) renderer = MilitaryShovelRenderer()
+                if (renderer == null) renderer = MilitaryShovelRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
                 return renderer!!
             }
         })

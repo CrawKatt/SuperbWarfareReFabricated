@@ -1,8 +1,10 @@
 package com.atsuishio.superbwarfare.client.overlay
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.client.RenderHelper
 import com.atsuishio.superbwarfare.client.overlay.weapon.*
+import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
@@ -23,8 +25,6 @@ import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
-import kotlin.math.cos
-import kotlin.math.sin
 
 /**
  * 控制载具主武器的玩家显示的HUD
@@ -79,28 +79,21 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
     }
 
     override fun RenderContext.render() {
-        val vehicle = player.vehicle
-        if (vehicle !is VehicleEntity) return
-
-        val type: String = vehicle.computed().hudType
-        if (type == EMPTY) return
-
-        val gunData = vehicle.getGunData(player) ?: return
-
         val poseStack = guiGraphics.pose()
         poseStack.pushPose()
 
-        RenderSystem.disableDepthTest()
-        RenderSystem.depthMask(false)
-        RenderSystem.enableBlend()
-        RenderSystem.setShader { GameRenderer.getPositionTexShader() }
-        RenderSystem.blendFuncSeparate(
-            GlStateManager.SourceFactor.SRC_ALPHA,
-            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-            GlStateManager.SourceFactor.ONE,
-            GlStateManager.DestFactor.ZERO
-        )
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
+        val vehicle = player.vehicle
+        if (vehicle !is VehicleEntity) {
+            poseStack.popPose()
+            return
+        }
+
+
+        val type: String = vehicle.computed().hudType
+        if (type == EMPTY) {
+            poseStack.popPose()
+            return
+        }
 
         when (type) {
             LandVehicleHud.ID -> LandVehicleHud.render(
@@ -152,13 +145,50 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                 screenWidth,
                 screenHeight
             )
+
+            KirovHud.ID -> KirovHud.render(
+                vehicle,
+                player,
+                mc,
+                guiGraphics,
+                partialTick,
+                screenWidth,
+                screenHeight
+            )
         }
 
-        val seekInfo = gunData.get(GunProp.SEEK_WEAPON_INFO)
-        if (seekInfo == null) {
+        val gunData = vehicle.getGunData(player)
+        if (gunData == null) {
             poseStack.popPose()
             return
         }
+
+
+        RenderSystem.disableDepthTest()
+        RenderSystem.depthMask(false)
+        RenderSystem.enableBlend()
+        RenderSystem.setShader { GameRenderer.getPositionTexShader() }
+        RenderSystem.blendFuncSeparate(
+            GlStateManager.SourceFactor.SRC_ALPHA,
+            GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+            GlStateManager.SourceFactor.ONE,
+            GlStateManager.DestFactor.ZERO
+        )
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
+
+
+
+        val seekInfo = gunData.get(GunProp.SEEK_WEAPON_INFO)
+        val color = gunData.get(GunProp.CROSSHAIR_COLOR).get()
+
+        // Lock-on frames, target indicators, and entity labels are part of
+        // the targeting HUD — suppress when server disables crosshair overlay.
+        if (seekInfo == null || MiscConfig.HIDE_COMBAT_HUD.get()) {
+            poseStack.popPose()
+            return
+        }
+
+        val level = clientLevel
 
         val seekTime = seekInfo.seekTime
 
@@ -166,9 +196,16 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
             val targetEntity = ClientEventHandler.lockingEntityVehicle
             var nearestEntity = ClientEventHandler.nearestEntityVehicle
 
-            for (e in entities!!) {
+            for (en in entities!!) {
+                val e = level!!.getEntity(en.id) ?: en
                 if (e.type.`is`(ModTags.EntityTypes.DECOY)) continue
-                val pos3 = lerpGetEntityBoundingBoxCenter(e, partialTick)
+
+                val pos3 = if (level.getEntity(e.id) != null)
+                    lerpGetEntityBoundingBoxCenter(e, partialTick)
+                else
+                    ClientSyncedEntityHandler.getExtrapolatedPos(level, e)
+                        .add(0.0, e.bbHeight / 2.0, 0.0)
+
                 val decoy = TraceTool.findLookDecoy(player, cameraPos, cameraPos.vectorTo(pos3).normalize(), seekInfo.seekRange)
 
                 if (decoy == null && pos3.canBeSeen() && !seekInfo.onlyLockBlock) {
@@ -202,7 +239,7 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                         if (seekInfo.calculateTrajectory) {
                             val shootVector = calculateFiringSolution(
                                 vehicle.getShootPos(player, partialTick),
-                                lerpGetEntityBoundingBoxCenter(targetEntity, partialTick),
+                                lerpGetEntityBoundingBoxCenter(targetEntity!!, partialTick),
                                 targetEntity.deltaMovement.scale(1.25),
                                 vehicle.getProjectileVelocity(player).toDouble(),
                                 vehicle.getProjectileGravity(player).toDouble()
@@ -367,7 +404,7 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                     poseStack.popPose()
                 }
             }
-        } else {
+        } else if (seekInfo.onlyLockBlock) {
             val pos = ClientEventHandler.lockingPosVehicle
             if (pos != null) {
                 val lockOn = ClientEventHandler.lockOnVehicle
@@ -416,7 +453,80 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                     )
                     poseStack.popPose()
                 }
+            } else {
+                poseStack.pushPose()
+                poseStack.translate((screenWidth / 2).toDouble(), (screenHeight / 2).toDouble(), 0.0)
+
+                RenderHelper.blit(
+                    poseStack,
+                    FRAME_TARGET,
+                    -12f,
+                    -12f,
+                    0f,
+                    0f,
+                    24f,
+                    24f,
+                    24f,
+                    24f,
+                    1f
+                )
+
+                val string = "[" + ModKeyMappings.VEHICLE_SEEK.key.displayName.string + "]"
+                val width = mc.font.width(string)
+                guiGraphics.drawString(
+                    mc.font,
+                    string,
+                    -width / 2,
+                    10,
+                    0xFFBD7F,
+                    false
+                )
+                poseStack.popPose()
             }
+        } else if (seekInfo.inputBlockPos) {
+            poseStack.pushPose()
+            poseStack.translate((screenWidth / 2).toDouble() + 90, (screenHeight / 2).toDouble(), 0.0)
+
+            val stringX = "X: " + (ClientEventHandler.missileLockingPos?.x ?: "---")
+            guiGraphics.drawString(
+                mc.font,
+                stringX,
+                0,
+                -17,
+                color,
+                false
+            )
+
+            val stringY = "Y: " + (ClientEventHandler.missileLockingPos?.y ?: "---")
+            guiGraphics.drawString(
+                mc.font,
+                stringY,
+                0,
+                -8,
+                color,
+                false
+            )
+
+            val stringZ = "Z: " + (ClientEventHandler.missileLockingPos?.z ?: "---")
+            guiGraphics.drawString(
+                mc.font,
+                stringZ,
+                0,
+                1,
+                color,
+                false
+            )
+
+            val string = Component.translatable("tips.superbwarfare.input_missile_target", ModKeyMappings.EDIT_MODE.translatedKeyMessage)
+            guiGraphics.drawString(
+                mc.font,
+                string,
+                0,
+                10,
+                color,
+                false
+            )
+            poseStack.popPose()
         }
 
         poseStack.popPose()
@@ -507,28 +617,5 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
         val length = font.width(component)
 
         guiGraphics.drawString(font, component, -length / 2, -9, Mth.hsvToRgb(0f, heat, 1f), false)
-    }
-
-    fun getAroundPos(direction: Vec3, center: Vec3, radius: Double): Vec3 {
-        var direction = direction
-        direction = direction.normalize()
-
-        // 构建垂直正交基
-        val randomPerp: Vec3 = getRandomPerpendicular(direction)
-        val u = randomPerp.normalize()
-        val v = direction.cross(u).normalize()
-
-        val theta = 2 * Math.PI
-        val xOffset = radius * (cos(theta) * u.x + sin(theta) * v.x)
-        val yOffset = radius * (cos(theta) * u.y + sin(theta) * v.y)
-        val zOffset = radius * (cos(theta) * u.z + sin(theta) * v.z)
-
-        return center.add(xOffset, yOffset, zOffset)
-    }
-
-    private fun getRandomPerpendicular(dir: Vec3): Vec3 {
-        val candidate1 = Vec3(dir.y, -dir.x, 0.0) // 在XY平面垂直
-        if (candidate1.lengthSqr() > 1e-4) return candidate1
-        return Vec3(0.0, dir.z, -dir.y) // 备用垂直向量
     }
 }

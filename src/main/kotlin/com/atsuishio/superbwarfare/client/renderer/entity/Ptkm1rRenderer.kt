@@ -2,13 +2,12 @@ package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.entity.projectile.Ptkm1rEntity
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader
-import com.atsuishio.superbwarfare.resource.BedrockModelLoader.getModel
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
 import com.maydaymemory.mae.blend.EulerAdditiveBlender
 import com.maydaymemory.mae.blend.SimpleEulerAdditiveBlender
 import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.entity.EntityRenderer
@@ -34,7 +33,7 @@ class Ptkm1rRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
         buffer: MultiBufferSource,
         packedLight: Int
     ) {
-        val model = getModel(BedrockModelLoader.PTKM_1R_MA.first) ?: return
+        val instance = entity.modelInstance ?: return
         val ani = entity.animationInstance ?: return
 
         poseStack.pushPose()
@@ -44,15 +43,15 @@ class Ptkm1rRenderer(renderManager: EntityRendererProvider.Context) : EntityRend
 
         ani.context.partialTick = partialTick
         ani.tick()
-        model.applyPose(BLENDER.blend(model.bindPose, ani.getPose()))
+        instance.applyPose(BLENDER.blend(instance.bindPose, ani.getPose()))
 
-        val bodyBone = model.getBone("body")
-        bodyBone?.rotation?.rotationY(-entityYaw * Mth.DEG_TO_RAD)
+        val bodyBone = instance.getBone("move_body")
+        bodyBone?.rotation?.mul(Axis.YP.rotationDegrees(-entityYaw))
 
-        val zhuBone = model.getBone("zhu2")
-        zhuBone?.rotation?.rotationX(-0.5f * Mth.lerp(partialTick, entity.xRotO, entity.xRot) * Mth.DEG_TO_RAD)
+        val zhuBone = instance.getBone("move_zhu2")
+        zhuBone?.rotation?.mul(Axis.XP.rotationDegrees(-0.5f * Mth.lerp(partialTick, entity.xRotO, entity.xRot)))
 
-        model.renderToBuffer(
+        instance.renderToBuffer(
             poseStack,
             vertexConsumer,
             packedLight,

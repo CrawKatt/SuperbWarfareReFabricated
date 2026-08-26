@@ -27,13 +27,14 @@ open class AerialBombEntity(type: EntityType<out AerialBombEntity>, level: Level
         return 0.7f
     }
 
-    override fun onHitEntity(result: EntityHitResult) {
-        super.onHitEntity(result)
+    override fun canPassThroughFluid() = true
+
+    override fun afterHitEntity(result: EntityHitResult) {
         val entity = result.entity
         val owner = this.owner
         if (entity == owner || (owner != null && entity == owner.vehicle) || entity is AerialBombEntity) return
         if (this.level() is ServerLevel) {
-            if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
+            if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get() && this.explosionDestroyValue) {
                 val aabb = AABB(result.getLocation(), result.getLocation()).inflate(5.0)
                 BlockPos.betweenClosedStream(aabb).forEach {
                     val hard = this.level().getBlockState(it).block.defaultDestroyTime()
@@ -53,25 +54,24 @@ open class AerialBombEntity(type: EntityType<out AerialBombEntity>, level: Level
         }
     }
 
-    override fun onHitBlock(blockHitResult: BlockHitResult) {
-        super.onHitBlock(blockHitResult)
+    override fun afterHitBlock(result: BlockHitResult) {
         if (this.level() is ServerLevel) {
-            if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get()) {
-                val aabb = AABB(blockHitResult.getLocation(), blockHitResult.getLocation()).inflate(5.0)
+            if (ExplosionConfig.EXPLOSION_DESTROY.get() && ExplosionConfig.EXTRA_EXPLOSION_EFFECT.get() && this.explosionDestroyValue) {
+                val aabb = AABB(result.getLocation(), result.getLocation()).inflate(5.0)
                 BlockPos.betweenClosedStream(aabb).forEach {
                     val hard = this.level().getBlockState(it).block.defaultDestroyTime()
                     if (hard != -1f && Vec3(
                             it.x.toDouble(),
                             it.y.toDouble(),
                             it.z.toDouble()
-                        ).distanceTo(blockHitResult.getLocation()) < 3
+                        ).distanceTo(result.getLocation()) < 3
                     ) {
                         this.level().destroyBlock(it, true)
                     }
                 }
             }
 
-            causeExplode(blockHitResult.getLocation())
+            causeExplode(result.getLocation())
             this.discard()
         }
     }

@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.block.VehicleAssemblingTableBlock
 import com.atsuishio.superbwarfare.block.property.BlockPart
 import com.atsuishio.superbwarfare.client.renderer.item.VehicleAssemblingTableBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlocks
+import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
@@ -54,7 +55,7 @@ class VehicleAssemblingTableBlockItem : BlockItem(ModBlocks.VEHICLE_ASSEMBLING_T
 
             override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
                 if (this.renderer == null) {
-                    this.renderer = VehicleAssemblingTableBlockItemRenderer()
+                    this.renderer = VehicleAssemblingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
                 }
                 return this.renderer!!
             }

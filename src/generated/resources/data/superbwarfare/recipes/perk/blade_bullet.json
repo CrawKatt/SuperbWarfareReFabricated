@@ -6,7 +6,7 @@
       "item": "superbwarfare:empty_perk"
     },
     "b": {
-      "tag": "superbwarfare:storage_blocks/steel"
+      "tag": "forge:storage_blocks/steel"
     },
     "c": {
       "item": "superbwarfare:barbed_wire"

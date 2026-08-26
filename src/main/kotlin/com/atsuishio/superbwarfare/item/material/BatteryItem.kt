@@ -82,8 +82,8 @@ open class BatteryItem(var maxEnergy: Int, properties: Properties) :
             val stackEnergyNeed =
                 min(cellEnergy.toDouble(), (toCharge.maxEnergyStored - toCharge.energyStored).toDouble()).toInt()
 
-            toCharge.receiveEnergy(stackEnergyNeed, false)
-            energyStorage.extractEnergy(stackEnergyNeed, false)
+            val received = toCharge.receiveEnergy(stackEnergyNeed, false)
+            energyStorage.extractEnergy(received, false)
         }
 
         TrinketsApi.getTrinketComponent(entity).ifPresent { component ->
@@ -97,9 +97,12 @@ open class BatteryItem(var maxEnergy: Int, properties: Properties) :
 
                         val cellEnergy = energyStorage.energyStored
                         if (cellEnergy <= 0) continue
-                        val needed = min(cellEnergy, toCharge.maxEnergyStored - toCharge.energyStored)
-                        toCharge.receiveEnergy(needed, false)
-                        energyStorage.extractEnergy(needed, false)
+
+                        val stackEnergyNeed =
+                            min(cellEnergy.toDouble(), (toCharge.maxEnergyStored - toCharge.energyStored).toDouble()).toInt()
+
+                        val received = toCharge.receiveEnergy(stackEnergyNeed, false)
+                        energyStorage.extractEnergy(received, false)
                     }
                 }
             }

@@ -27,6 +27,7 @@
   },
   "UpStep": 1.1,
   "Mass": 0.02,
+  "TowForceFactor": 10.0,
   "RotateOffsetHeight": 0.5,
   "AllowFreeCam": true,
   "SendHitParticles": false,
@@ -39,7 +40,6 @@
   ],
   "VehicleContainerType": "Empty",
   "DestroyInfo": {
-    "ParticleType": "Medium",
     "ExplosionDamage": 15,
     "ExplosionRadius": 2,
     "CrashPassengers": true,

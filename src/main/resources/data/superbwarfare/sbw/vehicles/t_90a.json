@@ -3,6 +3,11 @@
   "MaxEnergy": 10000000,
   "OBB": [
     {
+      "Part": "Collision",
+      "Size": [2.438, 0.969, 4.6],
+      "Position": [0, 0.969, 0.156]
+    },
+    {
       "Size": [2.2, 0.6875, 4.5716],
       "Position": [0, 1.2375, 0.2409]
     },
@@ -76,6 +81,7 @@
       "Transform": "Turret",
       "Position": [0.5863, -0.1, -0.426],
       "CanRotateBody": true,
+      "RotateWithVehicle": true,
       "MinPitch": -45,
       "MaxPitch": 90,
       "DismountInfo": {
@@ -254,6 +260,7 @@
   "UpStep": 2.25,
   "RotateOffsetHeight": 2.75,
   "Mass": 47,
+  "TowForceFactor": 1.5,
   "DamageModifiers": [
     "minecraft:arrow 0",
     "minecraft:trident 0",
@@ -280,14 +287,14 @@
     "#superbwarfare:projectile_absolute * 0.15",
     "@#superbwarfare:aa_missile * 0.3",
     "@superbwarfare:small_cannon_shell * 0.25",
-    "@superbwarfare:c4 * 4",
+    "@superbwarfare:c4 * 6",
     "@#superbwarfare:at_rocket * 1.1",
     "@superbwarfare:gun_grenade * 1.25",
     "@superbwarfare:mortar_shell * 1.25",
-    "@superbwarfare:tm_62 * 2.5"
+    "@superbwarfare:tm_62 * 2.5",
+    "$entity.getSourceAngle(source, 0.3) * damage"
   ],
   "DestroyInfo": {
-    "ParticleType": "Giant",
     "ExplosionDamage": 200,
     "ExplosionRadius": 16,
     "SympatheticDetonation": true,

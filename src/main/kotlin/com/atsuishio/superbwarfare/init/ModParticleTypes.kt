@@ -1,9 +1,7 @@
 package com.atsuishio.superbwarfare.init
 
-import com.atsuishio.superbwarfare.client.particle.BulletDecalOption
-import com.atsuishio.superbwarfare.client.particle.CannonMuzzleFlareOption
-import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
-import com.atsuishio.superbwarfare.client.particle.CustomSmokeOption
+import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.client.particle.*
 import com.mojang.serialization.Codec
 import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.core.particles.ParticleType
@@ -15,11 +13,18 @@ object ModParticleTypes {
     val FIRE_STAR: SimpleParticleType = registerSimpleParticle("fire_star")
 
     @JvmField
+    @JvmField
+    val EXPLOSION_DEBRIS: ParticleType<ExplosionDebrisOption> = Registration.particle(
+        "explosion_debris",
+    ) { createOptions(ExplosionDebrisOption.CODEC, true, ExplosionDebrisOption.DESERIALIZER) }
+
+    @JvmField
     val WHITE_STAR: SimpleParticleType = registerSimpleParticle("white_star")
 
     @JvmField
     val RISING_SMOKE: SimpleParticleType = registerSimpleParticle("rising_smoke")
 
+    @JvmField
     @JvmField
     val BULLET_DECAL: ParticleType<BulletDecalOption> = Registration.particle(
         "bullet_decal",
@@ -34,6 +39,11 @@ object ModParticleTypes {
     val CANNON_MUZZLE_FLARE: ParticleType<CannonMuzzleFlareOption> = Registration.particle(
         "cannon_muzzle_flare",
     ) { createOptions(CannonMuzzleFlareOption.CODEC, true, CannonMuzzleFlareOption.DESERIALIZER) }
+
+    @JvmField
+    val CUSTOM_FLARE: ParticleType<CustomFlareOption> = Registration.particle(
+        "custom_flare",
+    ) { createOptions(CustomFlareOption.CODEC, true, CustomFlareOption.DESERIALIZER) }
 
     @JvmField
     val CUSTOM_CLOUD: ParticleType<CustomCloudOption> = Registration.particle(

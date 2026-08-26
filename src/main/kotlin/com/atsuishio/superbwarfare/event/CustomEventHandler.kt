@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.config.server.ProjectileConfig
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.projectile.GrapeshotEntity
+import com.atsuishio.superbwarfare.entity.projectile.IAdvancedHitDetection
 import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity
 import com.atsuishio.superbwarfare.entity.projectile.SuperStarProjectileEntity
 import com.atsuishio.superbwarfare.event.custom.PreKillCallback
@@ -93,6 +94,10 @@ object CustomEventHandler {
             if (projectile is ProjectileEntity || projectile is GrapeshotEntity || projectile is SuperStarProjectileEntity) {
                 block.attemptToRing(projectile.level(), pos, face)
             }
+        }
+
+        if (projectile is IAdvancedHitDetection && block is TargetBlock) {
+            projectile.recordHitScore(face, event.hitVec)
         }
 
         if (projectile is ProjectileEntity) {

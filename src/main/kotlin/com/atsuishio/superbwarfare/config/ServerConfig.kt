@@ -17,6 +17,8 @@ val SERVER_CONFIG = buildConfig(
     VehicleConfig,
     MiscConfig,
     AmmoConfig,
+    MapConfig,
+    SyncConfig,
 )
 
 object ServerConfig {

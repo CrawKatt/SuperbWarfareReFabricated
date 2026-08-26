@@ -2,7 +2,7 @@
 
 package com.atsuishio.superbwarfare.tools
 
-import com.atsuishio.superbwarfare.Mod.Companion.queueClientWork
+import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.network.NetworkRegistry
 import com.atsuishio.superbwarfare.tools.FormatTool.format0D
 import net.fabricmc.api.EnvType
@@ -69,22 +69,34 @@ fun Vec3?.toFormattedString(): String {
     return "[ " + format0D(x) + ", " + format0D(y) + ", " + format0D(z) + " ]"
 }
 
-fun isSameItemStack(a: ItemStack, b: ItemStack) = a sameWith b
-
-// 为空tag添加特判后的比较，专治乱用getOrCreateTag（恼）
+/**
+ * Returns `true` when [this] and [that] represent the same item type with
+ * identical NBT data, treating `null` and empty [CompoundTag] as equivalent.
+ *
+ * Unlike [ItemStack.isSameItemSameTags], this method **never** triggers
+ * capability-gathering or posts to the Forge event bus, making it safe to
+ * call in tight per-tick loops (ammo scanning, inventory searches).
+ *
+ * @param that the stack to compare against; `null` returns `false`
+ * @return `true` if item type and NBT are equivalent
+ */
 infix fun ItemStack.sameWith(that: ItemStack?): Boolean {
     if (that == null) return false
-    if (this.tag == null && that.hasEmptyTag() || that.tag == null && this.hasEmptyTag()) {
-        val a = this.copy().apply { tag = null }
-        val b = that.copy().apply { tag = null }
-
-        return ItemStack.isSameItemSameTags(a, b)
-    }
-
-    return ItemStack.isSameItemSameTags(this, that)
+    // Fast reference-equality on Item registry object — O(1), zero allocation.
+    if (this.item !== that.item) return false
+    // Normalise: null tag and empty CompoundTag are semantically identical.
+    // Use takeUnless to avoid allocating a wrapper — returns null if isEmpty.
+    val thisTag = this.tag?.takeUnless { it.isEmpty }
+    val thatTag = that.tag?.takeUnless { it.isEmpty }
+    // CompoundTag.equals() compares tag trees by value — no capability lookup.
+    return thisTag == thatTag
 }
 
-// 判断是否tag不为null且内容为空
+// Keeps the existing public alias working without changes at call sites.
+fun isSameItemStack(a: ItemStack, b: ItemStack) = a sameWith b
+
+// Internal helper — checks whether tag is non-null but empty.
+// Kept private; external callers should use sameWith directly.
 private fun ItemStack.hasEmptyTag() = this.tag?.isEmpty ?: false
 
 // Network
@@ -112,7 +124,7 @@ fun Entity.sendPacketToTrackingThis(packet: Any) {
 
 inline fun queueClientWorkIfDelayed(delay: Int, crossinline block: () -> Unit) {
     if (delay > 0) {
-        queueClientWork(delay) { block() }
+        Mod.queueClientWork(delay) { block() }
     } else {
         block()
     }

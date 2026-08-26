@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.living
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.animation.entity.TargetAnimationInstance
 import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.setValue
@@ -7,6 +8,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
 import com.atsuishio.superbwarfare.tools.FormatTool
 import com.atsuishio.superbwarfare.tools.playLocalSound
 import net.minecraft.commands.arguments.EntityAnchorArgument
@@ -32,6 +34,7 @@ import net.minecraft.world.phys.Vec3
 open class TargetEntity(type: EntityType<TargetEntity>, level: Level) : LivingEntity(type, level) {
     open val animationInstance: TargetAnimationInstance? =
         if (this.level().isClientSide) TargetAnimationInstance(this) else null
+    open val modelInstance = EntityModelReloadListener.getModel(MODEL)?.createInstance()
 
     open var downTime by DOWN_TIME
 
@@ -75,7 +78,7 @@ open class TargetEntity(type: EntityType<TargetEntity>, level: Level) : LivingEn
             return super.hurt(source, amount)
         }
 
-        amount = DAMAGE_MODIFIER.compute(source, amount)
+        amount = DAMAGE_MODIFIER.compute(this, source, amount)
         if (amount <= 0 || this.downTime > 0) {
             return false
         }
@@ -182,6 +185,8 @@ open class TargetEntity(type: EntityType<TargetEntity>, level: Level) : LivingEn
         @JvmField
         val DOWN_TIME: EntityDataAccessor<Int> =
             SynchedEntityData.defineId(TargetEntity::class.java, EntityDataSerializers.INT)
+
+        val MODEL = loc("models/bedrock/entity/target.geo.json")
 
         private val DAMAGE_MODIFIER = DamageModifier.createDefaultModifier()
             .immuneTo(DamageTypes.LIGHTNING_BOLT)

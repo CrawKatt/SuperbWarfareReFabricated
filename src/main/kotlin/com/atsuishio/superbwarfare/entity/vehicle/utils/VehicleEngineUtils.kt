@@ -2,7 +2,9 @@ package com.atsuishio.superbwarfare.entity.vehicle.utils
 
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo
+import com.atsuishio.superbwarfare.entity.vehicle.Ac130hEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleEngineUtils.aircraftLoiter
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
@@ -16,9 +18,12 @@ import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.ClipContext
+import net.minecraft.world.level.levelgen.Heightmap
+import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import org.joml.Math
-import kotlin.math.min
+import kotlin.math.*
 
 object VehicleEngineUtils {
     private val VehicleEntity.isInFluidType: Boolean
@@ -36,7 +41,7 @@ object VehicleEngineUtils {
         val maxBackwardSpeedRate = engineInfo.maxBackwardSpeedRate
         var powerAdd = engineInfo.increment
         var powerReduce = engineInfo.decrement
-        var steeringSpeed = engineInfo.steeringSpeed
+        val steeringSpeed = engineInfo.steeringSpeed
 
         if (buoyancy != 0.0) {
             val fluidFloat = buoyancy * VehicleVecUtils.getSubmergedHeight(this)
@@ -67,11 +72,12 @@ object VehicleEngineUtils {
             powerAdd *= 0.1f
             powerReduce *= 0.1f
 
-            val f1 = Mth.clamp(0.9f
-                    + 0.09f * Mth.abs(deltaMovement.normalize().dot(getViewVector(1f)).toFloat())
-                    - 4f * deltaMovement.lengthSqr().toFloat()
-                - VehicleVecUtils.getSubmergedHeight(this).toFloat() * 0.02f
-                , 0f, 0.99f)
+            val f1 = Mth.clamp(
+                0.9f
+                        + 0.09f * Mth.abs(deltaMovement.normalize().dot(getViewVector(1f)).toFloat())
+                        - 4f * deltaMovement.lengthSqr().toFloat()
+                        - VehicleVecUtils.getSubmergedHeight(this).toFloat() * 0.02f, 0f, 0.99f
+            )
 
             deltaMovement = deltaMovement.add(
                 getViewVector(1f).normalize()
@@ -84,16 +90,22 @@ object VehicleEngineUtils {
 
         if (level().isClientSide) {
             if (isInFluidType && deltaMovement.horizontalDistanceSqr() > 0.3162) {
-                addRandomParticle(ParticleTypes.CLOUD, position().add(
-                    0.0,
-                    VehicleVecUtils.getSubmergedHeight(this) - 0.2,
-                    0.0),
-                    1f, level(), 0f, (2 + 4 * deltaMovement.length()).toInt())
+                addRandomParticle(
+                    ParticleTypes.CLOUD, position().add(
+                        0.0,
+                        VehicleVecUtils.getSubmergedHeight(this) - 0.2,
+                        0.0
+                    ),
+                    1f, level(), 0f, (2 + 4 * deltaMovement.length()).toInt()
+                )
 
-                addRandomParticle(ParticleTypes.BUBBLE_COLUMN_UP, position().add(
-                    0.0,
-                    VehicleVecUtils.getSubmergedHeight(this) - 0.2,
-                    0.0), 1f, level(), 0f, (2 + 10 * deltaMovement.length()).toInt())
+                addRandomParticle(
+                    ParticleTypes.BUBBLE_COLUMN_UP, position().add(
+                        0.0,
+                        VehicleVecUtils.getSubmergedHeight(this) - 0.2,
+                        0.0
+                    ), 1f, level(), 0f, (2 + 10 * deltaMovement.length()).toInt()
+                )
 
             }
         }
@@ -119,11 +131,17 @@ object VehicleEngineUtils {
         val maxPower = if (sprintInputDown) 1.25f else (if (power > 1) power - 0.002f else 1f)
 
         if (forwardInputDown && !backInputDown) {
-            power = Math.min(power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)), maxPower)
+            power = Math.min(
+                power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)),
+                maxPower
+            )
         }
 
         if (backInputDown) {
-            power = Math.max(power - (if (power > 0) powerReduce * 4f else powerReduce) * (maxPower - (Mth.abs(power) / 1.02f)), -1f)
+            power = Math.max(
+                power - (if (power > 0) powerReduce * 4f else powerReduce) * (maxPower - (Mth.abs(power) / 1.02f)),
+                -1f
+            )
             if (rightInputDown) {
                 holdTick++
                 deltaRot += steeringSpeed * 0.12f * Math.min(holdTick, 10)
@@ -146,9 +164,9 @@ object VehicleEngineUtils {
         }
 
         targetSpeed = if (power > 0) {
-            (maxForwardSpeedRate * (1 + xRot / 40)).toDouble()
+            (maxForwardSpeedRate * (1 + xRot / 60)).toDouble()
         } else {
-            (maxBackwardSpeedRate * (1 - xRot / 40)).toDouble()
+            (maxBackwardSpeedRate * (1 - xRot / 60)).toDouble()
         }
 
         if (!forwardInputDown && !backInputDown) {
@@ -165,10 +183,6 @@ object VehicleEngineUtils {
 
         if (level() is ServerLevel) {
             consumeEnergy(energyCost)
-        }
-
-        if (drift()) {
-            steeringSpeed *= 3.4f
         }
 
         deltaRot *= Math.max(0.76f - 0.1f * deltaMovement.horizontalDistance(), 0.3).toFloat()
@@ -210,7 +224,8 @@ object VehicleEngineUtils {
         yRot = (yRot - (if (isInFluidType && !onGround()) 2.5 else 8.0) * deltaRot - i * s0).toFloat()
 
         if (isInFluidType || onGround()) {
-            deltaMovement = deltaMovement.add(getViewVector(1f).scale((if (drift()) 0.03 else 0.15) * targetSpeed * power))
+            deltaMovement =
+                deltaMovement.add(getViewVector(1f).scale((if (drift()) 0.03 else 0.15) * targetSpeed * power))
         }
     }
 
@@ -251,11 +266,12 @@ object VehicleEngineUtils {
             powerAdd *= 0.1f
             powerReduce *= 0.1f
 
-            val f1 = Mth.clamp(0.9f
-                    + 0.09f * Mth.abs(deltaMovement.normalize().dot(getViewVector(1f)).toFloat())
-                    - 4f * deltaMovement.lengthSqr().toFloat()
-                    - VehicleVecUtils.getSubmergedHeight(this).toFloat() * 0.02f
-                , 0f, 0.99f)
+            val f1 = Mth.clamp(
+                0.9f
+                        + 0.09f * Mth.abs(deltaMovement.normalize().dot(getViewVector(1f)).toFloat())
+                        - 4f * deltaMovement.lengthSqr().toFloat()
+                        - VehicleVecUtils.getSubmergedHeight(this).toFloat() * 0.02f, 0f, 0.99f
+            )
 
             deltaMovement = deltaMovement.add(
                 getViewVector(1f).normalize()
@@ -268,16 +284,22 @@ object VehicleEngineUtils {
 
         if (level.isClientSide) {
             if (isInFluidType && deltaMovement.horizontalDistanceSqr() > 0.3162) {
-                addRandomParticle(ParticleTypes.CLOUD, position().add(
-                    0.0,
-                    VehicleVecUtils.getSubmergedHeight(this) - 0.2,
-                    0.0),
-                    1f, level(), 0f, (2 + 4 * deltaMovement.length()).toInt())
+                addRandomParticle(
+                    ParticleTypes.CLOUD, position().add(
+                        0.0,
+                        VehicleVecUtils.getSubmergedHeight(this) - 0.2,
+                        0.0
+                    ),
+                    1f, level(), 0f, (2 + 4 * deltaMovement.length()).toInt()
+                )
 
-                addRandomParticle(ParticleTypes.BUBBLE_COLUMN_UP, position().add(
-                    0.0,
-                    VehicleVecUtils.getSubmergedHeight(this) - 0.2,
-                    0.0), 1f, level(), 0f, (2 + 10 * deltaMovement.length()).toInt())
+                addRandomParticle(
+                    ParticleTypes.BUBBLE_COLUMN_UP, position().add(
+                        0.0,
+                        VehicleVecUtils.getSubmergedHeight(this) - 0.2,
+                        0.0
+                    ), 1f, level(), 0f, (2 + 10 * deltaMovement.length()).toInt()
+                )
 
             }
 
@@ -288,9 +310,10 @@ object VehicleEngineUtils {
                         pos.x, pos.y, pos.z
                     )
 
-                    val option = CustomCloudOption(0x000000, 200, 1.5f, 0f, false, false)
+                    val option = CustomCloudOption(0x000000, 200, 1.5f, 0f, cooldown = false, light = false)
 
-                    level().addParticle(option,
+                    level().addParticle(
+                        option,
                         worldPosition.x,
                         worldPosition.y,
                         worldPosition.z,
@@ -322,7 +345,10 @@ object VehicleEngineUtils {
         val maxPower = if (sprintInputDown) 1.3f else (if (power > 1) power - 0.002f else 1f)
 
         if (forwardInputDown && !backInputDown) {
-            power = Math.min(power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)), maxPower)
+            power = Math.min(
+                power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)),
+                maxPower
+            )
         }
 
         if (backInputDown) {
@@ -332,9 +358,9 @@ object VehicleEngineUtils {
         }
 
         targetSpeed = if (power > 0) {
-            (maxForwardSpeedRate * (1 + xRot / 40)).toDouble()
+            (maxForwardSpeedRate * (1 + xRot / 60)).toDouble()
         } else {
-            (maxBackwardSpeedRate * (1 - xRot / 40)).toDouble()
+            (maxBackwardSpeedRate * (1 - xRot / 60)).toDouble()
         }
 
         if (!forwardInputDown && !backInputDown) {
@@ -408,7 +434,8 @@ object VehicleEngineUtils {
         ) * rudderRot * (if (power > 0) 1 else -1) - i * s0).toFloat()
 
         if ((isInFluidType || onGround())) {
-            deltaMovement = deltaMovement.add(getViewVector(1f).scale((if (drift()) 0.02 else 0.15) * targetSpeed * power))
+            deltaMovement =
+                deltaMovement.add(getViewVector(1f).scale((if (drift()) 0.02 else 0.15) * targetSpeed * power))
         }
     }
 
@@ -429,9 +456,12 @@ object VehicleEngineUtils {
         }
 
         if (onGround()) {
-            deltaMovement = deltaMovement.multiply(0.2, 0.99, 0.2)
+            deltaMovement = deltaMovement.multiply(0.75, 0.99, 0.75)
         } else if (isInFluidType) {
-            val f = (0.835f - 0.04f * min(VehicleVecUtils.getSubmergedHeight(this), bbHeight.toDouble()) + 0.005f * Mth.abs(deltaMovement.normalize().dot(getViewVector(1f)).toFloat()))
+            val f =
+                (0.835f - 0.04f * min(VehicleVecUtils.getSubmergedHeight(this), bbHeight.toDouble()) + 0.005f * Mth.abs(
+                    deltaMovement.normalize().dot(getViewVector(1f)).toFloat()
+                ))
             deltaMovement = deltaMovement.add(
                 getViewVector(1f).normalize()
                     .scale(0.04 * deltaMovement.dot(getViewVector(1f)))
@@ -443,21 +473,30 @@ object VehicleEngineUtils {
 
         if (level().isClientSide && isInFluidType && deltaMovement.horizontalDistanceSqr() > 0.3162) {
             val y = y + VehicleVecUtils.getSubmergedHeight(this) - 0.2
-            addRandomParticle(ParticleTypes.CLOUD, position().add(
-                0.0,
-                y,
-                0.0),
-                1.2f, level(), 0f, (2 + 4 * deltaMovement.length()).toInt())
+            addRandomParticle(
+                ParticleTypes.CLOUD, position().add(
+                    0.0,
+                    y,
+                    0.0
+                ),
+                1.2f, level(), 0f, (2 + 4 * deltaMovement.length()).toInt()
+            )
 
-            addRandomParticle(ParticleTypes.BUBBLE_COLUMN_UP, position().add(
-                0.0,
-                y,
-                0.0), 1.2f, level(), 0f, (2 + 10 * deltaMovement.length()).toInt())
+            addRandomParticle(
+                ParticleTypes.BUBBLE_COLUMN_UP, position().add(
+                    0.0,
+                    y,
+                    0.0
+                ), 1.2f, level(), 0f, (2 + 10 * deltaMovement.length()).toInt()
+            )
 
-            addRandomParticle(ParticleTypes.BUBBLE_COLUMN_UP, position().add(
-                -4.5 * lookAngle.x,
-                -0.25,
-                -4.5 * lookAngle.z), 0.3f, level(), 0f, (40 * Mth.abs(power)).toInt())
+            addRandomParticle(
+                ParticleTypes.BUBBLE_COLUMN_UP, position().add(
+                    -4.5 * lookAngle.x,
+                    y - 0.25,
+                    -4.5 * lookAngle.z
+                ), 0.3f, level(), 0f, (40 * Mth.abs(power)).toInt()
+            )
 
         }
 
@@ -479,12 +518,15 @@ object VehicleEngineUtils {
         val maxPower = if (sprintInputDown) 1.3f else (if (power > 1) power - 0.002f else 1f)
 
         if (forwardInputDown && !backInputDown) {
-            power = Math.min(power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)), maxPower)
+            power = Math.min(
+                power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)),
+                maxPower
+            )
         }
 
         if (backInputDown) {
             power = Math.max(
-                    power - (if (power > 0) powerReduce * 4f else powerReduce) * (maxPower - (Mth.abs(power) / 1.02f)), -1f
+                power - (if (power > 0) powerReduce * 4f else powerReduce) * (maxPower - (Mth.abs(power) / 1.02f)), -1f
             )
         }
 
@@ -540,7 +582,11 @@ object VehicleEngineUtils {
             )
 
             deltaMovement = deltaMovement.add(
-                getUpVec(1f).scale(deltaMovement.length() * 0.005 * VehicleVecUtils.getSubmergedHeight(this) * Mth.abs(xRot))
+                getUpVec(1f).scale(
+                    deltaMovement.length() * 0.005 * VehicleVecUtils.getSubmergedHeight(this) * Mth.abs(
+                        xRot
+                    )
+                )
             )
         } else {
             xRot *= 0.99f
@@ -561,13 +607,15 @@ object VehicleEngineUtils {
         val speed = engineInfo.speed
 
         if (onGround()) {
-            deltaMovement = deltaMovement.multiply(0.8, 1.0, 0.8)
+            deltaMovement = deltaMovement.multiply(0.85, 1.0, 0.85)
         } else {
             if (!sympatheticDetonated) {
                 setZRot(roll * (if (backInputDown) 0.9f else 0.99f))
             }
             val f = Mth.clamp(
-                0.93499f - 0.01 * deltaMovement.lengthSqr() + (0.07 * speed) + 0.001f * Mth.abs(deltaMovement.normalize().dot(getViewVector(1f)).toFloat()), 0.01, 0.99
+                0.93499f - 0.01 * deltaMovement.lengthSqr() + (0.07 * speed) + 0.001f * Mth.abs(
+                    deltaMovement.normalize().dot(getViewVector(1f)).toFloat()
+                ), 0.01, 0.99
             ).toFloat()
             deltaMovement = deltaMovement.add(
                 getViewVector(1f).scale(
@@ -767,6 +815,8 @@ object VehicleEngineUtils {
         val speedRate = engineInfo.speedRate
         val resistance = engineInfo.resistance * if (downInputDown) 1.5 else 1.0
         val gearRotateAngle = engineInfo.gearRotateAngle
+        val clampPitch = engineInfo.clampPitch
+        val clampRoll = engineInfo.clampRoll
         val energyCost = (engineInfo.energyCostRate * Mth.abs(power)).toInt()
 
         val speedSqr = deltaMovement.lengthSqr()
@@ -826,6 +876,8 @@ object VehicleEngineUtils {
                 rightInputDown = false
                 forwardInputDown = false
                 backInputDown = false
+                sprintInputDown = false
+                downInputDown = false
                 if (onGround()) {
                     power *= 0.95f
                     deltaMovement = deltaMovement.multiply(0.94, 1.0, 0.94)
@@ -849,11 +901,12 @@ object VehicleEngineUtils {
                     val maxPower = if (sprintInputDown || onGround()) 3 else (if (power > 1) power - 0.012 else 1)
 
                     if (forwardInputDown) {
-                        power = Mth.clamp((power + 0.006f * powerAdd).toDouble(), -0.1, maxPower.toDouble()).toFloat() }
+                        power = Mth.clamp((power + 0.006f * powerAdd).toDouble(), -0.1, maxPower.toDouble()).toFloat()
+                    }
 
                     if (backInputDown) {
                         power = Math.max(
-                                power - 0.006f * powerReduce, if (onGround()) -0.2f else 0.025f
+                            power - 0.006f * powerReduce, if (onGround()) -0.2f else 0.025f
                         )
                     }
                 }
@@ -883,6 +936,13 @@ object VehicleEngineUtils {
 
                     planeBreak = Math.min(planeBreak + 10, 60f)
                 }
+            } else {
+                leftInputDown = false
+                rightInputDown = false
+                forwardInputDown = false
+                backInputDown = false
+                sprintInputDown = false
+                downInputDown = false
             }
 
             val rotSpeed = 0.3f + 3.2f * Mth.abs(calculateY(roll))
@@ -893,21 +953,18 @@ object VehicleEngineUtils {
             }
 
             val addX = Mth.clamp(Mth.clamp(dotViewVector - 0.24, 0.1, 0.2).toFloat() * mouseMoveSpeedY, -3.5f, 3.5f)
-            val addZ = deltaRot - (if (onGround() || Mth.abs(roll) > 60) 0f else 0.02f * (60 - Mth.abs(roll)) / 60) * mouseMoveSpeedX * dotViewVector.toFloat()
+            val addZ =
+                deltaRot - (if (onGround() || Mth.abs(roll) > 60) 0f else 0.02f * (60 - Mth.abs(roll)) / 60) * mouseMoveSpeedX * dotViewVector.toFloat()
 
             yRot += yawSpeed * addY
             if (!onGround()) {
-                xRot += pitchSpeed * addX
+                xRot = Mth.clamp(xRot + pitchSpeed * addX, -clampPitch, clampPitch)
 
                 if (tickCount > 5) {
                     updateRotation(this)
                 }
 
-                if ((roll > 0 && addY < 0) || (roll < 0 && addY > 0)) {
-                    addY *= Mth.clamp(1f - Mth.abs(roll) / 45, 0f, 1f)
-                }
-
-                setZRot(roll - rollSpeed * addZ)
+                setZRot(Mth.clamp(roll - rollSpeed * addZ, -clampRoll, clampRoll))
             }
 
             // 自动回正
@@ -922,6 +979,15 @@ object VehicleEngineUtils {
                 }
 
                 roll *= xSpeed
+            }
+
+            if (Mth.abs(xRot) < 20 && Mth.abs(mouseMoveSpeedY) < 0.001) {
+                xRot += if (deltaMovement.y() < 0) {
+                    0.2f * deltaMovement.y.toFloat()
+                } else {
+                    0.2f * deltaMovement.y.toFloat()
+                }
+                xRot *= 0.98f
             }
 
             propellerRot += 30 * power
@@ -989,7 +1055,11 @@ object VehicleEngineUtils {
             if (onGround()) {
                 destroyRot *= 0.95f
             } else {
-                destroyRot += 0.1f
+                destroyRot += if (vehicle is Ac130hEntity) {
+                    0.02f
+                } else {
+                    0.1f
+                }
             }
 
             val diffX: Float = 90 - xRot
@@ -1015,9 +1085,21 @@ object VehicleEngineUtils {
 
         val flapAngle = ((flap1LRot + flap1RRot + flap1L2Rot + flap1R2Rot) / 50).toDouble()
 
+        if (xRot > 0 && deltaMovement.y() > 0) {
+            liftOffset -= 0.0005f
+        } else {
+            liftOffset *= 0.95f
+        }
+
         deltaMovement = deltaMovement.add(
             getUpVec(1f).scale(
-                (1 - Mth.abs(deltaMovement.normalize().dot(getUpVec(1f)).toFloat())) * speed * 0.008 * lift * (flapAngle + Mth.clamp(4 - 0.25 * Mth.abs(dotViewVector.toFloat()), 1.0, 4.0))
+                (1 - Mth.abs(
+                    deltaMovement.normalize().dot(getUpVec(1f)).toFloat()
+                )) * speed * (0.008 + liftOffset) * lift * (flapAngle + Mth.clamp(
+                    4 - 0.25 * Mth.abs(dotViewVector.toFloat()),
+                    1.0,
+                    4.0
+                ))
             )
         )
 
@@ -1041,10 +1123,10 @@ object VehicleEngineUtils {
     }
 
     private fun updateRotation(entity: VehicleEntity) {
-        val d0 = entity.deltaMovement.add(0.0, -0.36, 0.0)
+        val d0 = entity.deltaMovement.add(0.0, -0.06, 0.0)
         if (Mth.abs(entity.xRot) < 60) {
             val diffY = Mth.wrapDegrees(-VehicleVecUtils.getYRotFromVector(d0) - entity.yRot).toFloat()
-            entity.yRot += 0.01f * diffY
+            entity.yRot += 0.002f * diffY
         }
         if (Mth.abs(entity.xRot) < 90) {
             val diffX = Mth.wrapDegrees(-VehicleVecUtils.getXRotFromVector(d0) - entity.xRot).toFloat()
@@ -1260,7 +1342,8 @@ object VehicleEngineUtils {
                 moveWithOutPower(passenger0, true)
             } else {
                 power = Math.min(
-                    power + (if (power < 0) powerAdd * 2f else powerAdd) * (1 - (power / 1.02f)), (if (sprintInputDown) 2f else 1f)
+                    power + (if (power < 0) powerAdd * 2f else powerAdd) * (1 - (power / 1.02f)),
+                    (if (sprintInputDown) 2f else 1f)
                 )
             }
         }
@@ -1334,6 +1417,192 @@ object VehicleEngineUtils {
         }
     }
 
+    @JvmStatic
+    fun VehicleEntity.airShipEngine(engineInfo: EngineInfo.AirShip) {
+        val buoyancy = engineInfo.buoyancy
+        val energyCost = (engineInfo.energyCostRate * Mth.abs(power)).toInt()
+        val maxForwardSpeedRate = engineInfo.maxForwardSpeedRate
+        val maxBackwardSpeedRate = engineInfo.maxBackwardSpeedRate
+        val maxUpSpeedRate = engineInfo.maxUpSpeedRate
+        val maxDownSpeedRate = engineInfo.maxDownSpeedRate
+        val powerAdd = engineInfo.increment * 0.05f
+        val powerReduce = engineInfo.decrement * 0.05f
+        val steeringSpeed = engineInfo.steeringSpeed * 0.05f
+        val floatHeight = engineInfo.floatHeight
+        val sprintMultiply = engineInfo.sprintMultiply
+
+        if (buoyancy != 0.0) {
+            val fluidFloat = buoyancy * VehicleVecUtils.getSubmergedHeight(this)
+            deltaMovement = deltaMovement.add(0.0, fluidFloat, 0.0)
+        }
+
+        val hasPassenger = getPassengers().isNotEmpty()
+
+        if (onGround()) {
+            deltaMovement = deltaMovement.multiply(0.8, 1.0, 0.8)
+        } else {
+            val f = Mth.clamp(
+                0.91499f - 0.01 * deltaMovement.lengthSqr() + 0.07 + 0.031f * Mth.abs(
+                    deltaMovement.normalize().dot(getViewVector(1f)).toFloat()
+                ), 0.01, 0.99
+            ).toFloat()
+            deltaMovement = deltaMovement.add(
+                getViewVector(1f).scale(
+                    (if (xRot < 0) -0.001 else (if (xRot > 0) 0.001 else 0.0)) * deltaMovement.length()
+                )
+            )
+            deltaMovement = deltaMovement.multiply(f.toDouble(), 0.9, f.toDouble())
+        }
+
+        if (isInFluidType && tickCount % 4 == 0 && VehicleVecUtils.getSubmergedHeight(this) > 0.5 * bbHeight) {
+            deltaMovement = deltaMovement.multiply(0.6, 0.6, 0.6)
+        }
+
+        if (level().isClientSide) {
+            if (isInFluidType && deltaMovement.horizontalDistanceSqr() > 0.3162) {
+                addRandomParticle(
+                    ParticleTypes.CLOUD, position().add(
+                        0.0,
+                        VehicleVecUtils.getSubmergedHeight(this) - 0.2,
+                        0.0
+                    ),
+                    1f, level(), 0f, (2 + 4 * deltaMovement.length()).toInt()
+                )
+
+                addRandomParticle(
+                    ParticleTypes.BUBBLE_COLUMN_UP, position().add(
+                        0.0,
+                        VehicleVecUtils.getSubmergedHeight(this) - 0.2,
+                        0.0
+                    ), 1f, level(), 0f, (2 + 10 * deltaMovement.length()).toInt()
+                )
+            }
+        }
+
+        val passenger0 = getFirstPassenger()
+
+        if (energy <= energyCost || (maxEnergy > 0 && energy <= 0)) {
+            forwardInputDown = false
+            backInputDown = false
+            leftInputDown = false
+            rightInputDown = false
+            upInputDown = false
+            downInputDown = false
+            power *= 0.95f
+        }
+
+        if (passenger0 == null) {
+            leftInputDown = false
+            rightInputDown = false
+            forwardInputDown = false
+            backInputDown = false
+            upInputDown = false
+            downInputDown = false
+            power = 0f
+        }
+
+        val maxPower = if (sprintInputDown) 1.25f else (if (power > 1) power - 0.002f else 1f)
+
+        if (forwardInputDown && !backInputDown) {
+            power = Math.min(
+                power + (if (power < 0) powerAdd * 2f else powerAdd) * (maxPower - (Mth.abs(power) / 1.02f)),
+                maxPower
+            )
+        }
+
+        if (backInputDown) {
+            power = Math.max(
+                power - (if (power > 0) powerReduce * 4f else powerReduce) * (maxPower - (Mth.abs(power) / 1.02f)),
+                -1f
+            )
+        }
+
+        if (rightInputDown) {
+            holdTick++
+            deltaRot -= steeringSpeed * 0.1125f * Math.min(holdTick, 40)
+        } else if (leftInputDown) {
+            holdTick++
+            deltaRot += steeringSpeed * 0.1125f * Math.min(holdTick, 40)
+        } else {
+            holdTick = 0
+        }
+
+        if (!forwardInputDown && !backInputDown) {
+            power *= 0.96f
+        }
+
+        targetSpeed = if (power > 0) {
+            (maxForwardSpeedRate).toDouble() * (if (sprintInputDown) sprintMultiply else 1.0)
+        } else {
+            (maxBackwardSpeedRate).toDouble()
+        }
+
+        if (upInputDown) {
+            liftSpeed = Mth.clamp(liftSpeed + 0.05f, -1f, 1f)
+        }
+
+        if (downInputDown) {
+            liftSpeed = Mth.clamp(liftSpeed - 0.05f, -1f, 1f)
+        }
+
+        if (health > 0) {
+            xRot *= 0.97f
+            roll *= 0.97f
+        }
+
+        if (health > 0) {
+            if (!upInputDown && !downInputDown) {
+                liftSpeed *= 0.8f
+            }
+
+            liftSpeed -= 0.01f * deltaMovement.y.toFloat()
+
+            if (!hasPassenger) {
+                val origin = position()
+                val rayHit = level().clip(
+                    ClipContext(
+                        origin,
+                        origin.add(0.0, -floatHeight, 0.0),
+                        ClipContext.Block.COLLIDER,
+                        ClipContext.Fluid.ANY,
+                        this
+                    )
+                )
+                val groundY = if (rayHit.type == HitResult.Type.BLOCK) rayHit.location.y else level().minBuildHeight - 1.0
+                liftSpeed = if (groundY > level().minBuildHeight) {
+                    val distToGround = y - groundY
+                    val diff = (distToGround - floatHeight) * 0.05f
+                    Math.clamp(liftSpeed - diff.toFloat(), -0.25f, 0.25f)
+                } else {
+                    Math.max(liftSpeed - 0.025f, -0.25f)
+                }
+            }
+        } else {
+            liftSpeed = Math.max(liftSpeed - 0.01f, -3f)
+        }
+
+        if (level() is ServerLevel) {
+            consumeEnergy(energyCost)
+        }
+
+        deltaRot *= Math.max(0.8f - 0.01f * deltaMovement.horizontalDistance(), 0.3).toFloat()
+
+        rudderRot = Mth.clamp(
+            rudderRot + deltaRot,
+            -1f,
+            1f
+        ) * 0.85f
+
+        yRot = (yRot - (if (isInFluidType) 0.5 else 1.0) * deltaRot).toFloat()
+        deltaMovement = deltaMovement.add(getViewVector(1f).scale(power * targetSpeed * 0.01))
+        deltaMovement = if (liftSpeed >= 0) {
+            deltaMovement.add(0.0, maxUpSpeedRate * 0.06 * liftSpeed, 0.0)
+        } else {
+            deltaMovement.add(0.0, maxDownSpeedRate * 0.06 * liftSpeed, 0.0)
+        }
+    }
+
+    @JvmStatic
     fun VehicleEntity.moveWithOutPower(player: Player, forward: Boolean) {
         deltaMovement = deltaMovement.add(getViewVector(1f).scale((if (forward) 0.1f else -0.1f).toDouble()))
         if (player is ServerPlayer) {
@@ -1351,6 +1620,7 @@ object VehicleEngineUtils {
      * @param radius 搜索半径
      * @return 辅助方块顶面位置，如果未找到则返回null
      */
+    @JvmStatic
     fun VehicleEntity.findNearestLandingPos(radius: Int): Vec3? {
         val world = level()
         val entityPos = blockPosition()
@@ -1386,6 +1656,7 @@ object VehicleEngineUtils {
         return landingBlocks[0]?.center
     }
 
+    @JvmStatic
     fun VehicleEntity.updateAutoLanding(landingTarget: Vec3) {
         // 计算水平方向上的偏移向量 (忽略Y轴)
         val currentPos = position()
@@ -1440,5 +1711,463 @@ object VehicleEngineUtils {
         while (diff > 180) diff -= 360f
 
         return current + diff * factor
+    }
+
+    /**
+     * 固定翼飞机自动盘旋飞控（左舷朝向圆心）
+     *
+     * 两阶段混合制导：
+     * - **切线飞行**：左舷朝向圆心的切线方向，维持绕圈
+     * - **径向修正**：圈内时朝圈外飞，圈外时朝圆心飞
+     *
+     * 混合权重随径向距离自适应——越接近轨道越倾向切线，越远离越倾向径向修正。
+     * 径向混合在极近轨道(<5%半径≈50m)平滑退场→纯P修正防振荡，
+     * 其余距离全效混合。额外 P=0.12, clamp ±35°。
+     *
+     * 应在 [VehicleEntity.baseTick] 中 engine work 之后调用，
+     * 仅对 [EngineType.AIRCRAFT] 类型生效。
+     */
+    @JvmStatic
+    fun VehicleEntity.aircraftLoiter() {
+        // ========== 0. 解析四元数盘旋参数 ==========
+        // x=centerX, y=centerY(高度), z=centerZ, w=radius
+
+        val lp = loiterParams
+        val centerX = lp.x().toDouble()
+        val altitude = lp.y().toDouble()
+        val centerZ = lp.z().toDouble()
+        val radius = lp.w().toDouble()
+
+        // ========== 1. 位置与误差计算 ==========
+
+        val dx = x - centerX
+        val dz = z - centerZ
+        val horizontalDist = sqrt(dx * dx + dz * dz)
+        val radialError = horizontalDist - radius
+
+        // ========== 2. 两阶段航向制导 ==========
+
+        // 航向 A：左舷朝向圆心的切线方向（盘旋阶段）
+        val tangentYaw = Math.toDegrees(atan2(-dz, -dx))
+        val errorTangent = Mth.wrapDegrees(tangentYaw - yRot.toDouble())
+
+        // 航向 B：指向圆心（拦截阶段），圈内时反转180°指向圈外
+        val toCenterYaw = Math.toDegrees(atan2(dx, -dz))
+        val errorToCenter = Mth.wrapDegrees(toCenterYaw - yRot.toDouble())
+        val errorOutward = Mth.wrapDegrees(toCenterYaw + 180.0 - yRot.toDouble())
+        val radialYaw = if (radialError < 0) errorOutward else errorToCenter
+
+        // 混合权重：越远越倾向径向飞行，越近越倾向切线飞行
+        // 仅在极近轨道（20m内）平滑退场，避免方向翻转导致振荡
+        val distFromOrbit = abs(radialError)
+        val blend = Mth.clamp(1.0 - distFromOrbit / radius, 0.0, 0.8)
+        val blendZone = 20.0
+        val blendFactor = Mth.clamp((distFromOrbit - blendZone) / blendZone, 0.0, 1.0)
+        val effectiveRadial = (1.0 - blend) * blendFactor
+        var yawError = (errorTangent * (1.0 - effectiveRadial) + radialYaw * effectiveRadial).toFloat()
+
+        // ========== 3. 径向位置精修 ==========
+
+        yawError += Mth.clamp(radialError.toFloat() * 0.12f, -35f, 35f)
+
+        // ========== 4. 偏航控制 ==========
+
+        mouseMoveSpeedX = Mth.clamp(yawError, -20f, 20f)
+        deltaRot += yawError * -0.01f * Mth.clamp(1 - (Mth.abs(roll) / 30), 0f, 1f)
+
+        // ========== 5. 高度控制 ==========
+
+        val altError = altitude - y
+        val targetPitch = Mth.clamp(altError.toFloat() * -0.15f, -10f, 10f)
+        xRot = Mth.lerp(0.01f, xRot, targetPitch)
+        mouseMoveSpeedY = Mth.clamp(altError.toFloat() * -0.02f, -1f, 1f)
+
+        // ========== 6. 油门控制（高度自适应防失速） ==========
+
+        // 低于目标高度 → 爬升需增大油门防失速；高于目标高度 → 缓慢减油
+        val powerTarget = if (altError > 0) {
+            Mth.clamp(0.9f + altError.toFloat() * 0.002f, 0.9f, 2.0f)
+        } else {
+            Mth.clamp(0.9f + altError.toFloat() * 0.0005f, 0.5f, 0.9f)
+        }
+        power = Mth.lerp(0.05f, power, powerTarget)
+
+        // ========== 7. 障碍物规避 ==========
+        // 通过 mouseMoveSpeedY 模拟鼠标输入，让 aircraftEngine() 的气动模型
+        // 自然限制机动性能。功率被动根据爬升角度缓慢设下限，防失速不主动拉。
+        // 返回 null 表示无威胁或已禁用，跳过整段规避逻辑。
+
+        obstacleAvoidanceOverride()?.let { avoidance ->
+            if (avoidance.mouseYBlendFactor > 0f) {
+                mouseMoveSpeedY = Mth.lerp(avoidance.mouseYBlendFactor, mouseMoveSpeedY, avoidance.mouseYOverride)
+
+                // 被动功率托底：爬升越陡下限越高，只托不拉，变化极慢(lerp 0.02)
+                val climbDemand = Mth.clamp(-avoidance.mouseYOverride / 22f, 0f, 1f)
+                val minPower = Mth.lerp(climbDemand, 1.1f, 1.8f)
+                if (power < minPower) {
+                    power = Mth.lerp(0.02f, power, minPower)
+                }
+            }
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  障碍物规避系统
+    // ═══════════════════════════════════════════════════════════════
+
+    // ─── 常量 ───
+
+    /** 扫描间隔 (tick) — 4 tick = 0.2s，保证响应速度 */
+    private const val OA_SCAN_INTERVAL = 5
+
+    /** 前方扫描最大距离 (格) */
+    private const val OA_SCAN_RANGE = 360.0
+
+    /** 扫描步长 (格) */
+    private const val OA_SCAN_STEP = 20.0
+
+    /** 扇形扫描半角 (度) */
+    private const val OA_FAN_HALF_ANGLE = 15.0
+
+    /** 扇形扫描射线数 (必须为奇数，中间=正前方) */
+    private const val OA_FAN_RAYS = 9
+
+    /** 基础安全余量 (格) — 飞机需要保持高于地形的最小高度 */
+    private const val OA_SAFETY_BASE = 10.0
+
+    /** 速度加成安全余量系数 — 速度越快越早反应 */
+    private const val OA_SAFETY_SPEED_FACTOR = 0.15
+
+    /** 爬升紧迫性特征距离 (格) — urgency = D/(D+d)，D越大越早开始反应 */
+    private const val OA_DANGER_DISTANCE = 300.0
+
+    /** 最大爬升俯仰角 (度, 抬头为负) — 用于 estimateMaxClimb 爬升能力估算 */
+    private const val OA_MAX_CLIMB_PITCH = -25f
+
+    /** 跳过低速扫描阈值 (m/s 真实秒速) */
+    private const val OA_SKIP_SPEED = 5.0
+
+    /** 释放宽限期 (tick) — 威胁消失后持续响应N tick防振荡 */
+    private const val OA_RELEASE_GRACE = 12
+
+    // ─── 数据类 ───
+
+    /** 单条射线的扫描结果 */
+    private data class RayScan(
+        val angleOffset: Double,            // 射线偏移角度 (弧度)
+        val firstImpactDist: Double,        // 首次碰撞距离，-1 表示畅通
+        val firstImpactHeight: Double       // 首次碰撞点的地形高度
+    )
+
+    /** 前方扫描总结果 */
+    private data class ObstacleScan(
+        val hasThreat: Boolean,
+        val threatLevel: Float,             // 0~1，越大越紧急
+        val closestDist: Double,            // 最近碰撞距离，-1 表示无威胁
+        val impactX: Double,                // 碰撞点 X
+        val impactZ: Double,                // 碰撞点 Z
+        val obstacleRelHeight: Double,      // 障碍物高于飞行器的高度
+        val rays: List<RayScan>
+    ) {
+        companion object {
+            val CLEAR = ObstacleScan(false, 0f, -1.0, 0.0, 0.0, 0.0, emptyList())
+        }
+    }
+
+    /** 规避策略 */
+    private enum class AvoidanceStrategy { NONE, CLIMB, EMERGENCY_CLIMB }
+
+    /**
+     * 规避输出：通过 mouseMoveSpeedY 模拟鼠标输入，
+     * 由 aircraftEngine() 的气动模型（pitchSpeed、clampPitch、襟翼等）自然处理。
+     * 功率由集成层根据爬升角度被动托底，不在此处主动设置。
+     */
+    private data class AvoidanceOutput(
+        val mouseYOverride: Float,        // mouseMoveSpeedY 覆盖值（负=抬头）
+        val mouseYBlendFactor: Float      // 俯仰混合因子 0~1
+    ) {
+        companion object {
+            val NONE = AvoidanceOutput(0f, 0f)
+        }
+    }
+
+    // ─── 缓存（按实体 ID 索引，防止多架飞行器共享状态） ───
+
+    private data class AvoidanceCache(
+        val scan: ObstacleScan = ObstacleScan.CLEAR,
+        val threatActive: Boolean = false,
+        val strategy: AvoidanceStrategy = AvoidanceStrategy.NONE,
+        val lastScanTick: Int = -1,
+        val releaseGrace: Int = 0     // >0 表示威胁已消失但仍在宽限期内
+    )
+
+    private val avoidanceCache = mutableMapOf<Int, AvoidanceCache>()
+
+    /** 清理长时间未使用的缓存条目（每 200 tick 触发一次） */
+    private fun cleanupAvoidanceCache(currentTick: Int) {
+        if (currentTick % 200 != 0) return
+        val threshold = currentTick - 400
+        avoidanceCache.entries.removeAll { (_, v) -> v.lastScanTick < threshold }
+    }
+
+    // ─── 主入口 ───
+
+    /**
+     * 障碍物规避主逻辑，在 [aircraftLoiter] 末尾调用。
+     * 扫描帧执行完整分析，非扫描帧用当前位置实时更新距离后继续响应。
+     *
+     * @return 规避输出；null 表示无威胁（缓存已清），调用方可跳过整段规避代码
+     */
+    private fun VehicleEntity.obstacleAvoidanceOverride(): AvoidanceOutput? {
+        // 建筑高度以上：不可能有地形，直接禁用
+        if (y > level().maxBuildHeight) {
+            avoidanceCache.remove(id)
+            return null
+        }
+
+        cleanupAvoidanceCache(tickCount)
+        val cache = avoidanceCache[id]
+
+        // 非扫描帧：用缓存数据 + 实时距离
+        if (tickCount % OA_SCAN_INTERVAL != 0) {
+            if (cache == null) return null
+
+            // 宽限期倒计时：威胁已消失，逐 tick 衰减后释放
+            if (!cache.threatActive) {
+                if (cache.releaseGrace > 1) {
+                    avoidanceCache[id] = cache.copy(releaseGrace = cache.releaseGrace - 1)
+                    val decay = cache.releaseGrace.toFloat() / OA_RELEASE_GRACE
+                    val output = computeAvoidance(cache.strategy, cache.scan.closestDist)
+                    return output.copy(
+                        mouseYBlendFactor = output.mouseYBlendFactor * decay,
+                        mouseYOverride = output.mouseYOverride * decay
+                    )
+                }
+                avoidanceCache.remove(id)
+                return null
+            }
+
+            // 威胁活跃中：计算实时距离
+            val dx = x - cache.scan.impactX
+            val dz = z - cache.scan.impactZ
+            val currentDist = sqrt(dx * dx + dz * dz)
+            // 已经飞过碰撞点或距离增加 → 威胁解除，进入宽限期
+            if (currentDist > cache.scan.closestDist * 1.5 || currentDist < 0) {
+                avoidanceCache[id] = cache.copy(threatActive = false, releaseGrace = OA_RELEASE_GRACE)
+                return computeAvoidance(cache.strategy, currentDist)
+            }
+            val output = computeAvoidance(cache.strategy, currentDist)
+            // 实时距离计算后威胁低于阈值 → 进入宽限期
+            if (output.mouseYBlendFactor <= 0f) {
+                avoidanceCache[id] = cache.copy(threatActive = false, releaseGrace = OA_RELEASE_GRACE)
+                return output
+            }
+            return output
+        }
+
+        // 低速门控
+        val speedPerTick = deltaMovement.length()
+        val speedMs = speedPerTick * 20.0
+        if (speedMs < OA_SKIP_SPEED) {
+            avoidanceCache.remove(id)
+            return null
+        }
+
+        // 1. 前向扫描
+        val scan = scanTerrainAhead(speedMs)
+        if (!scan.hasThreat) {
+            // 无威胁：若之前有活跃威胁则进入宽限期防振荡，否则直接清
+            if (cache != null && cache.threatActive) {
+                avoidanceCache[id] = cache.copy(threatActive = false, releaseGrace = OA_RELEASE_GRACE)
+                val output = computeAvoidance(cache.strategy, cache.scan.closestDist)
+                return output.copy(
+                    mouseYBlendFactor = output.mouseYBlendFactor * 0.5f,
+                    mouseYOverride = output.mouseYOverride * 0.5f
+                )
+            }
+            avoidanceCache.remove(id)
+            return null
+        }
+
+        // 2. 决策
+        val strategy = decideStrategy(scan.obstacleRelHeight, scan.closestDist)
+
+        // 3. 计算规避输出
+        val output = computeAvoidance(strategy, scan.closestDist)
+
+        avoidanceCache[id] = AvoidanceCache(
+            scan = scan,
+            threatActive = true,
+            strategy = strategy,
+            lastScanTick = tickCount
+        )
+
+        return output
+    }
+
+    // ─── 1. 前向扇形扫描 ───
+
+    /**
+     * 沿速度方向发射 OA_FAN_RAYS 条射线，每条射线步进 OA_SCAN_STEP 格，
+     * 使用 MOTION_BLOCKING 高度图检测地形碰撞。
+     */
+    private fun VehicleEntity.scanTerrainAhead(speed: Double): ObstacleScan {
+        val vel = deltaMovement
+        val forward = Vec3(vel.x, 0.0, vel.z).normalize()
+        val level = level()
+        val maxSteps = (OA_SCAN_RANGE / OA_SCAN_STEP).toInt()
+
+        val angles = computeFanAngles()
+        val rays = mutableListOf<RayScan>()
+        var closestDist = Double.MAX_VALUE
+        var impactX = 0.0
+        var impactZ = 0.0
+        var obstacleRelHeight = 0.0
+        val safetyMargin = OA_SAFETY_BASE + speed * OA_SAFETY_SPEED_FACTOR
+
+        for (angleRad in angles) {
+            val rayDir = forward.yRot(angleRad.toFloat())
+            var firstHit = -1.0
+            var firstHeight = 0.0
+            var rayBlocked = false
+
+            for (step in 1..maxSteps) {
+                val dist = step * OA_SCAN_STEP
+                val sx = x + rayDir.x * dist
+                val sz = z + rayDir.z * dist
+                val cx = sx.toInt() shr 4
+                val cz = sz.toInt() shr 4
+
+                if (!level.hasChunk(cx, cz)) {
+                    // 未加载区块：静默截断射线，不标记威胁。
+                    // 扫描范围 300m 通常超出服务器视距，若视为阻塞则每条射线都会产生假威胁。
+                    // 真正的危险地形会在区块随飞机接近而加载后被下轮扫描捕获。
+                    rayBlocked = true
+                    break
+                }
+
+                val terrainY = level.getHeight(Heightmap.Types.MOTION_BLOCKING, sx.toInt(), sz.toInt()).toDouble()
+                val dangerAlt = terrainY + safetyMargin
+
+                if (y < dangerAlt) {
+                    firstHit = dist
+                    firstHeight = terrainY
+                    rayBlocked = true
+                    break
+                }
+            }
+
+            if (!rayBlocked) {
+                rays.add(RayScan(angleRad, -1.0, 0.0))
+            } else {
+                rays.add(RayScan(angleRad, firstHit, firstHeight))
+                if (firstHit < closestDist) {
+                    closestDist = firstHit
+                    val dist = firstHit
+                    impactX = x + rayDir.x * dist
+                    impactZ = z + rayDir.z * dist
+                    obstacleRelHeight = firstHeight + safetyMargin - y
+                }
+            }
+        }
+
+        if (closestDist >= OA_SCAN_RANGE) {
+            return ObstacleScan.CLEAR
+        }
+
+        // 二次威胁曲线：远距离增长缓慢，近距离快速攀升
+        val t = Mth.clamp(1.0 - closestDist / OA_SCAN_RANGE, 0.0, 1.0)
+        val threatLevel = (t * t).toFloat()
+
+        return ObstacleScan(
+            hasThreat = true,
+            threatLevel = threatLevel,
+            closestDist = closestDist,
+            impactX = impactX,
+            impactZ = impactZ,
+            obstacleRelHeight = obstacleRelHeight,
+            rays = rays
+        )
+    }
+
+    /** 计算扇形扫描各射线的偏转角 (弧度) */
+    private fun computeFanAngles(): List<Double> {
+        val rays = OA_FAN_RAYS
+        val halfDeg = OA_FAN_HALF_ANGLE
+        val stepDeg = (2.0 * halfDeg) / (rays - 1)
+        return (0 until rays).map { i ->
+            Math.toRadians(-halfDeg + i * stepDeg)
+        }
+    }
+
+    // ─── 2. 爬升能力估算 ───
+
+    /**
+     * 估算在 [distance] 格内飞行器能爬升的最大高度。
+     * 受限于气动参数和当前速度。
+     */
+    private fun VehicleEntity.estimateMaxClimb(distance: Double): Double {
+        val speedPerTick = deltaMovement.length()
+        val speedMs = speedPerTick * 20.0  // 换算真实秒速
+        if (speedMs < 1.0) return 10.0
+
+        val lift = (engineInfo as? EngineInfo.Aircraft)?.liftSpeed ?: 1f
+        // 气动爬升角 ≈ atan(speedMs * 0.008 * lift * 4.0)，不超过 MAX_CLIMB_PITCH (25°)
+        val climbSlope = min(
+            tan(Math.toRadians((-OA_MAX_CLIMB_PITCH).toDouble())),
+            speedMs * 0.008 * lift.toDouble() * 4.0
+        )
+        return distance * climbSlope
+    }
+
+    // ─── 3. 策略决策 ───
+
+    private fun VehicleEntity.decideStrategy(
+        obstacleRelHeight: Double,
+        distance: Double
+    ): AvoidanceStrategy {
+        if (obstacleRelHeight <= 0) return AvoidanceStrategy.NONE
+        return if (obstacleRelHeight < estimateMaxClimb(distance)) AvoidanceStrategy.CLIMB
+        else AvoidanceStrategy.EMERGENCY_CLIMB
+    }
+
+    // ─── 4. 规避输出计算 ───
+
+    /**
+     * @param currentDist 飞机到碰撞点的当前实时距离
+     *
+     * 通过 mouseMoveSpeedY 模拟鼠标输入，aircraftEngine() 的气动模型
+     * 自然限制 pitchSpeed/clampPitch/襟翼等，确保机动不超性能边界。
+     */
+    private fun computeAvoidance(
+        strategy: AvoidanceStrategy,
+        currentDist: Double
+    ): AvoidanceOutput {
+        if (strategy == AvoidanceStrategy.NONE) return AvoidanceOutput.NONE
+
+        val distClamped = Mth.clamp(currentDist, 0.0, OA_SCAN_RANGE)
+
+        // sqrt 曲线：远距离就有明显反应，中距离快速攀升
+        val t = Mth.clamp(1.0 - distClamped / OA_SCAN_RANGE, 0.0, 1.0)
+        val liveThreat = Math.sqrt(t).toFloat()
+        if (liveThreat <= 0.02f) return AvoidanceOutput.NONE
+
+        // urgency = D/(D+d)，D=200
+        val urgency = (OA_DANGER_DISTANCE / (OA_DANGER_DISTANCE + distClamped)).toFloat()
+        val effectiveFactor = liveThreat * urgency
+
+        return when (strategy) {
+            AvoidanceStrategy.CLIMB -> {
+                val mouseYTarget = Mth.clamp(-30f * effectiveFactor, -22f, -5f)
+                val mouseYBlend = Mth.clamp(effectiveFactor * 2.5f, 0f, 1f)
+                AvoidanceOutput(mouseYOverride = mouseYTarget, mouseYBlendFactor = mouseYBlend)
+            }
+
+            AvoidanceStrategy.EMERGENCY_CLIMB -> AvoidanceOutput(
+                mouseYOverride = -22f, mouseYBlendFactor = 1f
+            )
+
+            else -> AvoidanceOutput.NONE
+        }
     }
 }

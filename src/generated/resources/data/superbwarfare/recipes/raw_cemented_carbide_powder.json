@@ -2,33 +2,73 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
+    [
+      {
+        "tag": "forge:dusts/tungsten"
+      },
+      {
+        "tag": "forge:dusts/scheelite"
+      }
+    ],
+    [
+      {
+        "tag": "forge:dusts/tungsten"
+      },
+      {
+        "tag": "forge:dusts/scheelite"
+      }
+    ],
+    [
+      {
+        "tag": "forge:dusts/tungsten"
+      },
+      {
+        "tag": "forge:dusts/scheelite"
+      }
+    ],
+    [
+      {
+        "tag": "forge:dusts/tungsten"
+      },
+      {
+        "tag": "forge:dusts/scheelite"
+      }
+    ],
+    [
+      {
+        "tag": "forge:dusts/tungsten"
+      },
+      {
+        "tag": "forge:dusts/scheelite"
+      }
+    ],
+    [
+      {
+        "tag": "forge:dusts/tungsten"
+      },
+      {
+        "tag": "forge:dusts/scheelite"
+      }
+    ],
+    [
+      {
+        "tag": "forge:dusts/tungsten"
+      },
+      {
+        "tag": "forge:dusts/scheelite"
+      }
+    ],
     {
-      "tag": "c:dusts/tungsten"
+      "tag": "forge:dusts/iron"
     },
-    {
-      "tag": "c:dusts/tungsten"
-    },
-    {
-      "tag": "c:dusts/tungsten"
-    },
-    {
-      "tag": "c:dusts/tungsten"
-    },
-    {
-      "tag": "c:dusts/tungsten"
-    },
-    {
-      "tag": "c:dusts/tungsten"
-    },
-    {
-      "tag": "c:dusts/tungsten"
-    },
-    {
-      "tag": "c:dusts/iron"
-    },
-    {
-      "tag": "c:dusts/coal_coke"
-    }
+    [
+      {
+        "tag": "forge:dusts/coal_coke"
+      },
+      {
+        "tag": "forge:dusts/coal"
+      }
+    ]
   ],
   "result": {
     "count": 8,

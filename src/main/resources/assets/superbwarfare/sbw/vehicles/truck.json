@@ -1,5 +1,8 @@
 {
-  "Model": {
-    "Model": "superbwarfare:geo/truck.geo.json"
-  }
+  "Models": [
+    {
+      "Model": "superbwarfare:models/bedrock/vehicle/truck.geo.json",
+      "Texture": "superbwarfare:textures/bedrock/vehicle/truck.png"
+    }
+  ]
 }

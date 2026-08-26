@@ -3,6 +3,11 @@
   "MaxEnergy": 5000000,
   "OBB": [
     {
+      "Part": "Collision",
+      "Size": [1.75, 1.0938, 3.875],
+      "Position": [0, 1.0938, 0.25]
+    },
+    {
       "Size": [1.563, 0.875, 2.938],
       "Position": [0, 1.375, -0.625]
     },
@@ -48,7 +53,7 @@
         "ZoomPosition": [-0.025, 0.645, 1.204],
         "Direction": "Barrel"
       },
-      "Weapons": ["Cannon", "MainMachineGun", "Missile"],
+      "Weapons": ["Cannon", "MachineGun", "Missile"],
       "Sensitivity": [0.53, 0.71, 0.9],
       "DismountInfo": {
         "Transform": "Vehicle",
@@ -103,6 +108,7 @@
       "BanHand": true,
       "Transform": "Vehicle",
       "Position": [0, 1, 0],
+      "RotateWithVehicle": true,
       "CameraPos": {
         "UseSimulate3P": true,
         "Simulate3PPos": [6, 1]
@@ -113,6 +119,7 @@
       "BanHand": true,
       "Transform": "Vehicle",
       "Position": [0, 1, 0],
+      "RotateWithVehicle": true,
       "CameraPos": {
         "UseSimulate3P": true,
         "Simulate3PPos": [6, 1]
@@ -123,6 +130,7 @@
       "BanHand": true,
       "Transform": "Vehicle",
       "Position": [0, 1, 0],
+      "RotateWithVehicle": true,
       "CameraPos": {
         "UseSimulate3P": true,
         "Simulate3PPos": [6, 1]
@@ -133,6 +141,7 @@
       "BanHand": true,
       "Transform": "Vehicle",
       "Position": [0, 1, 0],
+      "RotateWithVehicle": true,
       "CameraPos": {
         "UseSimulate3P": true,
         "Simulate3PPos": [6, 1]
@@ -208,7 +217,7 @@
         "Directions": ["Barrel"]
       }
     },
-    "MainMachineGun": {
+    "MachineGun": {
       "DefaultFireMode": "Auto",
       "AvailableFireModes": "Auto",
       "DefaultZoom": 3,
@@ -252,12 +261,13 @@
       "Name": "weapon.superbwarfare.tow_missile",
       "AmmoType": "superbwarfare:medium_anti_ground_missile",
       "Projectile": "superbwarfare:wire_guide_missile",
+      "ProjectileLife": 400,
       "Magazine": 2,
       "EmptyReloadTime": 200,
-      "Damage": 450,
-      "ExplosionDamage": 55,
-      "ExplosionRadius": 7,
-      "RPM": 30,
+      "Damage": 600,
+      "ExplosionDamage": 60,
+      "ExplosionRadius": 8,
+      "RPM": 60,
       "Velocity": 3,
       "RecoilTime": 18,
       "RecoilForce": 0.05,
@@ -346,6 +356,7 @@
   "UpStep": 2.25,
   "RotateOffsetHeight": 2.7,
   "Mass": 14.6,
+  "TowForceFactor": 2.0,
   "DamageModifiers": [
     "All - 13",
     "minecraft:lava + 13",
@@ -371,7 +382,9 @@
     "@#superbwarfare:aa_missile * 0.5",
     "#superbwarfare:projectile * 0.1",
     "#superbwarfare:projectile_absolute * 0.7",
+    "@superbwarfare:small_cannon_shell * 0.5",
     "#superbwarfare:vehicle_strike * 13",
+    "@superbwarfare:c4 * 1.5",
     "@superbwarfare:mortar_shell * 1.1",
     "@superbwarfare:gun_grenade * 1.5",
     "@superbwarfare:javelin_missile * 0.8"
@@ -379,7 +392,6 @@
   "ThirdPersonCameraPos": [0, 1, 3],
   "VehicleContainerType": "Medium",
   "DestroyInfo": {
-    "ParticleType": "Huge",
     "ExplosionDamage": 160,
     "ExplosionRadius": 8,
     "SympatheticDetonation": true,

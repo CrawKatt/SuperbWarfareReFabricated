@@ -74,6 +74,13 @@ sourceSets.main {
 repositories {
     mavenCentral()
     mavenLocal()
+    mavenCentral()
+    maven {
+        url = uri("https://raw.githubusercontent.com/Fuzss/modresources/main/maven/")
+    }
+    maven {
+        url = uri("https://maven.createmod.net")
+    }
     flatDir {
         dirs("libs")
     }
@@ -137,6 +144,14 @@ repositories {
         url = uri("https://api.modrinth.com/maven")
         content {
             includeGroup("maven.modrinth")
+        }
+    }
+
+    maven("https://maven.createmod.net/") {
+        name = "CreateMod"
+        content {
+            includeGroup("net.createmod.ponder")
+            includeGroup("dev.engine-room.flywheel")
         }
     }
 
@@ -214,6 +229,9 @@ dependencies {
 
     // GeckoLib
     modImplementation("software.bernie.geckolib:geckolib-fabric-1.20.1:4.4.6")
+
+    // Ponder (bundled, same as upstream jij's the Forge variant)
+    include(modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("minecraft_version")}:${project.property("ponder_version")}")!!)
     implementation("com.eliotlash.mclib:mclib:20")
 
     // JEI Fabric
@@ -239,6 +257,19 @@ dependencies {
 
     // Optional client compatibility, compiled against the Fabric artifact.
     modCompileOnly("maven.modrinth:fYYSAh4R:ncXw8tDz") // Real Camera 0.7.4 Fabric
+}
+
+tasks.withType<JavaCompile> {
+    // Ensure SRG mappings exist before compilation (needed for Mixin AP)
+    dependsOn("createSrgToMcp")
+
+    options.encoding = "UTF-8"
+    options.compilerArgs.addAll(
+        listOf(
+            "-Amixin.refmap=mixins.superbwarfare.refmap.json",
+            "-Amixin.defaultRefmap=mixins.superbwarfare.refmap.json"
+        )
+    )
 }
 
 tasks.named<ProcessResources>("processResources") {
@@ -281,6 +312,8 @@ tasks.named<ProcessResources>("processResources") {
 }
 
 tasks.named<Jar>("jar") {
+    from("COPYING", "COPYING.LESSER")
+
     manifest {
         attributes(
             "Specification-Title" to project.property("mod_id").toString(),
@@ -294,8 +327,8 @@ tasks.named<Jar>("jar") {
     }
 }
 
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
+java {
+    withSourcesJar()
 }
 
 kotlin {

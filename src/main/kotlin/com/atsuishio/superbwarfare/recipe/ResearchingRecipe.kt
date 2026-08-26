@@ -86,7 +86,7 @@ class ResearchingRecipe(
                     this.resultStack = ItemStack.EMPTY
                 } else {
                     if (nbt != null) {
-                        val tag = TagDataParser.parse(nbt)
+                        val tag = TagDataParser.parseObject(nbt)
                         val tmp = CompoundTag()
                         if (tag.contains("ForgeCaps")) {
                             tmp.put("ForgeCaps", tag.get("ForgeCaps"))

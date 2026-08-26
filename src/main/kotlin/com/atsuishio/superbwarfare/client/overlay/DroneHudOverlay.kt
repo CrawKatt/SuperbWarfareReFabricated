@@ -157,7 +157,7 @@ object DroneHudOverlay : CommonOverlay("drone_hud") {
                         // 弹药
                         guiGraphics.drawString(
                             mc.font, Component.translatable("tips.superbwarfare.drone.ammo") + Component.literal(
-                                entity.ammo.toString() + " / " + entity.getEntityData()
+                                entity.getAmmo().toString() + " / " + entity.getEntityData()
                                     .get(DroneEntity.MAX_AMMO)
                             ),
                             screenWidth / 2 + 12, screenHeight / 2 - 37, -1, false

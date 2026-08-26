@@ -48,6 +48,7 @@ object ModVillagers {
     @JvmStatic
     fun init() {
         registerTrade(1,
+            trade(ItemStack(Items.EMERALD, 1), ItemStack(ModItems.CRUST, 4), 16, 4, 0.05f),
             trade(ItemStack(ModItems.TASER_BLUEPRINT), ItemStack(Items.EMERALD, 2), 16, 5, 0.05f),
             trade(ItemStack(Items.EMERALD, 1), ItemStack(ModItems.HANDGUN_AMMO, 20), 16, 1, 0.05f),
             trade(ItemStack(Items.EMERALD, 1), ItemStack(ModItems.RIFLE_AMMO, 15), 16, 1, 0.05f),
@@ -144,7 +145,9 @@ object ModVillagers {
             trade(ItemStack(Items.EMERALD, 12), ItemStack(ModItems.JAVELIN_MISSILE, 1), 8, 10, 0.05f),
             trade(ItemStack(Items.EMERALD, 12), ItemStack(ModItems.MEDIUM_ANTI_GROUND_MISSILE, 1), 8, 10, 0.05f),
             trade(ItemStack(Items.EMERALD, 16), ItemStack(ModItems.LARGE_ANTI_GROUND_MISSILE, 1), 8, 10, 0.05f),
+            trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.EXTRA_LARGE_ANTI_GROUND_MISSILE, 1), 8, 20, 0.05f),
             trade(ItemStack(Items.EMERALD, 16), ItemStack(ModItems.MEDIUM_AERIAL_BOMB, 1), 8, 10, 0.05f),
+            trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.LARGE_AERIAL_BOMB, 1), 8, 10, 0.05f),
             trade(ItemStack(ModItems.LARGE_SHELL_HE, 1), ItemStack(Items.EMERALD, 4), 32, 4, 0.05f),
             trade(ItemStack(ModItems.LARGE_SHELL_AP, 1), ItemStack(Items.EMERALD, 4), 32, 4, 0.05f),
             trade(ItemStack(ModItems.LARGE_SHELL_CM, 1), ItemStack(Items.EMERALD, 4), 32, 4, 0.05f),
@@ -154,7 +157,9 @@ object ModVillagers {
             trade(ItemStack(ModItems.JAVELIN_MISSILE, 1), ItemStack(Items.EMERALD, 6), 32, 4, 0.05f),
             trade(ItemStack(ModItems.MEDIUM_ANTI_GROUND_MISSILE, 1), ItemStack(Items.EMERALD, 6), 32, 4, 0.05f),
             trade(ItemStack(ModItems.LARGE_ANTI_GROUND_MISSILE, 1), ItemStack(Items.EMERALD, 8), 32, 4, 0.05f),
-            trade(ItemStack(ModItems.MEDIUM_AERIAL_BOMB, 1), ItemStack(Items.EMERALD, 8), 32, 4, 0.05f)
+            trade(ItemStack(ModItems.EXTRA_LARGE_ANTI_GROUND_MISSILE, 1), ItemStack(Items.EMERALD, 16), 32, 8, 0.05f),
+            trade(ItemStack(ModItems.MEDIUM_AERIAL_BOMB, 1), ItemStack(Items.EMERALD, 8), 32, 4, 0.05f),
+            trade(ItemStack(ModItems.LARGE_AERIAL_BOMB, 1), ItemStack(Items.EMERALD, 16), 32, 4, 0.05f)
         )
         registerTrade(5,
             trade(ItemStack(Items.EMERALD, 22), ItemStack(ModItems.PERK_ITEMS[ModPerks.POISONOUS_BULLET]!!, 1), 4, 10, 0.05f),

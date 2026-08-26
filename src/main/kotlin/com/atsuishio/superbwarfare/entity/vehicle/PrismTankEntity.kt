@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.entity.vehicle
 
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
-import com.atsuishio.superbwarfare.entity.vehicle.base.GeoVehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
@@ -24,13 +24,10 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 
-class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : GeoVehicleEntity(type, world) {
+open class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : VehicleEntity(type, world) {
     init {
         this.noCulling = true
     }
-
-    override fun getDamageModifier() = super.getDamageModifier()
-        .custom { source, damage -> getSourceAngle(source, 0.2f) * damage }
 
     fun hitBlock(pos: Vec3, gunData: GunData, shooter: Entity?) {
         val serverLevel = level() as? ServerLevel ?: return
@@ -164,9 +161,9 @@ class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : GeoVehi
             .withinRange(vec, range)
             .notItsVehicle()
             .baseFilter()
-            .smokeFilter()
             .noVehicle()
-            .differentTeam()
+            .notFriendly()
+            .isNotMyOwner()
             .build()
 
         for (e in entities) {
@@ -188,7 +185,7 @@ class PrismTankEntity(type: EntityType<PrismTankEntity>, world: Level) : GeoVehi
                     0.0,
                     true
                 )
-                i += 0.2f
+                i += 0.1f
             }
 
             ParticleTool.sendParticle(

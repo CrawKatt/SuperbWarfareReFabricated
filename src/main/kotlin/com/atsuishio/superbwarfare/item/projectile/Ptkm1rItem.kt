@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.item.projectile
 import com.atsuishio.superbwarfare.client.renderer.item.Ptkm1rItemRenderer
 import com.atsuishio.superbwarfare.entity.projectile.Ptkm1rEntity
 import com.atsuishio.superbwarfare.item.misc.AbstractDeployerItem
+import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
@@ -29,7 +30,7 @@ open class Ptkm1rItem : AbstractDeployerItem(Properties().rarity(Rarity.RARE).st
 
             override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
                 if (this.renderer == null) {
-                    this.renderer = Ptkm1rItemRenderer()
+                    this.renderer = Ptkm1rItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
                 }
                 return this.renderer!!
             }

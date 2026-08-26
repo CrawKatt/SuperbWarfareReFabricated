@@ -1,9 +1,13 @@
 package com.atsuishio.superbwarfare.item
 
+import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.client.renderer.item.LungeMineRenderer
 import com.atsuishio.superbwarfare.event.ClientEventHandler
+import com.atsuishio.superbwarfare.init.ModAttributes
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.tools.localPlayer
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.loader.api.FabricLoader
@@ -15,7 +19,10 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResultHolder
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.Attribute
+import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemDisplayContext
@@ -31,6 +38,7 @@ import software.bernie.geckolib.core.animation.AnimationState
 import software.bernie.geckolib.core.animation.RawAnimation
 import software.bernie.geckolib.core.`object`.PlayState
 import software.bernie.geckolib.util.GeckoLibUtil
+import java.util.*
 import java.util.function.Consumer
 import java.util.function.Supplier
 
@@ -129,6 +137,26 @@ open class LungeMine : Item(Properties().stacksTo(4)), GeoItem, EntitySwingHook,
 
     override fun canAttackBlock(state: BlockState, level: Level, pos: BlockPos, player: Player): Boolean {
         return false
+    }
+
+    override fun getAttributeModifiers(
+        stack: ItemStack,
+        slot: EquipmentSlot
+    ): Multimap<Attribute, AttributeModifier> {
+        var map = super.getAttributeModifiers(stack, slot)
+        val uuid = UUID(slot.toString().hashCode().toLong(), 0)
+        if (slot != EquipmentSlot.MAINHAND) return map
+
+        map = HashMultimap.create<Attribute, AttributeModifier>(map)
+        map.put(
+            ModAttributes.ENTITY_REACH, AttributeModifier(
+                uuid, Mod.ATTRIBUTE_MODIFIER,
+                1.5,
+                AttributeModifier.Operation.ADDITION
+            )
+        )
+
+        return map
     }
 
     companion object {

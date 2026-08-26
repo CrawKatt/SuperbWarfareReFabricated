@@ -1,16 +1,23 @@
 package com.atsuishio.superbwarfare.event
 
+import com.atsuishio.superbwarfare.api.event.ClientVehicleFireEvent
 import com.atsuishio.superbwarfare.capability.ModCapabilities
 import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
+import com.atsuishio.superbwarfare.client.lighting.LightPositionRegistry
+import com.atsuishio.superbwarfare.client.lighting.VehicleLightingHandler
+import com.atsuishio.superbwarfare.client.lighting.MuzzleFlashHelper
 import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay
+import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
+import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
+import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.gun.GunItem
@@ -33,10 +40,7 @@ import net.minecraft.sounds.SoundSource
 import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
 import net.minecraft.world.InteractionHand
-import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.HumanoidArm
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.Pose
+import net.minecraft.world.entity.*
 import net.minecraft.world.entity.npc.AbstractVillager
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
@@ -457,6 +461,42 @@ object ClientEventHandler {
     @JvmField
     var keysCache: Short = 0
 
+    /** 自动盘旋双击夺回操控权：上次按下前进键的tick */
+    @JvmField
+    var loiterLastForwardTapTick: Int = -20
+
+    /** 自动盘旋双击夺回操控权：前进键连击计数 */
+    @JvmField
+    var loiterForwardTapCount: Int = 0
+
+    /** 卸载乘客按住：按住卸载乘客键的持续tick，每20tick(1秒)卸载一位乘客 */
+    @JvmField
+    var unloadPassengersHoldTicks: Int = 0
+
+    /** 卸载乘客双击：上次按下卸载乘客键的tick */
+    @JvmField
+    var unloadPassengersLastTapTick: Int = -20
+
+    /** 卸载乘客双击：卸载乘客键连击计数 */
+    @JvmField
+    var unloadPassengersTapCount: Int = 0
+
+    /** 卸载乘客双击：上一帧卸载乘客键是否按下，用于检测上升沿 */
+    @JvmField
+    var wasUnloadPassengersDown: Boolean = false
+
+    /** 断开牵引双击：上次按下断开牵引键的tick */
+    @JvmField
+    var disconnectTowingLastTapTick: Int = -20
+
+    /** 断开牵引双击：断开牵引键连击计数 */
+    @JvmField
+    var disconnectTowingTapCount: Int = 0
+
+    /** 断开牵引双击：上一帧断开牵引键是否按下，用于检测上升沿 */
+    @JvmField
+    var wasDisconnectTowingDown: Boolean = false
+
     @JvmField
     var tdmSavedData: TDMSavedData = TDMSavedData()
 
@@ -481,6 +521,10 @@ object ClientEventHandler {
 
     @JvmField
     var bombHitPos: Vec3 = Vec3.ZERO
+
+    @JvmField
+    var missileLockingPos: BlockPos? = null
+
     @JvmStatic
     fun handleWeaponTurn(partialTick: Float) {
         val player = localPlayer ?: return
@@ -496,20 +540,39 @@ object ClientEventHandler {
     @JvmStatic
     fun isFreeCam(player: Player): Boolean {
         val vehicle = player.vehicle
-        return vehicle is VehicleEntity && vehicle.allowFreeCam() && ModKeyMappings.FREE_CAMERA.isDown()
+        return vehicle is VehicleEntity && vehicle.allowFreeCam() && ModKeyMappings.FREE_CAMERA.isDown
+    }
+
+    @JvmStatic
+    fun isNacelleCam(player: Player): Boolean {
+        val vehicle = player.vehicle
+
+        if (vehicle is VehicleEntity) {
+            val data = vehicle.getGunData(player)
+            if (data != null) {
+                return data.get(GunProp.USE_NACELLE_CAMERA) && zoomVehicle
+            }
+        }
+
+        return false
     }
 
     private fun isMoving(): Boolean {
         val player = localPlayer ?: return false
-        return mc.options.keyLeft.isDown()
-                || mc.options.keyRight.isDown()
-                || mc.options.keyUp.isDown()
-                || mc.options.keyDown.isDown()
+        return mc.options.keyLeft.isDown
+                || mc.options.keyRight.isDown
+                || mc.options.keyUp.isDown
+                || mc.options.keyDown.isDown
                 || player.isSprinting
     }
     @JvmStatic
     fun handleClientTick() {
         val player = localPlayer ?: return
+        if (mc.fps <= 20) {
+            handleGunShoot()
+            handleVehicleGunShoot()
+        }
+
         val stack = player.mainHandItem
         if (notInGame && !ClickEventHandler.switchZoom) {
             zoom = false
@@ -534,10 +597,13 @@ object ClientEventHandler {
         lockWeaponSeeking(player, stack)
         vehicleWeaponSeeking(player)
         handleThermalImaging(player)
+        handleHandsomeGoggles(player)
         handleShootDelay(player, stack)
         handleControlVehicle(player, stack)
         handleArtilleryIndicator(player, stack)
         calculateBombHitPos(player)
+
+        LightPositionRegistry.tick()
     }
 
     @JvmStatic
@@ -546,7 +612,7 @@ object ClientEventHandler {
 
         return TrinketsApi.getTrinketComponent(player)
             .map { component -> component.isEquipped(ModItems.THERMAL_IMAGING_GOGGLES) }
-            .orElse(false)!!
+            .orElse(false)
     }
 
     fun handleThermalImaging(player: Player) {
@@ -569,28 +635,49 @@ object ClientEventHandler {
         } else if (Minecraft.getInstance().gameRenderer.currentEffect() == null) {
             turnOnThermalImaging()
         }
+    }
 
         val active = PlayerVariable.getOrDefault(player).activeThermalImaging
 
-        if (activeThermalImaging && !active) {
-            sendPacketToServer(ActiveThermalImagingMessage(true))
-        }
-
-        if (active && !activeThermalImaging) {
-            sendPacketToServer(ActiveThermalImagingMessage(false))
-        }
-    }
-
-    @JvmStatic
-    fun turnOnThermalImaging() {
-        ThermalShaderHandler.setActive(true)
-        mc.gameRenderer.loadEffect(com.atsuishio.superbwarfare.Mod.loc("shaders/post/night_vision.json"))
-    }
-
     @JvmStatic
     fun turnOffThermalImaging() {
+        if (ThermalShaderHandler.isActive()) {
+            mc.gameRenderer.shutdownEffect()
+            ThermalShaderHandler.setActive(false)
+        }
+    }
+
+    @JvmStatic
+    var handsomeGogglesActive: Boolean = false
+
+    @JvmStatic
+    fun isWearingHandsomeGoggles(player: Player): Boolean {
+        return player.getItemBySlot(EquipmentSlot.HEAD).`is`(ModItems.HANDSOME_GOGGLES.get())
+    }
+
+    fun handleHandsomeGoggles(player: Player) {
+        val wearing = isWearingHandsomeGoggles(player)
+        val isFirstPerson = mc.options.cameraType == CameraType.FIRST_PERSON
+        val shouldBeActive = wearing && isFirstPerson
+
+        if (shouldBeActive && !handsomeGogglesActive) {
+            handsomeGogglesActive = false  // reset so turnOn actually loads
+            turnOnHandsomeGoggles()
+        } else if (!shouldBeActive && handsomeGogglesActive) {
+            turnOffHandsomeGoggles()
+        }
+    }
+
+    @JvmStatic
+    fun turnOnHandsomeGoggles() {
+        handsomeGogglesActive = true
+        mc.gameRenderer.loadEffect(com.atsuishio.superbwarfare.Mod.loc("shaders/post/handsome_goggles.json"))
+    }
+
+    @JvmStatic
+    fun turnOffHandsomeGoggles() {
+        handsomeGogglesActive = false
         mc.gameRenderer.shutdownEffect()
-        ThermalShaderHandler.setActive(false)
     }
 
     /**
@@ -620,6 +707,9 @@ object ClientEventHandler {
 
             if ((holdingFireKey || (zoom && stack.`is`(ModItems.MINIGUN))) && item.canShoot(data, player)) {
                 holdingFireKeyTicks = (holdingFireKeyTicks + 1).coerceAtMost(data.get(GunProp.SHOOT_DELAY) + 1)
+
+                // Spawn light flashes for raycast tools (RepairTool / Taser) when holding fire key
+                MuzzleFlashHelper.spawnToolFlash(player, stack)
 
                 // 加特林特有的旋转音效
                 if (stack.`is`(ModItems.MINIGUN)) {
@@ -716,7 +806,34 @@ object ClientEventHandler {
         }
 
         if (keys != keysCache) {
-            sendPacketToServer(VehicleMovementMessage(keys))
+            // 盘旋模式下阻止操控包发往服务端，但检测双击前进键夺回操控权
+            val blockLoiter = vehicle is VehicleEntity
+                    && vehicle.loiterActive
+                    && vehicle.computed().engineType == EngineType.AIRCRAFT
+            if (!blockLoiter) {
+                sendPacketToServer(VehicleMovementMessage(keys))
+            } else {
+                // 检测双击前进键(W)在0.5s(10tick)内夺回操控权
+                val forwardBit = 0b000000100
+                val forwardJustPressed = (keys.toInt() and forwardBit) != 0 && (keysCache.toInt() and forwardBit) == 0
+                if (forwardJustPressed) {
+                    val currentTick = player.tickCount
+                    if (currentTick - loiterLastForwardTapTick <= 10) {
+                        sendPacketToServer(LoiterOverrideMessage)
+                        loiterForwardTapCount = 0
+                        loiterLastForwardTapTick = -20
+                    } else {
+                        loiterForwardTapCount = 1
+                        loiterLastForwardTapTick = currentTick
+                        player.displayClientMessage(
+                            Component.translatable(
+                                "tips.superbwarfare.loiter_override_hint",
+                                ModKeyMappings.MOVE_FORWARD.key.displayName.string
+                            ), true
+                        )
+                    }
+                }
+            }
             keysCache = keys
         }
 
@@ -728,6 +845,74 @@ object ClientEventHandler {
             }
         } else {
             holdToEjection = 0
+        }
+
+        // 卸载乘客：按住每隔1秒卸载最后一位，双击卸载全部
+        if (vehicle is VehicleEntity && vehicle.firstPassenger == player && vehicle.passengers.size > 1) {
+            val unloadDown = ModKeyMappings.UNLOAD_PASSENGERS.isDown
+            val unloadJustPressed = unloadDown && !wasUnloadPassengersDown
+            wasUnloadPassengersDown = unloadDown
+
+            if (unloadDown) {
+                // 按住：每隔1秒(20tick)卸载序号最靠后的一位乘客
+                unloadPassengersHoldTicks++
+                if (unloadPassengersHoldTicks >= 20) {
+                    sendPacketToServer(VehicleUnloadPassengersMessage(false))
+                    unloadPassengersHoldTicks = 0
+                }
+            } else {
+                unloadPassengersHoldTicks = 0
+            }
+
+            // 双击：在0.5s(10tick)内检测两次按下，卸载全部乘客
+            if (unloadJustPressed) {
+                val currentTick = player.tickCount
+                if (currentTick - unloadPassengersLastTapTick <= 10) {
+                    sendPacketToServer(VehicleUnloadPassengersMessage(true))
+                    unloadPassengersTapCount = 0
+                    unloadPassengersLastTapTick = -20
+                    unloadPassengersHoldTicks = 0
+                } else {
+                    unloadPassengersTapCount = 1
+                    unloadPassengersLastTapTick = currentTick
+                    player.displayClientMessage(
+                        Component.translatable(
+                            "tips.superbwarfare.unload_passengers_hint",
+                            ModKeyMappings.UNLOAD_PASSENGERS.key.displayName.string,
+                            ModKeyMappings.UNLOAD_PASSENGERS.key.displayName.string
+                        ), true
+                    )
+                }
+            }
+        } else {
+            wasUnloadPassengersDown = false
+            unloadPassengersHoldTicks = 0
+        }
+
+        // 检测双击断开牵引键在0.5s(10tick)内，断开载具的牵引关系
+        if (vehicle is VehicleEntity && vehicle.firstPassenger == player) {
+            val towingDown = ModKeyMappings.DISCONNECT_TOWING.isDown
+            val towingJustPressed = towingDown && !wasDisconnectTowingDown
+            wasDisconnectTowingDown = towingDown
+            if (towingJustPressed) {
+                val currentTick = player.tickCount
+                if (currentTick - disconnectTowingLastTapTick <= 10) {
+                    sendPacketToServer(VehicleDisconnectTowingMessage)
+                    disconnectTowingTapCount = 0
+                    disconnectTowingLastTapTick = -20
+                } else {
+                    disconnectTowingTapCount = 1
+                    disconnectTowingLastTapTick = currentTick
+                    player.displayClientMessage(
+                        Component.translatable(
+                            "tips.superbwarfare.disconnect_towing_hint",
+                            ModKeyMappings.DISCONNECT_TOWING.key.displayName.string
+                        ), true
+                    )
+                }
+            }
+        } else {
+            wasDisconnectTowingDown = false
         }
     }
 
@@ -1002,7 +1187,7 @@ object ClientEventHandler {
                     ClipContext.Block.VISUAL, ClipContext.Fluid.ANY, player
                 )
             )
-            seekingPosVehicle = result.getLocation()
+            seekingPosVehicle = result.location
 
             if (seekingTimeVehicle > lockTime + 2 && !lockOnVehicle) {
                 lockOnVehicle = true
@@ -1015,7 +1200,7 @@ object ClientEventHandler {
                 seekFailure(player)
             }
 
-            if (ModKeyMappings.VEHICLE_SEEK.isDown()) {
+            if (ModKeyMappings.VEHICLE_SEEK.isDown) {
                 if (seekingPosVehicle != null && seekingPosVehicle!!.distanceToSqr(cameraPos) < seekRange * seekRange) {
                     seekingTimeVehicle++
                     if (seekingTimeVehicle == 1) {
@@ -1288,7 +1473,7 @@ object ClientEventHandler {
         }
 
         if (!targetEntities.isEmpty()) {
-            val list = targetEntities.filter { it != null && it.isAlive && it != lookingEntity }
+            val list = targetEntities.filter { it.isAlive && it != lookingEntity }
                 .sortedBy {
                     player.lookAngle.angleTo(player.eyePosition.vectorTo(it.eyePosition))
                 }
@@ -1307,7 +1492,7 @@ object ClientEventHandler {
         }
 
         if (stack.`is`(ModItems.LUNGE_MINE) && ((lungeAttack >= 9 && lungeAttack <= 10.5) || lungeSprint > 0)) {
-            val lookingEntity = TraceTool.findLookingEntity(player, player.getEntityReach() + 1.5)
+            val lookingEntity = OverlayTraceHandler.playerReachEntity
 
             val result = player.level().clip(
                 ClipContext(
@@ -1576,6 +1761,12 @@ object ClientEventHandler {
         )
         fireRecoilTime = 10.0
 
+        // Spawn dynamic block light muzzle flash for firearms using unified muzzle node
+        val flashParams = MuzzleFlashHelper.calculateFromStack(stack)
+        if (flashParams != null) {
+            MuzzleFlashHelper.spawnFlashCone(player.eyePosition, player.lookAngle, flashParams)
+        }
+
         // 真实后坐（
         if (data.get(GunProp.RECOIL) != 0.0) {
             player.deltaMovement = player.deltaMovement.add(player.getViewVector(1f).scale(-data.get(GunProp.RECOIL)))
@@ -1725,40 +1916,52 @@ object ClientEventHandler {
             val cooldown = (1000 / rps).roundToInt()
 
             if (holdFireVehicle) {
-                if (!clientTimerVehicle.started()) {
-                    clientTimerVehicle.start()
-                    // 首发瞬间发射
-                    clientTimerVehicle.progress = (cooldown + 1).toLong()
-                }
-
-                if (clientTimerVehicle.progress >= cooldown) {
-                    var newProgress = clientTimerVehicle.progress
-
-                    // 低帧率下的开火次数补偿
-                    do {
-                        sendPacketToServer(
-                            VehicleFireMessage(
-                                if (lockingEntityVehicle != null) lockingEntityVehicle!!.getUUID() else null,
-                                if (lockingPosVehicle != null) lockingPosVehicle!!.toVector3f() else null
-                            )
-                        )
-                        if (mc.options.cameraType == CameraType.FIRST_PERSON || zoomVehicle) {
-                            playVehicleClientSounds(player, vehicle)
-                        }
-
-                        newProgress -= cooldown
-                    } while (newProgress - cooldown > 0)
-
-                    clientTimerVehicle.progress = newProgress
-                }
                 if (gunData.get(GunProp.DEFAULT_FIRE_MODE) == "Semi") {
-                    holdFireVehicle = false
+                    if (clientTimerVehicle.progress == 0L) {
+                        clientTimerVehicle.start()
+                        clientShootVehicle(player, vehicle, gunData)
+                    }
+                } else {
+                    if (!clientTimerVehicle.started()) {
+                        clientTimerVehicle.start()
+                        // 首发瞬间发射
+                        clientTimerVehicle.progress = cooldown.toLong() + 1L
+                    }
+
+                    if (clientTimerVehicle.progress >= cooldown) {
+                        var newProgress = clientTimerVehicle.progress
+
+                        // 低帧率下的开火次数补偿
+                        do {
+                            clientShootVehicle(player, vehicle, gunData)
+                            newProgress -= cooldown
+                        } while (newProgress - cooldown > 0)
+
+                        clientTimerVehicle.progress = newProgress
+                    }
                 }
+
+                if (notInGame) {
+                    clientTimerVehicle.stop()
+                }
+
             } else if (clientTimerVehicle.progress >= cooldown) {
                 clientTimerVehicle.stop()
             }
         } else {
             clientTimerVehicle.stop()
+        }
+    }
+
+    fun clientShootVehicle(player: Player, vehicle: VehicleEntity, gunData: GunData) {
+        sendPacketToServer(
+            VehicleFireMessage(
+                if (lockingEntityVehicle != null) lockingEntityVehicle!!.uuid else null,
+                if (lockingPosVehicle != null) lockingPosVehicle!!.toVector3f() else (if (gunData.get(GunProp.SEEK_WEAPON_INFO)?.inputBlockPos == true) missileLockingPos?.center?.toVector3f() else null)
+            )
+        )
+        if (mc.options.cameraType == CameraType.FIRST_PERSON || zoomVehicle) {
+            playVehicleClientSounds(player, vehicle)
         }
     }
 
@@ -2529,8 +2732,6 @@ object ClientEventHandler {
 
         lookDistance = Mth.lerp(0.2 * times, lookDistance, range)
 
-        lookDistance = Mth.lerp(0.2 * times, lookDistance, range)
-
         val angle =
             if (lookDistance != 0.0 && cameraLocation != 0.0) {
                 atan(abs(cameraLocation) / (lookDistance + 2.9)) * Mth.RAD_TO_DEG
@@ -2726,6 +2927,19 @@ object ClientEventHandler {
     @JvmStatic
     fun shouldCancelCrossHair(): Boolean {
         val player = localPlayer ?: return false
+
+        // When combat HUD is hidden by server, suppress vanilla crosshair in ALL views
+        if (MiscConfig.HIDE_COMBAT_HUD.get()) {
+            val stack = player.mainHandItem
+            if (stack.item is GunItem) {
+                return true
+            }
+            val vehicle = player.vehicle
+            if (vehicle is VehicleEntity && vehicle.hasWeapon(vehicle.getSeatIndex(player))) {
+                return true
+            }
+        }
+
         if (!mc.options.cameraType.isFirstPerson) return false
 
         if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR)) {
@@ -2812,12 +3026,12 @@ object ClientEventHandler {
 
     @JvmStatic
     fun handleShells(x: Float, y: Float, vararg shells: CoreGeoBone) {
-        for (i in 0..<shells.size) {
+        for ((i, element) in shells.withIndex()) {
             if (i >= 5) break
-            shells[i].posX = (-x * shellIndexTime[i] * ((150 - shellIndexTime[i]) / 150)).toFloat()
-            shells[i].posY = (y * randomShell[0] * shellIndexTime[i] - 0.025 * shellIndexTime[i].pow(2)).toFloat()
-            shells[i].rotX = (randomShell[1] * shellIndexTime[i]).toFloat()
-            shells[i].rotY = (randomShell[2] * shellIndexTime[i]).toFloat()
+            element.posX = (-x * shellIndexTime[i] * ((150 - shellIndexTime[i]) / 150)).toFloat()
+            element.posY = (y * randomShell[0] * shellIndexTime[i] - 0.025 * shellIndexTime[i].pow(2)).toFloat()
+            element.rotX = (randomShell[1] * shellIndexTime[i]).toFloat()
+            element.rotY = (randomShell[2] * shellIndexTime[i]).toFloat()
         }
     }
 
@@ -2825,7 +3039,7 @@ object ClientEventHandler {
         if (aimVillagerCountdown > 0) return
 
         if (zoom) {
-            val entity = TraceTool.findLookingEntity(player, 10.0) as? AbstractVillager ?: return
+            val entity = OverlayTraceHandler.playerReachEntity as? AbstractVillager ?: return
             val entities = SeekTool.seekLivingEntities(entity, 16.0, 120.0)
             for (e in entities) {
                 if (e == player) {
@@ -2952,6 +3166,21 @@ object ClientEventHandler {
         } else {
             floatArrayOf(red, green, blue)
         }
+    }
+
+    @JvmStatic
+    fun onClientVehicleFire(event: ClientVehicleFireEvent) {
+        val shooter = event.shooter
+        val vehicle = event.vehicle
+        val index = event.index
+
+        VehicleLightingHandler.onVehicleFire(event)
+
+        val ani = vehicle.getAnimationInstance() ?: return
+        val name = event.weaponName
+            ?: vehicle.getGunName(vehicle.getSeatIndex(shooter))
+            ?: return
+        ani.fire(name.camelToSnake(), index)
     }
 
 }
