@@ -45,12 +45,12 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 
     override fun getSlotTexture(stack: ItemStack): ResourceLocation? {
         val resource = GunResource.compute(stack)
-        val slotIcon = if (!resource.slotIcon.isNullOrEmpty()) resource.slotIcon else resource.icon
+        val slotIcon = resource.slotIcon.ifEmpty { resource.icon }
         return ResourceLocation.tryParse(slotIcon)
     }
 
     override fun hasModel(stack: ItemStack): Boolean {
-        val modelResource = GunResource.compute(stack).model ?: return false
+        val modelResource = GunResource.compute(stack).getModel()
         return GeoGunModel.create(modelResource) != null
     }
 
@@ -89,7 +89,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         partialTick: Float
     ) {
         val resource = GunResource.compute(stack)
-        val modelResource = resource.model ?: return
+        val modelResource = resource.getModel()
 
         val useLod = !transformType.firstPerson()
                 && DisplayConfig.ENABLE_GUN_LOD.get()
