@@ -249,6 +249,12 @@ class GunProp<T, R>(
         val EXPLOSION_RADIUS = plainProp(DefaultGunData::explosionRadius)
 
         @JvmField
+        val EXPLOSION_DESTROY = plainProp(DefaultGunData::explosionDestroy)
+
+        @JvmField
+        val UNDERWATER_MOTION_SCALE = plainProp(DefaultGunData::underwaterMotionScale)
+
+        @JvmField
         val GRAVITY = plainProp(DefaultGunData::gravity)
 
         @JvmField

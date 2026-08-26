@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.client.model.entity.VehicleModelBoneGroups
 import com.atsuishio.superbwarfare.client.model.entity.VehicleModelInstance
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
+import com.atsuishio.superbwarfare.client.renderer.renderSingleBonePass
 import com.atsuishio.superbwarfare.client.renderer.SmartTextureBrightener
 import com.atsuishio.superbwarfare.client.renderer.TextureBrightnessHandler
 import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat

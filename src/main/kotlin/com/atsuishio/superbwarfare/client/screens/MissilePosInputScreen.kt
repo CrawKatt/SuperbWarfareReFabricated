@@ -9,10 +9,10 @@ import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 open class MissilePosInputScreen : Screen(Component.translatable("container.superbwarfare.missile_pos_input")) {
     lateinit var posX: EditBox
     lateinit var posY: EditBox
@@ -94,7 +94,7 @@ open class MissilePosInputScreen : Screen(Component.translatable("container.supe
         editBox.setFilter { it.matches("-?\\d*".toRegex()) }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     internal inner class DoneButton(pX: Int, pY: Int, pWidth: Int, pHeight: Int) :
         AbstractButton(pX, pY, pWidth, pHeight, Component.empty()) {
         override fun onPress() {

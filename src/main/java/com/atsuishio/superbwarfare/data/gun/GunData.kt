@@ -1066,7 +1066,7 @@ class GunData private constructor(
     init {
         val realGunItem = stack.item as? GunItem
         val useEmptyGunData = realGunItem == null || stack.isEmpty
-        val gunItem = if (useEmptyGunData) ModItems.EMPTY_GUN.get() as GunItem else realGunItem
+        val gunItem = if (useEmptyGunData) ModItems.EMPTY_GUN as GunItem else realGunItem
         this.item = gunItem
         this.stack = stack
         this.id = if (useEmptyGunData) EmptyGunItem.EMPTY_GUN_ID else getRegistryId(stack.item)

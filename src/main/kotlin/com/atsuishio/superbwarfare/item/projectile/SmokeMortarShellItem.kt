@@ -52,7 +52,7 @@ class SmokeMortarShellItem : MortarShellItem(), IDyeableSmokeItem {
             override fun getProjectile(pLevel: Level, pPosition: Position, pStack: ItemStack): Projectile {
                 val color = this@SmokeMortarShellItem.getColor(pStack)
                 val shell = MortarShellEntity(
-                    ModEntities.MORTAR_SHELL.get(),
+                    ModEntities.MORTAR_SHELL,
                     pPosition.x(),
                     pPosition.y(),
                     pPosition.z(),
@@ -71,7 +71,7 @@ class SmokeMortarShellItem : MortarShellItem(), IDyeableSmokeItem {
             }
 
             override fun playSound(pSource: BlockSource) {
-                pSource.level.playSound(null, pSource.pos, ModSounds.MORTAR_FIRE.get(), SoundSource.BLOCKS, 1f, 1f)
+                pSource.level.playSound(null, pSource.pos, ModSounds.MORTAR_FIRE, SoundSource.BLOCKS, 1f, 1f)
             }
         }
     }

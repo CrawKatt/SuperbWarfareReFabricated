@@ -2,12 +2,12 @@ package com.atsuishio.superbwarfare.script
 
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BakedModelInstance
 import com.mojang.blaze3d.vertex.PoseStack
-import org.mozillaa.javascript.Context
-import org.mozillaa.javascript.Script
-import org.mozillaa.javascript.Scriptable
-import org.mozillaa.javascript.ScriptableObject
+import org.mozilla.javascript.Context
+import org.mozilla.javascript.Script
+import org.mozilla.javascript.Scriptable
+import org.mozilla.javascript.ScriptableObject
 
-typealias JSFunction = org.mozillaa.javascript.Function
+typealias JSFunction = org.mozilla.javascript.Function
 
 object VehicleScriptManager {
     val RHINO_CONTEXT: Context = Context.enter()

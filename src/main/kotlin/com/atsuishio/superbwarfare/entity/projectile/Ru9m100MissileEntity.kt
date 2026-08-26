@@ -30,7 +30,7 @@ open class Ru9m100MissileEntity(type: EntityType<out Ru9m100MissileEntity>, leve
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.LARGE_ANTI_AIR_MISSILE.get()
+        return ModItems.LARGE_ANTI_AIR_MISSILE
     }
 
     override fun tick() {
@@ -46,7 +46,7 @@ open class Ru9m100MissileEntity(type: EntityType<out Ru9m100MissileEntity>, leve
                 entity.level().playSound(
                     null,
                     entity.onPos,
-                    if (entity is Pig) SoundEvents.PIG_HURT else ModSounds.MISSILE_WARNING.get(),
+                    if (entity is Pig) SoundEvents.PIG_HURT else ModSounds.MISSILE_WARNING,
                     SoundSource.PLAYERS,
                     2f,
                     1f
@@ -95,7 +95,7 @@ open class Ru9m100MissileEntity(type: EntityType<out Ru9m100MissileEntity>, leve
             level.playSound(
                 null,
                 BlockPos.containing(position()),
-                ModSounds.MISSILE_START.get(),
+                ModSounds.MISSILE_START,
                 SoundSource.PLAYERS,
                 4f,
                 1f
@@ -140,7 +140,7 @@ open class Ru9m100MissileEntity(type: EntityType<out Ru9m100MissileEntity>, leve
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.ROCKET_FLY.get()
+        return ModSounds.ROCKET_FLY
     }
 
     override val maxHealth: Float

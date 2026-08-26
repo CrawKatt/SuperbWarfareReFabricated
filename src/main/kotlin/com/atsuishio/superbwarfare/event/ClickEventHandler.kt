@@ -354,17 +354,17 @@ object ClickEventHandler {
                 return true
             }
 
-            if (key == ModKeyMappings.DISMOUNT.boundKey.value) {
+            if (key == ModKeyMappings.DISMOUNT.key.value) {
                 handleDismountPress(player)
             }
 
-            if (key == ModKeyMappings.TOGGLE_TACTICAL_MAP.boundKey.value && MapConfig.ENABLE_TACTICAL_MAP.get()) {
+            if (key == ModKeyMappings.TOGGLE_TACTICAL_MAP.key.value && MapConfig.ENABLE_TACTICAL_MAP.get()) {
                 if (TacticalTerminalItem.isTerminalEquipped(player) && mc.screen == null) {
                     mc.setScreen(TacticalMapScreen())
                 }
             }
 
-            if (key == mc.options.keyJump.boundKey.value) {
+            if (key == mc.options.keyJump.key.value) {
                 handleDoubleJump(player)
                 handleParachute()
             }
@@ -372,7 +372,7 @@ object ClickEventHandler {
             if (ModKeyMappings.CONFIG.matches(key, scanCode) && (modifiers and GLFW.GLFW_MOD_ALT) != 0) {
                 handleConfigScreen(player)
             }
-            if (key == ModKeyMappings.RELOAD.boundKey.value) {
+            if (key == ModKeyMappings.RELOAD.key.value) {
                 ClientEventHandler.burstFireAmount = 0
                 ClientEventHandler.isEditing = false
                 ClientEventHandler.seekingTime = 0
@@ -382,17 +382,17 @@ object ClickEventHandler {
                 ClientEventHandler.lockingPos = null
                 sendPacketToServer(ReloadMessage)
             }
-            if (key == ModKeyMappings.FIRE_MODE.boundKey.value || key == ModKeyMappings.CHANGE_FIRE_MODE_BACKWARD.boundKey.value) {
+            if (key == ModKeyMappings.FIRE_MODE.key.value || key == ModKeyMappings.CHANGE_FIRE_MODE_BACKWARD.key.value) {
                 sendPacketToServer(FireModeMessage(false))
                 ClientEventHandler.burstFireAmount = 0
             }
-            if (key == ModKeyMappings.CHANGE_FIRE_MODE_FORWARD.boundKey.value) {
+            if (key == ModKeyMappings.CHANGE_FIRE_MODE_FORWARD.key.value) {
                 sendPacketToServer(FireModeMessage(true))
                 ClientEventHandler.burstFireAmount = 0
             }
-            if (key == ModKeyMappings.INTERACT.boundKey.value) {
+            if (key == ModKeyMappings.INTERACT.key.value) {
                 if (stack.item is GunItem) {
-                    KeyMapping.click(mc.options.keyUse.boundKey)
+                    KeyMapping.click(mc.options.keyUse.key)
                 } else if (stack.`is`(ModItems.MONITOR)) {
                     sendPacketToServer(InteractMessage)
                 }
@@ -401,17 +401,17 @@ object ClickEventHandler {
             // 玩家手持枪械时，处理卸弹/切换弹种
             if (stack.item is GunItem) {
                 val data = GunData.from(stack)
-                if (key == ModKeyMappings.UNLOAD.boundKey.value) {
+                if (key == ModKeyMappings.UNLOAD.key.value) {
                     if (data.useBackpackAmmo() || data.ammo.get() + data.virtualAmmo.get() <= 0) return true
                     sendPacketToServer(UnloadMessage)
                     ClientEventHandler.burstFireAmount = 0
                 }
                 if (data.get(GunProp.AMMO_CONSUMER).size > 1) {
-                    if (key == ModKeyMappings.CHANGE_AMMO_FORWARD.boundKey.value) {
+                    if (key == ModKeyMappings.CHANGE_AMMO_FORWARD.key.value) {
                         sendPacketToServer(EditMessage(5, add = false, isVehicle = false))
                         ClientEventHandler.burstFireAmount = 0
                     }
-                    if (key == ModKeyMappings.CHANGE_AMMO_BACKWARD.boundKey.value) {
+                    if (key == ModKeyMappings.CHANGE_AMMO_BACKWARD.key.value) {
                         sendPacketToServer(EditMessage(5, add = true, isVehicle = false))
                         ClientEventHandler.burstFireAmount = 0
                     }
@@ -422,11 +422,11 @@ object ClickEventHandler {
             if (vehicle is VehicleEntity) {
                 val data = vehicle.getGunData(player)
                 if (data != null && data.get(GunProp.AMMO_CONSUMER).size > 1) {
-                    if (key == ModKeyMappings.CHANGE_AMMO_FORWARD.boundKey.value) {
+                    if (key == ModKeyMappings.CHANGE_AMMO_FORWARD.key.value) {
                         sendPacketToServer(EditMessage(5, add = false, isVehicle = true))
                         ClientEventHandler.burstFireAmount = 0
                     }
-                    if (key == ModKeyMappings.CHANGE_AMMO_BACKWARD.boundKey.value || key == ModKeyMappings.FIRE_MODE.boundKey.value) {
+                    if (key == ModKeyMappings.CHANGE_AMMO_BACKWARD.key.value || key == ModKeyMappings.FIRE_MODE.key.value) {
                         sendPacketToServer(EditMessage(5, add = true, isVehicle = true))
                         ClientEventHandler.burstFireAmount = 0
                     }
@@ -439,7 +439,7 @@ object ClickEventHandler {
                 }
             }
 
-            if (key == ModKeyMappings.EDIT_MODE.boundKey.value) {
+            if (key == ModKeyMappings.EDIT_MODE.key.value) {
                 if (vehicle is VehicleEntity) {
                     val data = vehicle.getGunData(player)
                     if (data != null) {
@@ -474,13 +474,13 @@ object ClickEventHandler {
                 }
             }
 
-            if (key == ModKeyMappings.BREATH.boundKey.value && !ClientEventHandler.exhaustion && ClientEventHandler.zoom) {
+            if (key == ModKeyMappings.BREATH.key.value && !ClientEventHandler.exhaustion && ClientEventHandler.zoom) {
                 ClientEventHandler.breath = true
             }
-            if (key == ModKeyMappings.SENSITIVITY_INCREASE.boundKey.value) {
+            if (key == ModKeyMappings.SENSITIVITY_INCREASE.key.value) {
                 sendPacketToServer(SensitivityMessage(true))
             }
-            if (key == ModKeyMappings.SENSITIVITY_REDUCE.boundKey.value) {
+            if (key == ModKeyMappings.SENSITIVITY_REDUCE.key.value) {
                 sendPacketToServer(SensitivityMessage(false))
             }
 
@@ -490,23 +490,23 @@ object ClickEventHandler {
                 || (stack.`is`(Items.SPYGLASS) && player.isScoping && player.offhandItem.`is`(ModItems.FIRING_PARAMETERS))
                 || (stack.`is`(ModItems.ARTILLERY_INDICATOR))
             ) {
-                if (key == ModKeyMappings.FIRE.boundKey.value) {
+                if (key == ModKeyMappings.FIRE.key.value) {
                     handleWeaponFirePress(player, stack)
                 }
 
-                if (key == ModKeyMappings.HOLD_ZOOM.boundKey.value) {
+                if (key == ModKeyMappings.HOLD_ZOOM.key.value) {
                     handleWeaponZoomPress(player, stack)
                     switchZoom = false
                     return true
                 }
 
-                if (key == ModKeyMappings.SWITCH_ZOOM.boundKey.value) {
+                if (key == ModKeyMappings.SWITCH_ZOOM.key.value) {
                     handleWeaponZoomPress(player, stack)
                     switchZoom = !switchZoom
                 }
             }
 
-            if (key == ModKeyMappings.MARK.boundKey.value) {
+            if (key == ModKeyMappings.MARK.key.value) {
                 if (stack.`is`(ModItems.ARTILLERY_INDICATOR)) {
                     sendPacketToServer(SetFiringParametersMessage)
                 }
@@ -515,18 +515,18 @@ object ClickEventHandler {
                 }
             }
         } else {
-            if (key == ModKeyMappings.FIRE.boundKey.value) {
+            if (key == ModKeyMappings.FIRE.key.value) {
                 handleWeaponFireRelease()
             }
 
-            if (key == ModKeyMappings.HOLD_ZOOM.boundKey.value) {
+            if (key == ModKeyMappings.HOLD_ZOOM.key.value) {
                 handleWeaponZoomRelease()
-            } else if (key == ModKeyMappings.SWITCH_ZOOM.boundKey.value && !switchZoom) {
+            } else if (key == ModKeyMappings.SWITCH_ZOOM.key.value && !switchZoom) {
                 handleWeaponZoomRelease()
             }
 
             if (action == GLFW.GLFW_RELEASE) {
-                if (key == ModKeyMappings.BREATH.boundKey.value) {
+                if (key == ModKeyMappings.BREATH.key.value) {
                     ClientEventHandler.breath = false
                     return true
                 }
@@ -842,7 +842,7 @@ object ClickEventHandler {
         }
     }
 
-    private val KeyMapping.boundKey: InputConstants.Key
+    private val KeyMapping.key: InputConstants.Key
         get() = (this as KeyMappingAccessor).`superbwarfare$getKey`()
 
     private fun ItemStack.`is`(item: Supplier<Item>): Boolean {

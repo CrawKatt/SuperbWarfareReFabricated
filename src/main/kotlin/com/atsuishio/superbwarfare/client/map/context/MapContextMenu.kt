@@ -7,11 +7,11 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.EditBox
 import net.minecraft.network.chat.Component
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.roundToInt
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 class MapContextMenu {
 
     // ── Context menu state ──

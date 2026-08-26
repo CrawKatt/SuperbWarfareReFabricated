@@ -593,7 +593,7 @@ object WaterSplashUtil {
         level.playSound(
             null,
             BlockPos(location.x.toInt(), location.y.toInt(), location.z.toInt()),
-            ModSounds.HIT_WATER.get(),
+            ModSounds.HIT_WATER,
             SoundSource.BLOCKS,
             0.25f + 0.75f * power,
             1.3f - 0.4f * power   // high power → lower pitch

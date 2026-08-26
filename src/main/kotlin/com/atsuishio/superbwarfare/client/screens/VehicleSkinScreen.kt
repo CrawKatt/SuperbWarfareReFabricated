@@ -18,10 +18,10 @@ import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) {
     companion object {
         private val TEXTURE = loc("textures/gui/vehicle_skin.png")
@@ -146,7 +146,7 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
         this.registerButtons()
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private inner class SkinSlotButton(
         x: Int, y: Int,
         private val skinId: String,
@@ -251,7 +251,7 @@ class VehicleSkinScreen(private val entity: Entity) : Screen(Component.empty()) 
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private inner class PageButton(
         x: Int,
         y: Int,

@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.client.renderer.projectile
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.client.renderer.renderSingleBonePass
 import com.atsuishio.superbwarfare.entity.projectile.BasicGeoProjectileEntity
 import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils

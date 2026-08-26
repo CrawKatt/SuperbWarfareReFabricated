@@ -819,24 +819,6 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
         this.xRotO = this.xRot
     }
 
-    override fun onAddedToWorld() {
-        super.onAddedToWorld()
-        if (level().isClientSide) {
-            ClientLightingHandler.handleProjectileAdded(this)
-        } else if (forceLoadChunk()) {
-            updateManualTickRegistration()
-        }
-    }
-
-    override fun onRemovedFromWorld() {
-        super.onRemovedFromWorld()
-        if (level().isClientSide) {
-            ClientLightingHandler.handleProjectileRemoved(this)
-        } else if (forceLoadChunk()) {
-            unregisterForManualTick(this)
-        }
-    }
-
     companion object {
         @JvmStatic
         fun init() {

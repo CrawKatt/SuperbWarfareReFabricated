@@ -50,7 +50,7 @@ public abstract class BlockStateMixin {
 		if (entity instanceof CatapultShuttleEntity catapultShuttle) {
 			BlockState state = catapultShuttle.level().getBlockState(pos);
 
-			if (state.is(ModBlocks.AIRCRAFT_CATAPULT.get())) {
+			if (state.is(ModBlocks.AIRCRAFT_CATAPULT)) {
 				ci.setReturnValue(Shapes.empty());
 			}
 		}

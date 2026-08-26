@@ -147,6 +147,14 @@ repositories {
         }
     }
 
+    maven("https://maven.valkyrienskies.org/") {
+        name = "ValkyrienSkies"
+        content {
+            includeGroup("org.valkyrienskies")
+            includeGroup("org.valkyrienskies.core")
+        }
+    }
+
     maven("https://maven.createmod.net/") {
         name = "CreateMod"
         content {
@@ -230,6 +238,21 @@ dependencies {
     // GeckoLib
     modImplementation("software.bernie.geckolib:geckolib-fabric-1.20.1:4.4.6")
 
+    // Valkyrien Skies (optional at runtime, compile-only API)
+    modCompileOnly("org.valkyrienskies.core:api:1.1.0+") {
+        exclude("org.joml", "joml")
+    }
+    // The VS2 mod artifact (contains org.valkyrienskies.mod.* API + shaded vs-core).
+    // Latest release for MC 1.20.x on maven.valkyrienskies.org (artifact suffix "-120" = 1.20.x line).
+    // Non-transitive: its runtime deps (create-fabric etc.) are irrelevant for compilation,
+    // and vs-core/joml are already shaded inside the jar.
+    modCompileOnly("org.valkyrienskies:valkyrienskies-120-fabric:2.4.13+a22354cf66") {
+        isTransitive = false
+    }
+
+    // Mozilla Rhino for perk/vehicle scripts (upstream uses a private fork; standard Rhino is API-compatible)
+    include(implementation("org.mozilla:rhino:1.7.15")!!)
+
     // Ponder (bundled, same as upstream jij's the Forge variant)
     include(modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("minecraft_version")}:${project.property("ponder_version")}")!!)
     implementation("com.eliotlash.mclib:mclib:20")
@@ -260,9 +283,6 @@ dependencies {
 }
 
 tasks.withType<JavaCompile> {
-    // Ensure SRG mappings exist before compilation (needed for Mixin AP)
-    dependsOn("createSrgToMcp")
-
     options.encoding = "UTF-8"
     options.compilerArgs.addAll(
         listOf(

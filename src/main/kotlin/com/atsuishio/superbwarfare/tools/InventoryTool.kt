@@ -1,8 +1,11 @@
 package com.atsuishio.superbwarfare.tools
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.capability.api.IItemHandler
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import com.atsuishio.superbwarfare.data.gun.Ammo
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.item.ammo.AmmoBoxItem
 import com.atsuishio.superbwarfare.item.ammo.AmmoSupplierItem
@@ -12,9 +15,6 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import net.minecraftforge.common.capabilities.ForgeCapabilities
-import net.minecraftforge.items.IItemHandler
-import net.minecraftforge.items.ItemHandlerHelper
 import org.joml.Math
 import java.util.function.Predicate
 import kotlin.math.min
@@ -69,11 +69,8 @@ object InventoryTool {
      */
     @JvmStatic
     fun countItem(entity: Entity?, item: Item): Int {
-        if (entity == null) return 0
-
-        return entity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-            .map { countItem(it, item) }
-            .orElseGet { 0 }
+        val handler = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null) ?: return 0
+        return countItem(handler, item)
     }
 
     @JvmStatic
@@ -104,20 +101,16 @@ object InventoryTool {
 
     @JvmStatic
     fun countAmmoItem(entity: Entity?, type: Ammo?): Int {
-        if (entity == null || type == null) return 0
-
-        return entity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-            .map { countAmmoItem(it, type) }
-            .orElseGet { 0 }
+        val handler = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null) ?: return 0
+        return countAmmoItem(handler, type)
     }
 
     @JvmStatic
     fun consumeAmmoItem(entity: Entity?, type: Ammo?, count: Int): Int {
         if (entity == null || type == null || count <= 0) return 0
 
-        return entity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-            .map { consumeAmmoItem(it, type, count) }
-            .orElseGet { 0 }
+        val handler = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null) ?: return 0
+        return consumeAmmoItem(handler, type, count)
     }
 
     @JvmStatic
@@ -180,11 +173,8 @@ object InventoryTool {
 
     @JvmStatic
     fun findFirst(entity: Entity?, item: Item): ItemStack {
-        if (entity == null) return ItemStack.EMPTY
-
-        return findFirst(
-            entity.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve().orElse(null)
-        ) { it.`is`(item) }
+        val handler = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null) ?: return ItemStack.EMPTY
+        return findFirst(handler) { stack: ItemStack -> stack.`is`(item) }
     }
 
     @JvmStatic
@@ -219,7 +209,7 @@ object InventoryTool {
 
     @JvmStatic
     fun hasCreativeAmmoBox(handler: IItemHandler?): Boolean {
-        return !findFirst(handler, ModItems.CREATIVE_AMMO_BOX.get()).isEmpty
+        return !findFirst(handler, ModItems.CREATIVE_AMMO_BOX).isEmpty
     }
 
     /**
@@ -229,7 +219,7 @@ object InventoryTool {
      */
     @JvmStatic
     fun hasCreativeAmmoBox(itemList: NonNullList<ItemStack>?): Boolean {
-        return !findFirst(itemList, ModItems.CREATIVE_AMMO_BOX.get()).isEmpty
+        return !findFirst(itemList, ModItems.CREATIVE_AMMO_BOX).isEmpty
     }
 
     /**
@@ -242,7 +232,7 @@ object InventoryTool {
         return if (entity is VehicleEntity) {
             hasCreativeAmmoBoxForVehicle(entity)
         } else {
-            hasItem(entity, ModItems.CREATIVE_AMMO_BOX.get())
+            hasItem(entity, ModItems.CREATIVE_AMMO_BOX)
         }
     }
 
@@ -250,9 +240,9 @@ object InventoryTool {
     fun hasCreativeAmmoBoxForVehicle(vehicle: VehicleEntity): Boolean {
         val passengers = vehicle.getPassengers()
         val flag = passengers.stream()
-            .anyMatch { hasItem(it, ModItems.CREATIVE_AMMO_BOX.get()) }
+            .anyMatch { passenger: Entity -> hasItem(passenger, ModItems.CREATIVE_AMMO_BOX) }
                 && vehicle.data().compute().usePassengerCreativeAmmoBox
-        return flag || hasItem(vehicle, ModItems.CREATIVE_AMMO_BOX.get())
+        return flag || hasItem(vehicle, ModItems.CREATIVE_AMMO_BOX)
     }
 
     /**
@@ -276,8 +266,8 @@ object InventoryTool {
      */
     @JvmStatic
     fun consumeItem(entity: Entity, item: Item, count: Int) {
-        entity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-            .ifPresent { consumeItem(it, item, count) }
+        val handler = ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null) ?: return
+        consumeItem(handler, item, count)
     }
 
     @JvmStatic
@@ -334,7 +324,7 @@ object InventoryTool {
         if (itemList == null || count <= 0) return count
 
         val defaultStack = ItemStack(item)
-        maxStackSize = Math.min(maxStackSize, item.getMaxStackSize(defaultStack))
+        maxStackSize = Math.min(maxStackSize, defaultStack.maxStackSize)
 
         for (i in itemList.indices) {
             val stack = itemList.get(i)
@@ -359,7 +349,7 @@ object InventoryTool {
     fun insertItem(itemList: NonNullList<ItemStack>?, stack: ItemStack): Int {
         if (itemList == null) return stack.count
 
-        val maxStackSize = stack.item.getMaxStackSize(stack)
+        val maxStackSize = stack.maxStackSize
         val originalCount = stack.count
 
         for (i in itemList.indices) {
@@ -382,6 +372,8 @@ object InventoryTool {
 
     @JvmStatic
     fun insertItem(handler: IItemHandler?, stack: ItemStack, count: Int): Int {
+        if (handler == null) return 0
+
         var count = count
         var inserted = 0
         while (count > 0) {

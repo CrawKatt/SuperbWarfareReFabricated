@@ -6,6 +6,7 @@ import com.github.mcmodderanchor.simplebedrockmodel.v2.client.renderer.GeoArmorR
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.tree.TreeBedrockModel
 import com.mojang.blaze3d.platform.NativeImage
 import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.texture.DynamicTexture
@@ -143,9 +144,9 @@ class HandsomeGogglesRenderer(model: TreeBedrockModel, slot: EquipmentSlot) : Ge
         }
     }
 
-    override fun renderArmorToBuffer(
+    override fun renderToBuffer(
         poseStack: PoseStack,
-        bufferSource: MultiBufferSource,
+        vertexConsumer: VertexConsumer,
         light: Int,
         overlay: Int,
         r: Float,
@@ -153,8 +154,6 @@ class HandsomeGogglesRenderer(model: TreeBedrockModel, slot: EquipmentSlot) : Ge
         b: Float,
         a: Float
     ) {
-        val mc = mc
-        val bufferSource = mc.renderBuffers().bufferSource()
         val partialTick = mc.frameTime
 
         poseStack.pushPose()
@@ -164,17 +163,7 @@ class HandsomeGogglesRenderer(model: TreeBedrockModel, slot: EquipmentSlot) : Ge
 
         this.instance.renderToBuffer(
             poseStack,
-            bufferSource.getBuffer(RenderType.entityTranslucent(TEXTURE)),
-            light,
-            overlay,
-            r,
-            g,
-            b,
-            a
-        )
-        this.instance.renderToBuffer(
-            poseStack,
-            bufferSource.getBuffer(RenderType.eyes(texture)),
+            vertexConsumer,
             light,
             overlay,
             r,

@@ -5,6 +5,8 @@ import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.projectile.MissileProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.network.message.receive.BeyondVisualEntitySyncMessage
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
@@ -13,10 +15,6 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.event.TickEvent
-import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.common.Mod
-import net.minecraftforge.registries.ForgeRegistries
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -29,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap
  * @author superbwarfare contributors
  * @since 0.8.9.1
  */
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
 object ServerSyncedEntityHandler {
     /**
     * How often (in ticks) to broadcast full BVR position updates.
@@ -99,7 +96,7 @@ object ServerSyncedEntityHandler {
             eyePos = entity.eyePosition,
             yRot = entity.yRot,
             xRot = entity.xRot,
-            entityType = ForgeRegistries.ENTITY_TYPES.getKey(entity.type) ?: return,
+            entityType = BuiltInRegistries.ENTITY_TYPE.getKey(entity.type) ?: return,
             nbt = nbt,
             timeStamp = now,
             targetPos = targetPos,
@@ -121,7 +118,7 @@ object ServerSyncedEntityHandler {
         val dim = entity.level().dimension().location().toString()
         entities[dim]?.remove(entity.id)
 
-        val entityType = ForgeRegistries.ENTITY_TYPES.getKey(entity.type) ?: return
+        val entityType = BuiltInRegistries.ENTITY_TYPE.getKey(entity.type) ?: return
         pendingRemovals.getOrPut(dim) { ConcurrentHashMap.newKeySet() }.add(Pair(entity.id, entityType))
     }
 
@@ -204,19 +201,17 @@ object ServerSyncedEntityHandler {
         }
     }
 
-    @SubscribeEvent
-    fun tick(event: TickEvent.ServerTickEvent) {
-        if (event.phase == TickEvent.Phase.START) return
-        val server = event.server
-        
-        // Periodic cleanup of expired entries
-        if (server.tickCount % SyncConfig.SERVER_SYNC_CLEAN_INTERVAL.get() == 0) {
-            cleanAll(server)
+    fun register() {
+        ServerTickEvents.END_SERVER_TICK.register { server ->
+            // Periodic cleanup of expired entries
+            if (server.tickCount % SyncConfig.SERVER_SYNC_CLEAN_INTERVAL.get() == 0) {
+                cleanAll(server)
+            }
+
+            // Throttled BVR broadcast: position updates every N ticks, removals every tick
+            val shouldBroadcastUpdates = server.tickCount % BVR_BROADCAST_INTERVAL == 0
+            broadcastWorldRender(server, includeUpdates = shouldBroadcastUpdates)
         }
-        
-        // Throttled BVR broadcast: position updates every N ticks, removals every tick
-        val shouldBroadcastUpdates = server.tickCount % BVR_BROADCAST_INTERVAL == 0
-        broadcastWorldRender(server, includeUpdates = shouldBroadcastUpdates)
     }
 
     /**

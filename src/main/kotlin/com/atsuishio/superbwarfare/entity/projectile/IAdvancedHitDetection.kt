@@ -133,7 +133,7 @@ interface IAdvancedHitDetection {
                     level.playSound(
                         null,
                         BlockPos.containing(hitPos),
-                        ModSounds.HIT.get(),
+                        ModSounds.HIT,
                         SoundSource.PLAYERS,
                         1f,
                         1f
@@ -255,8 +255,8 @@ interface IAdvancedHitDetection {
         )
 
         if (shooter is ServerPlayer) {
-            val holder = if (score == 10) Holder.direct(ModSounds.HEADSHOT.get())
-            else Holder.direct(ModSounds.INDICATION.get())
+            val holder = if (score == 10) Holder.direct(ModSounds.HEADSHOT)
+            else Holder.direct(ModSounds.INDICATION)
 
             sendPacketTo(
                 shooter,
@@ -275,7 +275,7 @@ interface IAdvancedHitDetection {
         }
 
         val stack = shooter.offhandItem
-        if (stack.`is`(ModItems.TRANSCRIPT.get())) {
+        if (stack.`is`(ModItems.TRANSCRIPT)) {
             val size = 10
 
             val tags = stack.getOrCreateTag().getList(TranscriptItem.TAG_SCORES, Tag.TAG_COMPOUND.toInt())

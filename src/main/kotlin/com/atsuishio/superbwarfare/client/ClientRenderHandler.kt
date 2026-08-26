@@ -35,6 +35,7 @@ import com.atsuishio.superbwarfare.client.tooltip.component.SentinelImageCompone
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.item.armor.GeHelmetM35Item
+import com.atsuishio.superbwarfare.item.armor.HandsomeGogglesItem
 import com.atsuishio.superbwarfare.item.armor.RuChest6b43Item
 import com.atsuishio.superbwarfare.item.armor.RuHelmet6b47Item
 import com.atsuishio.superbwarfare.item.armor.UsChestIotvItem
@@ -133,6 +134,7 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun registerOverlays() {
+        GPWSOverlay.register()
         ClientTickEvents.END_CLIENT_TICK.register {
             VehicleTeamOverlay.onVehicleTeamOverlayClientTick()
             VehicleMainWeaponHudOverlay.onVehicleMainWeaponHudOverlayClientTick()
@@ -194,6 +196,7 @@ object ClientRenderHandler {
         RuHelmet6b47Item.registerRenderer()
         UsChestIotvItem.registerRenderer()
         UsHelmetPasgtItem.registerRenderer()
+        HandsomeGogglesItem.registerRenderer()
     }
 
     @JvmStatic

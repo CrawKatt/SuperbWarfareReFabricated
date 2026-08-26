@@ -6,11 +6,11 @@ import net.minecraft.client.particle.*
 import net.minecraft.core.BlockPos
 import net.minecraft.util.Mth
 import net.minecraft.world.level.LightLayer
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.max
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 open class CustomFlareParticle protected constructor(
     world: ClientLevel,
     x: Double,
@@ -36,7 +36,7 @@ open class CustomFlareParticle protected constructor(
     var targetG: Float
     var targetB: Float
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     class Provider(private val spriteSet: SpriteSet) : ParticleProvider<CustomFlareOption> {
         override fun createParticle(
             pType: CustomFlareOption,

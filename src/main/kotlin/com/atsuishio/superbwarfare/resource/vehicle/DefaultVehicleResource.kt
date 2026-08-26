@@ -13,8 +13,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
-import org.mozillaa.javascript.NativeJavaClass
-import org.mozillaa.javascript.ScriptableObject
+import org.mozilla.javascript.NativeJavaClass
+import org.mozilla.javascript.ScriptableObject
 
 @Serializable
 class DefaultVehicleResource : IDBasedData<DefaultVehicleResource> {
@@ -85,7 +85,7 @@ class DefaultVehicleResource : IDBasedData<DefaultVehicleResource> {
             ScriptableObject.putProperty(scope, "Quaterniond", NativeJavaClass(scope, org.joml.Quaterniond::class.java))
             ScriptableObject.putProperty(scope, "Quaternionf", NativeJavaClass(scope, org.joml.Quaternionf::class.java))
 
-            script.exec(VehicleScriptManager.RHINO_CONTEXT, scope, scope)
+            script.exec(VehicleScriptManager.RHINO_CONTEXT, scope)
 
             val func = VehicleScriptManager.ScriptFunction(script, scope)
             scriptCache = func

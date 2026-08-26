@@ -68,13 +68,12 @@ open class CustomExplosion(
     radius, false, blockInteraction
 ) {
     private val damageSource: DamageSource = source ?: level.damageSources().explosion(this)
-    private val damageCalculator: ExplosionDamageCalculator = pDamageCalculator ?: ExplosionDamageCalculator()
+    private val damageCalculator: ExplosionDamageCalculator
 
     private var fireTime = 0
     private var beast = false
 
     init {
-        this.damageSource = source ?: level.damageSources().explosion(this)
         this.damageCalculator = damageCalculator ?: ExplosionDamageCalculator()
     }
 
@@ -493,7 +492,8 @@ open class CustomExplosion(
 
             }
 
-            blockstate.onBlockExploded(this.level, blockpos, this)
+            this.level.setBlock(blockpos, Blocks.AIR.defaultBlockState(), 3)
+            blockstate.block.wasExploded(this.level, blockpos, this)
         }
 
         for (pair in dropList) {

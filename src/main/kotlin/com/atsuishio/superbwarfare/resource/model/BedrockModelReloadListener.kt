@@ -6,6 +6,7 @@ import com.github.mcmodderanchor.simplebedrockmodel.v1.common.resource.GsonUtil
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.resource.pojo.BedrockAnimationFile
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.resource.pojo.BedrockModelPOJO
 import com.google.gson.Gson
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.minecraft.resources.FileToIdConverter
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.ResourceManager
@@ -16,7 +17,10 @@ import net.minecraft.util.profiling.ProfilerFiller
 abstract class BedrockModelReloadListener<T> @JvmOverloads constructor(
     val modelPath: String,
     val animPath: String = ""
-) : SimplePreparableReloadListener<Map<ResourceLocation, BedrockModelPOJO>>() {
+) : SimplePreparableReloadListener<Map<ResourceLocation, BedrockModelPOJO>>(),
+    IdentifiableResourceReloadListener {
+
+    override fun getFabricId(): ResourceLocation = Mod.loc(modelPath.replace('/', '_'))
     val gson: Gson = GsonUtil.CLIENT_GSON
     val models: MutableMap<ResourceLocation, T> = hashMapOf()
     val animFiles: MutableMap<ResourceLocation, BedrockAnimationFile> = hashMapOf()

@@ -38,13 +38,13 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.items.ItemHandlerHelper
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 
 open class MortarEntity(type: EntityType<MortarEntity>, level: Level) : ArtilleryEntity(type, level) {
     private var shooter: LivingEntity? = null
     var intelligent by INTELLIGENT
 
-    constructor(level: Level, yRot: Float) : this(ModEntities.MORTAR.get(), level) {
+    constructor(level: Level, yRot: Float) : this(ModEntities.MORTAR, level) {
         this.yRot = yRot
         this.entityData.set(TARGET_YAW, yRot)
     }
@@ -192,9 +192,9 @@ open class MortarEntity(type: EntityType<MortarEntity>, level: Level) : Artiller
     override fun getRetrieveItems(): MutableList<ItemStack> {
         val list = arrayListOf<ItemStack>()
 
-        list.add(ItemStack(ModItems.MORTAR_DEPLOYER.get()))
+        list.add(ItemStack(ModItems.MORTAR_DEPLOYER))
         if (entityData.get(INTELLIGENT)) {
-            list.add(ItemStack(ModItems.MONITOR.get()))
+            list.add(ItemStack(ModItems.MONITOR))
         }
 
         if (getItems()[0] != ItemStack.EMPTY) {
@@ -260,7 +260,7 @@ open class MortarEntity(type: EntityType<MortarEntity>, level: Level) : Artiller
         var f = 0.98f
         if (this.onGround()) {
             val pos = this.blockPosBelowThatAffectsMyMovement
-            f = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98f
+            f = this.level().getBlockState(pos).block.friction * 0.98f
         }
 
         this.deltaMovement = this.deltaMovement.multiply(f.toDouble(), 0.98, f.toDouble())
@@ -377,11 +377,11 @@ open class MortarEntity(type: EntityType<MortarEntity>, level: Level) : Artiller
             val y = this.y
             val z = this.z
             level.explode(null, x, y, z, 0f, Level.ExplosionInteraction.NONE)
-            val mortar = ItemEntity(level, x, (y + 1), z, ItemStack(ModItems.MORTAR_DEPLOYER.get()))
+            val mortar = ItemEntity(level, x, (y + 1), z, ItemStack(ModItems.MORTAR_DEPLOYER))
             mortar.setPickUpDelay(10)
             level.addFreshEntity(mortar)
             if (entityData.get(INTELLIGENT)) {
-                val monitor = ItemEntity(level, x, (y + 1), z, ItemStack(ModItems.MONITOR.get()))
+                val monitor = ItemEntity(level, x, (y + 1), z, ItemStack(ModItems.MONITOR))
                 monitor.setPickUpDelay(10)
                 level.addFreshEntity(monitor)
             }
@@ -400,7 +400,7 @@ open class MortarEntity(type: EntityType<MortarEntity>, level: Level) : Artiller
     }
 
     override fun getPickResult(): ItemStack? {
-        return ItemStack(ModItems.MORTAR_DEPLOYER.get())
+        return ItemStack(ModItems.MORTAR_DEPLOYER)
     }
 
     override fun canPlaceItem(slot: Int, stack: ItemStack): Boolean {

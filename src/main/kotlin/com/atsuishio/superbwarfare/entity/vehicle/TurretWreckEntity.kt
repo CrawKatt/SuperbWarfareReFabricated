@@ -517,10 +517,4 @@ open class TurretWreckEntity(type: EntityType<TurretWreckEntity>, level: Level) 
         this.deltaMovement = this.deltaMovement.add(pX, pY, pZ)
     }
 
-    override fun onRemovedFromWorld() {
-        super.onRemovedFromWorld()
-        if (level().isClientSide) {
-            VehicleLightingHandler.handleTurretWreckExplosion(this)
-        }
-    }
 }

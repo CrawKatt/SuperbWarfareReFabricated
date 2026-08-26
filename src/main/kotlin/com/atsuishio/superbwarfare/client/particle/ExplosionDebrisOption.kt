@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.client.particle
 
 import com.atsuishio.superbwarfare.init.ModParticleTypes
+import net.minecraft.core.registries.BuiltInRegistries
 import com.atsuishio.superbwarfare.serialization.ByteBufDecoder
 import com.atsuishio.superbwarfare.serialization.ByteBufEncoder
 import com.mojang.brigadier.StringReader
@@ -12,7 +13,6 @@ import kotlinx.serialization.serializer
 import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.core.particles.ParticleType
 import net.minecraft.network.FriendlyByteBuf
-import net.minecraftforge.registries.ForgeRegistries
 import kotlin.math.roundToInt
 
 @Serializable
@@ -52,7 +52,7 @@ class ExplosionDebrisOption(
         get() = (this.color and 255) / 255f
 
     override fun getType(): ParticleType<*> {
-        return ModParticleTypes.EXPLOSION_DEBRIS.get()
+        return ModParticleTypes.EXPLOSION_DEBRIS
     }
 
     override fun writeToNetwork(buffer: FriendlyByteBuf) {
@@ -60,7 +60,7 @@ class ExplosionDebrisOption(
     }
 
     override fun writeToString(): String {
-        return "${ForgeRegistries.PARTICLE_TYPES.getKey(this.type)} [$color, $life, $fade, $size, $animationSpeed, $sizeAdd]"
+        return "${BuiltInRegistries.PARTICLE_TYPE.getKey(this.type)} [$color, $life, $fade, $size, $animationSpeed, $sizeAdd]"
     }
 
     companion object {

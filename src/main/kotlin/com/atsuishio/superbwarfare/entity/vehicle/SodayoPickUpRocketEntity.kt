@@ -75,7 +75,7 @@ open class SodayoPickUpRocketEntity(type: EntityType<SodayoPickUpRocketEntity>, 
                                 vec3.x,
                                 vec3.y,
                                 vec3.z,
-                                ModSounds.TYPE_63_RELOAD.get(),
+                                ModSounds.TYPE_63_RELOAD,
                                 SoundSource.PLAYERS,
                                 1f,
                                 random.nextFloat() * 0.1f + 0.9f
@@ -103,7 +103,7 @@ open class SodayoPickUpRocketEntity(type: EntityType<SodayoPickUpRocketEntity>, 
                         vec3.x,
                         vec3.y,
                         vec3.z,
-                        ModSounds.TYPE_63_RELOAD.get(),
+                        ModSounds.TYPE_63_RELOAD,
                         SoundSource.PLAYERS,
                         1f,
                         random.nextFloat() * 0.1f + 0.9f
@@ -197,7 +197,7 @@ open class SodayoPickUpRocketEntity(type: EntityType<SodayoPickUpRocketEntity>, 
         val shootPos = vector3dToVec3(obb.center)
 
         val entityToSpawn = MediumRocketEntity(
-            ModEntities.MEDIUM_ROCKET.get(),
+            ModEntities.MEDIUM_ROCKET,
             shootPos.x,
             shootPos.y,
             shootPos.z,
@@ -303,7 +303,7 @@ open class SodayoPickUpRocketEntity(type: EntityType<SodayoPickUpRocketEntity>, 
         @JvmField
         val LOADED_AMMO: EntityDataAccessor<List<Int>> = SynchedEntityData.defineId(
             SodayoPickUpRocketEntity::class.java,
-            ModSerializers.INT_LIST_SERIALIZER.get()
+            ModSerializers.INT_LIST_SERIALIZER
         )
     }
 }

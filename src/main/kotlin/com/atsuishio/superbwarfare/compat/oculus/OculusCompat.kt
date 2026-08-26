@@ -3,9 +3,9 @@ package com.atsuishio.superbwarfare.compat.oculus
 import com.atsuishio.superbwarfare.compat.oculus.OculusCompat.getParticleShader
 import com.atsuishio.superbwarfare.compat.oculus.OculusCompat.getParticleTranslucentShader
 import net.minecraft.client.renderer.ShaderInstance
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
-import net.minecraftforge.fml.ModList
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.fabricmc.loader.api.FabricLoader
 
 /**
  * Reflection-based bridge to Oculus/Iris internal and public APIs.
@@ -26,12 +26,12 @@ import net.minecraftforge.fml.ModList
  *   shader-pack-compiled particle programs ([getParticleTranslucentShader],
  *   [getParticleShader]) that replace vanilla core shaders when a pack is active.
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object OculusCompat {
 
     /** True when Oculus or Iris mod id is present in the mod list. */
     val isInstalled: Boolean by lazy {
-        ModList.get().isLoaded("oculus") || ModList.get().isLoaded("iris")
+        FabricLoader.getInstance().isModLoaded("oculus") || FabricLoader.getInstance().isModLoaded("iris")
     }
 
     // -----------------------------------------------------------------------

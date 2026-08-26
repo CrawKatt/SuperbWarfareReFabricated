@@ -79,37 +79,37 @@ object ParticleTool {
     private fun playExplosionSounds(type: ParticleType, level: ServerLevel, pos: Vec3) {
         when (type) {
             ParticleType.MINI -> {
-                level.playSound(null, BlockPos.containing(pos.x, pos.y + 1, pos.z), ModSounds.MINI_EXPLOSION.get(), SoundSource.BLOCKS, 4f, 1f)
+                level.playSound(null, BlockPos.containing(pos.x, pos.y + 1, pos.z), ModSounds.MINI_EXPLOSION, SoundSource.BLOCKS, 4f, 1f)
             }
             ParticleType.SMALL -> {
-                playDistantSound(level, ModSounds.EXPLOSION_CLOSE.get(), pos, 2f, 1f, null)
-                playDistantSound(level, ModSounds.EXPLOSION_FAR.get(), pos, 8f, 1f, null)
-                playDistantSound(level, ModSounds.EXPLOSION_VERY_FAR.get(), pos, 32f, 1f, null)
+                playDistantSound(level, ModSounds.EXPLOSION_CLOSE, pos, 2f, 1f, null)
+                playDistantSound(level, ModSounds.EXPLOSION_FAR, pos, 8f, 1f, null)
+                playDistantSound(level, ModSounds.EXPLOSION_VERY_FAR, pos, 32f, 1f, null)
             }
             ParticleType.MEDIUM -> {
-                playDistantSound(level, ModSounds.EXPLOSION_CLOSE.get(), pos, 4f, 1f, null)
-                playDistantSound(level, ModSounds.EXPLOSION_FAR.get(), pos, 16f, 1f, null)
-                playDistantSound(level, ModSounds.EXPLOSION_VERY_FAR.get(), pos, 32f, 1f, null)
+                playDistantSound(level, ModSounds.EXPLOSION_CLOSE, pos, 4f, 1f, null)
+                playDistantSound(level, ModSounds.EXPLOSION_FAR, pos, 16f, 1f, null)
+                playDistantSound(level, ModSounds.EXPLOSION_VERY_FAR, pos, 32f, 1f, null)
             }
             ParticleType.LARGE -> {
-                playDistantSound(level, ModSounds.HUGE_EXPLOSION_CLOSE.get(), pos, 6f, 1f, null)
-                playDistantSound(level, ModSounds.HUGE_EXPLOSION_FAR.get(), pos, 20f, 1f, null)
-                playDistantSound(level, ModSounds.HUGE_EXPLOSION_VERY_FAR.get(), pos, 64f, 1f, null)
+                playDistantSound(level, ModSounds.HUGE_EXPLOSION_CLOSE, pos, 6f, 1f, null)
+                playDistantSound(level, ModSounds.HUGE_EXPLOSION_FAR, pos, 20f, 1f, null)
+                playDistantSound(level, ModSounds.HUGE_EXPLOSION_VERY_FAR, pos, 64f, 1f, null)
             }
             ParticleType.HUGE -> {
-                playDistantSound(level, ModSounds.HUGE_EXPLOSION_CLOSE.get(), pos, 8f, 1f, null)
-                playDistantSound(level, ModSounds.HUGE_EXPLOSION_FAR.get(), pos, 24f, 1f, null)
-                playDistantSound(level, ModSounds.HUGE_EXPLOSION_VERY_FAR.get(), pos, 128f, 1f, null)
+                playDistantSound(level, ModSounds.HUGE_EXPLOSION_CLOSE, pos, 8f, 1f, null)
+                playDistantSound(level, ModSounds.HUGE_EXPLOSION_FAR, pos, 24f, 1f, null)
+                playDistantSound(level, ModSounds.HUGE_EXPLOSION_VERY_FAR, pos, 128f, 1f, null)
             }
             ParticleType.GIANT -> {
-                playDistantSound(level, ModSounds.HUGE_EXPLOSION_CLOSE.get(), pos, 12f, 1f, null)
-                playDistantSound(level, ModSounds.HUGE_EXPLOSION_FAR.get(), pos, 32f, 1f, null)
-                playDistantSound(level, ModSounds.HUGE_EXPLOSION_VERY_FAR.get(), pos, 192f, 1f, null)
+                playDistantSound(level, ModSounds.HUGE_EXPLOSION_CLOSE, pos, 12f, 1f, null)
+                playDistantSound(level, ModSounds.HUGE_EXPLOSION_FAR, pos, 32f, 1f, null)
+                playDistantSound(level, ModSounds.HUGE_EXPLOSION_VERY_FAR, pos, 192f, 1f, null)
             }
             ParticleType.EPIC -> {
-                playDistantSound(level, ModSounds.EPIC_EXPLOSION_CLOSE.get(), pos, 24f, 1f, null)
-                playDistantSound(level, ModSounds.EPIC_EXPLOSION_FAR.get(), pos, 38f, 1f, null)
-                playDistantSound(level, ModSounds.EPIC_EXPLOSION_VERY_FAR.get(), pos, 132f, 1f, null)
+                playDistantSound(level, ModSounds.EPIC_EXPLOSION_CLOSE, pos, 24f, 1f, null)
+                playDistantSound(level, ModSounds.EPIC_EXPLOSION_FAR, pos, 38f, 1f, null)
+                playDistantSound(level, ModSounds.EPIC_EXPLOSION_VERY_FAR, pos, 132f, 1f, null)
             }
         }
     }
@@ -201,7 +201,7 @@ object ParticleTool {
         sendParticleClient(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y, z, 2, 0.1, 0.1, 0.1, 0.02)
         sendParticleClient(level, ParticleTypes.EXPLOSION, x, y, z, 2, 0.05, 0.05, 0.05, 1.0)
         sendParticleClient(level, ParticleTypes.LARGE_SMOKE, x, y, z, 1, 0.2, 0.2, 0.2, 0.02)
-        sendParticleClient(level, ModParticleTypes.FIRE_STAR.get(), x, y, z, 7, 0.0, 0.0, 0.0, 0.4)
+        sendParticleClient(level, ModParticleTypes.FIRE_STAR, x, y, z, 7, 0.0, 0.0, 0.0, 0.4)
         sendParticleClient(level, ParticleTypes.FLASH, x, y, z, 1, 0.0, 0.0, 0.0, 20.0)
     }
 
@@ -210,7 +210,7 @@ object ParticleTool {
         sendParticleClient(level, ParticleTypes.EXPLOSION, x, y, z, 2, 0.05, 0.05, 0.05, 1.0)
         sendParticleClient(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y, z, 3, 0.1, 0.1, 0.1, 0.02)
         sendParticleClient(level, ParticleTypes.LARGE_SMOKE, x, y, z, 4, 0.2, 0.2, 0.2, 0.02)
-        sendParticleClient(level, ModParticleTypes.FIRE_STAR.get(), x, y, z, 8, 0.0, 0.0, 0.0, 0.6)
+        sendParticleClient(level, ModParticleTypes.FIRE_STAR, x, y, z, 8, 0.0, 0.0, 0.0, 0.6)
         sendParticleClient(level, CustomFlareOption(1f, 1f, 1f, 10, 0.25f, 1, 0.2f, size = 4f), x, y, z, 1, 0.0, 0.0, 0.0, 0.005)
     }
 
@@ -219,7 +219,7 @@ object ParticleTool {
         sendParticleClient(level, ParticleTypes.EXPLOSION, x, y + 1, z, 4, 1.0, 1.0, 1.0, 1.0)
         sendParticleClient(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y + 1, z, 3, 0.2, 1.0, 0.2, 0.02)
         sendParticleClient(level, ParticleTypes.LARGE_SMOKE, x, y + 1, z, 6, 0.8, 1.0, 0.8, 0.02)
-        sendParticleClient(level, ModParticleTypes.FIRE_STAR.get(), x, y + 0.2, z, 8, 0.0, 0.0, 0.0, 0.8)
+        sendParticleClient(level, ModParticleTypes.FIRE_STAR, x, y + 0.2, z, 8, 0.0, 0.0, 0.0, 0.8)
 
         sendParticleClient(level, CustomFlareOption(1f, 1f, 1f, 10, 0.25f, 1, 0.2f, size = 6f), x, y, z, 1, 0.0, 0.0, 0.0, 0.005)
         sendParticleClient(level, CustomFlareOption(1f, 0.9f, 0.8f, 10, 0.25f, 1, 0.4f, size = 8f), x, y, z, 1, 0.0, 0.0, 0.0, 0.005)
@@ -235,7 +235,7 @@ object ParticleTool {
         val x = pos.x; val y = pos.y; val z = pos.z
         sendParticleClient(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y + 1, z, 10, 0.5, 2.0, 0.5, 0.02)
         sendParticleClient(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y + 0.25, z, 20, 5.0, 0.001, 5.0, 0.01)
-        sendParticleClient(level, ModParticleTypes.FIRE_STAR.get(), x, y + 0.2, z, 20, 0.0, 0.0, 0.0, 1.2)
+        sendParticleClient(level, ModParticleTypes.FIRE_STAR, x, y + 0.2, z, 20, 0.0, 0.0, 0.0, 1.2)
         sendParticleClient(level, ParticleTypes.EXPLOSION, x, y + 1, z, 10, 1.5, 1.5, 1.5, 1.0)
 
         sendParticleClient(level, CustomFlareOption(1f, 1f, 1f, 10, 0.25f, 1, 0.3f, size = 8f), x, y, z, 1, 0.0, 0.0, 0.0, 0.005)
@@ -267,7 +267,7 @@ object ParticleTool {
 
         sendParticleClient(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y + 1, z, 10, 0.75, 2.2, 0.75, 0.02)
         sendParticleClient(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y + 0.25, z, 10, 8.0, 0.001, 8.0, 0.01)
-        sendParticleClient(level, ModParticleTypes.FIRE_STAR.get(), x, y + 0.2, z, 40, 0.0, 0.0, 0.0, 1.2)
+        sendParticleClient(level, ModParticleTypes.FIRE_STAR, x, y + 0.2, z, 40, 0.0, 0.0, 0.0, 1.2)
         sendParticleClient(level, ParticleTypes.EXPLOSION, x, y + 1, z, 10, 2.5, 2.5, 2.5, 1.0)
 
         // 冲击波
@@ -309,7 +309,7 @@ object ParticleTool {
 
         sendParticleClient(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y + 1, z, 20, 0.75, 2.2, 0.75, 0.02)
         sendParticleClient(level, ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y + 0.25, z, 20, 12.0, 0.001, 12.0, 0.01)
-        sendParticleClient(level, ModParticleTypes.FIRE_STAR.get(), x, y + 0.2, z, 100, 0.0, 0.0, 0.0, 2.0)
+        sendParticleClient(level, ModParticleTypes.FIRE_STAR, x, y + 0.2, z, 100, 0.0, 0.0, 0.0, 2.0)
         sendParticleClient(level, ParticleTypes.EXPLOSION, x, y + 1, z, 30, 5.0, 5.0, 5.0, 1.0)
 
         // 冲击波
@@ -421,7 +421,7 @@ object ParticleTool {
     fun cannonHitParticles(serverLevel: ServerLevel, pos: Vec3) {
         sendParticle(serverLevel, ParticleTypes.EXPLOSION, pos.x, pos.y, pos.z, 2, 0.5, 0.5, 0.5, 1.0, true)
         sendParticle(serverLevel, ParticleTypes.FLASH, pos.x, pos.y, pos.z, 2, 0.2, 0.2, 0.2, 10.0, true)
-        sendParticle(serverLevel, ModParticleTypes.FIRE_STAR.get(), pos.x, pos.y, pos.z, 15, 0.0, 0.0, 0.0, 1.5, true)
+        sendParticle(serverLevel, ModParticleTypes.FIRE_STAR, pos.x, pos.y, pos.z, 15, 0.0, 0.0, 0.0, 1.5, true)
     }
 
     @JvmStatic
@@ -582,7 +582,7 @@ object ParticleTool {
     fun spawnBarrelSmoke(count: Int, level: ServerLevel, v0: Vec3, pos: Vec3) {
         repeat(count) {
             sendParticle(
-                level, ModParticleTypes.RISING_SMOKE.get(), pos.x, pos.y, pos.z,
+                level, ModParticleTypes.RISING_SMOKE, pos.x, pos.y, pos.z,
                 0, v0.x, v0.y, v0.z, 0.22, true
             )
         }

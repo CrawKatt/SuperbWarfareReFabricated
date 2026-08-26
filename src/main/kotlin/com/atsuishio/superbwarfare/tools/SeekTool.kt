@@ -18,7 +18,6 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.entity.EntityTypeTest
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.common.util.TriPredicate
 import java.util.function.BiPredicate
 import java.util.function.Predicate
 
@@ -148,7 +147,7 @@ object SeekTool {
         if (self !is Player || target == null) return@BiPredicate false
         val stack = self.mainHandItem
         var myDrone: DroneEntity? = null
-        if (stack.`is`(ModItems.MONITOR.get()) &&
+        if (stack.`is`(ModItems.MONITOR) &&
             stack.orCreateTag.getBoolean("Using") &&
             stack.orCreateTag.getBoolean("Linked")
         ) {

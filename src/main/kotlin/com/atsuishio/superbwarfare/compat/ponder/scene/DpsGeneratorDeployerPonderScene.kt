@@ -28,7 +28,7 @@ object DpsGeneratorDeployerPonderScene {
         val centerPos = util.grid().at(2, 0, 2)
         val pos = util.vector().topOf(centerPos)
         val entity = scene.world().createEntity {
-            val target = ModEntities.DPS_GENERATOR.get().create(it) ?: return@createEntity null
+            val target = ModEntities.DPS_GENERATOR.create(it) ?: return@createEntity null
             target.setPosRaw(pos.x, pos.y, pos.z)
             target.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3(pos.x, pos.y, pos.z - 1))
             target.xRot = 0f

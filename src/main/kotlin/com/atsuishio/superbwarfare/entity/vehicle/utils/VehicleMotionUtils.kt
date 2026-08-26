@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.vehicle.utils
 
+import com.atsuishio.superbwarfare.tools.persistentData
 import com.atsuishio.superbwarfare.client.particle.CustomCloudOption
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineInfo
@@ -639,7 +640,7 @@ object VehicleMotionUtils {
         // 若离地超过阈值则认为悬空，不处理地形贴合
         val heightAboveGround = (vehicle.y + collisionInfo.position.y - collisionInfo.size.y) - groundY
         if (heightAboveGround > maxHalfExtent) {
-            if (vehicle.isInFluidType) {
+            if (VectorTool.isInLiquid(vehicle.level(), vehicle.position())) {
                 vehicle.xRot *= 0.9f; vehicle.setZRot(vehicle.roll * 0.9f)
             }
             return
@@ -697,7 +698,7 @@ object VehicleMotionUtils {
 
         // 容差/坑洞参数（单位：方块）
         val embedTolerance = 0.25    // 横向嵌入容差：地面与OBB底相差不超过此值视为贴合，不产生倾角
-        val searchUp = vehicle.stepHeight.toDouble()           // 上坡探测上限：检测高出OBB底的地形（爬坡），同时限制最大抬头幅度
+        val searchUp = vehicle.maxUpStep().toDouble()           // 上坡探测上限：检测高出OBB底的地形（爬坡），同时限制最大抬头幅度
         val searchDown = maxHalfExtent         // 下坡/坑洞探测下限：检测低于OBB底的地形，同时限制最大低头幅度
         val potholeDepth = 0.6       // 采样列地面低于OBB底超过此值视为"坑"
         val potholeIgnoreRatio = 0.4 // 坑采样占比不超过此值时忽略其影响（保持水平，不栽进小坑）
@@ -811,7 +812,7 @@ object VehicleMotionUtils {
                         && state.`is`(BlockTags.MINEABLE_WITH_PICKAXE)
                     )
                         vehicle.addRandomParticle(
-                            ModParticleTypes.FIRE_STAR.get(),
+                            ModParticleTypes.FIRE_STAR,
                             p.add(0.0, 0.1, 0.0),
                             0.25f,
                             level,
@@ -1221,7 +1222,7 @@ object VehicleMotionUtils {
         }
         val searchBox = AABB(sMinX, sMinY, sMinZ, sMaxX, sMaxY, sMaxZ)
             .inflate(0.5)
-            .expandTowards(0.0, vehicle.stepHeight.toDouble() + 0.5, 0.0)
+            .expandTowards(0.0, vehicle.maxUpStep().toDouble() + 0.5, 0.0)
 
         // Collect candidate AABBs
         //

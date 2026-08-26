@@ -13,14 +13,21 @@ import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.client.event.RenderLevelStageEvent
-import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.common.Mod
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import org.joml.Matrix4f
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, value = [Dist.CLIENT])
+@Environment(EnvType.CLIENT)
 object TowingChainRenderer {
+
+    @JvmStatic
+    fun register() {
+        WorldRenderEvents.AFTER_ENTITIES.register { context ->
+            onRenderLevelStage(context)
+        }
+    }
 
     // Length of each chain link in blocks
     private const val LINK_LENGTH = 0.5f
@@ -58,15 +65,12 @@ object TowingChainRenderer {
         renderChain(b2, pose, fromPos, toPos, 1)
     }
 
-    @SubscribeEvent
-    fun onRenderLevelStage(event: RenderLevelStageEvent) {
-        if (event.stage != RenderLevelStageEvent.Stage.AFTER_ENTITIES) return
-
+    private fun onRenderLevelStage(event: WorldRenderContext) {
         val level = clientLevel ?: return
-        val camera = event.camera
-        val poseStack = event.poseStack
+        val camera = event.camera()
+        val poseStack = event.matrixStack()
         val bufferSource = mc.renderBuffers().bufferSource()
-        val partialTick = event.partialTick
+        val partialTick = event.tickDelta()
 
         poseStack.pushPose()
 

@@ -14,7 +14,7 @@ import com.atsuishio.superbwarfare.tools.VectorTool.combineRotationsTurret
 import com.atsuishio.superbwarfare.tools.plus
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.registries.ForgeRegistries
+import net.minecraft.core.registries.BuiltInRegistries
 
 /**
  * 处理载具销毁、爆炸等方法的工具类
@@ -41,7 +41,7 @@ object VehicleDestroyUtils {
 
         if (vehicle.hasTurret() && destroyInfo.sympatheticDetonation && Math.random() < destroyInfo.sympatheticDetonationChance) {
             vehicle.sympatheticDetonated = true
-            val turretWreckEntity = TurretWreckEntity(ModEntities.TURRET_WRECK.get(), vehicle.level())
+            val turretWreckEntity = TurretWreckEntity(ModEntities.TURRET_WRECK, vehicle.level())
             if (vehicle.turretPos != null) {
                 val pos = vehicle.turretPos?.let { vehicle.position().add(it) }
                 pos?.let { turretWreckEntity.setPos(it.x, it.y, it.z) }
@@ -59,7 +59,7 @@ object VehicleDestroyUtils {
             ).scale(destroyInfo.sympatheticDetonationForce.toDouble() * rdm)
 
             val quaternion = combineRotationsTurret(1f, vehicle)
-            turretWreckEntity.vehicleName = ForgeRegistries.ENTITY_TYPES.getKey(vehicle.type).toString()
+            turretWreckEntity.vehicleName = BuiltInRegistries.ENTITY_TYPE.getKey(vehicle.type).toString()
             turretWreckEntity.xRot = vehicle.getTurretPitch(1f)
             turretWreckEntity.yRot = -getYRotFromVector(vehicle.getBarrelVector(1f)).toFloat()
             turretWreckEntity.setQuaternion0(quaternion)

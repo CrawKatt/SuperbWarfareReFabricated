@@ -6,6 +6,9 @@ import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModKeyMappings
 import com.atsuishio.superbwarfare.network.message.receive.OpenTacticalMapScreenMessage
 import com.atsuishio.superbwarfare.tools.sendPacket
+import dev.emi.trinkets.api.SlotReference
+import dev.emi.trinkets.api.Trinket
+import dev.emi.trinkets.api.TrinketsApi
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.world.InteractionHand
@@ -17,15 +20,12 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Rarity
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
-import top.theillusivec4.curios.api.CuriosApi
-import top.theillusivec4.curios.api.SlotContext
-import top.theillusivec4.curios.api.type.capability.ICurioItem
 
-open class TacticalTerminalItem : Item(Properties().stacksTo(1).rarity(Rarity.UNCOMMON)), ICurioItem {
-    override fun canEquip(slotContext: SlotContext, stack: ItemStack?): Boolean {
-        return CuriosApi.getCuriosInventory(slotContext.entity)
-            .map { it.findFirstCurio(this).isEmpty }
-            .orElseGet { false }
+open class TacticalTerminalItem : Item(Properties().stacksTo(1).rarity(Rarity.UNCOMMON)), Trinket {
+    override fun canEquip(stack: ItemStack, slot: SlotReference, entity: LivingEntity): Boolean {
+        return TrinketsApi.getTrinketComponent(entity)
+            .map { !it.isEquipped(this) }
+            .orElse(false)
     }
 
     override fun appendHoverText(
@@ -43,7 +43,7 @@ open class TacticalTerminalItem : Item(Properties().stacksTo(1).rarity(Rarity.UN
         tooltip.add(
             Component.translatable(
                 "des.superbwarfare.tactical_terminal",
-                Component.literal("[${ModKeyMappings.TOGGLE_TACTICAL_MAP.key.displayName.string}]")
+                Component.literal("[${ModKeyMappings.TOGGLE_TACTICAL_MAP.getTranslatedKeyMessage().string}]")
                     .withStyle(ChatFormatting.AQUA)
             ).withStyle(ChatFormatting.GRAY)
         )
@@ -69,9 +69,10 @@ open class TacticalTerminalItem : Item(Properties().stacksTo(1).rarity(Rarity.UN
     companion object {
         @JvmStatic
         fun isTerminalEquipped(entity: LivingEntity?): Boolean {
-            return CuriosApi.getCuriosInventory(entity)
-                .map { !it.findFirstCurio(ModItems.TACTICAL_TERMINAL.get()).isEmpty }
-                .orElseGet { false }
+            if (entity == null) return false
+            return TrinketsApi.getTrinketComponent(entity)
+                .map { it.isEquipped(ModItems.TACTICAL_TERMINAL) }
+                .orElse(false)
         }
     }
 }

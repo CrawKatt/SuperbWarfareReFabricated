@@ -3,6 +3,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.init.ModKeyMappings;
 import com.atsuishio.superbwarfare.event.custom.InteractionKeyMappingTriggeredCallback;
 import com.atsuishio.superbwarfare.event.custom.ScreenOpeningCallback;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;

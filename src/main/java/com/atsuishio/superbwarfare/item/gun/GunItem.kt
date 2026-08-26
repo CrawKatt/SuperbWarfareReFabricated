@@ -180,12 +180,6 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         data.tick(entity, inMainHand)
     }
 
-    override fun onDroppedByPlayer(stack: ItemStack, player: Player): Boolean {
-        player.inventory.removeItem(stack)
-        player.drop(stack, true)
-        return false
-    }
-
     override fun shouldCauseReequipAnimation(oldStack: ItemStack, newStack: ItemStack, slotChanged: Boolean) = false
 
     override fun getAttributeModifiers(

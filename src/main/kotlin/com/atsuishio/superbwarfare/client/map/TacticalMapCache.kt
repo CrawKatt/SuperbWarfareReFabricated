@@ -14,8 +14,8 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.chunk.LevelChunk
 import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.level.material.MapColor
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -34,7 +34,7 @@ import java.util.zip.Inflater
  *   路径: `<gameDir>/superbwarfare/tactical_map_cache/<worldId>/<dim>/`，
  *   每个存档独立缓存，单人/多人均可用。
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object TacticalMapCache {
     const val TILE_SIZE = 256
     private const val TILE_SIZE_BITS = 8

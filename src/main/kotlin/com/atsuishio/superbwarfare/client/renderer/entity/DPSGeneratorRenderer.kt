@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.client.renderer.renderSingleBonePass
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory

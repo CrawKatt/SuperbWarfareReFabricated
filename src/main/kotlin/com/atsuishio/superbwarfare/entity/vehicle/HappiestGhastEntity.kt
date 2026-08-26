@@ -33,11 +33,11 @@ open class HappiestGhastEntity(type: EntityType<HappiestGhastEntity>, world: Lev
             if (doorOpen && !wasOpen) {
                 ctx.playAnimation("animation.door.open", AnimationPlayType.LOOP,
                     fadeInTicks = 40)
-                level().playLocalSound(boundingBox.center.toBlockPos(), ModSounds.HAPPIEST_GHAST_DOOR_OPEN.get(), SoundSource.AMBIENT, 1F, 1F, false)
+                level().playLocalSound(boundingBox.center.toBlockPos(), ModSounds.HAPPIEST_GHAST_DOOR_OPEN, SoundSource.AMBIENT, 1F, 1F, false)
             } else if (!doorOpen && wasOpen) {
                 ctx.stopAnimation("animation.door.open",
                     fadeOutTicks = 30)
-                level().playLocalSound(boundingBox.center.toBlockPos(), ModSounds.HAPPIEST_GHAST_DOOR_CLOSE.get(), SoundSource.AMBIENT, 1F, 1F, false)
+                level().playLocalSound(boundingBox.center.toBlockPos(), ModSounds.HAPPIEST_GHAST_DOOR_CLOSE, SoundSource.AMBIENT, 1F, 1F, false)
             }
             wasOpen = doorOpen
         }

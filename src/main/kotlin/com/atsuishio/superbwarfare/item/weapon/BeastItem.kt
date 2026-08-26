@@ -76,7 +76,6 @@ open class BeastItem : SwordItem(
             return false
         }
 
-        @JvmStatic
         fun onLeftClickEntity(stack: ItemStack, player: Player, entity: Entity): Boolean {
             beastKill(player, entity)
             return false

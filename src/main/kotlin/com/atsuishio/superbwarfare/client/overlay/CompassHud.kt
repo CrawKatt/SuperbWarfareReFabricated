@@ -6,15 +6,15 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.mojang.math.Axis
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.resources.ResourceLocation
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
 /**
  * 载具指南针HUD组件
  * 表盘（base）随载具yRot转动，指针（needle）固定不动指向正北
  * 可在任意HUD中引用，通过 [x]、[y]、[size] 自由调节位置和大小
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 class CompassHud {
     companion object {
         val DEFAULT_BASE: ResourceLocation = loc("textures/overlay/vehicle/common/compass_base.png")

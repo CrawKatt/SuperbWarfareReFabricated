@@ -39,12 +39,12 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.vehicle.Boat
 import net.minecraft.world.level.chunk.LevelChunk
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import java.util.*
 import kotlin.math.atan2
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 class TacticalMapScreen : Screen(Component.translatable("container.superbwarfare.tactical_map")) {
 
     override fun removed() {

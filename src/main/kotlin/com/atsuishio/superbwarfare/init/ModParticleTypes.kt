@@ -13,7 +13,6 @@ object ModParticleTypes {
     val FIRE_STAR: SimpleParticleType = registerSimpleParticle("fire_star")
 
     @JvmField
-    @JvmField
     val EXPLOSION_DEBRIS: ParticleType<ExplosionDebrisOption> = Registration.particle(
         "explosion_debris",
     ) { createOptions(ExplosionDebrisOption.CODEC, true, ExplosionDebrisOption.DESERIALIZER) }
@@ -24,7 +23,6 @@ object ModParticleTypes {
     @JvmField
     val RISING_SMOKE: SimpleParticleType = registerSimpleParticle("rising_smoke")
 
-    @JvmField
     @JvmField
     val BULLET_DECAL: ParticleType<BulletDecalOption> = Registration.particle(
         "bullet_decal",

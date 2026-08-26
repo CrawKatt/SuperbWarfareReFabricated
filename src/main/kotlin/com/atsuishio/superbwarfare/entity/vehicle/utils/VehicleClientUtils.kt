@@ -14,8 +14,8 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
 /**
  * 处理载具客户端专用方法的工具类
@@ -32,7 +32,7 @@ object VehicleClientUtils {
      * @param isFirstPerson 是否是第一人称视角
      * @return 视角旋转角度，如果不需要自定义视角则返回null
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @JvmStatic
     fun getCameraRotation(
         vehicle: VehicleEntity,
@@ -94,7 +94,7 @@ object VehicleClientUtils {
      * @param isFirstPerson 是否是第一人称视角
      * @return 视角位置，如果不需要自定义视角则返回null
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @JvmStatic
     fun getCameraPosition(
         vehicle: VehicleEntity,
@@ -142,7 +142,7 @@ object VehicleClientUtils {
      * @param entity  乘客实体
      * @return 是否使用固定视角
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @JvmStatic
     fun useFixedCameraPos(vehicle: VehicleEntity, entity: Entity?): Boolean {
         val index = vehicle.getSeatIndex(entity)
@@ -154,7 +154,7 @@ object VehicleClientUtils {
     /**
      * 客户端第一人称弹药HUD组件
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @JvmStatic
     fun firstPersonAmmoComponent(vehicle: VehicleEntity, data: GunData, player: Player?): Component {
         val name = data.get(GunProp.NAME)
@@ -167,7 +167,7 @@ object VehicleClientUtils {
     /**
      * 客户端第三人称弹药HUD组件
      */
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     @JvmStatic
     fun thirdPersonAmmoComponent(vehicle: VehicleEntity, data: GunData, player: Player?): Component {
         return firstPersonAmmoComponent(vehicle, data, player)

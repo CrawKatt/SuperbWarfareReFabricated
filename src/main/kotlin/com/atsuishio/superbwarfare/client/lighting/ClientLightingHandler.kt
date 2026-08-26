@@ -1,12 +1,18 @@
 package com.atsuishio.superbwarfare.client.lighting
 
+import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.projectile.IBulletProperties
+import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity
+import com.atsuishio.superbwarfare.entity.vehicle.TurretWreckEntity
+import com.atsuishio.superbwarfare.client.lighting.VehicleLightingHandler
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.projectile.Projectile
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
 /**
  * Client-side bridge that routes projectile lifecycle events to the lighting system.
@@ -17,8 +23,25 @@ import net.minecraftforge.api.distmarker.OnlyIn
  * @author paralax034
  * @since 0.8.9.1
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object ClientLightingHandler {
+
+    @JvmStatic
+    fun register() {
+        ClientEntityEvents.ENTITY_LOAD.register { entity, world ->
+            if (world is ClientLevel && (entity is ProjectileEntity || entity is FastThrowableProjectile)) {
+                handleProjectileAdded(entity)
+            }
+        }
+        ClientEntityEvents.ENTITY_UNLOAD.register { entity, world ->
+            if (world is ClientLevel) {
+                when (entity) {
+                    is TurretWreckEntity -> VehicleLightingHandler.handleTurretWreckExplosion(entity)
+                    is ProjectileEntity, is FastThrowableProjectile -> handleProjectileRemoved(entity)
+                }
+            }
+        }
+    }
 
     /**
      * Called every client tick from {@code ProjectileEntity} and

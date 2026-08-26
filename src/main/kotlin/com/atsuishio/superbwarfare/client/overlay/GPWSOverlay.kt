@@ -14,11 +14,9 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.phys.HitResult
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
-import net.minecraftforge.event.TickEvent
-import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.common.Mod
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import kotlin.math.max
 
 /**
@@ -28,8 +26,7 @@ import kotlin.math.max
  * 并预留对应警告的音效接口。
  * 警告触发条件针对MC短视距特点进行了合理调整。
  */
-@OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object GPWSOverlay : CommonOverlay("gpws") {
 
     /** 起飞后警告抑制时间 (tick) */
@@ -75,9 +72,11 @@ object GPWSOverlay : CommonOverlay("gpws") {
     // 前方碰撞距离缓存（供渲染使用）
     private var forwardCollisionDistance = -1.0
 
-    @SubscribeEvent
-    fun onClientTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase == TickEvent.Phase.START) return
+    fun register() {
+        ClientTickEvents.END_CLIENT_TICK.register { _ -> onClientTick() }
+    }
+
+    private fun onClientTick() {
         blinkTick++
 
         val player = localPlayer ?: return
@@ -418,32 +417,32 @@ object GPWSOverlay : CommonOverlay("gpws") {
 
     /** PULL UP 警告音效 — 最紧急 */
     private fun playPullUpSound(player: Player) {
-         player.playSound(ModSounds.GPWS_PULL_UP.get(), 2.0f, 1.0f)
+         player.playSound(ModSounds.GPWS_PULL_UP, 2.0f, 1.0f)
     }
 
     /** SINK RATE 警告音效 — 下降率过高 */
     private fun playSinkRateSound(player: Player) {
-         player.playSound(ModSounds.GPWS_SINK_RATE.get(), 2.0f, 1.0f)
+         player.playSound(ModSounds.GPWS_SINK_RATE, 2.0f, 1.0f)
     }
 
     /** TERRAIN AHEAD 警告音效 — 前方地形 */
     private fun playTerrainAheadSound(player: Player) {
-         player.playSound(ModSounds.GPWS_TERRAIN_AHEAD.get(), 2.0f, 1.0f)
+         player.playSound(ModSounds.GPWS_TERRAIN_AHEAD, 2.0f, 1.0f)
     }
 
     /** TERRAIN 地形警告音效 */
     private fun playTerrainSound(player: Player) {
-         player.playSound(ModSounds.GPWS_TERRAIN.get(), 2.0f, 1.0f)
+         player.playSound(ModSounds.GPWS_TERRAIN, 2.0f, 1.0f)
     }
 
     /** TOO LOW GEAR 起落架警告音效 */
     private fun playTooLowGearSound(player: Player) {
-         player.playSound(ModSounds.GPWS_TOO_LOW_GEAR.get(), 2.0f, 1.0f)
+         player.playSound(ModSounds.GPWS_TOO_LOW_GEAR, 2.0f, 1.0f)
     }
 
     /** TOO LOW TERRAIN 过低警告音效 */
     private fun playTooLowTerrainSound(player: Player) {
-         player.playSound(ModSounds.GPWS_TOO_LOW_TERRAIN.get(), 2.0f, 1.0f)
+         player.playSound(ModSounds.GPWS_TOO_LOW_TERRAIN, 2.0f, 1.0f)
     }
 
     private fun resetState() {

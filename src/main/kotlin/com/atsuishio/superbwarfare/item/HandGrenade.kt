@@ -7,6 +7,8 @@ import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.mc
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.BlockSource
 import net.minecraft.core.Position
@@ -25,15 +27,22 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Rarity
 import net.minecraft.world.item.UseAnim
 import net.minecraft.world.level.Level
-import net.minecraftforge.client.extensions.common.IClientItemExtensions
+import software.bernie.geckolib.animatable.GeoItem
+import software.bernie.geckolib.animatable.client.RenderProvider
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
+import software.bernie.geckolib.core.animation.AnimatableManager
+import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.function.Consumer
+import java.util.function.Supplier
 import kotlin.math.min
 
-open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLaunchable {
+open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLaunchable, GeoItem {
+    private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
+    private val renderProvider: Supplier<Any> = GeoItem.makeRenderer(this)
 
-    override fun initializeClient(consumer: Consumer<IClientItemExtensions?>) {
-        super.initializeClient(consumer)
-        consumer.accept(object : IClientItemExtensions {
+    @Environment(EnvType.CLIENT)
+    override fun createRenderer(consumer: Consumer<Any>) {
+        consumer.accept(object : RenderProvider {
             private var renderer: BlockEntityWithoutLevelRenderer? = null
 
             override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
@@ -44,6 +53,13 @@ open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLa
             }
         })
     }
+
+    override fun getRenderProvider(): Supplier<Any> = renderProvider
+
+    override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {}
+
+    override fun getAnimatableInstanceCache(): AnimatableInstanceCache = this.cache
+
     override fun use(worldIn: Level, playerIn: Player, handIn: InteractionHand): InteractionResultHolder<ItemStack> {
         val stack = playerIn.getItemInHand(handIn)
         playerIn.startUsingItem(handIn)

@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.ItemStack
-import net.minecraftforge.registries.ForgeRegistries
+import net.minecraft.core.registries.BuiltInRegistries
 import kotlin.random.Random
 
 /**
@@ -64,7 +64,7 @@ object VehicleLootUtils {
 
                     if (random > chance) return@forEach
                     val name = entry.name
-                    val item = ForgeRegistries.ITEMS.getValue(ResourceLocation(name)) ?: return@forEach
+                    val item = BuiltInRegistries.ITEM[ResourceLocation(name)] ?: return@forEach
                     val count = entry.count
                     val entity = ItemEntity(vehicle.level(), vehicle.x, (vehicle.y + 1), vehicle.z, ItemStack(item, count))
                     entity.setPickUpDelay(10)

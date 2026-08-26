@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.misc
 
+import com.atsuishio.superbwarfare.tools.persistentData
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
@@ -14,6 +15,7 @@ import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
@@ -26,7 +28,6 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import net.minecraftforge.network.NetworkHooks
 import kotlin.math.max
 
 open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, world: Level) : Entity(type, world) {
@@ -34,10 +35,10 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
     open val modelInstance = EntityModelReloadListener.getModel(MODEL)?.createInstance()
 
     override fun getAddEntityPacket(): Packet<ClientGamePacketListener> {
-        return NetworkHooks.getEntitySpawningPacket(this)
+        return ClientboundAddEntityPacket(this)
     }
 
-    constructor(level: Level) : this(ModEntities.CATAPULT_SHUTTLE.get(), level)
+    constructor(level: Level) : this(ModEntities.CATAPULT_SHUTTLE, level)
 
     override fun canCollideWith(entity: Entity): Boolean {
         return entity is CatapultShuttleEntity
@@ -53,7 +54,7 @@ open class CatapultShuttleEntity(type: EntityType<out CatapultShuttleEntity>, wo
                 clearTowingInfo()
                 this.discard()
 
-                val stack = ItemStack(ModItems.CATAPULT_SHUTTLE.get())
+                val stack = ItemStack(ModItems.CATAPULT_SHUTTLE)
                 if (!player.inventory.add(stack)) {
                     val itemEntity = ItemEntity(level(), x, y, z, stack)
                     level().addFreshEntity(itemEntity)

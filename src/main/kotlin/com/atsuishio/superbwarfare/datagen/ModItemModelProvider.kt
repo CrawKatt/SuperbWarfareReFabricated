@@ -83,8 +83,10 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         gunItem(ModItems.SUPER_STAR_SHOOTER)
 
         simpleItem(ModItems.VEHICLE_GUN)
-        withExistingParent(ModItems.EMPTY_GUN.id.path, ResourceLocation("item/generated"))
-            .texture("layer0", loc("item/vehicle_gun"))
+        addModel(
+            loc("item/" + itemPath(ModItems.EMPTY_GUN)),
+            model(ResourceLocation("item/generated"), mapOf("layer0" to loc("item/vehicle_gun")))
+        )
         simpleItem(ModItems.MORTAR_SHELL)
         simpleItem(ModItems.LARGE_SHELL_AP)
         simpleItem(ModItems.LARGE_SHELL_HE)

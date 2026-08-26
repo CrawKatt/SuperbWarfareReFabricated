@@ -3,10 +3,15 @@ package com.atsuishio.superbwarfare;
 import com.atsuishio.superbwarfare.client.ClientRenderHandler;
 import com.atsuishio.superbwarfare.client.MouseMovementHandler;
 import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
+import com.atsuishio.superbwarfare.client.lighting.ClientLightingHandler;
+import com.atsuishio.superbwarfare.client.map.TacticalMapChunkListener;
 import com.atsuishio.superbwarfare.client.model.DragonTeethObjModelLoader;
 import com.atsuishio.superbwarfare.client.molang.MolangVariable;
+import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
+import com.atsuishio.superbwarfare.client.renderer.SyncedEntityWorldRenderer;
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
+import com.atsuishio.superbwarfare.client.renderer.special.TowingChainRenderer;
 import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.screens.SnapshotWarningScreen;
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler;
@@ -79,9 +84,14 @@ public class ClientMod implements ClientModInitializer {
         SnapshotWarningScreen.register();
 
         MouseMovementHandler.INSTANCE.init();
+        ClientLightingHandler.register();
         MolangVariable.register();
         ModSoundInstances.init();
         ClientEventHandler.register();
+        TacticalMapChunkListener.register();
+        SyncedEntityWorldRenderer.register();
+        TowingChainRenderer.register();
+        OverlayTraceHandler.register();
         ThermalShaderHandler.register();
         ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> {
             if (entity instanceof ArtilleryEntity artillery) {

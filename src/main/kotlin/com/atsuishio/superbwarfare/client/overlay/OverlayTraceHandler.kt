@@ -11,14 +11,11 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
-import net.minecraftforge.event.TickEvent
-import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.common.Mod
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 
-@OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object OverlayTraceHandler {
     @JvmField
     var playerReachEntity: Entity? = null
@@ -35,17 +32,18 @@ object OverlayTraceHandler {
     @JvmField
     var blockMaxRangeResult: BlockHitResult? = null
 
-    @SubscribeEvent
-    fun onOverlayTraceClientTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase == TickEvent.Phase.START) return
-        val player = localPlayer
-        if (player == null) {
-            clear()
-            return
-        }
+    @JvmStatic
+    fun register() {
+        ClientTickEvents.END_CLIENT_TICK.register { _ ->
+            val player = localPlayer
+            if (player == null) {
+                clear()
+                return@register
+            }
 
-        handlePlayerTrace(player)
-        handleCameraTrace(player)
+            handlePlayerTrace(player)
+            handleCameraTrace(player)
+        }
     }
 
     @JvmStatic

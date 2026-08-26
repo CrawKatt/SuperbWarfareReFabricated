@@ -135,7 +135,7 @@ class ModAdvancementProvider(private val packOutput: PackOutput) : DataProvider 
                 .parent(enclave)
         }
         val powerfulCooler = advancement("powerful_cooler") {
-            it.icon(ModItems.PERK_ITEMS[ModPerks.POWERFUL_COOLER]!!.get())
+            it                .icon(ModItems.PERK_ITEMS[ModPerks.POWERFUL_COOLER]!!)
                 .whenIconCollected()
                 .parent(enclave)
         }
@@ -156,7 +156,7 @@ class ModAdvancementProvider(private val packOutput: PackOutput) : DataProvider 
         }
 
         val deleteYourGun = advancement("delete_your_gun") {
-            it.icon(ModItems.MARLIN.get())
+            it.icon(ModItems.MARLIN)
                 .externalTrigger(
                     VehicleHurtTrigger.TriggerInstance.vehicleHurt(
                         DamagePredicate.Builder.damageInstance()
@@ -172,7 +172,7 @@ class ModAdvancementProvider(private val packOutput: PackOutput) : DataProvider 
                 .parent(superContainer)
         }
         val criticalHit = advancement("critical_hit") {
-            it.icon(ModItems.NTW_20.get())
+            it.icon(ModItems.NTW_20)
                 .externalTrigger(
                     VehicleHurtTrigger.TriggerInstance.vehicleHurt(
                         DamagePredicate.Builder.damageInstance()
@@ -190,7 +190,7 @@ class ModAdvancementProvider(private val packOutput: PackOutput) : DataProvider 
 
         // 饼皮
         val eatCrust = advancement("eat_crust") {
-            it.icon(ModItems.CRUST.get())
+            it.icon(ModItems.CRUST)
                 .whenIconConsumed()
                 .parent(mainRoot)
         }

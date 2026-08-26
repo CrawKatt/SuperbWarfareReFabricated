@@ -15,17 +15,17 @@ import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.math.Axis
 import net.minecraft.client.CameraType
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
-import net.minecraftforge.client.gui.overlay.ForgeGui
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import org.joml.Math
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object KirovHud {
     const val ID: String = "@Kirov"
     private val BOMB_SCOPE = loc("textures/overlay/vehicle/aircraft/bomb_scope.png")
@@ -41,7 +41,7 @@ object KirovHud {
     fun render(
         vehicle: VehicleEntity,
         player: Player,
-        gui: ForgeGui,
+        mc: Minecraft,
         guiGraphics: GuiGraphics,
         partialTick: Float,
         screenWidth: Int,

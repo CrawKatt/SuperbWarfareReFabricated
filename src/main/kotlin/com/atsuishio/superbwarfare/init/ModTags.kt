@@ -55,6 +55,9 @@ object ModTags {
         @JvmField val MILITARY_ARMOR_HEAVY = modItemTag("military_armor_heavy")
 
         @JvmField val INGOTS_CEMENTED_CARBIDE = modItemTag("ingots/cemented_carbide")
+        @JvmField val INGOTS_STEEL = modItemTag("ingots/steel")
+        @JvmField val INGOTS_LEAD = modItemTag("ingots/lead")
+        @JvmField val STORAGE_BLOCK_STEEL = modItemTag("storage_blocks/steel")
         @JvmField val STORAGE_BLOCK_CEMENTED_CARBIDE = modItemTag("storage_blocks/cemented_carbide")
 
         @JvmField val BLUEPRINT = modItemTag("blueprint")

@@ -15,7 +15,7 @@ open class Bor57Entity(type: EntityType<out Bor57Entity>, level: Level) : Aerial
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.LARGE_AERIAL_BOMB.get()
+        return ModItems.LARGE_AERIAL_BOMB
     }
 
     override val maxHealth: Float

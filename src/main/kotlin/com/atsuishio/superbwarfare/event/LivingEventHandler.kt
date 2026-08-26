@@ -40,13 +40,19 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.effect.MobEffectCategory
-import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.phys.Vec3
+
 import net.minecraft.world.entity.Mob
+
 import net.minecraft.world.entity.OwnableEntity
+
 import net.minecraft.world.entity.item.ItemEntity
+
 import net.minecraft.world.entity.player.Player
+
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Explosion
@@ -725,9 +731,14 @@ object LivingEventHandler {
         while (iterator.hasNext()) {
             val entity = iterator.next() as? VehicleEntity ?: continue
             iterator.remove()
-            val explosionPos = explosion.position
+            val explosionAccess = explosion as ExplosionAccess
+            val explosionPos = Vec3(
+                explosionAccess.`superbwarfare$getX`(),
+                explosionAccess.`superbwarfare$getY`(),
+                explosionAccess.`superbwarfare$getZ`()
+            )
             val explosionRadius = if (isCustom) explosion.radius * 2.0F
-            else (explosion as ExplosionAccess).`superbwarfare$getRadius`() * 2.0F
+            else explosionAccess.`superbwarfare$getRadius`() * 2.0F
 
             if (!entity.ignoreExplosion()) {
                 val distanceRatio = sqrt(entity.distanceToSqr(explosionPos)) / explosionRadius

@@ -35,7 +35,7 @@ open class Ru3m14MissileEntity(type: EntityType<out Ru3m14MissileEntity>, level:
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.EXTRA_LARGE_ANTI_GROUND_MISSILE.get()
+        return ModItems.EXTRA_LARGE_ANTI_GROUND_MISSILE
     }
 
     override fun tick() {
@@ -123,7 +123,7 @@ open class Ru3m14MissileEntity(type: EntityType<out Ru3m14MissileEntity>, level:
             level.playSound(
                 null,
                 BlockPos.containing(position()),
-                ModSounds.MISSILE_START.get(),
+                ModSounds.MISSILE_START,
                 SoundSource.PLAYERS,
                 4f,
                 1f
@@ -164,7 +164,7 @@ open class Ru3m14MissileEntity(type: EntityType<out Ru3m14MissileEntity>, level:
     }
 
     override fun getSound(): SoundEvent {
-        return ModSounds.ROCKET_FLY.get()
+        return ModSounds.ROCKET_FLY
     }
 
     override val maxHealth: Float

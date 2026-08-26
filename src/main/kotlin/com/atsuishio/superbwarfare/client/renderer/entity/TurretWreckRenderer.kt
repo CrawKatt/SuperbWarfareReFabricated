@@ -124,12 +124,11 @@ class TurretWreckRenderer(renderManager: EntityRendererProvider.Context) :
                 poseStack.mulPose(Axis.YP.rotationDegrees(180f))
 
                 val turretIndex = instance.getIndex("turret")
-                instance.renderSingleBone(
-                    poseStack,
+                instance.baseModel().renderBone(
+                    instance,
                     turretIndex,
-                    bufferSource,
-                    RenderType.entityTranslucent(entry.texture),
-                    BedrockModelRenderTypes.polyMeshCutout(entry.texture),
+                    poseStack,
+                    bufferSource.getBuffer(RenderType.entityTranslucent(entry.texture)),
                     packedLight,
                     OverlayTexture.NO_OVERLAY,
                     0.3f, 0.3f, 0.3f, 1f,

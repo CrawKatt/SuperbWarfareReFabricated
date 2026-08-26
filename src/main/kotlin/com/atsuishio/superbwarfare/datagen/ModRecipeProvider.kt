@@ -8,7 +8,11 @@ import com.atsuishio.superbwarfare.init.ModItems.Materials
 import com.atsuishio.superbwarfare.init.ModTags.commonItemTag
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.recipe.vehicle.VehicleAssemblingRecipe
+import com.google.gson.JsonObject
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients
+import net.minecraft.advancements.Advancement
+import net.minecraft.advancements.RequirementsStrategy
+import net.minecraft.advancements.critereon.RecipeUnlockedTrigger
 import net.minecraft.data.PackOutput
 import net.minecraft.data.recipes.*
 import net.minecraft.resources.ResourceLocation
@@ -485,18 +489,28 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                     has(ModItems.HIGH_ENERGY_EXPLOSIVES)
                 )
                 .save(writer, loc(getItemName(ModItems.C4_BOMB)))
-            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.C4_BOMB, 2)
-                .withNBT { tag -> tag.putBoolean("Control", true) }
-                .pattern("aaa")
-                .pattern("aba")
-                .pattern("aaa")
-                .define('a', ModItems.HIGH_ENERGY_EXPLOSIVES)
-                .define('b', Items.COMPARATOR)
-                .unlockedBy(
-                    getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES),
-                    has(ModItems.HIGH_ENERGY_EXPLOSIVES)
-                )
-                .save(writer, loc(getItemName(ModItems.C4_BOMB) + "_rc"))
+            // Remote-controlled C4: custom recipe type (see C4BombRcRecipe)
+            val rcId = loc("c4_bomb_rc")
+            writer.accept(object : FinishedRecipe {
+                private val advancement: Advancement.Builder =
+                    Advancement.Builder.recipeAdvancement()
+                        .addCriterion("has_high_energy_explosives", has(ModItems.HIGH_ENERGY_EXPLOSIVES))
+                        .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(rcId))
+                        .requirements(RequirementsStrategy.OR)
+
+                override fun serializeRecipeData(json: JsonObject) {
+                    json.addProperty("type", "superbwarfare:c4_bomb_rc")
+                    json.addProperty("category", "equipment")
+                }
+
+                override fun getId(): ResourceLocation = rcId
+
+                override fun getType(): RecipeSerializer<*> = ModRecipes.C4_BOMB_RC_SERIALIZER
+
+                override fun serializeAdvancement(): JsonObject = advancement.serializeToJson()
+
+                override fun getAdvancementId(): ResourceLocation = loc("recipes/combat/c4_bomb_rc")
+            })
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.LARGE_SHELL_AP)
                 .pattern("a")
                 .pattern("b")
@@ -1170,11 +1184,9 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.COAL_IRON_POWDER)
                 .requires(commonItemTag("dusts/iron"))
                 .requires(
-                    Ingredient.merge(
-                        listOf(
-                            Ingredient.of(commonItemTag("dusts/coal_coke")),
-                            Ingredient.of(commonItemTag("dusts/coal"))
-                        )
+                    DefaultCustomIngredients.any(
+                        Ingredient.of(commonItemTag("dusts/coal_coke")),
+                        Ingredient.of(commonItemTag("dusts/coal"))
                     )
                 )
                 .unlockedBy(getHasName(ModItems.IRON_POWDER), has(ModItems.IRON_POWDER))
@@ -1468,20 +1480,16 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .save(writer, loc(getItemName(ModItems.PROPELLER)))
             ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.RAW_CEMENTED_CARBIDE_POWDER, 8)
                 .requires(
-                    Ingredient.merge(
-                        listOf(
-                            Ingredient.of(commonItemTag("dusts/tungsten")),
-                            Ingredient.of(commonItemTag("dusts/scheelite"))
-                        )
+                    DefaultCustomIngredients.any(
+                        Ingredient.of(commonItemTag("dusts/tungsten")),
+                        Ingredient.of(commonItemTag("dusts/scheelite"))
                     ), 7
                 )
                 .requires(commonItemTag("dusts/iron"))
                 .requires(
-                    Ingredient.merge(
-                        listOf(
-                            Ingredient.of(commonItemTag("dusts/coal_coke")),
-                            Ingredient.of(commonItemTag("dusts/coal"))
-                        )
+                    DefaultCustomIngredients.any(
+                        Ingredient.of(commonItemTag("dusts/coal_coke")),
+                        Ingredient.of(commonItemTag("dusts/coal"))
                     )
                 )
                 .unlockedBy(getHasName(ModItems.TUNGSTEN_POWDER), has(commonItemTag("dusts/tungsten")))

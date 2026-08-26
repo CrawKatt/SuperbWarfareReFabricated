@@ -89,7 +89,7 @@ object VehicleEffectUtils {
     @JvmStatic
     fun defaultPartDamageEffect(vehicle: VehicleEntity, pos: Vec3) {
         if (vehicle.level().isClientSide) {
-            addRandomParticle(vehicle, ModParticleTypes.FIRE_STAR.get(), pos, 0f, vehicle.level(), 0.25f, 1)
+            addRandomParticle(vehicle, ModParticleTypes.FIRE_STAR, pos, 0f, vehicle.level(), 0.25f, 1)
             addRandomParticle(vehicle, ParticleTypes.LARGE_SMOKE, pos, 0.5f, vehicle.level(), 0.001f, 1)
         }
     }
@@ -363,7 +363,7 @@ object VehicleEffectUtils {
                         (4 + 4 * random).toInt(),
                         0.8 * random.toDouble(),
                         vehicle.level(),
-                        ModParticleTypes.FIRE_STAR.get(),
+                        ModParticleTypes.FIRE_STAR,
                         dir,
                         pos,
                         0.4 + random
@@ -392,7 +392,7 @@ object VehicleEffectUtils {
                     vehicle.level().playSound(
                         null,
                         vehicle.onPos,
-                        ModSounds.TURRET_BURN_START.get(),
+                        ModSounds.TURRET_BURN_START,
                         SoundSource.BLOCKS,
                         4f,
                         1f + 0.05f * random
@@ -402,7 +402,7 @@ object VehicleEffectUtils {
                     vehicle.level().playSound(
                         null,
                         vehicle.onPos,
-                        ModSounds.TURRET_BURN.get(),
+                        ModSounds.TURRET_BURN,
                         SoundSource.BLOCKS,
                         1.5f,
                         1f + 0.05f * random
@@ -421,9 +421,9 @@ object VehicleEffectUtils {
         }
 
         if (vehicle.health > 0 && vehicle.health < 0.1f * vehicle.getMaxHealth() && vehicle.tickCount % 13 == 0) {
-            vehicle.level().playSound(null, vehicle.onPos, ModSounds.NO_HEALTH.get(), SoundSource.PLAYERS, 1f, 1f)
+            vehicle.level().playSound(null, vehicle.onPos, ModSounds.NO_HEALTH, SoundSource.PLAYERS, 1f, 1f)
         } else if (vehicle.health >= 0.1f && vehicle.health < 0.4f * vehicle.getMaxHealth() && vehicle.tickCount % 10 == 0) {
-            vehicle.level().playSound(null, vehicle.onPos, ModSounds.LOW_HEALTH.get(), SoundSource.PLAYERS, 1f, 1f)
+            vehicle.level().playSound(null, vehicle.onPos, ModSounds.LOW_HEALTH, SoundSource.PLAYERS, 1f, 1f)
         }
     }
 }

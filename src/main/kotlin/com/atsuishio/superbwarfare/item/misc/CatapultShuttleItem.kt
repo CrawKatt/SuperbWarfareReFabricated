@@ -38,7 +38,7 @@ open class CatapultShuttleItem : AbstractDeployerItem(Properties().rarity(Rarity
 
             val blockstate = level.getBlockState(clickedPos)
 
-            if (!blockstate.`is`(ModBlocks.AIRCRAFT_CATAPULT.get())) return InteractionResult.PASS
+            if (!blockstate.`is`(ModBlocks.AIRCRAFT_CATAPULT)) return InteractionResult.PASS
 
             val pos = if (blockstate.getCollisionShape(level, clickedPos).isEmpty) {
                 clickedPos
@@ -71,7 +71,7 @@ open class CatapultShuttleItem : AbstractDeployerItem(Properties().rarity(Rarity
             val blockpos = hitResult.blockPos
             val blockstate = level.getBlockState(blockpos)
 
-            if (!blockstate.`is`(ModBlocks.AIRCRAFT_CATAPULT.get())) return InteractionResultHolder.pass(itemstack)
+            if (!blockstate.`is`(ModBlocks.AIRCRAFT_CATAPULT)) return InteractionResultHolder.pass(itemstack)
 
             if (blockstate.block !is LiquidBlock) {
                 return InteractionResultHolder.pass(itemstack)

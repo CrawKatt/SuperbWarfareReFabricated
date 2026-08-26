@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.misc
 
+import com.atsuishio.superbwarfare.tools.persistentData
 import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
@@ -19,10 +20,9 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
-import net.minecraftforge.entity.PartEntity
-import net.minecraftforge.event.entity.player.PlayerInteractEvent
-import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.common.Mod
+
+import net.minecraft.world.phys.EntityHitResult
+import net.fabricmc.fabric.api.event.player.UseEntityCallback
 
 open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
 
@@ -299,23 +299,36 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
         }
     }
 
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
     companion object {
         private const val TAG_TOW_TARGET = "TowTarget"
 
-        @SubscribeEvent
-        fun onTowBarEntityInteract(event: PlayerInteractEvent.EntityInteract) {
-            val player = event.entity
-            val stack = event.itemStack
-            val originalTarget = event.target
-            val target = if (originalTarget is PartEntity<*>) originalTarget.parent else originalTarget
+        init {
+            UseEntityCallback.EVENT.register(::onTowBarEntityInteract)
+        }
 
-            if (player.level().isClientSide) return
+        /**
+         * Fabric port of Forge's PlayerInteractEvent.EntityInteract handler.
+         * Returning a non-PASS result cancels vanilla processing, matching the
+         * original event.isCanceled semantics (default cancellationResult PASS -> FAIL,
+         * SUCCESS -> success, CONSUME -> consume).
+         */
+        fun onTowBarEntityInteract(
+            player: Player,
+            @Suppress("UNUSED_PARAMETER") level: Level,
+            hand: InteractionHand,
+            entity: Entity,
+            @Suppress("UNUSED_PARAMETER") hitResult: EntityHitResult?
+        ): InteractionResult {
+            val stack = player.getItemInHand(hand)
+            val target = entity
 
-            val item = stack.item as? TowBarItem ?: return
+            if (player.level().isClientSide) return InteractionResult.PASS
+
+            val item = stack.item as? TowBarItem ?: return InteractionResult.PASS
 
             // --- Shift+right-click on CatapultShuttleEntity: clear towing relationship ---
             if (target is CatapultShuttleEntity && player.isShiftKeyDown) {
+                var cancelled = false
                 if (target.towingUUID.isNotBlank()) {
                     target.clearTowingInfo()
                     player.displayClientMessage(
@@ -324,7 +337,7 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
                         true
                     )
                     player.playSound(SoundEvents.CHAIN_BREAK, 1.0f, 1.0f)
-                    event.isCanceled = true
+                    cancelled = true
                 }
 
                 val tag = stack.tag
@@ -336,7 +349,7 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
                         true
                     )
                 }
-                return
+                return if (cancelled) InteractionResult.FAIL else InteractionResult.PASS
             }
 
             // --- First click on CatapultShuttleEntity: select it ---
@@ -354,18 +367,17 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
                         true
                     )
                     player.playSound(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1.0f, 1.0f)
-                    event.isCanceled = true
+                    return InteractionResult.FAIL
                 }
-                return
+                return InteractionResult.PASS
             }
 
             // --- VehicleEntity and LivingEntity are handled by onInteractVehicle / interactLivingEntity ---
-            if (target is VehicleEntity) return
+            if (target is VehicleEntity) return InteractionResult.PASS
             if (target is LivingEntity) {
-                event.isCanceled = true
-                event.cancellationResult = if (player.level().isClientSide) InteractionResult.CONSUME
-                else item.interactLivingEntity(stack, player, target, event.hand)
-                return
+                val result = if (player.level().isClientSide) InteractionResult.CONSUME
+                else item.interactLivingEntity(stack, player, target, hand)
+                return if (result == InteractionResult.PASS) InteractionResult.FAIL else result
             }
 
             // Exclude certain entity types
@@ -373,8 +385,10 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
                 || target is HangingEntity
                 || target is AreaEffectCloud
                 || target is LightningBolt
-            ) return
-            if (VehicleConfig.inConfigList(target.type, VehicleConfig.TOW_BLACK_LIST.get())) return
+            ) return InteractionResult.PASS
+            if (VehicleConfig.inConfigList(target.type, VehicleConfig.TOW_BLACK_LIST.get())) {
+                return InteractionResult.PASS
+            }
 
             // --- Shift+right-click on non-vehicle, non-living entity: clear towing relationship ---
             if (player.isShiftKeyDown) {
@@ -384,14 +398,13 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
                     shuttle?.clearTowingInfo()
                     target.persistentData.remove(CatapultShuttleEntity.TOWED_BY_SHUTTLE_TAG_KEY)
 
-                    event.isCanceled = true
                     player.displayClientMessage(
                         Component.translatable("tips.superbwarfare.tow_bar.unlinked")
                             .withStyle(ChatFormatting.YELLOW),
                         true
                     )
                     player.playSound(SoundEvents.CHAIN_BREAK, 1.0f, 1.0f)
-                    return
+                    return InteractionResult.FAIL
                 }
 
                 val tag = stack.tag
@@ -403,24 +416,23 @@ open class TowBarItem : Item(Properties().stacksTo(1)), IVehicleInteract {
                         true
                     )
                 }
-                return
+                return InteractionResult.PASS
             }
 
             // --- Right-click on other entity: link with stored shuttle ---
             val tag = stack.getOrCreateTag()
             val existingTarget = tag.getString(TAG_TOW_TARGET)
             if (existingTarget.isBlank()) {
-                event.isCanceled = true
                 player.displayClientMessage(
                     Component.translatable("tips.superbwarfare.tow_bar.select_shuttle_first")
                         .withStyle(ChatFormatting.GRAY),
                     true
                 )
-                return
+                return InteractionResult.FAIL
             }
 
-            item.linkTowTarget(stack, player, target, existingTarget)
-            event.isCanceled = true
+            val result = item.linkTowTarget(stack, player, target, existingTarget)
+            return if (result == InteractionResult.PASS) InteractionResult.FAIL else result
         }
     }
 }

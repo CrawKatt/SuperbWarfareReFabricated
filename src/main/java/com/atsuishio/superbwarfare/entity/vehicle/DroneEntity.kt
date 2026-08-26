@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.entity.vehicle
 
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.drone_attachment.DroneAttachmentData
 import com.atsuishio.superbwarfare.entity.getValue
@@ -22,7 +23,10 @@ import com.atsuishio.superbwarfare.tools.EntityFindUtil.findEntity
 import com.atsuishio.superbwarfare.tools.EntityFindUtil.findPlayer
 import com.atsuishio.superbwarfare.tools.TagDataParser
 import com.atsuishio.superbwarfare.tools.getMaxZoom
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.ChatFormatting
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtUtils
@@ -54,10 +58,6 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec2
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
-import net.minecraftforge.items.ItemHandlerHelper
-import net.minecraftforge.registries.ForgeRegistries
 import org.joml.Math
 import java.util.*
 import kotlin.math.abs
@@ -185,7 +185,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
         if (!this.onGround()) {
             if (controller != null) {
                 val stack = controller.mainHandItem
-                if (!stack.`is`(ModItems.MONITOR.get()) || !stack.getOrCreateTag().getBoolean("Using")) {
+                if (!stack.`is`(ModItems.MONITOR) || !stack.getOrCreateTag().getBoolean("Using")) {
                     leftInputDown = false
                     rightInputDown = false
                     forwardInputDown = false
@@ -196,7 +196,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
 
                 if (tickCount % 5 == 0) {
                     controller.inventory.items
-                        .filter { it.item === ModItems.MONITOR.get() }
+                        .filter { it.item === ModItems.MONITOR }
                         .forEach {
                             if (it.getOrCreateTag().getString(MonitorItem.LINKED_DRONE) == this.getStringUUID()) {
                                 MonitorItem.getDronePos(it, this.position())
@@ -223,7 +223,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
                 }
             } else {
                 if (controller != null) {
-                    if (controller.mainHandItem.`is`(ModItems.MONITOR.get())) {
+                    if (controller.mainHandItem.`is`(ModItems.MONITOR)) {
                         disLink(controller.mainHandItem, controller)
                     }
                     this.hurt(
@@ -278,7 +278,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
 
     override fun interact(player: Player, hand: InteractionHand): InteractionResult {
         val stack = player.mainHandItem
-        if (stack.item === ModItems.MONITOR.get()) {
+        if (stack.item === ModItems.MONITOR) {
             if (!player.isShiftKeyDown) {
                 if (!this.entityData.get(LINKED)) {
                     if (stack.getOrCreateTag().getBoolean("Linked")) {
@@ -348,7 +348,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
         } else if (player.isShiftKeyDown) {
             if (stack.isEmpty || stack.`is`(ModTags.Items.TOOLS_CROWBAR)) {
                 // 无人机拆除
-                ItemHandlerHelper.giveItemToPlayer(player, ItemStack(ModItems.DRONE.get()))
+                ItemHandlerHelper.giveItemToPlayer(player, ItemStack(ModItems.DRONE))
 
                 // 返还弹药
                 repeat(this.ammoCount) {
@@ -356,7 +356,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
                 }
 
                 player.inventory.items
-                    .filter { it.item === ModItems.MONITOR.get() }
+                    .filter { it.item === ModItems.MONITOR }
                     .forEach {
                         if (it.getOrCreateTag().getString(MonitorItem.LINKED_DRONE) == this.getStringUUID()) {
                             disLink(it, player)
@@ -401,7 +401,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
                             player.level().playSound(
                                 null,
                                 player.onPos,
-                                ModSounds.BULLET_SUPPLY.get(),
+                                ModSounds.BULLET_SUPPLY,
                                 SoundSource.PLAYERS,
                                 0.5f,
                                 1f
@@ -422,7 +422,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
                             player.level().playSound(
                                 null,
                                 player.onPos,
-                                ModSounds.BULLET_SUPPLY.get(),
+                                ModSounds.BULLET_SUPPLY,
                                 SoundSource.PLAYERS,
                                 0.5f,
                                 1f
@@ -576,7 +576,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
         val controller = findPlayer(this.level(), this.entityData.get(CONTROLLER))
         if (controller != null) {
             val stack = controller.mainHandItem
-            if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")) {
+            if (stack.`is`(ModItems.MONITOR) && stack.getOrCreateTag().getBoolean("Using")) {
                 this.yRot += 0.5f * mouseMoveSpeedX
                 this.xRot = (this.xRot + 0.5f * mouseMoveSpeedY).coerceIn(-10f, 90f)
             }
@@ -621,7 +621,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
                     }
                 }
 
-                if (player != null && player.mainHandItem.`is`(ModItems.MONITOR.get())) {
+                if (player != null && player.mainHandItem.`is`(ModItems.MONITOR)) {
                     disLink(player.mainHandItem, player)
                 }
             }
@@ -646,7 +646,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
         val player = findPlayer(this.level(), this.entityData.get(CONTROLLER)) ?: return power
 
         val stack = player.mainHandItem
-        if (stack.`is`(ModItems.MONITOR.get())
+        if (stack.`is`(ModItems.MONITOR)
             && stack.getOrCreateTag().getBoolean("Using")
             && stack.getOrCreateTag().getBoolean("Linked")
         ) {
@@ -686,13 +686,13 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
     }
 
     override fun getPickResult(): ItemStack? {
-        return ItemStack(ModItems.DRONE.get())
+        return ItemStack(ModItems.DRONE)
     }
 
     override fun destroy() {
         val controller = findPlayer(this.level(), this.entityData.get(CONTROLLER))
         if (controller != null) {
-            if (controller.mainHandItem.`is`(ModItems.MONITOR.get())) {
+            if (controller.mainHandItem.`is`(ModItems.MONITOR)) {
                 disLink(controller.mainHandItem, controller)
             }
         }
@@ -726,7 +726,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
         }
 
         val player = this.level().getPlayerByUUID(uuid)
-        player?.inventory?.items?.filter { it.item === ModItems.MONITOR.get() }?.forEach {
+        player?.inventory?.items?.filter { it.item === ModItems.MONITOR }?.forEach {
             if (it.getOrCreateTag().getString(MonitorItem.LINKED_DRONE) == this.getStringUUID()) {
                 disLink(it, player)
             }
@@ -792,7 +792,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
         return false
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     override fun getCameraRotation(
         partialTicks: Float,
         player: Player,
@@ -805,7 +805,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
         )
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     override fun getCameraPosition(
         partialTicks: Float,
         player: Player,
@@ -849,7 +849,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
         @JvmField
         val DISPLAY_DATA: EntityDataAccessor<List<Float>> = SynchedEntityData.defineId(
             DroneEntity::class.java,
-            ModSerializers.FLOAT_LIST_SERIALIZER.get()
+            ModSerializers.FLOAT_LIST_SERIALIZER
         )
 
         @JvmField
@@ -862,7 +862,7 @@ open class DroneEntity(type: EntityType<out DroneEntity>, world: Level) : GeoVeh
 
         @JvmStatic
         fun getItemId(stack: ItemStack): String {
-            val key = ForgeRegistries.ITEMS.getKey(stack.item) ?: return ""
+            val key = BuiltInRegistries.ITEM.getKey(stack.item) ?: return ""
             return key.toString()
         }
     }

@@ -7,8 +7,8 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import java.util.concurrent.ThreadLocalRandom
 
 /**
@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom
  * @author paralax034
  * @since 0.8.9.1
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object VehicleLightingHandler {
 
     /**

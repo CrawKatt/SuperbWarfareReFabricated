@@ -5,17 +5,11 @@ import com.atsuishio.superbwarfare.client.RenderHelper
 import com.atsuishio.superbwarfare.item.misc.VehicleKeyItem
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.clientLevel
-import net.minecraft.client.gui.Font
-import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
-import net.minecraftforge.client.IItemDecorator
 
-@OnlyIn(Dist.CLIENT)
-class VehicleKeyItemDecorator : IItemDecorator {
-    override fun render(guiGraphics: GuiGraphics, font: Font?, stack: ItemStack, xOffset: Int, yOffset: Int): Boolean {
+class VehicleKeyItemDecorator {
+    fun render(guiGraphics: net.minecraft.client.gui.GuiGraphics, font: net.minecraft.client.gui.Font?, stack: ItemStack, xOffset: Int, yOffset: Int): Boolean {
         if (stack.item !is VehicleKeyItem) return false
         val tag = stack.tag ?: return false
         if (!tag.contains(VehicleKeyItem.TAG_UUID)) return false

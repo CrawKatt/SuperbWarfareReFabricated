@@ -37,7 +37,7 @@ abstract class BounceProjectile : FastThrowableProjectile {
 
         if (this.onGround()) {
             val pos = this.blockPosBelowThatAffectsMyMovement
-            f = level.getBlockState(pos).getFriction(level, pos, this) * 0.98f
+            f = level.getBlockState(pos).block.friction * 0.98f
         }
 
         this.deltaMovement = deltaMovement.multiply(f.toDouble(), 0.98, f.toDouble())

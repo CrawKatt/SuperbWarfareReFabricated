@@ -805,13 +805,6 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         }
     }
 
-    override fun onAddedToWorld() {
-        super.onAddedToWorld()
-        if (level().isClientSide) {
-            ClientLightingHandler.handleProjectileAdded(this)
-        }
-    }
-
     /**
      * Builders
      */
@@ -886,13 +879,6 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
 
     override fun setCustomGravity(gravity: Float) {
         this.gravity = gravity
-    }
-
-    override fun onRemovedFromWorld() {
-        super.onRemovedFromWorld()
-        if (level().isClientSide) {
-            ClientLightingHandler.handleProjectileRemoved(this)
-        }
     }
 
     // ===== Builder methods (return ProjectileEntity for chaining) =====

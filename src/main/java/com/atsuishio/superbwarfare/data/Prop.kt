@@ -3,7 +3,9 @@ package com.atsuishio.superbwarfare.data
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.KSerializer
+import java.lang.reflect.Type
 import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.jvm.javaType
 
 private val PROP_SERIALIZATION_NAME_OVERRIDES = mapOf(
     "ammoConsumers" to "AmmoType",

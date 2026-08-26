@@ -69,7 +69,6 @@ class ModBlockStateProvider(private val output: PackOutput) : DataProvider {
         )
 
         horizontalBlock(
-        horizontalBlock(
             ModBlocks.CATAPULT_CONTROLLER,
             cube(
                 "catapult_controller",

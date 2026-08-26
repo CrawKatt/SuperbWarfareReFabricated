@@ -8,8 +8,8 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.lighting.LevelLightEngine
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.sin
@@ -24,7 +24,7 @@ import kotlin.math.sin
  * @author paralax034
  * @since 0.8.9.1
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object ProjectileLightHelper {
     private const val TRAIL_CULL_SQ = 128.0 * 128.0
     private const val EXPLODE_CULL_SQ = 192.0 * 192.0

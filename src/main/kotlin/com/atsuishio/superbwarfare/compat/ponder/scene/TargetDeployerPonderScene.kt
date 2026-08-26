@@ -33,7 +33,7 @@ object TargetDeployerPonderScene {
             val centerPos = util.grid().at(2, 0, 2)
             val pos = util.vector().topOf(centerPos)
             val entity = world().createEntity {
-                val target = ModEntities.TARGET.get().create(it) ?: return@createEntity null
+                val target = ModEntities.TARGET.create(it) ?: return@createEntity null
                 target.setPosRaw(pos.x, pos.y, pos.z)
                 target.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3(pos.x, pos.y, pos.z - 1))
                 target.xRot = 0f
@@ -81,7 +81,7 @@ object TargetDeployerPonderScene {
             val centerPos = util.grid().at(2, 0, 2)
             val pos = util.vector().topOf(centerPos)
             val entity = world().createEntity {
-                val target = ModEntities.TARGET.get().create(it) ?: return@createEntity null
+                val target = ModEntities.TARGET.create(it) ?: return@createEntity null
                 target.setPosRaw(pos.x, pos.y, pos.z)
                 target.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3(pos.x - 1, pos.y, pos.z))
                 target.xRot = 0f

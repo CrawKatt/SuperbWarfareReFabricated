@@ -15,7 +15,6 @@ import net.minecraft.util.Mth
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.common.ForgeMod
 
 /**
  * 用于处理载具武器瞄准或其他战斗相关方法的工具类
@@ -104,7 +103,7 @@ object VehicleWeaponUtils {
         var targetVel = target.deltaMovement
 
         if (target is LivingEntity) {
-            val gravity = target.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get())
+            val gravity = 0.08
             targetVel = targetVel.add(0.0, gravity, 0.0)
         }
 
@@ -143,7 +142,7 @@ object VehicleWeaponUtils {
                 }
 
                 vehicle.level()
-                    .playSound(null, vehicle, ModSounds.DECOY_RELEASE.get(), vehicle.soundSource, 1f, 1f)
+                    .playSound(null, vehicle, ModSounds.DECOY_RELEASE, vehicle.soundSource, 1f, 1f)
                 vehicle.decoyCount--
                 if (vehicle.decoyCount == 0) {
                     vehicle.decoyReloadCoolDown = vehicle.getDecoyReloadTime()
@@ -197,7 +196,7 @@ object VehicleWeaponUtils {
         vehicle.level().playSound(
             null,
             vehicle,
-            ModSounds.DECOY_RELEASE.get(),
+            ModSounds.DECOY_RELEASE,
             vehicle.soundSource,
             3f,
             1f
@@ -210,7 +209,7 @@ object VehicleWeaponUtils {
             vehicle.decoyCount = 1
             // 存在创造弹药盒时不消耗诱饵物品
             if (!vehicle.hasCreativeAmmoBoxCached()) {
-                InventoryTool.consumeItem(vehicle, ModItems.VEHICLE_SMOKE_AMMO.get(), 1)
+                InventoryTool.consumeItem(vehicle, ModItems.VEHICLE_SMOKE_AMMO, 1)
             }
         } else {
             if (vehicle.hasCreativeAmmoBoxCached()) {
@@ -218,10 +217,10 @@ object VehicleWeaponUtils {
             } else {
                 val decoyMagazineCount = vehicle.decoyItemCount.coerceAtMost(vehicle.computed().decoyMagazineSize)
                 vehicle.decoyCount += decoyMagazineCount
-                InventoryTool.consumeItem(vehicle, ModItems.FLYING_FLARE_AMMO.get(), decoyMagazineCount)
+                InventoryTool.consumeItem(vehicle, ModItems.FLYING_FLARE_AMMO, decoyMagazineCount)
             }
         }
-        vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELOAD.get(), vehicle.soundSource, 2f, 1f)
+        vehicle.level().playSound(null, vehicle, ModSounds.DECOY_RELOAD, vehicle.soundSource, 2f, 1f)
     }
 
     /**
@@ -243,7 +242,7 @@ object VehicleWeaponUtils {
             var targetVel = target.deltaMovement
 
             if (target is LivingEntity) {
-                val gravity = target.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get())
+                val gravity = 0.08
                 targetVel = targetVel.add(0.0, gravity, 0.0)
             }
 

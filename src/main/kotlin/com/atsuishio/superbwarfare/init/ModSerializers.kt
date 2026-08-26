@@ -28,7 +28,6 @@ object ModSerializers {
         })
 
     @JvmField
-    @JvmField
     val VEC3_SERIALIZER: EntityDataSerializer<Vec3> =
         EntityDataSerializer.simple({ buf, v ->
             buf.writeDouble(v.x)

@@ -20,7 +20,6 @@ import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.boss.EnderDragonPart
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.ClipContext
@@ -31,6 +30,7 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.Vec3
+import net.minecraft.world.entity.boss.EnderDragonPart
 import kotlin.math.min
 
 open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEntity>, world: Level) :
@@ -53,11 +53,7 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
         val entity = result.entity
         if (entity === this.owner?.vehicle) return
 
-        if (entity is EnderDragonPart) {
-            this.currentTarget = entity.parentMob
-        } else {
-            this.currentTarget = entity
-        }
+        this.currentTarget = if (entity is EnderDragonPart) entity.parentMob else entity
 
         super.onHitEntity(result)
     }
@@ -145,25 +141,16 @@ open class SuperStarProjectileEntity(type: EntityType<out SuperStarProjectileEnt
             val dir = Vec3(vx, vy, vz)
             summonVectorParticle(level, state, location, dir)
 
-        val pos = result.blockPos
-        val face = result.direction
-        val state = level.getBlockState(pos)
-
-        val vx = face.stepX.toDouble()
-        val vy = face.stepY.toDouble()
-        val vz = face.stepZ.toDouble()
-        val dir = Vec3(vx, vy, vz)
-        summonVectorParticle(level, state, location, dir)
-
-        this.discard()
-        level.playSound(
-            null,
-            BlockPos(location.x.toInt(), location.y.toInt(), location.z.toInt()),
-            ModSounds.LAND,
-            SoundSource.BLOCKS,
-            1f,
-            1f
-        )
+            this.discard()
+            level.playSound(
+                null,
+                BlockPos(location.x.toInt(), location.y.toInt(), location.z.toInt()),
+                ModSounds.LAND,
+                SoundSource.BLOCKS,
+                1f,
+                1f
+            )
+        }
     }
 
     open fun summonVectorParticle(serverLevel: ServerLevel, state: BlockState, pos: Vec3, dir: Vec3) {

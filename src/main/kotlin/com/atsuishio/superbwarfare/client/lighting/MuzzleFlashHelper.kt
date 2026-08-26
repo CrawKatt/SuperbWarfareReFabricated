@@ -13,8 +13,8 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import java.util.concurrent.ThreadLocalRandom
 
 /**
@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom
  * @author paralax034
  * @since 0.8.9.1
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object MuzzleFlashHelper {
 
     // -----------------------------
@@ -93,7 +93,7 @@ object MuzzleFlashHelper {
      */
     @JvmStatic
     fun spawnToolFlash(player: Player, stack: ItemStack) {
-        if (!stack.`is`(ModItems.REPAIR_TOOL.get()) && !stack.`is`(ModItems.TASER.get())) return
+        if (!stack.`is`(ModItems.REPAIR_TOOL) && !stack.`is`(ModItems.TASER)) return
         val params = calculateFromStack(stack) ?: return
         spawnFlashCone(player.eyePosition, player.lookAngle, params)
     }
@@ -152,10 +152,10 @@ object MuzzleFlashHelper {
         stack: ItemStack = ItemStack.EMPTY
     ): FlashParams {
         if (!stack.isEmpty) {
-            if (stack.`is`(ModItems.REPAIR_TOOL.get())) {
+            if (stack.`is`(ModItems.REPAIR_TOOL)) {
                 return FlashParams(8, 3, 4) // Bright welding arc spark
             }
-            if (stack.`is`(ModItems.TASER.get())) {
+            if (stack.`is`(ModItems.TASER)) {
                 return FlashParams(7, 3, 2) // Electric arc pop
             }
         }
@@ -232,7 +232,7 @@ object MuzzleFlashHelper {
     @JvmStatic
     fun calculateFromStack(stack: ItemStack): FlashParams? {
         if (stack.item !is GunItem) return null
-        if (NO_FLASH_ITEMS.any { stack.`is`(it.get()) }) return null
+        if (NO_FLASH_ITEMS.any { stack.`is`(it) }) return null
         return calculateFromGunData(GunData.from(stack))
     }
 

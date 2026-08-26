@@ -13,19 +13,19 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.fml.ModList
+import net.fabricmc.loader.api.FabricLoader
 import org.joml.Matrix4d
 import org.joml.Matrix4dc
 import org.joml.Vector3d
 import org.joml.primitives.AABBd
 import org.joml.primitives.AABBdc
 import org.valkyrienskies.core.api.ships.Ship
-import org.valkyrienskies.mod.api.getShipsIntersecting
-import org.valkyrienskies.mod.api.toJOML
-import org.valkyrienskies.mod.api.toMinecraft
 import org.valkyrienskies.mod.common.getLevelFromDimensionId
 import org.valkyrienskies.mod.common.getLoadedShipManagingPos
+import org.valkyrienskies.mod.common.getShipsIntersecting
 import org.valkyrienskies.mod.common.util.EntityShipCollisionUtils
+import org.valkyrienskies.mod.common.util.toJOML
+import org.valkyrienskies.mod.common.util.toMinecraft
 import java.util.function.Predicate
 import kotlin.math.atan2
 import kotlin.math.max
@@ -36,7 +36,7 @@ object ValkyrienSkiesCompat {
 
     @JvmStatic
     fun hasMod(): Boolean {
-        return ModList.get().isLoaded(CompatHolder.VALKYRIEN_SKIES)
+        return FabricLoader.getInstance().isModLoaded(CompatHolder.VALKYRIEN_SKIES)
     }
 
     @JvmStatic

@@ -11,8 +11,8 @@ import net.minecraft.client.gui.components.EditBox
 import net.minecraft.client.gui.narration.NarrationElementOutput
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import org.lwjgl.glfw.GLFW
 
 /**
@@ -23,7 +23,7 @@ import org.lwjgl.glfw.GLFW
  * 右侧为 Toggle / Confirm 按钮和跳过地形勾选框。
  * 暂时使用色块绘制，后续替换为贴图。
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 class LoiterConfigScreen(private val vehicle: VehicleEntity) :
     Screen(GameNarrator.NO_TITLE) {
 
@@ -203,7 +203,7 @@ class LoiterConfigScreen(private val vehicle: VehicleEntity) :
 
     // ==================== Inner Button Classes ====================
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private inner class ToggleButton(x: Int, y: Int, width: Int, height: Int) :
         AbstractButton(x, y, width, height, Component.empty()) {
 
@@ -222,7 +222,7 @@ class LoiterConfigScreen(private val vehicle: VehicleEntity) :
         override fun updateWidgetNarration(narration: NarrationElementOutput) {}
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private inner class ConfirmButton(x: Int, y: Int, width: Int, height: Int) :
         AbstractButton(x, y, width, height, Component.empty()) {
 
@@ -240,7 +240,7 @@ class LoiterConfigScreen(private val vehicle: VehicleEntity) :
         override fun updateWidgetNarration(narration: NarrationElementOutput) {}
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private inner class TerrainCheckbox(x: Int, y: Int, size: Int) :
         AbstractButton(x, y, size, size, Component.empty()) {
 

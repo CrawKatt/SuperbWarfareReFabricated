@@ -1,9 +1,9 @@
 package com.atsuishio.superbwarfare.script
 
-import org.mozillaa.javascript.Context
-import org.mozillaa.javascript.Function
-import org.mozillaa.javascript.Script
-import org.mozillaa.javascript.ScriptableObject
+import org.mozilla.javascript.Context
+import org.mozilla.javascript.Function
+import org.mozilla.javascript.Script
+import org.mozilla.javascript.ScriptableObject
 
 /**
  * Rhino JS 脚本管理器。
@@ -29,7 +29,7 @@ object ScriptManager {
         fun exec(): Any {
             val cx = Context.enter()
             try {
-                return script.exec(cx, scope, scope)
+                return script.exec(cx, scope)
             } finally {
                 Context.exit()
             }

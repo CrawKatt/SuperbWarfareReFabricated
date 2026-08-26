@@ -166,7 +166,7 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
             SynchedEntityData.defineId(MissileProjectile::class.java, EntityDataSerializers.STRING)
         @JvmField
         val TARGET_POS: EntityDataAccessor<Vec3> =
-            SynchedEntityData.defineId(MissileProjectile::class.java, ModSerializers.VEC3_SERIALIZER.get())
+            SynchedEntityData.defineId(MissileProjectile::class.java, ModSerializers.VEC3_SERIALIZER)
     }
 
     override fun tick() {

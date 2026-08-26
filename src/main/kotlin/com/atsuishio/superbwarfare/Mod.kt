@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.DataLoader
 import com.atsuishio.superbwarfare.data.container.ContainerDataManager
 import com.atsuishio.superbwarfare.data.loot.WreckageLootDataManager
+import com.atsuishio.superbwarfare.entity.projectile.FastProjectileManualTicker
 import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
@@ -18,6 +19,8 @@ import com.atsuishio.superbwarfare.event.CustomEventHandler
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
 import com.atsuishio.superbwarfare.event.LivingEventHandler
 import com.atsuishio.superbwarfare.event.ModVersionEventHandler
+import com.atsuishio.superbwarfare.tools.ServerSyncedEntityHandler
+import com.atsuishio.superbwarfare.world.saveddata.ProjectileChunkSavedData
 import com.atsuishio.superbwarfare.event.PlayerEventHandler
 import com.atsuishio.superbwarfare.event.custom.LivingAttackCallback
 import com.atsuishio.superbwarfare.event.custom.LivingDropsCallback
@@ -108,6 +111,7 @@ class Mod : ModInitializer {
         WreckageLootDataManager.register()
         ModLootModifier.register()
         FastThrowableProjectile.init()
+        FastProjectileManualTicker.register()
         TraumaMobEffect.registerEvents()
         registerLivingEvents()
         PlayerVariable.registerEvents()
@@ -116,10 +120,13 @@ class Mod : ModInitializer {
         ModCapabilities.init()
         CustomData.load()
         CommandRegister.register()
+        ModCommandArguments.init()
         ContainerDataManager.register()
         ChunkPosSavedData.register()
         TDMSavedData.register()
         ModVersionEventHandler.register()
+        ServerSyncedEntityHandler.register()
+        ProjectileChunkSavedData.register()
 
         registerDataTickets()
         registerServerLifecycle()
@@ -156,7 +163,7 @@ class Mod : ModInitializer {
         ModPotionRecipes.register()
         ModRecipes.init()
         ModAttributes.init()
-        ModCommandArguments.register()
+        ModCommandArguments.init()
         ModTabs.init()
         ModPerks.init()
         LootingLevelCallback.EVENT.register(PowerfulAttraction::onLootingLevel)

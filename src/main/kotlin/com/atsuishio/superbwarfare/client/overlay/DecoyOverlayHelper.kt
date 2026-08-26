@@ -5,10 +5,10 @@ import com.atsuishio.superbwarfare.init.ModKeyMappings
 import com.atsuishio.superbwarfare.tools.mc
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object DecoyOverlayHelper {
 
     @JvmStatic
@@ -21,7 +21,7 @@ object DecoyOverlayHelper {
                 guiGraphics.drawString(
                     font,
                     Component.translatable("tips.superbwarfare.$key.ready").append(
-                        Component.literal(" ${entity.decoyCount} [${ModKeyMappings.RELEASE_DECOY.key.displayName.string}]")
+                        Component.literal(" ${entity.decoyCount} [${ModKeyMappings.RELEASE_DECOY.getTranslatedKeyMessage().string}]")
                     ),
                     x,
                     y,
@@ -60,7 +60,7 @@ object DecoyOverlayHelper {
 
             if (entity.decoyCount > 0) {
                 val componentReady = Component.translatable("tips.superbwarfare.$key.ready").append(
-                    Component.literal(" ${entity.decoyCount} [${ModKeyMappings.RELEASE_DECOY.key.displayName.string}]")
+                    Component.literal(" ${entity.decoyCount} [${ModKeyMappings.RELEASE_DECOY.getTranslatedKeyMessage().string}]")
                 )
                 val length = font.width(componentReady)
 

@@ -15,16 +15,14 @@ import net.minecraft.world.level.chunk.ChunkStatus
 import net.minecraft.world.level.chunk.LevelChunk
 import net.minecraft.world.level.chunk.ProtoChunk
 import net.minecraft.world.level.saveddata.SavedData
-import net.minecraftforge.event.TickEvent
-import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.common.Mod
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 
 /**
  * Per-dimension chunk manager that force-loads chunks for fast-moving projectiles.
  *
  * Inspired by Create Big Cannons / Ritchie's Projectile Library's ChunkManager.
  * Uses a queue-based approach where projectiles enqueue their current chunk each tick,
- * and this manager processes the queue at [net.minecraftforge.event.TickEvent.LevelTickEvent], force-loading chunks
+ * and this manager processes the queue at [ServerTickEvents.END_SERVER_TICK], force-loading chunks
  * via [ServerLevel.getChunkSource().updateChunkForced] and aging them out with a
  * configurable TTL.
  *
@@ -75,7 +73,7 @@ class ProjectileChunkSavedData private constructor(private val chunks: LongOpenH
     }
 
     /**
-     * Called at [net.minecraftforge.event.TickEvent.LevelTickEvent] END phase.
+     * Called at [ServerTickEvents.END_SERVER_TICK] END phase.
      * Ages existing forced chunks, processes the pending queue, and releases expired chunks.
      */
     fun tick(level: ServerLevel) {
@@ -198,7 +196,6 @@ class ProjectileChunkSavedData private constructor(private val chunks: LongOpenH
         return access is LevelChunk
     }
 
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
     companion object {
         private const val FILE_ID = "superbwarfare_projectile_chunks"
         private const val KEY_LOADED_CHUNKS = "LoadedChunks"
@@ -237,12 +234,14 @@ class ProjectileChunkSavedData private constructor(private val chunks: LongOpenH
             return ProjectileChunkSavedData(set)
         }
 
-        @SubscribeEvent
-        fun onChunkLoadLevelTick(event: TickEvent.LevelTickEvent) {
-            if (!ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()) return
-            if (event.phase != TickEvent.Phase.END) return
-            val level = event.level as? ServerLevel ?: return
-            tickLevel(level)
+        @JvmStatic
+        fun register() {
+            ServerTickEvents.END_SERVER_TICK.register { server ->
+                if (!ProjectileConfig.PROJECTILE_CHUNK_LOADING.get()) return@register
+                for (level in server.allLevels) {
+                    tickLevel(level)
+                }
+            }
         }
     }
 }

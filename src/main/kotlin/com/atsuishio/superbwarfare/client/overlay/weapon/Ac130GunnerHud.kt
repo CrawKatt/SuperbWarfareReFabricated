@@ -23,12 +23,11 @@ import net.minecraft.util.Mth
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
-import net.minecraftforge.client.gui.overlay.ForgeGui
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import org.joml.Math
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 class Ac130GunnerHud {
     companion object {
         val ROLL_IND = loc("textures/overlay/vehicle/helicopter/roll_ind.png")
@@ -49,13 +48,12 @@ class Ac130GunnerHud {
     fun render(
         vehicle: VehicleEntity,
         player: Player,
-        gui: ForgeGui,
+        mc: Minecraft,
         guiGraphics: GuiGraphics,
         partialTick: Float,
         screenWidth: Int,
         screenHeight: Int
     ) {
-        val mc = gui.minecraft
         val poseStack = guiGraphics.pose()
         val index = vehicle.getSeatIndex(player)
         val data = vehicle.getGunData(index) ?: return

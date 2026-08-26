@@ -36,7 +36,6 @@ open class SyncedEntityEnergyStorage(
     override fun onFinalCommit() {
         entityData.set(energyDataAccessor, energy.toInt())
     }
-    }
 
     override fun getEnergyStored(): Int {
         // 获取同步数据，保证客户端能正确获得能量值

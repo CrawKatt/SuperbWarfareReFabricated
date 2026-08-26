@@ -48,6 +48,7 @@ import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.item.misc.VehicleKeyItem
 import com.atsuishio.superbwarfare.mixins.EntityOnGroundAccessor
+import com.atsuishio.superbwarfare.network.CustomSpawnDataEntity
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
 import com.atsuishio.superbwarfare.network.message.receive.ClientVehicleItemMessage
 import com.atsuishio.superbwarfare.network.message.receive.EntityRelationSyncMessage
@@ -70,10 +71,14 @@ import net.minecraft.core.Holder
 import net.minecraft.core.NonNullList
 import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.nbt.*
+import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.chat.Component
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
+import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientGamePacketListener
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket
 import net.minecraft.network.protocol.game.ClientboundSoundPacket
 import net.minecraft.network.syncher.EntityDataAccessor
@@ -86,6 +91,7 @@ import net.minecraft.server.level.TicketType
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
+import net.minecraft.tags.FluidTags
 import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
 import net.minecraft.world.ContainerHelper
@@ -119,7 +125,6 @@ import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import org.joml.*
 import java.util.*
 import java.util.function.BiConsumer
-import java.util.function.BiPredicate
 import java.util.function.Consumer
 import java.util.function.Function
 import javax.annotation.ParametersAreNonnullByDefault
@@ -127,7 +132,7 @@ import kotlin.math.*
 
 open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEntityType, pLevel),
     VehiclePropertyModifier, HasCustomInventoryScreen, OBBEntity, BasicGeoVehicleEntity, IBvrSyncableEntity,
-    IEntityAdditionalSpawnData {
+    CustomSpawnDataEntity {
 
     val anim: VehicleAnimationInstance<VehicleEntity>? =
         if (pLevel.isClientSide) VehicleAnimationInstance.create(this) else null
@@ -1542,7 +1547,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
      * @return the clientbound spawning packet.
      */
     override fun getAddEntityPacket(): Packet<ClientGamePacketListener> {
-        return NetworkHooks.getEntitySpawningPacket(this)
+        return ClientboundAddEntityPacket(this)
     }
 
     /**
@@ -2199,13 +2204,13 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         return super.updateInWaterStateAndDoFluidPushing()
     }
 
-    override fun isInFluidType(predicate: BiPredicate<FluidType, Double>): Boolean {
-        val collisionOBB = getCollisionOBB() ?: return super.isInFluidType(predicate)
+    override fun isInLava(): Boolean {
+        val collisionOBB = getCollisionOBB() ?: return super.isInLava()
 
-        // 对于有碰撞OBB的载具，只有当OBB接触到流体时才判定为处于流体中
+        // 对于有碰撞OBB的载具，只有当OBB接触到熔岩时才判定为处于熔岩中
         val obbAABB = OBB.getWorldAABB(collisionOBB).deflate(0.001)
         if (obbAABB.hasNaN() || obbAABB.size <= 0.0) {
-            return super.isInFluidType(predicate)
+            return super.isInLava()
         }
 
         val level = level()
@@ -2221,7 +2226,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                 for (z in minZ until maxZ) {
                     val pos = BlockPos(x, y, z)
                     val fluidState = level.getFluidState(pos)
-                    if (!fluidState.isEmpty) {
+                    if (!fluidState.isEmpty && fluidState.`is`(FluidTags.LAVA)) {
                         val height = (y + fluidState.getHeight(level, pos)).toDouble()
                         if (height >= obbAABB.minY) {
                             val blockAABB = AABB(
@@ -2229,9 +2234,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                                 (x + 1).toDouble(), height, (z + 1).toDouble()
                             )
                             if (OBB.isColliding(collisionOBB, blockAABB)) {
-                                if (predicate.test(fluidState.fluidType, height)) {
-                                    return true
-                                }
+                                return true
                             }
                         }
                     }
@@ -2239,13 +2242,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             }
         }
         return false
-    }
-
-    override fun isInLava(): Boolean {
-        if (getCollisionOBB() == null) return super.isInLava()
-        return isInFluidType { type, _ ->
-            type === ForgeRegistries.FLUID_TYPES.get().getValue(ResourceLocation("minecraft", "lava"))
-        }
     }
 
     open var health: Float
@@ -4502,7 +4498,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         val flag1 = pVec.y != vec3.y
         val flag2 = pVec.z != vec3.z
         val flag3 = effectiveOnGround || flag1 && pVec.y < 0.0
-        val stepHeight = stepHeight
+        val stepHeight = maxUpStep()
 
         if (stepHeight > 0.0f && flag3 && (flag || flag2)) {
             // Try step-up

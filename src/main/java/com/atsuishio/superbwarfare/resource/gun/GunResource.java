@@ -31,7 +31,7 @@ public class GunResource implements DefaultDataSupplier<DefaultGunResource> {
         var item = stack.getItem();
         var gunItem = item instanceof GunItem ? (GunItem) item : null;
         var useEmpty = gunItem == null || stack.isEmpty();
-        this.item = useEmpty ? (GunItem) ModItems.EMPTY_GUN.get() : gunItem;
+        this.item = useEmpty ? (GunItem) ModItems.EMPTY_GUN : gunItem;
         this.stack = stack;
         this.id = useEmpty ? EmptyGunItem.EMPTY_GUN_ID : getRegistryId(stack.getItem());
     }

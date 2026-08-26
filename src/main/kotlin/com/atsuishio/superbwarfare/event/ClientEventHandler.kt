@@ -569,8 +569,8 @@ object ClientEventHandler {
     fun handleClientTick() {
         val player = localPlayer ?: return
         if (mc.fps <= 20) {
-            handleGunShoot()
-            handleVehicleGunShoot()
+            handleWeaponFire()
+            handleVehicleFire()
         }
 
         val stack = player.mainHandItem
@@ -637,7 +637,11 @@ object ClientEventHandler {
         }
     }
 
-        val active = PlayerVariable.getOrDefault(player).activeThermalImaging
+    @JvmStatic
+    fun turnOnThermalImaging() {
+        ThermalShaderHandler.setActive(true)
+        mc.gameRenderer.loadEffect(com.atsuishio.superbwarfare.Mod.loc("shaders/post/night_vision.json"))
+    }
 
     @JvmStatic
     fun turnOffThermalImaging() {
@@ -652,7 +656,7 @@ object ClientEventHandler {
 
     @JvmStatic
     fun isWearingHandsomeGoggles(player: Player): Boolean {
-        return player.getItemBySlot(EquipmentSlot.HEAD).`is`(ModItems.HANDSOME_GOGGLES.get())
+        return player.getItemBySlot(EquipmentSlot.HEAD).`is`(ModItems.HANDSOME_GOGGLES)
     }
 
     fun handleHandsomeGoggles(player: Player) {

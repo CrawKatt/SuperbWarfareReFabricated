@@ -471,7 +471,7 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                     1f
                 )
 
-                val string = "[" + ModKeyMappings.VEHICLE_SEEK.key.displayName.string + "]"
+                val string = "[" + ModKeyMappings.VEHICLE_SEEK.getTranslatedKeyMessage().string + "]"
                 val width = mc.font.width(string)
                 guiGraphics.drawString(
                     mc.font,

@@ -10,13 +10,13 @@ import com.atsuishio.superbwarfare.perk.IAmmoStat
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.perk.PerkInstance
 import com.atsuishio.superbwarfare.script.ScriptManager
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
-import net.minecraftforge.registries.ForgeRegistries
 
 open class JsPerk(val perkId: String, private val descriptor: PerkDescriptor) : Perk(perkId, descriptor.perkType),
     IAmmoStat {
@@ -31,7 +31,7 @@ open class JsPerk(val perkId: String, private val descriptor: PerkDescriptor) : 
             val effects = mutableListOf<MobEffect>()
             descriptor.mobEffects?.forEach { name ->
                 val rl = ResourceLocation.tryParse(name) ?: return@forEach
-                val effect = ForgeRegistries.MOB_EFFECTS.getValue(rl)
+                val effect = BuiltInRegistries.MOB_EFFECT.get(rl)
                 if (effect != null) {
                     effects.add(effect)
                 } else {

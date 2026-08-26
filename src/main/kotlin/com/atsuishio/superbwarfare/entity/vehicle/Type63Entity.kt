@@ -130,7 +130,7 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
                                 vec3.x,
                                 vec3.y,
                                 vec3.z,
-                                ModSounds.WHEEL_VEHICLE_STEP.get(),
+                                ModSounds.WHEEL_VEHICLE_STEP,
                                 SoundSource.PLAYERS,
                                 0.5f,
                                 random.nextFloat() * 0.05f + 0.975f
@@ -155,7 +155,7 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
                                 vec3.x,
                                 vec3.y,
                                 vec3.z,
-                                ModSounds.WHEEL_VEHICLE_STEP.get(),
+                                ModSounds.WHEEL_VEHICLE_STEP,
                                 SoundSource.PLAYERS,
                                 0.5f,
                                 random.nextFloat() * 0.05f + 0.975f
@@ -178,7 +178,7 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
                                 vec3.x,
                                 vec3.y,
                                 vec3.z,
-                                ModSounds.TYPE_63_RELOAD.get(),
+                                ModSounds.TYPE_63_RELOAD,
                                 SoundSource.PLAYERS,
                                 1f,
                                 random.nextFloat() * 0.1f + 0.9f
@@ -231,7 +231,7 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
                         vec3.x,
                         vec3.y,
                         vec3.z,
-                        ModSounds.TYPE_63_RELOAD.get(),
+                        ModSounds.TYPE_63_RELOAD,
                         SoundSource.PLAYERS,
                         1f,
                         random.nextFloat() * 0.1f + 0.9f
@@ -297,7 +297,7 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
                     vec3.x,
                     vec3.y,
                     vec3.z,
-                    ModSounds.HAND_WHEEL_ROT.get(),
+                    ModSounds.HAND_WHEEL_ROT,
                     SoundSource.PLAYERS,
                     1f,
                     random.nextFloat() * 0.05f + 0.975f
@@ -324,7 +324,7 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
         val shootPos = vector3dToVec3(obb.center)
 
         val entityToSpawn = MediumRocketEntity(
-            ModEntities.MEDIUM_ROCKET.get(),
+            ModEntities.MEDIUM_ROCKET,
             shootPos.x,
             shootPos.y,
             shootPos.z,
@@ -509,7 +509,7 @@ open class Type63Entity(type: EntityType<Type63Entity>, level: Level) : VehicleE
         @JvmField
         val LOADED_AMMO: EntityDataAccessor<List<Int>> = SynchedEntityData.defineId(
             Type63Entity::class.java,
-            ModSerializers.INT_LIST_SERIALIZER.get()
+            ModSerializers.INT_LIST_SERIALIZER
         )
     }
 }

@@ -3,20 +3,24 @@ package com.atsuishio.superbwarfare.item.armor
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.renderer.armor.HandsomeGogglesRenderer
 import com.atsuishio.superbwarfare.init.ModEntities
+import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.resource.model.ArmorModelReloadListener
 import com.atsuishio.superbwarfare.tiers.ModArmorMaterial
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import com.atsuishio.superbwarfare.tools.TraceTool
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer
 import net.minecraft.ChatFormatting
-import net.minecraft.client.model.HumanoidModel
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResultHolder
-import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.monster.Ghast
 import net.minecraft.world.entity.player.Player
@@ -25,34 +29,11 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Rarity
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
-import net.minecraftforge.client.extensions.common.IClientItemExtensions
-import java.util.function.Consumer
 import kotlin.math.cos
 import kotlin.math.sin
 
 class HandsomeGogglesItem :
     ArmorItem(ModArmorMaterial.STEEL, Type.HELMET, Properties().rarity(Rarity.EPIC).fireResistant()) {
-    override fun isDamageable(stack: ItemStack) = false
-
-    override fun initializeClient(consumer: Consumer<IClientItemExtensions?>) {
-        consumer.accept(object : IClientItemExtensions {
-            private var renderer: HandsomeGogglesRenderer? = null
-
-            override fun getHumanoidArmorModel(
-                livingEntity: LivingEntity?,
-                itemStack: ItemStack?,
-                equipmentSlot: EquipmentSlot?,
-                original: HumanoidModel<*>?
-            ): HumanoidModel<*> {
-                if (this.renderer == null) {
-                    this.renderer = HandsomeGogglesRenderer(ArmorModelReloadListener.getModel(MODEL)!!, equipmentSlot!!)
-                }
-
-                this.renderer!!.preparePose(livingEntity, itemStack, equipmentSlot, original)
-                return this.renderer!!
-            }
-        })
-    }
 
     override fun appendHoverText(
         pStack: ItemStack,
@@ -102,7 +83,7 @@ class HandsomeGogglesItem :
 
             pLevel.playSound(
                 null, target.blockPosition(),
-                ModSounds.DPS_GENERATOR_EVOLVE.get(), SoundSource.PLAYERS,
+                ModSounds.DPS_GENERATOR_EVOLVE, SoundSource.PLAYERS,
                 1.5f, 1.2f
             )
 
@@ -131,7 +112,7 @@ class HandsomeGogglesItem :
                 40, 1.5, 2.5, 1.5, 0.15, true
             )
 
-            val happiestGhast = ModEntities.HAPPIEST_GHAST.get().create(pLevel) ?: return
+            val happiestGhast = ModEntities.HAPPIEST_GHAST.create(pLevel) ?: return
             happiestGhast.moveTo(target.x, target.y, target.z, target.yRot, target.xRot)
             target.discard()
             pLevel.addFreshEntity(happiestGhast)
@@ -148,6 +129,45 @@ class HandsomeGogglesItem :
 
     companion object {
         val MODEL = loc("models/bedrock/armor/handsome_goggles.geo.json")
+        val TEXTURE = HandsomeGogglesRenderer.TEXTURE
+
+        @Environment(EnvType.CLIENT)
+        private var renderer: HandsomeGogglesRenderer? = null
+
+        @Environment(EnvType.CLIENT)
+        @JvmStatic
+        fun registerRenderer() {
+            ArmorRenderer.register(
+                { matrices, vertexConsumers, stack, entity, slot, light, contextModel ->
+                    var gogglesRenderer = renderer
+
+                    if (gogglesRenderer == null) {
+                        val model = ArmorModelReloadListener.getModel(MODEL) ?: return@register
+                        gogglesRenderer = HandsomeGogglesRenderer(model, slot)
+                        renderer = gogglesRenderer
+                    }
+
+                    gogglesRenderer.preparePose(entity, stack, slot, contextModel)
+                    gogglesRenderer.young = entity.isBaby
+
+                    gogglesRenderer.renderToBuffer(
+                        matrices,
+                        vertexConsumers.getBuffer(RenderType.entityTranslucent(TEXTURE)),
+                        light,
+                        OverlayTexture.NO_OVERLAY,
+                        1f, 1f, 1f, 1f
+                    )
+                    gogglesRenderer.renderToBuffer(
+                        matrices,
+                        vertexConsumers.getBuffer(RenderType.eyes(gogglesRenderer.texture)),
+                        light,
+                        OverlayTexture.NO_OVERLAY,
+                        1f, 1f, 1f, 1f
+                    )
+                },
+                ModItems.HANDSOME_GOGGLES
+            )
+        }
 
         private fun findGhastInSight(player: Player): Ghast? {
             val target = TraceTool.findLookingEntity(player, 5.0)

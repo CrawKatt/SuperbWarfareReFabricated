@@ -14,7 +14,7 @@ open class Mk84Entity(type: EntityType<out Mk84Entity>, level: Level) : AerialBo
     }
 
     override fun getDefaultItem(): Item {
-        return ModItems.LARGE_AERIAL_BOMB.get()
+        return ModItems.LARGE_AERIAL_BOMB
     }
 
     override val maxHealth: Float

@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.event.ClientEventHandler.activeThermalImaging
+import com.atsuishio.superbwarfare.event.custom.RenderPlayerArmCallback
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.mojang.blaze3d.vertex.PoseStack
@@ -32,7 +33,6 @@ import software.bernie.geckolib.cache.`object`.GeoBone
 import software.bernie.geckolib.core.animatable.model.CoreGeoBone
 import software.bernie.geckolib.core.animation.AnimationProcessor
 import software.bernie.geckolib.util.RenderUtils
-import thedarkcolour.kotlinforforge.forge.FORGE_BUS
 
 @Deprecated("Geckolib will be removed since 0.8.10, use Simple Bedrock Model instead")
 object AnimationHelper {
@@ -222,7 +222,7 @@ object AnimationHelper {
             stack.popPose()
 
             lerpTimer = Mth.lerp(
-                Minecraft.getInstance().partialTick.toDouble(),
+                Minecraft.getInstance().frameTime.toDouble(),
                 lerpTimer.toDouble(),
                 ClientEventHandler.fireRotTimer * 0.667f
             ).toFloat()
@@ -542,7 +542,7 @@ object AnimationHelper {
             localPlayer, transformType, stack, arm, bone,
             currentBuffer, renderType, packedLightIn, useOldHandRender
         )
-        if (FORGE_BUS.post(renderPlayerArmEvent)) {
+        if (RenderPlayerArmCallback.post(renderPlayerArmEvent)) {
             currentBuffer.getBuffer(renderType) // 用来重置 Render Type，防止后续渲染出错
             stack.popPose()
             return

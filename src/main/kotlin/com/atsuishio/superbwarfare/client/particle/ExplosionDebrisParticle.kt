@@ -3,11 +3,11 @@ package com.atsuishio.superbwarfare.client.particle
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.particle.*
 import net.minecraft.world.phys.Vec3
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.max
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 open class ExplosionDebrisParticle protected constructor(
     world: ClientLevel,
     x: Double,
@@ -35,7 +35,7 @@ open class ExplosionDebrisParticle protected constructor(
     var life: Int
     var size: Float
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     class Provider(private val spriteSet: SpriteSet) : ParticleProvider<ExplosionDebrisOption> {
         override fun createParticle(
             pType: ExplosionDebrisOption,
