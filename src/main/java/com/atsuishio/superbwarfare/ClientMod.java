@@ -14,7 +14,6 @@ import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
 import com.atsuishio.superbwarfare.client.renderer.special.TowingChainRenderer;
 import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.screens.SnapshotWarningScreen;
-import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler;
 import com.atsuishio.superbwarfare.config.ClientConfig;
 import com.atsuishio.superbwarfare.data.DataLoader;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
