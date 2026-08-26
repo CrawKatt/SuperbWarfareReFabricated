@@ -83,5 +83,6 @@ object ModSerializers {
         EntityDataSerializers.registerSerializer(FLOAT_LIST_SERIALIZER)
         EntityDataSerializers.registerSerializer(VEHICLE_GUN_DATA_MAP_SERIALIZER)
         EntityDataSerializers.registerSerializer(SHORT_LIST_LIST_SERIALIZER)
+        EntityDataSerializers.registerSerializer(VEC3_SERIALIZER)
     }
 }
