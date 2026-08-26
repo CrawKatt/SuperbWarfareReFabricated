@@ -7,9 +7,11 @@ import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.resource.ModelResource
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedSoundEvent
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVec3
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVector3f
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import org.joml.Vector3f
 
 @Serializable
 class DefaultGunResource : IDBasedData<DefaultGunResource> {
@@ -73,15 +75,18 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
     @SerialName("CanZoom")
     var canZoom: Boolean = true
 
+    @SerialName("RootOffset")
+    var rootOffset: SerializedVector3f = Vector3f(0f, 0f, 0f)
+
     @Serializable
     class ItemDisplayInfo {
         @SerialName("translation")
-        var translation: FloatArray = floatArrayOf(0f, 0f, 0f)
+        var translation: SerializedVector3f = Vector3f(0f, 0f, 0f)
 
         @SerialName("rotation")
-        var rotation: FloatArray = floatArrayOf(0f, 0f, 0f)
+        var rotation: SerializedVector3f = Vector3f(0f, 0f, 0f)
 
         @SerialName("scale")
-        var scale: FloatArray = floatArrayOf(1f, 1f, 1f)
+        var scale: SerializedVector3f = Vector3f(0f, 0f, 0f)
     }
 }
