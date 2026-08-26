@@ -17,7 +17,6 @@
     "EntityMixin",
     "EntityOnGroundAccessor",
     "EntityPersistentDataMixin",
-    "EntitySetPosRawMixin",
     "ExplosionDetonateMixin",
     "ExplosionMixin",
     "FishingHookMixin",

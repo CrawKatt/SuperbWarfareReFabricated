@@ -47,15 +47,29 @@ object ModPerks {
     private val registeredIds = mutableSetOf<String>()
     private val autoRegistryObjects = mutableMapOf<String, Perk>()
 
-    init {
-        autoRegisterFromJsons()
-    }
-
     /**
      * Ammo Perks
      */
     @JvmField
     val AMMO_PERKS: MutableList<Perk> = arrayListOf()
+
+    /**
+     * Functional Perks
+     */
+    @JvmField
+    val FUNC_PERKS: MutableList<Perk> = arrayListOf()
+
+    /**
+     * Damage Perks
+     */
+    @JvmField
+    val DAMAGE_PERKS: MutableList<Perk> = arrayListOf()
+
+    init {
+        // Runs after the perk lists above are initialized: JSON-defined perks take
+        // precedence over the hardcoded fallbacks below (same as upstream).
+        autoRegisterFromJsons()
+    }
 
     private fun registerAmmoPerk(id: String, perk: () -> Perk): Perk {
         registeredIds.add(id)
@@ -92,12 +106,6 @@ object ModPerks {
     }
     // @formatter:on
 
-    /**
-     * Functional Perks
-     */
-    @JvmField
-    val FUNC_PERKS: MutableList<Perk> = arrayListOf()
-
     private fun registerFuncPerk(id: String, perk: () -> Perk): Perk {
         registeredIds.add(id)
         val registered = Registry.register(PERK_REGISTRY, loc(id), perk())
@@ -127,12 +135,6 @@ object ModPerks {
         EmptyPerk("eager_edge", Perk.Type.FUNCTIONAL)
     }
     // @formatter:on
-
-    /**
-     * Damage Perks
-     */
-    @JvmField
-    val DAMAGE_PERKS: MutableList<Perk> = arrayListOf()
 
     private fun registerDamagePerk(id: String, perk: () -> Perk): Perk {
         registeredIds.add(id)
