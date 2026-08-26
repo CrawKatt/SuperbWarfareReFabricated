@@ -60,7 +60,6 @@ public abstract class EffectInstanceMixin {
 
         int colon = rest.indexOf(':');
         if (colon < 0) {
-            // vanilla reference — keep the original location untouched
             return new ResourceLocation(raw);
         }
 
