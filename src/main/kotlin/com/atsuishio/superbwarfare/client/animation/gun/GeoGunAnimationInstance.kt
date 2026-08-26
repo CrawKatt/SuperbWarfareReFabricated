@@ -32,7 +32,7 @@ open class GeoGunAnimationInstance(
     }
 
     private fun loadAnimations() {
-        val location = GunResource.compute(stack).model?.animation ?: return
+        val location = GunResource.compute(stack).getModel().animation ?: return
         GunModelReloadListener.getAnimation(location)?.forEach { animation ->
             animations[animation.name] = animation
         }
