@@ -117,7 +117,9 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
             if (pose != null) {
                 model.applyPose(BLENDER.blend(model.getBindPose(), pose))
             }
-            ClientEventHandler.gunRootMoveV2(poseStack, 0f, 0f, 0f, false)
+
+            val rootOffset = resource.rootOffset
+            ClientEventHandler.gunRootMoveV2(poseStack, rootOffset.x, rootOffset.y, rootOffset.z, false)
             applyFirstPersonPositioningTransform(poseStack, model)
         }
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
@@ -171,21 +173,15 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 
     private fun applyItemDisplayTransform(poseStack: PoseStack, display: DefaultGunResource.ItemDisplayInfo) {
         val translation = display.translation
-        if (translation.size >= 3) {
-            poseStack.translate(translation[0] / 16f, translation[1] / 16f, translation[2] / 16f)
-        }
+        poseStack.translate(translation[0] / 16f, translation[1] / 16f, translation[2] / 16f)
 
         val rotation = display.rotation
-        if (rotation.size >= 3) {
-            poseStack.mulPose(Axis.XP.rotationDegrees(rotation[0]))
-            poseStack.mulPose(Axis.YP.rotationDegrees(rotation[1]))
-            poseStack.mulPose(Axis.ZP.rotationDegrees(rotation[2]))
-        }
+        poseStack.mulPose(Axis.XP.rotationDegrees(rotation[0]))
+        poseStack.mulPose(Axis.YP.rotationDegrees(rotation[1]))
+        poseStack.mulPose(Axis.ZP.rotationDegrees(rotation[2]))
 
         val scale = display.scale
-        if (scale.size >= 3) {
-            poseStack.scale(scale[0], scale[1], scale[2])
-        }
+        poseStack.scale(scale[0], scale[1], scale[2])
     }
 
     private fun displayKey(transformType: ItemDisplayContext): String {
