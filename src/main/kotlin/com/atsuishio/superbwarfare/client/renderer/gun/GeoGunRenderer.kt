@@ -1,8 +1,10 @@
 package com.atsuishio.superbwarfare.client.renderer.gun
 
+import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance
 import com.atsuishio.superbwarfare.client.model.gun.GeoGunModel
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
+import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.resource.gun.DefaultGunResource
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
@@ -24,6 +26,8 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import org.joml.Matrix4f
+import org.joml.Quaternionf
+import org.joml.Vector3f
 
 open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 
@@ -121,7 +125,47 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 
     private fun applyFirstPersonPositioningTransform(poseStack: PoseStack, model: GeoGunModel) {
         val idleViewTransform = model.getGlobalTransform(IDLE_VIEW_BONE) ?: return
-        poseStack.mulPoseMatrix(Matrix4f(idleViewTransform).invert())
+        val zoom = AnimationCurves.EASE_IN_OUT_QUINT
+            .apply(ClientEventHandler.zoomTime.coerceIn(0.0, 1.0))
+            .toFloat()
+
+        val viewTransform = if (zoom <= 0f) {
+            Matrix4f(idleViewTransform)
+        } else {
+            val ironViewTransform = model.getGlobalTransform(IRON_VIEW_BONE)
+            if (ironViewTransform == null) {
+                Matrix4f(idleViewTransform)
+            } else {
+                blendViewTransform(Matrix4f(idleViewTransform), Matrix4f(ironViewTransform), zoom)
+            }
+        }
+
+        poseStack.mulPoseMatrix(viewTransform.invert())
+    }
+
+    private fun blendViewTransform(from: Matrix4f, to: Matrix4f, t: Float): Matrix4f {
+        val translation = Vector3f()
+        val toTranslation = Vector3f()
+        from.getTranslation(translation)
+        to.getTranslation(toTranslation)
+        translation.lerp(toTranslation, t)
+
+        val rotation = Quaternionf()
+        val toRotation = Quaternionf()
+        from.getNormalizedRotation(rotation)
+        to.getNormalizedRotation(toRotation)
+        rotation.slerp(toRotation, t)
+
+        val scale = Vector3f()
+        val toScale = Vector3f()
+        from.getScale(scale)
+        to.getScale(toScale)
+        scale.lerp(toScale, t)
+
+        return Matrix4f()
+            .translation(translation)
+            .rotate(rotation)
+            .scale(scale)
     }
 
     private fun applyItemDisplayTransform(poseStack: PoseStack, display: DefaultGunResource.ItemDisplayInfo) {
@@ -159,6 +203,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 
     companion object {
         private const val IDLE_VIEW_BONE = "idle_view"
+        private const val IRON_VIEW_BONE = "iron_view"
 
         private val BLENDER: EulerAdditiveBlender =
             SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }

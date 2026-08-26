@@ -16,32 +16,6 @@
 					"pivot": [0, 0, 0]
 				},
 				{
-					"name": "positioning",
-					"parent": "root",
-					"pivot": [0, 0, 0]
-				},
-				{
-					"name": "idle_view",
-					"parent": "positioning",
-					"pivot": [2, 3, 7]
-				},
-				{
-					"name": "thirdperson_hand",
-					"parent": "positioning",
-					"pivot": [0, 4.225, -0.35]
-				},
-				{
-					"name": "ground",
-					"parent": "positioning",
-					"pivot": [0, -1.9, -0.35]
-				},
-				{
-					"name": "fixed",
-					"parent": "positioning",
-					"pivot": [0.7, 3.6, -0.175],
-					"rotation": [0, -90, 0]
-				},
-				{
 					"name": "head",
 					"parent": "root",
 					"pivot": [0, 0.32257, -5.37042],
@@ -757,6 +731,36 @@
 							}
 						}
 					]
+				},
+				{
+					"name": "positioning",
+					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "idle_view",
+					"parent": "positioning",
+					"pivot": [2, 3, 7]
+				},
+				{
+					"name": "iron_view",
+					"parent": "positioning",
+					"pivot": [0, 1.8, 7]
+				},
+				{
+					"name": "thirdperson_hand",
+					"parent": "positioning",
+					"pivot": [0, 4.225, -0.35]
+				},
+				{
+					"name": "ground",
+					"parent": "positioning",
+					"pivot": [0, -1.9, -0.35]
+				},
+				{
+					"name": "fixed",
+					"parent": "positioning",
+					"pivot": [0.7, 3.6, -0.175],
+					"rotation": [0, -90, 0]
 				}
 			]
 		}
