@@ -3,6 +3,9 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.ClientMouseHandler;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.tools.EntityFindUtil;
@@ -28,11 +31,59 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
+
+    @Unique
+    private boolean superbWarfare$anglesComputed;
+
+    @Unique
+    private float superbWarfare$computedYaw;
+
+    @Unique
+    private float superbWarfare$computedPitch;
+
+    @Unique
+    private float superbWarfare$partialTicks;
     @Shadow(aliases = "Lnet/minecraft/client/Camera;setRotation(FF)V")
     protected abstract void setRotation(float p_90573_, float p_90574_);
 
     @Shadow(aliases = "Lnet/minecraft/client/Camera;setPosition(DDD)V")
     protected abstract void setPosition(double p_90585_, double p_90586_, double p_90587_);
+
+    @Inject(method = "setup", at = @At("HEAD"))
+    private void superbWarfare$capturePartialTicks(BlockGetter level, Entity entity, boolean detached,
+                                                    boolean mirrored, float partialTicks, CallbackInfo ci) {
+        superbWarfare$anglesComputed = false;
+        superbWarfare$partialTicks = partialTicks;
+    }
+
+    @ModifyArgs(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0))
+    private void superbWarfare$applyComputedAngles(Args args) {
+        superbWarfare$computeAngles(args.get(0), args.get(1));
+        args.set(0, superbWarfare$computedYaw);
+        args.set(1, superbWarfare$computedPitch);
+    }
+
+    @Unique
+    private void superbWarfare$computeAngles(float yaw, float pitch) {
+        if (superbWarfare$anglesComputed) return;
+        superbWarfare$anglesComputed = true;
+
+        Camera camera = (Camera) (Object) this;
+        ClientMouseHandler.handleClientTick(camera, superbWarfare$partialTicks);
+
+        ClientEventHandler.CameraAnglesContext context = new ClientEventHandler.CameraAnglesContext(
+                camera,
+                superbWarfare$partialTicks,
+                yaw,
+                pitch,
+                0f
+        );
+
+        ClientEventHandler.computeCameraAngles(context);
+        superbWarfare$computedYaw = context.getYaw();
+        superbWarfare$computedPitch = context.getPitch();
+    }
+
 
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0),
             method = "setup(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/world/entity/Entity;ZZF)V",
