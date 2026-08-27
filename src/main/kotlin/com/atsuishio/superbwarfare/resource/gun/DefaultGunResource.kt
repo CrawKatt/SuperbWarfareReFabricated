@@ -75,8 +75,8 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
     @SerialName("CanZoom")
     var canZoom: Boolean = true
 
-    @SerialName("RootOffset")
-    var rootOffset: SerializedVector3f = Vector3f(0f, 0f, 0f)
+    @SerialName("SprintOffset")
+    var sprintOffset: SerializedVector3f = Vector3f(0f, 0f, 0f)
 
     @Serializable
     class ItemDisplayInfo {
