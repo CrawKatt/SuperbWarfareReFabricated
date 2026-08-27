@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.client.animation.gun
 
+import com.atsuishio.superbwarfare.client.animation.AnimationPlayType
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.resource.gun.GunResource
@@ -7,10 +8,15 @@ import com.atsuishio.superbwarfare.resource.model.GunModelReloadListener
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnimationInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.animation.BedrockAnimation
+import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.DummyPose
 import com.maydaymemory.mae.basic.Pose
+import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
+import com.maydaymemory.mae.blend.EulerAdditiveBlender
+import com.maydaymemory.mae.blend.SimpleEulerAdditiveBlender
 import com.maydaymemory.mae.control.runner.AnimationContext
 import com.maydaymemory.mae.control.runner.AnimationRunner
+import com.maydaymemory.mae.control.runner.StopState
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
@@ -23,7 +29,10 @@ open class GeoGunAnimationInstance(
 ) : IFPAnimationInstance {
     private val animations = hashMapOf<String, BedrockAnimation>()
     private var runner: AnimationRunner? = null
+    private var fireRunner: AnimationRunner? = null
     private var currentState: GunAnimationState? = null
+    private var fireSerial = 0
+    private var consumedFireSerial = 0
     private var cachedPose: Pose = DummyPose.INSTANCE
     private val cameraRotation = Quaternionf()
 
@@ -32,6 +41,7 @@ open class GeoGunAnimationInstance(
     }
 
     private fun loadAnimations() {
+        animations.clear()
         val location = GunResource.compute(stack).getModel().animation ?: return
         GunModelReloadListener.getAnimation(location)?.forEach { animation ->
             animations[animation.name] = animation
@@ -53,10 +63,6 @@ open class GeoGunAnimationInstance(
         }
 
         if (animation.melee != null && ClientEventHandler.gunMelee > 0) return GunAnimationState.MELEE
-        if (animation.fire != null && ClientEventHandler.holdingFireKey && data.canShoot(player)) {
-            return GunAnimationState.FIRE
-        }
-
         if (animation.run != null
             && player.isSprinting
             && player.onGround()
@@ -67,6 +73,18 @@ open class GeoGunAnimationInstance(
         }
 
         return if (animation.idle != null) GunAnimationState.IDLE else null
+    }
+
+    fun triggerFire(stack: ItemStack) {
+        val animation = GunResource.compute(stack).animation ?: return
+        val fireName = animation.fire ?: return
+        if (!animations.containsKey(fireName)) return
+
+        if (this.stack.item != stack.item) {
+            updateItem(stack)
+        }
+
+        fireSerial++
     }
 
     private fun animationName(state: GunAnimationState): String? {
@@ -94,6 +112,17 @@ open class GeoGunAnimationInstance(
         cachedPose = newRunner.evaluate()
     }
 
+    private fun playFire() {
+        val animation = GunResource.compute(stack).animation ?: return
+        val fireName = animation.fire ?: return
+        val fireAnimation = animations[fireName] ?: return
+
+        val newRunner = AnimationRunner(fireAnimation, AnimationContext(fireAnimation.specifiedEndTimeS))
+        newRunner.state = AnimationPlayType.PLAY_ONCE_STOP.state()
+        fireRunner = newRunner
+        cachedPose = newRunner.evaluate()
+    }
+
     override fun currentItem(): ItemStack = stack
 
     override fun getPose(): Pose = cachedPose
@@ -115,7 +144,24 @@ open class GeoGunAnimationInstance(
             runner?.tick()
         }
 
-        cachedPose = runner?.evaluate() ?: DummyPose.INSTANCE
+        if (fireSerial > consumedFireSerial) {
+            playFire()
+            consumedFireSerial = fireSerial
+        } else {
+            fireRunner?.tick()
+        }
+
+        if (fireRunner?.state is StopState) {
+            fireRunner = null
+        }
+
+        val basePose = runner?.evaluate() ?: DummyPose.INSTANCE
+        val firePose = fireRunner?.evaluate() ?: DummyPose.INSTANCE
+        cachedPose = when {
+            basePose == DummyPose.INSTANCE -> firePose
+            firePose == DummyPose.INSTANCE -> basePose
+            else -> BLENDER.blend(basePose, firePose)
+        }
     }
 
     override fun getCameraRotation(): Quaternionf = cameraRotation
@@ -125,7 +171,9 @@ open class GeoGunAnimationInstance(
     }
 
     override fun updateItem(stack: ItemStack) {
+        val itemChanged = this.stack.item != stack.item
         this.stack = stack
+        if (itemChanged) loadAnimations()
     }
 
     override fun triggerDraw() {
@@ -136,11 +184,19 @@ open class GeoGunAnimationInstance(
 
     override fun triggerPutAway() {
         runner = null
+        fireRunner = null
         currentState = null
+        fireSerial = 0
+        consumedFireSerial = 0
         cachedPose = DummyPose.INSTANCE
     }
 
     override fun shouldRenderHand(): Boolean {
         return true
+    }
+
+    companion object {
+        private val BLENDER: EulerAdditiveBlender =
+            SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }
     }
 }

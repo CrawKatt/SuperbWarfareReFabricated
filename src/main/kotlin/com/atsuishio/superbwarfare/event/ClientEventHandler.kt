@@ -1,9 +1,11 @@
 package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.api.event.ClientGunFireEvent
 import com.atsuishio.superbwarfare.api.event.ClientVehicleFireEvent
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
+import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance
 import com.atsuishio.superbwarfare.client.lighting.LightPositionRegistry
 import com.atsuishio.superbwarfare.client.lighting.MuzzleFlashHelper
 import com.atsuishio.superbwarfare.client.lighting.VehicleLightingHandler
@@ -26,6 +28,7 @@ import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
+import com.github.mcmodderanchor.simplebedrockmodel.v1.client.handler.FirstPersonRenderHandler
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.ChatFormatting
@@ -1759,6 +1762,8 @@ object ClientEventHandler {
         randomShell[0] = (1 + 0.2 * (Math.random() - 0.5))
         randomShell[1] = (0.2 + (Math.random() - 0.5))
         randomShell[2] = (0.7 + (Math.random() - 0.5))
+
+        postEvent(ClientGunFireEvent(player, stack))
     }
 
     fun playGunClientSounds(player: Player) {
@@ -2591,7 +2596,8 @@ object ClientEventHandler {
 
         val gunPosX = zoom * x * (recoilHorizon * (0.5f * firePosZ)).toFloat()
         val gunPosY = zoom * y * (getBoneMoveY(firePosTimer.toFloat()) * -0.05 * (1 - 0.25 * zoomTime)).toFloat()
-        val gunPosZ = zoom * z * (getBoneMoveZ(firePosTimer.toFloat()) * 0.1 + 1.1f * firePosZ).toFloat() * (1 - 0.5 * zoomTime).toFloat()
+        val gunPosZ =
+            zoom * z * (getBoneMoveZ(firePosTimer.toFloat()) * 0.1 + 1.1f * firePosZ).toFloat() * (1 - 0.5 * zoomTime).toFloat()
 
         val gunRotX =
             zoom * rotX * (-getBoneRotX(fireRotTimer.toFloat()) * Mth.DEG_TO_RAD * 0.5f + 0.01f * firePosZ).toFloat() * gripRecoilX * recoil *
@@ -3289,5 +3295,12 @@ object ClientEventHandler {
             ?: vehicle.getGunName(vehicle.getSeatIndex(shooter))
             ?: return
         ani.fire(name.camelToSnake(), index)
+    }
+
+    @SubscribeEvent
+    fun onClientGunFire(event: ClientGunFireEvent) {
+        val instance =
+            FirstPersonRenderHandler.getActiveAnimationInstance(event.hand) as? GeoGunAnimationInstance ?: return
+        instance.triggerFire(event.stack)
     }
 }
