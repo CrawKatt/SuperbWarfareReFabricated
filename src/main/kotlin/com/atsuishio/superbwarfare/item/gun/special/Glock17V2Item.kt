@@ -1,11 +1,10 @@
 package com.atsuishio.superbwarfare.item.gun.special
 
 import com.atsuishio.superbwarfare.data.gun.GunData
-import com.atsuishio.superbwarfare.item.gun.GunItem
-import net.minecraft.world.item.Item.Properties
+import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
 import java.util.function.Consumer
 
-object Glock17V2Item : GunItem(Properties()) {
+object Glock17V2Item : GeoGunItemV2(Properties()) {
     override fun isOpenBolt(data: GunData) = true
 
     override fun hasBulletInBarrel(data: GunData) = true

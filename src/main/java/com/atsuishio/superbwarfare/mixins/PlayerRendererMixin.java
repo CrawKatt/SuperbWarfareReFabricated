@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.init.ModEnumExtensions;
 import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
+import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
@@ -44,6 +45,8 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
 
         if (stack.getItem() instanceof GunGeoItem gunGeoItem) {
             cir.setReturnValue(gunGeoItem.getArmPose(player, hand, stack));
+        } else if (stack.getItem() instanceof GeoGunItemV2 geoGunItemV2) {
+            cir.setReturnValue(geoGunItemV2.getArmPose(player, hand, stack));
         } else if (stack.is(ModItems.LUNGE_MINE) && player.getUsedItemHand() == hand) {
             cir.setReturnValue(ModEnumExtensions.Client.getLungeMinePose());
         }
