@@ -63,6 +63,10 @@ public class DefaultGunResource implements IDBasedData<DefaultGunResource> {
 
     @SerializedName("EjectShell")
     public boolean ejectShell = false;
+
+    @SerializedName("ShellEject")
+    public ShellEject shellEject = null;
+
     @SerializedName("CanZoom")
     public boolean canZoom = true;
 
@@ -78,5 +82,37 @@ public class DefaultGunResource implements IDBasedData<DefaultGunResource> {
 
         @SerializedName("scale")
         public float[] scale = {0f, 0f, 0f};
+    }
+
+    public static class ShellEject {
+        @SerializedName("BoneName")
+        public String boneName = "shell";
+
+        @SerializedName("ShellModel")
+        public net.minecraft.resources.ResourceLocation shellModel = null;
+
+        @SerializedName("ShellTexture")
+        public net.minecraft.resources.ResourceLocation shellTexture = null;
+
+        @SerializedName("Size")
+        public float size = 1f;
+
+        @SerializedName("InitialVelocity")
+        public Vec3 initialVelocity = new Vec3(1.6, 0.9, 0.25);
+
+        @SerializedName("RandomVelocity")
+        public Vec3 randomVelocity = new Vec3(0.4, 0.35, 0.15);
+
+        @SerializedName("Acceleration")
+        public Vec3 acceleration = new Vec3(0, -18, 0);
+
+        @SerializedName("AngularVelocity")
+        public Vec3 angularVelocity = new Vec3(-1800, -2000, 240);
+
+        @SerializedName("LivingTime")
+        public float livingTime = 0.9f;
+
+        @SerializedName("MaxActive")
+        public int maxActive = 32;
     }
 }
