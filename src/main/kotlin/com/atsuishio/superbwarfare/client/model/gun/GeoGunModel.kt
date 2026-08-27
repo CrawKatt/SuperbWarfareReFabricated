@@ -193,6 +193,7 @@ open class GeoGunModel @JvmOverloads constructor(
     ) {
         hideBone(leftHandBoneIndex)
         hideBone(rightHandBoneIndex)
+        hideShellGeometry()
 
         baseModel.renderToBuffer(
             instance,
@@ -216,6 +217,14 @@ open class GeoGunModel @JvmOverloads constructor(
 
     private fun hideBone(boneIndex: Int) {
         instance.getBone(boneIndex)?.visible = false
+    }
+
+    private fun hideShellGeometry() {
+        baseModel.bones().forEach { bone ->
+            if (SHELL_GEOMETRY_PATTERN.matches(bone.name())) {
+                instance.getBone(bone.index())?.visible = false
+            }
+        }
     }
 
     private fun renderHands(poseStack: PoseStack, packedLight: Int, bufferSource: MultiBufferSource) {
@@ -244,6 +253,8 @@ open class GeoGunModel @JvmOverloads constructor(
         protected const val MOVE_BONE = "move"
         protected const val LEFT_HAND_BONE = "lefthand_pos"
         protected const val RIGHT_HAND_BONE = "righthand_pos"
+
+        private val SHELL_GEOMETRY_PATTERN = Regex("^shells$|^shell\\d+$|^bullet_shell$", RegexOption.IGNORE_CASE)
 
         @JvmStatic
         fun create(modelPath: ResourceLocation): GeoGunModel? {

@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.resource.model.GunLODModelReloadListener
 import com.atsuishio.superbwarfare.resource.model.GunModelReloadListener
 import com.atsuishio.superbwarfare.resource.model.ItemModelReloadListener
 import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
+import com.atsuishio.superbwarfare.resource.model.ShellModelReloadListener
 import com.atsuishio.superbwarfare.resource.model.VehicleLODModelReloadListener
 import com.atsuishio.superbwarfare.resource.model.VehicleModelReloadListener
 import net.fabricmc.api.EnvType
@@ -33,5 +34,6 @@ object BedrockModelLoader {
         helper.registerReloadListener(ItemModelReloadListener)
         helper.registerReloadListener(GunModelReloadListener)
         helper.registerReloadListener(GunLODModelReloadListener)
+        helper.registerReloadListener(ShellModelReloadListener)
     }
 }

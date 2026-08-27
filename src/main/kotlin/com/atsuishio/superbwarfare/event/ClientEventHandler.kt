@@ -1,11 +1,13 @@
 package com.atsuishio.superbwarfare.event
 
+import com.atsuishio.superbwarfare.api.event.ClientGunFireEvent
 import com.atsuishio.superbwarfare.api.event.ClientVehicleFireEvent
 import com.atsuishio.superbwarfare.capability.ModCapabilities
 import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
+import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance
 import com.atsuishio.superbwarfare.client.lighting.LightPositionRegistry
 import com.atsuishio.superbwarfare.client.lighting.MuzzleFlashHelper
 import com.atsuishio.superbwarfare.client.lighting.VehicleLightingHandler
@@ -28,6 +30,7 @@ import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
+import com.github.mcmodderanchor.simplebedrockmodel.v1.client.handler.FirstPersonRenderHandler
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.ChatFormatting
@@ -90,6 +93,8 @@ object ClientEventHandler {
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             onPlayerLoggedIn()
         }
+
+        ClientGunFireEvent.EVENT.register { event -> onClientGunFire(event) }
 
         InteractionKeyMappingTriggeredCallback.EVENT.register { event ->
             if (ClickEventHandler.stopSwing(event.hand)) {
@@ -1793,6 +1798,8 @@ object ClientEventHandler {
         randomShell[0] = (1 + 0.2 * (Math.random() - 0.5))
         randomShell[1] = (0.2 + (Math.random() - 0.5))
         randomShell[2] = (0.7 + (Math.random() - 0.5))
+
+        ClientGunFireEvent.post(ClientGunFireEvent(player, stack))
     }
 
     fun playGunClientSounds(player: Player) {
@@ -2553,6 +2560,91 @@ object ClientEventHandler {
     }
 
     @JvmStatic
+    fun handleShootAnimationV2(
+        poseStack: PoseStack,
+        x: Float,
+        y: Float,
+        z: Float,
+        rotX: Float,
+        rotY: Float,
+        rotZ: Float,
+        zoomMultiply: Float,
+        customSpeed: Float
+    ) {
+        val player = localPlayer ?: return
+        val stack = player.mainHandItem
+        val item = stack.item as? GunItem ?: return
+
+        customAnimSpeed = customSpeed.toDouble()
+
+        val data = GunData.from(stack)
+        val barrelType = data.attachment.get(AttachmentType.BARREL)
+        val gripType = data.attachment.get(AttachmentType.GRIP)
+        val scopeType = data.attachment.get(AttachmentType.SCOPE)
+
+        val recoil = when (barrelType) {
+            1 -> 0.75f
+            2 -> 0.95f
+            else -> 1f
+        }
+
+        val gripRecoilX = when (gripType) {
+            1 -> 0.85f
+            2 -> 0.95f
+            else -> 1f
+        }
+
+        val gripRecoilY = when (gripType) {
+            1 -> 0.95f
+            2 -> 0.85f
+            else -> 1f
+        }
+
+        val zoomRecoil = when (scopeType) {
+            2 -> 1.25f - (zoomTime * 0.8f).toFloat()
+            3 -> 1.25f - zoomTime.toFloat()
+            else -> 1.25f
+        }
+
+        val pose =
+            if (player.isShiftKeyDown && player.bbHeight >= 1 && !isProne(player)) {
+                0.85f
+            } else if (isProne(player)) {
+                if (data.attachment.get(AttachmentType.GRIP) == 3 || item.hasBipod(data)) {
+                    0.5f
+                } else {
+                    0.75f
+                }
+            } else {
+                1f
+            }
+
+        var zoomMultiply = zoomMultiply
+        zoomMultiply = zoomMultiply.coerceIn(0f, 1f)
+
+        val zoom = (1 - zoomMultiply * zoomTime).toFloat() * pose
+
+        val gunPosX = zoom * x * (recoilHorizon * (0.5f * firePosZ)).toFloat()
+        val gunPosY = zoom * y * (getBoneMoveY(firePosTimer.toFloat()) * -0.05 * (1 - 0.25 * zoomTime)).toFloat()
+        val gunPosZ = zoom * z * (getBoneMoveZ(firePosTimer.toFloat()) * 0.03 + 1.1f * firePosZ).toFloat() * (1 - 0.5 * zoomTime).toFloat()
+
+        val gunRotX =
+            zoom * rotX * (-getBoneRotX(fireRotTimer.toFloat()) * Mth.DEG_TO_RAD * 0.5f + 0.01f * firePosZ).toFloat() * gripRecoilX * recoil *
+                    (1 - 0.85 * zoomTime).toFloat() * zoomRecoil
+        val gunRotY =
+            (3 * zoom * rotY * getBoneRotY(fireRotTimer.toFloat()) * Mth.DEG_TO_RAD * recoilHorizon * gripRecoilY * recoil *
+                    (1 - 0.3 * zoomTime) * zoomRecoil).toFloat()
+        val gunRotZ =
+            (2 * zoom * rotZ * getBoneRotZ(fireRotTimer.toFloat()) * Mth.DEG_TO_RAD * recoilHorizon * gripRecoilY * recoil *
+                    (1 - 0.5 * zoomTime) * zoomRecoil).toFloat()
+
+        poseStack.mulPose(Axis.XP.rotation(gunRotX))
+        poseStack.mulPose(Axis.YP.rotation(gunRotY))
+        poseStack.mulPose(Axis.ZP.rotation(gunRotZ))
+        poseStack.translate(-gunPosX / 16, gunPosY / 16, gunPosZ / 16)
+    }
+
+    @JvmStatic
     fun getBoneRotX(t: Float): Float {
         return when {
             t <= 0.25f -> Mth.lerp(t / (0.25F - 0F), 0F, -5.82024F)
@@ -3235,6 +3327,12 @@ object ClientEventHandler {
             ?: vehicle.getGunName(vehicle.getSeatIndex(shooter))
             ?: return
         ani.fire(name.camelToSnake(), index)
+    }
+
+    @JvmStatic
+    fun onClientGunFire(event: ClientGunFireEvent) {
+        val instance = FirstPersonRenderHandler.getActiveAnimationInstance(event.hand) as? GeoGunAnimationInstance ?: return
+        instance.triggerFire(event.stack)
     }
 
 }
