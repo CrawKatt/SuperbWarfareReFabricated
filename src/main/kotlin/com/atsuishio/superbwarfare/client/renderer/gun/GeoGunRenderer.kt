@@ -131,6 +131,14 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
             ClientEventHandler.handleShootAnimationV2(poseStack, 1f, 1f, 1f, 1f, 1f, 1f, 0.2f, 1f)
         }
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
+        if (transformType.firstPerson()) {
+            val hand = if (transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
+                InteractionHand.OFF_HAND
+            } else {
+                InteractionHand.MAIN_HAND
+            }
+            ShellCasingFxRenderer.render(poseStack, model, stack, hand, bufferSource, packedLight)
+        }
         model.resetPose()
     }
 

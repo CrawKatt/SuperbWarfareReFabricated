@@ -18,5 +18,6 @@ object BedrockModelLoader {
         event.registerReloadListener(ItemModelReloadListener)
         event.registerReloadListener(GunModelReloadListener)
         event.registerReloadListener(GunLODModelReloadListener)
+        event.registerReloadListener(ShellModelReloadListener)
     }
 }
