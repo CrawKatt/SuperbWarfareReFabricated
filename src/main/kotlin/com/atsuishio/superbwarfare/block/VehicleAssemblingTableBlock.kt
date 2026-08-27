@@ -157,12 +157,15 @@ open class VehicleAssemblingTableBlock : BaseEntityBlock(
         hand: InteractionHand,
         hitResult: BlockHitResult
     ): ItemInteractionResult {
-        if (player.mainHandItem.`is`(ModTags.Items.TOOLS_CROWBAR)) {
-            interact(state, level, pos, player, hand, hitResult)
-            return ItemInteractionResult.SUCCESS
+        if (hand != InteractionHand.MAIN_HAND || !stack.`is`(ModTags.Items.TOOLS_CROWBAR)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
         }
 
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+        return if (interact(state, level, pos, player, hand, hitResult) == InteractionResult.SUCCESS) {
+            ItemInteractionResult.SUCCESS
+        } else {
+            ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+        }
     }
 
     override fun useWithoutItem(
@@ -221,23 +224,27 @@ open class VehicleAssemblingTableBlock : BaseEntityBlock(
             hand: InteractionHand,
             hitResult: BlockHitResult
         ): InteractionResult {
-            if (!level.isClientSide && player.mainHandItem.`is`(ModTags.Items.TOOLS_CROWBAR)) {
-                val server = level as ServerLevel
+            if (hand != InteractionHand.MAIN_HAND || !player.getItemInHand(hand).`is`(ModTags.Items.TOOLS_CROWBAR)) {
+                return InteractionResult.PASS
+            }
 
-                if (state.block is VehicleAssemblingTableBlock) {
-                    val facing = state.getValue(FACING)
-                    val part = state.getValue(BLOCK_PART)
-                    val originalPos = part.relativeNegative(pos, facing)
+            if (level.isClientSide) {
+                return InteractionResult.SUCCESS
+            }
 
-                    val vehicle = createVehicle(server, facing, originalPos)
-                    server.addFreshEntity(vehicle)
+            if (level is ServerLevel && state.block is VehicleAssemblingTableBlock) {
+                val facing = state.getValue(FACING)
+                val part = state.getValue(BLOCK_PART)
+                val originalPos = part.relativeNegative(pos, facing)
 
-                    for (p in BlockPart.entries) {
-                        server.destroyBlock(p.relative(originalPos, facing), false)
-                    }
+                val vehicle = createVehicle(level, facing, originalPos)
+                level.addFreshEntity(vehicle)
 
-                    return InteractionResult.SUCCESS
+                for (p in BlockPart.entries) {
+                    level.destroyBlock(p.relative(originalPos, facing), false)
                 }
+
+                return InteractionResult.SUCCESS
             }
 
             return InteractionResult.PASS

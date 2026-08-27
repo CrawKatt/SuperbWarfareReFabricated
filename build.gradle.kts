@@ -111,35 +111,6 @@ sourceSets {
             srcDir("src/generated/resources")
         }
     }
-
-    // Stub de compilación para la clase SubLevel del mod Sable (ver dependencias).
-    register("sableStub")
-}
-
-// El stub compila contra el mismo classpath de compilación que main. Como el output del stub
-// se agrega a main como directorio plano (files), no hay dependencia de tareas entre ambos
-// y el orden queda garantizado por los dependsOn de más abajo.
-configurations {
-    named("sableStubCompileClasspath") {
-        extendsFrom(compileClasspath.get())
-    }
-}
-
-val sableStubOutput = layout.buildDirectory.dir("classes/java/sableStub")
-
-dependencies {
-    // Clase SubLevel solo para compilar; en runtime la aporta el mod Sable.
-    compileOnly(files(sableStubOutput))
-}
-
-tasks.named("compileJava") {
-    dependsOn("sableStubClasses")
-}
-tasks.named("compileKotlin") {
-    dependsOn("sableStubClasses")
-}
-tasks.named("remapSourcesJar") {
-    dependsOn("sableStubClasses")
 }
 
 dependencies {
@@ -164,6 +135,9 @@ dependencies {
     include(modImplementation("com.github.Nova-Committee:ModernKeyBinding:17bf4f794ae3ce31aee90e0df67e2757c3533d10")!!)
     modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("parchment_minecraft_version")}:${project.property("ponder_version")}")
 
+    modCompileOnly("maven.modrinth:sable:e11C0I1A") {
+        isTransitive = false
+    }
     compileOnly("dev.ryanhcode.sable-companion:sable-companion-common-${project.property("parchment_minecraft_version")}:${project.property("sable_companion_version")}")
     implementation("org.ywzj:rhino:1.8.1-SNAPSHOT")
     include("org.ywzj:rhino:1.8.1-SNAPSHOT")
