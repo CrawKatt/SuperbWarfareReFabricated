@@ -44,6 +44,7 @@ import com.atsuishio.superbwarfare.client.renderer.block.VehicleAssemblingTableB
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.*
+import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.tooltip.ClientBocekImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
@@ -195,6 +196,11 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun onClientSetup() {
+        val geoGunRenderer = GeoGunRenderer()
+        listOf(ModItems.TASER_V2, ModItems.NAIL_GUN, ModItems.REFORGING).forEach { item ->
+            BuiltinItemRendererRegistry.INSTANCE.register(item, geoGunRenderer)
+        }
+
         val renderers: List<Pair<net.minecraft.world.item.Item, Lazy<BlockEntityWithoutLevelRenderer>>> = listOf(
             ModItems.TM_62 to lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.BLUEPRINT_RESEARCH_TABLE to lazy { BlueprintResearchingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },

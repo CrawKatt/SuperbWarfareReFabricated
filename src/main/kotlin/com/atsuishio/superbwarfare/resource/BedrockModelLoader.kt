@@ -18,5 +18,7 @@ object BedrockModelLoader {
         resources.registerReloadListener(ArmorModelReloadListener)
         resources.registerReloadListener(BlockModelReloadListener)
         resources.registerReloadListener(ItemModelReloadListener)
+        resources.registerReloadListener(GunModelReloadListener)
+        resources.registerReloadListener(GunLODModelReloadListener)
     }
 }

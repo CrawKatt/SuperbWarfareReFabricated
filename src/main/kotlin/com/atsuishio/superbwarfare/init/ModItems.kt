@@ -32,8 +32,11 @@ import com.atsuishio.superbwarfare.item.gun.smg.Mp5Item
 import com.atsuishio.superbwarfare.item.gun.smg.VectorItem
 import com.atsuishio.superbwarfare.item.gun.sniper.*
 import com.atsuishio.superbwarfare.item.gun.special.BocekItem
+import com.atsuishio.superbwarfare.item.gun.special.NailGunItem
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem
+import com.atsuishio.superbwarfare.item.gun.special.ReforgingItem
 import com.atsuishio.superbwarfare.item.gun.special.TaserItem
+import com.atsuishio.superbwarfare.item.gun.special.TaserV2Item
 import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGunItem
 import com.atsuishio.superbwarfare.item.material.*
 import com.atsuishio.superbwarfare.item.misc.*
@@ -86,11 +89,13 @@ object ModItems {
     // @formatter:off
     @JvmField val REPAIR_TOOL = registerGun("repair_tool") { RepairToolItem() }
     @JvmField val TASER = registerGun("taser") { TaserItem() }
+    @JvmField val TASER_V2 = registerGun("taser_v2") { TaserV2Item }
     @JvmField val GLOCK_17 = registerGun("glock_17") { Glock17Item() }
     @JvmField val GLOCK_18 = registerGun("glock_18") { Glock18Item() }
     @JvmField val MP_443 = registerGun("mp_443") { Mp443Item() }
     @JvmField val M_1911 = registerGun("m_1911") { M1911Item() }
     @JvmField val HOMEMADE_SHOTGUN = registerGun("homemade_shotgun") { HomemadeShotgunItem() }
+    @JvmField val NAIL_GUN = registerGun("nail_gun") { NailGunItem() }
     @JvmField val TRACHELIUM = registerGun("trachelium") { TracheliumItem() }
     @JvmField val MP_5 = registerGun("mp_5") { Mp5Item() }
     @JvmField val VECTOR = registerGun("vector") { VectorItem() }
@@ -127,6 +132,7 @@ object ModItems {
     @JvmField val IGLA_9K38 = registerGun("igla_9k38") { IglaItem() }
     @JvmField val BOCEK = registerGun("bocek") { BocekItem() }
     @JvmField val SUPER_STAR_SHOOTER = registerGun("super_star_shooter") { SuperStarShooterItem() }
+    @JvmField val REFORGING = registerGun("reforging") { ReforgingItem }
 
     @JvmField val VEHICLE_GUN = registerGun("vehicle_gun") { VehicleGunItem() }
     @JvmField val EMPTY_GUN = registerGun("empty_gun") { EmptyGunItem() }

@@ -8,6 +8,8 @@ import com.atsuishio.superbwarfare.resource.ModelResource;
 import com.google.gson.annotations.SerializedName;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.phys.Vec3;
+import java.util.HashMap;
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
 public class DefaultGunResource implements IDBasedData<DefaultGunResource> {
@@ -26,6 +28,12 @@ public class DefaultGunResource implements IDBasedData<DefaultGunResource> {
 
     @SerializedName("Icon")
     public String icon = Mod.loc("textures/gun_icon/default_icon.png").toString();
+
+    @SerializedName("SlotIcon")
+    public String slotIcon = "";
+
+    @SerializedName("ItemDisplay")
+    public Map<String, ItemDisplayInfo> itemDisplay = new HashMap<>();
 
     @SerializedName("Model")
     public ModelResource model = new ModelResource();
@@ -61,4 +69,18 @@ public class DefaultGunResource implements IDBasedData<DefaultGunResource> {
     public boolean ejectShell = false;
     @SerializedName("CanZoom")
     public boolean canZoom = true;
+
+    @SerializedName("SprintOffset")
+    public Vec3 sprintOffset = Vec3.ZERO;
+
+    public static class ItemDisplayInfo {
+        @SerializedName("translation")
+        public float[] translation = {0f, 0f, 0f};
+
+        @SerializedName("rotation")
+        public float[] rotation = {0f, 0f, 0f};
+
+        @SerializedName("scale")
+        public float[] scale = {0f, 0f, 0f};
+    }
 }
