@@ -51,7 +51,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
 
     override fun getSlotTexture(stack: ItemStack): ResourceLocation? {
         val resource = GunResource.compute(stack)
-        val slotIcon = resource.slotIcon.ifEmpty { resource.icon }
+        val slotIcon = resource.slotIcon.ifEmpty { null } ?: return null
         return ResourceLocation.tryParse(slotIcon)
     }
 

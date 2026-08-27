@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.resource.gun;
 
-import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.data.IDBasedData;
 import com.atsuishio.superbwarfare.data.ModColor;
 import com.atsuishio.superbwarfare.init.ModSounds;
@@ -25,9 +24,6 @@ public class DefaultGunResource implements IDBasedData<DefaultGunResource> {
     public void setId(@NotNull String id) {
         this.id = id;
     }
-
-    @SerializedName("Icon")
-    public String icon = Mod.loc("textures/gun_icon/default_icon.png").toString();
 
     @SerializedName("SlotIcon")
     public String slotIcon = "";
