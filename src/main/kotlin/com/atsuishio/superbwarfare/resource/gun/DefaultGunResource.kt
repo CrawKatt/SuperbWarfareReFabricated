@@ -119,6 +119,9 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
         @SerialName("AngularVelocity")
         var angularVelocity: SerializedVector3f = Vector3f(-1800f, -2000f, 240f)
 
+        @SerialName("RandomAngle")
+        var randomAngle: SerializedVector3f = Vector3f(0f, 0f, 0f)
+
         @SerialName("LivingTime")
         var livingTime: Float = 0.9f
 

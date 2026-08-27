@@ -64,12 +64,17 @@ object ShellCasingFxRenderer {
         val boneTransform = model.getGlobalTransform(boneName) ?: return
 
         val randomOffset = Vector3f(
-            (Math.random() * config.randomVelocity.x).toFloat(),
-            (Math.random() * config.randomVelocity.y).toFloat(),
-            (Math.random() * config.randomVelocity.z).toFloat()
+            ((Math.random() - 0.5) * 2 * config.randomVelocity.x).toFloat(),
+            ((Math.random() - 0.5) * 2 * config.randomVelocity.y).toFloat(),
+            ((Math.random() - 0.5) * 2 * config.randomVelocity.z).toFloat()
+        )
+        val randomAngle = Vector3f(
+            ((Math.random() - 0.5) * 2 * config.randomAngle.x).toFloat(),
+            ((Math.random() - 0.5) * 2 * config.randomAngle.y).toFloat(),
+            ((Math.random() - 0.5) * 2 * config.randomAngle.z).toFloat()
         )
         val frozenTransform = Matrix4f(poseStack.last().pose()).mul(boneTransform)
-        queue.offerLast(ShellCasingInstance(System.currentTimeMillis(), randomOffset, frozenTransform))
+        queue.offerLast(ShellCasingInstance(System.currentTimeMillis(), randomOffset, randomAngle, frozenTransform))
 
         val maxActive = config.maxActive.coerceAtLeast(1)
         while (queue.size > maxActive) {
@@ -118,9 +123,9 @@ object ShellCasingFxRenderer {
         poseStack.mulPoseMatrix(shell.frozenTransform)
         poseStack.scale(config.size.coerceAtLeast(0.01f), config.size.coerceAtLeast(0.01f), config.size.coerceAtLeast(0.01f))
         poseStack.translate(x.toFloat(), y.toFloat(), (-z).toFloat())
-        poseStack.mulPose(Axis.XN.rotationDegrees((config.angularVelocity.x * t).toFloat()))
-        poseStack.mulPose(Axis.YN.rotationDegrees((config.angularVelocity.y * t).toFloat()))
-        poseStack.mulPose(Axis.ZP.rotationDegrees((config.angularVelocity.z * t).toFloat()))
+        poseStack.mulPose(Axis.XN.rotationDegrees(shell.randomAngle.x + (config.angularVelocity.x * t).toFloat()))
+        poseStack.mulPose(Axis.YN.rotationDegrees(shell.randomAngle.y + (config.angularVelocity.y * t).toFloat()))
+        poseStack.mulPose(Axis.ZP.rotationDegrees(shell.randomAngle.z + (config.angularVelocity.z * t).toFloat()))
 
         shellModel.renderToBuffer(
             poseStack,
@@ -135,6 +140,7 @@ object ShellCasingFxRenderer {
     private class ShellCasingInstance(
         val timestamp: Long,
         val randomOffset: Vector3f,
+        val randomAngle: Vector3f,
         val frozenTransform: Matrix4f
     )
 }

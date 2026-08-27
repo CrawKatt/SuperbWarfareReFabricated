@@ -13,6 +13,7 @@
     "Texture": "superbwarfare:textures/item/glock_17.png",
     "LODModel": "superbwarfare:models/bedrock/gun_lod/glock_17_v2.geo.json"
   },
+  "FlareSize": 0.3,
   "EjectShell": true,
   "ShellEject": {
     "BoneName": "shell",
@@ -20,9 +21,10 @@
     "ShellTexture": "superbwarfare:textures/bedrock/shell/handgun_shell.png",
     "Size": 0.6,
     "InitialVelocity": [1.6, 0.9, 0.25],
-    "RandomVelocity": [0.4, 0.35, 0.15],
+    "RandomVelocity": [0.7, 0.6, 0.3],
     "Acceleration": [0, -12, 0],
     "AngularVelocity": [-1800, -2000, 240],
+    "RandomAngle": [60, 60, 360],
     "LivingTime": 0.8,
     "MaxActive": 24
   }
