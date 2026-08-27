@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.resource.gun
 
-import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.data.IDBasedData
 import com.atsuishio.superbwarfare.data.ModColor
 import com.atsuishio.superbwarfare.init.ModSounds
@@ -26,9 +25,6 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
     override fun setId(id: String) {
         this.id = id
     }
-
-    @SerialName("Icon")
-    var icon: String = loc("textures/gun_icon/default_icon.png").toString()
 
     @SerialName("SlotIcon")
     var slotIcon: String = ""
