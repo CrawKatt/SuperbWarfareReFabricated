@@ -9,6 +9,7 @@ object ModEntityRenderers {
     fun init() {
         EntityRendererRegistry.register(ModEntities.MORTAR, ::MortarRenderer)
         EntityRendererRegistry.register(ModEntities.SENPAI, ::SenpaiRenderer)
+        EntityRendererRegistry.register(ModEntities.CREEPING_SENPAI, ::CreepingSenpaiRenderer)
         EntityRendererRegistry.register(ModEntities.CLAYMORE, ::ClaymoreRenderer)
         EntityRendererRegistry.register(ModEntities.C4, ::C4Renderer)
         EntityRendererRegistry.register(ModEntities.TASER_BULLET, ::BasicProjectileRenderer)

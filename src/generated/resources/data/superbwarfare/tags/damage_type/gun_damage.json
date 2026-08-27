@@ -42,6 +42,10 @@
       "required": false
     },
     {
+      "id": "superbwarfare:projectile_hit_headshot",
+      "required": false
+    },
+    {
       "id": "superbwarfare:projectile_explosion",
       "required": false
     },

@@ -222,6 +222,7 @@ object ModTags {
         @JvmField val AA_MISSILE = modEntityTag("aa_missile")
         @JvmField val SEEK_BLACKLIST = modEntityTag("seek_blacklist")
         @JvmField val BIOGAS_GENERATOR_WHITELIST = modEntityTag("biogas_generator_whitelist")
+        @JvmField val SENPAI = modEntityTag("senpai")
     }
 
     object Perks {

@@ -85,7 +85,8 @@ class SnapshotWarningScreen(val lastScreen: Screen) : Screen(
             if (FabricLoader.getInstance().isDevelopmentEnvironment) return
             if (firstTimeStart || screen !is TitleScreen) return
             val version = getVersion() ?: return
-            if (!version.lowercase().contains("snapshot")) return
+            val versionName = version.lowercase()
+            if (!versionName.contains("snapshot") && !versionName.contains("dev")) return
 
             mc.setScreen(SnapshotWarningScreen(screen))
             firstTimeStart = true

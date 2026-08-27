@@ -21,6 +21,7 @@ import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.BlueprintResearchingTableBlockItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
+import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.tooltip.ClientBocekImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
@@ -167,6 +168,13 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun onClientSetup() {
+        val geoGunRenderer = lazy { GeoGunRenderer() }
+        listOf(ModItems.TASER_V2, ModItems.NAIL_GUN, ModItems.REFORGING).forEach { item ->
+            BuiltinItemRendererRegistry.INSTANCE.register(item) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
+                geoGunRenderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
+            }
+        }
+
         val tm62Renderer = lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
         BuiltinItemRendererRegistry.INSTANCE.register(
             ModItems.TM_62

@@ -62,6 +62,7 @@ class ModDamageTypeTagProvider(
             .addOptional(mod(ModDamageTypes.BURN))
             .addOptional(mod(ModDamageTypes.REPAIR_TOOL))
             .addOptional(mod(ModDamageTypes.PROJECTILE_HIT))
+            .addOptional(mod(ModDamageTypes.PROJECTILE_HIT_HEADSHOT))
             .addOptional(mod(ModDamageTypes.PROJECTILE_EXPLOSION))
             .addOptional(mod(ModDamageTypes.SUPER_STAR_HIT))
             .addOptional(mod(ModDamageTypes.SUPER_STAR_SLASH))

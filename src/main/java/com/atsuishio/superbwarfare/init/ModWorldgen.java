@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.init;
 
 import com.atsuishio.superbwarfare.Mod;
+import com.atsuishio.superbwarfare.config.server.SpawnConfig;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.minecraft.core.registries.Registries;
@@ -22,7 +23,13 @@ public class ModWorldgen {
             ResourceKey.create(Registries.PLACED_FEATURE, Mod.loc("scheelite_ore")),
             ResourceKey.create(Registries.PLACED_FEATURE, Mod.loc("deepslate_silver_ore")),
             ResourceKey.create(Registries.PLACED_FEATURE, Mod.loc("deepslate_galena_ore")),
-            ResourceKey.create(Registries.PLACED_FEATURE, Mod.loc("deepslate_scheelite_ore"))
+            ResourceKey.create(Registries.PLACED_FEATURE, Mod.loc("deepslate_scheelite_ore")),
+            ResourceKey.create(Registries.PLACED_FEATURE, Mod.loc("uranium_ore")),
+            ResourceKey.create(Registries.PLACED_FEATURE, Mod.loc("sulfur_ore")),
+            ResourceKey.create(Registries.PLACED_FEATURE, Mod.loc("niter_ore")),
+            ResourceKey.create(Registries.PLACED_FEATURE, Mod.loc("deepslate_uranium_ore")),
+            ResourceKey.create(Registries.PLACED_FEATURE, Mod.loc("deepslate_sulfur_ore")),
+            ResourceKey.create(Registries.PLACED_FEATURE, Mod.loc("deepslate_niter_ore"))
     );
 
     private static final List<ResourceKey<Biome>> SENPAI_BIOMES = List.of(
@@ -63,5 +70,14 @@ public class ModWorldgen {
                 ModEntities.STEEL_COIL,
                 5, 1, 3
         );
+
+        if (SpawnConfig.SPAWN_CREEPING_SENPAI.get()) {
+            BiomeModifications.addSpawn(
+                    BiomeSelectors.includeByKey(SENPAI_BIOMES),
+                    MobCategory.MONSTER,
+                    ModEntities.CREEPING_SENPAI,
+                    5, 1, 2
+            );
+        }
     }
 }

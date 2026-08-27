@@ -96,8 +96,14 @@ class ModEntityTypeTagProvider(
             EntityType.PLAYER,
             EntityType.VILLAGER,
             EntityType.WANDERING_TRADER,
-            ModEntities.SENPAI
+            ModEntities.SENPAI,
+            ModEntities.CREEPING_SENPAI
         ).addOptional(ResourceLocation("touhou_little_maid", "maid"))
+
+        this.tag(ModTags.EntityTypes.SENPAI).add(
+            ModEntities.SENPAI,
+            ModEntities.CREEPING_SENPAI
+        )
 
         this.tag(
             TagKey.create(

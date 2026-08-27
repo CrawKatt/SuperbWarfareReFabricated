@@ -1,0 +1,7 @@
+{
+  "parent": "superbwarfare:item/beast_gun_test_base",
+  "gui_light": "front",
+  "textures": {
+    "particle": "superbwarfare:item/beast_gun_test_icon"
+  }
+}

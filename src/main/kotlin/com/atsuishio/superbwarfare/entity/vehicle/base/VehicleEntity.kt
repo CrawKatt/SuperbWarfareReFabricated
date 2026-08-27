@@ -1012,10 +1012,10 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             define(MOUSE_SPEED_Y, 0f)
 
             define(TURRET_HEALTH, getTurretMaxHealth())
-            define(L_WHEEL_HEALTH, getWheelMaxHealth())
-            define(R_WHEEL_HEALTH, getWheelMaxHealth())
-            define(MAIN_ENGINE_HEALTH, getEngineMaxHealth())
-            define(SUB_ENGINE_HEALTH, getEngineMaxHealth())
+            define(L_WHEEL_HEALTH, getLeftWheelMaxHealth())
+            define(R_WHEEL_HEALTH, getRightWheelMaxHealth())
+            define(MAIN_ENGINE_HEALTH, getMainEngineMaxHealth())
+            define(SUB_ENGINE_HEALTH, getSubEngineMaxHealth())
 
             define(TURRET_DAMAGED, false)
             define(L_WHEEL_DAMAGED, false)
@@ -1618,11 +1618,21 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             this.getMaxHealth()
         }
 
-        turretHealth = compound.getFloat("TurretHealth")
-        leftWheelHealth = compound.getFloat("LeftWheelHealth")
-        rightWheelHealth = compound.getFloat("RightWheelHealth")
-        mainEngineHealth = compound.getFloat("MainEngineHealth")
-        subEngineHealth = compound.getFloat("SubEngineHealth")
+        turretHealth = if (compound.contains("TurretHealth")) {
+            compound.getFloat("TurretHealth")
+        } else this.getTurretMaxHealth()
+        leftWheelHealth = if (compound.contains("LeftWheelHealth")) {
+            compound.getFloat("LeftWheelHealth")
+        } else this.getLeftWheelMaxHealth()
+        rightWheelHealth = if (compound.contains("RightWheelHealth")) {
+            compound.getFloat("RightWheelHealth")
+        } else this.getRightWheelMaxHealth()
+        mainEngineHealth = if (compound.contains("MainEngineHealth")) {
+            compound.getFloat("MainEngineHealth")
+        } else this.getMainEngineMaxHealth()
+        subEngineHealth = if (compound.contains("SubEngineHealth")) {
+            compound.getFloat("SubEngineHealth")
+        } else this.getSubEngineMaxHealth()
 
         turretDamaged = compound.getBoolean("TurretDamaged")
         leftWheelDamaged = compound.getBoolean("LeftWheelDamaged")
@@ -2009,11 +2019,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     open val lastDriver: Entity?
         get() = EntityFindUtil.findEntity(level(), lastDriverUUID)
 
-    @Deprecated("")
-    open fun setDriverAngle(player: Player) {
-        VehicleVecUtils.setDriverAngle(this, player)
-    }
-
     override fun hurt(source: DamageSource, amount: Float): Boolean {
         if (source.`is`(ModTags.DamageTypes.VEHICLE_IMMUNE)) return false
 
@@ -2222,8 +2227,9 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         val maxZ = Mth.ceil(obbAABB.maxZ)
 
         for (x in minX until maxX) {
-            for (y in minY until maxY) {
-                for (z in minZ until maxZ) {
+            for (z in minZ until maxZ) {
+                if (!level.hasChunk(x shr 4, z shr 4)) continue
+                for (y in minY until maxY) {
                     val pos = BlockPos(x, y, z)
                     val fluidState = level.getFluidState(pos)
                     if (!fluidState.isEmpty && fluidState.`is`(FluidTags.LAVA)) {
@@ -2252,9 +2258,11 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
     open fun getMaxHealth() = computed().maxHealth
     open fun getDecoyReloadTime() = computed().decoyReloadTime
-    open fun getTurretMaxHealth() = 50f
-    open fun getWheelMaxHealth() = 50f
-    open fun getEngineMaxHealth() = 50f
+    open fun getTurretMaxHealth() = computed().partHealth.turret
+    open fun getLeftWheelMaxHealth() = computed().partHealth.leftWheel
+    open fun getRightWheelMaxHealth() = computed().partHealth.rightWheel
+    open fun getMainEngineMaxHealth() = computed().partHealth.mainEngine
+    open fun getSubEngineMaxHealth() = computed().partHealth.subEngine
 
     override fun lavaHurt() {
         if (tickCount % 10 == 0) {
@@ -4028,11 +4036,6 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         this.serverYaw = yaw
         this.serverPitch = pitch
         this.interpolationSteps = 10
-    }
-
-    @Deprecated("")
-    protected fun getDismountOffset(vehicleWidth: Double, passengerWidth: Double): Vec3 {
-        return VehicleMiscUtils.getDismountOffset(this, vehicleWidth, passengerWidth)
     }
 
     override fun getDismountLocationForPassenger(passenger: LivingEntity): Vec3 {

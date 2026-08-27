@@ -3,6 +3,8 @@ package com.atsuishio.superbwarfare.resource
 import com.atsuishio.superbwarfare.resource.model.ArmorModelReloadListener
 import com.atsuishio.superbwarfare.resource.model.BlockModelReloadListener
 import com.atsuishio.superbwarfare.resource.model.EntityModelReloadListener
+import com.atsuishio.superbwarfare.resource.model.GunLODModelReloadListener
+import com.atsuishio.superbwarfare.resource.model.GunModelReloadListener
 import com.atsuishio.superbwarfare.resource.model.ItemModelReloadListener
 import com.atsuishio.superbwarfare.resource.model.ProjectileModelReloadListener
 import com.atsuishio.superbwarfare.resource.model.VehicleLODModelReloadListener
@@ -29,5 +31,7 @@ object BedrockModelLoader {
         helper.registerReloadListener(ArmorModelReloadListener)
         helper.registerReloadListener(BlockModelReloadListener)
         helper.registerReloadListener(ItemModelReloadListener)
+        helper.registerReloadListener(GunModelReloadListener)
+        helper.registerReloadListener(GunLODModelReloadListener)
     }
 }

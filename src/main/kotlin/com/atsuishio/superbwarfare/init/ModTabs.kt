@@ -144,6 +144,7 @@ object ModTabs {
     fun init() {
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register { entries ->
             entries.accept(ModItems.SENPAI_SPAWN_EGG)
+            entries.accept(ModItems.CREEPING_SENPAI_SPAWN_EGG)
             entries.accept(ModItems.STEEL_COIL_SPAWN_EGG)
         }
     }

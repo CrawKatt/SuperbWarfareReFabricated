@@ -12,5 +12,8 @@ object ModRarities {
     val SUPERB: Rarity = BuiltInEnumFactories.createRarity("superbwarfare_superb", ChatFormatting.RED)
 
     @JvmField
+    val BEAST: Rarity = BuiltInEnumFactories.createRarity("superbwarfare_beast", ChatFormatting.DARK_RED)
+
+    @JvmField
     val VIRTUAL: Rarity = BuiltInEnumFactories.createRarity("superbwarfare_virtual", ChatFormatting.WHITE)
 }

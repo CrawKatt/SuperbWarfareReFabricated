@@ -27,6 +27,7 @@ import com.atsuishio.superbwarfare.event.custom.LivingAttackCallback
 import com.atsuishio.superbwarfare.event.custom.LivingDropsCallback
 import com.atsuishio.superbwarfare.event.custom.LivingExperienceDropCallback
 import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback
+import com.atsuishio.superbwarfare.item.misc.SonicAbsorberItem
 import com.atsuishio.superbwarfare.event.custom.LivingTickCallback
 import com.atsuishio.superbwarfare.event.custom.LootingLevelCallback
 import com.atsuishio.superbwarfare.event.custom.MobEffectAddedCallback
@@ -58,6 +59,7 @@ import com.atsuishio.superbwarfare.init.ModWorldgen
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.inventory.menu.EnergyMenu
 import com.atsuishio.superbwarfare.item.weapon.BeastItem
+import com.atsuishio.superbwarfare.item.gun.special.BeastGunTestItem
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect
@@ -209,8 +211,9 @@ class Mod : ModInitializer {
         ServerEntityEvents.EQUIPMENT_CHANGE.register(LivingEventHandler::handleChangeSlot)
 
         AttackEntityCallback.EVENT.register { player, _, _, entity, _ ->
-            if (player.mainHandItem.item is BeastItem) {
-                BeastItem.onLeftClickEntity(player.mainHandItem, player, entity)
+            when (val item = player.mainHandItem.item) {
+                is BeastItem -> BeastItem.onLeftClickEntity(player.mainHandItem, player, entity)
+                is BeastGunTestItem -> item.onLeftClickEntity(player.mainHandItem, player, entity)
             }
             PlayerEventHandler.onAttackEntity(player, entity)
             InteractionResult.PASS
@@ -229,6 +232,7 @@ class Mod : ModInitializer {
                     !LivingEventHandler.onEntityAttacked(entity, source, amount)
         }
         LivingHurtCallback.EVENT.register { event ->
+            SonicAbsorberItem.onEntityAttackedBySonicBoom(event)
             event.amount = LivingEventHandler.onEntityHurt(event.entity, event.source, event.amount)
         }
         LivingDropsCallback.EVENT.register { event ->

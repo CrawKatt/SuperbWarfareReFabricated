@@ -474,5 +474,12 @@
     [-2.5, 0.0, -2.266],
     [2.5, 0.0, -3.516],
     [-2.5, 0.0, -3.516]
-  ]
+  ],
+  "PartHealth": {
+    "Turret": 200,
+    "LeftWheel": 200,
+    "RightWheel": 200,
+    "MainEngine": 300,
+    "SubEngine": 300
+  }
 }

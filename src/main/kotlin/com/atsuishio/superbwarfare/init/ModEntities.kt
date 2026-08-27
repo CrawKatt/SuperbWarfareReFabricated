@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.init
 
 import com.atsuishio.superbwarfare.config.server.SpawnConfig
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
+import com.atsuishio.superbwarfare.entity.living.CreepingSenpaiEntity
 import com.atsuishio.superbwarfare.entity.living.SenpaiEntity
 import com.atsuishio.superbwarfare.entity.living.SteelCoilEntity
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
@@ -46,6 +47,13 @@ object ModEntities {
         "senpai",
         FabricEntityTypeBuilder.create(MobCategory.MONSTER, ::SenpaiEntity)
             .trackRangeChunks(64).trackedUpdateRate(3).dimensions(EntityDimensions.scalable(0.65f, 2f))
+    )
+
+    @JvmField
+    val CREEPING_SENPAI: EntityType<CreepingSenpaiEntity> = register(
+        "creeping_senpai",
+        FabricEntityTypeBuilder.create(MobCategory.MONSTER, ::CreepingSenpaiEntity)
+            .trackRangeChunks(64).trackedUpdateRate(3).dimensions(EntityDimensions.scalable(1f, 0.9f))
     )
 
     @JvmField
@@ -474,6 +482,7 @@ object ModEntities {
         FabricDefaultAttributeRegistry.register(TARGET, TargetEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(DPS_GENERATOR, DPSGeneratorEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(SENPAI, SenpaiEntity.createAttributes().build())
+        FabricDefaultAttributeRegistry.register(CREEPING_SENPAI, CreepingSenpaiEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(STEEL_COIL, SteelCoilEntity.createAttributes().build())
     }
 
@@ -486,6 +495,17 @@ object ModEntities {
         ) { entityType, world, reason, pos, random ->
             world.difficulty != Difficulty.PEACEFUL
                     && SpawnConfig.SPAWN_SENPAI.get()
+                    && Monster.isDarkEnoughToSpawn(world, pos, random)
+                    && Mob.checkMobSpawnRules(entityType, world, reason, pos, random)
+        }
+
+        SpawnPlacements.register(
+            CREEPING_SENPAI,
+            SpawnPlacements.Type.ON_GROUND,
+            Heightmap.Types.MOTION_BLOCKING_NO_LEAVES
+        ) { entityType, world, reason, pos, random ->
+            world.difficulty != Difficulty.PEACEFUL
+                    && SpawnConfig.SPAWN_CREEPING_SENPAI.get()
                     && Monster.isDarkEnoughToSpawn(world, pos, random)
                     && Mob.checkMobSpawnRules(entityType, world, reason, pos, random)
         }

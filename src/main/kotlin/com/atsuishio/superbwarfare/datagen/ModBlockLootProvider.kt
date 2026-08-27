@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.init.ModItems
 import com.mojang.datafixers.util.Pair
 import net.minecraft.advancements.critereon.StatePropertiesPredicate
 import net.minecraft.data.loot.BlockLootSubProvider
+import net.minecraft.world.item.enchantment.Enchantments
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.item.Item
@@ -18,9 +19,12 @@ import net.minecraft.world.level.storage.loot.LootPool
 import net.minecraft.world.level.storage.loot.LootTable
 import net.minecraft.world.level.storage.loot.entries.LootItem
 import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction
+import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator
 import java.util.function.BiConsumer
 
 class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureFlags.REGISTRY.allFlags()) {
@@ -45,6 +49,10 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
         this.dropSelf(ModBlocks.RAW_GALENA_BLOCK)
         this.dropSelf(ModBlocks.RAW_SCHEELITE_BLOCK)
         this.dropSelf(ModBlocks.RAW_SILVER_BLOCK)
+        this.dropSelf(ModBlocks.URANIUM_BLOCK)
+        this.dropSelf(ModBlocks.SULFUR_BLOCK)
+        this.dropSelf(ModBlocks.NITER_BLOCK)
+        this.dropSelf(ModBlocks.RAW_URANIUM_BLOCK)
         this.add(
             ModBlocks.BLUEPRINT_RESEARCH_TABLE,
             this.applyExplosionDecay(
@@ -97,6 +105,9 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
             this.createOreDrop(ModBlocks.SCHEELITE_ORE, ModItems.SCHEELITE)
         )
         this.add(ModBlocks.SILVER_ORE, this.createOreDrop(ModBlocks.SILVER_ORE, ModItems.RAW_SILVER))
+        this.add(ModBlocks.URANIUM_ORE, this.createOreDrop(ModBlocks.URANIUM_ORE, ModItems.RAW_URANIUM))
+        this.add(ModBlocks.SULFUR_ORE, this.createSulfurDrop(ModBlocks.SULFUR_ORE))
+        this.add(ModBlocks.NITER_ORE, this.createNiterDrop(ModBlocks.NITER_ORE))
         this.add(
             ModBlocks.DEEPSLATE_GALENA_ORE,
             this.createOreDrop(ModBlocks.DEEPSLATE_GALENA_ORE, ModItems.GALENA)
@@ -109,6 +120,12 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
             ModBlocks.DEEPSLATE_SILVER_ORE,
             this.createOreDrop(ModBlocks.DEEPSLATE_SILVER_ORE, ModItems.RAW_SILVER)
         )
+        this.add(
+            ModBlocks.DEEPSLATE_URANIUM_ORE,
+            this.createOreDrop(ModBlocks.DEEPSLATE_URANIUM_ORE, ModItems.RAW_URANIUM)
+        )
+        this.add(ModBlocks.DEEPSLATE_SULFUR_ORE, this.createSulfurDrop(ModBlocks.DEEPSLATE_SULFUR_ORE))
+        this.add(ModBlocks.DEEPSLATE_NITER_ORE, this.createNiterDrop(ModBlocks.DEEPSLATE_NITER_ORE))
 
         this.add(
             ModBlocks.CONTAINER, LootTable.lootTable().withPool(
@@ -174,5 +191,29 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
             pool.apply(copy)
         }
         return LootTable.lootTable().withPool(this.applyExplosionCondition(pBlock, pool))
+    }
+
+    private fun createSulfurDrop(block: Block): LootTable.Builder {
+        return createSilkTouchDispatchTable(
+            block,
+            this.applyExplosionDecay(
+                block,
+                LootItem.lootTableItem(ModItems.SULFUR)
+                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0f, 5.0f)))
+                    .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE))
+            )
+        )
+    }
+
+    private fun createNiterDrop(block: Block): LootTable.Builder {
+        return createSilkTouchDispatchTable(
+            block,
+            this.applyExplosionDecay(
+                block,
+                LootItem.lootTableItem(ModItems.NITER)
+                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0f, 9.0f)))
+                    .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE))
+            )
+        )
     }
 }

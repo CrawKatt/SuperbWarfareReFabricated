@@ -37,7 +37,7 @@ import net.minecraft.world.level.gameevent.GameEvent
 open class BeastItem : SwordItem(
     Tiers.NETHERITE, 0, 0f, Properties()
         .stacksTo(1)
-        .rarity(ModRarities.LEGENDARY)
+        .rarity(ModRarities.BEAST)
         .durability(114514)
 ) {
     override fun canBeDepleted() = false

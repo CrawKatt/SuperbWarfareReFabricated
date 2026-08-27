@@ -436,19 +436,6 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         }
     }
 
-    @Deprecated("")
-    @Suppress("unused")
-    fun beforeShoot(
-        shooter: Entity?,
-        level: ServerLevel,
-        shootPosition: Vec3,
-        shootDirection: Vec3,
-        data: GunData,
-        spread: Double,
-        zoom: Boolean
-    ) {
-    }
-
     /**
      * 服务端在开火后的额外行为
      */
@@ -502,20 +489,6 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         // TODO 这样搞会在远程遥控火炮的时候，无论隔多远都会摇晃屏幕（恼
 //        data.shakePlayers(shooter);
         data.clearTempModifications()
-    }
-
-    @Deprecated("")
-    @Suppress("unused")
-    fun afterShoot(
-        shooter: Entity?,
-        level: ServerLevel,
-        shootPosition: Vec3,
-        shootDirection: Vec3,
-        data: GunData,
-        spread: Double,
-        zoom: Boolean,
-        uuid: UUID?
-    ) {
     }
 
     fun shoot(
@@ -621,20 +594,6 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         data.item.afterShoot(parameters)
 
         data.save()
-    }
-
-    @Deprecated("")
-    @Suppress("unused")
-    fun shoot(
-        shooter: Entity?,
-        level: ServerLevel,
-        shootPosition: Vec3,
-        shootDirection: Vec3,
-        data: GunData,
-        spread: Double,
-        zoom: Boolean,
-        uuid: UUID?
-    ) {
     }
 
     /**
@@ -929,21 +888,6 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
 
         level.addFreshEntity(entity)
         return true
-    }
-
-    @Deprecated("")
-    @Suppress("unused")
-    fun shootBullet(
-        shooter: Entity?,
-        level: ServerLevel,
-        shootPosition: Vec3,
-        shootDirection: Vec3,
-        data: GunData,
-        spread: Double,
-        zoom: Boolean,
-        uuid: UUID?
-    ): Boolean {
-        return false
     }
 
     open fun shootRay(parameters: ShootParameters): Boolean {
