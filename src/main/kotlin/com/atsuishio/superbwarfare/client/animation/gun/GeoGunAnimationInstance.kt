@@ -33,6 +33,7 @@ open class GeoGunAnimationInstance(
     private var currentState: GunAnimationState? = null
     private var fireSerial = 0
     private var consumedFireSerial = 0
+    private val pendingShellEjects = ArrayList<Int>()
     private var cachedPose: Pose = DummyPose.INSTANCE
     private val cameraRotation = Quaternionf()
 
@@ -85,6 +86,15 @@ open class GeoGunAnimationInstance(
         }
 
         fireSerial++
+        pendingShellEjects += 0
+    }
+
+    fun consumePendingShellEjects(): List<Int> {
+        if (pendingShellEjects.isEmpty()) return emptyList()
+
+        val result = ArrayList(pendingShellEjects)
+        pendingShellEjects.clear()
+        return result
     }
 
     private fun animationName(state: GunAnimationState): String? {
@@ -188,6 +198,7 @@ open class GeoGunAnimationInstance(
         currentState = null
         fireSerial = 0
         consumedFireSerial = 0
+        pendingShellEjects.clear()
         cachedPose = DummyPose.INSTANCE
     }
 

@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.data.IDBasedData
 import com.atsuishio.superbwarfare.data.ModColor
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.resource.ModelResource
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedResourceLocation
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedSoundEvent
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVec3
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVector3f
@@ -68,6 +69,9 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
     @SerialName("EjectShell")
     var ejectShell: Boolean = false
 
+    @SerialName("ShellEject")
+    var shellEject: ShellEject? = null
+
     @SerialName("CanZoom")
     var canZoom: Boolean = true
 
@@ -84,5 +88,41 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
 
         @SerialName("scale")
         var scale: SerializedVector3f = Vector3f(0f, 0f, 0f)
+    }
+
+    @Serializable
+    class ShellEject {
+        @JvmField
+        @SerialName("BoneName")
+        var boneName: String = "shell"
+
+        @JvmField
+        @SerialName("ShellModel")
+        var shellModel: SerializedResourceLocation? = null
+
+        @JvmField
+        @SerialName("ShellTexture")
+        var shellTexture: SerializedResourceLocation? = null
+
+        @SerialName("Size")
+        var size: Float = 1f
+
+        @SerialName("InitialVelocity")
+        var initialVelocity: SerializedVector3f = Vector3f(1.6f, 0.9f, 0.25f)
+
+        @SerialName("RandomVelocity")
+        var randomVelocity: SerializedVector3f = Vector3f(0.4f, 0.35f, 0.15f)
+
+        @SerialName("Acceleration")
+        var acceleration: SerializedVector3f = Vector3f(0f, -18f, 0f)
+
+        @SerialName("AngularVelocity")
+        var angularVelocity: SerializedVector3f = Vector3f(-1800f, -2000f, 240f)
+
+        @SerialName("LivingTime")
+        var livingTime: Float = 0.9f
+
+        @SerialName("MaxActive")
+        var maxActive: Int = 32
     }
 }
