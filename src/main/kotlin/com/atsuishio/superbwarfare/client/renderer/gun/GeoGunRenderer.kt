@@ -124,9 +124,12 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
                 model.applyPose(BLENDER.blend(model.getBindPose(), pose))
             }
 
+
+            applyFirstPersonPositioningTransform(poseStack, model)
+
             val sprintOffset = resource.sprintOffset
             ClientEventHandler.gunRootMoveV2(poseStack, sprintOffset.x.toFloat(), sprintOffset.y.toFloat(), sprintOffset.z.toFloat(), false)
-            applyFirstPersonPositioningTransform(poseStack, model)
+            ClientEventHandler.handleShootAnimationV2(poseStack, 1f, 1f, 1f, 1f, 1f, 1f, 0.2f, 1f)
         }
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         model.resetPose()

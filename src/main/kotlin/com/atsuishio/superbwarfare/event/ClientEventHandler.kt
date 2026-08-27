@@ -2317,14 +2317,14 @@ object ClientEventHandler {
 
         val i = if (useCustomAnim) 0 else 1
 
-        val basicSprintPosX = (sprintBasicPosX * (-2.5 + customX)).toFloat() * i
+        val basicSprintPosX = (sprintBasicPosX * (1.5 + customX)).toFloat() * i
         val basicSprintPosY =
-            (sprintBasicPosY * (-7.5 + customY - 8 * AnimationCurves.PARABOLA.apply(sprintBasicPosY))).toFloat() * i
+            (sprintBasicPosY * (-2.35 + customY - 8 * AnimationCurves.PARABOLA.apply(sprintBasicPosY))).toFloat() * i
         val basicSprintPosZ = (sprintBasicPosZ * (-0.55 + customZ)).toFloat() * i
 
-        val basicSprintRotX = (sprintBasicRotX * 33 * Mth.DEG_TO_RAD).toFloat() * i
+        val basicSprintRotX = (sprintBasicRotX * 39 * Mth.DEG_TO_RAD).toFloat() * i
         val basicSprintRotY = (sprintBasicRotY * 35.6 * Mth.DEG_TO_RAD).toFloat() * i
-        val basicSprintRotZ = (sprintBasicRotZ * 25.7 * Mth.DEG_TO_RAD).toFloat() * i
+        val basicSprintRotZ = (sprintBasicRotZ * 34.7 * Mth.DEG_TO_RAD).toFloat() * i
 
         val gunPosX =
             (walkPosX + basicSprintPosX + sprintPosX * i + 20 * drawTime + 9.3f * movePosHorizon).toFloat() * (1 - 0.5 * zoomTime).toFloat()
@@ -2521,6 +2521,94 @@ object ClientEventHandler {
         bone.rotZ =
             (2 * zoom * rotZ * getBoneRotZ(fireRotTimer.toFloat()) * Mth.DEG_TO_RAD * recoilHorizon * gripRecoilY * recoil *
                     (1 - 0.5 * zoomTime) * zoomRecoil).toFloat()
+    }
+
+    @JvmStatic
+    fun handleShootAnimationV2(
+        poseStack: PoseStack,
+        x: Float,
+        y: Float,
+        z: Float,
+        rotX: Float,
+        rotY: Float,
+        rotZ: Float,
+        zoomMultiply: Float,
+        customSpeed: Float
+    ) {
+        val player = localPlayer ?: return
+        val stack = player.mainHandItem
+        val item = stack.item as? GunItem ?: return
+
+        customAnimSpeed = customSpeed.toDouble()
+
+        val data = GunData.from(stack)
+        val barrelType = data.attachment.get(AttachmentType.BARREL)
+        val gripType = data.attachment.get(AttachmentType.GRIP)
+        val scopeType = data.attachment.get(AttachmentType.SCOPE)
+
+        val recoil = when (barrelType) {
+            1 -> 0.75f
+            2 -> 0.95f
+            else -> 1f
+        }
+
+        val gripRecoilX = when (gripType) {
+            1 -> 0.85f
+            2 -> 0.95f
+            else -> 1f
+        }
+
+        val gripRecoilY = when (gripType) {
+            1 -> 0.95f
+            2 -> 0.85f
+            else -> 1f
+        }
+
+        val zoomRecoil = when (scopeType) {
+            2 -> 1.25f - (zoomTime * 0.8f).toFloat()
+            3 -> 1.25f - zoomTime.toFloat()
+            else -> 1.25f
+        }
+
+        val pose =
+            if (player.isShiftKeyDown && player.bbHeight >= 1 && !isProne(player)) {
+                0.85f
+            } else if (isProne(player)) {
+                if (data.attachment.get(AttachmentType.GRIP) == 3 || item.hasBipod(data)) {
+                    0.5f
+                } else {
+                    0.75f
+                }
+            } else {
+                1f
+            }
+
+        var zoomMultiply = zoomMultiply
+        zoomMultiply = zoomMultiply.coerceIn(0f, 1f)
+
+        val zoom = (1 - zoomMultiply * zoomTime).toFloat() * pose
+
+        val gunPosX = zoom * x * (recoilHorizon * (0.5f * firePosZ)).toFloat()
+        val gunPosY = zoom * y * (getBoneMoveY(firePosTimer.toFloat()) * -0.05 * (1 - 0.25 * zoomTime)).toFloat()
+        val gunPosZ = zoom * z * (getBoneMoveZ(firePosTimer.toFloat()) * 0.1 + 1.1f * firePosZ).toFloat() * (1 - 0.5 * zoomTime).toFloat()
+
+        val gunRotX =
+            zoom * rotX * (-getBoneRotX(fireRotTimer.toFloat()) * Mth.DEG_TO_RAD * 0.5f + 0.01f * firePosZ).toFloat() * gripRecoilX * recoil *
+                    (1 - 0.85 * zoomTime).toFloat() * zoomRecoil
+        val gunRotY =
+            (3 * zoom * rotY * getBoneRotY(fireRotTimer.toFloat()) * Mth.DEG_TO_RAD * recoilHorizon * gripRecoilY * recoil *
+                    (1 - 0.3 * zoomTime) * zoomRecoil).toFloat()
+        val gunRotZ =
+            (2 * zoom * rotZ * getBoneRotZ(fireRotTimer.toFloat()) * Mth.DEG_TO_RAD * recoilHorizon * gripRecoilY * recoil *
+                    (1 - 0.5 * zoomTime) * zoomRecoil).toFloat()
+
+        poseStack.mulPose(Axis.XP.rotation(gunRotX))
+        poseStack.mulPose(Axis.YP.rotation(gunRotY))
+        poseStack.mulPose(Axis.ZP.rotation(gunRotZ))
+
+        poseStack.translate(-gunPosX / 16, gunPosY / 16, gunPosZ / 16)
+
+
     }
 
     @JvmStatic
