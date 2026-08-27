@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.init;
 
 import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.config.server.SpawnConfig;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.minecraft.core.registries.Registries;
@@ -71,13 +70,11 @@ public class ModWorldgen {
                 5, 1, 3
         );
 
-        if (SpawnConfig.SPAWN_CREEPING_SENPAI.get()) {
-            BiomeModifications.addSpawn(
-                    BiomeSelectors.includeByKey(SENPAI_BIOMES),
-                    MobCategory.MONSTER,
-                    ModEntities.CREEPING_SENPAI,
-                    5, 1, 2
-            );
-        }
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(SENPAI_BIOMES),
+                MobCategory.MONSTER,
+                ModEntities.CREEPING_SENPAI,
+                5, 1, 2
+        );
     }
 }
