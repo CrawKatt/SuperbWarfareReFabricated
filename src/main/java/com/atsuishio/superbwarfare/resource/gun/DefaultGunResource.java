@@ -109,6 +109,9 @@ public class DefaultGunResource implements IDBasedData<DefaultGunResource> {
         @SerializedName("AngularVelocity")
         public Vec3 angularVelocity = new Vec3(-1800, -2000, 240);
 
+        @SerializedName("RandomAngle")
+        public Vec3 randomAngle = Vec3.ZERO;
+
         @SerializedName("LivingTime")
         public float livingTime = 0.9f;
 

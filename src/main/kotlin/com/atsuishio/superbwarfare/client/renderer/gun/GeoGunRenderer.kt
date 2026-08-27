@@ -133,6 +133,9 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         }
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         if (transformType.firstPerson()) {
+            MuzzleFlashRenderer.render(poseStack, model, stack, bufferSource)
+        }
+        if (transformType.firstPerson()) {
             val hand = if (transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
                 InteractionHand.OFF_HAND
             } else {
