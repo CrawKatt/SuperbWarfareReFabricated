@@ -1,28 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.special
 
-import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
-import com.atsuishio.superbwarfare.item.gun.GunItem
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
+import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
 import net.minecraft.world.item.Rarity
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
-import net.minecraftforge.client.extensions.common.IClientItemExtensions
-import java.util.function.Consumer
 
-class NailGunItem : GunItem(Properties().rarity(Rarity.RARE)) {
-
-    @OnlyIn(Dist.CLIENT)
-    override fun initializeClient(consumer: Consumer<IClientItemExtensions>) {
-        super.initializeClient(consumer)
-        consumer.accept(object : IClientItemExtensions {
-            private var renderer: GeoGunRenderer? = null
-
-            override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                if (renderer == null) {
-                    renderer = GeoGunRenderer()
-                }
-                return renderer!!
-            }
-        })
-    }
-}
+object NailGunItem : GeoGunItemV2(Properties().rarity(Rarity.RARE))
