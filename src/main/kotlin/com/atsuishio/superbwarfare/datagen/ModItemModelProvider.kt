@@ -57,7 +57,7 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         gunItem(ModItems.SENTINEL)
         gunItem(ModItems.SKS)
         gunItem(ModItems.SVD)
-        gunItem(ModItems.TASER)
+        gunItemV2(ModItems.TASER)
         gunItem(ModItems.TRACHELIUM)
         gunItem(ModItems.VECTOR)
         gunItem(ModItems.MP_5)
@@ -389,5 +389,11 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         this.gunIcon(item, name)
         this.gunBase(item, name)
         this.customSeparatedGunModel(item, name)
+    }
+
+    fun gunItemV2(item: DeferredHolder<Item, out Item>) {
+        getBuilder(item.id.path)
+            .parent(ModelFile.UncheckedModelFile("builtin/entity"))
+            .guiLight(BlockModel.GuiLight.FRONT)
     }
 }
