@@ -69,7 +69,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         gunItem(ModItems.SENTINEL)
         gunItem(ModItems.SKS)
         gunItem(ModItems.SVD)
-        gunItem(ModItems.TASER)
+        gunItemV2(ModItems.TASER)
         gunItem(ModItems.TRACHELIUM)
         gunItem(ModItems.VECTOR)
         gunItem(ModItems.MP_5)
@@ -444,5 +444,12 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
 
     private fun blockPath(block: Block): String {
         return BuiltInRegistries.BLOCK.getKey(block).path
+    }
+
+    private fun gunItemV2(item: Item) {
+        addModel(
+            loc("item/${itemPath(item)}"),
+            model(ResourceLocation.withDefaultNamespace("builtin/entity"), guiLight = "front")
+        )
     }
 }

@@ -32,12 +32,12 @@ import com.atsuishio.superbwarfare.item.gun.smg.Mp5Item
 import com.atsuishio.superbwarfare.item.gun.smg.VectorItem
 import com.atsuishio.superbwarfare.item.gun.sniper.*
 import com.atsuishio.superbwarfare.item.gun.special.BocekItem
+import com.atsuishio.superbwarfare.item.gun.special.BeastGunTestItem
 import com.atsuishio.superbwarfare.item.gun.special.Glock17V2Item
 import com.atsuishio.superbwarfare.item.gun.special.NailGunItem
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem
 import com.atsuishio.superbwarfare.item.gun.special.ReforgingItem
 import com.atsuishio.superbwarfare.item.gun.special.TaserItem
-import com.atsuishio.superbwarfare.item.gun.special.TaserV2Item
 import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGunItem
 import com.atsuishio.superbwarfare.item.material.*
 import com.atsuishio.superbwarfare.item.misc.*
@@ -89,8 +89,7 @@ object ModItems {
 
     // @formatter:off
     @JvmField val REPAIR_TOOL = registerGun("repair_tool") { RepairToolItem() }
-    @JvmField val TASER = registerGun("taser") { TaserItem() }
-    @JvmField val TASER_V2 = registerGun("taser_v2") { TaserV2Item }
+    @JvmField val TASER = registerGun("taser") { TaserItem }
     @JvmField val GLOCK_17 = registerGun("glock_17") { Glock17Item() }
     @JvmField val GLOCK_17_V2 = registerGun("glock_17_v2") { Glock17V2Item }
     @JvmField val GLOCK_18 = registerGun("glock_18") { Glock18Item() }
@@ -135,6 +134,8 @@ object ModItems {
     @JvmField val BOCEK = registerGun("bocek") { BocekItem() }
     @JvmField val SUPER_STAR_SHOOTER = registerGun("super_star_shooter") { SuperStarShooterItem() }
     @JvmField val REFORGING = registerGun("reforging") { ReforgingItem }
+
+    @JvmField val BEAST_GUN_TEST = registerGun("beast_gun_test") { BeastGunTestItem() }
 
     @JvmField val VEHICLE_GUN = registerGun("vehicle_gun") { VehicleGunItem() }
     @JvmField val EMPTY_GUN = registerGun("empty_gun") { EmptyGunItem() }

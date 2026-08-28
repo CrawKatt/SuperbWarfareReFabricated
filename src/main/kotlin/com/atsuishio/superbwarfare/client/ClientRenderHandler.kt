@@ -197,7 +197,7 @@ object ClientRenderHandler {
     @JvmStatic
     fun onClientSetup() {
         val geoGunRenderer = GeoGunRenderer()
-        listOf(ModItems.TASER_V2, ModItems.NAIL_GUN, ModItems.REFORGING, ModItems.GLOCK_17_V2).forEach { item ->
+        listOf(ModItems.TASER, ModItems.NAIL_GUN, ModItems.REFORGING, ModItems.GLOCK_17_V2).forEach { item ->
             BuiltinItemRendererRegistry.INSTANCE.register(item, geoGunRenderer)
         }
 
