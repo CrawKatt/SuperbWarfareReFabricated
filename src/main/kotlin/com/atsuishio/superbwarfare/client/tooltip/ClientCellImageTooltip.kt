@@ -60,7 +60,7 @@ open class ClientCellImageTooltip(tooltip: CellImageComponent) : ClientTooltipCo
             }
 
             component.append(
-                Component.literal(" $energy/$maxEnergy FE")
+                Component.literal(" $energy/$maxEnergy E")
                     .withStyle(ChatFormatting.GRAY)
             )
 

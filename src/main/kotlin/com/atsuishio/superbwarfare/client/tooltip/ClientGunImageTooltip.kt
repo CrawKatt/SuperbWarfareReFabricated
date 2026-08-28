@@ -295,7 +295,7 @@ open class ClientGunImageTooltip(tooltip: GunImageComponent) : ClientTooltipComp
             }
 
             component.append(
-                Component.literal(" $energy/$maxEnergy FE")
+                Component.literal(" $energy/$maxEnergy E")
                     .withStyle(ChatFormatting.GRAY)
             )
 
