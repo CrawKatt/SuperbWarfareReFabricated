@@ -169,7 +169,7 @@ object ClientRenderHandler {
     @JvmStatic
     fun onClientSetup() {
         val geoGunRenderer = lazy { GeoGunRenderer() }
-        listOf(ModItems.TASER_V2, ModItems.GLOCK_17_V2, ModItems.NAIL_GUN, ModItems.REFORGING).forEach { item ->
+        listOf(ModItems.TASER, ModItems.GLOCK_17_V2, ModItems.NAIL_GUN, ModItems.REFORGING).forEach { item ->
             BuiltinItemRendererRegistry.INSTANCE.register(item) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
                 geoGunRenderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
             }

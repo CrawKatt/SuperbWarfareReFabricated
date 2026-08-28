@@ -91,8 +91,7 @@ object ModItems {
 
     // @formatter:off
     @JvmField val REPAIR_TOOL = registerGun("repair_tool") { RepairToolItem() }
-    @JvmField val TASER = registerGun("taser") { TaserItem() }
-    @JvmField val TASER_V2 = registerGun("taser_v2") { TaserV2Item }
+    @JvmField val TASER = registerGun("taser") { TaserItem }
     @JvmField val GLOCK_17 = registerGun("glock_17") { Glock17Item() }
     @JvmField val GLOCK_17_V2 = registerGun("glock_17_v2") { Glock17V2Item }
     @JvmField val GLOCK_18 = registerGun("glock_18") { Glock18Item() }

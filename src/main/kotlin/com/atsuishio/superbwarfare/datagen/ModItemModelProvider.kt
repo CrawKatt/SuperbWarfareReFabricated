@@ -7,7 +7,6 @@ import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModItems.Materials
 import com.atsuishio.superbwarfare.init.ModPerks
 import com.google.gson.JsonObject
-import net.minecraft.client.renderer.block.model.BlockModel
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.data.CachedOutput
 import net.minecraft.data.DataProvider
@@ -70,7 +69,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         gunItem(ModItems.SENTINEL)
         gunItem(ModItems.SKS)
         gunItem(ModItems.SVD)
-        gunItem(ModItems.TASER)
+        gunItemV2(ModItems.TASER)
         gunItem(ModItems.TRACHELIUM)
         gunItem(ModItems.VECTOR)
         gunItem(ModItems.MP_5)
@@ -448,5 +447,12 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
 
     private fun blockPath(block: Block): String {
         return BuiltInRegistries.BLOCK.getKey(block).path
+    }
+
+    fun gunItemV2(item: Item) {
+        addModel(
+            loc("item/${itemPath(item)}"),
+            model(ResourceLocation("minecraft", "builtin/entity"), guiLight = "front")
+        )
     }
 }
