@@ -1,6 +1,8 @@
 package com.atsuishio.superbwarfare.block
 
 import com.atsuishio.superbwarfare.init.ModCapabilities
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
 
 import com.atsuishio.superbwarfare.block.entity.CreativeChargingStationBlockEntity
 import com.atsuishio.superbwarfare.init.ModBlockEntities
@@ -88,18 +90,19 @@ class CreativeChargingStationBlock(properties: Properties) : BaseEntityBlock(pro
     ): ItemInteractionResult {
         if (stack.isEmpty) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
 
-        val cap = ModCapabilities.ENERGY_ITEM.find(stack, null) ?: return ItemInteractionResult.FAIL
+        val cap = ContainerItemContext.forPlayerInteraction(player, hand)
+            .find(ModCapabilities.ENERGY_ITEM) ?: return ItemInteractionResult.FAIL
 
-        if (cap.canReceive() && cap.energyStored < cap.maxEnergyStored) {
-            cap.receiveEnergy(Int.MAX_VALUE, false)
+        if (cap.supportsInsertion() && cap.amount < cap.capacity) {
+            EnergyStorageHelper.insert(cap, Long.MAX_VALUE)
             if (!level.isClientSide) {
                 player.displayClientMessage(
                     Component.translatable("des.superbwarfare.creative_charging_station.charge.success")
                         .withStyle(ChatFormatting.GREEN), true
                 )
             }
-        } else if (cap.canExtract()) {
-            cap.extractEnergy(Int.MAX_VALUE, false)
+        } else if (cap.supportsExtraction()) {
+            EnergyStorageHelper.extract(cap, Long.MAX_VALUE)
             if (!level.isClientSide) {
                 player.displayClientMessage(
                     Component.translatable("des.superbwarfare.creative_charging_station.extract.success")

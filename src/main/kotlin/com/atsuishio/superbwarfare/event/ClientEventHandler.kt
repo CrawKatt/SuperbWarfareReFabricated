@@ -1771,7 +1771,7 @@ object ClientEventHandler {
 
         if (item == ModItems.SENTINEL) {
             val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
-            val charged = cap != null && cap.energyStored > 0
+            val charged = cap != null && cap.amount > 0
 
             if (charged) {
                 player.playSound(
@@ -1785,7 +1785,7 @@ object ClientEventHandler {
 
         if (item == ModItems.SECONDARY_CATACLYSM) {
             val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
-            val hasEnoughEnergy = cap != null && cap.energyStored > 3000
+            val hasEnoughEnergy = cap != null && cap.amount > 3000
 
             val isChargedFire = zoom && hasEnoughEnergy
 

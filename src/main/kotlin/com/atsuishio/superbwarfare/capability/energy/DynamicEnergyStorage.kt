@@ -10,16 +10,6 @@ open class DynamicEnergyStorage @JvmOverloads constructor(
     protected val maxExtractGetter: Supplier<Int?> = maxStorageGetter
 ) : EnergyStorage(Int.MAX_VALUE.toLong()) {
 
-    override fun extractEnergy(maxExtract: Int, simulate: Boolean): Int {
-        updateProps()
-        return super.extractEnergy(maxExtract, simulate)
-    }
-
-    override fun receiveEnergy(maxReceive: Int, simulate: Boolean): Int {
-        updateProps()
-        return super.receiveEnergy(maxReceive, simulate)
-    }
-
     override fun insert(maxAmount: Long, transaction: TransactionContext): Long {
         updateProps()
         return super.insert(maxAmount, transaction)
@@ -30,19 +20,14 @@ open class DynamicEnergyStorage @JvmOverloads constructor(
         return super.extract(maxAmount, transaction)
     }
 
-    override fun canReceive(): Boolean {
+    override fun supportsInsertion(): Boolean {
         updateProps()
-        return super.canReceive()
+        return super.supportsInsertion()
     }
 
-    override fun canExtract(): Boolean {
+    override fun supportsExtraction(): Boolean {
         updateProps()
-        return super.canExtract()
-    }
-
-    override fun getMaxEnergyStored(): Int {
-        updateProps()
-        return super.getMaxEnergyStored()
+        return super.supportsExtraction()
     }
 
     override fun getCapacity(): Long {

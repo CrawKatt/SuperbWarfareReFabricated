@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.perk.functional
 
 import com.atsuishio.superbwarfare.init.ModCapabilities
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.perk.Perk
@@ -15,7 +16,7 @@ object Regeneration : Perk("regeneration", Type.FUNCTIONAL) {
     ) {
         val stack = data.stack
         ModCapabilities.ENERGY_ITEM.find(stack, null)?.let {
-            it.receiveEnergy(instance.level * it.maxEnergyStored / 2000, false)
+            EnergyStorageHelper.insert(it, instance.level * it.capacity / 2000)
         }
     }
 }

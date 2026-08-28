@@ -1,8 +1,8 @@
 package com.atsuishio.superbwarfare.capability.energy
 
 import com.atsuishio.superbwarfare.init.ModDataComponents
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
 import net.minecraft.world.item.ItemStack
+import team.reborn.energy.api.EnergyStorage
 import java.util.function.Function
 
 class ItemEnergyStorage(
@@ -30,55 +30,18 @@ class ItemEnergyStorage(
     )
 
     init {
-        val component = stack.get(ModDataComponents.ENERGY)
-        this.energy = (component ?: 0).toLong()
+        val current = stack.get(EnergyStorage.ENERGY_COMPONENT)
+        val legacy = stack.get(ModDataComponents.ENERGY)
+        this.energy = current ?: legacy?.toLong() ?: 0L
+
+        if (current == null && legacy != null) {
+            stack.set(EnergyStorage.ENERGY_COMPONENT, energy)
+            stack.remove(ModDataComponents.ENERGY)
+        }
     }
 
-    override fun receiveEnergy(maxReceive: Int, simulate: Boolean): Int {
-        val received = super.receiveEnergy(maxReceive, simulate)
-
-        if (received > 0 && !simulate) {
-            stack.set(ModDataComponents.ENERGY, energyStored)
-        }
-
-        return received
-    }
-
-    override fun extractEnergy(maxExtract: Int, simulate: Boolean): Int {
-        val extracted = super.extractEnergy(maxExtract, simulate)
-
-        if (extracted > 0 && !simulate) {
-            stack.set(ModDataComponents.ENERGY, energyStored)
-        }
-
-        return extracted
-    }
-
-    override fun insert(maxAmount: Long, transaction: TransactionContext): Long {
-        val inserted = super.insert(maxAmount, transaction)
-
-        if (inserted > 0) {
-            transaction.addCloseCallback { _, result ->
-                if (result == TransactionContext.Result.COMMITTED) {
-                    stack.set(ModDataComponents.ENERGY, energyStored)
-                }
-            }
-        }
-
-        return inserted
-    }
-
-    override fun extract(maxAmount: Long, transaction: TransactionContext): Long {
-        val extracted = super.extract(maxAmount, transaction)
-
-        if (extracted > 0) {
-            transaction.addCloseCallback { _, result ->
-                if (result == TransactionContext.Result.COMMITTED) {
-                    stack.set(ModDataComponents.ENERGY, energyStored)
-                }
-            }
-        }
-
-        return extracted
+    override fun onFinalCommit() {
+        stack.set(EnergyStorage.ENERGY_COMPONENT, amount)
+        stack.remove(ModDataComponents.ENERGY)
     }
 }

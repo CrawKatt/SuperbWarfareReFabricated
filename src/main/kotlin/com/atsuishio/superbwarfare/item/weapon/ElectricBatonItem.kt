@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.item.weapon
 
 import com.atsuishio.superbwarfare.init.ModCapabilities
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
 import com.atsuishio.superbwarfare.init.ModItems
@@ -75,7 +76,7 @@ class ElectricBatonItem : SwordItem(
         if (NBTTool.getTag(stack).getBoolean(TAG_OPEN)) {
             val cap = ModCapabilities.ENERGY_ITEM.find(stack, null) ?: return 0
 
-            return (cap.energyStored.toFloat() * 13f / MAX_ENERGY).roundToInt()
+            return (cap.amount.toFloat() * 13f / MAX_ENERGY).roundToInt()
         } else {
             return super.getBarWidth(stack)
         }
@@ -99,8 +100,8 @@ class ElectricBatonItem : SwordItem(
 
         if (NBTTool.getTag(stack).getBoolean(TAG_OPEN)) {
             val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
-            if (cap != null && cap.energyStored >= ENERGY_COST) {
-                cap.extractEnergy(ENERGY_COST, false)
+            if (cap != null && cap.amount >= ENERGY_COST) {
+                EnergyStorageHelper.extract(cap, ENERGY_COST.toLong())
 
                 if (!target.level().isClientSide) {
                     target.addEffect(MobEffectInstance(ModMobEffects.SHOCK, 30, 2), attacker)
@@ -124,7 +125,7 @@ class ElectricBatonItem : SwordItem(
             val stack = ItemStack(ModItems.ELECTRIC_BATON)
 
             val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
-            cap?.receiveEnergy(MAX_ENERGY, false)
+            cap?.let { EnergyStorageHelper.insert(it, MAX_ENERGY.toLong()) }
 
             val tag = NBTTool.getTag(stack)
             tag.putBoolean(TAG_OPEN, true)

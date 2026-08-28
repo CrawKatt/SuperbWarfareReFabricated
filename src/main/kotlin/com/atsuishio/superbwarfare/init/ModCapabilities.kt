@@ -6,7 +6,6 @@ import com.atsuishio.superbwarfare.block.entity.BlueprintResearchTableBlockEntit
 import com.atsuishio.superbwarfare.block.entity.CreativeChargingStationBlockEntity
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.block.entity.SuperbItemInterfaceBlockEntity
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
 import com.atsuishio.superbwarfare.capability.api.IItemHandler
 import com.atsuishio.superbwarfare.capability.api.InvWrapper
 import com.atsuishio.superbwarfare.capability.api.SidedInvWrapper
@@ -17,24 +16,18 @@ import com.atsuishio.superbwarfare.item.EnergyStorageItem
 import com.atsuishio.superbwarfare.item.blockitem.CreativeChargingStationBlockItem
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
 import net.fabricmc.fabric.api.lookup.v1.entity.EntityApiLookup
-import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup
 import net.minecraft.core.Direction
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.entity.player.Player
 import team.reborn.energy.api.EnergyStorage
+import team.reborn.energy.api.base.SimpleEnergyItem
 
 object ModCapabilities {
     @JvmField
-    val ENERGY_BLOCK: BlockApiLookup<IEnergyStorage, Direction?> =
-        BlockApiLookup.get(Mod.loc("energy"), IEnergyStorage::class.java, Direction::class.java)
+    val ENERGY_BLOCK = EnergyStorage.SIDED
 
     @JvmField
-    val ENERGY_ITEM: ItemApiLookup<IEnergyStorage, Void?> =
-        ItemApiLookup.get(Mod.loc("energy"), IEnergyStorage::class.java, Void::class.java)
-
-    @JvmField
-    val ENERGY_ENTITY: EntityApiLookup<IEnergyStorage, Void?> =
-        EntityApiLookup.get(Mod.loc("energy"), IEnergyStorage::class.java, Void::class.java)
+    val ENERGY_ITEM = EnergyStorage.ITEM
 
     @JvmField
     val ITEM_HANDLER_BLOCK: BlockApiLookup<IItemHandler, Direction?> =
@@ -46,47 +39,24 @@ object ModCapabilities {
 
     @JvmStatic
     fun init() {
-        ENERGY_BLOCK.registerForBlockEntity(
+        EnergyStorage.SIDED.registerForBlockEntity(
             ChargingStationBlockEntity::getEnergyStorage,
             ModBlockEntities.CHARGING_STATION
         )
 
-        ENERGY_BLOCK.registerForBlockEntity(
+        EnergyStorage.SIDED.registerForBlockEntity(
             CreativeChargingStationBlockEntity::getEnergyStorage,
             ModBlockEntities.CREATIVE_CHARGING_STATION
         )
 
-        ENERGY_BLOCK.registerForBlockEntity(
-            { be, _ -> be.getEnergyStorage() },
+        EnergyStorage.SIDED.registerForBlockEntity(
+            { be: FuMO25BlockEntity, _: Direction? -> be.getEnergyStorage() },
             ModBlockEntities.FUMO_25
         )
 
-        ENERGY_ITEM.registerForItems(
-            { stack, _ ->
-                (stack.item as CreativeChargingStationBlockItem).energyStorage
-            },
+        EnergyStorage.ITEM.registerForItems(
+            { stack, _ -> (stack.item as CreativeChargingStationBlockItem).energyStorage },
             ModItems.CREATIVE_CHARGING_STATION
-        )
-
-        EnergyStorage.SIDED.registerForBlockEntity(
-            { be: ChargingStationBlockEntity, dir: Direction? ->
-                be.getEnergyStorage(dir) as EnergyStorage
-            },
-            ModBlockEntities.CHARGING_STATION
-        )
-
-        EnergyStorage.SIDED.registerForBlockEntity(
-            { be: CreativeChargingStationBlockEntity, dir: Direction? ->
-                be.getEnergyStorage(dir) as EnergyStorage
-            },
-            ModBlockEntities.CREATIVE_CHARGING_STATION
-        )
-
-        EnergyStorage.SIDED.registerForBlockEntity(
-            { be: FuMO25BlockEntity, dir: Direction? ->
-                be.getEnergyStorage() as EnergyStorage
-            },
-            ModBlockEntities.FUMO_25
         )
 
         ITEM_HANDLER_BLOCK.registerForBlockEntity(
@@ -130,30 +100,23 @@ object ModCapabilities {
 
         for (item in BuiltInRegistries.ITEM) {
             if (item is EnergyStorageItem) {
-                ENERGY_ITEM.registerForItems(
-                    { stack, _ ->
-                        ItemEnergyStorage(
-                            stack,
-                            item::getMaxEnergy,
-                            item::getMaxReceiveEnergy,
-                            item::getMaxExtractEnergy
-                        )
-                    },
-                    item
-                )
-            }
-        }
-
-        for (item in BuiltInRegistries.ITEM) {
-            if (item is EnergyStorageItem) {
                 EnergyStorage.ITEM.registerForItems(
-                    { stack, _ ->
-                        ItemEnergyStorage(
-                            stack,
-                            item::getMaxEnergy,
-                            item::getMaxReceiveEnergy,
-                            item::getMaxExtractEnergy
-                        )
+                    { stack, context ->
+                        if (context == null) {
+                            ItemEnergyStorage(
+                                stack,
+                                item::getMaxEnergy,
+                                item::getMaxReceiveEnergy,
+                                item::getMaxExtractEnergy
+                            )
+                        } else {
+                            SimpleEnergyItem.createStorage(
+                                context,
+                                item.getMaxEnergy(stack).toLong(),
+                                item.getMaxReceiveEnergy(stack).toLong(),
+                                item.getMaxExtractEnergy(stack).toLong()
+                            )
+                        }
                     },
                     item
                 )
@@ -161,17 +124,6 @@ object ModCapabilities {
         }
 
         for (entity in BuiltInRegistries.ENTITY_TYPE) {
-            ENERGY_ENTITY.registerForType(
-                { obj, _ ->
-                    when {
-                        obj is DPSGeneratorEntity -> obj.energyStorage
-                        obj is VehicleEntity && obj.hasEnergyStorage() -> obj.getEnergyStorage()
-                        else -> null
-                    }
-                },
-                entity
-            )
-
             ITEM_HANDLER_ENTITY.registerForType(
                 { obj, _ ->
                     when {
@@ -183,5 +135,12 @@ object ModCapabilities {
                 entity
             )
         }
+    }
+
+    @JvmStatic
+    fun getEntityEnergyStorage(entity: net.minecraft.world.entity.Entity): EnergyStorage? = when {
+        entity is DPSGeneratorEntity -> entity.energyStorage
+        entity is VehicleEntity && entity.hasEnergyStorage() -> entity.getEnergyStorage()
+        else -> null
     }
 }

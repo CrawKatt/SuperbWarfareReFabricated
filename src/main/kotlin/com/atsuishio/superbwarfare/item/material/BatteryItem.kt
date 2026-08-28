@@ -2,9 +2,13 @@ package com.atsuishio.superbwarfare.item.material
 
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
 import com.atsuishio.superbwarfare.init.ModCapabilities
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.item.EnergyStorageItem
 import com.atsuishio.superbwarfare.tools.tag
 import dev.emi.trinkets.api.TrinketsApi
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage
+import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage
 import net.minecraft.ChatFormatting
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
@@ -32,14 +36,14 @@ open class BatteryItem(var maxEnergy: Int, properties: Properties) : Item(proper
 
     override fun isBarVisible(pStack: ItemStack): Boolean {
         val cap = ModCapabilities.ENERGY_ITEM.find(pStack, null) ?: return false
-        return cap.energyStored != cap.maxEnergyStored
+        return cap.amount != cap.capacity
     }
 
     override fun getBarWidth(pStack: ItemStack): Int {
         var energy = 0
         val cap = ModCapabilities.ENERGY_ITEM.find(pStack, null)
         if (cap != null) {
-            energy = cap.energyStored
+            energy = cap.amount.toInt()
         }
 
         return (energy * 13f / maxEnergy).roundToInt()
@@ -69,7 +73,7 @@ open class BatteryItem(var maxEnergy: Int, properties: Properties) : Item(proper
         val stack = ItemStack(this)
         val cap = ModCapabilities.ENERGY_ITEM.find(stack, null) ?: return stack
 
-        cap.receiveEnergy(maxEnergy, false)
+        EnergyStorageHelper.insert(cap, maxEnergy.toLong())
         return stack
     }
 
@@ -79,40 +83,44 @@ open class BatteryItem(var maxEnergy: Int, properties: Properties) : Item(proper
         if (entity !is Player) return
         val energyStorage = ModCapabilities.ENERGY_ITEM.find(pStack, null) ?: return
 
-        for (stack in entity.inventory.items) {
+        val playerInventoryStorage = PlayerInventoryStorage.of(entity)
+        for ((slot, stack) in entity.inventory.items.withIndex()) {
             if (stack.item is BatteryItem) continue
-            val toCharge = ModCapabilities.ENERGY_ITEM.find(stack, null) ?: continue
-            if (!toCharge.canReceive()) continue
+            val toCharge = ContainerItemContext.ofSingleSlot(playerInventoryStorage.getSlot(slot))
+                .find(ModCapabilities.ENERGY_ITEM) ?: continue
+            if (!toCharge.supportsInsertion()) continue
 
-            val cellEnergy = energyStorage.energyStored
+            val cellEnergy = energyStorage.amount
             if (cellEnergy <= 0) break
 
             val stackEnergyNeed =
-                min(cellEnergy.toDouble(), (toCharge.maxEnergyStored - toCharge.energyStored).toDouble()).toInt()
+                min(cellEnergy.toDouble(), (toCharge.capacity - toCharge.amount).toDouble()).toInt()
 
-            val received = toCharge.receiveEnergy(stackEnergyNeed, false)
-            energyStorage.extractEnergy(received, false)
+            val received = EnergyStorageHelper.insert(toCharge, stackEnergyNeed.toLong())
+            EnergyStorageHelper.extract(energyStorage, received)
         }
 
         TrinketsApi.getTrinketComponent(entity).ifPresent { component ->
             component.inventory.values.forEach { group ->
                 group.values.forEach { inventory ->
+                    val inventoryStorage = InventoryStorage.of(inventory, null)
                     for (i in 0..<inventory.containerSize) {
                         val stack = inventory.getItem(i)
                         if (stack.isEmpty) continue
                         if (stack.item is BatteryItem) continue
 
-                        val toCharge = ModCapabilities.ENERGY_ITEM.find(stack, null) ?: continue
-                        if (!toCharge.canReceive()) continue
+                        val toCharge = ContainerItemContext.ofSingleSlot(inventoryStorage.getSlot(i))
+                            .find(ModCapabilities.ENERGY_ITEM) ?: continue
+                        if (!toCharge.supportsInsertion()) continue
 
-                        val cellEnergy = energyStorage.energyStored
+                        val cellEnergy = energyStorage.amount
                         if (cellEnergy <= 0) continue
 
                         val stackEnergyNeed =
-                            min(cellEnergy.toDouble(), (toCharge.maxEnergyStored - toCharge.energyStored).toDouble()).toInt()
+                            min(cellEnergy.toDouble(), (toCharge.capacity - toCharge.amount).toDouble()).toInt()
 
-                        toCharge.receiveEnergy(stackEnergyNeed, false)
-                        energyStorage.extractEnergy(stackEnergyNeed, false)
+                        EnergyStorageHelper.insert(toCharge, stackEnergyNeed.toLong())
+                        EnergyStorageHelper.extract(energyStorage, stackEnergyNeed.toLong())
                     }
                 }
             }

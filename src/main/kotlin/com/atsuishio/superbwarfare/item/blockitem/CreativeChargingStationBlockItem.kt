@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.item.blockitem
 
-import com.atsuishio.superbwarfare.capability.energy.InfinityEnergyStorage
 import com.atsuishio.superbwarfare.init.ModBlocks
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
@@ -8,14 +7,15 @@ import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Rarity
 import net.minecraft.world.item.TooltipFlag
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
+import team.reborn.energy.api.EnergyStorage
+import team.reborn.energy.api.base.InfiniteEnergyStorage
 import javax.annotation.ParametersAreNonnullByDefault
 
 class CreativeChargingStationBlockItem :
     BlockItem(ModBlocks.CREATIVE_CHARGING_STATION, Properties().rarity(Rarity.EPIC).stacksTo(1)) {
-    private val energy = InfinityEnergyStorage()
+    private val energy = InfiniteEnergyStorage.INSTANCE
 
-    val energyStorage: IEnergyStorage
+    val energyStorage: EnergyStorage
         get() = energy
 
     @ParametersAreNonnullByDefault
