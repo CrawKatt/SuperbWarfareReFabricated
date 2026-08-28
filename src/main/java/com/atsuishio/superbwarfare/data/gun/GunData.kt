@@ -1,6 +1,8 @@
 package com.atsuishio.superbwarfare.data.gun
 
 import com.atsuishio.superbwarfare.data.*
+import team.reborn.energy.api.EnergyStorage
+import com.atsuishio.superbwarfare.capability.api.IItemHandler
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.BACKUP_AMMO_CACHE_TICKS
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.get
 import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.AMMO_CONSUMER
@@ -34,8 +36,6 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
-import com.atsuishio.superbwarfare.capability.api.IItemHandler
 import org.jetbrains.annotations.ApiStatus
 import java.util.*
 import java.util.function.Function
@@ -881,7 +881,7 @@ class GunData private constructor(
     }
 
     /** Returns energy capability provider for energy-based weapons. */
-    fun getEnergyProvider(ammoSupplier: Entity?): IEnergyStorage? {
+    fun getEnergyProvider(ammoSupplier: Entity?): EnergyStorage? {
         return this.item.getEnergyProvider(this, ammoSupplier)
     }
 

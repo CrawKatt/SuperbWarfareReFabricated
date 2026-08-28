@@ -1,8 +1,8 @@
 package com.atsuishio.superbwarfare.client.renderer.gun;
 
+import team.reborn.energy.api.EnergyStorage;
 import com.atsuishio.superbwarfare.client.ItemModelHelper;
 import com.atsuishio.superbwarfare.client.animation.AnimationHelper;
-import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.client.model.item.SentinelItemModel;
 import com.atsuishio.superbwarfare.client.renderer.CustomGunRenderer;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -15,7 +15,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.cache.object.GeoBone;
 
@@ -47,15 +46,16 @@ public class SentinelItemRenderer extends CustomGunRenderer<SentinelItem> {
         if (itemStack.getItem() instanceof GunItem && GeoItem.getId(itemStack) == this.getInstanceId(animatable)) {
             if (this.renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND || this.renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
 
-                boolean[] flag = {ModEnergyApi.getEnergyStored(itemStack) > 0};
+                var cap = EnergyStorage.ITEM.find(itemStack, null);
+                var flag = cap != null && cap.getAmount() > 0;
 
                 if (name.equals("charge_illuminated")) {
-                    bone.setHidden(!flag[0]);
+                    bone.setHidden(!flag);
                     bone.setRotZ((System.currentTimeMillis() % 36000000) / 200f);
                 }
 
                 if (name.equals("charge_illuminated")) {
-                    bone.setHidden(!flag[0]);
+                    bone.setHidden(!flag);
                     bone.setRotZ((System.currentTimeMillis() % 36000000) / 200f);
                 }
 

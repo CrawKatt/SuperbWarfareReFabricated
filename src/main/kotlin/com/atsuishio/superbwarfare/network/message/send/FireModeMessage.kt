@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.network.message.send
 
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.GunProp
-import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.gun.GunItem
@@ -38,8 +38,8 @@ data class FireModeMessage(val forward: Boolean) : ServerPacketPayload() {
         ) {
             for (cell in player.getInventory().items) {
                 if (cell.`is`(ModItems.CELL)) {
-                    // NeoForge 0.8.9 only checks that the cell exposes an energy capability.
-                    if (ModEnergyApi.get(cell) != null) {
+                    val cap = ModCapabilities.ENERGY_ITEM.find(cell, null)
+                    if (cap != null && cap.amount > 0) {
                         data.charge.starter.markStart()
                     }
                 }

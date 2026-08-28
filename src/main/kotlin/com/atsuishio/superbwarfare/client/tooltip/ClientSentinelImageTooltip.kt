@@ -12,7 +12,7 @@ class ClientSentinelImageTooltip(tooltip: GunImageComponent) : ClientGunImageToo
         get() {
             val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
 
-            if (cap != null && cap.energyStored > 0) {
+            if (cap != null && cap.amount > 0) {
                 val damage = data.get(GunProp.DAMAGE)
                 val explosionDamage = data.get(GunProp.EXPLOSION_DAMAGE)
 

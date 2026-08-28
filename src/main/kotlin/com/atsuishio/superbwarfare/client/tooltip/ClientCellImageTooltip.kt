@@ -37,8 +37,8 @@ open class ClientCellImageTooltip(tooltip: CellImageComponent) : ClientTooltipCo
         get() {
             val storage = ModCapabilities.ENERGY_ITEM.find(stack, null)
             checkNotNull(storage)
-            val energy = storage.energyStored
-            val maxEnergy = storage.maxEnergyStored
+            val energy = storage.amount
+            val maxEnergy = storage.capacity
             val percentage = (energy.toFloat() / maxEnergy).coerceIn(0f, 1f)
             val component = Component.empty()
             val format = if (percentage <= .2f) {
@@ -59,7 +59,7 @@ open class ClientCellImageTooltip(tooltip: CellImageComponent) : ClientTooltipCo
             }
 
             component.append(
-                Component.literal(" $energy/$maxEnergy FE")
+                Component.literal(" $energy/$maxEnergy E")
                     .withStyle(ChatFormatting.GRAY)
             )
 

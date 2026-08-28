@@ -4,6 +4,8 @@ import com.atsuishio.superbwarfare.init.ModSounds;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper;
+import team.reborn.energy.api.EnergyStorage;
 
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.TooltipTool;
@@ -118,8 +120,9 @@ public class SecondaryCataclysmItem extends GunGeoItem {
 
     @Override
     public double getCustomDamage(GunData data) {
-        var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
-        if (cap != null && cap.getEnergyStored() > 0) {
+        var stack = data.stack;
+        var cap = EnergyStorage.ITEM.find(stack, null);
+        if (cap != null && cap.getAmount() > 0) {
             return 2.5 * data.getDefault().damage;
         }
         return 0;
@@ -135,8 +138,8 @@ public class SecondaryCataclysmItem extends GunGeoItem {
 
         var stack = data.stack;
 
-        var stackCap = ModCapabilities.ENERGY_ITEM.find(stack, null);
-        var hasEnoughEnergy = stackCap != null && stackCap.getEnergyStored() >= 3000;
+        var stackCap = EnergyStorage.ITEM.find(stack, null);
+        var hasEnoughEnergy = stackCap != null && stackCap.getAmount() >= 3000;
 
         boolean isChargedFire = hasEnoughEnergy;
 
@@ -148,9 +151,9 @@ public class SecondaryCataclysmItem extends GunGeoItem {
                 4, 0.1, 0.1, 0.1, 0.002, true);
 
         if (isChargedFire) {
-            var itemCap = ModCapabilities.ENERGY_ITEM.find(stack, null);
+            var itemCap = EnergyStorage.ITEM.find(stack, null);
             if (itemCap != null) {
-                itemCap.extractEnergy(3000, false);
+                EnergyStorageHelper.extract(itemCap, 3000);
             }
         }
 
@@ -159,9 +162,9 @@ public class SecondaryCataclysmItem extends GunGeoItem {
 
     @Override
     public void playFireSounds(GunData data, Entity shooter, boolean zoom) {
-        var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
+        var cap = EnergyStorage.ITEM.find(data.stack, null);
 
-        if (cap != null && cap.getEnergyStored() > 3000) {
+        if (cap != null && cap.getAmount() > 3000) {
             float soundRadius = data.get(GunProp.SOUND_RADIUS).floatValue();
 
             shooter.playSound(ModSounds.SECONDARY_CATACLYSM_FIRE_3P_CHARGE, soundRadius * 0.4f, 1f);

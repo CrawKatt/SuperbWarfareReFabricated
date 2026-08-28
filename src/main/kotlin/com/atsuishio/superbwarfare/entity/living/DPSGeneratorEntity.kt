@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.entity.living
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.client.animation.entity.DPSGeneratorAnimationInstance
 import com.atsuishio.superbwarfare.entity.getValue
 import com.atsuishio.superbwarfare.entity.setValue
@@ -215,11 +216,12 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
                 }
 
                 // 发电
-                entityCap.setMaxReceive(this.maxEnergy)
-                entityCap.receiveEnergy(
+                entityCap.setMaxReceive(entityCap.capacity.toInt())
+                EnergyStorageHelper.insert(
+                    entityCap,
                     (128.0 * max(this.generatorLevel, 1) * 2.0.pow(
                         this.generatorLevel.toDouble()
-                    ) * damage).roundToInt(), false
+                    ) * damage).roundToInt().toLong()
                 )
                 entityCap.setMaxReceive(0)
             }
@@ -298,17 +300,17 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
     protected fun chargeBlockBelow() {
         val entityCap = this.energyStorage
 
-        if (!entityCap.canExtract() || entityCap.energyStored <= 0) return
+        if (!entityCap.supportsExtraction() || entityCap.amount <= 0) return
         val blockPos = this.blockPosition().below()
         val cap = ModCapabilities.ENERGY_BLOCK.find(this.level(), blockPos, Direction.UP)
-        if (cap == null || !cap.canReceive()) return
+        if (cap == null || !cap.supportsInsertion()) return
 
-        val extract = entityCap.extractEnergy(entityCap.energyStored, true)
-        val extracted = cap.receiveEnergy(extract, false)
+        val extract = EnergyStorageHelper.simulateExtract(entityCap, entityCap.amount)
+        val extracted = EnergyStorageHelper.insert(cap, extract)
         if (extracted <= 0) return
 
         this.level().blockEntityChanged(blockPos)
-        entityCap.extractEnergy(extracted, false)
+        EnergyStorageHelper.extract(entityCap, extracted)
     }
 
     fun beastCharge() {

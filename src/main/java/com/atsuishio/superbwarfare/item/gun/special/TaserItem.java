@@ -3,7 +3,8 @@ package com.atsuishio.superbwarfare.item.gun.special;
 import com.atsuishio.superbwarfare.client.renderer.gun.TaserItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
-import com.atsuishio.superbwarfare.init.ModCapabilities;
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper;
+import team.reborn.energy.api.EnergyStorage;
 import com.atsuishio.superbwarfare.init.ModPerks;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import net.minecraft.world.entity.Entity;
@@ -35,9 +36,9 @@ public class TaserItem extends GunGeoItem {
         var stack = data.stack;
         int perkLevel = data.perk.getLevel(ModPerks.VOLT_OVERLOAD);
 
-        var energyStorage = ModCapabilities.ENERGY_ITEM.find(stack, null);
+        var energyStorage = EnergyStorage.ITEM.find(stack, null);
         if (energyStorage != null) {
-            energyStorage.extractEnergy(400 + 100 * perkLevel, false);
+            EnergyStorageHelper.extract(energyStorage, 400 + 100L * perkLevel);
         }
     }
 
@@ -46,8 +47,8 @@ public class TaserItem extends GunGeoItem {
         var stack = data.stack;
 
         int perkLevel = data.perk.getLevel(ModPerks.VOLT_OVERLOAD);
-        var energyStorage = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
-        var hasEnoughEnergy = energyStorage != null && energyStorage.getEnergyStored() >= 400 + 100 * perkLevel;
+        var energyStorage = EnergyStorage.ITEM.find(data.stack, null);
+        var hasEnoughEnergy = energyStorage != null && energyStorage.getAmount() >= 400 + 100 * perkLevel;
 
         if (!hasEnoughEnergy) return false;
 

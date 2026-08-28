@@ -1,14 +1,16 @@
 package com.atsuishio.superbwarfare.block.entity
 
 import com.atsuishio.superbwarfare.block.ChargingStationBlock
-import com.atsuishio.superbwarfare.capability.api.EnergyStorage
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
+import com.atsuishio.superbwarfare.capability.api.EnergyStorage as ModEnergyStorage
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.inventory.menu.ChargingStationMenu
 import com.atsuishio.superbwarfare.network.dataslot.ContainerEnergyData
 import com.atsuishio.superbwarfare.tools.isSameItemStack
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.NonNullList
@@ -31,6 +33,7 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
+import team.reborn.energy.api.EnergyStorage
 import kotlin.math.min
 
 /**
@@ -41,7 +44,7 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
     var items: NonNullList<ItemStack> = NonNullList.withSize(2, ItemStack.EMPTY)
         protected set
 
-    private val energyStorage: IEnergyStorage = EnergyStorage(MAX_ENERGY.toLong())
+    private val energyStorage: EnergyStorage = ModEnergyStorage(MAX_ENERGY.toLong())
 
     var fuelTick: Int = 0
     var maxFuelTick: Int = DEFAULT_FUEL_TIME
@@ -52,7 +55,7 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
             return when (index) {
                 0 -> this@ChargingStationBlockEntity.fuelTick.toLong()
                 1 -> this@ChargingStationBlockEntity.maxFuelTick.toLong()
-                2 -> energyStorage.energyStored.toLong()
+                2 -> this@ChargingStationBlockEntity.energyStorage.amount
 
                 3 -> if (this@ChargingStationBlockEntity.showRange) 1L else 0L
                 else -> 0L
@@ -63,7 +66,7 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
             when (index) {
                 0 -> this@ChargingStationBlockEntity.fuelTick = value.toInt()
                 1 -> this@ChargingStationBlockEntity.maxFuelTick = value.toInt()
-                2 -> energyStorage.receiveEnergy(value.toInt(), false)
+                2 -> EnergyStorageHelper.insert(this@ChargingStationBlockEntity.energyStorage, value)
 
                 3 -> this@ChargingStationBlockEntity.showRange = value == 1L
             }
@@ -74,46 +77,58 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
         }
     }
 
-    private fun chargeEntity(handler: IEnergyStorage) {
+    private fun chargeEntity(handler: EnergyStorage) {
         val level = this.level ?: return
         if (level.gameTime % 20 != 0L) return
 
         val entities = level.getEntitiesOfClass<Entity>(
-            Entity::class.java, AABB(this.blockPos)
-                .inflate(CHARGE_RADIUS.toDouble())
+            Entity::class.java,
+            AABB(this.blockPos).inflate(CHARGE_RADIUS.toDouble())
         )
         entities.forEach { entity ->
-            val cap = ModCapabilities.ENERGY_ENTITY.find(entity, null) ?: return@forEach
-            if (cap.canReceive()) {
-                val charged = cap.receiveEnergy(min(handler.energyStored, CHARGE_OTHER_SPEED * 20), false)
-                handler.extractEnergy(charged, false)
-            }
+            val cap = ModCapabilities.getEntityEnergyStorage(entity)
+            if (cap == null || !cap.supportsInsertion()) return@forEach
+
+            val charged = EnergyStorageHelper.insert(
+                cap,
+                min(handler.amount, (CHARGE_OTHER_SPEED * 20).toLong())
+            )
+            EnergyStorageHelper.extract(handler, charged)
         }
         this.setChanged()
     }
 
-    private fun chargeItemStack(handler: IEnergyStorage) {
+    private fun chargeItemStack(handler: EnergyStorage) {
         val stack = this.getItem(SLOT_CHARGE)
         if (stack.isEmpty) return
 
-        val consumer = ModCapabilities.ENERGY_ITEM.find(stack, null) ?: return
-        if (consumer.energyStored < consumer.maxEnergyStored) {
-            val charged = consumer.receiveEnergy(min(CHARGE_OTHER_SPEED, handler.energyStored), false)
-            handler.extractEnergy(min(charged, handler.energyStored), false)
+        val consumer = ContainerItemContext.ofSingleSlot(
+            InventoryStorage.of(this, null).getSlot(SLOT_CHARGE)
+        ).find(EnergyStorage.ITEM)
+        if (consumer != null && consumer.amount < consumer.capacity) {
+            val charged = EnergyStorageHelper.insert(
+                consumer,
+                min(CHARGE_OTHER_SPEED.toLong(), handler.amount)
+            )
+            EnergyStorageHelper.extract(handler, min(charged, handler.amount))
         }
         this.setChanged()
     }
 
-    private fun chargeBlock(handler: IEnergyStorage) {
+    private fun chargeBlock(handler: EnergyStorage) {
         val level = this.level ?: return
 
         for (direction in Direction.entries) {
             val blockEntity = level.getBlockEntity(this.blockPos.relative(direction)) ?: continue
-            if (blockEntity is ChargingStationBlockEntity) continue
-            val cap = ModCapabilities.ENERGY_BLOCK.find(level, blockEntity.blockPos, null) ?: continue
-            if (cap.canReceive() && cap.energyStored < cap.maxEnergyStored) {
-                val received = cap.receiveEnergy(min(handler.energyStored, CHARGE_OTHER_SPEED), false)
-                handler.extractEnergy(received, false)
+            val energy = EnergyStorage.SIDED.find(level, blockEntity.blockPos, direction)
+            if (energy == null || blockEntity is ChargingStationBlockEntity) continue
+
+            if (energy.supportsInsertion() && energy.amount < energy.capacity) {
+                val received = EnergyStorageHelper.insert(
+                    energy,
+                    min(handler.amount, CHARGE_OTHER_SPEED.toLong())
+                )
+                EnergyStorageHelper.extract(handler, received)
                 blockEntity.setChanged()
                 this.setChanged()
             }
@@ -124,7 +139,7 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
         super.load(pTag)
 
         if (pTag.contains("Energy")) {
-            (energyStorage as EnergyStorage).deserializeNBT(pTag.get("Energy")!!)
+            (energyStorage as ModEnergyStorage).deserializeNBT(pTag.get("Energy")!!)
         }
         this.fuelTick = pTag.getInt("FuelTick")
         this.maxFuelTick = pTag.getInt("MaxFuelTick")
@@ -136,7 +151,7 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
     override fun saveAdditional(pTag: CompoundTag) {
         super.saveAdditional(pTag)
 
-        pTag.put("Energy", (energyStorage as EnergyStorage).serializeNBT())
+        pTag.put("Energy", (energyStorage as ModEnergyStorage).serializeNBT())
         pTag.putInt("FuelTick", this.fuelTick)
         pTag.putInt("MaxFuelTick", this.maxFuelTick)
         pTag.putBoolean("ShowRange", this.showRange)
@@ -221,11 +236,11 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
         return tag
     }
 
-    fun getEnergyStorage(side: Direction?): IEnergyStorage = energyStorage
+    fun getEnergyStorage(side: Direction?): EnergyStorage = energyStorage
 
     override fun saveToItem(pStack: ItemStack) {
         val tag = CompoundTag()
-        tag.put("Energy", (energyStorage as EnergyStorage).serializeNBT())
+        tag.put("Energy", (energyStorage as ModEnergyStorage).serializeNBT())
         BlockItem.setBlockEntityData(pStack, this.type, tag)
     }
 
@@ -258,26 +273,49 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
                 setChanged(pLevel, pPos, pState)
             }
 
-            val handler = blockEntity.energyStorage
-            if (handler.energyStored > 0) blockEntity.chargeEntity(handler)
-            if (handler.energyStored > 0) blockEntity.chargeItemStack(handler)
-            if (handler.energyStored > 0) blockEntity.chargeBlock(handler)
+            val handler = blockEntity.getEnergyStorage(null)
+
+            val energy = handler.amount
+
+            if (energy > 0) {
+                blockEntity.chargeEntity(handler)
+            }
+
+            if (handler.amount > 0) {
+                blockEntity.chargeItemStack(handler)
+            }
+
+            if (handler.amount > 0) {
+                blockEntity.chargeBlock(handler)
+            }
 
             if (blockEntity.fuelTick > 0) {
                 blockEntity.fuelTick--
-                if (handler.energyStored < handler.maxEnergyStored) handler.receiveEnergy(CHARGE_SPEED, false)
+
+                if (energy < handler.capacity) {
+                    EnergyStorageHelper.insert(handler, CHARGE_SPEED.toLong())
+                }
             } else if (!blockEntity.getItem(SLOT_FUEL).isEmpty) {
-                if (handler.energyStored >= handler.maxEnergyStored) return
+                if (handler.amount >= handler.capacity) return
 
                 val fuel = blockEntity.getItem(SLOT_FUEL)
                 val burnTime = AbstractFurnaceBlockEntity.getFuel().getOrDefault(fuel.item, 0)
 
-                val fuelEnergy = ModCapabilities.ENERGY_ITEM.find(fuel, null)
+                val fuelEnergy = ContainerItemContext.ofSingleSlot(
+                    InventoryStorage.of(blockEntity, null).getSlot(SLOT_FUEL)
+                ).find(EnergyStorage.ITEM)
+
                 if (fuelEnergy != null) {
-                    // 优先当作电池处理
-                    val energyToExtract = min(CHARGE_OTHER_SPEED, handler.maxEnergyStored - handler.energyStored)
-                    if (fuelEnergy.canExtract() && handler.canReceive()) {
-                        handler.receiveEnergy(fuelEnergy.extractEnergy(energyToExtract, false), false)
+                    val energyToExtract = min(
+                        CHARGE_OTHER_SPEED,
+                        (handler.capacity - handler.amount).toInt()
+                    )
+
+                    if (fuelEnergy.supportsExtraction() && handler.supportsInsertion()) {
+                        EnergyStorageHelper.insert(
+                            handler,
+                            EnergyStorageHelper.extract(fuelEnergy, energyToExtract.toLong())
+                        )
                     }
                     blockEntity.setChanged()
                 } else if (burnTime > 0) {

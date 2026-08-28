@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.block.entity
 
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModTags
@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
+import team.reborn.energy.api.EnergyStorage
 
 open class BiogasGeneratorBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(ModBlockEntities.BIOGAS_GENERATOR, pos, state) {
@@ -62,17 +63,17 @@ open class BiogasGeneratorBlockEntity(pos: BlockPos, state: BlockState) :
                 entity.power = entity.checkAndGetPowerLevel()
                 entity.setChanged()
             }
-            val list = mutableListOf<IEnergyStorage>()
+            val list = mutableListOf<EnergyStorage>()
             for (face in Direction.entries) {
                 if (face == Direction.UP) continue
 
-                ModCapabilities.ENERGY_BLOCK.find(level, pos.relative(face), face.opposite)?.let {
-                    if (it.canReceive() && it.energyStored < it.maxEnergyStored) {
+                EnergyStorage.SIDED.find(level, pos.relative(face), face)?.let {
+                    if (it.supportsInsertion() && it.amount < it.capacity) {
                         list += it
                     }
                 }
             }
-            list.forEach { it.receiveEnergy((entity.power * ENERGY_RATE / list.size).toInt(), false) }
+            list.forEach { EnergyStorageHelper.insert(it, (entity.power * ENERGY_RATE / list.size).toLong()) }
         }
     }
 }

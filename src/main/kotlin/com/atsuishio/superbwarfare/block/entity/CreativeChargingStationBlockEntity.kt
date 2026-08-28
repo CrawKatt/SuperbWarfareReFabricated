@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.block.entity
 
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
-import com.atsuishio.superbwarfare.capability.energy.InfinityEnergyStorage
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModCapabilities
 import net.minecraft.core.BlockPos
@@ -11,13 +10,15 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
+import team.reborn.energy.api.EnergyStorage
+import team.reborn.energy.api.base.InfiniteEnergyStorage
 
 open class CreativeChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
     BlockEntity(ModBlockEntities.CREATIVE_CHARGING_STATION, pos, state) {
 
-    private val energyStorage: IEnergyStorage = InfinityEnergyStorage()
+    private val energyStorage: EnergyStorage = InfiniteEnergyStorage.INSTANCE
 
-    fun getEnergyStorage(side: Direction?): IEnergyStorage = energyStorage
+    fun getEnergyStorage(side: Direction?): EnergyStorage = energyStorage
 
     private fun chargeEntity() {
         val level = this.level ?: return
@@ -27,19 +28,23 @@ open class CreativeChargingStationBlockEntity(pos: BlockPos, state: BlockState) 
             Entity::class.java,
             AABB(blockPos).inflate(CHARGE_RADIUS.toDouble())
         ).forEach { entity ->
-            val cap = ModCapabilities.ENERGY_ENTITY.find(entity, null) ?: return@forEach
-            if (cap.canReceive()) cap.receiveEnergy(Int.MAX_VALUE, false)
+            val cap = ModCapabilities.getEntityEnergyStorage(entity)
+            if (cap == null || !cap.supportsInsertion()) return@forEach
+
+            EnergyStorageHelper.insert(cap, Long.MAX_VALUE)
         }
     }
 
     private fun chargeBlock() {
         val level = this.level ?: return
         for (direction in Direction.entries) {
-            val blockEntity = level.getBlockEntity(blockPos.relative(direction)) ?: continue
-            if (blockEntity is CreativeChargingStationBlockEntity) continue
-            val cap = ModCapabilities.ENERGY_BLOCK.find(level, blockEntity.blockPos, null) ?: continue
-            if (cap.canReceive() && cap.energyStored < cap.maxEnergyStored) {
-                cap.receiveEnergy(Int.MAX_VALUE, false)
+            val blockEntity = level.getBlockEntity(this.blockPos.relative(direction)) ?: continue
+
+            val energy = EnergyStorage.SIDED.find(level, blockEntity.blockPos, direction)
+            if (energy == null || blockEntity is CreativeChargingStationBlockEntity) continue
+
+            if (energy.supportsInsertion() && energy.amount < energy.capacity) {
+                EnergyStorageHelper.insert(energy, Long.MAX_VALUE)
                 blockEntity.setChanged()
             }
         }

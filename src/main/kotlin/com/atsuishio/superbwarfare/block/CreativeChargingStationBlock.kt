@@ -1,8 +1,10 @@
 package com.atsuishio.superbwarfare.block
 
 import com.atsuishio.superbwarfare.block.entity.CreativeChargingStationBlockEntity
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModCapabilities
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
 import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
@@ -51,9 +53,10 @@ class CreativeChargingStationBlock :
         pHit: BlockHitResult
     ): InteractionResult {
         val stack = player.getItemInHand(hand)
-        val energy = ModCapabilities.ENERGY_ITEM.find(stack, null) ?: return InteractionResult.FAIL
-        if (energy.canReceive() && energy.energyStored < energy.maxEnergyStored) {
-            energy.receiveEnergy(Int.MAX_VALUE, false)
+        val energy = ContainerItemContext.forPlayerInteraction(player, hand).find(ModCapabilities.ENERGY_ITEM)
+            ?: return InteractionResult.FAIL
+        if (energy.supportsInsertion() && energy.amount < energy.capacity) {
+            EnergyStorageHelper.insert(energy, Long.MAX_VALUE)
             if (!level.isClientSide) {
                 player.displayClientMessage(
                     Component.translatable("des.superbwarfare.creative_charging_station.charge.success")
@@ -61,8 +64,8 @@ class CreativeChargingStationBlock :
                 )
             }
             return InteractionResult.SUCCESS
-        } else if (energy.canExtract()) {
-            energy.extractEnergy(Int.MAX_VALUE, false)
+        } else if (energy.supportsExtraction()) {
+            EnergyStorageHelper.extract(energy, Long.MAX_VALUE)
             if (!level.isClientSide) {
                 player.displayClientMessage(
                     Component.translatable("des.superbwarfare.creative_charging_station.extract.success")

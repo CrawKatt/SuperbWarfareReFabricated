@@ -364,10 +364,7 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
         if (data.selectedAmmoConsumer().type == AmmoConsumeType.ENERGY) {
             val storage = ModCapabilities.ENERGY_ITEM.find(data.stack, null)
             val energy = if (storage == null) 0.0 else Mth.clamp(
-                storage.energyStored.toDouble() / max(
-                    1,
-                    storage.maxEnergyStored
-                ), 0.0, 1.0
+                storage.amount.toDouble() / max(1L, storage.capacity), 0.0, 1.0
             )
             return format1DZZ(energy * 100) + "%"
         }

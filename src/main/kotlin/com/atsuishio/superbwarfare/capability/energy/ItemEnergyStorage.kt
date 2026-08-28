@@ -35,7 +35,7 @@ class ItemEnergyStorage(
     }
 
     override fun onFinalCommit() {
-        stack.orCreateTag.putInt(NBT_ENERGY, energyStored)
+        stack.orCreateTag.putInt(NBT_ENERGY, energy.toInt())
     }
 
     companion object {
