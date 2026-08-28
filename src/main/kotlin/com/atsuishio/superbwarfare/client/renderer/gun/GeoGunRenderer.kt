@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.resource.gun.pojo.ItemDisplayInfo
+import com.atsuishio.superbwarfare.script.GunScriptManager
 import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.atsuishio.superbwarfare.tools.mulPoseMatrix
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnimationInstance
@@ -59,9 +60,9 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
 
     override fun blockOffhandRender(): Boolean = true
 
-    private val capturedRenderPose = mutableMapOf<InteractionHand, Matrix4f>()
-    private val lastBoneTransforms = mutableMapOf<InteractionHand, MutableMap<String, Matrix4f>>()
-    private val muzzleEmitterLocators =
+    protected val capturedRenderPose = mutableMapOf<InteractionHand, Matrix4f>()
+    protected val lastBoneTransforms = mutableMapOf<InteractionHand, MutableMap<String, Matrix4f>>()
+    protected val muzzleEmitterLocators =
         mutableMapOf<InteractionHand, MutableMap<ParticleEmitterInstance, String>>()
 
     override fun createAnimationInstance(stack: ItemStack, entity: Entity): IFPAnimationInstance {
@@ -209,6 +210,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
                 shootRecoil.zoomRate, shootRecoil.speed
             )
         }
+        applyCustomAnimations(stack, model, transformType, partialTick)
+        applyCustomAnimationsByScript(stack, model, transformType, partialTick)
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         if (transformType.firstPerson()) {
             MuzzleFlashRenderer.render(poseStack, model, stack, bufferSource)
@@ -224,7 +227,25 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         model.resetPose()
     }
 
-    private fun spawnAndBindMuzzleParticles(
+    open fun applyCustomAnimations(
+        stack: ItemStack,
+        model: GeoGunModel,
+        transformType: ItemDisplayContext,
+        partialTick: Float
+    ) {
+    }
+
+    open fun applyCustomAnimationsByScript(
+        stack: ItemStack,
+        model: GeoGunModel,
+        transformType: ItemDisplayContext,
+        partialTick: Float
+    ) {
+        val script = GunResource.compute(stack).getScript() ?: return
+        GunScriptManager.invokeTransform(script, stack, model, transformType, partialTick, this)
+    }
+
+    open fun spawnAndBindMuzzleParticles(
         poseStack: PoseStack,
         stack: ItemStack,
         hand: InteractionHand
@@ -292,7 +313,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         locators.keys.removeIf { it.isFinished }
     }
 
-    private fun resolveMuzzleLocator(
+    open fun resolveMuzzleLocator(
         data: ParticleEffectData,
         boneTransforms: Map<String, Matrix4f>
     ): String? {
@@ -309,7 +330,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         return null
     }
 
-    private fun cameraRotationInverse(): Matrix4f {
+    open fun cameraRotationInverse(): Matrix4f {
         val camera = Minecraft.getInstance().gameRenderer.mainCamera
         return Matrix4f()
             .rotationX(Mth.DEG_TO_RAD * camera.xRot)
@@ -318,7 +339,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
             .invert()
     }
 
-    private fun handForContext(transformType: ItemDisplayContext): InteractionHand {
+    open fun handForContext(transformType: ItemDisplayContext): InteractionHand {
         return if (transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
             InteractionHand.OFF_HAND
         } else {
@@ -326,7 +347,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         }
     }
 
-    private fun applyReloadCameraShake(stack: ItemStack, model: GeoGunModel, hand: InteractionHand) {
+    open fun applyReloadCameraShake(stack: ItemStack, model: GeoGunModel, hand: InteractionHand) {
         val animation = FirstPersonRenderHandler.getActiveAnimationInstance(hand) ?: return
         val camera = model.getCameraBone()
         if (camera == null || GunData.from(stack).reload.time() <= 0) {
@@ -361,7 +382,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         animation.cameraRotation = Quaternionf().rotateZYX(cameraEuler.z, cameraEuler.y, cameraEuler.x)
     }
 
-    private fun applyFirstPersonPositioningTransform(poseStack: PoseStack, model: GeoGunModel) {
+    open fun applyFirstPersonPositioningTransform(poseStack: PoseStack, model: GeoGunModel) {
         val idleViewTransform = model.getGlobalTransform(IDLE_VIEW_BONE) ?: return
         val zoom = AnimationCurves.EASE_IN_OUT_QUINT
             .apply(ClientEventHandler.zoomTime.coerceIn(0.0, 1.0))
@@ -381,7 +402,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         poseStack.mulPoseMatrix(viewTransform.invert())
     }
 
-    private fun blendViewTransform(from: Matrix4f, to: Matrix4f, t: Float): Matrix4f {
+    open fun blendViewTransform(from: Matrix4f, to: Matrix4f, t: Float): Matrix4f {
         val translation = Vector3f()
         val toTranslation = Vector3f()
         from.getTranslation(translation)
@@ -406,7 +427,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
             .scale(scale)
     }
 
-    private fun applyItemDisplayTransform(poseStack: PoseStack, display: ItemDisplayInfo) {
+    open fun applyItemDisplayTransform(poseStack: PoseStack, display: ItemDisplayInfo) {
         val translation = display.translation
         poseStack.translate(translation[0] / 16f, translation[1] / 16f, translation[2] / 16f)
 
@@ -419,7 +440,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         poseStack.scale(scale[0], scale[1], scale[2])
     }
 
-    private fun displayKey(transformType: ItemDisplayContext): String {
+    open fun displayKey(transformType: ItemDisplayContext): String {
         return when (transformType) {
             ItemDisplayContext.FIRST_PERSON_RIGHT_HAND -> "firstperson_righthand"
             ItemDisplayContext.FIRST_PERSON_LEFT_HAND -> "firstperson_lefthand"

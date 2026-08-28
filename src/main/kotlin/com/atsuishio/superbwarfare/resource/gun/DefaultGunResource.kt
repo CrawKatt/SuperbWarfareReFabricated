@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.resource.gun
 
+import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.data.IDBasedData
 import com.atsuishio.superbwarfare.data.ModColor
 import com.atsuishio.superbwarfare.init.ModSounds
@@ -8,13 +9,20 @@ import com.atsuishio.superbwarfare.resource.gun.pojo.ItemDisplayInfo
 import com.atsuishio.superbwarfare.resource.gun.pojo.ShellEjectInfo
 import com.atsuishio.superbwarfare.resource.gun.pojo.ShootRecoilInfo
 import com.atsuishio.superbwarfare.resource.gun.pojo.SmokeInfo
+import com.atsuishio.superbwarfare.script.GunScriptManager
+import com.atsuishio.superbwarfare.script.ScriptMath
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedResourceLocation
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedSoundEvent
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVec3
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVector3f
+import com.atsuishio.superbwarfare.tools.mc
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import org.apache.logging.log4j.Marker
+import org.apache.logging.log4j.MarkerManager
 import org.joml.Vector3f
+import org.mozillaa.javascript.ScriptableObject
 
 @Serializable
 class DefaultGunResource : IDBasedData<DefaultGunResource> {
@@ -41,6 +49,42 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
 
     fun getModel(): ModelResource {
         return if (modelValue == null) ModelResource() else modelValue!!
+    }
+
+    @SerialName("Script")
+    private val script: SerializedResourceLocation? = null
+
+    @Transient
+    @kotlin.jvm.Transient
+    private var scriptCache: GunScriptManager.ScriptFunction? = null
+
+    fun getScript(): GunScriptManager.ScriptFunction? {
+        if (scriptCache != null) return scriptCache!!
+        val script = this.script ?: return null
+        return try {
+            val resource = mc.resourceManager.getResource(script)
+            if (resource.isEmpty) return null
+
+            val source = resource.get().openAsReader().use { it.readText().trim() }
+            if (!GunScriptManager.RHINO_CONTEXT.stringIsCompilableUnit(source)) {
+                Mod.LOGGER.error(MARKER, "Failed to compile gun script: $source")
+                return null
+            }
+
+            val compiled = GunScriptManager.RHINO_CONTEXT.compileString(source, script.toString(), 1, null)
+            val scope = GunScriptManager.RHINO_CONTEXT.newObject(GunScriptManager.SHARED_SCOPE)
+            scope.parentScope = GunScriptManager.SHARED_SCOPE
+
+            ScriptableObject.putProperty(scope, "JsMath", ScriptMath)
+            compiled.exec(GunScriptManager.RHINO_CONTEXT, scope, scope)
+
+            val func = GunScriptManager.ScriptFunction(compiled, scope)
+            scriptCache = func
+            func
+        } catch (e: Exception) {
+            Mod.LOGGER.error(MARKER, "Failed to load gun script: $script", e)
+            null
+        }
     }
 
     @JvmField
@@ -86,4 +130,8 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
 
     @SerialName("ShootRecoil")
     var shootRecoil: ShootRecoilInfo = ShootRecoilInfo()
+
+    companion object {
+        private val MARKER: Marker = MarkerManager.getMarker("GunResource")
+    }
 }
