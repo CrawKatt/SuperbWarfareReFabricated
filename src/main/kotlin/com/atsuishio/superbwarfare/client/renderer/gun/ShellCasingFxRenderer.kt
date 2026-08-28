@@ -3,8 +3,8 @@ package com.atsuishio.superbwarfare.client.renderer.gun
 import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance
 import com.atsuishio.superbwarfare.client.model.gun.GeoGunModel
 import com.atsuishio.superbwarfare.client.model.shell.BedrockShellModel
-import com.atsuishio.superbwarfare.resource.gun.DefaultGunResource.ShellEject
 import com.atsuishio.superbwarfare.resource.gun.GunResource
+import com.atsuishio.superbwarfare.resource.gun.pojo.ShellEjectInfo
 import com.atsuishio.superbwarfare.resource.model.ShellModelReloadListener
 import com.atsuishio.superbwarfare.tools.mulPoseMatrix
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.handler.FirstPersonRenderHandler
@@ -59,7 +59,7 @@ object ShellCasingFxRenderer {
         renderActive(bufferSource, shellModel, shellTexture, config, packedLight)
     }
 
-    private fun spawn(poseStack: PoseStack, model: GeoGunModel, config: ShellEject, window: Int) {
+    private fun spawn(poseStack: PoseStack, model: GeoGunModel, config: ShellEjectInfo, window: Int) {
         val baseBone = config.boneName.ifBlank { DEFAULT_SHELL_BONE }
         val boneName = if (window <= 0) baseBone else "${baseBone}_$window"
         val boneTransform = model.getGlobalTransform(boneName) ?: return
@@ -87,7 +87,7 @@ object ShellCasingFxRenderer {
         bufferSource: MultiBufferSource,
         shellModel: BedrockShellModel,
         shellTexture: ResourceLocation,
-        config: ShellEject,
+        config: ShellEjectInfo,
         packedLight: Int
     ) {
         val lifeMs = (config.livingTime * 1000.0).toLong()
@@ -110,7 +110,7 @@ object ShellCasingFxRenderer {
         shellModel: BedrockShellModel,
         quadType: RenderType,
         triangleType: RenderType,
-        config: ShellEject,
+        config: ShellEjectInfo,
         shell: ShellCasingInstance,
         now: Long,
         packedLight: Int
