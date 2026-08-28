@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.client.renderer.gun;
 
-import com.atsuishio.superbwarfare.init.ModCapabilities;
+import team.reborn.energy.api.EnergyStorage;
 
 import com.atsuishio.superbwarfare.client.ItemModelHelper;
 import com.atsuishio.superbwarfare.client.animation.AnimationHelper;
@@ -59,8 +59,8 @@ public class Ql1031ItemRenderer extends CustomGunRenderer<Ql1031Item> {
                 AnimationHelper.handleShootFlare(name, stack, itemStack, bone, buffer, packedLightIn);
                 ItemModelHelper.handleGunAttachments(bone, itemStack, name);
 
-                var cap = ModCapabilities.ENERGY_ITEM.find(itemStack, null);
-                var energy = cap != null ? cap.getEnergyStored() : 0;
+                var cap = EnergyStorage.ITEM.find(itemStack, null);
+                var energy = cap != null ? cap.getAmount() : 0;
 
                 if (name.equals("energy2_illuminated") || name.equals("energy3_illuminated") || name.equals("energy4_illuminated")) {
                     bone.setScaleX((float) energy / data.get(GunProp.MAX_ENERGY));

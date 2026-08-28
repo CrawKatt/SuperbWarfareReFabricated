@@ -7,6 +7,9 @@ import net.minecraft.core.NonNullList
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.ContainerHelper
 import net.minecraft.world.item.ItemStack
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
+import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage
 import kotlin.math.min
 
 open class VehicleContainerHandler(
@@ -143,6 +146,22 @@ open class VehicleContainerHandler(
 
     fun getItems(): NonNullList<ItemStack> {
         return stacks
+    }
+
+    fun getSlotStorage(slot: Int): SingleSlotStorage<ItemVariant> {
+        validateSlotIndex(slot)
+
+        return object : SingleStackStorage() {
+            override fun getStack() = stacks[slot]
+
+            override fun setStack(stack: ItemStack) {
+                stacks[slot] = stack
+            }
+
+            override fun onFinalCommit() {
+                onContentsChanged(slot)
+            }
+        }
     }
 
     fun setItems(list: NonNullList<ItemStack>) {

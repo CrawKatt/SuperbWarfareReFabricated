@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.data.gun
 
 import com.atsuishio.superbwarfare.data.DefaultDataSupplier
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
+import team.reborn.energy.api.EnergyStorage
 import com.atsuishio.superbwarfare.capability.api.IItemHandler
 import com.atsuishio.superbwarfare.data.JsonPropertyModifier
 import com.atsuishio.superbwarfare.data.PMC
@@ -889,7 +889,7 @@ class GunData private constructor(
     }
 
     /** Returns energy capability provider for energy-based weapons. */
-    fun getEnergyProvider(ammoSupplier: Entity?): IEnergyStorage? {
+    fun getEnergyProvider(ammoSupplier: Entity?): EnergyStorage? {
         return this.item.getEnergyProvider(this, ammoSupplier)
     }
 

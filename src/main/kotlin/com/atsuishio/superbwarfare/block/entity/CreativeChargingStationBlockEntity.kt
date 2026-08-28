@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.block.entity
 
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
-import com.atsuishio.superbwarfare.capability.energy.InfinityEnergyStorage
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModCapabilities
 import net.minecraft.core.BlockPos
@@ -16,6 +15,8 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
+import team.reborn.energy.api.EnergyStorage
+import team.reborn.energy.api.base.InfiniteEnergyStorage
 
 /**
  * Energy Data Slot Code based on @GoryMoon's Chargers
@@ -44,10 +45,10 @@ open class CreativeChargingStationBlockEntity(pos: BlockPos, state: BlockState) 
             )
         )
         entities.forEach { entity ->
-            val cap = ModCapabilities.ENERGY_ENTITY.find(entity, null)
-            if (cap == null || !cap.canReceive()) return@forEach
+            val cap = ModCapabilities.getEntityEnergyStorage(entity)
+            if (cap == null || !cap.supportsInsertion()) return@forEach
 
-            cap.receiveEnergy(Int.MAX_VALUE, false)
+            EnergyStorageHelper.insert(cap, Long.MAX_VALUE)
         }
     }
 
@@ -57,19 +58,19 @@ open class CreativeChargingStationBlockEntity(pos: BlockPos, state: BlockState) 
         for (direction in Direction.entries) {
             val blockEntity = level.getBlockEntity(this.blockPos.relative(direction)) ?: continue
 
-            val energy = ModCapabilities.ENERGY_BLOCK.find(level, blockEntity.blockPos, direction)
+            val energy = EnergyStorage.SIDED.find(level, blockEntity.blockPos, direction)
             if (energy == null || blockEntity is CreativeChargingStationBlockEntity) continue
 
-            if (energy.canReceive() && energy.getEnergyStored() < energy.getMaxEnergyStored()) {
-                energy.receiveEnergy(Int.MAX_VALUE, false)
+            if (energy.supportsInsertion() && energy.amount < energy.capacity) {
+                EnergyStorageHelper.insert(energy, Long.MAX_VALUE)
                 blockEntity.setChanged()
             }
         }
     }
 
-    private val energyStorage: IEnergyStorage = InfinityEnergyStorage()
+    private val energyStorage: EnergyStorage = InfiniteEnergyStorage.INSTANCE
 
-    fun getEnergyStorage(side: Direction?): IEnergyStorage {
+    fun getEnergyStorage(side: Direction?): EnergyStorage {
         return energyStorage
     }
 

@@ -137,11 +137,11 @@ open class ChargingStationBlock : BaseEntityBlock(Properties.of().sound(SoundTyp
         if (blockEntity is ChargingStationBlockEntity) {
             val energy = blockEntity.getEnergyStorage(null)
 
-            if (energy == null || energy.maxEnergyStored <= 0) {
+            if (energy == null || energy.capacity <= 0) {
                 return 0
             }
 
-            return (15 * energy.energyStored / energy.maxEnergyStored.toDouble()).toInt()
+            return (15 * energy.amount / energy.capacity.toDouble()).toInt()
         }
 
         return super.getAnalogOutputSignal(state, level, pos)

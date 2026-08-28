@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.capability.energy
 
 import com.atsuishio.superbwarfare.capability.api.EnergyStorage
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.IntTag
 import net.minecraft.nbt.Tag
@@ -53,57 +52,13 @@ open class SyncedEntityEnergyStorage(
         this.maxReceive = maxReceive.toLong()
     }
 
-    override fun receiveEnergy(maxReceive: Int, simulate: Boolean): Int {
-        val received = super.receiveEnergy(maxReceive, simulate)
-
-        if (!simulate) {
-            entityData.set(energyDataAccessor, this.energy.toInt())
-        }
-
-        return received
+    override fun onFinalCommit() {
+        entityData.set(energyDataAccessor, this.energy.toInt())
     }
 
-    override fun extractEnergy(maxExtract: Int, simulate: Boolean): Int {
-        val extracted = super.extractEnergy(maxExtract, simulate)
-
-        if (!simulate) {
-            entityData.set(energyDataAccessor, this.energy.toInt())
-        }
-
-        return extracted
-    }
-
-    override fun insert(maxAmount: Long, transaction: TransactionContext): Long {
-        val inserted = super.insert(maxAmount, transaction)
-
-        if (inserted > 0) {
-            transaction.addCloseCallback { _, result ->
-                if (result == TransactionContext.Result.COMMITTED) {
-                    entityData.set(energyDataAccessor, this.energy.toInt())
-                }
-            }
-        }
-
-        return inserted
-    }
-
-    override fun extract(maxAmount: Long, transaction: TransactionContext): Long {
-        val extracted = super.extract(maxAmount, transaction)
-
-        if (extracted > 0) {
-            transaction.addCloseCallback { _, result ->
-                if (result == TransactionContext.Result.COMMITTED) {
-                    entityData.set(energyDataAccessor, this.energy.toInt())
-                }
-            }
-        }
-
-        return extracted
-    }
-
-    override fun getEnergyStored(): Int {
+    override fun getAmount(): Long {
         // 获取同步数据，保证客户端能正确获得能量值
-        return entityData.get(energyDataAccessor)
+        return entityData.get(energyDataAccessor).toLong()
     }
 
     override fun deserializeNBT(provider: HolderLookup.Provider, nbt: Tag) {

@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.api.event.ReloadEvent
 import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.gun.value.ReloadState
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModComponents
 import com.atsuishio.superbwarfare.init.ModItems
@@ -796,17 +797,17 @@ object GunEventHandler {
 
             val stackStorage = ModCapabilities.ENERGY_ITEM.find(data.stack(), null) ?: continue
 
-            val stackMaxEnergy = stackStorage.maxEnergyStored
-            val stackEnergy = stackStorage.energyStored
+            val stackMaxEnergy = stackStorage.capacity
+            val stackEnergy = stackStorage.amount
 
             val cellStorage = ModCapabilities.ENERGY_ITEM.find(cell, null) ?: continue
-            val cellEnergy = cellStorage.energyStored
+            val cellEnergy = cellStorage.amount
 
             val stackEnergyNeed = min(cellEnergy, stackMaxEnergy - stackEnergy)
 
             if (cellEnergy > 0) {
-                val received = stackStorage.receiveEnergy(stackEnergyNeed, false)
-                cellStorage.extractEnergy(received, false)
+                val received = EnergyStorageHelper.insert(stackStorage, stackEnergyNeed)
+                EnergyStorageHelper.extract(cellStorage, received)
             }
         }
     }

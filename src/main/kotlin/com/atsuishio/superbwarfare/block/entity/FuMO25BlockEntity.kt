@@ -32,8 +32,8 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
-import com.atsuishio.superbwarfare.capability.api.EnergyStorage
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
+import com.atsuishio.superbwarfare.capability.api.EnergyStorage as ModEnergyStorage
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import java.util.*
 import javax.annotation.ParametersAreNonnullByDefault
 import kotlin.math.abs
@@ -41,7 +41,7 @@ import kotlin.math.abs
 open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
     BlockEntity(ModBlockEntities.FUMO_25, pPos, pBlockState), MenuProvider {
 
-    private val energyStorage: IEnergyStorage = EnergyStorage(MAX_ENERGY.toLong())
+    private val energyStorage = ModEnergyStorage(MAX_ENERGY.toLong())
 
     open val modelInstance = BlockModelReloadListener.getModel(MODEL)?.createInstance()
 
@@ -54,7 +54,7 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
     protected val dataAccess: ContainerEnergyData = object : ContainerEnergyData {
         override fun get(index: Int): Long {
             return when (index) {
-                0 -> this@FuMO25BlockEntity.energyStorage.energyStored
+                0 -> this@FuMO25BlockEntity.energyStorage.amount
                 1 -> this@FuMO25BlockEntity.type.ordinal
                 2 -> if (this@FuMO25BlockEntity.powered) 1 else 0
                 3 -> this@FuMO25BlockEntity.tick
@@ -65,7 +65,7 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
 
         override fun set(index: Int, value: Long) {
             when (index) {
-                0 -> this@FuMO25BlockEntity.energyStorage.receiveEnergy(value.toInt(), false)
+                0 -> EnergyStorageHelper.insert(this@FuMO25BlockEntity.energyStorage, value)
                 1 -> this@FuMO25BlockEntity.type = FuncType.entries[value.toInt()]
                 2 -> this@FuMO25BlockEntity.powered = value == 1L
                 3 -> this@FuMO25BlockEntity.tick = value.toInt()
@@ -95,7 +95,7 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
 
         val energyTag = tag.get("Energy")
         if (energyTag != null) {
-            (energyStorage as EnergyStorage).deserializeNBT(registries, energyTag)
+            energyStorage.deserializeNBT(registries, energyTag)
         }
         this.type = FuncType.entries[tag.getInt("Type").coerceIn(0, 3)]
         this.powered = tag.getBoolean("Powered")
@@ -111,7 +111,7 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
     override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
         super.saveAdditional(tag, registries)
 
-        tag.put("Energy", (energyStorage as EnergyStorage).serializeNBT(registries))
+        tag.put("Energy", energyStorage.serializeNBT(registries))
         tag.putInt("Type", this.type.ordinal)
         tag.putBoolean("Powered", this.powered)
         tag.putInt("Tick", this.tick)
@@ -180,7 +180,7 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
         fun serverTick(level: Level, pos: BlockPos, state: BlockState, blockEntity: FuMO25BlockEntity) {
             if (!SyncConfig.SYNC_ENTITY_OVER_RANGE.get()) return
             val energyStorage = blockEntity.getEnergyStorage()
-            val energy = energyStorage.energyStored
+            val energy = energyStorage.amount
 
             blockEntity.tickO = blockEntity.tick
 
@@ -212,7 +212,7 @@ open class FuMO25BlockEntity(pPos: BlockPos, pBlockState: BlockState) :
                         setChanged(level, pos, state)
                     }
                 } else {
-                    energyStorage.extractEnergy(energyCost, false)
+                    EnergyStorageHelper.extract(energyStorage, energyCost.toLong())
                     if (blockEntity.tick == 360) {
                         level.playSound(null, pos, ModSounds.RADAR_SEARCH_IDLE, SoundSource.BLOCKS, 1f, 1f)
                     }

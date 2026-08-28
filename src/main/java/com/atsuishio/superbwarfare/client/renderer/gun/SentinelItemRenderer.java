@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.client.renderer.gun;
 
-import com.atsuishio.superbwarfare.init.ModCapabilities;
+import team.reborn.energy.api.EnergyStorage;
 
 import com.atsuishio.superbwarfare.client.ItemModelHelper;
 import com.atsuishio.superbwarfare.client.animation.AnimationHelper;
@@ -46,8 +46,8 @@ public class SentinelItemRenderer extends CustomGunRenderer<SentinelItem> {
         if (itemStack.getItem() instanceof GunItem && GeoItem.getId(itemStack) == this.getInstanceId(animatable)) {
             if (this.renderPerspective == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND || this.renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
 
-                var cap = ModCapabilities.ENERGY_ITEM.find(itemStack, null);
-                var flag = cap != null && cap.getEnergyStored() > 0;
+                var cap = EnergyStorage.ITEM.find(itemStack, null);
+                var flag = cap != null && cap.getAmount() > 0;
 
                 if (name.equals("charge_illuminated")) {
                     bone.setHidden(!flag);

@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.data.gun.ammo_consumer_strategy
 
-import com.atsuishio.superbwarfare.init.ModCapabilities
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 
 import com.atsuishio.superbwarfare.data.gun.AmmoConsumer
 import com.atsuishio.superbwarfare.data.gun.GunData
@@ -8,6 +8,7 @@ import net.minecraft.world.entity.Entity
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import com.atsuishio.superbwarfare.capability.api.IItemHandler
+import team.reborn.energy.api.EnergyStorage
 
 /**
  * 能量弹药策略 — ammo 字符串形如 "fe"、 "rf"、 "energy"
@@ -20,24 +21,24 @@ object EnergyAmmoStrategy : AmmoConsumeStrategy() {
 
     override fun consume(data: GunData, consumer: AmmoConsumer, shooter: Entity, count: Int): Int {
         val energyStorage = data.getEnergyProvider(shooter) ?: return 0
-        return energyStorage.extractEnergy(count, false)
+        return EnergyStorageHelper.extract(energyStorage, count.toLong()).toInt()
     }
 
     override fun consume(data: GunData, consumer: AmmoConsumer, handler: IItemHandler, count: Int): Int {
-        val energyStorage = ModCapabilities.ENERGY_ITEM.find(data.stack, null) ?: return 0
-        return energyStorage.extractEnergy(count, false)
+        val energyStorage = EnergyStorage.ITEM.find(data.stack, null) ?: return 0
+        return EnergyStorageHelper.extract(energyStorage, count.toLong()).toInt()
     }
 
     override fun count(data: GunData, consumer: AmmoConsumer, entity: Entity?): Int {
         if (entity == null) return 0
         val energyStorage = data.getEnergyProvider(entity) ?: return 0
-        return energyStorage.energyStored
+        return energyStorage.amount.toInt()
     }
 
     override fun count(data: GunData, consumer: AmmoConsumer, handler: IItemHandler?): Int {
         if (handler == null) return 0
-        val energyStorage = ModCapabilities.ENERGY_ITEM.find(data.stack, null) ?: return 0
-        return energyStorage.energyStored
+        val energyStorage = EnergyStorage.ITEM.find(data.stack, null) ?: return 0
+        return energyStorage.amount.toInt()
     }
 
     override fun withdraw(consumer: AmmoConsumer, ammoSupplier: Entity, count: Int) = 0

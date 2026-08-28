@@ -19,7 +19,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
+import team.reborn.energy.api.EnergyStorage
 
 open class VehicleGunItem : GunItem(Properties()) {
     override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) {
@@ -49,9 +49,9 @@ open class VehicleGunItem : GunItem(Properties()) {
                 && shooter.getAmmo(data) >= data.get(GunProp.AMMO_COST_PER_SHOOT)
     }
 
-    override fun getEnergyProvider(data: GunData, ammoSupplier: Entity?): IEnergyStorage? {
+    override fun getEnergyProvider(data: GunData, ammoSupplier: Entity?): EnergyStorage? {
         return if (ammoSupplier != null) {
-            ModCapabilities.ENERGY_ENTITY.find(ammoSupplier, null)
+            ModCapabilities.getEntityEnergyStorage(ammoSupplier)
         } else {
             super.getEnergyProvider(data, null)
         }
