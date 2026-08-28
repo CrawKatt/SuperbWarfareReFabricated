@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.resource.gun.DefaultGunResource
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
+import com.atsuishio.superbwarfare.tools.mulPoseMatrix
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnimationInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.handler.FirstPersonRenderHandler
 import com.github.mcmodderanchor.simplebedrockmodel.v2.client.renderer.AbstractGeoItemRendererV2
@@ -69,11 +70,6 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         packedLight: Int,
         partialTick: Float
     ) {
-        if (GunResource.compute(stack).itemDisplay[displayKey(transformType)] == null) {
-            super.renderFirstPerson(player, stack, transformType, poseStack, bufferSource, packedLight, partialTick)
-            return
-        }
-
         render(stack, transformType, poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY, partialTick)
     }
 
@@ -84,7 +80,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         partialTick: Float
     ) {
         val display = GunResource.compute(stack).itemDisplay[displayKey(transformType)]
-        if (display != null) {
+        if (display != null && !transformType.firstPerson()) {
             applyItemDisplayTransform(poseStack, display)
         }
         super.beforeRender(poseStack, transformType, stack, partialTick)
@@ -102,7 +98,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val resource = GunResource.compute(stack)
         val modelResource = resource.getModel()
 
-        val useLod = transformType != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
+        val useLod = !transformType.firstPerson()
                 && DisplayConfig.ENABLE_GUN_LOD.get()
                 && !RenderDistanceHelper.isInGui()
         val model = if (useLod) {
@@ -163,7 +159,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
             }
         }
 
-        poseStack.mulPose(viewTransform.invert())
+        poseStack.mulPoseMatrix(viewTransform.invert())
     }
 
     private fun blendViewTransform(from: Matrix4f, to: Matrix4f, t: Float): Matrix4f {
