@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.resource.gun.pojo.ItemDisplayInfo
+import com.atsuishio.superbwarfare.script.GunScriptManager
 import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnimationInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.handler.FirstPersonRenderHandler
@@ -16,6 +17,7 @@ import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.firstperson.Firs
 import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.render.CameraStateCache
 import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.resource.ParticleDefinitionLoader
 import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.runtime.ParticleEmitterInstance
+import com.github.mcmodderanchor.simplebedrockmodel.v1.molang.runtime.value.NumberValue
 import com.github.mcmodderanchor.simplebedrockmodel.v2.client.renderer.AbstractGeoItemRendererV2
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.YXZRotationView
@@ -43,9 +45,9 @@ import kotlin.math.roundToInt
 
 open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 
-    private val capturedRenderPose = mutableMapOf<InteractionHand, Matrix4f>()
-    private val lastBoneTransforms = mutableMapOf<InteractionHand, MutableMap<String, Matrix4f>>()
-    private val muzzleEmitterLocators =
+    protected val capturedRenderPose = mutableMapOf<InteractionHand, Matrix4f>()
+    protected val lastBoneTransforms = mutableMapOf<InteractionHand, MutableMap<String, Matrix4f>>()
+    protected val muzzleEmitterLocators =
         mutableMapOf<InteractionHand, MutableMap<ParticleEmitterInstance, String>>()
 
     override fun createAnimationInstance(stack: ItemStack, entity: Entity): IFPAnimationInstance {
@@ -201,6 +203,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
                 shootRecoil.zoomRate, shootRecoil.speed
             )
         }
+        applyCustomAnimations(stack, model, transformType, partialTick)
+        applyCustomAnimationsByScript(stack, model, transformType, partialTick)
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         if (transformType.firstPerson()) {
             MuzzleFlashRenderer.render(poseStack, model, stack, bufferSource)
@@ -216,7 +220,25 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         model.resetPose()
     }
 
-    private fun spawnAndBindMuzzleParticles(
+    open fun applyCustomAnimations(
+        stack: ItemStack,
+        model: GeoGunModel,
+        transformType: ItemDisplayContext,
+        partialTick: Float
+    ) {
+    }
+
+    open fun applyCustomAnimationsByScript(
+        stack: ItemStack,
+        model: GeoGunModel,
+        transformType: ItemDisplayContext,
+        partialTick: Float
+    ) {
+        val script = GunResource.compute(stack).getScript() ?: return
+        GunScriptManager.invokeTransform(script, stack, model, transformType, partialTick, this)
+    }
+
+    open fun spawnAndBindMuzzleParticles(
         poseStack: PoseStack,
         stack: ItemStack,
         hand: InteractionHand
@@ -243,16 +265,17 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
             val countJitter = 1f - smoke.randomCount + shotRandom * 2f * smoke.randomCount
             val opacityJitter = 1f - smoke.randomOpacity + shotRandom * 2f * smoke.randomOpacity
 
-            emitter.setVariable("smoke_size", smoke.size * sizeJitter)
-            emitter.setVariable("smoke_growth", smoke.growth * growthJitter)
-            emitter.setVariable("smoke_lifetime", smoke.lifetime * lifetimeJitter)
-            emitter.setVariable("smoke_speed", smoke.speed * speedJitter)
-            emitter.setVariable(
+            val variables = emitter.molang.variableStorage
+            variables.set("smoke_size", NumberValue.of((smoke.size * sizeJitter).toDouble()))
+            variables.set("smoke_growth", NumberValue.of((smoke.growth * growthJitter).toDouble()))
+            variables.set("smoke_lifetime", NumberValue.of((smoke.lifetime * lifetimeJitter).toDouble()))
+            variables.set("smoke_speed", NumberValue.of((smoke.speed * speedJitter).toDouble()))
+            variables.set(
                 "smoke_count",
-                (smoke.count * countJitter).roundToInt().coerceAtLeast(1).toFloat()
+                NumberValue.of((smoke.count * countJitter).roundToInt().coerceAtLeast(1).toDouble())
             )
-            emitter.setVariable("smoke_opacity", smoke.opacity * opacityJitter)
-            emitter.setVariable("smoke_drag", resource.smoke.drag)
+            variables.set("smoke_opacity", NumberValue.of((smoke.opacity * opacityJitter).toDouble()))
+            variables.set("smoke_drag", NumberValue.of(resource.smoke.drag.toDouble()))
             val locator = resolveMuzzleLocator(data, boneTransforms)
             if (locator == null) {
                 emitter.setRemoved(true)
@@ -284,7 +307,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         locators.keys.removeIf { it.isFinished }
     }
 
-    private fun resolveMuzzleLocator(
+    open fun resolveMuzzleLocator(
         data: ParticleEffectData,
         boneTransforms: Map<String, Matrix4f>
     ): String? {
@@ -301,7 +324,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         return null
     }
 
-    private fun cameraRotationInverse(): Matrix4f {
+    open fun cameraRotationInverse(): Matrix4f {
         val camera = Minecraft.getInstance().gameRenderer.mainCamera
         return Matrix4f()
             .rotationX(Mth.DEG_TO_RAD * camera.xRot)
@@ -310,7 +333,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
             .invert()
     }
 
-    private fun handForContext(transformType: ItemDisplayContext): InteractionHand {
+    open fun handForContext(transformType: ItemDisplayContext): InteractionHand {
         return if (transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
             InteractionHand.OFF_HAND
         } else {
@@ -318,7 +341,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         }
     }
 
-    private fun applyReloadCameraShake(stack: ItemStack, model: GeoGunModel, hand: InteractionHand) {
+    open fun applyReloadCameraShake(stack: ItemStack, model: GeoGunModel, hand: InteractionHand) {
         val animation = FirstPersonRenderHandler.getActiveAnimationInstance(hand) ?: return
         val camera = model.getCameraBone()
         if (camera == null || GunData.from(stack).reload.time() <= 0) {
@@ -353,7 +376,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         animation.cameraRotation = Quaternionf().rotateZYX(cameraEuler.z, cameraEuler.y, cameraEuler.x)
     }
 
-    private fun applyFirstPersonPositioningTransform(poseStack: PoseStack, model: GeoGunModel) {
+    open fun applyFirstPersonPositioningTransform(poseStack: PoseStack, model: GeoGunModel) {
         val idleViewTransform = model.getGlobalTransform(IDLE_VIEW_BONE) ?: return
         val zoom = AnimationCurves.EASE_IN_OUT_QUINT
             .apply(ClientEventHandler.zoomTime.coerceIn(0.0, 1.0))
@@ -373,7 +396,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         poseStack.mulPoseMatrix(viewTransform.invert())
     }
 
-    private fun blendViewTransform(from: Matrix4f, to: Matrix4f, t: Float): Matrix4f {
+    open fun blendViewTransform(from: Matrix4f, to: Matrix4f, t: Float): Matrix4f {
         val translation = Vector3f()
         val toTranslation = Vector3f()
         from.getTranslation(translation)
@@ -398,7 +421,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
             .scale(scale)
     }
 
-    private fun applyItemDisplayTransform(poseStack: PoseStack, display: ItemDisplayInfo) {
+    open fun applyItemDisplayTransform(poseStack: PoseStack, display: ItemDisplayInfo) {
         val translation = display.translation
         poseStack.translate(translation[0] / 16f, translation[1] / 16f, translation[2] / 16f)
 
@@ -411,7 +434,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         poseStack.scale(scale[0], scale[1], scale[2])
     }
 
-    private fun displayKey(transformType: ItemDisplayContext): String {
+    open fun displayKey(transformType: ItemDisplayContext): String {
         return when (transformType) {
             ItemDisplayContext.FIRST_PERSON_RIGHT_HAND -> "firstperson_righthand"
             ItemDisplayContext.FIRST_PERSON_LEFT_HAND -> "firstperson_lefthand"
