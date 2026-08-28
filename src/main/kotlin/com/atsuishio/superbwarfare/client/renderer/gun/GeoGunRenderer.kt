@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance
 import com.atsuishio.superbwarfare.client.model.gun.GeoGunModel
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
+import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.resource.gun.DefaultGunResource
 import com.atsuishio.superbwarfare.resource.gun.GunResource
@@ -13,6 +14,7 @@ import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnima
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.handler.FirstPersonRenderHandler
 import com.github.mcmodderanchor.simplebedrockmodel.v2.client.renderer.AbstractGeoItemRendererV2
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
+import com.maydaymemory.mae.basic.YXZRotationView
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
 import com.maydaymemory.mae.blend.EulerAdditiveBlender
 import com.maydaymemory.mae.blend.SimpleEulerAdditiveBlender
@@ -22,10 +24,12 @@ import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
+import net.neoforged.neoforge.client.event.ViewportEvent
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
@@ -53,6 +57,36 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
     override fun hasModel(stack: ItemStack): Boolean {
         val modelResource = GunResource.compute(stack).getModel()
         return GeoGunModel.create(modelResource) != null
+    }
+
+    override fun applyLevelCameraAnimation(
+        event: ViewportEvent.ComputeCameraAngles,
+        stack: ItemStack,
+        animateRot: Quaternionf,
+        partialTicks: Float
+    ) {
+        val raw = YXZRotationView(
+            Vector3f(
+                Mth.DEG_TO_RAD * event.pitch,
+                Mth.DEG_TO_RAD * event.yaw,
+                Mth.DEG_TO_RAD * event.roll
+            )
+        ).asQuaternion()
+        val combined = Quaternionf(raw).mul(animateRot)
+        val euler = YXZRotationView(combined).asEulerAngle()
+
+        event.yaw = Mth.RAD_TO_DEG * euler.y()
+        event.pitch = Mth.RAD_TO_DEG * euler.x()
+        event.roll = -Mth.RAD_TO_DEG * euler.z()
+    }
+
+    override fun applyItemInHandCameraAnimation(
+        poseStack: PoseStack,
+        stack: ItemStack,
+        animateRot: Quaternionf,
+        partialTicks: Float
+    ) {
+        poseStack.mulPose(animateRot)
     }
 
     override fun renderFirstPerson(
@@ -119,6 +153,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
                 model.applyPose(BLENDER.blend(model.getBindPose(), pose))
             }
 
+            applyReloadCameraShake(stack, model, hand)
 
             applyFirstPersonPositioningTransform(poseStack, model)
 
@@ -139,6 +174,41 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
             ShellCasingFxRenderer.render(poseStack, model, stack, hand, bufferSource, packedLight)
         }
         model.resetPose()
+    }
+
+    private fun applyReloadCameraShake(stack: ItemStack, model: GeoGunModel, hand: InteractionHand) {
+        val animation = FirstPersonRenderHandler.getActiveAnimationInstance(hand) ?: return
+        val camera = model.getCameraBone()
+        if (camera == null || GunData.from(stack).reload.time() <= 0) {
+            animation.cameraRotation = Quaternionf()
+            return
+        }
+
+        val strength = DisplayConfig.WEAPON_SCREEN_SHAKE.get().toFloat() / 100f
+        if (strength <= 0f) {
+            animation.cameraRotation = Quaternionf()
+            return
+        }
+
+        val zoomTime = ClientEventHandler.zoomTime.coerceIn(0.0, 1.0).toFloat()
+        val rotationScale = (1f - 0.9f * zoomTime).coerceAtLeast(0.05f)
+        val positionScale = (1f - 0.8f * zoomTime).coerceAtLeast(0.05f)
+
+        val main = model.getMainBone()
+            ?: model.getGunBone()
+            ?: model.getBone(BODY_BONE)
+            ?: model.getBone(GENERIC_GEOMETRY_BONE)
+        main?.let { bone ->
+            val boneEuler = Vector3f(bone.rotationInEuler).mul(rotationScale)
+            bone.rotation.set(Quaternionf().rotateZYX(boneEuler.z, boneEuler.y, boneEuler.x))
+            bone.rotationInEuler.set(boneEuler)
+            bone.x *= positionScale
+            bone.y *= positionScale
+            bone.z *= positionScale
+        }
+
+        val cameraEuler = Vector3f(camera.rotationInEuler).mul(rotationScale).mul(-strength)
+        animation.cameraRotation = Quaternionf().rotateZYX(cameraEuler.z, cameraEuler.y, cameraEuler.x)
     }
 
     private fun applyFirstPersonPositioningTransform(poseStack: PoseStack, model: GeoGunModel) {
@@ -216,6 +286,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
     companion object {
         private const val IDLE_VIEW_BONE = "idle_view"
         private const val IRON_VIEW_BONE = "iron_view"
+        private const val BODY_BONE = "body"
+        private const val GENERIC_GEOMETRY_BONE = "bone"
 
         private val BLENDER: EulerAdditiveBlender =
             SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }
