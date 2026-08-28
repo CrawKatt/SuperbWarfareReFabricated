@@ -2,8 +2,8 @@ package com.atsuishio.superbwarfare.item.gun
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.Companion.loc
+import team.reborn.energy.api.EnergyStorage
 import com.atsuishio.superbwarfare.api.event.ShootEvent
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
 import com.atsuishio.superbwarfare.client.particle.BulletDecalOption
 import com.atsuishio.superbwarfare.client.screens.WeaponEditScreen
 import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent
@@ -121,8 +121,8 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         val data = from(stack)
         if (data.get(GunProp.MAX_DURABILITY) > 0) return super.isBarVisible(stack)
 
-        val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
-        return cap != null && cap.energyStored > 0 && cap.maxEnergyStored > 0
+        val cap = EnergyStorage.ITEM.find(stack, null)
+        return cap != null && cap.amount > 0 && cap.capacity > 0
     }
 
     override fun getBarWidth(stack: ItemStack): Int {
@@ -132,8 +132,8 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         }
 
         if (data.get(GunProp.MAX_ENERGY) > 0) {
-            val energy = ModCapabilities.ENERGY_ITEM.find(stack, null)?.energyStored ?: 0
-            return Math.round(energy * 13f / GunData.get(stack, GunProp.MAX_ENERGY))
+            val cap = EnergyStorage.ITEM.find(stack, null)
+            return Math.round((cap?.amount ?: 0).toFloat() * 13f / GunData.get(stack, GunProp.MAX_ENERGY))
         }
 
         return super.getBarWidth(stack)
@@ -1202,8 +1202,9 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
 
     open fun getDefaultData(data: GunData) = getDefault(data.id)
 
-    open fun getEnergyProvider(data: GunData, ammoSupplier: Entity?): IEnergyStorage? =
-        ModCapabilities.ENERGY_ITEM.find(data.stack, null)
+    open fun getEnergyProvider(data: GunData, ammoSupplier: Entity?): EnergyStorage? {
+        return EnergyStorage.ITEM.find(data.stack, null)
+    }
 
     companion object {
         protected fun getEntityResult(target: Entity, hitBoxPos: Vec3, hitPos: Vec3): EntityResult {

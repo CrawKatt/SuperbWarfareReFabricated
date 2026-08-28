@@ -5,6 +5,8 @@ import com.atsuishio.superbwarfare.Mod.Companion.queueServerWork
 import com.atsuishio.superbwarfare.advancement.CriteriaRegister
 import com.atsuishio.superbwarfare.annotation.ExcludeBvrSync
 import com.atsuishio.superbwarfare.capability.PersistentDataAccessor
+import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.capability.energy.SyncedEntityEnergyStorage
 import com.atsuishio.superbwarfare.capability.energy.VehicleEnergyStorage
 import com.atsuishio.superbwarfare.client.animation.entity.VehicleAnimationInstance
@@ -63,6 +65,7 @@ import com.atsuishio.superbwarfare.tools.VectorTool.lerpGetEntityBoundingBoxCent
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
 import com.google.common.collect.ImmutableList
 import com.mojang.math.Axis
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
 import net.minecraft.ChatFormatting
 import net.minecraft.client.CameraType
 import net.minecraft.core.BlockPos
@@ -120,9 +123,8 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.fabric.api.entity.FakePlayer
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
-import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import org.joml.*
+import team.reborn.energy.api.EnergyStorage
 import java.util.*
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -1081,7 +1083,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             return
         }
         if (this.level() is ServerLevel) {
-            this.energyStorage.extractEnergy(amount, false)
+            EnergyStorageHelper.extract(this.energyStorage, amount.toLong())
         }
     }
 
@@ -1105,7 +1107,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                 )
                 return Int.MAX_VALUE
             }
-            return this.energyStorage.energyStored
+            return this.energyStorage.amount.toInt()
         }
         set(pEnergy) {
             if (!this.hasEnergyStorage()) {
@@ -1117,14 +1119,15 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             }
             val targetEnergy = Mth.clamp(pEnergy, 0, this.maxEnergy)
 
-            if (targetEnergy > energyStorage.energyStored) {
-                energyStorage.receiveEnergy(targetEnergy - energyStorage.energyStored, false)
+            val storedEnergy = energyStorage.amount
+            if (targetEnergy.toLong() > storedEnergy) {
+                EnergyStorageHelper.insert(energyStorage, targetEnergy.toLong() - storedEnergy)
             } else {
-                energyStorage.extractEnergy(energyStorage.energyStored - targetEnergy, false)
+                EnergyStorageHelper.extract(energyStorage, storedEnergy - targetEnergy.toLong())
             }
         }
 
-    open fun getEnergyStorage(): IEnergyStorage? {
+    open fun getEnergyStorage(): EnergyStorage? {
         if (!this.hasEnergyStorage()) {
             Mod.LOGGER.warn("Trying to get energy storage of vehicle {}, but it has no energy storage", this.name)
         }
@@ -2702,18 +2705,19 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
 
         if (this.hasEnergyStorage() && this.tickCount % 20 == 0) {
-            for (stack in this.inventory.getItems()) {
+            for (slot in 0 until this.inventory.slots) {
                 val neededEnergy: Int = this.maxEnergy - this.energy
                 if (neededEnergy <= 0) break
 
-                val energyCap = ModCapabilities.ENERGY_ITEM.find(stack, null) ?: continue
+                val energyCap = ContainerItemContext.ofSingleSlot(this.inventory.getSlotStorage(slot))
+                    .find(EnergyStorage.ITEM) ?: continue
 
-                val stored = energyCap.energyStored
+                val stored = energyCap.amount
                 if (stored <= 0) continue
 
-                val energyToExtract = Math.min(stored, neededEnergy)
-                val extracted = energyCap.extractEnergy(energyToExtract, false)
-                this.energy += extracted
+                val energyToExtract = minOf(stored, neededEnergy.toLong())
+                val extracted = EnergyStorageHelper.extract(energyCap, energyToExtract)
+                this.energy += extracted.toInt()
             }
         }
 

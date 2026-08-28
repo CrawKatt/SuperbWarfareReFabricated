@@ -4,6 +4,8 @@ import com.atsuishio.superbwarfare.init.ModSounds;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper;
+import team.reborn.energy.api.EnergyStorage;
 
 import com.atsuishio.superbwarfare.client.renderer.gun.SentinelItemRenderer;
 import com.atsuishio.superbwarfare.client.tooltip.component.SentinelImageComponent;
@@ -83,8 +85,9 @@ public class SentinelItem extends GunGeoItem {
 
     @Override
     public double getCustomDamage(GunData data) {
-        var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
-        if (cap != null && cap.getEnergyStored() > 0) {
+        var stack = data.stack;
+        var cap = EnergyStorage.ITEM.find(stack, null);
+        if (cap != null && cap.getAmount() > 0) {
             return 0.2857142857142857 * data.getDefault().damage;
         }
         return 0;
@@ -94,9 +97,9 @@ public class SentinelItem extends GunGeoItem {
     @ParametersAreNonnullByDefault
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, level, entity, slot, selected);
-        var cap = ModCapabilities.ENERGY_ITEM.find(stack, null);
-        if (cap != null && cap.getEnergyStored() > 0) {
-            cap.extractEnergy(1, false);
+        var cap = EnergyStorage.ITEM.find(stack, null);
+        if (cap != null && cap.getAmount() > 0) {
+            EnergyStorageHelper.extract(cap, 1);
         }
     }
 
@@ -121,17 +124,17 @@ public class SentinelItem extends GunGeoItem {
 
         var data = parameters.data;
 
-        var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
+        var cap = EnergyStorage.ITEM.find(data.stack, null);
         if (cap != null) {
-            cap.extractEnergy(3000, false);
+            EnergyStorageHelper.extract(cap, 3000);
         }
     }
 
     @Override
     public void playFireSounds(GunData data, Entity shooter, boolean zoom) {
-        var cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null);
+        var cap = EnergyStorage.ITEM.find(data.stack, null);
 
-        if (cap != null && cap.getEnergyStored() > 0) {
+        if (cap != null && cap.getAmount() > 0) {
             float soundRadius = data.get(GunProp.SOUND_RADIUS).floatValue();
 
             shooter.playSound(ModSounds.SENTINEL_CHARGE_FAR, soundRadius * 0.7f, 1f);

@@ -77,7 +77,7 @@ open class ClientGunImageTooltip(tooltip: GunImageComponent) : ClientTooltipComp
 
     protected fun shouldRenderEnergyTooltip(): Boolean {
         val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
-        return cap != null && cap.maxEnergyStored > 0
+        return cap != null && cap.capacity > 0
     }
 
     protected fun shouldRenderEditTooltip(): Boolean {
@@ -273,8 +273,8 @@ open class ClientGunImageTooltip(tooltip: GunImageComponent) : ClientTooltipComp
             val storage = ModCapabilities.ENERGY_ITEM.find(stack, null)
             checkNotNull(storage)
 
-            val energy = storage.energyStored
-            val maxEnergy = storage.maxEnergyStored
+            val energy = storage.amount
+            val maxEnergy = storage.capacity
             val percentage = (energy.toFloat() / maxEnergy).coerceIn(0f, 1f)
             val component = Component.empty()
             val format = if (percentage <= .2f) {
@@ -295,7 +295,7 @@ open class ClientGunImageTooltip(tooltip: GunImageComponent) : ClientTooltipComp
             }
 
             component.append(
-                Component.literal(" $energy/$maxEnergy FE")
+                Component.literal(" $energy/$maxEnergy E")
                     .withStyle(ChatFormatting.GRAY)
             )
 

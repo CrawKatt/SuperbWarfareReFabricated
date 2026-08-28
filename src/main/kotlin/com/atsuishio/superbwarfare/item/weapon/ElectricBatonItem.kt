@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.weapon
 
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
 import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.init.ModItems
@@ -22,6 +23,7 @@ import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 import org.joml.Math
 import java.util.*
+import kotlin.math.roundToInt
 
 class ElectricBatonItem : SwordItem(ModItemTier.STEEL, 2, -2.5f, Properties().durability(1114)),
     EnergyStorageItem {
@@ -64,9 +66,8 @@ class ElectricBatonItem : SwordItem(ModItemTier.STEEL, 2, -2.5f, Properties().du
 
     override fun getBarWidth(pStack: ItemStack): Int {
         if (pStack.getOrCreateTag().getBoolean(TAG_OPEN)) {
-            val energy = ModCapabilities.ENERGY_ITEM.find(pStack, null)?.energyStored ?: 0
-
-            return Math.round(energy * 13f / MAX_ENERGY)
+            val cap = ModCapabilities.ENERGY_ITEM.find(pStack, null) ?: return 0
+            return (cap.amount.toFloat() * 13f / MAX_ENERGY).roundToInt()
         } else {
             return super.getBarWidth(pStack)
         }
@@ -87,8 +88,8 @@ class ElectricBatonItem : SwordItem(ModItemTier.STEEL, 2, -2.5f, Properties().du
         )
         if (pStack.getOrCreateTag().getBoolean(TAG_OPEN)) {
             val energy = ModCapabilities.ENERGY_ITEM.find(pStack, null)
-            if (energy != null && energy.energyStored >= ENERGY_COST) {
-                energy.extractEnergy(ENERGY_COST, false)
+            if (energy != null && energy.amount >= ENERGY_COST) {
+                EnergyStorageHelper.extract(energy, ENERGY_COST.toLong())
                 if (!pTarget.level().isClientSide) {
                     pTarget.addEffect(MobEffectInstance(ModMobEffects.SHOCK, 30, 2), pAttacker)
                 }
@@ -111,7 +112,8 @@ class ElectricBatonItem : SwordItem(ModItemTier.STEEL, 2, -2.5f, Properties().du
         @JvmStatic
         fun makeFullEnergyStack(): ItemStack {
             val stack = ItemStack(ModItems.ELECTRIC_BATON)
-            ModCapabilities.ENERGY_ITEM.find(stack, null)?.receiveEnergy(MAX_ENERGY, false)
+            val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
+            cap?.let { EnergyStorageHelper.insert(it, MAX_ENERGY.toLong()) }
             stack.getOrCreateTag().putBoolean(TAG_OPEN, true)
             return stack
         }

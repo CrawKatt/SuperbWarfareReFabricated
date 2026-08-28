@@ -2,8 +2,8 @@ package com.atsuishio.superbwarfare.block.entity
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.block.FuMO25Block
-import com.atsuishio.superbwarfare.capability.api.EnergyStorage
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
+import com.atsuishio.superbwarfare.capability.api.EnergyStorage as ModEnergyStorage
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModSounds
@@ -38,6 +38,7 @@ import software.bernie.geckolib.core.animation.AnimatableManager
 import software.bernie.geckolib.network.SerializableDataTicket
 import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.UUID
+import team.reborn.energy.api.EnergyStorage
 import javax.annotation.ParametersAreNonnullByDefault
 
 open class FuMO25BlockEntity(
@@ -47,7 +48,7 @@ open class FuMO25BlockEntity(
 
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
 
-    private val energyStorage: IEnergyStorage = EnergyStorage(MAX_ENERGY.toLong())
+    private val energyStorage = ModEnergyStorage(MAX_ENERGY.toLong())
 
     open val modelInstance = BlockModelReloadListener.getModel(MODEL)?.createInstance()
 
@@ -59,18 +60,17 @@ open class FuMO25BlockEntity(
     protected val dataAccess: ContainerEnergyData = object : ContainerEnergyData {
         override fun get(index: Int): Long {
             return when (index) {
-                0 -> this@FuMO25BlockEntity.energyStorage.energyStored.toLong()
-                1 -> this@FuMO25BlockEntity.type.ordinal.toLong()
-                2 -> if (this@FuMO25BlockEntity.powered) 1L else 0L
-                3 -> this@FuMO25BlockEntity.tick.toLong()
-                else -> 0L
-            }
+                0 -> this@FuMO25BlockEntity.energyStorage.amount
+                1 -> this@FuMO25BlockEntity.type.ordinal
+                2 -> if (this@FuMO25BlockEntity.powered) 1 else 0
+                3 -> this@FuMO25BlockEntity.tick
+                else -> 0
+            }.toLong()
         }
 
         override fun set(index: Int, value: Long) {
             when (index) {
-                0 -> this@FuMO25BlockEntity.energyStorage.receiveEnergy(value.toInt(), false)
-
+                0 -> EnergyStorageHelper.insert(this@FuMO25BlockEntity.energyStorage, value)
                 1 -> this@FuMO25BlockEntity.type = FuncType.entries[value.toInt()]
                 2 -> this@FuMO25BlockEntity.powered = value == 1L
                 3 -> this@FuMO25BlockEntity.tick = value.toInt()
@@ -82,7 +82,7 @@ open class FuMO25BlockEntity(
         }
     }
 
-    fun getEnergyStorage(direction: Direction?): IEnergyStorage {
+    fun getEnergyStorage(direction: Direction?): EnergyStorage {
         return this.energyStorage
     }
 
@@ -112,7 +112,10 @@ open class FuMO25BlockEntity(
     override fun load(tag: CompoundTag) {
         super.load(tag)
 
-        tag.get("Energy")?.let { (energyStorage as EnergyStorage).deserializeNBT(it) }
+        val energyTag = tag.get("Energy")
+        if (energyTag != null) {
+            energyStorage.deserializeNBT(energyTag)
+        }
         this.type = FuncType.entries[tag.getInt("Type").coerceIn(0, 3)]
         this.powered = tag.getBoolean("Powered")
         this.tick = tag.getInt("Tick")
@@ -125,7 +128,7 @@ open class FuMO25BlockEntity(
     override fun saveAdditional(tag: CompoundTag) {
         super.saveAdditional(tag)
 
-        tag.put("Energy", (energyStorage as EnergyStorage).serializeNBT())
+        tag.put("Energy", energyStorage.serializeNBT())
         tag.putInt("Type", this.type.ordinal)
         tag.putBoolean("Powered", this.powered)
         tag.putInt("Tick", this.tick)
@@ -199,7 +202,7 @@ open class FuMO25BlockEntity(
 
         fun serverTick(level: Level, pos: BlockPos, state: BlockState, blockEntity: FuMO25BlockEntity) {
             val energyStorage = blockEntity.getEnergyStorage(null)
-            val energy = energyStorage.energyStored
+            val energy = energyStorage.amount
 
 
             if (state.getValue(FuMO25Block.POWERED)) {
@@ -255,7 +258,7 @@ open class FuMO25BlockEntity(
                         setChanged(level, pos, state)
                     }
                 } else {
-                    energyStorage.extractEnergy(energyCost, false)
+                    EnergyStorageHelper.extract(energyStorage, energyCost.toLong())
                     if (blockEntity.tick == 360) {
                         level.playSound(
                             null,

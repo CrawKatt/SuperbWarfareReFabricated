@@ -6,20 +6,17 @@ import com.atsuishio.superbwarfare.block.entity.ChargingStationBlockEntity
 import com.atsuishio.superbwarfare.block.entity.CreativeChargingStationBlockEntity
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.block.entity.SuperbItemInterfaceBlockEntity
-import com.atsuishio.superbwarfare.capability.api.IEnergyStorage
 import com.atsuishio.superbwarfare.capability.api.IItemHandler
 import com.atsuishio.superbwarfare.capability.api.InvWrapper
 import com.atsuishio.superbwarfare.capability.api.PlayerInvWrapper
 import com.atsuishio.superbwarfare.capability.api.SidedInvWrapper
 import com.atsuishio.superbwarfare.capability.energy.ItemEnergyStorage
-import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.item.EnergyStorageItem
 import com.atsuishio.superbwarfare.item.blockitem.CreativeChargingStationBlockItem
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
 import net.fabricmc.fabric.api.lookup.v1.entity.EntityApiLookup
-import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage
 import net.minecraft.core.Direction
@@ -29,16 +26,10 @@ import team.reborn.energy.api.EnergyStorage
 
 object ModCapabilities {
     @JvmField
-    val ENERGY_BLOCK: BlockApiLookup<IEnergyStorage, Direction?> =
-        BlockApiLookup.get(Mod.loc("energy"), IEnergyStorage::class.java, Direction::class.java)
+    val ENERGY_BLOCK = EnergyStorage.SIDED
 
     @JvmField
-    val ENERGY_ITEM: ItemApiLookup<IEnergyStorage, Void?> =
-        ItemApiLookup.get(Mod.loc("energy"), IEnergyStorage::class.java, Void::class.java)
-
-    @JvmField
-    val ENERGY_ENTITY: EntityApiLookup<IEnergyStorage, Void?> =
-        EntityApiLookup.get(Mod.loc("energy"), IEnergyStorage::class.java, Void::class.java)
+    val ENERGY_ITEM = EnergyStorage.ITEM
 
     @JvmField
     val ITEM_HANDLER_BLOCK: BlockApiLookup<IItemHandler, Direction?> =
@@ -70,30 +61,10 @@ object ModCapabilities {
             CreativeChargingStationBlockEntity::getEnergyStorage,
             ModBlockEntities.CREATIVE_CHARGING_STATION
         )
-        ENERGY_BLOCK.registerForBlockEntity(FuMO25BlockEntity::getEnergyStorage, ModBlockEntities.FUMO_25)
-
-        EnergyStorage.SIDED.registerForBlockEntity(
-            { blockEntity: ChargingStationBlockEntity, direction: Direction? ->
-                blockEntity.getEnergyStorage(direction) as EnergyStorage
-            },
-            ModBlockEntities.CHARGING_STATION
-        )
-        EnergyStorage.SIDED.registerForBlockEntity(
-            { blockEntity: CreativeChargingStationBlockEntity, direction: Direction? ->
-                blockEntity.getEnergyStorage(direction) as EnergyStorage
-            },
-            ModBlockEntities.CREATIVE_CHARGING_STATION
-        )
-        EnergyStorage.SIDED.registerForBlockEntity(
-            { blockEntity: FuMO25BlockEntity, direction: Direction? ->
-                blockEntity.getEnergyStorage(direction) as EnergyStorage
-            },
+        ENERGY_BLOCK.registerForBlockEntity(
+            FuMO25BlockEntity::getEnergyStorage,
             ModBlockEntities.FUMO_25
         )
-
-        ENERGY_BLOCK.registerFallback { level, pos, _, _, direction ->
-            EnergyStorage.SIDED.find(level, pos, direction)?.let(::EnergyStorageAdapter)
-        }
     }
 
     private fun registerItemHandlers() {
@@ -159,19 +130,18 @@ object ModCapabilities {
             { stack, _ -> (stack.item as CreativeChargingStationBlockItem).energyStorage },
             ModItems.CREATIVE_CHARGING_STATION
         )
-        EnergyStorage.ITEM.registerForItems(
-            { stack, _ -> (stack.item as CreativeChargingStationBlockItem).energyStorage as EnergyStorage },
-            ModItems.CREATIVE_CHARGING_STATION
-        )
 
         for (item in BuiltInRegistries.ITEM) {
             if (item !is EnergyStorageItem) continue
             ENERGY_ITEM.registerForItems(
-                { stack, _ -> ItemEnergyStorage(stack, item::getMaxEnergy, item::getMaxReceiveEnergy, item::getMaxExtractEnergy) },
-                item
-            )
-            EnergyStorage.ITEM.registerForItems(
-                { stack, _ -> ItemEnergyStorage(stack, item::getMaxEnergy, item::getMaxReceiveEnergy, item::getMaxExtractEnergy) },
+                { stack, _ ->
+                    ItemEnergyStorage(
+                        stack,
+                        item::getMaxEnergy,
+                        item::getMaxReceiveEnergy,
+                        item::getMaxExtractEnergy
+                    )
+                },
                 item
             )
         }
@@ -179,16 +149,6 @@ object ModCapabilities {
 
     private fun registerEntityHandlers() {
         for (type in BuiltInRegistries.ENTITY_TYPE) {
-            ENERGY_ENTITY.registerForType(
-                { entity, _ ->
-                    when {
-                        entity is DPSGeneratorEntity -> entity.energyStorage
-                        entity is VehicleEntity && entity.hasEnergyStorage() -> entity.getEnergyStorage()
-                        else -> null
-                    }
-                },
-                type
-            )
             ITEM_HANDLER_ENTITY.registerForType(
                 { entity, _ ->
                     when {
@@ -202,19 +162,10 @@ object ModCapabilities {
         }
     }
 
-    private class EnergyStorageAdapter(private val storage: EnergyStorage) : IEnergyStorage {
-        override fun receiveEnergy(maxReceive: Int, simulate: Boolean) =
-            ModEnergyApi.receiveEnergy(storage, maxReceive, simulate)
-
-        override fun extractEnergy(maxExtract: Int, simulate: Boolean) =
-            ModEnergyApi.extractEnergy(storage, maxExtract, simulate)
-
-        override fun getEnergyStored() = ModEnergyApi.getEnergyStored(storage)
-
-        override fun getMaxEnergyStored() = ModEnergyApi.getMaxEnergyStored(storage)
-
-        override fun canExtract() = storage.supportsExtraction()
-
-        override fun canReceive() = storage.supportsInsertion()
+    @JvmStatic
+    fun getEntityEnergyStorage(entity: net.minecraft.world.entity.Entity): EnergyStorage? = when {
+        entity is DPSGeneratorEntity -> entity.energyStorage
+        entity is VehicleEntity && entity.hasEnergyStorage() -> entity.getEnergyStorage()
+        else -> null
     }
 }

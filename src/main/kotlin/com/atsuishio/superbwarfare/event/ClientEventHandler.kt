@@ -1,8 +1,7 @@
 package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.api.event.ClientVehicleFireEvent
-import com.atsuishio.superbwarfare.capability.ModCapabilities
-import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
@@ -1799,7 +1798,8 @@ object ClientEventHandler {
         if (item !is GunItem) return
 
         if (item == ModItems.SENTINEL) {
-            val charged = ModEnergyApi.getEnergyStored(stack) > 0
+            val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
+            val charged = cap != null && cap.amount > 0
 
             if (charged) {
                 player.playSound(
@@ -1812,7 +1812,8 @@ object ClientEventHandler {
         }
 
         if (item == ModItems.SECONDARY_CATACLYSM) {
-            val hasEnoughEnergy = ModEnergyApi.getEnergyStored(stack) >= 3000
+            val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
+            val hasEnoughEnergy = cap != null && cap.amount > 3000
 
             val isChargedFire = zoom && hasEnoughEnergy
             if (isChargedFire) {

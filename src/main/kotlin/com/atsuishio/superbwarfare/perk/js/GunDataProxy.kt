@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.perk.js
 
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.init.ModCapabilities
@@ -57,11 +58,12 @@ class GunDataProxy(private val data: GunData) {
 
     // ── Energy (for Regeneration) ──
     fun getMaxEnergyStored(): Int {
-        return ModCapabilities.ENERGY_ITEM.find(data.stack, null)?.maxEnergyStored ?: 0
+        val cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null) ?: return 0
+        return cap.capacity.toInt()
     }
 
     fun receiveEnergy(amount: Int): Int {
-        return ModCapabilities.ENERGY_ITEM.find(data.stack, null)
-            ?.receiveEnergy(amount, false) ?: 0
+        val cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null) ?: return 0
+        return EnergyStorageHelper.insert(cap, amount.toLong()).toInt()
     }
 }

@@ -11,50 +11,30 @@ open class VehicleEnergyStorage(protected var vehicle: VehicleEntity) :
         vehicle.getEnergyDataAccessor()
     ) {
 
-    override fun extractEnergy(maxExtract: Int, simulate: Boolean): Int {
-        if (VehicleData.getDefault(vehicle).isDefaultData) return 0
-
-        this.capacity = maxEnergyStored.toLong()
-        this.maxExtract = maxEnergyStored.toLong()
-        return super.extractEnergy(maxExtract, simulate)
-    }
-
-    override fun receiveEnergy(maxReceive: Int, simulate: Boolean): Int {
-        if (VehicleData.getDefault(vehicle).isDefaultData) return 0
-
-        this.capacity = maxEnergyStored.toLong()
-        this.maxReceive = maxEnergyStored.toLong()
-        return super.receiveEnergy(maxReceive, simulate)
-    }
-
     override fun insert(maxAmount: Long, transaction: TransactionContext): Long {
         if (VehicleData.getDefault(vehicle).isDefaultData) return 0
 
-        this.capacity = maxEnergyStored.toLong()
-        this.maxReceive = maxEnergyStored.toLong()
+        this.capacity = getCapacity()
+        this.maxReceive = this.capacity
         return super.insert(maxAmount, transaction)
     }
 
     override fun extract(maxAmount: Long, transaction: TransactionContext): Long {
         if (VehicleData.getDefault(vehicle).isDefaultData) return 0
 
-        this.capacity = maxEnergyStored.toLong()
-        this.maxExtract = maxEnergyStored.toLong()
+        this.capacity = getCapacity()
+        this.maxExtract = this.capacity
         return super.extract(maxAmount, transaction)
     }
 
-    override fun canReceive(): Boolean {
+    override fun supportsInsertion(): Boolean {
         return !VehicleData.getDefault(vehicle).isDefaultData &&
-                super.canReceive() &&
+                super.supportsInsertion() &&
                 vehicle.computed().maxEnergy > 0
     }
 
-    override fun canExtract(): Boolean {
-        return !VehicleData.getDefault(vehicle).isDefaultData && super.canExtract()
-    }
-
-    override fun getMaxEnergyStored(): Int {
-        return VehicleData.compute(vehicle).maxEnergy
+    override fun supportsExtraction(): Boolean {
+        return !VehicleData.getDefault(vehicle).isDefaultData && super.supportsExtraction()
     }
 
     override fun getCapacity(): Long {

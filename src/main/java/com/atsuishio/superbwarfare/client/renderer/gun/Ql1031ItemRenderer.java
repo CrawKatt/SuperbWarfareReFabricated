@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.client.renderer.gun;
 
+import team.reborn.energy.api.EnergyStorage;
 import com.atsuishio.superbwarfare.client.ItemModelHelper;
 import com.atsuishio.superbwarfare.client.animation.AnimationHelper;
 import com.atsuishio.superbwarfare.client.model.item.Ql1031ItemModel;
@@ -8,7 +9,6 @@ import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.init.ModCapabilities;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.item.gun.sniper.Ql1031Item;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -20,7 +20,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.cache.object.GeoBone;
 
@@ -59,7 +58,8 @@ public class Ql1031ItemRenderer extends CustomGunRenderer<Ql1031Item> {
                 AnimationHelper.handleShootFlare(name, stack, itemStack, bone, buffer, packedLightIn);
                 ItemModelHelper.handleGunAttachments(bone, itemStack, name);
 
-                int energy = ModEnergyApi.getEnergyStored(itemStack);
+                var cap = EnergyStorage.ITEM.find(itemStack, null);
+                var energy = cap != null ? cap.getAmount() : 0;
 
                 if (name.equals("energy2_illuminated") || name.equals("energy3_illuminated") || name.equals("energy4_illuminated")) {
                     bone.setScaleX((float) energy / data.get(GunProp.MAX_ENERGY));

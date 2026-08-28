@@ -37,11 +37,6 @@ open class SyncedEntityEnergyStorage(
         entityData.set(energyDataAccessor, energy.toInt())
     }
 
-    override fun getEnergyStored(): Int {
-        // 获取同步数据，保证客户端能正确获得能量值
-        return entityData.get(energyDataAccessor)
-    }
-
     override fun getAmount(): Long = entityData.get(energyDataAccessor).toLong()
 
     override fun deserializeNBT(nbt: Tag) {
