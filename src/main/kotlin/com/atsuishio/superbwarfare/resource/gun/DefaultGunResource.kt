@@ -64,7 +64,7 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
     var energyBarColor: ModColor = ModColor(0x95E9FF)
 
     @SerialName("TriggerSound")
-    var triggerSound: SerializedSoundEvent = ModSounds.TRIGGER_CLICK.get()
+    var triggerSound: SerializedSoundEvent? = ModSounds.TRIGGER_CLICK.get()
 
     @SerialName("DischargeSound")
     var dischargeSound: SerializedSoundEvent? = null
