@@ -11,6 +11,11 @@ import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnimationInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.handler.FirstPersonRenderHandler
+import com.github.mcmodderanchor.simplebedrockmodel.v1.common.resource.pojo.ParticleEffectData
+import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.firstperson.FirstPersonParticleSystem
+import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.render.CameraStateCache
+import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.resource.ParticleDefinitionLoader
+import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.runtime.ParticleEmitterInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v2.client.renderer.AbstractGeoItemRendererV2
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.YXZRotationView
@@ -19,6 +24,7 @@ import com.maydaymemory.mae.blend.EulerAdditiveBlender
 import com.maydaymemory.mae.blend.SimpleEulerAdditiveBlender
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
+import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.texture.OverlayTexture
@@ -32,8 +38,15 @@ import net.minecraftforge.client.event.ViewportEvent
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
+import java.util.*
+import kotlin.math.roundToInt
 
 open class GeoGunRenderer : AbstractGeoItemRendererV2() {
+
+    private val capturedRenderPose = mutableMapOf<InteractionHand, Matrix4f>()
+    private val lastBoneTransforms = mutableMapOf<InteractionHand, MutableMap<String, Matrix4f>>()
+    private val muzzleEmitterLocators =
+        mutableMapOf<InteractionHand, MutableMap<ParticleEmitterInstance, String>>()
 
     override fun createAnimationInstance(stack: ItemStack, entity: Entity): IFPAnimationInstance {
         return GeoGunAnimationInstance(stack, entity, InteractionHand.MAIN_HAND)
@@ -113,6 +126,27 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         super.beforeRender(poseStack, transformType, stack, partialTick)
     }
 
+    override fun updateParticleEmitterTransforms(
+        system: FirstPersonParticleSystem,
+        poseStack: PoseStack,
+        hand: InteractionHand
+    ) {
+        capturedRenderPose[hand] = Matrix4f(poseStack.last().pose())
+    }
+
+    override fun afterRender(
+        poseStack: PoseStack,
+        transformType: ItemDisplayContext,
+        stack: ItemStack,
+        bufferSource: MultiBufferSource,
+        packedLight: Int,
+        partialTick: Float
+    ) {
+        super.afterRender(poseStack, transformType, stack, bufferSource, packedLight, partialTick)
+        if (!transformType.firstPerson()) return
+        spawnAndBindMuzzleParticles(poseStack, stack, handForContext(transformType))
+    }
+
     override fun renderModel(
         poseStack: PoseStack,
         transformType: ItemDisplayContext,
@@ -122,6 +156,10 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         packedOverlay: Int,
         partialTick: Float
     ) {
+        if (transformType.firstPerson()) {
+            lastBoneTransforms[handForContext(transformType)]?.clear()
+        }
+
         val resource = GunResource.compute(stack)
         val modelResource = resource.getModel()
 
@@ -142,11 +180,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 
         model.renderHand = transformType.firstPerson()
         if (transformType.firstPerson()) {
-            val hand = if (transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
-                InteractionHand.OFF_HAND
-            } else {
-                InteractionHand.MAIN_HAND
-            }
+            val hand = handForContext(transformType)
             val pose = FirstPersonRenderHandler.getActiveAnimationInstance(hand)?.cachedPose
             if (pose != null) {
                 model.applyPose(BLENDER.blend(model.getBindPose(), pose))
@@ -163,16 +197,118 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         if (transformType.firstPerson()) {
             MuzzleFlashRenderer.render(poseStack, model, stack, bufferSource)
-        }
-        if (transformType.firstPerson()) {
-            val hand = if (transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
-                InteractionHand.OFF_HAND
-            } else {
-                InteractionHand.MAIN_HAND
-            }
+
+            val hand = handForContext(transformType)
             ShellCasingFxRenderer.render(poseStack, model, stack, hand, bufferSource, packedLight)
+
+            val transforms = lastBoneTransforms.getOrPut(handForContext(transformType)) { mutableMapOf() }
+            for (boneName in listOf(FLARE_BONE, MUZZLE_FLASH_BONE)) {
+                model.getGlobalTransform(boneName)?.let { transforms[boneName] = Matrix4f(it) }
+            }
         }
         model.resetPose()
+    }
+
+    private fun spawnAndBindMuzzleParticles(
+        poseStack: PoseStack,
+        stack: ItemStack,
+        hand: InteractionHand
+    ) {
+        val basePose = capturedRenderPose[hand] ?: return
+        val boneTransforms = lastBoneTransforms[hand] ?: return
+        if (boneTransforms.isEmpty()) return
+
+        val animation = FirstPersonRenderHandler.getActiveAnimationInstance(hand) as? GeoGunAnimationInstance ?: return
+        val system = FirstPersonRenderHandler.getParticleSystem()
+        val resource = GunResource.compute(stack)
+        val newEmitters = ArrayList<ParticleEmitterInstance>()
+        val locators = muzzleEmitterLocators.getOrPut(hand) { WeakHashMap() }
+
+        for (data in animation.consumePendingParticles()) {
+            val definition = ParticleDefinitionLoader.getInstance().getDefinition(data.effect()) ?: continue
+            val emitter = system.addEmitter(definition, hand)
+            val smoke = resource.smoke
+            val shotRandom = Math.random().toFloat()
+            val sizeJitter = 1f - smoke.randomSize + shotRandom * 2f * smoke.randomSize
+            val growthJitter = 1f - smoke.randomGrowth + shotRandom * 2f * smoke.randomGrowth
+            val lifetimeJitter = 1f - smoke.randomLifetime + shotRandom * 2f * smoke.randomLifetime
+            val speedJitter = 1f - smoke.randomSpeed + shotRandom * 2f * smoke.randomSpeed
+            val countJitter = 1f - smoke.randomCount + shotRandom * 2f * smoke.randomCount
+            val opacityJitter = 1f - smoke.randomOpacity + shotRandom * 2f * smoke.randomOpacity
+
+            emitter.setVariable("smoke_size", smoke.size * sizeJitter)
+            emitter.setVariable("smoke_growth", smoke.growth * growthJitter)
+            emitter.setVariable("smoke_lifetime", smoke.lifetime * lifetimeJitter)
+            emitter.setVariable("smoke_speed", smoke.speed * speedJitter)
+            emitter.setVariable(
+                "smoke_count",
+                (smoke.count * countJitter).roundToInt().coerceAtLeast(1).toFloat()
+            )
+            emitter.setVariable("smoke_opacity", smoke.opacity * opacityJitter)
+            emitter.setVariable("smoke_drag", resource.smoke.drag)
+            val locator = resolveMuzzleLocator(data, boneTransforms)
+            if (locator == null) {
+                emitter.setRemoved(true)
+                continue
+            }
+            locators[emitter] = locator
+            newEmitters += emitter
+        }
+
+        if (locators.isEmpty()) return
+
+        val basePoseInv = Matrix4f(basePose).invert()
+        val cameraRotationInv = cameraRotationInverse()
+        val gunViewPose = poseStack.last().pose()
+
+        for ((emitter, locator) in locators) {
+            val boneTransform = boneTransforms[locator] ?: continue
+            val muzzleView = Matrix4f(gunViewPose).mul(boneTransform)
+            emitter.setEmitterTransform(
+                Matrix4f(basePoseInv).mul(muzzleView),
+                Matrix4f(cameraRotationInv).mul(muzzleView)
+            )
+        }
+
+        for (emitter in newEmitters) {
+            emitter.tick(0f)
+        }
+
+        locators.keys.removeIf { it.isFinished }
+    }
+
+    private fun resolveMuzzleLocator(
+        data: ParticleEffectData,
+        boneTransforms: Map<String, Matrix4f>
+    ): String? {
+        val locator = data.locator()
+        if (locator.isNotBlank() && boneTransforms.containsKey(locator)) {
+            return locator
+        }
+        if (boneTransforms.containsKey(FLARE_BONE)) {
+            return FLARE_BONE
+        }
+        if (boneTransforms.containsKey(MUZZLE_FLASH_BONE)) {
+            return MUZZLE_FLASH_BONE
+        }
+        return null
+    }
+
+    private fun cameraRotationInverse(): Matrix4f {
+        val camera = Minecraft.getInstance().gameRenderer.mainCamera
+        return Matrix4f()
+            .rotationX(Mth.DEG_TO_RAD * camera.xRot)
+            .rotateY(Mth.DEG_TO_RAD * (camera.yRot + 180f))
+            .rotateZ(CameraStateCache.getCameraRollRadians())
+            .invert()
+    }
+
+    private fun handForContext(transformType: ItemDisplayContext): InteractionHand {
+        return if (transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
+            InteractionHand.OFF_HAND
+        } else {
+            InteractionHand.MAIN_HAND
+        }
     }
 
     private fun applyReloadCameraShake(stack: ItemStack, model: GeoGunModel, hand: InteractionHand) {
@@ -287,6 +423,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         private const val IRON_VIEW_BONE = "iron_view"
         private const val BODY_BONE = "body"
         private const val GENERIC_GEOMETRY_BONE = "bone"
+        private const val FLARE_BONE = "flare"
+        private const val MUZZLE_FLASH_BONE = "muzzle_flash"
 
         private val BLENDER: EulerAdditiveBlender =
             SimpleEulerAdditiveBlender(ZYXBoneTransformFactory()) { ArrayPoseBuilder() }

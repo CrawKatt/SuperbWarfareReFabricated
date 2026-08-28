@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.resource.model.GunModelReloadListener
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnimationInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.animation.BedrockAnimation
+import com.github.mcmodderanchor.simplebedrockmodel.v1.common.resource.pojo.ParticleEffectData
 import com.maydaymemory.mae.basic.ArrayPoseBuilder
 import com.maydaymemory.mae.basic.DummyPose
 import com.maydaymemory.mae.basic.Pose
@@ -34,6 +35,7 @@ open class GeoGunAnimationInstance(
     private var fireSerial = 0
     private var consumedFireSerial = 0
     private val pendingShellEjects = ArrayList<Int>()
+    private val pendingParticles = ArrayList<ParticleEffectData>()
     private var cachedPose: Pose = DummyPose.INSTANCE
     private val cameraRotation = Quaternionf()
 
@@ -97,6 +99,14 @@ open class GeoGunAnimationInstance(
         return result
     }
 
+    fun consumePendingParticles(): List<ParticleEffectData> {
+        if (pendingParticles.isEmpty()) return emptyList()
+
+        val result = ArrayList(pendingParticles)
+        pendingParticles.clear()
+        return result
+    }
+
     private fun animationName(state: GunAnimationState): String? {
         val animation = GunResource.compute(stack).animation ?: return null
         return when (state) {
@@ -144,6 +154,7 @@ open class GeoGunAnimationInstance(
         if (target == null) {
             runner = null
             currentState = null
+            pendingParticles.clear()
             cachedPose = DummyPose.INSTANCE
             return
         }
@@ -161,6 +172,9 @@ open class GeoGunAnimationInstance(
             fireRunner?.tick()
         }
 
+        collectParticleEvents(runner)
+        collectParticleEvents(fireRunner)
+
         if (fireRunner?.state is StopState) {
             fireRunner = null
         }
@@ -174,6 +188,13 @@ open class GeoGunAnimationInstance(
         }
     }
 
+    private fun collectParticleEvents(animationRunner: AnimationRunner?) {
+        val particles = animationRunner?.clip<ParticleEffectData>(BedrockAnimation.PARTICLE_CHANNEL_NAME) ?: return
+        for (keyframe in particles) {
+            keyframe?.value?.let { pendingParticles += it }
+        }
+    }
+
     override fun getCameraRotation(): Quaternionf = cameraRotation
 
     override fun setCameraRotation(rotation: Quaternionf) {
@@ -183,7 +204,10 @@ open class GeoGunAnimationInstance(
     override fun updateItem(stack: ItemStack) {
         val itemChanged = this.stack.item != stack.item
         this.stack = stack
-        if (itemChanged) loadAnimations()
+        if (itemChanged) {
+            pendingParticles.clear()
+            loadAnimations()
+        }
     }
 
     override fun triggerDraw() {
@@ -199,6 +223,7 @@ open class GeoGunAnimationInstance(
         fireSerial = 0
         consumedFireSerial = 0
         pendingShellEjects.clear()
+        pendingParticles.clear()
         cachedPose = DummyPose.INSTANCE
     }
 
