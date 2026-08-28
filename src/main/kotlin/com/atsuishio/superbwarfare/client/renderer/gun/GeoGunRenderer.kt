@@ -7,8 +7,8 @@ import com.atsuishio.superbwarfare.client.renderer.setVariable
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.event.ClientEventHandler
-import com.atsuishio.superbwarfare.resource.gun.DefaultGunResource
 import com.atsuishio.superbwarfare.resource.gun.GunResource
+import com.atsuishio.superbwarfare.resource.gun.pojo.ItemDisplayInfo
 import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.atsuishio.superbwarfare.tools.mulPoseMatrix
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnimationInstance
@@ -194,7 +194,14 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 
             val sprintOffset = resource.sprintOffset
             ClientEventHandler.gunRootMoveV2(poseStack, sprintOffset.x, sprintOffset.y, sprintOffset.z, false)
-            ClientEventHandler.handleShootAnimationV2(poseStack, 1f, 1f, 1f, 1f, 1f, 1f, 0.2f, 1f)
+
+            val shootRecoil = resource.shootRecoil
+            ClientEventHandler.handleShootAnimationV2(
+                poseStack,
+                shootRecoil.offset.x, shootRecoil.offset.y, shootRecoil.offset.z,
+                shootRecoil.rotation.x, shootRecoil.rotation.y, shootRecoil.rotation.z,
+                shootRecoil.zoomRate, shootRecoil.speed
+            )
         }
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         if (transformType.firstPerson()) {
@@ -393,7 +400,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
             .scale(scale)
     }
 
-    private fun applyItemDisplayTransform(poseStack: PoseStack, display: DefaultGunResource.ItemDisplayInfo) {
+    private fun applyItemDisplayTransform(poseStack: PoseStack, display: ItemDisplayInfo) {
         val translation = display.translation
         poseStack.translate(translation[0] / 16f, translation[1] / 16f, translation[2] / 16f)
 
