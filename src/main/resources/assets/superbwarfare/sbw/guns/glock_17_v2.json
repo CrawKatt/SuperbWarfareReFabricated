@@ -14,6 +14,20 @@
     "LODModel": "superbwarfare:models/bedrock/gun_lod/glock_17_v2.geo.json"
   },
   "FlareSize": 0.3,
+  "Smoke": {
+    "Size": 0.15,
+    "Growth": 0.25,
+    "Lifetime": 0.3,
+    "Speed": 0.4,
+    "Count": 2,
+    "Opacity": 0.9,
+    "Drag": 2,
+    "RandomSize": 0.05,
+    "RandomGrowth": 0.2,
+    "RandomLifetime": 0.2,
+    "RandomSpeed": 0.2,
+    "RandomOpacity": 0.1
+  },
   "EjectShell": true,
   "ShellEject": {
     "BoneName": "shell",
