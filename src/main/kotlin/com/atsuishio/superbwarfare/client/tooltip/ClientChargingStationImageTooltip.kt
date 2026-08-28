@@ -52,7 +52,7 @@ open class ClientChargingStationImageTooltip(tooltip: GunImageComponent) : Clien
             }
 
             component.append(
-                Component.literal(" $energy/$maxEnergy FE").withStyle(ChatFormatting.GRAY)
+                Component.literal(" $energy/$maxEnergy E").withStyle(ChatFormatting.GRAY)
             )
 
             return component
