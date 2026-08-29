@@ -16,13 +16,13 @@
 					"pivot": [0, 0, 0]
 				},
 				{
-					"name": "body",
+					"name": "gun",
 					"parent": "root",
 					"pivot": [0, 0.26563, 0.22795]
 				},
 				{
 					"name": "qiangshen",
-					"parent": "body",
+					"parent": "gun",
 					"pivot": [0, 2.44868, 9.29673],
 					"cubes": [
 						{
@@ -1028,7 +1028,7 @@
 				},
 				{
 					"name": "banji",
-					"parent": "body",
+					"parent": "gun",
 					"pivot": [0, -0.4325, 0.26236],
 					"rotation": [-26.25, 0, 0],
 					"cubes": [
@@ -1097,7 +1097,7 @@
 				},
 				{
 					"name": "qiangguan",
-					"parent": "body",
+					"parent": "gun",
 					"pivot": [0, 1.56563, -0.57205],
 					"cubes": [
 						{
@@ -1157,7 +1157,7 @@
 				},
 				{
 					"name": "guan",
-					"parent": "body",
+					"parent": "gun",
 					"pivot": [0, 1.55781, -0.55955],
 					"cubes": [
 						{
@@ -1212,7 +1212,7 @@
 				},
 				{
 					"name": "huatao",
-					"parent": "body",
+					"parent": "gun",
 					"pivot": [0, 0.26563, 0.22795]
 				},
 				{
