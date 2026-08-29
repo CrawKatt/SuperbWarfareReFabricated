@@ -12,7 +12,7 @@
       "sbm:fp_emitter_local_space": {
         "position": false,
         "rotation": false,
-        "to_world": false
+        "to_world": true
       },
       "minecraft:emitter_local_space": {
         "position": false,
