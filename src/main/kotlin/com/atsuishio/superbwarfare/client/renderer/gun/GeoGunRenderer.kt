@@ -367,7 +367,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val rotationScale = (1f - 0.9f * zoomTime).coerceAtLeast(0.05f)
         val positionScale = (1f - 0.8f * zoomTime).coerceAtLeast(0.05f)
 
-        val main = model.getMainBone()
+        val main = model.getGunRootBone()
+            ?: model.getMainBone()
             ?: model.getGunBone()
             ?: model.getBone(BODY_BONE)
             ?: model.getBone(GENERIC_GEOMETRY_BONE)
