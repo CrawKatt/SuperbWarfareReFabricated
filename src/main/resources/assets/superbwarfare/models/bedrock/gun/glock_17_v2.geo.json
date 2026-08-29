@@ -16,10 +16,6 @@
 					"pivot": [0, 0, 0]
 				},
 				{
-					"name": "camera",
-					"pivot": [0.87141, 7.16276, 13.77702]
-				},
-				{
 					"name": "body",
 					"parent": "root",
 					"pivot": [0, 0.26563, 0.22795]
@@ -2406,6 +2402,10 @@
 					"pivot": [0, 2.075, 3.275]
 				},
 				{
+					"name": "camera",
+					"pivot": [2.25, 4, 12.75]
+				},
+				{
 					"name": "positioning",
 					"pivot": [0, 0, 0]
 				},
@@ -2422,7 +2422,7 @@
 				{
 					"name": "thirdperson_hand",
 					"parent": "positioning",
-					"pivot": [0, 4.225, -0.35]
+					"pivot": [0, 0.425, -0.1]
 				},
 				{
 					"name": "ground",
