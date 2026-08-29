@@ -65,6 +65,7 @@
     "MinecraftAccessor",
     "MinecraftMixin",
     "ModelBakeryMixin",
+    "MolangWorldParticleRenderTypeMixin",
     "MouseHandlerMixin",
     "MultiPlayerGameModeMixin",
     "OverlayTextureMixin",
@@ -78,4 +79,5 @@
     "defaultRequire": 1
   },
   "minVersion": "0.8"
+  }
 }

@@ -260,13 +260,15 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         stack: ItemStack,
         hand: InteractionHand
     ) {
+        val resource = GunResource.compute(stack)
+        if (!resource.hasSmoke) return
+
         val basePose = capturedRenderPose[hand] ?: return
         val boneTransforms = lastBoneTransforms[hand] ?: return
         if (boneTransforms.isEmpty()) return
 
         val animation = FirstPersonRenderHandler.getActiveAnimationInstance(hand) as? GeoGunAnimationInstance ?: return
         val system = FirstPersonRenderHandler.getParticleSystem()
-        val resource = GunResource.compute(stack)
         val newEmitters = ArrayList<ParticleEmitterInstance>()
         val locators = muzzleEmitterLocators.getOrPut(hand) { WeakHashMap() }
 
