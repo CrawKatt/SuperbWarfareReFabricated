@@ -375,11 +375,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val rotationScale = (1f - 0.9f * zoomTime).coerceAtLeast(0.05f)
         val positionScale = (1f - 0.8f * zoomTime).coerceAtLeast(0.05f)
 
-        val main = model.getGunRootBone()
-            ?: model.getMainBone()
-            ?: model.getGunBone()
-            ?: model.getBone(BODY_BONE)
-            ?: model.getBone(GENERIC_GEOMETRY_BONE)
+        val main = model.getRootBone()
         main?.let { bone ->
             val boneEuler = Vector3f(bone.rotationInEuler).mul(rotationScale)
             bone.rotation.set(Quaternionf().rotateZYX(boneEuler.z, boneEuler.y, boneEuler.x))
@@ -492,8 +488,6 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
     companion object {
         private const val IDLE_VIEW_BONE = "idle_view"
         private const val IRON_VIEW_BONE = "iron_view"
-        private const val BODY_BONE = "body"
-        private const val GENERIC_GEOMETRY_BONE = "bone"
         private const val THIRDPERSON_HAND_BONE = "thirdperson_hand"
         private const val GROUND_BONE = "ground"
         private const val FIXED_BONE = "fixed"

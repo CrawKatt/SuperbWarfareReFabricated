@@ -38,10 +38,7 @@ open class GeoGunModel @JvmOverloads constructor(
     val instance: TreeModelInstance = baseModel.createInstance()
 
     protected val rootBoneIndex: Int = baseModel.getIndex(ROOT_BONE)
-    protected val gunBoneIndex: Int = baseModel.getIndex(GUN_BONE)
     protected val cameraBoneIndex: Int = baseModel.getIndex(CAMERA_BONE)
-    protected val mainBoneIndex: Int = baseModel.getIndex(MAIN_BONE)
-    protected val moveBoneIndex: Int = baseModel.getIndex(MOVE_BONE)
     protected val leftHandBoneIndex: Int = baseModel.getIndex(LEFT_HAND_BONE)
     protected val rightHandBoneIndex: Int = baseModel.getIndex(RIGHT_HAND_BONE)
 
@@ -71,15 +68,9 @@ open class GeoGunModel @JvmOverloads constructor(
 
     fun getGlobalTransform(boneIndex: Int): Matrix4f = instance.getGlobalTransform(boneIndex)
 
-    fun getGunRootBone(): BoneState? = instance.getBone(rootBoneIndex)
-
-    fun getGunBone(): BoneState? = instance.getBone(gunBoneIndex)
+    fun getRootBone(): BoneState? = instance.getBone(rootBoneIndex)
 
     fun getCameraBone(): BoneState? = instance.getBone(cameraBoneIndex)
-
-    fun getMainBone(): BoneState? = instance.getBone(mainBoneIndex)
-
-    fun getMoveBone(): BoneState? = instance.getBone(moveBoneIndex)
 
     /**
      * Global transform for a bone in bind pose, cached by name.
@@ -246,11 +237,8 @@ open class GeoGunModel @JvmOverloads constructor(
     }
 
     companion object {
-        protected const val GUN_BONE = "gun"
         protected const val ROOT_BONE = "root"
         protected const val CAMERA_BONE = "camera"
-        protected const val MAIN_BONE = "main"
-        protected const val MOVE_BONE = "move"
         protected const val LEFT_HAND_BONE = "lefthand_pos"
         protected const val RIGHT_HAND_BONE = "righthand_pos"
 
