@@ -38,12 +38,15 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
         this.id = id
     }
 
+    @JvmField
     @SerialName("SlotIcon")
     var slotIcon: String = ""
 
+    @JvmField
     @SerialName("ItemDisplay")
     var itemDisplay: MutableMap<String, ItemDisplayInfo> = hashMapOf()
 
+    @JvmField
     @SerialName("Model")
     var modelValue: ModelResource? = ModelResource()
 
@@ -95,39 +98,51 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
     @SerialName("UseOldHandRenderer")
     var useOldHandRenderer: Boolean = false
 
+    @JvmField
     @SerialName("FlarePosition")
     var flarePosition: SerializedVec3? = null
 
+    @JvmField
     @SerialName("FlareSize")
     var flareSize: Float = 1f
 
+    @JvmField
     @SerialName("Smoke")
     var smoke: SmokeInfo = SmokeInfo()
 
+    @JvmField
     @SerialName("HideCrosshairWhenZoom")
     var hideCrosshairWhenZoom: Boolean = true
 
+    @JvmField
     @SerialName("EnergyBarColor")
     var energyBarColor: ModColor = ModColor(0x95E9FF)
 
+    @JvmField
     @SerialName("TriggerSound")
     var triggerSound: SerializedSoundEvent? = ModSounds.TRIGGER_CLICK
 
+    @JvmField
     @SerialName("DischargeSound")
     var dischargeSound: SerializedSoundEvent? = null
 
+    @JvmField
     @SerialName("EjectShell")
     var ejectShell: Boolean = false
 
+    @JvmField
     @SerialName("ShellEject")
     var shellEject: ShellEjectInfo? = null
 
+    @JvmField
     @SerialName("CanZoom")
     var canZoom: Boolean = true
 
+    @JvmField
     @SerialName("SprintOffset")
     var sprintOffset: SerializedVector3f = Vector3f(0f, 0f, 0f)
 
+    @JvmField
     @SerialName("ShootRecoil")
     var shootRecoil: ShootRecoilInfo = ShootRecoilInfo()
 
