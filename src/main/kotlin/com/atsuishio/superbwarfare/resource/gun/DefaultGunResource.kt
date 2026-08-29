@@ -1,0 +1,131 @@
+package com.atsuishio.superbwarfare.resource.gun
+
+import com.atsuishio.superbwarfare.data.IDBasedData
+import com.atsuishio.superbwarfare.data.ModColor
+import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.resource.ModelResource
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedResourceLocation
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedSoundEvent
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVec3
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedVector3f
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import org.joml.Vector3f
+
+@Serializable
+class DefaultGunResource : IDBasedData<DefaultGunResource> {
+    @Transient
+    @kotlin.jvm.Transient
+    private var id = ""
+
+    override fun getId(): String {
+        return this.id
+    }
+
+    override fun setId(id: String) {
+        this.id = id
+    }
+
+    @SerialName("SlotIcon")
+    var slotIcon: String = ""
+
+    @SerialName("ItemDisplay")
+    var itemDisplay: MutableMap<String, ItemDisplayInfo> = hashMapOf()
+
+    @SerialName("Model")
+    var modelValue: ModelResource? = ModelResource()
+
+    fun getModel(): ModelResource {
+        return if (modelValue == null) ModelResource() else modelValue!!
+    }
+
+    @JvmField
+    @SerialName("Animation")
+    var animation: GunAnimation? = GunAnimation()
+
+    @JvmField
+    @SerialName("UseOldHandRenderer")
+    var useOldHandRenderer: Boolean = false
+
+    @SerialName("FlarePosition")
+    var flarePosition: SerializedVec3? = null
+
+    @SerialName("FlareSize")
+    var flareSize: Float = 1f
+
+    @SerialName("HideCrosshairWhenZoom")
+    var hideCrosshairWhenZoom: Boolean = true
+
+    @SerialName("EnergyBarColor")
+    var energyBarColor: ModColor = ModColor(0x95E9FF)
+
+    @SerialName("TriggerSound")
+    var triggerSound: SerializedSoundEvent? = ModSounds.TRIGGER_CLICK
+
+    @SerialName("DischargeSound")
+    var dischargeSound: SerializedSoundEvent? = null
+
+    @SerialName("EjectShell")
+    var ejectShell: Boolean = false
+
+    @SerialName("ShellEject")
+    var shellEject: ShellEject? = null
+
+    @SerialName("CanZoom")
+    var canZoom: Boolean = true
+
+    @SerialName("SprintOffset")
+    var sprintOffset: SerializedVector3f = Vector3f(0f, 0f, 0f)
+
+    @Serializable
+    class ItemDisplayInfo {
+        @SerialName("translation")
+        var translation: SerializedVector3f = Vector3f(0f, 0f, 0f)
+
+        @SerialName("rotation")
+        var rotation: SerializedVector3f = Vector3f(0f, 0f, 0f)
+
+        @SerialName("scale")
+        var scale: SerializedVector3f = Vector3f(0f, 0f, 0f)
+    }
+
+    @Serializable
+    class ShellEject {
+        @JvmField
+        @SerialName("BoneName")
+        var boneName: String = "shell"
+
+        @JvmField
+        @SerialName("ShellModel")
+        var shellModel: SerializedResourceLocation? = null
+
+        @JvmField
+        @SerialName("ShellTexture")
+        var shellTexture: SerializedResourceLocation? = null
+
+        @SerialName("Size")
+        var size: Float = 1f
+
+        @SerialName("InitialVelocity")
+        var initialVelocity: SerializedVector3f = Vector3f(1.6f, 0.9f, 0.25f)
+
+        @SerialName("RandomVelocity")
+        var randomVelocity: SerializedVector3f = Vector3f(0.4f, 0.35f, 0.15f)
+
+        @SerialName("Acceleration")
+        var acceleration: SerializedVector3f = Vector3f(0f, -18f, 0f)
+
+        @SerialName("AngularVelocity")
+        var angularVelocity: SerializedVector3f = Vector3f(-1800f, -2000f, 240f)
+
+        @SerialName("RandomAngle")
+        var randomAngle: SerializedVector3f = Vector3f(0f, 0f, 0f)
+
+        @SerialName("LivingTime")
+        var livingTime: Float = 0.9f
+
+        @SerialName("MaxActive")
+        var maxActive: Int = 32
+    }
+}

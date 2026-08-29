@@ -20,6 +20,7 @@ import com.maydaymemory.mae.blend.EulerAdditiveBlender
 import com.maydaymemory.mae.blend.SimpleEulerAdditiveBlender
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
+import cn.sh1rocu.simplebedrockmodel.api.event.ViewportEvent
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.texture.OverlayTexture
@@ -30,7 +31,6 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
-import net.neoforged.neoforge.client.event.ViewportEvent
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
@@ -149,7 +149,12 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
 
         model.renderHand = transformType.firstPerson()
         if (transformType.firstPerson()) {
-            val pose = FirstPersonRenderHandler.getActiveAnimationInstance()?.cachedPose
+            val hand = if (transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
+                InteractionHand.OFF_HAND
+            } else {
+                InteractionHand.MAIN_HAND
+            }
+            val pose = FirstPersonRenderHandler.getActiveAnimationInstance(hand)?.cachedPose
             if (pose != null) {
                 model.applyPose(BLENDER.blend(model.getBindPose(), pose))
             }

@@ -32,6 +32,7 @@ import com.atsuishio.superbwarfare.item.gun.smg.Mp5Item
 import com.atsuishio.superbwarfare.item.gun.smg.VectorItem
 import com.atsuishio.superbwarfare.item.gun.sniper.*
 import com.atsuishio.superbwarfare.item.gun.special.BocekItem
+import com.atsuishio.superbwarfare.item.gun.special.Glock17V2Item
 import com.atsuishio.superbwarfare.item.gun.special.NailGunItem
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem
 import com.atsuishio.superbwarfare.item.gun.special.ReforgingItem
