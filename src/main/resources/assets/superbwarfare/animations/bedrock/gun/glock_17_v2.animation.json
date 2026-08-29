@@ -59,6 +59,26 @@
 				}
 			}
 		},
+		"animation.glock_17.hold_open": {
+			"animation_length": 0.1,
+			"bones": {
+				"guan": {
+					"rotation": [-2.5, 0, 0]
+				},
+				"huatao": {
+					"position": [0, 0, 1.75]
+				},
+				"bullet": {
+					"scale": 0
+				}
+			},
+			"particle_effects": {
+				"0.0": {
+					"effect": "superbwarfare:muzzle_smoke",
+					"locator": "flare"
+				}
+			}
+		},
 		"animation.glock_17.reload_normal": {
 			"loop": "hold_on_last_frame",
 			"animation_length": 2.25,
