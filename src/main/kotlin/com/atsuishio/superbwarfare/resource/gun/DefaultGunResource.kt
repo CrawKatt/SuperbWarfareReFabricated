@@ -111,6 +111,10 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
     var smoke: SmokeInfo = SmokeInfo()
 
     @JvmField
+    @SerialName("HasSmoke")
+    var hasSmoke: Boolean = false
+
+    @JvmField
     @SerialName("HideCrosshairWhenZoom")
     var hideCrosshairWhenZoom: Boolean = true
 

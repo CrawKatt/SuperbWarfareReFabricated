@@ -44,6 +44,7 @@
     "LivingEntityRendererMixin",
     "LocalPlayerMixin",
     "MinecraftMixin",
+    "MolangWorldParticleRenderTypeMixin",
     "MouseHandlerMixin",
     "MultiPlayerGameModeMixin",
     "OverlayTextureMixin",
