@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.client.renderer.setVariable
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.event.ClientEventHandler
+import com.atsuishio.superbwarfare.resource.ModelResource
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.resource.gun.pojo.ItemDisplayInfo
 import com.atsuishio.superbwarfare.script.GunScriptManager
@@ -128,8 +129,14 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         stack: ItemStack,
         partialTick: Float
     ) {
-        val display = GunResource.compute(stack).itemDisplay[displayKey(transformType)]
-        if (display != null && !transformType.firstPerson()) {
+        val resource = GunResource.compute(stack)
+        val modelResource = resource.getModel()
+        val boneName = positioningBone(transformType)
+        val usesModelBone = !transformType.firstPerson()
+                && boneName != null
+                && GeoGunModel.create(modelResource)?.getBindGlobalTransform(boneName) != null
+        val display = resource.itemDisplay[displayKey(transformType)]
+        if (display != null && !usesModelBone) {
             applyItemDisplayTransform(poseStack, display)
         }
         super.beforeRender(poseStack, transformType, stack, partialTick)
@@ -212,6 +219,9 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         }
         applyCustomAnimations(stack, model, transformType, partialTick)
         applyCustomAnimationsByScript(stack, model, transformType, partialTick)
+        if (!transformType.firstPerson()) {
+            applyModelBonePositioning(poseStack, model, modelResource, transformType)
+        }
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         if (transformType.firstPerson()) {
             MuzzleFlashRenderer.render(poseStack, model, stack, bufferSource)
@@ -440,6 +450,30 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         poseStack.scale(scale[0], scale[1], scale[2])
     }
 
+    open fun positioningBone(transformType: ItemDisplayContext): String? {
+        return when (transformType) {
+            ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
+            ItemDisplayContext.THIRD_PERSON_LEFT_HAND -> THIRDPERSON_HAND_BONE
+
+            ItemDisplayContext.GROUND -> GROUND_BONE
+            ItemDisplayContext.FIXED -> FIXED_BONE
+            else -> null
+        }
+    }
+
+    open fun applyModelBonePositioning(
+        poseStack: PoseStack,
+        model: GeoGunModel,
+        modelResource: ModelResource,
+        transformType: ItemDisplayContext
+    ) {
+        val boneName = positioningBone(transformType) ?: return
+        val transform = model.getBindGlobalTransform(boneName)
+            ?: GeoGunModel.create(modelResource)?.getBindGlobalTransform(boneName)
+            ?: return
+        poseStack.mulPoseMatrix(Matrix4f(transform).invert())
+    }
+
     open fun displayKey(transformType: ItemDisplayContext): String {
         return when (transformType) {
             ItemDisplayContext.FIRST_PERSON_RIGHT_HAND -> "firstperson_righthand"
@@ -459,6 +493,9 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         private const val IRON_VIEW_BONE = "iron_view"
         private const val BODY_BONE = "body"
         private const val GENERIC_GEOMETRY_BONE = "bone"
+        private const val THIRDPERSON_HAND_BONE = "thirdperson_hand"
+        private const val GROUND_BONE = "ground"
+        private const val FIXED_BONE = "fixed"
         private const val FLARE_BONE = "flare"
         private const val MUZZLE_FLASH_BONE = "muzzle_flash"
 
