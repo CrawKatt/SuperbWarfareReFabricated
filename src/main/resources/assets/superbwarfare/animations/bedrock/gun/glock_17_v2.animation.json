@@ -60,6 +60,7 @@
 			}
 		},
 		"animation.glock_17.hold_open": {
+			"loop": true,
 			"animation_length": 0.1,
 			"bones": {
 				"guan": {
@@ -70,12 +71,6 @@
 				},
 				"bullet": {
 					"scale": 0
-				}
-			},
-			"particle_effects": {
-				"0.0": {
-					"effect": "superbwarfare:muzzle_smoke",
-					"locator": "flare"
 				}
 			}
 		},
