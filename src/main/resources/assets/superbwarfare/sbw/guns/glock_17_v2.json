@@ -15,6 +15,7 @@
     "LODModel": "superbwarfare:models/bedrock/gun_lod/glock_17_v2.geo.json"
   },
   "FlareSize": 0.3,
+  "HasSmoke": true,
   "Smoke": {
     "Size": 0.15,
     "Growth": 0.25,
