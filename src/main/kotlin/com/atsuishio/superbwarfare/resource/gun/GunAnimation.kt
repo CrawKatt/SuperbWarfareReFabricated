@@ -31,12 +31,19 @@ class GunAnimation {
     @SerialName("ReloadEmpty")
     var reloadEmpty: String? = null
 
+    @JvmField
+    @SerialName("HoldOpen")
+    var holdOpen: String? = null
+
+    @JvmField
     @SerialName("Prepare")
     var prepare: String? = null
 
+    @JvmField
     @SerialName("Iterative")
     var iterative: String? = null
 
+    @JvmField
     @SerialName("Finish")
     var finish: String? = null
 
