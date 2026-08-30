@@ -87,6 +87,16 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         animateRot: Quaternionf,
         partialTicks: Float
     ) {
+        // Avoid the Euler -> Quaternion -> Euler roundtrip while idle/aiming:
+        // at +/-90 degrees pitch it remaps yaw into roll.
+        if (Mth.abs(animateRot.x()) < 1e-5f &&
+            Mth.abs(animateRot.y()) < 1e-5f &&
+            Mth.abs(animateRot.z()) < 1e-5f &&
+            Mth.abs(animateRot.w() - 1f) < 1e-5f
+        ) {
+            return
+        }
+
         val raw = YXZRotationView(
             Vector3f(
                 Mth.DEG_TO_RAD * event.pitch,
