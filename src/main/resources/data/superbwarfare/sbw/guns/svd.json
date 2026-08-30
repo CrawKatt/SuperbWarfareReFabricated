@@ -12,6 +12,7 @@
   "Magazine": 10,
   "Weight": 5,
   "DrawTime": 12,
+  "ZoomTime": 7,
   "ZoomSpreadRate": 0.005,
   "NormalReloadTime": 59,
   "EmptyReloadTime": 78,

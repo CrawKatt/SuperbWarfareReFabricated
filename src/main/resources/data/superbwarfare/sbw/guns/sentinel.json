@@ -13,6 +13,7 @@
   "BoltActionTime": 22,
   "Weight": 7,
   "DrawTime": 14,
+  "ZoomTime": 9,
   "ZoomSpreadRate": 0.005,
   "NormalReloadTime": 59,
   "EmptyReloadTime": 89,

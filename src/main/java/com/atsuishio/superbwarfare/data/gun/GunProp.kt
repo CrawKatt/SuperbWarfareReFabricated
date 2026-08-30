@@ -293,6 +293,16 @@ class GunProp<T, R>(
         @JvmField
         val DRAW_TIME = plainProp(DefaultGunData::drawTime)
 
+        /**
+         * 武器进入瞄准的时间，单位是tick
+         *
+         * 主创否定了将进入瞄准和退出瞄准时间分离的设计，现在ZOOM_OUT_TIME = ZOOM_TIME * 0.75f
+         * 这导致无法制作瞄准时间1秒，退出瞄准时间需要10秒的池沼瞄准镜
+         * 如果以后哪天要做这种功能了，记得带上这段注释来打脸
+         */
+        @JvmField
+        val ZOOM_TIME = plainProp(DefaultGunData::zoomTime)
+
         @JvmField
         val AVAILABLE_PERKS = complexProp(DefaultGunData::availablePerks) {
             val availablePerks = mutableListOf<Perk>()
@@ -442,6 +452,9 @@ class GunProp<T, R>(
             modify(BURST_AMOUNT) { it.coerceAtLeast(0) }
             modify(RPM) { it.coerceIn(1, 114514) }
             modify(UNDERWATER_MOTION_SCALE) { it.coerceIn(0.0f, 1.0f) }
+
+            modify(DRAW_TIME) { it.coerceAtLeast(1) }
+            modify(ZOOM_TIME) { it.coerceAtLeast(1) }
         }
     }
 }

@@ -9,6 +9,7 @@
   "BoltActionTime": 22,
   "Weight": 5,
   "DrawTime": 12,
+  "ZoomTime": 7,
   "ZoomSpreadRate": 0.005,
   "DefaultFireMode": "Auto",
   "GunType": "Sniper",

@@ -15,6 +15,7 @@
   "BoltActionTime": 37,
   "Weight": 13,
   "DrawTime": 21,
+  "ZoomTime": 15,
   "NormalReloadTime": 84,
   "EmptyReloadTime": 112,
   "BypassesArmor": 1,

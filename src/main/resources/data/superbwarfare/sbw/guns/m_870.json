@@ -13,6 +13,7 @@
   "ProjectileAmount": 12,
   "Weight": 4,
   "DrawTime": 11,
+  "ZoomTime": 6,
   "ReloadTypes": [
     "Iterative"
   ],
