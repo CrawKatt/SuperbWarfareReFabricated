@@ -8,6 +8,7 @@
   "Magazine": 48,
   "Weight": 6,
   "DrawTime": 13,
+  "ZoomTime": 8,
   "DefaultFireMode": "Burst",
   "BurstAmount": 4,
   "EmptyReloadTime": 56,

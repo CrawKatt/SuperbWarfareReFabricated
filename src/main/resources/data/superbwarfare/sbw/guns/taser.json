@@ -8,6 +8,7 @@
   "Magazine": 1,
   "Weight": 1,
   "DrawTime": 7,
+  "ZoomTime": 3,
   "Headshot": 0,
   "EmptyReloadTime": 58,
   "RPM": 240,

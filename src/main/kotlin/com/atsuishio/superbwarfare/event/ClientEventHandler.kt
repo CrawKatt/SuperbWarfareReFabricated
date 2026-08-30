@@ -2345,10 +2345,10 @@ object ClientEventHandler {
         val player = entity as? Player ?: return
         val stack = player.mainHandItem
         val data = GunData.from(stack)
-        val times = 5 * getDelta()
-
-        val weight = data.get(GunProp.WEIGHT)
-        val speed = 7.0 / (weight + 2)
+        val times = getDelta()
+        val duration = data.get(GunProp.ZOOM_TIME).coerceAtLeast(1)
+        val stepIn = times / duration
+        val stepOut = times / (duration * 0.75f)
         val vehicle = player.vehicle
 
         if (zoom
@@ -2359,10 +2359,10 @@ object ClientEventHandler {
             && !(data.reloading() && !data.get(GunProp.ZOOM_RELOAD))
         ) {
             if (fireCooldown <= 10) {
-                zoomTime = (zoomTime + 0.03 * speed * times).coerceIn(0.0, 1.0)
+                zoomTime = (zoomTime + stepIn).coerceIn(0.0, 1.0)
             }
         } else {
-            zoomTime = (zoomTime - 0.04 * speed * times).coerceIn(0.0, 1.0)
+            zoomTime = (zoomTime - stepOut).coerceIn(0.0, 1.0)
         }
 
         if (zoomPos > 0.8) {

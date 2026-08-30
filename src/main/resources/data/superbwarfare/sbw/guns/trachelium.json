@@ -8,6 +8,7 @@
   "Magazine": 6,
   "Weight": 2,
   "DrawTime": 9,
+  "ZoomTime": 4,
   "EmptyReloadTime": 65,
   "BypassesArmor": 0.5,
   "SoundRadius": 10,
