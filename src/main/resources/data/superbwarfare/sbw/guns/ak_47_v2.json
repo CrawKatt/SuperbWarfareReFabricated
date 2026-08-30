@@ -2,7 +2,6 @@
   "MinZoom": 1.25,
   "MaxZoom": 6,
   "Spread": 4,
-  "OpenBolt": true,
   "HasBarrelBullet": true,
   "RecoilX": 0.0018,
   "RecoilY": 0.012,
