@@ -92,8 +92,7 @@ object ModItems {
     // @formatter:off
     @JvmField val REPAIR_TOOL = registerGun("repair_tool") { RepairToolItem() }
     @JvmField val TASER = registerGun("taser") { TaserItem }
-    @JvmField val GLOCK_17 = registerGun("glock_17") { Glock17Item() }
-    @JvmField val GLOCK_17_V2 = registerGun("glock_17_v2") { Glock17V2Item }
+    @JvmField val GLOCK_17 = registerGun("glock_17") { Glock17Item }
     @JvmField val GLOCK_18 = registerGun("glock_18") { Glock18Item() }
     @JvmField val MP_443 = registerGun("mp_443") { Mp443Item() }
     @JvmField val M_1911 = registerGun("m_1911") { M1911Item() }
@@ -103,6 +102,7 @@ object ModItems {
     @JvmField val MP_5 = registerGun("mp_5") { Mp5Item() }
     @JvmField val VECTOR = registerGun("vector") { VectorItem() }
     @JvmField val AK_47 = registerGun("ak_47") { AK47Item() }
+    @JvmField val AK_47_V2 = registerGun("ak_47_v2") { AK47V2Item }
     @JvmField val AK_12 = registerGun("ak_12") { AK12Item() }
     @JvmField val SKS = registerGun("sks") { SksItem() }
     @JvmField val M_4 = registerGun("m_4") { M4Item() }
