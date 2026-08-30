@@ -140,11 +140,6 @@ public class Ql1031Item extends GunGeoItem {
     }
 
     @Override
-    public boolean hasBulletInBarrel(GunData data) {
-        return true;
-    }
-
-    @Override
     public boolean hasCustomBarrel(GunData data) {
         return true;
     }

@@ -165,16 +165,6 @@ public class Qbz191Item extends GunGeoItem {
     }
 
     @Override
-    public boolean isOpenBolt(GunData data) {
-        return true;
-    }
-
-    @Override
-    public boolean hasBulletInBarrel(GunData data) {
-        return true;
-    }
-
-    @Override
     public boolean hasCustomBarrel(GunData data) {
         return true;
     }

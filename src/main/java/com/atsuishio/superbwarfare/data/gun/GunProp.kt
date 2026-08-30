@@ -273,6 +273,12 @@ class GunProp<T, R>(
         val USE_NACELLE_CAMERA = plainProp(DefaultGunData::useNacelleCamera)
 
         @JvmField
+        val OPEN_BOLT = plainProp(DefaultGunData::openBolt)
+
+        @JvmField
+        val HAS_BARREL_BULLET = plainProp(DefaultGunData::hasBarrelBullet)
+
+        @JvmField
         val AVAILABLE_PERKS = complexProp(DefaultGunData::availablePerks) {
             val availablePerks = mutableListOf<Perk>()
             val perkNames = it.list.ifEmpty { return@complexProp availablePerks }

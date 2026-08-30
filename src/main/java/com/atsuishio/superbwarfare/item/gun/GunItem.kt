@@ -269,12 +269,12 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     /**
      * 开膛待击
      */
-    open fun isOpenBolt(data: GunData) = false
+    open fun isOpenBolt(data: GunData) = data.get(GunProp.OPEN_BOLT)
 
     /**
      * 是否允许额外往枪管里塞入一发子弹
      */
-    open fun hasBulletInBarrel(data: GunData) = false
+    open fun hasBulletInBarrel(data: GunData) = data.get(GunProp.HAS_BARREL_BULLET)
 
     /**
      * 武器是否能更换枪管配件
