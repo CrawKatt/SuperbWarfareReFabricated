@@ -7,6 +7,7 @@
   "Velocity": 38,
   "Magazine": 1,
   "Weight": 5,
+  "DrawTime": 12,
   "ZoomSpreadRate": 0.005,
   "EmptyReloadTime": 64,
   "BypassesArmor": 0.7,

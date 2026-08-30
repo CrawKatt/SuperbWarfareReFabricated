@@ -10,6 +10,7 @@
   "MeleeDuration": 2,
   "Velocity": 3,
   "Weight": 0,
+  "DrawTime": 6,
   "EmptyReloadTime": 1,
   "RPM": 300,
   "Gravity": 0,

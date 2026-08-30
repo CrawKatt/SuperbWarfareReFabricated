@@ -13,6 +13,7 @@
   "ZoomSpreadRate": 0.005,
   "BoltActionTime": 24,
   "Weight": 6,
+  "DrawTime": 13,
   "NormalReloadTime": 62,
   "EmptyReloadTime": 80,
   "BypassesArmor": 0.8,
