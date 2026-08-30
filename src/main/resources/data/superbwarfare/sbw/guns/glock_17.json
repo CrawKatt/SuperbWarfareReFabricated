@@ -1,5 +1,7 @@
 {
   "Spread": 2.5,
+  "OpenBolt": true,
+  "HasBarrelBullet": true,
   "RecoilX": 0.001,
   "RecoilY": 0.013,
   "Damage": 5.5,

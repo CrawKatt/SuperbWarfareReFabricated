@@ -194,6 +194,12 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
     @SerialName("UseNacelleCamera")
     var useNacelleCamera = false
 
+    @SerialName("OpenBolt")
+    var openBolt = false
+
+    @SerialName("HasBarrelBullet")
+    var hasBarrelBullet = false
+
     @Transient
     @kotlinx.serialization.Transient
     private var ammoConsumersCache: List<AmmoConsumer>? = null
