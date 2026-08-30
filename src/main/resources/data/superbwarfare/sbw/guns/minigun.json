@@ -6,6 +6,7 @@
   "Headshot": 2,
   "Velocity": 46,
   "Weight": 10,
+  "DrawTime": 18,
   "BypassesArmor": 0.3,
   "ZoomSpreadRate": 0.75,
   "SoundRadius": 14,

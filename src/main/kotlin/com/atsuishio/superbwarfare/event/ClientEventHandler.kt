@@ -3133,11 +3133,10 @@ object ClientEventHandler {
 
     private fun handleWeaponDraw(entity: LivingEntity) {
         val times = getDelta()
-        val stack = entity.mainHandItem
-        val data = GunData.from(stack)
-        val weight = data.get(GunProp.WEIGHT)
-        val speed = 20 / (weight + 5)
-        drawTime = (drawTime - (0.2 * speed * times * drawTime).coerceAtLeast(0.0008)).coerceAtLeast(0.0)
+        val data = GunData.from(entity.mainHandItem)
+        val duration = data.get(GunProp.DRAW_TIME).coerceAtLeast(1)
+        val decay = ln(100.0) / duration
+        drawTime = (drawTime - decay * times * drawTime).coerceAtLeast(0.0)
     }
 
     @JvmStatic
