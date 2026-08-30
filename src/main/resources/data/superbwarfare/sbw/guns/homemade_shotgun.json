@@ -1,6 +1,7 @@
 {
   "MaxDurability": 24,
   "Spread": 4,
+  "OpenBolt": true,
   "RecoilX": 0.005,
   "RecoilY": 0.026,
   "Damage": 5,

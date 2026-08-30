@@ -109,16 +109,6 @@ public class Ntw20Item extends GunGeoItem {
     }
 
     @Override
-    public boolean isOpenBolt(GunData data) {
-        return true;
-    }
-
-    @Override
-    public boolean hasBulletInBarrel(GunData data) {
-        return true;
-    }
-
-    @Override
     public boolean hasCustomMagazine(GunData data) {
         return true;
     }

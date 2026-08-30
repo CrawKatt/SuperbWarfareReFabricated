@@ -109,16 +109,6 @@ public class SentinelItem extends GunGeoItem {
     }
 
     @Override
-    public boolean isOpenBolt(GunData data) {
-        return true;
-    }
-
-    @Override
-    public boolean hasBulletInBarrel(GunData data) {
-        return true;
-    }
-
-    @Override
     public void afterShoot(@NotNull ShootParameters parameters) {
         super.afterShoot(parameters);
 

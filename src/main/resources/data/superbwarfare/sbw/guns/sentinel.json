@@ -1,6 +1,8 @@
 {
   "DefaultZoom": 3,
   "Spread": 6,
+  "OpenBolt": true,
+  "HasBarrelBullet": true,
   "RecoilX": 0.003,
   "RecoilY": 0.018,
   "MaxEnergy": 24000,

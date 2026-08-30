@@ -4,7 +4,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import com.atsuishio.superbwarfare.client.renderer.gun.DevotionItemRenderer;
-import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -24,13 +23,4 @@ public class DevotionItem extends GunGeoItem {
         return DevotionItemRenderer::new;
     }
 
-    @Override
-    public boolean isOpenBolt(GunData data) {
-        return true;
-    }
-
-    @Override
-    public boolean hasBulletInBarrel(GunData data) {
-        return true;
-    }
 }

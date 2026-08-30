@@ -28,16 +28,6 @@ public class Mp443Item extends GunGeoItem {
     }
 
     @Override
-    public boolean isOpenBolt(GunData data) {
-        return true;
-    }
-
-    @Override
-    public boolean hasBulletInBarrel(GunData data) {
-        return true;
-    }
-
-    @Override
     public void whenNoAmmo(GunData data) {
         data.holdOpen.set(true);
     }
