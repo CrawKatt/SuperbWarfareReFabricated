@@ -65,7 +65,6 @@
     "MinecraftAccessor",
     "MinecraftMixin",
     "ModelBakeryMixin",
-    "MolangWorldParticleRenderTypeMixin",
     "MouseHandlerMixin",
     "MultiPlayerGameModeMixin",
     "OverlayTextureMixin",
