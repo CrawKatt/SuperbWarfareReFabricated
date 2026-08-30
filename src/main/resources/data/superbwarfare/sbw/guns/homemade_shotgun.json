@@ -12,6 +12,7 @@
   "ProjectileAmount": 12,
   "Weight": 1,
   "DrawTime": 7,
+  "ZoomTime": 3,
   "NormalReloadTime": 66,
   "EmptyReloadTime": 83,
   "BypassesArmor": 0.01,
