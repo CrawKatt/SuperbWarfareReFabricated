@@ -150,6 +150,11 @@ class DefaultGunResource : IDBasedData<DefaultGunResource> {
     @SerialName("ShootRecoil")
     var shootRecoil: ShootRecoilInfo = ShootRecoilInfo()
 
+    // 移动时是否出现倾斜动画
+    @JvmField
+    @SerialName("MovingTilt")
+    var movingTilt: Boolean = true
+
     companion object {
         private val MARKER: Marker = MarkerManager.getMarker("GunResource")
     }
