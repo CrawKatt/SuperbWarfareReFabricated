@@ -291,6 +291,9 @@ class GunProp<T, R>(
         val HAS_BARREL_BULLET = plainProp(DefaultGunData::hasBarrelBullet)
 
         @JvmField
+        val DRAW_TIME = plainProp(DefaultGunData::drawTime)
+
+        @JvmField
         val AVAILABLE_PERKS = complexProp(DefaultGunData::availablePerks) {
             val availablePerks = mutableListOf<Perk>()
             val perkNames = it.list.ifEmpty { return@complexProp availablePerks }

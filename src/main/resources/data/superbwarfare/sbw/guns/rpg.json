@@ -11,6 +11,7 @@
   "Velocity": 4,
   "Magazine": 1,
   "Weight": 7,
+  "DrawTime": 14,
   "EmptyReloadTime": 100,
   "RPM": 120,
   "Gravity": 0.03,

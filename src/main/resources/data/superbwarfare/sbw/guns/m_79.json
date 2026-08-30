@@ -10,6 +10,7 @@
   "Velocity": 3.75,
   "Magazine": 1,
   "Weight": 4,
+  "DrawTime": 11,
   "EmptyReloadTime": 64,
   "RPM": 180,
   "GunType": "CurvedLauncher",

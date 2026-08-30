@@ -10,6 +10,7 @@
   "Velocity": 40,
   "Magazine": 55,
   "Weight": 6,
+  "DrawTime": 13,
   "DefaultFireMode": "Auto",
   "NormalReloadTime": 73,
   "EmptyReloadTime": 95,

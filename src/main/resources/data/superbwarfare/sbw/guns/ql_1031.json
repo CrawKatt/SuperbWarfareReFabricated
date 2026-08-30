@@ -9,6 +9,7 @@
   "Headshot": 2,
   "Velocity": 44,
   "Weight": 4,
+  "DrawTime": 11,
   "DefaultFireMode": "Auto",
   "BypassesArmor": 0.5,
   "SoundRadius": 8,

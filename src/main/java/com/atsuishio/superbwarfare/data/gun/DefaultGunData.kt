@@ -200,6 +200,9 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
     @SerialName("HasBarrelBullet")
     var hasBarrelBullet = false
 
+    @SerialName("DrawTime")
+    var drawTime = 7
+
     @Transient
     @kotlinx.serialization.Transient
     private var ammoConsumersCache: List<AmmoConsumer>? = null

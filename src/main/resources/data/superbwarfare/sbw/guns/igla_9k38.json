@@ -3,6 +3,7 @@
   "Spread": 5,
   "Magazine": 1,
   "Weight": 8,
+  "DrawTime": 15,
   "EmptyReloadTime": 88,
   "Damage": 260,
   "ExplosionDamage": 90,

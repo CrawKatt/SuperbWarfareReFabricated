@@ -12,6 +12,7 @@
   "ZoomSpreadRate": 0.75,
   "ProjectileAmount": 12,
   "Weight": 4,
+  "DrawTime": 11,
   "ReloadTypes": [
     "Iterative"
   ],
