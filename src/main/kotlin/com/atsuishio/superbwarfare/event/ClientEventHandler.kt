@@ -20,7 +20,6 @@ import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.gun.GunItem
-import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem
 import com.atsuishio.superbwarfare.item.misc.MonitorItem
 import com.atsuishio.superbwarfare.network.message.send.*
 import com.atsuishio.superbwarfare.perk.Perk
@@ -2161,6 +2160,7 @@ object ClientEventHandler {
         val player = entity as? Player ?: return
         val item = stack.item as? GunItem ?: return
         val data = GunData.from(stack)
+        val resource = GunResource.compute(stack)
 
         val times = 3.7f * getDelta().coerceAtMost(0.8f)
         val moveSpeed = entity.deltaMovement.horizontalDistance()
@@ -2179,7 +2179,7 @@ object ClientEventHandler {
 
         if (!isEditing) {
             moveRotZ =
-                if (!entity.isSprinting && mc.options.keyUp.isDown && firePosTimer == 0.0 && item !is SuperStarShooterItem) {
+                if (!entity.isSprinting && mc.options.keyUp.isDown && firePosTimer == 0.0 && resource.movingTilt) {
                     Mth.lerp(0.2 * times, moveRotZ, 0.14) * (1 - zoomTime)
                 } else {
                     Mth.lerp(0.2 * times, moveRotZ, 0.0) * (1 - zoomTime)

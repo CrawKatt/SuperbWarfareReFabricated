@@ -5,10 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class GunAnimation {
-    @JvmField
-    @SerialName("TransitionTickTime")
-    var transitionTickTime: Int = 1
-
     // This should NOT be null or empty!
     @JvmField
     @SerialName("Idle")
