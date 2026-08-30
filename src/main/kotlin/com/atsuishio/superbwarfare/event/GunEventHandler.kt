@@ -186,7 +186,7 @@ object GunEventHandler {
 
             if (canMagazineReload || canClipLoad) {
                 val magazine = data.get(GunProp.MAGAZINE)
-                val extra = if (data.item.isOpenBolt(data) && data.item.hasBulletInBarrel(data)) 1 else 0
+                val extra = if (data.item.hasBulletInBarrel(data)) 1 else 0
                 val maxAmmo = magazine + extra
 
                 if (data.ammo.get() < maxAmmo) {
@@ -388,7 +388,7 @@ object GunEventHandler {
 
         data.nbtVersion.invalidateStructural()
 
-        if (data.item.isOpenBolt(data)) {
+        if (data.item.hasBulletInBarrel(data)) {
             if (!data.hasEnoughAmmoToShoot(shooter)) {
                 reload.setTime(data.get(GunProp.EMPTY_RELOAD_TIME) + 1)
                 reload.setState(ReloadState.EMPTY_RELOADING)
