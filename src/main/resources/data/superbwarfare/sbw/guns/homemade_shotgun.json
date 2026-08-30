@@ -11,6 +11,7 @@
   "ZoomSpreadRate": 0.75,
   "ProjectileAmount": 12,
   "Weight": 1,
+  "DrawTime": 7,
   "NormalReloadTime": 66,
   "EmptyReloadTime": 83,
   "BypassesArmor": 0.01,
