@@ -109,6 +109,7 @@ object ModItems {
     @JvmField val MP_5 = registerGun<Mp5Item>("mp_5")
     @JvmField val VECTOR = registerGun<VectorItem>("vector")
     @JvmField val AK_47 = registerGun<AK47Item>("ak_47")
+    @JvmField val AK_47_V2 = registerGun<AK47V2Item>("ak_47_v2")
     @JvmField val AK_12 = registerGun<AK12Item>("ak_12")
     @JvmField val SKS = registerGun<SksItem>("sks")
     @JvmField val M_4 = registerGun<M4Item>("m_4")

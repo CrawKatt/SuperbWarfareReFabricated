@@ -208,6 +208,19 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
                 shootRecoil.rotation.x, shootRecoil.rotation.y, shootRecoil.rotation.z,
                 shootRecoil.zoomRate, shootRecoil.speed
             )
+
+            val zoomPivot = computeViewTransform(model)?.let {
+                val pivot = Vector3f()
+                it.getTranslation(pivot)
+                pivot
+            }
+            if (zoomPivot != null) {
+                poseStack.translate(zoomPivot.x, zoomPivot.y, zoomPivot.z)
+            }
+            poseStack.scale(1f, 1f, 1f - 0.25f * ClientEventHandler.zoomTime.toFloat())
+            if (zoomPivot != null) {
+                poseStack.translate(-zoomPivot.x, -zoomPivot.y, -zoomPivot.z)
+            }
         }
         applyCustomAnimations(stack, model, transformType, partialTick)
         applyCustomAnimationsByScript(stack, model, transformType, partialTick)
@@ -384,23 +397,22 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
     }
 
     open fun applyFirstPersonPositioningTransform(poseStack: PoseStack, model: GeoGunModel) {
-        val idleViewTransform = model.getGlobalTransform(IDLE_VIEW_BONE) ?: return
+        val viewTransform = computeViewTransform(model) ?: return
+        poseStack.mulPoseMatrix(viewTransform.invert())
+    }
+
+    open fun computeViewTransform(model: GeoGunModel): Matrix4f? {
+        val idleViewTransform = model.getGlobalTransform(IDLE_VIEW_BONE) ?: return null
         val zoom = AnimationCurves.EASE_IN_OUT_QUINT
             .apply(ClientEventHandler.zoomTime.coerceIn(0.0, 1.0))
             .toFloat()
 
-        val viewTransform = if (zoom <= 0f) {
-            Matrix4f(idleViewTransform)
-        } else {
-            val ironViewTransform = model.getGlobalTransform(IRON_VIEW_BONE)
-            if (ironViewTransform == null) {
-                Matrix4f(idleViewTransform)
-            } else {
-                blendViewTransform(Matrix4f(idleViewTransform), Matrix4f(ironViewTransform), zoom)
-            }
+        if (zoom <= 0f) {
+            return Matrix4f(idleViewTransform)
         }
-
-        poseStack.mulPoseMatrix(viewTransform.invert())
+        val ironViewTransform = model.getGlobalTransform(IRON_VIEW_BONE)
+            ?: return Matrix4f(idleViewTransform)
+        return blendViewTransform(Matrix4f(idleViewTransform), Matrix4f(ironViewTransform), zoom)
     }
 
     open fun blendViewTransform(from: Matrix4f, to: Matrix4f, t: Float): Matrix4f {
