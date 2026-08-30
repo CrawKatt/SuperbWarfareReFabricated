@@ -37,6 +37,13 @@ open class GeoGunModel @JvmOverloads constructor(
 ) {
     val instance: TreeModelInstance = baseModel.createInstance()
 
+    private val illuminatedBoneIndices: IntArray = baseModel.bones()
+        .asSequence()
+        .filter { it.name().endsWith(ILLUMINATED_SUFFIX) }
+        .map { it.index() }
+        .toList()
+        .toIntArray()
+
     protected val rootBoneIndex: Int = baseModel.getIndex(ROOT_BONE)
     protected val cameraBoneIndex: Int = baseModel.getIndex(CAMERA_BONE)
     protected val leftHandBoneIndex: Int = baseModel.getIndex(LEFT_HAND_BONE)
@@ -44,6 +51,10 @@ open class GeoGunModel @JvmOverloads constructor(
 
     protected val bindGlobalTransformCache = hashMapOf<String, Matrix4f?>()
     protected var modelCenterCache: Vector3f? = null
+
+    init {
+        markIlluminatedBones()
+    }
 
     fun getBone(boneName: String): BoneState? = instance.getBone(boneName)
 
@@ -59,6 +70,7 @@ open class GeoGunModel @JvmOverloads constructor(
 
     fun resetPose() {
         instance.resetPose()
+        markIlluminatedBones()
     }
 
     fun getGlobalTransform(boneName: String): Matrix4f? {
@@ -185,6 +197,7 @@ open class GeoGunModel @JvmOverloads constructor(
         hideBone(leftHandBoneIndex)
         hideBone(rightHandBoneIndex)
         hideShellGeometry()
+        markIlluminatedBones()
 
         baseModel.renderToBuffer(
             instance,
@@ -218,6 +231,12 @@ open class GeoGunModel @JvmOverloads constructor(
         }
     }
 
+    private fun markIlluminatedBones() {
+        for (index in illuminatedBoneIndices) {
+            instance.getBone(index)?.illuminated = true
+        }
+    }
+
     private fun renderHands(poseStack: PoseStack, packedLight: Int, bufferSource: MultiBufferSource) {
         val player = localPlayer ?: return
 
@@ -241,6 +260,8 @@ open class GeoGunModel @JvmOverloads constructor(
         protected const val CAMERA_BONE = "camera"
         protected const val LEFT_HAND_BONE = "lefthand_pos"
         protected const val RIGHT_HAND_BONE = "righthand_pos"
+
+        private const val ILLUMINATED_SUFFIX = "_illuminated"
 
         private val SHELL_GEOMETRY_PATTERN = Regex("^shells$|^shell\\d+$|^bullet_shell$", RegexOption.IGNORE_CASE)
 
