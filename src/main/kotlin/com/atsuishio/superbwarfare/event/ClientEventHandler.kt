@@ -2219,13 +2219,13 @@ object ClientEventHandler {
 
         if (!isEditing) {
             moveRotZ =
-                if (!entity.isSprinting && mc.options.keyUp.isDown() && firePosTimer == 0.0 && item !is SuperStarShooterItem) {
+                if (!entity.isSprinting && mc.options.keyUp.isDown && firePosTimer == 0.0 && item !is SuperStarShooterItem) {
                     Mth.lerp(0.2 * times, moveRotZ, 0.14) * (1 - zoomTime)
                 } else {
                     Mth.lerp(0.2 * times, moveRotZ, 0.0) * (1 - zoomTime)
                 }
 
-            if (entity.isSprinting && !data.reloading() && firePosTimer == 0.0 && !ModKeyMappings.FIRE.isDown() && noSprintTicks == 0f && zoomTime < 0.5) {
+            if (entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown && zoomTime < 0.99) {
                 sprintBasicRotX = Mth.lerp(0.3f * times / (customWeight + 4), sprintBasicRotX, 1.0).coerceIn(0.0, 1.0)
                 sprintBasicRotY = Mth.lerp(0.18f * times / (customWeight + 4), sprintBasicRotY, 1.0).coerceIn(0.0, 1.0)
                 sprintBasicRotZ = Mth.lerp(0.3f * times / (customWeight + 4), sprintBasicRotZ, 1.0).coerceIn(0.0, 1.0)
@@ -2252,7 +2252,7 @@ object ClientEventHandler {
             moveFadeTime = Mth.lerp(0.1 * times, moveFadeTime, 0.0)
         }
 
-        if (entity.isSprinting && !data.reloading() && firePosTimer == 0.0 && !ModKeyMappings.FIRE.isDown() && noSprintTicks == 0f) {
+        if (entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown && zoomTime < 0.99) {
             sprintFadeTime = if (entity.onGround()) {
                 Mth.lerp(0.08 * times, sprintFadeTime, 1.0)
             } else {
