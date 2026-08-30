@@ -11,6 +11,7 @@
   "Magazine": 100,
   "Weight": 17,
   "DrawTime": 26,
+  "ZoomTime": 19,
   "ZoomSpreadRate": 0.005,
   "DefaultFireMode": "Auto",
   "NormalReloadTime": 100,

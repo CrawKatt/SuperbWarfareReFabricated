@@ -12,6 +12,7 @@
   "ProjectileAmount": 12,
   "Weight": 7,
   "DrawTime": 14,
+  "ZoomTime": 9,
   "DefaultFireMode": "Auto",
   "NormalReloadTime": 64,
   "EmptyReloadTime": 85,

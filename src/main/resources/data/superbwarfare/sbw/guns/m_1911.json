@@ -10,6 +10,7 @@
   "Magazine": 7,
   "Weight": 2,
   "DrawTime": 9,
+  "ZoomTime": 4,
   "NormalReloadTime": 44,
   "EmptyReloadTime": 47,
   "BypassesArmor": 0.2,

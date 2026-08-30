@@ -203,6 +203,9 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
     @SerialName("DrawTime")
     var drawTime = 7
 
+    @SerialName("ZoomTime")
+    var zoomTime = 3
+
     @Transient
     @kotlinx.serialization.Transient
     private var ammoConsumersCache: List<AmmoConsumer>? = null

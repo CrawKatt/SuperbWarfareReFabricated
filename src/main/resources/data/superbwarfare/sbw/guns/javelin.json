@@ -4,6 +4,7 @@
   "Magazine": 1,
   "Weight": 10,
   "DrawTime": 18,
+  "ZoomTime": 12,
   "EmptyReloadTime": 78,
   "Damage": 650,
   "ExplosionDamage": 120,

@@ -10,6 +10,7 @@
   "Magazine": 30,
   "Weight": 3.2,
   "DrawTime": 10,
+  "ZoomTime": 5,
   "DefaultFireMode": "Auto",
   "BurstAmount": 3,
   "NormalReloadTime": 45,
