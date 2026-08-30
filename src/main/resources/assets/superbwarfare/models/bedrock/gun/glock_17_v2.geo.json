@@ -2402,12 +2402,13 @@
 					"pivot": [0, 2.075, 3.275]
 				},
 				{
-					"name": "camera",
-					"pivot": [2.25, 4, 12.75]
-				},
-				{
 					"name": "positioning",
 					"pivot": [0, 0, 0]
+				},
+				{
+					"name": "camera",
+					"parent": "positioning",
+					"pivot": [2.25, 4, 12.75]
 				},
 				{
 					"name": "idle_view",
