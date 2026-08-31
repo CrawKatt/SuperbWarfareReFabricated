@@ -10,7 +10,7 @@
   "Model": {
     "Animation": "superbwarfare:animations/bedrock/gun/ak_47_v2.animation.json",
     "Model": "superbwarfare:models/bedrock/gun/ak_47_v2.geo.json",
-    "Texture": "superbwarfare:textures/item/ak_47.png",
+    "Texture": "superbwarfare:textures/bedrock/gun/ak_47.png",
     "LODModel": "superbwarfare:models/bedrock/gun_lod/ak_47_v2.geo.json"
   },
   "FlareSize": 0.3,
