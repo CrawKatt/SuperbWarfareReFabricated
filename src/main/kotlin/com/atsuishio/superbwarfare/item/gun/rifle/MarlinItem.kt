@@ -20,5 +20,3 @@ object MarlinItem : GeoGunItemV2(Properties()) {
         })
     }
 }
-
-

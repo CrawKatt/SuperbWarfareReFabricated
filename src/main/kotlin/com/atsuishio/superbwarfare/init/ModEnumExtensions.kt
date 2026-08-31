@@ -23,6 +23,12 @@ object ModEnumExtensions {
     )
 
     @JvmField
+    val SUPERBWARFARE_BEAST: Rarity = BuiltInEnumFactories.INSTANCE.createRarity(
+        Mod.loc("superbwarfare_beast"),
+        ChatFormatting.DARK_RED
+    )
+
+    @JvmField
     val SUPERBWARFARE_VIRTUAL: Rarity = BuiltInEnumFactories.INSTANCE.createRarity(
         Mod.loc("superbwarfare_virtual"),
         ChatFormatting.WHITE
@@ -33,6 +39,9 @@ object ModEnumExtensions {
 
     @JvmStatic
     val superb: Rarity get() = SUPERBWARFARE_SUPERB
+
+    @JvmStatic
+    val beast: Rarity get() = SUPERBWARFARE_BEAST
 
     @JvmStatic
     val virtual: Rarity get() = SUPERBWARFARE_VIRTUAL

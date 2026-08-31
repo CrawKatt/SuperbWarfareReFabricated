@@ -544,6 +544,12 @@
   "des.superbwarfare.eager_edge": "After switching to this weapon, pressing the melee button immediately performs a forward dash.",
   "item.superbwarfare.adrenaline_rush": "Adrenaline Rush",
   "des.superbwarfare.adrenaline_rush": "When health is not full, increases RPM, reload, draw and aim speed based on missing health.",
+  "item.superbwarfare.quickdraw": "Quickdraw",
+  "des.superbwarfare.quickdraw": "This weapon can be drawn unbelievably fast. Reload is improved.",
+  "item.superbwarfare.snapshot_sights": "Snapshot Sights",
+  "des.superbwarfare.snapshot_sights": "Faster time to aim down sights. Stability is increased.",
+  "item.superbwarfare.triple_tap": "Triple Tap",
+  "des.superbwarfare.triple_tap": "Landing precision hits will return one round to the magazine.",
 
   "item.superbwarfare.kill_clip": "Kill Clip",
   "des.superbwarfare.kill_clip": "Increases the damage of weapon after dealing a final blow.",

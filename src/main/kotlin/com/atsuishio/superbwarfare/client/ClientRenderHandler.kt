@@ -59,6 +59,7 @@ import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.SentinelImageComponent
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModItems
+import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
 import com.atsuishio.superbwarfare.item.armor.GeHelmetM35Item
 import com.atsuishio.superbwarfare.item.armor.HandsomeGogglesItem
 import com.atsuishio.superbwarfare.item.armor.RuChest6b43Item
@@ -78,6 +79,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.LayeredDraw
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
@@ -197,7 +199,7 @@ object ClientRenderHandler {
     @JvmStatic
     fun onClientSetup() {
         val geoGunRenderer = GeoGunRenderer()
-        listOf(ModItems.TASER, ModItems.NAIL_GUN, ModItems.REFORGING, ModItems.GLOCK_17).forEach { item ->
+        BuiltInRegistries.ITEM.filterIsInstance<GeoGunItemV2>().forEach { item ->
             BuiltinItemRendererRegistry.INSTANCE.register(item, geoGunRenderer)
         }
 

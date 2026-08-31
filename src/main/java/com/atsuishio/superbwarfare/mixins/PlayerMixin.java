@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.trinket.ParachuteItem;
+import com.atsuishio.superbwarfare.item.gun.special.BeastGunTestItem;
 import com.atsuishio.superbwarfare.item.weapon.BeastItem;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -51,7 +52,7 @@ public abstract class PlayerMixin extends Entity {
         Player player = (Player) (Object) this;
         ItemStack stack = player.getMainHandItem();
 
-        if (stack.getItem() instanceof BeastItem) {
+        if (stack.getItem() instanceof BeastItem || stack.getItem() instanceof BeastGunTestItem) {
             BeastItem.onLeftClickEntity(stack, player, target);
 
             if (target instanceof Player targetPlayer
@@ -76,7 +77,7 @@ public abstract class PlayerMixin extends Entity {
         Player player = (Player) (Object) this;
         ItemStack stack = player.getMainHandItem();
 
-        if (stack.getItem() instanceof BeastItem) {
+        if (stack.getItem() instanceof BeastItem || stack.getItem() instanceof BeastGunTestItem) {
             args.set(0, (Double) args.get(0) + 3.0D);
             args.set(1, (Double) args.get(1) + 3.0D);
             args.set(2, (Double) args.get(2) + 3.0D);

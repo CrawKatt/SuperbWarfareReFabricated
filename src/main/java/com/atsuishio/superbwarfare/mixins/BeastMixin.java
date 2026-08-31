@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.mixin.BeastEntityKiller;
 import com.atsuishio.superbwarfare.item.ammo.AmmoBoxItem;
+import com.atsuishio.superbwarfare.item.gun.special.BeastGunTestItem;
 import com.atsuishio.superbwarfare.item.weapon.BeastItem;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -53,7 +54,7 @@ public abstract class BeastMixin implements BeastEntityKiller {
         LivingEntity entity = (LivingEntity) (Object) this;
         ItemStack stack = entity.getItemInHand(hand);
 
-        if (stack.getItem() instanceof BeastItem) {
+        if (stack.getItem() instanceof BeastItem || stack.getItem() instanceof BeastGunTestItem) {
             BeastItem.onEntitySwing(stack, entity, hand);
         } else if (stack.getItem() instanceof AmmoBoxItem ammoBox) {
             ammoBox.onEntitySwing(stack, entity, hand);
