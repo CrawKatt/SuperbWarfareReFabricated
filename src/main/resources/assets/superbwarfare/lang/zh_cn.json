@@ -560,6 +560,12 @@
   "des.superbwarfare.eager_edge": "切换到此武器后，立即按下近战能够向前冲刺",
   "item.superbwarfare.adrenaline_rush": "肾上腺素飙升",
   "des.superbwarfare.adrenaline_rush": "生命值未满时，按已损失生命比例提升射速、换弹、拔枪和瞄准速度",
+  "item.superbwarfare.quickdraw": "光速拔枪",
+  "des.superbwarfare.quickdraw": "此武器的切换速度快得难以置信，提高填装速度",
+  "item.superbwarfare.snapshot_sights": "速射瞄准",
+  "des.superbwarfare.snapshot_sights": "提高瞄准速度，提高稳定性",
+  "item.superbwarfare.triple_tap": "精准连击",
+  "des.superbwarfare.triple_tap": "精准命中目标会向弹匣里填装一枚弹药",
 
   "item.superbwarfare.kill_clip": "杀戮弹匣",
   "des.superbwarfare.kill_clip": "完成击杀后填装可提升武器伤害",
