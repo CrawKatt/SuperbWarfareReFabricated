@@ -21,12 +21,12 @@ function tick(perkTag, level, gunData, entity) {
 
     const maxHealth = entity.getMaxHealth()
     const health = entity.getHealth()
-    if (maxHealth <= 0 || health > maxHealth * 0.9) {
+    if (maxHealth <= 0 || health >= maxHealth) {
         setActive(perkTag, gunData, 0)
         return
     }
 
-    const lostHealth = Math.max(0, 1 - health / maxHealth)
+    const lostHealth = Math.max(0, Math.min(0.9, 1 - health / maxHealth))
     const boost = lostHealth * (0.6 + 0.02 * level)
     setActive(perkTag, gunData, boost)
 }
