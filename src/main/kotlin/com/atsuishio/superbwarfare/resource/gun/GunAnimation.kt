@@ -40,6 +40,10 @@ class GunAnimation {
     var iterative: String? = null
 
     @JvmField
+    @SerialName("Iterative2")
+    var iterative2: String? = null
+
+    @JvmField
     @SerialName("Finish")
     var finish: String? = null
 

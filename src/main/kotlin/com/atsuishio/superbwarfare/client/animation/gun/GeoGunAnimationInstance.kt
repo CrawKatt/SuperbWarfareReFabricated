@@ -16,10 +16,7 @@ import com.maydaymemory.mae.basic.Pose
 import com.maydaymemory.mae.basic.ZYXBoneTransformFactory
 import com.maydaymemory.mae.blend.EulerAdditiveBlender
 import com.maydaymemory.mae.blend.SimpleEulerAdditiveBlender
-import com.maydaymemory.mae.control.runner.AnimationContext
-import com.maydaymemory.mae.control.runner.AnimationRunner
-import com.maydaymemory.mae.control.runner.PlayingState
-import com.maydaymemory.mae.control.runner.StopState
+import com.maydaymemory.mae.control.runner.*
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
@@ -67,6 +64,20 @@ open class GeoGunAnimationInstance(
         if (animation.bolt != null && data.bolt.actionTimer.get() > 0) return GunAnimationState.BOLT
 
         if (data.reloading()) {
+            when {
+                data.reload.stage() == 1 && animation.prepare != null -> return GunAnimationState.PREPARE
+                data.reload.stage() == 2 && animation.iterative != null -> {
+                    return if (data.loadIndex.get() == 1
+                        && animation.iterative2 != null
+                        && animations.containsKey(animation.iterative2)
+                    ) {
+                        GunAnimationState.ITERATIVE_2
+                    } else {
+                        GunAnimationState.ITERATIVE
+                    }
+                }
+                data.reload.stage() == 3 && animation.finish != null -> return GunAnimationState.FINISH
+            }
             if (animation.reload != null) return GunAnimationState.RELOAD
             if (animation.reloadNormal != null && data.reload.normal()) return GunAnimationState.RELOAD_NORMAL
             if (animation.reloadEmpty != null && data.reload.empty()) return GunAnimationState.RELOAD_EMPTY
@@ -123,6 +134,10 @@ open class GeoGunAnimationInstance(
             GunAnimationState.RELOAD -> animation.reload
             GunAnimationState.RELOAD_NORMAL -> animation.reloadNormal
             GunAnimationState.RELOAD_EMPTY -> animation.reloadEmpty
+            GunAnimationState.PREPARE -> animation.prepare
+            GunAnimationState.ITERATIVE -> animation.iterative
+            GunAnimationState.ITERATIVE_2 -> animation.iterative2 ?: animation.iterative
+            GunAnimationState.FINISH -> animation.finish
             GunAnimationState.MELEE -> animation.melee
             GunAnimationState.FIRE -> animation.fire
             GunAnimationState.RUN -> animation.run
@@ -132,7 +147,11 @@ open class GeoGunAnimationInstance(
     private fun GunAnimationState.isReload(): Boolean {
         return this == GunAnimationState.RELOAD ||
                 this == GunAnimationState.RELOAD_NORMAL ||
-                this == GunAnimationState.RELOAD_EMPTY
+                this == GunAnimationState.RELOAD_EMPTY ||
+                this == GunAnimationState.PREPARE ||
+                this == GunAnimationState.ITERATIVE ||
+                this == GunAnimationState.ITERATIVE_2 ||
+                this == GunAnimationState.FINISH
     }
 
     private fun reloadTicks(state: GunAnimationState, data: GunData): Int {
@@ -143,6 +162,9 @@ open class GeoGunAnimationInstance(
                 if (data.reload.empty()) data.get(GunProp.EMPTY_RELOAD_TIME)
                 else data.get(GunProp.NORMAL_RELOAD_TIME)
 
+            GunAnimationState.PREPARE -> data.get(GunProp.PREPARE_TIME)
+            GunAnimationState.ITERATIVE, GunAnimationState.ITERATIVE_2 -> data.get(GunProp.ITERATIVE_TIME)
+            GunAnimationState.FINISH -> data.get(GunProp.FINISH_TIME)
             else -> 0
         }
         if (rawTicks <= 0) return 0
@@ -164,12 +186,20 @@ open class GeoGunAnimationInstance(
         }
     }
 
+    private fun setAnimationSpeed(state: IAnimationState?, speed: Float) {
+        when (state) {
+            is PlayingState -> state.speed = speed
+            is LoopingState -> state.speed = speed
+            else -> {}
+        }
+    }
+
     private fun play(state: GunAnimationState) {
         val name = animationName(state) ?: return
         val animation = animations[name] ?: return
         val playState = state.playType.state()
-        if (playState is PlayingState && state.isReload()) {
-            playState.speed = reloadPlaybackSpeed(state, animation)
+        if (state.isReload()) {
+            setAnimationSpeed(playState, reloadPlaybackSpeed(state, animation))
         }
         val newRunner = AnimationRunner(animation, AnimationContext(animation.specifiedEndTimeS))
         newRunner.state = playState
@@ -237,9 +267,8 @@ open class GeoGunAnimationInstance(
         // Keep the reload animation aligned if perks change the reload prop mid-reload.
         if (currentState != null && currentState!!.isReload()) {
             val runnerAnimation = runner?.animation as? BedrockAnimation
-            val playState = runner?.state as? PlayingState
-            if (runnerAnimation != null && playState != null) {
-                playState.speed = reloadPlaybackSpeed(currentState!!, runnerAnimation)
+            if (runnerAnimation != null) {
+                setAnimationSpeed(runner?.state, reloadPlaybackSpeed(currentState!!, runnerAnimation))
             }
         }
 
