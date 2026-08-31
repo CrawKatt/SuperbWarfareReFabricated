@@ -125,7 +125,7 @@
 			},
 			"sound_effects": {
 				"0.0": {
-					"effect": "marlin_end"
+					"effect": "superbwarfare:marlin_end"
 				}
 			}
 		},
