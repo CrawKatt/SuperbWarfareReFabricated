@@ -42,6 +42,7 @@ import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModDatapackRegistries
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModGameRules
+import com.atsuishio.superbwarfare.init.ModAttachments
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModLootModifier
 import com.atsuishio.superbwarfare.init.ModMenuTypes
@@ -155,6 +156,7 @@ class Mod : ModInitializer {
         ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.COMMON, CommonConfig.init())
         ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.SERVER, ServerConfig.init())
 
+        ModAttachments.init()
         ModItems.init()
         ModItems.registerDispenserBehavior()
 

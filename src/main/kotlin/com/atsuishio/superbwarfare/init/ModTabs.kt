@@ -50,6 +50,17 @@ object ModTabs {
     }
 
     @JvmField
+    val ATTACHMENT_TAB: CreativeModeTab = Registration.creativeTab("attachment") {
+        FabricItemGroup.builder()
+            .title(Component.translatable("item_group.superbwarfare.attachment"))
+            .icon { ItemStack(ModAttachments.OEM_STOCK_STANDARD) }
+            .displayItems { _, output ->
+                ModAttachments.ITEMS.forEach(output::accept)
+            }
+            .build()
+    }
+
+    @JvmField
     val PERK_TAB: CreativeModeTab = Registration.creativeTab("perk") {
         FabricItemGroup.builder()
             .title(Component.translatable("item_group.superbwarfare.perk"))

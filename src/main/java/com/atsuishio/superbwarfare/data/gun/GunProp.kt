@@ -181,6 +181,12 @@ class GunProp<T, R>(
         val DEFAULT_ZOOM = plainProp(DefaultGunData::defaultZoom)
 
         @JvmField
+        val MIN_ZOOM = plainProp(DefaultGunData::minZoom)
+
+        @JvmField
+        val MAX_ZOOM = plainProp(DefaultGunData::maxZoom)
+
+        @JvmField
         val BOUND_BONES = plainProp(DefaultGunData::boundBones)
 
         @JvmField
