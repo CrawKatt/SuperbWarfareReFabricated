@@ -4,11 +4,11 @@
 		"animation.ak_47.idle": {
 			"animation_length": 0.1,
 			"bones": {
-				"Lefthand": {
+				"lefthand": {
 					"rotation": [90.4533, -389.73135, -129.57361],
 					"position": [7.4, -17.45, -9.75]
 				},
-				"Righthand": {
+				"righthand": {
 					"rotation": [100.03742, 4.92385, -179.12962],
 					"position": [-7.05, -19.2, 1.9]
 				}
@@ -99,11 +99,11 @@
 						}
 					}
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": [90.4533, -389.73135, -129.57361],
 					"position": [7.4, -17.7, -8.75]
 				},
-				"Righthand": {
+				"righthand": {
 					"rotation": [100.03742, 4.92385, -179.12962],
 					"position": [-7.3, -19.45, 1.4]
 				}
@@ -498,7 +498,7 @@
 						}
 					}
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": {
 						"0.0": [90.4533, -389.73135, -129.57361],
 						"0.1": [90.4533, -389.73135, -129.57361],
@@ -519,14 +519,14 @@
 						"1.85": [7.4, -17.45, -9.75]
 					}
 				},
-				"Righthand": {
+				"righthand": {
 					"rotation": [100.03742, 4.92385, -179.12962],
 					"position": [-7.05, -19.2, 1.9]
 				}
 			},
 			"sound_effects": {
 				"0.4167": {
-					"effect": "superbwarfare:ak_47_reload_normal_drum"
+					"effect": "superbwarfare:ak_47_mag_out"
 				},
 				"1.1833": {
 					"effect": "superbwarfare:ak_47_mag_in"
@@ -981,7 +981,7 @@
 						"2.4333": [0, 0, 0]
 					}
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": {
 						"0.0": [90.4533, -389.73135, -129.57361],
 						"0.1": [90.4533, -389.73135, -129.57361],
@@ -1019,14 +1019,14 @@
 						"2.8167": [7.4, -17.45, -9.75]
 					}
 				},
-				"Righthand": {
+				"righthand": {
 					"rotation": [100.03742, 4.92385, -179.12962],
 					"position": [-7.05, -19.2, 1.9]
 				}
 			},
 			"sound_effects": {
 				"0.4167": {
-					"effect": "superbwarfare:ak_47_reload_normal_drum"
+					"effect": "superbwarfare:ak_47_mag_out"
 				},
 				"1.1833": {
 					"effect": "superbwarfare:ak_47_mag_in"
@@ -1289,7 +1289,7 @@
 						"1.5": [0, 0, 0]
 					}
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": {
 						"0.1167": [0, 0, 0],
 						"0.3333": [24.37037, 15.9389, -21.54738],
@@ -1439,7 +1439,7 @@
 						"1.55": [0, 0, 0]
 					}
 				},
-				"Righthand": {
+				"righthand": {
 					"position": {
 						"0.1": [0, 0, 0],
 						"0.2": [-0.75, 0, 0],
@@ -1450,7 +1450,7 @@
 			},
 			"sound_effects": {
 				"0.0": {
-					"effect": "superbwarfare:ak_47_reload_normal_drum"
+					"effect": "superbwarfare:ak_47_mag_out"
 				}
 			}
 		},
@@ -1763,7 +1763,7 @@
 						"1.5": [0, 0, 0]
 					}
 				},
-				"Righthand": {
+				"righthand": {
 					"rotation": {
 						"1.9333": [0, 0, 0],
 						"2.0167": [-0.42998, -8.83789, -8.81644],
@@ -1789,7 +1789,7 @@
 						"2.7167": [0, 0, 0]
 					}
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": {
 						"0.1167": [0, 0, 0],
 						"0.3333": [24.37037, 15.9389, -21.54738],
@@ -1950,14 +1950,14 @@
 			},
 			"sound_effects": {
 				"0.0": {
-					"effect": "superbwarfare:ak_47_reload_normal_drum"
+					"effect": "superbwarfare:ak_47_mag_out"
 				}
 			}
 		},
 		"animation.ak_47.idle_grip": {
 			"animation_length": 7.2667,
 			"bones": {
-				"Lefthand": {
+				"lefthand": {
 					"rotation": [-3.66253, 12.91538, 13.30298],
 					"position": [-0.3, -0.8, -2.7]
 				}
@@ -2216,7 +2216,7 @@
 						"1.5": [0, 0, 0]
 					}
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": {
 						"0.1167": [-3.66253, 12.91538, 13.30298],
 						"0.3333": [50.29539, 45.73453, -56.50534],
@@ -2366,7 +2366,7 @@
 						"1.55": [0, 0, 0]
 					}
 				},
-				"Righthand": {
+				"righthand": {
 					"position": {
 						"0.1": [0, 0, 0],
 						"0.2": [-0.75, 0, 0],
@@ -2377,7 +2377,7 @@
 			},
 			"sound_effects": {
 				"0.0": {
-					"effect": "superbwarfare:ak_47_reload_normal_drum"
+					"effect": "superbwarfare:ak_47_mag_out"
 				}
 			}
 		},
@@ -2634,7 +2634,7 @@
 						"1.5": [0, 0, 0]
 					}
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": {
 						"0.1167": [-3.66253, 12.91538, 13.30298],
 						"0.3333": [24.37037, 15.9389, -21.54738],
@@ -2784,7 +2784,7 @@
 						"1.55": [0, 0, 0]
 					}
 				},
-				"Righthand": {
+				"righthand": {
 					"position": {
 						"0.1": [0, 0, 0],
 						"0.2": [-0.75, 0, 0],
@@ -2795,7 +2795,7 @@
 			},
 			"sound_effects": {
 				"0.0": {
-					"effect": "superbwarfare:ak_47_reload_normal_drum"
+					"effect": "superbwarfare:ak_47_mag_out"
 				}
 			}
 		},
@@ -3104,7 +3104,7 @@
 						"1.5": [0, 0, 0]
 					}
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": {
 						"0.1167": [-3.66253, 12.91538, 13.30298],
 						"0.3333": [50.29539, 45.73453, -56.50534],
@@ -3276,7 +3276,7 @@
 						"1.55": [0, 0, 0]
 					}
 				},
-				"Righthand": {
+				"righthand": {
 					"position": {
 						"0.1": [0, 0, 0],
 						"0.2": [-0.75, 0, 0],
@@ -3287,7 +3287,7 @@
 			},
 			"sound_effects": {
 				"0.0": {
-					"effect": "superbwarfare:ak_47_reload_normal_drum"
+					"effect": "superbwarfare:ak_47_mag_out"
 				}
 			}
 		},
@@ -3600,7 +3600,7 @@
 						"1.5": [0, 0, 0]
 					}
 				},
-				"Righthand": {
+				"righthand": {
 					"rotation": {
 						"1.9333": [0, 0, 0],
 						"2.0167": [-0.42998, -8.83789, -8.81644],
@@ -3626,7 +3626,7 @@
 						"2.7167": [0, 0, 0]
 					}
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": {
 						"0.1167": [-3.66253, 12.91538, 13.30298],
 						"0.3333": [24.37037, 15.9389, -21.54738],
@@ -3786,7 +3786,7 @@
 			},
 			"sound_effects": {
 				"0.0": {
-					"effect": "superbwarfare:ak_47_reload_normal_drum"
+					"effect": "superbwarfare:ak_47_mag_out"
 				}
 			}
 		}

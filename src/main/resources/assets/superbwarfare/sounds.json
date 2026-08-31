@@ -15,10 +15,18 @@
       }
     ]
   },
-  "taser_reload_empty": {
+  "taser_head_out": {
     "sounds": [
       {
-        "name": "superbwarfare:gun/taser/taser_reload_empty",
+        "name": "superbwarfare:gun/taser/taser_head_out",
+        "stream": false
+      }
+    ]
+  },
+  "taser_head_in": {
+    "sounds": [
+      {
+        "name": "superbwarfare:gun/taser/taser_head_in",
         "stream": false
       }
     ]
