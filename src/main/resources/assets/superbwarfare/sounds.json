@@ -351,18 +351,26 @@
       }
     ]
   },
-  "ak_47_reload_normal": {
+  "ak_47_mag_in": {
     "sounds": [
       {
-        "name": "superbwarfare:gun/ak_47/ak_47_reload_normal",
+        "name": "superbwarfare:gun/ak_47/ak_47_mag_in",
         "stream": false
       }
     ]
   },
-  "ak_47_reload_empty": {
+  "ak_47_mag_out": {
     "sounds": [
       {
-        "name": "superbwarfare:gun/ak_47/ak_47_reload_empty",
+        "name": "superbwarfare:gun/ak_47/ak_47_mag_out",
+        "stream": false
+      }
+    ]
+  },
+  "ak_47_bolt": {
+    "sounds": [
+      {
+        "name": "superbwarfare:gun/ak_47/ak_47_bolt",
         "stream": false
       }
     ]
