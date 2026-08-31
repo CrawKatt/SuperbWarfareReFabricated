@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.client.animation.gun
 
 import com.atsuishio.superbwarfare.client.animation.AnimationPlayType
 import com.atsuishio.superbwarfare.data.gun.GunData
+import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.resource.model.GunModelReloadListener
@@ -17,6 +18,7 @@ import com.maydaymemory.mae.blend.EulerAdditiveBlender
 import com.maydaymemory.mae.blend.SimpleEulerAdditiveBlender
 import com.maydaymemory.mae.control.runner.AnimationContext
 import com.maydaymemory.mae.control.runner.AnimationRunner
+import com.maydaymemory.mae.control.runner.PlayingState
 import com.maydaymemory.mae.control.runner.StopState
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
@@ -124,11 +126,50 @@ open class GeoGunAnimationInstance(
         }
     }
 
+    private fun GunAnimationState.isReload(): Boolean {
+        return this == GunAnimationState.RELOAD ||
+                this == GunAnimationState.RELOAD_NORMAL ||
+                this == GunAnimationState.RELOAD_EMPTY
+    }
+
+    private fun reloadTicks(state: GunAnimationState, data: GunData): Int {
+        val rawTicks = when (state) {
+            GunAnimationState.RELOAD_NORMAL -> data.get(GunProp.NORMAL_RELOAD_TIME)
+            GunAnimationState.RELOAD_EMPTY -> data.get(GunProp.EMPTY_RELOAD_TIME)
+            GunAnimationState.RELOAD ->
+                if (data.reload.empty()) data.get(GunProp.EMPTY_RELOAD_TIME)
+                else data.get(GunProp.NORMAL_RELOAD_TIME)
+
+            else -> 0
+        }
+        if (rawTicks <= 0) return 0
+
+        // GunEventHandler starts at NORMAL/EMPTY + 1 when a barrel bullet exists,
+        // and at EMPTY + 2 without one, so the final gameplay window is one tick shorter
+        // when the weapon has a barrel bullet.
+        val correctedTicks = rawTicks - if (data.item.hasBulletInBarrel(data)) 1 else 0
+        return correctedTicks.coerceAtLeast(1)
+    }
+
+    private fun reloadPlaybackSpeed(state: GunAnimationState, animation: BedrockAnimation): Float {
+        // MAE advances states by real time; scale it so the animation matches the gameplay reload window.
+        val targetSeconds = reloadTicks(state, GunData.from(stack)) / 20.0f
+        return if (animation.specifiedEndTimeS > 0f && targetSeconds > 0f) {
+            animation.specifiedEndTimeS / targetSeconds
+        } else {
+            1f
+        }
+    }
+
     private fun play(state: GunAnimationState) {
         val name = animationName(state) ?: return
         val animation = animations[name] ?: return
+        val playState = state.playType.state()
+        if (playState is PlayingState && state.isReload()) {
+            playState.speed = reloadPlaybackSpeed(state, animation)
+        }
         val newRunner = AnimationRunner(animation, AnimationContext(animation.specifiedEndTimeS))
-        newRunner.state = state.playType.state()
+        newRunner.state = playState
         runner = newRunner
         currentState = state
         cachedPose = newRunner.evaluate()
@@ -189,6 +230,14 @@ open class GeoGunAnimationInstance(
             play(target)
         } else {
             runner?.tick()
+        }
+        // Keep the reload animation aligned if perks change the reload prop mid-reload.
+        if (currentState != null && currentState!!.isReload()) {
+            val runnerAnimation = runner?.animation as? BedrockAnimation
+            val playState = runner?.state as? PlayingState
+            if (runnerAnimation != null && playState != null) {
+                playState.speed = reloadPlaybackSpeed(currentState!!, runnerAnimation)
+            }
         }
 
         if (fireSerial > consumedFireSerial) {
