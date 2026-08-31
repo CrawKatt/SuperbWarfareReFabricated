@@ -53,6 +53,15 @@
     "!superbwarfare:longer_wire",
     "!superbwarfare:cupid_arrow"
   ],
+  "AvailableAttachments": {
+    "Scope": [
+      "superbwarfare:iron_sight",
+      "superbwarfare:acog_4x"
+    ],
+    "Magazine": [
+      "superbwarfare:extended_mag"
+    ]
+  },
   "SoundInfo": {
     "Fire1P": "superbwarfare:ak_47_fire_1p",
     "Fire3P": "superbwarfare:ak_47_fire_3p",

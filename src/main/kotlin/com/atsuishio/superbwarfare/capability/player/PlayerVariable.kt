@@ -27,7 +27,6 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
 
     fun sync(entity: Entity) {
         val newVariable = getOrDefault(entity)
-
         if (old != null && old == newVariable) return
 
         if (entity is ServerPlayer) {

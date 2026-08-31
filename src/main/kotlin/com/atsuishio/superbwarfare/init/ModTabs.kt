@@ -57,6 +57,18 @@ object ModTabs {
     )
 
     @JvmField
+    val ATTACHMENT_TAB: CreativeModeTab = register(
+        "attachment",
+        FabricItemGroup.builder()
+            .title(Component.translatable("item_group.superbwarfare.attachment"))
+            .icon { ItemStack(ModItems.OEM_STOCK_STANDARD) }
+            .displayItems { _, output ->
+                ModItems.ATTACHMENTS.forEach(output::accept)
+            }
+            .build()
+    )
+
+    @JvmField
     val PERK_TAB: CreativeModeTab = register(
         "perk",
         FabricItemGroup.builder()
@@ -160,7 +172,7 @@ object ModTabs {
 
     @JvmStatic
     fun init() {
-        listOf("vehicle", "block", "item", "ammo", "perk", "guns").forEach { name ->
+        listOf("attachment", "guns", "perk", "ammo", "item", "block", "vehicle").forEach { name ->
             Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Mod.loc(name), tabs.getValue(name))
         }
 

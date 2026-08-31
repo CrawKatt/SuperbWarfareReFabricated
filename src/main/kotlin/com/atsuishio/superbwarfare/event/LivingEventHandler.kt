@@ -103,7 +103,6 @@ object LivingEventHandler {
         renderDamageIndicator(entity, source, damage)
         damage = reduceDamage(entity, source, damage)
         giveExpToWeapon(entity, source, damage)
-        handleGunLevels(entity, source, damage)
         return damage
     }
 
@@ -219,40 +218,9 @@ object LivingEventHandler {
         val data = GunData.from(stack)
         val expAmount = (0.5f * amount).coerceAtMost(entity.maxHealth)
 
-        // 先处理发射器类武器或高爆弹的爆炸伤害
-        if (source.`is`(ModDamageTypes.PROJECTILE_EXPLOSION)) {
-            if (data.get(GunProp.EXPLOSION_DAMAGE) > 0 || GunData.from(stack).perk.getLevel(ModPerks.HE_BULLET) > 0) {
-                data.exp.set(data.exp.get() + expAmount)
-            }
-        }
-
-        // 再判断是不是枪械能造成的伤害
         if (!isGunDamage(source) && !source.`is`(DamageTypes.PLAYER_ATTACK)) return
 
-        data.exp.set(data.exp.get() + expAmount)
-        data.save()
-    }
-
-    private fun giveKillExpToWeapon(entity: LivingEntity, source: DamageSource) {
-        val sourceEntity = source.entity as? LivingEntity ?: return
-        val stack = sourceEntity.mainHandItem
-        if (stack.item !is GunItem) return
-        if (entity.type.`is`(ModTags.EntityTypes.NO_EXPERIENCE)) return
-
-        val data = GunData.from(stack)
-        val amount = (20 + 2 * entity.maxHealth).toDouble()
-
-        // 先处理发射器类武器或高爆弹的爆炸伤害
-        if (source.`is`(ModDamageTypes.PROJECTILE_EXPLOSION)) {
-            if (data.get(GunProp.EXPLOSION_DAMAGE) > 0 || GunData.from(stack).perk.getLevel(ModPerks.HE_BULLET) > 0) {
-                data.exp.add(amount)
-            }
-        }
-
-        // 再判断是不是枪械能造成的伤害
-        if (isGunDamage(source) || source.`is`(DamageTypes.PLAYER_ATTACK)) {
-            data.exp.add(amount)
-        }
+        data.exp.add(expAmount.toDouble())
 
         // 提升武器等级
         var level = data.level.get()
@@ -269,13 +237,21 @@ object LivingEventHandler {
         data.save()
     }
 
-    private fun handleGunLevels(entity: LivingEntity, source: DamageSource, amount: Float) {
+    private fun giveKillExpToWeapon(entity: LivingEntity, source: DamageSource) {
         val sourceEntity = source.entity as? LivingEntity ?: return
         val stack = sourceEntity.mainHandItem
         if (stack.item !is GunItem) return
         if (entity.type.`is`(ModTags.EntityTypes.NO_EXPERIENCE)) return
 
         val data = GunData.from(stack)
+        val amount = (20 + 2 * entity.maxHealth).toDouble()
+
+        // 判断是不是枪械能造成的伤害
+        if (isGunDamage(source) || source.`is`(DamageTypes.PLAYER_ATTACK)) {
+            data.exp.add(amount)
+        }
+
+        // 提升武器等级
         var level = data.level.get()
         var exp = data.exp.get()
         var upgradeExpNeeded = 20 * level.toDouble().pow(2.0) + 160 * level + 20

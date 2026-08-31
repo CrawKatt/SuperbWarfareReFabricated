@@ -109,7 +109,6 @@ open class AmmoBoxItem : Item(Properties().stacksTo(1)) {
                     type.add(stack, -countToStore)
                 }
             }
-
             cap.sync(player)
 
             level.playSound(

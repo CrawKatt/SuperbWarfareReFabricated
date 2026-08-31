@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.entity.projectile.MediumRocketEntity
 import com.atsuishio.superbwarfare.item.*
 import com.atsuishio.superbwarfare.item.ammo.*
 import com.atsuishio.superbwarfare.item.armor.*
+import com.atsuishio.superbwarfare.item.attachment.AttachmentItem
 import com.atsuishio.superbwarfare.item.blockitem.BlueprintResearchTableBlockItem
 import com.atsuishio.superbwarfare.item.blockitem.ChargingStationBlockItem
 import com.atsuishio.superbwarfare.item.blockitem.CreativeChargingStationBlockItem
@@ -70,6 +71,7 @@ object ModItems {
     val ITEMS = mutableListOf<Item>()
     val BLOCKS = mutableListOf<Item>()
     val PERKS = mutableListOf<Item>()
+    val ATTACHMENTS = mutableListOf<Item>()
 
     private fun <T : Item> register(id: String, item: T): T {
         val registered = Registry.register(BuiltInRegistries.ITEM, Mod.loc(id), item)
@@ -224,7 +226,20 @@ object ModItems {
         return registered
     }
 
+    private fun <T : Item> registerAttachment(id: String, item: () -> T): T {
+        val registered = register(id, item())
+        ATTACHMENTS.add(registered)
+        return registered
+    }
+
     private fun registerBlueprint(id: String, rarity: Rarity) = registerItem(id) { BlueprintItem(rarity) }
+
+    @JvmField val OEM_STOCK_STANDARD = registerAttachment("oem_stock_standard") {
+        AttachmentItem("${Mod.MODID}:oem_stock_standard")
+    }
+    @JvmField val MAGAZINE_STANDARD = registerAttachment("magazine_standard") {
+        AttachmentItem("${Mod.MODID}:magazine_standard")
+    }
 
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {

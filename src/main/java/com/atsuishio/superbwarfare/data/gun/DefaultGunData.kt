@@ -332,6 +332,9 @@ class DefaultGunData : IDBasedData<DefaultGunData> {
         return availablePerks.list
     }
 
+    @SerialName("AvailableAttachments")
+    var availableAttachments: Map<String, List<String>> = emptyMap()
+
     @ServerOnly
     @SerialName("DamageReduce")
     var damageReduce: DamageReduce = DamageReduce()
