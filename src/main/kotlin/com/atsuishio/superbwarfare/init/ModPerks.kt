@@ -95,6 +95,7 @@ object ModPerks {
     lateinit var POWERFUL_COOLER: PERK
     lateinit var CAST_NO_SHADOWS: PERK
     lateinit var EAGER_EDGE: PERK
+    lateinit var ADRENALINE_RUSH: PERK
     // @formatter:on
 
     /**
@@ -232,6 +233,9 @@ object ModPerks {
             autoRegistryObjects["cast_no_shadows"] ?: registerFuncPerk("cast_no_shadows") { CastNoShadows }
         EAGER_EDGE = autoRegistryObjects["eager_edge"] ?: registerFuncPerk("eager_edge") {
             EmptyPerk("eager_edge", Perk.Type.FUNCTIONAL)
+        }
+        ADRENALINE_RUSH = autoRegistryObjects["adrenaline_rush"] ?: registerFuncPerk("adrenaline_rush") {
+            EmptyPerk("adrenaline_rush", Perk.Type.FUNCTIONAL)
         }
 
         // Damage Perks
