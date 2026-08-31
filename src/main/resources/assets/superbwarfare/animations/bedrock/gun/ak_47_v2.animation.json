@@ -525,8 +525,11 @@
 				}
 			},
 			"sound_effects": {
-				"0.0": {
+				"0.4167": {
 					"effect": "ak_47_reload_normal_drum"
+				},
+				"1.1833": {
+					"effect": "ak_47_mag_in"
 				}
 			}
 		},
@@ -1022,8 +1025,14 @@
 				}
 			},
 			"sound_effects": {
-				"0.0": {
+				"0.4167": {
 					"effect": "ak_47_reload_normal_drum"
+				},
+				"1.1833": {
+					"effect": "ak_47_mag_in"
+				},
+				"2.25": {
+					"effect": "ak_47_bolt"
 				}
 			}
 		},
