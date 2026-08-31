@@ -541,6 +541,8 @@
   "des.superbwarfare.cast_no_shadows": "造成近战伤害会从备弹中填装部分弹药并治疗自身",
   "item.superbwarfare.eager_edge": "急切刀锋",
   "des.superbwarfare.eager_edge": "切换到此武器后，立即按下近战能够向前冲刺",
+  "item.superbwarfare.adrenaline_rush": "肾上腺素飙升",
+  "des.superbwarfare.adrenaline_rush": "生命值较低时，按已损失生命比例提升射速、换弹、拔枪和瞄准速度",
 
   "item.superbwarfare.kill_clip": "杀戮弹匣",
   "des.superbwarfare.kill_clip": "完成击杀后填装可提升武器伤害",
