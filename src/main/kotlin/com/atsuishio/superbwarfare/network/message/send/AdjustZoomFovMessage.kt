@@ -1,6 +1,8 @@
 package com.atsuishio.superbwarfare.network.message.send
 
+import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.gun.toGunData
+import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.network.PayloadContext
@@ -41,13 +43,21 @@ data class AdjustZoomFovMessage(val scroll: Double) : ServerPacketPayload() {
                 SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV.get(), 1f, 0.7f)
             }
         } else {
-            val minZoom = gun.minZoom() - 1.25
-            val maxZoom = gun.maxZoom() - 1.25
-            val customZoom = data.getDouble("CustomZoom")
-            data.putDouble("CustomZoom", Mth.clamp(customZoom + 0.5 * scroll, minZoom, maxZoom))
+            val scopeZoom = gun.attachment.id(AttachmentType.SCOPE)
+                ?.let { CustomData.ATTACHMENTS[it.toString()] }
+                ?.zoom
 
-            if (customZoom > minZoom && customZoom < maxZoom) {
-                SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV.get(), 1f, 0.7f)
+            if (scopeZoom != null) {
+                gun.attachment.cycleZoom(AttachmentType.SCOPE, scroll)
+            } else {
+                val minZoom = gun.minZoom() - 1.25
+                val maxZoom = gun.maxZoom() - 1.25
+                val customZoom = data.getDouble("CustomZoom")
+                data.putDouble("CustomZoom", Mth.clamp(customZoom + 0.5 * scroll, minZoom, maxZoom))
+
+                if (customZoom > minZoom && customZoom < maxZoom) {
+                    SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV.get(), 1f, 0.7f)
+                }
             }
         }
 

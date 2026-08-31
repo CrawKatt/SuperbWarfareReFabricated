@@ -55,6 +55,18 @@ object ModTabs {
     }
 
     @JvmField
+    val ATTACHMENT_TAB: RegistryObject<CreativeModeTab> = TABS.register("attachment") {
+        CreativeModeTab.builder()
+            .title(Component.translatable("item_group.superbwarfare.attachment"))
+            .icon { ItemStack(ModAttachments.OEM_STOCK_STANDARD.get()) }
+            .withTabsBefore(GUN_TAB.getKey())
+            .displayItems { param: CreativeModeTab.ItemDisplayParameters, output: CreativeModeTab.Output ->
+                ModAttachments.REGISTRY.getEntries().forEach { output.accept(it.get()) }
+            }
+            .build()
+    }
+
+    @JvmField
     val PERK_TAB: RegistryObject<CreativeModeTab> = TABS.register("perk") {
         CreativeModeTab.builder()
             .title(Component.translatable("item_group.superbwarfare.perk"))
