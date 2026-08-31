@@ -61,6 +61,19 @@ object ModTabs {
                 .build()
         })
 
+    @JvmField
+    val ATTACHMENT_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = TABS.register("attachment"
+    , Supplier {
+        builder()
+            .title(Component.translatable("item_group.superbwarfare.attachment"))
+            .icon { ItemStack(ModAttachments.OEM_STOCK_STANDARD.get()) }
+            .withTabsBefore(GUN_TAB.getKey())
+            .displayItems { param: ItemDisplayParameters, output: Output ->
+                ModAttachments.REGISTRY.getEntries().forEach { output.accept(it.get()) }
+            }
+            .build()
+    })
+
     @JvmStatic
     val PERK_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> = TABS.register(
         "perk",

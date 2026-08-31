@@ -4,7 +4,7 @@ import com.atsuishio.superbwarfare.api.event.ReloadEvent
 import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.gun.value.ReloadState
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
-import com.atsuishio.superbwarfare.init.ModAttachments
+import com.atsuishio.superbwarfare.init.ModDataAttachments
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.tools.InventoryTool
@@ -272,12 +272,12 @@ object GunEventHandler {
             val count = ammoCount - magazine - (if (hasBulletInBarrel) 1 else 0)
 
             if (shooter is Player) {
-                val capability = shooter.getData(ModAttachments.PLAYER_VARIABLE).watch()
+                val capability = shooter.getData(ModDataAttachments.PLAYER_VARIABLE).watch()
                 if (data.selectedAmmoConsumer().type == AmmoConsumer.AmmoConsumeType.PLAYER_AMMO) {
                     val ammoType = data.selectedAmmoConsumer().playerAmmoType
                     ammoType?.add(capability, count)
                 }
-                shooter.setData(ModAttachments.PLAYER_VARIABLE, capability)
+                shooter.setData(ModDataAttachments.PLAYER_VARIABLE, capability)
                 capability.sync(shooter)
             }
 
@@ -586,8 +586,8 @@ object GunEventHandler {
 
         if (!InventoryTool.hasCreativeAmmoBox(shooter)) {
             if (shooter != null) {
-                val cap = shooter.getData(ModAttachments.PLAYER_VARIABLE)
-                shooter.setData(ModAttachments.PLAYER_VARIABLE, cap)
+                val cap = shooter.getData(ModDataAttachments.PLAYER_VARIABLE)
+                shooter.setData(ModDataAttachments.PLAYER_VARIABLE, cap)
             }
             data.consumeBackupAmmo(shooter, available)
         }
