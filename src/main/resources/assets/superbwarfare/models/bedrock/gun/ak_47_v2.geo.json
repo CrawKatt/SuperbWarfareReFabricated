@@ -16,13 +16,13 @@
 					"pivot": [0, 0, 0]
 				},
 				{
-					"name": "HandGuard",
+					"name": "handguard",
 					"parent": "root",
 					"pivot": [-0.72036, 0, 0]
 				},
 				{
 					"name": "oem_hand_guard",
-					"parent": "HandGuard",
+					"parent": "handguard",
 					"pivot": [-0.88051, -0.09343, 3.42279],
 					"cubes": [
 						{
@@ -690,7 +690,7 @@
 				},
 				{
 					"name": "custom_hand_guard",
-					"parent": "HandGuard",
+					"parent": "handguard",
 					"pivot": [-0.88051, -0.09343, 3.42279],
 					"cubes": [
 						{
@@ -4071,13 +4071,13 @@
 					]
 				},
 				{
-					"name": "Stock",
+					"name": "stock",
 					"parent": "root",
 					"pivot": [-0.81553, 0.20336, 2.22369]
 				},
 				{
 					"name": "oem_stock_standard",
-					"parent": "Stock",
+					"parent": "stock",
 					"pivot": [-0.81553, 0.20336, 2.22369],
 					"cubes": [
 						{
@@ -4251,7 +4251,7 @@
 				},
 				{
 					"name": "oem_stock_light",
-					"parent": "Stock",
+					"parent": "stock",
 					"pivot": [-0.01223, 3.05045, -4.67943]
 				},
 				{
@@ -4719,7 +4719,7 @@
 				},
 				{
 					"name": "oem_stock_heavy",
-					"parent": "Stock",
+					"parent": "stock",
 					"pivot": [0.00058, 0.86511, 11.72054],
 					"cubes": [
 						{
@@ -5094,7 +5094,7 @@
 				},
 				{
 					"name": "custom_stock_adapter",
-					"parent": "Stock",
+					"parent": "stock",
 					"pivot": [0, 2.612, 9]
 				},
 				{
@@ -5598,13 +5598,13 @@
 					"pivot": [0, -2.00576, -3.93118]
 				},
 				{
-					"name": "Lefthand",
+					"name": "lefthand",
 					"parent": "magazine",
 					"pivot": [-6.01875, 18, 0]
 				},
 				{
 					"name": "lefthand_pos",
-					"parent": "Lefthand",
+					"parent": "lefthand",
 					"pivot": [-0.01875, 7, 0],
 					"cubes": [
 						{
@@ -6301,13 +6301,13 @@
 					]
 				},
 				{
-					"name": "magazine_extand",
+					"name": "magazine_extend",
 					"parent": "magazine",
 					"pivot": [0, -2.00576, -3.93118]
 				},
 				{
 					"name": "bone27",
-					"parent": "magazine_extand",
+					"parent": "magazine_extend",
 					"pivot": [-0.72036, 0, 0],
 					"cubes": [
 						{
@@ -6374,7 +6374,7 @@
 				},
 				{
 					"name": "bone34",
-					"parent": "magazine_extand",
+					"parent": "magazine_extend",
 					"pivot": [-0.34962, -8.10716, -3.08492],
 					"cubes": [
 						{
@@ -6417,7 +6417,7 @@
 				},
 				{
 					"name": "bone35",
-					"parent": "magazine_extand",
+					"parent": "magazine_extend",
 					"pivot": [0.79101, -3.62111, -8.16075],
 					"cubes": [
 						{
@@ -6448,7 +6448,7 @@
 				},
 				{
 					"name": "bone44",
-					"parent": "magazine_extand",
+					"parent": "magazine_extend",
 					"pivot": [0, -3.61923, -13.76244],
 					"rotation": [-22.5, 0, 0],
 					"cubes": [
@@ -6862,7 +6862,7 @@
 				},
 				{
 					"name": "bone45",
-					"parent": "magazine_extand",
+					"parent": "magazine_extend",
 					"pivot": [0, -0.01446, -2.42966],
 					"cubes": [
 						{
@@ -6953,7 +6953,7 @@
 				},
 				{
 					"name": "bone46",
-					"parent": "magazine_extand",
+					"parent": "magazine_extend",
 					"pivot": [0, -0.13348, -2.56351],
 					"rotation": [-11.25, 0, 0],
 					"cubes": [
@@ -7045,7 +7045,7 @@
 				},
 				{
 					"name": "bone47",
-					"parent": "magazine_extand",
+					"parent": "magazine_extend",
 					"pivot": [0, -2.13005, -3.39052],
 					"rotation": [-22.5, 0, 0],
 					"cubes": [
@@ -7136,7 +7136,7 @@
 					]
 				},
 				{
-					"name": "magazine_extand_pro",
+					"name": "magazine_extend_pro",
 					"parent": "magazine",
 					"pivot": [0, -2.00056, -3.94646],
 					"cubes": [
@@ -7172,7 +7172,7 @@
 				},
 				{
 					"name": "bone55",
-					"parent": "magazine_extand_pro",
+					"parent": "magazine_extend_pro",
 					"pivot": [0.79101, -3.90925, -8.30483],
 					"cubes": [
 						{
@@ -7205,7 +7205,7 @@
 				},
 				{
 					"name": "bone56",
-					"parent": "magazine_extand_pro",
+					"parent": "magazine_extend_pro",
 					"pivot": [-0.72036, -0.59767, -0.30164],
 					"rotation": [-9, 0, 0]
 				},
@@ -11176,13 +11176,13 @@
 					"pivot": [0, 4.79038, -1.04452]
 				},
 				{
-					"name": "Righthand",
+					"name": "righthand",
 					"parent": "root",
 					"pivot": [5.98125, 18, 0]
 				},
 				{
 					"name": "righthand_pos",
-					"parent": "Righthand",
+					"parent": "righthand",
 					"pivot": [-0.01875, 7, 0],
 					"cubes": [
 						{
