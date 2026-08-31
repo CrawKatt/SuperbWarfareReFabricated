@@ -111,7 +111,7 @@ object GunEventHandler {
      * 完成换弹过程，装填弹药
      */
     private fun finishReload(shooter: Entity?, data: GunData) {
-        if (data.item.isOpenBolt(data)) {
+        if (data.item.hasBulletInBarrel(data)) {
             if (!data.hasEnoughAmmoToShoot(shooter)) {
                 finishGunEmptyReload(shooter, data)
             } else {
