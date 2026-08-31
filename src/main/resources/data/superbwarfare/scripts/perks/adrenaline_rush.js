@@ -27,14 +27,14 @@ function tick(perkTag, level, gunData, entity) {
     }
 
     const lostHealth = Math.max(0, Math.min(0.9, 1 - health / maxHealth))
-    const boost = lostHealth * (0.6 + 0.02 * level)
+    const boost = lostHealth * (0.4 + 0.03 * level)
     setActive(perkTag, gunData, boost)
 }
 
-function reduceTime(pmc, key, factor) {
+function scaleDurationBySpeed(pmc, key, speedFactor) {
     const current = pmc.get(key)
     if (current > 0) {
-        pmc.set(key, Math.max(1, Math.round(current / factor)))
+        pmc.set(key, Math.max(1, Math.round(current / speedFactor)))
     }
 }
 
@@ -44,10 +44,10 @@ function modifyProperty(pmc, level, perkTag, gunData) {
     const boost = perkTag.getDouble("AdrenalineRushBoost")
     if (boost <= 0) return
 
-    const factor = 1 + boost
-    pmc.mul("RPM", factor)
+    const speedFactor = 1 + boost
+    pmc.mul("RPM", speedFactor)
 
-    const reloadTimes = [
+    const reloadDurations = [
         "NormalReloadTime",
         "EmptyReloadTime",
         "PrepareTime",
@@ -58,9 +58,9 @@ function modifyProperty(pmc, level, perkTag, gunData) {
         "IterativeAmmoLoadTime",
         "FinishTime"
     ]
-    for (let i = 0; i < reloadTimes.length; i++) {
-        reduceTime(pmc, reloadTimes[i], factor)
+    for (let i = 0; i < reloadDurations.length; i++) {
+        scaleDurationBySpeed(pmc, reloadDurations[i], speedFactor)
     }
-    reduceTime(pmc, "DrawTime", factor)
-    reduceTime(pmc, "ZoomTime", factor)
+    scaleDurationBySpeed(pmc, "DrawTime", speedFactor)
+    scaleDurationBySpeed(pmc, "ZoomTime", speedFactor)
 }
