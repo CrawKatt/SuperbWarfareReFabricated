@@ -18,6 +18,12 @@ object ModAttachments {
     @JvmField
     val MAGAZINE_STANDARD: RegistryObject<Item> = register("magazine_standard")
 
+    @JvmField
+    val MAGAZINE_EXTEND: RegistryObject<Item> = register("magazine_extend")
+
+    @JvmField
+    val MAGAZINE_EXTEND_PRO: RegistryObject<Item> = register("magazine_extend_pro")
+
     private fun register(id: String): RegistryObject<Item> {
         return REGISTRY.register(id) { AttachmentItem("${Mod.MODID}:$id") }
     }
