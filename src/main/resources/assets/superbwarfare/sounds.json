@@ -1447,18 +1447,26 @@
       }
     ]
   },
-  "glock_17_reload_normal": {
+  "glock_17_mag_in": {
     "sounds": [
       {
-        "name": "superbwarfare:gun/glock_17/glock_17_reload_normal",
+        "name": "superbwarfare:gun/glock_17/glock_17_mag_in",
         "stream": false
       }
     ]
   },
-  "glock_17_reload_empty": {
+  "glock_17_mag_out": {
     "sounds": [
       {
-        "name": "superbwarfare:gun/glock_17/glock_17_reload_empty",
+        "name": "superbwarfare:gun/glock_17/glock_17_mag_out",
+        "stream": false
+      }
+    ]
+  },
+  "glock_17_slide": {
+    "sounds": [
+      {
+        "name": "superbwarfare:gun/glock_17/glock_17_slide",
         "stream": false
       }
     ]
