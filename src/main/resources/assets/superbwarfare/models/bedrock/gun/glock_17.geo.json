@@ -2216,7 +2216,7 @@
 					]
 				},
 				{
-					"name": "mag",
+					"name": "magazine_standard",
 					"parent": "magazine",
 					"pivot": [0.24823, -6.38367, 0.94374],
 					"cubes": [
@@ -2334,13 +2334,13 @@
 					]
 				},
 				{
-					"name": "Lefthand",
+					"name": "lefthand",
 					"parent": "magazine",
 					"pivot": [-6.01875, 18, 0]
 				},
 				{
 					"name": "lefthand_pos",
-					"parent": "Lefthand",
+					"parent": "lefthand",
 					"pivot": [-0.01875, 7, 0],
 					"cubes": [
 						{
@@ -2358,13 +2358,13 @@
 					]
 				},
 				{
-					"name": "Righthand",
+					"name": "righthand",
 					"parent": "root",
 					"pivot": [5.98125, 18, 0]
 				},
 				{
 					"name": "righthand_pos",
-					"parent": "Righthand",
+					"parent": "righthand",
 					"pivot": [-0.01875, 7, 0],
 					"cubes": [
 						{
