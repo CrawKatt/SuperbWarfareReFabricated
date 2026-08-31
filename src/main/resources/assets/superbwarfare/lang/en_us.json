@@ -557,6 +557,8 @@
   "des.superbwarfare.cast_no_shadows": "Dealing melee damage loads a certain amount of ammo from reserves and heals you.",
   "item.superbwarfare.eager_edge": "Eager Edge",
   "des.superbwarfare.eager_edge": "After switching to this weapon, pressing the melee button immediately performs a forward dash.",
+  "item.superbwarfare.adrenaline_rush": "Adrenaline Rush",
+  "des.superbwarfare.adrenaline_rush": "When health is low, increases RPM, reload, draw and aim speed based on lost health.",
 
   "item.superbwarfare.kill_clip": "Kill Clip",
   "des.superbwarfare.kill_clip": "Increases the damage of weapon after dealing a final blow.",
