@@ -56,6 +56,10 @@ class GunDataProxy(private val data: GunData) {
     // ── Zoom / Aiming ──
     fun isZooming(): Boolean = data.zooming.get()
 
+    fun invalidateProperties() {
+        data.nbtVersion.invalidateStructural()
+    }
+
     // ── Energy (for Regeneration) ──
     fun getMaxEnergyStored(): Int {
         val cap = ModCapabilities.ENERGY_ITEM.find(data.stack, null) ?: return 0
