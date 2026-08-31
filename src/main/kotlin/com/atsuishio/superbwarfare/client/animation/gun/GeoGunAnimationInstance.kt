@@ -20,6 +20,9 @@ import com.maydaymemory.mae.control.runner.AnimationContext
 import com.maydaymemory.mae.control.runner.AnimationRunner
 import com.maydaymemory.mae.control.runner.PlayingState
 import com.maydaymemory.mae.control.runner.StopState
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundSource
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
@@ -252,6 +255,9 @@ open class GeoGunAnimationInstance(
 
         collectParticleEvents(runner)
         collectParticleEvents(fireRunner)
+        collectSoundEvents(runner)
+        collectSoundEvents(fireRunner)
+        collectSoundEvents(holdOpenRunner)
 
         if (fireRunner?.state is StopState) {
             fireRunner = null
@@ -274,6 +280,23 @@ open class GeoGunAnimationInstance(
         val particles = animationRunner?.clip<ParticleEffectData>(BedrockAnimation.PARTICLE_CHANNEL_NAME) ?: return
         for (keyframe in particles) {
             keyframe?.value?.let { pendingParticles += it }
+        }
+    }
+
+    private fun collectSoundEvents(animationRunner: AnimationRunner?) {
+        val sounds = animationRunner?.clip<ResourceLocation>(BedrockAnimation.SOUND_CHANNEL_NAME) ?: return
+        val player = localPlayer ?: return
+        for (keyframe in sounds) {
+            val soundLocation = keyframe.value ?: continue
+            val soundEvent = SoundEvent.createVariableRangeEvent(soundLocation)
+            player.level().playSound(
+                player,
+                player.blockPosition(),
+                soundEvent,
+                SoundSource.PLAYERS,
+                1.0f,
+                1.0f
+            )
         }
     }
 
