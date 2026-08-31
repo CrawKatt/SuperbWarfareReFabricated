@@ -44,6 +44,12 @@ open class GeoGunModel @JvmOverloads constructor(
         .toList()
         .toIntArray()
 
+    private val magazineBones: Map<String, Int> = mapOf(
+        MAGAZINE_STANDARD_BONE to baseModel.getIndex(MAGAZINE_STANDARD_BONE),
+        MAGAZINE_EXTEND_BONE to baseModel.getIndex(MAGAZINE_EXTEND_BONE),
+        MAGAZINE_EXTEND_PRO_BONE to baseModel.getIndex(MAGAZINE_EXTEND_PRO_BONE)
+    ).filterValues { it >= 0 }
+
     protected val rootBoneIndex: Int = baseModel.getIndex(ROOT_BONE)
     protected val cameraBoneIndex: Int = baseModel.getIndex(CAMERA_BONE)
     protected val leftHandBoneIndex: Int = baseModel.getIndex(LEFT_HAND_BONE)
@@ -83,6 +89,15 @@ open class GeoGunModel @JvmOverloads constructor(
     fun getRootBone(): BoneState? = instance.getBone(rootBoneIndex)
 
     fun getCameraBone(): BoneState? = instance.getBone(cameraBoneIndex)
+
+    fun showMagazineBone(visibleBoneName: String) {
+        val visibleIndex = magazineBones[visibleBoneName]
+            ?: magazineBones[MAGAZINE_STANDARD_BONE]
+            ?: return
+        for ((_, index) in magazineBones) {
+            instance.getBone(index)?.visible = index == visibleIndex
+        }
+    }
 
     /**
      * Global transform for a bone in bind pose, cached by name.
@@ -262,6 +277,17 @@ open class GeoGunModel @JvmOverloads constructor(
         protected const val RIGHT_HAND_BONE = "righthand_pos"
 
         private const val ILLUMINATED_SUFFIX = "_illuminated"
+
+        const val MAGAZINE_STANDARD_BONE = "magazine_standard"
+        const val MAGAZINE_EXTEND_BONE = "magazine_extend"
+        const val MAGAZINE_EXTEND_PRO_BONE = "magazine_extend_pro"
+
+        @JvmField
+        val MAGAZINE_BONE_NAMES: Set<String> = setOf(
+            MAGAZINE_STANDARD_BONE,
+            MAGAZINE_EXTEND_BONE,
+            MAGAZINE_EXTEND_PRO_BONE
+        )
 
         private val SHELL_GEOMETRY_PATTERN = Regex("^shells$|^shell\\d+$|^bullet_shell$", RegexOption.IGNORE_CASE)
 

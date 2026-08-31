@@ -240,6 +240,12 @@ object ModItems {
     @JvmField val MAGAZINE_STANDARD = registerAttachment("magazine_standard") {
         AttachmentItem("${Mod.MODID}:magazine_standard")
     }
+    @JvmField val MAGAZINE_EXTEND = registerAttachment("magazine_extend") {
+        AttachmentItem("${Mod.MODID}:magazine_extend")
+    }
+    @JvmField val MAGAZINE_EXTEND_PRO = registerAttachment("magazine_extend_pro") {
+        AttachmentItem("${Mod.MODID}:magazine_extend_pro")
+    }
 
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
