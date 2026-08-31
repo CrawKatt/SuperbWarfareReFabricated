@@ -211,8 +211,8 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_api_version")}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("fabric_kotlin_version")}")
 
-    // Built from Sh1roCu/SimpleBedrockModel-Fabric@926992e (the upstream JitPack build is broken).
-    include(modImplementation(":simplebedrockmodel-fabric:2.5.1+mc1.20.1-sbw1")!!)
+    // Built from Sh1roCu/SimpleBedrockModel-Fabric@7d1d412 (the upstream JitPack build is broken).
+    include(modImplementation(":simplebedrockmodel-fabric:2.5.6+mc1.20.1")!!)
 
     modRuntimeOnly("maven.modrinth:touhoulittlemaid-orihime:0.6.2-forge1.5.0")
     modRuntimeOnly("io.github.fabricators_of_create.Porting-Lib:base:2.3.8+1.20.1")
