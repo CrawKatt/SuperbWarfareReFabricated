@@ -56,7 +56,6 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         gunItem(ModItems.M_1911)
         gunItem(ModItems.M_870)
         gunItem(ModItems.M_98B)
-        gunItem(ModItems.MARLIN)
         gunItem(ModItems.MINIGUN)
         gunItem(ModItems.MK_14)
         gunItem(ModItems.MOSIN_NAGANT)
