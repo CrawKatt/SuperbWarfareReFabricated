@@ -685,13 +685,13 @@
 					]
 				},
 				{
-					"name": "Righthand",
+					"name": "righthand",
 					"parent": "root",
 					"pivot": [5.98125, 19, 0]
 				},
 				{
 					"name": "righthand_pos",
-					"parent": "Righthand",
+					"parent": "righthand",
 					"pivot": [-0.01875, 8, 0],
 					"cubes": [
 						{
@@ -709,13 +709,13 @@
 					]
 				},
 				{
-					"name": "Lefthand",
+					"name": "lefthand",
 					"parent": "root",
 					"pivot": [-6.01875, 19, 0]
 				},
 				{
 					"name": "lefthand_pos",
-					"parent": "Lefthand",
+					"parent": "lefthand",
 					"pivot": [-0.01875, 8, 0],
 					"cubes": [
 						{

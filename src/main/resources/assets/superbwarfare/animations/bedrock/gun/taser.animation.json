@@ -5,11 +5,11 @@
 			"loop": true,
 			"animation_length": 0.1,
 			"bones": {
-				"Righthand": {
+				"righthand": {
 					"rotation": [-83.42, 173.71, 3.34],
 					"position": [-7.24, -20.58, 1.1]
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": [-77.29, -168.44, -0.67],
 					"position": [7.16, -21.5, -0.42]
 				}
@@ -176,11 +176,11 @@
 						"2.0833": [0, 0, 0]
 					}
 				},
-				"Righthand": {
+				"righthand": {
 					"rotation": [-83.42, 173.71, 3.34],
 					"position": [-7.24, -20.58, 1.1]
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": {
 						"0.0": [-77.29, -168.44, -0.67],
 						"0.3333": [-72.29, -168.44, -0.67],
@@ -268,8 +268,11 @@
 				}
 			},
 			"sound_effects": {
-				"0.0": {
-					"effect": "taserreload"
+				"0.2083": {
+					"effect": "superbwarfare:taser_head_out"
+				},
+				"2.0417": {
+					"effect": "superbwarfare:taser_head_in"
 				}
 			}
 		}
