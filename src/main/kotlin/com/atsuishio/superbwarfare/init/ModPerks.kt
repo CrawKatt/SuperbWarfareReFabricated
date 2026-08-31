@@ -127,6 +127,15 @@ object ModPerks {
     @JvmField val ADRENALINE_RUSH = autoRegistryObjects["adrenaline_rush"] ?: registerFuncPerk("adrenaline_rush") {
         EmptyPerk("adrenaline_rush", Perk.Type.FUNCTIONAL)
     }
+    @JvmField val QUICKDRAW = autoRegistryObjects["quickdraw"] ?: registerFuncPerk("quickdraw") {
+        EmptyPerk("quickdraw", Perk.Type.FUNCTIONAL)
+    }
+    @JvmField val SNAPSHOT_SIGHTS = autoRegistryObjects["snapshot_sights"] ?: registerFuncPerk("snapshot_sights") {
+        EmptyPerk("snapshot_sights", Perk.Type.FUNCTIONAL)
+    }
+    @JvmField val TRIPLE_TAP = autoRegistryObjects["triple_tap"] ?: registerFuncPerk("triple_tap") {
+        EmptyPerk("triple_tap", Perk.Type.FUNCTIONAL)
+    }
     // @formatter:on
 
     private fun registerDamagePerk(id: String, perk: () -> Perk): Perk {
