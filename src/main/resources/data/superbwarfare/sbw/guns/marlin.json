@@ -54,15 +54,6 @@
     "Fire1P": "superbwarfare:marlin_fire_1p",
     "Fire3P": "superbwarfare:marlin_fire_3p",
     "Fire3PFar": "superbwarfare:marlin_far",
-    "Fire3PVeryFar": "superbwarfare:marlin_veryfar",
-    "ReloadPrepare": "superbwarfare:marlin_prepare",
-    "ReloadLoop": "superbwarfare:marlin_loop",
-    "ReloadEnd": "superbwarfare:marlin_bolt",
-    "Bolt": "superbwarfare:marlin_bolt",
-    "CancellableSounds": [
-      "superbwarfare:marlin_prepare",
-      "superbwarfare:marlin_loop",
-      "superbwarfare:marlin_bolt"
-    ]
+    "Fire3PVeryFar": "superbwarfare:marlin_veryfar"
   }
 }

@@ -1,7 +1,0 @@
-{
-  "parent": "superbwarfare:item/marlin_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/marlin_icon"
-  }
-}
