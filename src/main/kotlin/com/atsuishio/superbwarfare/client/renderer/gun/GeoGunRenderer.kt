@@ -5,7 +5,9 @@ import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance
 import com.atsuishio.superbwarfare.client.model.gun.GeoGunModel
 import com.atsuishio.superbwarfare.client.renderer.setVariable
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
+import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.gun.GunData
+import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.resource.ModelResource
 import com.atsuishio.superbwarfare.resource.gun.GunResource
@@ -239,6 +241,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         if (!transformType.firstPerson()) {
             applyModelBonePositioning(poseStack, model, modelResource, transformType)
         }
+        renderAttachments(stack, model, transformType)
         model.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         if (transformType.firstPerson()) {
             MuzzleFlashRenderer.render(poseStack, model, stack, bufferSource)
@@ -252,6 +255,26 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
             }
         }
         model.resetPose()
+    }
+
+    open fun renderAttachments(
+        stack: ItemStack,
+        model: GeoGunModel,
+        transformType: ItemDisplayContext
+    ) {
+        renderMagazine(stack, model)
+    }
+
+    protected open fun renderMagazine(stack: ItemStack, model: GeoGunModel) {
+        model.showMagazineBone(resolveMagazineBone(stack))
+    }
+
+    private fun resolveMagazineBone(stack: ItemStack): String {
+        val installedBone = GunData.from(stack)
+            .attachment.id(AttachmentType.MAGAZINE)
+            ?.let { CustomData.ATTACHMENTS[it.toString()]?.bone }
+        return installedBone?.takeIf { it in GeoGunModel.MAGAZINE_BONE_NAMES }
+            ?: GeoGunModel.MAGAZINE_STANDARD_BONE
     }
 
     open fun applyCustomAnimations(

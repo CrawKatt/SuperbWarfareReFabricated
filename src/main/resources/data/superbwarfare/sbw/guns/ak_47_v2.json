@@ -59,7 +59,8 @@
       "superbwarfare:acog_4x"
     ],
     "Magazine": [
-      "superbwarfare:extended_mag"
+      "superbwarfare:magazine_extend",
+      "superbwarfare:magazine_extend_pro"
     ]
   },
   "SoundInfo": {

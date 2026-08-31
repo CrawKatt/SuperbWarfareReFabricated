@@ -1,0 +1,16 @@
+{
+  "Slot": "Magazine",
+  "Bone": "magazine_extend",
+  "Modifiers": [
+    {
+      "Prop": "Magazine",
+      "Op": "Add",
+      "Value": 15
+    },
+    {
+      "Prop": "Weight",
+      "Op": "Add",
+      "Value": 1.0
+    }
+  ]
+}

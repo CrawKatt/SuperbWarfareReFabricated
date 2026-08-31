@@ -19,6 +19,12 @@ object ModAttachments {
     @JvmField
     val MAGAZINE_STANDARD: DeferredHolder<Item, out Item> = register("magazine_standard")
 
+    @JvmField
+    val MAGAZINE_EXTEND: DeferredHolder<Item, out Item> = register("magazine_extend")
+
+    @JvmField
+    val MAGAZINE_EXTEND_PRO: DeferredHolder<Item, out Item> = register("magazine_extend_pro")
+
     private fun register(id: String): DeferredHolder<Item, out Item> {
         return REGISTRY.register(id, Supplier { AttachmentItem("${Mod.MODID}:$id") })
     }
