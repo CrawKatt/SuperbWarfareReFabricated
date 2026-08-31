@@ -393,16 +393,16 @@ object GunEventHandler {
 
         if (data.item.hasBulletInBarrel(data)) {
             if (!data.hasEnoughAmmoToShoot(shooter)) {
-                reload.setTime(data.get(GunProp.EMPTY_RELOAD_TIME) + 1)
+                reload.setTime(data.get(GunProp.EMPTY_RELOAD_TIME))
                 reload.setState(ReloadState.EMPTY_RELOADING)
                 playGunEmptyReloadSounds(shooter, data)
             } else {
-                reload.setTime(data.get(GunProp.NORMAL_RELOAD_TIME) + 1)
+                reload.setTime(data.get(GunProp.NORMAL_RELOAD_TIME))
                 reload.setState(ReloadState.NORMAL_RELOADING)
                 playGunNormalReloadSounds(shooter, data)
             }
         } else {
-            reload.setTime(data.get(GunProp.EMPTY_RELOAD_TIME) + 2)
+            reload.setTime(data.get(GunProp.EMPTY_RELOAD_TIME))
             reload.setState(ReloadState.EMPTY_RELOADING)
             playGunEmptyReloadSounds(shooter, data)
         }

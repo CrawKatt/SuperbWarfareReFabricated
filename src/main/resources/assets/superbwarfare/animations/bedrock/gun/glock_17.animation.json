@@ -5,11 +5,11 @@
 			"loop": true,
 			"animation_length": 0.25,
 			"bones": {
-				"Righthand": {
+				"righthand": {
 					"rotation": [-263.42, 6.29, -176.66],
 					"position": [-6.49, -19.83, 1.1]
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": [-257.29, -11.56, 179.33],
 					"position": [7.16, -20, -0.17]
 				}
@@ -76,9 +76,9 @@
 		},
 		"animation.glock_17.reload_normal": {
 			"loop": "hold_on_last_frame",
-			"animation_length": 2.25,
+			"animation_length": 2.075,
 			"bones": {
-				"Righthand": {
+				"righthand": {
 					"rotation": {
 						"0.0": [-263.42, 6.29, -176.66],
 						"0.15": [-263.42, 6.29, -176.66],
@@ -92,7 +92,7 @@
 						"1.575": [-6.49, -19.83, 1.1]
 					}
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": {
 						"0.0": [-257.29, -11.56, 179.33],
 						"0.3": [-269.30539, -23.22878, 251.47311],
@@ -418,13 +418,21 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.25": {
+					"effect": "superbwarfare:glock_17_mag_out"
+				},
+				"1.0": {
+					"effect": "superbwarfare:glock_17_mag_in"
+				}
 			}
 		},
 		"animation.glock_17.reload_empty": {
 			"loop": "hold_on_last_frame",
-			"animation_length": 2.65,
+			"animation_length": 2.25,
 			"bones": {
-				"Righthand": {
+				"righthand": {
 					"rotation": {
 						"0.0": [-263.42, 6.29, -176.66],
 						"0.15": [-263.42, 6.29, -176.66],
@@ -438,7 +446,7 @@
 						"1.575": [-6.49, -19.83, 1.1]
 					}
 				},
-				"Lefthand": {
+				"lefthand": {
 					"rotation": {
 						"0.0": [-257.29, -11.56, 179.33],
 						"0.3": [-269.30539, -23.22878, 251.47311],
@@ -775,6 +783,17 @@
 							"lerp_mode": "catmullrom"
 						}
 					}
+				}
+			},
+			"sound_effects": {
+				"0.25": {
+					"effect": "superbwarfare:glock_17_mag_out"
+				},
+				"1.0": {
+					"effect": "superbwarfare:glock_17_mag_in"
+				},
+				"1.6": {
+					"effect": "superbwarfare:glock_17_slide"
 				}
 			}
 		}

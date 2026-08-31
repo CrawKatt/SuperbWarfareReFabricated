@@ -12,6 +12,6 @@ object Glock17Item : GeoGunItemV2(Properties()) {
 
     override fun addReloadTimeBehavior(behaviors: MutableMap<Int, Consumer<GunData>?>?) {
         super.addReloadTimeBehavior(behaviors)
-        behaviors?.set(9, Consumer { data: GunData -> data.holdOpen.set(false) })
+        behaviors?.set(13, Consumer { data: GunData -> data.holdOpen.set(false) })
     }
 }
