@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.data.gun
 
 import com.atsuishio.superbwarfare.data.DefaultDataSupplier
 import com.atsuishio.superbwarfare.data.CustomData
+import com.atsuishio.superbwarfare.data.ObjectToList
 import team.reborn.energy.api.EnergyStorage
 import com.atsuishio.superbwarfare.capability.api.IItemHandler
 import com.atsuishio.superbwarfare.data.JsonPropertyModifier
@@ -70,6 +71,14 @@ fun ObjectToList<Int>.atMagazineLevel(level: Int): Int {
 fun GunData.magazineLevel(): Int {
     val id = attachment.id(AttachmentType.MAGAZINE) ?: return 0
     return CustomData.ATTACHMENTS[id.toString()]?.level?.coerceAtLeast(0) ?: 0
+}
+
+/**
+ * Checks whether the installed barrel attachment is configured as a silencer.
+ */
+fun GunData.isBarrelSilenced(): Boolean {
+    val id = attachment.id(AttachmentType.BARREL) ?: return false
+    return CustomData.ATTACHMENTS[id.toString()]?.isSilenced == true
 }
 
 /**

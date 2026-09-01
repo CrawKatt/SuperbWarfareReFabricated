@@ -238,16 +238,19 @@ object ModItems {
         AttachmentItem("${Mod.MODID}:oem_stock_standard")
     }
     @JvmField val MAGAZINE_EXTEND = registerAttachment("magazine_extend") {
-        AttachmentItem("${Mod.MODID}:magazine_extend")
+        AttachmentItem("${Mod.MODID}:magazine_extend", Rarity.RARE)
     }
     @JvmField val MAGAZINE_EXTEND_PRO = registerAttachment("magazine_extend_pro") {
-        AttachmentItem("${Mod.MODID}:magazine_extend_pro")
+        AttachmentItem("${Mod.MODID}:magazine_extend_pro", Rarity.EPIC)
     }
     @JvmField val MEOWLENCER = registerAttachment("meowlencer") {
-        AttachmentItem("${Mod.MODID}:meowlencer")
+        AttachmentItem("${Mod.MODID}:meowlencer", Rarity.RARE)
     }
     @JvmField val HISSILENCER = registerAttachment("hissilencer") {
-        AttachmentItem("${Mod.MODID}:hissilencer")
+        AttachmentItem("${Mod.MODID}:hissilencer", Rarity.RARE)
+    }
+    @JvmField val RU_SILENCER = registerAttachment("ru_silencer") {
+        AttachmentItem("${Mod.MODID}:ru_silencer")
     }
 
     // @formatter:off

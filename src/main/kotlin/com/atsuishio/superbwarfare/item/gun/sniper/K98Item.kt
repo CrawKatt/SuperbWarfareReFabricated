@@ -8,5 +8,3 @@ object K98Item : GeoGunItemV2(Properties()) {
     override fun hasCustomBarrel(data: GunData): Boolean = true
     override fun canEditAttachments(data: GunData): Boolean = true
 }
-
-

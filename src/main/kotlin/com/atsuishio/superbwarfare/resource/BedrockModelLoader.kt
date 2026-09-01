@@ -21,5 +21,6 @@ object BedrockModelLoader {
         resources.registerReloadListener(GunModelReloadListener)
         resources.registerReloadListener(GunLODModelReloadListener)
         resources.registerReloadListener(ShellModelReloadListener)
+        resources.registerReloadListener(AttachmentModelReloadListener)
     }
 }
