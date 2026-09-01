@@ -49,7 +49,6 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         gunItem(ModItems.HUNTING_RIFLE)
         gunItem(ModItems.INSIDIOUS)
         gunItem(ModItems.JAVELIN)
-        gunItem(ModItems.K_98)
         gunItem(ModItems.M_4)
         gunItem(ModItems.M_60)
         gunItem(ModItems.M_79)
