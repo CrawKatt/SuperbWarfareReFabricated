@@ -61,6 +61,7 @@ import com.atsuishio.superbwarfare.event.custom.RenderNameTagCallback
 import com.atsuishio.superbwarfare.event.custom.RenderPlayerCallback
 import net.minecraft.client.Camera
 import org.joml.Matrix4f
+import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW
 import software.bernie.geckolib.core.animatable.model.CoreGeoBone
 import software.bernie.geckolib.core.animation.AnimationProcessor
@@ -409,6 +410,20 @@ object ClientEventHandler {
 
     @JvmField
     var isEditing: Boolean = false
+
+    /**
+     * 改装状态下当前正在编辑的配件槽位，与 [com.atsuishio.superbwarfare.client.screens.WeaponEditScreen.EditButton] 的 type 一致，
+     * -1 表示未选中任何配件。
+     */
+    @JvmField
+    var editingAttachmentType: Int = -1
+
+    /**
+     * 改装时视线聚焦的平滑偏移量（相对 IDLE_VIEW_BONE，模型空间），
+     * 由 GeoGunRenderer 每帧向目标偏移插值。
+     */
+    @JvmField
+    var editFocusOffset: Vector3f = Vector3f()
 
     @JvmField
     var shootCoolDown: Int = 0
@@ -3152,6 +3167,8 @@ object ClientEventHandler {
         seekingEntity = null
         lockingPos = null
         isEditing = false
+        editingAttachmentType = -1
+        editFocusOffset.set(0f, 0f, 0f)
         zoomTime = 0.0
     }
 
@@ -3212,6 +3229,7 @@ object ClientEventHandler {
     fun onOpenEditScreen() {
         val player = localPlayer ?: return
         isEditing = true
+        editingAttachmentType = -1
         holdingFireKey = false
         player.playSound(ModSounds.EDIT_MODE, 1f, 1f)
     }
@@ -3219,6 +3237,7 @@ object ClientEventHandler {
     @JvmStatic
     fun onCloseEditScreen() {
         isEditing = false
+        editingAttachmentType = -1
     }
 
     @JvmStatic
