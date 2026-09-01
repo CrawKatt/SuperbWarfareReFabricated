@@ -131,7 +131,7 @@ dependencies {
     modImplementation("dev.emi:trinkets:${project.property("trinkets_version")}")
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:15.0.140")
 
-    include(modImplementation("com.github.Sh1roCu:SimpleBedrockModel-Fabric:${project.property("simple_bedrock_model_version")}")!!)
+    include(modImplementation(":simplebedrockmodel-fabric:2.5.7+mc1.21.1")!!)
     include(modImplementation("com.github.Nova-Committee:ModernKeyBinding:17bf4f794ae3ce31aee90e0df67e2757c3533d10")!!)
     modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("parchment_minecraft_version")}:${project.property("ponder_version")}")
 
