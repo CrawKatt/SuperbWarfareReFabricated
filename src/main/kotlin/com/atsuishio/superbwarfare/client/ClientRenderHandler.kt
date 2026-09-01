@@ -42,6 +42,7 @@ import com.atsuishio.superbwarfare.item.armor.RuChest6b43Item
 import com.atsuishio.superbwarfare.item.armor.RuHelmet6b47Item
 import com.atsuishio.superbwarfare.item.armor.UsChestIotvItem
 import com.atsuishio.superbwarfare.item.armor.UsHelmetPasgtItem
+import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
 import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.emi.trinkets.api.client.TrinketRendererRegistry
@@ -52,6 +53,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
@@ -169,7 +171,7 @@ object ClientRenderHandler {
     @JvmStatic
     fun onClientSetup() {
         val geoGunRenderer = lazy { GeoGunRenderer() }
-        listOf(ModItems.TASER, ModItems.GLOCK_17, ModItems.NAIL_GUN, ModItems.REFORGING).forEach { item ->
+        BuiltInRegistries.ITEM.filterIsInstance<GeoGunItemV2>().forEach { item ->
             BuiltinItemRendererRegistry.INSTANCE.register(item) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
                 geoGunRenderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
             }
