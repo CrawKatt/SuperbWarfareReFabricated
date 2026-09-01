@@ -18,6 +18,7 @@ import com.atsuishio.superbwarfare.item.container.LuckyContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
 import com.atsuishio.superbwarfare.item.curio.*
 import com.atsuishio.superbwarfare.item.food.CrustItem
+import com.atsuishio.superbwarfare.item.attachment.AttachmentItem
 import com.atsuishio.superbwarfare.item.gun.EmptyGunItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.item.gun.handgun.*
@@ -73,6 +74,8 @@ object ModItems {
     val VEHICLES = mutableListOf<Item>()
     @JvmField
     val PERKS = mutableListOf<Item>()
+    @JvmField
+    val ATTACHMENTS = mutableListOf<Item>()
 
     private fun register(id: String, item: () -> Item): Item {
         val registered = Registration.item(id, Supplier(item))
@@ -568,6 +571,20 @@ object ModItems {
     // @formatter:off
     @JvmField val SHORTCUT_PACK = registerPerkItem("shortcut_pack") { ShortcutPackItem() }
     @JvmField val EMPTY_PERK = registerPerkItem("empty_perk") { Item(Properties()) }
+    // @formatter:on
+
+    private fun registerAttachment(id: String): Item {
+        val item = register(id) { AttachmentItem("${Mod.MODID}:$id") }
+        ATTACHMENTS.add(item)
+        return item
+    }
+
+    // @formatter:off
+    @JvmField val OEM_STOCK_STANDARD = registerAttachment("oem_stock_standard")
+    @JvmField val MAGAZINE_EXTEND = registerAttachment("magazine_extend")
+    @JvmField val MAGAZINE_EXTEND_PRO = registerAttachment("magazine_extend_pro")
+    @JvmField val MEOWLENCER = registerAttachment("meowlencer")
+    @JvmField val HISSILENCER = registerAttachment("hissilencer")
     // @formatter:on
 
     fun registerDispenserBehavior() {
