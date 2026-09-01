@@ -1,4 +1,20 @@
 package com.atsuishio.superbwarfare.item.gun
 
-/** Marker for guns rendered by the SBM V2 first-person renderer. */
-open class GeoGunItemV2(properties: Properties) : GunItem(properties)
+import com.atsuishio.superbwarfare.client.PoseTool
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.minecraft.client.model.HumanoidModel
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.item.Item.Properties
+import net.minecraft.world.item.ItemStack
+
+open class GeoGunItemV2(properties: Properties) : GunItem(properties) {
+
+    @Environment(EnvType.CLIENT)
+    fun getArmPose(
+        entityLiving: LivingEntity,
+        hand: InteractionHand,
+        itemStack: ItemStack
+    ): HumanoidModel.ArmPose = PoseTool.pose(entityLiving, hand, itemStack)
+}

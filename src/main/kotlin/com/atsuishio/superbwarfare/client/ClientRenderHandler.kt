@@ -170,11 +170,9 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun onClientSetup() {
-        val geoGunRenderer = lazy { GeoGunRenderer() }
+        val geoGunRenderer = GeoGunRenderer()
         BuiltInRegistries.ITEM.filterIsInstance<GeoGunItemV2>().forEach { item ->
-            BuiltinItemRendererRegistry.INSTANCE.register(item) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
-                geoGunRenderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
-            }
+            BuiltinItemRendererRegistry.INSTANCE.register(item, geoGunRenderer)
         }
 
         val tm62Renderer = lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }

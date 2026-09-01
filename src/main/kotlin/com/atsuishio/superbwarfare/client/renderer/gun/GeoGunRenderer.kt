@@ -33,6 +33,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.texture.OverlayTexture
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
@@ -46,7 +47,20 @@ import org.joml.Vector3f
 import java.util.*
 import kotlin.math.roundToInt
 
-open class GeoGunRenderer : AbstractGeoItemRendererV2() {
+open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegistry.DynamicItemRenderer {
+
+    override fun render(
+        stack: ItemStack,
+        mode: ItemDisplayContext,
+        matrices: PoseStack,
+        vertexConsumers: MultiBufferSource,
+        light: Int,
+        overlay: Int
+    ) {
+        renderByItem(stack, mode, matrices, vertexConsumers, light, overlay)
+    }
+
+    override fun blockOffhandRender(): Boolean = true
 
     protected val capturedRenderPose = mutableMapOf<InteractionHand, Matrix4f>()
     protected val lastBoneTransforms = mutableMapOf<InteractionHand, MutableMap<String, Matrix4f>>()

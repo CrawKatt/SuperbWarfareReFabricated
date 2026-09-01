@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.event.custom.RenderPlayerCallback;
 import com.atsuishio.superbwarfare.item.LungeMine;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2;
-import com.atsuishio.superbwarfare.client.PoseTool;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem;
 import com.atsuishio.superbwarfare.item.gun.machinegun.M2HBItem;
@@ -52,8 +51,8 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
             cir.setReturnValue(HumanoidModel.ArmPose.BOW_AND_ARROW);
         } else if (superbwarfare$usesCustomArmPose(stack)) {
             cir.setReturnValue(HumanoidModel.ArmPose.EMPTY);
-        } else if (stack.getItem() instanceof GeoGunItemV2) {
-            cir.setReturnValue(PoseTool.pose(player, hand, stack));
+        } else if (stack.getItem() instanceof GeoGunItemV2 geoGunItemV2) {
+            cir.setReturnValue(geoGunItemV2.getArmPose(player, hand, stack));
         } else if (stack.getItem() instanceof GunGeoItem gun) {
             cir.setReturnValue(gun.getArmPose(player, hand, stack));
         }
