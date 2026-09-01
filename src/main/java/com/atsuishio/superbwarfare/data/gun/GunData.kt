@@ -241,6 +241,7 @@ class GunData private constructor(
     }
 
     private val jsonPropModifier = JsonPropertyModifier(GunProp.entries)
+    private val attachmentJsonPropModifier = JsonPropertyModifier(GunProp.entries)
     private var cache: DefaultGunData? = null
     private var tempModifications: Function<DefaultGunData, DefaultGunData>? = null
 
@@ -322,7 +323,12 @@ class GunData private constructor(
         item.modifyProperty(pmcInstance)
 
         // 3. Attachments
+        attachmentJsonPropModifier.update(`object` = null)
         for (instance in attachment.installed()) {
+            attachmentOption(instance.slot, instance.id)?.let { option ->
+                attachmentJsonPropModifier.update(option.override)
+                attachmentJsonPropModifier.modifyProperty(pmcInstance)
+            }
             instance.definition.modifyProperty(pmcInstance)
         }
 
@@ -859,7 +865,16 @@ class GunData private constructor(
     fun availableAttachments(slot: AttachmentType): List<ResourceLocation> {
         return getDefault().availableAttachments[slot.attachmentName]
             .orEmpty()
-            .mapNotNull { ResourceLocation.tryParse(it) }
+            .mapNotNull { ResourceLocation.tryParse(it.value.id) }
+    }
+
+    /** Returns the weapon-level option for [id] installed in [slot], if declared. */
+    fun attachmentOption(slot: AttachmentType, id: ResourceLocation): AttachmentOption? {
+        val idString = id.toString()
+        return getDefault().availableAttachments[slot.attachmentName]
+            .orEmpty()
+            .firstOrNull { it.value.id == idString }
+            ?.value
     }
 
     /** Checks whether [id] can be installed in [slot] for this gun. */
