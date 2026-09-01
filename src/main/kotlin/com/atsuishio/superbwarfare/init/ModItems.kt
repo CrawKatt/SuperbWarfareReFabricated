@@ -380,7 +380,7 @@ object ModItems {
     @JvmField val AMMO_PERK_DATA_CHIP = registerItem("ammo_perk_data_chip")
     @JvmField val FUNCTIONAL_PERK_DATA_CHIP = registerItem("functional_perk_data_chip")
     @JvmField val DAMAGE_PERK_DATA_CHIP = registerItem("damage_perk_data_chip")
-    
+
     @JvmField val DIRECTIONAL_RESEARCH_MODULE = registerItem("directional_research_module") { Item(Properties().rarity(Rarity.EPIC)) }
     @JvmField val ENLARGEMENT_RESEARCH_MODULE = registerItem("enlargement_research_module") { Item(Properties().rarity(Rarity.EPIC)) }
     @JvmField val EFFECTIVE_RESEARCH_MODULE = registerItem("effective_research_module") { Item(Properties().rarity(Rarity.RARE)) }
@@ -573,18 +573,19 @@ object ModItems {
     @JvmField val EMPTY_PERK = registerPerkItem("empty_perk") { Item(Properties()) }
     // @formatter:on
 
-    private fun registerAttachment(id: String): Item {
-        val item = register(id) { AttachmentItem("${Mod.MODID}:$id") }
+    private fun registerAttachment(id: String, rarity: Rarity = Rarity.COMMON): Item {
+        val item = register(id) { AttachmentItem("${Mod.MODID}:$id", rarity) }
         ATTACHMENTS.add(item)
         return item
     }
 
     // @formatter:off
     @JvmField val OEM_STOCK_STANDARD = registerAttachment("oem_stock_standard")
-    @JvmField val MAGAZINE_EXTEND = registerAttachment("magazine_extend")
-    @JvmField val MAGAZINE_EXTEND_PRO = registerAttachment("magazine_extend_pro")
-    @JvmField val MEOWLENCER = registerAttachment("meowlencer")
-    @JvmField val HISSILENCER = registerAttachment("hissilencer")
+    @JvmField val MAGAZINE_EXTEND = registerAttachment("magazine_extend", Rarity.RARE)
+    @JvmField val MAGAZINE_EXTEND_PRO = registerAttachment("magazine_extend_pro", Rarity.EPIC)
+    @JvmField val MEOWLENCER = registerAttachment("meowlencer", Rarity.RARE)
+    @JvmField val HISSILENCER = registerAttachment("hissilencer", Rarity.RARE)
+    @JvmField val RU_SILENCER = registerAttachment("ru_silencer")
     // @formatter:on
 
     fun registerDispenserBehavior() {

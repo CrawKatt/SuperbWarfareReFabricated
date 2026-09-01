@@ -20,7 +20,14 @@ object MuzzleFlashRenderer {
     private const val MUZZLE_FLASH_BONE = "muzzle_flash"
     private const val MAX_VISIBLE_TIME = 0.3
 
-    fun render(poseStack: PoseStack, model: GeoGunModel, stack: ItemStack, bufferSource: MultiBufferSource) {
+    fun render(
+        poseStack: PoseStack,
+        model: GeoGunModel,
+        stack: ItemStack,
+        bufferSource: MultiBufferSource,
+        attachmentMuzzleTransform: Matrix4f? = null,
+        muzzleFlashScale: Float = 1.0f
+    ) {
         val fireRotTimer = ClientEventHandler.fireRotTimer
         if (fireRotTimer <= 0.0 || fireRotTimer >= MAX_VISIBLE_TIME) return
         if (GunData.from(stack).attachment.get(AttachmentType.BARREL) == 2) return
@@ -28,14 +35,22 @@ object MuzzleFlashRenderer {
         val resource = GunResource.compute(stack)
         val flareBone = model.getBone(FLARE_BONE) ?: model.getBone(MUZZLE_FLASH_BONE)
         val flarePosition = resource.flarePosition
-        if (flareBone == null && flarePosition == null) return
+        if (flareBone == null && flarePosition == null && attachmentMuzzleTransform == null) return
 
         poseStack.pushPose()
-        if (flareBone != null) model.instance.mulGlobalTransform(poseStack, flareBone.index())
-        if (flarePosition != null) poseStack.translate(flarePosition.x, flarePosition.y + 0.02, -flarePosition.z)
+        if (attachmentMuzzleTransform != null) {
+            poseStack.last().pose().mul(attachmentMuzzleTransform)
+        } else if (flareBone != null) {
+            model.instance.mulGlobalTransform(poseStack, flareBone.index())
+        }
+        if (flarePosition != null) {
+            poseStack.translate(flarePosition.x, flarePosition.y + 0.02, -flarePosition.z)
+        }
 
-        val size = resource.flareSize * (0.6f + 0.8f * Math.random().toFloat())
-        poseStack.mulPose(Axis.ZP.rotation(0.5f * (Math.random().toFloat() - 0.5f)))
+        val scaleRandom = Math.random().toFloat()
+        val rotationRandom = Math.random().toFloat()
+        val size = resource.flareSize * (0.6f + 0.8f * scaleRandom) * muzzleFlashScale.coerceAtLeast(0f)
+        poseStack.mulPose(Axis.ZP.rotation(0.5f * (rotationRandom - 0.5f)))
         poseStack.scale(size, size, 1f)
 
         val consumer = bufferSource.getBuffer(ModRenderTypes.MUZZLE_FLASH_TYPE.apply(FLARE_TEXTURE))
