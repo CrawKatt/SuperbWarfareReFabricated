@@ -10,9 +10,6 @@ object ModAttachments {
     val OEM_STOCK_STANDARD: Item = register("oem_stock_standard")
 
     @JvmField
-    val MAGAZINE_STANDARD: Item = register("magazine_standard")
-
-    @JvmField
     val MAGAZINE_EXTEND: Item = register("magazine_extend")
 
     @JvmField
@@ -21,7 +18,6 @@ object ModAttachments {
     @JvmField
     val ITEMS: List<Item> = listOf(
         OEM_STOCK_STANDARD,
-        MAGAZINE_STANDARD,
         MAGAZINE_EXTEND,
         MAGAZINE_EXTEND_PRO
     )
