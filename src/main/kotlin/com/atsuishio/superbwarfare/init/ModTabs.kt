@@ -61,7 +61,7 @@ object ModTabs {
         "attachment",
         FabricItemGroup.builder()
             .title(Component.translatable("item_group.superbwarfare.attachment"))
-            .icon { ItemStack(ModItems.OEM_STOCK_STANDARD) }
+            .icon { ItemStack(ModItems.MAGAZINE_EXTEND_PRO) }
             .displayItems { _, output ->
                 ModItems.ATTACHMENTS.forEach(output::accept)
             }
@@ -172,7 +172,7 @@ object ModTabs {
 
     @JvmStatic
     fun init() {
-        listOf("attachment", "guns", "perk", "ammo", "item", "block", "vehicle").forEach { name ->
+        listOf("vehicle", "block", "item", "ammo", "perk", "attachment", "guns").forEach { name ->
             Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Mod.loc(name), tabs.getValue(name))
         }
 
