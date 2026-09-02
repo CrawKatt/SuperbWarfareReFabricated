@@ -261,6 +261,9 @@ object ModItems {
     @JvmField val HANDGUN_SILENCER = registerAttachment("handgun_silencer") {
         AttachmentItem("${Mod.MODID}:handgun_silencer")
     }
+    @JvmField val LOUDSPEAKER = registerAttachment("loudspeaker") {
+        AttachmentItem("${Mod.MODID}:loudspeaker", ModRarities.LEGENDARY)
+    }
 
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
