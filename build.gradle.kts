@@ -174,11 +174,13 @@ dependencies {
     compileOnly("com.google.code.findbugs:jsr305:3.0.2")
     runtimeOnly("com.google.code.findbugs:jsr305:3.0.2")
 
-    compileOnly("com.maydaymemory:mae:1.1.2") {
+    implementation("com.maydaymemory:mae:1.1.4") {
+        exclude("com.google.code.gson", "gson")
         exclude("com.google.code.findbugs", "jsr305")
         exclude("it.unimi.dsi", "fastutil")
         exclude("org.joml", "joml")
     }
+    include("com.maydaymemory:mae:1.1.4")
 }
 
 fabricApi {

@@ -21,7 +21,9 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
+import org.lwjgl.glfw.GLFW
 import kotlin.math.min
+
 class WeaponEditScreen(private val stack: ItemStack) : Screen(Component.empty()) {
     override fun isPauseScreen(): Boolean {
         return false
@@ -246,6 +248,10 @@ class WeaponEditScreen(private val stack: ItemStack) : Screen(Component.empty())
     override fun keyPressed(pKeyCode: Int, pScanCode: Int, pModifiers: Int): Boolean {
         if (pKeyCode == ModKeyMappings.EDIT_MODE.key.value) {
             this.onClose()
+            return true
+        }
+        if (pKeyCode == GLFW.GLFW_KEY_ESCAPE && editingAttachmentType != -1) {
+            editingAttachmentType = -1
             return true
         }
         return super.keyPressed(pKeyCode, pScanCode, pModifiers)
