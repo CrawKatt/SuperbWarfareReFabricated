@@ -249,6 +249,9 @@ object ModItems {
     @JvmField val HISSILENCER = registerAttachment("hissilencer") {
         AttachmentItem("${Mod.MODID}:hissilencer", Rarity.RARE)
     }
+    @JvmField val SILAOWUNCER = registerAttachment("silaowuncer") {
+        AttachmentItem("${Mod.MODID}:silaowuncer", Rarity.RARE)
+    }
     @JvmField val RU_SILENCER = registerAttachment("ru_silencer") {
         AttachmentItem("${Mod.MODID}:ru_silencer")
     }
