@@ -184,7 +184,7 @@ Forge Config API Port 会保留部分 `net.minecraftforge.*` 包下的类。在�
 - **添加载具：** 定义 `VehicleData`/资源、注册实体，并添加客户端模型与渲染器。
 - **添加弹药：** 注册物品并配置对应的 `AmmoConsumer`。
 - **添加 Perk：** 在 `ModPerks` 中注册，并实现 PMC 修改。
-- **添加网络包：** 创建 Payload 与 Codec，在 `NetworkRegistry` 中按方向注册，并检查 Handler 线程。
+- **添加网络包：** 创建继承 `ServerPacketPayload` / `ClientPacketPayload` 的消息类并标注 `@RegisterPacket`，无需手动维护注册列表。
 - **添加事件：** 先查找 Fabric 回调或已有自定义回调；只有缺少等价 Hook 时才使用 Mixin。
 - **添加配置：** 使用现有配置类，需要界面时通过 Cloth Config 暴露。
 - **添加可选兼容：** 隔离依赖引用，并通过 Mod 检测保护访问。

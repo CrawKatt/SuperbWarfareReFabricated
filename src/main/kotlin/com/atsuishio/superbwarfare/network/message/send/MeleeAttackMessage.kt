@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.network.message.send
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.gun.GunItem
+import com.atsuishio.superbwarfare.ksp.annotation.RegisterPacket
 import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.network.ServerPacketPayload
 import com.atsuishio.superbwarfare.perk.Perk
@@ -26,6 +27,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper
 import kotlin.math.*
 import kotlin.random.Random
 
+@RegisterPacket
 @Serializable
 data class MeleeAttackMessage(val uuidList: List<SerializedUUID>) : ServerPacketPayload() {
     override fun PayloadContext.handler() {
