@@ -1,8 +1,6 @@
 package com.atsuishio.superbwarfare.network
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
-import com.atsuishio.superbwarfare.network.message.receive.*
-import com.atsuishio.superbwarfare.network.message.send.*
 import com.atsuishio.superbwarfare.serialization.ByteBufDecoder
 import com.atsuishio.superbwarfare.serialization.ByteBufEncoder
 import com.atsuishio.superbwarfare.tools.createStreamCodec
@@ -54,7 +52,7 @@ private inline fun <reified T : PacketPayload> buildType(): Pair<CustomPacketPay
  * Registers a server-bound (C2S) payload: the stream codec with the [PayloadTypeRegistry] and the
  * global receiver that runs the payload's [PacketPayload.handler] on the server thread.
  */
-private inline fun <reified T : ServerPacketPayload> playToServer() {
+internal inline fun <reified T : ServerPacketPayload> playToServer() {
     val (type, codec) = buildType<T>()
     PayloadTypeRegistry.playC2S().register(type, codec)
     ServerPlayNetworking.registerGlobalReceiver(type) { msg, context ->
@@ -67,7 +65,7 @@ private inline fun <reified T : ServerPacketPayload> playToServer() {
  * receiver is wired up separately in [registerClientReceivers] to avoid loading client-only classes
  * on a dedicated server.
  */
-private inline fun <reified T : ClientPacketPayload> playToClient() {
+internal inline fun <reified T : ClientPacketPayload> playToClient() {
     val (type, codec) = buildType<T>()
     PayloadTypeRegistry.playS2C().register(type, codec)
 }
@@ -119,82 +117,5 @@ fun registerClientReceivers() {
 }
 
 fun registerPayloads() {
-    playToClient<ClientIndicatorMessage>()
-    playToClient<ClientSetMotionMessage>()
-    playToClient<DataSyncMessage>()
-    playToClient<ClientMotionSyncMessage>()
-    playToClient<ClientPhosphorusFireMessage>()
-    playToClient<ContainerDataMessage>()
-    playToClient<DrawClientMessage>()
-    playToClient<FinishAssemblingVehicleMessage>()
-    playToClient<LivingGunKillMessage>()
-    playToClient<ModVersionSyncMessage>()
-    playToClient<PlayerVariablesSyncMessage>()
-    playToClient<RadarMenuCloseMessage>()
-    playToClient<RadarMenuOpenMessage>()
-    playToClient<ResetCameraTypeMessage>()
-    playToClient<BeyondVisualEntitySyncMessage>()
-    playToClient<ExplosionParticleMessage>()
-    playToClient<MissileTrailParticleMessage>()
-    playToClient<ShakeClientMessage>()
-    playToClient<ShootClientMessage>()
-    playToClient<SoundClientMessage>()
-    playToClient<VehicleShootClientMessage>()
-    playToClient<TDMSyncMessage>()
-    playToClient<EntityRelationSyncMessage>()
-    playToClient<PlayerInfoSyncMessage>()
-    playToClient<RadarSyncMessage>()
-    playToClient<ClientVehicleItemMessage>()
-    playToClient<OpenVehicleSkinScreenMessage>()
-    playToClient<OpenTacticalMapScreenMessage>()
-
-    playToServer<AdjustMortarAngleMessage>()
-    playToServer<AdjustZoomFovMessage>()
-    playToServer<AimVillagerMessage>()
-    playToServer<AssembleVehicleMessage>()
-    playToServer<ChangeVehicleSeatMessage>()
-    playToServer<ArtilleryIndicatorFireMessage>()
-    playToServer<DogTagFinishEditMessage>()
-    playToServer<DoubleJumpMessage>()
-    playToServer<DroneFireMessage>()
-    playToServer<EditMessage>()
-    playToServer<FireKeyMessage>()
-    playToServer<FireModeMessage>()
-    playToServer<FiringParametersEditMessage>()
-    playToServer<GunReforgeMessage>()
-    playToServer<InteractMessage>()
-    playToServer<LaserShootMessage>()
-    playToServer<LungeMineAttackMessage>()
-    playToServer<MeleeAttackMessage>()
-    playToServer<MouseMoveMessage>()
-    playToServer<ParachuteMessage>()
-    playToServer<PlayerStopRidingMessage>()
-    playToServer<RadarChangeModeMessage>()
-    playToServer<RadarSetPosMessage>()
-    playToServer<RadarSetTargetMessage>()
-    playToServer<RadarSetParametersMessage>()
-    playToServer<ReloadMessage>()
-    playToServer<SeekingWeaponWarningMessage>()
-    playToServer<SensitivityMessage>()
-    playToServer<SetFiringParametersMessage>()
-    playToServer<SetVehicleSkinMessage>()
-    playToServer<SetPerkLevelMessage>()
-    playToServer<ShootMessage>()
-    playToServer<ShowChargingRangeMessage>()
-    playToServer<SwitchScopeMessage>()
-    playToServer<SwitchVehicleWeaponMessage>()
-    playToServer<UnloadMessage>()
-    playToServer<VehicleFireMessage>()
-    playToServer<VehicleMovementMessage>()
-    playToServer<WeaponZoomingMessage>()
-    playToServer<ZoomMessage>()
-    playToServer<BlueprintCraftMessage>()
-    playToServer<BlueprintSetIndexMessage>()
-    playToServer<LoiterConfigMessage>()
-    playToServer<LoiterOverrideMessage>()
-    playToServer<VehicleUnloadPassengersMessage>()
-    playToServer<VehicleDisconnectTowingMessage>()
-    playToServer<EntityClearMessage>()
-    playToServer<EntityAreaClearMessage>()
-    playToServer<CreativeContainerStackMessage>()
+    registerGeneratedPayloads()
 }

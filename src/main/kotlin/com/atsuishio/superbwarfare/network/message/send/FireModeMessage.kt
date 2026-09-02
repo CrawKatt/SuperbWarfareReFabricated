@@ -7,12 +7,14 @@ import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.gun.GunItem
+import com.atsuishio.superbwarfare.ksp.annotation.RegisterPacket
 import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.network.ServerPacketPayload
 import com.atsuishio.superbwarfare.tools.SoundTool
 import kotlinx.serialization.Serializable
 
 @Serializable
+@RegisterPacket
 data class FireModeMessage(val forward: Boolean) : ServerPacketPayload() {
     override fun PayloadContext.handler() {
         val player = sender()

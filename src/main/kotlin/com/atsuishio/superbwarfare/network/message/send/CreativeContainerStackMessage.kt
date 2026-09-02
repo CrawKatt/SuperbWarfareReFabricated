@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.network.message.send
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
+import com.atsuishio.superbwarfare.ksp.annotation.RegisterPacket
 import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.network.ServerPacketPayload
 import com.atsuishio.superbwarfare.serialization.kserializer.SerializedResourceLocation
@@ -18,6 +19,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.storage.loot.LootTable
 
 @Serializable
+@RegisterPacket
 data class CreativeContainerStackMessage(
     val slot: Int,
     val item: SerializedResourceLocation,

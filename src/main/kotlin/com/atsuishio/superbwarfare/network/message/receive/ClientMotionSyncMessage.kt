@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.network.message.receive
 
+import com.atsuishio.superbwarfare.ksp.annotation.RegisterPacket
 import com.atsuishio.superbwarfare.network.ClientPacketPayload
 import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.entity.projectile.IBulletProperties
@@ -9,6 +10,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 
 @Serializable
+@RegisterPacket
 data class ClientMotionSyncMessage(
     val id: Int,
     val x: Float,

@@ -115,7 +115,7 @@ sourceSets {
 
 dependencies {
     add("ksp", project(":ksp"))
-    implementation(project(":ksp"))
+    compileOnly(project(":ksp"))
 
     minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
 

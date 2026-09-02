@@ -3,12 +3,14 @@ package com.atsuishio.superbwarfare.network.message.send
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.trinket.ParachuteItem
+import com.atsuishio.superbwarfare.ksp.annotation.RegisterPacket
 import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.network.ServerPacketPayload
 import com.atsuishio.superbwarfare.tools.NBTTool
 import dev.emi.trinkets.api.TrinketsApi
 import net.minecraft.sounds.SoundSource
 
+@RegisterPacket
 object ParachuteMessage : ServerPacketPayload() {
     override fun PayloadContext.handler() {
         val player = sender()
