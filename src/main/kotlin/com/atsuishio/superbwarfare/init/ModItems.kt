@@ -252,6 +252,9 @@ object ModItems {
     @JvmField val RU_SILENCER = registerAttachment("ru_silencer") {
         AttachmentItem("${Mod.MODID}:ru_silencer")
     }
+    @JvmField val AR_SILENCER = registerAttachment("ar_silencer") {
+        AttachmentItem("${Mod.MODID}:ar_silencer")
+    }
 
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
