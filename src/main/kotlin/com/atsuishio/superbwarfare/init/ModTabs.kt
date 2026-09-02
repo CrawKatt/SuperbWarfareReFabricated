@@ -53,7 +53,7 @@ object ModTabs {
     val ATTACHMENT_TAB: CreativeModeTab = Registration.creativeTab("attachment") {
         FabricItemGroup.builder()
             .title(Component.translatable("item_group.superbwarfare.attachment"))
-            .icon { ItemStack(ModItems.OEM_STOCK_STANDARD) }
+            .icon { ItemStack(ModItems.MAGAZINE_EXTEND_PRO) }
             .displayItems { _, output ->
                 ModItems.ATTACHMENTS.forEach(output::accept)
             }
