@@ -326,6 +326,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.HANDGUN_SILENCER)
         simpleItem(ModItems.MAGAZINE_EXTEND)
         simpleItem(ModItems.MAGAZINE_EXTEND_PRO)
+        simpleItem(ModItems.LOUDSPEAKER)
 
         // blocks
         evenSimplerBlockItem(ModBlocks.BARBED_WIRE)
