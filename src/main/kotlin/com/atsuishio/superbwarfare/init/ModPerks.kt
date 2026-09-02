@@ -165,6 +165,12 @@ object ModPerks {
     @JvmField val TARGET_LOCK = autoRegistryObjects["target_lock"] ?: registerDamagePerk("target_lock") {
         EmptyPerk("target_lock", Perk.Type.DAMAGE)
     }
+    @JvmField val SOUL_REAVER = autoRegistryObjects["soul_reaver"] ?: registerDamagePerk("soul_reaver") {
+        EmptyPerk("soul_reaver", Perk.Type.DAMAGE)
+    }
+    @JvmField val STEADY_RESOLVE = autoRegistryObjects["steady_resolve"] ?: registerDamagePerk("steady_resolve") {
+        EmptyPerk("steady_resolve", Perk.Type.DAMAGE)
+    }
     // @formatter:on
 
     private fun autoRegisterFromJsons() {
