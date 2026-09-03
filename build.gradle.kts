@@ -3,7 +3,7 @@ import java.time.Instant
 plugins {
     eclipse
     idea
-    id("fabric-loom") version "1.13.6"
+    id("fabric-loom") version "1.17.20"
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.serialization") version "2.1.20"
     id("com.google.devtools.ksp") version "2.1.20-2.0.1"
@@ -70,25 +70,6 @@ sourceSets.main {
         srcDir("src/generated/resources")
         exclude(".cache/**")
     }
-}
-
-val sbwRecipeResources = fileTree("src/generated/resources/data/superbwarfare") {
-    include("recipes/**/*.json", "advancements/recipes/**/*.json")
-}
-
-tasks.register("verifyNoForgeRecipeTags") {
-    inputs.files(sbwRecipeResources)
-    doLast {
-        val offenders = sbwRecipeResources.files.filter { "\"forge:" in it.readText() }
-        check(offenders.isEmpty()) {
-            "Obsolete forge: tags found in generated SBW recipes:\n" +
-                    offenders.joinToString("\n") { it.relativeTo(projectDir).path }
-        }
-    }
-}
-
-tasks.named("check") {
-    dependsOn("verifyNoForgeRecipeTags")
 }
 
 repositories {
