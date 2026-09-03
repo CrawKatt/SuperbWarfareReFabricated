@@ -234,15 +234,31 @@ object ModItems {
 
     private fun registerBlueprint(id: String, rarity: Rarity) = registerItem(id) { BlueprintItem(rarity) }
 
-    @JvmField val OEM_STOCK_STANDARD = registerAttachment("oem_stock_standard") {
-        AttachmentItem("${Mod.MODID}:oem_stock_standard")
+    // Stock
+    // @formatter:off
+    @JvmField val OEM_STOCK_LIGHT = registerAttachment("oem_stock_light") {
+        AttachmentItem("${Mod.MODID}:oem_stock_light")
     }
+    @JvmField val OEM_STOCK_HEAVY = registerAttachment("oem_stock_heavy") {
+        AttachmentItem("${Mod.MODID}:oem_stock_heavy")
+    }
+    @JvmField val STOCK_UBR = registerAttachment("stock_ubr") {
+        AttachmentItem("${Mod.MODID}:stock_ubr")
+    }
+    // @formatter:on
+
+    // Magazine
+    // @formatter:off
     @JvmField val MAGAZINE_EXTEND = registerAttachment("magazine_extend") {
         AttachmentItem("${Mod.MODID}:magazine_extend", Rarity.RARE)
     }
     @JvmField val MAGAZINE_EXTEND_PRO = registerAttachment("magazine_extend_pro") {
         AttachmentItem("${Mod.MODID}:magazine_extend_pro", Rarity.EPIC)
     }
+    // @formatter:on
+
+    // Barrel
+    // @formatter:off
     @JvmField val MEOWLENCER = registerAttachment("meowlencer") {
         AttachmentItem("${Mod.MODID}:meowlencer", Rarity.RARE)
     }
@@ -264,9 +280,14 @@ object ModItems {
     @JvmField val LOUDSPEAKER = registerAttachment("loudspeaker") {
         AttachmentItem("${Mod.MODID}:loudspeaker", ModRarities.LEGENDARY)
     }
+    // @formatter:on
+
+    // Grip
+    // @formatter:off
     @JvmField val VERTICAL_GRIP = registerAttachment("vertical_grip") {
         AttachmentItem("${Mod.MODID}:vertical_grip")
     }
+    // @formatter:on
 
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
