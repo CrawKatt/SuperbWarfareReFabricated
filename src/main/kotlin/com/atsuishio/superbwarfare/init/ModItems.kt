@@ -287,6 +287,9 @@ object ModItems {
     @JvmField val VERTICAL_GRIP = registerAttachment("vertical_grip") {
         AttachmentItem("${Mod.MODID}:vertical_grip")
     }
+    @JvmField val TRIANGLE_GRIP = registerAttachment("triangle_grip") {
+        AttachmentItem("${Mod.MODID}:triangle_grip")
+    }
     // @formatter:on
 
     // @formatter:off
