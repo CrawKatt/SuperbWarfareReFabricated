@@ -12,6 +12,7 @@ accessible field net/minecraft/world/entity/Entity boardingCooldown I
 accessible field net/minecraft/world/entity/Entity passengers Lcom/google/common/collect/ImmutableList;
 accessible field net/minecraft/world/entity/Entity levelCallback Lnet/minecraft/world/level/entity/EntityInLevelCallback;
 accessible field net/minecraft/world/entity/Entity removalReason Lnet/minecraft/world/entity/Entity$RemovalReason;
+accessible method net/minecraft/world/entity/Entity getEncodeId ()Ljava/lang/String;
 
 accessible field net/minecraft/world/entity/LivingEntity jumping Z
 accessible field net/minecraft/world/entity/LivingEntity lastHurt F

@@ -3,7 +3,7 @@ import java.time.Instant
 plugins {
     eclipse
     idea
-    id("fabric-loom") version "1.13.6"
+    id("fabric-loom") version "1.17.20"
     kotlin("jvm") version "2.1.20"
     kotlin("plugin.serialization") version "2.1.20"
 }
@@ -269,7 +269,8 @@ dependencies {
     }
 
     // Same relocated Rhino fork used by the NeoForge build.
-    include(implementation(":rhino:1.8.1-SNAPSHOT")!!)
+    implementation("org.ywzj:rhino:1.8.1-SNAPSHOT")
+    include("org.ywzj:rhino:1.8.1-SNAPSHOT")
 
     // Ponder (bundled, same as upstream jij's the Forge variant)
     include(modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("minecraft_version")}:${project.property("ponder_version")}")!!)
