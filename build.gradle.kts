@@ -133,7 +133,7 @@ dependencies {
 
     include(modImplementation("com.github.Sh1roCu:SimpleBedrockModel-Fabric:${project.property("simple_bedrock_model_version")}")!!)
     include(modImplementation("com.github.Nova-Committee:ModernKeyBinding:17bf4f794ae3ce31aee90e0df67e2757c3533d10")!!)
-    modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("parchment_minecraft_version")}:${project.property("ponder_version")}")
+    include(modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("parchment_minecraft_version")}:${project.property("ponder_version")}")!!)
 
     modCompileOnly("maven.modrinth:sable:e11C0I1A") {
         isTransitive = false
