@@ -1,7 +1,4 @@
 {
-  "parent": "superbwarfare:item/glock_17_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/glock_17_icon"
-  }
+  "parent": "minecraft:builtin/entity",
+  "gui_light": "front"
 }
