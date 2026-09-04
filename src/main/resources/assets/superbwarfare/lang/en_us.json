@@ -1,4 +1,4 @@
-{
+﻿{
   "attribute.superbwarfare.block_reach": "Block Reach",
   "attribute.superbwarfare.bullet_resistance": "Bullet Resistance",
   "attribute.superbwarfare.entity_reach": "Entity Reach",
@@ -778,6 +778,7 @@
   "item.superbwarfare.stock_prs": "PRS Heavy Stock",
   "item.superbwarfare.osprey_silencer": "Osprey Handgun Silencer",
   "item.superbwarfare.osprey_silencer_trachelium": "Osprey Handgun Silencer (Trachelium)",
+  "item.superbwarfare.scope_coyote": "Coyote Sight",
   "item.superbwarfare.hpj_11_blueprint": "H/PJ-11 CIWS Blueprint",
   "item.superbwarfare.hunting_rifle": "Hunting Rifle",
   "item.superbwarfare.hunting_rifle_blueprint": "Hunting Rifle Blueprint",
