@@ -4,11 +4,11 @@ import com.atsuishio.superbwarfare.client.model.gun.GeoGunModel
 import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.render.CameraStateCache
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.client.Camera
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -39,7 +39,7 @@ data class BoneScreenPoint(
  *
  * Code based on TACZ-RESPAWN.
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object BedrockBoneCoordinateTool {
 
     private const val CLIP_EPSILON = 1.0e-5f
