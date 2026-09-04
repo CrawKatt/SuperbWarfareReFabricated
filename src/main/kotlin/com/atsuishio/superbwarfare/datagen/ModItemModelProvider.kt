@@ -333,6 +333,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.OSPREY_SILENCER)
         simpleItem(ModItems.OSPREY_SILENCER_TRACHELIUM)
         simpleItem(ModItems.SCOPE_COYOTE)
+        simpleItem(ModItems.SCOPE_ACOG)
 
         // blocks
         evenSimplerBlockItem(ModBlocks.BARBED_WIRE)
