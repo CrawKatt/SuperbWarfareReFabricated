@@ -291,6 +291,13 @@ object ModItems {
     }
     // @formatter:on
 
+    // Scope / sight
+    // @formatter:off
+    @JvmField val SCOPE_COYOTE = registerAttachment("scope_coyote") {
+        AttachmentItem("${Mod.MODID}:scope_coyote")
+    }
+    // @formatter:on
+
     // Grip
     // @formatter:off
     @JvmField val VERTICAL_GRIP = registerAttachment("vertical_grip") {
