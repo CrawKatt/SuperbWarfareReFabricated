@@ -245,6 +245,9 @@ object ModItems {
     @JvmField val STOCK_UBR = registerAttachment("stock_ubr") {
         AttachmentItem("${Mod.MODID}:stock_ubr")
     }
+    @JvmField val STOCK_PRS = registerAttachment("stock_prs") {
+        AttachmentItem("${Mod.MODID}:stock_prs")
+    }
     // @formatter:on
 
     // Magazine
