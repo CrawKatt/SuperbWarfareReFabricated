@@ -289,6 +289,9 @@ object ModItems {
     @JvmField val OSPREY_SILENCER_TRACHELIUM = registerAttachment("osprey_silencer_trachelium") {
         AttachmentItem("${Mod.MODID}:osprey_silencer_trachelium", ModRarities.LEGENDARY)
     }
+    @JvmField val SILENCER_QINGLAN = registerAttachment("silencer_qinglan") {
+        AttachmentItem("${Mod.MODID}:silencer_qinglan", ModRarities.VIRTUAL)
+    }
     // @formatter:on
 
     // Scope / sight
