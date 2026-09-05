@@ -5,7 +5,7 @@ import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.ObjectToList
 import team.reborn.energy.api.EnergyStorage
 import com.atsuishio.superbwarfare.capability.api.IItemHandler
-import com.atsuishio.superbwarfare.capability.living.InfiniteAmmoCapability
+import com.atsuishio.superbwarfare.capability.entity.InfiniteAmmoCapability
 import com.atsuishio.superbwarfare.data.JsonPropertyModifier
 import com.atsuishio.superbwarfare.data.PMC
 import com.atsuishio.superbwarfare.data.StringOrVec3

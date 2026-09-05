@@ -1,6 +1,6 @@
-package com.atsuishio.superbwarfare.capability.living
+package com.atsuishio.superbwarfare.capability.entity
 
-import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.init.ModComponents
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
@@ -21,7 +21,7 @@ class InfiniteAmmoCapability(var hasInfiniteAmmo: Boolean = false) : Component {
 
     companion object {
         @JvmField
-        val ID = loc("infinite_ammo_capability")
+        val ID = Mod.loc("infinite_ammo_capability")
 
         const val TAG_INFINITE_AMMO = "SbwInfiniteAmmo"
 

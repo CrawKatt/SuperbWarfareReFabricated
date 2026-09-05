@@ -1,6 +1,6 @@
 package com.atsuishio.superbwarfare.item.ammo
 
-import com.atsuishio.superbwarfare.capability.living.InfiniteAmmoCapability
+import com.atsuishio.superbwarfare.capability.entity.InfiniteAmmoCapability
 import com.atsuishio.superbwarfare.network.message.receive.ClientInfiniteAmmoMessage
 import com.atsuishio.superbwarfare.tools.sendPacketTo
 import com.atsuishio.superbwarfare.tools.sendPacketToTrackingThis
@@ -41,7 +41,10 @@ object CreativeAmmoBoxItem : Item(Properties().rarity(Rarity.EPIC).stacksTo(1)) 
         tooltipFlag: TooltipFlag
     ) {
         tooltipComponents.add(
-            Component.translatable("des.superbwarfare.creative_ammo_box").withStyle(ChatFormatting.GRAY)
+            Component.translatable("des.superbwarfare.creative_ammo_box_1").withStyle(ChatFormatting.GRAY)
+        )
+        tooltipComponents.add(
+            Component.translatable("des.superbwarfare.creative_ammo_box_2").withStyle(ChatFormatting.GRAY)
         )
     }
 
@@ -60,8 +63,13 @@ object CreativeAmmoBoxItem : Item(Properties().rarity(Rarity.EPIC).stacksTo(1)) 
             it.hasInfiniteAmmo = hasInfiniteAmmo
         }
 
-        // TODO message
-        player?.displayClientMessage(Component.literal(if (hasInfiniteAmmo) "+ infinity" else "- infinity"), true)
+        player?.displayClientMessage(
+            Component.translatable(
+                "des.superbwarfare.creative_ammo_box.${if (hasInfiniteAmmo) "enabled" else "disabled"}",
+                entity.displayName
+            ).withStyle(if (hasInfiniteAmmo) ChatFormatting.GREEN else ChatFormatting.RED),
+            true
+        )
 
         if (entity is Player) {
             sendPacketTo(entity, ClientInfiniteAmmoMessage(entity.id, hasInfiniteAmmo))
