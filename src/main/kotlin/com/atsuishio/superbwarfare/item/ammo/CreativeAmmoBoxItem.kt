@@ -21,9 +21,16 @@ import net.minecraft.world.level.Level
 object CreativeAmmoBoxItem : Item(Properties().rarity(Rarity.EPIC).stacksTo(1)) {
 
     init {
-        UseEntityCallback.EVENT.register { player, _, _, entity, _ ->
-            invertInfiniteAmmo(player, entity)
-            InteractionResult.PASS
+        UseEntityCallback.EVENT.register { player, _, hand, entity, _ ->
+            if (player.getItemInHand(hand).item != this) {
+                return@register InteractionResult.PASS
+            }
+
+            if (invertInfiniteAmmo(player, entity)) {
+                InteractionResult.SUCCESS
+            } else {
+                InteractionResult.PASS
+            }
         }
     }
 
@@ -43,8 +50,8 @@ object CreativeAmmoBoxItem : Item(Properties().rarity(Rarity.EPIC).stacksTo(1)) 
         return super.use(level, player, usedHand)
     }
 
-    private fun invertInfiniteAmmo(player: Player? = null, entity: Entity) {
-        if (entity.level().isClientSide) return
+    private fun invertInfiniteAmmo(player: Player? = null, entity: Entity): Boolean {
+        if (entity.level().isClientSide) return false
 
         var hasInfiniteAmmo = false
 
@@ -60,5 +67,6 @@ object CreativeAmmoBoxItem : Item(Properties().rarity(Rarity.EPIC).stacksTo(1)) 
             sendPacketTo(entity, ClientInfiniteAmmoMessage(entity.id, hasInfiniteAmmo))
         }
         entity.sendPacketToTrackingThis(ClientInfiniteAmmoMessage(entity.id, hasInfiniteAmmo))
+        return true
     }
 }
