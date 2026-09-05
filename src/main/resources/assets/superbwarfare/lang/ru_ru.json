@@ -331,7 +331,10 @@
   "des.superbwarfare.container.fail.empty": "Этот контейнер пуст",
   "des.superbwarfare.container.fail.open": "Недостаточно свободного места",
   "des.superbwarfare.container.info": "Нажмите %1$s чтобы посмотреь информацию",
-  "des.superbwarfare.creative_ammo_box": "Когда находится в инвентаре, снабажает бесконечными боеприпасами",
+  "des.superbwarfare.creative_ammo_box_1": "Когда находится в инвентаре, снабажает бесконечными боеприпасами",
+  "des.superbwarfare.creative_ammo_box_2": "Щёлкните ПКМ, чтобы переключить свой режим бесконечных боеприпасов, или щёлкните ПКМ по сущности, чтобы переключить её режим",
+  "des.superbwarfare.creative_ammo_box.enabled": "Режим бесконечных боеприпасов включён для %1$s",
+  "des.superbwarfare.creative_ammo_box.disabled": "Режим бесконечных боеприпасов выключен для %1$s",
   "des.superbwarfare.creative_charging_station": "Заряжает ближайшие сущности и соседние блоки, также используется как источник энергии",
   "des.superbwarfare.creative_charging_station.charge.success": "Предмет успешно заряжен!",
   "des.superbwarfare.creative_charging_station.extract.success": "Предмет успешно разряжен!",
@@ -1387,5 +1390,10 @@
   "weapon.superbwarfare.ru_3m14_missile": "Крылатая ракета 3М-14 \"Калибр\" %1$s",
   "weapon.superbwarfare.sc_250_bomb": "Авиабомба общего назначения SC-250 %1$s",
   "weapon.superbwarfare.sc_50_bomb": "Авиабомба общего назначения SC-50 %1$s",
-  "weapon.superbwarfare.swarm_drone": "РОЕВОЙ ДРОН %1$s"
+  "weapon.superbwarfare.swarm_drone": "РОЕВОЙ ДРОН %1$s",
+  "commands.superbwarfare.ammo.infinite.set.enabled.single": "Режим бесконечных боеприпасов включён для %1$s",
+  "commands.superbwarfare.ammo.infinite.set.disabled.single": "Режим бесконечных боеприпасов выключен для %1$s",
+  "commands.superbwarfare.ammo.infinite.set.enabled.multiple": "Режим бесконечных боеприпасов включён для %1$s сущностей",
+  "commands.superbwarfare.ammo.infinite.set.disabled.multiple": "Режим бесконечных боеприпасов выключен для %1$s сущностей",
+  "commands.superbwarfare.ammo.infinite.get": "Режим бесконечных боеприпасов сущности %1$s: %2$s"
 }

@@ -138,7 +138,10 @@
   "des.superbwarfare.container.fail.crowbar": "Peut-être essayez un autre outil",
   "des.superbwarfare.container.fail.empty": "Ce conteneur est vide",
   "des.superbwarfare.container.fail.open": "Pas assez d'espace",
-  "des.superbwarfare.creative_ammo_box": "Fournit des munitions infinies lorsqu'elle est placée dans l'inventaire",
+  "des.superbwarfare.creative_ammo_box_1": "Fournit des munitions infinies lorsqu'elle est placée dans l'inventaire",
+  "des.superbwarfare.creative_ammo_box_2": "Clic droit pour activer ou désactiver votre mode de munitions infinies, clic droit sur une entité pour modifier le sien",
+  "des.superbwarfare.creative_ammo_box.enabled": "Mode de munitions infinies activé pour %1$s",
+  "des.superbwarfare.creative_ammo_box.disabled": "Mode de munitions infinies désactivé pour %1$s",
   "des.superbwarfare.creative_charging_station": "Charge les entités proches et les blocs adjacents, peut aussi servir de source énergétique portable",
   "des.superbwarfare.creative_charging_station.charge.success": "Objet chargé avec succès !",
   "des.superbwarfare.creative_charging_station.extract.success": "Objet déchargé avec succès !",
@@ -514,5 +517,10 @@
   "tips.superbwarfare.shoot.rings": "Anneaux",
   "tips.superbwarfare.target.damage": "Dégâts : %1$s Distance : %2$sm",
   "tips.superbwarfare.target.down": "Cible abattue %1$s",
-  "trinkets.slot.chest.dog_tag": "Plaque d'identité"
+  "trinkets.slot.chest.dog_tag": "Plaque d'identité",
+  "commands.superbwarfare.ammo.infinite.set.enabled.single": "Mode de munitions infinies activé pour %1$s",
+  "commands.superbwarfare.ammo.infinite.set.disabled.single": "Mode de munitions infinies désactivé pour %1$s",
+  "commands.superbwarfare.ammo.infinite.set.enabled.multiple": "Mode de munitions infinies activé pour %1$s entités",
+  "commands.superbwarfare.ammo.infinite.set.disabled.multiple": "Mode de munitions infinies désactivé pour %1$s entités",
+  "commands.superbwarfare.ammo.infinite.get": "Le mode de munitions infinies de l'entité %1$s est %2$s"
 }

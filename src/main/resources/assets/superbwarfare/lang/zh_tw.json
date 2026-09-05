@@ -189,7 +189,10 @@
   "des.superbwarfare.container.fail.crowbar": "或許應該換個工具試試",
   "des.superbwarfare.container.fail.empty": "這個箱子是空的",
   "des.superbwarfare.container.fail.open": "空間不足",
-  "des.superbwarfare.creative_ammo_box": "放置於背包中以提供無限彈藥",
+  "des.superbwarfare.creative_ammo_box_1": "放置於背包中以提供無限彈藥",
+  "des.superbwarfare.creative_ammo_box_2": "右鍵切換自己的無限彈藥模式，右鍵任意實體切換該實體的無限彈藥模式",
+  "des.superbwarfare.creative_ammo_box.enabled": "已為 %1$s 啟用無限彈藥模式",
+  "des.superbwarfare.creative_ammo_box.disabled": "已為 %1$s 停用無限彈藥模式",
   "des.superbwarfare.creative_charging_station": "為附近實體及相鄰方塊充能，亦可作為電源物品使用",
   "des.superbwarfare.creative_charging_station.charge.success": "成功為該物品充能！",
   "des.superbwarfare.creative_charging_station.extract.success": "成功清空該物品的能量！",
@@ -732,5 +735,10 @@
   "tips.superbwarfare.target.pitch": "目標俯仰角：",
   "tips.superbwarfare.target.yaw": "目標偏航角：",
   "trinkets.slot.chest.dog_tag": "狗牌",
-  "trinkets.slot.chest.iff": "敵我識別裝置"
+  "trinkets.slot.chest.iff": "敵我識別裝置",
+  "commands.superbwarfare.ammo.infinite.set.enabled.single": "已為 %1$s 啟用無限彈藥模式",
+  "commands.superbwarfare.ammo.infinite.set.disabled.single": "已為 %1$s 停用無限彈藥模式",
+  "commands.superbwarfare.ammo.infinite.set.enabled.multiple": "已為 %1$s 個實體啟用無限彈藥模式",
+  "commands.superbwarfare.ammo.infinite.set.disabled.multiple": "已為 %1$s 個實體停用無限彈藥模式",
+  "commands.superbwarfare.ammo.infinite.get": "實體 %1$s 的無限彈藥模式為 %2$s"
 }

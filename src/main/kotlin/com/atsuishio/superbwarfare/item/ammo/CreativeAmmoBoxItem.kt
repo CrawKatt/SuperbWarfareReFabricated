@@ -27,7 +27,7 @@ object CreativeAmmoBoxItem : Item(Properties().rarity(Rarity.EPIC).stacksTo(1)) 
             }
 
             if (invertInfinityAmmo(player, entity)) {
-                InteractionResult.SUCCESS
+                InteractionResult.FAIL
             } else {
                 InteractionResult.PASS
             }
@@ -41,7 +41,10 @@ object CreativeAmmoBoxItem : Item(Properties().rarity(Rarity.EPIC).stacksTo(1)) 
         pIsAdvanced: TooltipFlag
     ) {
         pTooltipComponents.add(
-            Component.translatable("des.superbwarfare.creative_ammo_box").withStyle(ChatFormatting.GRAY)
+            Component.translatable("des.superbwarfare.creative_ammo_box_1").withStyle(ChatFormatting.GRAY)
+        )
+        pTooltipComponents.add(
+            Component.translatable("des.superbwarfare.creative_ammo_box_2").withStyle(ChatFormatting.GRAY)
         )
     }
 
@@ -64,9 +67,11 @@ object CreativeAmmoBoxItem : Item(Properties().rarity(Rarity.EPIC).stacksTo(1)) 
             it.hasInfinityAmmo = hasInfiniteAmmo
         }
 
-        // TODO message
         player?.displayClientMessage(
-            Component.literal(if (hasInfiniteAmmo) "+ infinity" else "- infinity"),
+            Component.translatable(
+                "des.superbwarfare.creative_ammo_box.${if (hasInfiniteAmmo) "enabled" else "disabled"}",
+                entity.displayName
+            ).withStyle(if (hasInfiniteAmmo) ChatFormatting.GREEN else ChatFormatting.RED),
             true
         )
 

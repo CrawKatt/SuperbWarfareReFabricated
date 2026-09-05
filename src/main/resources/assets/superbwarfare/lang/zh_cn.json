@@ -346,7 +346,10 @@
   "des.superbwarfare.container.fail.open": "没有足够的空间",
   "des.superbwarfare.container.info": "按下 %1$s 键查看简介",
   "des.superbwarfare.container.sponsor": "赞助者: %1$s",
-  "des.superbwarfare.creative_ammo_box": "放置在背包中以提供无限的弹药",
+  "des.superbwarfare.creative_ammo_box_1": "放置在背包中以提供无限的弹药",
+  "des.superbwarfare.creative_ammo_box_2": "右键切换自己的无限弹药模式，右键任意实体切换该实体的无限弹药模式",
+  "des.superbwarfare.creative_ammo_box.enabled": "已为 %1$s 启用无限弹药模式",
+  "des.superbwarfare.creative_ammo_box.disabled": "已为 %1$s 禁用无限弹药模式",
   "des.superbwarfare.creative_charging_station": "充能附近的实体和相邻方块，也可以作为电源物品使用",
   "des.superbwarfare.creative_charging_station.charge.success": "成功充能该物品！",
   "des.superbwarfare.creative_charging_station.extract.success": "成功清空该物品的能量！",
@@ -1487,5 +1490,10 @@
   "weapon.superbwarfare.sc_250_bomb": "SC-250 GP航空炸弹 %1$s",
   "weapon.superbwarfare.sc_50_bomb": "SC-50 GP航空炸弹 %1$s",
   "weapon.superbwarfare.swarm_drone": "蜂群无人机 %1$s",
-  "weapon.superbwarfare.tow_missile": "“陶”式反坦克导弹 %1$s"
+  "weapon.superbwarfare.tow_missile": "“陶”式反坦克导弹 %1$s",
+  "commands.superbwarfare.ammo.infinite.set.enabled.single": "已为 %1$s 启用无限弹药模式",
+  "commands.superbwarfare.ammo.infinite.set.disabled.single": "已为 %1$s 禁用无限弹药模式",
+  "commands.superbwarfare.ammo.infinite.set.enabled.multiple": "已为 %1$s 个实体启用无限弹药模式",
+  "commands.superbwarfare.ammo.infinite.set.disabled.multiple": "已为 %1$s 个实体禁用无限弹药模式",
+  "commands.superbwarfare.ammo.infinite.get": "实体 %1$s 的无限弹药模式为 %2$s"
 }

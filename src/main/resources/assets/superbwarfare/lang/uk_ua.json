@@ -331,7 +331,10 @@
   "des.superbwarfare.container.fail.empty": "Цей контейнер порожній",
   "des.superbwarfare.container.fail.open": "Недостатньо місця",
   "des.superbwarfare.container.info": "Натисніть %1$s щоб побачити інформацію",
-  "des.superbwarfare.creative_ammo_box": "Надає нескінченні боєприпаси при триманні в інвентарі",
+  "des.superbwarfare.creative_ammo_box_1": "Надає нескінченні боєприпаси при триманні в інвентарі",
+  "des.superbwarfare.creative_ammo_box_2": "Клацніть ПКМ, щоб перемкнути свій режим нескінченних боєприпасів, або клацніть ПКМ по сутності, щоб перемкнути її режим",
+  "des.superbwarfare.creative_ammo_box.enabled": "Режим нескінченних боєприпасів увімкнено для %1$s",
+  "des.superbwarfare.creative_ammo_box.disabled": "Режим нескінченних боєприпасів вимкнено для %1$s",
   "des.superbwarfare.creative_charging_station": "Заряджання об'єктів поблизу та суміжні блоки, також можуть бути використані як джерело енергії",
   "des.superbwarfare.creative_charging_station.charge.success": "Успішно заряджено цей предмет!",
   "des.superbwarfare.creative_charging_station.extract.success": "Енергія успішно очищена!",
@@ -1384,5 +1387,10 @@
   "weapon.superbwarfare.sc_250_bomb": "БОМБА ЗАГАЛЬНОГО ПРИЗНАЧЕННЯ SC-250 %1$s",
   "weapon.superbwarfare.sc_50_bomb": "БОМБА ЗАГАЛЬНОГО ПРИЗНАЧЕННЯ SC-50 %1$s",
   "weapon.superbwarfare.swarm_drone": "РОЙОВИЙ ДРОН %1$s",
-  "weapon.superbwarfare.tow_missile": "TOW"
+  "weapon.superbwarfare.tow_missile": "TOW",
+  "commands.superbwarfare.ammo.infinite.set.enabled.single": "Режим нескінченних боєприпасів увімкнено для %1$s",
+  "commands.superbwarfare.ammo.infinite.set.disabled.single": "Режим нескінченних боєприпасів вимкнено для %1$s",
+  "commands.superbwarfare.ammo.infinite.set.enabled.multiple": "Режим нескінченних боєприпасів увімкнено для %1$s сутностей",
+  "commands.superbwarfare.ammo.infinite.set.disabled.multiple": "Режим нескінченних боєприпасів вимкнено для %1$s сутностей",
+  "commands.superbwarfare.ammo.infinite.get": "Режим нескінченних боєприпасів сутності %1$s: %2$s"
 }

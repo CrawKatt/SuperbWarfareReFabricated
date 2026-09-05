@@ -181,7 +181,10 @@
   "des.superbwarfare.container.fail.crowbar": "別のツールを試してみてください",
   "des.superbwarfare.container.fail.empty": "コンテナは空です",
   "des.superbwarfare.container.fail.open": "十分なスペースがありません",
-  "des.superbwarfare.creative_ammo_box": "インベントリに配置すると弾薬が無限に供給されます",
+  "des.superbwarfare.creative_ammo_box_1": "インベントリに配置すると弾薬が無限に供給されます",
+  "des.superbwarfare.creative_ammo_box_2": "右クリックで自分の無限弾薬モードを切り替え、エンティティを右クリックしてその無限弾薬モードを切り替えます",
+  "des.superbwarfare.creative_ammo_box.enabled": "%1$s の無限弾薬モードを有効にしました",
+  "des.superbwarfare.creative_ammo_box.disabled": "%1$s の無限弾薬モードを無効にしました",
   "des.superbwarfare.creative_charging_station": "近くのエンティティや隣接するブロックを充電し、電源アイテムとしても使用できます。",
   "des.superbwarfare.creative_charging_station.charge.success": "アイテムは正常に充電されました！",
   "des.superbwarfare.creative_charging_station.extract.success": "アイテムは正常に放電されました！",
@@ -667,5 +670,10 @@
   "tips.superbwarfare.target.damage": "ダメージ: %1$s 距離: %2$s",
   "tips.superbwarfare.target.down": "的ダウン %1$s",
   "tips.superbwarfare.vehicle_assembling_table.warn": "車両を解体するための場所が足りません",
-  "trinkets.slot.chest.dog_tag": "ドッグタグ(認識票)"
+  "trinkets.slot.chest.dog_tag": "ドッグタグ(認識票)",
+  "commands.superbwarfare.ammo.infinite.set.enabled.single": "%1$s の無限弾薬モードを有効にしました",
+  "commands.superbwarfare.ammo.infinite.set.disabled.single": "%1$s の無限弾薬モードを無効にしました",
+  "commands.superbwarfare.ammo.infinite.set.enabled.multiple": "%1$s 個のエンティティの無限弾薬モードを有効にしました",
+  "commands.superbwarfare.ammo.infinite.set.disabled.multiple": "%1$s 個のエンティティの無限弾薬モードを無効にしました",
+  "commands.superbwarfare.ammo.infinite.get": "エンティティ %1$s の無限弾薬モードは %2$s です"
 }

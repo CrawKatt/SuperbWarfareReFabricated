@@ -180,7 +180,10 @@
   "des.superbwarfare.container.fail.crowbar": "Quizás intenta con otra herramienta",
   "des.superbwarfare.container.fail.empty": "Este contenedor está vacío",
   "des.superbwarfare.container.fail.open": "No hay suficiente espacio",
-  "des.superbwarfare.creative_ammo_box": "Proporciona munición infinita cuando está en el inventario",
+  "des.superbwarfare.creative_ammo_box_1": "Proporciona munición infinita cuando está en el inventario",
+  "des.superbwarfare.creative_ammo_box_2": "Haz clic derecho para alternar tu modo de munición infinita, haz clic derecho en cualquier entidad para alternar su modo de munición infinita",
+  "des.superbwarfare.creative_ammo_box.enabled": "Modo de munición infinita activado para %1$s",
+  "des.superbwarfare.creative_ammo_box.disabled": "Modo de munición infinita desactivado para %1$s",
   "des.superbwarfare.creative_charging_station": "Carga entidades cercanas y bloques adyacentes, también puede usarse como fuente de energía",
   "des.superbwarfare.creative_charging_station.charge.success": "¡Ítem cargado exitosamente!",
   "des.superbwarfare.creative_charging_station.extract.success": "¡Energía del ítem limpiada exitosamente!",
@@ -656,5 +659,10 @@
   "tips.superbwarfare.target.down": "Objetivo eliminado %1$s",
   "tips.superbwarfare.target.pitch": "Cabeceo objetivo: ",
   "tips.superbwarfare.target.yaw": "Guiñada objetivo: ",
-  "trinkets.slot.chest.dog_tag": "Placa de Identificación"
+  "trinkets.slot.chest.dog_tag": "Placa de Identificación",
+  "commands.superbwarfare.ammo.infinite.set.enabled.single": "Modo de munición infinita activado para %1$s",
+  "commands.superbwarfare.ammo.infinite.set.disabled.single": "Modo de munición infinita desactivado para %1$s",
+  "commands.superbwarfare.ammo.infinite.set.enabled.multiple": "Modo de munición infinita activado para %1$s entidades",
+  "commands.superbwarfare.ammo.infinite.set.disabled.multiple": "Modo de munición infinita desactivado para %1$s entidades",
+  "commands.superbwarfare.ammo.infinite.get": "El modo de munición infinita de la entidad %1$s es %2$s"
 }

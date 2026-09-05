@@ -45,7 +45,10 @@
   "des.superbwarfare.container.fail.crowbar": "Forse prova un altro strumento",
   "des.superbwarfare.container.fail.empty": "Questo contenitore è vuoto",
   "des.superbwarfare.container.fail.open": "Spazio insufficiente",
-  "des.superbwarfare.creative_ammo_box": "Fornisce munizioni infinite quando posizionato nell'inventario",
+  "des.superbwarfare.creative_ammo_box_1": "Fornisce munizioni infinite quando posizionato nell'inventario",
+  "des.superbwarfare.creative_ammo_box_2": "Fai clic destro per attivare o disattivare la tua modalità munizioni infinite, fai clic destro su un'entità per modificare la sua",
+  "des.superbwarfare.creative_ammo_box.enabled": "Modalità munizioni infinite attivata per %1$s",
+  "des.superbwarfare.creative_ammo_box.disabled": "Modalità munizioni infinite disattivata per %1$s",
   "des.superbwarfare.field_doctor": "I proiettili curano gli alleati mentre spari senza mirare.",
   "des.superbwarfare.fumo_25.current_pos": "Posizione attuale: %1$s",
   "des.superbwarfare.fumo_25.current_target": "Bersaglio: %1$s",
@@ -242,5 +245,10 @@
   "item_group.superbwarfare.item": "Oggetti Superb Warfare",
   "item_group.superbwarfare.perk": "permessi Superb Warfare",
   "perk.superbwarfare.slot": "Tipo: ",
-  "trinkets.slot.chest.dog_tag": "Gettone"
+  "trinkets.slot.chest.dog_tag": "Gettone",
+  "commands.superbwarfare.ammo.infinite.set.enabled.single": "Modalità munizioni infinite attivata per %1$s",
+  "commands.superbwarfare.ammo.infinite.set.disabled.single": "Modalità munizioni infinite disattivata per %1$s",
+  "commands.superbwarfare.ammo.infinite.set.enabled.multiple": "Modalità munizioni infinite attivata per %1$s entità",
+  "commands.superbwarfare.ammo.infinite.set.disabled.multiple": "Modalità munizioni infinite disattivata per %1$s entità",
+  "commands.superbwarfare.ammo.infinite.get": "La modalità munizioni infinite dell'entità %1$s è %2$s"
 }

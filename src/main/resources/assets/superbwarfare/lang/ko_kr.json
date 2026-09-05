@@ -186,7 +186,10 @@
   "des.superbwarfare.container.fail.crowbar": "다른 도구를 사용해 보세요",
   "des.superbwarfare.container.fail.empty": "이 컨테이너는 비어 있습니다",
   "des.superbwarfare.container.fail.open": "저장 공간 부족",
-  "des.superbwarfare.creative_ammo_box": "인벤토리에 넣으면 탄약이 무한 제공됩니다",
+  "des.superbwarfare.creative_ammo_box_1": "인벤토리에 넣으면 탄약이 무한 제공됩니다",
+  "des.superbwarfare.creative_ammo_box_2": "우클릭으로 자신의 무한 탄약 모드를 전환하고, 엔티티를 우클릭하여 해당 엔티티의 무한 탄약 모드를 전환합니다",
+  "des.superbwarfare.creative_ammo_box.enabled": "%1$s의 무한 탄약 모드를 활성화했습니다",
+  "des.superbwarfare.creative_ammo_box.disabled": "%1$s의 무한 탄약 모드를 비활성화했습니다",
   "des.superbwarfare.creative_charging_station": "근처 엔티티와 인접 블록을 충전하고 전원 원천 아이템으로도 사용할 수 있습니다",
   "des.superbwarfare.creative_charging_station.charge.success": "이 아이템이 성공적으로 충전되었습니다!",
   "des.superbwarfare.creative_charging_station.extract.success": "이 아이템에서 에너지를 성공적으로 제거했습니다!",
@@ -675,5 +678,10 @@
   "tips.superbwarfare.target.pitch": "대상 Pitch: ",
   "tips.superbwarfare.target.yaw": "대상 Yaw: ",
   "trinkets.slot.chest.dog_tag": "군번줄",
-  "trinkets.slot.chest.iff": "피아식별장치"
+  "trinkets.slot.chest.iff": "피아식별장치",
+  "commands.superbwarfare.ammo.infinite.set.enabled.single": "%1$s의 무한 탄약 모드를 활성화했습니다",
+  "commands.superbwarfare.ammo.infinite.set.disabled.single": "%1$s의 무한 탄약 모드를 비활성화했습니다",
+  "commands.superbwarfare.ammo.infinite.set.enabled.multiple": "%1$s개 엔티티의 무한 탄약 모드를 활성화했습니다",
+  "commands.superbwarfare.ammo.infinite.set.disabled.multiple": "%1$s개 엔티티의 무한 탄약 모드를 비활성화했습니다",
+  "commands.superbwarfare.ammo.infinite.get": "엔티티 %1$s의 무한 탄약 모드는 %2$s입니다"
 }
