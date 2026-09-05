@@ -5,7 +5,7 @@ import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.ObjectToList
 import team.reborn.energy.api.EnergyStorage
 import com.atsuishio.superbwarfare.capability.api.IItemHandler
-import com.atsuishio.superbwarfare.capability.living.InfinityAmmoCapability
+import com.atsuishio.superbwarfare.capability.living.InfiniteAmmoCapability
 import com.atsuishio.superbwarfare.data.JsonPropertyModifier
 import com.atsuishio.superbwarfare.data.PMC
 import com.atsuishio.superbwarfare.data.StringOrVec3
@@ -377,7 +377,7 @@ class GunData private constructor(
      */
     fun hasInfiniteBackupAmmo(shooter: Entity?): Boolean {
         return shooter is Player && shooter.isCreative
-                || shooter?.let { InfinityAmmoCapability.get(it) }?.hasInfinityAmmo ?: false
+                || shooter?.let { InfiniteAmmoCapability.get(it) }?.hasInfiniteAmmo ?: false
                 || selectedAmmoConsumer().type == AmmoConsumer.AmmoConsumeType.INFINITE
                 || meleeOnly()
                 || InventoryTool.hasCreativeAmmoBox(shooter)

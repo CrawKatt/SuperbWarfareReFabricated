@@ -32,7 +32,7 @@
     "cardinal-components": [
       "superbwarfare:player_variable",
       "superbwarfare:phosphorus_fire_capability",
-      "superbwarfare:infinity_ammo_capability"
+      "superbwarfare:infinite_ammo_capability"
     ]
   },
   "mixins": [

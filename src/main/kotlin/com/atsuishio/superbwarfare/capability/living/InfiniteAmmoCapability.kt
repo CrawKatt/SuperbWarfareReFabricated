@@ -7,31 +7,31 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.entity.Entity
 import org.ladysnake.cca.api.v3.component.Component
 
-class InfinityAmmoCapability(var hasInfinityAmmo: Boolean = false) : Component {
+class InfiniteAmmoCapability(var hasInfiniteAmmo: Boolean = false) : Component {
 
     override fun writeToNbt(tag: CompoundTag, registryLookup: HolderLookup.Provider) {
-        tag.putBoolean(TAG_INFINITY_AMMO, hasInfinityAmmo)
+        tag.putBoolean(TAG_INFINITE_AMMO, hasInfiniteAmmo)
     }
 
     override fun readFromNbt(tag: CompoundTag, registryLookup: HolderLookup.Provider) {
-        if (tag.contains(TAG_INFINITY_AMMO)) {
-            this.hasInfinityAmmo = tag.getBoolean(TAG_INFINITY_AMMO)
+        if (tag.contains(TAG_INFINITE_AMMO)) {
+            this.hasInfiniteAmmo = tag.getBoolean(TAG_INFINITE_AMMO)
         }
     }
 
     companion object {
         @JvmField
-        val ID = loc("infinity_ammo_capability")
+        val ID = loc("infinite_ammo_capability")
 
-        const val TAG_INFINITY_AMMO = "SbwInfinityAmmo"
+        const val TAG_INFINITE_AMMO = "SbwInfiniteAmmo"
 
         @JvmStatic
-        fun get(entity: Entity): InfinityAmmoCapability {
-            return ModComponents.INFINITY_AMMO.get(entity)
+        fun get(entity: Entity): InfiniteAmmoCapability {
+            return ModComponents.INFINITE_AMMO.get(entity)
         }
 
         @JvmStatic
-        fun modify(entity: Entity, modifier: (InfinityAmmoCapability) -> Unit) {
+        fun modify(entity: Entity, modifier: (InfiniteAmmoCapability) -> Unit) {
             val data = get(entity)
             data.apply(modifier)
         }
