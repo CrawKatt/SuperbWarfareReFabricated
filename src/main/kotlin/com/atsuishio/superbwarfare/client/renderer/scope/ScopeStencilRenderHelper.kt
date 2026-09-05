@@ -1,17 +1,18 @@
 package com.atsuishio.superbwarfare.client.renderer.scope
 
+import com.atsuishio.superbwarfare.accessor.RenderTargetStencilAccessor
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import org.lwjgl.opengl.GL11
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object ScopeStencilRenderHelper {
 
     fun enableItemEntityStencilTest() {
         RenderSystem.assertOnRenderThread()
-        Minecraft.getInstance().mainRenderTarget.enableStencil()
+        (Minecraft.getInstance().mainRenderTarget as RenderTargetStencilAccessor).`superbwarfare$enableStencil`()
         GL11.glEnable(GL11.GL_STENCIL_TEST)
     }
 

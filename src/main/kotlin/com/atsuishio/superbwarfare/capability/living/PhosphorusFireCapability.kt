@@ -8,8 +8,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.LivingEntity
 import org.ladysnake.cca.api.v3.component.Component
 
-class PhosphorusFireCapability : Component {
-    var isOnFire: Boolean = false
+class PhosphorusFireCapability(var isOnFire: Boolean = false) : Component {
 
     override fun readFromNbt(tag: CompoundTag, registryLookup: HolderLookup.Provider) {
         if (tag.contains(TAG_PHOSPHORUS_FIRE)) {

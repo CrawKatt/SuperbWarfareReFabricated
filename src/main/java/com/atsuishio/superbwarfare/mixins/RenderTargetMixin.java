@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import java.nio.IntBuffer;
+
 @Mixin(RenderTarget.class)
 public abstract class RenderTargetMixin implements RenderTargetStencilAccessor {
 
@@ -53,7 +55,8 @@ public abstract class RenderTargetMixin implements RenderTargetStencilAccessor {
             method = "createBuffers",
             at = @At(
                     value = "INVOKE",
-                    target = "Lcom/mojang/blaze3d/platform/GlStateManager;_texImage2D(IIIIIIIILjava/nio/IntBuffer;)V"
+                    target = "Lcom/mojang/blaze3d/platform/GlStateManager;_texImage2D(IIIIIIIILjava/nio/IntBuffer;)V",
+                    ordinal = 0
             )
     )
     private void superbwarfare$useDepthStencilTexture(
@@ -65,7 +68,7 @@ public abstract class RenderTargetMixin implements RenderTargetStencilAccessor {
             int border,
             int format,
             int type,
-            java.nio.IntBuffer pixels
+            IntBuffer pixels
     ) {
         if (this.superbwarfare$stencilEnabled) {
             GlStateManager._texImage2D(
