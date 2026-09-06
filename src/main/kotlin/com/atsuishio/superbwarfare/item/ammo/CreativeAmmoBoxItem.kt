@@ -26,7 +26,7 @@ object CreativeAmmoBoxItem : Item(Properties().rarity(Rarity.EPIC).stacksTo(1)) 
                 return@register InteractionResult.PASS
             }
 
-            if (invertInfinityAmmo(player, entity)) {
+            if (invertInfiniteAmmo(player, entity)) {
                 InteractionResult.FAIL
             } else {
                 InteractionResult.PASS
@@ -41,10 +41,12 @@ object CreativeAmmoBoxItem : Item(Properties().rarity(Rarity.EPIC).stacksTo(1)) 
         pIsAdvanced: TooltipFlag
     ) {
         pTooltipComponents.add(
-            Component.translatable("des.superbwarfare.creative_ammo_box_1").withStyle(ChatFormatting.GRAY)
+            Component.translatable("des.superbwarfare.creative_ammo_box_1")
+                .withStyle(ChatFormatting.GRAY)
         )
         pTooltipComponents.add(
-            Component.translatable("des.superbwarfare.creative_ammo_box_2").withStyle(ChatFormatting.GRAY)
+            Component.translatable("des.superbwarfare.creative_ammo_box_2")
+                .withStyle(ChatFormatting.GRAY)
         )
     }
 
@@ -53,18 +55,18 @@ object CreativeAmmoBoxItem : Item(Properties().rarity(Rarity.EPIC).stacksTo(1)) 
         player: Player,
         usedHand: InteractionHand
     ): InteractionResultHolder<ItemStack> {
-        invertInfinityAmmo(player, player)
+        invertInfiniteAmmo(player, player)
         return super.use(level, player, usedHand)
     }
 
-    private fun invertInfinityAmmo(player: Player? = null, entity: Entity): Boolean {
+    private fun invertInfiniteAmmo(player: Player? = null, entity: Entity): Boolean {
         if (entity.level().isClientSide) return false
 
         var hasInfiniteAmmo = false
 
         InfiniteAmmoCapability.modify(entity) {
-            hasInfiniteAmmo = !it.hasInfinityAmmo
-            it.hasInfinityAmmo = hasInfiniteAmmo
+            hasInfiniteAmmo = !it.hasInfiniteAmmo
+            it.hasInfiniteAmmo = hasInfiniteAmmo
         }
 
         player?.displayClientMessage(

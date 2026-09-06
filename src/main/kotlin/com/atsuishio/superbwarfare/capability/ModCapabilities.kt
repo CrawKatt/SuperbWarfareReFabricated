@@ -20,7 +20,7 @@ class ModCapabilities : EntityComponentInitializer {
             RespawnCopyStrategy.ALWAYS_COPY
         )
         registry.registerFor(LivingEntity::class.java, PHOSPHORUS_FIRE) { PhosphorusFireCapability() }
-        registry.registerFor(Entity::class.java, INFINITY_AMMO) { InfiniteAmmoCapability() }
+        registry.registerFor(Entity::class.java, INFINITE_AMMO) { InfiniteAmmoCapability() }
     }
 
     companion object {
@@ -37,7 +37,7 @@ class ModCapabilities : EntityComponentInitializer {
         )
 
         @JvmField
-        val INFINITY_AMMO: ComponentKey<InfiniteAmmoCapability> = ComponentRegistry.getOrCreate(
+        val INFINITE_AMMO: ComponentKey<InfiniteAmmoCapability> = ComponentRegistry.getOrCreate(
             InfiniteAmmoCapability.ID,
             InfiniteAmmoCapability::class.java
         )

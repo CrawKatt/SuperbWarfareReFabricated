@@ -6,25 +6,25 @@ import dev.onyxstudios.cca.api.v3.component.Component
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.entity.Entity
 
-class InfiniteAmmoCapability(var hasInfinityAmmo: Boolean = false) : Component {
+class InfiniteAmmoCapability(var hasInfiniteAmmo: Boolean = false) : Component {
 
     override fun readFromNbt(tag: CompoundTag) {
-        if (tag.contains(TAG_INFINITY_AMMO)) {
-            this.hasInfinityAmmo = tag.getBoolean(TAG_INFINITY_AMMO)
+        if (tag.contains(TAG_INFINITE_AMMO)) {
+            this.hasInfiniteAmmo = tag.getBoolean(TAG_INFINITE_AMMO)
         }
     }
 
     override fun writeToNbt(tag: CompoundTag) {
-        tag.putBoolean(TAG_INFINITY_AMMO, hasInfinityAmmo)
+        tag.putBoolean(TAG_INFINITE_AMMO, hasInfiniteAmmo)
     }
 
     companion object {
         val ID = Mod.loc("infinite_ammo_capability")
-        const val TAG_INFINITY_AMMO = "SbwInfiniteAmmo"
+        const val TAG_INFINITE_AMMO = "SbwInfiniteAmmo"
 
         @JvmStatic
         fun get(entity: Entity): InfiniteAmmoCapability {
-            return ModCapabilities.INFINITY_AMMO.get(entity)
+            return ModCapabilities.INFINITE_AMMO.get(entity)
         }
 
         @JvmStatic
