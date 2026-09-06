@@ -8,7 +8,7 @@ import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer.Companion.
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeStencilRenderHelper
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.attachment.AttachmentDefinition
-import com.atsuishio.superbwarfare.data.attachment.ScopeInfo
+import com.atsuishio.superbwarfare.data.attachment.ScopeMode
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.magazineLevel
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
@@ -83,7 +83,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
     data class ScopeRenderData(
         val model: BedrockAttachmentModel,
         val texture: ResourceLocation,
-        val scopeInfo: ScopeInfo,
+        val scopeMode: ScopeMode,
         val attachmentId: ResourceLocation,
         val slotTransform: Matrix4f,
         val bindSlotTransform: Matrix4f
@@ -293,11 +293,11 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
                 stencilScope.texture,
                 packedLight,
                 partialTick,
-                stencilScope.scopeInfo
+                stencilScope.scopeMode
             )
             poseStack.popPose()
 
-            if (stencilScope.scopeInfo.isScope()) {
+            if (stencilScope.scopeMode.isScope()) {
                 ScopeStencilRenderHelper.enableItemEntityStencilTest()
                 RenderSystem.stencilFunc(GL11.GL_EQUAL, 0, 0xFF)
                 RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
@@ -374,6 +374,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val attachmentId = data.attachment.id(AttachmentType.SCOPE) ?: return null
         val definition = AttachmentDefinition.from(attachmentId) ?: return null
         val scopeInfo = definition.scopeInfo ?: return null
+        val scopeMode = scopeInfo.mode(data.attachment.scopeMode(AttachmentType.SCOPE))
         val modelPath = definition.model ?: return null
         val texture = definition.texture ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
@@ -381,14 +382,14 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val mountTransform = model.getGlobalTransform(boneName) ?: return null
         val bindMountTransform = model.getBindGlobalTransform(boneName) ?: return null
         return ScopeRenderData(
-            attachmentModel, texture, scopeInfo, attachmentId,
+            attachmentModel, texture, scopeMode, attachmentId,
             Matrix4f(mountTransform), Matrix4f(bindMountTransform)
         )
     }
 
     private fun findStencilScope(stack: ItemStack, model: GeoGunModel): ScopeRenderData? {
         val data = resolveScopeAttachmentRender(stack, model) ?: return null
-        return if (data.model.needsStencil(data.scopeInfo)) data else null
+        return if (data.model.needsStencil(data.scopeMode)) data else null
     }
 
     private fun finishStencilCulling(bufferSource: MultiBufferSource) {
@@ -774,7 +775,9 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
 
     private fun scopeViewTransform(scopeRender: ScopeRenderData?): Matrix4f? {
         if (scopeRender == null) return null
-        val scopeView = scopeRender.model.getGlobalTransform(SCOPE_VIEW_BONE) ?: return null
+        val scopeView = scopeRender.model.getGlobalTransform(scopeRender.scopeMode.viewBone)
+            ?: scopeRender.model.getGlobalTransform(SCOPE_VIEW_BONE)
+            ?: return null
         return Matrix4f(scopeRender.bindSlotTransform).mul(scopeView)
     }
 
