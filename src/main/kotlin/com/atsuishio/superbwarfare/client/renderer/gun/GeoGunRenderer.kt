@@ -20,7 +20,6 @@ import com.atsuishio.superbwarfare.resource.model.AttachmentModelReloadListener
 import com.atsuishio.superbwarfare.script.GunScriptManager
 import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.atsuishio.superbwarfare.tools.deltaFrameTime
-import com.atsuishio.superbwarfare.tools.mulPoseMatrix
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnimationInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.handler.FirstPersonRenderHandler
 import com.github.mcmodderanchor.simplebedrockmodel.v1.common.resource.pojo.ParticleEffectData
@@ -49,6 +48,7 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
+import org.joml.Matrix3f
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
@@ -279,7 +279,6 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val muzzleFlashScale = resolveBarrelAttachmentMuzzleFlashScale(stack)
 
         val canStencil = transformType.firstPerson()
-                && !ClientEventHandler.isEditing
 //                && !OculusCompat.isRenderingShadowPass()
                 && bufferSource is MultiBufferSource.BufferSource
         val stencilScope = if (canStencil) findStencilScope(stack, model) else null
@@ -287,7 +286,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         if (stencilScope != null) {
             handledScopeAttachment = stencilScope.attachmentId
             poseStack.pushPose()
-            poseStack.mulPoseMatrix(stencilScope.slotTransform)
+            mulPoseWithNormal(poseStack, stencilScope.slotTransform)
             stencilScope.model.renderWithStencil(
                 poseStack,
                 bufferSource as MultiBufferSource.BufferSource,
@@ -365,7 +364,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         if (data.attachmentId == handledScopeAttachment) return
 
         poseStack.pushPose()
-        poseStack.mulPoseMatrix(data.slotTransform)
+        mulPoseWithNormal(poseStack, data.slotTransform)
         data.model.renderToBuffer(poseStack, bufferSource, data.texture, packedLight, packedOverlay)
         poseStack.popPose()
     }
@@ -453,7 +452,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val mountTransform = model.getGlobalTransform(GeoGunModel.CUSTOM_STOCK_ADAPTER_BONE) ?: return
 
         poseStack.pushPose()
-        poseStack.mulPoseMatrix(Matrix4f(mountTransform))
+        mulPoseWithNormal(poseStack, Matrix4f(mountTransform))
         attachmentModel.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         poseStack.popPose()
     }
@@ -490,7 +489,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val mountTransform = model.getGlobalTransform(boneName) ?: return
 
         poseStack.pushPose()
-        poseStack.mulPoseMatrix(Matrix4f(mountTransform))
+        mulPoseWithNormal(poseStack, Matrix4f(mountTransform))
         attachmentModel.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         poseStack.popPose()
     }
@@ -522,7 +521,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val mountTransform = model.getGlobalTransform(boneName) ?: return
 
         poseStack.pushPose()
-        poseStack.mulPoseMatrix(Matrix4f(mountTransform))
+        mulPoseWithNormal(poseStack, Matrix4f(mountTransform))
         attachmentModel.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         poseStack.popPose()
     }
@@ -734,7 +733,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         scopeRender: ScopeRenderData? = null
     ) {
         val viewTransform = computeViewTransform(model, scopeRender) ?: return
-        poseStack.mulPoseMatrix(viewTransform.invert())
+        mulPoseWithNormal(poseStack, viewTransform.invert())
     }
 
     open fun computeViewTransform(model: GeoGunModel, scopeRender: ScopeRenderData? = null): Matrix4f? {
@@ -962,7 +961,14 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val transform = model.getBindGlobalTransform(boneName)
             ?: GeoGunModel.create(modelResource)?.getBindGlobalTransform(boneName)
             ?: return
-        poseStack.mulPoseMatrix(Matrix4f(transform).invert())
+        mulPoseWithNormal(poseStack, Matrix4f(transform).invert())
+    }
+
+    fun mulPoseWithNormal(poseStack: PoseStack, matrix: Matrix4f) {
+        // PoseStack.mulPoseMatrix only updates pose; SBM geometry also consumes the normal matrix.
+        val normal = Matrix3f(matrix).invert().transpose()
+        poseStack.last().normal().mul(normal)
+        poseStack.last().pose().mul(matrix)
     }
 
     open fun displayKey(transformType: ItemDisplayContext): String {
