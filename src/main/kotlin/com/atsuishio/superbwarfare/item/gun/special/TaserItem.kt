@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.special
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.ShootParameters
 import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
@@ -7,6 +8,7 @@ import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
 import net.minecraft.world.entity.Entity
 import team.reborn.energy.api.EnergyStorage
 
+@RegistryName("taser")
 object TaserItem : GeoGunItemV2(Properties()) {
 
     override fun afterShoot(parameters: ShootParameters) {

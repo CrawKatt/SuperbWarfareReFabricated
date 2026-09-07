@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.tools.persistentData
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
 import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import net.minecraft.ChatFormatting
@@ -22,6 +23,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.phys.EntityHitResult
 import net.fabricmc.fabric.api.event.player.UseEntityCallback
 
+@RegistryName("towline")
 open class TowlineItem : Item(Properties().stacksTo(1)), IVehicleInteract {
 
     override fun appendHoverText(

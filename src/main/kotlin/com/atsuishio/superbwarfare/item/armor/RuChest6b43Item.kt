@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.armor
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.init.ModAttributes
@@ -20,6 +21,7 @@ import net.minecraft.world.item.ItemStack
 import java.util.UUID
 import kotlin.math.max
 
+@RegistryName("ru_chest_6b43")
 class RuChest6b43Item : ArmorItem(
     ModArmorMaterial.CEMENTED_CARBIDE,
     Type.CHESTPLATE,

@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.projectile
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.client.renderer.item.Ptkm1rItemRenderer
 import com.atsuishio.superbwarfare.entity.projectile.Ptkm1rEntity
 import com.atsuishio.superbwarfare.item.misc.AbstractDeployerItem
@@ -19,6 +20,7 @@ import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.function.Consumer
 import java.util.function.Supplier
 
+@RegistryName("ptkm_1r")
 open class Ptkm1rItem : AbstractDeployerItem(Properties().rarity(Rarity.RARE).stacksTo(2)), GeoItem {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
     private val renderProvider: Supplier<Any> = GeoItem.makeRenderer(this)

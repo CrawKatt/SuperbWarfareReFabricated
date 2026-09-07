@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.client.renderer.item.HandGrenadeRenderer
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.entity.projectile.HandGrenadeEntity
@@ -39,6 +40,7 @@ import kotlin.math.min
 @Deprecated("reserved for compatibility, DO NOT USE")
 sealed interface HandGrenade
 
+@RegistryName("hand_grenade")
 open class HandGrenadeItem : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLaunchable, GeoItem,
     @Suppress("DEPRECATION") HandGrenade {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)

@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.special;
 
+import com.atsuishio.superbwarfare.init.RegistryName;
 import com.atsuishio.superbwarfare.client.renderer.gun.BocekItemRenderer;
 import com.atsuishio.superbwarfare.client.tooltip.component.BocekImageComponent;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -42,6 +43,7 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@RegistryName("bocek")
 public class BocekItem extends GunGeoItem {
 
     public BocekItem() {

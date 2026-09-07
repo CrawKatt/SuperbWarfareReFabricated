@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.weapon
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.capability.api.ItemHandlerHelper
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
@@ -23,6 +24,7 @@ import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 import java.util.*
 
+@RegistryName("crowbar")
 open class CrowbarItem : SwordItem(Tiers.IRON, 2, -2f, Properties().durability(400)),
     IVehicleInteract {
     override fun getAttributeModifiers(

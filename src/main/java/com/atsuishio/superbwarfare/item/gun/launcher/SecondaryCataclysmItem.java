@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.launcher;
 
+import com.atsuishio.superbwarfare.init.RegistryName;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -45,6 +46,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.function.Supplier;
 
+@RegistryName("secondary_cataclysm")
 public class SecondaryCataclysmItem extends GunGeoItem {
 
     public SecondaryCataclysmItem() {

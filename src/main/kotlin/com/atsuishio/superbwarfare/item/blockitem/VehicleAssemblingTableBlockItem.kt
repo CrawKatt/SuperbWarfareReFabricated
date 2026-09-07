@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.blockitem
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.block.VehicleAssemblingTableBlock
 import com.atsuishio.superbwarfare.block.property.BlockPart
 import com.atsuishio.superbwarfare.client.renderer.item.VehicleAssemblingTableBlockItemRenderer
@@ -23,6 +24,7 @@ import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.function.Consumer
 import java.util.function.Supplier
 
+@RegistryName("vehicle_assembling_table")
 class VehicleAssemblingTableBlockItem : BlockItem(ModBlocks.VEHICLE_ASSEMBLING_TABLE, Properties()), GeoItem {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
     private val renderProvider: Supplier<Any> = GeoItem.makeRenderer(this)

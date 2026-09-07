@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.curio
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.config.server.SyncConfig
 import com.atsuishio.superbwarfare.network.message.receive.EntityRelationSyncMessage
 import com.atsuishio.superbwarfare.network.message.receive.PlayerInfoSyncMessage
@@ -19,6 +20,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 
+@RegistryName("iff")
 open class IffItem : Item(Properties().stacksTo(1)), Trinket {
     override fun canEquip(stack: ItemStack, slot: SlotReference, entity: LivingEntity): Boolean {
         return TrinketsApi.getTrinketComponent(entity)

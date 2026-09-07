@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.launcher
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.client.GunRendererBuilder
 import com.atsuishio.superbwarfare.client.model.item.SuperStarShooterItemModel
 import com.atsuishio.superbwarfare.data.gun.GunData
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.Entity
 import software.bernie.geckolib.renderer.GeoItemRenderer
 import java.util.function.Supplier
 
+@RegistryName("super_star_shooter")
 class SuperStarShooterItem : GunGeoItem(Properties().rarity(ModRarities.SUPERB)) {
 
     override fun getRenderer(): Supplier<out GeoItemRenderer<*>> =

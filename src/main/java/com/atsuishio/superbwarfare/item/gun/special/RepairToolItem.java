@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.special;
 
+import com.atsuishio.superbwarfare.init.RegistryName;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.client.renderer.gun.RepairToolItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
@@ -34,6 +35,7 @@ import java.util.function.Supplier;
 
 import static com.atsuishio.superbwarfare.tools.ParticleTool.sendParticle;
 
+@RegistryName("repair_tool")
 public class RepairToolItem extends GunGeoItem {
 
     public RepairToolItem() {

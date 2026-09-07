@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.misc
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.capability.PersistentDataAccessor
 import com.atsuishio.superbwarfare.client.item.MonitorClient
 import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity
@@ -24,6 +25,7 @@ import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 
+@RegistryName("monitor")
 open class MonitorItem : Item(Properties().stacksTo(1)) {
     private fun resetDroneData(drone: DroneEntity?) {
         if (drone == null) return

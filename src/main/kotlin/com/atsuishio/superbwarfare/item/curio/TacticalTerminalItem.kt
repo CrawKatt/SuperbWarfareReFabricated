@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.curio
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.client.TooltipTool
 import com.atsuishio.superbwarfare.config.server.MapConfig
 import com.atsuishio.superbwarfare.init.ModItems
@@ -21,6 +22,7 @@ import net.minecraft.world.item.Rarity
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 
+@RegistryName("tactical_terminal")
 open class TacticalTerminalItem : Item(Properties().stacksTo(1).rarity(Rarity.UNCOMMON)), Trinket {
     override fun canEquip(stack: ItemStack, slot: SlotReference, entity: LivingEntity): Boolean {
         return TrinketsApi.getTrinketComponent(entity)

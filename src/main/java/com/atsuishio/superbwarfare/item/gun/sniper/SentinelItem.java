@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.sniper;
 
+import com.atsuishio.superbwarfare.init.RegistryName;
 import com.atsuishio.superbwarfare.init.ModSounds;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -37,6 +38,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@RegistryName("sentinel")
 public class SentinelItem extends GunGeoItem {
 
     public SentinelItem() {

@@ -5,6 +5,7 @@ import net.fabricmc.api.Environment;
 
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.model.item.HuntingRifleItemModel;
+import com.atsuishio.superbwarfare.init.RegistryName;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -12,6 +13,7 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 import java.util.function.Supplier;
 
+@RegistryName("hunting_rifle")
 public class HuntingRifleItem extends GunGeoItem {
 
     public HuntingRifleItem() {

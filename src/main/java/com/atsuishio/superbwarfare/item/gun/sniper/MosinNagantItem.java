@@ -7,6 +7,7 @@ import net.fabricmc.api.Environment;
 
 import com.atsuishio.superbwarfare.client.renderer.gun.MosinNagantItemRenderer;
 import com.atsuishio.superbwarfare.data.gun.GunData;
+import com.atsuishio.superbwarfare.init.RegistryName;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.minecraft.client.Minecraft;
@@ -25,6 +26,7 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 import java.util.function.Supplier;
 
+@RegistryName("mosin_nagant")
 public class MosinNagantItem extends GunGeoItem {
 
     public MosinNagantItem() {

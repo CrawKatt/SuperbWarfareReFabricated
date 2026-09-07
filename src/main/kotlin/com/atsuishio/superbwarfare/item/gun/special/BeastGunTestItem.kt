@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.special
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.client.GunRendererBuilder
 import com.atsuishio.superbwarfare.client.model.item.BeastGunTestModel
 import com.atsuishio.superbwarfare.init.ModRarities
@@ -20,6 +21,7 @@ import software.bernie.geckolib.renderer.GeoItemRenderer
 import java.util.function.Supplier
 import javax.annotation.ParametersAreNonnullByDefault
 
+@RegistryName("beast_gun_test")
 open class BeastGunTestItem : GunGeoItem(Properties().rarity(ModRarities.BEAST)), EntitySwingHook {
     override fun hurtEnemy(stack: ItemStack, target: LivingEntity, attacker: LivingEntity): Boolean {
         beastKill(attacker, target)

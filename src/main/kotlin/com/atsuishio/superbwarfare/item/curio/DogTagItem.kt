@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.curio
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.client.TooltipTool
 import com.atsuishio.superbwarfare.client.screens.DogTagEditorScreen
 import com.atsuishio.superbwarfare.client.tooltip.component.DogTagImageComponent
@@ -24,6 +25,7 @@ import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 import java.util.*
 
+@RegistryName("dog_tag")
 open class DogTagItem : Item(Properties().stacksTo(1)), Trinket, ItemScreenProvider, IVehicleInteract {
     @Environment(EnvType.CLIENT)
     override fun appendHoverText(

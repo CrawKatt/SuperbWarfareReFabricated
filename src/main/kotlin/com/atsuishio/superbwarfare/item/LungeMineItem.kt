@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.client.renderer.item.LungeMineRenderer
 import com.atsuishio.superbwarfare.event.ClientEventHandler
@@ -45,6 +46,7 @@ import java.util.function.Supplier
 @Deprecated("reserved for compatibility, DO NOT USE")
 sealed interface LungeMine
 
+@RegistryName("lunge_mine")
 open class LungeMineItem : Item(Properties().stacksTo(4)), GeoItem, EntitySwingHook, ReequipAnimationHook,
     @Suppress("DEPRECATION") LungeMine {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)

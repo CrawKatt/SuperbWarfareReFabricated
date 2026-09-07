@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.weapon
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.client.renderer.item.MilitaryShovelRenderer
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.tiers.ModItemTier
@@ -33,6 +34,7 @@ import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.function.Consumer
 import java.util.function.Supplier
 
+@RegistryName("military_shovel")
 open class MilitaryShovelItem :
     AxeItem(
         ModItemTier.CEMENTED_CARBIDE, 2f, -2.6f,

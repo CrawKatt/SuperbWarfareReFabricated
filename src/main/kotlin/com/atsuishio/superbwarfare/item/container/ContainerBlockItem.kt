@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.container
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.api.event.RegisterContainersEvent
 import com.atsuishio.superbwarfare.client.renderer.item.ContainerBlockItemRenderer
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
@@ -48,6 +49,7 @@ import java.util.function.Supplier
 import org.joml.Math
 import kotlin.jvm.optionals.getOrNull
 
+@RegistryName("container")
 class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(1).fireResistant()), GeoItem {
     private val cache = GeckoLibUtil.createInstanceCache(this)
     private val renderProvider: Supplier<Any> = GeoItem.makeRenderer(this)

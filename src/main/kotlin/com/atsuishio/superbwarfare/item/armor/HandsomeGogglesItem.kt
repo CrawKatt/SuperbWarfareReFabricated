@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.renderer.armor.HandsomeGogglesRenderer
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.resource.model.ArmorModelReloadListener
 import com.atsuishio.superbwarfare.tiers.ModArmorMaterial
 import com.atsuishio.superbwarfare.tools.ParticleTool
@@ -32,6 +33,7 @@ import net.minecraft.world.level.Level
 import kotlin.math.cos
 import kotlin.math.sin
 
+@RegistryName("handsome_goggles")
 class HandsomeGogglesItem :
     ArmorItem(ModArmorMaterial.STEEL, Type.HELMET, Properties().rarity(Rarity.EPIC).fireResistant()) {
 

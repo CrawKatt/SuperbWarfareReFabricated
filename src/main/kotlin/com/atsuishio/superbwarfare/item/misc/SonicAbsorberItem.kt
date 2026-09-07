@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.misc
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback
 import net.minecraft.sounds.SoundEvents
@@ -13,6 +14,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Rarity
 import net.minecraft.world.level.Level
 
+@RegistryName("sonic_absorber")
 object SonicAbsorberItem : Item(Properties().rarity(Rarity.EPIC)) {
 
     const val PARRY_TICK_TAG = "SonicParryTicks"

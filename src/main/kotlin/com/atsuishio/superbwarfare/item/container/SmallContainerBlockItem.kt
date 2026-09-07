@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.container
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.renderer.item.SmallContainerBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlockEntities
@@ -27,6 +28,7 @@ import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.function.Consumer
 import java.util.function.Supplier
 
+@RegistryName("small_container")
 class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER, Properties().stacksTo(1).fireResistant()),
     GeoItem {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)

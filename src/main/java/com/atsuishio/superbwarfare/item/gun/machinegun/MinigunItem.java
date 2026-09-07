@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.machinegun;
 
+import com.atsuishio.superbwarfare.init.RegistryName;
 import net.fabricmc.loader.api.FabricLoader;
 
 import net.fabricmc.api.EnvType;
@@ -15,6 +16,7 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 import java.util.function.Supplier;
 
+@RegistryName("minigun")
 public class MinigunItem extends GunGeoItem {
 
     public MinigunItem() {

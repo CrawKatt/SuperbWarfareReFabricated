@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.vehicle
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.data.PMC
 import com.atsuishio.superbwarfare.data.gun.DefaultGunData
 import com.atsuishio.superbwarfare.data.gun.GunData
@@ -20,6 +21,7 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import team.reborn.energy.api.EnergyStorage
 
+@RegistryName("vehicle_gun")
 open class VehicleGunItem : GunItem(Properties()) {
     override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) {
         if (modifier[GunProp.AUTO_RELOAD] == null) {

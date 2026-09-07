@@ -6,12 +6,14 @@ import net.fabricmc.api.Environment;
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.model.item.Aa12ItemModel;
 import com.atsuishio.superbwarfare.init.ModRarities;
+import com.atsuishio.superbwarfare.init.RegistryName;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import net.minecraft.world.item.Item;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 import java.util.function.Supplier;
 
+@RegistryName("aa_12")
 public class Aa12Item extends GunGeoItem {
 
     public Aa12Item() {

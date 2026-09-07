@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.renderer.item.LuckyContainerBlockItemRenderer
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModBlocks
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -36,6 +37,7 @@ import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.function.Consumer
 import java.util.function.Supplier
 
+@RegistryName("lucky_container")
 class LuckyContainerBlockItem :
     BlockItem(ModBlocks.LUCKY_CONTAINER, Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()), GeoItem {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)

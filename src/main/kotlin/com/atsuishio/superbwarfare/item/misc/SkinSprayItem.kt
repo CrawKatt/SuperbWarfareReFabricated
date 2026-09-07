@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.misc
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.client.renderer.item.SkinSprayRenderer
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.item.IVehicleInteract
@@ -22,6 +23,7 @@ import software.bernie.geckolib.util.GeckoLibUtil
 import java.util.function.Consumer
 import java.util.function.Supplier
 
+@RegistryName("skin_spray")
 class SkinSprayItem : Item(Properties().stacksTo(1)), IVehicleInteract, GeoItem {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
     private val renderProvider: Supplier<Any> = GeoItem.makeRenderer(this)

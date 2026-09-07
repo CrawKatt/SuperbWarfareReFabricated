@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.entity.vehicle.MortarEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
 import com.atsuishio.superbwarfare.tools.EntityFindUtil
@@ -27,6 +28,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.*
 import net.minecraft.world.level.Level
 
+@RegistryName("artillery_indicator")
 open class ArtilleryIndicatorItem : Item(Properties().stacksTo(1).rarity(Rarity.UNCOMMON)), ItemScreenProvider,
     IVehicleInteract {
     override fun appendHoverText(

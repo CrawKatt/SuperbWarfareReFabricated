@@ -6,6 +6,7 @@ import net.fabricmc.api.Environment;
 import com.atsuishio.superbwarfare.client.GunRendererBuilder;
 import com.atsuishio.superbwarfare.client.model.item.HomemadeShotgunItemModel;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
+import com.atsuishio.superbwarfare.init.RegistryName;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.tools.ParticleTool;
 import net.minecraft.core.particles.ParticleTypes;
@@ -16,6 +17,7 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 import java.util.function.Supplier;
 
+@RegistryName("homemade_shotgun")
 public class HomemadeShotgunItem extends GunGeoItem {
 
     public HomemadeShotgunItem() {

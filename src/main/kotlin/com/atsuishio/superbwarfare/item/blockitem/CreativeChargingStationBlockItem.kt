@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.blockitem
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.init.ModBlocks
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
@@ -12,6 +13,7 @@ import team.reborn.energy.api.EnergyStorage
 import team.reborn.energy.api.base.InfiniteEnergyStorage
 import javax.annotation.ParametersAreNonnullByDefault
 
+@RegistryName("creative_charging_station")
 class CreativeChargingStationBlockItem :
     BlockItem(ModBlocks.CREATIVE_CHARGING_STATION, Properties().rarity(Rarity.EPIC).stacksTo(1)) {
     private val energy = InfiniteEnergyStorage.INSTANCE

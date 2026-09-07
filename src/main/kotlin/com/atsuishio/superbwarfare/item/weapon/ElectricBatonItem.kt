@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.weapon
 
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
 import com.atsuishio.superbwarfare.init.ModCapabilities
@@ -25,6 +26,7 @@ import org.joml.Math
 import java.util.*
 import kotlin.math.roundToInt
 
+@RegistryName("electric_baton")
 class ElectricBatonItem : SwordItem(ModItemTier.STEEL, 2, -2.5f, Properties().durability(1114)),
     EnergyStorageItem {
 
