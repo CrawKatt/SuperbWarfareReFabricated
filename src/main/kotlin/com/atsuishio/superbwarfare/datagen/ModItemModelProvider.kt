@@ -38,7 +38,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
     private fun registerModels() {
         // gun
         gunItem(ModItems.AA_12)
-        gunItem(ModItems.AK_12)
+        gunItemV2(ModItems.AK_12)
         gunItemV2(ModItems.AK_47)
         gunItem(ModItems.BOCEK)
         gunItem(ModItems.DEVOTION)
