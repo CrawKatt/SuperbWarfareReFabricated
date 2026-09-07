@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.item
 
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
-import com.atsuishio.superbwarfare.entity.projectile.HandGrenadeEntity
+import com.atsuishio.superbwarfare.entity.projectile.RgoGrenadeEntity
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.projectile.AbstractProjectileDispenseBehavior
@@ -24,12 +24,12 @@ import net.minecraft.world.item.UseAnim
 import net.minecraft.world.level.Level
 import kotlin.math.min
 
-open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLaunchable {
-    override fun use(
-        worldIn: Level,
-        playerIn: Player,
-        handIn: InteractionHand
-    ): InteractionResultHolder<ItemStack> {
+@Deprecated("reserved for compatibility, DO NOT USE")
+sealed interface RgoGrenade
+
+open class RgoGrenadeItem : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLaunchable,
+    @Suppress("DEPRECATION") RgoGrenade {
+    override fun use(worldIn: Level, playerIn: Player, handIn: InteractionHand): InteractionResultHolder<ItemStack> {
         val stack = playerIn.getItemInHand(handIn)
         playerIn.startUsingItem(handIn)
         if (playerIn is ServerPlayer) {
@@ -47,12 +47,12 @@ open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLa
             if (living is Player) {
                 val usingTime = this.getUseDuration(stack, living) - timeLeft
                 if (usingTime > 3) {
-                    living.cooldowns.addCooldown(stack.item, 25)
-                    val power = min(usingTime / 10.0f, 1.5f)
+                    living.cooldowns.addCooldown(stack.item, 20)
+                    val power = min(usingTime / 8.0f, 1.8f)
 
-                    val handGrenade = HandGrenadeEntity(living, level)
-                    handGrenade.setLife(100 - usingTime)
-                    handGrenade.shootFromRotation(
+                    val rgoGrenade = RgoGrenadeEntity(living, level)
+                    rgoGrenade.setLife(80 - usingTime)
+                    rgoGrenade.shootFromRotation(
                         living,
                         living.xRot,
                         living.yRot,
@@ -60,7 +60,7 @@ open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLa
                         power,
                         0.0f
                     )
-                    level.addFreshEntity(handGrenade)
+                    level.addFreshEntity(rgoGrenade)
 
                     if (level is ServerLevel) {
                         level.playSound(
@@ -83,16 +83,16 @@ open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLa
 
     override fun finishUsingItem(pStack: ItemStack, pLevel: Level, pLivingEntity: LivingEntity): ItemStack {
         if (!pLevel.isClientSide) {
-            val handGrenade = HandGrenadeEntity(pLivingEntity, pLevel)
+            val rgoGrenade = RgoGrenadeEntity(pLivingEntity, pLevel)
 
-            CustomExplosion.Builder(handGrenade)
+            CustomExplosion.Builder(rgoGrenade)
                 .attacker(pLivingEntity)
-                .damage(ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE.get().toFloat())
-                .radius(ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS.get().toFloat())
+                .damage(ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE.get().toFloat())
+                .radius(ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS.get().toFloat())
                 .explode()
 
             if (pLivingEntity is Player) {
-                pLivingEntity.cooldowns.addCooldown(pStack.item, 25)
+                pLivingEntity.cooldowns.addCooldown(pStack.item, 20)
             }
 
             if (pLivingEntity is Player && !pLivingEntity.isCreative) {
@@ -104,14 +104,14 @@ open class HandGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLa
     }
 
     override fun getUseDuration(stack: ItemStack, entity: LivingEntity): Int {
-        return 100
+        return 80
     }
 
     override fun getLaunchBehavior(): DispenseItemBehavior {
         return object : AbstractProjectileDispenseBehavior() {
             override fun getProjectile(level: Level, position: Position, stack: ItemStack): Projectile {
-                return HandGrenadeEntity(
-                    ModEntities.HAND_GRENADE,
+                return RgoGrenadeEntity(
+                    ModEntities.RGO_GRENADE,
                     position.x(),
                     position.y(),
                     position.z(),
