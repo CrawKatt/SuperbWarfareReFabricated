@@ -16,7 +16,7 @@ object PhosphorusFireRenderer {
     @JvmStatic
     @Suppress("DEPRECATION")
     fun render(entity: LivingEntity, stack: PoseStack, multiBufferSource: MultiBufferSource) {
-        if (!PhosphorusFireCapability.of(entity).isOnFire) return
+        if (!PhosphorusFireCapability.get(entity).isOnFire) return
 
         val sprite1 = Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation("block/soul_fire_0")).sprite()
         val sprite2 = Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation("block/soul_fire_1")).sprite()

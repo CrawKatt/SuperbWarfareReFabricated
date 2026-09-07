@@ -2,25 +2,32 @@ package com.atsuishio.superbwarfare.capability.entity
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.capability.ModCapabilities
+import com.atsuishio.superbwarfare.serialization.decodeFromCompoundTag
+import com.atsuishio.superbwarfare.serialization.encodeToCompoundTag
 import dev.onyxstudios.cca.api.v3.component.Component
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.serializer
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.entity.Entity
 
-class InfiniteAmmoCapability(var hasInfiniteAmmo: Boolean = false) : Component {
+@Serializable
+data class InfiniteAmmoCapability(
+    @SerialName("SbwInfiniteAmmo")
+    var hasInfiniteAmmo: Boolean = false,
+) : Component {
 
     override fun readFromNbt(tag: CompoundTag) {
-        if (tag.contains(TAG_INFINITE_AMMO)) {
-            this.hasInfiniteAmmo = tag.getBoolean(TAG_INFINITE_AMMO)
-        }
+        hasInfiniteAmmo = decodeFromCompoundTag(serializer<InfiniteAmmoCapability>(), tag).hasInfiniteAmmo
     }
 
     override fun writeToNbt(tag: CompoundTag) {
-        tag.putBoolean(TAG_INFINITE_AMMO, hasInfiniteAmmo)
+        val written = encodeToCompoundTag(serializer<InfiniteAmmoCapability>(), this)
+        for (key in written.allKeys) written.get(key)?.let { tag.put(key, it) }
     }
 
     companion object {
         val ID = Mod.loc("infinite_ammo_capability")
-        const val TAG_INFINITE_AMMO = "SbwInfiniteAmmo"
 
         @JvmStatic
         fun get(entity: Entity): InfiniteAmmoCapability {
@@ -28,9 +35,15 @@ class InfiniteAmmoCapability(var hasInfiniteAmmo: Boolean = false) : Component {
         }
 
         @JvmStatic
-        fun modify(entity: Entity, modifier: (InfiniteAmmoCapability) -> Unit) {
-            val data = get(entity)
-            data.apply(modifier)
+        fun set(entity: Entity, value: Boolean) {
+            get(entity).hasInfiniteAmmo = value
+        }
+
+        @JvmStatic
+        fun toggle(entity: Entity): Boolean {
+            val enabled = !get(entity).hasInfiniteAmmo
+            set(entity, enabled)
+            return enabled
         }
     }
 }
