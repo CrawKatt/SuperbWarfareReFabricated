@@ -42,8 +42,11 @@ import java.util.*
 import java.util.function.Consumer
 import java.util.function.Supplier
 
-// 不要改这个东西，会肘击 YSM
-open class LungeMine : Item(Properties().stacksTo(4)), GeoItem, EntitySwingHook, ReequipAnimationHook {
+@Deprecated("reserved for compatibility, DO NOT USE")
+sealed interface LungeMine
+
+open class LungeMineItem : Item(Properties().stacksTo(4)), GeoItem, EntitySwingHook, ReequipAnimationHook,
+    @Suppress("DEPRECATION") LungeMine {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
     private val renderProvider: Supplier<Any> = GeoItem.makeRenderer(this)
 
@@ -66,7 +69,7 @@ open class LungeMine : Item(Properties().stacksTo(4)), GeoItem, EntitySwingHook,
     }
 
     @Environment(EnvType.CLIENT)
-    private fun idlePredicate(event: AnimationState<LungeMine>): PlayState {
+    private fun idlePredicate(event: AnimationState<LungeMineItem>): PlayState {
         val player = localPlayer ?: return PlayState.STOP
         if (ClientEventHandler.lungeSprint > 0) {
             return event.setAndContinue(RawAnimation.begin().thenPlay("animation.lunge_mine.sprint"))
@@ -89,7 +92,7 @@ open class LungeMine : Item(Properties().stacksTo(4)), GeoItem, EntitySwingHook,
 
     override fun registerControllers(data: ControllerRegistrar) {
         if (FabricLoader.getInstance().environmentType == EnvType.SERVER) return
-        val idleController = AnimationController<LungeMine>(
+        val idleController = AnimationController<LungeMineItem>(
             this,
             "idleController",
             2

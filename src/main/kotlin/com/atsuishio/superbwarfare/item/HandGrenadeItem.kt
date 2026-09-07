@@ -1,10 +1,15 @@
 package com.atsuishio.superbwarfare.item
 
+import com.atsuishio.superbwarfare.client.renderer.item.HandGrenadeRenderer
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
-import com.atsuishio.superbwarfare.entity.projectile.RgoGrenadeEntity
+import com.atsuishio.superbwarfare.entity.projectile.HandGrenadeEntity
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.tools.CustomExplosion
+import com.atsuishio.superbwarfare.tools.mc
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.BlockSource
 import net.minecraft.core.Position
 import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior
@@ -22,9 +27,43 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Rarity
 import net.minecraft.world.item.UseAnim
 import net.minecraft.world.level.Level
+import software.bernie.geckolib.animatable.GeoItem
+import software.bernie.geckolib.animatable.client.RenderProvider
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
+import software.bernie.geckolib.core.animation.AnimatableManager
+import software.bernie.geckolib.util.GeckoLibUtil
+import java.util.function.Consumer
+import java.util.function.Supplier
 import kotlin.math.min
 
-open class RgoGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLaunchable {
+@Deprecated("reserved for compatibility, DO NOT USE")
+sealed interface HandGrenade
+
+open class HandGrenadeItem : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLaunchable, GeoItem,
+    @Suppress("DEPRECATION") HandGrenade {
+    private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
+    private val renderProvider: Supplier<Any> = GeoItem.makeRenderer(this)
+
+    @Environment(EnvType.CLIENT)
+    override fun createRenderer(consumer: Consumer<Any>) {
+        consumer.accept(object : RenderProvider {
+            private var renderer: BlockEntityWithoutLevelRenderer? = null
+
+            override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
+                if (renderer == null) {
+                    renderer = HandGrenadeRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
+                }
+                return renderer!!
+            }
+        })
+    }
+
+    override fun getRenderProvider(): Supplier<Any> = renderProvider
+
+    override fun registerControllers(controllers: AnimatableManager.ControllerRegistrar) {}
+
+    override fun getAnimatableInstanceCache(): AnimatableInstanceCache = this.cache
+
     override fun use(worldIn: Level, playerIn: Player, handIn: InteractionHand): InteractionResultHolder<ItemStack> {
         val stack = playerIn.getItemInHand(handIn)
         playerIn.startUsingItem(handIn)
@@ -43,12 +82,12 @@ open class RgoGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLau
             if (living is Player) {
                 val usingTime = this.getUseDuration(stack) - timeLeft
                 if (usingTime > 3) {
-                    living.cooldowns.addCooldown(stack.item, 20)
-                    val power = min(usingTime / 8.0f, 1.8f)
+                    living.cooldowns.addCooldown(stack.item, 25)
+                    val power = min(usingTime / 10.0f, 1.5f)
 
-                    val rgoGrenade = RgoGrenadeEntity(living, level)
-                    rgoGrenade.setLife(80 - usingTime)
-                    rgoGrenade.shootFromRotation(
+                    val handGrenade = HandGrenadeEntity(living, level)
+                    handGrenade.setLife(100 - usingTime)
+                    handGrenade.shootFromRotation(
                         living,
                         living.xRot,
                         living.yRot,
@@ -56,7 +95,7 @@ open class RgoGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLau
                         power,
                         0.0f
                     )
-                    level.addFreshEntity(rgoGrenade)
+                    level.addFreshEntity(handGrenade)
 
                     if (level is ServerLevel) {
                         level.playSound(
@@ -79,16 +118,16 @@ open class RgoGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLau
 
     override fun finishUsingItem(pStack: ItemStack, pLevel: Level, pLivingEntity: LivingEntity): ItemStack {
         if (!pLevel.isClientSide) {
-            val rgoGrenade = RgoGrenadeEntity(pLivingEntity, pLevel)
+            val handGrenade = HandGrenadeEntity(pLivingEntity, pLevel)
 
-            CustomExplosion.Builder(rgoGrenade)
+            CustomExplosion.Builder(handGrenade)
                 .attacker(pLivingEntity)
-                .damage(ExplosionConfig.RGO_GRENADE_EXPLOSION_DAMAGE.get().toFloat())
-                .radius(ExplosionConfig.RGO_GRENADE_EXPLOSION_RADIUS.get().toFloat())
+                .damage(ExplosionConfig.M67_GRENADE_EXPLOSION_DAMAGE.get().toFloat())
+                .radius(ExplosionConfig.M67_GRENADE_EXPLOSION_RADIUS.get().toFloat())
                 .explode()
 
             if (pLivingEntity is Player) {
-                pLivingEntity.cooldowns.addCooldown(pStack.item, 20)
+                pLivingEntity.cooldowns.addCooldown(pStack.item, 25)
             }
 
             if (pLivingEntity is Player && !pLivingEntity.isCreative) {
@@ -100,14 +139,14 @@ open class RgoGrenade : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLau
     }
 
     override fun getUseDuration(stack: ItemStack): Int {
-        return 80
+        return 100
     }
 
     override fun getLaunchBehavior(): DispenseItemBehavior {
         return object : AbstractProjectileDispenseBehavior() {
             override fun getProjectile(pLevel: Level, pPosition: Position, pStack: ItemStack): Projectile {
-                return RgoGrenadeEntity(
-                    ModEntities.RGO_GRENADE,
+                return HandGrenadeEntity(
+                    ModEntities.HAND_GRENADE,
                     pPosition.x(),
                     pPosition.y(),
                     pPosition.z(),
