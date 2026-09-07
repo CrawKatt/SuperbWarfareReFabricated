@@ -130,8 +130,8 @@ public class BocekItem extends GunGeoItem {
         if (!data.hasEnoughAmmoToShoot(player) || parameters.power <= 0.0) return;
 
         var perk = data.perk.get(Perk.Type.AMMO);
-        SoundTool.stopSound(player, ModSounds.BOCEK_PULL_1P.getId(), SoundSource.PLAYERS);
-        SoundTool.stopSound(player, ModSounds.BOCEK_PULL_3P.getId(), SoundSource.PLAYERS);
+        SoundTool.stopSound(player, ModSounds.BOCEK_PULL_1P.getLocation(), SoundSource.PLAYERS);
+        SoundTool.stopSound(player, ModSounds.BOCEK_PULL_3P.getLocation(), SoundSource.PLAYERS);
 
         if (zoom) {
             spawnBullet(data, player, power, true);
