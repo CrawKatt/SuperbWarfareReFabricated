@@ -337,6 +337,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.SCOPE_EOTECH_551)
         simpleItem(ModItems.SCOPE_OKP_7)
         simpleItem(ModItems.SCOPE_ACOG)
+        simpleItem(ModItems.SCOPE_LPVO)
         simpleItem(ModItems.SILENCER_QINGLAN)
         simpleItem(ModItems.SCOPE_HAMR)
 

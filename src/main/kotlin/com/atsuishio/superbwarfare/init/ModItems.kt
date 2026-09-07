@@ -314,6 +314,9 @@ object ModItems {
     @JvmField val SCOPE_HAMR = registerAttachment("scope_hamr") {
         AttachmentItem("${Mod.MODID}:scope_hamr", Rarity.EPIC)
     }
+    @JvmField val SCOPE_LPVO = registerAttachment("scope_lpvo") {
+        AttachmentItem("${Mod.MODID}:scope_lpvo", Rarity.EPIC)
+    }
     // @formatter:on
 
     // Grip
