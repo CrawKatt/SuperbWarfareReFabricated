@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.item.blockitem
 import com.atsuishio.superbwarfare.block.VehicleAssemblingTableBlock
 import com.atsuishio.superbwarfare.block.property.BlockPart
 import com.atsuishio.superbwarfare.init.ModBlocks
+import com.atsuishio.superbwarfare.init.RegistryName
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.item.BlockItem
@@ -11,6 +12,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.shapes.CollisionContext
 
+@RegistryName("vehicle_assembling_table")
 class VehicleAssemblingTableBlockItem : BlockItem(ModBlocks.VEHICLE_ASSEMBLING_TABLE, Properties()) {
 
     // 多方块额外碰撞检测

@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.vehicle.PrismTankEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.world.phys.EntityResult
 import net.minecraft.ChatFormatting
@@ -21,6 +22,7 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import team.reborn.energy.api.EnergyStorage
 
+@RegistryName("vehicle_gun")
 open class VehicleGunItem : GunItem(Properties()) {
     override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) {
         if (modifier[GunProp.AUTO_RELOAD] == null) {

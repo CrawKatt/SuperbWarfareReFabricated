@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.item.container
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModItems
+import com.atsuishio.superbwarfare.init.RegistryName
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
@@ -15,6 +16,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.SeededContainerLoot
 import net.minecraft.world.level.storage.loot.LootTable
 
+@RegistryName("small_container")
 class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER, Properties().stacksTo(1).fireResistant()) {
 
     companion object {

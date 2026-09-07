@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.screens.DogTagEditorScreen
 import com.atsuishio.superbwarfare.client.tooltip.component.DogTagImageComponent
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModDataComponents
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.item.IVehicleInteract
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
 import dev.emi.trinkets.api.SlotReference
@@ -24,6 +25,7 @@ import net.minecraft.world.item.TooltipFlag
 import java.util.Arrays
 import java.util.Optional
 
+@RegistryName("dog_tag")
 class DogTagItem : TrinketItem(Properties().stacksTo(1)), ItemScreenProvider, IVehicleInteract {
     @Environment(EnvType.CLIENT)
     override fun appendHoverText(

@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.entity.projectile.MortarShellEntity
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.item.DispenserLaunchable
 import net.minecraft.core.Position
 import net.minecraft.core.component.DataComponents
@@ -20,6 +21,7 @@ import net.minecraft.world.item.alchemy.Potions
 import net.minecraft.world.level.Level
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
 
+@RegistryName("potion_mortar_shell")
 class PotionMortarShellItem : MortarShellItem(), DispenserLaunchable {
     override fun getDefaultInstance(): ItemStack {
         val stack = super.getDefaultInstance()

@@ -10,6 +10,7 @@ import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.init.ModPerks;
 import com.atsuishio.superbwarfare.init.ModSounds;
+import com.atsuishio.superbwarfare.init.RegistryName;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.network.message.receive.ShootClientMessage;
@@ -35,6 +36,7 @@ import software.bernie.geckolib.renderer.GeoItemRenderer;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@RegistryName("bocek")
 public class BocekItem extends GunGeoItem {
 
     public BocekItem() {

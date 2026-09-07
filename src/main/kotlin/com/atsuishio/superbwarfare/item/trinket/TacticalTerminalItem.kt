@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.client.TooltipTool
 import com.atsuishio.superbwarfare.config.server.MapConfig
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModKeyMappings
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.network.message.receive.OpenTacticalMapScreenMessage
 import com.atsuishio.superbwarfare.tools.sendPacketTo
 import dev.emi.trinkets.api.SlotReference
@@ -20,6 +21,7 @@ import net.minecraft.world.item.Rarity
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 
+@RegistryName("tactical_terminal")
 open class TacticalTerminalItem : TrinketItem(Properties().stacksTo(1).rarity(Rarity.UNCOMMON)) {
     override fun canEquip(stack: ItemStack, slot: SlotReference, entity: LivingEntity): Boolean {
         return TrinketsApi.getTrinketComponent(entity)

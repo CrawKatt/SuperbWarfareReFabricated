@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.item.weapon
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.item.IVehicleInteract
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
@@ -44,7 +45,8 @@ private val TIER = object : Tier {
     }
 }
 
-class CrowbarItem : SwordItem(
+@RegistryName("crowbar")
+open class CrowbarItem : SwordItem(
     TIER, Properties().stacksTo(1)
         .attributes(
             createAttributes(TIER, 2, -2f)

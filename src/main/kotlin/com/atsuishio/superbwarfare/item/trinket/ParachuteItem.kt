@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.item.trinket
 
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.tools.NBTTool
 import dev.emi.trinkets.api.SlotReference
 import dev.emi.trinkets.api.TrinketItem
@@ -15,6 +16,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.phys.Vec3
 
+@RegistryName("parachute")
 class ParachuteItem : TrinketItem(Properties().stacksTo(1).durability(600)) {
     override fun isValidRepairItem(stack: ItemStack, repairCandidate: ItemStack): Boolean {
         return repairCandidate.`is`(Items.PHANTOM_MEMBRANE)

@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModItems
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.tools.component1
 import com.atsuishio.superbwarfare.tools.component2
 import com.atsuishio.superbwarfare.tools.component3
@@ -31,6 +32,7 @@ import com.atsuishio.superbwarfare.tools.postEvent
 import org.joml.Math
 import kotlin.jvm.optionals.getOrNull
 
+@RegistryName("container")
 class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(1).fireResistant()) {
 
     override fun useOn(context: UseOnContext) = InteractionResult.PASS

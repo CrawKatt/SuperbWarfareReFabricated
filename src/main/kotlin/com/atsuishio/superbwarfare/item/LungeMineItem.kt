@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.item
 import com.atsuishio.superbwarfare.client.renderer.item.LungeMineRenderer
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.tools.localPlayer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -39,7 +40,7 @@ import java.util.function.Consumer
 @Deprecated("reserved for compatibility, DO NOT USE")
 sealed interface LungeMine
 
-// 不要改这个东西，会肘击 YSM
+@RegistryName("lunge_mine")
 open class LungeMineItem : Item(Properties().stacksTo(4)), GeoItem, @Suppress("DEPRECATION") LungeMine {
     private val cache: AnimatableInstanceCache = GeckoLibUtil.createInstanceCache(this)
 

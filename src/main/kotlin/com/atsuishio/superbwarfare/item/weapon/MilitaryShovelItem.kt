@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.item.weapon
 
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.item.CustomDamageProperty
 import com.atsuishio.superbwarfare.tiers.ModItemTier
 import net.minecraft.ChatFormatting
@@ -24,6 +25,7 @@ import net.minecraft.world.level.block.WeatheringCopper
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.gameevent.GameEvent
 
+@RegistryName("military_shovel")
 open class MilitaryShovelItem :
     AxeItem(
         ModItemTier.CEMENTED_CARBIDE,
