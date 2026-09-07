@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.client.renderer.gun.BocekItemRenderer;
 import com.atsuishio.superbwarfare.client.tooltip.component.BocekImageComponent;
 import com.atsuishio.superbwarfare.data.gun.GunData;
 import com.atsuishio.superbwarfare.data.gun.GunProp;
-import com.atsuishio.superbwarfare.data.gun.GunProp;
 import com.atsuishio.superbwarfare.data.gun.ShootParameters;
 import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -13,11 +12,9 @@ import com.atsuishio.superbwarfare.init.ModSounds;
 import com.atsuishio.superbwarfare.init.RegistryName;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
-import com.atsuishio.superbwarfare.network.message.receive.ShootClientMessage;
 import com.atsuishio.superbwarfare.perk.AmmoPerk;
 import com.atsuishio.superbwarfare.perk.Perk;
 import com.atsuishio.superbwarfare.tools.SoundTool;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.server.level.ServerPlayer;
@@ -111,60 +108,44 @@ public class BocekItem extends GunGeoItem {
     }
 
     @Override
-    public boolean useSpecialFireProcedure(@NotNull GunData data) {
-        return true;
-    }
-
-    @Override
     public @NotNull Optional<TooltipComponent> getTooltipImage(@NotNull ItemStack pStack) {
         return Optional.of(new BocekImageComponent(pStack));
     }
 
     @Override
     public void shoot(@NotNull ShootParameters parameters) {
-    }
+        if (!(parameters.shooter instanceof ServerPlayer player)) return;
 
-    @Override
-    public void onFireKeyRelease(@NotNull GunData data, @NotNull Player player, double power, boolean zoom) {
-        super.onFireKeyRelease(data, player, power, zoom);
-
-        if (!data.hasEnoughAmmoToShoot(player)) return;
+        GunData data = parameters.data;
+        double power = parameters.power;
+        boolean zoom = parameters.zoom;
+        if (!data.hasEnoughAmmoToShoot(player) || parameters.power <= 0.0) return;
 
         var perk = data.perk.get(Perk.Type.AMMO);
+        SoundTool.stopSound(player, ModSounds.BOCEK_PULL_1P.getLocation(), SoundSource.PLAYERS);
+        SoundTool.stopSound(player, ModSounds.BOCEK_PULL_3P.getLocation(), SoundSource.PLAYERS);
 
-        if (player instanceof ServerPlayer serverPlayer) {
-            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_1P.getLocation(), SoundSource.PLAYERS);
-            SoundTool.stopSound(serverPlayer, ModSounds.BOCEK_PULL_3P.getLocation(), SoundSource.PLAYERS);
-            ServerPlayNetworking.send(serverPlayer, ShootClientMessage.INSTANCE);
-        }
-
-        if (power * 12 >= 6) {
-            if (zoom) {
-                spawnBullet(data, player, power, true);
-
-                SoundTool.playLocalSound(player, ModSounds.BOCEK_ZOOM_FIRE_1P, 10, 1);
-                player.playSound(ModSounds.BOCEK_ZOOM_FIRE_3P, 2, 1);
-            } else {
-                for (int i = 0; i < (perk instanceof AmmoPerk ammoPerk && ammoPerk.slug ? 1 : 10); i++) {
-                    spawnBullet(data, player, power, false);
-                }
-
-                SoundTool.playLocalSound(player, ModSounds.BOCEK_SHATTER_CAP_FIRE_1P, 10, 1);
-                player.playSound(ModSounds.BOCEK_SHATTER_CAP_FIRE_3P, 2, 1);
+        if (zoom) {
+            spawnBullet(data, player, power, true);
+            SoundTool.playLocalSound(player, ModSounds.BOCEK_ZOOM_FIRE_1P, 10, 1);
+            player.playSound(ModSounds.BOCEK_ZOOM_FIRE_3P, 2, 1);
+        } else {
+            for (int i = 0; i < (perk instanceof AmmoPerk ammoPerk && ammoPerk.slug ? 1 : 10); i++) {
+                spawnBullet(data, player, power, false);
             }
 
-            if (perk == ModPerks.INSTANCE.getBEAST_BULLET()) {
-                player.playSound(ModSounds.HENG, 4f, 1f);
-
-                if (player instanceof ServerPlayer serverPlayer) {
-                    SoundTool.playLocalSound(serverPlayer, ModSounds.HENG, 4f, 1f);
-                }
-            }
-
-            data.ammo.set(data.ammo.get() - data.get(GunProp.AMMO_COST_PER_SHOOT));
-            data.nbtVersion.invalidateStructural();
-            data.save();
+            SoundTool.playLocalSound(player, ModSounds.BOCEK_SHATTER_CAP_FIRE_1P, 10, 1);
+            player.playSound(ModSounds.BOCEK_SHATTER_CAP_FIRE_3P, 2, 1);
         }
+
+        if (perk == ModPerks.INSTANCE.getBEAST_BULLET()) {
+            player.playSound(ModSounds.HENG, 4f, 1f);
+            SoundTool.playLocalSound(player, ModSounds.HENG, 4f, 1f);
+        }
+
+        data.ammo.set(data.ammo.get() - data.get(GunProp.AMMO_COST_PER_SHOOT));
+        data.nbtVersion.invalidateStructural();
+        data.save();
     }
 
     public void spawnBullet(GunData data, Player player, double power, boolean zoom) {
