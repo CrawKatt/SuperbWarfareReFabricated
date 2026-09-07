@@ -203,7 +203,7 @@ object ModItems {
     @JvmField val VEHICLE_SMOKE_AMMO = registerAmmo("vehicle_smoke_ammo")
 
     @JvmField val MORTAR_SHELL = registerAmmo<MortarShellItem>()
-    @JvmField val MORTAR_SHELL_WP = registerAmmo<MortarShellItem>()
+    @JvmField val MORTAR_SHELL_WP = registerAmmo<MortarShellItem>("mortar_shell_wp")
     @JvmField val MORTAR_SHELL_SMOKE = registerAmmo<SmokeMortarShellItem>()
     @JvmField val POTION_MORTAR_SHELL = registerAmmo<PotionMortarShellItem>()
     @JvmField val RPG_ROCKET_STANDARD = registerAmmo<RpgRocketStandardItem>()
