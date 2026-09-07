@@ -299,6 +299,9 @@ object ModItems {
     @JvmField val SCOPE_COYOTE = registerAttachment("scope_coyote") {
         AttachmentItem("${Mod.MODID}:scope_coyote")
     }
+    @JvmField val SCOPE_HANDGUN_RED_DOT = registerAttachment("scope_handgun_red_dot") {
+        AttachmentItem("${Mod.MODID}:scope_handgun_red_dot")
+    }
     @JvmField val SCOPE_EOTECH_551 = registerAttachment("scope_eotech_551") {
         AttachmentItem("${Mod.MODID}:scope_eutech_551")
     }
