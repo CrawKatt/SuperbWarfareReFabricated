@@ -247,6 +247,9 @@ object ModItems {
     @JvmField val STOCK_PRS = registerAttachment("stock_prs") {
         AttachmentItem("${Mod.MODID}:stock_prs")
     }
+    @JvmField val STOCK_AR_TACTICAL = registerAttachment("stock_ar_tactical") {
+        AttachmentItem("${Mod.MODID}:stock_ar_tactical")
+    }
     // @formatter:on
 
     // Magazine
@@ -315,6 +318,9 @@ object ModItems {
     }
     @JvmField val SCOPE_LPVO = registerAttachment("scope_lpvo") {
         AttachmentItem("${Mod.MODID}:scope_lpvo", Rarity.EPIC)
+    }
+    @JvmField val SCOPE_SNIPER = registerAttachment("scope_sniper") {
+        AttachmentItem("${Mod.MODID}:scope_sniper", Rarity.EPIC)
     }
     // @formatter:on
 

@@ -326,6 +326,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.VERTICAL_GRIP)
         simpleItem(ModItems.STOCK_UBR)
         simpleItem(ModItems.STOCK_PRS)
+        simpleItem(ModItems.STOCK_AR_TACTICAL)
         simpleItem(ModItems.OEM_STOCK_LIGHT)
         simpleItem(ModItems.OEM_STOCK_HEAVY)
         simpleItem(ModItems.TRIANGLE_GRIP)
@@ -337,6 +338,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.SCOPE_OKP_7)
         simpleItem(ModItems.SCOPE_ACOG)
         simpleItem(ModItems.SCOPE_LPVO)
+        simpleItem(ModItems.SCOPE_SNIPER)
         simpleItem(ModItems.SILENCER_QINGLAN)
         simpleItem(ModItems.SCOPE_HAMR)
 
