@@ -282,7 +282,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
             if (zoomPivot != null) {
                 poseStack.translate(zoomPivot.x, zoomPivot.y, zoomPivot.z)
             }
-            poseStack.scale(1f, 1f, 1f - 0.25f * ClientEventHandler.zoomTime.toFloat())
+            val zoomLengthScale = scopeRender?.scopeMode?.zoomLengthScale ?: 0.75f
+            poseStack.scale(1f, 1f, 1f - (1f - zoomLengthScale) * ClientEventHandler.zoomTime.toFloat())
             if (zoomPivot != null) {
                 poseStack.translate(-zoomPivot.x, -zoomPivot.y, -zoomPivot.z)
             }
@@ -775,7 +776,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
 
         val zoomTime = ClientEventHandler.zoomTime.coerceIn(0.0, 1.0).toFloat()
         val rotationScale = (1f - 0.5f * zoomTime).coerceAtLeast(0.05f)
-        val rotationScaleX = (1f - 0.95f * zoomTime).coerceAtLeast(0.05f)
+        val rotationScaleX = (1f - 0.75f * zoomTime).coerceAtLeast(0.05f)
         val rotationScaleY = (1f - 0.95f * zoomTime).coerceAtLeast(0.05f)
         val rotationScaleZ = (1f - 0.7f * zoomTime).coerceAtLeast(0.05f)
         val positionScale = (1f - 0.85f * zoomTime).coerceAtLeast(0.05f)
