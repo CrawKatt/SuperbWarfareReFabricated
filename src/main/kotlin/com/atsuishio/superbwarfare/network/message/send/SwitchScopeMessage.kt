@@ -30,6 +30,6 @@ data class SwitchScopeMessage(val scroll: Double) : ServerPacketPayload() {
             tag.putBoolean("ScopeAlt", !tag.getBoolean("ScopeAlt"))
         }
         data.save()
-        SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV.get(), 1f, 0.7f)
+        SoundTool.playLocalSound(player, ModSounds.ADJUST_FOV, 1f, 0.7f)
     }
 }
