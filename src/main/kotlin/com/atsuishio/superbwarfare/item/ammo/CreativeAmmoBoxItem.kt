@@ -42,7 +42,7 @@ object CreativeAmmoBoxItem : Item(Properties().rarity(Rarity.EPIC).stacksTo(1)) 
 
     override fun appendHoverText(
         pStack: ItemStack,
-        context: TooltipContext,
+        level: Level?,
         pTooltipComponents: MutableList<Component>,
         pIsAdvanced: TooltipFlag
     ) {
