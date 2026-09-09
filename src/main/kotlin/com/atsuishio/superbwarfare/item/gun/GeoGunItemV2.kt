@@ -9,12 +9,23 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.Item.Properties
 import net.minecraft.world.item.ItemStack
 
-// V2 items share the Fabric renderer registration in ClientRenderHandler.
+// TODO 替换掉之前的GunGeoItem，给这个的V2去掉
 open class GeoGunItemV2(properties: Properties) : GunItem(properties) {
     @Environment(EnvType.CLIENT)
     fun getArmPose(
         entityLiving: LivingEntity,
         hand: InteractionHand,
         itemStack: ItemStack
-    ): HumanoidModel.ArmPose = PoseTool.pose(entityLiving, hand, itemStack)
+    ): HumanoidModel.ArmPose {
+        return armPose(entityLiving, hand, itemStack)
+    }
+
+    @Environment(EnvType.CLIENT)
+    open fun armPose(
+        entityLiving: LivingEntity,
+        hand: InteractionHand,
+        itemStack: ItemStack
+    ): HumanoidModel.ArmPose {
+        return PoseTool.pose(entityLiving, hand, itemStack)
+    }
 }
