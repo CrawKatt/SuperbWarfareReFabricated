@@ -6,7 +6,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
-import com.atsuishio.superbwarfare.item.gun.special.SuperStarShooterItem;
+import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem;
 import com.atsuishio.superbwarfare.tools.OBB;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

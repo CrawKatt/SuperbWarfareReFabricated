@@ -1,4 +1,4 @@
-package com.atsuishio.superbwarfare.item.gun.special
+package com.atsuishio.superbwarfare.item.gun.launcher
 
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
@@ -15,8 +15,8 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.ItemStack
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
 @RegistryName("super_star_shooter")
 class SuperStarShooterItem : GeoGunItemV2(Properties().rarity(ModRarities.SUPERB)) {
@@ -33,7 +33,7 @@ class SuperStarShooterItem : GeoGunItemV2(Properties().rarity(ModRarities.SUPERB
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     override fun armPose(
         entityLiving: LivingEntity,
         hand: InteractionHand,
