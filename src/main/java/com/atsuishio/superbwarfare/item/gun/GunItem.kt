@@ -588,8 +588,17 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         val projectileAmount = data.get(GunProp.PROJECTILE_AMOUNT)
 
         // 生成所有子弹
-        repeat(projectileAmount) {
-            if (!shootBullet(parameters)) return
+        val spreadPattern = data.get(GunProp.SPREAD_PATTERN)
+        val spreadDirections = ProjectileSpreadTool.generateDirections(
+            this.random,
+            parameters.shootDirection,
+            parameters.spread,
+            projectileAmount,
+            spreadPattern
+        )
+
+        repeat(projectileAmount) { index ->
+            if (!shootBullet(parameters.copy(shootDirection = spreadDirections[index]))) return
         }
 
         // n连发模式开火数据设置
@@ -718,7 +727,6 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         val shootDirection = parameters.shootDirection
         val shooter = parameters.shooter
         val zoom = parameters.zoom
-        val spread = parameters.spread
         val uuid = parameters.targetEntityUUID
         val targetPos = parameters.targetPos
 
@@ -906,6 +914,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         }
 
         // 发射任意实体
+        val direction = Vec3(shootDirection.x, shootDirection.y, shootDirection.z).normalize()
         entity.setPos(
             shootPosition.x,
             shootPosition.y,
@@ -917,17 +926,9 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         val z = shootDirection.z
 
         if (entity is Projectile) {
-            entity.shoot(x, y, z, velocity, spread.toFloat())
+            entity.shoot(direction.x, direction.y, direction.z, velocity, 0f)
         } else {
-            val random = RandomSource.create()
-            val vec3 = Vec3(x, y, z)
-                .normalize()
-                .add(
-                    random.triangle(0.0, 0.0172275 * spread),
-                    random.triangle(0.0, 0.0172275 * spread),
-                    random.triangle(0.0, 0.0172275 * spread)
-                )
-                .scale(velocity.toDouble())
+            val vec3 = direction.scale(velocity.toDouble())
 
             entity.deltaMovement = vec3
             entity.hasImpulse = true
