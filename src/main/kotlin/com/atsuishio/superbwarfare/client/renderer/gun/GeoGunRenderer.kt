@@ -491,10 +491,14 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
             return
         }
 
-        model.showStockBone(
-            GeoGunModel.CUSTOM_STOCK_ADAPTER_BONE,
-            GeoGunModel.CUSTOM_STOCK_ADAPTER_BONE
-        )
+        if (definition.requiresAdapter) {
+            model.showStockBone(
+                GeoGunModel.CUSTOM_STOCK_ADAPTER_BONE,
+                GeoGunModel.CUSTOM_STOCK_ADAPTER_BONE
+            )
+        } else {
+            model.hideAllStockBones()
+        }
         renderStockAttachment(stack, model, poseStack, bufferSource, packedLight, packedOverlay)
     }
 
