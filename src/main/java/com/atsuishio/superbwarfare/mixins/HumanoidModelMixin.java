@@ -3,7 +3,7 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.LungeMine;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
-import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem;
+import com.atsuishio.superbwarfare.item.gun.special.SuperStarShooterItem;
 import com.atsuishio.superbwarfare.item.gun.machinegun.M2HBItem;
 import com.atsuishio.superbwarfare.item.gun.machinegun.MinigunItem;
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem;

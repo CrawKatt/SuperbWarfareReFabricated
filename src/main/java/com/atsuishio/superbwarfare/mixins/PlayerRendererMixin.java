@@ -5,7 +5,7 @@ import com.atsuishio.superbwarfare.item.LungeMine;
 import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem;
+import com.atsuishio.superbwarfare.item.gun.special.SuperStarShooterItem;
 import com.atsuishio.superbwarfare.item.gun.machinegun.M2HBItem;
 import com.atsuishio.superbwarfare.item.gun.machinegun.MinigunItem;
 import com.atsuishio.superbwarfare.item.gun.special.BocekItem;
