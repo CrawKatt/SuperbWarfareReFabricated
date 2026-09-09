@@ -2388,7 +2388,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             gunSmithing(
                 writer,
                 ModItems.HUNTING_RIFLE_BLUEPRINT,
-                GunRarity.RARE,
+                GunRarity.EPIC,
                 ItemTags.LOGS,
                 ModItems.HUNTING_RIFLE
             )

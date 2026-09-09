@@ -289,8 +289,7 @@ class ModItemTagProvider(
             ModItems.HK_416_BLUEPRINT,
             ModItems.AK_12_BLUEPRINT,
             ModItems.QBZ_95_BLUEPRINT,
-            ModItems.RPG_BLUEPRINT,
-            ModItems.HUNTING_RIFLE_BLUEPRINT
+            ModItems.RPG_BLUEPRINT
         )
 
         this.tag(ModTags.Items.EPIC_BLUEPRINT).add(
@@ -306,7 +305,8 @@ class ModItemTagProvider(
             ModItems.QBZ_191_BLUEPRINT,
             ModItems.AWM_BLUEPRINT,
             ModItems.IGLA_BLUEPRINT,
-            ModItems.SENTINEL_BLUEPRINT
+            ModItems.SENTINEL_BLUEPRINT,
+            ModItems.HUNTING_RIFLE_BLUEPRINT
         )
 
         this.tag(ModTags.Items.LEGENDARY_BLUEPRINT).add(

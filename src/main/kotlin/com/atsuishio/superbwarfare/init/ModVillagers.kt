@@ -106,8 +106,7 @@ object ModVillagers {
             trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.RPG_BLUEPRINT), 10, 25, 0.05f),
             trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.HK_416_BLUEPRINT), 10, 25, 0.05f),
             trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.QBZ_95_BLUEPRINT), 10, 25, 0.05f),
-            trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.AK_12_BLUEPRINT), 10, 25, 0.05f),
-            trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.HUNTING_RIFLE_BLUEPRINT), 10, 25, 0.05f)
+            trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.AK_12_BLUEPRINT), 10, 25, 0.05f)
         )
         registerTrade(4,
             trade(ItemStack(Items.EMERALD, 2), ItemStack(ModItems.GRENADE_40MM, 1), 16, 5, 0.05f),
@@ -136,6 +135,7 @@ object ModVillagers {
             trade(ItemStack(Items.EMERALD, 64), ItemStack(ModItems.M_98B_BLUEPRINT), 10, 30, 0.05f),
             trade(ItemStack(Items.EMERALD, 64), ItemStack(ModItems.AWM_BLUEPRINT), 10, 30, 0.05f),
             trade(ItemStack(Items.EMERALD, 64), ItemStack(ModItems.DEVOTION_BLUEPRINT), 10, 30, 0.05f),
+            trade(ItemStack(Items.EMERALD, 64), ItemStack(ModItems.HUNTING_RIFLE_BLUEPRINT), 10, 30, 0.05f),
             trade(ItemStack(Items.EMERALD, 8), ItemStack(ModItems.LARGE_SHELL_HE, 1), 8, 10, 0.05f),
             trade(ItemStack(Items.EMERALD, 8), ItemStack(ModItems.LARGE_SHELL_AP, 1), 8, 10, 0.05f),
             trade(ItemStack(Items.EMERALD, 8), ItemStack(ModItems.LARGE_SHELL_CM, 1), 8, 10, 0.05f),
