@@ -117,7 +117,7 @@ object ModItems {
     @JvmField val AWM = registerGun("awm") { AwmItem() }
     @JvmField val M_98B = registerGun("m_98b") { M98bItem() }
     @JvmField val SENTINEL = registerGun("sentinel") { SentinelItem() }
-    @JvmField val HUNTING_RIFLE = registerGun("hunting_rifle") { HuntingRifleItem() }
+    @JvmField val HUNTING_RIFLE = registerGun("hunting_rifle") { HuntingRifleItem }
     @JvmField val NTW_20 = registerGun("ntw_20") { Ntw20Item() }
     @JvmField val M_870 = registerGun("m_870") { M870Item() }
     @JvmField val AA_12 = registerGun("aa_12") { Aa12Item() }
@@ -275,6 +275,9 @@ object ModItems {
     }
     @JvmField val RU_SILENCER = registerAttachment("ru_silencer") {
         AttachmentItem("${Mod.MODID}:ru_silencer")
+    }
+    @JvmField val SILENCER_50_CAL = registerAttachment("silencer_50_cal") {
+        AttachmentItem("${Mod.MODID}:silencer_50_cal")
     }
     @JvmField val AR_SILENCER = registerAttachment("ar_silencer") {
         AttachmentItem("${Mod.MODID}:ar_silencer")

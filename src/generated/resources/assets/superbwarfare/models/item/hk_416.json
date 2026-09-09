@@ -1,7 +1,4 @@
 {
-  "parent": "superbwarfare:item/hk_416_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/hk_416_icon"
-  }
+  "parent": "minecraft:builtin/entity",
+  "gui_light": "front"
 }
