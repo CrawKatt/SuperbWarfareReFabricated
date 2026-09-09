@@ -316,6 +316,9 @@ object ModItems {
     @JvmField val SCOPE_OKP_7 = registerAttachment("scope_okp_7") {
         AttachmentItem("${Mod.MODID}:scope_okp_7")
     }
+    @JvmField val SCOPE_PKAS = registerAttachment("scope_pkas") {
+        AttachmentItem("${Mod.MODID}:scope_pkas")
+    }
     @JvmField val SCOPE_ACOG = registerAttachment("scope_acog") {
         AttachmentItem("${Mod.MODID}:scope_acog", Rarity.RARE)
     }
