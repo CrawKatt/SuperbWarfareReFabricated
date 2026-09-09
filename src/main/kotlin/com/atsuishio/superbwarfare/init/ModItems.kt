@@ -122,7 +122,7 @@ object ModItems {
     @JvmField val M_870 = registerGun("m_870") { M870Item() }
     @JvmField val AA_12 = registerGun("aa_12") { Aa12Item() }
     @JvmField val DEVOTION = registerGun("devotion") { DevotionItem() }
-    @JvmField val RPK = registerGun("rpk") { RpkItem() }
+    @JvmField val RPK = registerGun("rpk") { RpkItem }
     @JvmField val M_60 = registerGun("m_60") { M60Item() }
     @JvmField val M_2_HB = registerGun("m_2_hb") { M2HBItem() }
     @JvmField val MINIGUN = registerGun("minigun") { MinigunItem() }
@@ -249,6 +249,9 @@ object ModItems {
     }
     @JvmField val STOCK_AR_TACTICAL = registerAttachment("stock_ar_tactical") {
         AttachmentItem("${Mod.MODID}:stock_ar_tactical")
+    }
+    @JvmField val STOCK_ZENIT_PT_1 = registerAttachment("stock_zenit_pt_1") {
+        AttachmentItem("${Mod.MODID}:stock_zenit_pt_1")
     }
     // @formatter:on
 
