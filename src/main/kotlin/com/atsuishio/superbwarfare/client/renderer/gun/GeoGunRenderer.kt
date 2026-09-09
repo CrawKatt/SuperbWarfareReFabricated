@@ -382,6 +382,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         renderStock(stack, model, poseStack, bufferSource, packedLight, packedOverlay)
         renderGripHandGuard(stack, model)
         renderGripAttachment(stack, model, poseStack, bufferSource, packedLight, packedOverlay)
+        renderOemScope(stack, model)
         renderOemMuzzle(stack, model)
         renderBarrelAttachment(stack, model, poseStack, bufferSource, packedLight, packedOverlay)
     }
@@ -577,6 +578,14 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val hasBarrelAttachment = data.attachment.id(AttachmentType.BARREL) != null
                 || data.attachment.get(AttachmentType.BARREL) != 0
         bone.visible = !hasBarrelAttachment
+    }
+
+    open fun renderOemScope(stack: ItemStack, model: GeoGunModel) {
+        val bone = model.getBone(OEM_SCOPE_BONE) ?: return
+        val data = GunData.from(stack)
+        val hasScope = data.attachment.id(AttachmentType.SCOPE) != null
+                || data.attachment.get(AttachmentType.SCOPE) != 0
+        bone.visible = !hasScope
     }
 
     open fun renderBarrelAttachment(
@@ -1133,6 +1142,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         private const val CUSTOM_HAND_GUARD_BONE = "custom_hand_guard"
         private const val OEM_HAND_GUARD_BONE = "oem_hand_guard"
         private const val OEM_MUZZLE_BONE = "oem_muzzle"
+        private const val OEM_SCOPE_BONE = "oem_scope"
         private const val CUSTOM_SCOPE_MOUNT_BONE = "custom_scope_mount"
 
         private const val SCOPE_STENCIL_START_PROGRESS = 0.2
