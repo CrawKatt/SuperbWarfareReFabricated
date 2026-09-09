@@ -296,7 +296,8 @@ class ModItemTagProvider(
             ModItems.QBZ_191_BLUEPRINT,
             ModItems.AWM_BLUEPRINT,
             ModItems.IGLA_BLUEPRINT,
-            ModItems.SENTINEL_BLUEPRINT
+            ModItems.SENTINEL_BLUEPRINT,
+            ModItems.HUNTING_RIFLE_BLUEPRINT
         )
 
         this.tag(ModTags.Items.LEGENDARY_BLUEPRINT).add(

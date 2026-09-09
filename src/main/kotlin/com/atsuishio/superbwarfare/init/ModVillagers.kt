@@ -272,10 +272,6 @@ object ModVillagers {
                     ItemStack(Items.EMERALD, 32),
                     ItemStack(ModItems.AK_12_BLUEPRINT), 10, 25, 0.05f
                 ),
-                BasicItemListing(
-                    ItemStack(Items.EMERALD, 32),
-                    ItemStack(ModItems.HUNTING_RIFLE_BLUEPRINT), 10, 25, 0.05f
-                )
             )
         registerTrade(3, list3)
 
@@ -384,6 +380,10 @@ object ModVillagers {
                 BasicItemListing(
                     ItemStack(Items.EMERALD, 64),
                     ItemStack(ModItems.DEVOTION_BLUEPRINT), 10, 30, 0.05f
+                ),
+                BasicItemListing(
+                    ItemStack(Items.EMERALD, 64),
+                    ItemStack(ModItems.HUNTING_RIFLE_BLUEPRINT), 10, 30, 0.05f
                 ),
                 BasicItemListing(
                     ItemStack(Items.EMERALD, 8),
