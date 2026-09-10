@@ -341,55 +341,6 @@ class GunData private constructor(
     private val jsonPropModifier = JsonPropertyModifier(GunProp.entries)
     private val attachmentJsonPropModifier = JsonPropertyModifier(GunProp.entries)
     private var tempModifications: Function<DefaultGunData, DefaultGunData>? = null
-
-    /**
-     * Computes modified property values into a standalone [DefaultGunData] snapshot.
-     *
-     * @param useCache whether to re-use cached result if available.
-     * @return computed gun data properties.
-     * @deprecated Use [get] with [GunProp] keys instead for optimized property resolution.
-     */
-    @JvmOverloads
-    @Deprecated("Use get() instead")
-    @ApiStatus.ScheduledForRemoval
-    fun compute(useCache: Boolean = true): DefaultGunData {
-        if (cache != null && useCache) return cache!!
-
-        var rawData = getDefault().copy()
-//
-//        // property override tag
-//        jsonPropModifier.update(propertyOverrideString.get())
-//        rawData = jsonPropModifier.computeProperties(this, rawData)
-//
-//        // gun modifiers
-//        rawData = item.computeProperties(this, rawData)
-//
-//        // FireMode
-//        rawData = selectedFireModeInfo(rawData.availableFireModes()).computeProperties(this, rawData)
-//
-//        // AmmoConsumer
-//        rawData = selectedAmmoConsumer(rawData.getProcessedAmmoConsumers()).computeProperties(this, rawData)
-//
-//        // perk
-//        for (type in PERK_TYPES) {
-//            val instance = perk.get(type) ?: continue
-//
-//            rawData = instance.computeProperties(this, rawData)
-//        }
-//
-//        // Temporary property modifications
-//        if (tempModifications != null) {
-//            rawData = tempModifications!!.apply(rawData)
-//        }
-//
-//        rawData.limit()
-//        if (useCache) {
-//            cache = rawData
-//        }
-
-        return rawData
-    }
-
     private val pmcInstance: PMC<GunData, DefaultGunData> by lazy { PMC(this) }
     private var cachedStructuralVersion: Int = -1
 
