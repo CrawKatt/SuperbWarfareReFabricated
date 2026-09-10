@@ -548,7 +548,10 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val mountTransform = model.getGlobalTransform(boneName) ?: return
 
         poseStack.pushPose()
-        mulPoseWithNormal(poseStack, Matrix4f(mountTransform))
+        mulPoseWithNormal(
+            poseStack,
+            Matrix4f(mountTransform).mul(resolveBarrelAttachmentLocalTransform(stack))
+        )
         attachmentModel.renderToBuffer(poseStack, bufferSource, texture, packedLight, packedOverlay)
         poseStack.popPose()
     }
@@ -623,6 +626,15 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         return AttachmentDefinition.from(attachmentId)?.bone
     }
 
+    open fun resolveBarrelAttachmentLocalTransform(stack: ItemStack): Matrix4f {
+        val data = GunData.from(stack)
+        val offset = data.attachment.getOffset(AttachmentType.BARREL)
+        val rotation = data.attachment.getRotation(AttachmentType.BARREL).toFloat()
+        return Matrix4f()
+            .translate(0f, 0f, offset.toFloat())
+            .rotateZ(Mth.DEG_TO_RAD * rotation)
+    }
+
     open fun resolveBarrelAttachmentMuzzleTransform(
         stack: ItemStack,
         model: GeoGunModel,
@@ -631,7 +643,9 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val attachmentMuzzle = renderData.first.getGlobalTransform(MUZZLE_BONE) ?: return null
         val boneName = resolveBarrelAttachmentBone(stack) ?: return null
         val mountTransform = model.getGlobalTransform(boneName) ?: return null
-        return Matrix4f(mountTransform).mul(attachmentMuzzle)
+        return Matrix4f(mountTransform)
+            .mul(resolveBarrelAttachmentLocalTransform(stack))
+            .mul(attachmentMuzzle)
     }
 
     open fun resolveMagazineBone(stack: ItemStack): String {
