@@ -182,35 +182,43 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                 return gunDataMapCache!!
             }
 
-            // Slow path: rebuild the weapon map.
-            // computed() is called exactly once here.  Its result is cached by
-            // VehicleData.compute(), so this is effectively O(1) after the first call.
-            val weapons = computed().weapons()
+            // Slow path: rebuild the weapon map from the weapon keys declared by the vehicle data.
+            // Only the key set is needed here — every weapon's baseline DefaultGunData is resolved
+            // from the stack itself via GunData.defaultDataId (see VehicleData.weaponDefaultDataId),
+            // so no default-data supplier has to be injected.
+            val vehicleId = VehicleData.getRegistryId(this.type)
+            val weaponKeys = computed().weaponKeys()
             val rawMap = entityData.get(GUN_DATA_MAP)
             val newMap = linkedMapOf<String, GunData>()
 
-            for (kv in weapons.entries) {
-                val existing = rawMap[kv.key]
+            for (key in weaponKeys) {
+                val defaultDataId = VehicleData.weaponDefaultDataId(vehicleId, key)
+                val existing = rawMap[key]
+
                 if (existing != null) {
-                    // Reuse the existing GunData instance.  Updating the supplier
-                    // preserves the PMC cache — only triggers a structural rebuild
-                    // if the weapon definition actually changed.
-                    existing.updateDefaultDataSupplier { kv.value }
-                    newMap[kv.key] = existing
+                    // Reuse the existing GunData instance so its PMC cache survives. A stack from a
+                    // legacy save may not carry the id yet, so stamp it through the GunData write path.
+                    if (existing.defaultDataId.get() != defaultDataId) {
+                        existing.defaultDataId.set(defaultDataId)
+                        existing.save()
+                    }
+
+                    newMap[key] = existing
                 } else {
                     // First encounter: allocate once, never again for this slot.
-                    newMap[kv.key] = GunData.from(
-                        ItemStack(ModItems.VEHICLE_GUN)
-                    ) { kv.value }
+                    val stack = ItemStack(ModItems.VEHICLE_GUN)
+                    GunData.setDefaultDataId(stack, defaultDataId)
+                    newMap[key] = GunData.from(stack)
                 }
             }
 
             gunDataMapCache = newMap
-            gunDataMapWeaponKeys = weapons.keys
+            gunDataMapWeaponKeys = weaponKeys
             return newMap
         }
         set(value) {
             this.entityData.set(GUN_DATA_MAP, value.toMap())
+
             // External write — must invalidate cache.
             this.gunDataMapCache = null
             this.gunDataMapWeaponKeys = null
@@ -493,7 +501,9 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     private fun initOBB() {
         this.obbCache = null
         this.invalidateAABBCache()
-        this.obb = data().getDefault().copy().obb.toList()
+        // Per-entity copies: the datapack default is shared, and each vehicle mutates its own OBB
+        // instances (OBBInfo.getOBB() lazily builds one per instance).
+        this.obb = data().getDefault().obb.map { it.copy() }.toList()
     }
 
     /**
@@ -1596,6 +1606,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         // GunData
         val state = compound.getCompound("WeaponState")
         val newMap = mutableMapOf<String, GunData>()
+        val vehicleId = VehicleData.getRegistryId(this.type)
         for (key in state.allKeys) {
             var tag = state.getCompound(key)
 
@@ -1604,7 +1615,11 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             tag.putInt("count", 1)
 
             ItemStack.parse(this.level().registryAccess(), tag)
-                .ifPresent { stack -> newMap[key] = GunData.from(stack) }
+                .ifPresent { stack ->
+                    // Ensure the baseline id is present even for stacks saved before this existed.
+                    GunData.setDefaultDataId(stack, VehicleData.weaponDefaultDataId(vehicleId, key))
+                    newMap[key] = GunData.from(stack)
+                }
         }
         gunDataMap = newMap
 
