@@ -322,6 +322,9 @@ object ModItems {
     @JvmField val SCOPE_ACOG = registerAttachment("scope_acog") {
         AttachmentItem("${Mod.MODID}:scope_acog", Rarity.RARE)
     }
+    @JvmField val SCOPE_1P_78 = registerAttachment("scope_1p_78") {
+        AttachmentItem("${Mod.MODID}:scope_1p_78", Rarity.RARE)
+    }
     @JvmField val SCOPE_HAMR = registerAttachment("scope_hamr") {
         AttachmentItem("${Mod.MODID}:scope_hamr", Rarity.EPIC)
     }
