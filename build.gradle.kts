@@ -147,8 +147,8 @@ dependencies {
 
     modImplementation("curse.maven:jade-324717:6291517")
 
-    modCompileOnly("vazkii.patchouli:Patchouli:1.21.1-93-FABRIC")
-    modRuntimeOnly("vazkii.patchouli:Patchouli:1.21.1-93-FABRIC")
+    //modCompileOnly("vazkii.patchouli:Patchouli:1.21.1-93-FABRIC")
+    //modRuntimeOnly("vazkii.patchouli:Patchouli:1.21.1-93-FABRIC")
 
     modCompileOnly("com.github.thedeathlycow:thermoo:v4.8.0")
     modRuntimeOnly("com.github.thedeathlycow:thermoo:v4.8.0")
