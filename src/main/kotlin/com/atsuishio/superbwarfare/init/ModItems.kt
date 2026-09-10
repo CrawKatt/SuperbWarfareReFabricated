@@ -300,6 +300,12 @@ object ModItems {
     @JvmField val SILENCER_QINGLAN = registerAttachment("silencer_qinglan") {
         AttachmentItem("${Mod.MODID}:silencer_qinglan", ModRarities.VIRTUAL)
     }
+    @JvmField val TRIANGULAR_MUZZLE = registerAttachment("triangular_muzzle") {
+        AttachmentItem("${Mod.MODID}:triangular_muzzle", Rarity.RARE)
+    }
+    @JvmField val LOVE_MUZZLE = registerAttachment("love_muzzle") {
+        AttachmentItem("${Mod.MODID}:love_muzzle", ModRarities.VIRTUAL)
+    }
     // @formatter:on
 
     // Scope / sight
