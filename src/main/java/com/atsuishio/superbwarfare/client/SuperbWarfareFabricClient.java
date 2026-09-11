@@ -24,6 +24,7 @@ import com.atsuishio.superbwarfare.network.NetworkRegistryKt;
 import com.atsuishio.superbwarfare.sound.SoundLimit;
 import net.createmod.ponder.foundation.PonderIndex;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -45,7 +46,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         ClientRenderHandler.registerRenderers();
         ClientRenderHandler.registerOverlays();
         ClientRenderHandler.registerTooltip();
-        ClientRenderHandler.onClientSetup();
+        ClientLifecycleEvents.CLIENT_STARTED.register(client -> ClientRenderHandler.onClientSetup());
         ClientRenderHandler.registerItemDecorations();
         PotionMortarShellItem.registerColorHandler();
         ParachuteRenderer.onRenderLevelStage();
