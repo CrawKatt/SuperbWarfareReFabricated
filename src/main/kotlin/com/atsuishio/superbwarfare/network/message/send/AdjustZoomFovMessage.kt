@@ -77,6 +77,7 @@ data class AdjustZoomFovMessage(val scroll: Double) : ServerPacketPayload() {
                 }
             }
 
+            gun.invalidateProperties()
             gun.save()
             return true
         }

@@ -101,6 +101,7 @@ public class IglaItem extends GunGeoItem {
         }
 
         data.ammo.set(data.ammo.get() - data.get(GunProp.AMMO_COST_PER_SHOOT));
+        data.invalidateProperties();
         data.save();
     }
 }

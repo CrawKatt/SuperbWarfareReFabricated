@@ -30,7 +30,7 @@ object GunEventHandler {
         if (data.item.useSpecialFireProcedure(data)) return
 
         if (data.bolt.actionTimer.get() > 0) {
-            data.nbtVersion.invalidateStructural()
+            data.invalidateProperties()
         }
 
         data.bolt.actionTimer.reduce()
@@ -122,7 +122,7 @@ object GunEventHandler {
 
         data.reload.reloadStarter.finish()
 
-        data.nbtVersion.invalidateStructural()
+        data.invalidateProperties()
     }
 
     /**
@@ -196,7 +196,7 @@ object GunEventHandler {
             } else if (canSingleReload && data.ammo.get() < data.get(GunProp.MAGAZINE)) {
                 data.reload.singleReloadStarter.markStart()
 
-                data.nbtVersion.invalidateStructural()
+                data.invalidateProperties()
             } else {
                 return
             }
@@ -229,8 +229,12 @@ object GunEventHandler {
     fun handleCooldown(shooter: Entity?, data: GunData, environmentRate: Double? = null) {
         val rate = environmentRate ?: computeEnvironmentRate(shooter, data)
 
-
-        data.heat.set(max(data.heat.get() - data.get(GunProp.NATURAL_COOLDOWN) * rate, 0.0))
+        val heatO = data.heat.get()
+        val heat = max(heatO - data.get(GunProp.NATURAL_COOLDOWN) * rate, 0.0)
+        if (heat != heatO) {
+            data.invalidateProperties()
+            data.heat.set(heat)
+        }
 
         if (data.heat.get() < 80 && data.overHeat.get()) {
             data.overHeat.set(false)
@@ -364,7 +368,7 @@ object GunEventHandler {
             }
 
             if (data.reload.time() > 0) {
-                data.nbtVersion.invalidateStructural()
+                data.invalidateProperties()
             }
             // Reduce remaining reload timer
             data.reload.reduce()
@@ -398,7 +402,7 @@ object GunEventHandler {
     private fun startReload(shooter: Entity?, data: GunData) {
         val reload = data.reload
 
-        data.nbtVersion.invalidateStructural()
+        data.invalidateProperties()
 
         if (data.item.hasBulletInBarrel(data)) {
             if (!data.hasEnoughAmmoToShoot(shooter)) {
@@ -492,7 +496,7 @@ object GunEventHandler {
             reload.setStage(1)
             reload.setState(ReloadState.NORMAL_RELOADING)
 
-            data.nbtVersion.invalidateStructural()
+            data.invalidateProperties()
         }
 
         if (reload.prepareLoadTimer.get() == data.get(GunProp.PREPARE_AMMO_LOAD_TIME)) {
@@ -525,6 +529,7 @@ object GunEventHandler {
 
             // 动画播放nbt
             data.loadIndex.set(if (data.loadIndex.get() == 1) 0 else 1)
+            data.invalidateProperties()
         }
 
         // 装填
@@ -565,6 +570,7 @@ object GunEventHandler {
             reload.setStage(0)
             if (data.get(GunProp.BOLT_ACTION_TIME) > 0) {
                 data.bolt.needed.set(false)
+                data.invalidateProperties()
             }
             reload.setState(ReloadState.NOT_RELOADING)
             reload.singleReloadStarter.finish()
@@ -578,6 +584,7 @@ object GunEventHandler {
         val required = min(data.get(GunProp.MAGAZINE) - data.ammo.get(), 1)
         val available = min(required, data.countBackupAmmo(shooter))
         data.ammo.add(available)
+        data.invalidateProperties()
 
         if (!InventoryTool.hasCreativeAmmoBox(shooter)) {
             data.consumeBackupAmmo(shooter, available)
@@ -592,6 +599,7 @@ object GunEventHandler {
         )
         val available = min(required, data.countBackupAmmo(shooter))
         data.ammo.add(available)
+        data.invalidateProperties()
 
         if (!InventoryTool.hasCreativeAmmoBox(shooter)) {
             data.consumeBackupAmmo(shooter, available)
