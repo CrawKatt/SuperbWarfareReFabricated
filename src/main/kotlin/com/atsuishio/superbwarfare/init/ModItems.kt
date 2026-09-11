@@ -225,8 +225,8 @@ object ModItems {
         return registered
     }
 
-    private fun <T : Item> registerAttachment(id: String, item: () -> T): T {
-        val registered = register(id, item())
+    private fun registerAttachment(id: String, rarity: Rarity = Rarity.COMMON): AttachmentItem {
+        val registered = register(id, AttachmentItem("${Mod.MODID}:$id", rarity))
         ATTACHMENTS.add(registered)
         return registered
     }
@@ -235,127 +235,57 @@ object ModItems {
 
     // Stock
     // @formatter:off
-    @JvmField val OEM_STOCK_LIGHT = registerAttachment("oem_stock_light") {
-        AttachmentItem("${Mod.MODID}:oem_stock_light")
-    }
-    @JvmField val OEM_STOCK_HEAVY = registerAttachment("oem_stock_heavy") {
-        AttachmentItem("${Mod.MODID}:oem_stock_heavy")
-    }
-    @JvmField val STOCK_UBR = registerAttachment("stock_ubr") {
-        AttachmentItem("${Mod.MODID}:stock_ubr")
-    }
-    @JvmField val STOCK_PRS = registerAttachment("stock_prs") {
-        AttachmentItem("${Mod.MODID}:stock_prs")
-    }
-    @JvmField val STOCK_AR_TACTICAL = registerAttachment("stock_ar_tactical") {
-        AttachmentItem("${Mod.MODID}:stock_ar_tactical")
-    }
-    @JvmField val STOCK_ZENIT_PT_1 = registerAttachment("stock_zenit_pt_1") {
-        AttachmentItem("${Mod.MODID}:stock_zenit_pt_1")
-    }
+    @JvmField val OEM_STOCK_LIGHT = registerAttachment("oem_stock_light")
+    @JvmField val OEM_STOCK_HEAVY = registerAttachment("oem_stock_heavy")
+    @JvmField val STOCK_UBR = registerAttachment("stock_ubr")
+    @JvmField val STOCK_PRS = registerAttachment("stock_prs")
+    @JvmField val STOCK_AR_TACTICAL = registerAttachment("stock_ar_tactical")
+    @JvmField val STOCK_ZENIT_PT_1 = registerAttachment("stock_zenit_pt_1")
     // @formatter:on
 
     // Magazine
     // @formatter:off
-    @JvmField val MAGAZINE_EXTEND = registerAttachment("magazine_extend") {
-        AttachmentItem("${Mod.MODID}:magazine_extend", Rarity.RARE)
-    }
-    @JvmField val MAGAZINE_EXTEND_PRO = registerAttachment("magazine_extend_pro") {
-        AttachmentItem("${Mod.MODID}:magazine_extend_pro", Rarity.EPIC)
-    }
+    @JvmField val MAGAZINE_EXTEND = registerAttachment("magazine_extend", Rarity.RARE)
+    @JvmField val MAGAZINE_EXTEND_PRO = registerAttachment("magazine_extend_pro", Rarity.EPIC)
     // @formatter:on
 
     // Barrel
     // @formatter:off
-    @JvmField val MEOWLENCER = registerAttachment("meowlencer") {
-        AttachmentItem("${Mod.MODID}:meowlencer", Rarity.RARE)
-    }
-    @JvmField val HISSILENCER = registerAttachment("hissilencer") {
-        AttachmentItem("${Mod.MODID}:hissilencer", Rarity.RARE)
-    }
-    @JvmField val SILAOWUNCER = registerAttachment("silaowuncer") {
-        AttachmentItem("${Mod.MODID}:silaowuncer", Rarity.RARE)
-    }
-    @JvmField val RU_SILENCER = registerAttachment("ru_silencer") {
-        AttachmentItem("${Mod.MODID}:ru_silencer")
-    }
-    @JvmField val SILENCER_50_CAL = registerAttachment("silencer_50_cal") {
-        AttachmentItem("${Mod.MODID}:silencer_50_cal")
-    }
-    @JvmField val AR_SILENCER = registerAttachment("ar_silencer") {
-        AttachmentItem("${Mod.MODID}:ar_silencer")
-    }
-    @JvmField val HANDGUN_SILENCER = registerAttachment("handgun_silencer") {
-        AttachmentItem("${Mod.MODID}:handgun_silencer")
-    }
-    @JvmField val OSPREY_SILENCER = registerAttachment("osprey_silencer") {
-        AttachmentItem("${Mod.MODID}:osprey_silencer")
-    }
-    @JvmField val LOUDSPEAKER = registerAttachment("loudspeaker") {
-        AttachmentItem("${Mod.MODID}:loudspeaker", ModRarities.LEGENDARY)
-    }
-    @JvmField val OSPREY_SILENCER_TRACHELIUM = registerAttachment("osprey_silencer_trachelium") {
-        AttachmentItem("${Mod.MODID}:osprey_silencer_trachelium", ModRarities.LEGENDARY)
-    }
-    @JvmField val SILENCER_QINGLAN = registerAttachment("silencer_qinglan") {
-        AttachmentItem("${Mod.MODID}:silencer_qinglan", ModRarities.VIRTUAL)
-    }
-    @JvmField val TRIANGULAR_MUZZLE = registerAttachment("triangular_muzzle") {
-        AttachmentItem("${Mod.MODID}:triangular_muzzle", Rarity.RARE)
-    }
-    @JvmField val LOVE_MUZZLE = registerAttachment("love_muzzle") {
-        AttachmentItem("${Mod.MODID}:love_muzzle", ModRarities.VIRTUAL)
-    }
+    @JvmField val MEOWLENCER = registerAttachment("meowlencer", Rarity.RARE)
+    @JvmField val HISSILENCER = registerAttachment("hissilencer", Rarity.RARE)
+    @JvmField val SILAOWUNCER = registerAttachment("silaowuncer", Rarity.RARE)
+    @JvmField val RU_SILENCER = registerAttachment("ru_silencer")
+    @JvmField val SILENCER_50_CAL = registerAttachment("silencer_50_cal")
+    @JvmField val AR_SILENCER = registerAttachment("ar_silencer")
+    @JvmField val HANDGUN_SILENCER = registerAttachment("handgun_silencer")
+    @JvmField val OSPREY_SILENCER = registerAttachment("osprey_silencer")
+    @JvmField val LOUDSPEAKER = registerAttachment("loudspeaker", ModRarities.LEGENDARY)
+    @JvmField val OSPREY_SILENCER_TRACHELIUM = registerAttachment("osprey_silencer_trachelium", ModRarities.LEGENDARY)
+    @JvmField val SILENCER_QINGLAN = registerAttachment("silencer_qinglan", ModRarities.VIRTUAL)
+    @JvmField val TRIANGULAR_MUZZLE = registerAttachment("triangular_muzzle", Rarity.RARE)
+    @JvmField val LOVE_MUZZLE = registerAttachment("love_muzzle", ModRarities.VIRTUAL)
     // @formatter:on
 
     // Scope / sight
     // @formatter:off
-    @JvmField val SCOPE_COYOTE = registerAttachment("scope_coyote") {
-        AttachmentItem("${Mod.MODID}:scope_coyote")
-    }
-    @JvmField val SCOPE_AIMPOINT_T2 = registerAttachment("scope_aimpoint_t2") {
-        AttachmentItem("${Mod.MODID}:scope_aimpoint_t2")
-    }
-    @JvmField val SCOPE_HANDGUN_RED_DOT = registerAttachment("scope_handgun_red_dot") {
-        AttachmentItem("${Mod.MODID}:scope_handgun_red_dot")
-    }
-    @JvmField val SCOPE_EOTECH_551 = registerAttachment("scope_eotech_551") {
-        AttachmentItem("${Mod.MODID}:scope_eutech_551")
-    }
-    @JvmField val SCOPE_OKP_7 = registerAttachment("scope_okp_7") {
-        AttachmentItem("${Mod.MODID}:scope_okp_7")
-    }
-    @JvmField val SCOPE_PKAS = registerAttachment("scope_pkas") {
-        AttachmentItem("${Mod.MODID}:scope_pkas")
-    }
-    @JvmField val SCOPE_ACOG = registerAttachment("scope_acog") {
-        AttachmentItem("${Mod.MODID}:scope_acog", Rarity.RARE)
-    }
-    @JvmField val SCOPE_QMK171 = registerAttachment("scope_qmk171") {
-        AttachmentItem("${Mod.MODID}:scope_qmk171", Rarity.RARE)
-    }
-    @JvmField val SCOPE_1P_78 = registerAttachment("scope_1p_78") {
-        AttachmentItem("${Mod.MODID}:scope_1p_78", Rarity.RARE)
-    }
-    @JvmField val SCOPE_HAMR = registerAttachment("scope_hamr") {
-        AttachmentItem("${Mod.MODID}:scope_hamr", Rarity.EPIC)
-    }
-    @JvmField val SCOPE_LPVO = registerAttachment("scope_lpvo") {
-        AttachmentItem("${Mod.MODID}:scope_lpvo", Rarity.EPIC)
-    }
-    @JvmField val SCOPE_SNIPER = registerAttachment("scope_sniper") {
-        AttachmentItem("${Mod.MODID}:scope_sniper", Rarity.EPIC)
-    }
+    @JvmField val SCOPE_COYOTE = registerAttachment("scope_coyote")
+    @JvmField val SCOPE_AIMPOINT_T2 = registerAttachment("scope_aimpoint_t2")
+    @JvmField val SCOPE_HANDGUN_RED_DOT = registerAttachment("scope_handgun_red_dot")
+    @JvmField val SCOPE_EOTECH_551 = registerAttachment("scope_eotech_551")
+    @JvmField val SCOPE_OKP_7 = registerAttachment("scope_okp_7")
+    @JvmField val SCOPE_PKAS = registerAttachment("scope_pkas")
+    @JvmField val SCOPE_ACOG = registerAttachment("scope_acog", Rarity.RARE)
+    @JvmField val SCOPE_QMK171 = registerAttachment("scope_qmk171", Rarity.RARE)
+    @JvmField val SCOPE_1P_78 = registerAttachment("scope_1p_78", Rarity.RARE)
+    @JvmField val SCOPE_HAMR = registerAttachment("scope_hamr", Rarity.EPIC)
+    @JvmField val SCOPE_LPVO = registerAttachment("scope_lpvo", Rarity.EPIC)
+    @JvmField val SCOPE_SNIPER = registerAttachment("scope_sniper", Rarity.EPIC)
     // @formatter:on
 
     // Grip
     // @formatter:off
-    @JvmField val VERTICAL_GRIP = registerAttachment("vertical_grip") {
-        AttachmentItem("${Mod.MODID}:vertical_grip")
-    }
-    @JvmField val TRIANGLE_GRIP = registerAttachment("triangle_grip") {
-        AttachmentItem("${Mod.MODID}:triangle_grip")
-    }
+    @JvmField val VERTICAL_GRIP = registerAttachment("vertical_grip")
+    @JvmField val TRIANGLE_GRIP = registerAttachment("triangle_grip")
     // @formatter:on
 
     // @formatter:off
