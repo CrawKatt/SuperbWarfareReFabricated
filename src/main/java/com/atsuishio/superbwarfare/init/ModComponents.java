@@ -33,7 +33,7 @@ public class ModComponents implements EntityComponentInitializer {
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerForPlayers(
                 PLAYER_VARIABLE,
-                player -> new PlayerVariable(),
+                PlayerVariable::new,
                 RespawnCopyStrategy.ALWAYS_COPY
         );
 

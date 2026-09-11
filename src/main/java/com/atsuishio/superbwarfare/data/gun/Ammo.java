@@ -178,9 +178,10 @@ public enum Ammo {
         return ModComponents.PLAYER_VARIABLE
                 .maybeGet(entity)
                 .map(cap -> {
-                    var watched = cap.watch();
-                    boolean success = set(watched, count);
-                    if (success) watched.sync(entity);
+                    if (get(cap) == count) return true;
+
+                    boolean success = set(cap, count);
+                    if (success) cap.sync(entity);
                     return success;
                 })
                 .orElse(false);

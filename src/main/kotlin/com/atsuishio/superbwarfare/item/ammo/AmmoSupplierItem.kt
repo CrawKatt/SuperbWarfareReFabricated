@@ -50,7 +50,7 @@ open class AmmoSupplierItem(val type: Ammo, val ammoToAdd: Int, properties: Prop
 
             toAddCount
         } else {
-            val capability = ModAttachments.PLAYER_VARIABLE.get(player).watch()
+            val capability = ModAttachments.PLAYER_VARIABLE.get(player)
 
             val canAddAmount = type.limit - type.get(capability)
             val toAddCount = (canAddAmount / ammoToAdd).coerceAtMost(count)

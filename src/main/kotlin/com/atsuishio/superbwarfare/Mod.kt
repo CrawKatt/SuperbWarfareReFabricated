@@ -65,7 +65,6 @@ class Mod : ModInitializer {
         WreckageLootDataManager.register()
         ModLootModifier.init()
         IffItem.init()
-        PhosphorusFireMobEffect.registerEvents()
         PlayerVariable.registerEvents()
 
         ContainerBlockItem.registerContainers()

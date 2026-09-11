@@ -93,7 +93,7 @@ open class AmmoBoxItem : Item(Properties().stacksTo(1)) {
         player.cooldowns.addCooldown(this, 10)
 
         val info = stack.ammoBoxData
-        val cap = ModComponents.PLAYER_VARIABLE.get(player).watch()
+        val cap = ModComponents.PLAYER_VARIABLE.get(player)
 
         if (!level.isClientSide) {
             for (type in info.selectedTypes) {

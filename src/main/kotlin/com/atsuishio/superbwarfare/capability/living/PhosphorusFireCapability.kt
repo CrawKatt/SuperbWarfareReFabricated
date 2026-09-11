@@ -9,12 +9,13 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.LivingEntity
 import org.ladysnake.cca.api.v3.component.Component
+import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
 
 @Serializable
 data class PhosphorusFireCapability(
     @SerialName("SbwPhosphorusFire")
     var isOnFire: Boolean = false
-) : Component {
+) : Component, AutoSyncedComponent {
 
     override fun readFromNbt(tag: CompoundTag, registryLookup: HolderLookup.Provider) {
         if (tag.contains(TAG_PHOSPHORUS_FIRE)) {
@@ -33,6 +34,17 @@ data class PhosphorusFireCapability(
         @JvmStatic
         fun of(living: LivingEntity): PhosphorusFireCapability {
             return ModComponents.PHOSPHORUS_FIRE.get(living)
+        }
+
+        @JvmStatic
+        fun set(living: LivingEntity, value: Boolean) {
+            val data = of(living)
+            if (data.isOnFire == value) return
+
+            data.isOnFire = value
+            if (!living.level().isClientSide) {
+                ModComponents.PHOSPHORUS_FIRE.sync(living)
+            }
         }
     }
 }

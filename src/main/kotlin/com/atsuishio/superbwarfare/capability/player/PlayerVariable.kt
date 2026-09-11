@@ -2,8 +2,6 @@ package com.atsuishio.superbwarfare.capability.player
 
 import com.atsuishio.superbwarfare.data.gun.Ammo
 import com.atsuishio.superbwarfare.init.ModComponents
-import com.atsuishio.superbwarfare.network.message.receive.PlayerVariablesSyncMessage
-import com.atsuishio.superbwarfare.tools.sendPacket
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -14,65 +12,25 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import org.ladysnake.cca.api.v3.component.Component
 import org.ladysnake.cca.api.v3.component.CopyableComponent
+import org.ladysnake.cca.api.v3.component.ComponentProvider
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
 import java.util.EnumMap
 import java.util.function.Consumer
 
-class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerVariable> {
-    private var old: PlayerVariable? = null
-
+class PlayerVariable(private val owner: Player? = null) : Component, AutoSyncedComponent, CopyableComponent<PlayerVariable> {
     @JvmField
     var ammo: MutableMap<Ammo, Int> = EnumMap(Ammo::class.java)
     var activeThermalImaging: Boolean = false
 
+    override fun shouldSyncWith(player: ServerPlayer): Boolean {
+        return owner === player
+    }
+
+    /** Synchronizes this private component with the player who owns it. */
     fun sync(entity: Entity) {
-        val newVariable = getOrDefault(entity)
-        if (old != null && old == newVariable) return
-
         if (entity is ServerPlayer) {
-            entity.sendPacket(
-                PlayerVariablesSyncMessage(
-                    entity.id,
-                    compareAndUpdate()
-                )
-            )
+            ModComponents.PLAYER_VARIABLE.syncWith(entity, entity as ComponentProvider)
         }
-    }
-
-    fun watch(): PlayerVariable {
-        this.old = this.copy()
-        return this
-    }
-
-    fun forceUpdate(): MutableMap<Byte, Int> {
-        val map = hashMapOf<Byte, Int>()
-
-        for (type in Ammo.entries) {
-            map[type.ordinal.toByte()] = type.get(this)
-        }
-
-        map[(-1).toByte()] = if (this.activeThermalImaging) 1 else 0
-        return map
-    }
-
-    fun compareAndUpdate(): MutableMap<Byte, Int> {
-        val map = hashMapOf<Byte, Int>()
-        val old = this.old ?: PlayerVariable()
-
-        for (type in Ammo.entries) {
-            val oldCount = old.ammo.getOrDefault(type, 0)
-            val newCount = type.get(this)
-
-            if (oldCount != newCount) {
-                map[type.ordinal.toByte()] = newCount
-            }
-        }
-
-        if (old.activeThermalImaging != this.activeThermalImaging) {
-            map[(-1).toByte()] = if (this.activeThermalImaging) 1 else 0
-        }
-
-        return map
     }
 
     fun writeToNBT(): CompoundTag {
@@ -96,13 +54,13 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
     }
 
     fun copy(): PlayerVariable {
-        val clone = PlayerVariable()
+        val clone = PlayerVariable(owner)
 
         for (type in Ammo.entries) {
             type.set(clone, type.get(this))
         }
 
-        clone.activeThermalImaging = this.activeThermalImaging
+        clone.activeThermalImaging = activeThermalImaging
 
         return clone
     }
@@ -124,8 +82,7 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
             type.set(this, type.get(original))
         }
 
-        this.activeThermalImaging = original.activeThermalImaging
-        this.old = original.old?.copy()
+        activeThermalImaging = original.activeThermalImaging
     }
 
     override fun equals(other: Any?): Boolean {
@@ -147,7 +104,7 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
     companion object {
         @JvmStatic
         fun modify(player: Player, consumer: Consumer<PlayerVariable>) {
-            val cap = ModComponents.PLAYER_VARIABLE.get(player).watch()
+            val cap = ModComponents.PLAYER_VARIABLE.get(player)
             consumer.accept(cap)
             cap.sync(player)
         }
@@ -161,31 +118,15 @@ class PlayerVariable : Component, AutoSyncedComponent, CopyableComponent<PlayerV
         fun registerEvents() {
             ServerPlayConnectionEvents.JOIN.register { handler, _, _ ->
                 val player = handler.player
-
-                player.sendPacket(
-                    PlayerVariablesSyncMessage(
-                        player.id,
-                        getOrDefault(player).compareAndUpdate()
-                    )
-                )
+                getOrDefault(player).sync(player)
             }
 
             ServerPlayerEvents.AFTER_RESPAWN.register { _, newPlayer, _ ->
-                newPlayer.sendPacket(
-                    PlayerVariablesSyncMessage(
-                        newPlayer.id,
-                        getOrDefault(newPlayer).compareAndUpdate()
-                    )
-                )
+                getOrDefault(newPlayer).sync(newPlayer)
             }
 
             ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register { player, _, _ ->
-                player.sendPacket(
-                    PlayerVariablesSyncMessage(
-                        player.id,
-                        getOrDefault(player).forceUpdate()
-                    )
-                )
+                getOrDefault(player).sync(player)
             }
         }
     }

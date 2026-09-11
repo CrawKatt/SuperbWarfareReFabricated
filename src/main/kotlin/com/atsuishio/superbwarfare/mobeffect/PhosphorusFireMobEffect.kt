@@ -1,13 +1,10 @@
 package com.atsuishio.superbwarfare.mobeffect
 
 import com.atsuishio.superbwarfare.capability.PersistentDataAccessor
+import com.atsuishio.superbwarfare.capability.living.PhosphorusFireCapability
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModMobEffects
-import com.atsuishio.superbwarfare.network.message.receive.ClientPhosphorusFireMessage
 import com.atsuishio.superbwarfare.tools.DamageHandler
-import com.atsuishio.superbwarfare.tools.sendPacketTo
-import com.atsuishio.superbwarfare.tools.sendPacketToTrackingThis
-import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
@@ -21,15 +18,6 @@ import net.minecraft.world.item.enchantment.Enchantments
 object PhosphorusFireMobEffect : MobEffect(MobEffectCategory.HARMFUL, 0xB1C1F2) {
     const val TAG_PHOSPHORUS_FIRE_COUNT = "SbwPhosphorusFireCount"
     const val TAG_PHOSPHORUS_FIRE_ATTACKER = "SbwPhosphorusFireAttacker"
-
-    @JvmStatic
-    fun registerEvents() {
-        EntityTrackingEvents.START_TRACKING.register { entity, player ->
-            if (entity is LivingEntity && entity.hasEffect(ModMobEffects.PHOSPHORUS_FIRE)) {
-                sendPacketTo(player, ClientPhosphorusFireMessage(entity.id, true))
-            }
-        }
-    }
 
     override fun applyEffectTick(entity: LivingEntity, amplifier: Int): Boolean {
         val data = persistentData(entity)
@@ -88,7 +76,9 @@ object PhosphorusFireMobEffect : MobEffect(MobEffectCategory.HARMFUL, 0xB1C1F2) 
             persistentData(living).putInt(TAG_PHOSPHORUS_FIRE_ATTACKER, source.id)
         }
 
-        living.sendPacketToTrackingThis(ClientPhosphorusFireMessage(living.id, true))
+        if (!living.level().isClientSide) {
+            PhosphorusFireCapability.set(living, true)
+        }
     }
 
     @JvmStatic
@@ -100,17 +90,19 @@ object PhosphorusFireMobEffect : MobEffect(MobEffectCategory.HARMFUL, 0xB1C1F2) 
         data.remove(TAG_PHOSPHORUS_FIRE_ATTACKER)
         data.remove(TAG_PHOSPHORUS_FIRE_COUNT)
 
-        living.sendPacketToTrackingThis(ClientPhosphorusFireMessage(living.id, false))
+        if (!living.level().isClientSide) {
+            PhosphorusFireCapability.set(living, false)
+        }
     }
 
     @JvmStatic
     fun onLivingTick(living: LivingEntity) {
-        if (
-            !living.level().isClientSide &&
-            living.hasEffect(ModMobEffects.PHOSPHORUS_FIRE) &&
-            living.level().gameTime % 1000L == 0L
-        ) {
-            living.sendPacketToTrackingThis(ClientPhosphorusFireMessage(living.id, true))
+        if (!living.level().isClientSide && living.level().gameTime % 1000L == 0L) {
+            val onFire = living.hasEffect(ModMobEffects.PHOSPHORUS_FIRE)
+            val synced = PhosphorusFireCapability.of(living).isOnFire
+            if (synced != onFire) {
+                PhosphorusFireCapability.set(living, onFire)
+            }
         }
     }
 

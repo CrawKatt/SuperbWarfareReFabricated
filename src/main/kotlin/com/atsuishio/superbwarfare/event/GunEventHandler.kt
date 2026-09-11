@@ -276,7 +276,7 @@ object GunEventHandler {
             val count = ammoCount - magazine - (if (hasBulletInBarrel) 1 else 0)
 
             if (shooter is Player) {
-                val capability = ModComponents.PLAYER_VARIABLE.get(shooter).watch()
+                val capability = ModComponents.PLAYER_VARIABLE.get(shooter)
                 if (data.selectedAmmoConsumer().type == AmmoConsumer.AmmoConsumeType.PLAYER_AMMO) {
                     val ammoType = data.selectedAmmoConsumer().playerAmmoType
                     ammoType?.add(capability, count)

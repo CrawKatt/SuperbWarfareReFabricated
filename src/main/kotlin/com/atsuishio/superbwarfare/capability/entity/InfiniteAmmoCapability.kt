@@ -8,12 +8,13 @@ import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.entity.Entity
 import org.ladysnake.cca.api.v3.component.Component
+import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent
 
 @Serializable
 data class InfiniteAmmoCapability(
     @SerialName("SbwInfiniteAmmo")
     var hasInfiniteAmmo: Boolean = false
-) : Component {
+) : Component, AutoSyncedComponent {
 
     override fun writeToNbt(tag: CompoundTag, registryLookup: HolderLookup.Provider) {
         tag.putBoolean(TAG_INFINITE_AMMO, hasInfiniteAmmo)
@@ -38,7 +39,11 @@ data class InfiniteAmmoCapability(
         @JvmStatic
         fun modify(entity: Entity, modifier: (InfiniteAmmoCapability) -> Unit) {
             val data = get(entity)
+            val oldValue = data.hasInfiniteAmmo
             data.apply(modifier)
+            if (oldValue != data.hasInfiniteAmmo && !entity.level().isClientSide) {
+                ModComponents.INFINITE_AMMO.sync(entity)
+            }
         }
 
         @JvmStatic
