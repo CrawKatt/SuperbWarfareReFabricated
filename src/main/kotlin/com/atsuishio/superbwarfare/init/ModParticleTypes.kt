@@ -2,8 +2,8 @@ package com.atsuishio.superbwarfare.init
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.client.particle.*
+import com.atsuishio.superbwarfare.tools.createMapCodec
 import com.atsuishio.superbwarfare.tools.createStreamCodec
-import com.atsuishio.superbwarfare.tools.generateMapCodec
 import com.mojang.serialization.MapCodec
 import net.minecraft.core.Registry
 import net.minecraft.core.particles.ParticleOptions
@@ -51,7 +51,7 @@ object ModParticleTypes {
     inline fun <reified T : ParticleOptions> registerParticle(
         name: String,
         overrideLimiter: Boolean = true,
-        codec: MapCodec<T> = generateMapCodec<T>(),
+        codec: MapCodec<T> = createMapCodec<T>(),
         streamCodec: StreamCodec<in RegistryFriendlyByteBuf, T> = createStreamCodec<T>(),
     ): ParticleType<T> = Registry.register(
         BuiltInRegistries.PARTICLE_TYPE,
