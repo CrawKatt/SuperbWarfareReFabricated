@@ -357,6 +357,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.SCOPE_HAMR)
         simpleItem(ModItems.SCOPE_1P_78)
         simpleItem(ModItems.TRIANGULAR_MUZZLE)
+        simpleItem(ModItems.STAR_MUZZLE)
         simpleItem(ModItems.LOVE_MUZZLE)
 
         // blocks
