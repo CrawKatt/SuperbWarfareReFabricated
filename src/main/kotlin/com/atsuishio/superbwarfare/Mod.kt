@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.advancement.CriteriaRegister
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.command.CommandRegister
+import com.atsuishio.superbwarfare.capability.sync.ModSyncedCapabilities
 import com.atsuishio.superbwarfare.compat.tacz.TACZGunEventHandler
 import com.atsuishio.superbwarfare.compat.tacz.TaczCompat
 import com.atsuishio.superbwarfare.config.CommonConfig
@@ -119,6 +120,7 @@ class Mod : ModInitializer {
         }
 
         NetworkRegistry.register()
+        ModSyncedCapabilities.register()
         DataLoader.register()
         WreckageLootDataManager.register()
         ModLootModifier.register()
@@ -126,7 +128,6 @@ class Mod : ModInitializer {
         FastProjectileManualTicker.register()
         TraumaMobEffect.registerEvents()
         registerLivingEvents()
-        PlayerVariable.registerEvents()
 
         ContainerBlockItem.registerContainers()
         ModCapabilities.init()
@@ -261,9 +262,7 @@ class Mod : ModInitializer {
             ShockMobEffect.onShockRemoved(entity, instance)
         }
         LivingTickCallback.EVENT.register(BurnMobEffect::onLivingTick)
-        LivingTickCallback.EVENT.register(PhosphorusFireMobEffect::onLivingTick)
         LivingTickCallback.EVENT.register(ShockMobEffect::onLivingTick)
-        PhosphorusFireMobEffect.registerEvents()
     }
 
     private fun registerTicks() {

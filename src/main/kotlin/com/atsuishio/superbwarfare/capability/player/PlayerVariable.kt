@@ -2,59 +2,61 @@ package com.atsuishio.superbwarfare.capability.player
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.capability.ModCapabilities
+import com.atsuishio.superbwarfare.capability.sync.CapabilitySync
+import com.atsuishio.superbwarfare.capability.sync.SyncTarget
+import com.atsuishio.superbwarfare.capability.sync.SyncedCapability
 import com.atsuishio.superbwarfare.data.gun.Ammo
-import com.atsuishio.superbwarfare.network.message.receive.PlayerVariablesSyncMessage
-import com.atsuishio.superbwarfare.tools.sendPacketTo
+import com.atsuishio.superbwarfare.serialization.ByteBufDecoder
+import com.atsuishio.superbwarfare.serialization.ByteBufEncoder
 import dev.onyxstudios.cca.api.v3.component.CopyableComponent
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import java.util.EnumMap
 import java.util.function.Consumer
 
-class PlayerVariable : AutoSyncedComponent, CopyableComponent<PlayerVariable> {
+class PlayerVariable : AutoSyncedComponent, CopyableComponent<PlayerVariable>, SyncedCapability {
     private var old: PlayerVariable? = null
 
     @JvmField
     var ammo: MutableMap<Ammo, Int> = EnumMap(Ammo::class.java)
     var activeThermalImaging: Boolean = false
 
-    fun sync(entity: Entity) {
-        if (entity !is ServerPlayer) return
-        val variable = ModCapabilities.PLAYER_VARIABLE.maybeGet(entity).orElse(null) ?: return
-        if (old != null && old == variable) return
-        sendPacketTo(entity, PlayerVariablesSyncMessage(entity.id, compareAndUpdate()))
+    /** 玩家变量只对本人有意义 */
+    override val syncTarget: SyncTarget
+        get() = SyncTarget.SELF
+
+    /** 全量同步：字段顺序必须与 [readSync] 保持一致。 */
+    override fun writeSync(encoder: ByteBufEncoder, full: Boolean) {
+        encoder.encodeBoolean(activeThermalImaging)
+        encoder.encodeInt(Ammo.entries.size)
+
+        for (type in Ammo.entries) {
+            encoder.encodeInt(type.get(this))
+        }
     }
 
+    override fun readSync(decoder: ByteBufDecoder, full: Boolean) {
+        activeThermalImaging = decoder.decodeBoolean()
+
+        val size = decoder.decodeInt()
+        for (index in 0 until size) {
+            val count = decoder.decodeInt()
+            if (index < Ammo.entries.size) {
+                // El servidor es la fuente de verdad; no aplicar límites locales.
+                ammo[Ammo.entries[index]] = count
+            }
+        }
+    }
+
+    /** Registra el estado previo para comprobar si [modify] cambió algo. */
     fun watch(): PlayerVariable {
         old = copy()
         return this
     }
 
-    fun forceUpdate(): MutableMap<Byte, Int> {
-        val map = HashMap<Byte, Int>()
-        for (type in Ammo.entries) map[type.ordinal.toByte()] = type.get(this)
-        map[(-1).toByte()] = if (activeThermalImaging) 1 else 0
-        return map
-    }
-
-    fun compareAndUpdate(): MutableMap<Byte, Int> {
-        val map = HashMap<Byte, Int>()
-        val previous = old ?: PlayerVariable()
-        for (type in Ammo.entries) {
-            val count = type.get(this)
-            if (previous.ammo.getOrDefault(type, 0) != count) map[type.ordinal.toByte()] = count
-        }
-        if (previous.activeThermalImaging != activeThermalImaging) {
-            map[(-1).toByte()] = if (activeThermalImaging) 1 else 0
-        }
-        return map
-    }
+    fun changed(): Boolean = old != null && old != this
 
     fun writeToNBT(): CompoundTag = CompoundTag().also { tag ->
         for (type in Ammo.entries) type.set(tag, type.get(this))
@@ -99,27 +101,20 @@ class PlayerVariable : AutoSyncedComponent, CopyableComponent<PlayerVariable> {
         fun getOrDefault(entity: Entity): PlayerVariable =
             ModCapabilities.PLAYER_VARIABLE.maybeGet(entity).orElseGet(::PlayerVariable)
 
+        /** Marca los datos para sincronizarlos al final del tick. */
+        @JvmStatic
+        fun markDirty(entity: Entity) {
+            CapabilitySync.markDirty(entity, ID)
+        }
+
+        /** Edita la variable y sincroniza solo si cambió. */
         @JvmStatic
         fun modify(entity: Entity, consumer: Consumer<PlayerVariable>) {
             if (entity.level().isClientSide) return
-            ModCapabilities.PLAYER_VARIABLE.maybeGet(entity).ifPresent { variable ->
-                variable.watch()
-                consumer.accept(variable)
-                variable.sync(entity)
-            }
-        }
-
-        @JvmStatic
-        fun registerEvents() {
-            ServerPlayConnectionEvents.JOIN.register { handler, _, _ ->
-                val player = handler.player
-                sendPacketTo(player, PlayerVariablesSyncMessage(player.id, getOrDefault(player).compareAndUpdate()))
-            }
-            ServerPlayerEvents.AFTER_RESPAWN.register { _, player, _ ->
-                sendPacketTo(player, PlayerVariablesSyncMessage(player.id, getOrDefault(player).compareAndUpdate()))
-            }
-            ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register { player, _, _ ->
-                sendPacketTo(player, PlayerVariablesSyncMessage(player.id, getOrDefault(player).forceUpdate()))
+            ModCapabilities.PLAYER_VARIABLE.maybeGet(entity).ifPresent { cap ->
+                cap.watch()
+                consumer.accept(cap)
+                if (cap.changed()) markDirty(entity)
             }
         }
     }
