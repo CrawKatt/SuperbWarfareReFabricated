@@ -101,8 +101,16 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val bindSlotTransform: Matrix4f
     )
 
-    override fun createAnimationInstance(stack: ItemStack, entity: Entity): IFPAnimationInstance {
+    override fun createAnimationInstance(stack: ItemStack, entity: Entity?): IFPAnimationInstance {
         return GeoGunAnimationInstance(stack, entity, InteractionHand.MAIN_HAND)
+    }
+
+    override fun createAnimationInstance(
+        stack: ItemStack,
+        entity: Entity?,
+        hand: InteractionHand
+    ): IFPAnimationInstance {
+        return GeoGunAnimationInstance(stack, entity, hand)
     }
 
     override fun getSlotTexture(stack: ItemStack): ResourceLocation? {

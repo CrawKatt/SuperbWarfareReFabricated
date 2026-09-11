@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.client
 
+import com.atsuishio.superbwarfare.accessor.RenderTargetStencilAccessor
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.decorator.ContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.LuckyContainerItemDecorator
@@ -198,6 +199,13 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun onClientSetup() {
+        val mainRenderTarget = mc.mainRenderTarget as RenderTargetStencilAccessor
+        val stencilWasEnabled = mainRenderTarget.`superbwarfare$isStencilEnabled`()
+        mainRenderTarget.`superbwarfare$enableStencil`()
+        if (!stencilWasEnabled) {
+            mc.levelRenderer.graphicsChanged()
+        }
+
         val geoGunRenderer = GeoGunRenderer()
         BuiltInRegistries.ITEM.filterIsInstance<GeoGunItemV2>().forEach { item ->
             BuiltinItemRendererRegistry.INSTANCE.register(item, geoGunRenderer)
