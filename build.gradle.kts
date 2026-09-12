@@ -96,11 +96,22 @@ java {
     withSourcesJar()
 }
 
+// 测试用插件 mod（loader test）
+val loaderTest: SourceSet by sourceSets.creating {
+    java.srcDir("localmod/sbwloadertest/java")
+    kotlin.srcDir("localmod/sbwloadertest/kotlin")
+    resources.srcDir("localmod/sbwloadertest/resources")
+}
+
 loom {
     accessWidenerPath = file("src/main/resources/superbwarfare.accesswidener")
     mods {
         create(project.property("mod_id") as String) {
             sourceSet(sourceSets.main.get())
+        }
+
+        create("sbwloadertest") {
+            sourceSet(loaderTest)
         }
     }
 }
@@ -123,6 +134,11 @@ dependencies {
         officialMojangMappings()
         parchment("org.parchmentmc.data:parchment-${project.property("parchment_minecraft_version")}:${project.property("parchment_mappings_version")}@zip")
     })
+
+    // loaderTest 夹具要 import @TestLoaderTarget 注解类：只给编译期可见，
+    // 运行期由 superbwarfare 本体提供。
+    add(loaderTest.compileOnlyConfigurationName, sourceSets.main.get().output)
+    add("localRuntime", loaderTest.output)
 
     modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")

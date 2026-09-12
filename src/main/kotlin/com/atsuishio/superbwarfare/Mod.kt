@@ -59,6 +59,7 @@ class Mod : ModInitializer {
         callInits()
         ModWorldGen.init()
         CustomEventHandler.register()
+        TestLoader.register()
 
         registerPayloads()
         DataLoader.register()

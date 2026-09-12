@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "sbwloadertest",
+  "version": "0.1.0",
+  "name": "SBW Loader Test",
+  "description": "Loader?",
+  "authors": [
+    "Superb Warfare Dev Team"
+  ],
+  "license": "WTFPL",
+  "environment": "*",
+  "depends": {
+    "fabricloader": ">=0.17.2",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "superbwarfare": "*",
+    "fabric-language-kotlin": "*"
+  }
+}
