@@ -350,6 +350,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.SCOPE_OKP_7)
         simpleItem(ModItems.SCOPE_PKAS)
         simpleItem(ModItems.SCOPE_BRUISER)
+        simpleItem(ModItems.SCOPE_RANGER)
         simpleItem(ModItems.SCOPE_ACOG)
         simpleItem(ModItems.SCOPE_QMK171)
         simpleItem(ModItems.SCOPE_LPVO)
