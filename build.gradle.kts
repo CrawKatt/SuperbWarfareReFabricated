@@ -29,8 +29,24 @@ java {
     withSourcesJar()
 }
 
+// Mod de prueba del loader, cargado como source set durante runClient.
+val loaderTest: SourceSet by sourceSets.creating {
+    java.srcDir("localmod/sbwloadertest/java")
+    kotlin.srcDir("localmod/sbwloadertest/kotlin")
+    resources.srcDir("localmod/sbwloadertest/resources")
+}
+
 loom {
     accessWidenerPath.set(file("src/main/resources/superbwarfare.accesswidener"))
+
+    mods {
+        create(project.property("mod_id").toString()) {
+            sourceSet(sourceSets.main.get())
+        }
+        create("sbwloadertest") {
+            sourceSet(loaderTest)
+        }
+    }
 
     runs {
         named("client") {
@@ -41,7 +57,6 @@ loom {
             vmArg("-XX:+IgnoreUnrecognizedVMOptions")
             vmArg("-XX:+AllowEnhancedClassRedefinition")
 
-            //property("geckolib.disable_examples", "true")
         }
 
         named("server") {
@@ -191,6 +206,9 @@ dependencies {
         officialMojangMappings()
         parchment("org.parchmentmc.data:parchment-1.20.1:2023.09.03@zip")
     })
+    // The addon compiles against the host annotation; the host supplies it at runtime.
+    add(loaderTest.compileOnlyConfigurationName, sourceSets.main.get().output)
+    add("localRuntime", loaderTest.output)
 
     modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_api_version")}")
@@ -367,3 +385,8 @@ idea {
         isDownloadJavadoc = true
     }
 }
+// Ensure the addon source set is built before a development run.
+tasks.matching { it.name in listOf("runClient", "runServer", "runData") }
+    .configureEach {
+        dependsOn(loaderTest.classesTaskName, loaderTest.processResourcesTaskName)
+    }

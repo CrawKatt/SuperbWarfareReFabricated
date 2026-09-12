@@ -55,6 +55,7 @@ import com.atsuishio.superbwarfare.init.ModSerializers
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTabs
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.init.TestLoader
 import com.atsuishio.superbwarfare.init.ModVillagers
 import com.atsuishio.superbwarfare.init.ModWorldgen
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
@@ -110,6 +111,7 @@ class Mod : ModInitializer {
         callInits()
         ModWorldgen.register()
         CustomEventHandler.register()
+        TestLoader.register()
         if (TaczCompat.isCompatible()) {
             TACZGunEventHandler.registerEvents()
         } else if (TaczCompat.isLoaded()) {
