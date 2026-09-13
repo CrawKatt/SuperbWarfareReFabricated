@@ -97,7 +97,6 @@ object ModItems {
     @JvmField val MP_443 = registerGun("mp_443") { Mp443Item }
     @JvmField val M_1911 = registerGun("m_1911") { M1911Item }
     @JvmField val HOMEMADE_SHOTGUN = registerGun("homemade_shotgun") { HomemadeShotgunItem() }
-    @JvmField val M_1897 = registerGun("m_1897") { M1987Item }
     @JvmField val NAIL_GUN = registerGun("nail_gun") { NailGunItem() }
     @JvmField val TRACHELIUM = registerGun("trachelium") { TracheliumItem() }
     @JvmField val MP_5 = registerGun("mp_5") { Mp5Item() }
@@ -122,6 +121,7 @@ object ModItems {
     @JvmField val HUNTING_RIFLE = registerGun("hunting_rifle") { HuntingRifleItem }
     @JvmField val NTW_20 = registerGun("ntw_20") { Ntw20Item() }
     @JvmField val M_870 = registerGun("m_870") { M870Item }
+    @JvmField val M_1897 = registerGun("m_1897") { M1987Item }
     @JvmField val AA_12 = registerGun("aa_12") { Aa12Item() }
     @JvmField val DEVOTION = registerGun("devotion") { DevotionItem() }
     @JvmField val RPK = registerGun("rpk") { RpkItem }
@@ -477,7 +477,7 @@ object ModItems {
     @JvmField val SVD_BLUEPRINT = registerBlueprint("svd_blueprint", Rarity.EPIC)
     @JvmField val MARLIN_BLUEPRINT = registerBlueprint("marlin_blueprint", Rarity.COMMON)
     @JvmField val M_870_BLUEPRINT = registerBlueprint("m_870_blueprint", Rarity.RARE)
-    @JvmField val M_1897_BLUEPRINT = registerBlueprint("m_1897_blueprint", Rarity.COMMON)
+    @JvmField val M_1897_BLUEPRINT = registerBlueprint("m_1897_blueprint", Rarity.RARE)
     @JvmField val AWM_BLUEPRINT = registerBlueprint("awm_blueprint", Rarity.EPIC)
     @JvmField val M_98B_BLUEPRINT = registerBlueprint("m_98b_blueprint", Rarity.EPIC)
     @JvmField val AK_47_BLUEPRINT = registerBlueprint("ak_47_blueprint", Rarity.RARE)
