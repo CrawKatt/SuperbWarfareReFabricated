@@ -1,7 +1,4 @@
 {
-  "parent": "superbwarfare:item/qbz_95_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/qbz_95_icon"
-  }
+  "parent": "minecraft:builtin/entity",
+  "gui_light": "front"
 }
