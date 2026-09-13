@@ -206,6 +206,7 @@ class ModItemTagProvider(
         this.tag(ModTags.Items.ANIMATED_SHOTGUN).add(
             ModItems.HOMEMADE_SHOTGUN,
             ModItems.M_870,
+            ModItems.M_1897,
             ModItems.AA_12,
             ModItems.M_79,
             ModItems.SECONDARY_CATACLYSM
@@ -256,7 +257,7 @@ class ModItemTagProvider(
             ModItems.AWM,
             ModItems.QL_1031
         )
-        this.tag(ModTags.Items.SHOTGUN).add(ModItems.HOMEMADE_SHOTGUN, ModItems.M_870, ModItems.AA_12)
+        this.tag(ModTags.Items.SHOTGUN).add(ModItems.HOMEMADE_SHOTGUN, ModItems.M_870, ModItems.M_1897, ModItems.AA_12)
         this.tag(ModTags.Items.MACHINE_GUN).add(ModItems.MINIGUN, ModItems.M_2_HB)
         this.tag(ModTags.Items.LAUNCHER).add(
             ModItems.RPG, ModItems.JAVELIN, ModItems.IGLA_9K38,
@@ -274,7 +275,7 @@ class ModItemTagProvider(
 
         this.tag(ModTags.Items.COMMON_BLUEPRINT).add(
             ModItems.GLOCK_17_BLUEPRINT, ModItems.MP_443_BLUEPRINT, ModItems.MARLIN_BLUEPRINT,
-            ModItems.TASER_BLUEPRINT, ModItems.M_1911_BLUEPRINT
+            ModItems.TASER_BLUEPRINT, ModItems.M_1911_BLUEPRINT, ModItems.M_1897_BLUEPRINT
         )
 
         this.tag(ModTags.Items.RARE_BLUEPRINT).add(

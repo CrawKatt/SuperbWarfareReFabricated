@@ -77,6 +77,7 @@ object ModVillagers {
             trade(ItemStack(Items.EMERALD, 6), ItemStack(ModItems.STEEL_MATERIALS.trigger), 12, 5, 0.05f),
             trade(ItemStack(Items.EMERALD, 8), ItemStack(ModItems.STEEL_MATERIALS.spring), 12, 5, 0.05f),
             trade(ItemStack(Items.EMERALD, 16), ItemStack(ModItems.MARLIN_BLUEPRINT), 8, 25, 0.05f),
+            trade(ItemStack(Items.EMERALD, 16), ItemStack(ModItems.M_1897_BLUEPRINT), 8, 15, 0.05f),
             trade(ItemStack(Items.EMERALD, 16), ItemStack(ModItems.GLOCK_17_BLUEPRINT), 8, 15, 0.05f),
             trade(ItemStack(Items.EMERALD, 16), ItemStack(ModItems.M_1911_BLUEPRINT), 8, 15, 0.05f),
             trade(ItemStack(Items.EMERALD, 16), ItemStack(ModItems.MP_443_BLUEPRINT), 8, 15, 0.05f),

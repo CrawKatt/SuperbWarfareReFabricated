@@ -2469,6 +2469,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 ModItems.SVD
             )
             gunSmithing(writer, ModItems.MARLIN_BLUEPRINT, GunRarity.COMMON, ItemTags.LOGS, ModItems.MARLIN)
+            gunSmithing(writer, ModItems.M_1897_BLUEPRINT, GunRarity.COMMON, ItemTags.LOGS, ModItems.M_1897)
             gunSmithing(
                 writer,
                 ModItems.M_870_BLUEPRINT,
@@ -2615,6 +2616,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             copyBlueprint(writer, ModItems.SVD_BLUEPRINT)
             copyBlueprint(writer, ModItems.MARLIN_BLUEPRINT)
             copyBlueprint(writer, ModItems.M_870_BLUEPRINT)
+            copyBlueprint(writer, ModItems.M_1897_BLUEPRINT)
             copyBlueprint(writer, ModItems.AWM_BLUEPRINT)
             copyBlueprint(writer, ModItems.M_98B_BLUEPRINT)
             copyBlueprint(writer, ModItems.AK_47_BLUEPRINT)
