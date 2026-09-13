@@ -324,6 +324,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.HISSILENCER)
         simpleItem(ModItems.SILAOWUNCER)
         simpleItem(ModItems.RU_SILENCER)
+        simpleItem(ModItems.SILENCER_SUPERB_12)
         simpleItem(ModItems.SILENCER_50_CAL)
         simpleItem(ModItems.AR_SILENCER)
         simpleItem(ModItems.HANDGUN_SILENCER)
