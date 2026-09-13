@@ -157,6 +157,10 @@ object ModVillagers {
                 ),
                 BasicItemListing(
                     ItemStack(Items.EMERALD, 16),
+                    ItemStack(ModItems.M_1897_BLUEPRINT), 8, 15, 0.05f
+                ),
+                BasicItemListing(
+                    ItemStack(Items.EMERALD, 16),
                     ItemStack(ModItems.GLOCK_17_BLUEPRINT), 8, 15, 0.05f
                 ),
                 BasicItemListing(
