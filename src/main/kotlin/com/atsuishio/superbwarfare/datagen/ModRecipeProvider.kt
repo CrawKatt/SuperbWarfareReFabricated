@@ -2465,7 +2465,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 ModItems.SVD.get()
             )
             gunSmithing(writer, ModItems.MARLIN_BLUEPRINT.get(), GunRarity.COMMON, ItemTags.LOGS, ModItems.MARLIN.get())
-            gunSmithing(writer, ModItems.M_1897_BLUEPRINT.get(), GunRarity.COMMON, ItemTags.LOGS, ModItems.M_1897.get())
+            gunSmithing(writer, ModItems.M_1897_BLUEPRINT.get(), GunRarity.RARE, ItemTags.LOGS, ModItems.M_1897.get())
             gunSmithing(
                 writer,
                 ModItems.M_870_BLUEPRINT.get(),
