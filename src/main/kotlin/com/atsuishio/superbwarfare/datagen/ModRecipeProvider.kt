@@ -2469,7 +2469,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 ModItems.SVD
             )
             gunSmithing(writer, ModItems.MARLIN_BLUEPRINT, GunRarity.COMMON, ItemTags.LOGS, ModItems.MARLIN)
-            gunSmithing(writer, ModItems.M_1897_BLUEPRINT, GunRarity.COMMON, ItemTags.LOGS, ModItems.M_1897)
+            gunSmithing(writer, ModItems.M_1897_BLUEPRINT, GunRarity.RARE, ItemTags.LOGS, ModItems.M_1897)
             gunSmithing(
                 writer,
                 ModItems.M_870_BLUEPRINT,

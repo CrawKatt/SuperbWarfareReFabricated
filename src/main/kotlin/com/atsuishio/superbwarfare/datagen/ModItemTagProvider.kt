@@ -275,7 +275,7 @@ class ModItemTagProvider(
 
         this.tag(ModTags.Items.COMMON_BLUEPRINT).add(
             ModItems.GLOCK_17_BLUEPRINT, ModItems.MP_443_BLUEPRINT, ModItems.MARLIN_BLUEPRINT,
-            ModItems.TASER_BLUEPRINT, ModItems.M_1911_BLUEPRINT, ModItems.M_1897_BLUEPRINT
+            ModItems.TASER_BLUEPRINT, ModItems.M_1911_BLUEPRINT
         )
 
         this.tag(ModTags.Items.RARE_BLUEPRINT).add(
@@ -291,7 +291,8 @@ class ModItemTagProvider(
             ModItems.HK_416_BLUEPRINT,
             ModItems.AK_12_BLUEPRINT,
             ModItems.QBZ_95_BLUEPRINT,
-            ModItems.RPG_BLUEPRINT
+            ModItems.RPG_BLUEPRINT,
+            ModItems.M_1897_BLUEPRINT
         )
 
         this.tag(ModTags.Items.EPIC_BLUEPRINT).add(
