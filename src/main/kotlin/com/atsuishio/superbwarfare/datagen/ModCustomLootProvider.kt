@@ -168,6 +168,7 @@ class ModCustomLootProvider : LootTableSubProvider {
                     ModItems.MP_443_BLUEPRINT,
                     ModItems.M_1911_BLUEPRINT,
                     ModItems.MARLIN_BLUEPRINT,
+                    ModItems.M_1897_BLUEPRINT,
                 )
 
                 withWeight(
@@ -228,6 +229,7 @@ class ModCustomLootProvider : LootTableSubProvider {
                 ModItems.MP_443_BLUEPRINT weighted 10
                 ModItems.M_1911_BLUEPRINT weighted 10
                 ModItems.MARLIN_BLUEPRINT weighted 10
+                ModItems.M_1897_BLUEPRINT weighted 10
 
                 ModItems.GLOCK_18_BLUEPRINT weighted 30
                 ModItems.M_79_BLUEPRINT weighted 30
@@ -341,6 +343,7 @@ class ModCustomLootProvider : LootTableSubProvider {
                 ModItems.TASER_BLUEPRINT weighted 60
                 ModItems.MARLIN_BLUEPRINT weighted 60
                 ModItems.M_1911_BLUEPRINT weighted 60
+                ModItems.M_1897_BLUEPRINT weighted 60
 
                 ModItems.GLOCK_18_BLUEPRINT weighted 42
                 ModItems.M_79_BLUEPRINT weighted 42
@@ -424,6 +427,7 @@ class ModCustomLootProvider : LootTableSubProvider {
                     ModItems.M_1911_BLUEPRINT,
                     ModItems.MARLIN_BLUEPRINT,
                     ModItems.TASER_BLUEPRINT,
+                    ModItems.M_1897_BLUEPRINT,
                 )
 
                 withWeight(
