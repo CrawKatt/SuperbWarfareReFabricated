@@ -1,13 +1,18 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.mixin.DamageAccess;
+import com.atsuishio.superbwarfare.entity.mixin.ForceMobEffectAccess;
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.event.custom.MobEffectAddedCallback;
 import com.atsuishio.superbwarfare.init.ModTags;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -16,9 +21,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin implements ICustomKnockback, DamageAccess {
+public abstract class LivingEntityMixin implements ICustomKnockback, DamageAccess, ForceMobEffectAccess {
+
+    @Shadow
+    @Final
+    private Map<MobEffect, MobEffectInstance> activeEffects;
+
+    @Shadow
+    protected abstract void onEffectAdded(MobEffectInstance instance, @Nullable Entity source);
+
+    @Shadow
+    protected abstract void onEffectUpdated(MobEffectInstance instance, boolean forced, @Nullable Entity source);
 
     @Shadow
     @Nullable
@@ -85,6 +101,33 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
     @Override
     public boolean superbWarfare$checkTotemDeathProtection(DamageSource source) {
         return this.checkTotemDeathProtection(source);
+    }
+
+    @Override
+    public boolean superbWarfare$addEffectUnchecked(
+            MobEffectInstance instance,
+            @Nullable Entity source
+    ) {
+        LivingEntity self = (LivingEntity) (Object) this;
+        if (self.level().isClientSide) {
+            return false;
+        }
+
+        MobEffectInstance old = this.activeEffects.get(instance.getEffect());
+        if (old == null) {
+            this.activeEffects.put(instance.getEffect(), instance);
+            this.onEffectAdded(instance, source);
+            MobEffectAddedCallback.EVENT.invoker().onAdded(self, instance, source);
+            return true;
+        }
+
+        if (old.update(instance)) {
+            this.onEffectUpdated(old, true, source);
+            MobEffectAddedCallback.EVENT.invoker().onAdded(self, instance, source);
+            return true;
+        }
+
+        return false;
     }
 
     @Inject(method = "dismountVehicle", at = @At("RETURN"))
