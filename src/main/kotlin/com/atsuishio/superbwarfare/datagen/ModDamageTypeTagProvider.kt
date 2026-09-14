@@ -68,6 +68,7 @@ class ModDamageTypeTagProvider(
             .addOptional(mod(ModDamageTypes.SUPER_STAR_SLASH))
             .addOptional(mod(ModDamageTypes.PHOSPHORUS_FIRE))
             .addOptional(mod(ModDamageTypes.CUSTOM_EXPLOSION))
+            .addOptional(mod(ModDamageTypes.RADIATION))
         this.tag(ModTags.DamageTypes.SBW_GUN_FIRE_DAMAGE)
             .addOptional(mod(ModDamageTypes.GUN_FIRE))
             .addOptional(mod(ModDamageTypes.GUN_FIRE_HEADSHOT))
@@ -86,6 +87,7 @@ class ModDamageTypeTagProvider(
             .addOptional(mod(ModDamageTypes.SUPER_STAR_HIT))
             .addOptional(mod(ModDamageTypes.SUPER_STAR_SLASH))
             .addOptional(mod(ModDamageTypes.PHOSPHORUS_FIRE))
+            .addOptional(mod(ModDamageTypes.RADIATION))
         this.tag(DamageTypeTags.BYPASSES_ARMOR)
             .addOptional(mod(ModDamageTypes.GUN_FIRE_ABSOLUTE))
             .addOptional(mod(ModDamageTypes.GUN_FIRE_HEADSHOT_ABSOLUTE))
@@ -102,10 +104,12 @@ class ModDamageTypeTagProvider(
             .addOptional(mod(ModDamageTypes.SUPER_STAR_HIT))
             .addOptional(mod(ModDamageTypes.SUPER_STAR_SLASH))
             .addOptional(mod(ModDamageTypes.PHOSPHORUS_FIRE))
+            .addOptional(mod(ModDamageTypes.RADIATION))
             .addOptional(mod(ModDamageTypes.AMMO_CONSUMPTION))
         this.tag(DamageTypeTags.BYPASSES_EFFECTS)
             .addOptional(mod(ModDamageTypes.SHOCK))
             .addOptional(mod(ModDamageTypes.PHOSPHORUS_FIRE))
+            .addOptional(mod(ModDamageTypes.RADIATION))
             .addOptional(mod(ModDamageTypes.AMMO_CONSUMPTION))
         this.tag(DamageTypeTags.BYPASSES_ENCHANTMENTS)
             .addOptional(mod(ModDamageTypes.GUN_FIRE_ABSOLUTE))
@@ -155,6 +159,7 @@ class ModDamageTypeTagProvider(
             .addOptional(mod(ModDamageTypes.SUPER_STAR_HIT))
             .addOptional(mod(ModDamageTypes.SUPER_STAR_SLASH))
             .addOptional(mod(ModDamageTypes.PHOSPHORUS_FIRE))
+            .addOptional(mod(ModDamageTypes.RADIATION))
     }
 
     companion object {

@@ -24,6 +24,9 @@ object ModMobEffects {
     @JvmField
     val ACID_ETCHING: MobEffect = Registration.effect("acid_etching") { AcidEtchingMobEffect }
 
+    @JvmField
+    val RADIATION: MobEffect = Registration.effect("radiation") { RadiationMobEffect }
+
     @JvmStatic
     fun init() {
     }

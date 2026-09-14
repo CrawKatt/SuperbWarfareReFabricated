@@ -44,6 +44,10 @@
     {
       "id": "superbwarfare:phosphorus_fire",
       "required": false
+    },
+    {
+      "id": "superbwarfare:radiation",
+      "required": false
     }
   ]
 }

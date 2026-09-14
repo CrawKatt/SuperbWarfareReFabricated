@@ -64,6 +64,10 @@
     {
       "id": "superbwarfare:custom_explosion",
       "required": false
+    },
+    {
+      "id": "superbwarfare:radiation",
+      "required": false
     }
   ]
 }
