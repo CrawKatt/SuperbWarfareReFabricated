@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
+import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback;
 import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect;
@@ -144,7 +145,12 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
     @ModifyVariable(method = "hurt", at = @At("HEAD"), argsOnly = true)
     private float superbwarfare$modifyHurtAmount(float amount, DamageSource source) {
         LivingEntity self = (LivingEntity) (Object) this;
-        return TraumaMobEffect.modifyIncomingDamage(self, LivingEventHandler.onEntityHurt(self, source, amount));
+        LivingHurtCallback.Event event = new LivingHurtCallback.Event(self, source, amount);
+        LivingHurtCallback.EVENT.invoker().onLivingHurt(event);
+        return TraumaMobEffect.modifyIncomingDamage(
+                self,
+                LivingEventHandler.onEntityHurt(self, source, event.getAmount())
+        );
     }
 
     @ModifyVariable(method = "heal(F)V", at = @At("HEAD"), argsOnly = true)

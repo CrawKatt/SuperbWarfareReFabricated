@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.mobeffect
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.capability.PersistentDataAccessor
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModMobEffects
@@ -26,7 +27,7 @@ open class ShockMobEffect : MobEffect(MobEffectCategory.HARMFUL, -256) {
     init {
         addAttributeModifier(
             Attributes.MOVEMENT_SPEED,
-            ResourceLocation.withDefaultNamespace("effect.speed"),
+            loc("effect.shock"),
             -10.0,
             AttributeModifier.Operation.ADD_VALUE
         )
