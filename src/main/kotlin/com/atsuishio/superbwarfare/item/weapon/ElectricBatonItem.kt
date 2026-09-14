@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.init.ModMobEffects
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.tiers.ModItemTier
+import com.atsuishio.superbwarfare.tools.forceApplyEffect
 import net.minecraft.ChatFormatting
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
@@ -101,7 +102,10 @@ class ElectricBatonItem : SwordItem(ModItemTier.STEEL, 2, -2.5f, Properties().du
             if (energy >= ENERGY_COST) {
                 pStack.getCapability(ForgeCapabilities.ENERGY).ifPresent { it.extractEnergy(ENERGY_COST, false) }
                 if (!pTarget.level().isClientSide) {
-                    pTarget.addEffect(MobEffectInstance(ModMobEffects.SHOCK.get(), 30, 2), pAttacker)
+                    pTarget.forceApplyEffect(
+                        MobEffectInstance(ModMobEffects.SHOCK.get(), 30, 2),
+                        pAttacker
+                    )
                 }
             }
         }

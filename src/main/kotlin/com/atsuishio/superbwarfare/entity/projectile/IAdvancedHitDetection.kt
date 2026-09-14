@@ -10,15 +10,12 @@ import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.misc.TranscriptItem
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
+import com.atsuishio.superbwarfare.tools.*
 import com.atsuishio.superbwarfare.tools.FormatTool.format1D
 import com.atsuishio.superbwarfare.tools.HitboxHelper.getBoundingBox
 import com.atsuishio.superbwarfare.tools.HitboxHelper.getVelocity
-import com.atsuishio.superbwarfare.tools.OBB
 import com.atsuishio.superbwarfare.tools.OBB.Companion.vec3ToVector3d
 import com.atsuishio.superbwarfare.tools.OBB.Companion.vector3dToVec3
-import com.atsuishio.superbwarfare.tools.sendPacketTo
-import com.atsuishio.superbwarfare.tools.toVec3
-import com.atsuishio.superbwarfare.tools.toVector3d
 import com.atsuishio.superbwarfare.world.phys.EntityResult
 import net.minecraft.core.BlockPos
 import net.minecraft.core.BlockPos.MutableBlockPos
@@ -209,7 +206,7 @@ interface IAdvancedHitDetection {
         if (entity.level().isClientSide) return
         if (this.getEffects().isNotEmpty() && entity is LivingEntity) {
             this.getEffects().forEach {
-                entity.addEffect(it)
+                entity.forceApplyEffect(it)
             }
         }
     }

@@ -194,7 +194,7 @@ open class MortarShellEntity : FastThrowableProjectile, BasicGeoProjectileEntity
                 .forEach {
                     val dis = pos.distanceTo(it.position())
                     if (!checkNoClip(it, pos)) return@forEach
-                    (it as LivingEntity).addEffect(
+                    (it as LivingEntity).forceApplyEffect(
                         MobEffectInstance(
                             ModMobEffects.PHOSPHORUS_FIRE.get(),
                             (300 - 30 * dis).toInt(),

@@ -474,7 +474,15 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
                         return
                     }
                     if (!entity.level().isClientSide()) {
-                        entity.addEffect(MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 2, false, false))
+                        entity.forceApplyEffect(
+                            MobEffectInstance(
+                                MobEffects.MOVEMENT_SLOWDOWN,
+                                20,
+                                2,
+                                false,
+                                false
+                            )
+                        )
                     }
                 }
                 this.damageValue *= this.getLegShot()
@@ -587,7 +595,7 @@ abstract class FastThrowableProjectile : ThrowableItemProjectile, IFastMotionSyn
                             it.isVisible,
                             it.showIcon()
                         )
-                        (entity as LivingEntity).addEffect(instance, this.owner)
+                        (entity as LivingEntity).forceApplyEffect(instance, this.owner)
                     }
                 }
         }
