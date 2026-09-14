@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.mobeffect.AcidEtchingMobEffect
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect
+import com.atsuishio.superbwarfare.mobeffect.RadiationMobEffect
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect
 import com.atsuishio.superbwarfare.mobeffect.StrikeProtectionMobEffect
 import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect
@@ -33,6 +34,9 @@ object ModMobEffects {
 
     @JvmField
     val ACID_ETCHING = register("acid_etching", AcidEtchingMobEffect)
+
+    @JvmField
+    val RADIATION = register("radiation", RadiationMobEffect)
 
     private fun register(name: String, effect: MobEffect): Holder<MobEffect> {
         val id = Mod.loc(name)

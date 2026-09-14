@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
+import com.atsuishio.superbwarfare.event.custom.LivingHealCallback;
 import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback;
 import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
@@ -153,9 +154,16 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
         );
     }
 
-    @ModifyVariable(method = "heal(F)V", at = @At("HEAD"), argsOnly = true)
-    private float superbwarfare$modifyHealAmount(float healAmount) {
-        return TraumaMobEffect.modifyHeal((LivingEntity) (Object) this, healAmount);
+    @Inject(method = "heal(F)V", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$onLivingHeal(float healAmount, CallbackInfo ci) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        LivingHealCallback.Event event = new LivingHealCallback.Event(entity, healAmount);
+        LivingHealCallback.EVENT.invoker().onLivingHeal(event);
+        ci.cancel();
+
+        if (!event.isCanceled() && event.getAmount() > 0.0F && entity.getHealth() > 0.0F) {
+            entity.setHealth(entity.getHealth() + TraumaMobEffect.modifyHeal(entity, event.getAmount()));
+        }
     }
 
     @ModifyVariable(method = "knockback(DDD)V", at = @At("HEAD"), argsOnly = true, ordinal = 0)

@@ -61,6 +61,10 @@
       "required": false
     },
     {
+      "id": "superbwarfare:radiation",
+      "required": false
+    },
+    {
       "id": "superbwarfare:ammo_consumption",
       "required": false
     }
