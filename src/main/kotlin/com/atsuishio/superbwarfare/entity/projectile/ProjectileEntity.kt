@@ -720,7 +720,15 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
                         return
                     }
                     if (!entity.level().isClientSide()) {
-                        entity.addEffect(MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 2, false, false))
+                        entity.forceApplyEffect(
+                            MobEffectInstance(
+                                MobEffects.MOVEMENT_SLOWDOWN,
+                                20,
+                                2,
+                                false,
+                                false
+                            )
+                        )
                     }
                 }
                 this.damageValue *= this.legShotValue
@@ -731,7 +739,7 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
 
         if (!this.mobEffects.isEmpty() && entity is LivingEntity) {
             for (instance in this.mobEffects) {
-                entity.addEffect(instance.get(), shooter)
+                entity.forceApplyEffect(instance.get(), shooter)
             }
         }
 
