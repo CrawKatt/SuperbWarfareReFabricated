@@ -499,13 +499,12 @@ class ModItemTagProvider(
     }
 
     private fun addAttachmentTags() {
-        this.tag(ModTags.Items.ATTACHMENT).addTags(
-            ModTags.Items.ATTACHMENT_SCOPE,
-            ModTags.Items.ATTACHMENT_MAGAZINE,
-            ModTags.Items.ATTACHMENT_BARREL,
-            ModTags.Items.ATTACHMENT_STOCK,
-            ModTags.Items.ATTACHMENT_GRIP
-        )
+        this.tag(ModTags.Items.ATTACHMENT)
+            .addTag(ModTags.Items.ATTACHMENT_SCOPE)
+            .addTag(ModTags.Items.ATTACHMENT_MAGAZINE)
+            .addTag(ModTags.Items.ATTACHMENT_BARREL)
+            .addTag(ModTags.Items.ATTACHMENT_STOCK)
+            .addTag(ModTags.Items.ATTACHMENT_GRIP)
 
         this.addAttachmentTypeTags(
             ModTags.Items.ATTACHMENT_STOCK,
@@ -662,7 +661,13 @@ class ModItemTagProvider(
         superbTag: TagKey<Item>,
         virtualTag: TagKey<Item>
     ) {
-        this.tag(typeTag).addTags(commonTag, rareTag, epicTag, legendaryTag, superbTag, virtualTag)
+        this.tag(typeTag)
+            .addTag(commonTag)
+            .addTag(rareTag)
+            .addTag(epicTag)
+            .addTag(legendaryTag)
+            .addTag(superbTag)
+            .addTag(virtualTag)
         this.tag(commonTag)
         this.tag(rareTag)
         this.tag(epicTag)
@@ -678,10 +683,9 @@ class ModItemTagProvider(
         legendaryTag: TagKey<Item>,
         superbTag: TagKey<Item>,
         virtualTag: TagKey<Item>,
-        attachments: List<DeferredHolder<Item, out Item>>
+        attachments: List<Item>
     ) {
-        attachments.forEach {
-            val item = it.get()
+        attachments.forEach { item ->
             val rarityTag = when (item.defaultInstance.getRarity()) {
                 Rarity.COMMON -> commonTag
                 Rarity.RARE -> rareTag
