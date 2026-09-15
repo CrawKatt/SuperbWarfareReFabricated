@@ -3179,6 +3179,15 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
 
                 this.generatePerkRecycleResearchingRecipe(writer, it)
             }
+
+            listOf(
+                Rarity.COMMON,
+                Rarity.RARE,
+                Rarity.EPIC,
+                ModRarities.LEGENDARY,
+                ModRarities.SUPERB,
+                ModRarities.VIRTUAL
+            ).forEach { this.generateAttachmentResearchingRecipe(writer, it) }
         }
 
         fun copyBlueprint(writer: Consumer<FinishedRecipe>, result: ItemLike) {
@@ -3652,6 +3661,56 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                     has(ModItems.BOOST_RESEARCH_MODULE)
                 )
                 .save(writer, loc(getItemName(inputPerk) + "_from_blueprint_boost"))
+        }
+
+        fun generateAttachmentResearchingRecipe(writer: Consumer<FinishedRecipe>, rarity: Rarity) {
+            val input: Item
+            val resTag: TagKey<Item>
+            val rarityName: String
+            when (rarity) {
+                Rarity.RARE -> {
+                    input = ModItems.RARE_ACCESSORY_KIT.get()
+                    resTag = ModTags.Items.ATTACHMENT_RESEARCHABLE_RARE
+                    rarityName = "rare"
+                }
+
+                Rarity.EPIC -> {
+                    input = ModItems.EPIC_ACCESSORY_KIT.get()
+                    resTag = ModTags.Items.ATTACHMENT_RESEARCHABLE_EPIC
+                    rarityName = "epic"
+                }
+
+                ModRarities.LEGENDARY -> {
+                    input = ModItems.LEGENDARY_ACCESSORY_KIT.get()
+                    resTag = ModTags.Items.ATTACHMENT_RESEARCHABLE_LEGENDARY
+                    rarityName = "legendary"
+                }
+
+                ModRarities.SUPERB -> {
+                    input = ModItems.SUPERB_ACCESSORY_KIT.get()
+                    resTag = ModTags.Items.ATTACHMENT_RESEARCHABLE_SUPERB
+                    rarityName = "superb"
+                }
+
+                ModRarities.VIRTUAL -> {
+                    input = ModItems.VIRTUAL_ACCESSORY_KIT.get()
+                    resTag = ModTags.Items.ATTACHMENT_RESEARCHABLE_VIRTUAL
+                    rarityName = "virtual"
+                }
+
+                else -> {
+                    input = ModItems.COMMON_ACCESSORY_KIT.get()
+                    resTag = ModTags.Items.ATTACHMENT_RESEARCHABLE_COMMON
+                    rarityName = "common"
+                }
+            }
+
+            val id = "attachment_${rarityName}"
+            ResearchingRecipeBuilder.tag(resTag, 1, input)
+                .time(200)
+                .selectable()
+                .unlockedBy(getHasName(input), has(input))
+                .save(writer, loc("${id}_researching"))
         }
     }
 }
