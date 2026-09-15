@@ -1808,6 +1808,62 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 .define('b', ModTags.Items.INGOTS_IRON)
                 .unlockedBy(getHasName(Items.BLACK_WOOL), has(Items.BLACK_WOOL))
                 .save(writer, loc(getItemName(ModItems.WHEEL)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.COMMON_ACCESSORY_KIT)
+                .pattern("aba")
+                .pattern("b b")
+                .pattern("aba")
+                .define('a', PLATES_PLASTIC)
+                .define('b', ModTags.Items.INGOTS_IRON)
+                .unlockedBy(getHasName(ModItems.ENGINEERING_PLASTIC), has(PLATES_PLASTIC))
+                .save(writer, loc(getItemName(ModItems.COMMON_ACCESSORY_KIT)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.RARE_ACCESSORY_KIT)
+                .pattern("aba")
+                .pattern("b b")
+                .pattern("aba")
+                .define('a', PLATES_PLASTIC)
+                .define('b', INGOTS_STEEL)
+                .unlockedBy(getHasName(ModItems.ENGINEERING_PLASTIC), has(PLATES_PLASTIC))
+                .save(writer, loc(getItemName(ModItems.RARE_ACCESSORY_KIT)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.EPIC_ACCESSORY_KIT)
+                .pattern("aba")
+                .pattern("b b")
+                .pattern("aba")
+                .define('a', PLATES_PLASTIC)
+                .define('b', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
+                .unlockedBy(getHasName(ModItems.ENGINEERING_PLASTIC), has(PLATES_PLASTIC))
+                .save(writer, loc(getItemName(ModItems.EPIC_ACCESSORY_KIT)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.VIRTUAL_ACCESSORY_KIT)
+                .pattern(" b ")
+                .pattern("bab")
+                .pattern(" b ")
+                .define('a', ModItems.EPIC_ACCESSORY_KIT)
+                .define('b', Items.AMETHYST_SHARD)
+                .unlockedBy(getHasName(Items.AMETHYST_SHARD), has(Items.AMETHYST_SHARD))
+                .save(writer, loc(getItemName(ModItems.VIRTUAL_ACCESSORY_KIT)))
+            SmithingTransformRecipeBuilder.smithing(
+                Ingredient.of(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE),
+                Ingredient.of(ModItems.EPIC_ACCESSORY_KIT),
+                Ingredient.of(Items.NETHERITE_INGOT),
+                RecipeCategory.MISC,
+                ModItems.LEGENDARY_ACCESSORY_KIT
+            )
+                .unlocks(
+                    getHasName(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE),
+                    has(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE)
+                )
+                .unlocks(getHasName(ModItems.EPIC_ACCESSORY_KIT), has(ModItems.EPIC_ACCESSORY_KIT))
+                .save(writer, loc(getItemName(ModItems.LEGENDARY_ACCESSORY_KIT)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SUPERB_ACCESSORY_KIT)
+                .pattern(" a ")
+                .pattern("bec")
+                .pattern(" d ")
+                .define('a', ModItems.COMMON_ACCESSORY_KIT)
+                .define('b', ModItems.RARE_ACCESSORY_KIT)
+                .define('c', ModItems.EPIC_ACCESSORY_KIT)
+                .define('d', ModItems.LEGENDARY_ACCESSORY_KIT)
+                .define('e', Items.NETHER_STAR)
+                .unlockedBy(getHasName(Items.NETHER_STAR), has(Items.NETHER_STAR))
+                .save(writer, loc(getItemName(ModItems.SUPERB_ACCESSORY_KIT)))
         }
 
         private fun buildBlockRecipes(writer: RecipeOutput) {
