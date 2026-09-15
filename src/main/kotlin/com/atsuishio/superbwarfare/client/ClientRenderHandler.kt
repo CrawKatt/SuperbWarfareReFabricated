@@ -46,12 +46,14 @@ import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.*
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
+import com.atsuishio.superbwarfare.client.tooltip.ClientAttachmentImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientBocekImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientDogTagImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientGunImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientSentinelImageTooltip
+import com.atsuishio.superbwarfare.client.tooltip.component.AttachmentImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.BocekImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.ChargingStationImageComponent
@@ -142,6 +144,7 @@ object ClientRenderHandler {
                 is ChargingStationImageComponent -> ClientChargingStationImageTooltip(component)
                 is DogTagImageComponent -> ClientDogTagImageTooltip(component)
                 is GunImageComponent -> ClientGunImageTooltip(component)
+                is AttachmentImageComponent -> ClientAttachmentImageTooltip(component)
                 else -> null
             }
         }
