@@ -45,7 +45,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         gunItemV2(ModItems.GLOCK_17)
         gunItemV2(ModItems.GLOCK_18)
         gunItemV2(ModItems.HK_416)
-        gunItem(ModItems.HOMEMADE_SHOTGUN)
+        gunItemV2(ModItems.HOMEMADE_SHOTGUN)
         gunItemV2(ModItems.HUNTING_RIFLE)
         gunItem(ModItems.INSIDIOUS)
         gunItem(ModItems.JAVELIN)
