@@ -337,6 +337,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.MAGAZINE_EXTEND_PRO)
         simpleItem(ModItems.LOUDSPEAKER)
         simpleItem(ModItems.VERTICAL_GRIP)
+        simpleItem(ModItems.GRIP_RECTANGLE_VERTICAL)
         simpleItem(ModItems.STOCK_UBR)
         simpleItem(ModItems.STOCK_PRS)
         simpleItem(ModItems.STOCK_AR_TACTICAL)
