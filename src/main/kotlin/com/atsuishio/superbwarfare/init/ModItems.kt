@@ -113,7 +113,7 @@ object ModItems {
     @JvmField val QL_1031 = registerGun("ql_1031") { Ql1031Item() }
     @JvmField val MARLIN = registerGun("marlin") { MarlinItem }
     @JvmField val K_98 = registerGun("k_98") { K98Item }
-    @JvmField val MOSIN_NAGANT = registerGun("mosin_nagant") { MosinNagantItem() }
+    @JvmField val MOSIN_NAGANT = registerGun("mosin_nagant") { MosinNagantItem }
     @JvmField val SVD = registerGun("svd") { SvdItem() }
     @JvmField val AWM = registerGun("awm") { AwmItem() }
     @JvmField val M_98B = registerGun("m_98b") { M98bItem() }
@@ -283,6 +283,7 @@ object ModItems {
     @JvmField val SCOPE_BRUISER = registerAttachment("scope_bruiser", Rarity.RARE)
     @JvmField val SCOPE_ACOG = registerAttachment("scope_acog", Rarity.RARE)
     @JvmField val SCOPE_1P_78 = registerAttachment("scope_1p_78", Rarity.RARE)
+    @JvmField val SCOPE_PU = registerAttachment("scope_pu", Rarity.RARE)
     @JvmField val SCOPE_PK_A = registerAttachment("scope_pk_a", Rarity.RARE)
     @JvmField val SCOPE_RANGER = registerAttachment("scope_ranger", Rarity.EPIC)
     @JvmField val SCOPE_QMK171 = registerAttachment("scope_qmk171", Rarity.EPIC)
