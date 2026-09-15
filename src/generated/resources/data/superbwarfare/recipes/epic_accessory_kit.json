@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": {
+      "tag": "forge:plates/plastic"
+    },
+    "b": {
+      "tag": "superbwarfare:ingots/cemented_carbide"
+    }
+  },
+  "pattern": [
+    "aba",
+    "b b",
+    "aba"
+  ],
+  "result": {
+    "item": "superbwarfare:epic_accessory_kit"
+  },
+  "show_notification": true
+}
