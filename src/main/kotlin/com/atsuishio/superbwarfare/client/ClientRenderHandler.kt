@@ -28,12 +28,14 @@ import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTool
 import com.atsuishio.superbwarfare.client.tooltip.ClientDogTagImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientGunImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientSentinelImageTooltip
+import com.atsuishio.superbwarfare.client.tooltip.ClientAttachmentImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.component.BocekImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.ChargingStationImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.DogTagImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.SentinelImageComponent
+import com.atsuishio.superbwarfare.client.tooltip.component.AttachmentImageComponent
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.item.armor.GeHelmetM35Item
@@ -117,6 +119,7 @@ object ClientRenderHandler {
                 is ChargingStationImageComponent -> ClientChargingStationImageTooltip(component)
                 is DogTagImageComponent -> ClientDogTagImageTooltip(component)
                 is GunImageComponent -> ClientGunImageTooltip(component)
+                is AttachmentImageComponent -> ClientAttachmentImageTooltip(component)
                 else -> null
             }
         }
