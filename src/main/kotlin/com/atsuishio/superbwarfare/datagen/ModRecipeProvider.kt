@@ -1742,62 +1742,62 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .unlockedBy(getHasName(ModItems.SULFUR), has(DUSTS_SULFUR))
                 .unlockedBy(getHasName(ModItems.NITER), has(GEMS_NITER))
                 .save(writer, loc(getItemName(Items.GUNPOWDER) + "_from_sulfur_niter_coal"))
-            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.COMMON_ACCESSORY_KIT.get())
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.COMMON_ACCESSORY_KIT)
                 .pattern("aba")
                 .pattern("b b")
                 .pattern("aba")
                 .define('a', PLATES_PLASTIC)
-                .define('b', Tags.Items.INGOTS_IRON)
-                .unlockedBy(getHasName(ModItems.ENGINEERING_PLASTIC.get()), has(PLATES_PLASTIC))
-                .save(writer, loc(getItemName(ModItems.COMMON_ACCESSORY_KIT.get())))
-            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.RARE_ACCESSORY_KIT.get())
+                .define('b', ModTags.Items.INGOTS_IRON)
+                .unlockedBy(getHasName(ModItems.ENGINEERING_PLASTIC), has(PLATES_PLASTIC))
+                .save(writer, loc(getItemName(ModItems.COMMON_ACCESSORY_KIT)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.RARE_ACCESSORY_KIT)
                 .pattern("aba")
                 .pattern("b b")
                 .pattern("aba")
                 .define('a', PLATES_PLASTIC)
                 .define('b', INGOTS_STEEL)
-                .unlockedBy(getHasName(ModItems.ENGINEERING_PLASTIC.get()), has(PLATES_PLASTIC))
-                .save(writer, loc(getItemName(ModItems.RARE_ACCESSORY_KIT.get())))
-            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.EPIC_ACCESSORY_KIT.get())
+                .unlockedBy(getHasName(ModItems.ENGINEERING_PLASTIC), has(PLATES_PLASTIC))
+                .save(writer, loc(getItemName(ModItems.RARE_ACCESSORY_KIT)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.EPIC_ACCESSORY_KIT)
                 .pattern("aba")
                 .pattern("b b")
                 .pattern("aba")
                 .define('a', PLATES_PLASTIC)
                 .define('b', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
-                .unlockedBy(getHasName(ModItems.ENGINEERING_PLASTIC.get()), has(PLATES_PLASTIC))
-                .save(writer, loc(getItemName(ModItems.EPIC_ACCESSORY_KIT.get())))
-            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.VIRTUAL_ACCESSORY_KIT.get())
+                .unlockedBy(getHasName(ModItems.ENGINEERING_PLASTIC), has(PLATES_PLASTIC))
+                .save(writer, loc(getItemName(ModItems.EPIC_ACCESSORY_KIT)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.VIRTUAL_ACCESSORY_KIT)
                 .pattern(" b ")
                 .pattern("bab")
                 .pattern(" b ")
-                .define('a', ModItems.EPIC_ACCESSORY_KIT.get())
+                .define('a', ModItems.EPIC_ACCESSORY_KIT)
                 .define('b', Items.AMETHYST_SHARD)
                 .unlockedBy(getHasName(Items.AMETHYST_SHARD), has(Items.AMETHYST_SHARD))
-                .save(writer, loc(getItemName(ModItems.VIRTUAL_ACCESSORY_KIT.get())))
+                .save(writer, loc(getItemName(ModItems.VIRTUAL_ACCESSORY_KIT)))
             SmithingTransformRecipeBuilder.smithing(
                 Ingredient.of(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE),
-                Ingredient.of(ModItems.EPIC_ACCESSORY_KIT.get()),
+                Ingredient.of(ModItems.EPIC_ACCESSORY_KIT),
                 Ingredient.of(Items.NETHERITE_INGOT),
                 RecipeCategory.MISC,
-                ModItems.LEGENDARY_ACCESSORY_KIT.get()
+                ModItems.LEGENDARY_ACCESSORY_KIT
             )
                 .unlocks(
                     getHasName(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE),
                     has(Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE)
                 )
-                .unlocks(getHasName(ModItems.EPIC_ACCESSORY_KIT.get()), has(ModItems.EPIC_ACCESSORY_KIT.get()))
-                .save(writer, loc(getItemName(ModItems.LEGENDARY_ACCESSORY_KIT.get())))
-            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SUPERB_ACCESSORY_KIT.get())
+                .unlocks(getHasName(ModItems.EPIC_ACCESSORY_KIT), has(ModItems.EPIC_ACCESSORY_KIT))
+                .save(writer, loc(getItemName(ModItems.LEGENDARY_ACCESSORY_KIT)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SUPERB_ACCESSORY_KIT)
                 .pattern(" a ")
                 .pattern("bec")
                 .pattern(" d ")
-                .define('a', ModItems.COMMON_ACCESSORY_KIT.get())
-                .define('b', ModItems.RARE_ACCESSORY_KIT.get())
-                .define('c', ModItems.EPIC_ACCESSORY_KIT.get())
-                .define('d', ModItems.LEGENDARY_ACCESSORY_KIT.get())
+                .define('a', ModItems.COMMON_ACCESSORY_KIT)
+                .define('b', ModItems.RARE_ACCESSORY_KIT)
+                .define('c', ModItems.EPIC_ACCESSORY_KIT)
+                .define('d', ModItems.LEGENDARY_ACCESSORY_KIT)
                 .define('e', Items.NETHER_STAR)
                 .unlockedBy(getHasName(Items.NETHER_STAR), has(Items.NETHER_STAR))
-                .save(writer, loc(getItemName(ModItems.SUPERB_ACCESSORY_KIT.get())))
+                .save(writer, loc(getItemName(ModItems.SUPERB_ACCESSORY_KIT)))
         }
 
         private fun buildBlockRecipes(writer: Consumer<FinishedRecipe>) {
@@ -3725,37 +3725,37 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             val rarityName: String
             when (rarity) {
                 Rarity.RARE -> {
-                    input = ModItems.RARE_ACCESSORY_KIT.get()
+                    input = ModItems.RARE_ACCESSORY_KIT
                     resTag = ModTags.Items.ATTACHMENT_RESEARCHABLE_RARE
                     rarityName = "rare"
                 }
 
                 Rarity.EPIC -> {
-                    input = ModItems.EPIC_ACCESSORY_KIT.get()
+                    input = ModItems.EPIC_ACCESSORY_KIT
                     resTag = ModTags.Items.ATTACHMENT_RESEARCHABLE_EPIC
                     rarityName = "epic"
                 }
 
                 ModRarities.LEGENDARY -> {
-                    input = ModItems.LEGENDARY_ACCESSORY_KIT.get()
+                    input = ModItems.LEGENDARY_ACCESSORY_KIT
                     resTag = ModTags.Items.ATTACHMENT_RESEARCHABLE_LEGENDARY
                     rarityName = "legendary"
                 }
 
                 ModRarities.SUPERB -> {
-                    input = ModItems.SUPERB_ACCESSORY_KIT.get()
+                    input = ModItems.SUPERB_ACCESSORY_KIT
                     resTag = ModTags.Items.ATTACHMENT_RESEARCHABLE_SUPERB
                     rarityName = "superb"
                 }
 
                 ModRarities.VIRTUAL -> {
-                    input = ModItems.VIRTUAL_ACCESSORY_KIT.get()
+                    input = ModItems.VIRTUAL_ACCESSORY_KIT
                     resTag = ModTags.Items.ATTACHMENT_RESEARCHABLE_VIRTUAL
                     rarityName = "virtual"
                 }
 
                 else -> {
-                    input = ModItems.COMMON_ACCESSORY_KIT.get()
+                    input = ModItems.COMMON_ACCESSORY_KIT
                     resTag = ModTags.Items.ATTACHMENT_RESEARCHABLE_COMMON
                     rarityName = "common"
                 }
