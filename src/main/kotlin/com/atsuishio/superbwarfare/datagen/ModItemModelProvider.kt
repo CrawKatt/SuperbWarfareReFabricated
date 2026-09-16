@@ -346,6 +346,8 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.STOCK_PRS)
         simpleItem(ModItems.STOCK_AR_TACTICAL)
         simpleItem(ModItems.STOCK_ZENIT_PT_1)
+        simpleItem(ModItems.STOCK_STR)
+        simpleItem(ModItems.STOCK_ELITE)
         simpleItem(ModItems.OEM_STOCK_LIGHT)
         simpleItem(ModItems.OEM_STOCK_HEAVY)
         simpleItem(ModItems.TRIANGLE_GRIP)
