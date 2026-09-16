@@ -330,6 +330,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.SILAOWUNCER)
         simpleItem(ModItems.RU_SILENCER)
         simpleItem(ModItems.MUZZLE_BRAKE_RU)
+        simpleItem(ModItems.MUZZLE_BRAKE_AR)
         simpleItem(ModItems.SILENCER_SUPERB_12)
         simpleItem(ModItems.SILENCER_50_CAL)
         simpleItem(ModItems.AR_SILENCER)
