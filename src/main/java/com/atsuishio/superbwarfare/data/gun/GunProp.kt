@@ -142,6 +142,9 @@ class GunProp<T, R>(
         val PROJECTILE = complexProp(DefaultGunData::projectile) { it.value }
 
         @JvmField
+        val PROJECTILE_BONE = plainProp(DefaultGunData::projectileBone)
+
+        @JvmField
         val AMMO_COST_PER_SHOOT = plainProp(DefaultGunData::ammoCostPerShoot)
 
         @JvmField
