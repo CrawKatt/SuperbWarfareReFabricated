@@ -1,99 +1,85 @@
 package com.atsuishio.superbwarfare.recipe.vehicle
 
 import com.atsuishio.superbwarfare.Mod
-import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem.Companion.createInstance
 import com.atsuishio.superbwarfare.tools.TagDataParser
-import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
-import com.mojang.serialization.Codec
-import com.mojang.serialization.codecs.RecordCodecBuilder
+import com.mojang.serialization.MapCodec
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.ItemStack
+import kotlin.jvm.optionals.getOrNull
 
-class VehicleAssemblingResult {
-    @SerializedName("item")
-    @JvmField
-    var itemString: String = ""
+/** 载具装配配方的产物，由 kotlinx.serialization 从 `result` 字段反序列化。 */
+@Serializable
+data class VehicleAssemblingResult(
+    @SerialName("item")
+    var itemString: String = "",
 
-    @SerializedName("entity")
-    @JvmField
-    var entityTypeString: String = ""
+    @SerialName("entity")
+    var entityTypeString: String = "",
 
-    @SerializedName("count")
-    @JvmField
-    var count: Int = 1
+    @SerialName("count")
+    var count: Int = 1,
 
-    @SerializedName("nbt")
-    @JvmField
-    var nbt: JsonObject? = null
-
-    constructor()
-
-    constructor(itemString: String, entityTypeString: String, count: Int) {
-        this.itemString = itemString
-        this.entityTypeString = entityTypeString
-        this.count = count
-    }
-
+    @SerialName("nbt")
+    var nbt: JsonObject? = null,
+) {
+    @kotlinx.serialization.Transient
     @Transient
     @get:JvmName("result")
     var result: ItemStack? = null
 
     fun getResult(): ItemStack {
-        if (this.result != null) return this.result!!
+        if (result != null) return result!!
 
-        if (!entityTypeString.isEmpty()) {
-            val type = EntityType.byString(entityTypeString).orElse(null)
+        if (entityTypeString.isNotEmpty()) {
+            val type = EntityType.byString(entityTypeString).getOrNull()
             if (type == null) {
                 Mod.LOGGER.warn("invalid entity type: {}", entityTypeString)
-                this.result = ItemStack.EMPTY
+                result = ItemStack.EMPTY
             } else {
-                this.result = createInstance(type).copyWithCount(count)
+                result = createInstance(type).copyWithCount(count)
             }
-        } else if (!itemString.isEmpty()) {
-            val location = ResourceLocation.parse(itemString)
-            val item = BuiltInRegistries.ITEM.get(location)
-            if (nbt != null) {
+        } else if (itemString.isNotEmpty()) {
+            val itemKey = ResourceLocation.parse(itemString)
+            val item = BuiltInRegistries.ITEM.getOptional(itemKey).getOrNull()
+            if (item == null) {
+                Mod.LOGGER.warn("invalid item: {}", itemString)
+                result = ItemStack.EMPTY
+            } else if (nbt != null) {
                 val tag = TagDataParser.parseObject(nbt)
-                tag.putString("id", location.toString())
-                tag.putInt("count", 1)
-                ItemStack.parse(RegistryAccess.EMPTY, tag).ifPresent { this.result = it }
+                val stackTag = CompoundTag()
+                stackTag.put("components", tag)
+                stackTag.putString("id", itemKey.toString())
+                stackTag.putInt("count", count)
+                result = ItemStack.EMPTY
+                ItemStack.parse(RegistryAccess.EMPTY, stackTag).ifPresent { result = it }
             } else {
-                this.result = ItemStack(item, count)
+                result = ItemStack(item, count)
             }
         } else {
-            this.result = ItemStack.EMPTY
+            result = ItemStack.EMPTY
         }
 
-        return this.result!!
+        return result!!
     }
 
     companion object {
-        val CODEC: Codec<VehicleAssemblingResult> =
-            RecordCodecBuilder.mapCodec { builder: RecordCodecBuilder.Instance<VehicleAssemblingResult> ->
-                builder.group(
-                    Codec.STRING.optionalFieldOf(
-                        "item",
-                        BuiltInRegistries.ITEM.getKey(ModItems.CONTAINER).toString()
-                    ).forGetter { it.itemString },
-                    Codec.STRING.optionalFieldOf("entity", "").forGetter { it.entityTypeString },
-                    Codec.INT.optionalFieldOf("count", 1).forGetter { it.count }
-                ).apply(builder, ::VehicleAssemblingResult)
-            }.codec()
-
         val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, VehicleAssemblingResult> =
             StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8, { it.itemString },
                 ByteBufCodecs.STRING_UTF8, { it.entityTypeString },
                 ByteBufCodecs.VAR_INT, { it.count },
-                ::VehicleAssemblingResult
+                { item, entity, count -> VehicleAssemblingResult(item, entity, count) }
             )
     }
 }

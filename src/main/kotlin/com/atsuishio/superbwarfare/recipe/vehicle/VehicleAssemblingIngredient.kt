@@ -2,9 +2,10 @@ package com.atsuishio.superbwarfare.recipe.vehicle
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.data.DeserializeFromString
-import com.google.gson.annotations.SerializedName
-import com.mojang.serialization.Codec
-import com.mojang.serialization.codecs.RecordCodecBuilder
+import com.atsuishio.superbwarfare.data.StringInstanceBuilder
+import com.atsuishio.superbwarfare.data.StringOrObjectFactory
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.RegistryFriendlyByteBuf
@@ -17,13 +18,19 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.math.max
 
+@StringOrObjectFactory(VehicleAssemblingIngredient.InstanceBuilder::class)
+@Serializable
 class VehicleAssemblingIngredient : DeserializeFromString {
-    @SerializedName("ingredient")
+    @SerialName("ingredient")
     var ingredientString: String = ""
 
-    @SerializedName("count")
     @JvmField
+    @SerialName("count")
     var count: Int = 1
+
+    @kotlinx.serialization.Transient
+    @Transient
+    var ingredientObject: Ingredient? = null
 
     constructor()
 
@@ -32,19 +39,14 @@ class VehicleAssemblingIngredient : DeserializeFromString {
         this.count = count
     }
 
-    @Transient
-    var ingredientObject: Ingredient? = null
-
     val ingredient: Ingredient
         get() {
-            if (ingredientObject == null) {
-                deserializeFromString(ingredientString)
-            }
+            if (ingredientObject == null) deserializeFromString(ingredientString)
             return ingredientObject!!
         }
 
     override fun deserializeFromString(str: String) {
-        this.ingredientString = str
+        ingredientString = str
         val matcher: Matcher = INGREDIENT_PATTERN.matcher(str)
         if (!matcher.matches()) {
             Mod.LOGGER.warn("invalid vehicle assembling ingredient: {}", str)
@@ -53,9 +55,7 @@ class VehicleAssemblingIngredient : DeserializeFromString {
         }
 
         val countString = matcher.group("count")
-        if (!countString.isEmpty()) {
-            count = max(1, countString.toInt())
-        }
+        if (countString.isNotEmpty()) count = max(1, countString.toInt())
 
         val id = matcher.group("id")
         ingredientObject = if (matcher.group("prefix") == "#") {
@@ -65,18 +65,13 @@ class VehicleAssemblingIngredient : DeserializeFromString {
         }
     }
 
-    companion object {
-        val CODEC: Codec<VehicleAssemblingIngredient> =
-            RecordCodecBuilder.mapCodec { builder: RecordCodecBuilder.Instance<VehicleAssemblingIngredient> ->
-                builder.group(
-                    Codec.STRING.fieldOf("ingredient").forGetter { it.ingredientString },
-                    Codec.INT.fieldOf("count").forGetter { it.count }
-                ).apply(
-                    builder,
-                    ::VehicleAssemblingIngredient
-                )
-            }.codec()
+    object InstanceBuilder : StringInstanceBuilder<VehicleAssemblingIngredient> {
+        override fun fromString(value: String) = VehicleAssemblingIngredient().apply {
+            deserializeFromString(value)
+        }
+    }
 
+    companion object {
         val STREAM_CODEC: StreamCodec<RegistryFriendlyByteBuf, VehicleAssemblingIngredient> =
             StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8, { it.ingredientString },

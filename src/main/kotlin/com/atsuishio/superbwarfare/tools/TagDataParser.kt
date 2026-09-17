@@ -8,8 +8,7 @@ import java.util.function.Function
 /**
  * 把 JSON 树转成 NBT，并替换 `@sbw:xxx` 占位符。
  *
- * 主接口用 kotlinx 的 [JsonElement]（数据包数据都已经迁到 kotlinx）；
- * 另外保留一组 Gson 重载，给仍由原版 Gson 解析的调用方（研究配方 / 载具装配配方）使用。
+ * 接口统一用 kotlinx 的 [JsonElement]（数据包数据、研究配方、载具装配配方都已经迁到 kotlinx）。
  */
 object TagDataParser {
 
@@ -37,14 +36,6 @@ object TagDataParser {
 
         return tag
     }
-
-    /** Gson 重载：供仍由原版 Gson 解析的配方数据使用 */
-    @JvmOverloads
-    @JvmStatic
-    fun parseObject(
-        `object`: com.google.gson.JsonObject?,
-        tagModifier: Function<String, Tag?>? = null
-    ): CompoundTag = parseObject(`object`?.toKxJson()?.jsonObject, tagModifier)
 
     /**
      * 尝试将单个JsonElement转为NBT Tag，并替换自定义数据
@@ -93,9 +84,4 @@ object TagDataParser {
 
         }
     }
-
-    /** Gson 重载：供仍由原版 Gson 解析的配方数据使用 */
-    @JvmStatic
-    fun parseElement(`object`: com.google.gson.JsonElement, tagModifier: Function<String, Tag?>?): Tag? =
-        parseElement(`object`.toKxJson(), tagModifier)
 }

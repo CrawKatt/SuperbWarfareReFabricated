@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.tools
 
+import com.atsuishio.superbwarfare.data.DataLoader
 import com.atsuishio.superbwarfare.serialization.decodeFromCompoundTag
 import com.atsuishio.superbwarfare.serialization.encodeToCompoundTag
 import com.atsuishio.superbwarfare.serialization.serializersModule
@@ -8,6 +9,7 @@ import com.mojang.serialization.*
 import kotlinx.serialization.KSerializer
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
+import com.mojang.serialization.JsonOps
 
 /**
  * Derives a Mojang [MapCodec] from a kotlinx.serialization [KSerializer].
@@ -44,6 +46,50 @@ fun <T : Any> serializerToMapCodec(serializer: KSerializer<T>): MapCodec<T> {
                 )
             } catch (e: Exception) {
                 DataResult.error { "serializerToMapCodec: ${e.message}" }
+            }
+        }
+    }
+
+    return MapCodec.assumeMapUnsafe(Codec.of(encoder, decoder))
+}
+
+/** Exposes a kotlinx JSON serializer through Minecraft's 1.21 recipe codec API. */
+fun <T : Any> serializerToJsonMapCodec(serializer: KSerializer<T>): MapCodec<T> {
+    val encoder = object : Encoder<T> {
+        override fun <U> encode(input: T, ops: DynamicOps<U>, prefix: U): DataResult<U> {
+            return try {
+                val json = DataLoader.JSON.encodeToJsonElement(serializer, input).toGson()
+                if (json !is GsonObject) {
+                    return DataResult.error { "serializerToJsonMapCodec: expected a JSON object" }
+                }
+
+                val map = HashMap<U, U>()
+                for ((key, value) in json.entrySet()) {
+                    map[ops.createString(key)] = JsonOps.INSTANCE.convertTo(ops, value)
+                }
+                ops.mergeToMap(prefix, map)
+            } catch (e: Exception) {
+                DataResult.error { "serializerToJsonMapCodec: ${e.message}" }
+            }
+        }
+    }
+
+    val decoder = object : Decoder<T> {
+        override fun <U> decode(ops: DynamicOps<U>, input: U): DataResult<Pair<T, U>> {
+            return try {
+                val json = ops.convertTo(JsonOps.INSTANCE, input)
+                if (json !is GsonObject) {
+                    return DataResult.error { "serializerToJsonMapCodec: expected a JSON object" }
+                }
+
+                DataResult.success(
+                    Pair(
+                        DataLoader.JSON.decodeFromJsonElement(serializer, json.toKxJson()),
+                        ops.empty()
+                    )
+                )
+            } catch (e: Exception) {
+                DataResult.error { "serializerToJsonMapCodec: ${e.message}" }
             }
         }
     }
