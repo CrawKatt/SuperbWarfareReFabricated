@@ -2,11 +2,11 @@ package com.atsuishio.superbwarfare.data.gun
 
 import com.atsuishio.superbwarfare.data.DefaultDataSupplier
 import com.atsuishio.superbwarfare.data.CustomData
-import com.atsuishio.superbwarfare.data.ObjectToList
+import com.atsuishio.superbwarfare.data.SingleOrList
 import team.reborn.energy.api.EnergyStorage
 import com.atsuishio.superbwarfare.capability.api.IItemHandler
 import com.atsuishio.superbwarfare.capability.entity.InfiniteAmmoCapability
-import com.atsuishio.superbwarfare.data.JsonPropertyModifier
+import com.atsuishio.superbwarfare.data.JsonOverrideApplier
 import com.atsuishio.superbwarfare.data.PMC
 import com.atsuishio.superbwarfare.data.StringOrVec3
 import com.atsuishio.superbwarfare.data.attachment.AttachmentDefinition
@@ -69,7 +69,7 @@ import kotlin.math.min
  * Selects the magazine-level value, falling back to the last configured value
  * when the list is shorter than the requested level.
  */
-fun ObjectToList<Int>.atMagazineLevel(level: Int): Int {
+fun SingleOrList<Int>.atMagazineLevel(level: Int): Int {
     if (list.isEmpty()) return 0
     return list[level.coerceAtLeast(0).coerceAtMost(list.lastIndex)]
 }
@@ -355,8 +355,8 @@ class GunData private constructor(
         invalidateProperties()
     }
 
-    private val jsonPropModifier = JsonPropertyModifier(GunProp.entries)
-    private val attachmentJsonPropModifier = JsonPropertyModifier(GunProp.entries)
+    private val jsonPropModifier = JsonOverrideApplier(GunProp.entries)
+    private val attachmentJsonPropModifier = JsonOverrideApplier(GunProp.entries)
     private var tempModifications: Function<DefaultGunData, DefaultGunData>? = null
     private val pmcInstance: PMC<GunData, DefaultGunData> by lazy { PMC(this) }
 
