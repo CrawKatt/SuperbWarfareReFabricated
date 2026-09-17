@@ -393,7 +393,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
     }
 
     /**
-     * Shows the model bone of the loaded ammo type and hides the ones belonging to the ammo types
+     * Shows the model bones of the loaded ammo type and hides the ones belonging to the ammo types
      * that are not selected, so the round drawn in the weapon follows the ammo switch.
      */
     open fun renderProjectileBone(stack: ItemStack, model: GeoGunModel) {
