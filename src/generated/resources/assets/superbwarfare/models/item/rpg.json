@@ -1,7 +1,4 @@
 {
-  "parent": "superbwarfare:item/rpg_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/rpg_icon"
-  }
+  "parent": "minecraft:builtin/entity",
+  "gui_light": "front"
 }
