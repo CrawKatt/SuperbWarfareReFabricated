@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter
 import com.atsuishio.superbwarfare.data.gun.AmmoConsumer
+import com.atsuishio.superbwarfare.data.gun.AmmoSource
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.tools.InventoryTool
 import net.minecraft.core.RegistryAccess
@@ -32,7 +33,7 @@ object ItemAmmoStrategy : AmmoConsumeStrategy() {
 
     override fun match(ammo: String) = ammo.isNotBlank()
 
-    override fun init(consumer: AmmoConsumer, count: Int, matchedString: String) {
+    override fun init(source: AmmoSource, count: Int, matchedString: String) {
         // 手动解析 id 和 data
         // matchedString 形如 "mod:item{tag}" 或 "minecraft:arrow"
 
@@ -50,67 +51,67 @@ object ItemAmmoStrategy : AmmoConsumeStrategy() {
         val location = ResourceLocation.tryParse(id)
         if (location == null) {
             Mod.LOGGER.warn("invalid item id: {}", id)
-            consumer.type = AmmoConsumer.AmmoConsumeType.INVALID
+            source.type = AmmoConsumer.AmmoConsumeType.INVALID
             return
         }
         val item = BuiltInRegistries.ITEM.get(location)
         if (item === Items.AIR) {
             Mod.LOGGER.warn("invalid item: {}", id)
-            consumer.type = AmmoConsumer.AmmoConsumeType.INVALID
+            source.type = AmmoConsumer.AmmoConsumeType.INVALID
             return
         }
 
-        consumer.stack = ItemStack(item)
+        source.stack = ItemStack(item)
         if (data.isNotEmpty()) {
             try {
                 val tag = NbtUtils.snbtToStructure(data)
                 tag.putString("id", location.toString())
                 tag.putInt("count", 1)
-                ItemStack.parse(RegistryAccess.EMPTY, tag).ifPresent { s -> consumer.stack = s }
+                ItemStack.parse(RegistryAccess.EMPTY, tag).ifPresent { s -> source.stack = s }
             } catch (exception: Exception) {
                 Mod.LOGGER.warn("invalid item data {}: {}", data, exception.message)
-                consumer.type = AmmoConsumer.AmmoConsumeType.INVALID
+                source.type = AmmoConsumer.AmmoConsumeType.INVALID
                 return
             }
         }
     }
 
-    override fun consume(data: GunData, consumer: AmmoConsumer, shooter: Entity, count: Int): Int {
-        val handler = ModCapabilities.ITEM_HANDLER_ENTITY.find(shooter, null)
+    override fun consume(data: GunData, source: AmmoSource, shooter: Entity?, count: Int): Int {
+        val handler = shooter?.let { ModCapabilities.ITEM_HANDLER_ENTITY.find(it, null) }
         if (handler != null) {
-            return consume(data, consumer, handler, count)
+            return consume(data, source, handler, count)
         } else {
             Mod.LOGGER.warn("consume ammo failed: invalid item handler for entity {}", shooter)
             return 0
         }
     }
 
-    override fun consume(data: GunData, consumer: AmmoConsumer, handler: IItemHandler, count: Int): Int {
+    override fun consume(data: GunData, source: AmmoSource, handler: IItemHandler, count: Int): Int {
         return InventoryTool.consumeItem(
             handler,
-            { stack -> consumer.isAmmoItem(stack) },
+            { stack -> source.isAmmoItem(stack) },
             count
         )
     }
 
-    override fun count(data: GunData, consumer: AmmoConsumer, entity: Entity?): Int {
+    override fun count(data: GunData, source: AmmoSource, entity: Entity?): Int {
         if (entity == null) return 0
-        return count(data, consumer, ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null))
+        return count(data, source, ModCapabilities.ITEM_HANDLER_ENTITY.find(entity, null))
     }
 
-    override fun count(data: GunData, consumer: AmmoConsumer, handler: IItemHandler?): Int {
+    override fun count(data: GunData, source: AmmoSource, handler: IItemHandler?): Int {
         if (handler == null) return 0
-        return InventoryTool.countItem(handler) { stack -> consumer.isAmmoItem(stack) }
+        return InventoryTool.countItem(handler) { stack -> source.isAmmoItem(stack) }
     }
 
-    override fun withdraw(consumer: AmmoConsumer, ammoSupplier: Entity, count: Int): Int {
+    override fun withdraw(source: AmmoSource, ammoSupplier: Entity, count: Int): Int {
         if (ammoSupplier is Player) {
-            InventoryTool.insertItem(ammoSupplier, consumer.stack(), count)
+            InventoryTool.insertItem(ammoSupplier, source.stack(), count)
             return count
         } else {
             val itemHandler = ModCapabilities.ITEM_HANDLER_ENTITY.find(ammoSupplier, null)
             if (itemHandler != null) {
-                return withdraw(consumer, itemHandler, count)
+                return withdraw(source, itemHandler, count)
             } else {
                 Mod.LOGGER.warn("withdraw ammo failed: invalid item handler")
             }
@@ -118,20 +119,20 @@ object ItemAmmoStrategy : AmmoConsumeStrategy() {
         return 0
     }
 
-    override fun withdraw(consumer: AmmoConsumer, handler: IItemHandler, count: Int): Int {
-        return InventoryTool.insertItem(handler, consumer.stack(), count)
+    override fun withdraw(source: AmmoSource, handler: IItemHandler, count: Int): Int {
+        return InventoryTool.insertItem(handler, source.stack(), count)
     }
 
     @Environment(EnvType.CLIENT)
-    override fun getDisplayName(consumer: AmmoConsumer): String {
-        val stack = consumer.stack
-        if (stack.isEmpty) return super.getDisplayName(consumer)
-        val nameComponent = consumer.stack().hoverName
+    override fun getDisplayName(source: AmmoSource): String {
+        val stack = source.stack
+        if (stack.isEmpty) return super.getDisplayName(source)
+        val nameComponent = source.stack().hoverName
         val contents = nameComponent.contents
         if (contents is TranslatableContents) {
             return ClientLanguageGetter.EN_US.getOrDefault(contents.key)
         }
 
-        return ClientLanguageGetter.EN_US.getOrDefault(consumer.stack().descriptionId)
+        return ClientLanguageGetter.EN_US.getOrDefault(source.stack().descriptionId)
     }
 }
