@@ -22,19 +22,19 @@ import java.lang.reflect.Type
  * 创建一个List包装类，反序列化时将单个对象解析为单元素List，或直接以List方式进行读取，不影响序列化
  * {} -> [{}]
  */
-@Serializable(OTLSerializer::class)
+@Serializable(SingleOrListSerializer::class)
 @Suppress("DelegationToVarProperty")
-data class ObjectToList<T>(@JvmField var list: MutableList<T>) : List<T> by list {
+data class SingleOrList<T>(@JvmField var list: MutableList<T>) : List<T> by list {
     @SafeVarargs
     constructor(vararg objects: T) : this(mutableListOf(*objects))
 
-    internal class ListOrObjectAdapter<T>(type: Type, private val gson: Gson) : TypeAdapter<ObjectToList<T>>() {
+    internal class ListOrObjectAdapter<T>(type: Type, private val gson: Gson) : TypeAdapter<SingleOrList<T>>() {
         private val type = (type as ParameterizedType).actualTypeArguments[0]
 
         @Throws(IOException::class)
-        override fun write(jsonWriter: JsonWriter, objectToList: ObjectToList<T>?) {
-            val list = objectToList?.list
-            if (objectToList == null || list == null) {
+        override fun write(jsonWriter: JsonWriter, singleOrList: SingleOrList<T>?) {
+            val list = singleOrList?.list
+            if (singleOrList == null || list == null) {
                 jsonWriter.beginArray().endArray()
                 return
             }
@@ -51,23 +51,23 @@ data class ObjectToList<T>(@JvmField var list: MutableList<T>) : List<T> by list
         }
 
         @Throws(IOException::class)
-        override fun read(jsonReader: JsonReader): ObjectToList<T> {
+        override fun read(jsonReader: JsonReader): SingleOrList<T> {
             if (jsonReader.peek() != JsonToken.BEGIN_ARRAY) {
                 if (jsonReader.peek() == JsonToken.NULL) {
                     jsonReader.nextNull()
-                    return ObjectToList()
+                    return SingleOrList()
                 }
-                return ObjectToList(gson.fromJson<T>(jsonReader, type))
+                return SingleOrList(gson.fromJson<T>(jsonReader, type))
             }
 
             val listType = TypeToken.getParameterized(MutableList::class.java, type).type
-            return ObjectToList(gson.fromJson<MutableList<T>>(jsonReader, listType))
+            return SingleOrList(gson.fromJson<MutableList<T>>(jsonReader, listType))
         }
     }
 
     internal class AdapterFactory : TypeAdapterFactory {
         override fun <T> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
-            if (ObjectToList::class.java.isAssignableFrom(type.rawType)) {
+            if (SingleOrList::class.java.isAssignableFrom(type.rawType)) {
                 @Suppress("UNCHECKED_CAST")
                 return ListOrObjectAdapter<T>(type.type, gson) as TypeAdapter<T>
             }
@@ -76,24 +76,24 @@ data class ObjectToList<T>(@JvmField var list: MutableList<T>) : List<T> by list
     }
 }
 
-class OTLSerializer<T>(val elementSerializer: KSerializer<T>) : KSerializer<ObjectToList<T>> {
+class SingleOrListSerializer<T>(val elementSerializer: KSerializer<T>) : KSerializer<SingleOrList<T>> {
     override val descriptor = elementSerializer.descriptor
 
     override fun serialize(
         encoder: Encoder,
-        value: ObjectToList<T>
+        value: SingleOrList<T>
     ) {
         encoder.encodeSerializableValue(ListSerializer(elementSerializer), value.list)
     }
 
-    override fun deserialize(decoder: Decoder): ObjectToList<T> {
+    override fun deserialize(decoder: Decoder): SingleOrList<T> {
         require(decoder is JsonDecoder) { "only JsonDecoder is supported!" }
 
         val element = decoder.decodeJsonElement()
         return if (element is JsonArray) {
-            ObjectToList(element.map { decoder.json.decodeFromJsonElement(elementSerializer, it) }.toMutableList())
+            SingleOrList(element.map { decoder.json.decodeFromJsonElement(elementSerializer, it) }.toMutableList())
         } else {
-            ObjectToList(listOf(decoder.json.decodeFromJsonElement(elementSerializer, element)).toMutableList())
+            SingleOrList(listOf(decoder.json.decodeFromJsonElement(elementSerializer, element)).toMutableList())
         }
     }
 

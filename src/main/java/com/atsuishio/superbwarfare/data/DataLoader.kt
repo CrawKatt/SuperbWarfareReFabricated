@@ -34,8 +34,8 @@ object DataLoader {
     val GSON: Gson = GsonBuilder()
         .setLenient()
         .serializeSpecialFloatingPointValues()
-        .registerTypeAdapterFactory(ObjectToList.AdapterFactory())
-        .registerTypeAdapterFactory(StringToObject.AdapterFactory())
+        .registerTypeAdapterFactory(SingleOrList.AdapterFactory())
+        .registerTypeAdapterFactory(StringOrObject.AdapterFactory())
         .create()
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -134,11 +134,14 @@ object DataLoader {
             proxyMap
         }
     }
+    /**
+     * 将 StringOrObject 和 SingleOrList 转换为原始值
+     */
     @JvmStatic
     fun processValue(value: Any?): Any? {
         return when (value) {
-            is ObjectToList<*> -> value.list.map { processValue(it) }
-            is StringToObject<*> -> processValue(value.value)
+            is SingleOrList<*> -> value.list.map { value -> processValue(value) }
+            is StringOrObject<*> -> processValue(value.value)
             else -> value
         }
     }

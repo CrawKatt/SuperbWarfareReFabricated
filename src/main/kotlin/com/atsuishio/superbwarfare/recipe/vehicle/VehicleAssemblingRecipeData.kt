@@ -1,14 +1,14 @@
 package com.atsuishio.superbwarfare.recipe.vehicle
 
 import com.atsuishio.superbwarfare.data.DataLoader.processValue
-import com.atsuishio.superbwarfare.data.ObjectToList
-import com.atsuishio.superbwarfare.data.StringToObject
+import com.atsuishio.superbwarfare.data.SingleOrList
+import com.atsuishio.superbwarfare.data.StringOrObject
 import com.google.gson.annotations.SerializedName
 
 class VehicleAssemblingRecipeData {
     @SerializedName("inputs")
     @get:JvmName("inputs")
-    val inputs: ObjectToList<StringToObject<VehicleAssemblingIngredient>>? = null
+    val inputs: SingleOrList<StringOrObject<VehicleAssemblingIngredient>>? = null
 
     @SerializedName("result")
     val result: VehicleAssemblingResult? = null
