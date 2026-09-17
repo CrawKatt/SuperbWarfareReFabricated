@@ -3,19 +3,21 @@ package com.atsuishio.superbwarfare.recipe.vehicle
 import com.atsuishio.superbwarfare.data.DataLoader.processValue
 import com.atsuishio.superbwarfare.data.SingleOrList
 import com.atsuishio.superbwarfare.data.StringOrObject
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-class VehicleAssemblingRecipeData {
-    @SerializedName("inputs")
+@Serializable
+data class VehicleAssemblingRecipeData(
+    @SerialName("inputs")
     @get:JvmName("inputs")
-    val inputs: SingleOrList<StringOrObject<VehicleAssemblingIngredient>>? = null
+    val inputs: SingleOrList<StringOrObject<VehicleAssemblingIngredient>>? = null,
 
-    @SerializedName("result")
-    val result: VehicleAssemblingResult? = null
+    @SerialName("result")
+    val result: VehicleAssemblingResult? = null,
 
-    @SerializedName("category")
-    val category: String = "empty"
-
+    @SerialName("category")
+    val category: String = "empty",
+) {
     @Suppress("UNCHECKED_CAST")
     fun getInputs(): MutableList<VehicleAssemblingIngredient>? {
         return processValue(inputs) as MutableList<VehicleAssemblingIngredient>?

@@ -3,31 +3,35 @@ package com.atsuishio.superbwarfare.recipe.vehicle
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem.Companion.createInstance
 import com.atsuishio.superbwarfare.tools.TagDataParser
-import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.ItemStack
 import net.minecraftforge.registries.ForgeRegistries
 
-class VehicleAssemblingResult {
-    @JvmField
-    @SerializedName("item")
-    var itemString: String = ""
+/**
+ * 载具装配配方的产物（`result` 字段），由 kotlinx.serialization 反序列化。
+ *
+ * [result] 是按需构建的运行时缓存，不参与序列化。
+ */
+@Serializable
+data class VehicleAssemblingResult(
+    @SerialName("item")
+    var itemString: String = "",
 
-    @JvmField
-    @SerializedName("entity")
-    var entityTypeString: String = ""
+    @SerialName("entity")
+    var entityTypeString: String = "",
 
-    @JvmField
-    @SerializedName("count")
-    var count: Int = 1
+    @SerialName("count")
+    var count: Int = 1,
 
-    @JvmField
-    @SerializedName("nbt")
-    var nbt: JsonObject? = null
-
+    @SerialName("nbt")
+    var nbt: JsonObject? = null,
+) {
+    @kotlinx.serialization.Transient
     @Transient
     @get:JvmName("result")
     var result: ItemStack? = null

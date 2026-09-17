@@ -3,15 +3,19 @@ package com.atsuishio.superbwarfare.recipe
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.data.DataLoader
 import com.atsuishio.superbwarfare.init.ModRecipes
+import com.atsuishio.superbwarfare.serialization.kserializer.SerializedIngredient
+import com.atsuishio.superbwarfare.tools.GsonObject
 import com.atsuishio.superbwarfare.tools.TagDataParser
-import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
+import com.atsuishio.superbwarfare.tools.toKxJson
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 import net.minecraft.core.RegistryAccess
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.ItemTags
-import net.minecraft.util.GsonHelper
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -63,15 +67,19 @@ class ResearchingRecipe(
 
     override fun getType(): RecipeType<*> = ModRecipes.RESEARCHING_TYPE.get()
 
-    class Result(
-        @SerializedName("item") var item: String = "",
-        @SerializedName("tag") var tag: String = "",
-        @SerializedName("count") var count: Int = 1,
-        @SerializedName("nbt") var nbt: JsonObject? = null,
+    /** 配方产物，由 kotlinx.serialization 从 `result` 字段反序列化 */
+    @Serializable
+    data class Result(
+        @SerialName("item") var item: String = "",
+        @SerialName("tag") var tag: String = "",
+        @SerialName("count") var count: Int = 1,
+        @SerialName("nbt") var nbt: JsonObject? = null,
     ) {
+        @kotlinx.serialization.Transient
         @Transient
         var resultStack: ItemStack? = null
 
+        @kotlinx.serialization.Transient
         @Transient
         var list: MutableList<Item>? = null
 
@@ -140,28 +148,43 @@ class ResearchingRecipe(
     }
 
     class Serializer : RecipeSerializer<ResearchingRecipe> {
-        private fun ingredientOf(json: JsonObject, name: String): Ingredient {
-            if (!json.has(name)) return Ingredient.EMPTY
-            return Ingredient.fromJson(
-                if (GsonHelper.isArrayNode(json, name))
-                    GsonHelper.getAsJsonArray(json, name)
-                else GsonHelper.getAsJsonObject(json, name)
-            )
-        }
+        /** 配方 JSON 的 kotlinx 映射 */
+        @Serializable
+        private data class RecipeData(
+            @SerialName("input") val input: SerializedIngredient = Ingredient.EMPTY,
+            @SerialName("base") val base: SerializedIngredient = Ingredient.EMPTY,
+            @SerialName("addition") val addition: SerializedIngredient = Ingredient.EMPTY,
+            @SerialName("special") val special: SerializedIngredient = Ingredient.EMPTY,
+            @SerialName("selectable") val selectable: Boolean = false,
+            @SerialName("color") val color: Int = 0,
+            @SerialName("time") val time: Int = 1200,
+            @SerialName("result") val result: Result = Result(),
+        )
 
+        /**
+         * [GsonObject] 是 `tools.JsonUtil` 里对 Gson `JsonObject` 的 typealias：
+         * 原版 `RecipeSerializer` 接口只收 Gson 的 JsonObject，这个入参类型无法改，
+         * 所以这里立刻把它转成 kotlinx 的 JsonObject，配方解析全部由 kotlinx.serialization 完成。
+         */
         override fun fromJson(
             id: ResourceLocation,
-            json: JsonObject
+            json: GsonObject
         ): ResearchingRecipe {
-            val input = ingredientOf(json, "input")
-            val base = ingredientOf(json, "base")
-            val addition = ingredientOf(json, "addition")
-            val special = ingredientOf(json, "special")
-            val selectable = if (json.has("selectable")) GsonHelper.getAsBoolean(json, "selectable") else false
-            val color = (if (json.has("color")) GsonHelper.getAsInt(json, "color") else 0).coerceIn(0, 4)
-            val time = if (json.has("time")) GsonHelper.getAsInt(json, "time") else 1200
-            val result = DataLoader.GSON.fromJson(json.get("result"), Result::class.java)
-            return ResearchingRecipe(id, input, base, addition, special, selectable, color, time, result)
+            val data = DataLoader.JSON.decodeFromJsonElement(
+                RecipeData.serializer(),
+                json.toKxJson().jsonObject
+            )
+            return ResearchingRecipe(
+                id,
+                data.input,
+                data.base,
+                data.addition,
+                data.special,
+                data.selectable,
+                data.color.coerceIn(0, 4),
+                data.time,
+                data.result
+            )
         }
 
         override fun fromNetwork(
