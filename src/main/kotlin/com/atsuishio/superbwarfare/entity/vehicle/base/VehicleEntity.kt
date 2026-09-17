@@ -61,6 +61,8 @@ import com.atsuishio.superbwarfare.tools.VectorTool.lerpGetEntityBoundingBoxCent
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
 import com.google.common.collect.ImmutableList
 import com.mojang.math.Axis
+import kotlinx.serialization.json.floatOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import net.minecraft.ChatFormatting
 import net.minecraft.client.CameraType
 import net.minecraft.core.BlockPos
@@ -3804,7 +3806,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
                 this.engineInfo = if (serializer == null) {
                     null
                 } else {
-                    DataLoader.JSON.decodeFromJsonElement(serializer, engineInfo.toKxJson())
+                    DataLoader.JSON.decodeFromJsonElement(serializer, engineInfo)
                 }
             } catch (e: Exception) {
                 Mod.LOGGER.error("Failed to parse engine info for vehicle {}, {}", this, e)
@@ -3822,7 +3824,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
 
         // Fallback to computed engineInfo JSON when runtime engineInfo is not yet initialized (e.g. phantom entities)
         val engineSoundVolume = this.engineInfo?.engineSoundVolume
-            ?: computed.engineInfo.get("EngineSoundVolume")?.asFloat
+            ?: computed.engineInfo["EngineSoundVolume"]?.jsonPrimitive?.floatOrNull
             ?: 0.4f
 
         return when (engineType) {
