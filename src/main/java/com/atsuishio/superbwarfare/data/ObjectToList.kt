@@ -29,9 +29,6 @@ data class ObjectToList<T>(@JvmField var list: MutableList<T>) : List<T> by list
     constructor(vararg objects: T) : this(mutableListOf(*objects))
 
     internal class ListOrObjectAdapter<T>(type: Type, private val gson: Gson) : TypeAdapter<ObjectToList<T>>() {
-        /**
-         * Type of T
-         */
         private val type = (type as ParameterizedType).actualTypeArguments[0]
 
         @Throws(IOException::class)
@@ -42,11 +39,11 @@ data class ObjectToList<T>(@JvmField var list: MutableList<T>) : List<T> by list
                 return
             }
 
-            if (objectToList.list.size == 1) {
+            if (list.size == 1) {
                 gson.toJson(list[0], type, jsonWriter)
             } else {
                 gson.toJson(
-                    objectToList.list,
+                    list,
                     TypeToken.getParameterized(MutableList::class.java, type).type,
                     jsonWriter
                 )
@@ -55,25 +52,22 @@ data class ObjectToList<T>(@JvmField var list: MutableList<T>) : List<T> by list
 
         @Throws(IOException::class)
         override fun read(jsonReader: JsonReader): ObjectToList<T> {
-            val token = jsonReader.peek()
-            if (token != JsonToken.BEGIN_ARRAY) {
-                // 单元素
-                if (token == JsonToken.NULL) {
+            if (jsonReader.peek() != JsonToken.BEGIN_ARRAY) {
+                if (jsonReader.peek() == JsonToken.NULL) {
                     jsonReader.nextNull()
                     return ObjectToList()
                 }
                 return ObjectToList(gson.fromJson<T>(jsonReader, type))
-            } else {
-                // 数组
-                val listType = TypeToken.getParameterized(MutableList::class.java, type).type
-                return ObjectToList(gson.fromJson<MutableList<T>>(jsonReader, listType))
             }
+
+            val listType = TypeToken.getParameterized(MutableList::class.java, type).type
+            return ObjectToList(gson.fromJson<MutableList<T>>(jsonReader, listType))
         }
     }
 
     internal class AdapterFactory : TypeAdapterFactory {
         override fun <T> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
-            if (ObjectToList::class.java.isAssignableFrom(type.getRawType())) {
+            if (ObjectToList::class.java.isAssignableFrom(type.rawType)) {
                 @Suppress("UNCHECKED_CAST")
                 return ListOrObjectAdapter<T>(type.type, gson) as TypeAdapter<T>
             }

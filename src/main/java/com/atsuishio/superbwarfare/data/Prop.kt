@@ -1,36 +1,28 @@
 package com.atsuishio.superbwarfare.data
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.KSerializer
 import java.lang.reflect.Type
-import kotlin.reflect.KMutableProperty1
-import kotlin.reflect.jvm.javaType
+import kotlin.reflect.KProperty1
+import kotlin.reflect.javaType
 
-private val PROP_SERIALIZATION_NAME_OVERRIDES = mapOf(
-    "ammoConsumers" to "AmmoType",
-    "rpm" to "RPM",
-)
-
-private fun serializationNameOf(propName: String): String {
-    return PROP_SERIALIZATION_NAME_OVERRIDES[propName]
-        ?: propName.replaceFirstChar { it.uppercaseChar() }
-}
+@OptIn(ExperimentalStdlibApi::class)
 
 abstract class Prop<DATA : DefaultDataSupplier<DEFAULT_DATA>, DEFAULT_DATA, FIELD, RESULT, SELF : Prop<DATA, DEFAULT_DATA, FIELD, RESULT, SELF>> protected constructor(
-    val prop: KMutableProperty1<DEFAULT_DATA, FIELD>,
-    val transform: (FIELD) -> RESULT,
-    private val serializerOverride: KSerializer<FIELD>? = null,
+    val prop: KProperty1<DEFAULT_DATA, FIELD>,
+    private val transform: (FIELD) -> RESULT,
     private val contextTransform: ((DATA, FIELD) -> RESULT)? = null,
 ) {
     @JvmField
     val type: Type = prop.returnType.javaType
 
-    val serializer by lazy { serializerOverride ?: prop.serializer() }
+    val serializer by lazy { prop.serializer() }
 
     override fun toString() = "Prop[$serializationName]"
 
-    val serializationName = serializationNameOf(prop.name)
+    val serializationName = prop.annotations.filterIsInstance<SerialName>().singleOrNull()?.value
+        ?: prop.name
 
     init {
         props.add(this)

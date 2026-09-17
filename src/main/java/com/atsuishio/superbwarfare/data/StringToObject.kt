@@ -24,14 +24,14 @@ import kotlin.reflect.full.createInstance
 /**
  * 创建一个value的包装类，允许使用字符串创建对象，或者直接以对象形式解析JSON值，在序列化和反序列化时可以将该包装类视为不存在
  * "" -> {}
+ *
+ * 字符串形式依赖类型上的 [STOFactory]；其中 Gson 版 TypeAdapter 还会调用 [DeserializeFromString]
+ * （只有仍在走 Gson 的数据集需要，如移动枪/配方）。
  */
 @Serializable(STOSerializer::class)
-class StringToObject<T : DeserializeFromString>(@JvmField var value: T) {
+class StringToObject<T : Any>(@JvmField var value: T) {
     internal class StringOrObjectAdapter<T : DeserializeFromString>(type: Type, private val gson: Gson) :
         TypeAdapter<StringToObject<T>>() {
-        /**
-         * Type of T
-         */
         private val type = (type as ParameterizedType).actualTypeArguments[0]
 
         @Throws(IOException::class)
@@ -40,32 +40,30 @@ class StringToObject<T : DeserializeFromString>(@JvmField var value: T) {
                 jsonWriter.nullValue()
                 return
             }
-
             gson.toJson(obj.value, type, jsonWriter)
         }
 
         @Throws(IOException::class)
         override fun read(jsonReader: JsonReader): StringToObject<T> {
-            val token = jsonReader.peek()
-            if (token == JsonToken.NULL) {
-                jsonReader.nextNull()
-                return gson.fromJson<StringToObject<T>>("{}", type)
-            }
-
-            if (token == JsonToken.BEGIN_OBJECT || token == JsonToken.BEGIN_ARRAY) {
-                return StringToObject(gson.fromJson<T>(jsonReader, type))
+            when (jsonReader.peek()) {
+                JsonToken.NULL -> {
+                    jsonReader.nextNull()
+                    return StringToObject(gson.fromJson("{}", type))
+                }
+                JsonToken.BEGIN_OBJECT, JsonToken.BEGIN_ARRAY ->
+                    return StringToObject(gson.fromJson<T>(jsonReader, type))
+                else -> Unit
             }
 
             val obj = gson.fromJson<T>("{}", type)
-            obj!!.deserializeFromString(gson.fromJson(jsonReader, String::class.java))
-
+            obj.deserializeFromString(gson.fromJson(jsonReader, String::class.java))
             return StringToObject(obj)
         }
     }
 
     internal class AdapterFactory : TypeAdapterFactory {
         override fun <T> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
-            if (StringToObject::class.java.isAssignableFrom(type.getRawType()) && type.type is ParameterizedType) {
+            if (StringToObject::class.java.isAssignableFrom(type.rawType) && type.type is ParameterizedType) {
                 @Suppress("UNCHECKED_CAST")
                 return StringOrObjectAdapter<DeserializeFromString>(type.type, gson) as TypeAdapter<T>
             }
@@ -82,7 +80,7 @@ private fun <T : Any> KClass<T>.getInstance() = cachedInstances.getOrPut(this) {
     objectInstance ?: createInstance()
 } as T
 
-class STOSerializer<T : DeserializeFromString>(private val serializer: KSerializer<T>) :
+class STOSerializer<T : Any>(private val serializer: KSerializer<T>) :
     KSerializer<StringToObject<T>> {
     override val descriptor = serializer.descriptor
 

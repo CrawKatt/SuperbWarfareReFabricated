@@ -7,46 +7,36 @@ import com.atsuishio.superbwarfare.data.Prop
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.getPerkPriority
 import com.atsuishio.superbwarfare.init.ModPerks
 import com.atsuishio.superbwarfare.perk.Perk
-import com.atsuishio.superbwarfare.serialization.kserializer.ResourceLocationSerializer
-import kotlinx.serialization.KSerializer
 import kotlin.math.min
-import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KProperty1
 
 @Suppress("UNUSED")
 class GunProp<T, R>(
-    private val rawProp: KMutableProperty1<DefaultGunData, T>,
+    prop: KProperty1<DefaultGunData, T>,
     transform: (T) -> R,
-    serializerOverride: KSerializer<T>? = null,
     contextTransform: ((GunData, T) -> R)? = null,
-) : Prop<GunData, DefaultGunData, T, R, GunProp<T, R>>(rawProp, transform, serializerOverride, contextTransform) {
+) : Prop<GunData, DefaultGunData, T, R, GunProp<T, R>>(prop, transform, contextTransform) {
 
     override fun toString() = "GunProp[$serializationName]"
-
-    @Suppress("UNCHECKED_CAST")
-    fun writeTo(data: DefaultGunData, value: Any?) {
-        (rawProp as KMutableProperty1<DefaultGunData, Any?>).set(data, value)
-    }
 
     companion object {
         val entries = mutableListOf<GunProp<*, *>>()
 
         inline fun <reified T> plainProp(
-            prop: KMutableProperty1<DefaultGunData, T>,
-            serializerOverride: KSerializer<T>? = null,
+            prop: KProperty1<DefaultGunData, T>,
         ): GunProp<T, T> {
-            return GunProp(prop, { it }, serializerOverride).also { entries.add(it) }
+            return GunProp(prop = prop, transform = { it }).also { entries.add(it) }
         }
 
         inline fun <reified T, R> complexProp(
-            prop: KMutableProperty1<DefaultGunData, T>,
-            serializerOverride: KSerializer<T>? = null,
+            prop: KProperty1<DefaultGunData, T>,
             noinline transform: (T) -> R
         ): GunProp<T, R> {
-            return GunProp(prop, transform, serializerOverride).also { entries.add(it) }
+            return GunProp(prop = prop, transform = transform).also { entries.add(it) }
         }
 
         fun leveledIntProp(
-            prop: KMutableProperty1<DefaultGunData, ObjectToList<Int>>,
+            prop: KProperty1<DefaultGunData, ObjectToList<Int>>,
         ): GunProp<ObjectToList<Int>, Int> {
             return GunProp(
                 prop,
@@ -169,9 +159,7 @@ class GunProp<T, R>(
 
         @JvmField
         val AVAILABLE_FIRE_MODES =
-            complexProp(DefaultGunData::availableFireModes) {
-                it.list.map { l -> l.value.also { fireMode -> fireMode.init() } }
-            }
+            complexProp(DefaultGunData::availableFireModes) { it.list.map { l -> l.value } }
 
         @JvmField
         val MAGAZINE = GunProp(
@@ -232,9 +220,9 @@ class GunProp<T, R>(
         val BYPASSES_ARMOR = plainProp(DefaultGunData::bypassesArmor)
 
         @JvmField
-        val AMMO_CONSUMER = complexProp(DefaultGunData::ammoConsumers) {
-            it.list.map { l -> l.value.also { consumer -> consumer.init() } }
-        }
+        val AMMO_CONSUMER = complexProp(
+            DefaultGunData::ammoConsumers
+        ) { it.list.map { l -> l.value } }
 
         @JvmField
         val NORMAL_RELOAD_TIME = leveledIntProp(DefaultGunData::normalReloadTime)
@@ -404,7 +392,7 @@ class GunProp<T, R>(
         }
 
         @JvmField
-        val ICON = complexProp(DefaultGunData::icon, ResourceLocationSerializer) { it }
+        val ICON = complexProp(DefaultGunData::icon) { it }
 
         @JvmField
         val CROSSHAIR = complexProp(DefaultGunData::crosshair) { it.ifEmpty { "@GunDefault" } }

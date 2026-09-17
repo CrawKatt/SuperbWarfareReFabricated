@@ -47,11 +47,7 @@ class ComplexJsonResourceReloadListener(
                             jsonStr = jsonEvent.jsonStr
                         }
 
-                        var loaded = if (value.isKtData) {
-                            DataLoader.JSON.decodeFromString(serializer(value.type), jsonStr)
-                        } else {
-                            DataLoader.GSON.fromJson(jsonStr, value.type)
-                        }
+                        var loaded = DataLoader.JSON.decodeFromString(serializer(value.type), jsonStr)
 
                         if (loaded is IDBasedData<*>) {
                             loaded.id = id
@@ -87,6 +83,8 @@ class ComplexJsonResourceReloadListener(
     }
 
     override fun apply(obj: Any, resourceManager: ResourceManager, profiler: ProfilerFiller) {
+        // 开发环境下用严格模式重解析一遍，把 ignoreUnknownKeys 吞掉的键名错误暴露出来
+        DataValidator.validateAndLog(resourceManager, this.data)
     }
 
     companion object {
