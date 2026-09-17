@@ -130,7 +130,7 @@ object ModItems {
     @JvmField val MINIGUN = registerGun("minigun") { MinigunItem() }
     @JvmField val M_79 = registerGun("m_79") { M79Item }
     @JvmField val SECONDARY_CATACLYSM = registerGun("secondary_cataclysm") { SecondaryCataclysmItem() }
-    @JvmField val RPG = registerGun("rpg") { RpgItem() }
+    @JvmField val RPG = registerGun("rpg") { RpgItem }
     @JvmField val JAVELIN = registerGun("javelin") { JavelinItem() }
     @JvmField val IGLA_9K38 = registerGun("igla_9k38") { IglaItem() }
     @JvmField val BOCEK = registerGun("bocek") { BocekItem() }
