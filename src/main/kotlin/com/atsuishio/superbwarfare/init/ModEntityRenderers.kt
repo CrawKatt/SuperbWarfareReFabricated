@@ -13,6 +13,7 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.C4, ::C4Renderer)
         EntityRendererRegistry.register(ModEntities.TASER_BULLET, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.GUN_GRENADE, ::BasicProjectileRenderer)
+        EntityRendererRegistry.register(ModEntities.SMOKE_GUN_GRENADE, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.TARGET, ::TargetRenderer)
         EntityRendererRegistry.register(ModEntities.DPS_GENERATOR, ::DPSGeneratorRenderer)
         EntityRendererRegistry.register(ModEntities.RPG_ROCKET_TBG, ::BasicProjectileRenderer)

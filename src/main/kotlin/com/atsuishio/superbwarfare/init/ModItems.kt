@@ -128,7 +128,7 @@ object ModItems {
     @JvmField val M_60 = registerGun("m_60") { M60Item() }
     @JvmField val M_2_HB = registerGun("m_2_hb") { M2HBItem() }
     @JvmField val MINIGUN = registerGun("minigun") { MinigunItem() }
-    @JvmField val M_79 = registerGun("m_79") { M79Item() }
+    @JvmField val M_79 = registerGun("m_79") { M79Item }
     @JvmField val SECONDARY_CATACLYSM = registerGun("secondary_cataclysm") { SecondaryCataclysmItem() }
     @JvmField val RPG = registerGun("rpg") { RpgItem() }
     @JvmField val JAVELIN = registerGun("javelin") { JavelinItem() }
@@ -168,6 +168,7 @@ object ModItems {
     @JvmField val AMMO_BOX = registerAmmo("ammo_box") { AmmoBoxItem() }
     @JvmField val TASER_ELECTRODE = registerAmmo("taser_electrode")
     @JvmField val GRENADE_40MM = registerAmmo("grenade_40mm")
+    @JvmField val SMOKE_GUN_GRENADE = registerAmmo("smoke_gun_grenade")
     @JvmField val FLYING_FLARE_AMMO = registerAmmo("flying_flare_ammo")
     @JvmField val VEHICLE_SMOKE_AMMO = registerAmmo("vehicle_smoke_ammo")
 
