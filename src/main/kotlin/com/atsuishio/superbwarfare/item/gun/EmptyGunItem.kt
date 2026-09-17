@@ -63,81 +63,81 @@ class EmptyGunItem : GunItem(Properties()) {
             shootPos = ShootPos().apply {
                 positions = arrayListOf()
                 directions = arrayListOf()
-        }
-        seekWeaponInfo = null
-        projectileDummyInfo = null
+            }
+            seekWeaponInfo = null
+            projectileDummyInfo = null
 
-        ammoCostPerShoot = 0
-        projectileAmount = 0
-        weight = 0.0
+            ammoCostPerShoot = 0
+            projectileAmount = 0
+            weight = 0.0
 
-        defaultFireMode = ""
-        availableFireModes = ObjectToList()
-        reloadTypes = emptySet()
-        seekType = null
+            defaultFireMode = ""
+            availableFireModes = ObjectToList()
+            reloadTypes = emptySet()
+            seekType = null
 
-        autoReload = null
-        withdrawAmmoWhenChangeSlot = false
-        zoomReload = false
-        clearHoldProgressAfterShoot = false
-        burstAmount = 0
-        bypassesArmor = 0.0
-        ammoConsumers = ObjectToList(
-            mutableListOf(
-                StringToObject(AmmoConsumer().apply {
-                    ammo = "empty"
-                    init()
-                })
+            autoReload = null
+            withdrawAmmoWhenChangeSlot = false
+            zoomReload = false
+            clearHoldProgressAfterShoot = false
+            burstAmount = 0
+            bypassesArmor = 0.0
+            ammoConsumers = ObjectToList(
+                mutableListOf(
+                    StringToObject(AmmoConsumer().apply {
+                        ammo = ObjectToList("empty")
+                        init()
+                    })
+                )
             )
-        )
-        useNacelleCamera = false
+            useNacelleCamera = false
 
-        normalReloadTime = ObjectToList(0)
-        emptyReloadTime = ObjectToList(0)
-        boltActionTime = ObjectToList(0)
-        prepareTime = ObjectToList(0)
-        prepareLoadTime = ObjectToList(0)
-        prepareAmmoLoadTime = ObjectToList(0)
-        prepareEmptyTime = ObjectToList(0)
-        iterativeTime = ObjectToList(0)
-        iterativeAmmoLoadTime = ObjectToList(0)
-        iterativeLoadAmount = 0
-        finishTime = ObjectToList(0)
-        burstCooldown = 0
-        soundRadius = 0.0
-        rpm = 0
-        explosionDamage = 0.0
-        explosionRadius = 0.0
-        gravity = 0.0
-        shootDelay = 0
-        shootDelayTime = 0
-        heatPerShoot = 0.0
-        availablePerks = ObjectToList()
+            normalReloadTime = ObjectToList(0)
+            emptyReloadTime = ObjectToList(0)
+            boltActionTime = ObjectToList(0)
+            prepareTime = ObjectToList(0)
+            prepareLoadTime = ObjectToList(0)
+            prepareAmmoLoadTime = ObjectToList(0)
+            prepareEmptyTime = ObjectToList(0)
+            iterativeTime = ObjectToList(0)
+            iterativeAmmoLoadTime = ObjectToList(0)
+            iterativeLoadAmount = 0
+            finishTime = ObjectToList(0)
+            burstCooldown = 0
+            soundRadius = 0.0
+            rpm = 0
+            explosionDamage = 0.0
+            explosionRadius = 0.0
+            gravity = 0.0
+            shootDelay = 0
+            shootDelayTime = 0
+            heatPerShoot = 0.0
+            availablePerks = ObjectToList()
 
-        naturalCooldown = 0.0
-        inWaterCooldownRate = 0.0
-        inSnowCooldownRate = 0.0
-        inFireCooldownRate = 0.0
-        inLavaCooldownRate = 0.0
-        zoomSpreadRate = 0.0
+            naturalCooldown = 0.0
+            inWaterCooldownRate = 0.0
+            inSnowCooldownRate = 0.0
+            inFireCooldownRate = 0.0
+            inLavaCooldownRate = 0.0
+            zoomSpreadRate = 0.0
 
-        seekTime = 0
-        seekAngle = 0.0
-        seekRange = 0.0
-        maxGuidedRange = 0.0
-        canGuidedByRadar = false
-        affectedByStealthTarget = false
-        minTargetHeight = 0.0
-        maxTargetHeight = 0.0
+            seekTime = 0
+            seekAngle = 0.0
+            seekRange = 0.0
+            maxGuidedRange = 0.0
+            canGuidedByRadar = false
+            affectedByStealthTarget = false
+            minTargetHeight = 0.0
+            maxTargetHeight = 0.0
 
-        shootAnimationTime = 0
-        spreadAmount = 0
-        spreadAngle = 0
-        apDurability = 0
-        projectileLife = 0
-        addShooterDeltaMovement = false
-        underwaterMotionScale = 0f
-        explosionDestroy = false
+            shootAnimationTime = 0
+            spreadAmount = 0
+            spreadAngle = 0
+            apDurability = 0
+            projectileLife = 0
+            addShooterDeltaMovement = false
+            underwaterMotionScale = 0f
+            explosionDestroy = false
         }
 
     }
