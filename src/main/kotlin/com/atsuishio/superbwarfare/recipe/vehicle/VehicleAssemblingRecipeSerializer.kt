@@ -1,17 +1,24 @@
 package com.atsuishio.superbwarfare.recipe.vehicle
 
 import com.atsuishio.superbwarfare.data.DataLoader
-import com.google.gson.JsonObject
+import com.atsuishio.superbwarfare.tools.GsonObject
+import com.atsuishio.superbwarfare.tools.toKxJson
+import kotlinx.serialization.json.jsonObject
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.crafting.Ingredient
 import net.minecraft.world.item.crafting.RecipeSerializer
 
 class VehicleAssemblingRecipeSerializer : RecipeSerializer<VehicleAssemblingRecipe> {
-    override fun fromJson(pRecipeId: ResourceLocation, pSerializedRecipe: JsonObject): VehicleAssemblingRecipe {
-        val data = DataLoader.GSON.fromJson(
-            pSerializedRecipe,
-            VehicleAssemblingRecipeData::class.java
+    /**
+     * [GsonObject] 是 `tools.JsonUtil` 里对 Gson `JsonObject` 的 typealias：
+     * 原版 `RecipeSerializer` 接口只收 Gson 的 JsonObject，这个入参类型无法改，
+     * 所以这里立刻把它转成 kotlinx 的 JsonObject，配方解析全部由 kotlinx.serialization 完成。
+     */
+    override fun fromJson(pRecipeId: ResourceLocation, pSerializedRecipe: GsonObject): VehicleAssemblingRecipe {
+        val data = DataLoader.JSON.decodeFromJsonElement(
+            VehicleAssemblingRecipeData.serializer(),
+            pSerializedRecipe.toKxJson().jsonObject
         )
         return VehicleAssemblingRecipe(pRecipeId, data)
     }

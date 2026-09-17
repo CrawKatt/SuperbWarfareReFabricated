@@ -2,7 +2,10 @@ package com.atsuishio.superbwarfare.recipe.vehicle
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.data.DeserializeFromString
-import com.google.gson.annotations.SerializedName
+import com.atsuishio.superbwarfare.data.StringInstanceBuilder
+import com.atsuishio.superbwarfare.data.StringOrObjectFactory
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceLocation
@@ -12,14 +15,17 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.math.max
 
+@StringOrObjectFactory(VehicleAssemblingIngredient.InstanceBuilder::class)
+@Serializable
 class VehicleAssemblingIngredient : DeserializeFromString {
-    @SerializedName("ingredient")
+    @SerialName("ingredient")
     var ingredientString: String = ""
 
     @JvmField
-    @SerializedName("count")
+    @SerialName("count")
     var count: Int = 1
 
+    @kotlinx.serialization.Transient
     @Transient
     var ingredientObject: Ingredient? = null
 
@@ -49,6 +55,12 @@ class VehicleAssemblingIngredient : DeserializeFromString {
             Ingredient.of(TagKey.create(Registries.ITEM, ResourceLocation(id)))
         } else {
             Ingredient.of(BuiltInRegistries.ITEM.get(ResourceLocation(id)))
+        }
+    }
+
+    object InstanceBuilder : StringInstanceBuilder<VehicleAssemblingIngredient> {
+        override fun fromString(value: String) = VehicleAssemblingIngredient().apply {
+            deserializeFromString(value)
         }
     }
 
