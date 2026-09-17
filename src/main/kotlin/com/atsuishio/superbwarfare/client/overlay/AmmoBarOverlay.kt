@@ -9,10 +9,10 @@ import com.atsuishio.superbwarfare.data.gun.AmmoConsumer.AmmoConsumeType
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.GunProp
-import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModKeyMappings
+import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.tools.FormatTool.format1DZZ
 import com.sighs.apricityui.ApricityUI
 import com.sighs.apricityui.init.Document
@@ -642,7 +642,6 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
 
     private fun getAmmoDisplayName(data: GunData): String {
         if (data.meleeOnly()) return "Melee"
-        val consumer = data.selectedAmmoConsumer()
-        return consumer.strategy.getDisplayName(consumer)
+        return data.selectedAmmoConsumer().getDisplayName()
     }
 }
