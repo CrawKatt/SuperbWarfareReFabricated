@@ -1,21 +1,13 @@
 package com.atsuishio.superbwarfare.data
 
 import com.atsuishio.superbwarfare.Mod
-import com.atsuishio.superbwarfare.data.ModColor.ModColorAdapter
-import com.atsuishio.superbwarfare.data.StringOrVec3.StringOrVec3Adapter
-import com.atsuishio.superbwarfare.data.vehicle.subdata.CollisionLevel
-import com.atsuishio.superbwarfare.data.vehicle.subdata.CollisionLevel.LimitAdapter
+import com.atsuishio.superbwarfare.data.DataLoader.JSON
 import com.atsuishio.superbwarfare.network.message.receive.DataSyncMessage
 import com.atsuishio.superbwarfare.tools.sendPacket
-import com.google.common.cache.CacheBuilder
-import com.google.common.cache.CacheLoader
-import com.google.common.cache.LoadingCache
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
-import com.google.gson.reflect.TypeToken
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
@@ -25,14 +17,16 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.packs.PackType
-import net.minecraft.sounds.SoundEvent
-import net.minecraft.world.phys.Vec2
-import net.minecraft.world.phys.Vec3
 import java.util.function.Consumer
 
+/**
+ * 数据包加载入口。
+ *
+ * 全部数据集都已经迁到 kotlinx.serialization（不再有 Gson 分支），
+ * 所以这里只剩下 [JSON] 一份配置，以及"按目录把 `data/&lt;ns&gt;/&lt;directory&gt;/` 下的 `.json`
+ * 解析成 `Map&lt;id, T&gt;`"的通用流程。
+ */
 object DataLoader {
-    @JvmField
-    val GSON: Gson = createCommonBuilder().create()
 
     @OptIn(ExperimentalSerializationApi::class)
     val JSON = Json {
@@ -42,15 +36,6 @@ object DataLoader {
         allowTrailingComma = true
         allowSpecialFloatingPointValues = true
     }
-
-    @JvmField
-    val JSON_OBJECT_CACHE: LoadingCache<Any, JsonObject> = CacheBuilder.newBuilder()
-        .weakKeys()
-        .build(object : CacheLoader<Any, JsonObject>() {
-            override fun load(obj: Any): JsonObject {
-                return GSON.toJsonTree(obj).asJsonObject
-            }
-        })
 
     val LOADED_DATA = mutableMapOf<String, GeneralData<*>>()
     val LOADED_RESOURCE = mutableMapOf<String, GeneralData<*>>()
@@ -99,7 +84,6 @@ object DataLoader {
         directory: String,
         clazz: Class<T>,
         synced: Boolean = false,
-        isKtData: Boolean = false,
         onReload: Consumer<Map<String, Any>>? = null
     ): DataMap<T> {
         val data = LOADED_DATA[directory]
@@ -108,7 +92,7 @@ object DataLoader {
             data.proxyMap as DataMap<T>
         } else {
             val proxyMap = DataMap<T>(directory, LOADED_DATA)
-            LOADED_DATA[directory] = GeneralData(clazz, proxyMap, HashMap(), synced, isKtData, onReload)
+            LOADED_DATA[directory] = GeneralData(clazz, proxyMap, HashMap(), synced, onReload)
             proxyMap
         }
     }
@@ -119,7 +103,7 @@ object DataLoader {
         clazz: Class<T>,
         onReload: Consumer<Map<String, Any>>
     ): DataMap<T> {
-        return createData(directory, clazz, false, false, onReload)
+        return createData(directory, clazz, false, onReload)
     }
 
     @Suppress("unchecked_cast")
@@ -128,7 +112,6 @@ object DataLoader {
     fun <T> createResource(
         directory: String,
         clazz: Class<T>,
-        isKtData: Boolean = false,
         onReload: Consumer<Map<String, Any>>? = null
     ): DataMap<T> {
         val resource = LOADED_RESOURCE[directory]
@@ -137,35 +120,9 @@ object DataLoader {
             resource.proxyMap as DataMap<T>
         } else {
             val proxyMap = DataMap<T>(directory, LOADED_RESOURCE)
-            LOADED_RESOURCE[directory] = GeneralData(clazz, proxyMap, HashMap(), false, isKtData, onReload)
+            LOADED_RESOURCE[directory] = GeneralData(clazz, proxyMap, HashMap(), false, onReload)
             proxyMap
         }
-    }
-
-    @JvmStatic
-    fun <T> createResource(
-        directory: String,
-        clazz: Class<T>,
-        onReload: Consumer<Map<String, Any>>
-    ): DataMap<T> {
-        return createResource(directory, clazz, false, onReload)
-    }
-
-    @JvmStatic
-    fun createCommonBuilder(): GsonBuilder {
-        return GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-            .setLenient()
-            .serializeSpecialFloatingPointValues()
-            .registerTypeAdapter(Vec2::class.java, Vec2Adapter())
-            .registerTypeAdapter(Vec3::class.java, Vec3Adapter())
-            .registerTypeAdapter(ResourceLocation::class.java, ResourceLocationAdapter())
-            .registerTypeAdapter(SoundEvent::class.java, SoundEventAdapter())
-            .registerTypeAdapter(ModColor::class.java, ModColorAdapter())
-            .registerTypeAdapter(StringOrVec3::class.java, StringOrVec3Adapter())
-            .registerTypeAdapter(CollisionLevel.Limit::class.java, LimitAdapter())
-            .registerTypeAdapterFactory(ObjectToList.AdapterFactory())
-            .registerTypeAdapterFactory(StringToObject.AdapterFactory())
     }
 
     @JvmStatic
@@ -182,7 +139,6 @@ object DataLoader {
         @JvmField val proxyMap: DataMap<T>,
         @JvmField val dataMap: HashMap<String, Any>,
         @JvmField val synced: Boolean,
-        @JvmField val isKtData: Boolean = false,
         @JvmField val onReload: Consumer<Map<String, Any>>?
     ) {
         @JvmField
@@ -190,16 +146,14 @@ object DataLoader {
 
         fun getDataMap(): HashMap<String, Any> = dataMap
 
-        val mapType by lazy {
-            TypeToken.getParameterized(HashMap::class.java, String::class.java, type)!!
+        /** `Map<String, T>` 的 serializer，用于数据同步（取代原来的 Gson `TypeToken` + `GSON.toJson`） */
+        val mapSerializer: KSerializer<Map<String, Any>> by lazy {
+            @Suppress("UNCHECKED_CAST")
+            MapSerializer(String.serializer(), JSON.serializersModule.serializer(type) as KSerializer<Any>)
         }
 
         fun serializeToString(): String {
-            return if (isKtData) {
-                JSON.encodeToString(serializer(mapType.type), dataMap)
-            } else {
-                GSON.toJson(dataMap)!!
-            }
+            return JSON.encodeToString(mapSerializer, dataMap)
         }
     }
 }
