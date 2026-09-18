@@ -136,6 +136,7 @@ object ModItems {
     @JvmField val BOCEK = registerGun("bocek") { BocekItem() }
     @JvmField val SUPER_STAR_SHOOTER = registerGun("super_star_shooter") { SuperStarShooterItem() }
     @JvmField val REFORGING = registerGun("reforging") { ReforgingItem }
+    @JvmField val RAUBTIER = registerGun("raubtier") { RaubtierItem }
 
     @JvmField val BEAST_GUN_TEST = registerGun("beast_gun_test") { BeastGunTestItem() }
 
