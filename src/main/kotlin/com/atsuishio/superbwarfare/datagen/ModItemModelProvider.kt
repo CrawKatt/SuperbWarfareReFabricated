@@ -376,6 +376,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.CROSS_MUZZLE)
         simpleItem(ModItems.STAR_MUZZLE)
         simpleItem(ModItems.LOVE_MUZZLE)
+        simpleItem(ModItems.SCOPE_WINEFOX)
 
         // blocks
         evenSimplerBlockItem(ModBlocks.BARBED_WIRE)

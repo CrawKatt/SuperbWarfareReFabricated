@@ -630,7 +630,8 @@ class ModItemTagProvider(
                 ModItems.SCOPE_HAMR,
                 ModItems.SCOPE_ELCAN_4X,
                 ModItems.SCOPE_LPVO,
-                ModItems.SCOPE_SNIPER
+                ModItems.SCOPE_SNIPER,
+                ModItems.SCOPE_WINEFOX
             )
         )
 
