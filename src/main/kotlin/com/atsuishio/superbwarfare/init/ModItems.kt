@@ -107,7 +107,7 @@ object ModItems {
     @JvmField val M_4 = registerGun("m_4") { M4Item }
     @JvmField val HK_416 = registerGun("hk_416") { Hk416Item }
     @JvmField val QBZ_95 = registerGun("qbz_95") { Qbz95Item }
-    @JvmField val QBZ_191 = registerGun("qbz_191") { Qbz191Item() }
+    @JvmField val QBZ_191 = registerGun("qbz_191") { Qbz191Item }
     @JvmField val INSIDIOUS = registerGun("insidious") { InsidiousItem() }
     @JvmField val MK_14 = registerGun("mk_14") { Mk14Item() }
     @JvmField val QL_1031 = registerGun("ql_1031") { Ql1031Item() }
@@ -268,9 +268,9 @@ object ModItems {
     @JvmField val SILENCER_50_CAL = registerAttachment("silencer_50_cal")
     @JvmField val AR_SILENCER = registerAttachment("ar_silencer")
     @JvmField val HANDGUN_SILENCER = registerAttachment("handgun_silencer")
-    @JvmField val OSPREY_SILENCER = registerAttachment("osprey_silencer")
+    @JvmField val OSPREY_SILENCER = registerAttachment("osprey_silencer", Rarity.RARE)
     @JvmField val LOUDSPEAKER = registerAttachment("loudspeaker", ModRarities.LEGENDARY)
-    @JvmField val OSPREY_SILENCER_TRACHELIUM = registerAttachment("osprey_silencer_trachelium", ModRarities.LEGENDARY)
+    @JvmField val OSPREY_SILENCER_TRACHELIUM = registerAttachment("osprey_silencer_trachelium", ModRarities.VIRTUAL)
     @JvmField val SILENCER_QINGLAN = registerAttachment("silencer_qinglan", ModRarities.VIRTUAL)
     @JvmField val TRIANGULAR_MUZZLE = registerAttachment("triangular_muzzle", Rarity.RARE)
     @JvmField val LINEAR_MUZZLE = registerAttachment("linear_muzzle", Rarity.RARE)
@@ -306,6 +306,7 @@ object ModItems {
     @JvmField val GRIP_RECTANGLE_VERTICAL = registerAttachment("grip_rectangle_vertical")
     @JvmField val TRIANGLE_GRIP = registerAttachment("triangle_grip")
     @JvmField val GRIP_CQR_GEN2 = registerAttachment("grip_cqr_gen2", Rarity.RARE)
+    @JvmField val GRIP_VERTICAL_BIPOD = registerAttachment("grip_vertical_bipod", Rarity.RARE)
     // @formatter:on
 
     // @formatter:off
