@@ -115,7 +115,7 @@ object ModItems {
     @JvmField val K_98 = registerGun("k_98") { K98Item }
     @JvmField val MOSIN_NAGANT = registerGun("mosin_nagant") { MosinNagantItem }
     @JvmField val SVD = registerGun("svd") { SvdItem() }
-    @JvmField val AWM = registerGun("awm") { AwmItem() }
+    @JvmField val AWM = registerGun("awm") { AwmItem }
     @JvmField val M_98B = registerGun("m_98b") { M98bItem() }
     @JvmField val SENTINEL = registerGun("sentinel") { SentinelItem() }
     @JvmField val HUNTING_RIFLE = registerGun("hunting_rifle") { HuntingRifleItem }
