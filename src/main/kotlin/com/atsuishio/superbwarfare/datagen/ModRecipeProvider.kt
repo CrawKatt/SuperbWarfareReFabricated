@@ -2546,13 +2546,13 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput), IConditi
                 INGOTS_STEEL,
                 ModItems.AK_12.get()
             )
-            gunSmithing(
-                writer,
-                ModItems.DEVOTION_BLUEPRINT.get(),
-                GunRarity.EPIC,
-                ModTags.Items.INGOTS_CEMENTED_CARBIDE,
-                ModItems.DEVOTION.get()
-            )
+//            gunSmithing(
+//                writer,
+//                ModItems.DEVOTION_BLUEPRINT.get(),
+//                GunRarity.EPIC,
+//                ModTags.Items.INGOTS_CEMENTED_CARBIDE,
+//                ModItems.DEVOTION.get()
+//            )
             gunSmithing(
                 writer,
                 ModItems.TASER_BLUEPRINT.get(),
