@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.data.gun
 
 import com.atsuishio.superbwarfare.data.DefaultDataSupplier
 import com.atsuishio.superbwarfare.data.CustomData
+import com.atsuishio.superbwarfare.data.DataValidator
 import com.atsuishio.superbwarfare.data.SingleOrList
 import team.reborn.energy.api.EnergyStorage
 import com.atsuishio.superbwarfare.capability.api.IItemHandler

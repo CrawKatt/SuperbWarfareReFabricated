@@ -1,7 +1,4 @@
 {
-  "parent": "superbwarfare:item/devotion_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/devotion_icon"
-  }
+  "parent": "minecraft:builtin/entity",
+  "gui_light": "front"
 }

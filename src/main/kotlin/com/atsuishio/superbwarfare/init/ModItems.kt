@@ -27,6 +27,7 @@ import com.atsuishio.superbwarfare.item.gun.launcher.*
 import com.atsuishio.superbwarfare.item.gun.machinegun.M2HBItem
 import com.atsuishio.superbwarfare.item.gun.machinegun.M60Item
 import com.atsuishio.superbwarfare.item.gun.machinegun.MinigunItem
+import com.atsuishio.superbwarfare.item.gun.machinegun.DevotionItem
 import com.atsuishio.superbwarfare.item.gun.machinegun.RpkItem
 import com.atsuishio.superbwarfare.item.gun.rifle.*
 import com.atsuishio.superbwarfare.item.gun.shotgun.Aa12Item
@@ -126,6 +127,7 @@ object ModItems {
     @JvmField val M_870 = registerGun("m_870") { M870Item }
     @JvmField val M_1897 = registerGun("m_1897") { M1987Item }
     @JvmField val AA_12 = registerGun("aa_12") { Aa12Item }
+    @JvmField val DEVOTION = registerGun("devotion") { DevotionItem }
     @JvmField val RPK = registerGun("rpk") { RpkItem }
     @JvmField val M_60 = registerGun("m_60") { M60Item() }
     @JvmField val M_2_HB = registerGun("m_2_hb") { M2HBItem() }
