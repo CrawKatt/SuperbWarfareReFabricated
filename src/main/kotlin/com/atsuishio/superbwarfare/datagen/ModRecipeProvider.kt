@@ -2592,16 +2592,9 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
             )
             gunSmithing(
                 writer,
-                ModItems.DEVOTION_BLUEPRINT,
-                GunRarity.EPIC,
-                ModTags.Items.INGOTS_CEMENTED_CARBIDE,
-                ModItems.DEVOTION
-            )
-            gunSmithing(
-                writer,
                 ModItems.TASER_BLUEPRINT,
                 GunRarity.COMMON,
-                Items.YELLOW_CONCRETE,
+                PLATES_PLASTIC,
                 ModItems.TASER
             )
             gunSmithing(
