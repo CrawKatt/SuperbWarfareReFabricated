@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
+import kotlin.math.roundToInt
 
 /**
  * Proxy that exposes GunData properties and methods to JS perk scripts.
@@ -21,6 +22,18 @@ class GunDataProxy(private val data: GunData) {
 
     // ── Ammo ──
     fun getAmmo(): Int = data.ammo.get()
+
+    // ── RPM ──
+    fun getRpm(): Int = data.get(GunProp.RPM)
+
+    /**
+     * 基础 RPM 乘上全局射速倍率后的射速，最小为 1。
+     *
+     * 服务端看不到客户端那份每发累加值（customRpm），所以这里只有倍率；
+     * 需要"实际开火间隔"的 perk（例如权宜之计的停火窗口）应该用这个值。
+     */
+    fun getEffectiveRpm(): Int =
+        (data.get(GunProp.RPM) * data.get(GunProp.RPM_MULTIPLIER)).roundToInt().coerceAtLeast(1)
 
     fun setAmmo(value: Int) {
         data.ammo.set(value)
