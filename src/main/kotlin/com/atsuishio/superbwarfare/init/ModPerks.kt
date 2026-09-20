@@ -171,6 +171,9 @@ object ModPerks {
     @JvmField val STEADY_RESOLVE = autoRegistryObjects["steady_resolve"] ?: registerDamagePerk("steady_resolve") {
         EmptyPerk("steady_resolve", Perk.Type.DAMAGE)
     }
+    @JvmField val STOP_GAP = autoRegistryObjects["stop_gap"] ?: registerDamagePerk("stop_gap") {
+        EmptyPerk("stop_gap", Perk.Type.DAMAGE)
+    }
     // @formatter:on
 
     private fun autoRegisterFromJsons() {
