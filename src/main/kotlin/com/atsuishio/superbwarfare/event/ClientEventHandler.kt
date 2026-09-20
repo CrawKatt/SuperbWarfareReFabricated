@@ -19,6 +19,7 @@ import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.event.ClientEventHandler.zoomTime
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.item.misc.MonitorItem
@@ -3173,6 +3174,8 @@ object ClientEventHandler {
         seekingEntity = null
         lockingPos = null
         isEditing = false
+        // 切枪时清掉上一把枪累积的自定义 rpm，避免加成串到新枪上
+        customRpm = 0
         editingAttachmentType = -1
         editFocusOffset.set(0f, 0f, 0f)
         editFocusYaw = 0f
