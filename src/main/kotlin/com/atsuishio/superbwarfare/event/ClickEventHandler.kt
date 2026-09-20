@@ -275,8 +275,7 @@ object ClickEventHandler {
             val data = GunData.from(stack)
             if (data.canSwitchScope()) {
                 sendPacketToServer(SwitchScopeMessage(scroll))
-            } else if (data.canAdjustZoom() || stack.`is`(ModItems.MINIGUN)) {
-                AdjustZoomFovMessage.apply(player, scroll, false)
+            } else if (data.canAdjustZoom()) {
                 sendPacketToServer(AdjustZoomFovMessage(scroll))
             }
             canceled = true
