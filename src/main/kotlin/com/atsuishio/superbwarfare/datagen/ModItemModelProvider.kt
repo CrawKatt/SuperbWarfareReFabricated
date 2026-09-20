@@ -374,6 +374,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.SCOPE_HAMR)
         simpleItem(ModItems.SCOPE_ELCAN_4X)
         simpleItem(ModItems.SCOPE_1P_78)
+        simpleItem(ModItems.SCOPE_PSO_1)
         simpleItem(ModItems.SCOPE_PU)
         simpleItem(ModItems.SCOPE_PK_A)
         simpleItem(ModItems.TRIANGULAR_MUZZLE)
