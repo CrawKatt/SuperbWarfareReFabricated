@@ -107,18 +107,15 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
 
             val font = Minecraft.getInstance().font
 
-            // 渲染开火模式切换按键
-            if (item !== ModItems.MINIGUN.get()) {
-                val str = "[${ModKeyMappings.FIRE_MODE.key.displayName.string}]"
-                guiGraphics.drawString(
-                    font,
-                    str,
-                    (x - 100f) - font.width(str),
-                    (y - 20).toFloat(),
-                    0xFFFFFF,
-                    false
-                )
-            }
+            val str = "[${ModKeyMappings.FIRE_MODE.key.displayName.string}]"
+            guiGraphics.drawString(
+                font,
+                str,
+                (x - 100f) - font.width(str),
+                (y - 20).toFloat(),
+                0xFFFFFF,
+                false
+            )
 
             // 渲染开火模式
             var fireMode: ResourceLocation = getFireMode(data)
@@ -137,53 +134,28 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
                 )
             }
 
-            if (item === ModItems.MINIGUN.get()) {
-                fireMode = MOUSE
-                // 渲染加特林射速
-                guiGraphics.drawString(
-                    font,
-                    data.get(GunProp.RPM).toString() + " RPM",
-                    x - 111f,
-                    (y - 20).toFloat(),
-                    0xFFFFFF,
-                    false
-                )
-
-                guiGraphics.blit(
-                    fireMode,
-                    x - 126,
-                    y - 22,
-                    0f,
-                    0f,
-                    12,
-                    12,
-                    12,
-                    12
-                )
-            } else {
-                guiGraphics.blit(
-                    fireMode,
-                    x - 95,
-                    y - 21,
-                    0f,
-                    0f,
-                    8,
-                    8,
-                    8,
-                    8
-                )
-                guiGraphics.blit(
-                    LINE,
-                    x - 95,
-                    y - 16,
-                    0f,
-                    0f,
-                    8,
-                    8,
-                    8,
-                    8
-                )
-            }
+            guiGraphics.blit(
+                fireMode,
+                x - 95,
+                y - 21,
+                0f,
+                0f,
+                8,
+                8,
+                8,
+                8
+            )
+            guiGraphics.blit(
+                LINE,
+                x - 95,
+                y - 16,
+                0f,
+                0f,
+                8,
+                8,
+                8,
+                8
+            )
 
             // 如果弹药种类大于1，渲染弹种信息
             val size = data.get(GunProp.AMMO_CONSUMER).size
@@ -508,9 +480,7 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
         val ammoCount = getGunAmmoString(data, player)
         val backupAmmo = getBackupAmmoString(data, player)
         val virtualAmmo = if (data.virtualAmmo.get() > 0 && !data.meleeOnly()) "+" + data.virtualAmmo.get() else ""
-        val fireModeKey = if (data.stack.item !== ModItems.MINIGUN.get())
-            "[" + ModKeyMappings.FIRE_MODE.key.displayName.string + "]"
-        else ""
+        val fireModeKey = "[" + ModKeyMappings.FIRE_MODE.key.displayName.string + "]"
 
         setElementText(doc, "gun-name", gunName)
         setElementText(doc, "ammo-name", ammoName)
@@ -544,13 +514,6 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
 
         wasReloading = isReloading
         lastGunIconSrc = iconSrc
-
-        // Set fire mode icon
-        if (data.stack.item !== ModItems.MINIGUN.get()) {
-            setElementAttr(doc, "fire-mode-icon", "src", getFireMode(data).toString())
-        } else {
-            setElementAttr(doc, "fire-mode-icon", "src", MOUSE.toString())
-        }
     }
 
     /**
