@@ -28,7 +28,6 @@ import kotlin.math.roundToInt
 object AmmoBarOverlay : CommonOverlay("ammo_bar") {
 
     private val LINE = loc("textures/overlay/ammo_bar/fire_mode/line.png")
-    private val MOUSE = loc("textures/overlay/ammo_bar/fire_mode/mouse.png")
     private val CHOSEN = loc("textures/gui/attachment/chosen.png")
     private val NOT_CHOSEN = loc("textures/gui/attachment/not_chosen.png")
     private val AMMO_STACK = loc("textures/gui/attachment/ammo_stack.png")
@@ -65,17 +64,15 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
             val font = Minecraft.getInstance().font
 
             // 渲染开火模式切换按键
-            if (item !== ModItems.MINIGUN) {
-                val str = "[${ModKeyMappings.FIRE_MODE.translatedKeyMessage.string}]"
-                guiGraphics.drawString(
-                    font,
-                    str,
-                    x - 100 - font.width(str),
-                    y - 20,
-                    0xFFFFFF,
-                    false
-                )
-            }
+            val str = "[${ModKeyMappings.FIRE_MODE.translatedKeyMessage.string}]"
+            guiGraphics.drawString(
+                font,
+                str,
+                x - 100 - font.width(str),
+                y - 20,
+                0xFFFFFF,
+                false
+            )
 
             // 渲染开火模式
             var fireMode: ResourceLocation = getFireMode(data)
@@ -94,53 +91,28 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
                 )
             }
 
-            if (item === ModItems.MINIGUN) {
-                fireMode = MOUSE
-                // 渲染加特林射速
-                guiGraphics.drawString(
-                    font,
-                    data.get(GunProp.RPM).toString() + " RPM",
-                    x - 111,
-                    y - 20,
-                    0xFFFFFF,
-                    false
-                )
-
-                guiGraphics.blit(
-                    fireMode,
-                    x - 126,
-                    y - 22,
-                    0f,
-                    0f,
-                    12,
-                    12,
-                    12,
-                    12
-                )
-            } else {
-                guiGraphics.blit(
-                    fireMode,
-                    x - 95,
-                    y - 21,
-                    0f,
-                    0f,
-                    8,
-                    8,
-                    8,
-                    8
-                )
-                guiGraphics.blit(
-                    LINE,
-                    x - 95,
-                    y - 16,
-                    0f,
-                    0f,
-                    8,
-                    8,
-                    8,
-                    8
-                )
-            }
+            guiGraphics.blit(
+                fireMode,
+                x - 95,
+                y - 21,
+                0f,
+                0f,
+                8,
+                8,
+                8,
+                8
+            )
+            guiGraphics.blit(
+                LINE,
+                x - 95,
+                y - 16,
+                0f,
+                0f,
+                8,
+                8,
+                8,
+                8
+            )
 
             // 如果弹药种类大于1，渲染弹种信息
             val size = data.get(GunProp.AMMO_CONSUMER).size
