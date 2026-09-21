@@ -1,7 +1,4 @@
 {
-  "parent": "superbwarfare:item/ntw_20_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/ntw_20_icon"
-  }
+  "parent": "minecraft:builtin/entity",
+  "gui_light": "front"
 }
