@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.client.lighting.ClientLightingHandler;
 import com.atsuishio.superbwarfare.client.map.TacticalMapChunkListener;
 import com.atsuishio.superbwarfare.client.model.DragonTeethObjModelLoader;
 import com.atsuishio.superbwarfare.client.molang.MolangVariable;
+import com.atsuishio.superbwarfare.client.PoseTool;
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
 import com.atsuishio.superbwarfare.client.renderer.SyncedEntityWorldRenderer;
@@ -92,6 +93,7 @@ public class ClientMod implements ClientModInitializer {
         MouseMovementHandler.init();
         ClientLightingHandler.register();
         MolangVariable.register();
+        PoseTool.INSTANCE.init();
         ModSoundInstances.init();
         ClientEventHandler.register();
         TacticalMapChunkListener.register();
