@@ -106,8 +106,8 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
             guiGraphics.drawString(
                 font,
                 str,
-                (x - 100f) - font.width(str),
-                (y - 20).toFloat(),
+                x - 100 - font.width(str),
+                y - 20,
                 0xFFFFFF,
                 false
             )

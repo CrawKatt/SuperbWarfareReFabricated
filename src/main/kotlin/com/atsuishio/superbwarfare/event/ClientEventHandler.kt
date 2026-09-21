@@ -1962,7 +1962,7 @@ object ClientEventHandler {
                 ((2 * Math.random() - 1) * 0.05f + pitch).toFloat()
             )
             if (!isSilent) {
-                player.playSound(ModSounds.REFLECTIONS.get(), 0.25f * volumeMultiplier.toFloat(), ((2 * Math.random() - 1) * 0.05f + pitch).toFloat())
+                player.playSound(ModSounds.REFLECTIONS, 0.25f * volumeMultiplier.toFloat(), ((2 * Math.random() - 1) * 0.05f + pitch).toFloat())
             }
         }
 

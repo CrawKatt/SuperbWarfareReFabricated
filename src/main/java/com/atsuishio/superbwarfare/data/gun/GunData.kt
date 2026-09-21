@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.data.DefaultDataSupplier
 import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.DataValidator
 import com.atsuishio.superbwarfare.data.SingleOrList
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import team.reborn.energy.api.EnergyStorage
 import com.atsuishio.superbwarfare.capability.api.IItemHandler
 import com.atsuishio.superbwarfare.capability.entity.InfiniteAmmoCapability
@@ -1127,7 +1128,7 @@ class GunData private constructor(
 
         // 夹到 Int.MAX_VALUE：弹药数与换算比例都是玩家可控的数据，直接相乘可能溢出成负数
         val energy = min(rounds.toLong() * perRound, Int.MAX_VALUE.toLong()).toInt()
-        getEnergyProvider(null)?.receiveEnergy(energy, false)
+        getEnergyProvider(null)?.let { EnergyStorageHelper.insert(it, energy.toLong()) }
     }
 
     /** Gets list of available perks applicable to weapon. */

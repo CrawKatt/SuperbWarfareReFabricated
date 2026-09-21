@@ -118,12 +118,12 @@ object ModItems {
     @JvmField val MARLIN = registerGun("marlin") { MarlinItem }
     @JvmField val K_98 = registerGun("k_98") { K98Item }
     @JvmField val MOSIN_NAGANT = registerGun("mosin_nagant") { MosinNagantItem }
-    @JvmField val SVD = registerGun("svd") { SvdItem() }
+    @JvmField val SVD = registerGun("svd") { SvdItem }
     @JvmField val AWM = registerGun("awm") { AwmItem }
     @JvmField val M_98B = registerGun("m_98b") { M98bItem() }
     @JvmField val SENTINEL = registerGun("sentinel") { SentinelItem() }
     @JvmField val HUNTING_RIFLE = registerGun("hunting_rifle") { HuntingRifleItem }
-    @JvmField val NTW_20 = registerGun("ntw_20") { Ntw20Item() }
+    @JvmField val NTW_20 = registerGun("ntw_20") { Ntw20Item }
     @JvmField val M_870 = registerGun("m_870") { M870Item }
     @JvmField val M_1897 = registerGun("m_1897") { M1987Item }
     @JvmField val AA_12 = registerGun("aa_12") { Aa12Item }
