@@ -5,6 +5,7 @@
   "plugin": "com.atsuishio.superbwarfare.mixins.plugin.MixinPlugin",
   "mixins": [
     "AnimationProcessorAccessor",
+    "AnnotationScanUtilMixin",
     "AnvilMenuMixin",
     "AttributeMapMixin",
     "BeastMixin",

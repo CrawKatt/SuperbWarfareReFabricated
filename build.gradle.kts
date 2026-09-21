@@ -278,6 +278,9 @@ dependencies {
     include(modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("minecraft_version")}:${project.property("ponder_version")}")!!)
     implementation("com.eliotlash.mclib:mclib:20")
 
+    // ApricityUI (upstream creative ammo HUD)
+    include(modImplementation("curse.maven:apricityui-1470115:8681422")!!)
+
     // JEI Fabric
     modCompileOnly("mezz.jei:jei-${project.property("minecraft_version")}-fabric-api:${project.property("jei_version")}")
     modRuntimeOnly("mezz.jei:jei-${project.property("minecraft_version")}-fabric:${project.property("jei_version")}")

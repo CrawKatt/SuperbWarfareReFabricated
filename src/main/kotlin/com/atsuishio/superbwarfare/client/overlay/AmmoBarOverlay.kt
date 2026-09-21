@@ -16,6 +16,8 @@ import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModKeyMappings
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.tools.FormatTool.format1DZZ
+import com.sighs.apricityui.ApricityUI
+import com.sighs.apricityui.init.Document
 import net.minecraft.Util
 import net.minecraft.client.Minecraft
 import net.minecraft.resources.ResourceLocation
@@ -42,18 +44,46 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
      */
     private val LARGE_FIRE_MODE_ICONS = setOf("rpm600", "rpm1200", "rpm1800")
 
-    override fun shouldRender() = super.shouldRender() && DisplayConfig.AMMO_HUD.get()
+    private const val AUI_AMMO_BAR_PATH = "superbwarfare/ammo_bar.html"
+
+    private var auiDocument: Document? = null
+    private var auiDragging = false
+    private var dragStartMouseX = 0.0
+    private var dragStartMouseY = 0.0
+    private var dragStartRight = 0.0
+    private var dragStartBottom = 0.0
+    private var auiRight = 0.0
+    private var auiBottom = 0.0
+    private var dragMoveListener: java.util.function.Consumer<com.sighs.apricityui.event.Event>? = null
+    private var dragUpListener: java.util.function.Consumer<com.sighs.apricityui.event.Event>? = null
+    private var wasReloading = false
+    private var lastGunIconSrc: String? = null
+    private var scaleRestartFrames = 0
+
+    override fun shouldRender(): Boolean {
+        val result = super.shouldRender() && DisplayConfig.AMMO_HUD.get()
+        if (!result) removeAUIOverlay()
+        return result
+    }
 
     override fun RenderContext.render() {
         val stack = player.mainHandItem
         val vehicle = player.vehicle
         val item = stack.item
         if (item is GunItem && !(vehicle is VehicleEntity && vehicle.banHand(player))) {
+            val data = from(stack)
+
+            if (player.isCreative) {
+                renderWithAUI(data, player, screenWidth, screenHeight)
+                return
+            } else {
+                removeAUIOverlay()
+            }
+
             val x = screenWidth + DisplayConfig.WEAPON_HUD_X_OFFSET.get()
             val y = screenHeight + DisplayConfig.WEAPON_HUD_Y_OFFSET.get()
 
             val poseStack = guiGraphics.pose()
-            val data = from(stack)
 
             // 渲染图标
             guiGraphics.blit(
@@ -317,6 +347,146 @@ object AmmoBarOverlay : CommonOverlay("ammo_bar") {
             )
 
             poseStack.popPose()
+        } else {
+            removeAUIOverlay()
+        }
+    }
+
+    private fun renderWithAUI(data: GunData, player: Player, screenWidth: Int, screenHeight: Int) {
+        if (auiDocument == null) {
+            val doc = ApricityUI.createDocument(AUI_AMMO_BAR_PATH) ?: return
+            auiDocument = doc
+            auiRight = (-DisplayConfig.WEAPON_HUD_X_OFFSET.get()).toDouble().coerceAtLeast(0.0)
+            auiBottom = (-DisplayConfig.WEAPON_HUD_Y_OFFSET.get()).toDouble().coerceAtLeast(0.0)
+            setupDrag(doc)
+        }
+
+        updateAUIData(auiDocument!!, data, player, screenWidth, screenHeight)
+
+        if (scaleRestartFrames > 0) {
+            scaleRestartFrames--
+            if (scaleRestartFrames == 0) {
+                auiDocument?.getElementById("gun-icon")?.classList?.remove("reloading")
+            }
+        }
+    }
+
+    private fun setupDrag(doc: Document) {
+        val ammoBar = doc.getElementById("ammo-bar") ?: return
+        applyAuiPosition(ammoBar)
+        ammoBar.addEventListener("mousedown") { event ->
+            if (event is com.sighs.apricityui.event.MouseEvent && event.button == 0) {
+                startDrag(doc, ammoBar, event)
+            }
+        }
+    }
+
+    private fun startDrag(
+        doc: Document,
+        ammoBar: com.sighs.apricityui.init.Element,
+        event: com.sighs.apricityui.event.MouseEvent
+    ) {
+        auiDragging = true
+        dragStartMouseX = event.clientX
+        dragStartMouseY = event.clientY
+        dragStartRight = auiRight
+        dragStartBottom = auiBottom
+
+        val body = doc.body ?: return
+        dragMoveListener = java.util.function.Consumer { e ->
+            if (e is com.sighs.apricityui.event.MouseEvent) {
+                val dx = e.clientX - dragStartMouseX
+                val dy = e.clientY - dragStartMouseY
+                auiRight = (dragStartRight - dx).coerceIn(0.0, 1000.0)
+                auiBottom = (dragStartBottom - dy).coerceIn(0.0, 1000.0)
+                applyAuiPosition(ammoBar)
+            }
+        }
+        dragUpListener = java.util.function.Consumer { finishDrag(doc) }
+        body.addEventListener("mousemove", dragMoveListener)
+        body.addEventListener("mouseup", dragUpListener)
+    }
+
+    private fun finishDrag(doc: Document) {
+        if (!auiDragging) return
+        auiDragging = false
+
+        doc.body?.let { body ->
+            dragMoveListener?.let { body.removeEventListener("mousemove", it, false) }
+            dragUpListener?.let { body.removeEventListener("mouseup", it, false) }
+        }
+        dragMoveListener = null
+        dragUpListener = null
+        DisplayConfig.WEAPON_HUD_X_OFFSET.set(-auiRight.toInt())
+        DisplayConfig.WEAPON_HUD_Y_OFFSET.set(-auiBottom.toInt())
+    }
+
+    private fun applyAuiPosition(ammoBar: com.sighs.apricityui.init.Element) {
+        ammoBar.setAttribute("style", "right:${auiRight.toInt()}px;bottom:${auiBottom.toInt()}px;")
+    }
+
+    private fun triggerScale(element: com.sighs.apricityui.init.Element?) {
+        if (element == null) return
+        element.classList.add("reloading")
+        scaleRestartFrames = 5
+    }
+
+    private fun updateAUIData(doc: Document, data: GunData, player: Player, screenWidth: Int, screenHeight: Int) {
+        doc.body?.setAttribute("style", "width:${screenWidth}px;height:${screenHeight}px;")
+        doc.getElementById("ammo-bar")?.let(::applyAuiPosition)
+
+        val gunName = getGunDisplayName(data.stack)
+        val ammoName = REPLACE_FORMAT_CODE.matcher(getAmmoDisplayName(data)).replaceAll("")
+        val ammoCount = getGunAmmoString(data, player)
+        val backupAmmo = getBackupAmmoString(data, player)
+        val virtualAmmo = if (data.virtualAmmo.get() > 0 && !data.meleeOnly()) "+${data.virtualAmmo.get()}" else ""
+        val fireModeKey = "[${ModKeyMappings.FIRE_MODE.translatedKeyMessage.string}]"
+
+        setElementText(doc, "gun-name", gunName)
+        setElementText(doc, "ammo-name", ammoName)
+        setElementText(doc, "ammo-count", ammoCount)
+        setElementText(doc, "backup-ammo", backupAmmo)
+        setElementText(doc, "virtual-ammo", virtualAmmo)
+        setElementText(doc, "fire-mode-key", fireModeKey)
+
+        val fireModeName = toUnderScores(data.selectedFireModeInfo().name)
+        val fireModeSize = fireModeIconSize(fireModeName)
+        setElementAttr(doc, "fire-mode-icon", "src", TO_RESOURCE_LOCATION.apply(fireModeName).toString())
+        setElementAttr(doc, "fire-mode-icon", "style", "width:${fireModeSize}px;height:${fireModeSize}px;")
+
+        val icon = (data.stack.item as? GunItem)?.getGunIcon(data)
+        val iconSrc = icon?.toString() ?: ""
+        if (icon != null) setElementAttr(doc, "gun-icon", "src", iconSrc)
+
+        val isReloading = data.reloading()
+        val element = doc.getElementById("gun-icon")
+        if (isReloading && !wasReloading) {
+            element?.classList?.add("reloading")
+        } else if (!isReloading && wasReloading) {
+            element?.classList?.remove("reloading")
+            triggerScale(element)
+        }
+        if (!isReloading && iconSrc.isNotEmpty() && iconSrc != lastGunIconSrc) triggerScale(element)
+
+        wasReloading = isReloading
+        lastGunIconSrc = iconSrc
+    }
+
+    private fun setElementAttr(doc: Document, id: String, attr: String, value: String) {
+        doc.getElementById(id)?.setAttribute(attr, value)
+    }
+
+    private fun setElementText(doc: Document, id: String, text: String) {
+        doc.getElementById(id)?.textContent = text
+    }
+
+    private fun removeAUIOverlay() {
+        if (auiDocument != null) {
+            ApricityUI.removeDocument(AUI_AMMO_BAR_PATH)
+            auiDocument = null
+            auiDragging = false
+            dragMoveListener = null
+            dragUpListener = null
         }
     }
 
