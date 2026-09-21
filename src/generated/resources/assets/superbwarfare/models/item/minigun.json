@@ -1,7 +1,4 @@
 {
-  "parent": "superbwarfare:item/minigun_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/minigun_icon"
-  }
+  "parent": "minecraft:builtin/entity",
+  "gui_light": "front"
 }
