@@ -384,6 +384,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.LOVE_MUZZLE)
         simpleItem(ModItems.SCOPE_WINEFOX)
         simpleItem(ModItems.STEEL_PIPE_SILENCER)
+        simpleItem(ModItems.STEEL_PIPE_GRIP)
 
         // blocks
         evenSimplerBlockItem(ModBlocks.BARBED_WIRE)
