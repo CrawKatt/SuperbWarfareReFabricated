@@ -1,19 +1,20 @@
 package com.atsuishio.superbwarfare.datagen
 
+import com.atsuishio.superbwarfare.data.attachment.AttachmentSlots
+import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModPerks
-import com.atsuishio.superbwarfare.init.ModRarities
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.init.ModTags.commonItemTag
 import com.atsuishio.superbwarfare.item.misc.PerkItem
 import com.atsuishio.superbwarfare.perk.Perk
 import net.minecraft.core.HolderLookup
+import net.minecraft.core.component.DataComponents
 import net.minecraft.data.PackOutput
 import net.minecraft.data.tags.ItemTagsProvider
 import net.minecraft.data.tags.TagsProvider.TagLookup
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.ItemTags
-import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.Rarity
@@ -499,258 +500,114 @@ class ModItemTagProvider(
         return ModItems.PERK_ITEMS[perk]!!
     }
 
+    /**
+     * Slot to registered attachment items. Slot and rarity tag structure comes from [AttachmentSlots].
+     */
+    private fun attachmentItemsBySlot(): Map<AttachmentType, List<Item>> = mapOf(
+        AttachmentType.STOCK to listOf(
+            ModItems.OEM_STOCK_LIGHT,
+            ModItems.OEM_STOCK_HEAVY,
+            ModItems.STOCK_UBR,
+            ModItems.STOCK_PRS,
+            ModItems.STOCK_AR_TACTICAL,
+            ModItems.STOCK_ZENIT_PT_1,
+            ModItems.STOCK_STR,
+            ModItems.STOCK_ELITE,
+            ModItems.STEEL_PIPE_STOCK
+        ),
+        AttachmentType.MAGAZINE to listOf(
+            ModItems.MAGAZINE_EXTEND,
+            ModItems.MAGAZINE_EXTEND_PRO
+        ),
+        AttachmentType.BARREL to listOf(
+            ModItems.MEOWLENCER,
+            ModItems.HISSILENCER,
+            ModItems.SILAOWUNCER,
+            ModItems.RU_SILENCER,
+            ModItems.MUZZLE_BRAKE_RU,
+            ModItems.MUZZLE_BRAKE_AR,
+            ModItems.MUZZLE_BREAK_BIRDCAGE,
+            ModItems.MUZZLE_ZENIT_DTK_1,
+            ModItems.MUZZLE_COMPENSATOR_R_17,
+            ModItems.SILENCER_SUPERB_12,
+            ModItems.SILENCER_50_CAL,
+            ModItems.AR_SILENCER,
+            ModItems.HANDGUN_SILENCER,
+            ModItems.OSPREY_SILENCER,
+            ModItems.LOUDSPEAKER,
+            ModItems.OSPREY_SILENCER_TRACHELIUM,
+            ModItems.SILENCER_QINGLAN,
+            ModItems.TRIANGULAR_MUZZLE,
+            ModItems.LINEAR_MUZZLE,
+            ModItems.CROSS_MUZZLE,
+            ModItems.STAR_MUZZLE,
+            ModItems.LOVE_MUZZLE,
+            ModItems.STEEL_PIPE_SILENCER
+        ),
+        AttachmentType.SCOPE to listOf(
+            ModItems.SCOPE_COYOTE,
+            ModItems.SCOPE_AIMPOINT_T2,
+            ModItems.SCOPE_HANDGUN_RED_DOT,
+            ModItems.SCOPE_EOTECH_551,
+            ModItems.SCOPE_OKP_7,
+            ModItems.SCOPE_PKAS,
+            ModItems.SCOPE_BRUISER,
+            ModItems.SCOPE_ACOG,
+            ModItems.SCOPE_1P_78,
+            ModItems.SCOPE_SPYGLASS,
+            ModItems.SCOPE_PSO_1,
+            ModItems.SCOPE_PU,
+            ModItems.SCOPE_PK_A,
+            ModItems.SCOPE_RANGER,
+            ModItems.SCOPE_QMK171,
+            ModItems.SCOPE_HAMR,
+            ModItems.SCOPE_ELCAN_4X,
+            ModItems.SCOPE_LPVO,
+            ModItems.SCOPE_SNIPER,
+            ModItems.SCOPE_WINEFOX,
+            ModItems.STEEL_PIPE_SCOPE
+        ),
+        AttachmentType.GRIP to listOf(
+            ModItems.VERTICAL_GRIP,
+            ModItems.GRIP_RECTANGLE_VERTICAL,
+            ModItems.TRIANGLE_GRIP,
+            ModItems.GRIP_VERTICAL_PINEAPPLE,
+            ModItems.GRIP_CQR_GEN2,
+            ModItems.GRIP_VERTICAL_BIPOD,
+            ModItems.STEEL_PIPE_GRIP
+        ),
+        AttachmentType.BAYONET to listOf(ModItems.BAYONET_KNIFE),
+    )
+
     private fun addAttachmentTags() {
-        this.tag(ModTags.Items.ATTACHMENT)
-            .addTag(ModTags.Items.ATTACHMENT_SCOPE)
-            .addTag(ModTags.Items.ATTACHMENT_MAGAZINE)
-            .addTag(ModTags.Items.ATTACHMENT_BARREL)
-            .addTag(ModTags.Items.ATTACHMENT_STOCK)
-            .addTag(ModTags.Items.ATTACHMENT_GRIP)
+        val items = attachmentItemsBySlot()
 
-        this.addAttachmentTypeTags(
-            ModTags.Items.ATTACHMENT_STOCK,
-            ModTags.Items.ATTACHMENT_STOCK_COMMON,
-            ModTags.Items.ATTACHMENT_STOCK_RARE,
-            ModTags.Items.ATTACHMENT_STOCK_EPIC,
-            ModTags.Items.ATTACHMENT_STOCK_LEGENDARY,
-            ModTags.Items.ATTACHMENT_STOCK_SUPERB,
-            ModTags.Items.ATTACHMENT_STOCK_VIRTUAL
-        )
-        this.addAttachmentItems(
-            ModTags.Items.ATTACHMENT_STOCK_COMMON,
-            ModTags.Items.ATTACHMENT_STOCK_RARE,
-            ModTags.Items.ATTACHMENT_STOCK_EPIC,
-            ModTags.Items.ATTACHMENT_STOCK_LEGENDARY,
-            ModTags.Items.ATTACHMENT_STOCK_SUPERB,
-            ModTags.Items.ATTACHMENT_STOCK_VIRTUAL,
-            listOf(
-                ModItems.OEM_STOCK_LIGHT,
-                ModItems.OEM_STOCK_HEAVY,
-                ModItems.STOCK_UBR,
-                ModItems.STOCK_PRS,
-                ModItems.STOCK_AR_TACTICAL,
-                ModItems.STOCK_ZENIT_PT_1,
-                ModItems.STOCK_STR,
-                ModItems.STOCK_ELITE,
-                ModItems.STEEL_PIPE_STOCK
-            )
-        )
+        AttachmentSlots.ALL
+            .mapNotNull { ModTags.Items.ATTACHMENT_BY_SLOT[it.type] }
+            .forEach { this.tag(ModTags.Items.ATTACHMENT).addTag(it) }
 
-        this.addAttachmentTypeTags(
-            ModTags.Items.ATTACHMENT_MAGAZINE,
-            ModTags.Items.ATTACHMENT_MAGAZINE_COMMON,
-            ModTags.Items.ATTACHMENT_MAGAZINE_RARE,
-            ModTags.Items.ATTACHMENT_MAGAZINE_EPIC,
-            ModTags.Items.ATTACHMENT_MAGAZINE_LEGENDARY,
-            ModTags.Items.ATTACHMENT_MAGAZINE_SUPERB,
-            ModTags.Items.ATTACHMENT_MAGAZINE_VIRTUAL
-        )
-        this.addAttachmentItems(
-            ModTags.Items.ATTACHMENT_MAGAZINE_COMMON,
-            ModTags.Items.ATTACHMENT_MAGAZINE_RARE,
-            ModTags.Items.ATTACHMENT_MAGAZINE_EPIC,
-            ModTags.Items.ATTACHMENT_MAGAZINE_LEGENDARY,
-            ModTags.Items.ATTACHMENT_MAGAZINE_SUPERB,
-            ModTags.Items.ATTACHMENT_MAGAZINE_VIRTUAL,
-            listOf(
-                ModItems.MAGAZINE_EXTEND,
-                ModItems.MAGAZINE_EXTEND_PRO
-            )
-        )
+        for (slot in AttachmentSlots.ALL) {
+            val typeTag = ModTags.Items.ATTACHMENT_BY_SLOT[slot.type] ?: continue
+            val rarityTags = ModTags.Items.ATTACHMENT_RARITY_SUFFIXES
+                .mapNotNull { (rarity, _) -> ModTags.Items.attachmentRarityTag(slot.type, rarity) }
 
-        this.addAttachmentTypeTags(
-            ModTags.Items.ATTACHMENT_BARREL,
-            ModTags.Items.ATTACHMENT_BARREL_COMMON,
-            ModTags.Items.ATTACHMENT_BARREL_RARE,
-            ModTags.Items.ATTACHMENT_BARREL_EPIC,
-            ModTags.Items.ATTACHMENT_BARREL_LEGENDARY,
-            ModTags.Items.ATTACHMENT_BARREL_SUPERB,
-            ModTags.Items.ATTACHMENT_BARREL_VIRTUAL
-        )
-        this.addAttachmentItems(
-            ModTags.Items.ATTACHMENT_BARREL_COMMON,
-            ModTags.Items.ATTACHMENT_BARREL_RARE,
-            ModTags.Items.ATTACHMENT_BARREL_EPIC,
-            ModTags.Items.ATTACHMENT_BARREL_LEGENDARY,
-            ModTags.Items.ATTACHMENT_BARREL_SUPERB,
-            ModTags.Items.ATTACHMENT_BARREL_VIRTUAL,
-            listOf(
-                ModItems.MEOWLENCER,
-                ModItems.HISSILENCER,
-                ModItems.SILAOWUNCER,
-                ModItems.RU_SILENCER,
-                ModItems.MUZZLE_BRAKE_RU,
-                ModItems.MUZZLE_BRAKE_AR,
-                ModItems.MUZZLE_BREAK_BIRDCAGE,
-                ModItems.MUZZLE_ZENIT_DTK_1,
-                ModItems.MUZZLE_COMPENSATOR_R_17,
-                ModItems.SILENCER_SUPERB_12,
-                ModItems.SILENCER_50_CAL,
-                ModItems.AR_SILENCER,
-                ModItems.HANDGUN_SILENCER,
-                ModItems.OSPREY_SILENCER,
-                ModItems.LOUDSPEAKER,
-                ModItems.OSPREY_SILENCER_TRACHELIUM,
-                ModItems.SILENCER_QINGLAN,
-                ModItems.TRIANGULAR_MUZZLE,
-                ModItems.LINEAR_MUZZLE,
-                ModItems.CROSS_MUZZLE,
-                ModItems.STAR_MUZZLE,
-                ModItems.LOVE_MUZZLE,
-                ModItems.STEEL_PIPE_SILENCER
-            )
-        )
-
-        this.addAttachmentTypeTags(
-            ModTags.Items.ATTACHMENT_SCOPE,
-            ModTags.Items.ATTACHMENT_SCOPE_COMMON,
-            ModTags.Items.ATTACHMENT_SCOPE_RARE,
-            ModTags.Items.ATTACHMENT_SCOPE_EPIC,
-            ModTags.Items.ATTACHMENT_SCOPE_LEGENDARY,
-            ModTags.Items.ATTACHMENT_SCOPE_SUPERB,
-            ModTags.Items.ATTACHMENT_SCOPE_VIRTUAL
-        )
-        this.addAttachmentItems(
-            ModTags.Items.ATTACHMENT_SCOPE_COMMON,
-            ModTags.Items.ATTACHMENT_SCOPE_RARE,
-            ModTags.Items.ATTACHMENT_SCOPE_EPIC,
-            ModTags.Items.ATTACHMENT_SCOPE_LEGENDARY,
-            ModTags.Items.ATTACHMENT_SCOPE_SUPERB,
-            ModTags.Items.ATTACHMENT_SCOPE_VIRTUAL,
-            listOf(
-                ModItems.SCOPE_COYOTE,
-                ModItems.SCOPE_AIMPOINT_T2,
-                ModItems.SCOPE_HANDGUN_RED_DOT,
-                ModItems.SCOPE_EOTECH_551,
-                ModItems.SCOPE_OKP_7,
-                ModItems.SCOPE_PKAS,
-                ModItems.SCOPE_BRUISER,
-                ModItems.SCOPE_ACOG,
-                ModItems.SCOPE_1P_78,
-                ModItems.SCOPE_SPYGLASS,
-                ModItems.SCOPE_PSO_1,
-                ModItems.SCOPE_PU,
-                ModItems.SCOPE_PK_A,
-                ModItems.SCOPE_RANGER,
-                ModItems.SCOPE_QMK171,
-                ModItems.SCOPE_HAMR,
-                ModItems.SCOPE_ELCAN_4X,
-                ModItems.SCOPE_LPVO,
-                ModItems.SCOPE_SNIPER,
-                ModItems.SCOPE_WINEFOX,
-                ModItems.STEEL_PIPE_SCOPE
-            )
-        )
-
-        this.addAttachmentTypeTags(
-            ModTags.Items.ATTACHMENT_GRIP,
-            ModTags.Items.ATTACHMENT_GRIP_COMMON,
-            ModTags.Items.ATTACHMENT_GRIP_RARE,
-            ModTags.Items.ATTACHMENT_GRIP_EPIC,
-            ModTags.Items.ATTACHMENT_GRIP_LEGENDARY,
-            ModTags.Items.ATTACHMENT_GRIP_SUPERB,
-            ModTags.Items.ATTACHMENT_GRIP_VIRTUAL
-        )
-        this.addAttachmentItems(
-            ModTags.Items.ATTACHMENT_GRIP_COMMON,
-            ModTags.Items.ATTACHMENT_GRIP_RARE,
-            ModTags.Items.ATTACHMENT_GRIP_EPIC,
-            ModTags.Items.ATTACHMENT_GRIP_LEGENDARY,
-            ModTags.Items.ATTACHMENT_GRIP_SUPERB,
-            ModTags.Items.ATTACHMENT_GRIP_VIRTUAL,
-            listOf(
-                ModItems.VERTICAL_GRIP,
-                ModItems.GRIP_RECTANGLE_VERTICAL,
-                ModItems.TRIANGLE_GRIP,
-                ModItems.GRIP_VERTICAL_PINEAPPLE,
-                ModItems.GRIP_CQR_GEN2,
-                ModItems.GRIP_VERTICAL_BIPOD,
-                ModItems.STEEL_PIPE_GRIP
-            )
-        )
-
-        this.tag(ModTags.Items.ATTACHMENT_RESEARCHABLE_COMMON)
-            .addTag(ModTags.Items.ATTACHMENT_BARREL_COMMON)
-            .addTag(ModTags.Items.ATTACHMENT_GRIP_COMMON)
-            .addTag(ModTags.Items.ATTACHMENT_SCOPE_COMMON)
-            .addTag(ModTags.Items.ATTACHMENT_STOCK_COMMON)
-            .addTag(ModTags.Items.ATTACHMENT_MAGAZINE_COMMON)
-        this.tag(ModTags.Items.ATTACHMENT_RESEARCHABLE_RARE)
-            .addTag(ModTags.Items.ATTACHMENT_BARREL_RARE)
-            .addTag(ModTags.Items.ATTACHMENT_GRIP_RARE)
-            .addTag(ModTags.Items.ATTACHMENT_SCOPE_RARE)
-            .addTag(ModTags.Items.ATTACHMENT_STOCK_RARE)
-            .addTag(ModTags.Items.ATTACHMENT_MAGAZINE_RARE)
-        this.tag(ModTags.Items.ATTACHMENT_RESEARCHABLE_EPIC)
-            .addTag(ModTags.Items.ATTACHMENT_BARREL_EPIC)
-            .addTag(ModTags.Items.ATTACHMENT_GRIP_EPIC)
-            .addTag(ModTags.Items.ATTACHMENT_SCOPE_EPIC)
-            .addTag(ModTags.Items.ATTACHMENT_STOCK_EPIC)
-            .addTag(ModTags.Items.ATTACHMENT_MAGAZINE_EPIC)
-        this.tag(ModTags.Items.ATTACHMENT_RESEARCHABLE_LEGENDARY)
-            .addTag(ModTags.Items.ATTACHMENT_BARREL_LEGENDARY)
-            .addTag(ModTags.Items.ATTACHMENT_GRIP_LEGENDARY)
-            .addTag(ModTags.Items.ATTACHMENT_SCOPE_LEGENDARY)
-            .addTag(ModTags.Items.ATTACHMENT_STOCK_LEGENDARY)
-            .addTag(ModTags.Items.ATTACHMENT_MAGAZINE_LEGENDARY)
-        this.tag(ModTags.Items.ATTACHMENT_RESEARCHABLE_SUPERB)
-            .addTag(ModTags.Items.ATTACHMENT_BARREL_SUPERB)
-            .addTag(ModTags.Items.ATTACHMENT_GRIP_SUPERB)
-            .addTag(ModTags.Items.ATTACHMENT_SCOPE_SUPERB)
-            .addTag(ModTags.Items.ATTACHMENT_STOCK_SUPERB)
-            .addTag(ModTags.Items.ATTACHMENT_MAGAZINE_SUPERB)
-        this.tag(ModTags.Items.ATTACHMENT_RESEARCHABLE_VIRTUAL)
-            .addTag(ModTags.Items.ATTACHMENT_BARREL_VIRTUAL)
-            .addTag(ModTags.Items.ATTACHMENT_GRIP_VIRTUAL)
-            .addTag(ModTags.Items.ATTACHMENT_SCOPE_VIRTUAL)
-            .addTag(ModTags.Items.ATTACHMENT_STOCK_VIRTUAL)
-            .addTag(ModTags.Items.ATTACHMENT_MAGAZINE_VIRTUAL)
-    }
-
-    private fun addAttachmentTypeTags(
-        typeTag: TagKey<Item>,
-        commonTag: TagKey<Item>,
-        rareTag: TagKey<Item>,
-        epicTag: TagKey<Item>,
-        legendaryTag: TagKey<Item>,
-        superbTag: TagKey<Item>,
-        virtualTag: TagKey<Item>
-    ) {
-        this.tag(typeTag)
-            .addTag(commonTag)
-            .addTag(rareTag)
-            .addTag(epicTag)
-            .addTag(legendaryTag)
-            .addTag(superbTag)
-            .addTag(virtualTag)
-        this.tag(commonTag)
-        this.tag(rareTag)
-        this.tag(epicTag)
-        this.tag(legendaryTag)
-        this.tag(superbTag)
-        this.tag(virtualTag)
-    }
-
-    private fun addAttachmentItems(
-        commonTag: TagKey<Item>,
-        rareTag: TagKey<Item>,
-        epicTag: TagKey<Item>,
-        legendaryTag: TagKey<Item>,
-        superbTag: TagKey<Item>,
-        virtualTag: TagKey<Item>,
-        attachments: List<Item>
-    ) {
-        attachments.forEach { item ->
-            val rarityTag = when (item.defaultInstance.getRarity()) {
-                Rarity.COMMON -> commonTag
-                Rarity.RARE -> rareTag
-                Rarity.EPIC -> epicTag
-                ModRarities.LEGENDARY -> legendaryTag
-                ModRarities.SUPERB -> superbTag
-                ModRarities.VIRTUAL -> virtualTag
-                else -> error("Unsupported attachment rarity: ${item.defaultInstance.getRarity()}")
-            }
-            this.tag(rarityTag).add(item)
+            rarityTags.forEach { this.tag(typeTag).addTag(it) }
+            rarityTags.forEach { this.tag(it) }
+            items[slot.type].orEmpty().forEach { addAttachmentItem(it, slot.type) }
         }
+
+        for ((rarity, researchable) in ModTags.Items.ATTACHMENT_RESEARCHABLE_BY_RARITY) {
+            AttachmentSlots.ALL
+                .mapNotNull { ModTags.Items.attachmentRarityTag(it.type, rarity) }
+                .forEach { this.tag(researchable).addTag(it) }
+        }
+    }
+
+    private fun addAttachmentItem(item: Item, slot: AttachmentType) {
+        val rarity = item.defaultInstance.getOrDefault(DataComponents.RARITY, Rarity.COMMON)
+        val rarityTag = ModTags.Items.attachmentRarityTag(slot, rarity)
+            ?: error("Unsupported attachment rarity for $item: $rarity")
+
+        this.tag(rarityTag).add(item)
     }
 }
