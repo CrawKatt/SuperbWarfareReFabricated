@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.decorator.ContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.LuckyContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.VehicleKeyItemDecorator
+import com.atsuishio.superbwarfare.client.gun.MeleeClientHandler
 import com.atsuishio.superbwarfare.client.model.trinket.ParachuteModel
 import com.atsuishio.superbwarfare.client.model.trinket.ThermalImagingGogglesModel
 import com.atsuishio.superbwarfare.client.overlay.AmmoBarOverlay
@@ -148,6 +149,8 @@ object ClientRenderHandler {
                 else -> null
             }
         }
+        // `/sbw melee force` 的客户端实现挂点（判定只在客户端做）
+        MeleeClientHandler.installDebugHooks()
     }
 
     @JvmStatic

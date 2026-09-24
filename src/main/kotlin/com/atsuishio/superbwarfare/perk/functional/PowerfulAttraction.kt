@@ -5,7 +5,6 @@ import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.tools.DamageTypeTool
 import net.minecraft.world.damagesource.DamageSource
-import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 
@@ -39,7 +38,7 @@ object PowerfulAttraction : Perk("powerful_attraction", Type.FUNCTIONAL) {
         val level = GunData.from(stack).perk.getLevel(this)
 
         if (level <= 0) return false
-        if (!DamageTypeTool.isGunDamage(source) && !source.`is`(DamageTypes.PLAYER_ATTACK)) return false
+        if (!DamageTypeTool.isGunDamage(source) && !DamageTypeTool.isMeleeDamage(source)) return false
 
         val copy = drop.copy()
 
@@ -64,12 +63,27 @@ object PowerfulAttraction : Perk("powerful_attraction", Type.FUNCTIONAL) {
         if (stack.item !is GunItem) return originalXp
 
         val level = GunData.from(stack).perk.getLevel(this)
-
         if (level <= 0) return originalXp
-        if (!DamageTypeTool.isGunDamage(source) && !source.`is`(DamageTypes.PLAYER_ATTACK)) return originalXp
+        if (!DamageTypeTool.isGunDamage(source) && !DamageTypeTool.isMeleeDamage(source)) return originalXp
 
         player.giveExperiencePoints((originalXp * (0.8f + 0.2f * level)).toInt())
 
         return 0
     }
+
+    // TODO looting level
+//    @SubscribeEvent
+//    fun onLootingLevel(event: LootingLevelEvent) {
+//        val source = event.damageSource ?: return
+//        val sourceEntity = source.entity
+//        if (sourceEntity !is LivingEntity) return
+//
+//        val stack = sourceEntity.mainHandItem
+//        if (stack.item !is GunItem) return
+//
+//        val level = GunData.from(stack).perk.getLevel(this)
+//        if (level > 0 && (DamageTypeTool.isGunDamage(source) || DamageTypeTool.isMeleeDamage(source))) {
+//            event.lootingLevel = level / 4
+//        }
+//    }
 }
