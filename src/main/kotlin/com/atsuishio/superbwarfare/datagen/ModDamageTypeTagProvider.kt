@@ -74,6 +74,11 @@ class ModDamageTypeTagProvider(
             .addOptional(mod(ModDamageTypes.GUN_FIRE_HEADSHOT))
             .addOptional(mod(ModDamageTypes.GUN_FIRE_ABSOLUTE))
             .addOptional(mod(ModDamageTypes.GUN_FIRE_HEADSHOT_ABSOLUTE))
+        // 近战伤害：枪械近战 + 原版玩家近战。数据包/其它模组可以往里加自己的近战类型
+        this.tag(ModTags.DamageTypes.MELEE)
+            .addOptional(mod(ModDamageTypes.GUN_MELEE))
+            .addOptional(mod(ModDamageTypes.GUN_MELEE_HEADSHOT))
+            .add(DamageTypes.PLAYER_ATTACK)
 
         this.tag(DamageTypeTags.ALWAYS_HURTS_ENDER_DRAGONS)
             .addOptional(mod(ModDamageTypes.PROJECTILE_EXPLOSION))

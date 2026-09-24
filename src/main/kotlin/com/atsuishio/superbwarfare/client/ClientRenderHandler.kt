@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.decorator.ContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.LuckyContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.VehicleKeyItemDecorator
+import com.atsuishio.superbwarfare.client.gun.MeleeClientHandler
 import com.atsuishio.superbwarfare.client.model.curio.ParachuteModel
 import com.atsuishio.superbwarfare.client.model.curio.ThermalImagingGogglesModel
 import com.atsuishio.superbwarfare.client.overlay.*
@@ -22,6 +23,7 @@ import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRe
 import com.atsuishio.superbwarfare.client.renderer.item.BlueprintResearchingTableBlockItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
+import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
 import com.atsuishio.superbwarfare.client.tooltip.ClientBocekImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
@@ -173,6 +175,8 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun onClientSetup() {
+        MeleeClientHandler.installDebugHooks()
+        MeleeDebugRenderer.register()
         val geoGunRenderer = GeoGunRenderer()
         BuiltInRegistries.ITEM.filterIsInstance<GeoGunItemV2>().forEach { item ->
             BuiltinItemRendererRegistry.INSTANCE.register(item, geoGunRenderer)

@@ -7,7 +7,6 @@ import com.atsuishio.superbwarfare.event.custom.LivingDropsCallback
 import com.atsuishio.superbwarfare.event.custom.LootingLevelCallback
 import com.atsuishio.superbwarfare.tools.DamageTypeTool
 import net.minecraft.world.damagesource.DamageSource
-import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 
@@ -20,9 +19,8 @@ object PowerfulAttraction : Perk("powerful_attraction", Type.FUNCTIONAL) {
         if (stack.item !is GunItem) return
 
         val level = GunData.from(stack).perk.getLevel(this)
-
         if (level <= 0) return
-        if (!DamageTypeTool.isGunDamage(source) && !source.`is`(DamageTypes.PLAYER_ATTACK)) return
+        if (!DamageTypeTool.isGunDamage(source) && !DamageTypeTool.isMeleeDamage(source)) return
 
         event.drops.forEach {
             val item = it.item
@@ -42,9 +40,8 @@ object PowerfulAttraction : Perk("powerful_attraction", Type.FUNCTIONAL) {
         if (stack.item !is GunItem) return originalXp
 
         val level = GunData.from(stack).perk.getLevel(this)
-
         if (level <= 0) return originalXp
-        if (!DamageTypeTool.isGunDamage(source) && !source.`is`(DamageTypes.PLAYER_ATTACK)) return originalXp
+        if (!DamageTypeTool.isGunDamage(source) && !DamageTypeTool.isMeleeDamage(source)) return originalXp
 
         player.giveExperiencePoints((originalXp * (0.8f + 0.2f * level)).toInt())
 
@@ -60,7 +57,7 @@ object PowerfulAttraction : Perk("powerful_attraction", Type.FUNCTIONAL) {
         if (stack.item !is GunItem) return
 
         val level = GunData.from(stack).perk.getLevel(this)
-        if (level > 0 && (DamageTypeTool.isGunDamage(source) || source.`is`(DamageTypes.PLAYER_ATTACK))) {
+        if (level > 0 && (DamageTypeTool.isGunDamage(source) || DamageTypeTool.isMeleeDamage(source))) {
             event.lootingLevel = level / 4
         }
     }
