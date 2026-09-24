@@ -103,7 +103,7 @@ object ModItems {
     @JvmField val HOMEMADE_SHOTGUN = registerGun("homemade_shotgun") { HomemadeShotgunItem }
     @JvmField val NAIL_GUN = registerGun("nail_gun") { NailGunItem() }
     @JvmField val TRACHELIUM = registerGun("trachelium") { TracheliumItem() }
-    @JvmField val MP_5 = registerGun("mp_5") { Mp5Item() }
+    @JvmField val MP_5 = registerGun("mp_5") { Mp5Item }
     @JvmField val VECTOR = registerGun("vector") { VectorItem() }
     @JvmField val AK_47 = registerGun("ak_47") { AK47Item }
     @JvmField val AK_12 = registerGun("ak_12") { AK12Item }
@@ -267,6 +267,7 @@ object ModItems {
     @JvmField val SILAOWUNCER = registerAttachment("silaowuncer", Rarity.RARE)
     @JvmField val MUZZLE_BRAKE_RU = registerAttachment("muzzle_brake_ru")
     @JvmField val MUZZLE_BRAKE_AR = registerAttachment("muzzle_brake_ar")
+    @JvmField val MUZZLE_BREAK_BIRDCAGE = registerAttachment("muzzle_break_birdcage")
     @JvmField val MUZZLE_ZENIT_DTK_1 = registerAttachment("muzzle_zenit_dtk_1", Rarity.RARE)
     @JvmField val MUZZLE_COMPENSATOR_R_17 = registerAttachment("muzzle_compensator_r_17")
     @JvmField val RU_SILENCER = registerAttachment("ru_silencer")
