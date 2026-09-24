@@ -355,6 +355,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.OEM_STOCK_LIGHT)
         simpleItem(ModItems.OEM_STOCK_HEAVY)
         simpleItem(ModItems.TRIANGLE_GRIP)
+        simpleItem(ModItems.GRIP_VERTICAL_PINEAPPLE)
         simpleItem(ModItems.GRIP_CQR_GEN2)
         simpleItem(ModItems.GRIP_VERTICAL_BIPOD)
         simpleItem(ModItems.OSPREY_SILENCER)
