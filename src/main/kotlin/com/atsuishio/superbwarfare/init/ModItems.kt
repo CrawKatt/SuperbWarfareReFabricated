@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.item.LungeMineItem
 import com.atsuishio.superbwarfare.item.RgoGrenadeItem
 import com.atsuishio.superbwarfare.item.ammo.*
 import com.atsuishio.superbwarfare.item.armor.*
+import com.atsuishio.superbwarfare.item.attachment.BasicAttachmentItem
 import com.atsuishio.superbwarfare.item.blockitem.BlueprintResearchTableBlockItem
 import com.atsuishio.superbwarfare.item.blockitem.ChargingStationBlockItem
 import com.atsuishio.superbwarfare.item.blockitem.CreativeChargingStationBlockItem
@@ -18,7 +19,6 @@ import com.atsuishio.superbwarfare.item.container.LuckyContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
 import com.atsuishio.superbwarfare.item.curio.*
 import com.atsuishio.superbwarfare.item.food.CrustItem
-import com.atsuishio.superbwarfare.item.attachment.AttachmentItem
 import com.atsuishio.superbwarfare.item.gun.EmptyGunItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.item.gun.handgun.*
@@ -628,8 +628,12 @@ object ModItems {
     @JvmField val EMPTY_PERK = registerPerkItem("empty_perk") { Item(Properties()) }
     // @formatter:on
 
-    private fun registerAttachment(id: String, rarity: Rarity = Rarity.COMMON): Item {
-        val item = register(id) { AttachmentItem("${Mod.MODID}:$id", rarity) }
+    private fun registerAttachment(
+        id: String,
+        rarity: Rarity = Rarity.COMMON,
+        factory: (String, Rarity) -> Item = ::BasicAttachmentItem
+    ): Item {
+        val item = register(id) { factory("${Mod.MODID}:$id", rarity) }
         ATTACHMENTS.add(item)
         return item
     }
@@ -714,6 +718,11 @@ object ModItems {
     @JvmField val GRIP_CQR_GEN2 = registerAttachment("grip_cqr_gen2", Rarity.RARE)
     @JvmField val GRIP_VERTICAL_BIPOD = registerAttachment("grip_vertical_bipod", Rarity.RARE)
     @JvmField val STEEL_PIPE_GRIP = registerAttachment("steel_pipe_grip", Rarity.RARE)
+    // @formatter:on
+
+    // Bayonet
+    // @formatter:off
+    @JvmField val BAYONET_KNIFE = registerAttachment("bayonet_knife")
     // @formatter:on
 
     fun registerDispenserBehavior() {
