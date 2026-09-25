@@ -15,8 +15,8 @@ public class PersistentEntitySectionManagerMixin {
     @Inject(method = "addEntity", at = @At("HEAD"))
     private void superbWarfare$onEntityJoin(EntityAccess entity, boolean loadedFromDisk,
                                              CallbackInfoReturnable<Boolean> cir) {
-        if (!loadedFromDisk && entity instanceof Entity minecraftEntity) {
-            EntityUseGunEventHandler.entityJoin(minecraftEntity);
+        if (entity instanceof Entity minecraftEntity) {
+            EntityUseGunEventHandler.entityJoin(minecraftEntity, loadedFromDisk);
         }
     }
 }

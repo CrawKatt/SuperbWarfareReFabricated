@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.capability.PersistentDataAccessor;
+import com.atsuishio.superbwarfare.data.mob_guns.MobGunState;
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
@@ -13,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -186,6 +188,11 @@ public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
             float yOffset,
             CallbackInfoReturnable<ItemEntity> cir
     ) {
+        Entity entity = (Entity) (Object) this;
+        if (entity instanceof Mob mob && MobGunState.INSTANCE.selectionKey(mob) != null && stack.getItem() instanceof GunItem) {
+            return;
+        }
+
         if (PowerfulAttraction.tryMoveCurrentDropToPlayer(stack)) {
             cir.setReturnValue(null);
         }
