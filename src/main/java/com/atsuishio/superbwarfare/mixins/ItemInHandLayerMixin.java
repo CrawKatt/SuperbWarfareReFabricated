@@ -32,7 +32,7 @@ public class ItemInHandLayerMixin {
             }
             if (arm == HumanoidArm.LEFT) {
                 ItemStack mainHand = entity.getMainHandItem();
-                if (mainHand.getItem() instanceof GunItem || mainHand.is(ModItems.LUNGE_MINE)) {
+                if (GunItem.isHeldWeapon(mainHand) || mainHand.is(ModItems.LUNGE_MINE)) {
                     ci.cancel();
                 }
             }

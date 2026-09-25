@@ -393,6 +393,9 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.BAYONET_M_9)
         simpleItem(ModItems.BAYONET_6KH2)
 
+        // sub weapons（副武器：复用钢管枪口配件的模型与贴图，模型做好后再换）
+        simpleItem(ModItems.GP_25)
+
         // blocks
         evenSimplerBlockItem(ModBlocks.BARBED_WIRE)
         evenSimplerBlockItem(ModBlocks.JUMP_PAD)

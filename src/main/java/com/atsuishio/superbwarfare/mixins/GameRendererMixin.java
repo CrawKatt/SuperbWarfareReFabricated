@@ -67,7 +67,7 @@ public class GameRendererMixin {
         Player player = mc.player;
         if (player != null) {
             ItemStack stack = player.getMainHandItem();
-            if (stack.getItem() instanceof GunItem && Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON) {
+            if (GunItem.isHeldWeapon(stack) && Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON) {
                 ci.cancel();
             }
         }

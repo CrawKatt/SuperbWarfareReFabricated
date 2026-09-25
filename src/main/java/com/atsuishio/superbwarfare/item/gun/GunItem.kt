@@ -163,7 +163,9 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     override fun canAttackBlock(pState: BlockState, pLevel: Level, pPos: BlockPos, pPlayer: Player) = false
 
     override fun inventoryTick(stack: ItemStack, level: Level, entity: Entity, slot: Int, selected: Boolean) {
-        if (stack.item !is GunItem || level.isClientSide) return
+        // 副武器物品（`useAsWeaponInHand() == false`）躺在背包/手上时不跑枪械状态机：
+        // 它只有装在正常枪械上才生效，那时由主武器的 gun tick 顺带 tick（`SubWeaponRuntime.tick`）。
+        if (stack.item !is GunItem || !useAsWeaponInHand() || level.isClientSide) return
 
         if (level is ServerLevel) {
             GeoItem.getOrAssignId(stack, level)
@@ -184,6 +186,8 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         var map = super.getAttributeModifiers(stack, slot)
         val uuid = UUID(slot.toString().hashCode().toLong(), 0)
         if (slot != EquipmentSlot.MAINHAND) return map
+        // 手持副武器时只返回 super：不加移速惩罚（按 Weight）、也不加近战伤害属性
+        if (!useAsWeaponInHand()) return map
 
         val data = from(stack)
         map = HashMultimap.create<Attribute, AttributeModifier>(map)
@@ -222,13 +226,13 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
 
     override fun isEnchantable(stack: ItemStack) = false
 
-    fun getMaxDamage(stack: ItemStack): Int {
+    open fun getMaxDamage(stack: ItemStack): Int {
         val maxDurability = from(stack).get(GunProp.MAX_DURABILITY)
         isDamageable = maxDurability > 0
         return maxDurability
     }
 
-    fun isDamageable(stack: ItemStack?) = isDamageable
+    open fun isDamageable(stack: ItemStack?) = isDamageable
 
     /**
      * 开膛待击
@@ -1186,7 +1190,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     @Environment(EnvType.CLIENT)
     override fun getItemScreen(stack: ItemStack, player: Player, hand: InteractionHand): Screen? {
         if (ClientEventHandler.canOpenEditScreen(stack, hand)
-            && stack.item is GunItem
+            && isHeldWeapon(stack)
             && canEditAttachments(from(stack))
         ) {
             return WeaponEditScreen(stack)

@@ -45,7 +45,7 @@ public class ItemInHandRendererMixin {
 
     @ModifyVariable(method = "renderArmWithItem", at = @At("HEAD"), argsOnly = true, index = 5)
     private float superbwarfare$removeGunSwing(float value) {
-        return mainHandItem.getItem() instanceof GunItem ? 0f : value;
+        return GunItem.isHeldWeapon(mainHandItem) ? 0f : value;
     }
 
     @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)
