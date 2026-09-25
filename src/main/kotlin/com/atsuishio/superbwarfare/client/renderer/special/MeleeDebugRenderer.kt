@@ -12,12 +12,12 @@ import com.atsuishio.superbwarfare.tools.localPlayer
 import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -43,7 +43,7 @@ import kotlin.math.sin
  * > 而一个"宽 `reach×sin(半角)`、长 `reach/2`"的盒子又粗又短，
  * > 看的人会得出"盒子里的怪打不到、盒子外的怪反而挨打"的错误结论 —— 判定其实一直是对的。
  */
-@EventBusSubscriber(value = [Dist.CLIENT])
+@Environment(EnvType.CLIENT)
 object MeleeDebugRenderer {
 
     private const val COLOR_ACTIVE_R = 1f
@@ -59,9 +59,12 @@ object MeleeDebugRenderer {
     /** 胶囊端盖的采样点数 */
     private const val CAP_SEGMENTS = 16
 
-    @SubscribeEvent
-    fun onRenderLevelStage(event: RenderLevelStageEvent) {
-        if (event.stage != RenderLevelStageEvent.Stage.AFTER_ENTITIES) return
+    @JvmStatic
+    fun init() {
+        WorldRenderEvents.AFTER_ENTITIES.register(::render)
+    }
+
+    private fun render(renderContext: WorldRenderContext) {
 
         // 任一开关打开即可：F3+B 是原版既有的"显示判定体"，配置项用于长开
         val hitBoxes = mc.entityRenderDispatcher.shouldRenderHitBoxes()
@@ -79,8 +82,8 @@ object MeleeDebugRenderer {
         val state = GunActionLock.of(data)
         val context = MeleeQuery.contextOf(player, data.resolveMeleeAction(state.meleeActionIndex))
 
-        val poseStack = event.poseStack
-        val camera = event.camera
+        val poseStack = renderContext.matrixStack() ?: return
+        val camera = renderContext.camera()
         val bufferSource = mc.renderBuffers().bufferSource()
         val buffer = bufferSource.getBuffer(RenderType.lines())
 

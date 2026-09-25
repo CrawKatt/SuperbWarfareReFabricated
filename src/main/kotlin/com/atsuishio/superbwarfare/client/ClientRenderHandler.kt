@@ -43,6 +43,7 @@ import com.atsuishio.superbwarfare.client.renderer.block.FuMO25BlockEntityRender
 import com.atsuishio.superbwarfare.client.renderer.block.LuckyContainerBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.SmallContainerBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.VehicleAssemblingTableBlockEntityRenderer
+import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.*
@@ -155,6 +156,7 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun registerRenderers() {
+        MeleeDebugRenderer.init()
         BlockEntityRenderers.register(ModBlockEntities.CONTAINER) { ContainerBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.FUMO_25) { FuMO25BlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.CHARGING_STATION) { ChargingStationBlockEntityRenderer() }

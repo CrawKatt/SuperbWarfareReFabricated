@@ -9,7 +9,7 @@ import net.minecraft.commands.Commands
 object CommandRegister {
     @JvmStatic
     fun register() {
-        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
+        CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
             val command = buildCommand("sbw") {
                 add(AMMO_COMMAND)
                 add(CONFIG_COMMAND)
@@ -21,7 +21,6 @@ object CommandRegister {
                 add(ATTACHMENT_COMMAND)
                 add(MELEE_COMMAND)
             }
-        }
 
             val result = dispatcher.register(command as LiteralArgumentBuilder<CommandSourceStack>)
             dispatcher.register(Commands.literal("superbwarfare").redirect(result))
