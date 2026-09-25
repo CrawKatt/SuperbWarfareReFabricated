@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.item.*
 import com.atsuishio.superbwarfare.item.ammo.*
 import com.atsuishio.superbwarfare.item.armor.*
 import com.atsuishio.superbwarfare.item.attachment.BasicAttachmentItem
+import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
 import com.atsuishio.superbwarfare.item.blockitem.BlueprintResearchTableBlockItem
 import com.atsuishio.superbwarfare.item.blockitem.ChargingStationBlockItem
 import com.atsuishio.superbwarfare.item.blockitem.CreativeChargingStationBlockItem
@@ -233,8 +234,15 @@ object ModItems {
         return registered
     }
 
-    private fun registerAttachment(id: String, rarity: Rarity = Rarity.COMMON): BasicAttachmentItem {
-        val registered = register(id, BasicAttachmentItem("${Mod.MODID}:$id", rarity))
+    private fun registerAttachment(id: String, rarity: Rarity = Rarity.COMMON) =
+        registerAttachment(id, rarity, ::BasicAttachmentItem)
+
+    private fun <T : Item> registerAttachment(
+        id: String,
+        rarity: Rarity,
+        factory: (String, Rarity) -> T
+    ): T {
+        val registered = register(id, factory("${Mod.MODID}:$id", rarity))
         ATTACHMENTS.add(registered)
         return registered
     }
@@ -328,6 +336,8 @@ object ModItems {
     @JvmField val BAYONET_M_9 = registerAttachment("bayonet_m_9")
     @JvmField val BAYONET_6KH2 = registerAttachment("bayonet_6kh2")
     // @formatter:on
+
+    @JvmField val GP_25 = registerAttachment("gp_25", Rarity.RARE, ::SubWeaponItem)
 
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {

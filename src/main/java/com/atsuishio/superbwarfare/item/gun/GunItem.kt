@@ -161,7 +161,9 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     override fun canAttackBlock(pState: BlockState, pLevel: Level, pPos: BlockPos, pPlayer: Player) = false
 
     override fun inventoryTick(stack: ItemStack, level: Level, entity: Entity, slot: Int, selected: Boolean) {
-        if (stack.item !is GunItem || level.isClientSide) return
+        // 副武器物品（`useAsWeaponInHand() == false`）躺在背包/手上时不跑枪械状态机：
+        // 它只有装在正常枪械上才生效，那时由主武器的 gun tick 顺带 tick（`SubWeaponRuntime.tick`）。
+        if (stack.item !is GunItem || !useAsWeaponInHand() || level.isClientSide) return
 
         if (level is ServerLevel) {
             GeoItem.getOrAssignId(stack, level)
@@ -177,32 +179,34 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         val stack = data.stack
         val list = ArrayList<ItemAttributeModifiers.Entry>()
 
-        // 移速
-        list.add(
-            ItemAttributeModifiers.Entry(
-                Attributes.MOVEMENT_SPEED,
-                AttributeModifier(
-                    SPEED_ID,
-                    -0.01f - 0.005f * data.get(GunProp.WEIGHT),
-                    AttributeModifier.Operation.ADD_MULTIPLIED_BASE
-                ),
-                EquipmentSlotGroup.MAINHAND
-            )
-        )
-
-        // 近战伤害
-        if (data.get(GunProp.MELEE_DAMAGE) > 0) {
+        if (useAsWeaponInHand()) {
+            // 移速
             list.add(
                 ItemAttributeModifiers.Entry(
-                    Attributes.ATTACK_DAMAGE,
+                    Attributes.MOVEMENT_SPEED,
                     AttributeModifier(
-                        BASE_ATTACK_DAMAGE_ID,
-                        data.get(GunProp.MELEE_DAMAGE),
-                        AttributeModifier.Operation.ADD_VALUE
+                        SPEED_ID,
+                        -0.01f - 0.005f * data.get(GunProp.WEIGHT),
+                        AttributeModifier.Operation.ADD_MULTIPLIED_BASE
                     ),
                     EquipmentSlotGroup.MAINHAND
                 )
             )
+
+            // 近战伤害
+            if (data.get(GunProp.MELEE_DAMAGE) > 0) {
+                list.add(
+                    ItemAttributeModifiers.Entry(
+                        Attributes.ATTACK_DAMAGE,
+                        AttributeModifier(
+                            BASE_ATTACK_DAMAGE_ID,
+                            data.get(GunProp.MELEE_DAMAGE),
+                            AttributeModifier.Operation.ADD_VALUE
+                        ),
+                        EquipmentSlotGroup.MAINHAND
+                    )
+                )
+            }
         }
 
         val modifiers = ItemAttributeModifiers(list, true)
@@ -1267,7 +1271,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     @Environment(EnvType.CLIENT)
     override fun getItemScreen(stack: ItemStack, player: Player, hand: InteractionHand): Screen? {
         if (ClientEventHandler.canOpenEditScreen(stack, hand)
-            && stack.item is GunItem
+            && isHeldWeapon(stack)
             && canEditAttachments(from(stack))
         ) {
             return WeaponEditScreen(stack)

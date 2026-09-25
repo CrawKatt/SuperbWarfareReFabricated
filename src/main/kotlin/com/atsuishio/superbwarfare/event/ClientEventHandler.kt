@@ -745,8 +745,9 @@ object ClientEventHandler {
      *  处理武器射击延迟
      */
     fun handleShootDelay(player: Player, stack: ItemStack) {
-        val item = stack.item
-        if (item is GunItem) {
+        val item = stack.item as? GunItem
+        // 手持副武器时按普通物品处理
+        if (item != null && GunItem.isHeldWeapon(stack)) {
             val data = GunData.from(stack)
 
             var uuid: UUID? = null
@@ -985,8 +986,8 @@ object ClientEventHandler {
     }
 
     fun lockWeaponSeeking(player: Player, stack: ItemStack) {
-        val item = stack.item
-        if (item is GunItem) {
+        // 手持副武器时按普通物品处理
+        if (GunItem.isHeldWeapon(stack)) {
             val data = GunData.from(stack)
             val lockTime = data.get(GunProp.SEEK_TIME)
             // 搜寻角度
@@ -1404,7 +1405,7 @@ object ClientEventHandler {
     }
 
     fun weaponZooming(stack: ItemStack) {
-        if (stack.item is GunItem) {
+        if (GunItem.isHeldWeapon(stack)) {
             sendPacketToServer(WeaponZoomingMessage(zoomTime >= 0.7))
         }
     }
@@ -1502,7 +1503,7 @@ object ClientEventHandler {
     }
 
     /**
-     * 近战入口（V 近战 / G 副武器，§9.4）。
+     * 近战入口。
      *
      * 与旧实现的区别：
      * - 状态（连招下标 / 动作锁 / 本段时长）按**枪身份隔离**，放在 [com.atsuishio.superbwarfare.client.gun.GunActionLock]
@@ -1544,21 +1545,21 @@ object ClientEventHandler {
      */
     @JvmStatic
     fun isGunMeleeActive(stack: ItemStack): Boolean {
-        if (stack.item !is GunItem) return false
+        if (!GunItem.isHeldWeapon(stack)) return false
         return GunActionLock.of(stack).meleeTicks > 0
     }
 
     /** 当前这一段挥击的时长（动画按它拉伸） */
     @JvmStatic
     fun currentMeleeDuration(stack: ItemStack): Int {
-        if (stack.item !is GunItem) return 0
+        if (!GunItem.isHeldWeapon(stack)) return 0
         return GunActionLock.of(stack).meleeDuration
     }
 
     /** 当前这一段挥击锁存的下标（解析 clip 名用） */
     @JvmStatic
     fun currentMeleeIndex(stack: ItemStack): Int {
-        if (stack.item !is GunItem) return 0
+        if (!GunItem.isHeldWeapon(stack)) return 0
         return GunActionLock.of(stack).meleeActionIndex
     }
 
@@ -1638,8 +1639,9 @@ object ClientEventHandler {
         }
 
         val stack = player.mainHandItem
-        val item = stack.item
-        if (item !is GunItem) {
+        val item = stack.item as? GunItem
+        // 手持副武器时按普通物品处理
+        if (item == null || !GunItem.isHeldWeapon(stack)) {
             clientTimer.stop()
             fireSpread = 0.0
             gunSpread = 0.0
@@ -1653,7 +1655,7 @@ object ClientEventHandler {
         val chargeConfig = fireModeInfo.chargeConfig()
         val singleShotMode = mode == FireMode.SEMI
 
-        // 动作互斥：近战/副武器/换弹占用期间不开火（§9.5）。
+        // 动作互斥：近战/副武器/换弹占用期间不开火。
         // 这里刻意放在最前面：被拒绝的入口不该产生任何副作用（包括后面的计时器推进）。
         if (GunActionLock.of(data).blocks(GunAction.FIRING)) {
             clientTimer.stop()
@@ -1845,6 +1847,7 @@ object ClientEventHandler {
     fun shootClient(player: Player, chargePower: Double = 1.0) {
         val stack = player.mainHandItem
         val item = stack.item as? GunItem ?: return
+        if (!GunItem.isHeldWeapon(stack)) return
 
         val data = GunData.from(stack)
         if (!item.canShoot(data, player) || item.useSpecialFireProcedure(data)) return
@@ -1862,7 +1865,7 @@ object ClientEventHandler {
             fireCooldown = data.get(GunProp.BURST_COOLDOWN).toDouble()
         }
 
-        // 动作锁：开火占用 = 一个射击周期（§9.5）。连发期间会反复 acquire 同一个动作，
+        // 动作锁：开火占用 = 一个射击周期。连发期间会反复 acquire 同一个动作，
         // `blocks()` 允许"自己"通过，所以不会卡住连射。
         val cycleTicks = if (mode == FireMode.BURST && burstFireAmount > 0) {
             data.get(GunProp.BURST_COOLDOWN)
@@ -1902,7 +1905,7 @@ object ClientEventHandler {
     fun handleClientShoot(chargePower: Double = 1.0) {
         val player = localPlayer ?: return
         val stack = player.mainHandItem
-        if (stack.item !is GunItem) return
+        if (!GunItem.isHeldWeapon(stack)) return
         val data = GunData.from(stack)
 
         sendPacketToServer(
@@ -1948,8 +1951,9 @@ object ClientEventHandler {
 
     fun playGunClientSounds(player: Player) {
         val stack = player.mainHandItem
-        val item = stack.item
-        if (item !is GunItem) return
+        val item = stack.item as? GunItem
+        // 手持副武器时按普通物品处理
+        if (item == null || !GunItem.isHeldWeapon(stack)) return
 
         if (item == ModItems.SENTINEL) {
             val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
@@ -2146,6 +2150,7 @@ object ClientEventHandler {
         val player = localPlayer ?: return
         val stack = player.mainHandItem
         val item = stack.item as? GunItem ?: return
+        if (!GunItem.isHeldWeapon(stack)) return
         val vehicle = player.vehicle
 
         if (vehicle is VehicleEntity && player == vehicle.firstPassenger && vehicle.hidePassenger(player)) return
@@ -2245,7 +2250,8 @@ object ClientEventHandler {
 
         if (vehicle is VehicleEntity && vehicle.banHand(player)) return
 
-        if (stack.item is GunItem) {
+        // 手持副武器时按普通物品处理
+        if (GunItem.isHeldWeapon(stack)) {
             handleWeaponSway(entity)
             handleWeaponMove(entity)
             handleWeaponZoom(entity)
@@ -2281,7 +2287,7 @@ object ClientEventHandler {
         val rightHandItem = player.getItemInHand(rightHand)
 
         if (hand == leftHand) {
-            if (rightHandItem.item is GunItem) {
+            if (GunItem.isHeldWeapon(rightHandItem)) {
                 return true
             }
             if (rightHandItem.`is`(ModItems.LUNGE_MINE)) {
@@ -2293,7 +2299,7 @@ object ClientEventHandler {
         }
 
         if (hand == rightHand) {
-            if (rightHandItem.item is GunItem && drawTime > 0.15) {
+            if (GunItem.isHeldWeapon(rightHandItem) && drawTime > 0.15) {
                 return true
             }
             if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR)) {
@@ -2326,6 +2332,7 @@ object ClientEventHandler {
         val stack = entity.mainHandItem
         val player = entity as? Player ?: return
         val item = stack.item as? GunItem ?: return
+        if (!GunItem.isHeldWeapon(stack)) return
         val data = GunData.from(stack)
 
         val times = 2 * getDelta().coerceAtMost(0.8f)
@@ -2346,7 +2353,7 @@ object ClientEventHandler {
     private fun handleWeaponMove(entity: LivingEntity) {
         val stack = entity.mainHandItem
         val player = entity as? Player ?: return
-        if (stack.item !is GunItem) return
+        if (!GunItem.isHeldWeapon(stack)) return
         val data = GunData.from(stack)
         val resource = GunResource.compute(stack)
 
@@ -2572,6 +2579,7 @@ object ClientEventHandler {
         val player = entity as? Player ?: return
         val stack = player.mainHandItem
         val item = stack.item as? GunItem ?: return
+        if (!GunItem.isHeldWeapon(stack)) return
         val data = GunData.from(stack)
 
         val deployed = !isEditing && isProne(player) && (data.attachment.hasBipod() || item.hasBipod(data))
@@ -2680,6 +2688,7 @@ object ClientEventHandler {
         val player = localPlayer ?: return
         val stack = player.mainHandItem
         val item = stack.item as? GunItem ?: return
+        if (!GunItem.isHeldWeapon(stack)) return
 
         customAnimSpeed = customSpeed.toDouble()
 
@@ -2825,6 +2834,7 @@ object ClientEventHandler {
         val player = localPlayer ?: return
         val stack = player.mainHandItem
         val item = stack.item as? GunItem ?: return
+        if (!GunItem.isHeldWeapon(stack)) return
         val data = GunData.from(stack)
 
         val times = getDelta().coerceAtMost(1.6f)
@@ -3007,7 +3017,8 @@ object ClientEventHandler {
 
         event.fov /= artilleryIndicatorZoom
 
-        if (stack.item is GunItem) {
+        // 手持副武器时按普通物品处理
+        if (GunItem.isHeldWeapon(stack)) {
             if (!event.usedConfiguredFov()) {
                 lastX = player.xRot
                 lastY = player.yRot
@@ -3122,11 +3133,18 @@ object ClientEventHandler {
         }
         return false
     }
-
-
     @JvmStatic
     fun shouldCancelCrossHair(): Boolean {
         val player = localPlayer ?: return false
+
+        // Preserve upstream's all-view suppression when the server hides the combat HUD.
+        if (MiscConfig.HIDE_COMBAT_HUD.get()) {
+            val stack = player.mainHandItem
+            if (GunItem.isHeldWeapon(stack)) return true
+            val vehicle = player.vehicle
+            if (vehicle is VehicleEntity && vehicle.hasWeapon(vehicle.getSeatIndex(player))) return true
+        }
+
         if (!mc.options.cameraType.isFirstPerson) return false
 
         if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR)) {
@@ -3134,7 +3152,7 @@ object ClientEventHandler {
         }
 
         val stack = player.mainHandItem
-        if (stack.item is GunItem) {
+        if (GunItem.isHeldWeapon(stack)) {
             return true
         }
 
@@ -3259,7 +3277,8 @@ object ClientEventHandler {
      */
     @JvmStatic
     fun canOpenEditScreen(stack: ItemStack, hand: InteractionHand?): Boolean {
-        return burstFireAmount == 0 && stack.item is GunItem && hand == InteractionHand.MAIN_HAND
+        // 手持副武器时按普通物品处理
+        return burstFireAmount == 0 && GunItem.isHeldWeapon(stack) && hand == InteractionHand.MAIN_HAND
     }
 
     @JvmStatic
@@ -3303,7 +3322,7 @@ object ClientEventHandler {
     fun stopWeaponSeekSound(player: Player?) {
         if (player == null) return
         val stack = player.mainHandItem
-        if (stack.item is GunItem) {
+        if (GunItem.isHeldWeapon(stack)) {
             val gunData = GunData.from(stack)
             val location = gunData.get(GunProp.SOUND_INFO).locking.location
             stopSoundEvent(location, SoundSource.PLAYERS)
