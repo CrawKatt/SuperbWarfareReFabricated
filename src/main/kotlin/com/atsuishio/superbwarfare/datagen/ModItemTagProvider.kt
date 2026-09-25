@@ -576,7 +576,9 @@ class ModItemTagProvider(
             ModItems.GRIP_VERTICAL_BIPOD,
             ModItems.STEEL_PIPE_GRIP
         ),
-        AttachmentType.BAYONET to listOf(ModItems.BAYONET_KNIFE),
+        AttachmentType.BAYONET to listOf(
+            ModItems.BAYONET_M_9
+        ),
     )
 
     private fun addAttachmentTags() {

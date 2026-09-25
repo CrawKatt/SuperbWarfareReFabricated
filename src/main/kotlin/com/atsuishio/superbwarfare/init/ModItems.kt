@@ -321,7 +321,11 @@ object ModItems {
     @JvmField val GRIP_CQR_GEN2 = registerAttachment("grip_cqr_gen2", Rarity.RARE)
     @JvmField val GRIP_VERTICAL_BIPOD = registerAttachment("grip_vertical_bipod", Rarity.RARE)
     @JvmField val STEEL_PIPE_GRIP = registerAttachment("steel_pipe_grip", Rarity.RARE)
-    @JvmField val BAYONET_KNIFE = registerAttachment("bayonet_knife")
+    // @formatter:on
+
+    // Bayonet
+    // @formatter:off
+    @JvmField val BAYONET_M_9 = registerAttachment("bayonet_m_9")
     // @formatter:on
 
     // @formatter:off
