@@ -606,6 +606,7 @@ object LivingEventHandler {
 
     @JvmStatic
     fun onLivingDrops(entity: LivingEntity, source: DamageSource, drops: MutableCollection<ItemEntity>) {
+        EntityUseGunEventHandler.onLivingDrops(entity, drops)
         playerDropAmmoBox(entity, source, drops)
         vehicleCollectDrops(entity, source, drops)
     }

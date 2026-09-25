@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.data
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.data.DataLoader.JSON
+import com.atsuishio.superbwarfare.data.mob_guns.MobGunData
 import com.atsuishio.superbwarfare.network.message.receive.DataSyncMessage
 import com.atsuishio.superbwarfare.tools.sendPacket
 import com.google.gson.Gson
@@ -66,6 +67,8 @@ object DataLoader {
 
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register { server, _, success ->
             if (!success) return@register
+
+            MobGunData.reapplyLoadedMobs(server)
 
             for (player in server.playerList.players) {
                 syncDataToPlayer(server, player)

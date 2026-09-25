@@ -19,10 +19,9 @@ public class PersistentEntitySectionManagerMixin {
     private void superbwarfare$onEntityJoin(
             EntityAccess entityAccess, boolean loadedFromDisk,
             CallbackInfoReturnable<Boolean> cir) {
-        if (!loadedFromDisk
-                && entityAccess instanceof Mob mob
+        if (entityAccess instanceof Mob mob
                 && mob.level() instanceof ServerLevel) {
-            EntityUseGunEventHandler.entityJoin(mob);
+            EntityUseGunEventHandler.entityJoin(mob, loadedFromDisk);
         }
     }
 
