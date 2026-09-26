@@ -21,6 +21,7 @@ object CommandRegister {
                 add(ATTACHMENT_COMMAND)
                 add(MELEE_COMMAND)
                 add(SUBWEAPON_COMMAND)
+                add(DATA_COMMAND)
             }
 
             val result = dispatcher.register(command as LiteralArgumentBuilder<CommandSourceStack>)

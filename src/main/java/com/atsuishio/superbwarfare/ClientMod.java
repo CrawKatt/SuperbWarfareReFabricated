@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare;
 
 import com.atsuishio.superbwarfare.client.ClientRenderHandler;
+import com.atsuishio.superbwarfare.client.DataDumpChatHandler;
 import com.atsuishio.superbwarfare.client.MouseMovementHandler;
 import com.atsuishio.superbwarfare.client.ParachuteVisibilityHandler;
 import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
@@ -96,6 +97,7 @@ public class ClientMod implements ClientModInitializer {
         PoseTool.INSTANCE.init();
         ModSoundInstances.init();
         ClientEventHandler.register();
+        DataDumpChatHandler.register();
         TacticalMapChunkListener.register();
         SyncedEntityWorldRenderer.register();
         TowingChainRenderer.register();
