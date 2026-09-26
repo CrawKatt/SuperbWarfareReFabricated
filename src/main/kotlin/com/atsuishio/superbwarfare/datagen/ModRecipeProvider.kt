@@ -2457,7 +2457,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 ModItems.HUNTING_RIFLE
             )
             gunSmithing(writer, ModItems.M_79_BLUEPRINT, GunRarity.RARE, Items.DISPENSER, ModItems.M_79)
-            gunSmithing(writer, ModItems.GP_25_BLUEPRINT, GunRarity.RARE, Items.DISPENSER, ModItems.GP_25)
+            gunSmithing(writer, ModItems.GP_25_BLUEPRINT, GunRarity.EPIC, Items.DISPENSER, ModItems.GP_25)
             gunSmithing(writer, ModItems.RPG_BLUEPRINT, GunRarity.RARE, Items.DISPENSER, ModItems.RPG)
             gunSmithing(writer, ModItems.BOCEK_BLUEPRINT, GunRarity.EPIC, Items.BOW, ModItems.BOCEK)
             gunSmithing(

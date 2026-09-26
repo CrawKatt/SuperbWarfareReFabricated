@@ -162,7 +162,6 @@ class ModCustomLootProvider : LootTableSubProvider {
                     15,
                     ModItems.GLOCK_18_BLUEPRINT,
                     ModItems.M_79_BLUEPRINT,
-                    ModItems.GP_25_BLUEPRINT,
                     ModItems.M_4_BLUEPRINT,
                     ModItems.SKS_BLUEPRINT,
                     ModItems.K_98_BLUEPRINT,
@@ -182,6 +181,7 @@ class ModCustomLootProvider : LootTableSubProvider {
                 withWeight(
                     1,
                     ModItems.SENTINEL_BLUEPRINT,
+                    ModItems.GP_25_BLUEPRINT,
                     ModItems.BOCEK_BLUEPRINT,
                     ModItems.RPK_BLUEPRINT,
                     ModItems.VECTOR_BLUEPRINT,
@@ -221,7 +221,6 @@ class ModCustomLootProvider : LootTableSubProvider {
 
                 ModItems.GLOCK_18_BLUEPRINT weighted 30
                 ModItems.M_79_BLUEPRINT weighted 30
-                ModItems.GP_25_BLUEPRINT weighted 30
                 ModItems.M_4_BLUEPRINT weighted 30
                 ModItems.SKS_BLUEPRINT weighted 30
                 ModItems.K_98_BLUEPRINT weighted 30
@@ -236,6 +235,7 @@ class ModCustomLootProvider : LootTableSubProvider {
                 ModItems.M_2_HB_BLUEPRINT weighted 30
 
                 ModItems.HUNTING_RIFLE_BLUEPRINT weighted 10
+                ModItems.GP_25_BLUEPRINT weighted 10
                 ModItems.SENTINEL_BLUEPRINT weighted 10
                 ModItems.BOCEK_BLUEPRINT weighted 10
                 ModItems.RPK_BLUEPRINT weighted 10
@@ -336,7 +336,6 @@ class ModCustomLootProvider : LootTableSubProvider {
 
                 ModItems.GLOCK_18_BLUEPRINT weighted 42
                 ModItems.M_79_BLUEPRINT weighted 42
-                ModItems.GP_25_BLUEPRINT weighted 42
                 ModItems.M_4_BLUEPRINT weighted 42
                 ModItems.SKS_BLUEPRINT weighted 42
                 ModItems.M_870_BLUEPRINT weighted 42
@@ -351,6 +350,7 @@ class ModCustomLootProvider : LootTableSubProvider {
                 ModItems.M_2_HB_BLUEPRINT weighted 42
 
                 ModItems.HUNTING_RIFLE_BLUEPRINT weighted 15
+                ModItems.GP_25_BLUEPRINT weighted 15
                 ModItems.SENTINEL_BLUEPRINT weighted 15
                 ModItems.BOCEK_BLUEPRINT weighted 15
                 ModItems.RPK_BLUEPRINT weighted 15
