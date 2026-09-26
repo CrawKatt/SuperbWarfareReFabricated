@@ -338,7 +338,7 @@ object ModItems {
     @JvmField val BAYONET_6KH2 = registerAttachment("bayonet_6kh2")
     // @formatter:on
 
-    @JvmField val SUB_WEAPON_GP_25 = registerAttachment("sub_weapon_gp_25", Rarity.RARE, ::SubWeaponItem)
+    @JvmField val SUB_WEAPON_GP_25 = registerAttachment("sub_weapon_gp_25", Rarity.EPIC, ::SubWeaponItem)
 
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
@@ -504,7 +504,7 @@ object ModItems {
     @JvmField val GLOCK_18_BLUEPRINT = registerBlueprint("glock_18_blueprint", Rarity.RARE)
     @JvmField val HUNTING_RIFLE_BLUEPRINT = registerBlueprint("hunting_rifle_blueprint", Rarity.EPIC)
     @JvmField val M_79_BLUEPRINT = registerBlueprint("m_79_blueprint", Rarity.RARE)
-    @JvmField val GP_25_BLUEPRINT = registerBlueprint("gp_25_blueprint", Rarity.RARE)
+    @JvmField val GP_25_BLUEPRINT = registerBlueprint("gp_25_blueprint", Rarity.EPIC)
     @JvmField val RPG_BLUEPRINT = registerBlueprint("rpg_blueprint", Rarity.RARE)
     @JvmField val BOCEK_BLUEPRINT = registerBlueprint("bocek_blueprint", Rarity.EPIC)
     @JvmField val M_4_BLUEPRINT = registerBlueprint("m_4_blueprint", Rarity.RARE)
