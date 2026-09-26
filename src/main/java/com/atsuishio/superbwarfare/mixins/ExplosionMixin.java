@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.mixin.ExplosionAccess;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.phys.Vec3;
@@ -10,7 +11,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
  * Implements ExplosionAccess to expose the explosion radius field
@@ -29,16 +29,14 @@ public abstract class ExplosionMixin implements ExplosionAccess {
         return this.radius;
     }
 
-    @Redirect(
+    @WrapWithCondition(
             method = "explode",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V"
             )
     )
-    private void superbwarfare$cancelVehicleKnockback(Entity entity, Vec3 deltaMovement) {
-        if (!LivingEventHandler.onExplosionKnockback(entity)) {
-            entity.setDeltaMovement(deltaMovement);
-        }
+    private boolean superbwarfare$cancelVehicleKnockback(Entity entity, Vec3 deltaMovement) {
+        return !LivingEventHandler.onExplosionKnockback(entity);
     }
 }
