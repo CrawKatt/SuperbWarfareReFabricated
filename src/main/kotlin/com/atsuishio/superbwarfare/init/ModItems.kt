@@ -250,6 +250,17 @@ object ModItems {
 
     private fun registerBlueprint(id: String, rarity: Rarity) = registerItem(id) { BlueprintItem(rarity) }
 
+    /**
+     * 注册一个**副武器**配件：物品类换成 [SubWeaponItem]（`GunItem` + `AttachmentProvider`）。
+     *
+     * 物品注册 id 与配件数据 id 由 [registerAttachment] 保证一致，
+     * 而 `GunData` 在 `SubWeapon.Data` 为空时按物品注册 id 解析数据 —— 所以
+     * `sbw/attachments/<id>.json` 与 `sbw/guns/<id>.json` 同名成对出现即可；
+     * 想让多个配件共用一份副武器数据时才需要在配件里写 `Data`。
+     */
+    fun registerSubWeapon(id: String, rarity: Rarity = Rarity.COMMON): Item =
+        registerAttachment(id, rarity, ::SubWeaponItem)
+
     // Stock
     // @formatter:off
     @JvmField val OEM_STOCK_LIGHT = registerAttachment("oem_stock_light")
@@ -338,7 +349,7 @@ object ModItems {
     @JvmField val BAYONET_6KH2 = registerAttachment("bayonet_6kh2")
     // @formatter:on
 
-    @JvmField val SUB_WEAPON_GP_25 = registerAttachment("sub_weapon_gp_25", Rarity.EPIC, ::SubWeaponItem)
+    @JvmField val SUB_WEAPON_GP_25 = registerSubWeapon("sub_weapon_gp_25", Rarity.EPIC)
 
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
