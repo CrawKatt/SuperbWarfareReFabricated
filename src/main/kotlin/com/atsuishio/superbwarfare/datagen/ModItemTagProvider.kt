@@ -357,6 +357,7 @@ class ModItemTagProvider(
         this.tag(ItemTags.SWORDS).add(
             ModItems.MILITARY_SHOVEL,
             ModItems.KNIFE,
+            ModItems.KNIFE_6KH2,
             ModItems.T_BATON,
             ModItems.ELECTRIC_BATON,
             ModItems.STEEL_PIPE,
