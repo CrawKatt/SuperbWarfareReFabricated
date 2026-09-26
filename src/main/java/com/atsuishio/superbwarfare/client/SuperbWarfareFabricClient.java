@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.client;
 
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
+import com.atsuishio.superbwarfare.client.DataDumpChatHandler;
 import com.atsuishio.superbwarfare.client.map.TacticalMapChunkListener;
 import com.atsuishio.superbwarfare.client.model.DragonTeethObjModelLoader;
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
@@ -42,6 +43,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         DataLoader.registerClient();
 
         ClientLanguageGetter.register();
+        DataDumpChatHandler.register();
         ClientRenderHandler.registerLayer();
         ClientRenderHandler.registerRenderers();
         ClientRenderHandler.registerOverlays();
