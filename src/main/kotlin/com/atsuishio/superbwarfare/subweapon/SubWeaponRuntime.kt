@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.gun.GunState
 import com.atsuishio.superbwarfare.data.gun.subdata.Cooldown
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
+import com.atsuishio.superbwarfare.data.gun.value.ReloadState
 import com.atsuishio.superbwarfare.event.GunEventHandler
 import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
 import com.atsuishio.superbwarfare.subweapon.SubWeaponRuntime.BY_UUID
@@ -349,12 +350,16 @@ object SubWeaponRuntime {
      * - 主武器自己**不是副武器**（否则一把副武器上再装副武器会无限递归）；
      * - 主武器身上**确实有附件**（便宜的前置过滤，绝大多数枪直接跳过装配流程）。
      *
-     * **状态推进与"自动装填 / 提示"分开**：
-     * - 进度、栓动、热量这些**每把枪都推**（`inMainHand` 无关）——
-     *   一旦绑在 `inMainHand` 上，那个判定为假时副武器的状态机就会被整段冻住
-     *   （换弹计时器永远停在同一 tick、`canShoot` 永远 false）；
-     * - **自动装填、音效、动作栏提示只在 `inMainHand` 时做** ——
-     *   挂在背包里的枪不该自己吃备弹、也不该给玩家弹提示。
+     * **装填与栓动的进度只在"这把主武器正被持有"时推进** —— 与主武器完全同一条口径：
+     * 主武器的换弹计时器也在 `gunTickInternal` 的 `inMainHand` 分支里，切枪时
+     * `LivingEventHandler` 还会把计时器与状态一起清掉。副武器照做：主手没拿着这把枪时
+     * **直接中断装填**（进度归零），切回来从头装。
+     * 否则就会出现"把枪收回背包，装填照样在背包里跑完，切回来弹药已经满了"
+     * ——早先这里无条件传 `inMainHand = true`，正是这个毛病。
+     *
+     * 与持有无关的（热量、冷却、perk、各种计时器）照常推进：把它们也绑在 `inMainHand` 上，
+     * 副武器的状态机就会在那段判定为假时被整段冻住（换弹计时器停在同一 tick、`canShoot` 永远 false）。
+     * **自动装填、音效、动作栏提示同样只在持有**时做 —— 背包里的枪不该自己吃备弹、也不该弹提示。
      *
      * @param inMainHand 这把主武器是不是正被持有（`GunEventHandler.gunTickInternal` 的入参）
      */
@@ -377,6 +382,13 @@ object SubWeaponRuntime {
             val sub = instance.data
             val reloadingBefore = instance.wasReloading
 
+            // ⓪ 主手没拿着这把枪：**中断装填**（进度归零），而不是让它在背包里自己走完。
+            //    中断同时要把"装填结束"这个跳变吃掉 —— 中断不是完成，不该播完成音效与提示。
+            val interrupted = !inMainHand && sub.reloading()
+            if (!inMainHand) {
+                interruptReload(sub)
+            }
+
             // ① 自动装填：判定与主武器 `autoReload` 同一个谓词，入口是主武器的 `tryStartReload`
             //    （它会自己拒掉"正在装填 / 正在拉栓 / 计时器没归零 / 没有备弹 / 弹匣是满的"）。
             //    **必须在 `gunTick` 之前调用**：换弹是两段式的（`tryStartReload` 只 markStart，
@@ -389,15 +401,15 @@ object SubWeaponRuntime {
                 }
             }
 
-            // ② 推进状态机（与持有状态无关：已经在走的换弹必须能走完）
-            GunEventHandler.gunTick(shooter, sub, inMainHand = true)
+            // ② 推进状态机：入参就是主武器的持有状态 —— 装填/栓动只在持有的时候走
+            GunEventHandler.gunTick(shooter, sub, inMainHand = inMainHand)
 
-            // ③ 处理"开始 / 结束"这两个跳变
+            // ③ 处理"开始 / 结束"这两个跳变（被中断的那一次不算"完成"）
             val reloadingNow = sub.reloading()
-            if (!reloadingBefore && reloadingNow) {
-                onReloadStarted(shooter, instance)
-            } else if (reloadingBefore && !reloadingNow) {
-                onReloadFinished(shooter, instance)
+            when {
+                interrupted -> debug { "reload of ${instance.slotName} interrupted (gun left the main hand)" }
+                !reloadingBefore && reloadingNow -> onReloadStarted(shooter, instance)
+                reloadingBefore && !reloadingNow -> onReloadFinished(shooter, instance)
             }
             instance.wasReloading = reloadingNow
 
@@ -406,6 +418,42 @@ object SubWeaponRuntime {
                 showReloadingProgress(shooter, instance)
             }
         }
+    }
+
+    /**
+     * 中断装填：换弹状态与计时器清干净，**栓动计时器一起清**。
+     *
+     * 与主武器切枪时 `LivingEventHandler` 做的是同一件事（`reload.setTime(0)` +
+     * `NOT_RELOADING` + 单发装填的各阶段计时器 + `bolt.actionTimer.reset()`），
+     * 于是"切走再切回来"是从 0 重新装，而不是接着上次的进度。
+     *
+     * `reloadStarter` 不用手动清：它只在"标记了、但还没被 `gunTick` 消费"的那一 tick 里为真，
+     * 留着它反而正好让切回来的第一 tick 就重新起步。
+     *
+     * 没有任何东西在走时直接返回 —— 背包里躺着不动的枪每 tick 都会走到这里。
+     */
+    private fun interruptReload(data: GunData) {
+        if (!data.reloading() && data.bolt.actionTimer.get() == 0) return
+
+        data.reload.setTime(0)
+        data.reload.setState(ReloadState.NOT_RELOADING)
+
+        // 单发装填（`ReloadTypes: ["Iterative"]`）自己的阶段计时器也要一起清，否则会留下半截状态
+        if (data.get(GunProp.ITERATIVE_TIME) != 0) {
+            data.stopped.set(false)
+            data.forceStop.set(false)
+            data.reload.setStage(0)
+            data.reload.prepareTimer.reset()
+            data.reload.prepareLoadTimer.reset()
+            data.reload.iterativeLoadTimer.reset()
+            data.reload.finishTimer.reset()
+        }
+
+        if (data.get(GunProp.BOLT_ACTION_TIME) > 0) {
+            data.bolt.actionTimer.reset()
+        }
+
+        data.invalidateProperties()
     }
 
     /**
