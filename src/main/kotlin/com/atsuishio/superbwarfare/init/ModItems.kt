@@ -337,7 +337,7 @@ object ModItems {
     @JvmField val BAYONET_6KH2 = registerAttachment("bayonet_6kh2")
     // @formatter:on
 
-    @JvmField val GP_25 = registerAttachment("gp_25", Rarity.RARE, ::SubWeaponItem)
+    @JvmField val SUB_WEAPON_GP_25 = registerAttachment("sub_weapon_gp_25", Rarity.RARE, ::SubWeaponItem)
 
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
