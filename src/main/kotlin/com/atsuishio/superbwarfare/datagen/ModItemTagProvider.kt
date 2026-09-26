@@ -213,6 +213,7 @@ class ModItemTagProvider(
             ModItems.M_1897,
             ModItems.AA_12,
             ModItems.M_79,
+            ModItems.GP_25,
             ModItems.SECONDARY_CATACLYSM
         )
         this.tag(ModTags.Items.ANIMATED_SMG).add(
@@ -265,7 +266,7 @@ class ModItemTagProvider(
         this.tag(ModTags.Items.MACHINE_GUN).add(ModItems.MINIGUN, ModItems.M_2_HB)
         this.tag(ModTags.Items.LAUNCHER).add(
             ModItems.RPG, ModItems.JAVELIN, ModItems.IGLA_9K38,
-            ModItems.M_79, ModItems.SECONDARY_CATACLYSM, ModItems.SUPER_STAR_SHOOTER
+            ModItems.M_79, ModItems.GP_25, ModItems.SECONDARY_CATACLYSM, ModItems.SUPER_STAR_SHOOTER
         )
 
         this.tag(ModTags.Items.MILITARY_ARMOR).add(ModItems.RU_CHEST_6B43, ModItems.US_CHEST_IOTV)
@@ -285,6 +286,7 @@ class ModItemTagProvider(
         this.tag(ModTags.Items.RARE_BLUEPRINT).add(
             ModItems.GLOCK_18_BLUEPRINT,
             ModItems.M_79_BLUEPRINT,
+            ModItems.GP_25_BLUEPRINT,
             ModItems.M_4_BLUEPRINT,
             ModItems.SKS_BLUEPRINT,
             ModItems.M_870_BLUEPRINT,
