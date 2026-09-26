@@ -6,7 +6,7 @@ import com.atsuishio.superbwarfare.compat.valkyrienskies.ValkyrienSkiesCompat
 import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.tools.clientLevel
-import com.atsuishio.superbwarfare.tools.mc
+import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
@@ -37,6 +37,7 @@ object TowingChainRenderer {
 
     private val CHAIN_TEXTURE = loc("textures/item/towline_chain.png")
     private val TOW_BAR_CHAIN_TEXTURE = loc("textures/item/towline_bar.png")
+    private val bufferSource = MultiBufferSource.immediate(BufferBuilder(256))
 
     private fun getCenterPosition(entity: Entity, partialTick: Float): Vec3 {
         var height = entity.bbHeight / 2.0
@@ -69,7 +70,6 @@ object TowingChainRenderer {
         val level = clientLevel ?: return
         val camera = event.camera()
         val poseStack = event.matrixStack()
-        val bufferSource = mc.renderBuffers().bufferSource()
         val partialTick = event.tickDelta()
 
         poseStack.pushPose()
