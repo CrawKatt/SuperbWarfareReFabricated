@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.event.GunEventHandler
 import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
 import com.atsuishio.superbwarfare.subweapon.SubWeaponRuntime.BY_UUID
+import com.atsuishio.superbwarfare.subweapon.SubWeaponRuntime.applyBaselineId
 import com.atsuishio.superbwarfare.subweapon.SubWeaponRuntime.tick
 import com.atsuishio.superbwarfare.tools.playLocalSound
 import net.minecraft.core.registries.BuiltInRegistries
@@ -33,8 +34,8 @@ import java.util.concurrent.ConcurrentHashMap
  * | 要素 | 做法 |
  * |---|---|
  * | 物品 | 副武器物品**自己**（`SubWeaponItem : GunItem, AttachmentProvider`） |
- * | 合成栈 | tag 就是主武器 NBT 里那个附件子 tag 的**活引用** |
- * | 数据基线 | 默认按物品注册 id 解析（`sbw/guns/<id>.json` 与配件同名成对出现）；`SubWeaponInfo.Data` 非空时才覆盖 |
+ * | 合成栈 | tag 就是主武器 NBT 里那个附件子 tag 的**活引用**；Fabric 中创建栈后显式赋值 |
+ * | 数据基线 | **配件定义说了算**：`SubWeaponInfo.Data` 非空就用它，否则用附件自己的注册 id（`sbw/guns/<id>.json` 与配件同名成对出现）。落成 tag 上的 `defaultDataId`，见 [applyBaselineId] |
  * | 状态 | 弹药/热量/换弹/耐久/revision 全部写在这份共享 tag 上 → **随主武器 NBT 持久化**，无新存档字段 |
  * | 实例身份 | 缓存表（见 [BY_UUID]）持有合成栈的强引用，否则会掉出 `GunData.DATA_CACHE`（weakKeys） |
  * | tick | 合成栈不在背包里，`GunItem.inventoryTick` 不会跑 → 主武器 gun tick 里顺带 tick（见 [tick]） |
@@ -116,6 +117,14 @@ object SubWeaponRuntime {
         /** 报文与冷却键里用的槽位标识 */
         val slotName: String get() = slot.name
 
+        /**
+         * 这份副武器实际使用的**枪数据 id**（`SubWeapon.Data`，不写就是附件自己的注册 id）。
+         *
+         * 它会在装配时写进合成栈的枪械状态（[applyBaselineId]），所以调试时对不上账就查这里：
+         * 写的 id 在 `sbw/guns` 里不存在的话，`GunData` 会退回一份空基线（既打不出也装不上弹）。
+         */
+        val baselineId: String get() = baselineIdOf(attachmentId, info)
+
         /** 主武器冷却表上的键（`sub:<slot>`） */
         val cooldownKey: String get() = Cooldown.subWeaponKey(slotName)
 
@@ -190,6 +199,16 @@ object SubWeaponRuntime {
             // 就永远复用同一个 [Instance]**（必要时把槽位里那份挂回槽位）。
             // 其余情况都是"没得复用"：槽位从没装配过 / 换成了别的副武器 / 手里那份本来就没状态。
             val instance = if (cached != null && cached.attachmentId == attachment.id && carriesGunState(cached.liveTag)) {
+                // 基线 id 以**配件定义**为准：数据包改了 `SubWeapon.Data` 之后这里要跟着换，
+                // 而且必须换在**同一份 tag** 上（引用、`GunData`、[Instance] 三者都不能动）。
+                // 正常情况下两边一致，`setDefaultDataId` 会自己跳过写入，所以这里几乎总是空操作。
+                if (cached.data.defaultDataId.get() != baselineIdOf(attachment.id, info)) {
+                    applyBaselineId(cached.stack, attachment.id, info)
+                    // 状态是"构造时解码一次"的镜像（见 `GunData.pullFromTag`），写完要重新解码
+                    cached.data.pullFromTag()
+                    debug { "baseline of ${attachment.slot} -> ${cached.baselineId}" }
+                }
+
                 if (cached.liveTag !== incoming) {
                     // 主武器 rebind 过：附件子 tag 被换成了**副本**（见类 KDoc 的不变式 ②）。
                     // 把副本折进手里那份，再把手里那份挂回槽位 ——
@@ -255,10 +274,32 @@ object SubWeaponRuntime {
             stack.tag = liveTag
         }
 
+        // ⚠ 必须在 `GunData.from(stack)` **之前**：`GunData` 构造时就把 `defaultDataId` 解码进状态
+        applyBaselineId(stack, attachmentId, info)
+
         val instance = Instance(slot, attachmentId, info, client, stack, liveTag, GunData.from(stack))
         warnIfNoBaseline(instance)
 
         return instance
+    }
+
+    /** 副武器实际使用的枪数据 id：`SubWeapon.Data` 非空就用它，否则回落到附件自己的注册 id */
+    @JvmStatic
+    fun baselineIdOf(attachmentId: ResourceLocation, info: SubWeaponInfo): String =
+        info.data?.takeIf { it.isNotBlank() } ?: attachmentId.toString()
+
+    /**
+     * 把枪数据 id 写进合成栈（`SubWeaponInfo.Data` 的落地）。
+     *
+     * 走 [GunData.setDefaultDataId]：它把 id 盖在枪械状态子 tag 上，之后 `GunData.getDefault()`
+     * 就按这个 id 去 `CustomData.GUN_DATA`（`sbw/guns/<id>.json`）里取基线 ——
+     * 与载具武器共用同一个物品 id 时那一套机制完全相同，不新增任何存档字段。
+     *
+     * 那份子 tag **就是主武器 NBT 里的附件子 tag**，所以 id 随主武器持久化、也随同步到达客户端，
+     * 两边解出的是同一份基线（否则客户端与服务器的弹药/弹道会各算各的）。
+     */
+    private fun applyBaselineId(stack: ItemStack, attachmentId: ResourceLocation, info: SubWeaponInfo) {
+        GunData.setDefaultDataId(stack, baselineIdOf(attachmentId, info))
     }
 
     /**
@@ -470,7 +511,7 @@ object SubWeaponRuntime {
     private const val RELOAD_SOUND_VOLUME = 1.0f
 
     /**
-     * 副武器**必须**能按物品注册 id 解析到 `sbw/guns/<id>.json`。
+     * 副武器**必须**能按 [Instance.baselineId] 解析到 `sbw/guns/<id>.json`。
      *
      * 解析不到时 [GunData.getDefault] 会退回一份空的 [com.atsuishio.superbwarfare.data.gun.DefaultGunData]：
      * `Magazine = 0` → `useBackpackAmmo()` 为真 → `tryStartReload` 第一行就返回（**永远装不了弹**），
@@ -479,14 +520,13 @@ object SubWeaponRuntime {
      */
     private fun warnIfNoBaseline(instance: Instance) {
         if (!instance.data.getDefault().isDefaultData) return
-        if (!warnedMissingBaseline.add(instance.attachmentId.toString())) return
+        if (!warnedMissingBaseline.add(instance.baselineId)) return
 
         Mod.LOGGER.error(
-            "[SubWeapon] '{}' has no matching gun data; GunData fell back to an empty baseline " +
-                    "(Magazine=0, ProjectileAmount=0), so it can neither fire nor reload. " +
-                    "Expected a file at data/<namespace>/sbw/guns/{}.json " +
-                    "(or set SubWeapon.Data to an existing gun data id).",
-            instance.attachmentId, instance.attachmentId.path,
+            "[SubWeapon] '{}' has no matching gun data at sbw/guns/{}.json; GunData fell back to an empty " +
+                    "baseline (Magazine=0, ProjectileAmount=0), so it can neither fire nor reload. " +
+                    "Either ship that file or point SubWeapon.Data at an existing gun data id.",
+            instance.attachmentId, instance.baselineId.substringAfter(':'),
         )
     }
 
