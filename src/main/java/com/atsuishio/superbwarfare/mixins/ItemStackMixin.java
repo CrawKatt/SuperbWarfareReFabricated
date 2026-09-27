@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.init.ModAttributes;
 import com.atsuishio.superbwarfare.init.ModRarities;
+import com.atsuishio.superbwarfare.item.ItemDamageExtension;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
@@ -20,6 +21,22 @@ import java.util.List;
 
 @Mixin(ItemStack.class)
 public class ItemStackMixin {
+
+    @Inject(method = "getMaxDamage", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$getMaxDamage(CallbackInfoReturnable<Integer> cir) {
+        ItemStack stack = (ItemStack) (Object) this;
+        if (stack.getItem() instanceof ItemDamageExtension extension) {
+            cir.setReturnValue(extension.getMaxDamage(stack));
+        }
+    }
+
+    @Inject(method = "isDamageableItem", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$isDamageable(CallbackInfoReturnable<Boolean> cir) {
+        ItemStack stack = (ItemStack) (Object) this;
+        if (stack.getItem() instanceof ItemDamageExtension extension) {
+            cir.setReturnValue(extension.isDamageable(stack));
+        }
+    }
 
     @Redirect(
             method = {

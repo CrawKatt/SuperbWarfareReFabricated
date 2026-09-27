@@ -36,7 +36,6 @@ public abstract class GameRendererMixin {
     @Inject(method = "render", at = @At("HEAD"))
     private void superbWarfare$renderFramePre(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) {
         ClientEventHandler.handleWeaponFire();
-        ClientEventHandler.handleVehicleGunShoot();
         ClientEventHandler.handleWeaponBreathSway();
     }
 
