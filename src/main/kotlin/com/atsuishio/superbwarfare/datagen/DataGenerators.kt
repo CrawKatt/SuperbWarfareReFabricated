@@ -19,5 +19,6 @@ class DataGenerators : DataGeneratorEntrypoint {
         pack.addProvider { output, registries -> ModAdvancementProvider(output, registries) }
         pack.addProvider { output, registries -> ModPerkTagProvider(output, registries) }
         pack.addProvider { output -> ModWreckageLootProvider(output) }
+        pack.addProvider { output -> ModSoundProvider(output) }
     }
 }
