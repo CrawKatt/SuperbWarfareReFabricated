@@ -23,6 +23,7 @@ import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRe
 import com.atsuishio.superbwarfare.client.renderer.item.BlueprintResearchingTableBlockItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.Knife6kh2Renderer
 import com.atsuishio.superbwarfare.client.renderer.item.KnifeRenderer
+import com.atsuishio.superbwarfare.client.renderer.item.KnifeSeitengewehr84Renderer
 import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
@@ -218,6 +219,21 @@ object ClientRenderHandler {
             ModItems.KNIFE_6KH2
         ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
             knife6kh2Renderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
+        }
+
+        val knifeSeitengewehr84Renderer =
+            lazy { KnifeSeitengewehr84Renderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+        BuiltinItemRendererRegistry.INSTANCE.register(
+            ModItems.KNIFE_SEITENGEWEHR_84
+        ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
+            knifeSeitengewehr84Renderer.value.renderByItem(
+                stack,
+                displayContext,
+                poseStack,
+                buffer,
+                packedLight,
+                packedOverlay
+            )
         }
 
         TrinketRendererRegistry.registerRenderer(ModItems.PARACHUTE, ParachuteRenderer())

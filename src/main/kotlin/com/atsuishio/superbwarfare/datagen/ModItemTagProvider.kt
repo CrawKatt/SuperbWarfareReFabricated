@@ -358,6 +358,7 @@ class ModItemTagProvider(
             ModItems.MILITARY_SHOVEL,
             ModItems.KNIFE,
             ModItems.KNIFE_6KH2,
+            ModItems.KNIFE_SEITENGEWEHR_84,
             ModItems.T_BATON,
             ModItems.ELECTRIC_BATON,
             ModItems.STEEL_PIPE,
@@ -559,7 +560,8 @@ class ModItemTagProvider(
         ),
         AttachmentType.BAYONET to listOf(
             ModItems.BAYONET_M_9,
-            ModItems.BAYONET_6KH2
+            ModItems.BAYONET_6KH2,
+            ModItems.BAYONET_SEITENGEWEHR_84
         ),
         AttachmentType.SUBWEAPON to listOf(
             ModItems.SUB_WEAPON_GP_25
