@@ -22,7 +22,13 @@ object ModWorldGen {
         "deepslate_silver_ore",
         "galena_ore",
         "scheelite_ore",
-        "silver_ore"
+        "silver_ore",
+        "uranium_ore",
+        "deepslate_uranium_ore",
+        "sulfur_ore",
+        "deepslate_sulfur_ore",
+        "niter_ore",
+        "deepslate_niter_ore"
     )
 
     @JvmStatic
