@@ -352,6 +352,11 @@ object ModItems {
 
     @JvmField val SUB_WEAPON_GP_25 = registerSubWeapon("sub_weapon_gp_25", Rarity.EPIC)
 
+    // Charm（吊坠：纯装饰，第一人称下会摆）
+    // @formatter:off
+    @JvmField val CHARM_FUKAMIZU_FISH = registerAttachment("charm_fukamizu_fish", Rarity.RARE)
+    // @formatter:on
+
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
         SpawnEggItem(ModEntities.SENPAI, -11584987, -14014413, Properties())
