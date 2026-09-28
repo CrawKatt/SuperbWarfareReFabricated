@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_high_energy_explosives": {
+    "has_common_accessory_kit": {
       "conditions": {
         "items": [
           {
             "items": [
-              "superbwarfare:high_energy_explosives"
+              "superbwarfare:common_accessory_kit"
             ]
           }
         ]
@@ -15,20 +15,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "superbwarfare:c4_bomb_rc"
+        "recipe": "superbwarfare:small_container_charms"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_high_energy_explosives",
+      "has_common_accessory_kit",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "superbwarfare:c4_bomb_rc"
+      "superbwarfare:small_container_charms"
     ]
   },
   "sends_telemetry_event": false

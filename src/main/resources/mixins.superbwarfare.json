@@ -39,6 +39,7 @@
     "ProjectileUtilMixin",
     "RepairItemRecipeMixin",
     "ResultSlotMixin",
+    "ShapedRecipeMixin",
     "ServerEntityMixin",
     "ServerPlayerMixin",
     "SteelPipeFallMixin",

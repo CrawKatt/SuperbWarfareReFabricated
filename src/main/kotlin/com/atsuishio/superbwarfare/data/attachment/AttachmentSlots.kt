@@ -95,6 +95,7 @@ data class AttachmentSlot(
     val focusBone: String? = null,
     val renderMode: AttachmentRenderMode = AttachmentRenderMode.GENERIC,
     val withdrawAmmoOnChange: Boolean = false,
+    val researchable: Boolean = true,
 ) {
     /** 槽位的物品 tag 名，例如 `attachment/bayonet`。 */
     val tagName: String? get() = tagBucket?.let { "attachment/$it" }
@@ -268,6 +269,7 @@ object AttachmentSlots {
             mountBone = AttachmentMountBone.FromDefinition(Bones.CHARM),
             focusBone = Bones.CHARM,
             renderMode = AttachmentRenderMode.GENERIC,
+            researchable = false,
         ),
     )
 

@@ -18,12 +18,6 @@ object ModRecipes {
         }
 
     @JvmField
-    val C4_BOMB_RC_SERIALIZER: RecipeSerializer<C4BombRcRecipe> =
-        Registration.recipeSerializer("c4_bomb_rc") {
-            SimpleCraftingRecipeSerializer { id, category -> C4BombRcRecipe(id, category) }
-        }
-
-    @JvmField
     val POTION_MORTAR_SHELL_SERIALIZER: RecipeSerializer<PotionMortarShellRecipe> =
         Registration.recipeSerializer("potion_mortar_shell") {
             SimpleCraftingRecipeSerializer { id, category -> PotionMortarShellRecipe(id, category) }

@@ -1,18 +1,16 @@
 package com.atsuishio.superbwarfare.datagen
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.datagen.builder.NBTShapedRecipeBuilder
 import com.atsuishio.superbwarfare.datagen.builder.ResearchingRecipeBuilder
 import com.atsuishio.superbwarfare.datagen.builder.VehicleAssemblingRecipeBuilder
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.init.ModItems.Materials
 import com.atsuishio.superbwarfare.init.ModTags.commonItemTag
+import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.recipe.vehicle.VehicleAssemblingRecipe
-import com.google.gson.JsonObject
 import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients
-import net.minecraft.advancements.Advancement
-import net.minecraft.advancements.RequirementsStrategy
-import net.minecraft.advancements.critereon.RecipeUnlockedTrigger
 import net.minecraft.data.PackOutput
 import net.minecraft.data.recipes.*
 import net.minecraft.resources.ResourceLocation
@@ -492,28 +490,18 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                     has(ModItems.HIGH_ENERGY_EXPLOSIVES)
                 )
                 .save(writer, loc(getItemName(ModItems.C4_BOMB)))
-            // Remote-controlled C4: custom recipe type (see C4BombRcRecipe)
-            val rcId = loc("c4_bomb_rc")
-            writer.accept(object : FinishedRecipe {
-                private val advancement: Advancement.Builder =
-                    Advancement.Builder.recipeAdvancement()
-                        .addCriterion("has_high_energy_explosives", has(ModItems.HIGH_ENERGY_EXPLOSIVES))
-                        .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(rcId))
-                        .requirements(RequirementsStrategy.OR)
-
-                override fun serializeRecipeData(json: JsonObject) {
-                    json.addProperty("type", "superbwarfare:c4_bomb_rc")
-                    json.addProperty("category", "equipment")
-                }
-
-                override fun getId(): ResourceLocation = rcId
-
-                override fun getType(): RecipeSerializer<*> = ModRecipes.C4_BOMB_RC_SERIALIZER
-
-                override fun serializeAdvancement(): JsonObject = advancement.serializeToJson()
-
-                override fun getAdvancementId(): ResourceLocation = loc("recipes/combat/c4_bomb_rc")
-            })
+            NBTShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.C4_BOMB, 2)
+                .withNBT { tag -> tag.putBoolean("Control", true) }
+                .pattern("aaa")
+                .pattern("aba")
+                .pattern("aaa")
+                .define('a', ModItems.HIGH_ENERGY_EXPLOSIVES)
+                .define('b', Items.COMPARATOR)
+                .unlockedBy(
+                    getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES),
+                    has(ModItems.HIGH_ENERGY_EXPLOSIVES)
+                )
+                .save(writer, loc(getItemName(ModItems.C4_BOMB) + "_rc"))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.LARGE_SHELL_AP)
                 .pattern("a")
                 .pattern("b")
@@ -2022,6 +2010,18 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('a', INGOTS_URANIUM)
                 .unlockedBy(getHasName(ModItems.URANIUM_INGOT), has(INGOTS_URANIUM))
                 .save(writer, loc(getItemName(ModItems.URANIUM_BLOCK)))
+
+            NBTShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SMALL_CONTAINER)
+                .withNBT(SmallContainerBlockItem.createInstance(loc("containers/charms")).orCreateTag)
+                .pattern("a")
+                .pattern("b")
+                .define('a', PLATES_COPPER)
+                .define('b', ModItems.COMMON_ACCESSORY_KIT)
+                .unlockedBy(
+                    getHasName(ModItems.COMMON_ACCESSORY_KIT),
+                    has(ModItems.COMMON_ACCESSORY_KIT)
+                )
+                .save(writer, loc(getItemName(ModItems.SMALL_CONTAINER) + "_charms"))
         }
 
         private fun buildVehicleRecipes(writer: Consumer<FinishedRecipe>) {
