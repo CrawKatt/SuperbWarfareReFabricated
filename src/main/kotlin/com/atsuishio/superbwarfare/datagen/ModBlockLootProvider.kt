@@ -10,10 +10,12 @@ import net.minecraft.advancements.critereon.StatePropertiesPredicate
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.Registries
 import net.minecraft.data.loot.BlockLootSubProvider
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.flag.FeatureFlags
 import net.minecraft.world.item.Item
+import net.minecraft.world.item.enchantment.Enchantments
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.properties.BedPart
@@ -21,8 +23,11 @@ import net.minecraft.world.level.storage.loot.LootPool
 import net.minecraft.world.level.storage.loot.LootTable
 import net.minecraft.world.level.storage.loot.entries.LootItem
 import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction
+import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount.addUniformBonusCount
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator
 import java.util.function.BiConsumer
 
 class ModBlockLootProvider(provider: HolderLookup.Provider) :
@@ -48,6 +53,10 @@ class ModBlockLootProvider(provider: HolderLookup.Provider) :
         this.dropSelf(ModBlocks.RAW_GALENA_BLOCK)
         this.dropSelf(ModBlocks.RAW_SCHEELITE_BLOCK)
         this.dropSelf(ModBlocks.RAW_SILVER_BLOCK)
+        this.dropSelf(ModBlocks.RAW_URANIUM_BLOCK)
+        this.dropSelf(ModBlocks.URANIUM_BLOCK)
+        this.dropSelf(ModBlocks.SULFUR_BLOCK)
+        this.dropSelf(ModBlocks.NITER_BLOCK)
         this.add(
             ModBlocks.BLUEPRINT_RESEARCH_TABLE,
             this.applyExplosionDecay(
@@ -96,6 +105,12 @@ class ModBlockLootProvider(provider: HolderLookup.Provider) :
             this.createOreDrop(ModBlocks.SCHEELITE_ORE, ModItems.SCHEELITE)
         )
         this.add(ModBlocks.SILVER_ORE, this.createOreDrop(ModBlocks.SILVER_ORE, ModItems.RAW_SILVER))
+        this.add(ModBlocks.URANIUM_ORE, this.createOreDrop(ModBlocks.URANIUM_ORE, ModItems.RAW_URANIUM))
+        this.add(ModBlocks.DEEPSLATE_URANIUM_ORE, this.createOreDrop(ModBlocks.DEEPSLATE_URANIUM_ORE, ModItems.RAW_URANIUM))
+        this.add(ModBlocks.SULFUR_ORE, this.createSulfurDrop(ModBlocks.SULFUR_ORE))
+        this.add(ModBlocks.DEEPSLATE_SULFUR_ORE, this.createSulfurDrop(ModBlocks.DEEPSLATE_SULFUR_ORE))
+        this.add(ModBlocks.NITER_ORE, this.createNiterDrop(ModBlocks.NITER_ORE))
+        this.add(ModBlocks.DEEPSLATE_NITER_ORE, this.createNiterDrop(ModBlocks.DEEPSLATE_NITER_ORE))
         this.add(
             ModBlocks.DEEPSLATE_GALENA_ORE,
             this.createOreDrop(ModBlocks.DEEPSLATE_GALENA_ORE, ModItems.GALENA)
@@ -175,5 +190,36 @@ class ModBlockLootProvider(provider: HolderLookup.Provider) :
             pool.apply(copy)
         }
         return LootTable.lootTable().withPool(this.applyExplosionCondition(pBlock, pool))
+    }
+    private fun createSulfurDrop(block: Block): LootTable.Builder {
+        return createSilkTouchDispatchTable(
+            block,
+            this.applyExplosionDecay(
+                block,
+                LootItem.lootTableItem(ModItems.SULFUR)
+                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0f, 5.0f)))
+                    .apply(
+                        addUniformBonusCount(
+                            registries.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.FORTUNE)
+                        )
+                    )
+            )
+        )
+    }
+
+    private fun createNiterDrop(block: Block): LootTable.Builder {
+        return createSilkTouchDispatchTable(
+            block,
+            this.applyExplosionDecay(
+                block,
+                LootItem.lootTableItem(ModItems.NITER)
+                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0f, 9.0f)))
+                    .apply(
+                        addUniformBonusCount(
+                            registries.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.FORTUNE)
+                        )
+                    )
+            )
+        )
     }
 }

@@ -114,6 +114,38 @@ class ModItemTagProvider(
             ModItems.DEEPSLATE_SILVER_ORE
         )
 
+        this.tag(ModTags.Items.DUSTS).addTag(commonItemTag("dusts/sulfur"))
+        this.tag(commonItemTag("dusts/sulfur")).add(ModItems.SULFUR)
+        this.tag(commonItemTag("gems")).addTag(commonItemTag("gems/niter"))
+        this.tag(commonItemTag("gems/niter")).add(ModItems.NITER)
+        this.tag(ModTags.Items.INGOTS).addTag(commonItemTag("ingots/uranium"))
+        this.tag(commonItemTag("ingots/uranium")).add(ModItems.URANIUM_INGOT)
+        this.tag(ModTags.Items.RAW_MATERIALS).addTag(commonItemTag("raw_materials/uranium"))
+        this.tag(commonItemTag("raw_materials/uranium")).add(ModItems.RAW_URANIUM)
+        this.tag(ModTags.Items.STORAGE_BLOCKS).addTag(commonItemTag("storage_blocks/raw_uranium"))
+        this.tag(commonItemTag("storage_blocks/raw_uranium")).add(ModItems.RAW_URANIUM_BLOCK)
+        this.tag(ModTags.Items.STORAGE_BLOCKS).addTag(commonItemTag("storage_blocks/uranium"))
+        this.tag(commonItemTag("storage_blocks/uranium")).add(ModItems.URANIUM_BLOCK)
+        this.tag(ModTags.Items.ORES).addTag(commonItemTag("ores/uranium"))
+        this.tag(commonItemTag("ores/uranium")).add(ModItems.URANIUM_ORE, ModItems.DEEPSLATE_URANIUM_ORE)
+        this.tag(ModTags.Items.ORE_RATES_SINGULAR).add(ModItems.URANIUM_ORE, ModItems.DEEPSLATE_URANIUM_ORE)
+        this.tag(ModTags.Items.ORES_IN_GROUND_STONE).add(ModItems.URANIUM_ORE)
+        this.tag(ModTags.Items.ORES_IN_GROUND_DEEPSLATE).add(ModItems.DEEPSLATE_URANIUM_ORE)
+        this.tag(ModTags.Items.STORAGE_BLOCKS).addTag(commonItemTag("storage_blocks/sulfur"))
+        this.tag(commonItemTag("storage_blocks/sulfur")).add(ModItems.SULFUR_BLOCK)
+        this.tag(ModTags.Items.ORES).addTag(commonItemTag("ores/sulfur"))
+        this.tag(commonItemTag("ores/sulfur")).add(ModItems.SULFUR_ORE, ModItems.DEEPSLATE_SULFUR_ORE)
+        this.tag(ModTags.Items.ORE_RATES_SINGULAR).add(ModItems.SULFUR_ORE, ModItems.DEEPSLATE_SULFUR_ORE)
+        this.tag(ModTags.Items.ORES_IN_GROUND_STONE).add(ModItems.SULFUR_ORE)
+        this.tag(ModTags.Items.ORES_IN_GROUND_DEEPSLATE).add(ModItems.DEEPSLATE_SULFUR_ORE)
+        this.tag(ModTags.Items.STORAGE_BLOCKS).addTag(commonItemTag("storage_blocks/niter"))
+        this.tag(commonItemTag("storage_blocks/niter")).add(ModItems.NITER_BLOCK)
+        this.tag(ModTags.Items.ORES).addTag(commonItemTag("ores/niter"))
+        this.tag(commonItemTag("ores/niter")).add(ModItems.NITER_ORE, ModItems.DEEPSLATE_NITER_ORE)
+        this.tag(ModTags.Items.ORE_RATES_SINGULAR).add(ModItems.NITER_ORE, ModItems.DEEPSLATE_NITER_ORE)
+        this.tag(ModTags.Items.ORES_IN_GROUND_STONE).add(ModItems.NITER_ORE)
+        this.tag(ModTags.Items.ORES_IN_GROUND_DEEPSLATE).add(ModItems.DEEPSLATE_NITER_ORE)
+
         this.tag(commonItemTag("plates"))
             .addTag(commonItemTag("plates/copper"))
             .addTag(commonItemTag("plates/steel"))
@@ -613,6 +645,7 @@ class ModItemTagProvider(
 
         for ((rarity, researchable) in ModTags.Items.ATTACHMENT_RESEARCHABLE_BY_RARITY) {
             AttachmentSlots.ALL
+                .filter { it.researchable }
                 .mapNotNull { ModTags.Items.attachmentRarityTag(it.type, rarity) }
                 .forEach { this.tag(researchable).addTag(it) }
         }

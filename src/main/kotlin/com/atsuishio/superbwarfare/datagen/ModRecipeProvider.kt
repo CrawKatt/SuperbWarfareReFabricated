@@ -1,11 +1,13 @@
 package com.atsuishio.superbwarfare.datagen
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.datagen.builder.ItemStackShapedRecipeBuilder
 import com.atsuishio.superbwarfare.datagen.builder.ResearchingRecipeBuilder
 import com.atsuishio.superbwarfare.datagen.builder.VehicleAssemblingRecipeBuilder
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.init.ModItems.Materials
 import com.atsuishio.superbwarfare.init.ModTags.commonItemTag
+import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.recipe.PotionMortarShellRecipe
 import com.atsuishio.superbwarfare.recipe.SmokeDyeRecipe
@@ -80,6 +82,9 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
         val INGOTS_LEAD: TagKey<Item> = commonItemTag("ingots/lead")
         val INGOTS_SILVER: TagKey<Item> = commonItemTag("ingots/silver")
         val INGOTS_TUNGSTEN: TagKey<Item> = commonItemTag("ingots/tungsten")
+        val INGOTS_URANIUM = commonItemTag("ingots/uranium")
+        val DUSTS_SULFUR = commonItemTag("dusts/sulfur")
+        val GEMS_NITER = commonItemTag("gems/niter")
         val STORAGE_BLOCK_STEEL = commonItemTag("storage_blocks/steel")
 
         private fun saveControlledC4Recipe(writer: RecipeOutput) {
@@ -1816,6 +1821,104 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 .define('b', ModTags.Items.INGOTS_IRON)
                 .unlockedBy(getHasName(Items.BLACK_WOOL), has(Items.BLACK_WOOL))
                 .save(writer, loc(getItemName(ModItems.WHEEL)))
+            SimpleCookingRecipeBuilder.generic(
+                Ingredient.of(ModItems.RAW_URANIUM),
+                RecipeCategory.MISC,
+                ModItems.URANIUM_INGOT,
+                0.7f,
+                100,
+                RecipeSerializer.BLASTING_RECIPE,
+                ::BlastingRecipe
+            )
+                .unlockedBy(getHasName(ModItems.RAW_URANIUM), has(ModItems.RAW_URANIUM))
+                .save(writer, loc(getItemName(ModItems.URANIUM_INGOT) + "_blasting"))
+            SimpleCookingRecipeBuilder.generic(
+                Ingredient.of(ModItems.URANIUM_ORE, ModItems.DEEPSLATE_URANIUM_ORE),
+                RecipeCategory.MISC,
+                ModItems.URANIUM_INGOT,
+                0.7f,
+                100,
+                RecipeSerializer.BLASTING_RECIPE,
+                ::BlastingRecipe
+            )
+                .unlockedBy(getHasName(ModItems.URANIUM_ORE), has(commonItemTag("ores/uranium")))
+                .save(writer, loc(getItemName(ModItems.URANIUM_INGOT) + "_blasting_from_ore"))
+            SimpleCookingRecipeBuilder.generic(
+                Ingredient.of(ModItems.RAW_URANIUM),
+                RecipeCategory.MISC,
+                ModItems.URANIUM_INGOT,
+                0.7f,
+                200,
+                RecipeSerializer.SMELTING_RECIPE,
+                ::SmeltingRecipe
+            )
+                .unlockedBy(getHasName(ModItems.RAW_URANIUM), has(ModItems.RAW_URANIUM))
+                .save(writer, loc(getItemName(ModItems.URANIUM_INGOT) + "_smelting"))
+            SimpleCookingRecipeBuilder.generic(
+                Ingredient.of(ModItems.URANIUM_ORE, ModItems.DEEPSLATE_URANIUM_ORE),
+                RecipeCategory.MISC,
+                ModItems.URANIUM_INGOT,
+                0.7f,
+                200,
+                RecipeSerializer.SMELTING_RECIPE,
+                ::SmeltingRecipe
+            )
+                .unlockedBy(getHasName(ModItems.URANIUM_ORE), has(commonItemTag("ores/uranium")))
+                .save(writer, loc(getItemName(ModItems.URANIUM_INGOT) + "_smelting_from_ore"))
+            SimpleCookingRecipeBuilder.generic(
+                Ingredient.of(ModItems.SULFUR_ORE, ModItems.DEEPSLATE_SULFUR_ORE),
+                RecipeCategory.MISC,
+                ModItems.SULFUR,
+                0.7f,
+                100,
+                RecipeSerializer.BLASTING_RECIPE,
+                ::BlastingRecipe
+            )
+                .unlockedBy(getHasName(ModItems.SULFUR_ORE), has(commonItemTag("ores/sulfur")))
+                .save(writer, loc(getItemName(ModItems.SULFUR) + "_blasting_from_ore"))
+            SimpleCookingRecipeBuilder.generic(
+                Ingredient.of(ModItems.SULFUR_ORE, ModItems.DEEPSLATE_SULFUR_ORE),
+                RecipeCategory.MISC,
+                ModItems.SULFUR,
+                0.7f,
+                200,
+                RecipeSerializer.SMELTING_RECIPE,
+                ::SmeltingRecipe
+            )
+                .unlockedBy(getHasName(ModItems.SULFUR_ORE), has(commonItemTag("ores/sulfur")))
+                .save(writer, loc(getItemName(ModItems.SULFUR) + "_smelting_from_ore"))
+            SimpleCookingRecipeBuilder.generic(
+                Ingredient.of(ModItems.NITER_ORE, ModItems.DEEPSLATE_NITER_ORE),
+                RecipeCategory.MISC,
+                ModItems.NITER,
+                0.7f,
+                100,
+                RecipeSerializer.BLASTING_RECIPE,
+                ::BlastingRecipe
+            )
+                .unlockedBy(getHasName(ModItems.NITER_ORE), has(commonItemTag("ores/niter")))
+                .save(writer, loc(getItemName(ModItems.NITER) + "_blasting_from_ore"))
+            SimpleCookingRecipeBuilder.generic(
+                Ingredient.of(ModItems.NITER_ORE, ModItems.DEEPSLATE_NITER_ORE),
+                RecipeCategory.MISC,
+                ModItems.NITER,
+                0.7f,
+                200,
+                RecipeSerializer.SMELTING_RECIPE,
+                ::SmeltingRecipe
+            )
+                .unlockedBy(getHasName(ModItems.NITER_ORE), has(commonItemTag("ores/niter")))
+                .save(writer, loc(getItemName(ModItems.NITER) + "_smelting_from_ore"))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.GUNPOWDER, 6)
+                .requires(DUSTS_SULFUR)
+                .requires(GEMS_NITER)
+                .requires(GEMS_NITER)
+                .requires(ItemTags.COALS)
+                .requires(ItemTags.COALS)
+                .requires(ItemTags.COALS)
+                .unlockedBy(getHasName(ModItems.SULFUR), has(DUSTS_SULFUR))
+                .unlockedBy(getHasName(ModItems.NITER), has(GEMS_NITER))
+                .save(writer, loc(getItemName(Items.GUNPOWDER) + "_from_sulfur_niter_coal"))
             ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.COMMON_ACCESSORY_KIT)
                 .pattern("aba")
                 .pattern("b b")
@@ -2060,6 +2163,47 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 .define('a', commonItemTag("raw_materials/silver"))
                 .unlockedBy(getHasName(ModItems.RAW_SILVER), has(commonItemTag("raw_materials/silver")))
                 .save(writer, loc(getItemName(ModItems.RAW_SILVER_BLOCK)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModItems.RAW_URANIUM_BLOCK)
+                .pattern("aaa")
+                .pattern("aaa")
+                .pattern("aaa")
+                .define('a', commonItemTag("raw_materials/uranium"))
+                .unlockedBy(getHasName(ModItems.RAW_URANIUM), has(commonItemTag("raw_materials/uranium")))
+                .save(writer, loc(getItemName(ModItems.RAW_URANIUM_BLOCK)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModItems.SULFUR_BLOCK)
+                .pattern("aaa")
+                .pattern("aaa")
+                .pattern("aaa")
+                .define('a', DUSTS_SULFUR)
+                .unlockedBy(getHasName(ModItems.SULFUR), has(DUSTS_SULFUR))
+                .save(writer, loc(getItemName(ModItems.SULFUR_BLOCK)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModItems.NITER_BLOCK)
+                .pattern("aaa")
+                .pattern("aaa")
+                .pattern("aaa")
+                .define('a', GEMS_NITER)
+                .unlockedBy(getHasName(ModItems.NITER), has(GEMS_NITER))
+                .save(writer, loc(getItemName(ModItems.NITER_BLOCK)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModItems.URANIUM_BLOCK)
+                .pattern("aaa")
+                .pattern("aaa")
+                .pattern("aaa")
+                .define('a', INGOTS_URANIUM)
+                .unlockedBy(getHasName(ModItems.URANIUM_INGOT), has(INGOTS_URANIUM))
+                .save(writer, loc(getItemName(ModItems.URANIUM_BLOCK)))
+            ItemStackShapedRecipeBuilder(
+                RecipeCategory.MISC,
+                NBTTool.withTag(SmallContainerBlockItem.createInstance(loc("containers/charms"))) {}
+            )
+                .pattern("a")
+                .pattern("b")
+                .define('a', PLATES_COPPER)
+                .define('b', ModItems.COMMON_ACCESSORY_KIT)
+                .unlockedBy(
+                    getHasName(ModItems.COMMON_ACCESSORY_KIT),
+                    has(ModItems.COMMON_ACCESSORY_KIT)
+                )
+                .save(writer, loc(getItemName(ModItems.SMALL_CONTAINER) + "_charms"))
         }
 
         private fun buildVehicleRecipes(writer: RecipeOutput) {
@@ -3192,6 +3336,34 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 .define('d', commonItemTag("dyes"))
                 .unlockedBy(getHasName(Items.TRIPWIRE_HOOK), has(Items.TRIPWIRE_HOOK))
                 .save(writer, loc(getItemName(ModItems.SKIN_SPRAY)))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.RAW_URANIUM, 9)
+                .requires(commonItemTag("storage_blocks/raw_uranium"))
+                .unlockedBy(
+                    getHasName(ModItems.RAW_URANIUM_BLOCK),
+                    has(commonItemTag("storage_blocks/raw_uranium"))
+                )
+                .save(writer, loc("${getItemName(ModItems.RAW_URANIUM)}_from_raw_block"))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.SULFUR, 9)
+                .requires(commonItemTag("storage_blocks/sulfur"))
+                .unlockedBy(
+                    getHasName(ModItems.SULFUR_BLOCK),
+                    has(commonItemTag("storage_blocks/sulfur"))
+                )
+                .save(writer, loc("${getItemName(ModItems.SULFUR)}_from_block"))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.NITER, 9)
+                .requires(commonItemTag("storage_blocks/niter"))
+                .unlockedBy(
+                    getHasName(ModItems.NITER_BLOCK),
+                    has(commonItemTag("storage_blocks/niter"))
+                )
+                .save(writer, loc("${getItemName(ModItems.NITER)}_from_block"))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.URANIUM_INGOT, 9)
+                .requires(commonItemTag("storage_blocks/uranium"))
+                .unlockedBy(
+                    getHasName(ModItems.URANIUM_BLOCK),
+                    has(commonItemTag("storage_blocks/uranium"))
+                )
+                .save(writer, loc("${getItemName(ModItems.URANIUM_INGOT)}_from_block"))
             VehicleAssemblingRecipeBuilder.item(
                 ModItems.VEHICLE_KEY,
                 1,

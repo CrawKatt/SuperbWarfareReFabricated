@@ -16,6 +16,25 @@ class ModBlockTagProvider(
 ) : VanillaBlockTagsProvider(output, lookupProvider) {
     override fun addTags(pProvider: HolderLookup.Provider) {
         super.addTags(pProvider)
+        this.tag(BlockTags.NEEDS_STONE_TOOL).add(ModBlocks.SULFUR_ORE, ModBlocks.DEEPSLATE_SULFUR_ORE, ModBlocks.SULFUR_BLOCK, ModBlocks.NITER_ORE, ModBlocks.DEEPSLATE_NITER_ORE, ModBlocks.NITER_BLOCK)
+        this.tag(BlockTags.NEEDS_IRON_TOOL).add(ModBlocks.URANIUM_ORE, ModBlocks.DEEPSLATE_URANIUM_ORE, ModBlocks.URANIUM_BLOCK, ModBlocks.RAW_URANIUM_BLOCK)
+        this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(ModBlocks.URANIUM_ORE, ModBlocks.DEEPSLATE_URANIUM_ORE, ModBlocks.SULFUR_ORE, ModBlocks.DEEPSLATE_SULFUR_ORE, ModBlocks.NITER_ORE, ModBlocks.DEEPSLATE_NITER_ORE, ModBlocks.RAW_URANIUM_BLOCK, ModBlocks.URANIUM_BLOCK, ModBlocks.SULFUR_BLOCK, ModBlocks.NITER_BLOCK)
+        this.tag(commonBlockTag("storage_blocks/raw_uranium")).add(ModBlocks.RAW_URANIUM_BLOCK)
+        this.tag(ModTags.Blocks.ORES).addTag(commonBlockTag("ores/uranium"))
+        this.tag(commonBlockTag("ores/uranium")).add(ModBlocks.URANIUM_ORE, ModBlocks.DEEPSLATE_URANIUM_ORE)
+        this.tag(commonBlockTag("storage_blocks/uranium")).add(ModBlocks.URANIUM_BLOCK)
+        this.tag(ModTags.Blocks.ORES_IN_GROUND_STONE).add(ModBlocks.URANIUM_ORE)
+        this.tag(ModTags.Blocks.ORES_IN_GROUND_DEEPSLATE).add(ModBlocks.DEEPSLATE_URANIUM_ORE)
+        this.tag(ModTags.Blocks.ORES).addTag(commonBlockTag("ores/sulfur"))
+        this.tag(commonBlockTag("ores/sulfur")).add(ModBlocks.SULFUR_ORE, ModBlocks.DEEPSLATE_SULFUR_ORE)
+        this.tag(commonBlockTag("storage_blocks/sulfur")).add(ModBlocks.SULFUR_BLOCK)
+        this.tag(ModTags.Blocks.ORES_IN_GROUND_STONE).add(ModBlocks.SULFUR_ORE)
+        this.tag(ModTags.Blocks.ORES_IN_GROUND_DEEPSLATE).add(ModBlocks.DEEPSLATE_SULFUR_ORE)
+        this.tag(ModTags.Blocks.ORES).addTag(commonBlockTag("ores/niter"))
+        this.tag(commonBlockTag("ores/niter")).add(ModBlocks.NITER_ORE, ModBlocks.DEEPSLATE_NITER_ORE)
+        this.tag(commonBlockTag("storage_blocks/niter")).add(ModBlocks.NITER_BLOCK)
+        this.tag(ModTags.Blocks.ORES_IN_GROUND_STONE).add(ModBlocks.NITER_ORE)
+        this.tag(ModTags.Blocks.ORES_IN_GROUND_DEEPSLATE).add(ModBlocks.DEEPSLATE_NITER_ORE)
         this.tag(BlockTags.NEEDS_IRON_TOOL).add(
             ModBlocks.GALENA_ORE, ModBlocks.SCHEELITE_ORE,
             ModBlocks.DEEPSLATE_GALENA_ORE, ModBlocks.DEEPSLATE_SCHEELITE_ORE,

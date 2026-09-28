@@ -132,6 +132,16 @@ class ModBlockStateProvider(private val output: PackOutput) : DataProvider {
         blockWithItem(ModBlocks.RAW_GALENA_BLOCK)
         blockWithItem(ModBlocks.RAW_SCHEELITE_BLOCK)
         blockWithItem(ModBlocks.RAW_SILVER_BLOCK)
+        blockWithItem(ModBlocks.URANIUM_ORE)
+        blockWithItem(ModBlocks.DEEPSLATE_URANIUM_ORE)
+        blockWithItem(ModBlocks.SULFUR_ORE)
+        blockWithItem(ModBlocks.DEEPSLATE_SULFUR_ORE)
+        blockWithItem(ModBlocks.NITER_ORE)
+        blockWithItem(ModBlocks.DEEPSLATE_NITER_ORE)
+        blockWithItem(ModBlocks.RAW_URANIUM_BLOCK)
+        blockWithItem(ModBlocks.URANIUM_BLOCK)
+        blockWithItem(ModBlocks.SULFUR_BLOCK)
+        blockWithItem(ModBlocks.NITER_BLOCK)
 
         simpleBlock(ModBlocks.FUMO_25, blockModel("fumo_25"))
     }
