@@ -304,14 +304,16 @@ class ModItemTagProvider(
             .addTag(ModTags.Items.CANNON_BLUEPRINT)
 
         this.tag(ModTags.Items.COMMON_BLUEPRINT).add(
-            ModItems.GLOCK_17_BLUEPRINT, ModItems.MP_443_BLUEPRINT, ModItems.MARLIN_BLUEPRINT,
-            ModItems.TASER_BLUEPRINT, ModItems.M_1911_BLUEPRINT
+            ModItems.GLOCK_17_BLUEPRINT,
+            ModItems.MP_443_BLUEPRINT,
+            ModItems.MARLIN_BLUEPRINT,
+            ModItems.TASER_BLUEPRINT,
+            ModItems.M_1911_BLUEPRINT,
         )
 
         this.tag(ModTags.Items.RARE_BLUEPRINT).add(
             ModItems.GLOCK_18_BLUEPRINT,
             ModItems.M_79_BLUEPRINT,
-            ModItems.GP_25_BLUEPRINT,
             ModItems.M_4_BLUEPRINT,
             ModItems.SKS_BLUEPRINT,
             ModItems.M_870_BLUEPRINT,
@@ -323,7 +325,9 @@ class ModItemTagProvider(
             ModItems.AK_12_BLUEPRINT,
             ModItems.QBZ_95_BLUEPRINT,
             ModItems.RPG_BLUEPRINT,
-            ModItems.M_1897_BLUEPRINT
+            ModItems.M_1897_BLUEPRINT,
+            ModItems.MP_5_BLUEPRINT,
+            ModItems.NAIL_GUN_BLUEPRINT,
         )
 
         this.tag(ModTags.Items.EPIC_BLUEPRINT).add(
@@ -340,7 +344,8 @@ class ModItemTagProvider(
             ModItems.AWM_BLUEPRINT,
             ModItems.IGLA_BLUEPRINT,
             ModItems.SENTINEL_BLUEPRINT,
-            ModItems.HUNTING_RIFLE_BLUEPRINT
+            ModItems.HUNTING_RIFLE_BLUEPRINT,
+            ModItems.GP_25_BLUEPRINT,
         )
 
         this.tag(ModTags.Items.LEGENDARY_BLUEPRINT).add(
@@ -352,10 +357,14 @@ class ModItemTagProvider(
             ModItems.MLE_1934_BLUEPRINT,
             ModItems.ANNIHILATOR_BLUEPRINT,
             ModItems.HPJ_11_BLUEPRINT,
-            ModItems.BL_132_BLUEPRINT
+            ModItems.BL_132_BLUEPRINT,
         )
 
-        this.tag(ModTags.Items.SUPERB_BLUEPRINT).add(ModItems.SUPER_STAR_SHOOTER_BLUEPRINT)
+        this.tag(ModTags.Items.SUPERB_BLUEPRINT).add(
+            ModItems.SUPER_STAR_SHOOTER_BLUEPRINT,
+            ModItems.RAUBTIER_BLUEPRINT,
+            ModItems.REFORGING_BLUEPRINT,
+        )
 
         this.tag(ModTags.Items.VIRTUAL_BLUEPRINT).add(
             ModItems.TRACHELIUM_BLUEPRINT,

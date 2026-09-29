@@ -2828,6 +2828,27 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 ModItems.MEDIUM_ARMAMENT_MODULE,
                 ModItems.SUPER_STAR_SHOOTER
             )
+            gunSmithing(
+                writer,
+                ModItems.RAUBTIER_BLUEPRINT.get(),
+                GunRarity.SUPERB,
+                ModItems.CANNON_CORE.get(),
+                ModItems.RAUBTIER.get()
+            )
+            gunSmithing(
+                writer,
+                ModItems.REFORGING_BLUEPRINT.get(),
+                GunRarity.SUPERB,
+                ModItems.REFORGING_TABLE.get(),
+                ModItems.REFORGING.get()
+            )
+            gunSmithing(
+                writer,
+                ModItems.NAIL_GUN_BLUEPRINT.get(),
+                GunRarity.RARE,
+                ModItems.ENGINEERING_PLASTIC.get(),
+                ModItems.NAIL_GUN.get()
+            )
 
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.HOMEMADE_SHOTGUN)
                 .pattern("aab")
@@ -2890,6 +2911,9 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
             copyBlueprint(writer, ModItems.ANNIHILATOR_BLUEPRINT)
             copyBlueprint(writer, ModItems.QL_1031_BLUEPRINT)
             copyBlueprint(writer, ModItems.SUPER_STAR_SHOOTER_BLUEPRINT)
+            copyBlueprint(writer, ModItems.REFORGING_BLUEPRINT)
+            copyBlueprint(writer, ModItems.RAUBTIER_BLUEPRINT)
+            copyBlueprint(writer, ModItems.NAIL_GUN_BLUEPRINT)
         }
 
         private fun buildPerkRecipes(writer: RecipeOutput) {
