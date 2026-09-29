@@ -1,10 +1,10 @@
 package com.atsuishio.superbwarfare.mixins;
 
+import com.atsuishio.superbwarfare.client.ArmPoseExtensible;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.LungeMine;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.item.gun.special.SuperStarShooterItem;
-import com.atsuishio.superbwarfare.item.gun.machinegun.M2HBItem;
 import com.atsuishio.superbwarfare.item.gun.machinegun.MinigunItem;
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem;
 import com.atsuishio.superbwarfare.item.curio.ParachuteItem;
@@ -19,6 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -44,6 +45,10 @@ public abstract class HumanoidModelMixin {
 
     @Shadow @Final public ModelPart hat;
 
+    @Shadow protected HumanoidModel.ArmPose rightArmPose;
+
+    @Shadow protected HumanoidModel.ArmPose leftArmPose;
+
     @Inject(method = "poseRightArm", at = @At("HEAD"), cancellable = true)
     private void superbwarfare$applyCustomRightArmPose(LivingEntity entity, CallbackInfo ci) {
         if (!(entity instanceof Player)) return;
@@ -60,11 +65,6 @@ public abstract class HumanoidModelMixin {
             model.rightArm.yRot = -12f * Mth.DEG_TO_RAD;
             model.leftArm.xRot = -45f * Mth.DEG_TO_RAD + model.head.xRot;
             model.leftArm.yRot = 40f * Mth.DEG_TO_RAD;
-        } else if (item instanceof M2HBItem) {
-            model.rightArm.xRot = 45f * Mth.DEG_TO_RAD + model.head.xRot;
-            model.rightArm.yRot = model.head.yRot;
-            model.leftArm.xRot = Mth.clamp(-45f * Mth.DEG_TO_RAD + model.head.xRot, -67.5f * Mth.DEG_TO_RAD, 0f);
-            model.leftArm.yRot = Mth.clamp(45f * Mth.DEG_TO_RAD + model.head.yRot, 45f * Mth.DEG_TO_RAD, 80f * Mth.DEG_TO_RAD);
         } else if (item instanceof MinigunItem) {
             model.rightArm.xRot = 22.5f * Mth.DEG_TO_RAD + model.head.xRot;
             model.rightArm.yRot = model.head.yRot;
@@ -85,6 +85,24 @@ public abstract class HumanoidModelMixin {
         }
 
         ci.cancel();
+    }
+
+    @Inject(method = "poseRightArm", at = @At("TAIL"))
+    private void superbwarfare$applyExtendedRightArmPose(LivingEntity entity, CallbackInfo ci) {
+        this.superbwarfare$applyExtendedArmPose(this.rightArmPose, entity, HumanoidArm.RIGHT);
+    }
+
+    @Inject(method = "poseLeftArm", at = @At("TAIL"))
+    private void superbwarfare$applyExtendedLeftArmPose(LivingEntity entity, CallbackInfo ci) {
+        this.superbwarfare$applyExtendedArmPose(this.leftArmPose, entity, HumanoidArm.LEFT);
+    }
+
+    @Unique
+    private void superbwarfare$applyExtendedArmPose(HumanoidModel.ArmPose pose, LivingEntity entity, HumanoidArm arm) {
+        ArmPoseExtensible extension = (ArmPoseExtensible) (Object) pose;
+        if (extension.superbwarfare$hasTransformer()) {
+            extension.superbwarfare$applyTransform((HumanoidModel<?>) (Object) this, entity, arm);
+        }
     }
 
     @Inject(

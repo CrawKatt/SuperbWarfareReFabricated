@@ -2915,7 +2915,7 @@ object ClientEventHandler {
         poseStack.mulPose(Axis.XP.rotation(gunRotX))
         poseStack.mulPose(Axis.YP.rotation(gunRotY))
         poseStack.mulPose(Axis.ZP.rotation(gunRotZ))
-        poseStack.translate(-gunPosX / 16, gunPosY / 16, gunPosZ / 16)
+        poseStack.translate(gunPosX / 16, gunPosY / 16, gunPosZ / 16)
     }
 
     @JvmStatic

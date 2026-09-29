@@ -60,6 +60,7 @@
     "GameRendererMixin",
     "GuiGraphicsMixin",
     "GuiMixin",
+    "ArmPoseMixin",
     "HumanoidModelMixin",
     "ItemInHandLayerMixin",
     "ItemInHandRendererMixin",
