@@ -3,7 +3,6 @@
   "values": [
     "superbwarfare:glock_18_blueprint",
     "superbwarfare:m_79_blueprint",
-    "superbwarfare:gp_25_blueprint",
     "superbwarfare:m_4_blueprint",
     "superbwarfare:sks_blueprint",
     "superbwarfare:m_870_blueprint",
@@ -15,6 +14,8 @@
     "superbwarfare:ak_12_blueprint",
     "superbwarfare:qbz_95_blueprint",
     "superbwarfare:rpg_blueprint",
-    "superbwarfare:m_1897_blueprint"
+    "superbwarfare:m_1897_blueprint",
+    "superbwarfare:mp_5_blueprint",
+    "superbwarfare:nail_gun_blueprint"
   ]
 }
