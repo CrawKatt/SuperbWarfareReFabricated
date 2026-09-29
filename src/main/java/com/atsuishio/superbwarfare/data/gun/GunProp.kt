@@ -216,8 +216,11 @@ class GunProp<T, R>(
         val MAGAZINE = GunProp(
             DefaultGunData::magazine,
             { it.firstOrNull() ?: 0 },
-            contextTransform = { data, values ->
-                if (values.list.size <= 1) {
+            { data, values ->
+                if (values.list.isEmpty() || values.firstOrNull() == 0) {
+                    // 第一档为 0 = 这把枪没有弹匣（背包型），与有几档扩容弹匣无关
+                    0
+                } else if (values.list.size <= 1) {
                     (values.firstOrNull() ?: 0) + data.item.getCustomMagazine(data)
                 } else {
                     values.atMagazineLevel(data.magazineLevel())
