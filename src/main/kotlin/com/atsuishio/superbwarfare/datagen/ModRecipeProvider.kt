@@ -2830,24 +2830,24 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
             )
             gunSmithing(
                 writer,
-                ModItems.RAUBTIER_BLUEPRINT.get(),
+                ModItems.RAUBTIER_BLUEPRINT,
                 GunRarity.SUPERB,
-                ModItems.CANNON_CORE.get(),
-                ModItems.RAUBTIER.get()
+                ModItems.CANNON_CORE,
+                ModItems.RAUBTIER
             )
             gunSmithing(
                 writer,
-                ModItems.REFORGING_BLUEPRINT.get(),
+                ModItems.REFORGING_BLUEPRINT,
                 GunRarity.SUPERB,
-                ModItems.REFORGING_TABLE.get(),
-                ModItems.REFORGING.get()
+                ModItems.REFORGING_TABLE,
+                ModItems.REFORGING
             )
             gunSmithing(
                 writer,
-                ModItems.NAIL_GUN_BLUEPRINT.get(),
+                ModItems.NAIL_GUN_BLUEPRINT,
                 GunRarity.RARE,
-                ModItems.ENGINEERING_PLASTIC.get(),
-                ModItems.NAIL_GUN.get()
+                ModItems.ENGINEERING_PLASTIC,
+                ModItems.NAIL_GUN
             )
 
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.HOMEMADE_SHOTGUN)

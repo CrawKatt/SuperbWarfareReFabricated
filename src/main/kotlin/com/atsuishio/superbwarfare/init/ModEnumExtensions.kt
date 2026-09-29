@@ -104,7 +104,7 @@ object ModEnumExtensions {
                     )
                 }
                 SUPERBWARFARE_M2_POSE -> {
-                    model.rightArm.xRot = 45f * Mth.DEG_TO_RAD + model.head.xRot
+                    model.rightArm.xRot = model.head.xRot
                     model.rightArm.yRot = model.head.yRot
                     model.leftArm.xRot = Mth.clamp(
                         -45f * Mth.DEG_TO_RAD + model.head.xRot,
