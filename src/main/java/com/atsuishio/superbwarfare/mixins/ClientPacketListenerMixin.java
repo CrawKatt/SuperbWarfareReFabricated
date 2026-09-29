@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.event.custom.TagsUpdatedCallback;
 import com.atsuishio.superbwarfare.init.ModKeyMappings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -8,6 +9,7 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.PacketUtils;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
+import net.minecraft.network.protocol.game.ClientboundUpdateTagsPacket;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -75,5 +77,10 @@ public abstract class ClientPacketListenerMixin {
         }
 
         vehicle.setEntityIndexOverride(null);
+    }
+
+    @Inject(method = "handleUpdateTags", at = @At("TAIL"))
+    private void superbwarfare$onTagsUpdated(ClientboundUpdateTagsPacket packet, CallbackInfo ci) {
+        TagsUpdatedCallback.EVENT.invoker().onTagsUpdated(!this.minecraft.hasSingleplayerServer());
     }
 }
