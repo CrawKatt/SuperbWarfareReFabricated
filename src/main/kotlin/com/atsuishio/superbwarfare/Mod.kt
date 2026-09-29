@@ -10,6 +10,7 @@ import com.atsuishio.superbwarfare.config.COMMON_CONFIG
 import com.atsuishio.superbwarfare.config.SERVER_CONFIG
 import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.DataLoader
+import com.atsuishio.superbwarfare.data.attachment.AvailableAttachments
 import com.atsuishio.superbwarfare.data.container.ContainerDataManager
 import com.atsuishio.superbwarfare.data.loot.WreckageLootDataManager
 import com.atsuishio.superbwarfare.event.CustomEventHandler
@@ -63,6 +64,7 @@ class Mod : ModInitializer {
 
         registerPayloads()
         DataLoader.register()
+        AvailableAttachments.TagsUpdatedListener.register()
         WreckageLootDataManager.register()
         ModLootModifier.init()
         IffItem.init()
