@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.datagen
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.datagen.builder.ItemStackShapedRecipeBuilder
+import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.datagen.builder.ResearchingRecipeBuilder
 import com.atsuishio.superbwarfare.datagen.builder.VehicleAssemblingRecipeBuilder
 import com.atsuishio.superbwarfare.init.*
@@ -2204,6 +2205,19 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                     has(ModItems.COMMON_ACCESSORY_KIT)
                 )
                 .save(writer, loc(getItemName(ModItems.SMALL_CONTAINER) + "_charms"))
+            ItemStackShapedRecipeBuilder(
+                RecipeCategory.MISC,
+                NBTTool.withTag(SmallContainerBlockItem.createInstance(loc("containers/charms"))) {}
+            )
+                .pattern(" a ")
+                .pattern("a a")
+                .pattern(" a ")
+                .define('a', ModTags.Items.ATTACHMENT_BY_SLOT[AttachmentType.CHARM]!!)
+                .unlockedBy(
+                    getHasName(ModItems.CHARM_BEE),
+                    has(ModTags.Items.ATTACHMENT_BY_SLOT[AttachmentType.CHARM]!!)
+                )
+                .save(writer, loc(getItemName(ModItems.SMALL_CONTAINER) + "_charms_recycle"))
         }
 
         private fun buildVehicleRecipes(writer: RecipeOutput) {
