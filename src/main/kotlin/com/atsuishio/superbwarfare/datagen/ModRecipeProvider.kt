@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.datagen
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.datagen.builder.NBTShapedRecipeBuilder
 import com.atsuishio.superbwarfare.datagen.builder.ResearchingRecipeBuilder
 import com.atsuishio.superbwarfare.datagen.builder.VehicleAssemblingRecipeBuilder
@@ -2010,7 +2011,6 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('a', INGOTS_URANIUM)
                 .unlockedBy(getHasName(ModItems.URANIUM_INGOT), has(INGOTS_URANIUM))
                 .save(writer, loc(getItemName(ModItems.URANIUM_BLOCK)))
-
             NBTShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SMALL_CONTAINER)
                 .withNBT(SmallContainerBlockItem.createInstance(loc("containers/charms")).orCreateTag)
                 .pattern("a")
@@ -2022,6 +2022,17 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                     has(ModItems.COMMON_ACCESSORY_KIT)
                 )
                 .save(writer, loc(getItemName(ModItems.SMALL_CONTAINER) + "_charms"))
+            NBTShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModItems.SMALL_CONTAINER)
+                .withNBT(SmallContainerBlockItem.createInstance(loc("containers/charms")).orCreateTag)
+                .pattern(" a ")
+                .pattern("a a")
+                .pattern(" a ")
+                .define('a', ModTags.Items.ATTACHMENT_BY_SLOT[AttachmentType.CHARM]!!)
+                .unlockedBy(
+                    getHasName(ModItems.CHARM_BEE),
+                    has(ModTags.Items.ATTACHMENT_BY_SLOT[AttachmentType.CHARM]!!)
+                )
+                .save(writer, loc(getItemName(ModItems.SMALL_CONTAINER) + "_charms_recycle"))
         }
 
         private fun buildVehicleRecipes(writer: Consumer<FinishedRecipe>) {
