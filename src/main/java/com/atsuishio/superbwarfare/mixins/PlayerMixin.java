@@ -3,12 +3,17 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.trinket.ParachuteItem;
 import com.atsuishio.superbwarfare.item.weapon.BeastItem;
+import com.atsuishio.superbwarfare.item.weapon.MilitaryShovelItem;
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -62,6 +67,13 @@ public abstract class PlayerMixin extends Entity {
                 targetPlayer.level().broadcastEntityEvent(targetPlayer, (byte) 30);
             }
         }
+    }
+
+    @Definition(id = "SwordItem", type = SwordItem.class)
+    @Expression("? instanceof SwordItem")
+    @ModifyExpressionValue(method = "attack", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private boolean superbwarfare$militaryShovelSweep(boolean original) {
+        return original || ((Player) (Object) this).getMainHandItem().getItem() instanceof MilitaryShovelItem;
     }
 
     @ModifyArgs(

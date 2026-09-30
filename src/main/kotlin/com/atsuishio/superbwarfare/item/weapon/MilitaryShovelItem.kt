@@ -84,12 +84,22 @@ open class MilitaryShovelItem :
 
         if (player.isShiftKeyDown) {
             // 锄：耕地
-            val tillable = HoeItem.TILLABLES[blockstate.block] ?: return InteractionResult.PASS
-            if (!tillable.first.test(context)) return InteractionResult.PASS
+            val hoeRes = when (blockstate.block) {
+                Blocks.ROOTED_DIRT, Blocks.COARSE_DIRT -> Blocks.DIRT.defaultBlockState()
+                Blocks.GRASS_BLOCK, Blocks.DIRT_PATH, Blocks.DIRT -> Blocks.FARMLAND.defaultBlockState()
+                else -> return InteractionResult.PASS
+            }
+            if (blockstate.`is`(Blocks.ROOTED_DIRT)) {
+                if (!level.isClientSide) {
+                    Block.popResourceFromFace(level, blockpos, context.clickedFace, ItemStack(Items.HANGING_ROOTS))
+                }
+            } else if (!level.getBlockState(blockpos.above()).isAir) {
+                return InteractionResult.PASS
+            }
 
             level.playSound(player, blockpos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1.0f, 1.0f)
             if (!level.isClientSide) {
-                tillable.second.accept(context)
+                HoeItem.changeIntoState(hoeRes).accept(context)
                 context.itemInHand.hurtAndBreak(1, player, LivingEntity.getSlotForHand(context.hand))
             }
             return InteractionResult.sidedSuccess(level.isClientSide)
@@ -104,8 +114,8 @@ open class MilitaryShovelItem :
             level.playSound(player, blockpos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F)
         } else {
             resultToSet = if (blockstate.block is CampfireBlock && blockstate.getValue(CampfireBlock.LIT)) {
+                CampfireBlock.dowse(player, level, blockpos, blockstate)
                 if (!level.isClientSide) {
-                    CampfireBlock.dowse(player, level, blockpos, blockstate)
                     level.levelEvent(null, LevelEvent.SOUND_EXTINGUISH_FIRE, blockpos, 0)
                 }
                 blockstate.setValue(CampfireBlock.LIT, false)

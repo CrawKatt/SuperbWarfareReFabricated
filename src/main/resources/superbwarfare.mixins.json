@@ -77,5 +77,8 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "minVersion": "0.8"
+  "minVersion": "0.8",
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  }
 }
