@@ -280,7 +280,8 @@ class ModItemTagProvider(
             ModItems.AK_12_BLUEPRINT,
             ModItems.QBZ_95_BLUEPRINT,
             ModItems.RPG_BLUEPRINT,
-            ModItems.HUNTING_RIFLE_BLUEPRINT
+            ModItems.HUNTING_RIFLE_BLUEPRINT,
+            ModItems.MP_5_BLUEPRINT
         )
 
         this.tag(ModTags.Items.EPIC_BLUEPRINT).add(
