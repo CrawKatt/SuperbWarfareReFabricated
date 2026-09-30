@@ -125,3 +125,7 @@ run/
 
 .cache
 .kotlin
+
+bin/
+/.mc-mcp-cache/
+/.mc-mcp-server/
