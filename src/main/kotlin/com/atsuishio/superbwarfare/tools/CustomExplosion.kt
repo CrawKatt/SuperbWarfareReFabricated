@@ -144,22 +144,6 @@ open class CustomExplosion @JvmOverloads constructor(
         if (ExplosionConfig.EXPLOSION_DESTROY.get()) {
             this.level.gameEvent(this.entity, GameEvent.EXPLODE, Vec3(this.x, this.y, this.z))
 
-            // Pre-compute decreasing tier boundaries to keep block count per
-            // tick balanced. Outer shells have 4πr² more volume, so they need
-            // smaller tier sizes. Tier sizes: 25, 23, 21, …, min 5.
-            // ================================================================
-            val initialTierSize = 25.0
-            val tierDecrease = 2.0
-            val minTierSize = 2.0
-
-            val tierBoundaries = mutableListOf(0.0)
-            var currentBoundary = 0.0
-            var currentSize = initialTierSize
-            while (currentBoundary < radius * 2.0) {
-                currentBoundary += currentSize
-                tierBoundaries.add(currentBoundary)
-                currentSize = (currentSize - tierDecrease).coerceAtLeast(minTierSize)
-=======
             if (this.interactsWithBlocks()) {
                 explodeBlocks()
             }
