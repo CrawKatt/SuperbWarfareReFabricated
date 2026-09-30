@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TDMSyncMessage(@JvmField val data: Set<String>) : ClientPacketPayload() {
     override fun PayloadContext.handler() {
+        // Fabric invokes play payload handlers on the render thread.
         ClientEventHandler.tdmSavedData = TDMSavedData(data)
     }
 }
