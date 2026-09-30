@@ -67,7 +67,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         gunItemV2(ModItems.QBZ_95)
         gunItemV2(ModItems.RPG)
         gunItemV2(ModItems.RPK)
-        gunItem(ModItems.SECONDARY_CATACLYSM)
+        gunItemV2(ModItems.SECONDARY_CATACLYSM)
         gunItem(ModItems.SENTINEL)
         gunItem(ModItems.SKS)
         gunItemV2(ModItems.SVD)

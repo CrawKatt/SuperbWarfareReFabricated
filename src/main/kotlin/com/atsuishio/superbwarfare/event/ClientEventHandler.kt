@@ -2112,34 +2112,33 @@ object ClientEventHandler {
         // 主手不是枪时什么都不播；部署中的副武器走的是同一条链路（§9.8.3）
         if (item == null || !GunItem.isOperable(stack)) return
 
-        if (item == ModItems.SENTINEL) {
-            val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
-            val charged = cap != null && cap.amount > 0
+//        if (item == ModItems.SENTINEL.get()) {
+//            val flag = stack.getCapability(ForgeCapabilities.ENERGY).map { it.energyStored > 0 }.orElseGet { false }
+//            if (flag) {
+//                player.playSound(
+//                    ModSounds.SENTINEL_CHARGE_FIRE_1P.get(),
+//                    2f,
+//                    ((2 * Math.random() - 1) * 0.05f + 1).toFloat()
+//                )
+//                return
+//            }
+//        }
 
-            if (charged) {
-                player.playSound(
-                    ModSounds.SENTINEL_CHARGE_FIRE_1P,
-                    2f,
-                    ((2 * Math.random() - 1) * 0.05f + 1).toFloat()
-                )
-                return
-            }
-        }
-
-        if (item == ModItems.SECONDARY_CATACLYSM) {
-            val cap = ModCapabilities.ENERGY_ITEM.find(stack, null)
-            val hasEnoughEnergy = cap != null && cap.amount > 3000
-
-            val isChargedFire = zoom && hasEnoughEnergy
-            if (isChargedFire) {
-                player.playSound(
-                    ModSounds.SECONDARY_CATACLYSM_FIRE_1P_CHARGE,
-                    2f,
-                    ((2 * Math.random() - 1) * 0.05f + 1.0f).toFloat()
-                )
-                return
-            }
-        }
+//        if (item == ModItems.SECONDARY_CATACLYSM.get()) {
+//            val hasEnoughEnergy = stack.getCapability(ForgeCapabilities.ENERGY)
+//                .map { it.energyStored >= 3000 }
+//                .orElseGet { false }
+//
+//            val isChargedFire = zoom && hasEnoughEnergy
+//            if (isChargedFire) {
+//                player.playSound(
+//                    ModSounds.SECONDARY_CATACLYSM_FIRE_1P_CHARGE.get(),
+//                    2f,
+//                    ((2 * Math.random() - 1) * 0.05f + 1.0f).toFloat()
+//                )
+//                return
+//            }
+//        }
 
         val data = GunData.from(stack)
 
