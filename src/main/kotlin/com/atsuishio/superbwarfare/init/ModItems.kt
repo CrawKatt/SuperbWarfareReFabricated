@@ -349,6 +349,7 @@ object ModItems {
     @JvmField val BAYONET_M_9 = registerAttachment("bayonet_m_9")
     @JvmField val BAYONET_6KH2 = registerAttachment("bayonet_6kh2")
     @JvmField val BAYONET_SEITENGEWEHR_84 = registerAttachment("bayonet_seitengewehr_84")
+    @JvmField val BAYONET_M_91_30 = registerAttachment("bayonet_m_91_30")
     // @formatter:on
 
     @JvmField val SUB_WEAPON_GP_25 = registerSubWeapon("sub_weapon_gp_25", Rarity.EPIC)
