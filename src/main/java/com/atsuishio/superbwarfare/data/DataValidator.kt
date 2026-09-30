@@ -20,10 +20,11 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.serializer
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.Registries
 import net.minecraft.resources.FileToIdConverter
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.ResourceManager
-import net.minecraft.tags.ItemTags
+import net.minecraft.tags.TagKey
 import kotlin.jvm.optionals.getOrNull
 
 /**
@@ -228,7 +229,7 @@ object DataValidator {
                 }
 
                 val members = if (tagged) {
-                    val tag = BuiltInRegistries.ITEM.getTag(ItemTags.create(id))
+                    val tag = BuiltInRegistries.ITEM.getTag(TagKey.create(Registries.ITEM, id))
                         .map { items -> items.map { it.value() } }
                         .getOrNull()
 

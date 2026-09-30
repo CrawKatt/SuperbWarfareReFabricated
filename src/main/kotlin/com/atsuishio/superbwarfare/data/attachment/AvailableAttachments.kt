@@ -8,8 +8,9 @@ import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import kotlinx.serialization.json.JsonObject
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.tags.ItemTags
+import net.minecraft.tags.TagKey
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.optionals.getOrNull
 
@@ -120,7 +121,7 @@ object AvailableAttachments {
 
     /** 标签里的全部物品 id；注册表还没就绪时返回空集合，不抛异常。 */
     private fun tagMembers(id: ResourceLocation): List<ResourceLocation> {
-        return BuiltInRegistries.ITEM.getTag(ItemTags.create(id))
+        return BuiltInRegistries.ITEM.getTag(TagKey.create(Registries.ITEM, id))
             .map { items -> items.map { BuiltInRegistries.ITEM.getKey(it.value()) } }
             .getOrNull() ?: mutableListOf()
     }
