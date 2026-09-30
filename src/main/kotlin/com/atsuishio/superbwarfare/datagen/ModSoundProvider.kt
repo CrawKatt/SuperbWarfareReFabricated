@@ -368,7 +368,7 @@ class ModSoundProvider(private val output: PackOutput) : DataProvider {
         // -------------------- gun/m_98b --------------------
         group(
             "gun/m_98b", "m_98b_fire_1p", "m_98b_fire_3p", "m_98b_fire_1p_s", "m_98b_fire_3p_s", "m_98b_far",
-            "m_98b_veryfar", "m_98b_reload_normal", "m_98b_reload_empty", "m_98b_bolt",
+            "m_98b_veryfar", "m_98b_mag_out", "m_98b_mag_in", "m_98b_bolt_open", "m_98b_bolt_close",
         )
 
         // -------------------- gun/marlin --------------------
