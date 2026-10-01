@@ -197,6 +197,8 @@ dependencies {
         exclude("org.joml", "joml")
     }
     include("com.maydaymemory:mae:1.1.4")
+
+    modCompileOnly("maven.modrinth:accrelatedrendering-refabricated:1.0.11-1.21.1-alpha-fabric.1")
 }
 
 fabricApi {
