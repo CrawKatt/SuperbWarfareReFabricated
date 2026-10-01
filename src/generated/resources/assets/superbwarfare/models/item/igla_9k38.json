@@ -1,7 +1,4 @@
 {
-  "parent": "superbwarfare:item/igla_9k38_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/igla_9k38_icon"
-  }
+  "parent": "minecraft:builtin/entity",
+  "gui_light": "front"
 }
