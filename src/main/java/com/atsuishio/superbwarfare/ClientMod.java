@@ -19,6 +19,7 @@ import com.atsuishio.superbwarfare.client.renderer.special.TowingChainRenderer;
 import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.screens.SnapshotWarningScreen;
 import com.atsuishio.superbwarfare.config.ClientConfig;
+import com.atsuishio.superbwarfare.compat.acceleratedrendering.AcceleratedRenderingCompat;
 import com.atsuishio.superbwarfare.compat.ponder.SBWPonderPlugin;
 import com.atsuishio.superbwarfare.data.DataLoader;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
@@ -95,6 +96,8 @@ public class ClientMod implements ClientModInitializer {
         ClientLightingHandler.register();
         MolangVariable.register();
         PoseTool.INSTANCE.init();
+        // 加速渲染是可选客户端模组；这里只探一次"它在不在"，不在的话整条兼容路径都不会被走到
+        AcceleratedRenderingCompat.INSTANCE.init();
         ModSoundInstances.init();
         ClientEventHandler.register();
         DataDumpChatHandler.register();

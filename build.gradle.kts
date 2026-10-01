@@ -259,6 +259,9 @@ dependencies {
     // GeckoLib
     modImplementation("software.bernie.geckolib:geckolib-fabric-1.20.1:4.4.6")
 
+    // 加速渲染
+    modCompileOnly("maven.modrinth:accrelatedrendering-refabricated:1.0.8-1.20.1-alpha-fabric.3")
+
     // Valkyrien Skies (optional at runtime, compile-only API)
     modCompileOnly("org.valkyrienskies.core:api:1.1.0+") {
         exclude("org.joml", "joml")
