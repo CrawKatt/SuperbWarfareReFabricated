@@ -411,6 +411,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.CHARM_CREEPER_HEAD)
         simpleItem(ModItems.CHARM_WITHER_SKELETON_SKULL)
         simpleItem(ModItems.CHARM_NETHER_STAR)
+        simpleItem(ModItems.CHARM_CONDUIT)
         simpleItem(ModItems.CHARM_SEPT_WOLVES)
         simpleItem(ModItems.CHARM_ANCIENT_CPU)
         simpleItem(ModItems.CHARM_SENPAI)
