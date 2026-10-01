@@ -130,7 +130,7 @@ object ModItems {
     @JvmField val SECONDARY_CATACLYSM = registerGun("secondary_cataclysm") { SecondaryCataclysmItem }
     @JvmField val RPG = registerGun("rpg") { RpgItem }
     @JvmField val JAVELIN = registerGun("javelin") { JavelinItem() }
-    @JvmField val IGLA_9K38 = registerGun("igla_9k38") { IglaItem() }
+    @JvmField val IGLA_9K38 = registerGun("igla_9k38") { IglaItem }
     @JvmField val BOCEK = registerGun("bocek") { BocekItem() }
     @JvmField val SUPER_STAR_SHOOTER = registerGun("super_star_shooter") { SuperStarShooterItem() }
     @JvmField val REFORGING = registerGun("reforging") { GeoGunItemV2(Properties().rarity(SUPERB)) }
