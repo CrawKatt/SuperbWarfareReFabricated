@@ -147,7 +147,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val definition: AttachmentDefinition,
     )
 
-    override fun createAnimationInstance(stack: ItemStack, entity: Entity): IFPAnimationInstance {
+    override fun createAnimationInstance(stack: ItemStack, entity: Entity?): IFPAnimationInstance {
         return GeoGunAnimationInstance(stack, entity, InteractionHand.MAIN_HAND)
     }
 
@@ -562,7 +562,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
                     poseStack.pushPose()
                     model.builtinScopeRenderer.renderWithStencil(
                         poseStack,
-                        bufferSource as MultiBufferSource.BufferSource,
+                        bufferSource,
                         RenderType.entityTranslucent(texture),
                         BedrockModelRenderTypes.polyMeshCutout(texture),
                         packedLight,
@@ -1391,7 +1391,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
     private fun withoutBone(pose: Pose, boneIndex: Int): Pose {
         if (boneIndex < 0) return pose
         val builder = ArrayPoseBuilder()
-        for (transform in pose.getBoneTransforms()) {
+        for (transform in pose.boneTransforms) {
             if (transform.boneIndex() != boneIndex) builder.addBoneTransform(transform)
         }
         return builder.toPose()
@@ -1404,7 +1404,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
      * 一帧里最多两次调用、骨骼数量级是几十，可以忽略。
      */
     private fun Pose.findTransform(boneIndex: Int): BoneTransform? =
-        getBoneTransforms().firstOrNull { it.boneIndex() == boneIndex }
+        boneTransforms.firstOrNull { it.boneIndex() == boneIndex }
 
     /** 构造一个"只含某一根骨骼"的姿态，供 [MERGE_BLENDER] 覆盖到别的姿态上 */
     private fun singleBonePose(transform: BoneTransform): Pose {
@@ -2576,7 +2576,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         /**
          * 单帧步进的上限（tick）。卡顿或调试暂停会让 `deltaFrameTime` 偶尔跳到很大，
          * 不夹住的话淡入淡出会"一帧走完"，看起来还是硬切。
-         * 0.8 与同文件 [`scriptFrameDeltaSeconds`] 的口径一致。
+         * 0.8 与同文件 [scriptFrameDeltaSeconds] 的口径一致。
          */
         private const val MAX_FRAME_DELTA_TICKS = 0.8f
 
