@@ -1,5 +1,10 @@
 package com.atsuishio.superbwarfare.init;
 
+import com.atsuishio.superbwarfare.api.event.SuperbWarfareEvents;
+import com.atsuishio.superbwarfare.event.custom.MobEffectAddedEvent;
+import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
+import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect;
+import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.PlayerEventHandler;
@@ -18,6 +23,13 @@ import net.minecraft.world.InteractionResult;
 public class ModEventHandlers {
 
     public static void init() {
+        SuperbWarfareEvents.register(MobEffectAddedEvent.class, event ->
+                BurnMobEffect.onBurnAdded(event.getEntity(), event.getEffectInstance(), event.getEffectSource()));
+        SuperbWarfareEvents.register(MobEffectAddedEvent.class, event ->
+                PhosphorusFireMobEffect.onPhosphorusFireAdded(event.getEntity(), event.getEffectInstance(), event.getEffectSource()));
+        SuperbWarfareEvents.register(MobEffectAddedEvent.class, event ->
+                ShockMobEffect.onShockAdded(event.getEntity(), event.getEffectInstance(), event.getEffectSource()));
+
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             PlayerEventHandler.onPlayerLoggedIn(handler.getPlayer());
         });

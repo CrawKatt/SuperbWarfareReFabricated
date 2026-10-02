@@ -9,12 +9,14 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.custom.LivingHealCallback;
 import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback;
+import com.atsuishio.superbwarfare.event.custom.MobEffectAddedEvent;
 import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect;
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
+import com.atsuishio.superbwarfare.tools.MinecraftUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -147,24 +149,23 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
         }
 
         MobEffectInstance old = this.activeEffects.get(instance.getEffect());
+        MinecraftUtil.postEvent(
+                new MobEffectAddedEvent(self, old, instance, source)
+        );
+
+        boolean applied = false;
         if (old == null) {
             this.activeEffects.put(instance.getEffect(), instance);
             this.onEffectAdded(instance, source);
-            BurnMobEffect.onBurnAdded(self, instance, source);
-            PhosphorusFireMobEffect.onPhosphorusFireAdded(self, instance, source);
-            ShockMobEffect.onShockAdded(self, instance, source);
-            return true;
-        }
-
-        if (old.update(instance)) {
+            instance.onEffectAdded(self);
+            applied = true;
+        } else if (old.update(instance)) {
             this.onEffectUpdated(old, true, source);
-            BurnMobEffect.onBurnAdded(self, instance, source);
-            PhosphorusFireMobEffect.onPhosphorusFireAdded(self, instance, source);
-            ShockMobEffect.onShockAdded(self, instance, source);
-            return true;
+            applied = true;
         }
 
-        return false;
+        instance.onEffectStarted(self);
+        return applied;
     }
     @Inject(method = "dismountVehicle", at = @At("RETURN"))
     private void dismountVehicle(Entity pVehicle, CallbackInfo ci) {
@@ -244,30 +245,26 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
         }
     }
 
-    @Inject(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z", at = @At("TAIL"))
+    @Inject(
+            method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;",
+                    shift = At.Shift.AFTER
+            )
+    )
     private void superbwarfare$onAddEffect(
             MobEffectInstance effectInstance,
             @Nullable Entity source,
             CallbackInfoReturnable<Boolean> cir
     ) {
-        if (!cir.getReturnValue()) return;
-
-        BurnMobEffect.onBurnAdded(
-                (LivingEntity) (Object) this,
-                effectInstance,
-                source
-        );
-
-        PhosphorusFireMobEffect.onPhosphorusFireAdded(
-                (LivingEntity) (Object) this,
-                effectInstance,
-                source
-        );
-
-        ShockMobEffect.onShockAdded(
-                (LivingEntity) (Object) this,
-                effectInstance,
-                source
+        MinecraftUtil.postEvent(
+                new MobEffectAddedEvent(
+                        (LivingEntity) (Object) this,
+                        this.activeEffects.get(effectInstance.getEffect()),
+                        effectInstance,
+                        source
+                )
         );
     }
 
