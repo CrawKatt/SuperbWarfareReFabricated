@@ -536,6 +536,12 @@ class GunProp<T, R>(
         val PROJECTILE_LIFE = plainProp(DefaultGunData::projectileLife)
 
         @JvmField
+        val PROJECTILE_SPLIT_COUNT = plainProp(DefaultGunData::projectileSplitCount)
+
+        @JvmField
+        val PROJECTILE_SPLIT_AMOUNT = plainProp(DefaultGunData::projectileSplitAmount)
+
+        @JvmField
         val AP_DURABILITY = plainProp(DefaultGunData::apDurability)
 
         fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) = with(modifier) {
@@ -570,6 +576,8 @@ class GunProp<T, R>(
             modify(AMMO_COST_PER_SHOOT) { it.coerceAtLeast(0) }
             modify(FUEL_PER_AMMO) { it.coerceAtLeast(0) }
             modify(PROJECTILE_AMOUNT) { it.coerceAtLeast(0) }
+            modify(PROJECTILE_SPLIT_COUNT) { it.coerceAtLeast(0) }
+            modify(PROJECTILE_SPLIT_AMOUNT) { it.coerceAtLeast(0) }
             modify(WEIGHT) { it.coerceAtLeast(1.0) }
 
             modify(MAGAZINE) {

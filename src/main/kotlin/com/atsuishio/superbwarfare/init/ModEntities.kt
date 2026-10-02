@@ -169,6 +169,10 @@ object ModEntities {
         register("gun_grenade", fastProjectile(::GunGrenadeEntity).dimensions(EntityDimensions.scalable(0.5f, 0.5f)))
 
     @JvmField
+    val SMALL_GRENADE: EntityType<SmallGrenadeEntity> =
+        register("small_grenade", fastProjectile(::SmallGrenadeEntity).dimensions(EntityDimensions.scalable(0.25f, 0.25f)))
+
+    @JvmField
     val GRAPESHOT: EntityType<GrapeshotEntity> =
         register("grapeshot", fastProjectile(::GrapeshotEntity).dimensions(EntityDimensions.scalable(0.5f, 0.5f)))
 
@@ -477,7 +481,6 @@ object ModEntities {
             .forceTrackedVelocityUpdates(receiveVelocityUpdates)
             .trackRangeChunks(64)
             .trackedUpdateRate(1)
-            .disableSaving()
     }
 
     @JvmStatic
