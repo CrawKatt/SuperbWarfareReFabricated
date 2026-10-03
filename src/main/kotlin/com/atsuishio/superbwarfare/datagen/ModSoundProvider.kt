@@ -487,7 +487,7 @@ class ModSoundProvider(private val output: PackOutput) : DataProvider {
 
         // -------------------- gun/sks --------------------
         group(
-            "gun/sks", "sks_fire_1p", "sks_fire_3p", "sks_reload_normal", "sks_reload_empty", "sks_far",
+            "gun/sks", "sks_fire_1p", "sks_fire_3p", "sks_fire_1p_s", "sks_fire_3p_s", "sks_mag_in", "sks_mag_out", "sks_bolt", "sks_far",
             "sks_veryfar",
         )
 
