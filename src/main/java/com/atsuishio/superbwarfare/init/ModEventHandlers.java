@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
+import com.atsuishio.superbwarfare.event.GunEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity;
@@ -57,6 +58,7 @@ public class ModEventHandlers {
             return InteractionResult.PASS;
         });
 
+        ServerTickEvents.START_SERVER_TICK.register(GunEventHandler::onServerTick);
         ServerTickEvents.END_SERVER_TICK.register(ServerSyncedEntityHandler::onServerTick);
     }
 }
