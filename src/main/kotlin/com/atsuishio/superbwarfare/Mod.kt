@@ -18,6 +18,7 @@ import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.event.CustomEventHandler
+import com.atsuishio.superbwarfare.event.GunEventHandler
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
 import com.atsuishio.superbwarfare.event.LivingEventHandler
 import com.atsuishio.superbwarfare.event.ModVersionEventHandler
@@ -268,6 +269,7 @@ class Mod : ModInitializer {
     }
 
     private fun registerTicks() {
+        ServerTickEvents.START_SERVER_TICK.register { _ -> GunEventHandler.onServerTick() }
         ServerTickEvents.END_SERVER_TICK.register { server ->
             tickServer()
 
