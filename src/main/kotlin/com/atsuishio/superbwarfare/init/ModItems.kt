@@ -357,6 +357,7 @@ object ModItems {
     @JvmField val CHARM_SMALL_CONTAINER = registerAttachment("charm_small_container")
     @JvmField val CHARM_SHEEP = registerAttachment("charm_sheep")
     @JvmField val CHARM_CHICKEN = registerAttachment("charm_chicken")
+    @JvmField val CHARM_DOG_TAG = registerAttachment("charm_dog_tag")
     @JvmField val CHARM_PUFFERFISH = registerAttachment("charm_pufferfish")
     @JvmField val CHARM_ZOMBIE_HEAD = registerAttachment("charm_zombie_head", Rarity.RARE)
     @JvmField val CHARM_SKELETON_SKULL = registerAttachment("charm_skeleton_skull", Rarity.RARE)
