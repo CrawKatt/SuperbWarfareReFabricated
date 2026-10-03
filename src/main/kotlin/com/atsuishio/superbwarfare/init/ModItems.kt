@@ -470,6 +470,7 @@ object ModItems {
     @JvmField val TUNGSTEN_INGOT = registerItem("tungsten_ingot")
     @JvmField val CEMENTED_CARBIDE_INGOT = registerItem("cemented_carbide_ingot")
     @JvmField val HIGH_ENERGY_EXPLOSIVES = registerItem("high_energy_explosives")
+    @JvmField val NITROCELLULOSE = registerItem("nitrocellulose")
     @JvmField val GRAIN = registerItem("grain")
     @JvmField val IRON_POWDER = registerItem("iron_powder")
     @JvmField val TUNGSTEN_POWDER = registerItem("tungsten_powder")

@@ -209,6 +209,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.TACTICAL_TERMINAL)
         simpleItem(ModItems.CRUST)
         simpleItem(ModItems.RAD_AWAY)
+        simpleItem(ModItems.NITROCELLULOSE)
 
         simpleMaterials(ModItems.IRON_MATERIALS)
         simpleMaterials(ModItems.STEEL_MATERIALS)
