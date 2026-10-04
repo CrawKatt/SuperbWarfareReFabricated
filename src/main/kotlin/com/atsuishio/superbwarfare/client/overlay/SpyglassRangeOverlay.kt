@@ -21,9 +21,11 @@ import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
-import net.minecraft.world.level.ClipContext
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.min
 
+@Environment(EnvType.CLIENT)
 object SpyglassRangeOverlay : CommonOverlay("spyglass_range") {
     private val INDICATOR = loc("textures/overlay/spyglass/indicator.png")
     private val SPYGLASS = loc("textures/overlay/spyglass/spyglass.png")
@@ -138,15 +140,9 @@ object SpyglassRangeOverlay : CommonOverlay("spyglass_range") {
 
             var lookAtEntity = false
 
-            val result = player.level().clip(
-                ClipContext(
-                    player.eyePosition, player.eyePosition.add(player.getViewVector(1f).scale(512.0)),
-                    ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player
-                )
-            )
-            val hitPos = result.getLocation()
-
-            val blockRange = player.getEyePosition(1f).distanceTo(hitPos)
+            val blockRange = OverlayTraceHandler.playerViewBlockResult
+                ?.let { player.eyePosition.distanceTo(it.location) }
+                ?: Double.MAX_VALUE
 
             var entityRange = 0.0
             val lookingEntity = OverlayTraceHandler.maxRangeEntity
