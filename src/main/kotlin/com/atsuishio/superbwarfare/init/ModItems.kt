@@ -359,6 +359,7 @@ object ModItems {
     @JvmField val BAYONET_SEITENGEWEHR_84 = registerAttachment("bayonet_seitengewehr_84")
     @JvmField val BAYONET_M_91_30 = registerAttachment("bayonet_m_91_30")
     @JvmField val BAYONET_TRIANGULAR = registerAttachment("bayonet_triangular")
+    @JvmField val BAYONET_M1917 = registerAttachment("bayonet_m1917")
     // @formatter:on
 
     @JvmField val SUB_WEAPON_GP_25 = registerSubWeapon("sub_weapon_gp_25", Rarity.EPIC)
@@ -436,6 +437,7 @@ object ModItems {
     @JvmField val KNIFE = registerItem("knife") { KnifeItem() }
     @JvmField val KNIFE_6KH2 = registerItem("knife_6kh2") { Knife6kh2Item() }
     @JvmField val KNIFE_SEITENGEWEHR_84 = registerItem("knife_seitengewehr_84") { KnifeSeitengewehr84Item() }
+    @JvmField val KNIFE_M1917 = registerItem("knife_m1917") { KnifeM1917Item() }
     @JvmField val HAMMER = registerItem("hammer") { HammerItem(Tiers.IRON, 11, -3.2f, Properties().durability(400)) }
     @JvmField val GOLDEN_HAMMER = registerItem("golden_hammer") { HammerItem(Tiers.GOLD, 11, -3.2f, Properties().durability(150)) }
     @JvmField val STEEL_HAMMER = registerItem("steel_hammer") { HammerItem(ModItemTier.STEEL, 9, -3.2f, Properties().durability(600)) }
