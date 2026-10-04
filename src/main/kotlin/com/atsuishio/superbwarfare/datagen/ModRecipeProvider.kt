@@ -344,6 +344,13 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                     has(ModItems.BAYONET_SEITENGEWEHR_84)
                 )
                 .save(writer, loc(getItemName(ModItems.KNIFE_SEITENGEWEHR_84)))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ModItems.KNIFE_M1917)
+                .requires(ModItems.BAYONET_M1917)
+                .unlockedBy(
+                    getHasName(ModItems.BAYONET_M1917),
+                    has(ModItems.BAYONET_M1917)
+                )
+                .save(writer, loc(getItemName(ModItems.KNIFE_M1917)))
         }
 
         private fun buildArmorRecipes(writer: Consumer<FinishedRecipe>) {

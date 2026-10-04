@@ -22,6 +22,7 @@ import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.BlueprintResearchingTableBlockItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.Knife6kh2Renderer
+import com.atsuishio.superbwarfare.client.renderer.item.KnifeM1917Renderer
 import com.atsuishio.superbwarfare.client.renderer.item.KnifeRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.KnifeSeitengewehr84Renderer
 import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
@@ -234,6 +235,13 @@ object ClientRenderHandler {
                 packedLight,
                 packedOverlay
             )
+        }
+
+        val knifeM1917Renderer = lazy { KnifeM1917Renderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+        BuiltinItemRendererRegistry.INSTANCE.register(
+            ModItems.KNIFE_M1917
+        ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
+            knifeM1917Renderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
         }
 
         TrinketRendererRegistry.registerRenderer(ModItems.PARACHUTE, ParachuteRenderer())
