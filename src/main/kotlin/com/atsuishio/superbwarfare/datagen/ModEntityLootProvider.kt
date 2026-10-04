@@ -53,5 +53,15 @@ class ModEntityLootProvider : LootTableSubProvider {
                     .add(LootItem.lootTableItem(Items.ENCHANTED_GOLDEN_APPLE).setWeight(1))
             )
         )
+
+        output.accept(
+            ModEntities.CREEPING_SENPAI.defaultLootTable,
+            LootTable.lootTable().withPool(
+                LootPool.lootPool().setRolls(ConstantValue.exactly(1f))
+                    .add(LootItem.lootTableItem(Items.APPLE).setWeight(80))
+                    .add(LootItem.lootTableItem(Items.GOLDEN_APPLE).setWeight(19))
+                    .add(LootItem.lootTableItem(Items.ENCHANTED_GOLDEN_APPLE).setWeight(1))
+            )
+        )
     }
 }

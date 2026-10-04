@@ -43,6 +43,7 @@ object ModWorldGen {
         }
 
         BiomeModifications.addSpawn(overworld, MobCategory.MONSTER, ModEntities.SENPAI, 20, 4, 4)
+        BiomeModifications.addSpawn(overworld, MobCategory.MONSTER, ModEntities.CREEPING_SENPAI, 5, 1, 2)
         BiomeModifications.addSpawn(overworld, MobCategory.MONSTER, ModEntities.STEEL_COIL, 5, 1, 3)
     }
 }

@@ -1,10 +1,7 @@
 ﻿package com.atsuishio.superbwarfare.network.message.send
 
-import com.atsuishio.superbwarfare.init.ModCapabilities
-
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.GunProp
-import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.ksp.annotation.RegisterPacket
@@ -33,26 +30,6 @@ data class FireModeMessage(val forward: Boolean) : ServerPacketPayload() {
             data.selectedFireMode.set(mode)
             SoundTool.playLocalSound(player, ModSounds.FIRE_RATE)
             return
-        }
-
-        if (stack.item === ModItems.SENTINEL
-            && !player.isSpectator
-            && !(player.cooldowns.isOnCooldown(stack.item))
-            && data.reload.time() == 0
-            && !data.charging()
-        ) {
-            for (cell in player.getInventory().items) {
-                if (cell.`is`(ModItems.CELL)) {
-                    val cap = ModCapabilities.ENERGY_ITEM.find(cell, null)
-                    if (cap != null && cap.amount > 0) {
-                        data.charge.starter.markStart()
-                    }
-                }
-            }
-        }
-
-        if (stack.item === ModItems.JAVELIN) {
-            SoundTool.playLocalSound(player, ModSounds.CANNON_ZOOM_OUT)
         }
         data.save()
     }

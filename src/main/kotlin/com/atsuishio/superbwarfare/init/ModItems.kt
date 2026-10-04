@@ -357,8 +357,8 @@ object ModItems {
     @JvmField val CHARM_SMALL_CONTAINER = registerAttachment("charm_small_container")
     @JvmField val CHARM_SHEEP = registerAttachment("charm_sheep")
     @JvmField val CHARM_CHICKEN = registerAttachment("charm_chicken")
-    @JvmField val CHARM_DOG_TAG = registerAttachment("charm_dog_tag")
     @JvmField val CHARM_PUFFERFISH = registerAttachment("charm_pufferfish")
+    @JvmField val CHARM_DOG_TAG = registerAttachment("charm_dog_tag")
     @JvmField val CHARM_ZOMBIE_HEAD = registerAttachment("charm_zombie_head", Rarity.RARE)
     @JvmField val CHARM_SKELETON_SKULL = registerAttachment("charm_skeleton_skull", Rarity.RARE)
     @JvmField val CHARM_CREEPER_HEAD = registerAttachment("charm_creeper_head", Rarity.RARE)
@@ -394,6 +394,9 @@ object ModItems {
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
         SpawnEggItem(ModEntities.SENPAI, -11584987, -14014413, Properties())
+    }
+    @JvmField val CREEPING_SENPAI_SPAWN_EGG = registerItem("creeping_senpai_spawn_egg") {
+        SpawnEggItem(ModEntities.CREEPING_SENPAI, -11584987, 3288889, Properties())
     }
     @JvmField val STEEL_COIL_SPAWN_EGG = registerItem("steel_coil_spawn_egg") {
         SpawnEggItem(ModEntities.STEEL_COIL, 0, 0xc0c0c0, Properties())

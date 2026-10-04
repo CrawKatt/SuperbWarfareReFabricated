@@ -20,6 +20,7 @@ import com.atsuishio.superbwarfare.data.gun.GunData.Companion.DATA_VERSION
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.UUID_CACHE
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.get
+import com.atsuishio.superbwarfare.data.gun.GunData.Companion.getDefault
 import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.AMMO_CONSUMER
 import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.AMMO_COST_PER_SHOOT
 import com.atsuishio.superbwarfare.data.gun.GunProp.Companion.AVAILABLE_FIRE_MODES
@@ -780,8 +781,6 @@ class GunData private constructor(
         this.bolt.actionTimer.reset()
         this.bolt.totalTicks.reset()
         this.bolt.needed.reset()
-        this.charge.starter.finish()
-        this.charge.timer.reset()
 
         invalidateProperties()
     }
@@ -1520,12 +1519,6 @@ class GunData private constructor(
     fun reloading(): Boolean = reload.state() != ReloadState.NOT_RELOADING
 
     @JvmField
-    val charge: Charge
-
-    /** Checks if energy charging is active. */
-    fun charging(): Boolean = charge.time() > 0
-
-    @JvmField
     val isEmpty: BooleanValue
 
     @JvmField
@@ -1957,7 +1950,6 @@ class GunData private constructor(
 
         // Subdata handlers
         reload = Reload(this)
-        charge = Charge(this)
         bolt = Bolt(this)
         attachment = Attachment(this)
         perk = Perks(this)
