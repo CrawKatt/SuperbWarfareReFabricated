@@ -7,8 +7,8 @@ import com.atsuishio.superbwarfare.data.attachment.AmmoTextEntry
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import kotlin.math.roundToInt
 
 /**
@@ -35,7 +35,7 @@ import kotlin.math.roundToInt
  * 别人手里的枪、掉落物、展示框、改装界面一律不测，既省下射线，也避免第三人称里
  * 别人的枪上挂着一个跟着**自己**视线乱跳的数字。
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object RangeReadout {
 
     /** 超过这个距离就没有读数，与望远镜一致 */

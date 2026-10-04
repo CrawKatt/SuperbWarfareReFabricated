@@ -24,7 +24,7 @@ import net.minecraft.world.item.ItemStack
 
 class GunAttachmentsCategory(helper: IGuiHelper) : IRecipeCategory<AttachmentRecipe> {
     private val icon: IDrawable =
-        helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, ItemStack(ModItems.MAGAZINE_EXTEND.get()))
+        helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, ItemStack(ModItems.MAGAZINE_EXTEND))
 
     override fun getRecipeType(): RecipeType<AttachmentRecipe> = TYPE
 
@@ -85,8 +85,8 @@ class GunAttachmentsCategory(helper: IGuiHelper) : IRecipeCategory<AttachmentRec
 
         @JvmStatic
         fun createRecipes(guns: List<ItemStack>): List<AttachmentRecipe> {
-            val bySlot = ModItems.ATTACHMENTS.entries
-                .map { ItemStack(it.get()) }
+            val bySlot = ModItems.ATTACHMENTS
+                .map { ItemStack(it) }
                 .mapNotNull { stack ->
                     val id = BuiltInRegistries.ITEM.getKey(stack.item)
                     AttachmentDefinition.from(id)?.let { it.slot to stack }

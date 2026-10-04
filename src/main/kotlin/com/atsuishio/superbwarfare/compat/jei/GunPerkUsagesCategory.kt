@@ -1,11 +1,11 @@
 package com.atsuishio.superbwarfare.compat.jei
 
 import com.atsuishio.superbwarfare.Mod
-import com.atsuishio.superbwarfare.data.attachment.AttachmentDefinition
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
-import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.item.gun.GunItem
+import com.atsuishio.superbwarfare.item.misc.PerkItem
+import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.tools.mc
 import mezz.jei.api.constants.VanillaTypes
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder
@@ -18,17 +18,17 @@ import mezz.jei.api.recipe.RecipeIngredientRole
 import mezz.jei.api.recipe.RecipeType
 import mezz.jei.api.recipe.category.IRecipeCategory
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 
-class GunAttachmentUsagesCategory(helper: IGuiHelper) : IRecipeCategory<AttachmentUsageRecipe> {
+class GunPerkUsagesCategory(helper: IGuiHelper) : IRecipeCategory<PerkUsageRecipe> {
     private val icon: IDrawable =
-        helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, ItemStack(ModItems.AK_47))
+        helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, ItemStack(ModItems.REFORGING_TABLE))
 
-    override fun getRecipeType(): RecipeType<AttachmentUsageRecipe> = TYPE
+    override fun getRecipeType(): RecipeType<PerkUsageRecipe> = TYPE
 
-    override fun getTitle(): Component = Component.translatable("jei.superbwarfare.gun_attachment_usages")
+    override fun getTitle(): Component = Component.translatable("jei.superbwarfare.gun_perk_usages")
 
     override fun getIcon(): IDrawable = this.icon
 
@@ -36,25 +36,25 @@ class GunAttachmentUsagesCategory(helper: IGuiHelper) : IRecipeCategory<Attachme
 
     override fun getHeight(): Int = HEIGHT
 
-    override fun isHandled(recipe: AttachmentUsageRecipe): Boolean = recipe.guns.isNotEmpty()
+    override fun isHandled(recipe: PerkUsageRecipe): Boolean = recipe.guns.isNotEmpty()
 
     override fun draw(
-        recipe: AttachmentUsageRecipe,
+        recipe: PerkUsageRecipe,
         recipeSlotsView: IRecipeSlotsView,
         guiGraphics: GuiGraphics,
         mouseX: Double,
         mouseY: Double
     ) {
-        val name = recipe.attachment.hoverName
+        val name = recipe.perk.hoverName
         guiGraphics.drawString(
             mc.font, name,
             WIDTH / 2 - mc.font.width(name) / 2, 5, 5592405, false
         )
     }
 
-    override fun setRecipe(builder: IRecipeLayoutBuilder, recipe: AttachmentUsageRecipe, focuses: IFocusGroup) {
+    override fun setRecipe(builder: IRecipeLayoutBuilder, recipe: PerkUsageRecipe, focuses: IFocusGroup) {
         builder.addSlot(RecipeIngredientRole.INPUT, 1, 1)
-            .addItemStack(recipe.attachment)
+            .addItemStack(recipe.perk)
             .setStandardSlotBackground()
 
         for (gun in recipe.guns) {
@@ -64,7 +64,7 @@ class GunAttachmentUsagesCategory(helper: IGuiHelper) : IRecipeCategory<Attachme
 
     override fun createRecipeExtras(
         builder: IRecipeExtrasBuilder,
-        recipe: AttachmentUsageRecipe,
+        recipe: PerkUsageRecipe,
         focuses: IFocusGroup
     ) {
         val slots = builder.recipeSlots.getSlots(RecipeIngredientRole.RENDER_ONLY)
@@ -73,8 +73,8 @@ class GunAttachmentUsagesCategory(helper: IGuiHelper) : IRecipeCategory<Attachme
     }
 
     companion object {
-        val TYPE: RecipeType<AttachmentUsageRecipe> =
-            RecipeType.create(Mod.MODID, "gun_attachment_usages", AttachmentUsageRecipe::class.java)
+        val TYPE: RecipeType<PerkUsageRecipe> =
+            RecipeType.create(Mod.MODID, "gun_perk_usages", PerkUsageRecipe::class.java)
 
         private const val WIDTH = 144
         private const val HEIGHT = 112
@@ -82,36 +82,35 @@ class GunAttachmentUsagesCategory(helper: IGuiHelper) : IRecipeCategory<Attachme
         private const val VISIBLE_ROWS = (HEIGHT - 21) / 18
 
         @JvmStatic
-        fun createRecipes(guns: List<ItemStack>): List<AttachmentUsageRecipe> {
-            val bySlot = ModItems.ATTACHMENTS
-                .map { ItemStack(it) }
-                .mapNotNull { stack ->
-                    val id = BuiltInRegistries.ITEM.getKey(stack.item)
-                    AttachmentDefinition.from(id)?.let { it.slot to stack }
-                }
-                .groupBy({ it.first }, { it.second })
+        fun createRecipes(guns: List<ItemStack>): List<PerkUsageRecipe> {
+            val byName = LinkedHashMap<String, Item>()
+            val byPerk = LinkedHashMap<Perk, Item>()
 
-            val accepting = LinkedHashMap<ItemStack, LinkedHashSet<ItemStack>>()
+            for (entry in ModItems.PERKS) {
+                val item = entry
+                if (item !is PerkItem) continue
+
+                byName[item.perk.descriptionId] = item
+                byPerk[item.perk] = item
+            }
+
+            val accepting = LinkedHashMap<Item, LinkedHashSet<ItemStack>>()
 
             for (gun in guns) {
                 if (gun.item !is GunItem) continue
 
-                val data = from(gun)
-                for (slot in AttachmentType.entries) {
-                    val available = data.availableAttachments(slot).toSet()
-                    for (stack in bySlot[slot].orEmpty()) {
-                        if (BuiltInRegistries.ITEM.getKey(stack.item) !in available) continue
-                        accepting.getOrPut(stack) { LinkedHashSet() }.add(gun.copy())
-                    }
+                for (perk in from(gun).availablePerks()) {
+                    val item = byPerk[perk] ?: byName[perk.descriptionId] ?: continue
+                    accepting.getOrPut(item) { LinkedHashSet() }.add(gun.copy())
                 }
             }
 
-            return accepting.map { (attachment, owners) -> AttachmentUsageRecipe(attachment, owners.toList()) }
+            return accepting.map { (item, owners) -> PerkUsageRecipe(ItemStack(item), owners.toList()) }
         }
     }
 }
 
-data class AttachmentUsageRecipe(
-    val attachment: ItemStack,
+data class PerkUsageRecipe(
+    val perk: ItemStack,
     val guns: List<ItemStack>
 )
