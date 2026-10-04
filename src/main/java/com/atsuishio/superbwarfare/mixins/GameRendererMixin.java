@@ -47,8 +47,8 @@ public abstract class GameRendererMixin {
                 changingFov
         );
 
-        ClientEventHandler.captureFov(context);
         ClientEventHandler.onFovUpdate(context);
+        ClientEventHandler.captureFov(context);
 
         cir.setReturnValue(context.getFov());
     }
