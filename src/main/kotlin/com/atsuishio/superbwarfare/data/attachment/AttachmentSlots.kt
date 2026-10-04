@@ -410,7 +410,7 @@ object AttachmentSlots {
         return registeredIdsCache.getOrPut(type) {
             ModItems.ATTACHMENTS
                 .map { BuiltInRegistries.ITEM.getKey(it) }
-                .filter { AttachmentDefinition.from(it)?.slot == type }
+                .filter { AttachmentDefinition.from(it)?.acceptedSlots?.contains(type) == true }
                 .sorted()
         }
     }
