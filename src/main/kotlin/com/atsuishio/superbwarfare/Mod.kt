@@ -25,6 +25,7 @@ import com.atsuishio.superbwarfare.event.ModVersionEventHandler
 import com.atsuishio.superbwarfare.tools.ServerSyncedEntityHandler
 import com.atsuishio.superbwarfare.world.saveddata.ProjectileChunkSavedData
 import com.atsuishio.superbwarfare.event.PlayerEventHandler
+import com.atsuishio.superbwarfare.event.ShieldHandler
 import com.atsuishio.superbwarfare.event.custom.LivingAttackCallback
 import com.atsuishio.superbwarfare.event.custom.LivingDropsCallback
 import com.atsuishio.superbwarfare.event.custom.LivingExperienceDropCallback
@@ -239,6 +240,7 @@ class Mod : ModInitializer {
             SonicAbsorberItem.onEntityAttackedBySonicBoom(event)
             event.amount = LivingEventHandler.onEntityHurt(event.entity, event.source, event.amount)
         }
+        LivingHurtCallback.EVENT.register(ShieldHandler::onEntityHurt)
         LivingDropsCallback.EVENT.register { event ->
             LivingEventHandler.onLivingDrops(event.entity, event.source, event.drops)
         }

@@ -10,6 +10,9 @@ public interface LivingHurtCallback {
             callbacks -> event -> {
                 for (LivingHurtCallback callback : callbacks) {
                     callback.onLivingHurt(event);
+                    if (event.isCanceled()) {
+                        return;
+                    }
                 }
             }
     );
@@ -20,6 +23,7 @@ public interface LivingHurtCallback {
         private final LivingEntity entity;
         private final DamageSource source;
         private float amount;
+        private boolean canceled;
 
         public Event(LivingEntity entity, DamageSource source, float amount) {
             this.entity = entity;
@@ -41,6 +45,14 @@ public interface LivingHurtCallback {
 
         public void setAmount(float amount) {
             this.amount = amount;
+        }
+
+        public boolean isCanceled() {
+            return this.canceled;
+        }
+
+        public void setCanceled(boolean canceled) {
+            this.canceled = canceled;
         }
     }
 }

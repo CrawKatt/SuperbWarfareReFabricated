@@ -2,8 +2,13 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.PlayerEventHandler;
+import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback;
 import com.atsuishio.superbwarfare.item.weapon.BeastItem;
 import com.atsuishio.superbwarfare.item.curio.ParachuteItem;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
@@ -25,6 +30,22 @@ public abstract class PlayerMixin extends Entity {
 
     public PlayerMixin(EntityType<?> type, Level world) {
         super(type, world);
+    }
+
+    @ModifyExpressionValue(method = "actuallyHurt",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/player/Player;isInvulnerableTo(Lnet/minecraft/world/damagesource/DamageSource;)Z"))
+    private boolean superbwarfare$onLivingHurt(
+            boolean invulnerable,
+            @Local(argsOnly = true) DamageSource source,
+            @Local(argsOnly = true) LocalFloatRef amount
+    ) {
+        if (invulnerable) return true;
+
+        LivingHurtCallback.Event event = new LivingHurtCallback.Event((Player) (Object) this, source, amount.get());
+        LivingHurtCallback.EVENT.invoker().onLivingHurt(event);
+        amount.set(event.getAmount());
+        return event.isCanceled() || event.getAmount() <= 0.0F;
     }
 
     @Inject(method = "tick", at = @At("TAIL"))

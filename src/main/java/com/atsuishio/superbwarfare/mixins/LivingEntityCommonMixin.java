@@ -1,9 +1,11 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.mixin.LivingDropsCapture;
-import com.atsuishio.superbwarfare.entity.mixin.DamageAccess;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.custom.*;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -43,16 +45,18 @@ public class LivingEntityCommonMixin implements LivingDropsCapture {
         }
     }
 
-    @Redirect(method = "hurt",
+    @ModifyExpressionValue(method = "actuallyHurt",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;actuallyHurt(Lnet/minecraft/world/damagesource/DamageSource;F)V"))
-    private void superbwarfare$onLivingHurt(LivingEntity entity, DamageSource source, float amount) {
-        LivingHurtCallback.Event event = new LivingHurtCallback.Event(entity, source, amount);
-        LivingHurtCallback.EVENT.invoker().onLivingHurt(event);
+                    target = "Lnet/minecraft/world/entity/LivingEntity;isInvulnerableTo(Lnet/minecraft/world/damagesource/DamageSource;)Z"))
+    private boolean superbwarfare$onLivingHurt(boolean invulnerable,
+                                               @Local(argsOnly = true) DamageSource source,
+                                               @Local(argsOnly = true) LocalFloatRef amount) {
+        if (invulnerable) return true;
 
-        if (event.getAmount() > 0.0F) {
-            ((DamageAccess) entity).superbWarfare$actuallyHurt(source, event.getAmount());
-        }
+        LivingHurtCallback.Event event = new LivingHurtCallback.Event((LivingEntity) (Object) this, source, amount.get());
+        LivingHurtCallback.EVENT.invoker().onLivingHurt(event);
+        amount.set(event.getAmount());
+        return event.isCanceled() || event.getAmount() <= 0.0F;
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
