@@ -1,7 +1,4 @@
 {
-  "parent": "superbwarfare:item/vector_base",
-  "gui_light": "front",
-  "textures": {
-    "particle": "superbwarfare:item/vector_icon"
-  }
+  "parent": "minecraft:builtin/entity",
+  "gui_light": "front"
 }
