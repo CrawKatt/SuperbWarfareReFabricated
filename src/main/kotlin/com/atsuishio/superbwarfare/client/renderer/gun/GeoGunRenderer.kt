@@ -647,9 +647,6 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         if (OculusCompat.isRenderingShadowPass()) return
 
         val data = from(stack)
-        // 副武器被切出来时显示的是副武器模型，画激光反而突兀
-        if (ActiveGun.isDeployed(data, true)) return
-
         LaserSightCapture.capture(
             info = info,
             colorRgb = info.resolveColorRgb(data.attachment.getLaserColor(slot)),
