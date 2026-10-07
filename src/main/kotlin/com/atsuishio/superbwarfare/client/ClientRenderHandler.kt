@@ -225,6 +225,7 @@ object ClientRenderHandler {
             ModItems.SMALL_CONTAINER to lazy { SmallContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.VEHICLE_ASSEMBLING_TABLE to lazy { VehicleAssemblingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.HAND_GRENADE to lazy { HandGrenadeRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
+            ModItems.TYPE_88_CLUSTER_GRENADES to lazy { Type88ClusterGrenadesRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.SKIN_SPRAY to lazy { SkinSprayRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.PTKM_1R to lazy { Ptkm1rItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.MILITARY_SHOVEL to lazy { MilitaryShovelRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
