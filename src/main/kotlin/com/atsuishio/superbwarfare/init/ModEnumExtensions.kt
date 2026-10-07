@@ -59,6 +59,9 @@ object ModEnumExtensions {
         @JvmField
         val SUPERBWARFARE_SUPER_STAR_SHOOTER_POSE: ArmPose = createArmPose("SUPERBWARFARE_SUPER_STAR_SHOOTER_POSE")
 
+        @JvmField
+        val REPAIR_TOOL_POSE: ArmPose = createArmPose("SUPERBWARFARE_REPAIR_TOOL_POSE")
+
         private fun createArmPose(name: String): ArmPose {
             EnumAppender.create(ArmPose::class.java, Boolean::class.java)
                 .addEnumConstant(name, false)
@@ -77,6 +80,9 @@ object ModEnumExtensions {
 
         @JvmStatic
         val superStarShooterPose: ArmPose get() = SUPERBWARFARE_SUPER_STAR_SHOOTER_POSE
+
+        @JvmStatic
+        val repairToolPose: ArmPose get() = REPAIR_TOOL_POSE
 
         @JvmStatic
         fun applyArmPose(model: HumanoidModel<*>) {
@@ -126,6 +132,10 @@ object ModEnumExtensions {
                     model.leftArm.zRot = 0f
                 }
 
+                REPAIR_TOOL_POSE -> {
+                    model.rightArm.xRot = -67.5f * Mth.DEG_TO_RAD + model.head.xRot + 0.05f * model.rightArm.xRot
+                    model.rightArm.yRot = 5f * Mth.DEG_TO_RAD + model.head.yRot
+                }
                 else -> {}
             }
         }

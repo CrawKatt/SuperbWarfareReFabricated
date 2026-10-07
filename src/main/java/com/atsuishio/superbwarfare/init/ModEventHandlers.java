@@ -8,6 +8,8 @@ import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
 import com.atsuishio.superbwarfare.event.GunEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
+import com.atsuishio.superbwarfare.event.ShieldHandler;
+import com.atsuishio.superbwarfare.event.custom.LivingIncomingDamageCallback;
 import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity;
 import com.atsuishio.superbwarfare.entity.living.TargetEntity;
@@ -24,6 +26,7 @@ import net.minecraft.world.InteractionResult;
 public class ModEventHandlers {
 
     public static void init() {
+        LivingIncomingDamageCallback.EVENT.register(ShieldHandler::onEntityHurt);
         SuperbWarfareEvents.register(MobEffectAddedEvent.class, event ->
                 BurnMobEffect.onBurnAdded(event.getEntity(), event.getEffectInstance(), event.getEffectSource()));
         SuperbWarfareEvents.register(MobEffectAddedEvent.class, event ->

@@ -5,13 +5,14 @@ import com.atsuishio.superbwarfare.data.attachment.ShieldEmitter
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.tools.SoundTool
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
-import net.neoforged.neoforge.capabilities.Capabilities
+import team.reborn.energy.api.EnergyStorage
 import kotlin.math.ceil
 import kotlin.math.max
 
@@ -172,8 +173,8 @@ object ShieldRuntime {
         if (energy <= 0.0) return true
 
         val need = max(1, ceil(energy).toInt())
-        val stored = stack.getCapability(Capabilities.EnergyStorage.ITEM) ?: return false
+        val stored = EnergyStorage.ITEM.find(stack, null) ?: return false
 
-        return stored.extractEnergy(need, false) >= need
+        return EnergyStorageHelper.extract(stored, need.toLong()) >= need
     }
 }

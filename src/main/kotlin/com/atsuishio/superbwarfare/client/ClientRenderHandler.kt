@@ -47,7 +47,6 @@ import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.*
-import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.tooltip.ClientAttachmentImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientBocekImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
@@ -214,9 +213,8 @@ object ClientRenderHandler {
             mc.levelRenderer.graphicsChanged()
         }
 
-        val geoGunRenderer = GeoGunRenderer()
         BuiltInRegistries.ITEM.filterIsInstance<GeoGunItemV2>().forEach { item ->
-            BuiltinItemRendererRegistry.INSTANCE.register(item, geoGunRenderer)
+            BuiltinItemRendererRegistry.INSTANCE.register(item, item.createRenderer())
         }
 
         val renderers: List<Pair<net.minecraft.world.item.Item, Lazy<BlockEntityWithoutLevelRenderer>>> = listOf(

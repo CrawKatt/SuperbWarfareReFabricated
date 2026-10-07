@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.entity.mixin.DamageContainer
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.damage.DamageModifier.ModifyResult
 import com.atsuishio.superbwarfare.event.LivingEventHandler
+import com.atsuishio.superbwarfare.event.custom.LivingIncomingDamageCallback
 import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect
 import com.atsuishio.superbwarfare.tools.DamageHandler.doDamage
 import com.atsuishio.superbwarfare.tools.FormatTool.format2D
@@ -61,6 +62,14 @@ object DamageHandler {
                 val damageAccess = DamageAccess.of(entity)
                 val container = damageAccess.`superbwarfare$getDamageContainers`() ?: return false
                 container.push(DamageContainer(source, damage))
+
+                val incoming = LivingIncomingDamageCallback.Event(entity, source, damage)
+                LivingIncomingDamageCallback.EVENT.invoker().onIncomingDamage(incoming)
+                if (incoming.isCanceled) {
+                    container.pop()
+                    return false
+                }
+                damage = incoming.amount
 
                 if (LivingEventHandler.onEntityAttacked(entity, source, damage)) {
                     container.pop()

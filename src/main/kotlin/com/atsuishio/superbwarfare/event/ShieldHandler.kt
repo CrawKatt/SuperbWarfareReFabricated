@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.event
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.tools.DamageTypeTool
+import com.atsuishio.superbwarfare.event.custom.LivingIncomingDamageCallback
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.tags.DamageTypeTags
@@ -10,14 +11,10 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.phys.Vec3
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent
 
 /**
  * 枪盾的伤害拦截
  */
-@EventBusSubscriber
 object ShieldHandler {
 
     private val soundCooldown = HashMap<Int, Long>()
@@ -57,8 +54,8 @@ object ShieldHandler {
         return GunData.from(stack)
     }
 
-    @SubscribeEvent
-    fun onEntityHurt(event: LivingIncomingDamageEvent) {
+    @JvmStatic
+    fun onEntityHurt(event: LivingIncomingDamageCallback.Event) {
         val victim = event.entity ?: return
         if (victim.level().isClientSide) return
         if (event.source.entity == victim) return

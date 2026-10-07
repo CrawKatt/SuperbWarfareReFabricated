@@ -803,10 +803,10 @@ open class ProjectileEntity(entityType: EntityType<out ProjectileEntity>, level:
         lastShieldSpark = now
 
         ParticleTool.sendParticle(
-            level, ModParticleTypes.FIRE_STAR.get(), pos.x, pos.y, pos.z,
+            level, ModParticleTypes.FIRE_STAR, pos.x, pos.y, pos.z,
             3, 0.0, 0.0, 0.0, 0.2, false
         )
-        level.playSound(null, BlockPos.containing(pos), ModSounds.STEEL_PIPE_HIT.get(), SoundSource.PLAYERS, 1f, 1.2f)
+        level.playSound(null, BlockPos.containing(pos), ModSounds.STEEL_PIPE_HIT, SoundSource.PLAYERS, 1f, 1.2f)
     }
 
     override fun performDamage(entity: Entity, damage: Float, isHeadshot: Boolean) {

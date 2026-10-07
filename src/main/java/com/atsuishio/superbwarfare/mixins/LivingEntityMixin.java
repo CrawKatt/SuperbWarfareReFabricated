@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.custom.LivingHealCallback;
 import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback;
+import com.atsuishio.superbwarfare.event.custom.LivingIncomingDamageCallback;
 import com.atsuishio.superbwarfare.event.custom.MobEffectAddedEvent;
 import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
@@ -17,6 +18,8 @@ import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect;
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import com.atsuishio.superbwarfare.tools.MinecraftUtil;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -186,6 +189,19 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
 
         if (LivingEventHandler.onEntityAttacked(self, source, amount)) {
             cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isSleeping()Z"), cancellable = true)
+    private void superbwarfare$onIncomingDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir, @Local(argsOnly = true) LocalFloatRef damage) {
+        LivingIncomingDamageCallback.Event event = new LivingIncomingDamageCallback.Event(
+                (LivingEntity) (Object) this, source, amount
+        );
+        LivingIncomingDamageCallback.EVENT.invoker().onIncomingDamage(event);
+        if (event.isCanceled()) {
+            cir.setReturnValue(false);
+        } else {
+            damage.set(event.getAmount());
         }
     }
 
