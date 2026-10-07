@@ -2,11 +2,11 @@ package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.api.event.ReloadEvent
 import com.atsuishio.superbwarfare.data.gun.*
+import com.atsuishio.superbwarfare.data.gun.subweapon.SubWeaponRuntime
 import com.atsuishio.superbwarfare.data.gun.value.ReloadState
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModComponents
 import com.atsuishio.superbwarfare.init.ModSounds
-import com.atsuishio.superbwarfare.subweapon.SubWeaponRuntime
 import com.atsuishio.superbwarfare.tools.*
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
