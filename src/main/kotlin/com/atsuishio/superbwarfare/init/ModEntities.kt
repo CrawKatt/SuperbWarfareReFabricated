@@ -200,6 +200,14 @@ object ModEntities {
         register("smoke_gun_grenade", fastProjectile(::SmokeGunGrenadeEntity, true).dimensions(EntityDimensions.scalable(0.5f, 0.5f)))
 
     @JvmField
+    val TYPE_88_CLUSTER_GRENADES: EntityType<Type88ClusterGrenadesEntity> =
+        register("type_88_cluster_grenades", fastProjectile(::Type88ClusterGrenadesEntity, true).dimensions(EntityDimensions.scalable(0.3f, 0.3f)))
+
+    @JvmField
+    val SPLIT_TYPE_88_GRENADE: EntityType<SplitType88GrenadeEntity> =
+        register("split_type_88_grenade", fastProjectile(::SplitType88GrenadeEntity, true).dimensions(EntityDimensions.scalable(0.2f, 0.2f)))
+
+    @JvmField
     val JAVELIN_MISSILE: EntityType<JavelinMissileEntity> =
         register("javelin_missile", fastProjectile(::JavelinMissileEntity).dimensions(EntityDimensions.scalable(0.5f, 0.5f)))
 

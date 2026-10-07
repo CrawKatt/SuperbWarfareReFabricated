@@ -26,6 +26,7 @@ import com.atsuishio.superbwarfare.client.renderer.item.KnifeM1917Renderer
 import com.atsuishio.superbwarfare.client.renderer.item.KnifeRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.KnifeSeitengewehr84Renderer
 import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
+import com.atsuishio.superbwarfare.client.renderer.item.Type88ClusterGrenadesRenderer
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
 import com.atsuishio.superbwarfare.client.tooltip.ClientBocekImageTooltip
@@ -191,6 +192,16 @@ object ClientRenderHandler {
             ModItems.TM_62
         ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
             tm62Renderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
+        }
+
+        val type88ClusterGrenadesRenderer =
+            lazy { Type88ClusterGrenadesRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+        BuiltinItemRendererRegistry.INSTANCE.register(
+            ModItems.TYPE_88_CLUSTER_GRENADES
+        ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
+            type88ClusterGrenadesRenderer.value.renderByItem(
+                stack, displayContext, poseStack, buffer, packedLight, packedOverlay
+            )
         }
 
         val blueprintResearchTableRenderer =
