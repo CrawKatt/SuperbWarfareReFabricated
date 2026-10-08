@@ -28,6 +28,7 @@ import com.atsuishio.superbwarfare.item.EnergyStorageItem
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
 import com.atsuishio.superbwarfare.item.gun.GunItem.Companion.isHeldWeapon
 import com.atsuishio.superbwarfare.item.gun.GunItem.Companion.isOperable
+import com.atsuishio.superbwarfare.item.gun.GunItem.Companion.resolveShootDirection
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
@@ -611,7 +612,19 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         )
     }
 
-    fun shoot(data: GunData, shooter: Entity, spread: Double, zoom: Boolean, uuid: UUID?, pos: Vec3?, power: Double) {
+    fun shoot(data: GunData, shooter: Entity, spread: Double, zoom: Boolean, uuid: UUID?, pos: Vec3?, power: Double) =
+        shoot(data, shooter, spread, zoom, uuid, pos, power, null)
+
+    fun shoot(
+        data: GunData,
+        shooter: Entity,
+        spread: Double,
+        zoom: Boolean,
+        uuid: UUID?,
+        pos: Vec3?,
+        power: Double,
+        muzzleDirection: Vec3?
+    ) {
         val server = shooter.level() as? ServerLevel ?: return
 
         shoot(
@@ -620,7 +633,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
                 shooter,
                 server,
                 Vec3(shooter.x, shooter.eyeY, shooter.z),
-                shooter.lookAngle,
+                resolveShootDirection(muzzleDirection, shooter),
                 data,
                 spread,
                 zoom,
@@ -1358,6 +1371,23 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             if (stack == null || stack.isEmpty) return false
             return stack.item is GunItem
         }
+
+        @JvmStatic
+        fun resolveShootDirection(muzzleDirection: Vec3?, shooter: Entity): Vec3 {
+            val aim = shooter.lookAngle
+            if (muzzleDirection == null) return aim
+            if (!muzzleDirection.x.isFinite() || !muzzleDirection.y.isFinite() || !muzzleDirection.z.isFinite()) return aim
+            if (muzzleDirection.lengthSqr() < 1e-8) return aim
+
+            val direction = muzzleDirection.normalize()
+            return if (direction.dot(aim) < MIN_MUZZLE_ALIGNMENT) aim else direction
+        }
+
+        /** [resolveShootDirection] 的夹角上限（度）：只是"样本是不是疯了"的兜底，见那边的注释 */
+        private const val MAX_MUZZLE_DEVIATION_DEGREES = 60.0
+
+        /** 上面那个角度换算成的余弦阈值（`lookAngle` 是单位向量，点积就是夹角余弦） */
+        private val MIN_MUZZLE_ALIGNMENT = Math.cos(Math.toRadians(MAX_MUZZLE_DEVIATION_DEGREES))
 
         protected fun getEntityResult(target: Entity, hitBoxPos: Vec3, hitPos: Vec3): EntityResult {
             var headshot = false
