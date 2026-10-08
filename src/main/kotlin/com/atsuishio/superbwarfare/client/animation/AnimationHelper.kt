@@ -9,7 +9,6 @@ import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.event.ClientEventHandler.activeThermalImaging
-import com.atsuishio.superbwarfare.event.ClientEventHandler.handleShells
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.postEvent
@@ -29,7 +28,6 @@ import net.minecraft.world.entity.player.PlayerModelPart
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import org.joml.Matrix4f
-import software.bernie.geckolib.animation.AnimationProcessor
 import software.bernie.geckolib.cache.`object`.GeoBone
 import software.bernie.geckolib.util.RenderUtil
 
@@ -83,36 +81,6 @@ object AnimationHelper {
         model.xRot = 0.0f
         model.yRot = 180 * Mth.DEG_TO_RAD
         model.zRot = 180 * Mth.DEG_TO_RAD
-    }
-
-    fun renderPartOverBone2R(
-        model: ModelPart,
-        bone: GeoBone,
-        stack: PoseStack,
-        buffer: VertexConsumer,
-        packedLightIn: Int,
-        packedOverlayIn: Int
-    ) {
-        setupModelFromBone2R(model, bone)
-        model.render(stack, buffer, packedLightIn, packedOverlayIn)
-    }
-
-    fun setupModelFromBone2R(model: ModelPart, bone: GeoBone) {
-        model.setPos(bone.pivotX, bone.pivotY + 7, bone.pivotZ)
-        model.xRot = 180 * Mth.DEG_TO_RAD
-        model.yRot = 180 * Mth.DEG_TO_RAD
-        model.zRot = 0f
-    }
-
-    @JvmStatic
-    fun handleShellsAnimation(animationProcessor: AnimationProcessor<*>, x: Float, y: Float) {
-        val shell1 = animationProcessor.getBone("shell1")
-        val shell2 = animationProcessor.getBone("shell2")
-        val shell3 = animationProcessor.getBone("shell3")
-        val shell4 = animationProcessor.getBone("shell4")
-        val shell5 = animationProcessor.getBone("shell5")
-
-        handleShells(x, y, shell1, shell2, shell3, shell4, shell5)
     }
 
     @JvmStatic
