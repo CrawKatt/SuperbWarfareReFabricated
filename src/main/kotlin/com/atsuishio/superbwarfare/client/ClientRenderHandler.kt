@@ -30,6 +30,7 @@ import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.Type88ClusterGrenadesRenderer
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
+import com.atsuishio.superbwarfare.client.renderer.special.RadiationGlowRenderer
 import com.atsuishio.superbwarfare.client.tooltip.ClientBocekImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
@@ -62,12 +63,17 @@ import dev.emi.trinkets.api.client.TrinketRendererRegistry
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.model.EntityModel
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers
+import net.minecraft.client.renderer.entity.LivingEntityRenderer
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
@@ -252,7 +258,31 @@ object ClientRenderHandler {
     }
 
     @JvmStatic
+    fun addRadiationGlowLayers() {
+        LivingEntityFeatureRendererRegistrationCallback.EVENT.register { type, renderer, helper, _ ->
+            attachRadiationGlowLayer(type, renderer, helper)
+        }
+    }
+
+    @JvmStatic
+    @Suppress("UNCHECKED_CAST")
+    fun attachRadiationGlowLayer(
+        type: EntityType<out LivingEntity>,
+        entityRenderer: LivingEntityRenderer<*, *>,
+        helper: LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper
+    ) {
+        if (type == EntityType.ENDER_DRAGON) return
+        val renderer = try {
+            entityRenderer as? LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>
+        } catch (_: Exception) {
+            null
+        }
+        renderer?.let { helper.register(RadiationGlowRenderer(it)) }
+    }
+
+    @JvmStatic
     fun registerRenderers() {
+        addRadiationGlowLayers()
         BlockEntityRenderers.register(ModBlockEntities.CONTAINER) { ContainerBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.FUMO_25) { FuMO25BlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.CHARGING_STATION) { ChargingStationBlockEntityRenderer() }

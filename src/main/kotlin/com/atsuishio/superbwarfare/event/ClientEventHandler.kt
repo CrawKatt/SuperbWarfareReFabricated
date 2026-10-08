@@ -19,6 +19,7 @@ import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
+import com.atsuishio.superbwarfare.client.shader.RadiationShaderHandler
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.config.server.MiscConfig
@@ -39,6 +40,7 @@ import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.item.misc.MonitorItem
+import com.atsuishio.superbwarfare.mobeffect.RadiationMobEffect
 import com.atsuishio.superbwarfare.network.message.send.*
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
@@ -70,6 +72,8 @@ import net.minecraft.world.level.block.DoorBlock
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import com.atsuishio.superbwarfare.event.custom.InteractionKeyMappingTriggeredCallback
 import com.atsuishio.superbwarfare.event.custom.RenderGuiOverlayCallback
 import com.atsuishio.superbwarfare.event.custom.RenderHandCallback
@@ -106,6 +110,9 @@ object ClientEventHandler {
 
     @JvmStatic
     fun register() {
+        RadiationShaderHandler.onRegisterReloadListeners()
+        WorldRenderEvents.END.register(::renderRadiationShader)
+
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             onPlayerLoggedIn()
         }
@@ -690,8 +697,22 @@ object ClientEventHandler {
                 || player.isSprinting
     }
     @JvmStatic
+    fun renderRadiationShader(event: WorldRenderContext) {
+        RadiationShaderHandler.render(event)
+    }
+
+    @JvmStatic
     fun handleClientTick() {
-        val player = localPlayer ?: return
+        val player = localPlayer ?: run {
+            RadiationShaderHandler.setLevel(0)
+            return
+        }
+
+        val radiationLevel = RadiationMobEffect.getLevel(player)
+        RadiationShaderHandler.setLevel(
+            if (mc.options.cameraType == CameraType.FIRST_PERSON) radiationLevel else 0
+        )
+
         if (mc.fps <= 20) {
             handleWeaponFire()
             handleVehicleFire()
