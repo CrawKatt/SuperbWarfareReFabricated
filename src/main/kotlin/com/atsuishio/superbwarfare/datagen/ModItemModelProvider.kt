@@ -444,6 +444,8 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.CHARM_FLANDRE_SCARLET)
         simpleItem(ModItems.CHARM_SAIGYOUJI_YUYUKO)
         simpleItem(ModItems.CHARM_HOURAISAN_KAGUYA)
+        simpleItem(ModItems.CHARM_MOON_HEART)
+        simpleItem(ModItems.CHARM_TYPE_88_CLUSTER_GRENADES)
         simpleItem(ModItems.CHARM_SEPT_WOLVES)
         simpleItem(ModItems.CHARM_ANCIENT_CPU)
         simpleItem(ModItems.CHARM_DRAGON_HEAD)
