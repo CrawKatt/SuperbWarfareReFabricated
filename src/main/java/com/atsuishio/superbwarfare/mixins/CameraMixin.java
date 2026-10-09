@@ -18,7 +18,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
-import org.joml.Math;
 import org.joml.Matrix4d;
 import org.joml.Vector4d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,6 +28,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
+
+import static com.atsuishio.superbwarfare.event.ClientEventHandler.zoomTime;
 
 @Mixin(Camera.class)
 public abstract class CameraMixin {
@@ -190,9 +191,9 @@ public abstract class CameraMixin {
         if (Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK
                 && entity instanceof Player player
                 && GunItem.isHeldWeapon(player.getMainHandItem())
-                && Math.max(ClientEventHandler.bowPullPos, ClientEventHandler.zoomPos) > 0
+                && zoomTime > 0
         ) {
-            move(-getMaxZoom((float) (-2.9 * Math.max(ClientEventHandler.bowPullPos, ClientEventHandler.zoomPos))), 0F, (float) (-ClientEventHandler.cameraLocation * Math.max(ClientEventHandler.bowPullPos, ClientEventHandler.zoomPos)));
+            move(-getMaxZoom((float) (-2.9 * zoomTime)), 0f, (float) (-ClientEventHandler.cameraLocation * zoomTime));
             return;
         }
 
