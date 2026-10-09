@@ -644,8 +644,13 @@ object ClientEventHandler {
     }
 
     @SubscribeEvent
-    fun renderRadiationShader(event: RenderLevelStageEvent) {
+    fun renderRadiationShader(event: RenderGuiEvent.Post) {
         RadiationShaderHandler.render(event)
+    }
+
+    @SubscribeEvent
+    fun renderRadiationShaderOnHiddenGui(event: RenderLevelStageEvent) {
+        RadiationShaderHandler.renderLevel(event)
     }
 
     @SubscribeEvent
