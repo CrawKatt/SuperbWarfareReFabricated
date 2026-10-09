@@ -218,20 +218,13 @@ class BuiltinGunScopeRenderer(
         RenderSystem.colorMask(true, true, true, true)
     }
 
-    /**
-     * 在屏幕空间画一个大圆盘，用 `GL_INVERT` 把窗口**内部**的模板值翻成 `~(i + 1)`。
-     *
-     * 圆盘贴在 `ocular` 所在的深度上，半径 = `80 × 倍率 × 开镜进度 / 90 × 深度`，也就是 1.20 那个
-     * `atan(80 × 倍率 / 90)` 的视角：倍率 1.0 推满时约 41.6°，比屏幕还大，于是**整片镜筒口**都被翻成
-     * 窗口，镜片与镜筒壁的贴图一张都画不出来，外框只剩枪身自己的几何。倍率调小才会在窗口边缘留一圈。
-     */
     private fun carveDisc(poseStack: PoseStack, info: BuiltinScopeInfo) {
         RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_INVERT)
         RenderSystem.colorMask(false, false, false, false)
         RenderSystem.depthMask(false)
 
-        val aimingProgress = ClientEventHandler.zoomTime.coerceIn(0.0, 1.0).toFloat()
-        val rad = 80f * info.viewRadiusModifier * aimingProgress
+        val progress = ClientEventHandler.aimingProgress(ClientEventHandler.zoomTime)
+        val rad = 80f * info.viewRadiusModifier * progress
         val modelViewMatrix = Matrix4f(RenderSystem.getModelViewMatrix())
 
         val modelViewStack = RenderSystem.getModelViewStack()

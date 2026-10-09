@@ -121,7 +121,8 @@ public abstract class CameraMixin {
                 && GunItem.isHeldWeapon(player.getMainHandItem())
                 && zoomTime > 0
         ) {
-            move(-getMaxZoom((float) (-2.9 * zoomTime)), 0f, (float) (-ClientEventHandler.cameraLocation * zoomTime));
+            double zoom = ClientEventHandler.aimingProgress(zoomTime);
+            move(-getMaxZoom((float) (-2.9 * zoom)), 0f, (float) (-ClientEventHandler.cameraLocation * zoom));
             return;
         }
 
