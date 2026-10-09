@@ -560,9 +560,8 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
         RenderSystem.colorMask(false, false, false, false)
         RenderSystem.depthMask(false)
 
-        val aimingProgress = ClientEventHandler.zoomTime.coerceIn(0.0, 1.0).toFloat()
-        val rad = 80f * info.viewRadiusModifier * aimingProgress
-
+        val progress = ClientEventHandler.aimingProgress(ClientEventHandler.zoomTime)
+        val rad = 80f * info.viewRadiusModifier * progress
         val window = Minecraft.getInstance().window
         val projectionMatrix = Matrix4f(RenderSystem.getProjectionMatrix())
         val modelViewMatrix = Matrix4f(RenderSystem.getModelViewMatrix())
