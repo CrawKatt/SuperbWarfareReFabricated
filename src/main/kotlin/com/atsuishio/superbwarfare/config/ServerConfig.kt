@@ -20,6 +20,7 @@ val SERVER_CONFIG = buildConfig(
     AmmoConfig,
     MapConfig,
     SyncConfig,
+    RadiationConfig,
 )
 
 object ServerConfig {

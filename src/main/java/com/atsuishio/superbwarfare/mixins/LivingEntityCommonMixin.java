@@ -59,6 +59,15 @@ public class LivingEntityCommonMixin implements LivingDropsCapture {
         return event.isCanceled() || event.getAmount() <= 0.0F;
     }
 
+    @Inject(method = "tick()V", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$onLivingTickPre(CallbackInfo ci) {
+        LivingTickPreCallback.Event event = new LivingTickPreCallback.Event((LivingEntity) (Object) this);
+        LivingTickPreCallback.EVENT.invoker().onLivingTick(event);
+        if (event.isCanceled()) {
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "tick", at = @At("TAIL"))
     private void superbwarfare$onLivingTick(CallbackInfo ci) {
         LivingEntity entity = (LivingEntity) (Object) this;
