@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import net.minecraft.client.CameraType
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.ChatScreen
 import net.minecraft.client.renderer.PostChain
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.PackType
@@ -51,22 +52,41 @@ class RadiationShaderHandler : SimpleSynchronousResourceReloadListener {
         }
 
         @JvmStatic
-        fun render(event: WorldRenderContext) {
-            if (activeDose <= 0f || localPlayer  == null || clientLevel == null ||
+        fun render(partialTick: Float) {
+            if (mc.options.hideGui && mc.screen == null) return
+
+            process(partialTick)
+        }
+
+        @JvmStatic
+        fun renderLevel(event: WorldRenderContext) {
+            if (!mc.options.hideGui || mc.screen != null) return
+
+            process(event.tickDelta())
+        }
+
+        private fun process(partialTick: Float) {
+            if (activeDose <= 0f || localPlayer == null || clientLevel == null ||
                 mc.options.cameraType != CameraType.FIRST_PERSON ||
-                mc.gameRenderer.currentEffect() != null || ThermalShaderHandler.isActive()
+                mc.gameRenderer.currentEffect() != null || ThermalShaderHandler.isActive() ||
+                !keepsWorldVisible()
             ) {
                 return
             }
 
-            RenderSystem.setShaderGameTime(0, event.tickDelta())
+            RenderSystem.setShaderGameTime(0, partialTick)
             if (!ensureChain(mc)) return
             try {
-                radiationChain?.process(event.tickDelta())
+                radiationChain?.process(partialTick)
             } catch (_: Exception) {
                 cleanup()
             }
             mc.mainRenderTarget.bindWrite(true)
+        }
+
+        private fun keepsWorldVisible(): Boolean {
+            val screen = mc.screen ?: return true
+            return screen is ChatScreen
         }
 
         private fun ensureChain(mc: Minecraft): Boolean {

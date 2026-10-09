@@ -37,6 +37,7 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler.handleGunRecoil
 import com.atsuishio.superbwarfare.event.ClientEventHandler.handleWeaponFire
 import com.atsuishio.superbwarfare.event.ClientEventHandler.isGunMeleeActive
 import com.atsuishio.superbwarfare.event.ClientEventHandler.resetGunTransientState
+import com.atsuishio.superbwarfare.event.ClientEventHandler.zoomTime
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
@@ -72,6 +73,7 @@ import net.minecraft.world.level.block.DoorBlock
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import com.atsuishio.superbwarfare.event.custom.InteractionKeyMappingTriggeredCallback
@@ -110,7 +112,8 @@ object ClientEventHandler {
     @JvmStatic
     fun register() {
         RadiationShaderHandler.onRegisterReloadListeners()
-        WorldRenderEvents.END.register(::renderRadiationShader)
+        HudRenderCallback.EVENT.register { _, partialTick -> renderRadiationShader(partialTick) }
+        WorldRenderEvents.END.register(::renderRadiationShaderOnHiddenGui)
 
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             onPlayerLoggedIn()
@@ -694,9 +697,15 @@ object ClientEventHandler {
                 || mc.options.keyDown.isDown
                 || player.isSprinting
     }
+
     @JvmStatic
-    fun renderRadiationShader(event: WorldRenderContext) {
-        RadiationShaderHandler.render(event)
+    fun renderRadiationShader(partialTick: Float) {
+        RadiationShaderHandler.render(partialTick)
+    }
+
+    @JvmStatic
+    fun renderRadiationShaderOnHiddenGui(event: WorldRenderContext) {
+        RadiationShaderHandler.renderLevel(event)
     }
 
     @JvmStatic
