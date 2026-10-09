@@ -41,7 +41,7 @@ object IglaHudOverlay : CommonOverlay("igla_9k38_hud") {
         val vehicle = player.vehicle
         if (vehicle is VehicleEntity && vehicle.banHand(player)) return
 
-        if (stack.item === ModItems.IGLA_9K38 && ClientEventHandler.zoomPos > 0.83 && isFirstPerson && ClientEventHandler.zoom) {
+        if (stack.item === ModItems.IGLA_9K38 && ClientEventHandler.zoomTime > 0.83 && isFirstPerson && ClientEventHandler.zoom) {
             val data = from(stack)
 
             poseStack.pushPose()
