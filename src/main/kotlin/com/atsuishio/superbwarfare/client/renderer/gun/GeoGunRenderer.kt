@@ -941,9 +941,9 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
             // 能量即弹药的枪（ql_1031 等）没有弹匣，弹匣那套数字对它没有意义：`ammo` 恒为 0、
             // `MAGAZINE <= 0` 又会让弹药条按满算，也就是永远「满条 + 0」。改报电量百分比，
             // 发数按当前射击模式（`AvailableFireModes[].Override`）的 `AmmoCostPerShoot` 折算。
-            val storage = stack.getCapability(Capabilities.EnergyStorage.ITEM)
-            val stored = storage?.energyStored ?: 0
-            val capacity = storage?.maxEnergyStored ?: 0
+            val storage = ModCapabilities.ENERGY_ITEM.find(stack, null)
+            val stored = storage?.amount?.toInt() ?: 0
+            val capacity = storage?.capacity?.toInt() ?: 0
             // 每发 0 FE 等于永远打不完，夹到 1 让发数退化成剩余能量点数，也避免除零
             val cost = gun.primaryAmmoCostPerShoot().coerceAtLeast(1)
             return AmmoReadout(

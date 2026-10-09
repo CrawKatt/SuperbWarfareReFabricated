@@ -105,7 +105,7 @@ object ModItems {
     @JvmField val QBZ_191 = registerGun("qbz_191") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
     @JvmField val INSIDIOUS = registerGun("insidious") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
     @JvmField val MK_14 = registerGun("mk_14") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val QL_1031 = registerGun("ql_1031") { Ql1031Item() }
+    @JvmField val QL_1031 = registerGun("ql_1031") { Ql1031Item }
     @JvmField val MARLIN = registerGun("marlin") { GeoGunItemV2(Properties()) }
     @JvmField val K_98 = registerGun("k_98") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
     @JvmField val MOSIN_NAGANT = registerGun("mosin_nagant") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }

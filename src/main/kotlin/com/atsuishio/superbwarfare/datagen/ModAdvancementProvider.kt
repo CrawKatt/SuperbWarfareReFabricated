@@ -72,7 +72,7 @@ class ModAdvancementProvider(
                 .parent(vehicleAssembling)
         }
         val vehicleResetKit = advancement("vehicle_reset_kit") {
-            it.icon(ModItems.VEHICLE_RESET_KIT.get())
+            it.icon(ModItems.VEHICLE_RESET_KIT)
                 .whenIconCollected()
                 .type(ModAdvancement.Type.DEFAULT_CHALLENGE)
                 .parent(superContainer)
