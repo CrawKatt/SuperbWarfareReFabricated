@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.init
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.capability.entity.InfiniteAmmoCapability
 import com.atsuishio.superbwarfare.capability.living.PhosphorusFireCapability
+import com.atsuishio.superbwarfare.capability.living.RadiationCapability
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.tools.createMapCodec
 import com.atsuishio.superbwarfare.tools.createStreamCodec
@@ -34,6 +35,11 @@ object ModDataAttachments {
     @JvmField
     val PHOSPHORUS_FIRE = registerCodec<PhosphorusFireCapability>("phosphorus_fire") {
         it.sync(createStreamCodec<PhosphorusFireCapability>())
+    }
+
+    @JvmField
+    val RADIATION = registerCodec<RadiationCapability>("radiation") {
+        it.sync(createStreamCodec<RadiationCapability>())
     }
 
     @JvmField
