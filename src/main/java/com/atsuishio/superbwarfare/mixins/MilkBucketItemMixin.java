@@ -20,7 +20,7 @@ public class MilkBucketItemMixin {
     private boolean superbwarfare$preservePhosphorusFire(LivingEntity entity) {
         boolean removed = false;
         for (MobEffectInstance effect : List.copyOf(entity.getActiveEffects())) {
-            if (effect.getEffect() != ModMobEffects.PHOSPHORUS_FIRE) {
+            if (effect.getEffect() != ModMobEffects.PHOSPHORUS_FIRE && effect.getEffect() != ModMobEffects.RADIATION) {
                 removed |= entity.removeEffect(effect.getEffect());
             }
         }

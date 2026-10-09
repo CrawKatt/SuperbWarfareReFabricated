@@ -3,6 +3,8 @@ package com.atsuishio.superbwarfare.init;
 import com.atsuishio.superbwarfare.Mod;
 import com.atsuishio.superbwarfare.capability.entity.InfiniteAmmoCapability;
 import com.atsuishio.superbwarfare.capability.living.PhosphorusFireCapability;
+import com.atsuishio.superbwarfare.capability.living.RadiationCapability;
+import com.atsuishio.superbwarfare.capability.living.RadiationComponent;
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,6 +15,11 @@ import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
 import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 
 public class ModComponents implements EntityComponentInitializer {
+
+    public static final ComponentKey<RadiationComponent> RADIATION = ComponentRegistry.getOrCreate(
+            RadiationCapability.ID,
+            RadiationComponent.class
+    );
 
     public static final ComponentKey<PlayerVariable> PLAYER_VARIABLE = ComponentRegistry.getOrCreate(
             Mod.loc("player_variable"),
@@ -31,6 +38,8 @@ public class ModComponents implements EntityComponentInitializer {
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
+        registry.registerFor(Entity.class, RADIATION, entity -> new RadiationComponent());
+        registry.registerForPlayers(RADIATION, player -> new RadiationComponent(), RespawnCopyStrategy.NEVER_COPY);
         registry.registerForPlayers(
                 PLAYER_VARIABLE,
                 PlayerVariable::new,
