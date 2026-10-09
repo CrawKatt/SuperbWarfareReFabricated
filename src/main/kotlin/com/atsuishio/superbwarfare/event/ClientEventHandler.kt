@@ -104,7 +104,8 @@ object ClientEventHandler {
     @JvmStatic
     fun register() {
         RadiationShaderHandler.onRegisterReloadListeners()
-        net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.END.register(::renderRadiationShader)
+        net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register(::renderRadiationShader)
+        net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.END.register(::renderRadiationShaderOnHiddenGui)
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             onPlayerLoggedIn()
         }
@@ -665,8 +666,13 @@ object ClientEventHandler {
     }
 
     @JvmStatic
-    fun renderRadiationShader(event: net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext) {
-        RadiationShaderHandler.render(event)
+    fun renderRadiationShader(guiGraphics: GuiGraphics, deltaTracker: net.minecraft.client.DeltaTracker) {
+        RadiationShaderHandler.render(deltaTracker)
+    }
+
+    @JvmStatic
+    fun renderRadiationShaderOnHiddenGui(event: net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext) {
+        RadiationShaderHandler.renderLevel(event)
     }
 
     @JvmStatic
