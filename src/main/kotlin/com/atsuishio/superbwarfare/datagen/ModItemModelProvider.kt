@@ -80,7 +80,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         gunItemV2(ModItems.AWM)
         gunItemV2(ModItems.IGLA_9K38)
         gunItemV2(ModItems.REPAIR_TOOL)
-        gunItem(ModItems.QL_1031)
+        gunItemV2(ModItems.QL_1031)
         gunItemV2(ModItems.SUPER_STAR_SHOOTER)
         gunItemV2(ModItems.REFORGING)
         gunItemV2(ModItems.M_1897)
