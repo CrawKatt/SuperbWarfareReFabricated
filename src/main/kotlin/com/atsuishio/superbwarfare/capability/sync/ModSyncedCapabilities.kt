@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.capability.sync
 import com.atsuishio.superbwarfare.capability.ModCapabilities
 import com.atsuishio.superbwarfare.capability.entity.InfiniteAmmoCapability
 import com.atsuishio.superbwarfare.capability.living.PhosphorusFireCapability
+import com.atsuishio.superbwarfare.capability.living.RadiationCapability
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 
 /**
@@ -25,6 +26,10 @@ object ModSyncedCapabilities {
 
         CapabilitySync.register(PhosphorusFireCapability.ID) { entity ->
             ModCapabilities.PHOSPHORUS_FIRE.maybeGet(entity).orElse(null)
+        }
+
+        CapabilitySync.register(RadiationCapability.ID) { entity ->
+            ModCapabilities.RADIATION_CAPABILITY.maybeGet(entity).orElse(null)
         }
 
         CapabilitySync.register(PlayerVariable.ID) { entity ->

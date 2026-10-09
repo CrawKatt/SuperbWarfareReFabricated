@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.capability
 
 import com.atsuishio.superbwarfare.capability.entity.InfiniteAmmoCapability
 import com.atsuishio.superbwarfare.capability.living.PhosphorusFireCapability
+import com.atsuishio.superbwarfare.capability.living.RadiationCapability
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import dev.onyxstudios.cca.api.v3.component.ComponentKey
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
@@ -20,6 +21,9 @@ class ModCapabilities : EntityComponentInitializer {
             RespawnCopyStrategy.ALWAYS_COPY
         )
         registry.registerFor(LivingEntity::class.java, PHOSPHORUS_FIRE) { PhosphorusFireCapability() }
+        registry.beginRegistration(LivingEntity::class.java, RADIATION_CAPABILITY)
+            .respawnStrategy(RespawnCopyStrategy.NEVER_COPY)
+            .end { RadiationCapability() }
         registry.registerFor(Entity::class.java, INFINITE_AMMO) { InfiniteAmmoCapability() }
     }
 
@@ -34,6 +38,12 @@ class ModCapabilities : EntityComponentInitializer {
         val PHOSPHORUS_FIRE: ComponentKey<PhosphorusFireCapability> = ComponentRegistry.getOrCreate(
             PhosphorusFireCapability.ID,
             PhosphorusFireCapability::class.java
+        )
+
+        @JvmField
+        val RADIATION_CAPABILITY: ComponentKey<RadiationCapability> = ComponentRegistry.getOrCreate(
+            RadiationCapability.ID,
+            RadiationCapability::class.java
         )
 
         @JvmField
