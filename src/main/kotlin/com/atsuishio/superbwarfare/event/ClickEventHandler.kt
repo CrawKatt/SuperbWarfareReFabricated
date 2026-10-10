@@ -448,7 +448,7 @@ object ClickEventHandler {
             }
 
             if (key == ModKeyMappings.EDIT_MODE.key.value) {
-                if (DeployedWeaponHandler.isDeployed(player)) return
+                if (DeployedWeaponHandler.isDeployed(player)) return false
 
                 if (vehicle is VehicleEntity) {
                     val data = vehicle.getGunData(player)

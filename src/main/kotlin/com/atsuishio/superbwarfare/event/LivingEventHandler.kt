@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.event.custom.LivingIncomingDamageCallback
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.ammo.ammoBoxData
 import com.atsuishio.superbwarfare.item.gun.GunItem
@@ -98,6 +99,7 @@ object LivingEventHandler {
         damage = handleGunPerksWhenHurt(entity, source, damage)
         renderDamageIndicator(entity, source, damage)
         damage = reduceDamage(entity, source, damage)
+        applyLifesteal(LivingIncomingDamageCallback.Event(entity, source, damage))
         giveExpToWeapon(entity, source, damage)
         return damage
     }
@@ -203,6 +205,52 @@ object LivingEventHandler {
     }
 
     /**
+     * 生命汲取
+     */
+    private fun applyLifesteal(event: LivingIncomingDamageCallback.Event) {
+        val source = event.source
+        val isGunDamage = DamageTypeTool.isGunDamage(source)
+        val isMeleeDamage = DamageTypeTool.isMeleeDamage(source)
+        if (!isGunDamage && !isMeleeDamage) return
+        // 伤害被取消（例如被载具吸收）时并没有真的造成伤害
+        if (event.isCanceled) return
+
+        var attacker: LivingEntity? = null
+        val sourceEntity = source.entity
+        val directEntity = source.directEntity
+
+        if (sourceEntity is LivingEntity) {
+            attacker = sourceEntity
+        }
+
+        if (directEntity is Projectile && directEntity.owner is LivingEntity) {
+            val owner = directEntity.owner as LivingEntity
+            if (owner is ServerPlayer) {
+                attacker = owner
+            } else if (owner is OwnableEntity && owner.owner is ServerPlayer) {
+                attacker = owner
+            }
+        }
+
+        val living = attacker ?: return
+        val stack = living.mainHandItem
+        if (stack.item !is GunItem) return
+
+        val data = GunData.from(stack)
+        val rate = if (isGunDamage) {
+            data.get(GunProp.PROJECTILE_LIFESTEAL)
+        } else {
+            data.get(GunProp.MELEE_LIFESTEAL)
+        }
+        if (rate <= 0.0) return
+
+        val amount = event.amount
+        if (amount <= 0f) return
+
+        living.heal((amount * rate).toFloat())
+    }
+
+    /**
      * 根据造成的伤害，提供武器经验
      */
     private fun giveExpToWeapon(entity: LivingEntity, source: DamageSource, amount: Float) {
@@ -217,7 +265,7 @@ object LivingEventHandler {
         // 判断是不是枪械/近战能造成的伤害
         if (!DamageTypeTool.isGunDamage(source) && !DamageTypeTool.isMeleeDamage(source)) return
 
-        data.exp.add(expAmount.toDouble())
+        data.exp.add(expAmount.toDouble() * data.get(GunProp.EXP_MULTIPLIER))
 
         // 提升武器等级
         var level = data.level.get()
@@ -245,7 +293,7 @@ object LivingEventHandler {
 
         // 判断是不是枪械/近战能造成的伤害
         if (DamageTypeTool.isGunDamage(source) || DamageTypeTool.isMeleeDamage(source)) {
-            data.exp.add(amount)
+            data.exp.add(amount * data.get(GunProp.EXP_MULTIPLIER))
         }
 
         // 提升武器等级

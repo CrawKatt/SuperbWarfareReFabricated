@@ -201,7 +201,7 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
         if (event.isCanceled()) {
             cir.setReturnValue(false);
         } else {
-            damage.set(event.getAmount());
+            damage.set(LivingEventHandler.onEntityHurt(event.getEntity(), source, event.getAmount()));
         }
     }
 
@@ -212,7 +212,7 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
         LivingHurtCallback.EVENT.invoker().onLivingHurt(event);
         return TraumaMobEffect.modifyIncomingDamage(
                 self,
-                LivingEventHandler.onEntityHurt(self, source, event.getAmount())
+                event.getAmount()
         );
     }
 

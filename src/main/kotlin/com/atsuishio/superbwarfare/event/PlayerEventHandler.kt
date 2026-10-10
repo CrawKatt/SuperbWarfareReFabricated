@@ -53,9 +53,9 @@ object PlayerEventHandler {
         DeployedWeaponHandler.serverTick(player)
     }
 
-    @SubscribeEvent
-    fun onPlayerChangedDimension(event: PlayerEvent.PlayerChangedDimensionEvent) {
-        DeployedWeaponHandler.undeploy(event.entity)
+    @JvmStatic
+    fun onPlayerChangedDimension(player: ServerPlayer) {
+        DeployedWeaponHandler.undeploy(player)
     }
 
     private fun handleSpecialWeaponAmmo(player: Player) {

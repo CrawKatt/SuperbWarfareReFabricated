@@ -16,6 +16,7 @@ import com.atsuishio.superbwarfare.entity.living.TargetEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
@@ -45,6 +46,8 @@ public class ModEventHandlers {
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             PlayerEventHandler.onPlayerRespawned(newPlayer, alive);
         });
+        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) ->
+                PlayerEventHandler.onPlayerChangedDimension(player));
 
         ServerLivingEntityEvents.AFTER_DEATH.register(LivingEventHandler::onEntityDeath);
         ServerLivingEntityEvents.ALLOW_DEATH.register(TargetEntity::onTargetDown);
