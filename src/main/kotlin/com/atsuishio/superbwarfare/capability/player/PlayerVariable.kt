@@ -13,6 +13,7 @@ import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.Vec3
 import java.util.EnumMap
 import java.util.function.Consumer
 
@@ -23,6 +24,12 @@ class PlayerVariable : AutoSyncedComponent, CopyableComponent<PlayerVariable>, S
     var ammo: MutableMap<Ammo, Int> = EnumMap(Ammo::class.java)
     var activeThermalImaging: Boolean = false
 
+    @JvmField
+    var deployPivot: Vec3? = null
+
+    @JvmField
+    var deployGunUuid: String? = null
+
     /** 玩家变量只对本人有意义 */
     override val syncTarget: SyncTarget
         get() = SyncTarget.SELF
@@ -30,6 +37,16 @@ class PlayerVariable : AutoSyncedComponent, CopyableComponent<PlayerVariable>, S
     /** 全量同步：字段顺序必须与 [readSync] 保持一致。 */
     override fun writeSync(encoder: ByteBufEncoder, full: Boolean) {
         encoder.encodeBoolean(activeThermalImaging)
+
+        val pivot = deployPivot
+        encoder.encodeBoolean(pivot != null)
+        if (pivot != null) {
+            encoder.encodeDouble(pivot.x)
+            encoder.encodeDouble(pivot.y)
+            encoder.encodeDouble(pivot.z)
+        }
+        encoder.encodeString(deployGunUuid ?: "")
+
         encoder.encodeInt(Ammo.entries.size)
 
         for (type in Ammo.entries) {
@@ -39,6 +56,13 @@ class PlayerVariable : AutoSyncedComponent, CopyableComponent<PlayerVariable>, S
 
     override fun readSync(decoder: ByteBufDecoder, full: Boolean) {
         activeThermalImaging = decoder.decodeBoolean()
+
+        deployPivot = if (decoder.decodeBoolean()) {
+            Vec3(decoder.decodeDouble(), decoder.decodeDouble(), decoder.decodeDouble())
+        } else {
+            null
+        }
+        deployGunUuid = decoder.decodeString().takeIf { it.isNotEmpty() }
 
         val size = decoder.decodeInt()
         for (index in 0 until size) {
@@ -71,6 +95,8 @@ class PlayerVariable : AutoSyncedComponent, CopyableComponent<PlayerVariable>, S
     fun copy() = PlayerVariable().also { copy ->
         for (type in Ammo.entries) type.set(copy, type.get(this))
         copy.activeThermalImaging = activeThermalImaging
+        copy.deployPivot = deployPivot
+        copy.deployGunUuid = deployGunUuid
     }
 
     override fun readFromNbt(tag: CompoundTag) = readFromNBT(tag)
@@ -87,11 +113,17 @@ class PlayerVariable : AutoSyncedComponent, CopyableComponent<PlayerVariable>, S
 
     override fun equals(other: Any?): Boolean {
         if (other !is PlayerVariable) return false
-        return Ammo.entries.all { it.get(this) == it.get(other) } &&
-            activeThermalImaging == other.activeThermalImaging
-    }
 
-    override fun hashCode(): Int = 31 * ammo.hashCode() + activeThermalImaging.hashCode()
+        for (type in Ammo.entries) {
+            if (type.get(this) != type.get(other)) return false
+        }
+
+        if (activeThermalImaging != other.activeThermalImaging) return false
+        if (deployPivot != other.deployPivot) return false
+        if (deployGunUuid != other.deployGunUuid) return false
+
+        return true
+    }
 
     companion object {
         @JvmField
@@ -117,5 +149,14 @@ class PlayerVariable : AutoSyncedComponent, CopyableComponent<PlayerVariable>, S
                 if (cap.changed()) markDirty(entity)
             }
         }
+    }
+
+    override fun hashCode(): Int {
+        var result = activeThermalImaging.hashCode()
+        result = 31 * result + (old?.hashCode() ?: 0)
+        result = 31 * result + ammo.hashCode()
+        result = 31 * result + (deployPivot?.hashCode() ?: 0)
+        result = 31 * result + (deployGunUuid?.hashCode() ?: 0)
+        return result
     }
 }

@@ -80,6 +80,7 @@ import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents
@@ -211,6 +212,10 @@ class Mod : ModInitializer {
 
         ServerPlayerEvents.AFTER_RESPAWN.register { _, player, alive ->
             PlayerEventHandler.onPlayerRespawned(player, alive)
+        }
+
+        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register { player, _, _ ->
+            PlayerEventHandler.onPlayerChangedDimension(player)
         }
 
         ServerEntityEvents.EQUIPMENT_CHANGE.register(LivingEventHandler::handleChangeSlot)

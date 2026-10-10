@@ -50,6 +50,13 @@ object PlayerEventHandler {
         if (stack.item is GunItem) {
             handleSpecialWeaponAmmo(player)
         }
+
+        DeployedWeaponHandler.serverTick(player)
+    }
+
+    @JvmStatic
+    fun onPlayerChangedDimension(player: ServerPlayer) {
+        DeployedWeaponHandler.undeploy(player)
     }
 
     private fun handleSpecialWeaponAmmo(player: Player) {
