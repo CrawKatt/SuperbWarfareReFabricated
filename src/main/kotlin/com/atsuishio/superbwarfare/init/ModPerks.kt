@@ -100,6 +100,9 @@ object ModPerks {
     @JvmField val SUPER_HEAVY_BULLET = autoRegistryObjects["super_heavy_bullet"] ?: registerAmmoPerk("super_heavy_bullet") {
         EmptyPerk("super_heavy_bullet", Perk.Type.AMMO)
     }
+    @JvmField val SHATTER_CAPS = autoRegistryObjects["shatter_caps"] ?: registerAmmoPerk("shatter_caps") {
+        EmptyPerk("shatter_caps", Perk.Type.AMMO)
+    }
     // @formatter:on
 
     private fun registerFuncPerk(id: String, perk: () -> Perk): Perk {
