@@ -400,6 +400,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.LOWER_RAIL_BIPOD)
         simpleItem(ModItems.PEQ_15)
         simpleItem(ModItems.STANDARD_GUN_SHIELD)
+        simpleItem(ModItems.HANDGUN_SHIELD)
         simpleItem(ModItems.PISTOL_LASER)
         simpleItem(ModItems.RANGE_FINDER)
         simpleItem(ModItems.BAYONET_M_9)
