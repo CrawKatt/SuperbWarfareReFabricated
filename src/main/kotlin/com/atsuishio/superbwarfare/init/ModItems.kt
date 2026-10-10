@@ -32,7 +32,6 @@ import com.atsuishio.superbwarfare.item.gun.shotgun.HomemadeShotgunItem
 import com.atsuishio.superbwarfare.item.gun.sniper.Ql1031Item
 import com.atsuishio.superbwarfare.item.gun.sniper.SentinelItem
 import com.atsuishio.superbwarfare.item.gun.special.BeastGunTestItem
-import com.atsuishio.superbwarfare.item.gun.special.BocekItem
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem
 import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGunItem
 import com.atsuishio.superbwarfare.item.material.*
@@ -129,7 +128,7 @@ object ModItems {
     @JvmField val RPG = registerGun("rpg") { RpgItem }
     @JvmField val JAVELIN = registerGun("javelin") { JavelinItem }
     @JvmField val IGLA_9K38 = registerGun("igla_9k38") { IglaItem }
-    @JvmField val BOCEK = registerGun("bocek") { BocekItem() }
+    @JvmField val BOCEK = registerGun("bocek") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
     @JvmField val SUPER_STAR_SHOOTER = registerGun("super_star_shooter") { SuperStarShooterItem() }
     @JvmField val REFORGING = registerGun("reforging") { GeoGunItemV2(Properties().rarity(SUPERB)) }
     @JvmField val RAUBTIER = registerGun("raubtier") { GeoGunItemV2(Properties().rarity(SUPERB)) }
