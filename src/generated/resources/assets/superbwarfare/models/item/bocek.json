@@ -1,6 +1,14 @@
 {
-  "parent": "superbwarfare:item/bocek_base",
+  "base": {
+    "parent": "superbwarfare:item/bocek_base"
+  },
   "gui_light": "front",
+  "loader": "forge:separate_transforms",
+  "perspectives": {
+    "gui": {
+      "parent": "superbwarfare:item/bocek_icon"
+    }
+  },
   "textures": {
     "particle": "superbwarfare:item/bocek_icon"
   }

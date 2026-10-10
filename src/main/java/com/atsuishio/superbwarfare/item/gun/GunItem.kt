@@ -410,7 +410,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         return EntityType.byString(projectileType).orElse(null) == ModEntities.PROJECTILE
     }
 
-    open fun resolveFire1PSounds(data: GunData): List<LocalSound> {
+    open fun resolveFire1PSounds(data: GunData, stack: ItemStack): List<LocalSound> {
         val sounds = ArrayList<LocalSound>(3)
 
         val soundInfo = data.get(GunProp.SOUND_INFO)
@@ -431,7 +431,9 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
                 ((2 * Math.random() - 1) * 0.05f + pitch).toFloat()
             )
 
-            if (!isSilent && isBulletProjectile(data)) {
+            val resource = GunResource.compute(stack)
+
+            if (!isSilent && isBulletProjectile(data) && resource.hasReflectionSound) {
                 sounds += LocalSound(
                     ModSounds.REFLECTIONS,
                     0.25f * volumeMultiplier.toFloat(),
