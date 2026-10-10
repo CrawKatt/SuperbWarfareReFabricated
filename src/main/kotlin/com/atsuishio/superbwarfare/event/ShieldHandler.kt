@@ -79,6 +79,7 @@ object ShieldHandler {
         )
     }
 
+    @JvmStatic
     fun onEntityHurt(event: LivingIncomingDamageCallback.Event) {
         val victim = event.entity ?: return
         if (victim.level().isClientSide) return
