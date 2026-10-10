@@ -243,7 +243,7 @@ class Mod : ModInitializer {
         }
         LivingHurtCallback.EVENT.register { event ->
             SonicAbsorberItem.onEntityAttackedBySonicBoom(event)
-            event.amount = LivingEventHandler.onEntityHurt(event.entity, event.source, event.amount)
+            LivingEventHandler.onEntityHurt(event)
         }
         LivingHurtCallback.EVENT.register(ShieldHandler::onEntityHurt)
         LivingDropsCallback.EVENT.register { event ->
