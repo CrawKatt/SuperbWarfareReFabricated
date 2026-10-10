@@ -431,7 +431,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     open fun isBulletProjectile(data: GunData): Boolean {
         val projectileType = data.get(GunProp.PROJECTILE).itemId
         if (projectileType.isEngineProjectileMarker()) return false
-        return EntityType.byString(projectileType).orElse(null) == ModEntities.PROJECTILE.get()
+        return EntityType.byString(projectileType).orElse(null) == ModEntities.PROJECTILE
     }
 
     open fun resolveFire1PSounds(data: GunData): List<LocalSound> {
