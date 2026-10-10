@@ -26,6 +26,7 @@ import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.event.AnvilUpdateEvent
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent
+import net.neoforged.neoforge.event.entity.player.PlayerEvent
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerRespawnEvent
 import net.neoforged.neoforge.event.tick.PlayerTickEvent
@@ -59,7 +60,14 @@ object PlayerEventHandler {
 
         if (stack.item is GunItem) {
             handleSpecialWeaponAmmo(player)
-        }
+        };
+
+        DeployedWeaponHandler.serverTick(player)
+    }
+
+    @SubscribeEvent
+    fun onPlayerChangedDimension(event: PlayerEvent.PlayerChangedDimensionEvent) {
+        DeployedWeaponHandler.undeploy(event.entity)
     }
 
     private fun handleSpecialWeaponAmmo(player: Player) {
