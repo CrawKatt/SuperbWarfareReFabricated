@@ -212,7 +212,7 @@ object LivingEventHandler {
     /**
      * 生命汲取
      */
-    private fun applyLifesteal(event: LivingHurtEvent) {
+    private fun applyLifesteal(event: LivingIncomingDamageEvent) {
         val source = event.source
         val isGunDamage = DamageTypeTool.isGunDamage(source)
         val isMeleeDamage = DamageTypeTool.isMeleeDamage(source)
