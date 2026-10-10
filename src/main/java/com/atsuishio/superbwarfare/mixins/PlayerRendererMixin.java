@@ -7,7 +7,6 @@ import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.item.gun.special.SuperStarShooterItem;
 import com.atsuishio.superbwarfare.item.gun.machinegun.MinigunItem;
-import com.atsuishio.superbwarfare.item.gun.special.BocekItem;
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
@@ -46,9 +45,7 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
                                                   CallbackInfoReturnable<HumanoidModel.ArmPose> cir) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (stack.getItem() instanceof BocekItem) {
-            cir.setReturnValue(HumanoidModel.ArmPose.BOW_AND_ARROW);
-        } else if (superbwarfare$usesCustomArmPose(stack)) {
+        if (superbwarfare$usesCustomArmPose(stack)) {
             cir.setReturnValue(HumanoidModel.ArmPose.EMPTY);
         } else if (stack.getItem() instanceof GeoGunItemV2 geoGunItemV2) {
             cir.setReturnValue(geoGunItemV2.getArmPose(player, hand, stack));

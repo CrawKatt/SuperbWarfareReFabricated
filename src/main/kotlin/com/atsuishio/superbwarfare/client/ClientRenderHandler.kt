@@ -31,14 +31,12 @@ import com.atsuishio.superbwarfare.client.renderer.item.Type88ClusterGrenadesRen
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.RadiationGlowRenderer
-import com.atsuishio.superbwarfare.client.tooltip.ClientBocekImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientDogTagImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientGunImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientSentinelImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientAttachmentImageTooltip
-import com.atsuishio.superbwarfare.client.tooltip.component.BocekImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.ChargingStationImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.DogTagImageComponent
@@ -245,7 +243,6 @@ object ClientRenderHandler {
     fun registerTooltip() {
         TooltipComponentCallback.EVENT.register { component ->
             when (component) {
-                is BocekImageComponent -> ClientBocekImageTooltip(component)
                 is CellImageComponent -> ClientCellImageTooltip(component)
                 is SentinelImageComponent -> ClientSentinelImageTooltip(component)
                 is ChargingStationImageComponent -> ClientChargingStationImageTooltip(component)
