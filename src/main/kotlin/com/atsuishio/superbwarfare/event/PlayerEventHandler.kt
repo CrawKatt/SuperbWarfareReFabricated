@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.config.common.GameplayConfig
 import com.atsuishio.superbwarfare.config.server.MiscConfig
-import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
+import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModItems
@@ -10,7 +10,10 @@ import com.atsuishio.superbwarfare.init.ModParticleTypes
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.item.gun.GunItem
-import com.atsuishio.superbwarfare.tools.*
+import com.atsuishio.superbwarfare.tools.InventoryTool
+import com.atsuishio.superbwarfare.tools.NBTTool
+import com.atsuishio.superbwarfare.tools.ParticleTool
+import com.atsuishio.superbwarfare.tools.TraceTool
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -61,10 +64,9 @@ object PlayerEventHandler {
 
     private fun handleSpecialWeaponAmmo(player: Player) {
         val stack = player.mainHandItem
+        val data = GunData.from(stack)
 
-        val data = from(stack)
-
-        if (stack.`is`(ModItems.RPG, ModItems.BOCEK) && data.hasEnoughAmmoToShoot(player)) {
+        if (data.hasEnoughAmmoToShoot(player)) {
             data.isEmpty.set(false)
         }
     }
@@ -74,7 +76,7 @@ object PlayerEventHandler {
 
         for (stack in player.getInventory().items) {
             if (stack.item is GunItem) {
-                val data = from(stack)
+                val data = GunData.from(stack)
 
                 if (!InventoryTool.hasCreativeAmmoBox(player)) {
                     data.reloadAmmo(player)
@@ -141,7 +143,7 @@ object PlayerEventHandler {
         if (left.item is GunItem && right.item == ModItems.SHORTCUT_PACK.get()) {
             val output = left.copy()
 
-            val data = from(output)
+            val data = GunData.from(output)
             data.level.add(1)
             data.save()
 
