@@ -1967,8 +1967,15 @@ object ClientEventHandler {
         }
 
         // 真实后坐（
-        if (data.get(GunProp.RECOIL) != 0.0 && !(player.isCrouching || isProne(player))) {
-            player.deltaMovement = player.deltaMovement.add(player.getViewVector(1f).scale(-data.get(GunProp.RECOIL)))
+        if (data.get(GunProp.RECOIL) != 0.0 && !DeployedWeaponHandler.isDeployed(player)) {
+            val resistance = when {
+                isProne(player) -> data.get(GunProp.CRAWL_KNOCKBACK_RESISTANCE)
+                player.isCrouching -> data.get(GunProp.SNEAK_KNOCKBACK_RESISTANCE)
+                else -> 0.0
+            }
+
+            player.deltaMovement =
+                player.deltaMovement.add(player.getViewVector(1f).scale(-data.get(GunProp.RECOIL) * (1.0 - resistance)))
         }
 
         val gunRecoilY = data.get(GunProp.RECOIL_Y) * 10
