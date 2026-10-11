@@ -1636,6 +1636,7 @@
   "prop.superbwarfare.exp_multiplier": "EXP Multiplier",
   "prop.superbwarfare.projectile_lifesteal": "Projectile Lifesteal",
   "prop.superbwarfare.melee_lifesteal": "Melee Lifesteal",
+  "prop.superbwarfare.zoom_spread_rate": "Zoom Spread Rate",
 
   "superbwarfare.book.superb_warfare_manual": "Superb Warfare Manual",
   "superbwarfare.book.superb_warfare_manual.des": "A tutorial on Superb Warfare mod, teaching you how to become a superb soldier (WIP)",
