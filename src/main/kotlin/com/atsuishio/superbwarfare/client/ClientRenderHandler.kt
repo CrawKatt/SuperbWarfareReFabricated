@@ -222,6 +222,7 @@ object ClientRenderHandler {
         event.registerBlockEntityRenderer(ModBlockEntities.LUCKY_CONTAINER.get()) { _ -> LuckyContainerBlockEntityRenderer() }
         event.registerBlockEntityRenderer(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE.get()) { _ -> VehicleAssemblingTableBlockEntityRenderer() }
         event.registerBlockEntityRenderer(ModBlockEntities.BLUEPRINT_RESEARCH_TABLE.get()) { _ -> BlueprintResearchTableBlockEntityRenderer() }
+        event.registerBlockEntityRenderer(ModBlockEntities.TRIPOD.get()) { _ -> TripodBlockEntityRenderer() }
     }
 
     @SubscribeEvent
