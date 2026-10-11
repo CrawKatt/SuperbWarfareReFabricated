@@ -2379,7 +2379,7 @@ object ClientEventHandler {
                     Mth.lerp(0.2 * times, moveRotZ, 0.0) * (1 - zoomTime)
                 }
 
-            if (entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown && zoomTime < 0.99 && !isGunMeleeActive(stack)) {
+            if (entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown && zoomTime < 0.99 && !isGunMeleeActive(stack) && !isEditing) {
                 val rotEase = sprintEaseAlpha(SPRINT_EASE_ROT_IN, times, customWeight, true)
                 val rotYEase = sprintEaseAlpha(SPRINT_EASE_ROT_Y_IN, times, customWeight, true)
                 val posEase = sprintEaseAlpha(SPRINT_EASE_POS_IN, times, customWeight, true)
