@@ -42,6 +42,10 @@ data class DefaultGunData(
     val recoilTime: Int = 0,
     @SerialName("RecoilForce")
     val recoilForce: Float = 0f,
+    @SerialName("SneakKnockbackResistance")
+    val sneakKnockbackResistance: Double = 0.5,
+    @SerialName("CrawlKnockbackResistance")
+    val crawlKnockbackResistance: Double = 1.0,
     // x:范围，y：振动时长，z：振幅
     @SerialName("ShootShake")
     val shootShake: SerializedVec3? = null,

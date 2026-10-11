@@ -1599,6 +1599,8 @@
   "prop.superbwarfare.recoil_x": "竖直后坐力",
   "prop.superbwarfare.recoil_y": "水平后坐力",
   "prop.superbwarfare.recoil": "真实后坐力",
+  "prop.superbwarfare.sneak_knockback_resistance": "潜行击退抗性",
+  "prop.superbwarfare.crawl_knockback_resistance": "爬行击退抗性",
   "prop.superbwarfare.zoom": "放大倍率",
   "prop.superbwarfare.zoom_range": "放大倍率",
   "prop.superbwarfare.moving_zoom": "移动时变焦",
