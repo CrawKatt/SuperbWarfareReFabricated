@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.event
 import com.atsuishio.superbwarfare.block.TripodBlock
 import com.atsuishio.superbwarfare.capability.player.PlayerDeployState
 import com.atsuishio.superbwarfare.data.gun.GunData
+import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.tools.getBlockReach
 import net.minecraft.core.BlockPos
@@ -19,8 +20,6 @@ object DeployedWeaponHandler {
 
     const val STAND_BEHIND = 1.0
 
-    const val MIN_STAND_BEHIND = 0.5
-
     const val PITCH_LIMIT_UP = 45f
 
     const val PITCH_LIMIT_DOWN = 30f
@@ -31,12 +30,21 @@ object DeployedWeaponHandler {
 
     const val FLOOR_PROBE = 0.05
 
+    const val MAX_SINK = 0.05
+
     @JvmStatic
     fun clampPitch(xRot: Float): Float = Mth.clamp(xRot, -PITCH_LIMIT_UP, PITCH_LIMIT_DOWN)
 
     @JvmStatic
-    fun orbitRadius(xRot: Float): Double =
-        (STAND_BEHIND * Mth.cos(xRot * Mth.DEG_TO_RAD)).coerceAtLeast(MIN_STAND_BEHIND)
+    fun standBehind(player: Player): Double {
+        val stack = player.mainHandItem
+        if (stack.item !is GunItem) return STAND_BEHIND
+        return GunData.from(stack).get(GunProp.STAND_BEHIND)
+    }
+
+    @JvmStatic
+    fun orbitRadius(xRot: Float, standBehind: Double): Double =
+        standBehind * Mth.cos(xRot * Mth.DEG_TO_RAD)
 
     @JvmStatic
     fun isDeployed(player: Player): Boolean = tripodOf(player) != null
@@ -58,15 +66,24 @@ object DeployedWeaponHandler {
     fun orbitPos(player: Player, tripod: BlockPos, xRot: Float): Vec3 {
         val pivot = pivotAt(tripod)
         val forward = horizontalForward(player)
-        val radius = orbitRadius(xRot)
+        val radius = orbitRadius(xRot, standBehind(player))
         return Vec3(pivot.x - forward.x * radius, pivot.y - PIVOT_HEIGHT, pivot.z - forward.z * radius)
     }
 
+    private fun boxAt(player: Player, pos: Vec3) =
+        player.boundingBox.move(pos.x - player.x, pos.y - player.y, pos.z - player.z)
+
     @JvmStatic
-    fun hasFloor(player: Player, pos: Vec3): Boolean {
-        val box = player.boundingBox.move(pos.x - player.x, pos.y - player.y, pos.z - player.z)
-        return !player.level().noCollision(player, box.move(0.0, -FLOOR_PROBE, 0.0))
-    }
+    fun hasFloor(player: Player, pos: Vec3): Boolean =
+        !player.level().noCollision(player, boxAt(player, pos).move(0.0, -FLOOR_PROBE, 0.0))
+
+    @JvmStatic
+    fun hasRoom(player: Player, pos: Vec3): Boolean =
+        player.level().noCollision(player, boxAt(player, pos))
+
+    @JvmStatic
+    fun sunkTooDeep(player: Player, pos: Vec3): Boolean =
+        !player.level().noCollision(player, boxAt(player, pos).deflate(MAX_SINK))
 
     @JvmStatic
     fun deployTarget(player: Player): BlockPos? {
@@ -77,7 +94,8 @@ object DeployedWeaponHandler {
 
         val tripod = lookingTripod(player) ?: return null
         if (player.level().players().any { it !== player && tripodOf(it) == tripod }) return null
-        if (!hasFloor(player, orbitPos(player, tripod, clampPitch(player.xRot)))) return null
+        val target = orbitPos(player, tripod, clampPitch(player.xRot))
+        if (!hasFloor(player, target) || !hasRoom(player, target)) return null
         return tripod
     }
 
@@ -120,10 +138,12 @@ object DeployedWeaponHandler {
         val pivot = pivotOf(player) ?: return
 
         val forward = horizontalForward(player)
-        val radius = orbitRadius(player.xRot)
+        val radius = orbitRadius(player.xRot, standBehind(player))
         val x = pivot.x - forward.x * radius
         val z = pivot.z - forward.z * radius
         val y = player.y
+
+        if (sunkTooDeep(player, Vec3(x, y, z))) return
 
         player.setPos(x, y, z)
 
@@ -167,9 +187,10 @@ object DeployedWeaponHandler {
         val radius = sqrt(dx * dx + dz * dz)
         val dy = player.y - (pivot.y - PIVOT_HEIGHT)
 
-        if (abs(radius - orbitRadius(clamped)) > MAX_DRIFT ||
+        if (abs(radius - orbitRadius(clamped, standBehind(player))) > MAX_DRIFT ||
             abs(dy) > MAX_DRIFT ||
             !hasFloor(player, player.position()) ||
+            sunkTooDeep(player, orbitPos(player, tripod, clamped)) ||
             player.level().getBlockState(player.blockPosition()).canOcclude()
         ) {
             undeploy(player)

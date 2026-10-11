@@ -374,6 +374,9 @@ class GunProp<T, R>(
         val DEPLOYABLE = plainProp(DefaultGunData::deployable)
 
         @JvmField
+        val STAND_BEHIND = plainProp(DefaultGunData::standBehind)
+
+        @JvmField
         val ZOOM_TIME = plainProp(DefaultGunData::zoomTime)
 
         @JvmField
@@ -535,6 +538,7 @@ class GunProp<T, R>(
             modify(PROJECTILE_SPLIT_AMOUNT) { it.coerceAtLeast(0) }
             modify(WEIGHT) { it.coerceAtLeast(1.0) }
             modify(SWAY) { it.coerceAtLeast(0.0) }
+            modify(STAND_BEHIND) { it.coerceAtLeast(0.0) }
 
             modify(MAGAZINE) {
                 if (modifier[PROJECTILE].itemId.isMeleeProjectileMarker() ||

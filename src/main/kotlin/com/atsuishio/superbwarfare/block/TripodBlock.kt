@@ -28,6 +28,15 @@ open class TripodBlock :
         return SHAPE
     }
 
+    override fun getCollisionShape(
+        pState: BlockState,
+        pLevel: BlockGetter,
+        pPos: BlockPos,
+        pContext: CollisionContext
+    ): VoxelShape {
+        return Shapes.empty()
+    }
+
     override fun getVisualShape(
         pState: BlockState,
         pLevel: BlockGetter,
