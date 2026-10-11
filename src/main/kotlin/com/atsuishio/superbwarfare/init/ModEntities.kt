@@ -173,6 +173,10 @@ object ModEntities {
         register("small_grenade", fastProjectile(::SmallGrenadeEntity).dimensions(EntityDimensions.scalable(0.25f, 0.25f)))
 
     @JvmField
+    val MINI_BOMB: EntityType<MiniBombEntity> =
+        register("mini_bomb", fastProjectile(::MiniBombEntity).dimensions(EntityDimensions.scalable(0.25f, 0.25f)))
+
+    @JvmField
     val GRAPESHOT: EntityType<GrapeshotEntity> =
         register("grapeshot", fastProjectile(::GrapeshotEntity).dimensions(EntityDimensions.scalable(0.5f, 0.5f)))
 
