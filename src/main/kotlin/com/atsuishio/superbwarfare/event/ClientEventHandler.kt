@@ -607,6 +607,7 @@ object ClientEventHandler {
     @SubscribeEvent
     fun handleWeaponTurn(event: ViewportEvent.ComputeFov) {
         val player = localPlayer ?: return
+        if (DeployedWeaponHandler.isDeployed(player)) return
         val xRotOffset = Mth.lerp(event.partialTick.toFloat(), player.xBobO, player.xBob)
         val yRotOffset = Mth.lerp(event.partialTick.toFloat(), player.yBobO, player.yBob)
         val xRot = player.getViewXRot(event.partialTick.toFloat()) - xRotOffset
@@ -1752,7 +1753,7 @@ object ClientEventHandler {
         val prone = if (isProne(player)) -0.3 * basicDev else 0.0
         val jump = if (player.onGround()) 0.0 else 0.35 * basicDev
         val ride = if (player.onGround()) -0.25 * basicDev else 0.0
-        val deployed = if (DeployedWeaponHandler.isDeployed(player)) -0.5 * basicDev else 0.0
+        val deployed = if (DeployedWeaponHandler.isDeployed(player)) -0.75 * basicDev else 0.0
 
         val zoomSpread = 1 - (1 - data.zoomSpreadRateFor(zoom, player)) * zoomTime
         val spread =
@@ -2379,10 +2380,7 @@ object ClientEventHandler {
 
         if (!isEditing) {
             moveRotZ =
-                if (!entity.isSprinting && mc.options.keyUp.isDown && firePosTimer == 0.0 && resource.movingTilt && !isProne(
-                        player
-                    )
-                ) {
+                if (!entity.isSprinting && mc.options.keyUp.isDown && firePosTimer == 0.0 && resource.movingTilt && !isProne(player) && !DeployedWeaponHandler.isDeployed(player)) {
                     Mth.lerp(0.2 * times, moveRotZ, 0.14) * (1 - zoomTime)
                 } else {
                     Mth.lerp(0.2 * times, moveRotZ, 0.0) * (1 - zoomTime)
@@ -2451,14 +2449,16 @@ object ClientEventHandler {
         val left = mc.options.keyLeft.isDown
         val right = mc.options.keyRight.isDown
         var pos = 0.0
-        if (left) {
-            pos = -0.04
-        }
-        if (right) {
-            pos = 0.04
-        }
-        if (left && right) {
-            pos = 0.0
+        if (!DeployedWeaponHandler.isDeployed(player)) {
+            if (left) {
+                pos = -0.04
+            }
+            if (right) {
+                pos = 0.04
+            }
+            if (left && right) {
+                pos = 0.0
+            }
         }
 
         movePosHorizon = Mth.lerp(0.1 * times, movePosHorizon, pos * (1 - 1 * zoomTime))
