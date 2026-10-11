@@ -21,6 +21,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.Vec3
+import net.minecraftforge.common.capabilities.ForgeCapabilities
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
@@ -333,6 +334,7 @@ object GunEventHandler {
         init(shooter, data)
         autoReload(shooter, data, inMainHand)
         tickPerk(shooter, data)
+        regenerateEnergy(data, budget)
         handleCooldown(shooter, data, environmentRate, budget)
         data.cooldown.tick(budget)
         redrawExtraAmmo(shooter, data)
@@ -364,6 +366,17 @@ object GunEventHandler {
         SubWeaponRuntime.tick(shooter, data, ActiveGun.activeSlot(data), inMainHand)
 
         data.save()
+    }
+
+    private fun regenerateEnergy(data: GunData, ticks: Int) {
+        val rate = data.get(GunProp.ENERGY_REGENERATION)
+        if (rate <= 0) return
+
+        data.stack.getCapability(ForgeCapabilities.ENERGY).ifPresent { storage ->
+            if (storage.maxEnergyStored > 0) {
+                storage.receiveEnergy(rate * ticks, false)
+            }
+        }
     }
 
     private fun hasActiveAction(data: GunData): Boolean =
