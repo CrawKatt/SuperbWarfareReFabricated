@@ -16,7 +16,7 @@ class ModBlockTagProvider(
 ) : VanillaBlockTagsProvider(output, lookupProvider) {
     override fun addTags(pProvider: HolderLookup.Provider) {
         super.addTags(pProvider)
-        this.tag(BlockTags.NEEDS_STONE_TOOL).add(ModBlocks.SULFUR_ORE, ModBlocks.DEEPSLATE_SULFUR_ORE, ModBlocks.SULFUR_BLOCK, ModBlocks.NITER_ORE, ModBlocks.DEEPSLATE_NITER_ORE, ModBlocks.NITER_BLOCK)
+        this.tag(BlockTags.NEEDS_STONE_TOOL).add(ModBlocks.SULFUR_ORE, ModBlocks.DEEPSLATE_SULFUR_ORE, ModBlocks.SULFUR_BLOCK, ModBlocks.NITER_ORE, ModBlocks.DEEPSLATE_NITER_ORE, ModBlocks.NITER_BLOCK, ModBlocks.TRIPOD)
         this.tag(BlockTags.NEEDS_IRON_TOOL).add(ModBlocks.URANIUM_ORE, ModBlocks.DEEPSLATE_URANIUM_ORE, ModBlocks.URANIUM_BLOCK, ModBlocks.RAW_URANIUM_BLOCK)
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(ModBlocks.URANIUM_ORE, ModBlocks.DEEPSLATE_URANIUM_ORE, ModBlocks.SULFUR_ORE, ModBlocks.DEEPSLATE_SULFUR_ORE, ModBlocks.NITER_ORE, ModBlocks.DEEPSLATE_NITER_ORE, ModBlocks.RAW_URANIUM_BLOCK, ModBlocks.URANIUM_BLOCK, ModBlocks.SULFUR_BLOCK, ModBlocks.NITER_BLOCK)
         this.tag(commonBlockTag("storage_blocks/raw_uranium")).add(ModBlocks.RAW_URANIUM_BLOCK)
@@ -74,7 +74,18 @@ class ModBlockTagProvider(
             ModBlocks.BLUEPRINT_RESEARCH_TABLE,
             ModBlocks.RAW_GALENA_BLOCK,
             ModBlocks.RAW_SCHEELITE_BLOCK,
-            ModBlocks.RAW_SILVER_BLOCK
+            ModBlocks.RAW_SILVER_BLOCK,
+            ModBlocks.URANIUM_ORE,
+            ModBlocks.DEEPSLATE_URANIUM_ORE,
+            ModBlocks.URANIUM_BLOCK,
+            ModBlocks.RAW_URANIUM_BLOCK,
+            ModBlocks.SULFUR_ORE,
+            ModBlocks.DEEPSLATE_SULFUR_ORE,
+            ModBlocks.SULFUR_BLOCK,
+            ModBlocks.NITER_ORE,
+            ModBlocks.DEEPSLATE_NITER_ORE,
+            ModBlocks.NITER_BLOCK,
+            ModBlocks.TRIPOD
         )
         this.tag(BlockTags.MINEABLE_WITH_SHOVEL).add(ModBlocks.SANDBAG)
 

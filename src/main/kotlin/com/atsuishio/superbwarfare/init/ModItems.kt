@@ -8,10 +8,7 @@ import com.atsuishio.superbwarfare.item.ammo.*
 import com.atsuishio.superbwarfare.item.armor.*
 import com.atsuishio.superbwarfare.item.attachment.BasicAttachmentItem
 import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
-import com.atsuishio.superbwarfare.item.blockitem.BlueprintResearchTableBlockItem
-import com.atsuishio.superbwarfare.item.blockitem.ChargingStationBlockItem
-import com.atsuishio.superbwarfare.item.blockitem.CreativeChargingStationBlockItem
-import com.atsuishio.superbwarfare.item.blockitem.VehicleAssemblingTableBlockItem
+import com.atsuishio.superbwarfare.item.blockitem.*
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.LuckyContainerBlockItem
 import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
@@ -703,6 +700,7 @@ object ModItems {
     }
     @JvmField val VEHICLE_ASSEMBLING_TABLE = registerBlock("vehicle_assembling_table") { VehicleAssemblingTableBlockItem() }
     @JvmField val BLUEPRINT_RESEARCH_TABLE = registerBlock("blueprint_research_table") { BlueprintResearchTableBlockItem() }
+    @JvmField val TRIPOD = registerBlock("tripod") { TripodBlockItem() }
     @JvmField val BIOGAS_GENERATOR = registerBlock(ModBlocks.BIOGAS_GENERATOR)
     // @formatter:on
 

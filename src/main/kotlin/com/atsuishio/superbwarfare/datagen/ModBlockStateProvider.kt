@@ -144,6 +144,7 @@ class ModBlockStateProvider(private val output: PackOutput) : DataProvider {
         blockWithItem(ModBlocks.NITER_BLOCK)
 
         simpleBlock(ModBlocks.FUMO_25, blockModel("fumo_25"))
+        simpleBlock(ModBlocks.TRIPOD, blockModel("tripod"))
     }
 
     private fun simpleBlock(block: Block, model: ResourceLocation) {

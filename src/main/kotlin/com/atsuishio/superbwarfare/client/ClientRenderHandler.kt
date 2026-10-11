@@ -49,6 +49,7 @@ import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.*
+import com.atsuishio.superbwarfare.client.renderer.block.TripodBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.tooltip.ClientAttachmentImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
@@ -284,6 +285,7 @@ object ClientRenderHandler {
         MeleeDebugRenderer.init()
         BlockEntityRenderers.register(ModBlockEntities.CONTAINER) { ContainerBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.FUMO_25) { FuMO25BlockEntityRenderer() }
+        BlockEntityRenderers.register(ModBlockEntities.TRIPOD) { TripodBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.CHARGING_STATION) { ChargingStationBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.SMALL_CONTAINER) { SmallContainerBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.LUCKY_CONTAINER) { LuckyContainerBlockEntityRenderer() }
@@ -328,7 +330,6 @@ object ClientRenderHandler {
             HelicopterHud.onHelicopterHudClientTick()
             OldAircraftHud.onOldAircraftHudClientTick()
         }
-
     }
 
     @JvmStatic
@@ -368,6 +369,7 @@ object ClientRenderHandler {
 
         val renderers: List<Pair<net.minecraft.world.item.Item, Lazy<BlockEntityWithoutLevelRenderer>>> = listOf(
             ModItems.TM_62 to lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
+            ModItems.TRIPOD to lazy { TripodBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.BLUEPRINT_RESEARCH_TABLE to lazy { BlueprintResearchingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.CONTAINER to lazy { ContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.LUCKY_CONTAINER to lazy { LuckyContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
