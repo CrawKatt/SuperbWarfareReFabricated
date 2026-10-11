@@ -21,7 +21,6 @@ import com.atsuishio.superbwarfare.item.food.CrustItem
 import com.atsuishio.superbwarfare.item.gun.EmptyGunItem
 import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
 import com.atsuishio.superbwarfare.item.gun.GunItem
-import com.atsuishio.superbwarfare.item.gun.handgun.TracheliumItem
 import com.atsuishio.superbwarfare.item.gun.launcher.IglaItem
 import com.atsuishio.superbwarfare.item.gun.launcher.JavelinItem
 import com.atsuishio.superbwarfare.item.gun.launcher.RpgItem
@@ -118,7 +117,7 @@ object ModItems {
     @JvmField val M_1911 = registerGun("m_1911") { GeoGunItemV2(Properties()) }
     @JvmField val HOMEMADE_SHOTGUN = registerGun<HomemadeShotgunItem>()
     @JvmField val NAIL_GUN = registerGun("nail_gun") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val TRACHELIUM = registerGun<TracheliumItem>()
+    @JvmField val TRACHELIUM = registerGun("trachelium") { GeoGunItemV2(Properties().rarity(ModRarities.VIRTUAL)) }
     @JvmField val MP_5 = registerGun("mp_5") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
     @JvmField val VECTOR = registerGun("vector") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
     @JvmField val AK_47 = registerGun("ak_47") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
