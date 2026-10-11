@@ -1599,6 +1599,8 @@
   "prop.superbwarfare.recoil_x": "Vertical Recoil",
   "prop.superbwarfare.recoil_y": "Horizontal Recoil",
   "prop.superbwarfare.recoil": "True Recoil",
+  "prop.superbwarfare.sneak_knockback_resistance": "Sneak Knockback Resistance",
+  "prop.superbwarfare.crawl_knockback_resistance": "Crawl Knockback Resistance",
   "prop.superbwarfare.zoom": "Zoom",
   "prop.superbwarfare.zoom_range": "Zoom",
   "prop.superbwarfare.moving_zoom": "Moving Zoom",
