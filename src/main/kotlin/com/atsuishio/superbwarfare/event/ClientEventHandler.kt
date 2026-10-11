@@ -375,12 +375,6 @@ object ClientEventHandler {
     var shouldPlayDischargeSound: Boolean = true
 
     @JvmField
-    var revolverPreTime: Double = 0.0
-
-    @JvmField
-    var revolverWheelPreTime: Double = 0.0
-
-    @JvmField
     var shakeTime: Double = 0.0
 
     @JvmField
@@ -1786,15 +1780,6 @@ object ClientEventHandler {
 
         // cooldown in ms
         val cooldown = (1000 / rps).roundToInt()
-
-        // 左轮类
-        if (clientTimer.progress == 0L && stack.`is`(ModItems.TRACHELIUM.get()) && holdingFireKey) {
-            revolverPreTime = (revolverPreTime + 0.3 * times).coerceIn(0.0, 1.0)
-            revolverWheelPreTime =
-                (revolverWheelPreTime + 0.32 * times).coerceIn(0.0, if (revolverPreTime > 0.7) 1.0 else 0.55)
-        } else {
-            revolverPreTime = (revolverPreTime - 1.2 * times).coerceIn(0.0, 1.0)
-        }
 
         val vehicle = player.vehicle
         if (((holdingFireKey || burstFireAmount > 0) && holdingFireKeyTicks >= data.get(GunProp.SHOOT_DELAY))
