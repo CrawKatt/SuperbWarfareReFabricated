@@ -339,6 +339,7 @@ open class ClientAttachmentImageTooltip(tooltip: AttachmentImageComponent) : Cli
             "Gravity",
             "ReloadTime",
             "ZoomSpreadRate",
+            "FuelPerAmmo",
         )
     }
 }
