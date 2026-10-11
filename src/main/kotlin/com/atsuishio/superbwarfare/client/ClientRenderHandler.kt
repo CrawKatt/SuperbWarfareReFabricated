@@ -252,6 +252,7 @@ object ClientRenderHandler {
         event.registerBelowAll(SpyglassRangeOverlay.ID, SpyglassRangeOverlay)
         event.registerBelowAll(TowOverlay.ID, TowOverlay)
         event.registerBelowAll(MortarInfoOverlay.ID, MortarInfoOverlay)
+        event.registerBelowAll(DeployWeaponTipOverlay.ID, DeployWeaponTipOverlay)
         event.registerBelowAll(Type63InfoOverlay.ID, Type63InfoOverlay)
         event.registerBelowAll(SodayoRocketInfoOverlay.ID, SodayoRocketInfoOverlay)
     }
