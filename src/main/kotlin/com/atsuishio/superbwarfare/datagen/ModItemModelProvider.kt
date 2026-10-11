@@ -72,7 +72,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         gunItemV2(ModItems.SKS)
         gunItemV2(ModItems.SVD)
         gunItemV2(ModItems.TASER)
-        gunItem(ModItems.TRACHELIUM)
+        gunItemV2(ModItems.TRACHELIUM)
         gunItemV2(ModItems.VECTOR)
         gunItemV2(ModItems.MP_5)
         gunItemV2(ModItems.M_2_HB)
