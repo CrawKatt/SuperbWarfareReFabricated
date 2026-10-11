@@ -2,6 +2,8 @@ package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.api.event.ReloadEvent
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.gun.subweapon.SubWeaponRuntime
 import com.atsuishio.superbwarfare.data.gun.value.ReloadState
@@ -331,6 +333,7 @@ object GunEventHandler {
         init(shooter, data)
         autoReload(shooter, data, inMainHand)
         tickPerk(shooter, data)
+        regenerateEnergy(data, budget)
         handleCooldown(shooter, data, environmentRate, budget)
         data.cooldown.tick(budget)
         redrawExtraAmmo(shooter, data)
@@ -362,6 +365,17 @@ object GunEventHandler {
         SubWeaponRuntime.tick(shooter, data, ActiveGun.activeSlot(data), inMainHand)
 
         data.save()
+    }
+
+    private fun regenerateEnergy(data: GunData, ticks: Int) {
+        val rate = data.get(GunProp.ENERGY_REGENERATION)
+        if (rate <= 0) return
+
+        ModCapabilities.ENERGY_ITEM.find(data.stack, null)?.let { storage ->
+            if (storage.capacity > 0) {
+                EnergyStorageHelper.insert(storage, (rate * ticks).toLong())
+            }
+        }
     }
 
     private fun hasActiveAction(data: GunData): Boolean =

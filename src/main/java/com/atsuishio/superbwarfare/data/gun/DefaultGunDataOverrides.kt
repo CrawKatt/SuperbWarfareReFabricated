@@ -42,6 +42,7 @@ fun DefaultGunData.withOverrides(diff: Map<out Prop<*, *, *, *, *>, Any?>): Defa
         maxEnergy = int(GunProp.MAX_ENERGY, maxEnergy),
         maxReceiveEnergy = int(GunProp.MAX_RECEIVE_ENERGY, maxReceiveEnergy),
         maxExtractEnergy = int(GunProp.MAX_EXTRACT_ENERGY, maxExtractEnergy),
+        energyRegeneration = int(GunProp.ENERGY_REGENERATION, energyRegeneration),
         recoilX = num(GunProp.RECOIL_X, recoilX),
         recoilY = num(GunProp.RECOIL_Y, recoilY),
         shootShake = if (diff.containsKey(GunProp.SHOOT_SHAKE)) diff[GunProp.SHOOT_SHAKE] as? SerializedVec3 else shootShake,

@@ -1626,6 +1626,7 @@
   "prop.superbwarfare.melee_headshot": "近战爆头倍率",
   "prop.superbwarfare.melee_legshot": "近战打腿倍率",
   "prop.superbwarfare.max_energy": "最大能量",
+  "prop.superbwarfare.energy_regeneration": "能量再生",
   "prop.superbwarfare.draw_time": "切枪时间",
   "prop.superbwarfare.gravity": "子弹重力",
   "prop.superbwarfare.explosion_damage": "爆炸伤害",
