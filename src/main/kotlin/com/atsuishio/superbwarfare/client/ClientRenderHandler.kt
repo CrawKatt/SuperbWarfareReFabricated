@@ -18,6 +18,7 @@ import com.atsuishio.superbwarfare.client.renderer.block.ContainerBlockEntityRen
 import com.atsuishio.superbwarfare.client.renderer.block.FuMO25BlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.LuckyContainerBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.SmallContainerBlockEntityRenderer
+import com.atsuishio.superbwarfare.client.renderer.block.TripodBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.VehicleAssemblingTableBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
@@ -27,6 +28,7 @@ import com.atsuishio.superbwarfare.client.renderer.item.KnifeM1917Renderer
 import com.atsuishio.superbwarfare.client.renderer.item.KnifeRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.KnifeSeitengewehr84Renderer
 import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
+import com.atsuishio.superbwarfare.client.renderer.item.TripodBlockItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.Type88ClusterGrenadesRenderer
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
@@ -291,6 +293,7 @@ object ClientRenderHandler {
         BlockEntityRenderers.register(ModBlockEntities.BLUEPRINT_RESEARCH_TABLE) {
             BlueprintResearchTableBlockEntityRenderer()
         }
+        BlockEntityRenderers.register(ModBlockEntities.TRIPOD) { TripodBlockEntityRenderer() }
     }
 
     @JvmStatic
@@ -363,6 +366,13 @@ object ClientRenderHandler {
                 packedLight,
                 packedOverlay
             )
+        }
+
+        val tripodRenderer = lazy { TripodBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+        BuiltinItemRendererRegistry.INSTANCE.register(
+            ModItems.TRIPOD
+        ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
+            tripodRenderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
         }
 
         val knifeRenderer = lazy { KnifeRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }

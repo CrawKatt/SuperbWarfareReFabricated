@@ -391,10 +391,7 @@ object ClickEventHandler {
                 sendPacketToServer(FireModeMessage(true))
                 ClientEventHandler.burstFireAmount = 0
             }
-            if (key == ModKeyMappings.DEPLOY_WEAPON.key.value) {
-                sendPacketToServer(DeployWeaponMessage)
-            }
-            // 部署状态下按跳跃/潜行键直接解除部署，效果等同再按一次部署键
+            // 部署状态下按跳跃/潜行键直接解除部署，效果等同再按一次交互键
             if ((key == mc.options.keyJump.key.value || key == mc.options.keyShift.key.value)
                 && DeployedWeaponHandler.isDeployed(player)
             ) {
@@ -403,7 +400,11 @@ object ClickEventHandler {
             if (key == ModKeyMappings.INTERACT.key.value) {
                 // 手持副武器时按普通物品处理
                 if (GunItem.isHeldWeapon(stack)) {
-                    KeyMapping.click(mc.options.keyUse.key)
+                    if (DeployedWeaponHandler.isDeployed(player) || DeployedWeaponHandler.deployTarget(player) != null) {
+                        sendPacketToServer(DeployWeaponMessage)
+                    } else {
+                        KeyMapping.click(mc.options.keyUse.key)
+                    }
                 } else if (stack.`is`(ModItems.MONITOR)) {
                     sendPacketToServer(InteractMessage)
                 }

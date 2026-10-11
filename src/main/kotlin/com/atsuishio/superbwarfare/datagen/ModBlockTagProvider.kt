@@ -18,7 +18,8 @@ class ModBlockTagProvider(
         super.addTags(pProvider)
         this.tag(BlockTags.NEEDS_STONE_TOOL).add(
             ModBlocks.SULFUR_ORE, ModBlocks.DEEPSLATE_SULFUR_ORE, ModBlocks.SULFUR_BLOCK,
-            ModBlocks.NITER_ORE, ModBlocks.DEEPSLATE_NITER_ORE, ModBlocks.NITER_BLOCK
+            ModBlocks.NITER_ORE, ModBlocks.DEEPSLATE_NITER_ORE, ModBlocks.NITER_BLOCK,
+            ModBlocks.TRIPOD
         )
         this.tag(BlockTags.NEEDS_IRON_TOOL).add(
             ModBlocks.GALENA_ORE, ModBlocks.SCHEELITE_ORE,
@@ -71,7 +72,8 @@ class ModBlockTagProvider(
             ModBlocks.SULFUR_BLOCK,
             ModBlocks.NITER_ORE,
             ModBlocks.DEEPSLATE_NITER_ORE,
-            ModBlocks.NITER_BLOCK
+            ModBlocks.NITER_BLOCK,
+            ModBlocks.TRIPOD
         )
         this.tag(BlockTags.MINEABLE_WITH_SHOVEL).add(ModBlocks.SANDBAG)
 
