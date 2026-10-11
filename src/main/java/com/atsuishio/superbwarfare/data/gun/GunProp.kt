@@ -62,6 +62,9 @@ class GunProp<T, R>(
         val MAX_EXTRACT_ENERGY = plainProp(DefaultGunData::maxExtractEnergy)
 
         @JvmField
+        val ENERGY_REGENERATION = plainProp(DefaultGunData::energyRegeneration)
+
+        @JvmField
         val RECOIL_X = plainProp(DefaultGunData::recoilX)
 
         @JvmField
@@ -520,6 +523,7 @@ class GunProp<T, R>(
                 val value = it.coerceIn(-1, maxEnergy)
                 if (value < 0) maxEnergy else value
             }
+            modify(ENERGY_REGENERATION) { it.coerceAtLeast(0) }
 
             modify(MELEE_DURATION) { it.coerceAtLeast(1) }
             modify(MELEE_ANGLE) { it.coerceIn(1, 180) }

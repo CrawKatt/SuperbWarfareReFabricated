@@ -1,6 +1,8 @@
 package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.api.event.ReloadEvent
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
+import com.atsuishio.superbwarfare.init.ModCapabilities
 import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.gun.subweapon.SubWeaponRuntime
 import com.atsuishio.superbwarfare.data.gun.value.ReloadState
@@ -254,9 +256,9 @@ object GunEventHandler {
         return when {
             shooter.wasInPowderSnow -> data.get(GunProp.IN_SNOW_COOLDOWN_RATE)
             shooter.isInWaterOrRain -> data.get(GunProp.IN_WATER_COOLDOWN_RATE)
-            shooter.isOnFire        -> data.get(GunProp.IN_FIRE_COOLDOWN_RATE)
-            shooter.isInLava        -> data.get(GunProp.IN_LAVA_COOLDOWN_RATE)
-            else                    -> 1.0
+            shooter.isOnFire -> data.get(GunProp.IN_FIRE_COOLDOWN_RATE)
+            shooter.isInLava -> data.get(GunProp.IN_LAVA_COOLDOWN_RATE)
+            else -> 1.0
         }
     }
 
@@ -328,6 +330,7 @@ object GunEventHandler {
         init(shooter, data)
         autoReload(shooter, data, inMainHand)
         tickPerk(shooter, data)
+        regenerateEnergy(data, budget)
         handleCooldown(shooter, data, environmentRate, budget)
         data.cooldown.tick(budget)
         redrawExtraAmmo(shooter, data)
@@ -359,6 +362,16 @@ object GunEventHandler {
         SubWeaponRuntime.tick(shooter, data, ActiveGun.activeSlot(data), inMainHand)
 
         data.save()
+    }
+
+    private fun regenerateEnergy(data: GunData, ticks: Int) {
+        val rate = data.get(GunProp.ENERGY_REGENERATION)
+        if (rate <= 0) return
+
+        val storage = ModCapabilities.ENERGY_ITEM.find(data.stack, null) ?: return
+        if (storage.capacity > 0) {
+            EnergyStorageHelper.insert(storage, (rate * ticks).toLong())
+        }
     }
 
     private fun hasActiveAction(data: GunData): Boolean =
@@ -598,25 +611,25 @@ object GunEventHandler {
         ActionTickClock.advance()
     }
 
-    // TODO 正确实现更新注册名
-    //    @SubscribeEvent
-    //    public static void onMissingMappings(MissingMappingsEvent event) {
-    //        for (MissingMappingsEvent.Mapping<Item> mapping : event.getAllMappings(Registries.ITEM)) {
-    //            if (Mod.MODID.equals(mapping.getKey().getNamespace())) {
-    //                var item = mapping.getKey().getPath();
-    //                if (item.equals("abekiri")) {
-    //                    mapping.remap(ModItems.HOMEMADE_SHOTGUN);
-    //                }
-    //                if (item.equals("m2hb_blueprint")) {
-    //                    mapping.remap(ModItems.M_2_HB_BLUEPRINT);
-    //                }
-    //                if (item.equals("rocket_70")) {
-    //                    mapping.remap(ModItems.SMALL_ROCKET);
-    //                }
-    //                if (item.equals("us_helmet_pastg")) {
-    //                    mapping.remap(ModItems.US_HELMET_PASGT);
-    //                }
-    //            }
-    //        }
-    //    }
+// TODO 正确实现更新注册名
+//    @SubscribeEvent
+//    public static void onMissingMappings(MissingMappingsEvent event) {
+//        for (MissingMappingsEvent.Mapping<Item> mapping : event.getAllMappings(Registries.ITEM)) {
+//            if (Mod.MODID.equals(mapping.getKey().getNamespace())) {
+//                var item = mapping.getKey().getPath();
+//                if (item.equals("abekiri")) {
+//                    mapping.remap(ModItems.HOMEMADE_SHOTGUN.get());
+//                }
+//                if (item.equals("m2hb_blueprint")) {
+//                    mapping.remap(ModItems.M_2_HB_BLUEPRINT.get());
+//                }
+//                if (item.equals("rocket_70")) {
+//                    mapping.remap(ModItems.SMALL_ROCKET.get());
+//                }
+//                if (item.equals("us_helmet_pastg")) {
+//                    mapping.remap(ModItems.US_HELMET_PASGT.get());
+//                }
+//            }
+//        }
+//    }
 }

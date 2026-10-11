@@ -1,22 +1,17 @@
 package com.atsuishio.superbwarfare.perk.functional
 
-import com.atsuishio.superbwarfare.init.ModCapabilities
-import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
-
+import com.atsuishio.superbwarfare.data.PMC
+import com.atsuishio.superbwarfare.data.gun.DefaultGunData
 import com.atsuishio.superbwarfare.data.gun.GunData
+import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.perk.Perk
-import com.atsuishio.superbwarfare.perk.PerkInstance
-import net.minecraft.world.entity.Entity
 
 object Regeneration : Perk("regeneration", Type.FUNCTIONAL) {
-    override fun tick(
-        data: GunData,
-        instance: PerkInstance,
-        entity: Entity?
-    ) {
-        val stack = data.stack
-        ModCapabilities.ENERGY_ITEM.find(stack, null)?.let {
-            EnergyStorageHelper.insert(it, instance.level * it.capacity / 2000)
-        }
+    override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) {
+        val maxEnergy = modifier[GunProp.MAX_ENERGY]
+        if (maxEnergy <= 0) return
+
+        val level = modifier.data.perk.getLevel(this)
+        modifier[GunProp.ENERGY_REGENERATION] += ((1 + level * 0.4) * maxEnergy / 4000).toInt()
     }
 }
