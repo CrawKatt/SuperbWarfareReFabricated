@@ -140,6 +140,8 @@ data class DefaultGunData(
     val hasBipod: Boolean = false,
     @SerialName("Deployable")
     val deployable: Boolean = false,
+    @SerialName("StandBehind")
+    val standBehind: Double = 1.0,
     // TODO(fire-mode): Keep this as legacy compatibility until HOLD uses ChargeInfo reset semantics.
     @SerialName("ClearHoldProgressAfterShoot")
     val clearHoldProgressAfterShoot: Boolean = false,
