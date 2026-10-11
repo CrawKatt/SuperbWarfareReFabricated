@@ -338,6 +338,7 @@ open class ClientAttachmentImageTooltip(tooltip: AttachmentImageComponent) : Cli
             "DrawTime",
             "Gravity",
             "ReloadTime",
+            "ZoomSpreadRate",
         )
     }
 }
