@@ -6,7 +6,6 @@ import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.item.gun.special.SuperStarShooterItem;
-import com.atsuishio.superbwarfare.item.gun.machinegun.MinigunItem;
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
@@ -57,7 +56,6 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
     @Unique
     private static boolean superbwarfare$usesCustomArmPose(ItemStack stack) {
         return stack.getItem() instanceof LungeMine
-                || stack.getItem() instanceof MinigunItem
                 || stack.getItem() instanceof SuperStarShooterItem
                 || stack.getItem() instanceof RepairToolItem;
     }

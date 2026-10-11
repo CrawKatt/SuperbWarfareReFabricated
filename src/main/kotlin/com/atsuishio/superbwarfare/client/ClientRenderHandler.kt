@@ -32,6 +32,7 @@ import com.atsuishio.superbwarfare.client.renderer.item.TripodBlockItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.Type88ClusterGrenadesRenderer
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
+import com.atsuishio.superbwarfare.client.renderer.special.DeployedWeaponRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.RadiationGlowRenderer
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
@@ -91,6 +92,7 @@ object ClientRenderHandler {
     private val overlays = listOf(
         SodayoRocketInfoOverlay,
         Type63InfoOverlay,
+        DeployWeaponTipOverlay,
         MortarInfoOverlay,
         TowOverlay,
         SpyglassRangeOverlay,
@@ -227,6 +229,7 @@ object ClientRenderHandler {
         if (System.nanoTime() - bulletRenderOffsetTime > OFFSET_TTL) return false
 
         val player = Minecraft.getInstance().player ?: return false
+
         val owner = projectile.owner ?: return false
         return player.getUUID() == owner.getUUID()
     }
@@ -331,6 +334,7 @@ object ClientRenderHandler {
     fun onClientSetup() {
         MeleeClientHandler.installDebugHooks()
         MeleeDebugRenderer.register()
+        DeployedWeaponRenderer.register()
         val geoGunRenderer = GeoGunRenderer()
         BuiltInRegistries.ITEM.filterIsInstance<GeoGunItemV2>().forEach { item ->
             BuiltinItemRendererRegistry.INSTANCE.register(item, geoGunRenderer)

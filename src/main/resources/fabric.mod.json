@@ -29,6 +29,7 @@
       "superbwarfare:phosphorus_fire_capability",
       "superbwarfare:radiation_capability",
       "superbwarfare:player_variables",
+      "superbwarfare:player_deploy_state",
       "superbwarfare:infinite_ammo_capability"
     ]
   },

@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.capability
 import com.atsuishio.superbwarfare.capability.entity.InfiniteAmmoCapability
 import com.atsuishio.superbwarfare.capability.living.PhosphorusFireCapability
 import com.atsuishio.superbwarfare.capability.living.RadiationCapability
+import com.atsuishio.superbwarfare.capability.player.PlayerDeployState
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import dev.onyxstudios.cca.api.v3.component.ComponentKey
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
@@ -20,6 +21,7 @@ class ModCapabilities : EntityComponentInitializer {
             { PlayerVariable() },
             RespawnCopyStrategy.ALWAYS_COPY
         )
+        registry.registerForPlayers(PLAYER_DEPLOY_STATE, { PlayerDeployState() }, RespawnCopyStrategy.NEVER_COPY)
         registry.registerFor(LivingEntity::class.java, PHOSPHORUS_FIRE) { PhosphorusFireCapability() }
         registry.beginRegistration(LivingEntity::class.java, RADIATION_CAPABILITY)
             .respawnStrategy(RespawnCopyStrategy.NEVER_COPY)
@@ -28,6 +30,12 @@ class ModCapabilities : EntityComponentInitializer {
     }
 
     companion object {
+        @JvmField
+        val PLAYER_DEPLOY_STATE: ComponentKey<PlayerDeployState> = ComponentRegistry.getOrCreate(
+            PlayerDeployState.ID,
+            PlayerDeployState::class.java
+        )
+
         @JvmField
         val PLAYER_VARIABLE: ComponentKey<PlayerVariable> = ComponentRegistry.getOrCreate(
             PlayerVariable.ID,

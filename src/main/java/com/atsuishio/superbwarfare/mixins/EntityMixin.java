@@ -104,6 +104,10 @@ public abstract class EntityMixin implements OBBHitter {
             player.setYRot(player.getYRot() + f1);
             player.xRotO = DeployedWeaponHandler.clampPitch(player.xRotO + f);
             player.yRotO += f1;
+
+            float diffY = Math.clamp(-90f, 90f, Mth.wrapDegrees(player.getYHeadRot() - player.yBodyRot));
+            player.setYBodyRot(player.yBodyRot + 0.5f * diffY);
+
             DeployedWeaponHandler.applyOrbit(player);
             return;
         }

@@ -3,9 +3,9 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.client.ArmPoseExtensible;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.LungeMine;
+import com.atsuishio.superbwarfare.event.DeployedWeaponHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.item.gun.special.SuperStarShooterItem;
-import com.atsuishio.superbwarfare.item.gun.machinegun.MinigunItem;
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem;
 import com.atsuishio.superbwarfare.item.curio.ParachuteItem;
 import net.minecraft.client.model.HumanoidModel;
@@ -65,11 +65,6 @@ public abstract class HumanoidModelMixin {
             model.rightArm.yRot = -12f * Mth.DEG_TO_RAD;
             model.leftArm.xRot = -45f * Mth.DEG_TO_RAD + model.head.xRot;
             model.leftArm.yRot = 40f * Mth.DEG_TO_RAD;
-        } else if (item instanceof MinigunItem) {
-            model.rightArm.xRot = 22.5f * Mth.DEG_TO_RAD + model.head.xRot;
-            model.rightArm.yRot = model.head.yRot;
-            model.leftArm.xRot = Mth.clamp(-45f * Mth.DEG_TO_RAD + model.head.xRot, -67.5f * Mth.DEG_TO_RAD, 0f);
-            model.leftArm.yRot = Mth.clamp(45f * Mth.DEG_TO_RAD + model.head.yRot, 45f * Mth.DEG_TO_RAD, 80f * Mth.DEG_TO_RAD);
         } else if (item instanceof SuperStarShooterItem) {
             model.rightArm.xRot = -70f * Mth.DEG_TO_RAD + model.head.xRot;
             model.rightArm.yRot = 0f;
@@ -189,6 +184,18 @@ public abstract class HumanoidModelMixin {
                 this.rightLeg.yRot = 0;
                 this.rightLeg.zRot = 0;
             }
+        }
+
+        if (livingEntity instanceof Player player && DeployedWeaponHandler.isDeployed(player)) {
+            var x = -45;
+
+            this.leftArm.xRot = x * Mth.DEG_TO_RAD;
+            this.leftArm.yRot = 0 * Mth.DEG_TO_RAD;
+            this.leftArm.zRot = 0 * Mth.DEG_TO_RAD;
+
+            this.rightArm.xRot = x * Mth.DEG_TO_RAD;
+            this.rightArm.yRot = 0 * Mth.DEG_TO_RAD;
+            this.rightArm.zRot = 0 * Mth.DEG_TO_RAD;
         }
 
         // 趴下持枪

@@ -1,6 +1,7 @@
 {
   "Spread": 4.5,
   "ZoomSpreadRate": 0.5,
+  "Deployable": true,
   "RecoilX": 0.003,
   "RecoilY": 0.02,
   "Damage": 8,
