@@ -1637,6 +1637,7 @@
   "prop.superbwarfare.projectile_lifesteal": "Projectile Lifesteal",
   "prop.superbwarfare.melee_lifesteal": "Melee Lifesteal",
   "prop.superbwarfare.zoom_spread_rate": "Zoom Spread Rate",
+  "prop.superbwarfare.fuel_per_ammo": "Fuel Cost Per Ammo",
 
   "superbwarfare.book.superb_warfare_manual": "Superb Warfare Manual",
   "superbwarfare.book.superb_warfare_manual.des": "A tutorial on Superb Warfare mod, teaching you how to become a superb soldier (WIP)",

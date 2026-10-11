@@ -1637,6 +1637,7 @@
   "prop.superbwarfare.projectile_lifesteal": "子弹生命汲取",
   "prop.superbwarfare.melee_lifesteal": "近战生命汲取",
   "prop.superbwarfare.zoom_spread_rate": "瞄准散布倍率",
+  "prop.superbwarfare.fuel_per_ammo": "开火能量消耗",
 
   "superbwarfare.book.superb_warfare_manual": "卓越单兵手册",
   "superbwarfare.book.superb_warfare_manual.des": "卓越前线模组的教程，教你如何成为一名卓越的士兵（编写中）",
