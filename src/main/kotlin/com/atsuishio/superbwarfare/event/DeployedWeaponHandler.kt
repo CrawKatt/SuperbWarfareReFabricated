@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
+import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
 import kotlin.math.sqrt
@@ -86,13 +87,14 @@ object DeployedWeaponHandler {
         !player.level().noCollision(player, boxAt(player, pos).deflate(MAX_SINK))
 
     @JvmStatic
-    fun deployTarget(player: Player): BlockPos? {
+    @JvmOverloads
+    fun deployTarget(player: Player, viewHit: BlockHitResult? = null): BlockPos? {
         val stack = player.mainHandItem
         val item = stack.item as? GunItem ?: return null
         if (!item.deployable(GunData.from(stack))) return null
         if (player.isSpectator || player.isPassenger || !player.isAlive) return null
 
-        val tripod = lookingTripod(player) ?: return null
+        val tripod = lookingTripod(player, viewHit) ?: return null
         if (player.level().players().any { it !== player && tripodOf(it) == tripod }) return null
         val target = orbitPos(player, tripod, clampPitch(player.xRot))
         if (!hasFloor(player, target) || !hasRoom(player, target)) return null
@@ -120,11 +122,21 @@ object DeployedWeaponHandler {
     }
 
     @JvmStatic
-    fun lookingTripod(player: Player): BlockPos? {
+    @JvmOverloads
+    fun lookingTripod(player: Player, viewHit: BlockHitResult? = null): BlockPos? {
         val level = player.level()
-        val start = player.eyePosition
-        val end = start.add(player.getViewVector(1f).scale(PlayerReachTool.getBlockReach(player)))
-        val hit = level.clip(ClipContext(start, end, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, player))
+        val eye = player.eyePosition
+
+        val hit = viewHit ?: level.clip(
+            ClipContext(
+                eye,
+                eye.add(player.getViewVector(1f).scale(PlayerReachTool.getBlockReach(player))),
+                ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, player
+            )
+        )
+
+        val reach = PlayerReachTool.getBlockReach(player)
+        if (hit.location.distanceToSqr(eye) > reach * reach) return null
 
         return hit.blockPos.takeIf { level.getBlockState(it).block is TripodBlock }
     }
