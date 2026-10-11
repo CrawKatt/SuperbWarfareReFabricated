@@ -80,6 +80,12 @@ class GunProp<T, R>(
         val RECOIL_FORCE = plainProp(DefaultGunData::recoilForce)
 
         @JvmField
+        val SNEAK_KNOCKBACK_RESISTANCE = plainProp(DefaultGunData::sneakKnockbackResistance)
+
+        @JvmField
+        val CRAWL_KNOCKBACK_RESISTANCE = plainProp(DefaultGunData::crawlKnockbackResistance)
+
+        @JvmField
         val SHOOT_SHAKE = plainProp(DefaultGunData::shootShake)
 
         @JvmField
@@ -554,6 +560,8 @@ class GunProp<T, R>(
             modify(PROJECTILE_SPLIT_AMOUNT) { it.coerceAtLeast(0) }
             modify(WEIGHT) { it.coerceAtLeast(1.0) }
             modify(SWAY) { it.coerceAtLeast(0.0) }
+            modify(SNEAK_KNOCKBACK_RESISTANCE) { it.coerceIn(0.0, 1.0) }
+            modify(CRAWL_KNOCKBACK_RESISTANCE) { it.coerceIn(0.0, 1.0) }
             modify(STAND_BEHIND) { it.coerceAtLeast(0.0) }
 
             modify(MAGAZINE) {

@@ -45,6 +45,8 @@ fun DefaultGunData.withOverrides(diff: Map<out Prop<*, *, *, *, *>, Any?>): Defa
         energyRegeneration = int(GunProp.ENERGY_REGENERATION, energyRegeneration),
         recoilX = num(GunProp.RECOIL_X, recoilX),
         recoilY = num(GunProp.RECOIL_Y, recoilY),
+        sneakKnockbackResistance = num(GunProp.SNEAK_KNOCKBACK_RESISTANCE, sneakKnockbackResistance),
+        crawlKnockbackResistance = num(GunProp.CRAWL_KNOCKBACK_RESISTANCE, crawlKnockbackResistance),
         shootShake = if (diff.containsKey(GunProp.SHOOT_SHAKE)) diff[GunProp.SHOOT_SHAKE] as? SerializedVec3 else shootShake,
         spread = num(GunProp.SPREAD, spread),
         damage = num(GunProp.DAMAGE, damage),
