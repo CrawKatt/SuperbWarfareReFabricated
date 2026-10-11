@@ -403,7 +403,9 @@ object ClickEventHandler {
             }
             if (key == ModKeyMappings.INTERACT.key.value) {
                 if (GunItem.isHeldWeapon(stack)) {
-                    if (DeployedWeaponHandler.isDeployed(player) || DeployedWeaponHandler.deployTarget(player) != null) {
+                    if (DeployedWeaponHandler.isDeployed(player) ||
+                        DeployedWeaponHandler.deployTarget(player, OverlayTraceHandler.playerViewBlockResult) != null
+                    ) {
                         sendPacketToServer(DeployWeaponMessage)
                     } else {
                         (mc as MinecraftAccessor).`superbwarfare$startUseItem`()
