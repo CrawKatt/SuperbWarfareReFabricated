@@ -24,6 +24,8 @@ import com.atsuishio.superbwarfare.client.overlay.ItemRendererFixOverlay
 import com.atsuishio.superbwarfare.client.overlay.JavelinHudOverlay
 import com.atsuishio.superbwarfare.client.overlay.KillMessageOverlay
 import com.atsuishio.superbwarfare.client.overlay.MortarInfoOverlay
+import com.atsuishio.superbwarfare.client.overlay.DeployWeaponTipOverlay
+import com.atsuishio.superbwarfare.client.renderer.special.DeployedWeaponRenderer
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.RedTriangleOverlay
 import com.atsuishio.superbwarfare.client.overlay.SodayoRocketInfoOverlay
@@ -112,6 +114,7 @@ object ClientRenderHandler {
     private val overlays = listOf<LayeredDraw.Layer>(
         SodayoRocketInfoOverlay,
         Type63InfoOverlay,
+        DeployWeaponTipOverlay,
         MortarInfoOverlay,
         TowOverlay,
         SpyglassRangeOverlay,
@@ -281,6 +284,7 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun registerRenderers() {
+        net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.AFTER_ENTITIES.register(DeployedWeaponRenderer::onRenderLevelStage)
         addRadiationGlowLayers()
         MeleeDebugRenderer.init()
         BlockEntityRenderers.register(ModBlockEntities.CONTAINER) { ContainerBlockEntityRenderer() }

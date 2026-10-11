@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun.machinegun
 
+import com.atsuishio.superbwarfare.event.DeployedWeaponHandler
 import com.atsuishio.superbwarfare.init.ModEnumExtensions
 import com.atsuishio.superbwarfare.init.ModRarities
 import com.atsuishio.superbwarfare.init.RegistryName
@@ -9,6 +10,7 @@ import net.fabricmc.api.Environment
 import net.minecraft.client.model.HumanoidModel.ArmPose
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 
 @RegistryName("minigun")
@@ -20,6 +22,7 @@ class MinigunItem : GeoGunItemV2(Properties().rarity(ModRarities.LEGENDARY)) {
         hand: InteractionHand,
         itemStack: ItemStack
     ): ArmPose {
+        if (entityLiving is Player && DeployedWeaponHandler.isDeployed(entityLiving)) return ArmPose.EMPTY
         return if (!itemStack.isEmpty && entityLiving.usedItemHand == hand) ModEnumExtensions.Client.minigunPose else ArmPose.EMPTY
     }
 }

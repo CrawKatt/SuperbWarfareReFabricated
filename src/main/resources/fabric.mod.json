@@ -33,7 +33,8 @@
       "superbwarfare:player_variable",
       "superbwarfare:phosphorus_fire_capability",
       "superbwarfare:infinite_ammo_capability",
-      "superbwarfare:radiation_capability"
+      "superbwarfare:radiation_capability",
+      "superbwarfare:player_deploy_state"
     ]
   },
   "mixins": [

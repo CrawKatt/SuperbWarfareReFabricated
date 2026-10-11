@@ -376,6 +376,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val modelResource = resource.getModel()
 
         val useLod = !transformType.firstPerson()
+                && !GunMountContext.active
                 && DisplayConfig.ENABLE_GUN_LOD.get()
                 && !RenderDistanceHelper.isInGui()
         val model = if (useLod) {
@@ -2408,6 +2409,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
     }
 
     open fun positioningBone(transformType: ItemDisplayContext): String? {
+        if (GunMountContext.active) return DEPLOY_POS_BONE
+
         return when (transformType) {
             ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
             ItemDisplayContext.THIRD_PERSON_LEFT_HAND -> THIRDPERSON_HAND_BONE
@@ -2520,6 +2523,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         private const val THIRDPERSON_HAND_BONE = "thirdperson_hand"
         private const val GROUND_BONE = "ground"
         private const val FIXED_BONE = "fixed"
+        private const val DEPLOY_POS_BONE = "deploy_pos"
         private const val FLARE_BONE = "flare"
         private const val MUZZLE_FLASH_BONE = "muzzle_flash"
         private const val CUSTOM_HAND_GUARD_BONE = "custom_hand_guard"
