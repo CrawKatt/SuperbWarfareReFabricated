@@ -12,7 +12,6 @@ import com.atsuishio.superbwarfare.serialization.ByteBufEncoder
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.phys.Vec3
 import net.minecraftforge.common.capabilities.AutoRegisterCapability
 import net.minecraftforge.common.util.INBTSerializable
 import java.util.*
@@ -26,12 +25,6 @@ class PlayerVariable : INBTSerializable<CompoundTag>, SyncedCapability {
     var ammo: MutableMap<Ammo, Int> = EnumMap(Ammo::class.java)
     var activeThermalImaging: Boolean = false
 
-    @JvmField
-    var deployPivot: Vec3? = null
-
-    @JvmField
-    var deployGunUuid: String? = null
-
     /** 玩家变量只对本人有意义 */
     override val syncTarget: SyncTarget
         get() = SyncTarget.SELF
@@ -43,15 +36,6 @@ class PlayerVariable : INBTSerializable<CompoundTag>, SyncedCapability {
     override fun writeSync(encoder: ByteBufEncoder, full: Boolean) {
         encoder.encodeBoolean(activeThermalImaging)
 
-        val pivot = deployPivot
-        encoder.encodeBoolean(pivot != null)
-        if (pivot != null) {
-            encoder.encodeDouble(pivot.x)
-            encoder.encodeDouble(pivot.y)
-            encoder.encodeDouble(pivot.z)
-        }
-        encoder.encodeString(deployGunUuid ?: "")
-
         encoder.encodeInt(Ammo.entries.size)
 
         for (type in Ammo.entries) {
@@ -61,13 +45,6 @@ class PlayerVariable : INBTSerializable<CompoundTag>, SyncedCapability {
 
     override fun readSync(decoder: ByteBufDecoder, full: Boolean) {
         activeThermalImaging = decoder.decodeBoolean()
-
-        deployPivot = if (decoder.decodeBoolean()) {
-            Vec3(decoder.decodeDouble(), decoder.decodeDouble(), decoder.decodeDouble())
-        } else {
-            null
-        }
-        deployGunUuid = decoder.decodeString().takeIf { it.isNotEmpty() }
 
         val size = decoder.decodeInt()
         for (index in 0 until size) {
@@ -121,8 +98,6 @@ class PlayerVariable : INBTSerializable<CompoundTag>, SyncedCapability {
         }
 
         clone.activeThermalImaging = this.activeThermalImaging
-        clone.deployPivot = this.deployPivot
-        clone.deployGunUuid = this.deployGunUuid
 
         return clone
     }
@@ -135,8 +110,6 @@ class PlayerVariable : INBTSerializable<CompoundTag>, SyncedCapability {
         }
 
         if (activeThermalImaging != other.activeThermalImaging) return false
-        if (deployPivot != other.deployPivot) return false
-        if (deployGunUuid != other.deployGunUuid) return false
 
         return true
     }
@@ -188,8 +161,6 @@ class PlayerVariable : INBTSerializable<CompoundTag>, SyncedCapability {
         var result = activeThermalImaging.hashCode()
         result = 31 * result + (old?.hashCode() ?: 0)
         result = 31 * result + ammo.hashCode()
-        result = 31 * result + (deployPivot?.hashCode() ?: 0)
-        result = 31 * result + (deployGunUuid?.hashCode() ?: 0)
         return result
     }
 }

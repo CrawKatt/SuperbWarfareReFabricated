@@ -163,6 +163,7 @@ object ClientRenderHandler {
         if (System.nanoTime() - bulletRenderOffsetTime > OFFSET_TTL) return false
 
         val player = Minecraft.getInstance().player ?: return false
+
         val owner = projectile.owner ?: return false
         return player.getUUID() == owner.getUUID()
     }
@@ -257,6 +258,7 @@ object ClientRenderHandler {
         event.registerBelowAll(SpyglassRangeOverlay.ID, SpyglassRangeOverlay)
         event.registerBelowAll(TowOverlay.ID, TowOverlay)
         event.registerBelowAll(MortarInfoOverlay.ID, MortarInfoOverlay)
+        event.registerBelowAll(DeployWeaponTipOverlay.ID, DeployWeaponTipOverlay)
         event.registerBelowAll(Type63InfoOverlay.ID, Type63InfoOverlay)
         event.registerBelowAll(SodayoRocketInfoOverlay.ID, SodayoRocketInfoOverlay)
     }

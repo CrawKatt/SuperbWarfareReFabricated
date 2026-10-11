@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.block.TripodBlock
-import com.atsuishio.superbwarfare.capability.player.PlayerVariable
+import com.atsuishio.superbwarfare.capability.player.PlayerDeployState
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import net.minecraft.core.BlockPos
@@ -26,6 +26,10 @@ object DeployedWeaponHandler {
 
     const val MAX_DRIFT = 1.0
 
+    const val MUZZLE_CLEARANCE = 0.25
+
+    const val FLOOR_PROBE = 0.05
+
     @JvmStatic
     fun clampPitch(xRot: Float): Float = Mth.clamp(xRot, -PITCH_LIMIT_UP, PITCH_LIMIT_DOWN)
 
@@ -34,10 +38,34 @@ object DeployedWeaponHandler {
         (STAND_BEHIND * Mth.cos(xRot * Mth.DEG_TO_RAD)).coerceAtLeast(MIN_STAND_BEHIND)
 
     @JvmStatic
-    fun isDeployed(player: Player): Boolean = pivotOf(player) != null
+    fun isDeployed(player: Player): Boolean = tripodOf(player) != null
 
     @JvmStatic
-    fun pivotOf(player: Player): Vec3? = PlayerVariable.getOrDefault(player).deployPivot
+    fun tripodOf(player: Player): BlockPos? = PlayerDeployState.getOrDefault(player).tripodPos
+
+    @JvmStatic
+    fun pivotAt(tripodPos: BlockPos): Vec3 =
+        Vec3(tripodPos.x + 0.5, tripodPos.y + PIVOT_HEIGHT, tripodPos.z + 0.5)
+
+    @JvmStatic
+    fun pivotOf(player: Player): Vec3? = tripodOf(player)?.let { pivotAt(it) }
+
+    @JvmStatic
+    fun deployedMuzzle(player: Player): Vec3? = pivotOf(player)?.add(0.0, MUZZLE_CLEARANCE, 0.0)
+
+    @JvmStatic
+    fun orbitPos(player: Player, tripod: BlockPos, xRot: Float): Vec3 {
+        val pivot = pivotAt(tripod)
+        val forward = horizontalForward(player)
+        val radius = orbitRadius(xRot)
+        return Vec3(pivot.x - forward.x * radius, pivot.y - PIVOT_HEIGHT, pivot.z - forward.z * radius)
+    }
+
+    @JvmStatic
+    fun hasFloor(player: Player, pos: Vec3): Boolean {
+        val box = player.boundingBox.move(pos.x - player.x, pos.y - player.y, pos.z - player.z)
+        return !player.level().noCollision(player, box.move(0.0, -FLOOR_PROBE, 0.0))
+    }
 
     @JvmStatic
     fun deployTarget(player: Player): BlockPos? {
@@ -46,7 +74,10 @@ object DeployedWeaponHandler {
         if (!item.deployable(GunData.from(stack))) return null
         if (player.isSpectator || player.isPassenger || !player.isAlive) return null
 
-        return lookingTripod(player)
+        val tripod = lookingTripod(player) ?: return null
+        if (player.level().players().any { it !== player && tripodOf(it) == tripod }) return null
+        if (!hasFloor(player, orbitPos(player, tripod, clampPitch(player.xRot)))) return null
+        return tripod
     }
 
     @JvmStatic
@@ -56,22 +87,15 @@ object DeployedWeaponHandler {
         val tripod = deployTarget(player) ?: return false
         val data = GunData.from(player.mainHandItem)
 
-        val pivot = Vec3(tripod.x + 0.5, tripod.y + PIVOT_HEIGHT, tripod.z + 0.5)
+        val target = orbitPos(player, tripod, clampPitch(player.xRot))
 
-        val forward = horizontalForward(player)
-        val radius = orbitRadius(player.xRot)
-        val behindX = pivot.x - forward.x * radius
-        val behindZ = pivot.z - forward.z * radius
-        val behindY = pivot.y - PIVOT_HEIGHT
-
-
-        player.teleportTo(behindX, behindY, behindZ)
+        player.teleportTo(target.x, target.y, target.z)
         player.deltaMovement = Vec3.ZERO
 
         val uuid = data.uuid?.toString()
-        PlayerVariable.modify(player) {
-            it.deployPivot = pivot
-            it.deployGunUuid = uuid
+        PlayerDeployState.modify(player) {
+            it.tripodPos = tripod
+            it.gunUuid = uuid
         }
         return true
     }
@@ -90,9 +114,9 @@ object DeployedWeaponHandler {
     fun undeploy(player: Player) {
         if (player.level().isClientSide) return
 
-        PlayerVariable.modify(player) {
-            it.deployPivot = null
-            it.deployGunUuid = null
+        PlayerDeployState.modify(player) {
+            it.tripodPos = null
+            it.gunUuid = null
         }
     }
 
@@ -119,19 +143,23 @@ object DeployedWeaponHandler {
     fun serverTick(player: Player) {
         if (player.level().isClientSide) return
 
-        val cap = PlayerVariable.getOrDefault(player)
-        val pivot = cap.deployPivot ?: return
+        val cap = PlayerDeployState.getOrDefault(player)
+        val tripod = cap.tripodPos ?: return
 
         val stack = player.mainHandItem
         val item = stack.item as? GunItem
         val data = if (item == null) null else GunData.from(stack)
         val stillHolding = item != null && data != null && item.deployable(data) &&
-                cap.deployGunUuid != null && cap.deployGunUuid == data.uuid?.toString()
+                cap.gunUuid != null && cap.gunUuid == data.uuid?.toString()
 
-        if (!stillHolding || !player.isAlive || player.isPassenger || player.isSpectator) {
+        if (!stillHolding || !player.isAlive || player.isPassenger || player.isSpectator ||
+            player.level().getBlockState(tripod).block !is TripodBlock
+        ) {
             undeploy(player)
             return
         }
+
+        val pivot = pivotAt(tripod)
 
         val clamped = clampPitch(player.xRot)
         if (clamped != player.xRot) {
@@ -146,6 +174,7 @@ object DeployedWeaponHandler {
 
         if (abs(radius - orbitRadius(clamped)) > MAX_DRIFT ||
             abs(dy) > MAX_DRIFT ||
+            !hasFloor(player, player.position()) ||
             player.level().getBlockState(player.blockPosition()).canOcclude()
         ) {
             undeploy(player)
