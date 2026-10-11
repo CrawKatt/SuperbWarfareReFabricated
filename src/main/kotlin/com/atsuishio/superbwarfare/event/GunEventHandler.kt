@@ -20,6 +20,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.Vec3
 import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.event.tick.ServerTickEvent
 import kotlin.math.max
 import kotlin.math.min
@@ -256,9 +257,9 @@ object GunEventHandler {
         return when {
             shooter.wasInPowderSnow -> data.get(GunProp.IN_SNOW_COOLDOWN_RATE)
             shooter.isInWaterOrRain -> data.get(GunProp.IN_WATER_COOLDOWN_RATE)
-            shooter.isOnFire        -> data.get(GunProp.IN_FIRE_COOLDOWN_RATE)
-            shooter.isInLava        -> data.get(GunProp.IN_LAVA_COOLDOWN_RATE)
-            else                    -> 1.0
+            shooter.isOnFire -> data.get(GunProp.IN_FIRE_COOLDOWN_RATE)
+            shooter.isInLava -> data.get(GunProp.IN_LAVA_COOLDOWN_RATE)
+            else -> 1.0
         }
     }
 
@@ -329,6 +330,7 @@ object GunEventHandler {
         init(shooter, data)
         autoReload(shooter, data, inMainHand)
         tickPerk(shooter, data)
+        regenerateEnergy(data, budget)
         handleCooldown(shooter, data, environmentRate, budget)
         data.cooldown.tick(budget)
         redrawExtraAmmo(shooter, data)
@@ -360,6 +362,16 @@ object GunEventHandler {
         SubWeaponRuntime.tick(shooter, data, ActiveGun.activeSlot(data), inMainHand)
 
         data.save()
+    }
+
+    private fun regenerateEnergy(data: GunData, ticks: Int) {
+        val rate = data.get(GunProp.ENERGY_REGENERATION)
+        if (rate <= 0) return
+
+        val storage = data.stack.getCapability(Capabilities.EnergyStorage.ITEM) ?: return
+        if (storage.maxEnergyStored > 0) {
+            storage.receiveEnergy(rate * ticks, false)
+        }
     }
 
     private fun hasActiveAction(data: GunData): Boolean =
@@ -581,7 +593,7 @@ object GunEventHandler {
         data.invalidateProperties()
 
         if (!InventoryTool.hasCreativeAmmoBox(shooter)) {
-             data.consumeBackupAmmo(shooter, available)
+            data.consumeBackupAmmo(shooter, available)
         }
     }
 
@@ -595,25 +607,25 @@ object GunEventHandler {
         ActionTickClock.advance()
     }
 
-    // TODO 正确实现更新注册名
-    //    @SubscribeEvent
-    //    public static void onMissingMappings(MissingMappingsEvent event) {
-    //        for (MissingMappingsEvent.Mapping<Item> mapping : event.getAllMappings(Registries.ITEM)) {
-    //            if (Mod.MODID.equals(mapping.getKey().getNamespace())) {
-    //                var item = mapping.getKey().getPath();
-    //                if (item.equals("abekiri")) {
-    //                    mapping.remap(ModItems.HOMEMADE_SHOTGUN.get());
-    //                }
-    //                if (item.equals("m2hb_blueprint")) {
-    //                    mapping.remap(ModItems.M_2_HB_BLUEPRINT.get());
-    //                }
-    //                if (item.equals("rocket_70")) {
-    //                    mapping.remap(ModItems.SMALL_ROCKET.get());
-    //                }
-    //                if (item.equals("us_helmet_pastg")) {
-    //                    mapping.remap(ModItems.US_HELMET_PASGT.get());
-    //                }
-    //            }
-    //        }
-    //    }
+// TODO 正确实现更新注册名
+//    @SubscribeEvent
+//    public static void onMissingMappings(MissingMappingsEvent event) {
+//        for (MissingMappingsEvent.Mapping<Item> mapping : event.getAllMappings(Registries.ITEM)) {
+//            if (Mod.MODID.equals(mapping.getKey().getNamespace())) {
+//                var item = mapping.getKey().getPath();
+//                if (item.equals("abekiri")) {
+//                    mapping.remap(ModItems.HOMEMADE_SHOTGUN.get());
+//                }
+//                if (item.equals("m2hb_blueprint")) {
+//                    mapping.remap(ModItems.M_2_HB_BLUEPRINT.get());
+//                }
+//                if (item.equals("rocket_70")) {
+//                    mapping.remap(ModItems.SMALL_ROCKET.get());
+//                }
+//                if (item.equals("us_helmet_pastg")) {
+//                    mapping.remap(ModItems.US_HELMET_PASGT.get());
+//                }
+//            }
+//        }
+//    }
 }

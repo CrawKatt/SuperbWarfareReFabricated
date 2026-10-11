@@ -30,6 +30,8 @@ data class DefaultGunData(
     val maxReceiveEnergy: Int = -1,
     @SerialName("MaxExtractEnergy")
     val maxExtractEnergy: Int = -1,
+    @SerialName("EnergyRegeneration")
+    val energyRegeneration: Int = 0,
     @SerialName("RecoilX")
     val recoilX: Double = 0.0,
     @SerialName("RecoilY")

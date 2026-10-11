@@ -1626,6 +1626,7 @@
   "prop.superbwarfare.melee_headshot": "Melee Headshot",
   "prop.superbwarfare.melee_legshot": "Melee Legshot",
   "prop.superbwarfare.max_energy": "Max Energy",
+  "prop.superbwarfare.energy_regeneration": "Energy Regeneration",
   "prop.superbwarfare.draw_time": "Draw Time",
   "prop.superbwarfare.gravity": "Projectile Gravity",
   "prop.superbwarfare.explosion_damage": "Explosion Damage",
