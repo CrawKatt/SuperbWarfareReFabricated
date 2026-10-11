@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.mobeffect
 
 import com.atsuishio.superbwarfare.capability.living.RadiationCapability
-import com.atsuishio.superbwarfare.capability.sync.CapabilitySync
 import com.atsuishio.superbwarfare.config.server.RadiationConfig
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModMobEffects
@@ -79,7 +78,7 @@ object RadiationMobEffect : MobEffect(MobEffectCategory.HARMFUL, 0x55FF55) {
             val decayRate = if (symptomatic) SYMPTOM_DECAY_RATE else SUBSYMPTOM_DECAY_RATE
             val decayed = (before - (RadiationConfig.DECAY_RATE.get() * decayRate * interval).toFloat())
                 .coerceAtLeast(0f)
-            capability.dosage = decayed
+            RadiationCapability.setDosage(living, decayed)
             decayed
         }
 
@@ -98,8 +97,6 @@ object RadiationMobEffect : MobEffect(MobEffectCategory.HARMFUL, 0x55FF55) {
         } else {
             setRadiationAttributes(living, 0f)
         }
-
-        if (dose != before) CapabilitySync.markDirty(living, RadiationCapability.ID)
     }
 
     @SubscribeEvent
