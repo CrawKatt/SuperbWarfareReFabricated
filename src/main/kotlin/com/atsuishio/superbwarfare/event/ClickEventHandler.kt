@@ -338,7 +338,9 @@ object ClickEventHandler {
             if (key == ModKeyMappings.INTERACT.key.value) {
                 // 手持副武器时按普通物品处理
                 if (GunItem.isHeldWeapon(stack)) {
-                    if (DeployedWeaponHandler.isDeployed(player) || DeployedWeaponHandler.deployTarget(player) != null) {
+                    if (DeployedWeaponHandler.isDeployed(player) ||
+                        DeployedWeaponHandler.deployTarget(player, OverlayTraceHandler.playerViewBlockResult) != null
+                    ) {
                         sendPacketToServer(DeployWeaponMessage)
                     } else {
                         KeyMapping.click(mc.options.keyUse.key)
