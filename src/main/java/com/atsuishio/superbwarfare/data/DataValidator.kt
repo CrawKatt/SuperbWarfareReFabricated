@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.data.attachment.AttachmentRenderMode
 import com.atsuishio.superbwarfare.data.attachment.AttachmentSlots
 import com.atsuishio.superbwarfare.data.gun.DefaultGunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
+import com.atsuishio.superbwarfare.data.gun.melee.MeleeEffectBehavior
 import com.atsuishio.superbwarfare.data.gun.melee.MeleeEffectSpec
 import com.atsuishio.superbwarfare.data.gun.melee.MeleeHitboxType
 import com.atsuishio.superbwarfare.data.gun.melee.isMeleeProjectileMarker
@@ -14,7 +15,6 @@ import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.init.ModMeleeEffects
 import com.atsuishio.superbwarfare.item.attachment.AttachmentProvider
 import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
-import com.atsuishio.superbwarfare.melee.MeleeEffectBehavior
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.serializer
