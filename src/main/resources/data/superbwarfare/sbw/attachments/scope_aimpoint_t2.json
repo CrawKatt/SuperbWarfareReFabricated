@@ -13,10 +13,17 @@
       "Value": 0.95
     }
   ],
+  "AmmoBar": [
+    {
+      "Bone": "energy_illuminated",
+      "Axis": "X"
+    }
+  ],
   "Bone": "scope_pos",
   "Model": "superbwarfare:models/bedrock/attachment/scope_aimpoint_t2.geo.json",
   "Texture": "superbwarfare:textures/bedrock/attachment/scope_aimpoint_t2.png",
   "ScopeInfo": {
-    "Type": "Sight"
+    "Type": "Sight",
+    "ZoomLengthScale": 0.5
   }
 }

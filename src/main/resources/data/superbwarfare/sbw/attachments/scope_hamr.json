@@ -11,6 +11,12 @@
   "Bone": "scope_pos",
   "Model": "superbwarfare:models/bedrock/attachment/scope_hamr.geo.json",
   "Texture": "superbwarfare:textures/bedrock/attachment/scope_hamr.png",
+  "AmmoBar": [
+    {
+      "Bone": "energy_illuminated",
+      "Axis": "X"
+    }
+  ],
   "ScopeInfo": {
     "Type": "Scope",
     "Modes": [
