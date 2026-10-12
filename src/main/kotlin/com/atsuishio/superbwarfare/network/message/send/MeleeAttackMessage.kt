@@ -4,13 +4,13 @@ import com.atsuishio.superbwarfare.data.gun.ActiveGun
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.gun.MeleeSound
+import com.atsuishio.superbwarfare.data.gun.melee.MeleeEffectDispatcher
 import com.atsuishio.superbwarfare.data.gun.melee.ResolvedMeleeAction
 import com.atsuishio.superbwarfare.data.gun.subdata.Cooldown
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.ksp.annotation.RegisterPacket
-import com.atsuishio.superbwarfare.melee.MeleeEffectDispatcher
 import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.network.ServerPacketPayload
 import com.atsuishio.superbwarfare.perk.MeleeAttackContext
