@@ -14,9 +14,15 @@
   "SlotIcon": "superbwarfare:textures/item/trachelium_icon.png",
   "Animation": {
     "Idle": "animation.trachelium.idle",
+    "Edit": "animation.trachelium.edit",
     "Fire": "animation.trachelium.fire",
+    "FireStock": "animation.trachelium.fire_stock",
     "ReloadEmpty": "animation.trachelium.reload",
-    "Charge": "animation.trachelium.charge"
+    "Charge": "animation.trachelium.charge",
+    "IdleHandGuard": "animation.trachelium.idle_hand_guard",
+    "FireHandGuard": "animation.trachelium.fire_hand_guard",
+    "EditHandGuard": "animation.trachelium.edit_hand_guard",
+    "ReloadEmptyHandGuard": "animation.trachelium.reload_hand_guard"
   },
   "ShootRecoil": {
     "Offset": [0.7, 1.0, 0.5],

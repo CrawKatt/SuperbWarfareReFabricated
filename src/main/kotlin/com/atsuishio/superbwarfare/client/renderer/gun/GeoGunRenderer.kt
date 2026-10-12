@@ -11,13 +11,8 @@ import com.atsuishio.superbwarfare.client.model.gun.GeoGunModel
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.renderer.ammo.AmmoReadout
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer.Companion.ARM_ANCHOR_FADE_TICKS
-import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer.Companion.CUSTOM_HAND_GUARD_BONE
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer.Companion.EDIT_FOCUS_Z_OFFSET
-import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer.Companion.FLARE_BONE
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer.Companion.MERGE_BLENDER
-import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer.Companion.MUZZLE_BONE
-import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer.Companion.OEM_HAND_GUARD_BONE
-import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer.Companion.OEM_MUZZLE_BONE
 import com.atsuishio.superbwarfare.client.renderer.laser.LaserSightCapture
 import com.atsuishio.superbwarfare.client.renderer.laser.LaserSightRenderer
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeStencilRenderHelper
@@ -25,12 +20,9 @@ import com.atsuishio.superbwarfare.compat.acceleratedrendering.AcceleratedRender
 import com.atsuishio.superbwarfare.compat.oculus.OculusCompat
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.attachment.*
-import com.atsuishio.superbwarfare.data.gun.ActiveGun
+import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.gun.AmmoConsumer.AmmoConsumeType
-import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
-import com.atsuishio.superbwarfare.data.gun.GunProp
-import com.atsuishio.superbwarfare.data.gun.magazineLevel
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.event.DeployedWeaponHandler
@@ -470,9 +462,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         if (!transformType.firstPerson()) {
             applyModelBonePositioning(poseStack, model, modelResource, transformType)
         }
-        // 加长护木：把枪口那几根骨骼搬到护木末端。⚠ 必须夹在下面那句
-        // `resolveMuzzleAttachmentMuzzleTransform`（本帧唯一一次采样 `muzzle_pos`）之前，
-        // 也要排在所有 `apply*` 之后 —— 骨骼得先摆到本帧的最终姿态上再搬。
+        // 加长护木换挂点，必须排在所有 apply* 之后、采样 muzzle_pos 之前
         renderBarrelExtension(stack, model)
         val attachmentRender = resolveMuzzleAttachmentRender(stack)
         val attachmentMuzzleTransform = attachmentRender?.let {
@@ -742,8 +732,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
 
             val attachmentId = data.attachment.id(slot.type) ?: continue
             val definition = AttachmentDefinition.from(attachmentId) ?: continue
-            val modelPath = definition.model ?: continue
-            val texture = definition.texture ?: continue
+            val modelPath = AttachmentSkins.modelPath(definition, data.id) ?: continue
+            val texture = AttachmentSkins.texture(definition, data.id) ?: continue
 
             val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: continue
 
@@ -870,7 +860,9 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val data = from(stack)
         val definition = data.attachment.id(AttachmentType.SCOPE)
             ?.let { AttachmentDefinition.from(it) }
-        bone.visible = definition != null && definition.requiresRail
+        // 上导轨上挂了东西（peq_15 这类）也要把这段导轨画出来，不然配件是浮空的
+        bone.visible = data.attachment.has(AttachmentType.UPPER_RAIL) ||
+                (definition != null && definition.requiresRail)
     }
 
     open fun renderScopeAttachment(
@@ -910,8 +902,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         } else {
             null
         }
-        val modelPath = definition.model ?: return null
-        val texture = definition.texture ?: return null
+        val modelPath = AttachmentSkins.modelPath(definition, data.id) ?: return null
+        val texture = AttachmentSkins.texture(definition, data.id) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         val boneName = definition.bone ?: SCOPE_BONE
         val mountTransform = model.getGlobalTransform(boneName) ?: return null
@@ -1126,17 +1118,12 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val attachmentId = data.attachment.id(AttachmentType.STOCK) ?: return null
         val definition = AttachmentDefinition.from(attachmentId) ?: return null
         if (definition.usesGunStock) return null
-        val modelPath = definition.model ?: return null
-        val texture = definition.texture ?: return null
+        val modelPath = AttachmentSkins.modelPath(definition, data.id) ?: return null
+        val texture = AttachmentSkins.texture(definition, data.id) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         return AttachmentRenderData(attachmentModel, texture, definition)
     }
 
-    /**
-     * 护木的"原厂 / 导轨"二选一：判定见 [shouldShowCustomHandGuard]，成立就换成
-     * [CUSTOM_HAND_GUARD_BONE]、藏起 [OEM_HAND_GUARD_BONE]；模型里没有 `custom_hand_guard`
-     * 骨骼的枪不受影响。
-     */
     open fun renderGripHandGuard(stack: ItemStack, model: GeoGunModel) {
         val customBone = model.getBone(CUSTOM_HAND_GUARD_BONE) ?: return
         val showCustom = shouldShowCustomHandGuard(stack, model)
@@ -1144,63 +1131,20 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         model.getBone(OEM_HAND_GUARD_BONE)?.visible = !showCustom
     }
 
-    /**
-     * 本帧是否渲染"带导轨的那支护木"（[CUSTOM_HAND_GUARD_BONE]，同时藏掉 [OEM_HAND_GUARD_BONE]）。
-     *
-     * 两个开关各管一套触发条件，任一成立就换：
-     * - `Attachments.GripHandGuard`（历史行为）：装了**握把**、**下导轨件**或**下挂副武器**；
-     * - `Attachments.RailHandGuard`：**四面导轨（下 / 上 / 左 / 右）任一件**或**下挂副武器** ——
-     *   Vector 这类枪的握把并不长在那支护木上，靠"装握把"永远换不出它，只能看导轨。
-     *
-     * 只读配件数据与枪 json，是纯函数，所以 [renderBarrelExtension] 可以在渲染流程更早的位置
-     * 单独问一次，不必等 [renderGripHandGuard] 跑过（那之前 `visible` 还是上一帧的值）。
-     */
     open fun shouldShowCustomHandGuard(stack: ItemStack, model: GeoGunModel): Boolean {
         if (model.getBone(CUSTOM_HAND_GUARD_BONE) == null) return false
-        val gun = from(stack)
-        val info = GunResource.compute(stack).attachmentInfo
-        val subWeapon = findSubWeapon(gun) != null
-        val legacyTrigger = info.gripHandGuard &&
-                (gun.attachment.has(AttachmentType.GRIP) || gun.attachment.has(AttachmentType.LOWER_RAIL) || subWeapon)
-        val railTrigger = info.railHandGuard && (RAIL_SLOTS.any { gun.attachment.has(it) } || subWeapon)
-        return legacyTrigger || railTrigger
+        return from(stack).showsHandGuard()
     }
 
-    /**
-     * 加长枪管：[CUSTOM_HAND_GUARD_BONE] 里带了 `new_flare` / `new_muzzle_pos` 这对"延长段"锚点
-     * （Vector）时，把那支护木当成枪管的延长件 ——
-     * 枪口焰锚点 [FLARE_BONE] 与枪口挂点 [MUZZLE_BONE] 搬到 `new_flare` / `new_muzzle_pos`，
-     * 原厂火帽 [OEM_MUZZLE_BONE] 一起搬到延长后的枪口（它的绑定位置本来就与 `muzzle_pos` 重合）。
-     *
-     * 搬的是**骨骼自己的变换**，所以后面所有按名字取全局变换的地方（枪口配件挂载、枪口焰、
-     * 枪口烟、脚本查询）全都跟着走，不需要各自再挑一次骨骼名。
-     *
-     * ⚠ 必须在 `renderModel` 里那句 `resolveMuzzleAttachmentMuzzleTransform` **之前**调用 ——
-     * 它是本帧唯一一次采样 `muzzle_pos` 全局变换的地方，晚了枪口配件还挂在旧枪口上。
-     *
-     * ⚠ 写的是共享骨骼实例，由每帧收尾的 `model.resetPose()` 复位（与同文件里那些 `visible`
-     * 写入同一套约定：不要自己再存一份、也不要在中途还原）。
-     */
     open fun renderBarrelExtension(stack: ItemStack, model: GeoGunModel) {
         if (!shouldShowCustomHandGuard(stack, model)) return
+        retargetBone(model, CHARM_BONE, NEW_CHARM_BONE)
         if (model.getIndex(NEW_FLARE_BONE) < 0 || model.getIndex(NEW_MUZZLE_BONE) < 0) return
         retargetBone(model, FLARE_BONE, NEW_FLARE_BONE)
         retargetBone(model, MUZZLE_BONE, NEW_MUZZLE_BONE)
         retargetBone(model, OEM_MUZZLE_BONE, NEW_MUZZLE_BONE)
     }
 
-    /**
-     * 把 [fromName] 这根骨骼的**局部变换**改写成"它的全局变换等于 [toName] 的全局变换"。
-     *
-     * 两根骨骼的父链可以完全不同（`flare` 挂在 `root` 下，`new_flare` 挂在 `custom_hand_guard` 下），
-     * 所以先把目标全局变换换算到 [fromName] 父节点的空间里得到目标局部变换 `L`，再按运行时那套
-     * 「平移（骨骼单位）→ 绕 pivot 旋转」的表示反解：局部位移 `p` 处的局部变换是
-     * `T(pos) · T(p) · R · S · T(-p)`，要让它的线性部分等于 `L`，平移只能取 `pos = L(p) - p`
-     * （`L` 的旋转部分原样当 `R`，缩放不动）。
-     *
-     * 名字取不到、或者骨骼带**折叠父变换**（那层变换夹在平移与 pivot 之间，上面的式子不成立）
-     * 时原样不动。
-     */
     private fun retargetBone(model: GeoGunModel, fromName: String, toName: String) {
         val fromIndex = model.getIndex(fromName)
         val toIndex = model.getIndex(toName)
@@ -1261,8 +1205,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val data = from(stack)
         val attachmentId = data.attachment.id(AttachmentType.GRIP) ?: return null
         val definition = AttachmentDefinition.from(attachmentId) ?: return null
-        val modelPath = definition.model ?: return null
-        val texture = definition.texture ?: return null
+        val modelPath = AttachmentSkins.modelPath(definition, data.id) ?: return null
+        val texture = AttachmentSkins.texture(definition, data.id) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         return AttachmentRenderData(attachmentModel, texture, definition)
     }
@@ -1313,8 +1257,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val data = from(stack)
         val attachmentId = data.attachment.id(AttachmentType.MUZZLE) ?: return null
         val definition = AttachmentDefinition.from(attachmentId) ?: return null
-        val modelPath = definition.model ?: return null
-        val texture = definition.texture ?: return null
+        val modelPath = AttachmentSkins.modelPath(definition, data.id) ?: return null
+        val texture = AttachmentSkins.texture(definition, data.id) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         return AttachmentRenderData(attachmentModel, texture, definition)
     }
@@ -1366,7 +1310,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
     open fun resolveSubWeaponFollowPose(stack: ItemStack, model: GeoGunModel): SubWeaponFollowPose? {
         val (slot, definition) = findSubWeapon(from(stack)) ?: return null
 
-        val modelPath = definition.model ?: return null
+        val modelPath = AttachmentSkins.modelPath(definition, from(stack).id) ?: return null
         val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
 
@@ -1512,7 +1456,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         if (animation?.currentGunState?.takesHandAway == true) return
 
         val (slot, definition) = findSubWeapon(data) ?: return
-        val modelPath = definition.model ?: return
+        val modelPath = AttachmentSkins.modelPath(definition, data.id) ?: return
         val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: return
         val pose = animation?.subWeaponIdlePose() ?: return
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return
@@ -1607,7 +1551,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
     open fun resolveSubWeaponFlareTransform(stack: ItemStack, model: GeoGunModel): Matrix4f? {
         val (slot, definition) = findSubWeapon(from(stack)) ?: return null
 
-        val modelPath = definition.model ?: return null
+        val modelPath = AttachmentSkins.modelPath(definition, from(stack).id) ?: return null
         val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         val mountTransform = model.getGlobalTransform(boneName) ?: return null
@@ -2064,7 +2008,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
     open fun resolveSubWeaponAimTransform(stack: ItemStack, model: GeoGunModel): Matrix4f? {
         val (slot, definition) = findSubWeapon(from(stack)) ?: return null
 
-        val modelPath = definition.model ?: return null
+        val modelPath = AttachmentSkins.modelPath(definition, from(stack).id) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: return null
 
@@ -2081,7 +2025,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
     open fun resolveSubWeaponIdleTransform(stack: ItemStack, model: GeoGunModel): Matrix4f? {
         val (slot, definition) = findSubWeapon(from(stack)) ?: return null
 
-        val modelPath = definition.model ?: return null
+        val modelPath = AttachmentSkins.modelPath(definition, from(stack).id) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: return null
 
@@ -2097,7 +2041,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
      */
     private fun subWeaponIdleViewKey(stack: ItemStack): String? {
         val (slot, definition) = findSubWeapon(from(stack)) ?: return null
-        val modelPath = definition.model ?: return null
+        val modelPath = AttachmentSkins.modelPath(definition, from(stack).id) ?: return null
         val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: return null
         return "$boneName@$modelPath"
     }
@@ -2499,7 +2443,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         @JvmStatic
         fun subWeaponHasOwnAimPose(gun: GunData): Boolean {
             val definition = findSubWeapon(gun)?.second ?: return false
-            val modelPath = definition.model ?: return false
+            val modelPath = AttachmentSkins.modelPath(definition, gun.id) ?: return false
             val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return false
             return attachmentModel.getGlobalTransform(SubWeaponInfo.VIEW_BONE) != null
         }
@@ -2517,6 +2461,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         private const val MAGAZINE_BONE = AttachmentSlots.Bones.MAGAZINE
         private const val SCOPE_BONE = AttachmentSlots.Bones.SCOPE
         private const val STOCK_BONE = AttachmentSlots.Bones.STOCK
+        private const val CHARM_BONE = AttachmentSlots.Bones.CHARM
         private const val AMMO_BONE = "ammo_pos"
         private const val SCOPE_VIEW_BONE = "scope_view"
         private const val SCOPE_VIEW_SMOOTHING = 0.6f
@@ -2529,17 +2474,9 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         private const val CUSTOM_HAND_GUARD_BONE = "custom_hand_guard"
         private const val OEM_HAND_GUARD_BONE = "oem_hand_guard"
 
-        /** 加长护木里那对"延长段"锚点，见 [renderBarrelExtension] */
         private const val NEW_FLARE_BONE = "new_flare"
         private const val NEW_MUZZLE_BONE = "new_muzzle_pos"
-
-        /** 四面导轨的槽位，见 [shouldShowCustomHandGuard] */
-        private val RAIL_SLOTS = listOf(
-            AttachmentType.LOWER_RAIL,
-            AttachmentType.UPPER_RAIL,
-            AttachmentType.LEFT_RAIL,
-            AttachmentType.RIGHT_RAIL
-        )
+        private const val NEW_CHARM_BONE = "new_charm_pos"
 
         /** **主武器**模型里的整体骨骼。副武器换弹时"反推"过来的运动加在它上面（见 [resolveSubWeaponFollowPose]） */
         private const val GUN_ROOT_BONE = "root"
