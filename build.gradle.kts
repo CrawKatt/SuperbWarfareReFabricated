@@ -254,7 +254,7 @@ dependencies {
 //    jijImplement("curse.maven:handheld-moon-1398036:7300858")
 
     // AUI
-    jijImplement("com.sighs:ApricityUI-forge-1.20.1:1.2.3")
+    jijImplement("com.sighs:ApricityUI-forge-1.20.1:1.2.7")
 
     // 可选 mod 依赖
 
