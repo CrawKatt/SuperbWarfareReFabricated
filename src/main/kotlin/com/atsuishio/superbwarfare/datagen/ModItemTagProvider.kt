@@ -632,6 +632,7 @@ class ModItemTagProvider(
             ModItems.CHARM_SENPAI,
             ModItems.CHARM_MRAHC,
             ModItems.CHARM_EXPERIENCE_BOTTLE,
+            ModItems.CHARM_TOTEM_OF_UNDYING,
             ModItems.CHARM_CHIRAM_CORE,
             ModItems.CHARM_LILY,
             ModItems.CHARM_HIRU_HEAD
