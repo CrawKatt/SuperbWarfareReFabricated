@@ -700,7 +700,8 @@ class ModItemTagProvider(
             ModItems.CHARM_TOTEM_OF_UNDYING,
             ModItems.CHARM_CHIRAM_CORE,
             ModItems.CHARM_LILY,
-            ModItems.CHARM_HIRU_HEAD
+            ModItems.CHARM_HIRU_HEAD,
+            ModItems.CHARM_SWISS_COIL
         ),
         AttachmentType.LOWER_RAIL to listOf(
             ModItems.LOWER_RAIL_BIPOD,
