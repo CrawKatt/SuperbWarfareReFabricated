@@ -563,6 +563,10 @@
   "des.superbwarfare.super_heavy_bullet": "发射受更大的重力影响的重型子弹，能够造成强力击退效果",
   "item.superbwarfare.shatter_caps": "粉碎帽",
   "des.superbwarfare.shatter_caps": "腰射时把子弹粉碎为若干个伤害较低的弹丸",
+  "item.superbwarfare.acid_bullet": "酸液弹",
+  "des.superbwarfare.acid_bullet": "发射飞溅酸液的子弹",
+  "item.superbwarfare.irradiation_bullet": "辐照弹",
+  "des.superbwarfare.irradiation_bullet": "发射带有强力辐射源的子弹",
 
   "item.superbwarfare.heal_clip": "治疗弹匣",
   "des.superbwarfare.heal_clip": "最后一击后短时间内填装，可治疗自身和附近队友",
