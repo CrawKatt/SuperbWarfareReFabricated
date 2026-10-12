@@ -563,6 +563,10 @@
   "des.superbwarfare.super_heavy_bullet": "Launch heavy bullets that are influenced by stronger gravity, with stronger knockback force.",
   "item.superbwarfare.shatter_caps": "Shatter Caps",
   "des.superbwarfare.shatter_caps": "Hip firing shatters the bullet into several pellets that deals lower damage.",
+  "item.superbwarfare.acid_bullet": "Acid Bullet",
+  "des.superbwarfare.acid_bullet": "Fires bullets that splash acid.",
+  "item.superbwarfare.irradiation_bullet": "Irradiation Bullet",
+  "des.superbwarfare.irradiation_bullet": "Fires bullets carrying a potent radiation source.",
 
   "item.superbwarfare.heal_clip": "Heal Clip",
   "des.superbwarfare.heal_clip": "Reloading after defeating a mob will heal you and your nearby allies.",
