@@ -539,8 +539,6 @@ class ModItemTagProvider(
             ModItems.HANDGUN_SILENCER,
             ModItems.OSPREY_SILENCER,
             ModItems.LOUDSPEAKER,
-            ModItems.OSPREY_SILENCER_TRACHELIUM,
-            ModItems.SILENCER_QINGLAN,
             ModItems.TRIANGULAR_MUZZLE,
             ModItems.LINEAR_MUZZLE,
             ModItems.CROSS_MUZZLE,
