@@ -460,6 +460,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.CHARM_CHIRAM_CORE)
         simpleItem(ModItems.CHARM_LILY)
         simpleItem(ModItems.CHARM_HIRU_HEAD)
+        simpleItem(ModItems.CHARM_SWISS_COIL)
 
         // blocks
         evenSimplerBlockItem(ModBlocks.BARBED_WIRE)
