@@ -2363,40 +2363,38 @@ object ClientEventHandler {
         // 冲刺/行走摇摆的阻尼按**主武器**的重量（`ActiveGun.handlingData`）
         val customWeight = (ActiveGun.handlingData(player) ?: data).get(GunProp.WEIGHT).coerceIn(1.0, 50.0)
 
-        if (!isEditing) {
-            moveRotZ =
-                if (!entity.isSprinting && mc.options.keyUp.isDown && firePosTimer == 0.0 && resource.movingTilt && !isProne(player) && !DeployedWeaponHandler.isDeployed(player)) {
-                    Mth.lerp(0.2 * times, moveRotZ, 0.14) * (1 - zoomTime)
-                } else {
-                    Mth.lerp(0.2 * times, moveRotZ, 0.0) * (1 - zoomTime)
-                }
-
-            if (entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown && zoomTime < 0.99 && !isGunMeleeActive(stack) && !isEditing) {
-                val rotEase = sprintEaseAlpha(SPRINT_EASE_ROT_IN, times, customWeight, true)
-                val rotYEase = sprintEaseAlpha(SPRINT_EASE_ROT_Y_IN, times, customWeight, true)
-                val posEase = sprintEaseAlpha(SPRINT_EASE_POS_IN, times, customWeight, true)
-                val posYEase = sprintEaseAlpha(SPRINT_EASE_POS_Y_IN, times, customWeight, true)
-
-                sprintBasicRotX = Mth.lerp(rotEase, sprintBasicRotX, 1.0).coerceIn(0.0, 1.0)
-                sprintBasicRotY = Mth.lerp(rotYEase, sprintBasicRotY, 1.0).coerceIn(0.0, 1.0)
-                sprintBasicRotZ = Mth.lerp(rotEase, sprintBasicRotZ, 1.0).coerceIn(0.0, 1.0)
-
-                sprintBasicPosX = Mth.lerp(posEase, sprintBasicPosX, 1.0).coerceIn(0.0, 1.0)
-                sprintBasicPosY = Mth.lerp(posYEase, sprintBasicPosY, 1.0).coerceIn(0.0, 1.0)
-                sprintBasicPosZ = Mth.lerp(posEase, sprintBasicPosZ, 1.0).coerceIn(0.0, 1.0)
+        moveRotZ =
+            if (!entity.isSprinting && mc.options.keyUp.isDown && firePosTimer == 0.0 && resource.movingTilt && !isProne(player) && !DeployedWeaponHandler.isDeployed(player) && !isEditing) {
+                Mth.lerp(0.2 * times, moveRotZ, 0.14) * (1 - zoomTime)
             } else {
-                val rotEase = sprintEaseAlpha(SPRINT_EASE_ROT_OUT, times, customWeight, false)
-                val rotYEase = sprintEaseAlpha(SPRINT_EASE_ROT_Y_OUT, times, customWeight, false)
-                val posEase = sprintEaseAlpha(SPRINT_EASE_POS_OUT, times, customWeight, false)
-
-                sprintBasicRotX = Mth.lerp(rotEase, sprintBasicRotX, 0.0).coerceIn(0.0, 1.0)
-                sprintBasicRotY = Mth.lerp(rotYEase, sprintBasicRotY, 0.0).coerceIn(0.0, 1.0)
-                sprintBasicRotZ = Mth.lerp(rotEase, sprintBasicRotZ, 0.0).coerceIn(0.0, 1.0)
-
-                sprintBasicPosX = Mth.lerp(posEase, sprintBasicPosX, 0.0).coerceIn(0.0, 1.0)
-                sprintBasicPosY = Mth.lerp(posEase, sprintBasicPosY, 0.0).coerceIn(0.0, 1.0)
-                sprintBasicPosZ = Mth.lerp(posEase, sprintBasicPosZ, 0.0).coerceIn(0.0, 1.0)
+                Mth.lerp(0.2 * times, moveRotZ, 0.0) * (1 - zoomTime)
             }
+
+        if (entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown && zoomTime < 0.99 && !isGunMeleeActive(stack) && !isEditing) {
+            val rotEase = sprintEaseAlpha(SPRINT_EASE_ROT_IN, times, customWeight, true)
+            val rotYEase = sprintEaseAlpha(SPRINT_EASE_ROT_Y_IN, times, customWeight, true)
+            val posEase = sprintEaseAlpha(SPRINT_EASE_POS_IN, times, customWeight, true)
+            val posYEase = sprintEaseAlpha(SPRINT_EASE_POS_Y_IN, times, customWeight, true)
+
+            sprintBasicRotX = Mth.lerp(rotEase, sprintBasicRotX, 1.0).coerceIn(0.0, 1.0)
+            sprintBasicRotY = Mth.lerp(rotYEase, sprintBasicRotY, 1.0).coerceIn(0.0, 1.0)
+            sprintBasicRotZ = Mth.lerp(rotEase, sprintBasicRotZ, 1.0).coerceIn(0.0, 1.0)
+
+            sprintBasicPosX = Mth.lerp(posEase, sprintBasicPosX, 1.0).coerceIn(0.0, 1.0)
+            sprintBasicPosY = Mth.lerp(posYEase, sprintBasicPosY, 1.0).coerceIn(0.0, 1.0)
+            sprintBasicPosZ = Mth.lerp(posEase, sprintBasicPosZ, 1.0).coerceIn(0.0, 1.0)
+        } else {
+            val rotEase = sprintEaseAlpha(SPRINT_EASE_ROT_OUT, times, customWeight, false)
+            val rotYEase = sprintEaseAlpha(SPRINT_EASE_ROT_Y_OUT, times, customWeight, false)
+            val posEase = sprintEaseAlpha(SPRINT_EASE_POS_OUT, times, customWeight, false)
+
+            sprintBasicRotX = Mth.lerp(rotEase, sprintBasicRotX, 0.0).coerceIn(0.0, 1.0)
+            sprintBasicRotY = Mth.lerp(rotYEase, sprintBasicRotY, 0.0).coerceIn(0.0, 1.0)
+            sprintBasicRotZ = Mth.lerp(rotEase, sprintBasicRotZ, 0.0).coerceIn(0.0, 1.0)
+
+            sprintBasicPosX = Mth.lerp(posEase, sprintBasicPosX, 0.0).coerceIn(0.0, 1.0)
+            sprintBasicPosY = Mth.lerp(posEase, sprintBasicPosY, 0.0).coerceIn(0.0, 1.0)
+            sprintBasicPosZ = Mth.lerp(posEase, sprintBasicPosZ, 0.0).coerceIn(0.0, 1.0)
         }
 
         if (isMoving()) {
@@ -2407,7 +2405,7 @@ object ClientEventHandler {
             moveFadeTime = Mth.lerp(0.1 * times, moveFadeTime, 0.0)
         }
 
-        if (entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown && zoomTime < 0.99 && !isGunMeleeActive(stack)) {
+        if (entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown && zoomTime < 0.99 && !isGunMeleeActive(stack) && !isEditing) {
             sprintFadeTime = if (entity.onGround()) {
                 Mth.lerp(0.08 * times, sprintFadeTime, 1.0)
             } else {
