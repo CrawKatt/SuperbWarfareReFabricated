@@ -34,11 +34,7 @@ import com.atsuishio.superbwarfare.resource.gun.pojo.BuiltinScopeInfo
 import com.atsuishio.superbwarfare.resource.gun.pojo.ItemDisplayInfo
 import com.atsuishio.superbwarfare.resource.model.AttachmentModelReloadListener
 import com.atsuishio.superbwarfare.script.GunScriptManager
-import com.atsuishio.superbwarfare.tools.BedrockBoneCoordinateTool
-import com.atsuishio.superbwarfare.tools.BoneScreenPoint
-import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
-import com.atsuishio.superbwarfare.tools.deltaFrameTime
-import com.atsuishio.superbwarfare.tools.localPlayer
+import com.atsuishio.superbwarfare.tools.*
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnimationInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.handler.FirstPersonRenderHandler
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.renderer.BedrockModelRenderTypes
@@ -730,8 +726,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 
             val attachmentId = data.attachment.id(slot.type) ?: continue
             val definition = AttachmentDefinition.from(attachmentId) ?: continue
-            val modelPath = AttachmentSkins.modelPath(definition, data.id) ?: continue
-            val texture = AttachmentSkins.texture(definition, data.id) ?: continue
+            val (modelPath, texture) = definition.resolveAssets(data, slot.type) ?: continue
 
             val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: continue
 
@@ -900,8 +895,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         } else {
             null
         }
-        val modelPath = AttachmentSkins.modelPath(definition, data.id) ?: return null
-        val texture = AttachmentSkins.texture(definition, data.id) ?: return null
+        val (modelPath, texture) = definition.resolveAssets(data, AttachmentType.SCOPE) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         val boneName = definition.bone ?: SCOPE_BONE
         val mountTransform = model.getGlobalTransform(boneName) ?: return null
@@ -983,14 +977,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
     }
 
     /**
-     * 玩家准星正对着的东西有多远，单位是格；没有有效读数时返回 [AmmoTextEntry.NO_RANGE]。
-     *
-     * 实体优先于方块（`OverlayTraceHandler.maxRangeEntity` 这一 tick 锁到谁就是谁），**载具和生
-     * 物一视同仁**。原先这里对 `VehicleEntity` 一刀切地不报读数（望远镜当年就是这么写的），结果
-     * 看别人的车时明明有距离却读不出来。
-     *
-     * 自己正乘坐的那辆不用在这里排除：[TraceTool.findLookingEntity] 和
-     * [TraceTool.cameraFindLookingEntity] 的实体过滤里本来就带着 `it !== player.vehicle`。
+     * 玩家准星正对着的东西有多远，单位是格
      */
     open fun measureRange(player: Player?): Int {
         if (player == null) return AmmoTextEntry.NO_RANGE
@@ -1116,8 +1103,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val attachmentId = data.attachment.id(AttachmentType.STOCK) ?: return null
         val definition = AttachmentDefinition.from(attachmentId) ?: return null
         if (definition.usesGunStock) return null
-        val modelPath = AttachmentSkins.modelPath(definition, data.id) ?: return null
-        val texture = AttachmentSkins.texture(definition, data.id) ?: return null
+        val (modelPath, texture) = definition.resolveAssets(data, AttachmentType.STOCK) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         return AttachmentRenderData(attachmentModel, texture, definition)
     }
@@ -1203,8 +1189,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val data = from(stack)
         val attachmentId = data.attachment.id(AttachmentType.GRIP) ?: return null
         val definition = AttachmentDefinition.from(attachmentId) ?: return null
-        val modelPath = AttachmentSkins.modelPath(definition, data.id) ?: return null
-        val texture = AttachmentSkins.texture(definition, data.id) ?: return null
+        val (modelPath, texture) = definition.resolveAssets(data, AttachmentType.GRIP) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         return AttachmentRenderData(attachmentModel, texture, definition)
     }
@@ -1255,8 +1240,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val data = from(stack)
         val attachmentId = data.attachment.id(AttachmentType.MUZZLE) ?: return null
         val definition = AttachmentDefinition.from(attachmentId) ?: return null
-        val modelPath = AttachmentSkins.modelPath(definition, data.id) ?: return null
-        val texture = AttachmentSkins.texture(definition, data.id) ?: return null
+        val (modelPath, texture) = definition.resolveAssets(data, AttachmentType.MUZZLE) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         return AttachmentRenderData(attachmentModel, texture, definition)
     }
@@ -1308,7 +1292,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
     open fun resolveSubWeaponFollowPose(stack: ItemStack, model: GeoGunModel): SubWeaponFollowPose? {
         val (slot, definition) = findSubWeapon(from(stack)) ?: return null
 
-        val modelPath = AttachmentSkins.modelPath(definition, from(stack).id) ?: return null
+        val modelPath = definition.modelOf(from(stack), slot.type) ?: return null
         val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
 
@@ -1438,11 +1422,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 
     /**
      * 部署期间的手臂接管：副武器被切出来之后，手臂就挂在**副武器自己**的
-     * `lefthand_pos` / `righthand_pos` 上，直到把它切回去（这样换弹进出的那一次换源不存在硬切）。
-     *
-     * 准入条件只有 [ActiveGun.isDeployed]；宿主枪自己换弹 / 近战 / 改装时让位（[GunAnimationState.takesHandAway]）。
-     * 姿态来自副武器数据里的 `Animation.Idle`（[GeoGunAnimationInstance.subWeaponIdlePose]），
-     * ⚠ 挂点要取本帧最终骨骼，附件模型的姿态写入必须与 `resetPose()` 配平（实例是全局共享的）。
+     * `lefthand_pos` / `righthand_pos` 上，直到把它切回去（这样换弹进出的那一次换源不存在硬切）
      */
     private fun resolveDeployedSubWeaponArmAnchors(stack: ItemStack, model: GeoGunModel, hand: InteractionHand) {
         val data = from(stack)
@@ -1454,7 +1434,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         if (animation?.currentGunState?.takesHandAway == true) return
 
         val (slot, definition) = findSubWeapon(data) ?: return
-        val modelPath = AttachmentSkins.modelPath(definition, data.id) ?: return
+        val modelPath = definition.modelOf(data, slot.type) ?: return
         val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: return
         val pose = animation?.subWeaponIdlePose() ?: return
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return
@@ -1549,7 +1529,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
     open fun resolveSubWeaponFlareTransform(stack: ItemStack, model: GeoGunModel): Matrix4f? {
         val (slot, definition) = findSubWeapon(from(stack)) ?: return null
 
-        val modelPath = AttachmentSkins.modelPath(definition, from(stack).id) ?: return null
+        val modelPath = definition.modelOf(from(stack), slot.type) ?: return null
         val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         val mountTransform = model.getGlobalTransform(boneName) ?: return null
@@ -1616,7 +1596,6 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
             (storage.energyStored.toDouble() / max(1, storage.maxEnergyStored)).coerceIn(0.0, 1.0)
         } ?: 0.0
     }
-
 
     open fun scriptChargeProgress(stack: ItemStack): Double {
         val progress = ClientEventHandler.chargeProgress
@@ -2005,7 +1984,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
     open fun resolveSubWeaponAimTransform(stack: ItemStack, model: GeoGunModel): Matrix4f? {
         val (slot, definition) = findSubWeapon(from(stack)) ?: return null
 
-        val modelPath = AttachmentSkins.modelPath(definition, from(stack).id) ?: return null
+        val modelPath = definition.modelOf(from(stack), slot.type) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: return null
 
@@ -2022,7 +2001,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
     open fun resolveSubWeaponIdleTransform(stack: ItemStack, model: GeoGunModel): Matrix4f? {
         val (slot, definition) = findSubWeapon(from(stack)) ?: return null
 
-        val modelPath = AttachmentSkins.modelPath(definition, from(stack).id) ?: return null
+        val modelPath = definition.modelOf(from(stack), slot.type) ?: return null
         val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return null
         val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: return null
 
@@ -2033,14 +2012,14 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
     }
 
     /**
-     * [updateSubWeaponIdleView] 用的来源标识（`"<挂点骨骼>@<附件模型路径>"`）：
-     * 换掉副武器时基准也会变，那一下同样该淡过去；取不到副武器返回 `null`。
+     * [updateSubWeaponIdleView] 用的来源标识（`"<挂点骨骼>@<附件模型路径>@<贴图路径>"`）：
+     * 换掉副武器**或给它换一套皮肤**时基准都会变，那一下同样该淡过去；取不到副武器返回 `null`。
      */
     private fun subWeaponIdleViewKey(stack: ItemStack): String? {
         val (slot, definition) = findSubWeapon(from(stack)) ?: return null
-        val modelPath = AttachmentSkins.modelPath(definition, from(stack).id) ?: return null
+        val (modelPath, texture) = definition.resolveAssets(from(stack), slot.type) ?: return null
         val boneName = AttachmentSlots.mountBoneOf(slot, definition) ?: return null
-        return "$boneName@$modelPath"
+        return "$boneName@$modelPath@$texture"
     }
 
     /**
@@ -2118,8 +2097,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 
     private fun bipodIronViewTransform(model: GeoGunModel): Matrix4f? {
         val iron = model.getGlobalTransform(IRON_VIEW_BONE)
-        val bipodIron = model.getGlobalTransform(BIPOD_IRON_VIEW_BONE)
-        if (bipodIron == null) return iron
+        val bipodIron = model.getGlobalTransform(BIPOD_IRON_VIEW_BONE) ?: return iron
 
         val progress = ClientEventHandler.bipodViewTime
         if (progress <= 0.0) return iron ?: Matrix4f(bipodIron)
@@ -2467,8 +2445,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
          */
         @JvmStatic
         fun subWeaponHasOwnAimPose(gun: GunData): Boolean {
-            val definition = findSubWeapon(gun)?.second ?: return false
-            val modelPath = AttachmentSkins.modelPath(definition, gun.id) ?: return false
+            val (slot, definition) = findSubWeapon(gun) ?: return false
+            val modelPath = definition.modelOf(gun, slot.type) ?: return false
             val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return false
             return attachmentModel.getGlobalTransform(SubWeaponInfo.VIEW_BONE) != null
         }

@@ -28,9 +28,13 @@ private const val ENTITY_ARG = "entity"
 private const val TYPE_ARG = "type"
 private const val ATTACHMENT_ARG = "attachment"
 private const val COLOR_ARG = "color"
+private const val SKIN_ARG = "skinId"
 
 /** `laserColor` 的 `<hex>` 传这个值表示清掉颜色覆盖 */
 private const val LASER_COLOR_RESET = "reset"
+
+/** `skin` 的 `<skinId>` 传这个值表示恢复配件本体模型贴图 */
+private const val SKIN_RESET = "reset"
 
 /** `RRGGBB` / `#RRGGBB` / `0xRRGGBB` */
 private val RGB_PATTERN = Regex("^(?:#|0x)?([A-Fa-f0-9]{6})$", RegexOption.IGNORE_CASE)
@@ -266,6 +270,87 @@ val ATTACHMENT_COMMAND = buildCommand("attachment") {
                 }
             }
         }
+
+        "skin" {
+            enumArg<AttachmentType>(TYPE_ARG) {
+                // 不写 skinId：查询当前皮肤
+                execute {
+                    val type = enumArg
+                    val data = mainHandGunData(entity) ?: fail { notGunMessage() }
+                    val definition = installedDefinition(data, type) ?: fail { notAttachmentMessage(type) }
+
+                    val skinId = data.attachment.getSkin(type)
+                    val skin = definition.skinOrNull(skinId)
+
+                    success {
+                        if (skin == null) {
+                            Component.translatable(
+                                "commands.superbwarfare.attachment.skin.current",
+                                entity.displayName,
+                                type.slotName(),
+                                skinId.ifBlank { AttachmentDefinition.DEFAULT_SKIN_ID },
+                                Component.translatable(
+                                    if (skinId.isBlank()) {
+                                        "commands.superbwarfare.attachment.skin.source.default"
+                                    } else {
+                                        "commands.superbwarfare.attachment.skin.source.missing"
+                                    }
+                                )
+                            )
+                        } else {
+                            Component.translatable(
+                                "commands.superbwarfare.attachment.skin.current",
+                                entity.displayName,
+                                type.slotName(),
+                                skin.name.ifBlank { skin.id },
+                                Component.translatable("commands.superbwarfare.attachment.skin.source.skin")
+                            )
+                        }
+                    }
+                }
+
+                stringWordArg(SKIN_ARG, suggests = attachmentSkinSuggestions()) {
+                    execute {
+                        val type = enumArg
+                        val raw = wordArg
+                        val data = mainHandGunData(entity) ?: fail { notGunMessage() }
+                        val definition = installedDefinition(data, type) ?: fail { notAttachmentMessage(type) }
+
+                        val reset = raw.equals(SKIN_RESET, ignoreCase = true)
+                        if (!reset && definition.skinOrNull(raw) == null) {
+                            fail {
+                                Component.translatable(
+                                    "commands.superbwarfare.attachment.fail.skin.unknown",
+                                    raw,
+                                    definition.skins.joinToString(", ") { it.id },
+                                    type.slotName()
+                                )
+                            }
+                        }
+
+                        data.attachment.setSkin(type, if (reset) null else raw)
+                        data.save()
+
+                        success {
+                            if (reset) {
+                                Component.translatable(
+                                    "commands.superbwarfare.attachment.success.skin.reset",
+                                    entity.displayName,
+                                    type.slotName()
+                                )
+                            } else {
+                                Component.translatable(
+                                    "commands.superbwarfare.attachment.success.skin",
+                                    entity.displayName,
+                                    type.slotName(),
+                                    raw
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -294,17 +379,57 @@ private fun clearAllAttachments(data: GunData, ammoSupplier: Entity) {
 }
 
 /** 取该槽位上的激光配置，槽位空或配件没有 `Laser` 段时返回 null */
-private fun laserInfoAt(data: GunData, type: AttachmentType): LaserInfo? {
-    val id = data.attachment.id(type) ?: return null
-    val definition = AttachmentDefinition.from(id) ?: return null
-    if (type !in definition.acceptedSlots) return null
-    return definition.laser
-}
+private fun laserInfoAt(data: GunData, type: AttachmentType): LaserInfo? =
+    installedDefinition(data, type)?.laser
 
 /** 该槽位没有激光配件时的报错消息 */
 private fun notLaserMessage(type: AttachmentType) = Component.translatable(
     "commands.superbwarfare.attachment.fail.laser", type.slotName()
 )
+
+/** 该槽位没装这件配件时的报错消息 */
+private fun notAttachmentMessage(type: AttachmentType) = Component.translatable(
+    "commands.superbwarfare.attachment.fail.empty", type.slotName()
+)
+
+/**
+ * [type] 槽位上装着的那件配件的定义；槽位空、或这件配件本来就不认这个槽位时返回 null。
+ *
+ * 皮肤是**装上去之后**才谈得上的东西，所以 `skin` 子命令的两条路径都先过它。
+ */
+private fun installedDefinition(data: GunData, type: AttachmentType): AttachmentDefinition? {
+    val id = data.attachment.id(type) ?: return null
+    val definition = AttachmentDefinition.from(id) ?: return null
+    if (type !in definition.acceptedSlots) return null
+    return definition
+}
+
+/**
+ * 补全皮肤 id；目标枪械与槽位都解析得出时，只列**这件配件声明的皮肤**。
+ *
+ * 与 [attachmentIdSuggestions] 同样必须兜底：补全器抛异常会让整个补全包处理失败，
+ * 连 `set` / `clear` 这些字面量补全都收不到。
+ */
+private fun attachmentSkinSuggestions(): SuggestionProvider<CommandSourceStack> =
+    SuggestionProvider { context, builder ->
+        val ids = runCatching { suggestedSkinIds(context) }
+            .onFailure { Mod.LOGGER.warn("Failed to compute attachment skin suggestions", it) }
+            .getOrDefault(emptyList())
+
+        SharedSuggestionProvider.suggest(ids, builder)
+    }
+
+private fun suggestedSkinIds(context: CommandContext<CommandSourceStack>): List<String> {
+    val type = context.parsedArgument<AttachmentType>(TYPE_ARG) ?: return emptyList()
+    // 没匹配到实体（或匹配到多个）时解析会抛异常，此时没有可补全的内容
+    val gun = runCatching { EntityArgument.getEntity(context, ENTITY_ARG) }
+        .getOrNull()
+        ?.let(::mainHandGunData)
+        ?: return emptyList()
+
+    return installedDefinition(gun, type)?.skins?.map { it.id }?.filter { it.isNotBlank() }?.sorted()
+        ?: emptyList()
+}
 
 /** 解析 `RRGGBB` / `#RRGGBB` / `0xRRGGBB`，非法返回 null */
 private fun parseRgb(raw: String): Int? {
