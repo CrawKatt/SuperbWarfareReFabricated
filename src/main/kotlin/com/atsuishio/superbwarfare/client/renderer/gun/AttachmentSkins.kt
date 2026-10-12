@@ -1,13 +1,15 @@
 package com.atsuishio.superbwarfare.client.renderer.gun
 
+import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.data.attachment.AttachmentDefinition
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.minecraft.client.Minecraft
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.ResourceManager
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener
 import net.minecraft.util.profiling.ProfilerFiller
 
-object AttachmentSkins : SimplePreparableReloadListener<Unit>() {
+object AttachmentSkins : SimplePreparableReloadListener<Unit>(), IdentifiableResourceReloadListener {
 
     private const val GEO_SUFFIX = ".geo.json"
 
@@ -59,4 +61,6 @@ object AttachmentSkins : SimplePreparableReloadListener<Unit>() {
     override fun apply(unit: Unit, resourceManager: ResourceManager, profiler: ProfilerFiller) {
         cache.clear()
     }
+
+    override fun getFabricId(): ResourceLocation = Mod.loc("attachment_skins")
 }

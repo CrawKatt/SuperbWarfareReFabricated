@@ -16,6 +16,7 @@ import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer.Companion.
 import com.atsuishio.superbwarfare.client.renderer.laser.LaserSightCapture
 import com.atsuishio.superbwarfare.client.renderer.laser.LaserSightRenderer
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeStencilRenderHelper
+import com.atsuishio.superbwarfare.client.screens.WeaponEditMountTracker
 import com.atsuishio.superbwarfare.compat.acceleratedrendering.AcceleratedRenderingCompat
 import com.atsuishio.superbwarfare.compat.oculus.OculusCompat
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
@@ -36,6 +37,7 @@ import com.atsuishio.superbwarfare.resource.gun.pojo.ItemDisplayInfo
 import com.atsuishio.superbwarfare.resource.model.AttachmentModelReloadListener
 import com.atsuishio.superbwarfare.script.GunScriptManager
 import com.atsuishio.superbwarfare.tools.BedrockBoneCoordinateTool
+import com.atsuishio.superbwarfare.tools.BoneScreenPoint
 import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
 import com.atsuishio.superbwarfare.tools.localPlayer
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnimationInstance
@@ -577,6 +579,16 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
                 // 可见性写在共享模型实例上，中间抛异常也必须还原
                 if (savedOcularBones != null) model.builtinScopeRenderer.restoreOcularBones(savedOcularBones)
                 model.builtinScopeRenderer.restoreDivisionBones(savedDivisionBones)
+            }
+
+            // 改装界面：把各槽位挂点骨骼投影成屏幕坐标，供界面摆放按钮（见 [WeaponEditMountTracker]）。
+            // 投影要的正是"模型几何原点"这一层 PoseStack —— 就是刚交给 `renderToBuffer` 的那个。
+            // 只取第一人称的主手：改装界面只对主手的枪开放，副手也拿着枪时后渲染的那一把会把结果覆盖掉。
+            if (transformType.firstPerson()
+                && ClientEventHandler.isEditing
+                && handForContext(transformType) == InteractionHand.MAIN_HAND
+            ) {
+                captureMountScreenPositions(poseStack, model)
             }
 
             // 激光束：本地玩家第一人称 + 第三人称右手（出光口已在 `renderAttachments` 里采完）。
@@ -2201,6 +2213,34 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
     }
 
     /**
+     * 逐帧把各槽位挂点骨骼投影成屏幕坐标，交给改装界面摆放按钮（见 [WeaponEditMountTracker]）。
+     *
+     * 用的是**槽位登记的固定骨骼**（[AttachmentSlot.focusBone]，即 `scope_pos` / `grip_pos`
+     * 这类约定名），而不是"配件自己的 Bone"——按钮位置必须稳定，不能因为装了什么配件就跳走。
+     * 骨骼不在模型里、或投影落到相机背面时该槽位不出现在结果里，界面据此隐藏按钮。
+     *
+     * 投影矩阵取采样这一刻生效的那一份，与 [submitScopeReticleSample] 同一套口径。
+     */
+    private fun captureMountScreenPositions(poseStack: PoseStack, model: GeoGunModel) {
+        val positions = mutableMapOf<AttachmentType, BoneScreenPoint>()
+        for (slot in AttachmentSlots.ALL) {
+            val bone = slot.focusBone ?: continue
+            val point = BedrockBoneCoordinateTool.firstPersonBonePointToScreen(
+                poseStack, model, bone, EDIT_MOUNT_POINT
+            ) ?: continue
+            positions[slot.type] = point
+        }
+
+        // 弹种不是一个槽位，骨骼得按模型挑：有 `ammo_pos` 就用它，否则退回弹匣的定位骨骼
+        val ammo = BedrockBoneCoordinateTool.firstPersonBonePointToScreen(
+            poseStack, model, ammoFocusBone(model), EDIT_MOUNT_POINT
+        )
+
+        val window = Minecraft.getInstance().window
+        WeaponEditMountTracker.update(positions, ammo, window.guiScaledWidth, window.guiScaledHeight)
+    }
+
+    /**
      * 每帧将 [com.atsuishio.superbwarfare.event.ClientEventHandler.editFocusOffset] 向
      * 改装聚焦目标偏移平滑插值，实现槽位切换时的缓动过渡。
      */
@@ -2512,6 +2552,9 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         private const val UNFOCUSED_PAN_YAW = 0.6f
         private const val UNFOCUSED_PAN_PITCH = 0.3f
         private const val VERTICAL_PITCH_START = 89.0f
+
+        /** 挂点骨骼的局部取样点：骨骼原点，也就是 `xxx_pos` 这类空骨骼本身的位置 */
+        private val EDIT_MOUNT_POINT = Vector3f()
 
         private const val MAX_SCOPE_RANGE = 500.0
 
