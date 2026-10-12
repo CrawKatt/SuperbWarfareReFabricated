@@ -5,10 +5,8 @@ import com.atsuishio.superbwarfare.client.animation.AnimationPlayType
 import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance.Companion.CHARGE_CANCEL_FADE_TICKS
 import com.atsuishio.superbwarfare.client.gun.MeleeClientHandler
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
-import com.atsuishio.superbwarfare.data.gun.ActiveGun
-import com.atsuishio.superbwarfare.data.gun.GunData
-import com.atsuishio.superbwarfare.data.gun.GunProp
-import com.atsuishio.superbwarfare.data.gun.isDrumLevel
+import com.atsuishio.superbwarfare.data.gun.*
+import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.event.DeployedWeaponHandler
 import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
@@ -253,7 +251,7 @@ open class GeoGunAnimationInstance(
             updateItem(stack)
         }
 
-        val gunFire = GunResource.compute(hostStack).animation?.fire
+        val gunFire = hostFireName(GunResource.compute(hostStack).animation, hostStack)
         pendingFireAnimation = fireName
         subWeaponFire = candidates.isNotEmpty() && fireName != gunFire
 
@@ -437,6 +435,11 @@ open class GeoGunAnimationInstance(
         return GunData.from(stack).isDrumLevel()
     }
 
+    private fun handGuardName(base: String?, handGuard: String?): String? {
+        if (handGuard == null || !animations.containsKey(handGuard) || !GunData.from(stack).showsHandGuard()) return base
+        return handGuard
+    }
+
     private fun normalReloadName(animation: GunAnimation): String? {
         if (isDeployedGun()) {
             val deployName = animation.reloadNormalDeploy
@@ -446,7 +449,7 @@ open class GeoGunAnimationInstance(
             val drumName = animation.reloadNormalDrum
             if (drumName != null && animations.containsKey(drumName)) return drumName
         }
-        return animation.reloadNormal
+        return handGuardName(animation.reloadNormal, animation.reloadNormalHandGuard)
     }
 
     private fun emptyReloadName(animation: GunAnimation): String? {
@@ -458,7 +461,19 @@ open class GeoGunAnimationInstance(
             val drumName = animation.reloadEmptyDrum
             if (drumName != null && animations.containsKey(drumName)) return drumName
         }
-        return animation.reloadEmpty
+        return handGuardName(animation.reloadEmpty, animation.reloadEmptyHandGuard)
+    }
+
+    private fun hostFireName(animation: GunAnimation?, stack: ItemStack): String? {
+        if (animation == null) return null
+        // 两个都装上时护木优先：它换的是枪管那一段
+        val handGuard = handGuardName(animation.fire, animation.fireHandGuard)
+        if (handGuard != animation.fire) return handGuard
+        val stock = animation.fireStock
+        if (stock != null && animations.containsKey(stock) && GunData.from(stack).attachment.has(AttachmentType.STOCK)) {
+            return stock
+        }
+        return animation.fire
     }
 
     private fun isDeployedGun(): Boolean {
@@ -562,10 +577,10 @@ open class GeoGunAnimationInstance(
     private fun animationName(animation: GunAnimation?, state: GunAnimationState): String? {
         if (animation == null) return null
         return when (state) {
-            GunAnimationState.IDLE -> animation.idle
-            GunAnimationState.EDIT -> animation.edit
+            GunAnimationState.IDLE -> handGuardName(animation.idle, animation.idleHandGuard)
+            GunAnimationState.EDIT -> handGuardName(animation.edit, animation.editHandGuard)
             GunAnimationState.BOLT -> animation.bolt
-            GunAnimationState.RELOAD -> animation.reload
+            GunAnimationState.RELOAD -> handGuardName(animation.reload, animation.reloadHandGuard)
             GunAnimationState.RELOAD_NORMAL -> normalReloadName(animation)
             GunAnimationState.RELOAD_EMPTY -> emptyReloadName(animation)
             GunAnimationState.PREPARE -> animation.prepare
@@ -574,7 +589,7 @@ open class GeoGunAnimationInstance(
             GunAnimationState.ITERATIVE_2 -> animation.iterative
             GunAnimationState.FINISH -> animation.finish
             GunAnimationState.MELEE -> resolveMeleeName()
-            GunAnimationState.FIRE -> animation.fire
+            GunAnimationState.FIRE -> hostFireName(animation, stack)
             GunAnimationState.CHARGE -> animation.charge
         }
     }
@@ -642,7 +657,7 @@ open class GeoGunAnimationInstance(
         }
     }
 
-    private fun play(state: GunAnimationState) {
+    private fun play(state: GunAnimationState, keepProgress: Boolean = false) {
         val name = animationName(state) ?: return
         val animation = animations[name] ?: return
         val playState = state.playType.state()
@@ -653,9 +668,22 @@ open class GeoGunAnimationInstance(
         }
         val newRunner = AnimationRunner(animation, AnimationContext(animation.specifiedEndTimeS))
         newRunner.state = playState
+        // 只是换了变体（装上/卸下护木这类）：把播放头按比例接过去，不然整段会从头再播一遍
+        if (keepProgress) {
+            val old = runner
+            val oldMax = old?.maxProgress ?: 0L
+            if (old != null && oldMax > 0L) {
+                newRunner.progress = (old.progress.toDouble() / oldMax * newRunner.maxProgress).toLong()
+            }
+        }
         runner = newRunner
         currentState = state
         cachedPose = newRunner.evaluate()
+    }
+
+    private fun playsCurrentClip(state: GunAnimationState): Boolean {
+        val clip = animationName(state)?.let(animations::get) ?: return true
+        return runner?.animation === clip
     }
 
     private fun playFire() {
@@ -721,7 +749,7 @@ open class GeoGunAnimationInstance(
             }
         }
 
-        return animation?.fire
+        return hostFireName(animation, stack)
     }
 
     /**
@@ -1561,6 +1589,9 @@ open class GeoGunAnimationInstance(
         } else if (newMeleeSwing && currentState == GunAnimationState.MELEE) {
             // 连招/连挥：状态没变但确实开了新的一段，重播一次（不重建状态，只换 runner）
             play(GunAnimationState.MELEE)
+        } else if (currentState != GunAnimationState.MELEE && !playsCurrentClip(target)) {
+            // 状态没变但该播的 clip 换了（装上/卸下护木这类变体），换 runner 但接着旧进度走
+            play(target, keepProgress = true)
         } else {
             runner?.tick()
         }

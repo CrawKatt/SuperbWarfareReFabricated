@@ -146,7 +146,6 @@
       "superbwarfare:muzzle_compensator_r_17",
       "superbwarfare:ar_silencer",
       "superbwarfare:loudspeaker",
-      "superbwarfare:silencer_qinglan",
       "superbwarfare:steel_pipe_silencer",
       "superbwarfare:milencer",
       "superbwarfare:bayonet_6kh2"
@@ -172,6 +171,9 @@
     "Grip": [
       "LowerRail"
     ]
+  },
+  "HandGuard": {
+    "Grip": true
   },
   "SoundInfo": {
     "Fire1P": "superbwarfare:ak_47_fire_1p",
