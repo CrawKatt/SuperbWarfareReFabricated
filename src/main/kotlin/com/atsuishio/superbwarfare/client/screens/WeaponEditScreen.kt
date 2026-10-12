@@ -164,7 +164,7 @@ class WeaponEditScreen(private val stack: ItemStack) : Screen(Component.empty())
 
         editingAttachmentType = index
         editModelShake()
-        localPlayer?.playSound(ModSounds.EDIT.get(), 1f, 1f)
+        localPlayer?.playSound(ModSounds.EDIT, 1f, 1f)
     }
 
     /**

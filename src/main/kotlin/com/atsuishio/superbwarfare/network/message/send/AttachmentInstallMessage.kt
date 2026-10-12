@@ -59,7 +59,7 @@ private fun uninstall(player: ServerPlayer, data: GunData, type: AttachmentType)
     data.save()
 
     returnItem(player, current)
-    player.playLocalSound(ModSounds.ATTACHMENT_REMOVE.get(), 1f, 1f)
+    player.playLocalSound(ModSounds.ATTACHMENT_REMOVE, 1f, 1f)
 }
 
 /**
@@ -82,7 +82,7 @@ private fun install(player: ServerPlayer, data: GunData, type: AttachmentType, i
     data.save()
 
     previous?.let { returnItem(player, it) }
-    player.playLocalSound(ModSounds.ATTACHMENT_SET.get(), 1f, 1f)
+    player.playLocalSound(ModSounds.ATTACHMENT_SET, 1f, 1f)
 }
 
 /** 换这个槽位的配件前先把已装填的弹药退还给玩家（目前只有弹匣槽位需要）。 */
