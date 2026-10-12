@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler.editModelShake
 import com.atsuishio.superbwarfare.event.ClientEventHandler.editingAttachmentType
 import com.atsuishio.superbwarfare.event.ClientEventHandler.onCloseEditScreen
 import com.atsuishio.superbwarfare.init.ModKeyMappings
+import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.attachment.AttachmentProvider
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.network.message.send.AttachmentInstallMessage
@@ -164,6 +165,7 @@ class WeaponEditScreen(private val stack: ItemStack) : Screen(Component.empty())
 
         editingAttachmentType = index
         editModelShake()
+        localPlayer?.playSound(ModSounds.EDIT.get(), 1f, 1f)
     }
 
     /**
