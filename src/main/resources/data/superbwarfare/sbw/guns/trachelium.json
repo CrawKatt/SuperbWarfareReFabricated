@@ -13,7 +13,7 @@
   "BypassesArmor": 0.5,
   "SoundRadius": 10,
   "ZoomReload": false,
-  "RPM": 180,
+  "RPM": 120,
   "GunType": "Handgun",
   "AmmoType": [
     "@RifleAmmo",
