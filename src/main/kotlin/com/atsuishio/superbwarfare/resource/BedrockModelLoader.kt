@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.resource
 
+import com.atsuishio.superbwarfare.client.renderer.gun.AttachmentSkins
 import com.atsuishio.superbwarfare.client.renderer.gun.GunEmissiveTextures
 import com.atsuishio.superbwarfare.resource.model.*
 import net.fabricmc.api.EnvType
@@ -25,5 +26,7 @@ object BedrockModelLoader {
         resources.registerReloadListener(AttachmentModelReloadListener)
         // 只是清一下"哪张枪械贴图有 _e 自发光层"的缓存：这个答案只在换资源包时才会变。
         resources.registerReloadListener(GunEmissiveTextures)
+        // 同理：清"哪件配件有皮肤"的缓存
+        resources.registerReloadListener(AttachmentSkins)
     }
 }
