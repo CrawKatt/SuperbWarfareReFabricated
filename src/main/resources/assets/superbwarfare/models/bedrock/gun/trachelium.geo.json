@@ -7869,6 +7869,11 @@
 					"pivot": [0, 3.313, 13.5271]
 				},
 				{
+					"name": "bipod_view",
+					"parent": "positioning",
+					"pivot": [0, 6.7564, 10.7771]
+				},
+				{
 					"name": "thirdperson_hand",
 					"parent": "positioning",
 					"pivot": [0, 0.47248, -0.84318]
