@@ -103,6 +103,12 @@ object ModPerks {
     @JvmField val SHATTER_CAPS = autoRegistryObjects["shatter_caps"] ?: registerAmmoPerk("shatter_caps") {
         EmptyPerk("shatter_caps", Perk.Type.AMMO)
     }
+    @JvmField val ACID_BULLET = autoRegistryObjects["acid_bullet"] ?: registerAmmoPerk("acid_bullet") {
+        EmptyPerk("acid_bullet", Perk.Type.AMMO)
+    }
+    @JvmField val IRRADIATION_BULLET = autoRegistryObjects["irradiation_bullet"] ?: registerAmmoPerk("irradiation_bullet") {
+        EmptyPerk("irradiation_bullet", Perk.Type.AMMO)
+    }
     // @formatter:on
 
     private fun registerFuncPerk(id: String, perk: () -> Perk): Perk {
