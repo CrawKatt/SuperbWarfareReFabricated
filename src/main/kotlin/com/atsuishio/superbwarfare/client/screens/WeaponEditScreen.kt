@@ -28,8 +28,7 @@ import net.minecraft.world.item.ItemStack
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import org.lwjgl.glfw.GLFW
-import java.util.Locale
-import kotlin.math.roundToInt
+import java.util.*
 
 /**
  * 改枪界面。
@@ -120,9 +119,17 @@ class WeaponEditScreen(private val stack: ItemStack) : Screen(Component.empty())
 
         doc.getElementById(AMMO_MOUNT_ID)?.addEventListener("click") { onAmmoClicked() }
 
-        // 空白处与挂点按钮 / 面板是兄弟节点，点按钮不会顺带点到它。
-        // 点空白处关界面 —— 与旧界面"点面板外就关闭"的习惯一致。
-        doc.getElementById(BACKDROP_ID)?.addEventListener("click") { this.onClose() }
+        // 空白处与挂点按钮 / 面板是兄弟节点，点按钮不会顺带点到它
+        doc.getElementById(BACKDROP_ID)?.addEventListener("click") { onBackdropClicked() }
+    }
+
+    /** 空白处先退一级：正在选配件就退回挂点层，已经在挂点层才关界面（与 ESC 同一套）。 */
+    private fun onBackdropClicked() {
+        if (editingAttachmentType != -1) {
+            editingAttachmentType = -1
+            return
+        }
+        onClose()
     }
 
     private fun wirePanel(doc: Document) {
@@ -270,10 +277,10 @@ class WeaponEditScreen(private val stack: ItemStack) : Screen(Component.empty())
             }
         }
 
-        val maxLeft = (WeaponEditMountTracker.guiWidth - PANEL_WIDTH).coerceAtLeast(0)
-        val maxTop = (WeaponEditMountTracker.guiHeight - PANEL_HEIGHT).coerceAtLeast(0)
-        panel.style.left = "${(point.x + PANEL_GAP).roundToInt().coerceIn(0, maxLeft)}px"
-        panel.style.top = "${(point.y - PANEL_HEIGHT / 2f).roundToInt().coerceIn(0, maxTop)}px"
+        val maxLeft = (WeaponEditMountTracker.guiWidth - PANEL_WIDTH).coerceAtLeast(0).toFloat()
+        val maxTop = (WeaponEditMountTracker.guiHeight - PANEL_HEIGHT).coerceAtLeast(0).toFloat()
+        panel.style.left = px((point.x + PANEL_GAP).coerceIn(0f, maxLeft))
+        panel.style.top = px((point.y - PANEL_HEIGHT / 2f).coerceIn(0f, maxTop))
     }
 
     /**
@@ -313,9 +320,12 @@ class WeaponEditScreen(private val stack: ItemStack) : Screen(Component.empty())
     /** 按钮中心落在骨骼投影点上（[MOUNT_RADIUS] 是按钮外框边长的一半）。 */
     private fun place(element: Element, x: Float, y: Float) {
         element.style.display = "flex"
-        element.style.left = "${(x - MOUNT_RADIUS).roundToInt()}px"
-        element.style.top = "${(y - MOUNT_RADIUS).roundToInt()}px"
+        element.style.left = px(x - MOUNT_RADIUS)
+        element.style.top = px(y - MOUNT_RADIUS)
     }
+
+    /** 位置每帧都在动，取整到像素会让按钮一格一格地跳；AUI 的布局是浮点的，直接给小数。 */
+    private fun px(value: Float): String = String.format(Locale.ROOT, "%.2fpx", value)
 
     /** 把 [container] 里那个 `<item>` 换成 [itemId]；值没变就跳过，避免无谓地让 AUI 重解析。 */
     private fun setElementItem(container: Element, itemId: String) {
