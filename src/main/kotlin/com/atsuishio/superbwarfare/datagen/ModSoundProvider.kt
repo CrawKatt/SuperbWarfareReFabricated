@@ -64,6 +64,7 @@ class ModSoundProvider(private val output: PackOutput) : DataProvider {
             "edit_mode", "edit", "open", "into_cannon", "into_missile", "missile_reload", "lunge_mine_growl",
             "laser_tower_shoot", "turret_turn", "smoke_fire",
         )
+        root("attachment_set", "attachment_remove")
         register("rocket_fly") { attenuationDistance(128) }
         register("shell_fly") { attenuationDistance(96) }
         register("rocket_engine") { attenuationDistance(128) }
@@ -510,6 +511,7 @@ class ModSoundProvider(private val output: PackOutput) : DataProvider {
         group(
             "gun/trachelium", "trachelium_fire_1p", "trachelium_fire_3p", "trachelium_far", "trachelium_veryfar",
             "trachelium_fire_1p_s", "trachelium_fire_3p_s", "trachelium_bolt", "trachelium_open", "trachelium_ammo_in", "trachelium_close"
+            , "trachelium_bullet_drop"
         )
 
         // -------------------- gun/vector --------------------
