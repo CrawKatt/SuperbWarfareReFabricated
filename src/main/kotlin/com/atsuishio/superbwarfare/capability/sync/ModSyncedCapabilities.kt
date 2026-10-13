@@ -1,17 +1,12 @@
 package com.atsuishio.superbwarfare.capability.sync
 
 import com.atsuishio.superbwarfare.capability.ModCapabilities
-import com.atsuishio.superbwarfare.capability.entity.InfiniteAmmoCapability
-import com.atsuishio.superbwarfare.capability.living.PhosphorusFireCapability
-import com.atsuishio.superbwarfare.capability.living.RadiationCapability
-import com.atsuishio.superbwarfare.capability.player.PlayerDeployState
-import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 
 /**
- * 所有参与自动同步的 capability 的登记入口。
+ * 把所有参与自动同步的 capability 登记进 [CapabilitySync]。
  *
- * 新增一个自动同步的 capability 时，在这里加一行 [CapabilitySync.register]，
- * 并在其写入点调用 [CapabilitySync.markDirty] 即可，无需再写同步包。
+ * 列表来自 [ModCapabilities.ALL]，因此新增一个 capability 时不需要改这里 ——
+ * 在 [ModCapabilities] 里登记一行就够了。
  */
 object ModSyncedCapabilities {
 
@@ -21,24 +16,8 @@ object ModSyncedCapabilities {
         if (initialized) return
         initialized = true
 
-        CapabilitySync.register(InfiniteAmmoCapability.ID) { entity ->
-            ModCapabilities.INFINITE_AMMO.maybeGet(entity).orElse(null)
-        }
-
-        CapabilitySync.register(PhosphorusFireCapability.ID) { entity ->
-            ModCapabilities.PHOSPHORUS_FIRE.maybeGet(entity).orElse(null)
-        }
-
-        CapabilitySync.register(RadiationCapability.ID) { entity ->
-            ModCapabilities.RADIATION_CAPABILITY.maybeGet(entity).orElse(null)
-        }
-
-        CapabilitySync.register(PlayerVariable.ID) { entity ->
-            ModCapabilities.PLAYER_VARIABLE.maybeGet(entity).orElse(null)
-        }
-
-        CapabilitySync.register(PlayerDeployState.ID) { entity ->
-            ModCapabilities.PLAYER_DEPLOY_STATE.maybeGet(entity).orElse(null)
+        for (capability in ModCapabilities.ALL) {
+            CapabilitySync.register(capability.id) { entity -> capability.syncedHolder(entity) }
         }
 
         CapabilitySync.registerEvents()

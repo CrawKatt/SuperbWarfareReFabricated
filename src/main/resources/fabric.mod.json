@@ -21,7 +21,7 @@
       "com.atsuishio.superbwarfare.datagen.DataGenerators"
     ],
     "cardinal-components-entity": [
-      "com.atsuishio.superbwarfare.capability.ModCapabilities"
+      "com.atsuishio.superbwarfare.capability.CapabilityHandler"
     ]
   },
   "custom": {

@@ -18,6 +18,29 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 
+/**
+ * Capability 自动同步框架。
+ *
+ * Forge 的 Capability 系统只负责持久化（`ICapabilitySerializable` + `AttachCapabilitiesEvent`）
+ * 与玩家重生时的数据搬运，**不会**把数据发给客户端，官方要求各 mod 自己用包同步，
+ * 并且明确列出三个必须自己处理同步的时机：实体生成、数据变化、新客户端开始观察。
+ *
+ * 本对象把这三件事一次性地接过来：
+ *
+ * 1. **何时同步**：[markDirty] 只打脏标记，真正的发包统一在服务端 tick 结束时由 [flush] 完成，
+ *    同一 tick 内的多次修改会合并成一个包，同一实体上的多个 capability 也会合并。
+ * 2. **向谁同步**：由 [SyncedCapability.syncTarget] 决定，收件人交给 `PacketDistributor`
+ *    与实体 tracking 集合解析，不再在每个调用点手写 `sendPacketToTrackingThis`。
+ * 3. **全量补发**：`StartTracking`（新观察者）、玩家登录/重生/换维度时自动推送完整数据。
+ *    玩家自己的实体不在自己的 tracking 集合里，且客户端在重生/换维度时不会重建本地玩家实体，
+ *    因此这几处必须显式补发，否则客户端会一直留着旧值。
+ *
+ * 新增一个自动同步的 capability 只需要在 `ModCapabilities` 里登记一行：挂载、存档读写与
+ * 这里的登记都会自动完成；数据由 `CapabilityWrapper` 用 kotlinx 序列化器编解码，
+ * 框架只负责"什么时候发、发给谁、怎么打包"。
+ *
+ * 线程约束：注册表与脏集合只在服务端主线程读写（tick、命令、物品交互、效果事件都在主线程）。
+ */
 object CapabilitySync {
     private data class Entry(
         val id: ResourceLocation,
