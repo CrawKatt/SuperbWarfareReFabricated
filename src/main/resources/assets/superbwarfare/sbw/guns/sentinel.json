@@ -23,6 +23,21 @@
     "LODModel": "superbwarfare:models/bedrock/gun_lod/sentinel.geo.json",
     "LODTexture": "superbwarfare:textures/bedrock/gun_lod/sentinel.png"
   },
+  "TextShow": [
+    {
+      "Bone": "ammo_count_text",
+      "Scale": 0.0025,
+      "Align": "Center",
+      "ColorMode": "Switch",
+      "Color": {
+        "Default": "A0D7FF",
+        "0.5": "FF6127",
+        "0.25": "FF0000"
+      },
+      "Shadow": false,
+      "Text": "%ammo_count%"
+    }
+  ],
   "FlareSize": 1.2,
   "HasSmoke": true,
   "Smoke": {

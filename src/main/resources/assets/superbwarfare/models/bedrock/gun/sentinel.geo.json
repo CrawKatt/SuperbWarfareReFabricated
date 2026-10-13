@@ -7314,13 +7314,13 @@
 					]
 				},
 				{
-					"name": "magzine_pos",
+					"name": "magazine_pos",
 					"parent": "root",
 					"pivot": [0, -2.78954, 16.5937]
 				},
 				{
 					"name": "lefthand",
-					"parent": "magzine_pos",
+					"parent": "magazine_pos",
 					"pivot": [-6.01875, 18, 0]
 				},
 				{
@@ -7344,7 +7344,7 @@
 				},
 				{
 					"name": "bone45",
-					"parent": "magzine_pos",
+					"parent": "magazine_pos",
 					"pivot": [-0.40551, 1.44567, 17.25621],
 					"cubes": [
 						{
@@ -7487,6 +7487,12 @@
 					"name": "scope_pos",
 					"parent": "root",
 					"pivot": [0, 3.72813, 1.5625]
+				},
+				{
+					"name": "ammo_count_text",
+					"parent": "root",
+					"pivot": [0, 3.33874, 7.81613],
+					"rotation": [67.5, 0, 0]
 				},
 				{
 					"name": "positioning",
