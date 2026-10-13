@@ -1,8 +1,10 @@
 {
   "Icon": "superbwarfare:textures/gun_icon/sentinel_icon.png",
   "SlotIcon": "superbwarfare:textures/item/sentinel_icon.png",
+  "Script": "superbwarfare:scripts/guns/sentinel.js",
   "Animation": {
     "Idle": "animation.sentinel.idle",
+    "Loop": "animation.sentinel.loop",
     "Fire": "animation.sentinel.fire",
     "ReloadNormal": "animation.sentinel.reload_normal",
     "ReloadEmpty": "animation.sentinel.reload_empty",
