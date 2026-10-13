@@ -129,8 +129,6 @@ object ModItems {
     @JvmField val REFORGING = registerGun("reforging") { GeoGunItem(Properties().rarity(SUPERB)) }
     @JvmField val RAUBTIER = registerGun("raubtier") { GeoGunItem(Properties().rarity(SUPERB)) }
 
-//    @JvmField val BEAST_GUN_TEST = registerGun<BeastGunTestItem>()
-
     @JvmField val VEHICLE_GUN = registerGun("vehicle_gun") { VehicleGunItem() }
     @JvmField val EMPTY_GUN = registerGun("empty_gun") { EmptyGunItem() }
     // @formatter:on

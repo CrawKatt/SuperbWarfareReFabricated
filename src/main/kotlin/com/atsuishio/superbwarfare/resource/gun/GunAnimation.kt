@@ -152,9 +152,6 @@ class GunAnimation {
     @SerialName("Melee")
     var melee: SingleOrList<String>? = null
 
-    /** 第一支近战 clip 名；没配或配成空列表时返回 `null`（老 GeckoLib 路径用） */
-    fun firstMeleeName(): String? = melee?.list?.firstOrNull()
-
     /**
      * 换弹 clip 名
      */
