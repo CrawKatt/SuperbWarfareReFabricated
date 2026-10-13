@@ -70,12 +70,11 @@ SuperbWarfare 是一个 Minecraft Forge 1.20.1 军事题材模组。Kotlin/Java 
 | `data/vehicle/` | VehicleData, VehiclePropertyModifier                                                            |
 | `data/launchable/` | ShootData, LaunchableEntityTool                                                                 |
 | `data/mob_guns/` | 生物用枪数据                                                                                          |
-| `data/drone_attachment/` | 无人机挂载数据                                                                                         |
 | `item/gun/` | 全部具体枪械物品类（约45把枪，按类型分目录）                                                                         |
 | `item/gun/vehicle/` | VehicleGun.kt（载具武器的抽象基类）                                                                        |
 | `resource/gun/` | GunResource, DefaultGunResource, GunAnimation                                                   |
 | `entity/vehicle/utils/` | VehicleMiscUtils                                                                                |
-| `client/` | Java 客户端代码（GunRendererBuilder, PoseTool, 30+ 枪械 ItemRenderer, 30+ 枪械 ItemModel, layer/vehicle/） |
+| `client/` | Java 客户端代码（GunRendererBuilder, PoseTool, 30+ 枪械 ItemRenderer, 30+ 枪械 ItemModel） |
 | `mixins/` | Mixin（Player, Villager, Mob, KeyMapping, LightTexture 等）                                   |
 | `compat/netmusic/` | NetMusic 兼容内部持有类（未完成）                                                                           |
 
@@ -84,8 +83,7 @@ SuperbWarfare 是一个 Minecraft Forge 1.20.1 军事题材模组。Kotlin/Java 
 ```
 Entity (Minecraft)
   ├─ VehicleEntity (base/VehicleEntity.kt:132) — 载具基类
-  │    ├─ GeoVehicleEntity (base/GeoVehicleEntity.kt) — GeckoLib 载具（未来要删除）
-  │    │    └─ Lav150Entity, Lav25Entity, M1A2Entity, T90aEntity 等
+  │    ├─ M1A2Entity, T90aEntity, Plz05Entity 等 — 具体载具
   │    └─ AutoAimableEntity (base/AutoAimableEntity.kt:53) — 自动瞄准
   │         └─ ArtilleryEntity (base/ArtilleryEntity.kt) — 火炮
   │              └─ GeckoArtilleryEntity (base/GeckoArtilleryEntity.kt:10) — 临时桥接

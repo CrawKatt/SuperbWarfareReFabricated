@@ -12,9 +12,9 @@ object ModProperties {
     @SubscribeEvent
     fun propertyOverrideRegistry(event: FMLClientSetupEvent) {
         event.enqueueWork {
-            ItemProperties.register(ModItems.MONITOR.get(), loc("monitor_linked")) { itemStack, _, _, _ ->
-                if (itemStack.tag != null && itemStack.tag!!.getBoolean("Linked")) 1f else 0f
-            }
+//            ItemProperties.register(ModItems.MONITOR.get(), loc("monitor_linked")) { itemStack, _, _, _ ->
+//                if (itemStack.tag != null && itemStack.tag!!.getBoolean("Linked")) 1f else 0f
+//            }
         }
         event.enqueueWork {
             ItemProperties.register(ModItems.ARMOR_PLATE.get(), loc("armor_plate_infinite")) { itemStack, _, _, _ ->

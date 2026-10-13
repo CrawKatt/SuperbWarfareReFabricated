@@ -60,10 +60,6 @@ open class ArtilleryIndicatorItem : Item(Properties().stacksTo(1).rarity(Rarity.
         pTooltipComponents.add(
             Component.translatable("des.superbwarfare.artillery_indicator_4").withStyle(ChatFormatting.GRAY)
         )
-        pTooltipComponents.add(Component.literal(" ").withStyle(ChatFormatting.GRAY))
-        pTooltipComponents.add(
-            Component.translatable("des.superbwarfare.artillery_indicator_5").withStyle(ChatFormatting.GRAY)
-        )
     }
 
     override fun getUseDuration(stack: ItemStack): Int {

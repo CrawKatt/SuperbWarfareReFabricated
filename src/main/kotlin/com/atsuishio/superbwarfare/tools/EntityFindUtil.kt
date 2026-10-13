@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.tools
 
-import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
@@ -63,15 +62,6 @@ object EntityFindUtil {
     fun findPlayer(level: Level, uuidString: String): Player? {
         val target = findEntity(level, uuidString)
         if (target is Player) {
-            return target
-        }
-        return null
-    }
-
-    @JvmStatic
-    fun findDrone(level: Level, uuidString: String): DroneEntity? {
-        val target = findEntity(level, uuidString)
-        if (target is DroneEntity) {
             return target
         }
         return null

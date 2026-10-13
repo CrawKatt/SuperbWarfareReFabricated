@@ -11,7 +11,10 @@ import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModMobEffects
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.network.message.send.MouseMoveMessage
-import com.atsuishio.superbwarfare.tools.*
+import com.atsuishio.superbwarfare.tools.localPlayer
+import com.atsuishio.superbwarfare.tools.mc
+import com.atsuishio.superbwarfare.tools.notInGame
+import com.atsuishio.superbwarfare.tools.sendPacketToServer
 import net.minecraft.client.CameraType
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec2
@@ -83,29 +86,6 @@ object ClientMouseHandler {
         val moveSpeedX = Mth.clamp(posN.x - posO.x, -speed, speed)
         val moveSpeedY = Mth.clamp(posN.y - posO.y, -speed, speed)
 
-
-        val stack = player.mainHandItem
-
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
-        ) {
-            val drone =
-                EntityFindUtil.findDrone(player.level(), stack.getOrCreateTag().getString("LinkedDrone")) ?: return
-
-            speedX = (drone.mouseSensitivity / ClientEventHandler.droneFovLerp) * moveSpeedX
-            speedY = (drone.mouseSensitivity / ClientEventHandler.droneFovLerp) * moveSpeedY
-
-            lerpSpeedX = Mth.lerp(0.3, lerpSpeedX, speedX)
-            lerpSpeedY = Mth.lerp(0.3, lerpSpeedY, speedY)
-
-            if (notInGame) {
-                sendPacketToServer(MouseMoveMessage(0.0, 0.0))
-            } else {
-                sendPacketToServer(MouseMoveMessage(lerpSpeedX, lerpSpeedY))
-            }
-
-            return
-        }
 
         val vehicle = player.vehicle
         if (vehicle is VehicleEntity && (vehicle.vehicleType == VehicleType.AIRPLANE || vehicle.vehicleType == VehicleType.HELICOPTER)) {
@@ -266,14 +246,6 @@ object ClientMouseHandler {
     fun changeSensitivity(original: Double): Double {
         val player = localPlayer ?: return original
         if (player.hasEffect(ModMobEffects.SHOCK.get()) && !player.isSpectator) {
-            return 0.0
-        }
-
-        val stack = player.mainHandItem
-
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
-        ) {
             return 0.0
         }
 

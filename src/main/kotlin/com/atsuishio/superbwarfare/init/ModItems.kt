@@ -275,7 +275,6 @@ object ModItems {
     @JvmField val LARGE_MOTOR = registerItem("large_motor")
     @JvmField val WHEEL = registerItem("wheel")
     @JvmField val TRACK = registerItem("track")
-    @JvmField val DRONE = registerItem<DroneItem>()
 
     @JvmField val MONITOR = registerItem<MonitorItem>()
     @JvmField val ARTILLERY_INDICATOR = registerItem<ArtilleryIndicatorItem>()

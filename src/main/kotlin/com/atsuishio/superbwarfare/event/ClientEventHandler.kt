@@ -34,7 +34,6 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler.SPRINT_EASE_ROT_Y_IN
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
-import com.atsuishio.superbwarfare.item.misc.MonitorItem
 import com.atsuishio.superbwarfare.network.message.send.*
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
@@ -266,12 +265,6 @@ object ClientEventHandler {
         val charged = chargedRecoilY
         return if (charged != null && chargedRecoilActive()) charged else data.get(GunProp.RECOIL_Y)
     }
-
-    @JvmField
-    var droneFov: Double = 1.0
-
-    @JvmField
-    var droneFovLerp: Double = 1.0
 
     @JvmField
     var currentFov: Double = 0.0
@@ -828,9 +821,7 @@ object ClientEventHandler {
     }
 
     fun handleArtilleryIndicator(player: Player, stack: ItemStack) {
-        if ((stack.`is`(ModItems.ARTILLERY_INDICATOR.get()) || (stack.`is`(ModItems.MONITOR.get())
-                    && player.offhandItem.`is`(ModItems.ARTILLERY_INDICATOR.get()))) && holdingFireKey
-        ) {
+        if (stack.`is`(ModItems.ARTILLERY_INDICATOR.get()) && holdingFireKey) {
             holdArtilleryIndicator = (holdArtilleryIndicator + 1).coerceIn(0, 20)
             if (holdArtilleryIndicator >= 19 && shootCoolDown == 0) {
                 sendPacketToServer(ArtilleryIndicatorFireMessage)
@@ -861,12 +852,8 @@ object ClientEventHandler {
         var keys: Short = 0
         val vehicle = player.vehicle
 
-        // 正在游戏内控制载具或无人机
-        if (!notInGame && (vehicle is VehicleEntity && vehicle.firstPassenger == player) ||
-            (stack.`is`(ModItems.MONITOR.get()) && stack.tag != null
-                    && stack.tag!!.getBoolean(MonitorItem.USING)
-                    && stack.tag!!.getBoolean(MonitorItem.LINKED))
-        ) {
+        // 正在游戏内控制载具
+        if (!notInGame && (vehicle is VehicleEntity && vehicle.firstPassenger == player)) {
             if (ModKeyMappings.MOVE_LEFT.isDown) {
                 keys = keys or 0b000000001
             }
@@ -2194,12 +2181,6 @@ object ClientEventHandler {
         val player = localPlayer ?: return
         val stack = entity.mainHandItem
 
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
-        ) {
-            handleDroneCamera(event, entity)
-        }
-
         val yaw = event.yaw
         val pitch = event.pitch
         val roll = event.roll
@@ -2257,13 +2238,6 @@ object ClientEventHandler {
         handleShockCamera(event, entity)
     }
 
-    private fun handleDroneCamera(event: ViewportEvent.ComputeCameraAngles, entity: LivingEntity) {
-        val stack = entity.mainHandItem
-        val drone = EntityFindUtil.findDrone(entity.level(), stack.getOrCreateTag().getString("LinkedDrone")) ?: return
-        cameraRoll =
-            drone.getRoll(event.partialTick.toFloat() * (1 - (drone.getPitch(event.partialTick.toFloat()) / 90)))
-    }
-
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderHand(event: RenderHandEvent) {
         val player = localPlayer ?: return
@@ -2300,13 +2274,6 @@ object ClientEventHandler {
         }
 
         val stack = player.mainHandItem
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
-        ) {
-            if (EntityFindUtil.findDrone(player.level(), stack.getOrCreateTag().getString("LinkedDrone")) != null) {
-                event.isCanceled = true
-            }
-        }
 
         val vehicle = player.vehicle
         if (vehicle is VehicleEntity && (vehicle.banHand(player) ||
@@ -3046,14 +3013,6 @@ object ClientEventHandler {
             lastX = player.xRot
             lastY = player.yRot
         }
-
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
-        ) {
-            droneFovLerp = Mth.lerp(0.1 * getDelta(), droneFovLerp, droneFov)
-            event.fov /= droneFovLerp
-            currentFov = event.fov
-        }
     }
 
     fun look(player: Player, target: Vec3) {
@@ -3121,12 +3080,6 @@ object ClientEventHandler {
         }
 
         if (vehicle is VehicleEntity && vehicle.banHand(player)) {
-            event.isCanceled = true
-        }
-
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
-        ) {
             event.isCanceled = true
         }
     }

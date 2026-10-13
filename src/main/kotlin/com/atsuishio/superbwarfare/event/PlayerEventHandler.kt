@@ -32,15 +32,6 @@ import kotlin.math.ceil
 @Mod.EventBusSubscriber
 object PlayerEventHandler {
     @SubscribeEvent
-    fun onPlayerLoggedIn(event: PlayerEvent.PlayerLoggedInEvent) {
-        val player = event.entity
-        val stack = player.mainHandItem
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")) {
-            stack.getOrCreateTag().putBoolean("Using", false)
-        }
-    }
-
-    @SubscribeEvent
     fun onPlayerRespawned(event: PlayerEvent.PlayerRespawnEvent) {
         val player = event.entity ?: return
 
