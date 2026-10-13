@@ -28,8 +28,6 @@ import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem
 import com.atsuishio.superbwarfare.item.gun.machinegun.M2HBItem
 import com.atsuishio.superbwarfare.item.gun.machinegun.MinigunItem
 import com.atsuishio.superbwarfare.item.gun.shotgun.HomemadeShotgunItem
-import com.atsuishio.superbwarfare.item.gun.sniper.SentinelItem
-import com.atsuishio.superbwarfare.item.gun.special.BeastGunTestItem
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem
 import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGunItem
 import com.atsuishio.superbwarfare.item.material.*
@@ -134,7 +132,7 @@ object ModItems {
     @JvmField val SVD = registerGun("svd") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
     @JvmField val AWM = registerGun("awm") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
     @JvmField val M_98B = registerGun("m_98b") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val SENTINEL = registerGun<SentinelItem>()
+    @JvmField val SENTINEL = registerGun("sentinel") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
     @JvmField val HUNTING_RIFLE = registerGun("hunting_rifle") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
     @JvmField val NTW_20 = registerGun("ntw_20") { GeoGunItemV2(Properties().rarity(LEGENDARY)) }
     @JvmField val M_870 = registerGun("m_870") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
@@ -156,7 +154,7 @@ object ModItems {
     @JvmField val REFORGING = registerGun("reforging") { GeoGunItemV2(Properties().rarity(SUPERB)) }
     @JvmField val RAUBTIER = registerGun("raubtier") { GeoGunItemV2(Properties().rarity(SUPERB)) }
 
-    @JvmField val BEAST_GUN_TEST = registerGun<BeastGunTestItem>()
+//    @JvmField val BEAST_GUN_TEST = registerGun<BeastGunTestItem>()
 
     @JvmField val VEHICLE_GUN = registerGun<VehicleGunItem>()
     @JvmField val EMPTY_GUN = registerGun<EmptyGunItem>()
