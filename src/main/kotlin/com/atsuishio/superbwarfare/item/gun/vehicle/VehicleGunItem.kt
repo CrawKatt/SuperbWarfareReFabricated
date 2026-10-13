@@ -52,20 +52,16 @@ open class VehicleGunItem : GunItem(Properties()) {
     }
 
     override fun getEnergyProvider(data: GunData, ammoSupplier: Entity?): IEnergyStorage? {
-        return if (ammoSupplier != null) {
-            ammoSupplier.getCapability(Capabilities.EnergyStorage.ENTITY, Direction.UP)
-        } else {
-            super.getEnergyProvider(data, null)
-        }
+       return ammoSupplier?.getCapability(Capabilities.EnergyStorage.ENTITY, Direction.UP) ?: super.getEnergyProvider(data, null)
     }
 
     override fun appendHoverText(
         stack: ItemStack,
         context: TooltipContext,
-        tooltipComponents: MutableList<Component>,
-        tooltipFlag: TooltipFlag
+        list: MutableList<Component>,
+        flag: TooltipFlag
     ) {
-        tooltipComponents.add(Component.translatable("des.superbwarfare.vehicle_gun").withStyle(ChatFormatting.RED))
+        list.add(Component.translatable("des.superbwarfare.vehicle_gun").withStyle(ChatFormatting.RED))
     }
 
     // TODO 去掉特判

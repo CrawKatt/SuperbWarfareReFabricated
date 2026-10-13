@@ -180,7 +180,6 @@ object ClientRenderHandler {
     fun registerTooltip(event: RegisterClientTooltipComponentFactoriesEvent) {
         event.register(GunImageComponent::class.java) { ClientGunImageTooltip(it) }
         event.register(CellImageComponent::class.java) { ClientCellImageTooltip(it) }
-        event.register(SentinelImageComponent::class.java) { ClientSentinelImageTooltip(it) }
         event.register(ChargingStationImageComponent::class.java) { ClientChargingStationImageTooltip(it) }
         event.register(DogTagImageComponent::class.java) { ClientDogTagImageTooltip(it) }
         event.register(AttachmentImageComponent::class.java) { ClientAttachmentImageTooltip(it) }
@@ -243,7 +242,6 @@ object ClientRenderHandler {
         event.registerBelow(GPWSOverlay.ID, VehicleCrosshairOverlay.ID, VehicleCrosshairOverlay)
         event.registerBelowAll(StaminaOverlay.ID, StaminaOverlay)
         event.registerBelowAll(AmmoCountOverlay.ID, AmmoCountOverlay)
-        event.registerBelowAll(ItemRendererFixOverlay.ID, ItemRendererFixOverlay)
         event.registerBelowAll(CrossHairOverlay.ID, CrossHairOverlay)
         event.registerBelowAll(HeatBarOverlay.ID, HeatBarOverlay)
         event.registerBelowAll(DroneHudOverlay.ID, DroneHudOverlay)
