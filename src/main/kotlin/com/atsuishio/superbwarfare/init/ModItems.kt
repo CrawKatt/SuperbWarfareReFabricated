@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.entity.projectile.MediumRocketEntity
 import com.atsuishio.superbwarfare.init.ModItems.registerAttachment
 import com.atsuishio.superbwarfare.item.DispenserLaunchable
 import com.atsuishio.superbwarfare.item.HandGrenadeItem
+import com.atsuishio.superbwarfare.item.LungeMineItem
 import com.atsuishio.superbwarfare.item.RgoGrenadeItem
 import com.atsuishio.superbwarfare.item.ammo.*
 import com.atsuishio.superbwarfare.item.armor.*
@@ -27,7 +28,6 @@ import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem
 import com.atsuishio.superbwarfare.item.gun.machinegun.M2HBItem
 import com.atsuishio.superbwarfare.item.gun.machinegun.MinigunItem
 import com.atsuishio.superbwarfare.item.gun.shotgun.HomemadeShotgunItem
-import com.atsuishio.superbwarfare.item.gun.special.LungeMineItem
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem
 import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGunItem
 import com.atsuishio.superbwarfare.item.material.*
