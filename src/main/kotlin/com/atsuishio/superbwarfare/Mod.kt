@@ -63,7 +63,6 @@ import com.atsuishio.superbwarfare.init.ModWorldgen
 import com.atsuishio.superbwarfare.item.container.ContainerBlockItem
 import com.atsuishio.superbwarfare.inventory.menu.EnergyMenu
 import com.atsuishio.superbwarfare.item.weapon.BeastItem
-import com.atsuishio.superbwarfare.item.gun.special.BeastGunTestItem
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect
@@ -223,7 +222,6 @@ class Mod : ModInitializer {
         AttackEntityCallback.EVENT.register { player, _, _, entity, _ ->
             when (val item = player.mainHandItem.item) {
                 is BeastItem -> BeastItem.onLeftClickEntity(player.mainHandItem, player, entity)
-                is BeastGunTestItem -> item.onLeftClickEntity(player.mainHandItem, player, entity)
             }
             PlayerEventHandler.onAttackEntity(player, entity)
             InteractionResult.PASS

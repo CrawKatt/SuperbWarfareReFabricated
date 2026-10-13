@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
@@ -50,11 +49,6 @@ public class ItemRendererMixin {
     @Unique
     private static String superbwarfare$getSeparateModelSuffix(ItemStack stack, ResourceLocation itemId,
                                                                 ItemDisplayContext displayContext) {
-        // Forge's generated gun models override only the GUI perspective.
-        if (stack.getItem() instanceof GunGeoItem) {
-            return displayContext == ItemDisplayContext.GUI ? "_icon" : null;
-        }
-
         if (!CUSTOM_SEPARATE_TRANSFORM_ITEMS.contains(itemId)) return null;
 
         return switch (displayContext) {

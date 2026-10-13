@@ -33,7 +33,6 @@ import com.atsuishio.superbwarfare.init.ModParticles;
 import com.atsuishio.superbwarfare.init.ModProperties;
 import com.atsuishio.superbwarfare.init.ModScreens;
 import com.atsuishio.superbwarfare.init.ModSoundInstances;
-import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.atsuishio.superbwarfare.item.projectile.PotionMortarShellItem;
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger;
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
@@ -127,7 +126,7 @@ public class ClientMod implements ClientModInitializer {
     private static void registerGuiIconModels() {
         ModelLoadingPlugin.register(context -> BuiltInRegistries.ITEM.forEach(item -> {
             ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
-            if (item instanceof GunGeoItem || CUSTOM_GUI_ICON_ITEMS.contains(itemId)) {
+            if (CUSTOM_GUI_ICON_ITEMS.contains(itemId)) {
                 context.addModels(new ModelResourceLocation(itemId.withPath(path -> path + "_icon"), "inventory"));
             }
             if (CUSTOM_GUI_ICON_ITEMS.contains(itemId)) {
