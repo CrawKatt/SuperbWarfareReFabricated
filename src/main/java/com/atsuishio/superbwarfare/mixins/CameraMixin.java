@@ -1,25 +1,16 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
-import com.atsuishio.superbwarfare.init.ModItems;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
-import com.atsuishio.superbwarfare.tools.EntityFindUtil;
-import com.atsuishio.superbwarfare.tools.NBTTool;
-import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
-import org.joml.Matrix4d;
-import org.joml.Vector4d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -74,44 +65,6 @@ public abstract class CameraMixin {
         LocalPlayer player = mc.player;
         if (player == null) return;
 
-        ItemStack stack = player.getMainHandItem();
-        var tag = NBTTool.getTag(stack);
-
-        if (stack.is(ModItems.MONITOR) && tag.getBoolean("Using") && tag.getBoolean("Linked")) {
-            DroneEntity drone = EntityFindUtil.findDrone(player.level(), tag.getString("LinkedDrone"));
-            if (drone != null) {
-                boolean firstPerson = Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON || Minecraft.getInstance().options.getCameraType() == CameraType.THIRD_PERSON_BACK;
-                if (firstPerson) {
-                    Matrix4d transform = superbWarfare$getDroneTransform(drone, partialTicks);
-                    double x0 = 0;
-                    double y0 = 0.075;
-                    double z0 = 0.18;
-
-                    Vector4d worldPosition = superbWarfare$transformPosition(transform, x0, y0, z0);
-
-                    setRotation(drone.getYaw(partialTicks), drone.getPitch(partialTicks));
-                    setPosition(worldPosition.x, worldPosition.y, worldPosition.z);
-                    superbWarfare$applyComputedAnglesToCustomCamera();
-                    info.cancel();
-                } else {
-                    var rotation = drone.getCameraRotation(partialTicks, player, false, false);
-                    if (rotation != null) {
-                        setRotation(rotation.x, rotation.y);
-                    }
-                    var position = drone.getCameraPosition(partialTicks, player, false, false);
-                    if (position != null) {
-                        setPosition(position.x, position.y, position.z);
-                    }
-
-                    if (rotation != null || position != null) {
-                        superbWarfare$applyComputedAnglesToCustomCamera();
-                        info.cancel();
-                    }
-                }
-            }
-            return;
-        }
-
         if (player.getVehicle() instanceof VehicleEntity vehicle) {
             var rotation = vehicle.getCameraRotation(partialTicks, player, ClientEventHandler.zoomVehicle, Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON);
             if (rotation != null) {
@@ -142,21 +95,6 @@ public abstract class CameraMixin {
         superbWarfare$computeAngles(args.get(0), args.get(1));
         args.set(0, superbWarfare$computedYaw);
         args.set(1, superbWarfare$computedPitch);
-    }
-
-    @Unique
-    private static Matrix4d superbWarfare$getDroneTransform(DroneEntity vehicle, float ticks) {
-        Matrix4d transform = new Matrix4d();
-        transform.translate(Mth.lerp(ticks, vehicle.xo, vehicle.getX()), Mth.lerp(ticks, vehicle.yo, vehicle.getY()), Mth.lerp(ticks, vehicle.zo, vehicle.getZ()));
-        transform.rotate(Axis.YP.rotationDegrees(-vehicle.getYaw(ticks)));
-        transform.rotate(Axis.XP.rotationDegrees(vehicle.getBodyPitch(ticks)));
-        transform.rotate(Axis.ZP.rotationDegrees(vehicle.getRoll(ticks)));
-        return transform;
-    }
-
-    @Unique
-    private static Vector4d superbWarfare$transformPosition(Matrix4d transform, double x, double y, double z) {
-        return transform.transform(new Vector4d(x, y, z, 1));
     }
 
     @Unique

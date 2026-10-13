@@ -142,7 +142,7 @@ Entity
 ├─ VehicleEntity
 │  ├─ AutoAimableEntity
 │  │  └─ ArtilleryEntity
-│  └─ 遗留 GeoVehicleEntity（计划在 0.8.10 移除）
+│  └─ M1A2Entity、T90aEntity、Plz05Entity 等具体载具
 ├─ ProjectileEntity / MissileProjectile / FastThrowableProjectile
 └─ TargetEntity / DPSGeneratorEntity / SenpaiEntity
 ```

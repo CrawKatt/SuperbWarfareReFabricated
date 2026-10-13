@@ -112,7 +112,6 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.LARGE_MOTOR)
         simpleItem(ModItems.WHEEL)
         simpleItem(ModItems.TRACK)
-        simpleItem(ModItems.DRONE)
         simpleItem(ModItems.LIGHT_ARMAMENT_MODULE)
         simpleItem(ModItems.MEDIUM_ARMAMENT_MODULE)
         simpleItem(ModItems.HEAVY_ARMAMENT_MODULE)

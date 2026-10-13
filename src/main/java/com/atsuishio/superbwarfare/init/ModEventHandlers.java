@@ -35,10 +35,6 @@ public class ModEventHandlers {
         SuperbWarfareEvents.register(MobEffectAddedEvent.class, event ->
                 ShockMobEffect.onShockAdded(event.getEntity(), event.getEffectInstance(), event.getEffectSource()));
 
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            PlayerEventHandler.onPlayerLoggedIn(handler.getPlayer());
-        });
-
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             HitboxHelperEventHandler.onPlayerLoggedOut(handler.getPlayer());
         });

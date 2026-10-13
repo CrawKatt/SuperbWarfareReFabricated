@@ -141,7 +141,6 @@ class ModEntityTypeTagProvider(
             ModEntities.AIR_SHEEP,
             ModEntities.HAPPIEST_GHAST,
             ModEntities.KIROV,
-            ModEntities.DRONE,
             ModEntities.MORTAR,
             ModEntities.VEHICLE_ASSEMBLING_TABLE,
             ModEntities.SODAYO_PICK_UP,
