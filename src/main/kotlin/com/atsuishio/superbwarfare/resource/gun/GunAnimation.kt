@@ -99,6 +99,11 @@ class GunAnimation {
     @SerialName("Hold")
     var hold: String? = null
 
+    // 常驻循环动画，任何状态下都播，垫在所有层之下
+    @JvmField
+    @SerialName("Loop")
+    var loop: String? = null
+
     // 循环开火动画
     @JvmField
     @SerialName("FireLoop")
