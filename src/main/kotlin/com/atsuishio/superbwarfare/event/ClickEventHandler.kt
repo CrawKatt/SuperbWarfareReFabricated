@@ -31,7 +31,6 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import net.minecraft.world.level.ClipContext
 import net.minecraft.world.phys.Vec3
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
@@ -126,9 +125,6 @@ object ClickEventHandler {
         if (button == ModKeyMappings.MARK.key.value) {
             if (stack.`is`(ModItems.ARTILLERY_INDICATOR.get())) {
                 sendPacketToServer(SetFiringParametersMessage)
-            }
-            if (stack.`is`(ModItems.MONITOR.get()) && player.offhandItem.`is`(ModItems.ARTILLERY_INDICATOR.get())) {
-                droneLeftClick(stack, player)
             }
         }
 
@@ -225,15 +221,6 @@ object ClickEventHandler {
             } else if (data.canAdjustZoom()) {
                 sendPacketToServer(AdjustZoomFovMessage(scroll))
             }
-            event.isCanceled = true
-        }
-
-        val tag = NBTTool.getTag(stack)
-
-        if (stack.`is`(ModItems.MONITOR.get()) && tag.getBoolean("Using")
-            && tag.getBoolean("Linked")
-        ) {
-            ClientEventHandler.droneFov = (ClientEventHandler.droneFov + 0.4 * scroll).coerceIn(1.0, 6.0)
             event.isCanceled = true
         }
 
@@ -345,8 +332,6 @@ object ClickEventHandler {
                     } else {
                         KeyMapping.click(mc.options.keyUse.key)
                     }
-                } else if (stack.`is`(ModItems.MONITOR.get())) {
-                    sendPacketToServer(InteractMessage)
                 }
             }
 
@@ -465,9 +450,6 @@ object ClickEventHandler {
                 if (stack.`is`(ModItems.ARTILLERY_INDICATOR.get())) {
                     sendPacketToServer(SetFiringParametersMessage)
                 }
-                if (stack.`is`(ModItems.MONITOR.get()) && player.offhandItem.`is`(ModItems.ARTILLERY_INDICATOR.get())) {
-                    droneLeftClick(stack, player)
-                }
             }
         } else {
             if (key == ModKeyMappings.FIRE.key.value) {
@@ -508,14 +490,6 @@ object ClickEventHandler {
 
         if (stack.`is`(Items.SPYGLASS) && player.isScoping && player.offhandItem.`is`(ModItems.FIRING_PARAMETERS.get())) {
             sendPacketToServer(SetFiringParametersMessage)
-        }
-
-        if (stack.`is`(ModItems.MONITOR.get())) {
-            if (player.offhandItem.`is`(ModItems.ARTILLERY_INDICATOR.get())) {
-                ClientEventHandler.holdingFireKey = true
-            } else {
-                droneLeftClick(stack, player)
-            }
         }
 
         if (stack.`is`(ModItems.LUNGE_MINE.get())) {
@@ -764,32 +738,5 @@ object ClickEventHandler {
         }
         sendPacketToServer(PlayerStopRidingMessage(false))
         ClientEventHandler.stopVehicleReloadSound(player)
-    }
-
-    fun droneLeftClick(stack: ItemStack, player: Player) {
-        if (stack.`is`(ModItems.MONITOR.get()) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
-        ) {
-            val drone =
-                EntityFindUtil.findDrone(player.level(), stack.getOrCreateTag().getString("LinkedDrone")) ?: return
-            val lookingEntity = SeekTool.seekLivingEntity(drone, 512.0, 2 / ClientEventHandler.droneFovLerp)
-
-            val result = player.level().clip(
-                ClipContext(
-                    drone.eyePosition,
-                    drone.eyePosition.add(drone.lookAngle.scale(512.0)),
-                    ClipContext.Block.OUTLINE,
-                    ClipContext.Fluid.NONE,
-                    drone
-                )
-            )
-
-            var pos = result.location
-            if (lookingEntity != null && !player.isShiftKeyDown) {
-                pos = lookingEntity.position()
-            }
-
-            sendPacketToServer(DroneFireMessage(pos.toVector3f()))
-        }
     }
 }

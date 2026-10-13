@@ -27,24 +27,12 @@ import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.event.AnvilUpdateEvent
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent
 import net.neoforged.neoforge.event.entity.player.PlayerEvent
-import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerRespawnEvent
 import net.neoforged.neoforge.event.tick.PlayerTickEvent
 import kotlin.math.ceil
 
 @EventBusSubscriber
 object PlayerEventHandler {
-    @SubscribeEvent
-    fun onPlayerLoggedIn(event: PlayerLoggedInEvent) {
-        val player = event.entity
-        val mainStack = player.mainHandItem
-        val tag = NBTTool.getTag(mainStack)
-        if (mainStack.`is`(ModItems.MONITOR.get()) && tag.getBoolean("Using")) {
-            tag.putBoolean("Using", false)
-            NBTTool.saveTag(mainStack, tag)
-        }
-    }
-
     @SubscribeEvent
     fun onPlayerRespawned(event: PlayerRespawnEvent) {
         val player = event.entity

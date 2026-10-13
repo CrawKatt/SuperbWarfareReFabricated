@@ -2,11 +2,8 @@ package com.atsuishio.superbwarfare.tools
 
 import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.entity.projectile.SmokeDecoyEntity
-import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
-import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModTags
-import com.atsuishio.superbwarfare.tools.NBTTool.getTag
 import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
 import net.minecraft.core.BlockPos
 import net.minecraft.tags.TagKey
@@ -143,25 +140,6 @@ object SeekTool {
                 (self === target || (target.team != null && !TDMSavedData.enabledTDM(target) && target.team == self.team))
     }
 
-    /** 判断目标是否为友方无人机 */
-    @JvmField
-    val IS_FRIENDLY_DRONE: BiPredicate<Entity?, Entity?> = BiPredicate { self, target ->
-        if (self !is Player || target == null) return@BiPredicate false
-        val stack = self.mainHandItem
-        var myDrone: DroneEntity? = null
-        val tag = getTag(stack)
-        if (stack.`is`(ModItems.MONITOR.get()) &&
-            tag.getBoolean("Using") &&
-            tag.getBoolean("Linked")
-        ) {
-            myDrone = EntityFindUtil.findDrone(self.level(), tag.getString("LinkedDrone"))
-        }
-        target is DroneEntity &&
-                target !== myDrone &&
-                target.getController() != null &&
-                IN_SAME_TEAM.test(target, target.getController())
-    }
-
     /** 判断两个实体是否是友方关系 */
     @JvmField
     val IS_FRIENDLY: BiPredicate<Entity?, Entity?> = BiPredicate { self, target ->
@@ -172,7 +150,6 @@ object SeekTool {
                 target.owner
             )
         ) return@BiPredicate true
-        if (IS_FRIENDLY_DRONE.test(self, target)) return@BiPredicate true
         if (target.passengers.any { IN_SAME_TEAM.test(self, it) }) return@BiPredicate true
         if (target is VehicleEntity) {
             val lastDriver = EntityFindUtil.findEntity(target.level(), target.lastDriverUUID)

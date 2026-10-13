@@ -40,7 +40,6 @@ object ModDamageTypes {
     @JvmField val MINE = registerDamageType("mine")
     @JvmField val BEAST = registerDamageType("beast")
     @JvmField val CUSTOM_EXPLOSION = registerDamageType("custom_explosion")
-    @JvmField val DRONE_HIT = registerDamageType("drone_hit")
     @JvmField val LASER_STATIC = registerDamageType("laser_static")
     @JvmField val VEHICLE_STRIKE = registerDamageType("vehicle_strike")
     @JvmField val AIR_CRASH = registerDamageType("air_crash")
@@ -152,11 +151,6 @@ object ModDamageTypes {
     @JvmStatic
     fun causeCustomExplosionDamage(registryAccess: RegistryAccess, directEntity: Entity?, attacker: Entity?): DamageSource {
         return DamageMessages(registryAccess.registry(Registries.DAMAGE_TYPE).get().getHolderOrThrow(CUSTOM_EXPLOSION), directEntity, attacker)
-    }
-
-    @JvmStatic
-    fun causeDroneHitDamage(registryAccess: RegistryAccess, directEntity: Entity?, attacker: Entity?): DamageSource {
-        return DamageMessages(registryAccess.registry(Registries.DAMAGE_TYPE).get().getHolderOrThrow(DRONE_HIT), directEntity, attacker)
     }
 
     @JvmStatic

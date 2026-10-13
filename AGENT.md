@@ -71,7 +71,6 @@ Simple Bedrock Model 渲染，Curios 做饰品栏位，Cloth Config 做配置界
 | `data/vehicle/`                  | VehicleData, VehiclePropertyModifier                                                         |
 | `data/launchable/`               | ShootData, LaunchableEntityTool                                                              |
 | `data/mob_guns/`                 | 生物用枪数据                                                                                       |
-| `data/drone_attachment/`         | 无人机挂载数据                                                                                      |
 | `item/gun/`                      | 全部具体枪械物品类（约45把枪，按类型分目录）                                                                      |
 | `item/gun/vehicle/`              | VehicleGun.kt（载具武器的抽象基类）                                                                     |
 | `resource/gun/`                  | GunResource, DefaultGunResource, GunAnimation                                                |
@@ -85,8 +84,7 @@ Simple Bedrock Model 渲染，Curios 做饰品栏位，Cloth Config 做配置界
 ```
 Entity (Minecraft)
   ├─ VehicleEntity (base/VehicleEntity.kt:125) — 载具基类
-  │    ├─ GeoVehicleEntity (base/GeoVehicleEntity.kt) — GeckoLib 载具（未来要删除）
-  │    │    └─ Lav150Entity, Lav25Entity, M1A2Entity, T90aEntity 等
+  │    ├─ M1A2Entity, T90aEntity, Plz05Entity 等 — 具体载具
   │    └─ AutoAimableEntity (base/AutoAimableEntity.kt:52) — 自动瞄准
   │         └─ ArtilleryEntity (base/ArtilleryEntity.kt) — 火炮
   │              └─ GeckoArtilleryEntity (base/GeckoArtilleryEntity.kt:11) — 临时桥接
