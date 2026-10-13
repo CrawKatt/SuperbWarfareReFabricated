@@ -776,7 +776,7 @@
 						}
 					}
 				},
-				"magzine_pos": {
+				"magazine_pos": {
 					"rotation": {
 						"0.0": [0, 0, 0],
 						"0.725": [0, 0, 0],
@@ -1200,7 +1200,7 @@
 						}
 					}
 				},
-				"magzine_pos": {
+				"magazine_pos": {
 					"rotation": {
 						"0.0": [0, 0, 0],
 						"0.3": [0, 0, 0],
