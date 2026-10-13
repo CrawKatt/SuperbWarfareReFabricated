@@ -1597,6 +1597,17 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         } ?: 0.0
     }
 
+    open fun scriptEnergy(stack: ItemStack): Int {
+        return stack.getCapability(ForgeCapabilities.ENERGY).map { it.energyStored }.orElse(0)
+    }
+
+    // 充能射击里最低那一档的门槛（`ChargeAction.OneShotCost`），没配充能射击时为 0
+    open fun scriptChargeCost(stack: ItemStack): Int {
+        val actions = from(stack).get(GunProp.CHARGE_ACTION)
+        if (actions.isEmpty()) return 0
+        return actions.minOf { it.cost }
+    }
+
     open fun scriptChargeProgress(stack: ItemStack): Double {
         val progress = ClientEventHandler.chargeProgress
         if (progress <= 0.0) return 0.0
