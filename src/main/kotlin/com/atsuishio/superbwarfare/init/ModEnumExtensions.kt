@@ -73,6 +73,7 @@ object ModEnumExtensions {
             }
         )
 
+        @JvmStatic
         val lungeMinePose: ArmPose
             get() = SUPERBWARFARE_LUNGE_MINE_POSE.getValue()
 

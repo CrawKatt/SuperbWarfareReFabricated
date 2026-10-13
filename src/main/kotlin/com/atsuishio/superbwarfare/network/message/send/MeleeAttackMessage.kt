@@ -114,10 +114,12 @@ data class MeleeAttackMessage(
         val dispatcher = level?.let { MeleeEffectDispatcher(it, player, data, index, action) }
         dispatcher?.swing()
 
+        var hitLanded = false
         try {
             if (targets.isNotEmpty() && dispatcher != null) {
-                attack(
+                hitLanded = attack(
                     player,
+                    data,
                     action.resolvedHeadshot(data.get(GunProp.MELEE_HEADSHOT)),
                     action.resolvedLegshot(data.get(GunProp.MELEE_LEGSHOT)),
                     action,
@@ -131,6 +133,11 @@ data class MeleeAttackMessage(
             MeleeAttackContext.remove(player.uuid)
         }
 
+        // 命中（含"只吃到效果、没真的掉血"的目标，比如免伤的载具）后消耗；创造模式不消耗
+        if (hitLanded && data.get(GunProp.CONSUME_ON_MELEE_HIT) && !player.isCreative) {
+            stack.shrink(1)
+        }
+
         if (action.durability > 0 && data.get(GunProp.MAX_DURABILITY) > 0) {
             // 本段自带的耐久消耗（`MeleeAction.Durability`）
             stack.hurtAndBreak(action.durability, player, EquipmentSlot.MAINHAND)
@@ -139,15 +146,17 @@ data class MeleeAttackMessage(
 
     private fun attack(
         attacker: Player,
+        data: GunData,
         headshotMultiplier: Double,
         legshotMultiplier: Double,
         action: ResolvedMeleeAction,
         meleeSound: MeleeSound?,
         targets: List<TargetPayload>,
         effects: MeleeEffectDispatcher,
-    ) {
+    ): Boolean {
         val level = attacker.level()
         var hurtCount = 0
+        var hitCount = 0
         var playedHitSound = false
         var playedNoDamageSound = false
 
@@ -160,6 +169,8 @@ data class MeleeAttackMessage(
             val wasAlive = (target as? LivingEntity)?.isAlive == true
 
             val zonePos = Vec3(payload.hitX, payload.hitY, payload.hitZ)
+            // 效果落在判定的那个点上（不是目标中心）；命中点是客户端给的，越出碰撞箱就贴回箱面
+            val effectPos = MeleeQuery.closestPointInBox(target.boundingBox.inflate(0.5), zonePos)
 
             // 命中区域 → 伤害倍率
             val headshot = payload.aimed && MeleeQuery.isHeadshot(target, zonePos)
@@ -179,7 +190,12 @@ data class MeleeAttackMessage(
             val damage = action.damage * zoneMultiplier * falloff
             if (damage <= 0) continue
 
-            val damageSource = if (headshot) {
+            val damageSource = ModDamageTypes.causeDamageType(
+                level.registryAccess(),
+                data.get(if (headshot) GunProp.MELEE_HEADSHOT_DAMAGE_TYPE else GunProp.MELEE_DAMAGE_TYPE),
+                attacker,
+                attacker,
+            ) ?: if (headshot) {
                 ModDamageTypes.causeGunMeleeHeadshotDamage(level.registryAccess(), attacker, attacker)
             } else {
                 ModDamageTypes.causeGunMeleeDamage(level.registryAccess(), attacker, attacker)
@@ -196,6 +212,10 @@ data class MeleeAttackMessage(
                     )
                     playedNoDamageSound = true
                 }
+
+                // 载具这类非生物目标的 hurt 恒返回 false，伤害被拒不等于没戳到，效果照常触发
+                effects.hit(target, effectPos, damaged = false)
+                hitCount++
                 continue
             }
 
@@ -259,21 +279,20 @@ data class MeleeAttackMessage(
                 attacker.awardStat(Stats.DAMAGE_DEALT, ((currentHealth - target.health) * 10.0F).roundToInt())
             }
 
-            // 近战额外效果。放在这里而不是伤害之前：
-            //   - `Hit`/`FirstHit` 只在"真的造成了伤害"时才该触发；
-            //   - 效果自己打出伤害（`extra_damage`/`explosion`）时，上面的原版收尾已经跑完，
-            //     不会被后续的 `setLastHurtMob`/`awardStat` 覆盖掉。
-            if (target is LivingEntity) {
-                effects.hit(target, target.position())
-                if (wasAlive && target.isDeadOrDying) {
-                    effects.kill(target, target.position())
-                }
+            // 近战额外效果。放在伤害之后：效果自己打出伤害（`extra_damage`/`explosion`）时，
+            // 上面的原版收尾已经跑完，不会被后续的 `setLastHurtMob`/`awardStat` 覆盖掉
+            effects.hit(target, effectPos)
+            hitCount++
+            if (target is LivingEntity && wasAlive && target.isDeadOrDying) {
+                effects.kill(target, effectPos)
             }
         }
 
         if (hurtCount > 0) {
             attacker.sweepAttack()
         }
+
+        return hitCount > 0
     }
 
     /**

@@ -514,6 +514,21 @@ class GunProp<T, R>(
         @JvmField
         val MELEE_LIFESTEAL = plainProp(DefaultGunData::meleeLifesteal)
 
+        @JvmField
+        val MELEE_DAMAGE_TYPE = plainProp(DefaultGunData::meleeDamageType)
+
+        @JvmField
+        val MELEE_HEADSHOT_DAMAGE_TYPE = plainProp(DefaultGunData::meleeHeadshotDamageType)
+
+        @JvmField
+        val RIGHT_CLICK_ACTION = plainProp(DefaultGunData::rightClickAction)
+
+        @JvmField
+        val BAYONET_CHARGE = plainProp(DefaultGunData::bayonetCharge)
+
+        @JvmField
+        val CONSUME_ON_MELEE_HIT = plainProp(DefaultGunData::consumeOnMeleeHit)
+
         // TODO 会不会有点屎...
         fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) = with(modifier) {
             modify(MAX_DURABILITY) { it.coerceAtLeast(0) }
@@ -574,6 +589,17 @@ class GunProp<T, R>(
             modify(EXP_MULTIPLIER) { it.coerceAtLeast(0.0) }
             modify(PROJECTILE_LIFESTEAL) { it.coerceAtLeast(0.0) }
             modify(MELEE_LIFESTEAL) { it.coerceAtLeast(0.0) }
+
+            modify(BAYONET_CHARGE) {
+                it.copy(
+                    duration = it.duration.coerceAtLeast(0),
+                    speed = it.speed.coerceAtLeast(0),
+                    cooldown = it.cooldown.coerceAtLeast(0),
+                    // 负数是"跟随动作表"的哨兵值，只把更负的压回来
+                    strikeDuration = it.strikeDuration.coerceAtLeast(-1),
+                    strikeHitTime = it.strikeHitTime.coerceAtLeast(-1),
+                )
+            }
         }
     }
 }
