@@ -88,6 +88,12 @@ open class GeoGunAnimationInstance(
     private var deployIdleAnimation: BedrockAnimation? = null
     private var deployIdlePower = 0f
 
+    // 常驻循环层（`Animation.Loop`）runner
+    private var loopRunner: AnimationRunner? = null
+
+    /** 已经解析好的常驻循环片段 */
+    private var loopAnimation: BedrockAnimation? = null
+
     // 蓄力层 runner
     private var chargeRunner: AnimationRunner? = null
 
@@ -886,7 +892,7 @@ open class GeoGunAnimationInstance(
         cachedPose = combineHoldOpen(
             combineFireModeSwitch(
                 combineLayers(
-                    exitRunner.evaluate(),
+                    overLoop(exitRunner.evaluate()),
                     fireModeRunner?.evaluate() ?: DummyPose.INSTANCE,
                     closeStrikeRunner?.evaluate() ?: DummyPose.INSTANCE,
                     spinRunner?.evaluate() ?: DummyPose.INSTANCE
@@ -1395,6 +1401,42 @@ open class GeoGunAnimationInstance(
         return target == GunAnimationState.IDLE
     }
 
+    // ── 常驻循环层（`Animation.Loop`）──────────────────────────────────────────
+
+    private fun updateLoopRunner(animation: GunAnimation?): Boolean {
+        val clip = animation?.loop?.let(animations::get)
+        if (clip == null) {
+            loopRunner = null
+            loopAnimation = null
+            return false
+        }
+
+        if (loopRunner != null && loopAnimation === clip) return false
+
+        loopAnimation = clip
+        val newRunner = AnimationRunner(clip, AnimationContext(clip.specifiedEndTimeS))
+        newRunner.state = AnimationPlayType.LOOP.state()
+        loopRunner = newRunner
+        return true
+    }
+
+    private fun tickLoopRunner(animation: GunAnimation?) {
+        if (updateLoopRunner(animation)) return
+        loopRunner?.tick()
+    }
+
+    private fun clearLoopRunner() {
+        loopRunner = null
+        loopAnimation = null
+    }
+
+    // 两边都 key 的骨骼听上层的，只有常驻层 key 的听常驻层
+    private fun overLoop(upperPose: Pose): Pose {
+        val loop = loopRunner ?: return upperPose
+        if (upperPose == DummyPose.INSTANCE) return loop.evaluate()
+        return MERGE_BLENDER.blend(listOf(loop.evaluate(), upperPose))
+    }
+
     /**
      * 把蓄力层按 [chargePower]**交叉淡出**到 [lowerPose] 上（[applyFireLoop] 的蓄力版）。
      *
@@ -1491,6 +1533,10 @@ open class GeoGunAnimationInstance(
 
     override fun tick(partialTicks: Float) {
         val target = resolveState()
+        val animation = GunResource.compute(stack).animation
+
+        // 常驻层排在状态分支之前：换弹/开火/近战都停不下它
+        tickLoopRunner(animation)
 
         // 编辑/改装里不该有蓄力（`chargeActive` 本来就要求 `!isEditing`）。这一句是防"蓄力收到
         // 一半就进编辑"：那条路走的是下面的提前 return，蓄力层会没人摘，一直挂着抖。
@@ -1540,7 +1586,7 @@ open class GeoGunAnimationInstance(
                     applyFireLoop(
                         combineFireModeSwitch(
                             combineLayers(
-                                editExitRunner!!.evaluate(),
+                                overLoop(editExitRunner!!.evaluate()),
                                 fireModeRunner?.evaluate() ?: DummyPose.INSTANCE,
                                 closeStrikeRunner?.evaluate() ?: DummyPose.INSTANCE,
                                 spinRunner?.evaluate() ?: DummyPose.INSTANCE
@@ -1569,7 +1615,6 @@ open class GeoGunAnimationInstance(
 
         val fireModeStarted = syncFireMode()
         val data = GunData.from(stack)
-        val animation = GunResource.compute(stack).animation
 
         // 蓄力层收尾要判"这一发打出去没有"。**必须在下面 [playFire] 消费 `fireSerial` 之前读**：
         // 松开蓄力那一帧 `chargeActive` 已经归零，"是打出去了还是没到发射标准"只剩这一个信号。
@@ -1661,6 +1706,9 @@ open class GeoGunAnimationInstance(
             collectSoundEvents(deployIdleRunner)
         }
 
+        collectParticleEvents(loopRunner)
+        collectSoundEvents(loopRunner)
+
         if (fireRunner?.state is StopState) {
             fireRunner = null
         }
@@ -1674,7 +1722,11 @@ open class GeoGunAnimationInstance(
                         // 它是按权重交叉淡出出来的，所以基础状态单独先合一次。
                         // 自定义奔跑层在最底下（`Idle` 之上、其余层之下）：蓄力/开火那类"正在做动作"
                         // 的层要压得住它，而它自己得盖住 `Idle` 的枪身。
-                        applyCharge(applyDeployIdle(applyCustomSprint(runner?.evaluate() ?: DummyPose.INSTANCE))),
+                        applyCharge(
+                            applyDeployIdle(
+                                applyCustomSprint(overLoop(runner?.evaluate() ?: DummyPose.INSTANCE))
+                            )
+                        ),
                         fireModeRunner?.evaluate() ?: DummyPose.INSTANCE,
                         closeStrikeRunner?.evaluate() ?: DummyPose.INSTANCE,
                         spinRunner?.evaluate() ?: DummyPose.INSTANCE
@@ -1737,6 +1789,7 @@ open class GeoGunAnimationInstance(
             clearFireLoopRunner()
             clearChargeRunner()
             clearCustomSprint()
+            clearLoopRunner()
             pendingParticles.clear()
             loadAnimations()
         }
@@ -1761,6 +1814,7 @@ open class GeoGunAnimationInstance(
         clearFireLoopRunner()
         clearChargeRunner()
         clearCustomSprint()
+        clearLoopRunner()
         currentState = null
         fireSerial = 0
         consumedFireSerial = 0
