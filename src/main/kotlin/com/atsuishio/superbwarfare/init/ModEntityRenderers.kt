@@ -27,7 +27,6 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.CANNON_SHELL, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.PROJECTILE, ::ProjectileEntityRenderer)
         EntityRendererRegistry.register(ModEntities.MK_42, ::Mk42Renderer)
-        EntityRendererRegistry.register(ModEntities.DRONE, ::DroneRenderer)
         EntityRendererRegistry.register(ModEntities.HAND_GRENADE, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.RGO_GRENADE, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.TYPE_88_CLUSTER_GRENADES, ::BasicProjectileRenderer)

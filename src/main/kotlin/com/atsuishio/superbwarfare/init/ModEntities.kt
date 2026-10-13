@@ -426,10 +426,6 @@ object ModEntities {
 
     // Special
     @JvmField
-    val DRONE: EntityType<DroneEntity> =
-        register("drone", misc(::DroneEntity).trackRangeChunks(512).trackedUpdateRate(1).dimensions(EntityDimensions.scalable(0.6f, 0.2f)))
-
-    @JvmField
     val MORTAR: EntityType<MortarEntity> =
         register("mortar", vehicle(::MortarEntity).dimensions(EntityDimensions.scalable(0.8f, 1.4f)))
 

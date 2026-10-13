@@ -79,29 +79,6 @@ object ClientMouseHandler {
         val moveSpeedY = Mth.clamp(posN.y - posO.y, -speed, speed)
 
 
-        val stack = player.mainHandItem
-
-        if (stack.`is`(ModItems.MONITOR) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
-        ) {
-            val drone =
-                EntityFindUtil.findDrone(player.level(), stack.getOrCreateTag().getString("LinkedDrone")) ?: return
-
-            speedX = (drone.mouseSensitivity / ClientEventHandler.droneFovLerp) * moveSpeedX
-            speedY = (drone.mouseSensitivity / ClientEventHandler.droneFovLerp) * moveSpeedY
-
-            lerpSpeedX = Mth.lerp(0.3, lerpSpeedX, speedX)
-            lerpSpeedY = Mth.lerp(0.3, lerpSpeedY, speedY)
-
-            if (notInGame) {
-                sendPacketToServer(MouseMoveMessage(0.0, 0.0))
-            } else {
-                sendPacketToServer(MouseMoveMessage(lerpSpeedX, lerpSpeedY))
-            }
-
-            return
-        }
-
         val vehicle = player.vehicle
         if (vehicle is VehicleEntity && (vehicle.vehicleType == VehicleType.AIRPLANE || vehicle.vehicleType == VehicleType.HELICOPTER)) {
             val y = if (ControlConfig.INVERT_AIRCRAFT_CONTROL.get()) -1 else 1
@@ -261,14 +238,6 @@ object ClientMouseHandler {
     fun changeSensitivity(original: Double): Double {
         val player = localPlayer ?: return original
         if (player.hasEffect(ModMobEffects.SHOCK) && !player.isSpectator) {
-            return 0.0
-        }
-
-        val stack = player.mainHandItem
-
-        if (stack.`is`(ModItems.MONITOR) && stack.getOrCreateTag().getBoolean("Using")
-            && stack.getOrCreateTag().getBoolean("Linked")
-        ) {
             return 0.0
         }
 

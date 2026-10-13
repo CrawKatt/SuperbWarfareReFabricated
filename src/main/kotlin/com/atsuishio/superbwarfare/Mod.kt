@@ -201,10 +201,6 @@ class Mod : ModInitializer {
             if (menu is EnergyMenu) menu.onOpened(player)
         }
 
-        ServerPlayConnectionEvents.JOIN.register { handler, _, _ ->
-            PlayerEventHandler.onPlayerLoggedIn(handler.player)
-        }
-
         ServerPlayConnectionEvents.DISCONNECT.register { handler, _ ->
             HitboxHelperEventHandler.onPlayerLoggedOut(handler.player)
         }

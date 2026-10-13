@@ -34,10 +34,6 @@
       "required": false
     },
     {
-      "id": "superbwarfare:drone_hit",
-      "required": false
-    },
-    {
       "id": "superbwarfare:laser",
       "required": false
     },

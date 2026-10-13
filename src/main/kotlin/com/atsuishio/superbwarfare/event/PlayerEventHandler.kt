@@ -28,16 +28,6 @@ import kotlin.math.ceil
 
 object PlayerEventHandler {
     @JvmStatic
-    fun onPlayerLoggedIn(player: ServerPlayer) {
-        val mainStack = player.mainHandItem
-        val tag = NBTTool.getTag(mainStack)
-        if (mainStack.`is`(ModItems.MONITOR) && tag.getBoolean("Using")) {
-            tag.putBoolean("Using", false)
-            NBTTool.saveTag(mainStack, tag)
-        }
-    }
-
-    @JvmStatic
     fun onPlayerRespawned(player: ServerPlayer, conquered: Boolean) {
         handleRespawnReload(player)
         handleRespawnAutoArmor(player)

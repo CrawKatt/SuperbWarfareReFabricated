@@ -151,7 +151,6 @@ class ModDamageTypeTagProvider(
             .addOptional(mod(ModDamageTypes.PROJECTILE_HIT))
             .addOptional(mod(ModDamageTypes.GRAPESHOT_HIT))
             .addOptional(mod(ModDamageTypes.CUSTOM_EXPLOSION))
-            .addOptional(mod(ModDamageTypes.DRONE_HIT))
             .addOptional(mod(ModDamageTypes.LASER))
             .addOptional(mod(ModDamageTypes.LASER_HEADSHOT))
             .addOptional(mod(ModDamageTypes.LASER_STATIC))

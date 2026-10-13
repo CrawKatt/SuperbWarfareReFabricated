@@ -95,7 +95,7 @@ Gradle 会编译 `src/main/kotlin` 和 `src/main/java` 中的 Kotlin 代码。�
 ```text
 Entity
   ├─ VehicleEntity
-  │    ├─ GeoVehicleEntity
+  │    ├─ M1A2Entity, T90aEntity, Plz05Entity 等 — 具体载具
   │    └─ AutoAimableEntity
   │         └─ ArtilleryEntity
   ├─ Projectile
