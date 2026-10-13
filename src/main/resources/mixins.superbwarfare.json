@@ -4,7 +4,6 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "com.atsuishio.superbwarfare.mixins.plugin.MixinPlugin",
   "mixins": [
-    "AnimationProcessorAccessor",
     "AnnotationScanUtilMixin",
     "AnvilMenuMixin",
     "AttributeMapMixin",
@@ -21,7 +20,6 @@
     "ExplosionDetonateMixin",
     "ExplosionMixin",
     "FishingHookMixin",
-    "GeoModelAccessor",
     "GrindstoneMenuMixin",
     "ItemEntityMixin",
     "ItemStackLegacyIdMixin",
