@@ -8,7 +8,6 @@ import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
 import com.atsuishio.superbwarfare.client.lighting.ClientLightingHandler;
 import com.atsuishio.superbwarfare.client.map.TacticalMapChunkListener;
 import com.atsuishio.superbwarfare.client.model.DragonTeethObjModelLoader;
-import com.atsuishio.superbwarfare.client.molang.MolangVariable;
 import com.atsuishio.superbwarfare.client.PoseTool;
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
@@ -93,7 +92,6 @@ public class ClientMod implements ClientModInitializer {
 
         MouseMovementHandler.init();
         ClientLightingHandler.register();
-        MolangVariable.register();
         PoseTool.INSTANCE.init();
         // 加速渲染是可选客户端模组；这里只探一次"它在不在"，不在的话整条兼容路径都不会被走到
         AcceleratedRenderingCompat.INSTANCE.init();

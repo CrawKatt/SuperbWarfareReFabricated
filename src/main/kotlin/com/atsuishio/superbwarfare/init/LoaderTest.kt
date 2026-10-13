@@ -2,7 +2,7 @@ package com.atsuishio.superbwarfare.init
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.init.TestLoader.parseManifest
-import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
+import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -95,7 +95,7 @@ object TestLoader {
     private fun registerItems() {
         for ((namespace, info) in manifests) {
             registerItems(namespace, info.items)
-            registerItems(namespace, info.guns) { GeoGunItemV2(it) }
+            registerItems(namespace, info.guns) { GeoGunItem(it) }
         }
     }
 

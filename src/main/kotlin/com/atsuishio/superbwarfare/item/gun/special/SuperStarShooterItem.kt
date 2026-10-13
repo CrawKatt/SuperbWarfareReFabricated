@@ -5,14 +5,14 @@ import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.init.ModRarities
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.RegistryName
-import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
+import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import com.atsuishio.superbwarfare.tools.playLocalSound
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.Entity
 
 @RegistryName("super_star_shooter")
-class SuperStarShooterItem : GeoGunItemV2(Properties().rarity(ModRarities.SUPERB)) {
+class SuperStarShooterItem : GeoGunItem(Properties().rarity(ModRarities.SUPERB)) {
 
     override fun tick(shooter: Entity?, data: GunData, inMainHand: Boolean) {
         val level = shooter?.level() ?: return

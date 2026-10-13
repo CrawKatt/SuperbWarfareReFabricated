@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.item.gun
 
 import com.atsuishio.superbwarfare.Mod
-import com.atsuishio.superbwarfare.Mod.Companion.loc
 import team.reborn.energy.api.EnergyStorage
 import com.atsuishio.superbwarfare.api.event.ShootEvent
 import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
@@ -13,8 +12,6 @@ import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.PMC
 import com.atsuishio.superbwarfare.data.PropertyModifier
 import com.atsuishio.superbwarfare.data.gun.*
-import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
-import com.atsuishio.superbwarfare.data.gun.GunData.Companion.getDefault
 import com.atsuishio.superbwarfare.data.gun.melee.ProjectileMarker
 import com.atsuishio.superbwarfare.data.gun.melee.isEngineProjectileMarker
 import com.atsuishio.superbwarfare.data.gun.melee.normalizeProjectileMarker
@@ -41,8 +38,6 @@ import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessag
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.*
-import com.atsuishio.superbwarfare.tools.VectorTool.isInLiquid
-import com.atsuishio.superbwarfare.tools.VectorTool.randomSpreadVec
 import com.atsuishio.superbwarfare.world.phys.EntityResult
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
@@ -100,7 +95,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
 
     private var isDamageable = false
 
-    override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) = with(GunProp) {
+    override fun modifyProperty(modifier: PMC<GunData, DefaultGunData>) = with(GunProp.Companion) {
         val data = modifier.data
 
         modifier[DAMAGE] += getCustomDamage(data)
@@ -116,7 +111,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     }
 
     override fun isBarVisible(stack: ItemStack): Boolean {
-        val data = from(stack)
+        val data = GunData.from(stack)
         if (data.get(GunProp.MAX_DURABILITY) > 0) return super.isBarVisible(stack)
 
         val cap = EnergyStorage.ITEM.find(stack, null)
@@ -124,7 +119,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     }
 
     override fun getBarWidth(stack: ItemStack): Int {
-        val data = from(stack)
+        val data = GunData.from(stack)
         if (data.get(GunProp.MAX_DURABILITY) > 0) {
             return super.getBarWidth(stack)
         }
@@ -138,7 +133,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     }
 
     override fun getBarColor(stack: ItemStack): Int {
-        val data = from(stack)
+        val data = GunData.from(stack)
         if (data.get(GunProp.MAX_DURABILITY) > 0) {
             return super.getBarColor(stack)
         }
@@ -179,7 +174,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             GeoItem.getOrAssignId(stack, level)
         }
 
-        val data = from(stack)
+        val data = GunData.from(stack)
 
         val inMainHand = entity is LivingEntity && entity.mainHandItem == stack
         data.tick(entity, inMainHand)
@@ -197,7 +192,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         // 手持副武器时只返回 super：不加移速惩罚（按 Weight）、也不加近战伤害属性
         if (!useAsWeaponInHand()) return map
 
-        val data = from(stack)
+        val data = GunData.from(stack)
         map = HashMultimap.create<Attribute, AttributeModifier>(map)
 
         // 移速
@@ -247,7 +242,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         }
     }
 
-    open fun getGunIcon(stack: ItemStack) = getGunIcon(from(stack))
+    open fun getGunIcon(stack: ItemStack) = getGunIcon(GunData.from(stack))
 
     open fun getGunIcon(data: GunData) = data.get(GunProp.ICON)
 
@@ -256,7 +251,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     override fun isEnchantable(stack: ItemStack) = false
 
     open fun getMaxDamage(stack: ItemStack): Int {
-        val maxDurability = from(stack).get(GunProp.MAX_DURABILITY)
+        val maxDurability = GunData.from(stack).get(GunProp.MAX_DURABILITY)
         isDamageable = maxDurability > 0
         return maxDurability
     }
@@ -374,7 +369,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     /**
      * 获取额外变化的重量，即计算后的总重与枪身基础重量的差值（默认来自配件等的重量加成）
      *
-     * 只用来读取差值（比如开镜/持枪展开的手感），不要再累加回 [GunProp.WEIGHT]，
+     * 只用来读取差值（比如开镜/持枪展开的手感），不要再累加回 [GunProp.Companion.WEIGHT]，
      * 也不能在 [modifyProperty] 里调用，否则会在 PMC 计算中递归读取属性
      */
     open fun getCustomWeight(data: GunData): Double = data.get(GunProp.WEIGHT) - data.getDefault().weight
@@ -423,13 +418,13 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     /**
      * 这次开火打出去的算不算「子弹」。
      *
-     * 判据是 [GunProp.PROJECTILE] 解析出来的实体类型就是 [ModEntities.PROJECTILE]
-     * （`superbwarfare:projectile`，也就是 [ProjectileEntity]，SBW 枪械的常规弹丸）：
+     * 判据是 [GunProp.Companion.PROJECTILE] 解析出来的实体类型就是 [com.atsuishio.superbwarfare.init.ModEntities.PROJECTILE]
+     * （`superbwarfare:projectile`，也就是 [com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity]，SBW 枪械的常规弹丸）：
      * 榴弹、火箭弹、炮弹、泰瑟针、超星弹这些「打出去的是别的东西」的武器不算，
      * `@empty` / `@ray` / `@melee` 这类压根没有实体的引擎标记也不算。
      *
      * 解析方式和 [shootBullet] 保持一致（`EntityType.byString`）而不是比字符串，是为了跟真正生成的那个
-     * 实体对齐；同理读 [GunProp.PROJECTILE] 而不读 `DefaultGunData`，因为配件/弹药可以改弹种。
+     * 实体对齐；同理读 [GunProp.Companion.PROJECTILE] 而不读 `DefaultGunData`，因为配件/弹药可以改弹种。
      */
     open fun isBulletProjectile(data: GunData): Boolean {
         val projectileType = data.get(GunProp.PROJECTILE).itemId
@@ -833,7 +828,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             val stack = data.stack
             val origin = stack.item.descriptionId
             val name = origin.substring(origin.lastIndexOf(".") + 1)
-            player.connection.send(ClientboundStopSoundPacket(loc(name + "_lock"), SoundSource.PLAYERS))
+            player.connection.send(ClientboundStopSoundPacket(Mod.loc(name + "_lock"), SoundSource.PLAYERS))
         }
         if (player is ServerPlayer && data.selectedFireModeInfo().isChargeMode()) {
             val chargeSound = GunResource.compute(data.stack).chargeSound
@@ -894,7 +889,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         var velocity = (data.get(GunProp.VELOCITY) * parameters.power.coerceAtLeast(0.0)).toFloat()
         val bypassArmorRate = data.get(GunProp.BYPASSES_ARMOR)
 
-        if (isInLiquid(level, shootPosition)) {
+        if (VectorTool.isInLiquid(level, shootPosition)) {
             velocity = 2 + 0.05f * velocity
         }
 
@@ -930,7 +925,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
                     setZoom(zoom)
                     setBypassArmorRate(bypassArmorRate.toFloat())
                     setVelocity(finalVelocity)
-                    setKnockback(data.get(GunProp.KNOCKBACK).toFloat())
+                    setKnockback(data.get(GunProp.KNOCKBACK))
                     setUnderwaterMotionScale(data.get(GunProp.UNDERWATER_MOTION_SCALE))
                     setExplosionDestroy(data.get(GunProp.EXPLOSION_DESTROY))
                     setProjectileSplitCount(data.get(GunProp.PROJECTILE_SPLIT_COUNT))
@@ -1321,7 +1316,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     }
 
     protected fun randomVec(vec3: Vec3, spread: Double): Vec3 =
-        randomSpreadVec(this.random, vec3, spread)
+        VectorTool.randomSpreadVec(this.random, vec3, spread)
 
     open fun canEditAttachments(data: GunData) = true
 
@@ -1340,7 +1335,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     override fun getItemScreen(stack: ItemStack, player: Player, hand: InteractionHand): Screen? {
         if (ClientEventHandler.canOpenEditScreen(stack, hand)
             && isHeldWeapon(stack)
-            && canEditAttachments(from(stack))
+            && canEditAttachments(GunData.from(stack))
         ) {
             return WeaponEditScreen(stack)
         }
@@ -1349,7 +1344,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
 
     open fun tick(shooter: Entity?, data: GunData, inMainHand: Boolean) {}
 
-    open fun getDefaultData(data: GunData) = getDefault(data.id)
+    open fun getDefaultData(data: GunData) = GunData.getDefault(data.id)
 
     open fun getEnergyProvider(data: GunData, ammoSupplier: Entity?): EnergyStorage? {
         return EnergyStorage.ITEM.find(data.stack, null)

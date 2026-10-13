@@ -3,7 +3,7 @@ package com.atsuishio.superbwarfare.item.gun.machinegun
 import com.atsuishio.superbwarfare.client.PoseTool
 import com.atsuishio.superbwarfare.event.DeployedWeaponHandler
 import com.atsuishio.superbwarfare.init.RegistryName
-import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
+import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.model.HumanoidModel
@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Rarity
 
 @RegistryName("m_2_hb")
-object M2HBItem : GeoGunItemV2(Properties().rarity(Rarity.RARE)) {
+object M2HBItem : GeoGunItem(Properties().rarity(Rarity.RARE)) {
 
     @Environment(EnvType.CLIENT)
     override fun armPose(

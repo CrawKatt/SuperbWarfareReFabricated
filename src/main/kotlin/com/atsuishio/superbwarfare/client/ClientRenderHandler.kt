@@ -38,13 +38,11 @@ import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientDogTagImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientGunImageTooltip
-import com.atsuishio.superbwarfare.client.tooltip.ClientSentinelImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientAttachmentImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.ChargingStationImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.DogTagImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent
-import com.atsuishio.superbwarfare.client.tooltip.component.SentinelImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.AttachmentImageComponent
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModItems
@@ -54,7 +52,7 @@ import com.atsuishio.superbwarfare.item.armor.RuChest6b43Item
 import com.atsuishio.superbwarfare.item.armor.RuHelmet6b47Item
 import com.atsuishio.superbwarfare.item.armor.UsChestIotvItem
 import com.atsuishio.superbwarfare.item.armor.UsHelmetPasgtItem
-import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
+import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import com.atsuishio.superbwarfare.tools.mc
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.tools.BedrockBoneCoordinateTool
@@ -101,7 +99,6 @@ object ClientRenderHandler {
         DroneHudOverlay,
         HeatBarOverlay,
         CrossHairOverlay,
-        ItemRendererFixOverlay,
         AmmoCountOverlay,
         StaminaOverlay,
         VehicleCrosshairOverlay,
@@ -249,7 +246,6 @@ object ClientRenderHandler {
         TooltipComponentCallback.EVENT.register { component ->
             when (component) {
                 is CellImageComponent -> ClientCellImageTooltip(component)
-                is SentinelImageComponent -> ClientSentinelImageTooltip(component)
                 is ChargingStationImageComponent -> ClientChargingStationImageTooltip(component)
                 is DogTagImageComponent -> ClientDogTagImageTooltip(component)
                 is GunImageComponent -> ClientGunImageTooltip(component)
@@ -336,7 +332,7 @@ object ClientRenderHandler {
         MeleeDebugRenderer.register()
         DeployedWeaponRenderer.register()
         val geoGunRenderer = GeoGunRenderer()
-        BuiltInRegistries.ITEM.filterIsInstance<GeoGunItemV2>().forEach { item ->
+        BuiltInRegistries.ITEM.filterIsInstance<GeoGunItem>().forEach { item ->
             BuiltinItemRendererRegistry.INSTANCE.register(item, geoGunRenderer)
         }
 

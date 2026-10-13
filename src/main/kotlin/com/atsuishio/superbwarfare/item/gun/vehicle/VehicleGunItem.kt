@@ -61,11 +61,11 @@ open class VehicleGunItem : GunItem(Properties()) {
 
     override fun appendHoverText(
         stack: ItemStack,
-        pLevel: Level?,
-        tooltipComponents: MutableList<Component>,
-        tooltipFlag: TooltipFlag
+        level: Level?,
+        list: MutableList<Component>,
+        flag: TooltipFlag
     ) {
-        tooltipComponents.add(Component.translatable("des.superbwarfare.vehicle_gun").withStyle(ChatFormatting.RED))
+        list.add(Component.translatable("des.superbwarfare.vehicle_gun").withStyle(ChatFormatting.RED))
     }
 
     // TODO 去掉特判
