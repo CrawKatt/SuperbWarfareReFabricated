@@ -749,7 +749,7 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 )
                 .save(writer, loc(getItemName(ModItems.JAVELIN_MISSILE) + "_convert"))
 
-            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.LUNGE_MINE, 2)
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.LUNGE_MINE)
                 .pattern(" ba")
                 .pattern(" cb")
                 .pattern("c  ")

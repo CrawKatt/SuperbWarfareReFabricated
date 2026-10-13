@@ -337,6 +337,11 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
 
     open fun deployable(data: GunData) = data.get(GunProp.DEPLOYABLE)
 
+    /** 右键行为（`RightClickAction`）按下 / 抬起；返回 `true` 表示本枪完全接管，默认分发不再执行 */
+    open fun onUseActionPress(player: Player, stack: ItemStack, data: GunData): Boolean = false
+
+    open fun onUseActionRelease(player: Player, stack: ItemStack, data: GunData): Boolean = false
+
     /**
      * 武器是否能进行近战攻击
      */

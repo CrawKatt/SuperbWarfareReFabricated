@@ -126,5 +126,25 @@ fun DefaultGunData.withOverrides(diff: Map<out Prop<*, *, *, *, *>, Any?>): Defa
         expMultiplier = num(GunProp.EXP_MULTIPLIER, expMultiplier),
         projectileLifesteal = num(GunProp.PROJECTILE_LIFESTEAL, projectileLifesteal),
         meleeLifesteal = num(GunProp.MELEE_LIFESTEAL, meleeLifesteal),
+        meleeDamageType = if (diff.containsKey(GunProp.MELEE_DAMAGE_TYPE)) {
+            diff[GunProp.MELEE_DAMAGE_TYPE] as? String ?: meleeDamageType
+        } else {
+            meleeDamageType
+        },
+        meleeHeadshotDamageType = if (diff.containsKey(GunProp.MELEE_HEADSHOT_DAMAGE_TYPE)) {
+            diff[GunProp.MELEE_HEADSHOT_DAMAGE_TYPE] as? String ?: meleeHeadshotDamageType
+        } else {
+            meleeHeadshotDamageType
+        },
+        rightClickAction = if (diff.containsKey(GunProp.RIGHT_CLICK_ACTION)) {
+            diff[GunProp.RIGHT_CLICK_ACTION] as? RightClickAction ?: rightClickAction
+        } else {
+            rightClickAction
+        },
+        bayonetCharge = if (diff.containsKey(GunProp.BAYONET_CHARGE)) {
+            diff[GunProp.BAYONET_CHARGE] as? BayonetChargeInfo ?: bayonetCharge
+        } else {
+            bayonetCharge
+        },
     )
 }

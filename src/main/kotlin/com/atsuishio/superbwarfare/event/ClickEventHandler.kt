@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.event
 
+import com.atsuishio.superbwarfare.client.gun.GunChargeHandler
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.screens.LoiterConfigScreen
 import com.atsuishio.superbwarfare.client.screens.MissilePosInputScreen
@@ -57,16 +58,16 @@ object ClickEventHandler {
         }
 
         if (ModKeyMappings.HOLD_ZOOM.matchesMouse(button)) {
-            handleWeaponZoomRelease()
+            handleWeaponUseRelease()
         } else if (ModKeyMappings.SWITCH_ZOOM.matchesMouse(button) && !switchZoom) {
-            handleWeaponZoomRelease()
+            handleWeaponUseRelease()
         }
     }
 
     private fun cancelFireKey(player: Player, stack: ItemStack): Boolean {
         val vehicle = player.vehicle
         // 手持副武器时按普通物品处理
-        return GunItem.isHeldWeapon(stack) || stack.`is`(ModItems.MONITOR) || stack.`is`(ModItems.LUNGE_MINE)
+        return GunItem.isHeldWeapon(stack) || stack.`is`(ModItems.MONITOR)
                 || stack.`is`(ModItems.ARTILLERY_INDICATOR) || player.hasEffect(ModMobEffects.SHOCK)
                 || (vehicle is VehicleEntity && vehicle.banHand(player))
     }
@@ -193,7 +194,6 @@ object ClickEventHandler {
         if (GunItem.isHeldWeapon(stack)
             || player.vehicle is VehicleEntity
             || stack.`is`(ModItems.MONITOR)
-            || stack.`is`(ModItems.LUNGE_MINE)
             || (stack.`is`(Items.SPYGLASS) && player.isScoping && player.offhandItem.`is`(ModItems.FIRING_PARAMETERS))
             || stack.`is`(ModItems.ARTILLERY_INDICATOR)
         ) {
@@ -202,10 +202,10 @@ object ClickEventHandler {
             }
 
             if (ModKeyMappings.HOLD_ZOOM.matchesMouse(button)) {
-                handleWeaponZoomPress(player, stack)
+                handleWeaponUsePress(player, stack)
                 switchZoom = false
             } else if (ModKeyMappings.SWITCH_ZOOM.matchesMouse(button)) {
-                handleWeaponZoomPress(player, stack)
+                handleWeaponUsePress(player, stack)
                 switchZoom = !switchZoom
             }
         }
@@ -500,13 +500,13 @@ object ClickEventHandler {
                 }
 
                 if (key == ModKeyMappings.HOLD_ZOOM.key.value) {
-                    handleWeaponZoomPress(player, stack)
+                    handleWeaponUsePress(player, stack)
                     switchZoom = false
                     return true
                 }
 
                 if (key == ModKeyMappings.SWITCH_ZOOM.key.value) {
-                    handleWeaponZoomPress(player, stack)
+                    handleWeaponUsePress(player, stack)
                     switchZoom = !switchZoom
                 }
             }
@@ -522,9 +522,9 @@ object ClickEventHandler {
             }
 
             if (key == ModKeyMappings.HOLD_ZOOM.key.value) {
-                handleWeaponZoomRelease()
+                handleWeaponUseRelease()
             } else if (key == ModKeyMappings.SWITCH_ZOOM.key.value && !switchZoom) {
-                handleWeaponZoomRelease()
+                handleWeaponUseRelease()
             }
 
             if (action == GLFW.GLFW_RELEASE) {
@@ -595,10 +595,6 @@ object ClickEventHandler {
 
         if (stack.`is`(Items.SPYGLASS) && player.isScoping && player.offhandItem.`is`(ModItems.FIRING_PARAMETERS)) {
             sendPacketToServer(SetFiringParametersMessage)
-        }
-
-        if (stack.`is`(ModItems.LUNGE_MINE)) {
-            ClientEventHandler.usingLunge = true
         }
 
         // 当前操控的枪
@@ -735,9 +731,7 @@ object ClickEventHandler {
         }
     }
 
-    fun handleWeaponZoomPress(player: Player, stack: ItemStack) {
-        sendPacketToServer(ZoomMessage(0))
-
+    fun handleWeaponUsePress(player: Player, stack: ItemStack) {
         ClientEventHandler.isEditing = false
 
         val vehicle = player.vehicle
@@ -750,6 +744,7 @@ object ClickEventHandler {
                     return
                 }
             }
+            sendPacketToServer(ZoomMessage(0))
             ClientEventHandler.zoomVehicle = true
             return
         }
@@ -757,9 +752,22 @@ object ClickEventHandler {
         // 当前操控的枪：`CanZoom` / `ZOOM_TIME` 全部读正在操作那把的数据
         val gunStack = ActiveGun.stackOf(player)
         if (!GunItem.isOperable(gunStack)) return
+
+        val item = gunStack.item as? GunItem
+        val data = GunData.from(gunStack)
+        if (item != null && item.onUseActionPress(player, gunStack, data)) return
+
+        when (data.get(GunProp.RIGHT_CLICK_ACTION)) {
+            RightClickAction.HEAVY_STRIKE -> ClientEventHandler.requestHeavyStrike()
+            RightClickAction.BAYONET_CHARGE -> GunChargeHandler.start(player, gunStack, data)
+            else -> handleWeaponAimPress(player, gunStack, data)
+        }
+    }
+
+    private fun handleWeaponAimPress(player: Player, gunStack: ItemStack, data: GunData) {
         if (!GunResource.compute(gunStack).canZoom) return
 
-        val data = GunData.from(gunStack)
+        sendPacketToServer(ZoomMessage(0))
         ClientEventHandler.zoom = true
 
         val level = data.perk.getLevel(ModPerks.INTELLIGENT_CHIP)
@@ -775,12 +783,21 @@ object ClickEventHandler {
         }
     }
 
-    fun handleWeaponZoomRelease() {
+    fun handleWeaponUseRelease() {
+        val player = Minecraft.getInstance().player
+        if (!ClientEventHandler.zoom && !ClientEventHandler.zoomVehicle) return
+
+        if (player != null) {
+            val gunStack = ActiveGun.stackOf(player)
+            val item = gunStack.item as? GunItem
+            if (item != null && item.onUseActionRelease(player, gunStack, GunData.from(gunStack))) return
+        }
+
         sendPacketToServer(ZoomMessage(1))
         ClientEventHandler.zoom = false
         ClientEventHandler.zoomVehicle = false
         ClientEventHandler.lockedEntity = null
-        ClientEventHandler.stopWeaponSeekSound(Minecraft.getInstance().player)
+        ClientEventHandler.stopWeaponSeekSound(player)
         ClientEventHandler.breath = false
     }
 
