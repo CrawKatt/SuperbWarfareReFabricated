@@ -39,32 +39,21 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.createmod.ponder.foundation.PonderIndex;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.config.ModConfig;
 
-import java.util.Set;
-
 public class ClientMod implements ClientModInitializer {
-
-    private static final Set<ResourceLocation> CUSTOM_GUI_ICON_ITEMS = Set.of(
-            new ResourceLocation(Mod.MODID, "lunge_mine")
-    );
 
     @Override
     public void onInitializeClient() {
         PonderIndex.addPlugin(SBWPonderPlugin.INSTANCE);
         ModParticleRenderTypes.INSTANCE.register();
         DragonTeethObjModelLoader.register();
-        registerGuiIconModels();
         registerBuiltinResourcePacks();
 
         ForgeConfigRegistry.INSTANCE.register(Mod.MODID, ModConfig.Type.CLIENT, ClientConfig.init());
@@ -119,18 +108,6 @@ public class ClientMod implements ClientModInitializer {
             KillMessageHandler.onClientTick();
             FuMO25ScreenHelper.onClientTick();
         });
-    }
-
-    private static void registerGuiIconModels() {
-        ModelLoadingPlugin.register(context -> BuiltInRegistries.ITEM.forEach(item -> {
-            ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
-            if (CUSTOM_GUI_ICON_ITEMS.contains(itemId)) {
-                context.addModels(new ModelResourceLocation(itemId.withPath(path -> path + "_icon"), "inventory"));
-            }
-            if (CUSTOM_GUI_ICON_ITEMS.contains(itemId)) {
-                context.addModels(new ModelResourceLocation(itemId.withPath(path -> path + "_3d"), "inventory"));
-            }
-        }));
     }
 
     private static void registerBuiltinResourcePacks() {

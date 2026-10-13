@@ -75,4 +75,18 @@ object PoseTool {
             model.rightArm.yRot = 5f * Mth.DEG_TO_RAD + model.head.yRot
         }
     })
+
+    /** 刺雷：右手前推、左手横挡在身前，和端着枪的 [pose] 完全不同。 */
+    @JvmField
+    val LUNGE_MINE_POSE: ArmPose = armPoseFactory.create(
+        "LungeMineItem",
+        false,
+        ArmPoseExtensible.Transformer { model: HumanoidModel<*>, entity: LivingEntity?, arm: HumanoidArm ->
+        if (arm != HumanoidArm.LEFT) {
+            model.rightArm.xRot = 20f * Mth.DEG_TO_RAD + model.head.xRot
+            model.rightArm.yRot = -12f * Mth.DEG_TO_RAD
+            model.leftArm.xRot = -45f * Mth.DEG_TO_RAD + model.head.xRot
+            model.leftArm.yRot = 40f * Mth.DEG_TO_RAD
+        }
+    })
 }

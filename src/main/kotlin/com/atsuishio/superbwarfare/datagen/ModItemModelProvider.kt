@@ -85,6 +85,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         gunItemV2(ModItems.REFORGING)
         gunItemV2(ModItems.M_1897)
         gunItemV2(ModItems.RAUBTIER)
+        gunItemV2(ModItems.LUNGE_MINE)
 
 //        gunItem(ModItems.BEAST_GUN_TEST)
 

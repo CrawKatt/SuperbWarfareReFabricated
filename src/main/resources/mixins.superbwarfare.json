@@ -62,7 +62,6 @@
     "HumanoidModelMixin",
     "ItemInHandLayerMixin",
     "ItemInHandRendererMixin",
-    "ItemRendererMixin",
     "KeyboardHandlerMixin",
     "KeyboardInputMixin",
     "KeymappingMixin",

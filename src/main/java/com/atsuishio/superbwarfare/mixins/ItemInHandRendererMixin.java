@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.custom.RenderHandCallback;
-import com.atsuishio.superbwarfare.item.LungeMine;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.item.misc.MonitorItem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -35,8 +34,7 @@ public class ItemInHandRendererMixin {
     private boolean superbWarfare$monitorMatchesForEquipAnimation(ItemStack oldStack, ItemStack newStack) {
         if (!oldStack.isEmpty() && !newStack.isEmpty()
                 && (oldStack.getItem() instanceof GunItem
-                || oldStack.getItem() instanceof MonitorItem
-                || oldStack.getItem() instanceof LungeMine)) {
+                || oldStack.getItem() instanceof MonitorItem)) {
             return true;
         }
 

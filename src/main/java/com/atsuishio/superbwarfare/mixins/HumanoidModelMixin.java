@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.client.ArmPoseExtensible;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
-import com.atsuishio.superbwarfare.item.LungeMine;
 import com.atsuishio.superbwarfare.event.DeployedWeaponHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.item.gun.special.SuperStarShooterItem;
@@ -60,12 +59,7 @@ public abstract class HumanoidModelMixin {
         var item = entity.getItemInHand(hand).getItem();
         var model = (HumanoidModel<?>) (Object) this;
 
-        if (item instanceof LungeMine) {
-            model.rightArm.xRot = 20f * Mth.DEG_TO_RAD + model.head.xRot;
-            model.rightArm.yRot = -12f * Mth.DEG_TO_RAD;
-            model.leftArm.xRot = -45f * Mth.DEG_TO_RAD + model.head.xRot;
-            model.leftArm.yRot = 40f * Mth.DEG_TO_RAD;
-        } else if (item instanceof SuperStarShooterItem) {
+        if (item instanceof SuperStarShooterItem) {
             model.rightArm.xRot = -70f * Mth.DEG_TO_RAD + model.head.xRot;
             model.rightArm.yRot = 0f;
             model.rightArm.zRot = 0f;
