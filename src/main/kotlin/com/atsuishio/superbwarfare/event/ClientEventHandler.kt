@@ -2149,6 +2149,7 @@ object ClientEventHandler {
     }
     @JvmStatic
     fun handleWeaponBreathSway() {
+        if (isEditing) return
         val player = localPlayer ?: return
         val stack = ActiveGun.stackOf(player)
         val item = stack.item as? GunItem ?: return
@@ -2310,6 +2311,12 @@ object ClientEventHandler {
 
 
     private fun handleWeaponSway(entity: LivingEntity) {
+        // 改装时固定挂点投影，停止呼吸摇摆；退出改装后继续按原来的相位计算。
+        if (isEditing) {
+            swayX = 0.0
+            swayY = 0.0
+            return
+        }
         val player = entity as? Player ?: return
         val stack = ActiveGun.stackOf(player)
         val item = stack.item as? GunItem ?: return
@@ -3209,6 +3216,8 @@ object ClientEventHandler {
     fun onOpenEditScreen() {
         val player = localPlayer ?: return
         isEditing = true
+        swayX = 0.0
+        swayY = 0.0
         editingAttachmentType = -1
         holdingFireKey = false
         player.playSound(ModSounds.EDIT_MODE, 1f, 1f)

@@ -1470,6 +1470,9 @@
   "config.jade.plugin_superbwarfare.vehicle_deployer": "Vehicle Deployer",
   "config.jade.plugin_superbwarfare.catapult_controller": "Catapult Controller",
 
+  "screen.superbwarfare.weapon_edit.empty": "No attachment installed",
+  "screen.superbwarfare.weapon_edit.no_available": "No compatible attachments in inventory",
+
   "gamerule.sbwDoGenerateLoots": "Generate Superb Warfare Chest Loots",
 
   "superbwarfare.advancement.main.root": "Superb Warfare",
