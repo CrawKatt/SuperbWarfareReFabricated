@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -45,9 +44,6 @@ public class ItemRendererMixin {
                 case THIRD_PERSON_RIGHT_HAND -> "_3d";
                 default -> null;
             };
-        } else if (stack.getItem() instanceof GunGeoItem
-                && (displayContext == ItemDisplayContext.GUI || displayContext == ItemDisplayContext.GROUND)) {
-            suffix = "_icon";
         }
 
         if (suffix != null) {

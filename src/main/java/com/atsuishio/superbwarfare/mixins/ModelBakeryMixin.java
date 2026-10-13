@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.item.gun.GunGeoItem;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.BlockStateModelLoader;
@@ -66,6 +65,6 @@ public abstract class ModelBakeryMixin {
 
     @Unique
     private static boolean usesGuiIconModel(ResourceLocation itemId, Item item) {
-        return item instanceof GunGeoItem || CUSTOM_GUI_ICON_ITEMS.contains(itemId);
+        return CUSTOM_GUI_ICON_ITEMS.contains(itemId);
     }
 }

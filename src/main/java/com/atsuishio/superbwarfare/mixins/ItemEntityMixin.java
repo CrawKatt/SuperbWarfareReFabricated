@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.item.gun.special.BeastGunTestItem;
 import com.atsuishio.superbwarfare.item.weapon.BeastItem;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -32,7 +31,7 @@ public abstract class ItemEntityMixin {
 
     @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
     private void superbwarfare$beastCannotBeHurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (this.getItem().getItem() instanceof BeastItem || this.getItem().getItem() instanceof BeastGunTestItem) {
+        if (this.getItem().getItem() instanceof BeastItem) {
             cir.setReturnValue(false);
         } else if (this.getItem().is(ModItems.CONTAINER)
                 && (source.is(DamageTypeTags.IS_EXPLOSION) || source.is(DamageTypes.CACTUS))) {
