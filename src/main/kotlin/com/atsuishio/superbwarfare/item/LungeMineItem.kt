@@ -1,4 +1,4 @@
-package com.atsuishio.superbwarfare.item.gun.special
+package com.atsuishio.superbwarfare.item
 
 import com.atsuishio.superbwarfare.client.PoseTool
 import com.atsuishio.superbwarfare.init.RegistryName
@@ -10,8 +10,11 @@ import net.minecraft.world.item.ItemStack
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 
+@Deprecated("reserved for compatibility, DO NOT USE")
+sealed interface LungeMine
+
 @RegistryName("lunge_mine")
-class LungeMineItem : GeoGunItem(Properties()) {
+open class LungeMineItem : GeoGunItem(Properties()), @Suppress("DEPRECATION") LungeMine {
 
     @OnlyIn(Dist.CLIENT)
     override fun armPose(
