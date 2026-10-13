@@ -6,7 +6,6 @@ import com.atsuishio.superbwarfare.entity.projectile.MediumRocketEntity
 import com.atsuishio.superbwarfare.init.ModItems.registerAttachment
 import com.atsuishio.superbwarfare.item.DispenserLaunchable
 import com.atsuishio.superbwarfare.item.HandGrenadeItem
-import com.atsuishio.superbwarfare.item.LungeMineItem
 import com.atsuishio.superbwarfare.item.RgoGrenadeItem
 import com.atsuishio.superbwarfare.item.ammo.*
 import com.atsuishio.superbwarfare.item.armor.*
@@ -28,6 +27,7 @@ import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem
 import com.atsuishio.superbwarfare.item.gun.machinegun.M2HBItem
 import com.atsuishio.superbwarfare.item.gun.machinegun.MinigunItem
 import com.atsuishio.superbwarfare.item.gun.shotgun.HomemadeShotgunItem
+import com.atsuishio.superbwarfare.item.gun.special.LungeMineItem
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem
 import com.atsuishio.superbwarfare.item.gun.vehicle.VehicleGunItem
 import com.atsuishio.superbwarfare.item.material.*
@@ -154,6 +154,7 @@ object ModItems {
     @JvmField val REFORGING = registerGun("reforging") { GeoGunItem(Properties().rarity(SUPERB)) }
     @JvmField val RAUBTIER = registerGun("raubtier") { GeoGunItem(Properties().rarity(SUPERB)) }
 
+    @JvmField val LUNGE_MINE = registerGun<LungeMineItem>()
     @JvmField val VEHICLE_GUN = registerGun<VehicleGunItem>()
     @JvmField val EMPTY_GUN = registerGun<EmptyGunItem>()
     // @formatter:on
@@ -197,7 +198,6 @@ object ModItems {
     @JvmField val RPG_ROCKET_STANDARD = registerAmmo<RpgRocketStandardItem>()
     @JvmField val RPG_ROCKET_TBG = registerAmmo<RpgRocketTBGItem>()
     @JvmField val JAVELIN_MISSILE = registerAmmo("javelin_missile") { Item(Properties().stacksTo(4)) }
-    @JvmField val LUNGE_MINE = registerAmmo<LungeMineItem>()
     @JvmField val SMALL_SHELL_AP = registerAmmo("small_shell_ap")
     @JvmField val SMALL_SHELL_HE = registerAmmo("small_shell_he")
     @JvmField val SMALL_SHELL_GS = registerAmmo("small_shell_gs")

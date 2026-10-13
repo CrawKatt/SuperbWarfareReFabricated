@@ -8,10 +8,7 @@ import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance
 import com.atsuishio.superbwarfare.client.animation.gun.GunDrawAnimation
-import com.atsuishio.superbwarfare.client.gun.GunAction
-import com.atsuishio.superbwarfare.client.gun.GunActionLock
-import com.atsuishio.superbwarfare.client.gun.MeleeClientHandler
-import com.atsuishio.superbwarfare.client.gun.SubWeaponClientHandler
+import com.atsuishio.superbwarfare.client.gun.*
 import com.atsuishio.superbwarfare.client.lighting.LightPositionRegistry
 import com.atsuishio.superbwarfare.client.lighting.MuzzleFlashHelper
 import com.atsuishio.superbwarfare.client.lighting.VehicleLightingHandler
@@ -48,7 +45,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
@@ -58,9 +54,6 @@ import net.minecraft.world.entity.npc.AbstractVillager
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.ClipContext
-import net.minecraft.world.level.block.BellBlock
-import net.minecraft.world.level.block.CrossCollisionBlock
-import net.minecraft.world.level.block.DoorBlock
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
@@ -385,17 +378,9 @@ object ClientEventHandler {
     @JvmField
     var lerpShake: Double = 0.0
 
+    // 右键重击（`RightClickAction: "HeavyStrike"`）按下后置位，被 `handleGunMelee` 消费一次
     @JvmField
-    var usingLunge: Boolean = false
-
-    @JvmField
-    var lungeAttack: Int = 0
-
-    @JvmField
-    var lungeDraw: Int = 0
-
-    @JvmField
-    var lungeSprint: Int = 0
+    var heavyStrikeRequested: Boolean = false
 
     // 智慧芯片锁定的实体
     @JvmField
@@ -679,7 +664,6 @@ object ClientEventHandler {
         CrossHairOverlay.handleRenderDamageIndicator()
         staminaSystem()
         handlePlayerSprint()
-        handleLungeAttack(player, stack)
         handleGunMelee(player, stack)
         weaponZooming(stack)
         lockWeaponSeeking(player, stack)
@@ -795,7 +779,7 @@ object ClientEventHandler {
 
             if (uuid == null || uuid != lastOperatingGunUUID) {
                 resetGunStatus()
-                resetLungeMineStatus()
+                resetUseActionStatus()
             }
             lastOperatingGunUUID = uuid
 
@@ -1544,7 +1528,21 @@ object ClientEventHandler {
         // 切换请求的兜底超时（丢一次包不该把 G 永久锁死，也不能让动作锁一直挂着）
         SubWeaponClientHandler.tick(gunData)
 
-        MeleeClientHandler.tick(
+        // 右键行为：重击指定段，冲锋撞到东西时打第 0 段（撞上的那个目标会被强行算进命中）
+        val heavyStrike = heavyStrikeRequested
+        val chargeTarget = if (heavyStrike) null else GunChargeHandler.tick(player, stack)
+        val bayonetCharge = chargeTarget != null
+        val requestedIndex = when {
+            heavyStrike -> MeleeClientHandler.indexOfHeavy(gunData)
+            bayonetCharge -> 0
+            else -> -1
+        }
+
+        if (heavyStrike) {
+            heavyStrikeRequested = false
+        }
+
+        val swung = MeleeClientHandler.tick(
             player = player,
             stack = stack,
             meleeKeyDown = ModKeyMappings.MELEE.isDown(),
@@ -1556,7 +1554,15 @@ object ClientEventHandler {
                     && !isEditing
                     && !(player.vehicle is VehicleEntity && (player.vehicle as VehicleEntity).banHand(player)),
             skipStateTick = true,
+            requestedIndex = requestedIndex,
+            chargeStrike = bayonetCharge,
+            chargeTarget = chargeTarget,
         )
+
+        // 一次冲锋只出一击：真正打出去了才收窗口
+        if (swung && bayonetCharge) {
+            GunChargeHandler.reset()
+        }
     }
 
     /**
@@ -1584,71 +1590,15 @@ object ClientEventHandler {
         return GunActionLock.of(stack).meleeActionIndex
     }
 
-    fun handleLungeAttack(player: Player, stack: ItemStack) {
-        if (stack.`is`(ModItems.LUNGE_MINE.get()) && lungeAttack == 0 && lungeDraw == 0 && usingLunge) {
-            lungeAttack = 18
-            usingLunge = false
-            player.playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1f, 1f)
-        }
+    /** 当前这一段挥击是不是刺刀冲锋的撞人那一下（解析 clip 名用） */
+    @JvmStatic
+    fun currentMeleeFromBayonetCharge(stack: ItemStack): Boolean {
+        if (!GunItem.isHeldWeapon(stack)) return false
+        return GunActionLock.of(stack).meleeFromBayonetCharge
+    }
 
-        if (stack.`is`(ModItems.LUNGE_MINE.get()) && ((lungeAttack >= 9 && lungeAttack <= 10.5) || lungeSprint > 0)) {
-            val lookingEntity = OverlayTraceHandler.playerReachEntity
-
-            val result = player.level().clip(
-                ClipContext(
-                    player.eyePosition,
-                    player.eyePosition.add(player.lookAngle.scale(player.getBlockReach() + 0.5)),
-                    ClipContext.Block.OUTLINE,
-                    ClipContext.Fluid.NONE,
-                    player
-                )
-            )
-
-            val looking = Vec3.atLowerCornerOf(
-                player.level().clip(
-                    ClipContext(
-                        player.eyePosition,
-                        player.eyePosition.add(player.lookAngle.scale(player.getBlockReach() + 0.5)),
-                        ClipContext.Block.OUTLINE,
-                        ClipContext.Fluid.NONE,
-                        player
-                    )
-                ).blockPos
-            )
-            val blockState = player.level().getBlockState(
-                BlockPos.containing(
-                    looking.x,
-                    looking.y,
-                    looking.z
-                )
-            )
-
-            if (lookingEntity != null) {
-                sendPacketToServer(LungeMineAttackMessage(0, lookingEntity.getUUID(), result.location))
-                lungeSprint = 0
-                lungeAttack = 0
-                lungeDraw = 15
-            } else if ((blockState.canOcclude() || blockState.block is DoorBlock
-                        || blockState.block is CrossCollisionBlock || blockState.block is BellBlock) && lungeSprint == 0
-            ) {
-                sendPacketToServer(LungeMineAttackMessage(1, player.getUUID(), result.location))
-                lungeSprint = 0
-                lungeAttack = 0
-                lungeDraw = 15
-            }
-        }
-
-        if (lungeSprint > 0) {
-            lungeSprint--
-        }
-
-        if (lungeAttack > 0) {
-            lungeAttack--
-        }
-
-        if (lungeDraw > 0) {
-            lungeDraw--
-        }
+    fun requestHeavyStrike() {
+        heavyStrikeRequested = true
     }
 
     @SubscribeEvent
@@ -2254,9 +2204,6 @@ object ClientEventHandler {
         if (event.hand == leftHand) {
             // 手持副武器时按普通物品处理
             if (GunItem.isHeldWeapon(rightHandItem)) {
-                event.isCanceled = true
-            }
-            if (rightHandItem.`is`(ModItems.LUNGE_MINE.get())) {
                 event.isCanceled = true
             }
             if (player.isUsingItem && player.useItem.`is`(ModItems.ARTILLERY_INDICATOR.get())) {
@@ -3140,11 +3087,9 @@ object ClientEventHandler {
         zoomTime = 0.0
     }
 
-    fun resetLungeMineStatus() {
-        lungeDraw = 30
-        lungeSprint = 0
-        lungeAttack = 0
-        usingLunge = false
+    fun resetUseActionStatus() {
+        GunChargeHandler.reset()
+        heavyStrikeRequested = false
     }
 
     private fun handleWeaponDraw(entity: LivingEntity) {

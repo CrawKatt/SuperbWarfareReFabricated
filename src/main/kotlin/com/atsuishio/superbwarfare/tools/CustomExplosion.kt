@@ -70,6 +70,7 @@ open class CustomExplosion(
     private val damageCalculator: ExplosionDamageCalculator
     private var fireTime = 0
     private var beast = false
+    private var excludeDirectSource = true
 
     init {
         this.damageSource = source ?: level.damageSources().explosion(this)
@@ -137,6 +138,12 @@ open class CustomExplosion(
 
     fun setBeast(flag: Boolean): CustomExplosion {
         this.beast = flag
+        return this
+    }
+
+    /** 取伤害目标时是否排除 [entity]（默认排除） */
+    fun setExcludeDirectSource(flag: Boolean): CustomExplosion {
+        this.excludeDirectSource = flag
         return this
     }
 
@@ -342,7 +349,7 @@ open class CustomExplosion(
         val z0 = Mth.floor(this.z - diameter.toDouble() - 1)
         val z1 = Mth.floor(this.z + diameter.toDouble() + 1)
         val list = this.level.getEntities(
-            this.entity,
+            if (this.excludeDirectSource) this.entity else null,
             AABB(x0.toDouble(), y0.toDouble(), z0.toDouble(), x1.toDouble(), y1.toDouble(), z1.toDouble())
         )
         ForgeEventFactory.onExplosionDetonate(this.level, this, list, diameter.toDouble())
@@ -523,6 +530,7 @@ open class CustomExplosion(
         private var damageSource: DamageSource? = null
         private var particlePosition: Vec3? = null
         private var beast = false
+        private var includeDirectSource = false
         var position: Vec3
 
         init {
@@ -596,6 +604,12 @@ open class CustomExplosion(
             return this
         }
 
+        /** 让 [directSource] 也吃这次爆炸的伤害（默认被排除） */
+        fun includeDirectSource(): Builder {
+            this.includeDirectSource = true
+            return this
+        }
+
         fun explode() {
             if (level.isClientSide) return
 
@@ -618,6 +632,7 @@ open class CustomExplosion(
             )
                 .setFireTime(fireTime)
                 .setBeast(beast)
+                .setExcludeDirectSource(!includeDirectSource)
 
             customExplosion.explode()
             ForgeEventFactory.onExplosionStart(directSource.level(), customExplosion)
