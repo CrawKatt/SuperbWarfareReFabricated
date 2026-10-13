@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.api.event.PreKillEvent
-import com.atsuishio.superbwarfare.capability.ModCapabilities
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.config.common.GameplayConfig
 import com.atsuishio.superbwarfare.config.server.MiscConfig
@@ -658,7 +657,7 @@ object LivingEventHandler {
         val player = event.entity as? Player ?: return
         if (!MiscConfig.DROP_AMMO_BOX.get()) return
 
-        val cap = player.getCapability(ModCapabilities.PLAYER_VARIABLE).orElse(PlayerVariable())
+        val cap = PlayerVariable.getOrDefault(player)
 
         val drop = Ammo.entries.sumOf { it.get(cap) } > 0
         if (!drop) return

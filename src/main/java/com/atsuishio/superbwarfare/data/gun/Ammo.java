@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.data.gun;
 
-import com.atsuishio.superbwarfare.capability.ModCapabilities;
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.config.server.AmmoConfigKt;
 import com.atsuishio.superbwarfare.init.ModItems;
@@ -138,9 +137,7 @@ public enum Ammo {
     }
 
     public int get(Player player) {
-        return player.getCapability(ModCapabilities.PLAYER_VARIABLE)
-                .map(this::get)
-                .orElse(0);
+        return get(PlayerVariable.getOrDefault(player));
     }
 
     public boolean set(Player player, int count) {

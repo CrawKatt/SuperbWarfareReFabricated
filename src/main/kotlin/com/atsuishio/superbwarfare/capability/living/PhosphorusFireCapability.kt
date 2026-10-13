@@ -1,59 +1,40 @@
 package com.atsuishio.superbwarfare.capability.living
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.capability.CapabilityWrapper
 import com.atsuishio.superbwarfare.capability.ModCapabilities
-import com.atsuishio.superbwarfare.capability.sync.CapabilitySync
-import com.atsuishio.superbwarfare.capability.sync.SyncedCapability
-import com.atsuishio.superbwarfare.serialization.ByteBufDecoder
-import com.atsuishio.superbwarfare.serialization.ByteBufEncoder
-import com.atsuishio.superbwarfare.serialization.decodeFromCompoundTag
-import com.atsuishio.superbwarfare.serialization.encodeToCompoundTag
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.serializer
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.Entity
 import net.minecraftforge.common.capabilities.AutoRegisterCapability
-import net.minecraftforge.common.util.INBTSerializable
 
-@AutoRegisterCapability
+/**
+ * 白磷弹燃烧状态。
+ *
+ * 只描述数据；存档读写与网络同步由 [CapabilityWrapper] 代劳，见 [ModCapabilities.PHOSPHORUS_FIRE]。
+ */
 @Serializable
 data class PhosphorusFireCapability(
     @SerialName("SbwPhosphorusFire")
-    var isOnFire: Boolean = false,
-) : INBTSerializable<CompoundTag>, SyncedCapability {
-
-    override fun serializeNBT(): CompoundTag =
-        encodeToCompoundTag(serializer<PhosphorusFireCapability>(), this)
-
-    override fun deserializeNBT(nbt: CompoundTag) {
-        isOnFire = decodeFromCompoundTag(serializer<PhosphorusFireCapability>(), nbt).isOnFire
-    }
-
-    // 只有一个字段，增量与全量没有区别
-    override fun writeSync(encoder: ByteBufEncoder, full: Boolean) {
-        encoder.encodeBoolean(isOnFire)
-    }
-
-    override fun readSync(decoder: ByteBufDecoder, full: Boolean) {
-        isOnFire = decoder.decodeBoolean()
-    }
-
+    val isOnFire: Boolean = false,
+) {
     companion object {
         val ID: ResourceLocation = loc("phosphorus_fire_capability")
 
         @JvmStatic
-        fun get(entity: Entity): PhosphorusFireCapability {
-            return entity.getCapability(ModCapabilities.PHOSPHORUS_FIRE_CAPABILITY)
-                .orElseGet { PhosphorusFireCapability() }
-        }
+        fun get(entity: Entity): PhosphorusFireCapability = ModCapabilities.PHOSPHORUS_FIRE.get(entity)
 
         @JvmStatic
         fun set(entity: Entity, value: Boolean) {
-            get(entity).isOnFire = value
-            // 由 CapabilitySync 自动决定何时、向谁同步（客户端调用时无副作用）
-            CapabilitySync.markDirty(entity, ID)
+            ModCapabilities.PHOSPHORUS_FIRE.set(entity, PhosphorusFireCapability(value))
         }
     }
+
+    /** 只为了让 Forge 有一个唯一的 capability 实现类而存在，见 [CapabilityWrapper]。 */
+    @AutoRegisterCapability
+    class Holder : CapabilityWrapper<PhosphorusFireCapability>(
+        serializer(),
+        PhosphorusFireCapability(),
+    )
 }
