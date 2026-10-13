@@ -3,7 +3,7 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.init.ModEnumExtensions;
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2;
+import com.atsuishio.superbwarfare.item.gun.GeoGunItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
@@ -42,8 +42,8 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
     ) {
         ItemStack stack = hand == InteractionHand.MAIN_HAND ? player.getMainHandItem() : player.getOffhandItem();
 
-        if (stack.getItem() instanceof GeoGunItemV2 geoGunItemV2) {
-            cir.setReturnValue(geoGunItemV2.getArmPose(player, hand, stack));
+        if (stack.getItem() instanceof GeoGunItem geoGunItem) {
+            cir.setReturnValue(geoGunItem.getArmPose(player, hand, stack));
         } else if (stack.is(ModItems.LUNGE_MINE) && player.getUsedItemHand() == hand) {
             cir.setReturnValue(ModEnumExtensions.Client.getLungeMinePose());
         }

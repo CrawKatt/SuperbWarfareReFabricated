@@ -20,7 +20,6 @@ import com.atsuishio.superbwarfare.client.overlay.HandsomeFrameOverlay
 import com.atsuishio.superbwarfare.client.overlay.HeatBarOverlay
 import com.atsuishio.superbwarfare.client.overlay.IFFOverlay
 import com.atsuishio.superbwarfare.client.overlay.IglaHudOverlay
-import com.atsuishio.superbwarfare.client.overlay.ItemRendererFixOverlay
 import com.atsuishio.superbwarfare.client.overlay.JavelinHudOverlay
 import com.atsuishio.superbwarfare.client.overlay.KillMessageOverlay
 import com.atsuishio.superbwarfare.client.overlay.MortarInfoOverlay
@@ -57,19 +56,17 @@ import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientDogTagImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientGunImageTooltip
-import com.atsuishio.superbwarfare.client.tooltip.ClientSentinelImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.component.AttachmentImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.ChargingStationImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.DogTagImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent
-import com.atsuishio.superbwarfare.client.tooltip.component.SentinelImageComponent
 import com.atsuishio.superbwarfare.client.renderer.special.RadiationGlowRenderer
 import com.atsuishio.superbwarfare.client.tooltip.*
 import com.atsuishio.superbwarfare.client.tooltip.component.*
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModItems
-import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
+import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import com.atsuishio.superbwarfare.item.armor.GeHelmetM35Item
 import com.atsuishio.superbwarfare.item.armor.HandsomeGogglesItem
 import com.atsuishio.superbwarfare.item.armor.RuChest6b43Item
@@ -123,7 +120,6 @@ object ClientRenderHandler {
         DroneHudOverlay,
         HeatBarOverlay,
         CrossHairOverlay,
-        ItemRendererFixOverlay,
         AmmoCountOverlay,
         StaminaOverlay,
         VehicleCrosshairOverlay,
@@ -270,7 +266,6 @@ object ClientRenderHandler {
         TooltipComponentCallback.EVENT.register { component ->
             when (component) {
                 is CellImageComponent -> ClientCellImageTooltip(component)
-                is SentinelImageComponent -> ClientSentinelImageTooltip(component)
                 is ChargingStationImageComponent -> ClientChargingStationImageTooltip(component)
                 is DogTagImageComponent -> ClientDogTagImageTooltip(component)
                 is GunImageComponent -> ClientGunImageTooltip(component)
@@ -367,7 +362,7 @@ object ClientRenderHandler {
             mc.levelRenderer.graphicsChanged()
         }
 
-        BuiltInRegistries.ITEM.filterIsInstance<GeoGunItemV2>().forEach { item ->
+        BuiltInRegistries.ITEM.filterIsInstance<GeoGunItem>().forEach { item ->
             BuiltinItemRendererRegistry.INSTANCE.register(item, item.createRenderer())
         }
 

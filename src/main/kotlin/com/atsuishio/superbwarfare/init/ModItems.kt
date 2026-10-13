@@ -19,7 +19,7 @@ import com.atsuishio.superbwarfare.item.trinket.IffItem
 import com.atsuishio.superbwarfare.item.trinket.ParachuteItem
 import com.atsuishio.superbwarfare.item.trinket.TacticalTerminalItem
 import com.atsuishio.superbwarfare.item.trinket.ThermalImagingGogglesItem
-import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
+import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.item.gun.launcher.IglaItem
 import com.atsuishio.superbwarfare.item.gun.launcher.JavelinItem
@@ -81,53 +81,53 @@ object ModItems {
 
     // @formatter:off
     @JvmField val REPAIR_TOOL = registerGun("repair_tool") { RepairToolItem() }
-    @JvmField val TASER = registerGun("taser") { GeoGunItemV2(Properties()) }
-    @JvmField val GLOCK_17 = registerGun("glock_17") { GeoGunItemV2(Properties()) }
-    @JvmField val GLOCK_18 = registerGun("glock_18") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val MP_443 = registerGun("mp_443") { GeoGunItemV2(Properties()) }
-    @JvmField val M_1911 = registerGun("m_1911") { GeoGunItemV2(Properties()) }
+    @JvmField val TASER = registerGun("taser") { GeoGunItem(Properties()) }
+    @JvmField val GLOCK_17 = registerGun("glock_17") { GeoGunItem(Properties()) }
+    @JvmField val GLOCK_18 = registerGun("glock_18") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val MP_443 = registerGun("mp_443") { GeoGunItem(Properties()) }
+    @JvmField val M_1911 = registerGun("m_1911") { GeoGunItem(Properties()) }
     @JvmField val HOMEMADE_SHOTGUN = registerGun("homemade_shotgun") { HomemadeShotgunItem }
-    @JvmField val NAIL_GUN = registerGun("nail_gun") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val TRACHELIUM = registerGun("trachelium") { GeoGunItemV2(Properties().rarity(ModRarities.VIRTUAL)) }
-    @JvmField val MP_5 = registerGun("mp_5") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val VECTOR = registerGun("vector") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val AK_47 = registerGun("ak_47") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val AK_12 = registerGun("ak_12") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val SKS = registerGun("sks") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val M_4 = registerGun("m_4") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val HK_416 = registerGun("hk_416") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val QBZ_95 = registerGun("qbz_95") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val QBZ_191 = registerGun("qbz_191") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val INSIDIOUS = registerGun("insidious") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val MK_14 = registerGun("mk_14") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val QL_1031 = registerGun("ql_1031") { GeoGunItemV2(Properties().rarity(ModRarities.VIRTUAL)) }
-    @JvmField val MARLIN = registerGun("marlin") { GeoGunItemV2(Properties()) }
-    @JvmField val K_98 = registerGun("k_98") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val MOSIN_NAGANT = registerGun("mosin_nagant") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val SVD = registerGun("svd") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val AWM = registerGun("awm") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val M_98B = registerGun("m_98b") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val SENTINEL = registerGun("sentinel") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val HUNTING_RIFLE = registerGun("hunting_rifle") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val NTW_20 = registerGun("ntw_20") { GeoGunItemV2(Properties().rarity(LEGENDARY)) }
-    @JvmField val M_870 = registerGun("m_870") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val M_1897 = registerGun("m_1897") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val AA_12 = registerGun("aa_12") { GeoGunItemV2(Properties().rarity(LEGENDARY)) }
-    @JvmField val DEVOTION = registerGun("devotion") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val RPK = registerGun("rpk") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val M_60 = registerGun("m_60") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val NAIL_GUN = registerGun("nail_gun") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val TRACHELIUM = registerGun("trachelium") { GeoGunItem(Properties().rarity(ModRarities.VIRTUAL)) }
+    @JvmField val MP_5 = registerGun("mp_5") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val VECTOR = registerGun("vector") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val AK_47 = registerGun("ak_47") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val AK_12 = registerGun("ak_12") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val SKS = registerGun("sks") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val M_4 = registerGun("m_4") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val HK_416 = registerGun("hk_416") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val QBZ_95 = registerGun("qbz_95") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val QBZ_191 = registerGun("qbz_191") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val INSIDIOUS = registerGun("insidious") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val MK_14 = registerGun("mk_14") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val QL_1031 = registerGun("ql_1031") { GeoGunItem(Properties().rarity(ModRarities.VIRTUAL)) }
+    @JvmField val MARLIN = registerGun("marlin") { GeoGunItem(Properties()) }
+    @JvmField val K_98 = registerGun("k_98") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val MOSIN_NAGANT = registerGun("mosin_nagant") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val SVD = registerGun("svd") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val AWM = registerGun("awm") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val M_98B = registerGun("m_98b") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val SENTINEL = registerGun("sentinel") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val HUNTING_RIFLE = registerGun("hunting_rifle") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val NTW_20 = registerGun("ntw_20") { GeoGunItem(Properties().rarity(LEGENDARY)) }
+    @JvmField val M_870 = registerGun("m_870") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val M_1897 = registerGun("m_1897") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val AA_12 = registerGun("aa_12") { GeoGunItem(Properties().rarity(LEGENDARY)) }
+    @JvmField val DEVOTION = registerGun("devotion") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val RPK = registerGun("rpk") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val M_60 = registerGun("m_60") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
     @JvmField val M_2_HB = registerGun("m_2_hb") { M2HBItem }
     @JvmField val MINIGUN = registerGun("minigun") { MinigunItem() }
-    @JvmField val M_79 = registerGun("m_79") { GeoGunItemV2(Properties().rarity(Rarity.RARE)) }
-    @JvmField val GP_25 = registerGun("gp_25") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val SECONDARY_CATACLYSM = registerGun("secondary_cataclysm") { GeoGunItemV2(Properties().rarity(ModRarities.VIRTUAL)) }
+    @JvmField val M_79 = registerGun("m_79") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val GP_25 = registerGun("gp_25") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val SECONDARY_CATACLYSM = registerGun("secondary_cataclysm") { GeoGunItem(Properties().rarity(ModRarities.VIRTUAL)) }
     @JvmField val RPG = registerGun("rpg") { RpgItem }
     @JvmField val JAVELIN = registerGun("javelin") { JavelinItem }
     @JvmField val IGLA_9K38 = registerGun("igla_9k38") { IglaItem }
-    @JvmField val BOCEK = registerGun("bocek") { GeoGunItemV2(Properties().rarity(Rarity.EPIC)) }
+    @JvmField val BOCEK = registerGun("bocek") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
     @JvmField val SUPER_STAR_SHOOTER = registerGun("super_star_shooter") { SuperStarShooterItem() }
-    @JvmField val REFORGING = registerGun("reforging") { GeoGunItemV2(Properties().rarity(SUPERB)) }
-    @JvmField val RAUBTIER = registerGun("raubtier") { GeoGunItemV2(Properties().rarity(SUPERB)) }
+    @JvmField val REFORGING = registerGun("reforging") { GeoGunItem(Properties().rarity(SUPERB)) }
+    @JvmField val RAUBTIER = registerGun("raubtier") { GeoGunItem(Properties().rarity(SUPERB)) }
 
 //    @JvmField val BEAST_GUN_TEST = registerGun<BeastGunTestItem>()
 

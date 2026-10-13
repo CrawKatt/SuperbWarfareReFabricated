@@ -11,7 +11,6 @@ import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview
 import com.atsuishio.superbwarfare.client.renderer.special.TowingChainRenderer;
 import com.atsuishio.superbwarfare.client.renderer.SyncedEntityWorldRenderer;
 import com.atsuishio.superbwarfare.client.renderer.ModParticleRenderTypes;
-import com.atsuishio.superbwarfare.client.molang.MolangVariable;
 import com.atsuishio.superbwarfare.client.screens.SnapshotWarningScreen;
 import com.atsuishio.superbwarfare.compat.ponder.SBWPonderPlugin;
 import com.atsuishio.superbwarfare.compat.acceleratedrendering.AcceleratedRenderingCompat;
@@ -61,7 +60,6 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         TacticalMapChunkListener.init();
 
         MouseMovementHandler.init();
-        MolangVariable.INSTANCE.register();
         // 加速渲染是可选客户端模组；这里只探一次"它在不在"，不在的话整条兼容路径都不会被走到
         AcceleratedRenderingCompat.INSTANCE.init();
         ModSoundInstances.init();
