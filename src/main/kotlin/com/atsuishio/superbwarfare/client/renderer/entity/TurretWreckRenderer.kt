@@ -1,7 +1,6 @@
 package com.atsuishio.superbwarfare.client.renderer.entity
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
-import com.atsuishio.superbwarfare.client.model.entity.VehicleModel
 import com.atsuishio.superbwarfare.entity.vehicle.TurretWreckEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.tools.mc
@@ -21,8 +20,6 @@ import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3f
 import org.joml.Matrix4f
 import org.joml.Quaternionf
-import software.bernie.geckolib.core.animatable.GeoAnimatable
-import software.bernie.geckolib.renderer.GeoEntityRenderer
 
 class TurretWreckRenderer(renderManager: EntityRendererProvider.Context) :
     EntityRenderer<TurretWreckEntity>(renderManager) {
@@ -43,58 +40,7 @@ class TurretWreckRenderer(renderManager: EntityRendererProvider.Context) :
         val entity = type.get().create(wreckEntity.level()) ?: return
         val renderer = mc.entityRenderDispatcher.getRenderer(entity)
         if (entity is VehicleEntity) {
-            if (entity is GeoAnimatable && renderer is GeoEntityRenderer) {
-                val model = renderer.geoModel
-                if (model !is VehicleModel) return
-
-                val modelResource = model.getPreciseModelResource(entity) ?: return
-                val textureResource = model.getPreciseTextureResource(entity) ?: return
-
-                val bakedModel = model.getBakedModel(modelResource)
-                val optionalBone = bakedModel.getBone("turret")
-                if (optionalBone.isEmpty) return
-
-                val barrelBone = bakedModel.getBone("barrel")
-                barrelBone.ifPresent { it.setRotX(-wreckEntity.xRotO * Mth.DEG_TO_RAD) }
-
-                val passerWeaponPitch = bakedModel.getBone("passengerWeaponStationPitch")
-                passerWeaponPitch.ifPresent { it.setRotX(0f) }
-
-                val passerWeaponYaw = bakedModel.getBone("passengerWeaponStationYaw")
-                passerWeaponYaw.ifPresent { it.setRotY(0f) }
-
-                optionalBone.get().setHidden(false)
-
-                val turretPos = entity.turretPos
-
-                poseStack.pushPose()
-
-                if (turretPos != null) {
-                    poseStack.translate(turretPos.x, -turretPos.y, turretPos.z)
-                }
-
-                val tBone = optionalBone.get()
-                val renderType = RenderType.entityTranslucent(textureResource)
-                val source = bufferSource.getBuffer(renderType)
-                renderer.renderCubesOfBone(poseStack, tBone, source, packedLight, packedOverlay, 0.3f, 0.3f, 0.3f, 1.0f)
-                renderer.renderChildBones(
-                    poseStack,
-                    entity,
-                    tBone,
-                    renderType,
-                    bufferSource,
-                    source,
-                    false,
-                    partialTick,
-                    packedLight,
-                    packedOverlay,
-                    0.3f,
-                    0.3f,
-                    0.3f,
-                    1.0f
-                )
-                poseStack.popPose()
-            } else if (renderer is GeoVehicleRenderer) {
+            if (renderer is GeoVehicleRenderer) {
                 val entries = entity.getModelEntries()
                 if (entries.isEmpty()) return
                 val entry = entries.first()

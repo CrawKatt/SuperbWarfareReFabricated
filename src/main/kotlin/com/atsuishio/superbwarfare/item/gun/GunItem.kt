@@ -76,7 +76,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider
 import net.minecraftforge.common.util.LazyOptional
 import net.minecraftforge.energy.IEnergyStorage
 import org.joml.Math
-import software.bernie.geckolib.animatable.GeoItem
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
@@ -188,10 +187,6 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         // 副武器物品（`useAsWeaponInHand() == false`）躺在背包/手上时不跑枪械状态机：
         // 它只有装在正常枪械上才生效，那时由主武器的 gun tick 顺带 tick（`SubWeaponRuntime.tick`）。
         if (stack.item !is GunItem || !useAsWeaponInHand() || level.isClientSide) return
-
-        if (level is ServerLevel) {
-            GeoItem.getOrAssignId(stack, level)
-        }
 
         val data = GunData.from(stack)
 
