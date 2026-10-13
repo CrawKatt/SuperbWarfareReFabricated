@@ -4,7 +4,7 @@ import com.atsuishio.superbwarfare.client.PoseTool
 import com.atsuishio.superbwarfare.event.DeployedWeaponHandler
 import com.atsuishio.superbwarfare.init.ModRarities
 import com.atsuishio.superbwarfare.init.RegistryName
-import com.atsuishio.superbwarfare.item.gun.GeoGunItemV2
+import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import net.minecraft.client.model.HumanoidModel
 import net.minecraft.client.model.HumanoidModel.ArmPose
 import net.minecraft.world.InteractionHand
@@ -15,7 +15,7 @@ import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 
 @RegistryName("minigun")
-class MinigunItem : GeoGunItemV2(Properties().rarity(ModRarities.LEGENDARY)) {
+class MinigunItem : GeoGunItem(Properties().rarity(ModRarities.LEGENDARY)) {
 
     @OnlyIn(Dist.CLIENT)
     override fun armPose(

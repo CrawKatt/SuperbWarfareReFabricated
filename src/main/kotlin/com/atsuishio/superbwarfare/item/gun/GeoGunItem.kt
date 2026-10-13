@@ -11,8 +11,7 @@ import net.minecraftforge.api.distmarker.OnlyIn
 import net.minecraftforge.client.extensions.common.IClientItemExtensions
 import java.util.function.Consumer
 
-// TODO 替换掉之前的GunGeoItem，给这个的V2去掉
-open class GeoGunItemV2(properties: Properties) : GunItem(properties) {
+open class GeoGunItem(properties: Properties) : GunItem(properties) {
 
     @OnlyIn(Dist.CLIENT)
     override fun initializeClient(consumer: Consumer<IClientItemExtensions>) {

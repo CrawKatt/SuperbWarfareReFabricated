@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.api.event.RegisterContainersEvent
 import com.atsuishio.superbwarfare.capability.sync.ModSyncedCapabilities
 import com.atsuishio.superbwarfare.client.MouseMovementHandler
 import com.atsuishio.superbwarfare.client.PoseTool
-import com.atsuishio.superbwarfare.client.molang.MolangVariable
 import com.atsuishio.superbwarfare.client.renderer.ModParticleRenderTypes
 import com.atsuishio.superbwarfare.compat.acceleratedrendering.AcceleratedRenderingCompat
 import com.atsuishio.superbwarfare.compat.coldsweat.ColdSweatCompatHandler
@@ -133,7 +132,6 @@ class Mod {
 
     private fun onClientSetup(event: FMLClientSetupEvent) {
         MouseMovementHandler.init()
-        MolangVariable.register()
         PoseTool.init()
         // 加速渲染是可选客户端模组；这里只探一次"它在不在"，不在的话整条兼容路径都不会被走到
         AcceleratedRenderingCompat.init()
