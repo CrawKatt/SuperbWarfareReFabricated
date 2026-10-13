@@ -34,6 +34,7 @@ import com.atsuishio.superbwarfare.resource.gun.pojo.BuiltinScopeInfo
 import com.atsuishio.superbwarfare.resource.gun.pojo.ItemDisplayInfo
 import com.atsuishio.superbwarfare.resource.model.AttachmentModelReloadListener
 import com.atsuishio.superbwarfare.script.GunScriptManager
+import com.atsuishio.superbwarfare.script.ScriptTransform
 import com.atsuishio.superbwarfare.tools.*
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.animation.IFPAnimationInstance
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.handler.FirstPersonRenderHandler
@@ -1598,7 +1599,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
     }
 
     open fun scriptEnergy(stack: ItemStack): Int {
-        return stack.getCapability(ForgeCapabilities.ENERGY).map { it.energyStored }.orElse(0)
+        return stack.getCapability(Capabilities.EnergyStorage.ITEM)?.energyStored ?: 0
     }
 
     // 充能射击里最低那一档的门槛（`ChargeAction.OneShotCost`），没配充能射击时为 0
@@ -1627,7 +1628,14 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         partialTick: Float
     ) {
         val script = GunResource.getDefault(stack).getScript() ?: return
-        GunScriptManager.invokeTransform(script, stack, model, transformType, partialTick, this)
+        GunScriptManager.invokeTransform(
+            script,
+            stack,
+            model,
+            ScriptTransform(transformType, displayKey(transformType)),
+            partialTick,
+            this
+        )
     }
 
     open fun spawnAndBindMuzzleParticles(
