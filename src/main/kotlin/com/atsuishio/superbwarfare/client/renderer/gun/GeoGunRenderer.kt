@@ -35,6 +35,7 @@ import com.atsuishio.superbwarfare.resource.gun.pojo.BuiltinScopeInfo
 import com.atsuishio.superbwarfare.resource.gun.pojo.ItemDisplayInfo
 import com.atsuishio.superbwarfare.resource.model.AttachmentModelReloadListener
 import com.atsuishio.superbwarfare.script.GunScriptManager
+import com.atsuishio.superbwarfare.script.ScriptTransform
 import com.atsuishio.superbwarfare.tools.BedrockBoneCoordinateTool
 import com.atsuishio.superbwarfare.tools.BoneScreenPoint
 import com.atsuishio.superbwarfare.tools.RenderDistanceHelper
@@ -1630,7 +1631,14 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         partialTick: Float
     ) {
         val script = GunResource.getDefault(stack).getScript() ?: return
-        GunScriptManager.invokeTransform(script, stack, model, transformType, partialTick, this)
+        GunScriptManager.invokeTransform(
+            script,
+            stack,
+            model,
+            ScriptTransform(transformType, displayKey(transformType)),
+            partialTick,
+            this
+        )
     }
 
     open fun spawnAndBindMuzzleParticles(
