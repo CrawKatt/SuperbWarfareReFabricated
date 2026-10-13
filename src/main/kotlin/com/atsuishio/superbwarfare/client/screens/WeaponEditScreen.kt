@@ -2,7 +2,6 @@ package com.atsuishio.superbwarfare.client.screens
 
 import com.atsuishio.superbwarfare.client.tooltip.ClientAttachmentImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.component.AttachmentImageComponent
-import com.atsuishio.superbwarfare.config.server.AttachmentConfig
 import com.atsuishio.superbwarfare.data.attachment.AttachmentSlots
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
@@ -452,7 +451,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
 
     private fun installableAttachments(player: Player, data: GunData, type: AttachmentType): List<ResourceLocation> {
         val available = data.availableAttachments(type).filter { data.canInstall(type, it) }.distinct()
-        if (AttachmentConfig.fullyFreeAttachmentMode) return available
+        if (player.isCreative) return available
         val owned = (player.inventory.items + player.inventory.offhand).asSequence()
             .filterNot { it.isEmpty }
             .mapNotNull { (it.item as? AttachmentProvider)?.attachmentId?.let(ResourceLocation::tryParse) }
