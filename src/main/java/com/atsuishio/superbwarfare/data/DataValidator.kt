@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.data.attachment.AttachmentRenderMode
 import com.atsuishio.superbwarfare.data.attachment.AttachmentSlots
 import com.atsuishio.superbwarfare.data.gun.DefaultGunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
+import com.atsuishio.superbwarfare.data.gun.RightClickAction
 import com.atsuishio.superbwarfare.data.gun.melee.MeleeEffectBehavior
 import com.atsuishio.superbwarfare.data.gun.melee.MeleeEffectSpec
 import com.atsuishio.superbwarfare.data.gun.melee.MeleeHitboxType
@@ -553,6 +554,18 @@ object DataValidator {
         ) {
             "BayonetCharge resolves at StrikeHitTime=${charge.strikeHitTime} but the strike lasts " +
                     "StrikeDuration=${charge.strikeDuration} ticks; it would never hit"
+        }
+
+        if (data.rightClickAction == RightClickAction.BAYONET_CHARGE && charge.duration <= 0) {
+            warn("RightClickAction is BayonetCharge but BayonetCharge.Duration is ${charge.duration}; right-click does nothing")
+        }
+
+        // 撞人那一击走的是 `hasMeleeAttack()`（`MeleeDamage > 0`）那条门禁，没近战就只剩加速
+        if (charge.duration > 0 && data.meleeDamage <= 0) {
+            warn(
+                "BayonetCharge.Duration=${charge.duration} but MeleeDamage=${data.meleeDamage}; " +
+                        "the strike can never land, only the speed effect applies"
+            )
         }
 
         for ((index, action) in data.meleeActions.list.withIndex()) {
