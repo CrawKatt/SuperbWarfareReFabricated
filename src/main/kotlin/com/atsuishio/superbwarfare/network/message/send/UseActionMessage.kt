@@ -10,6 +10,7 @@ import com.atsuishio.superbwarfare.network.PayloadContext
 import com.atsuishio.superbwarfare.network.ServerPacketPayload
 import com.atsuishio.superbwarfare.capability.persistentData
 import kotlinx.serialization.Serializable
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.player.Player
 
@@ -39,7 +40,11 @@ data class UseActionMessage(val action: RightClickAction, val active: Boolean = 
             if (onChargeCooldown(player, charge.cooldown)) return
 
             charge.sound?.let {
-                player.level().playSound(null, player.onPos, it, SoundSource.PLAYERS, 2f, 1f)
+                player.level().playSound(
+                    null, player.onPos,
+                    SoundEvent.createFixedRangeEvent(it.location, CHARGE_SOUND_RANGE),
+                    SoundSource.PLAYERS, CHARGE_SOUND_VOLUME, 1f
+                )
             }
             ChargeWindowHandler.start(player, charge)
             if (charge.cooldown > 0) {
@@ -51,6 +56,8 @@ data class UseActionMessage(val action: RightClickAction, val active: Boolean = 
     companion object {
         // 冲锋冷却记在玩家的 persistentData 上，不用原版物品冷却（那会连带锁住整把枪的使用）
         private const val CHARGE_COOLDOWN = "BayonetChargeCooldown"
+        private const val CHARGE_SOUND_RANGE = 32f
+        private const val CHARGE_SOUND_VOLUME = 4f
 
         // 存的是"冷却结束时的 tickCount"而不是剩余量，服务端不用每 tick 递减；
         // tickCount 不落盘、重登/重生会归零，所以剩余比冷却本身还长只可能是上一局的残留，放行
