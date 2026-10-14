@@ -729,6 +729,7 @@ object ModItems {
     // @formatter:off
     @JvmField val STANDARD_GUN_SHIELD = registerAttachment("standard_gun_shield")
     @JvmField val HANDGUN_SHIELD = registerAttachment("handgun_shield")
+    @JvmField val HYPERION_SHIELD_MODULE = registerAttachment("hyperion_shield_module", ModRarities.LEGENDARY)
     @JvmField val PEQ_15 = registerAttachment("peq_15")
     // @formatter:on
 
