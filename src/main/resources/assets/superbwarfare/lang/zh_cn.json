@@ -812,6 +812,7 @@
   "item.superbwarfare.milencer": "弥音器",
   "item.superbwarfare.standard_gun_shield": "基础枪盾",
   "item.superbwarfare.handgun_shield": "手枪枪盾",
+  "item.superbwarfare.hyperion_shield_module": "亥伯龙护盾模块",
 
   "death.attack.gunfire": "%1$s被%2$s射爆了",
   "death.attack.gunfire.entity": "%1$s被%2$s射爆了",
