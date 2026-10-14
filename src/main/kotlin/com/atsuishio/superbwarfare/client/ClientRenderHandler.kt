@@ -14,6 +14,7 @@ import com.atsuishio.superbwarfare.client.overlay.AmmoBarOverlay
 import com.atsuishio.superbwarfare.client.overlay.AmmoCountOverlay
 import com.atsuishio.superbwarfare.client.overlay.ArmorPlateOverlay
 import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay
+import com.atsuishio.superbwarfare.client.overlay.BayonetChargeOverlay
 import com.atsuishio.superbwarfare.client.overlay.GunShieldOverlay
 import com.atsuishio.superbwarfare.client.overlay.GPWSOverlay
 import com.atsuishio.superbwarfare.client.overlay.HandsomeFrameOverlay
@@ -117,6 +118,7 @@ object ClientRenderHandler {
         SpyglassRangeOverlay,
         HandsomeFrameOverlay,
         RedTriangleOverlay,
+        BayonetChargeOverlay,
         HeatBarOverlay,
         CrossHairOverlay,
         GunShieldOverlay,

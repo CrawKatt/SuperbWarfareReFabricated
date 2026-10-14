@@ -13,6 +13,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import kotlin.math.roundToInt
 
 /** 刺刀冲锋的客户端状态 */
 object GunChargeHandler {
@@ -25,7 +26,16 @@ object GunChargeHandler {
     var cooldownTicks: Int = 0
         private set
 
+    // 窗口总长（tick）与满格冷却总长（tick）；换枪之后都留着，HUD 拿它们算条子的比例
+    var chargeTotal: Int = 0
+        private set
+    var cooldownTotal: Int = 0
+        private set
+
     private var chargingItem: Item? = null
+
+    // 冷却的最低量：不管窗口消耗了多少，冷却至少按消耗一半算（走得短的红条从一半处开始恢复）
+    private const val MIN_SPENT = 0.5f
 
     fun start(stack: ItemStack, data: GunData) {
         if (isCharging() || cooldownTicks > 0) return
@@ -34,10 +44,9 @@ object GunChargeHandler {
         if (charge.duration <= 0) return
 
         chargeTicks = charge.duration
+        chargeTotal = charge.duration
+        cooldownTotal = charge.cooldown
         chargingItem = stack.item
-        if (charge.cooldown > 0) {
-            cooldownTicks = charge.cooldown
-        }
 
         sendPacketToServer(UseActionMessage(RightClickAction.BAYONET_CHARGE))
     }
@@ -84,13 +93,25 @@ object GunChargeHandler {
 
     fun isCharging(): Boolean = chargeTicks > 0
 
-    // 收窗口（打完那一击、换枪、切状态、到点）；本地一收就同步给服务端，不动冷却
+    // 收窗口（打完那一击、换枪、切状态、到点）；冷却从这一刻才开始
     fun reset() {
         val charging = isCharging()
+        val spent = if (charging) 1f - chargeTicks.toFloat() / chargeTotal.coerceAtLeast(1) else 0f
         chargeTicks = 0
         chargingItem = null
         if (charging) {
-            sendPacketToServer(UseActionMessage(RightClickAction.BAYONET_CHARGE, active = false))
+            cooldownTicks = scaledCooldown(spent)
+            sendPacketToServer(
+                UseActionMessage(
+                    RightClickAction.BAYONET_CHARGE,
+                    active = false,
+                    cooldownTicks = cooldownTicks
+                )
+            )
         }
     }
+
+    // 冷却长度按窗口里实际消耗掉的比例折算，最少折算 MIN_SPENT：消耗 80% 就冷却 80%，只消耗 20% 也冷却 50%
+    private fun scaledCooldown(spent: Float): Int =
+        (cooldownTotal * spent.coerceIn(MIN_SPENT, 1f)).roundToInt()
 }
