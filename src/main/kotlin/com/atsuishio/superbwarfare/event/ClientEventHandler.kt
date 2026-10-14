@@ -132,8 +132,9 @@ object ClientEventHandler {
     @JvmField
     var swayY: Double = 0.0
 
+    // 行走样张的相位（秒）
     @JvmField
-    var moveTime: Double = 0.0
+    var walkTime: Double = 0.0
 
     // 奔跑样张的相位（秒）
     @JvmField
@@ -181,6 +182,9 @@ object ClientEventHandler {
 
     // 奔跑样张的相位推进速率
     const val SPRINT_ANIM_RATE = 0.06f
+
+    // 行走样张的相位推进速率（同一支样张文件里的 `walk_simple`，照旧正弦的步频取的数）
+    const val WALK_ANIM_RATE = 0.06f
 
     // 摆动相位与滞空淡入淡出的时间尺度：3.7 * deltaFrameTime
     const val SPRINT_EASE_TIMES = 3.7f
@@ -2405,9 +2409,9 @@ object ClientEventHandler {
 
         moveRotZ =
             if (!entity.isSprinting && mc.options.keyUp.isDown && firePosTimer == 0.0 && resource.movingTilt && !isProne(player) && !DeployedWeaponHandler.isDeployed(player) && !isEditing) {
-                Mth.lerp(0.2 * times, moveRotZ, 0.14) * (1 - zoomTime)
+                Mth.lerp(0.1 * times, moveRotZ, 0.14) * (1 - zoomTime)
             } else {
-                Mth.lerp(0.2 * times, moveRotZ, 0.0) * (1 - zoomTime)
+                Mth.lerp(0.1 * times, moveRotZ, 0.0) * (1 - zoomTime)
             }
 
         val sprinting =
@@ -2424,8 +2428,10 @@ object ClientEventHandler {
         }
 
         if (isMoving()) {
-            moveTime += 0.15 * animSpeed * times * moveSpeed * if (firePosTimer != 0.0) 0.4 else 1.0
             // 过渡期间相位照常走：两头要跟循环段互淡，循环段那一侧得是活着的
+            walkTime =
+                (walkTime + WALK_ANIM_RATE * animSpeed * times * moveSpeed *
+                        (if (firePosTimer != 0.0) 0.4 else 1.0)) % GunSprintAnimation.WALK_LENGTH
             sprintTime =
                 (sprintTime + SPRINT_ANIM_RATE * animSpeed * times * moveSpeed *
                         (if (firePosTimer != 0.0) 0.4 else 1.0)) % GunSprintAnimation.LENGTH
@@ -2434,8 +2440,12 @@ object ClientEventHandler {
             moveFadeTime = Mth.lerp(0.1 * times, moveFadeTime, 0.0)
         }
 
-        movePosX = 0.2 * sin(1 * PI * moveTime) * (1 - 0.4 * zoomTime) * moveFadeTime
-        movePosY = -0.135 * sin(2 * PI * (moveTime - 0.25)) * (1 - 0.4 * zoomTime) * moveFadeTime
+        // 行走是样张里的一条纯偏移片段：位移和旋转都按同一个阻尼淡（开镜时收窄）
+        val walkFade = (moveFadeTime * (1 - 0.4 * zoomTime)).toFloat()
+        GunSprintAnimation.walkPositionAt(walkTime.toFloat(), walkAnimSample).mul(walkFade)
+        GunSprintAnimation.walkRotationAt(walkTime.toFloat(), walkAnimRotation).mul(walkFade)
+        movePosX = walkAnimSample.x.toDouble()
+        movePosY = walkAnimSample.y.toDouble()
 
         val left = mc.options.keyLeft.isDown
         val right = mc.options.keyRight.isDown
@@ -2460,6 +2470,11 @@ object ClientEventHandler {
 
     private val drawAnimRotation = Vector3f()
     private val drawAnimPosition = Vector3f()
+
+    // 行走样张采样到的偏移（已含淡出与开镜阻尼）：handleWeaponMove 每帧写，gunRootMoveV2 每帧读
+    private val walkAnimSample = Vector3f()
+    private val walkAnimRotation = Vector3f()
+
     private val sprintAnimSample = Vector3f()
     private val sprintAnimRotation = Vector3f()
     private val sprintClipSample = Vector3f()
@@ -2485,12 +2500,12 @@ object ClientEventHandler {
         customZ: Float,
         useCustomAnim: Boolean
     ) {
-        val walkPosX = movePosX.toFloat()
-        val walkPosY = (swayY + movePosY).toFloat()
-        val walkPosZ = 0f
-        val walkRotX = swayX.toFloat()
-        val walkRotY = (0.1f * movePosX).toFloat()
-        val walkRotZ = (0.2f * movePosX).toFloat()
+        val walkPosX = walkAnimSample.x
+        val walkPosY = swayY.toFloat() + walkAnimSample.y
+        val walkPosZ = walkAnimSample.z
+        val walkRotX = swayX.toFloat() + walkAnimRotation.x
+        val walkRotY = walkAnimRotation.y
+        val walkRotZ = walkAnimRotation.z
 
         val i = if (useCustomAnim) 0 else 1
 
