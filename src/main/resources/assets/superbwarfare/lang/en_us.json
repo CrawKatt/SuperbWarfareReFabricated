@@ -812,6 +812,7 @@
   "item.superbwarfare.milencer": "Milencer",
   "item.superbwarfare.standard_gun_shield": "Standard Gun Shield",
   "item.superbwarfare.handgun_shield": "Handgun Shield",
+  "item.superbwarfare.hyperion_shield_module": "Hyperion Shield Module",
 
   "death.attack.gunfire": "%1$s was gunned down by %2$s",
   "death.attack.gunfire.entity": "%1$s was gunned down by %2$s",
