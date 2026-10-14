@@ -6,9 +6,11 @@ import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import net.minecraft.client.model.HumanoidModel
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.inventory.tooltip.TooltipComponent
 import net.minecraft.world.item.ItemStack
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
+import java.util.*
 
 @Deprecated("reserved for compatibility, DO NOT USE")
 sealed interface LungeMine
@@ -24,5 +26,9 @@ open class LungeMineItem : GeoGunItem(Properties()), @Suppress("DEPRECATION") Lu
     ): HumanoidModel.ArmPose {
         return if (!itemStack.isEmpty && entityLiving.usedItemHand == hand) PoseTool.LUNGE_MINE_POSE
         else HumanoidModel.ArmPose.EMPTY
+    }
+
+    override fun getTooltipImage(pStack: ItemStack): Optional<TooltipComponent> {
+        return Optional.empty()
     }
 }
