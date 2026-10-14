@@ -614,6 +614,7 @@ class GunProp<T, R>(
                     // 负数是"跟随动作表"的哨兵值，只把更负的压回来
                     strikeDuration = it.strikeDuration.coerceAtLeast(-1),
                     strikeHitTime = it.strikeHitTime.coerceAtLeast(-1),
+                    strikeDamage = it.strikeDamage.coerceAtLeast(-1.0),
                 )
             }
         }

@@ -689,6 +689,10 @@ object ClientEventHandler {
     @JvmField
     var wasDisconnectTowingDown: Boolean = false
 
+    /** 刺刀冲锋：上一 tick 冲锋键是否按下，用于检测上升沿 */
+    @JvmField
+    var wasChargeKeyDown: Boolean = false
+
     @JvmField
     var tdmSavedData: TDMSavedData = TDMSavedData()
 
@@ -1627,6 +1631,9 @@ object ClientEventHandler {
         if (switchVehicleWeaponCooldown > 0) {
             switchVehicleWeaponCooldown--
         }
+
+        // 冲锋冷却是玩家级的变量，和手里拿什么无关
+        GunChargeHandler.tickCooldown()
     }
 
     @JvmStatic
@@ -1671,7 +1678,11 @@ object ClientEventHandler {
             }
         }
 
-        if (gunData == null) return
+        if (gunData == null) {
+            // 手里换成别的东西也要把窗口收掉（状态得立刻同步回去）
+            GunChargeHandler.cancelIfItemChanged(stack)
+            return
+        }
 
         // 切换请求的兜底超时（丢一次包不该把 G 永久锁死，也不能让动作锁一直挂着）
         SubWeaponClientHandler.tick(gunData)
@@ -1690,17 +1701,31 @@ object ClientEventHandler {
             heavyStrikeRequested = false
         }
 
+        val canOperate = !holdFireVehicle
+                && !notInGame
+                && !isEditing
+                && !(player.vehicle is VehicleEntity && (player.vehicle as VehicleEntity).banHand(player))
+
+        // 疾跑中单击冲锋键起刺刀冲锋（只在地面上、不在载具里）
+        val chargeKeyDown = ModKeyMappings.BAYONET_CHARGE.isDown()
+        if (chargeKeyDown && !wasChargeKeyDown && !GunChargeHandler.isCharging() &&
+            !zoom && player.vehicle == null && player.isSprinting && player.onGround() &&
+            drawTime < 0.01 && canOperate &&
+            !gunData.reloading() && gunData.bolt.actionTimer.get() <= 0
+        ) {
+            GunChargeHandler.start(stack, gunData)
+        }
+        wasChargeKeyDown = chargeKeyDown
+
         val swung = MeleeClientHandler.tick(
             player = player,
             stack = stack,
-            meleeKeyDown = ModKeyMappings.MELEE.isDown(),
+            // 冲锋窗口里 V 不再挥击：按住不放/再按一下都不能抢在冲锋那一击前面
+            meleeKeyDown = ModKeyMappings.MELEE.isDown() && !GunChargeHandler.isCharging(),
             subWeaponFireKeyDown = ModKeyMappings.SUBWEAPON_FIRE.isDown(),
             holdingFireKey = holdingFireKey,
             drawTime = drawTime,
-            canOperate = !holdFireVehicle
-                    && !notInGame
-                    && !isEditing
-                    && !(player.vehicle is VehicleEntity && (player.vehicle as VehicleEntity).banHand(player)),
+            canOperate = canOperate,
             skipStateTick = true,
             requestedIndex = requestedIndex,
             chargeStrike = bayonetCharge,
@@ -1778,6 +1803,13 @@ object ClientEventHandler {
         // 动作互斥：近战/副武器/换弹占用期间不开火。
         // 这里刻意放在最前面：被拒绝的入口不该产生任何副作用（包括后面的计时器推进）。
         if (GunActionLock.of(data).blocks(GunAction.FIRING)) {
+            clientTimer.stop()
+            fireSpread = 0.0
+            return
+        }
+
+        // 冲锋窗口里不许开火（左键在起冲锋之前就按着的情况也要挡）
+        if (GunChargeHandler.isCharging()) {
             clientTimer.stop()
             fireSpread = 0.0
             return
@@ -1951,6 +1983,9 @@ object ClientEventHandler {
     }
 
     fun shootClient(player: Player, chargePower: Double = 1.0) {
+        // 冲锋窗口里不许开火（蓄力满了松开左键的那一发也算）
+        if (GunChargeHandler.isCharging()) return
+
         val stack = ActiveGun.stackOf(player)
         val item = stack.item as? GunItem ?: return
         if (!GunItem.isOperable(stack)) return
@@ -2438,9 +2473,10 @@ object ClientEventHandler {
                 Mth.lerp(0.1 * times, moveRotZ, 0.0) * (1 - zoomTime)
             }
 
+        // 冲锋窗口里不给程序性奔跑姿势：冲锋 clip 自己占姿势，两条层用同一个速率交叉淡入淡出
         val sprinting =
             entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown &&
-                    zoomTime < 0.99 && !isGunMeleeActive(stack) && !isEditing
+                    zoomTime < 0.99 && !isGunMeleeActive(stack) && !isEditing && !GunChargeHandler.isCharging()
 
         sprintRotWeight = sprintRotTransition.weight(sprinting, sprintHandgun, delta, customWeight, switchSpeed)
         sprintPosWeight = sprintPosTransition.weight(sprinting, sprintHandgun, delta, customWeight, switchSpeed)

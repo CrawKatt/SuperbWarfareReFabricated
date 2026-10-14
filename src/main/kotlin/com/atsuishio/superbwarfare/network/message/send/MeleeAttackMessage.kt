@@ -48,6 +48,8 @@ data class MeleeAttackMessage(
     /** 客户端锁存的连招下标；服务端只做越界校验 */
     val actionIndex: Int,
     val targets: List<TargetPayload>,
+    /** 这一击是不是刺刀冲锋撞人那一下（伤害基数改走 `BayonetCharge.StrikeDamage`） */
+    val chargeStrike: Boolean = false,
 ) : ServerPacketPayload() {
 
     @Serializable
@@ -68,6 +70,7 @@ data class MeleeAttackMessage(
 
     override fun PayloadContext.handler() {
         val player = sender()
+
         if (player.isSpectator) return
 
         val stack = player.mainHandItem
@@ -122,6 +125,7 @@ data class MeleeAttackMessage(
                     meleeSound,
                     targets,
                     dispatcher,
+                    chargeStrike,
                 )
             }
         } finally {
@@ -149,8 +153,12 @@ data class MeleeAttackMessage(
         meleeSound: MeleeSound?,
         targets: List<TargetPayload>,
         effects: MeleeEffectDispatcher,
+        chargeStrike: Boolean,
     ): Boolean {
         val level = attacker.level()
+        // 刺刀冲锋那一击的伤害基数由 `BayonetCharge.StrikeDamage` 给（绝对值），不写就还是那一段的伤害
+        val chargeDamage = data.get(GunProp.BAYONET_CHARGE).strikeDamage
+        val baseDamage = if (chargeStrike && chargeDamage > 0) chargeDamage else action.damage
         var hurtCount = 0
         var hitCount = 0
         var playedHitSound = false
@@ -186,7 +194,7 @@ data class MeleeAttackMessage(
             // 伤害数值 = 枪的 `MeleeDamage` × 本段 `DamageMultiplier`（已在 resolve 里算完）；
             // `ATTACK_DAMAGE` 属性加成保留在 `GunItem.getAttributeModifiers` 里，但不参与这里的结算
             // ——否则 `MeleeDamage` 会被"属性加成"二次放大，和动作倍率叠在一起就说不清是谁放大的。
-            val damage = action.damage * zoneMultiplier * falloff
+            val damage = baseDamage * zoneMultiplier * falloff
             if (damage <= 0) continue
 
             val damageSource = ModDamageTypes.causeDamageType(

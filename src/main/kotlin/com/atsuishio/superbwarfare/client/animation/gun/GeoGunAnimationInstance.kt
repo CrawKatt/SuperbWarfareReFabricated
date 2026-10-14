@@ -231,6 +231,8 @@ open class GeoGunAnimationInstance(
         if (target != GunAnimationState.IDLE) return false
         if (isDeployedGun()) return false
         if (ClientEventHandler.drawTime >= 0.01) return false
+        // 右键是开镜的枪可以在窗口里开镜（刺雷的右键就是冲锋，到不了这里）
+        if (ClientEventHandler.zoomTime > 0.01) return false
         if (!GunChargeHandler.isCharging()) return false
         return player.onGround()
     }
