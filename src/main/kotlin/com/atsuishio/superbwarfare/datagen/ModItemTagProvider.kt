@@ -647,7 +647,8 @@ class ModItemTagProvider(
         AttachmentType.UPPER_RAIL to listOf(
             ModItems.PEQ_15,
             ModItems.PISTOL_LASER,
-            ModItems.STANDARD_GUN_SHIELD
+            ModItems.STANDARD_GUN_SHIELD,
+            ModItems.HYPERION_SHIELD_MODULE
         ),
         AttachmentType.LEFT_RAIL to listOf(
             ModItems.PEQ_15,
