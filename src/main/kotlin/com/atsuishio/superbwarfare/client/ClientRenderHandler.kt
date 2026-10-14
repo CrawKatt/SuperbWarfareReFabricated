@@ -98,6 +98,7 @@ object ClientRenderHandler {
         RedTriangleOverlay,
         HeatBarOverlay,
         CrossHairOverlay,
+        GunShieldOverlay,
         AmmoCountOverlay,
         StaminaOverlay,
         VehicleCrosshairOverlay,
