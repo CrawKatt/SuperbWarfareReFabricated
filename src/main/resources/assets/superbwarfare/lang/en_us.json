@@ -1478,6 +1478,7 @@
   "screen.superbwarfare.weapon_edit.rotation": "Angle",
   "screen.superbwarfare.weapon_edit.offset": "Offset",
   "screen.superbwarfare.weapon_edit.reset": "Reset",
+  "screen.superbwarfare.weapon_edit.confirm": "Apply settings",
 
   "gamerule.sbwDoGenerateLoots": "Generate Superb Warfare Chest Loots",
 
