@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.client.animation.gun
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.client.animation.AnimationPlayType
+import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance.Companion.ACTION_HANDOVER_TICKS
 import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance.Companion.CHARGE_CANCEL_FADE_TICKS
 import com.atsuishio.superbwarfare.client.gun.GunChargeHandler
 import com.atsuishio.superbwarfare.client.gun.MeleeClientHandler
@@ -233,6 +234,8 @@ open class GeoGunAnimationInstance(
         if (target != GunAnimationState.IDLE) return false
         if (isDeployedGun()) return false
         if (ClientEventHandler.drawTime >= 0.01) return false
+        // 右键是开镜的枪可以在窗口里开镜（刺雷的右键就是冲锋，到不了这里）
+        if (ClientEventHandler.zoomTime > 0.01) return false
         if (!GunChargeHandler.isCharging()) return false
         return player.onGround()
     }

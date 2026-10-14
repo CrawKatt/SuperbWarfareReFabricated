@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.init
 
+import com.atsuishio.superbwarfare.init.ModKeyMappings.FREE_CAMERA
 import com.mojang.blaze3d.platform.InputConstants
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.minecraft.client.KeyMapping
@@ -103,6 +104,10 @@ object ModKeyMappings {
 
     @JvmField
     val MELEE = registerKey("melee", GLFW.GLFW_KEY_V)
+
+    /** 刺刀冲锋（疾跑时单击）：和 [FREE_CAMERA] 同键，但那条只在载具里读 */
+    @JvmField
+    val BAYONET_CHARGE = registerKey("bayonet_charge", GLFW.GLFW_KEY_C)
 
     /**
      * 副武器开火（G）。
