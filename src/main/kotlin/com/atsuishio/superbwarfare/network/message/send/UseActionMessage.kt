@@ -43,7 +43,7 @@ data class UseActionMessage(
 
         if (action == RightClickAction.BAYONET_CHARGE) {
             val charge = data.get(GunProp.BAYONET_CHARGE)
-            if (charge.duration <= 0) return
+            if (!charge.canCharge(data)) return
             if (onChargeCooldown(player, charge.cooldown)) return
 
             charge.sound?.let {

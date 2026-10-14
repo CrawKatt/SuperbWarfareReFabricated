@@ -84,6 +84,7 @@ data class MeleeAttackMessage(
         if (source.isNotEmpty() && source != SOURCE_MAIN) return
 
         val data = GunData.from(stack)
+        if (chargeStrike && !data.get(GunProp.BAYONET_CHARGE).canCharge(data)) return
         if (data.reloading() || data.bolt.actionTimer.get() > 0) return
 
         val operated = ActiveGun.dataOf(data, false)
