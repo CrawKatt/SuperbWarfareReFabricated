@@ -499,6 +499,10 @@ object ClickEventHandler {
         val gunStack = ActiveGun.stackOf(player)
         val item = gunStack.item as? GunItem ?: return
         if (!GunItem.isOperable(gunStack)) return
+
+        // 冲锋窗口里不许开火（近战专属枪械的左键是挥击，不算开火）
+        if (GunChargeHandler.isCharging() && !GunData.from(gunStack).meleeOnly()) return
+
         if (ClientEventHandler.clientTimer.progress == 0L
             && !notInGame
         ) {
@@ -657,12 +661,14 @@ object ClickEventHandler {
 
         when (data.get(GunProp.RIGHT_CLICK_ACTION)) {
             RightClickAction.HEAVY_STRIKE -> ClientEventHandler.requestHeavyStrike()
-            RightClickAction.BAYONET_CHARGE -> GunChargeHandler.start(player, gunStack, data)
+            RightClickAction.BAYONET_CHARGE -> GunChargeHandler.start(gunStack, data)
             else -> handleWeaponAimPress(player, gunStack, data)
         }
     }
 
     private fun handleWeaponAimPress(player: Player, gunStack: ItemStack, data: GunData) {
+        // 冲锋窗口里不许开镜
+        if (GunChargeHandler.isCharging()) return
         if (!GunResource.compute(gunStack).canZoom) return
 
         sendPacketToServer(ZoomMessage(0))
