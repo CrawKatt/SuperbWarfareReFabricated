@@ -14,10 +14,10 @@ import net.neoforged.api.distmarker.OnlyIn
 object BayonetChargeOverlay : CommonOverlay("bayonet_charge") {
     private val TEXTURE = loc("textures/overlay/crosshair/bayonet_charge.png")
 
-    // 贴图原尺寸 128 x 16，画出来再缩一半；填充同样在贴图像素上按比例裁
+    // 贴图原尺寸 128 x 16，绘制为 48 x 6；填充同样在贴图像素上按比例裁
     private const val TEX_WIDTH = 128f
     private const val TEX_HEIGHT = 16f
-    private const val SHRINK = 0.5f
+    private const val SHRINK = 0.375f
     private const val WIDTH = TEX_WIDTH * SHRINK
     private const val HEIGHT = TEX_HEIGHT * SHRINK
 

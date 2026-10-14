@@ -18,7 +18,7 @@ import kotlin.math.roundToInt
 /** 刺刀冲锋的客户端状态 */
 object GunChargeHandler {
 
-    /** 窗口剩余 tick；`0` = 没在冲锋 */
+    /** 窗口剩余 tick；最后一 tick 的攻击由调用方确认后再结束冲锋。 */
     var chargeTicks: Int = 0
         private set
 
@@ -37,11 +37,14 @@ object GunChargeHandler {
     // 冷却的最低量：不管窗口消耗了多少，冷却至少按消耗一半算（走得短的红条从一半处开始恢复）
     private const val MIN_SPENT = 0.5f
 
+    // 未触发攻击而耗尽窗口时，从空条恢复，但速度是普通冷却的两倍。
+    private const val EXPIRED_RECOVERY_SPEED = 2f
+
     fun start(stack: ItemStack, data: GunData) {
         if (isCharging() || cooldownTicks > 0) return
 
         val charge = data.get(GunProp.BAYONET_CHARGE)
-        if (charge.duration <= 0) return
+        if (!charge.canCharge(data)) return
 
         chargeTicks = charge.duration
         chargeTotal = charge.duration
@@ -66,11 +69,17 @@ object GunChargeHandler {
      * 窗口继续跑，免得白打一下空。
      */
     fun tick(player: Player, stack: ItemStack): Entity? {
-        if (chargeTicks <= 0) return null
+        if (!isCharging()) return null
 
         // 换枪就作废（窗口跟着上一把枪走）
         if (!GunItem.isHeldWeapon(stack) || stack.item !== chargingItem) {
             reset()
+            return null
+        }
+
+        // 最后一 tick 找到目标但未能出手时，在下一 tick 正常按超时收窗口。
+        if (chargeTicks <= 0) {
+            reset(expired = true)
             return null
         }
 
@@ -80,8 +89,8 @@ object GunChargeHandler {
         val looking = OverlayTraceHandler.playerReachEntity
         val target = looking?.takeIf { MeleeQuery.isChargeTarget(player, it) }
 
-        // 到点是本地自己收的窗口，收的那一刻就把状态同步回去
-        if (chargeTicks <= 0) reset()
+        // 最后一 tick 仍允许攻击；未找到目标则直接进入加速恢复。
+        if (chargeTicks <= 0 && target == null) reset(expired = true)
 
         return target
     }
@@ -91,16 +100,22 @@ object GunChargeHandler {
         if (isCharging() && stack.item !== chargingItem) reset()
     }
 
-    fun isCharging(): Boolean = chargeTicks > 0
+    fun isCharging(): Boolean = chargingItem != null
 
     // 收窗口（打完那一击、换枪、切状态、到点）；冷却从这一刻才开始
-    fun reset() {
+    fun reset(expired: Boolean = false) {
         val charging = isCharging()
         val spent = if (charging) 1f - chargeTicks.toFloat() / chargeTotal.coerceAtLeast(1) else 0f
         chargeTicks = 0
         chargingItem = null
         if (charging) {
-            cooldownTicks = scaledCooldown(spent)
+            if (expired) {
+                // 分母和剩余量一起减半，让 HUD 从 0 起恢复，而不是从半条开始。
+                cooldownTotal = (cooldownTotal / EXPIRED_RECOVERY_SPEED).roundToInt()
+                cooldownTicks = cooldownTotal
+            } else {
+                cooldownTicks = scaledCooldown(spent)
+            }
             sendPacketToServer(
                 UseActionMessage(
                     RightClickAction.BAYONET_CHARGE,
