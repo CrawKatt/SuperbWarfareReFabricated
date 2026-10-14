@@ -28,6 +28,7 @@ import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.event.DeployedWeaponHandler
 import com.atsuishio.superbwarfare.event.ShieldRuntime
 import com.atsuishio.superbwarfare.item.gun.GunItem
+import com.atsuishio.superbwarfare.network.message.send.AttachmentAdjustMessage
 import com.atsuishio.superbwarfare.resource.ModelResource
 import com.atsuishio.superbwarfare.resource.gun.DefaultGunResource
 import com.atsuishio.superbwarfare.resource.gun.GunResource
@@ -668,9 +669,10 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 //        if (OculusCompat.isRenderingShadowPass()) return
 
         val data = from(stack)
+        val preview = attachmentEditPreview(stack, data, slot)
         LaserSightCapture.capture(
             info = info,
-            colorRgb = info.resolveColorRgb(data.attachment.getLaserColor(slot)),
+            colorRgb = info.resolveColorRgb(preview?.laserColor ?: data.attachment.getLaserColor(slot)),
             firstPerson = firstPerson,
             poseMatrix = poseMatrix,
             locatorTransform = attachmentModel.getLocatorTransform(info.locator),
@@ -1259,11 +1261,16 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         return AttachmentDefinition.from(attachmentId)?.bone
     }
 
+    /** 所有配件渲染路径共用编辑数据源，包括渲染库持有的主手物品副本。 */
+    private fun attachmentEditPreview(stack: ItemStack, data: GunData, type: AttachmentType): AttachmentAdjustMessage? {
+        if (localFirstPersonHand != InteractionHand.MAIN_HAND && stack !== localPlayer?.mainHandItem) return null
+        return (Minecraft.getInstance().screen as? WeaponEditScreen)?.renderAdjustmentFor(data, type)
+    }
+
     /** 实例调整沿挂点局部 Z 轴平移/旋转；偏移以 Bedrock 单位表示，1 = 1/16 方块。 */
     open fun resolveAttachmentLocalTransform(stack: ItemStack, type: AttachmentType): Matrix4f {
         val data = from(stack)
-        val preview = if (stack === localPlayer?.mainHandItem && type != AttachmentType.MAGAZINE)
-            (Minecraft.getInstance().screen as? WeaponEditScreen)?.previewFor(data, type) else null
+        val preview = if (type != AttachmentType.MAGAZINE) attachmentEditPreview(stack, data, type) else null
         val offset = preview?.offset ?: data.attachment.getOffset(type)
         val rotation = (preview?.rotation ?: data.attachment.getRotation(type)).toFloat()
         return Matrix4f()

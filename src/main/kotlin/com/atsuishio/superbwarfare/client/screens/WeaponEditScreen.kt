@@ -2,10 +2,7 @@ package com.atsuishio.superbwarfare.client.screens
 import com.atsuishio.superbwarfare.client.tooltip.ClientAttachmentImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.component.AttachmentImageComponent
 import com.atsuishio.superbwarfare.config.server.AttachmentConfig
-import com.atsuishio.superbwarfare.data.attachment.AttachmentAdjustments
-import com.atsuishio.superbwarfare.data.attachment.AttachmentDefinition
-import com.atsuishio.superbwarfare.data.attachment.AttachmentSlots
-import com.atsuishio.superbwarfare.data.attachment.AvailableAttachments
+import com.atsuishio.superbwarfare.data.attachment.*
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
@@ -81,16 +78,14 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
     private var tooltipWrapWidth = 0
     private var viewportWidth = 0f
     private var viewportHeight = 0f
-    private var pendingAdjustment: AttachmentAdjustMessage? = null
-    private var adjustmentPreview: AttachmentAdjustMessage? = null
-    private var adjustmentPreviewTicks = 0
+    private val adjustmentDraft = AttachmentEditDraft()
+    private var settingsHeight = 0f
 
     override fun isPauseScreen(): Boolean = false
 
     override fun tick() {
         super.tick()
-        flushAdjustment()
-        if (++adjustmentPreviewTicks >= 20) adjustmentPreview = null
+        adjustmentDraft.tick()
         if (openingTicks < MOUNT_REVEAL_DELAY_TICKS) openingTicks++
     }
 
@@ -102,8 +97,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
     }
 
     override fun removed() {
-        finishAdjustmentInputs()
-        flushAdjustment()
+        discardAdjustments()
         openingTicks = 0
         clearUiState()
         WeaponEditMountTracker.clear()
@@ -132,8 +126,8 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         tooltipLines = emptyList()
         tooltipWrapWidth = 0
         documentGeneration = -1L
-        adjustmentPreview = null
-        adjustmentPreviewTicks = 0
+        adjustmentDraft.discard()
+        settingsHeight = 0f
     }
 
     override fun render(graphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
@@ -184,7 +178,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
     override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontalScroll: Double, delta: Double): Boolean = true
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
-        if (keyCode == ModKeyMappings.EDIT_MODE.key.value) {
+        if (keyCode == ModKeyMappings.EDIT_MODE.key.value && !settingsTextInputs().any { it.isFocus }) {
             onClose()
             return true
         }
@@ -196,8 +190,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
     }
 
     private fun leaveSlot() {
-        finishAdjustmentInputs()
-        flushAdjustment()
+        discardAdjustments()
         editingAttachmentType = -1
         hoveredItem = null
     }
@@ -240,6 +233,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
             val type = AttachmentSlots.slotAt(editingAttachmentType) ?: return@addEventListener
             val data = localPlayer?.mainHandItem?.let(GunData::from) ?: return@addEventListener
             if (data.attachment.id(type) != null) {
+                discardAdjustments()
                 hoveredItem = null
                 sendPacketToServer(AttachmentInstallMessage(type.attachmentName, ""))
             }
@@ -256,7 +250,12 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
             reset.setAttribute("aria-label", label("reset"))
             reset.addEventListener("click") { adjustAttachment(reset = true) }
         }
-        for (property in listOf("rotation", "offset")) {
+        doc.getElementById("settings-confirm")?.let { confirm ->
+            confirm.setAttribute("title", label("confirm"))
+            confirm.setAttribute("aria-label", label("confirm"))
+            confirm.addEventListener("click") { confirmAdjustments() }
+        }
+        for (property in ADJUSTMENT_PROPERTIES) {
             doc.getElementById("settings-$property-minus")?.addEventListener("click") { stepAdjustment(property, -1) }
             doc.getElementById("settings-$property-plus")?.addEventListener("click") { stepAdjustment(property, 1) }
             doc.getElementById("settings-$property-label")?.textContent = label(property)
@@ -267,156 +266,220 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
                 }
             }
             doc.getElementById("settings-$property-value")?.let { input ->
-                input.addEventListener("focus") {
-                    val type = AttachmentSlots.slotAt(editingAttachmentType) ?: return@addEventListener
-                    val held = localPlayer?.mainHandItem ?: return@addEventListener
-                    if (held.item !is GunItem) return@addEventListener
-                    val data = GunData.from(held)
-                    input.setAttribute("data-adjustment-slot", type.attachmentName)
-                    input.setAttribute("data-adjustment-gun", data.uuid?.toString().orEmpty())
-                    input.setAttribute("data-adjustment-id", data.attachment.id(type)?.toString().orEmpty())
-                    input.setAttribute("data-adjustment-draft", input.getValue())
-                }
-                input.addEventListener("beforeinput") { event ->
-                    if (event is Event.InputEvent && event.inputType.startsWith("insert")) {
-                        val text = input as? Input ?: return@addEventListener
-                        val inserted = event.data ?: return@addEventListener
-                        val current = input.getValue()
-                        val start = text.getSelectionStart().coerceIn(0, current.length)
-                        val end = text.getSelectionEnd().coerceIn(start, current.length)
-                        if (!ADJUSTMENT_NUMBER.matches(current.replaceRange(start, end, inserted))) event.preventDefault()
-                    }
-                }
-                input.addEventListener("input") {
-                    // 粘贴、输入法、撤销等入口也校验；只接受数字、一个小数点与开头的负号。
-                    if (!ADJUSTMENT_NUMBER.matches(input.getValue())) {
-                        input.setValue(input.getAttribute("data-adjustment-draft") ?: "")
-                    } else {
-                        input.setAttribute("data-adjustment-draft", input.getValue())
-                        commitAdjustmentInput(input, property, finish = false)
-                    }
-                }
-                input.addEventListener("change") { commitAdjustmentInput(input, property, finish = true) }
-                input.addEventListener("blur") { commitAdjustmentInput(input, property, finish = true) }
-                input.addEventListener("keydown") { event ->
-                    if (event is KeyEvent && (event.keyCode == GLFW.GLFW_KEY_ENTER || event.keyCode == GLFW.GLFW_KEY_KP_ENTER)) {
-                        event.preventDefault()
-                        commitAdjustmentInput(input, property, finish = true)
-                        input.blur()
-                        flushAdjustment()
-                    } else if (event is KeyEvent && (event.keyCode == GLFW.GLFW_KEY_UP || event.keyCode == GLFW.GLFW_KEY_DOWN)) {
-                        event.preventDefault()
-                        stepAdjustment(property, if (event.keyCode == GLFW.GLFW_KEY_UP) 1 else -1)
-                    }
-                }
+                wireSettingsInput(input,
+                    { if (AttachmentColorInput.shift(property) != null) RGB_NUMBER.matches(it) else ADJUSTMENT_NUMBER.matches(it) },
+                    { finish -> commitAdjustmentInput(input, property, finish) },
+                    { direction -> stepAdjustment(property, direction) })
             }
+        }
+        doc.getElementById("settings-color-hex")?.let { input ->
+            wireSettingsInput(input, AttachmentColorInput::isDraft, { finish -> commitColorInput(input, finish) })
         }
         prepareGrid(doc)
     }
 
-    /** 一 tick 最多发一份最新值，关闭界面/退出槽位时也提交最后一次拖动。 */
-    private fun flushAdjustment() {
-        pendingAdjustment?.let(::sendPacketToServer)
-        pendingAdjustment = null
+    private fun wireSettingsInput(
+        input: Element, accepts: (String) -> Boolean, commit: (Boolean) -> Unit, step: ((Int) -> Unit)? = null,
+    ) {
+        input.addEventListener("focus") {
+            val (type, data) = selectedAdjustmentData() ?: return@addEventListener
+            input.setAttribute("data-adjustment-slot", type.attachmentName)
+            input.setAttribute("data-adjustment-gun", data.uuid?.toString().orEmpty())
+            input.setAttribute("data-adjustment-id", data.attachment.id(type)?.toString().orEmpty())
+            input.setAttribute("data-adjustment-draft", input.getValue())
+        }
+        input.addEventListener("beforeinput") { event ->
+            if (event is Event.InputEvent && event.inputType.startsWith("insert")) {
+                val text = input as? Input ?: return@addEventListener
+                val inserted = event.data ?: return@addEventListener
+                val current = input.getValue()
+                val start = text.getSelectionStart().coerceIn(0, current.length)
+                val end = text.getSelectionEnd().coerceIn(start, current.length)
+                if (!accepts(current.replaceRange(start, end, inserted))) event.preventDefault()
+            }
+        }
+        input.addEventListener("input") {
+            if (!accepts(input.getValue())) input.setValue(input.getAttribute("data-adjustment-draft") ?: "")
+            else {
+                input.setAttribute("data-adjustment-draft", input.getValue())
+                commit(false)
+            }
+        }
+        input.addEventListener("change") { commit(true) }
+        input.addEventListener("blur") { commit(true) }
+        input.addEventListener("keydown") { event ->
+            if (event !is KeyEvent) return@addEventListener
+            when (event.keyCode) {
+                GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER -> {
+                    event.preventDefault()
+                    commit(true)
+                    input.blur()
+                }
+                GLFW.GLFW_KEY_ESCAPE -> {
+                    event.preventDefault()
+                    leaveSlot()
+                }
+                GLFW.GLFW_KEY_UP, GLFW.GLFW_KEY_DOWN -> if (step != null) {
+                    event.preventDefault()
+                    step(if (event.keyCode == GLFW.GLFW_KEY_UP) 1 else -1)
+                }
+            }
+        }
     }
 
+    private fun settingsTextInputs(): List<Element> = linkedDocument?.let { doc ->
+        (ADJUSTMENT_PROPERTIES.map { "settings-$it-value" } + "settings-color-hex").mapNotNull(doc::getElementById)
+    } ?: emptyList()
+
     private fun finishAdjustmentInputs() {
-        for (property in listOf("rotation", "offset")) {
-            linkedDocument?.getElementById("settings-$property-value")?.takeIf { it.isFocus }?.blur()
-        }
+        settingsTextInputs().filter { it.isFocus }.forEach { it.blur() }
+    }
+
+    private fun discardAdjustments() {
+        finishAdjustmentInputs()
+        adjustmentDraft.discard()
+    }
+
+    /** 整个设置面板唯一的发包入口，回车/失焦/退出只处理草稿。 */
+    private fun confirmAdjustments() {
+        finishAdjustmentInputs()
+        val (type, data) = selectedAdjustmentData() ?: return
+        if (previewFor(data, type) == null) return
+        adjustmentDraft.submit()?.let(::sendPacketToServer)
+    }
+
+    private fun selectedAdjustmentData(): Pair<AttachmentType, GunData>? {
+        val type = AttachmentSlots.slotAt(editingAttachmentType) ?: return null
+        val held = localPlayer?.mainHandItem ?: return null
+        if (held.item !is GunItem || held.item !== stack.item) return null
+        val data = GunData.from(held)
+        if (!data.attachment.has(type)) return null
+        return type to data
+    }
+
+    private fun laserInfo(data: GunData, type: AttachmentType): LaserInfo? =
+        data.attachment.id(type)?.let(AttachmentDefinition::from)?.laser
+
+    private fun currentAdjustment(data: GunData, type: AttachmentType): AttachmentAdjustMessage =
+        previewFor(data, type) ?: AttachmentAdjustMessage(data.getDefault().itemId, data.uuid?.toString(),
+            localPlayer?.inventory?.selected ?: -1, type.attachmentName, data.attachment.id(type).toString(),
+            data.attachment.getRotation(type), data.attachment.getOffset(type),
+            laserColor = if (laserInfo(data, type) != null) data.attachment.getLaserColor(type) else null)
+
+    private fun currentColor(data: GunData, type: AttachmentType, preview: AttachmentAdjustMessage? = previewFor(data, type)): Int =
+        laserInfo(data, type)?.resolveColorRgb(preview?.laserColor ?: data.attachment.getLaserColor(type)) ?: 0
+
+    private fun adjustmentRange(data: GunData, type: AttachmentType, property: String): ClosedFloatingPointRange<Double>? = when {
+        property == "rotation" && AttachmentAdjustments.canRotate(data, type) -> AttachmentAdjustments.MIN_ROTATION..AttachmentAdjustments.MAX_ROTATION
+        property == "offset" && AttachmentAdjustments.canOffset(type) -> AttachmentAdjustments.offsetRange(data, type)
+        AttachmentColorInput.shift(property) != null && laserInfo(data, type) != null -> 0.0..255.0
+        else -> null
     }
 
     private fun stepAdjustment(property: String, direction: Int) {
         finishAdjustmentInputs()
-        val type = AttachmentSlots.slotAt(editingAttachmentType) ?: return
-        val held = localPlayer?.mainHandItem ?: return
-        if (held.item !is GunItem || held.item !== stack.item) return
-        val data = GunData.from(held)
-        val preview = previewFor(data, type)
-        val current = if (property == "rotation") preview?.rotation ?: data.attachment.getRotation(type)
-            else preview?.offset ?: data.attachment.getOffset(type)
-        val step = if (property == "rotation") AttachmentAdjustments.ROTATION_STEP else AttachmentAdjustments.OFFSET_STEP
+        val (type, data) = selectedAdjustmentData() ?: return
+        val current = adjustmentValue(data, type, property)
+        val step = if (property == "offset") AttachmentAdjustments.OFFSET_STEP else 1.0
         adjustAttachment(property, current + step * direction)
     }
 
     /** 输入中允许空串/负号等过渡状态；结束编辑时归一化、钳制，防止每帧同步打断输入。 */
     private fun commitAdjustmentInput(input: Element, property: String, finish: Boolean) {
-        val type = AttachmentSlots.slotAt(editingAttachmentType) ?: return
-        if (property == "rotation" && !AttachmentAdjustments.canRotate(type) ||
-            property == "offset" && !AttachmentAdjustments.canOffset(type)) return
-        val held = localPlayer?.mainHandItem ?: return
-        if (held.item !is GunItem || held.item !== stack.item) return
-        val data = GunData.from(held)
-        if (!data.attachment.has(type)) return
+        val (type, data) = selectedAdjustmentData() ?: return
+        val range = adjustmentRange(data, type, property) ?: return
         // 失焦可能发生在点击另一个槽位之后；旧输入框不能把旧值提交到新槽位或新配件。
         if (input.getAttribute("data-adjustment-slot") != type.attachmentName ||
             input.getAttribute("data-adjustment-gun") != data.uuid?.toString().orEmpty() ||
             input.getAttribute("data-adjustment-id") != data.attachment.id(type)?.toString()) return
-        val range = if (property == "rotation") AttachmentAdjustments.MIN_ROTATION..AttachmentAdjustments.MAX_ROTATION
-            else AttachmentAdjustments.offsetRange(data, type)
         val value = input.getValue().toDoubleOrNull()?.takeIf { it.isFinite() }
         if (!finish && (value == null || value !in range)) return
-        val previous = previewFor(data, type)
-        val fallback = if (property == "rotation") previous?.rotation ?: data.attachment.getRotation(type)
-            else previous?.offset ?: data.attachment.getOffset(type)
-        val clamped = formatAdjustment(property, (value ?: fallback).coerceIn(range.start, range.endInclusive)).toDouble()
+        val fallback = adjustmentValue(data, type, property)
+        val clamped = formatAdjustment(property, (value ?: fallback).coerceIn(range.start, range.endInclusive))
+            .toDouble().coerceIn(range.start, range.endInclusive)
         adjustAttachment(property, clamped)
         if (finish) input.setValue(formatAdjustment(property, clamped))
     }
 
     private fun formatAdjustment(property: String, value: Double) =
-        String.format(Locale.ROOT, if (property == "rotation") "%.0f" else "%.1f", value)
+        String.format(Locale.ROOT, if (property == "offset") "%.1f" else "%.0f", value)
+
+    private fun adjustmentValue(data: GunData, type: AttachmentType, property: String): Double {
+        AttachmentColorInput.shift(property)?.let { return AttachmentColorInput.channel(currentColor(data, type), it).toDouble() }
+        val current = currentAdjustment(data, type)
+        return if (property == "rotation") current.rotation else current.offset
+    }
+
+    private fun commitColorInput(input: Element, finish: Boolean) {
+        val (type, data) = selectedAdjustmentData() ?: return
+        if (laserInfo(data, type) == null || input.getAttribute("data-adjustment-slot") != type.attachmentName ||
+            input.getAttribute("data-adjustment-gun") != data.uuid?.toString().orEmpty() ||
+            input.getAttribute("data-adjustment-id") != data.attachment.id(type)?.toString()) return
+        AttachmentColorInput.parse(input.getValue())?.let { color ->
+            if (color != currentColor(data, type)) adjustmentDraft.update(currentAdjustment(data, type).copy(laserColor = color))
+        }
+        if (finish) input.setValue(AttachmentColorInput.format(currentColor(data, type)))
+    }
 
     private fun adjustAttachment(property: String = "", value: Double = 0.0, reset: Boolean = false) {
         if (!value.isFinite()) return
-        val type = AttachmentSlots.slotAt(editingAttachmentType) ?: return
-        val held = localPlayer?.mainHandItem ?: return
-        if (held.item !is GunItem || held.item !== stack.item) return
-        val data = GunData.from(held)
-        val installed = data.attachment.id(type) ?: return
-        if (type == AttachmentType.MAGAZINE) return
-        val previous = previewFor(data, type)
-        var rotation = previous?.rotation ?: data.attachment.getRotation(type)
-        var offset = previous?.offset ?: data.attachment.getOffset(type)
+        if (reset) finishAdjustmentInputs()
+        val (type, data) = selectedAdjustmentData() ?: return
+        val previous = currentAdjustment(data, type)
+        val next: AttachmentAdjustMessage
         if (reset) {
-            rotation = 0.0
-            offset = 0.0
-        } else if (AttachmentAdjustments.canRotate(type) && property == "rotation") {
-            rotation = formatAdjustment(property, value.coerceIn(AttachmentAdjustments.MIN_ROTATION, AttachmentAdjustments.MAX_ROTATION)).toDouble()
-        }
-        if (!reset && AttachmentAdjustments.canOffset(type) && property == "offset") {
-            val range = AttachmentAdjustments.offsetRange(data, type)
-            offset = formatAdjustment(property, value.coerceIn(range.start, range.endInclusive)).toDouble()
+            next = previous.copy(rotation = 0.0, offset = 0.0, reset = true,
+                laserColor = if (laserInfo(data, type) != null) -1 else null)
+        } else {
+            val range = adjustmentRange(data, type, property) ?: return
+            val normalized = formatAdjustment(property, value.coerceIn(range.start, range.endInclusive))
+                .toDouble().coerceIn(range.start, range.endInclusive)
+            if (normalized == adjustmentValue(data, type, property)) return
+            val shift = AttachmentColorInput.shift(property)
+            next = when {
+                shift != null -> previous.copy(laserColor = AttachmentColorInput.withChannel(currentColor(data, type), shift, normalized.toInt()))
+                property == "rotation" -> previous.copy(rotation = normalized)
+                else -> previous.copy(offset = normalized)
+            }
         }
         // 预览留在界面内存，不能在客户端 save()：这会递增 GunData revision，阻碍服务端快照接管。
-        val message = AttachmentAdjustMessage(data.getDefault().itemId, data.uuid?.toString(),
-            localPlayer?.inventory?.selected ?: return, type.attachmentName, installed.toString(), rotation, offset, reset)
-        pendingAdjustment = message
-        adjustmentPreview = message
-        adjustmentPreviewTicks = 0
-        // 重置单独立即提交，不能让同 tick 的后续滑块操作覆盖掉对隐藏属性的清零。
-        if (reset) {
-            for (name in listOf("rotation", "offset")) {
-                linkedDocument?.getElementById("settings-$name-value")?.setValue(formatAdjustment(name, 0.0))
-            }
-            flushAdjustment()
-        }
+        adjustmentDraft.update(next)
     }
 
     internal fun previewFor(data: GunData, type: AttachmentType): AttachmentAdjustMessage? =
-        adjustmentPreview?.takeIf { it.gunId == data.getDefault().itemId && it.gunUuid == data.uuid?.toString() &&
+        adjustmentDraft.preview?.takeIf { AttachmentSlots.slotAt(editingAttachmentType) == type &&
+            it.gunId == data.getDefault().itemId && it.gunUuid == data.uuid?.toString() &&
             it.hotbarSlot == localPlayer?.inventory?.selected && it.slot == type.attachmentName &&
             it.attachmentId == data.attachment.id(type)?.toString() }
+
+    /**
+     * 第一人称渲染可能持有主手物品的旧副本，不能用 ItemStack 引用相等判断是否正在改装。
+     * 草稿优先；提交完成后也从主手最新快照读取，避免渲染副本尚未刷新时跳回旧位置。
+     * 仅供本地主手渲染调用，仍校验枪械身份与配件，不能把草稿套到其他枪或旧配件上。
+     */
+    internal fun renderAdjustmentFor(renderedData: GunData, type: AttachmentType): AttachmentAdjustMessage? {
+        val held = localPlayer?.mainHandItem ?: return null
+        if (held.item !== stack.item || renderedData.item !== held.item) return null
+        val data = GunData.from(held)
+        if (data.getDefault().itemId != renderedData.getDefault().itemId ||
+            (renderedData.stack !== held && (data.uuid == null || data.uuid != renderedData.uuid)) ||
+            data.attachment.id(type) != renderedData.attachment.id(type)) return null
+        return currentAdjustment(data, type)
+    }
 
     private fun syncAdjustments(doc: Document, data: GunData): Box? {
         val settings = doc.getElementById("settings") ?: return null
         val type = AttachmentSlots.slotAt(editingAttachmentType)
-        val rotation = type != null && AttachmentAdjustments.canRotate(type)
+        val rotation = type != null && AttachmentAdjustments.canRotate(data, type)
         val offset = type != null && AttachmentAdjustments.canOffset(type)
-        if (type == null || !data.attachment.has(type) || (!rotation && !offset)) {
+        val laser = type?.let { laserInfo(data, it) }
+        settingsHeight = 0f
+        if (type == null || !data.attachment.has(type) || (!rotation && !offset && laser == null)) {
             settings.style.display = "none"
+            adjustmentDraft.discard()
             return null
         }
+        if (adjustmentDraft.preview != null && previewFor(data, type) == null) discardAdjustments()
         fun sync(property: String, visible: Boolean, value: Double, min: Double, max: Double, step: Double) {
             doc.getElementById("settings-$property-row")?.style?.display = if (visible) "flex" else "none"
             if (!visible) return
@@ -433,18 +496,38 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
                 }
             }
         }
-        var preview = previewFor(data, type)
-        if (preview != null && preview.rotation == data.attachment.getRotation(type) &&
-            preview.offset == data.attachment.getOffset(type) && pendingAdjustment == null) {
-            adjustmentPreview = null
-            preview = null
-        }
+        val submitted = previewFor(data, type)
+        adjustmentDraft.acknowledge(submitted != null && submitted.rotation == data.attachment.getRotation(type) &&
+            submitted.offset == data.attachment.getOffset(type) &&
+            (submitted.laserColor == null || submitted.laserColor == data.attachment.getLaserColor(type)))
+        val preview = previewFor(data, type)
         sync("rotation", rotation, preview?.rotation ?: data.attachment.getRotation(type), AttachmentAdjustments.MIN_ROTATION,
             AttachmentAdjustments.MAX_ROTATION, AttachmentAdjustments.ROTATION_STEP)
         val range = AttachmentAdjustments.offsetRange(data, type)
         sync("offset", offset, preview?.offset ?: data.attachment.getOffset(type), range.start, range.endInclusive,
             AttachmentAdjustments.OFFSET_STEP)
-        val height = if (rotation && offset) SETTINGS_HEIGHT + SETTINGS_ROW_HEIGHT else SETTINGS_HEIGHT
+        val color = currentColor(data, type, preview)
+        for (property in listOf("red", "green", "blue")) {
+            val channel = AttachmentColorInput.channel(color, AttachmentColorInput.shift(property)!!)
+            sync(property, laser != null, channel.toDouble(), 0.0, 255.0, 1.0)
+        }
+        doc.getElementById("settings-hex-row")?.style?.display = if (laser != null) "flex" else "none"
+        if (laser != null) {
+            val hex = AttachmentColorInput.format(color)
+            doc.getElementById("settings-color-hex")?.let { if (!it.isFocus && it.getValue() != hex) it.setValue(hex) }
+            doc.getElementById("settings-color-swatch")?.let {
+                val style = "background-color: $hex"
+                if (it.getAttribute("style") != style) it.setAttribute("style", style)
+            }
+        }
+        doc.getElementById("settings-confirm")?.let {
+            val disabled = adjustmentDraft.preview == null || adjustmentDraft.awaitingServer
+            setClass(it, "disabled", disabled)
+            it.toggleAttribute("disabled", disabled)
+        }
+        val rows = (if (rotation) 1 else 0) + (if (offset) 1 else 0) + (if (laser != null) 4 else 0)
+        val height = SETTINGS_BASE_HEIGHT + rows * SETTINGS_ROW_HEIGHT
+        settingsHeight = height
         settings.style.height = px(height)
         val scale = editorPanelScale()
         settings.style.transform = "scale($scale)"
@@ -478,8 +561,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
     private fun onMountClicked(type: AttachmentType) {
         val index = AttachmentSlots.editIndex(type)
         if (index < 0 || editingAttachmentType == index) return
-        finishAdjustmentInputs()
-        flushAdjustment()
+        discardAdjustments()
         hoveredItem = null
         editingAttachmentType = index
         editModelShake()
@@ -487,12 +569,11 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
     }
 
     private fun onAmmoClicked() {
-        finishAdjustmentInputs()
-        flushAdjustment()
+        discardAdjustments()
         hoveredItem = null
         editingAttachmentType = AttachmentSlots.AMMO_TYPE_EDIT_INDEX
         editModelShake()
-        sendPacketToServer(EditMessage(AttachmentSlots.AMMO_TYPE_EDIT_INDEX, true, false))
+        sendPacketToServer(EditMessage(AttachmentSlots.AMMO_TYPE_EDIT_INDEX, add = true, isVehicle = false))
     }
 
     private data class Mount(
@@ -605,6 +686,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
                     val type = panelType
                     if (type != null && AttachmentSlots.slotAt(editingAttachmentType) == type) {
                         val id = shownItems[key] ?: return@addEventListener
+                        discardAdjustments()
                         hoveredItem = null
                         sendPacketToServer(AttachmentInstallMessage(type.attachmentName, id))
                     }
@@ -818,7 +900,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         val bottom get() = top + height
         val centerX get() = left + width / 2f
         val centerY get() = top + height / 2f
-        fun contains(x: Float, y: Float) = x >= left && x < right && y >= top && y < bottom
+        fun contains(x: Float, y: Float) = x in left..<right && y >= top && y < bottom
         fun overlaps(other: Box, gap: Float) = left < other.right + gap && right + gap > other.left &&
                 top < other.bottom + gap && bottom + gap > other.top
 
@@ -831,7 +913,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
 
     // 两个菜单共用缩放，窄窗口/矮窗口下也保持相同的可见宽度和字号。
     private fun editorPanelScale() =
-        minOf(1f, (viewportWidth - 8f) / (PANEL_WIDTH * 2f), usableHeight() / PANEL_HEIGHT).coerceAtLeast(0.1f)
+        minOf(1f, (viewportWidth - 8f) / (PANEL_WIDTH * 2f), usableHeight() / max(PANEL_HEIGHT, settingsHeight)).coerceAtLeast(0.1f)
 
     /** 从期望位置向外搜索，矩形间保留 gap；极小窗口放不下时选择遮挡最少的位置。 */
     private fun findSpace(
@@ -1015,7 +1097,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
 
     companion object {
         private const val DOCUMENT_PATH = "superbwarfare/weapon_edit.html"
-        private val MOUNT_FILLED_COLOR = 0xffffb43b.toInt()
+        private const val MOUNT_FILLED_COLOR = 0xffffb43b.toInt()
         private const val MOUNT_REVEAL_DELAY_TICKS = 10
         private const val AIR = "minecraft:air"
         private const val AMMO_MOUNT_ID = "mount-ammo_type"
@@ -1025,7 +1107,9 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         private const val PANEL_HEIGHT = 112f
         private const val SETTINGS_WIDTH = PANEL_WIDTH
         private val ADJUSTMENT_NUMBER = Regex("-?[0-9]*(\\.[0-9]*)?")
-        private const val SETTINGS_HEIGHT = 56f
+        private val RGB_NUMBER = Regex("[0-9]*")
+        private val ADJUSTMENT_PROPERTIES = listOf("rotation", "offset", "red", "green", "blue")
+        private const val SETTINGS_BASE_HEIGHT = 56f
         private const val SETTINGS_ROW_HEIGHT = 24f
         private const val GRID_COLUMNS = 8
         private const val GRID_VISIBLE_ROWS = 3

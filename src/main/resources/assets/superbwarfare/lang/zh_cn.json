@@ -1478,6 +1478,7 @@
   "screen.superbwarfare.weapon_edit.rotation": "角度",
   "screen.superbwarfare.weapon_edit.offset": "偏移",
   "screen.superbwarfare.weapon_edit.reset": "重置",
+  "screen.superbwarfare.weapon_edit.confirm": "应用设置",
 
   "gamerule.sbwDoGenerateLoots": "生成卓越前线的箱子战利品",
 
