@@ -478,6 +478,9 @@ class GunProp<T, R>(
         val SOUND_INFO = complexProp(DefaultGunData::soundInfo) { it }
 
         @JvmField
+        val RAIL_INFO = complexProp(DefaultGunData::railInfo) { it }
+
+        @JvmField
         val SHOOT_ANIMATION_TIME = plainProp(DefaultGunData::shootAnimationTime)
 
         @JvmField

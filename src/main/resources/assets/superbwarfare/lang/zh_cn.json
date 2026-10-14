@@ -1474,6 +1474,10 @@
 
   "screen.superbwarfare.weapon_edit.empty": "未安装配件",
   "screen.superbwarfare.weapon_edit.no_available": "背包中没有可用配件",
+  "screen.superbwarfare.weapon_edit.settings": "配件设置",
+  "screen.superbwarfare.weapon_edit.rotation": "角度",
+  "screen.superbwarfare.weapon_edit.offset": "偏移",
+  "screen.superbwarfare.weapon_edit.reset": "重置",
 
   "gamerule.sbwDoGenerateLoots": "生成卓越前线的箱子战利品",
 
