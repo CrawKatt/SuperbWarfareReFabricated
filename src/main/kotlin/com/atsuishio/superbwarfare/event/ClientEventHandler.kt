@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.client.ClientSyncedEntityHandler
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance
 import com.atsuishio.superbwarfare.client.animation.gun.GunDrawAnimation
+import com.atsuishio.superbwarfare.client.animation.gun.GunSprintAnimation
 import com.atsuishio.superbwarfare.client.gun.*
 import com.atsuishio.superbwarfare.client.lighting.LightPositionRegistry
 import com.atsuishio.superbwarfare.client.lighting.MuzzleFlashHelper
@@ -25,9 +26,6 @@ import com.atsuishio.superbwarfare.data.attachment.SubWeaponInfo
 import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
-import com.atsuishio.superbwarfare.event.ClientEventHandler.SPRINT_EASE_MAX_DELTA_TICKS
-import com.atsuishio.superbwarfare.event.ClientEventHandler.SPRINT_EASE_POS_Y_IN
-import com.atsuishio.superbwarfare.event.ClientEventHandler.SPRINT_EASE_ROT_Y_IN
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
@@ -118,6 +116,7 @@ object ClientEventHandler {
     @JvmField
     var moveTime: Double = 0.0
 
+    // 奔跑样张的相位（秒）
     @JvmField
     var sprintTime: Double = 0.0
 
@@ -130,65 +129,157 @@ object ClientEventHandler {
     @JvmField
     var moveRotZ: Double = 0.0
 
+    // 奔跑姿势的旋转/位移权重（0..1）
     @JvmField
-    var sprintBasicRotX: Double = 0.0
-
-    @JvmField
-    var sprintBasicRotY: Double = 0.0
+    var sprintRotWeight: Double = 0.0
 
     @JvmField
-    var sprintBasicRotZ: Double = 0.0
+    var sprintPosWeight: Double = 0.0
 
+    // 当前过渡按哪支淡出片段走：枪型是手枪（`GunType` = Handgun）用样张里的手枪淡出
     @JvmField
-    var sprintPosX: Double = 0.0
+    var sprintHandgun: Boolean = false
 
+    private val sprintRotTransition = SprintTransition(rot = true)
+    private val sprintPosTransition = SprintTransition(rot = false)
+
+    // 滞空权重：0 = 只留基准姿势（详见 [GunSprintAnimation.BASE_POSITION] / [GunSprintAnimation.BASE_ROTATION]）
     @JvmField
-    var sprintPosY: Double = 0.0
+    var sprintAirFade: Double = 0.0
 
-    @JvmField
-    var sprintBasicPosX: Double = 0.0
+    // 奔跑姿势的缓入缓出时长
+    // 标准重量：这个重量的枪不缩放，就是 SPRINT_EASE_IN_SECONDS / SPRINT_EASE_OUT_SECONDS
+    const val SPRINT_EASE_WEIGHT_STANDARD = 6.0
 
-    @JvmField
-    var sprintBasicPosY: Double = 0.0
+    // 重量对时长的缩放指数：越小越"轻重枪一样快"（0.25 = 四次方根，重量 1~20 只差 0.64~1.35 倍）
+    const val SPRINT_EASE_WEIGHT_POWER = 0.25
 
-    @JvmField
-    var sprintBasicPosZ: Double = 0.0
+    // 标准枪的过渡整段时长（秒）：进
+    const val SPRINT_EASE_IN_SECONDS = 0.5f
 
-    // 奔跑姿势的缓入缓出速率
-    /** 旋转入：X/Z 用这档，Y 用 [SPRINT_EASE_ROT_Y_IN] */
-    const val SPRINT_EASE_ROT_IN = 0.3f
-    const val SPRINT_EASE_ROT_Y_IN = 0.18f
+    // 标准枪的过渡整段时长（秒）：出
+    const val SPRINT_EASE_OUT_SECONDS = 0.8f
 
-    /** 位移入：X/Z 用这档，Y 用 [SPRINT_EASE_POS_Y_IN] */
-    const val SPRINT_EASE_POS_IN = 0.8f
-    const val SPRINT_EASE_POS_Y_IN = 0.25f
+    // 奔跑样张的相位推进速率
+    const val SPRINT_ANIM_RATE = 0.06f
 
-    /** 旋转出 */
-    const val SPRINT_EASE_ROT_OUT = 1.4f
-    const val SPRINT_EASE_ROT_Y_OUT = 0.96f
-
-    /** 位移出（三轴同速） */
-    const val SPRINT_EASE_POS_OUT = 0.8f
-
-    /** 缓动的时间尺度：`3.7 * deltaFrameTime` */
+    // 摆动相位与滞空淡入淡出的时间尺度：3.7 * deltaFrameTime
     const val SPRINT_EASE_TIMES = 3.7f
 
-    /** 单帧 delta 的上限（tick）：掉帧时不要一步跳完 */
+    // 单帧 delta 的上限（tick）：掉帧时不要一步跳完
     const val SPRINT_EASE_MAX_DELTA_TICKS = 0.8f
 
-    /**
-     * 奔跑姿势缓动的时间尺度：`3.7 * deltaFrameTime`，单帧 delta 钳在 [SPRINT_EASE_MAX_DELTA_TICKS] 里。
-     */
+    // 过渡片段和循环段互淡的那一段占整段的比例（两头各留，缓动衔接）
+    const val SPRINT_CLIP_BLEND = 0.3f
+
+    // 过渡中途掉头（进 ↔ 出）时上一帧的姿势跟新片段互淡的时长（tick）：要抹的缝只跟样张有关，跟枪重无关
+    const val SPRINT_FLIP_TICKS = 4.0f
+
+    // 这一帧走了几个 tick
+    @JvmStatic
+    fun sprintDelta(deltaFrameTime: Float): Float =
+        deltaFrameTime.coerceAtMost(SPRINT_EASE_MAX_DELTA_TICKS)
+
+    // 奔跑姿势缓动的时间尺度
     @JvmStatic
     fun sprintEaseTimes(deltaFrameTime: Float): Float =
-        SPRINT_EASE_TIMES * deltaFrameTime.coerceAtMost(SPRINT_EASE_MAX_DELTA_TICKS)
+        SPRINT_EASE_TIMES * sprintDelta(deltaFrameTime)
 
-    /**
-     * 奔跑姿势**每帧**的插值系数
-     */
+    // 过渡的整段时长（tick）：标准时长 × 重量比 ^ SPRINT_EASE_WEIGHT_POWER ÷ 疾跑切换速度
     @JvmStatic
-    fun sprintEaseAlpha(base: Float, times: Float, weight: Double, entering: Boolean): Double =
-        base.toDouble() * times / (if (entering) weight + 4.0 else weight)
+    fun sprintEaseDuration(incoming: Boolean, weight: Double, switchSpeed: Double): Double {
+        val seconds = if (incoming) SPRINT_EASE_IN_SECONDS else SPRINT_EASE_OUT_SECONDS
+        val ratio = (weight / SPRINT_EASE_WEIGHT_STANDARD).coerceAtLeast(0.0).pow(SPRINT_EASE_WEIGHT_POWER)
+        return seconds * TICKS_PER_SECOND * ratio / switchSpeed.coerceAtLeast(0.1)
+    }
+
+    // 奔跑过渡的一条通道：相位沿样张的进出片段推进，权重取曲线的值
+    class SprintTransition(private val rot: Boolean) {
+        private var phase = 0.0
+
+        // 当前相位所在的是进曲线还是出曲线
+        private var entering = true
+
+        // 上一帧报出去的权重：出曲线尾巴不单调，照它走停跑那一下会抖两下
+        private var lastWeight = 0.0
+
+        // 相位没走完：这时的姿势该取样张的进出片段，不是「循环姿势 × 权重」
+        val inFlight: Boolean
+            get() = phase < 1.0
+
+        val incoming: Boolean
+            get() = entering
+
+        val progress: Float
+            get() = phase.toFloat()
+
+        // 片段自己的姿势占多少：进片段的尾巴、出片段的开头各留 SPRINT_CLIP_BLEND 跟循环段互淡
+        val clipWeight: Float
+            get() {
+                if (phase >= 1.0) return 1f
+                val edge = SPRINT_CLIP_BLEND.toDouble()
+                val x = ((if (entering) phase - (1.0 - edge) else phase) / edge).coerceIn(0.0, 1.0)
+                val fade = (x * x * (3.0 - 2.0 * x)).toFloat()
+                return if (entering) 1f - fade else fade
+            }
+
+        // 掉头互淡的另一侧（渲染路径上一帧真画出来的姿势）由渲染路径自己冻，这里只管时钟
+        private var flipPhase = 1.0
+        private var stamp = 0
+
+        val hasFlip: Boolean
+            get() = flipPhase < 1.0
+
+        // 掉一次头加一：渲染路径拿它认「这一帧该重新冻上一帧的姿势了」
+        val flipStamp: Int
+            get() = stamp
+
+        // 掉头后新姿势占多少：0 = 还完全是掉头前那一帧
+        val flipFade: Float
+            get() {
+                val x = flipPhase.coerceIn(0.0, 1.0)
+                return (x * x * (3.0 - 2.0 * x)).toFloat()
+            }
+
+        fun weight(
+            wantEnter: Boolean,
+            handgun: Boolean,
+            deltaTicks: Float,
+            weight: Double,
+            switchSpeed: Double
+        ): Double {
+            val inCurve = if (rot) GunSprintAnimation.IN_ROTATION else GunSprintAnimation.IN_POSITION
+            val outCurve = if (rot) GunSprintAnimation.outRotation(handgun) else GunSprintAnimation.outPosition(handgun)
+
+            val duration = sprintEaseDuration(wantEnter, weight, switchSpeed)
+            val ticks = sprintDelta(deltaTicks).toDouble()
+            val flipped = wantEnter != entering
+
+            // 只有过渡走到一半时换源才需要互淡：相位 1 上姿势是「循环段 × 权重」，权重本来就从头淡起
+            val inFlightBefore = phase < 1.0
+
+            // 掉头时换到另一条曲线上相位相同的点，权重才不会跳
+            if (flipped) {
+                val from = (if (entering) inCurve else outCurve).at(phase.toFloat())
+                if (inFlightBefore) {
+                    stamp++
+                    flipPhase = 0.0
+                }
+                phase = (if (wantEnter) inCurve else outCurve).phaseFor(from).toDouble()
+                entering = wantEnter
+            } else if (flipPhase < 1.0) {
+                flipPhase = (flipPhase + ticks / SPRINT_FLIP_TICKS).coerceAtMost(1.0)
+            }
+
+            phase = if (duration <= 0.0) 1.0 else (phase + ticks / duration).coerceAtMost(1.0)
+
+            val curve = if (wantEnter) inCurve else outCurve
+            lastWeight =
+                if (flipped) curve.at(phase.toFloat()).toDouble()
+                else curve.atMonotone(phase.toFloat(), lastWeight.toFloat()).toDouble()
+            return lastWeight
+        }
+    }
 
     @JvmField
     var movePosHorizon: Double = 0.0
@@ -326,9 +417,6 @@ object ClientEventHandler {
 
     @JvmField
     var moveFadeTime: Double = 0.0
-
-    @JvmField
-    var sprintFadeTime: Double = 0.0
 
     @JvmField
     var exhaustion: Boolean = false
@@ -1702,9 +1790,10 @@ object ClientEventHandler {
         }
 
         // 开火部分
-        // 冲刺后恢复开火的快慢按**主武器**的重量（`ActiveGun.handlingData`）—— 这一项是手感不是弹道
-        val weight = (ActiveGun.handlingData(player) ?: data).get(GunProp.WEIGHT)
-        val speed = 5 / (weight + 4)
+        // 冲刺后恢复开火的快慢按**主武器**的重量（`ActiveGun.handlingData`）与「疾跑切换速度」—— 这一项是手感不是弹道
+        val handling = ActiveGun.handlingData(player) ?: data
+        val switchSpeed = handling.get(GunProp.SPRINT_TRANSITION_SPEED)
+        val speed = 5 / (handling.get(GunProp.WEIGHT) + 4) * switchSpeed
 
         fireCooldown = if (noSprintTicks == 0f && player.isSprinting && !zoom && !holdingFireKey) {
             (fireCooldown + 3 * times).coerceIn(0.0, 24.0)
@@ -1725,7 +1814,7 @@ object ClientEventHandler {
             && item.canShoot(data, player)
             && !item.useSpecialFireProcedure(data)
             && fireCooldown == 0.0
-            && sprintBasicRotX * sprintBasicRotY * sprintBasicRotZ < 0.0001
+            && sprintRotWeight < GunSprintAnimation.FIRE_READY_WEIGHT
             && drawTime < 0.01
             && !notInGame
             && !isEditing
@@ -2269,6 +2358,7 @@ object ClientEventHandler {
         val resource = GunResource.compute(stack)
 
         val times = sprintEaseTimes(getDelta())
+        val delta = sprintDelta(getDelta())
         val moveSpeed = entity.deltaMovement.horizontalDistance()
         val animSpeed =
             if (entity.onGround()) {
@@ -2281,8 +2371,11 @@ object ClientEventHandler {
                 0.005
             }
 
-        // 冲刺/行走摇摆的阻尼按**主武器**的重量（`ActiveGun.handlingData`）
-        val customWeight = (ActiveGun.handlingData(player) ?: data).get(GunProp.WEIGHT).coerceIn(1.0, 50.0)
+        // 冲刺/行走摇摆的阻尼按**主武器**的重量与枪型（`ActiveGun.handlingData`）
+        val handling = ActiveGun.handlingData(player) ?: data
+        val customWeight = handling.get(GunProp.WEIGHT).coerceIn(1.0, 50.0)
+        val switchSpeed = handling.get(GunProp.SPRINT_TRANSITION_SPEED)
+        sprintHandgun = handling.get(GunProp.GUN_TYPE) == GunType.HANDGUN
 
         moveRotZ =
             if (!entity.isSprinting && mc.options.keyUp.isDown && firePosTimer == 0.0 && resource.movingTilt && !isProne(player) && !DeployedWeaponHandler.isDeployed(player) && !isEditing) {
@@ -2291,54 +2384,28 @@ object ClientEventHandler {
                 Mth.lerp(0.2 * times, moveRotZ, 0.0) * (1 - zoomTime)
             }
 
-        if (entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown && zoomTime < 0.99 && !isGunMeleeActive(stack) && !isEditing) {
-            val rotEase = sprintEaseAlpha(SPRINT_EASE_ROT_IN, times, customWeight, true)
-            val rotYEase = sprintEaseAlpha(SPRINT_EASE_ROT_Y_IN, times, customWeight, true)
-            val posEase = sprintEaseAlpha(SPRINT_EASE_POS_IN, times, customWeight, true)
-            val posYEase = sprintEaseAlpha(SPRINT_EASE_POS_Y_IN, times, customWeight, true)
+        val sprinting =
+            entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown &&
+                    zoomTime < 0.99 && !isGunMeleeActive(stack) && !isEditing
 
-            sprintBasicRotX = Mth.lerp(rotEase, sprintBasicRotX, 1.0).coerceIn(0.0, 1.0)
-            sprintBasicRotY = Mth.lerp(rotYEase, sprintBasicRotY, 1.0).coerceIn(0.0, 1.0)
-            sprintBasicRotZ = Mth.lerp(rotEase, sprintBasicRotZ, 1.0).coerceIn(0.0, 1.0)
+        sprintRotWeight = sprintRotTransition.weight(sprinting, sprintHandgun, delta, customWeight, switchSpeed)
+        sprintPosWeight = sprintPosTransition.weight(sprinting, sprintHandgun, delta, customWeight, switchSpeed)
 
-            sprintBasicPosX = Mth.lerp(posEase, sprintBasicPosX, 1.0).coerceIn(0.0, 1.0)
-            sprintBasicPosY = Mth.lerp(posYEase, sprintBasicPosY, 1.0).coerceIn(0.0, 1.0)
-            sprintBasicPosZ = Mth.lerp(posEase, sprintBasicPosZ, 1.0).coerceIn(0.0, 1.0)
-        } else {
-            val rotEase = sprintEaseAlpha(SPRINT_EASE_ROT_OUT, times, customWeight, false)
-            val rotYEase = sprintEaseAlpha(SPRINT_EASE_ROT_Y_OUT, times, customWeight, false)
-            val posEase = sprintEaseAlpha(SPRINT_EASE_POS_OUT, times, customWeight, false)
-
-            sprintBasicRotX = Mth.lerp(rotEase, sprintBasicRotX, 0.0).coerceIn(0.0, 1.0)
-            sprintBasicRotY = Mth.lerp(rotYEase, sprintBasicRotY, 0.0).coerceIn(0.0, 1.0)
-            sprintBasicRotZ = Mth.lerp(rotEase, sprintBasicRotZ, 0.0).coerceIn(0.0, 1.0)
-
-            sprintBasicPosX = Mth.lerp(posEase, sprintBasicPosX, 0.0).coerceIn(0.0, 1.0)
-            sprintBasicPosY = Mth.lerp(posEase, sprintBasicPosY, 0.0).coerceIn(0.0, 1.0)
-            sprintBasicPosZ = Mth.lerp(posEase, sprintBasicPosZ, 0.0).coerceIn(0.0, 1.0)
+        sprintAirFade = when {
+            !sprinting -> Mth.lerp(0.1 * times, sprintAirFade, 0.0)
+            entity.onGround() -> Mth.lerp(0.08 * times, sprintAirFade, 1.0)
+            else -> Mth.lerp(0.15 * times, sprintAirFade, 0.0)
         }
 
         if (isMoving()) {
             moveTime += 0.15 * animSpeed * times * moveSpeed * if (firePosTimer != 0.0) 0.4 else 1.0
-            sprintTime += 0.15 * animSpeed * times * moveSpeed * (if (player.isSprinting) sprintBasicPosX else 1.0) * (if (firePosTimer != 0.0) 0.4 else 1.0)
+            // 过渡期间相位照常走：两头要跟循环段互淡，循环段那一侧得是活着的
+            sprintTime =
+                (sprintTime + SPRINT_ANIM_RATE * animSpeed * times * moveSpeed *
+                        (if (firePosTimer != 0.0) 0.4 else 1.0)) % GunSprintAnimation.LENGTH
             moveFadeTime = Mth.lerp(0.13 * times, moveFadeTime, 1.0)
         } else {
             moveFadeTime = Mth.lerp(0.1 * times, moveFadeTime, 0.0)
-        }
-
-        if (entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown && zoomTime < 0.99 && !isGunMeleeActive(stack) && !isEditing) {
-            sprintFadeTime = if (entity.onGround()) {
-                Mth.lerp(0.08 * times, sprintFadeTime, 1.0)
-            } else {
-                Mth.lerp(0.15 * times, sprintFadeTime, 0.0)
-            }
-
-            sprintPosX = 2 * sin(1 * PI * sprintTime) * sprintFadeTime
-            sprintPosY = 1 * sin(2 * PI * sprintTime) * sprintFadeTime
-        } else {
-            sprintPosX = Mth.lerp(0.1 * times, sprintPosX, 0.0)
-            sprintPosY = Mth.lerp(0.1 * times, sprintPosY, 0.0)
-            sprintFadeTime = Mth.lerp(0.1 * times, sprintFadeTime, 0.0)
         }
 
         movePosX = 0.2 * sin(1 * PI * moveTime) * (1 - 0.4 * zoomTime) * moveFadeTime
@@ -2367,6 +2434,22 @@ object ClientEventHandler {
 
     private val drawAnimRotation = Vector3f()
     private val drawAnimPosition = Vector3f()
+    private val sprintAnimSample = Vector3f()
+    private val sprintAnimRotation = Vector3f()
+    private val sprintClipSample = Vector3f()
+    private val sprintClipRotation = Vector3f()
+    private val sprintPoseSample = Vector3f()
+    private val sprintPoseRotation = Vector3f()
+
+    // 上一帧画出来的姿势跟当时循环段的差：掉头时冻下来当互淡的另一侧，每帧重存
+    private val sprintFlipPrevSample = Vector3f()
+    private val sprintFlipPrevRotation = Vector3f()
+    private val sprintFlipFrozenSample = Vector3f()
+    private val sprintFlipFrozenRotation = Vector3f()
+    private var sprintFlipSeen = -1
+    private var sprintFlipArmed = false
+
+    private fun mixSprintPose(sample: Float, base: Float, fade: Float): Float = base + (sample - base) * fade
 
     @JvmStatic
     fun gunRootMoveV2(
@@ -2385,30 +2468,115 @@ object ClientEventHandler {
 
         val i = if (useCustomAnim) 0 else 1
 
-        val basicSprintPosX = (sprintBasicPosX * (1.5 + customX)).toFloat() * i
-        val basicSprintPosY =
-            (sprintBasicPosY * (-2.35 + customY - 8 * AnimationCurves.PARABOLA.apply(sprintBasicPosY))).toFloat() * i
-        val basicSprintPosZ = (sprintBasicPosZ * (-0.55 + customZ)).toFloat() * i
+        val sprintT = (sprintTime % GunSprintAnimation.LENGTH).toFloat()
+        GunSprintAnimation.rotationAt(sprintT, sprintAnimRotation)
+        GunSprintAnimation.positionAt(sprintT, sprintAnimSample)
 
-        val basicSprintRotX = (sprintBasicRotX * 39 * Mth.DEG_TO_RAD).toFloat() * i
-        val basicSprintRotY = (sprintBasicRotY * 35.6 * Mth.DEG_TO_RAD).toFloat() * i
-        val basicSprintRotZ = (sprintBasicRotZ * 14.7 * Mth.DEG_TO_RAD).toFloat() * i
+        // 循环段这一侧照旧按滞空混回 BASE（互淡时要拿它当基准，留到最后再混会跟上一帧对不上）
+        val air = sprintAirFade.toFloat()
+        sprintAnimRotation.set(
+            mixSprintPose(sprintAnimRotation.x, GunSprintAnimation.BASE_ROTATION.x, air),
+            mixSprintPose(sprintAnimRotation.y, GunSprintAnimation.BASE_ROTATION.y, air),
+            mixSprintPose(sprintAnimRotation.z, GunSprintAnimation.BASE_ROTATION.z, air),
+        )
+        sprintAnimSample.set(
+            mixSprintPose(sprintAnimSample.x, GunSprintAnimation.BASE_POSITION.x, air),
+            mixSprintPose(sprintAnimSample.y, GunSprintAnimation.BASE_POSITION.y, air),
+            mixSprintPose(sprintAnimSample.z, GunSprintAnimation.BASE_POSITION.z, air),
+        )
+
+        // 过渡中姿势逐轴取自样张的进出片段，只在两头跟循环段互淡；这里已经淡过，不能再乘权重叠一遍
+        sprintPoseRotation.set(sprintAnimRotation)
+        sprintPoseSample.set(sprintAnimSample)
+        val rotFromClip = sprintRotTransition.inFlight && GunSprintAnimation.transitionRotation(
+            sprintRotTransition.incoming, sprintHandgun, sprintRotTransition.progress, sprintClipRotation
+        )
+        if (rotFromClip) {
+            val k = sprintRotTransition.clipWeight
+            sprintPoseRotation.set(
+                mixSprintPose(sprintClipRotation.x, sprintAnimRotation.x, k),
+                mixSprintPose(sprintClipRotation.y, sprintAnimRotation.y, k),
+                mixSprintPose(sprintClipRotation.z, sprintAnimRotation.z, k),
+            )
+        }
+        val posFromClip = sprintPosTransition.inFlight && GunSprintAnimation.transitionPosition(
+            sprintPosTransition.incoming, sprintHandgun, sprintPosTransition.progress, sprintClipSample
+        )
+        if (posFromClip) {
+            val k = sprintPosTransition.clipWeight
+            sprintPoseSample.set(
+                mixSprintPose(sprintClipSample.x, sprintAnimSample.x, k),
+                mixSprintPose(sprintClipSample.y, sprintAnimSample.y, k),
+                mixSprintPose(sprintClipSample.z, sprintAnimSample.z, k),
+            )
+        }
+
+        // 掉头换掉的是整个姿势源：互淡的另一侧取上一帧真画出来的姿势（存成它跟循环段的差），连着掉头也从上一帧接续
+        if (sprintRotTransition.flipStamp != sprintFlipSeen) {
+            if (sprintFlipSeen >= 0) {
+                sprintFlipFrozenRotation.set(sprintFlipPrevRotation)
+                sprintFlipFrozenSample.set(sprintFlipPrevSample)
+                sprintFlipArmed = true
+            }
+            sprintFlipSeen = sprintRotTransition.flipStamp
+        }
+        if (sprintFlipArmed && sprintRotTransition.hasFlip) {
+            val f = sprintRotTransition.flipFade
+            sprintPoseRotation.set(
+                mixSprintPose(sprintPoseRotation.x, sprintAnimRotation.x + sprintFlipFrozenRotation.x, f),
+                mixSprintPose(sprintPoseRotation.y, sprintAnimRotation.y + sprintFlipFrozenRotation.y, f),
+                mixSprintPose(sprintPoseRotation.z, sprintAnimRotation.z + sprintFlipFrozenRotation.z, f),
+            )
+        }
+        if (sprintFlipArmed && sprintPosTransition.hasFlip) {
+            val f = sprintPosTransition.flipFade
+            sprintPoseSample.set(
+                mixSprintPose(sprintPoseSample.x, sprintAnimSample.x + sprintFlipFrozenSample.x, f),
+                mixSprintPose(sprintPoseSample.y, sprintAnimSample.y + sprintFlipFrozenSample.y, f),
+                mixSprintPose(sprintPoseSample.z, sprintAnimSample.z + sprintFlipFrozenSample.z, f),
+            )
+        }
+        sprintFlipPrevRotation.set(
+            sprintPoseRotation.x - sprintAnimRotation.x,
+            sprintPoseRotation.y - sprintAnimRotation.y,
+            sprintPoseRotation.z - sprintAnimRotation.z,
+        )
+        sprintFlipPrevSample.set(
+            sprintPoseSample.x - sprintAnimSample.x,
+            sprintPoseSample.y - sprintAnimSample.y,
+            sprintPoseSample.z - sprintAnimSample.z,
+        )
+
+        val zoomDamp = (1 - 0.5 * zoomTime).toFloat()
+        val sprintPosFade = (if (posFromClip) 1f else sprintPosWeight.toFloat()) * i
+        val sprintRotFade =
+            if (rotFromClip) i * zoomDamp else sprintRotWeight.toFloat() * i * zoomDamp
+
+        // 自定义偏移按权重淡：过渡期间 [sprintPosFade] 是 1（姿势在片段里），照它乘会在起跑那一帧整块挪过去
+        val sprintCustomFade = (sprintPosWeight * i).toFloat()
+        val sprintPosX = (sprintPoseSample.x * sprintPosFade + customX * sprintCustomFade).toFloat()
+        val sprintPosY = (sprintPoseSample.y * sprintPosFade + customY * sprintCustomFade).toFloat()
+        val sprintPosZ = (sprintPoseSample.z * sprintPosFade + customZ * sprintCustomFade).toFloat()
+
+        val sprintRotX = (sprintPoseRotation.x * sprintRotFade).toFloat()
+        val sprintRotY = (sprintPoseRotation.y * sprintRotFade).toFloat()
+        val sprintRotZ = (sprintPoseRotation.z * sprintRotFade).toFloat()
 
         val drawAnimT = GunDrawAnimation.timeAt(drawTime)
         GunDrawAnimation.rotationAt(drawAnimT, drawAnimRotation)
         GunDrawAnimation.positionAt(drawAnimT, drawAnimPosition)
 
         val gunPosX =
-            (walkPosX + basicSprintPosX + sprintPosX * i + 9.3f * movePosHorizon - 0.5 * turnRot[1]).toFloat() * (1 - 0.5 * zoomTime).toFloat()
+            (walkPosX + sprintPosX + 9.3f * movePosHorizon - 0.5 * turnRot[1]).toFloat() * (1 - 0.5 * zoomTime).toFloat()
         val gunPosY =
-            (walkPosY + basicSprintPosY + sprintPosY * i - 2f * velocityY).toFloat() * (1 - 0.5 * zoomTime).toFloat()
-        val gunPosZ = (walkPosZ + basicSprintPosZ) * (1 - 1 * zoomTime).toFloat()
+            (walkPosY + sprintPosY - 2f * velocityY).toFloat() * (1 - 0.5 * zoomTime).toFloat()
+        val gunPosZ = (walkPosZ + sprintPosZ) * (1 - 1 * zoomTime).toFloat()
         val gunRotX =
-            ((walkRotX + basicSprintRotX - 0.15f * velocityY) * (1 - 0.5 * zoomTime) + Mth.DEG_TO_RAD * turnRot[0]).toFloat()
+            ((walkRotX - 0.15f * velocityY) * (1 - 0.5 * zoomTime) + Mth.DEG_TO_RAD * turnRot[0]).toFloat()
         val gunRotY =
-            ((walkRotY + basicSprintRotY + (0.2f * sprintBasicPosX * i)) * (1 - 0.75 * zoomTime) + Mth.DEG_TO_RAD * turnRot[1]).toFloat()
+            (walkRotY * (1 - 0.75 * zoomTime) + Mth.DEG_TO_RAD * turnRot[1]).toFloat()
         val gunRotZ =
-            ((walkRotZ + basicSprintRotZ + moveRotZ + 2.7f * movePosHorizon) * (1 - 0.5 * zoomTime) + Mth.DEG_TO_RAD * turnRot[2]).toFloat()
+            ((walkRotZ + moveRotZ + 2.7f * movePosHorizon) * (1 - 0.5 * zoomTime) + Mth.DEG_TO_RAD * turnRot[2]).toFloat()
 
         poseStack.translate(
             -(gunPosX + drawAnimPosition.x) / 16,
@@ -2417,6 +2585,7 @@ object ClientEventHandler {
         )
 
         poseStack.mulPose(Quaternionf().rotateZYX(drawAnimRotation.z, drawAnimRotation.y, drawAnimRotation.x))
+        poseStack.mulPose(Quaternionf().rotateZYX(sprintRotZ, sprintRotY, sprintRotX))
         poseStack.mulPose(Axis.XP.rotation(gunRotX))
         poseStack.mulPose(Axis.YP.rotation(gunRotY))
         poseStack.mulPose(Axis.ZP.rotation(gunRotZ))

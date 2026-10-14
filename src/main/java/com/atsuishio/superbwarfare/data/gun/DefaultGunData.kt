@@ -51,6 +51,8 @@ data class DefaultGunData(
     val shootShake: SerializedVec3? = null,
     @SerialName("Sway")
     val sway: Double = 1.0,
+    @SerialName("SprintTransitionSpeed")
+    val sprintTransitionSpeed: Double = 1.0,
     @SerialName("DefaultZoom")
     val defaultZoom: Double = 1.25,
     @SerialName("BoundBones")
