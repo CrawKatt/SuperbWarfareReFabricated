@@ -16,6 +16,7 @@ import com.atsuishio.superbwarfare.client.renderer.laser.LaserSightCapture
 import com.atsuishio.superbwarfare.client.renderer.laser.LaserSightRenderer
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeStencilRenderHelper
 import com.atsuishio.superbwarfare.client.screens.WeaponEditMountTracker
+import com.atsuishio.superbwarfare.client.screens.WeaponEditScreen
 import com.atsuishio.superbwarfare.compat.acceleratedrendering.AcceleratedRenderingCompat
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.attachment.*
@@ -757,8 +758,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
 //                    && !OculusCompat.isRenderingShadowPass()
 
             // 挂点变换 + 配件自己的基础旋转，合成一份；手臂锚点也必须用它，否则手臂会从配件上脱开
-            val mount = Matrix4f(mountTransform)
-            attachmentRotation(definition)?.let { mount.mul(it) }
+            val mount = Matrix4f(mountTransform).mul(attachmentTransform(stack, slot.type, definition))
 
             poseStack.pushPose()
             mulPoseWithNormal(poseStack, mount)
@@ -902,9 +902,10 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val boneName = definition.bone ?: SCOPE_BONE
         val mountTransform = model.getGlobalTransform(boneName) ?: return null
         val bindMountTransform = model.getBindGlobalTransform(boneName) ?: return null
+        val local = attachmentTransform(stack, AttachmentType.SCOPE, definition)
         return ScopeRenderData(
             attachmentModel, texture, scopeMode, scopeModeIndex, companionSightMode, attachmentId,
-            Matrix4f(mountTransform), Matrix4f(bindMountTransform),
+            Matrix4f(mountTransform).mul(local), Matrix4f(bindMountTransform).mul(local),
             definition.ammoBar, definition.textShow
         )
     }
@@ -1056,9 +1057,11 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         }
 
         if (definition.usesGunStock) {
-            model.showStockBone(
-                definition.bone ?: GeoGunModel.OEM_STOCK_STANDARD_BONE
-            )
+            val bone = definition.bone ?: GeoGunModel.OEM_STOCK_STANDARD_BONE
+            model.showStockBone(bone)
+            adjustGunModelAttachment(stack, model, AttachmentType.STOCK,
+                if (model.getBone(bone) != null) bone else GeoGunModel.OEM_STOCK_STANDARD_BONE,
+                AttachmentSlots.Bones.STOCK)
             return
         }
 
@@ -1091,8 +1094,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val mountTransform = model.getGlobalTransform(GeoGunModel.CUSTOM_STOCK_ADAPTER_BONE) ?: return
 
         poseStack.pushPose()
-        mulPoseWithNormal(poseStack, Matrix4f(mountTransform))
-        mulAttachmentRotation(poseStack, definition)
+        mulPoseWithNormal(poseStack, Matrix4f(mountTransform).mul(attachmentTransform(stack, AttachmentType.STOCK, definition)))
         attachmentModel.renderToBuffer(
             poseStack, bufferSource, texture, packedLight, packedOverlay,
             null, resolveAmmoReadout(stack, definition.ammoBar, definition.textShow)
@@ -1177,9 +1179,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         poseStack.pushPose()
         mulPoseWithNormal(
             poseStack,
-            Matrix4f(mountTransform).mul(resolveMuzzleAttachmentLocalTransform(stack))
+            Matrix4f(mountTransform).mul(attachmentTransform(stack, AttachmentType.GRIP, definition))
         )
-        mulAttachmentRotation(poseStack, definition)
         attachmentModel.renderToBuffer(
             poseStack, bufferSource, texture, packedLight, packedOverlay,
             null, resolveAmmoReadout(stack, definition.ammoBar, definition.textShow)
@@ -1229,8 +1230,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val mountTransform = model.getGlobalTransform(boneName) ?: return
 
         poseStack.pushPose()
-        mulPoseWithNormal(poseStack, Matrix4f(mountTransform))
-        mulAttachmentRotation(poseStack, definition)
+        mulPoseWithNormal(poseStack, Matrix4f(mountTransform).mul(attachmentTransform(stack, AttachmentType.MUZZLE, definition)))
         attachmentModel.renderToBuffer(
             poseStack, bufferSource, texture, packedLight, packedOverlay,
             null, resolveAmmoReadout(stack, definition.ammoBar, definition.textShow)
@@ -1259,13 +1259,61 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         return AttachmentDefinition.from(attachmentId)?.bone
     }
 
-    open fun resolveMuzzleAttachmentLocalTransform(stack: ItemStack): Matrix4f {
+    /** 实例调整沿挂点局部 Z 轴平移/旋转；偏移以 Bedrock 单位表示，1 = 1/16 方块。 */
+    open fun resolveAttachmentLocalTransform(stack: ItemStack, type: AttachmentType): Matrix4f {
         val data = from(stack)
-        val offset = data.attachment.getOffset(AttachmentType.MUZZLE)
-        val rotation = data.attachment.getRotation(AttachmentType.MUZZLE).toFloat()
+        val preview = if (stack === localPlayer?.mainHandItem && type != AttachmentType.MAGAZINE)
+            (Minecraft.getInstance().screen as? WeaponEditScreen)?.previewFor(data, type) else null
+        val offset = preview?.offset ?: data.attachment.getOffset(type)
+        val rotation = (preview?.rotation ?: data.attachment.getRotation(type)).toFloat()
         return Matrix4f()
-            .translate(0f, 0f, offset.toFloat())
+            .translate(0f, 0f, (offset / 16.0).toFloat())
             .rotateZ(Mth.DEG_TO_RAD * rotation)
+    }
+
+    open fun resolveMuzzleAttachmentLocalTransform(stack: ItemStack): Matrix4f =
+        resolveAttachmentLocalTransform(stack, AttachmentType.MUZZLE)
+
+    /** 所有渲染、出光口与瞄准锚点都用相同顺序：挂点 × 实例调整 × 配件基础旋转。 */
+    private fun attachmentTransform(stack: ItemStack, type: AttachmentType, definition: AttachmentDefinition): Matrix4f {
+        val transform = if (type == AttachmentType.MUZZLE) resolveMuzzleAttachmentLocalTransform(stack)
+            else resolveAttachmentLocalTransform(stack, type)
+        attachmentRotation(definition)?.let { transform.mul(it) }
+        return transform
+    }
+
+    /** 内置枪托是枪模型的骨骼，也要支持完全自由改装；按挂点而非几何原点调整。 */
+    private fun adjustGunModelAttachment(
+        stack: ItemStack, model: GeoGunModel, type: AttachmentType, boneName: String, mountName: String,
+    ) {
+        val data = from(stack)
+        if (!data.attachment.has(type)) return
+        val adjustment = resolveAttachmentLocalTransform(stack, type)
+        if (adjustment == Matrix4f()) return
+        val bone = model.getBone(boneName) ?: return
+        val global = Matrix4f(model.getGlobalTransform(bone.index()))
+        val mount = model.getGlobalTransform(mountName)?.let(::Matrix4f) ?: Matrix4f(global)
+        val target = Matrix4f(mount).mul(adjustment)
+            .mul(Matrix4f(mount).invert()).mul(global)
+        val parent = if (bone.parentIndex() < 0) Matrix4f() else Matrix4f(model.getGlobalTransform(bone.parentIndex()))
+        val local = parent.invert().mul(target)
+        val definition = bone.definition()
+        definition.foldedParentTransform()?.let { local.set(Matrix4f(it).invert().mul(local)) }
+        val scale = local.getScale(Vector3f())
+        val rotation = local.getUnnormalizedRotation(Quaternionf())
+        val translation = local.getTranslation(Vector3f())
+        if (definition.rotateAroundPivot()) {
+            val pivot = Vector3f(definition.pivotX(), definition.pivotY(), definition.pivotZ())
+            translation.sub(pivot).add(Matrix4f().rotation(rotation).scale(scale).transformDirection(pivot))
+        }
+        bone.x = translation.x * 16f
+        bone.y = translation.y * 16f
+        bone.z = translation.z * 16f
+        bone.rotation.set(rotation)
+        Matrix4f().rotation(rotation).getEulerAnglesZYX(bone.rotationInEuler)
+        bone.xScale = scale.x
+        bone.yScale = scale.y
+        bone.zScale = scale.z
     }
 
     open fun resolveMuzzleAttachmentMuzzleTransform(
@@ -1277,7 +1325,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val boneName = resolveMuzzleAttachmentBone(stack) ?: return null
         val mountTransform = model.getGlobalTransform(boneName) ?: return null
         return Matrix4f(mountTransform)
-            .mul(resolveMuzzleAttachmentLocalTransform(stack))
+            .mul(attachmentTransform(stack, AttachmentType.MUZZLE, renderData.definition))
             .mul(attachmentMuzzle)
     }
 
@@ -1317,7 +1365,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val gunRootBind = model.getBindGlobalTransform(GUN_ROOT_BONE) ?: return null
 
         // M = 挂点在宿主枪 root 空间里的变换（方块）
-        val mount = Matrix4f(gunRootBind).invert().mul(mountBind)
+        val mount = Matrix4f(gunRootBind).invert().mul(mountBind).mul(attachmentTransform(stack, slot.type, definition))
 
         // A = 附件动画的 `root` 通道，换算到方块空间
         val rootLocal = localMatrixOfPose(attachmentModel.baseModel.bone(rootIndex), attachmentRoot)
@@ -1445,7 +1493,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         try {
             // 动画文件里的平移是"相对绑定姿势的偏移"，不先垫绑定就会把绑定不为 0 的骨骼送到父节点原点
             attachmentModel.applyPose(BLENDER.blend(attachmentModel.getBindPose(), pose))
-            deployedArmAnchors = resolveSubWeaponHandAnchors(attachmentModel, mountTransform)
+            deployedArmAnchors = resolveSubWeaponHandAnchors(attachmentModel,
+                Matrix4f(mountTransform).mul(attachmentTransform(stack, slot.type, definition)))
             deployedArmKey = "idle:${animation.subWeaponIdleClipName ?: ""}"
         } finally {
             attachmentModel.resetPose()
@@ -1537,7 +1586,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val mountTransform = model.getGlobalTransform(boneName) ?: return null
         val flareTransform = attachmentModel.getGlobalTransform(FLARE_BONE) ?: return null
 
-        return Matrix4f(mountTransform).mul(flareTransform)
+        return Matrix4f(mountTransform).mul(attachmentTransform(stack, slot.type, definition)).mul(flareTransform)
     }
 
     /** 副武器开火时的枪口焰缩放：与枪口配件共用配件 json 里的 `MuzzleFlashScale` 字段。 */
@@ -2011,7 +2060,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val aimTransform = attachmentModel.getGlobalTransform(SubWeaponInfo.VIEW_BONE) ?: return null
         val mountTransform = model.getBindGlobalTransform(boneName) ?: return null
 
-        return Matrix4f(mountTransform).mul(aimTransform)
+        return Matrix4f(mountTransform).mul(attachmentTransform(stack, slot.type, definition)).mul(aimTransform)
     }
 
     /**
@@ -2028,7 +2077,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val idleTransform = attachmentModel.getGlobalTransform(SubWeaponInfo.IDLE_VIEW_BONE) ?: return null
         val mountTransform = model.getBindGlobalTransform(boneName) ?: return null
 
-        return Matrix4f(mountTransform).mul(idleTransform)
+        return Matrix4f(mountTransform).mul(attachmentTransform(stack, slot.type, definition)).mul(idleTransform)
     }
 
     /**
