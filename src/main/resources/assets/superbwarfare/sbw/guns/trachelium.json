@@ -24,6 +24,7 @@
     "EditHandGuard": "animation.trachelium.edit_hand_guard",
     "ReloadEmptyHandGuard": "animation.trachelium.reload_hand_guard"
   },
+  "SprintOffset": [0, 4, 4],
   "ShootRecoil": {
     "Offset": [0.7, 1.0, 0.5],
     "Rotation": [0.2, 0.2, 0.5],

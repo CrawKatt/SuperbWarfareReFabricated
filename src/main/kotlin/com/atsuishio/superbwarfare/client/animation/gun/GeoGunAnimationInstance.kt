@@ -29,7 +29,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
-import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
@@ -204,7 +203,8 @@ open class GeoGunAnimationInstance(
      * 判据就是它以前当基础状态时的判据（见 [GunAnimationState] 的旧 `RUN`）：
      * 在跑、在地面上、没被"禁止冲刺"压住、也没在掏枪。另外它现在是一条**层**，
      * 得有个基础状态垫着 —— 所以还要求解析出来的是 `Idle`；换弹/近战/改装那些
-     * 本来就把 `Run` 挤掉的状态照旧挤掉，只是改成了**缓出**而不是硬切。
+     * 本来就把 `Run` 挤掉的状态由 [WeightedLoopLayer.tick] 的 `yieldNow` 在
+     * [ACTION_HANDOVER_TICKS] 里让位，这里只负责"奔跑本身结束"那几种缓出。
      */
     private fun wantsCustomSprint(target: GunAnimationState?, animation: GunAnimation?): Boolean {
         val player = localPlayer ?: return false
@@ -687,14 +687,6 @@ open class GeoGunAnimationInstance(
         }
     }
 
-    private fun setAnimationSpeed(state: IAnimationState?, speed: Float) {
-        when (state) {
-            is PlayingState -> state.speed = speed
-            is LoopingState -> state.speed = speed
-            else -> {}
-        }
-    }
-
     private fun play(state: GunAnimationState, keepProgress: Boolean = false) {
         val name = animationName(state) ?: return
         val animation = animations[name] ?: return
@@ -1100,8 +1092,16 @@ open class GeoGunAnimationInstance(
         }
 
         if (active) {
-            // 按下就是满权重：蓄力动画当场开始，不淡入
-            chargePower = 1f
+            // 底下垫着奔跑层的时候淡入（疾跑中拉弓，姿势不会当场跳过去），平时按下就是满权重
+            chargePower = if (!wasActive) {
+                if (customSprintLayer.visible) 0f else 1f
+            } else {
+                approach(
+                    chargePower, 1f,
+                    Minecraft.getInstance().deltaFrameTime.coerceIn(0f, SPIN_MAX_FRAME_DELTA_TICKS) /
+                            ACTION_HANDOVER_TICKS
+                )
+            }
             // 头一帧建层；缓出到一半又按下去时（`!wasActive`）也是重建 —— 从第 0 帧重来才和
             // 游戏里的 `chargeProgress` 同步，接着缓出的相位往前播会让动画和蓄力进度对不上
             if (runner == null || chargeAnimation !== clip || !wasActive) {
@@ -1116,9 +1116,8 @@ open class GeoGunAnimationInstance(
             return false
         }
 
-        // 松手那一帧：起点是满权重，从**下一帧**才开始退，退到 0 再摘层
+        // 松手那一帧先不动权重，下一帧才开始退
         if (wasActive) {
-            chargePower = 1f
             return false
         }
 
@@ -1240,85 +1239,128 @@ open class GeoGunAnimationInstance(
 
     // ── 权重循环层（自定义奔跑 / 刺刀冲锋）──────────────────────────────────────
 
-    /** 两条权重层取同一份缓动参数（都是"跑"的动作，共用一套速率） */
-    private fun sprintEaseTimes(): Float = ClientEventHandler.sprintEaseTimes(Minecraft.getInstance().deltaFrameTime)
+    // 两条权重层取同一份缓动参数
+    private fun sprintEaseDelta(): Float = ClientEventHandler.sprintDelta(Minecraft.getInstance().deltaFrameTime)
 
-    /**
-     * 和 `handleWeaponMove` 的 `customWeight` 取**同一个来源**（`ActiveGun.handlingData`
-     * 兜底才轮到手上这把枪），不然两边的缓动速率会差一个重量档
-     */
+    // 循环片段的播放倍率：按实际水平移速线性走，标准疾跑速度 = 片段作者写的 1.0 倍速
+    private fun loopPlaybackSpeed(): Float {
+        val speed = localPlayer?.deltaMovement?.horizontalDistance() ?: 0.0
+        return (speed / SPRINT_SPEED_REF).toFloat().coerceIn(LOOP_MIN_SPEED, LOOP_MAX_SPEED)
+    }
+
+    // 和 handleWeaponMove 的 customWeight 同源
     private fun sprintEaseWeight(): Double =
-        (localPlayer?.let { ActiveGun.handlingData(it) } ?: GunData.from(stack))
+        sprintEaseHandling()
             .get(GunProp.WEIGHT)
             .coerceIn(1.0, 50.0)
 
-    /**
-     * 按权重缓入缓出的循环层。
-     *
-     * 它本来是**层**不是基础状态：以前 `Run` 是个状态，进/出都是硬切 —— 0.6 秒一个周期的摆动会
-     * 在半途"啪"地开始/停住。现在基础状态始终是 `Idle`，层按权重混上去，权重沿
-     * [ClientEventHandler.sprintEaseAlpha] 的速率缓入缓出，和 [ClientEventHandler.handleWeaponMove]
-     * 里程序性奔跑那六个 `sprintBasic*` 同源（连"重枪入得慢、出得快"都是同一套系数）。
-     */
+    private fun sprintEaseSwitchSpeed(): Double =
+        sprintEaseHandling().get(GunProp.SPRINT_TRANSITION_SPEED)
+
+    // 淡出片段按枪型分，跟时长同源（和 handleWeaponMove 的 sprintHandgun 一样取主武器）
+    private fun sprintEaseHandgun(): Boolean =
+        sprintEaseHandling().get(GunProp.GUN_TYPE) == GunType.HANDGUN
+
+    private fun sprintEaseHandling(): GunData =
+        localPlayer?.let { ActiveGun.handlingData(it) } ?: GunData.from(stack)
+
+    // 循环层：权重取程序性奔跑那对样张曲线（相位 → 权重），时长也是同一套
     private class WeightedLoopLayer {
         private var runner: AnimationRunner? = null
         private var clip: BedrockAnimation? = null
 
-        /**
-         * 位移与旋转各一条权重：程序性奔跑那边位移本来就比旋转先到位（见
-         * [ClientEventHandler.SPRINT_EASE_POS_IN] / [ClientEventHandler.SPRINT_EASE_ROT_IN]），
-         * 一条权重总有一边差两倍多。
-         */
-        private var posPower = 0f
-        private var rotPower = 0f
+        // 权重曲线上的相位；[entering] = 现在走的是进曲线还是出曲线
+        private var progress = 0f
+        private var entering = true
+        private var power = 0f
 
-        /** 层还在（含正在缓出的那些帧）时非 `null` */
+        // 让位：动作片段接管基础状态时在 ACTION_HANDOVER_TICKS 里退干净，不走进出曲线
+        private var yielding = false
+        private var yieldFrom = 0f
+        private var yieldTicks = 0f
+
+        // 这一帧片段时间走没走
+        private var ticking = false
+
+        // 这一帧真走了时间的 runner，没走的那几帧不给事件（`clip()` 会重报上一窗口的键）
         val activeRunner: AnimationRunner?
-            get() = runner
+            get() = if (ticking) runner else null
 
         val visible: Boolean
-            get() = runner != null && (posPower > 0f || rotPower > 0f)
+            get() = runner != null && power > 0f
 
-        /**
-         * 推进这一层：换片段不动权重，权重退到看不见就收层。
-         *
-         * @param clip 本层要播的片段；`null` = 这把枪没配这条层
-         * @param want 这一帧该不该亮着
-         */
-        fun tick(clip: BedrockAnimation?, want: Boolean, times: Float, weight: Double) {
+        // 推进这一层：换片段不动权重，退到看不见就收层
+        fun tick(
+            clip: BedrockAnimation?,
+            want: Boolean,
+            yieldNow: Boolean,
+            handgun: Boolean,
+            deltaTicks: Float,
+            weight: Double,
+            switchSpeed: Double,
+            speed: Float,
+        ) {
+            // 上一帧走没走必须在清零之前读
+            val wasTicking = ticking
+            ticking = false
             if (clip == null) {
                 clear()
                 return
             }
+
+            if (yieldNow) {
+                if (!yielding) {
+                    yielding = true
+                    yieldFrom = power
+                    yieldTicks = 0f
+                }
+                yieldTicks += deltaTicks
+                val x = (yieldTicks / ACTION_HANDOVER_TICKS).coerceIn(0f, 1f)
+                power = yieldFrom * (1f - x * x * (3f - 2f * x))
+                if (power <= CUSTOM_SPRINT_MIN_POWER) {
+                    clear()
+                }
+                return
+            }
+
+            // 刚让位完又回来（或掉头）时，相位要按当前权重接回去，不然权重会跳
+            val resume = yielding
+            yielding = false
             if (rebuild(clip, want)) return
 
-            val target = if (want) 1f else 0f
-            val rotBase =
-                if (want) ClientEventHandler.SPRINT_EASE_ROT_IN else ClientEventHandler.SPRINT_EASE_ROT_OUT
-            val posBase =
-                if (want) ClientEventHandler.SPRINT_EASE_POS_IN else ClientEventHandler.SPRINT_EASE_POS_OUT
+            val curve =
+                if (want) GunSprintAnimation.IN_ROTATION else GunSprintAnimation.outRotation(handgun)
+            if (want != entering || resume) {
+                progress = curve.phaseFor(power)
+                entering = want
+            }
 
-            rotPower = Mth.lerp(
-                ClientEventHandler.sprintEaseAlpha(rotBase, times, weight, want).toFloat(),
-                rotPower,
-                target
-            )
-            posPower = Mth.lerp(
-                ClientEventHandler.sprintEaseAlpha(posBase, times, weight, want).toFloat(),
-                posPower,
-                target
-            )
+            val duration = ClientEventHandler.sprintEaseDuration(want, weight, switchSpeed)
+            val step = if (deltaTicks <= 0f || duration <= 0.0) 1f else (deltaTicks / duration).toFloat()
+            progress = (progress + step).coerceAtMost(1f)
+            power = curve.atMonotone(progress, power)
 
-            // lerp 是渐近的，永远到不了 0；退到看不见就收层（[CUSTOM_SPRINT_MIN_POWER] 时残留不到千分之一）
-            if (!want && rotPower <= CUSTOM_SPRINT_MIN_POWER && posPower <= CUSTOM_SPRINT_MIN_POWER) {
+            // 退到看不见就收层
+            if (!want && power <= CUSTOM_SPRINT_MIN_POWER) {
                 clear()
                 return
             }
 
-            runner?.tick()
+            val resuming = want && !wasTicking
+
+            // 离场把片段冻住，摆动不跟着权重一起收
+            ticking = want
+            if (want) {
+                runner?.let {
+                    setAnimationSpeed(it.state, speed)
+                    // MAE 的状态时钟是真实时间：冻住那几帧照走，接着跑前先拨到当下，不然进度一步跳完
+                    if (resuming) it.state?.onEnter(it.animationContext)
+                    it.tick()
+                }
+            }
         }
 
-        /** 资源重载 / 换片段：权重留在原地，只换 runner（不然换片段那一帧姿势会跳）。返回是否刚建过 */
+        // 资源重载 / 换片段：权重留在原地，只换 runner。返回是否刚建过
         private fun rebuild(clip: BedrockAnimation, want: Boolean): Boolean {
             if (runner == null && !want) return false
             if (runner != null && this.clip === clip) return false
@@ -1333,28 +1375,30 @@ open class GeoGunAnimationInstance(
         fun clear() {
             runner = null
             clip = null
-            posPower = 0f
-            rotPower = 0f
+            progress = 0f
+            entering = true
+            power = 0f
+            yielding = false
+            yieldTicks = 0f
+            ticking = false
         }
 
-        /** 把这一层按两条权重混到 [lowerPose] 上 */
+        // 把这一层按权重混到 lowerPose 上
         fun apply(lowerPose: Pose): Pose {
             val runner = runner ?: return lowerPose
-            val posWeight = posPower
-            val rotWeight = rotPower
-            if (posWeight <= 0f && rotWeight <= 0f) return lowerPose
+            val weight = power
+            if (weight <= 0f) return lowerPose
 
             val layerPose = runner.evaluate()
             return CROSSFADE_BLENDER.combine(lowerPose, layerPose) { lower, upper ->
                 if (upper.boneIndex() < 0) lower
                 else TRANSFORM_FACTORY.createBoneTransform(
                     maxOf(lower.boneIndex(), upper.boneIndex()),
-                    lower.translation().lerp(upper.translation(), posWeight, Vector3f()),
-                    // 旋转和缩放走旋转那一档：这条片段里它们本来就是同一个节奏（`righthand` 的 1.6 倍缩放）
+                    lower.translation().lerp(upper.translation(), weight, Vector3f()),
                     MathUtil.nlerpShortestPath(
-                        lower.rotation().asQuaternion(), upper.rotation().asQuaternion(), rotWeight
+                        lower.rotation().asQuaternion(), upper.rotation().asQuaternion(), weight
                     ),
-                    lower.scale().lerp(upper.scale(), rotWeight, Vector3f())
+                    lower.scale().lerp(upper.scale(), weight, Vector3f())
                 )
             }
         }
@@ -1701,19 +1745,32 @@ open class GeoGunAnimationInstance(
         tickSpinRunner(updateSpinRunner(data, animation))
         tickFireLoopRunner(updateFireLoopRunner(animation))
         tickChargeRunner(updateChargeRunner(animation, firedThisFrame))
-        val sprintTimes = sprintEaseTimes()
+        val sprintDelta = sprintEaseDelta()
         val sprintWeight = sprintEaseWeight()
+        val sprintSwitchSpeed = sprintEaseSwitchSpeed()
+        // 基础状态交给动作片段（换弹/近战/改装）时两条层在几 tick 内让位
+        val actionTookOver = target != GunAnimationState.IDLE
+        val loopSpeed = loopPlaybackSpeed()
+        val handgun = sprintEaseHandgun()
         customSprintLayer.tick(
             animation?.run?.let(animations::get),
             wantsCustomSprint(target, animation),
-            sprintTimes,
+            actionTookOver,
+            handgun,
+            sprintDelta,
             sprintWeight,
+            sprintSwitchSpeed,
+            loopSpeed,
         )
         bayonetChargeLayer.tick(
             animation?.bayonetCharge?.let(animations::get),
             wantsBayonetCharge(target, animation),
-            sprintTimes,
+            actionTookOver,
+            handgun,
+            sprintDelta,
             sprintWeight,
+            sprintSwitchSpeed,
+            loopSpeed,
         )
         tickDeployIdle(updateDeployIdle(animation, wantsDeployIdle(target, animation)))
 
@@ -1898,6 +1955,10 @@ open class GeoGunAnimationInstance(
          */
         private const val CHARGE_CANCEL_FADE_TICKS = 4f
 
+        // 动作片段（或蓄力层）接管那一刻的一小段交接（tick）：奔跑层让位、蓄力层淡入都用它。
+        // 不能是 0（硬切会弹），也不能长（波塞克的蓄力总共才 10 tick）
+        private const val ACTION_HANDOVER_TICKS = 3f
+
         /**
          * 缓入缓出每帧最多吃掉多少 tick。`deltaFrameTime` 单位是 tick（20/s，60FPS 一帧约 0.33），
          * 卡顿或断点续跑时可能蹦得很大——上面的常数按秒写就会一帧走完。上限照抄
@@ -1915,6 +1976,22 @@ open class GeoGunAnimationInstance(
          * （0.01° / 0.0002 格）已经看不见了。
          */
         private const val CUSTOM_SPRINT_MIN_POWER = 0.001f
+
+        // 标准疾跑的水平速度（格/tick）：自定义循环片段按它换算播放倍率
+        private const val SPRINT_SPEED_REF = 0.14
+
+        // 自定义循环层播放倍率的上下限：站着不动也继续摆，被加速时也不至于糊成一片
+        private const val LOOP_MIN_SPEED = 0.25f
+        private const val LOOP_MAX_SPEED = 2f
+
+        private fun setAnimationSpeed(state: IAnimationState?, speed: Float) {
+            when (state) {
+                is PlayingState -> state.speed = speed
+                is LoopingState -> state.speed = speed
+                else -> {}
+            }
+        }
+
 
         private val TRANSFORM_FACTORY: BoneTransformFactory = ZYXBoneTransformFactory()
 
