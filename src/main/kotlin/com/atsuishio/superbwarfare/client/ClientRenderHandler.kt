@@ -96,6 +96,7 @@ object ClientRenderHandler {
         SpyglassRangeOverlay,
         HandsomeFrameOverlay,
         RedTriangleOverlay,
+        BayonetChargeOverlay,
         HeatBarOverlay,
         CrossHairOverlay,
         GunShieldOverlay,
