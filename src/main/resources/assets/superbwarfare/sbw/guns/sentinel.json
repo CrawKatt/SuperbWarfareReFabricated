@@ -18,6 +18,7 @@
     "ZoomRate": 0.9,
     "Speed": 1.0
   },
+  "SprintOffset": [4, 0, 3],
   "Model": {
     "Animation": "superbwarfare:animations/bedrock/gun/sentinel.animation.json",
     "Model": "superbwarfare:models/bedrock/gun/sentinel.geo.json",
