@@ -1,7 +1,10 @@
 package com.atsuishio.superbwarfare.client.screens
 import com.atsuishio.superbwarfare.client.tooltip.ClientAttachmentImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.component.AttachmentImageComponent
+import com.atsuishio.superbwarfare.config.server.AttachmentConfig
+import com.atsuishio.superbwarfare.data.attachment.AttachmentDefinition
 import com.atsuishio.superbwarfare.data.attachment.AttachmentSlots
+import com.atsuishio.superbwarfare.data.attachment.AvailableAttachments
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
@@ -45,7 +48,7 @@ import kotlin.math.*
  * 改装界面：骨骼挂点附近显示圆点，悬停时显示槽位名，已安装的挂点标为橙黄色。
  * 已安装配件另放图标并用白线相连。
  * 点位与图标均可打开二级菜单。可装列表由枪械数据与背包共同决定，安装仍由服务端校验。
- * DOM 只在列表变化时重建；投影位置、显隐与样式增量同步。
+ * 候选列表按兼容状态与背包缓存；固定数量的 DOM 格子随滚动复用，投影位置、显隐与样式增量同步。
  */
 @OnlyIn(Dist.CLIENT)
 class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_PATH) {
@@ -56,6 +59,17 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
     private val iconBounds = mutableMapOf<String, Box>()
     private var panelIds: List<ResourceLocation> = emptyList()
     private var panelType: AttachmentType? = null
+    private var panelInstalled: ResourceLocation? = null
+    private val gridRows = mutableListOf<GridRow>()
+    private var gridFirstRow = -1
+    private var gridScrollTop = Double.NaN
+    private var gridSelected: ResourceLocation? = null
+    private var candidateKey: CandidateKey? = null
+    private val compatibleBySlot = mutableMapOf<AttachmentType, List<ResourceLocation>>()
+    private val installableBySlot = mutableMapOf<AttachmentType, List<ResourceLocation>>()
+    private var ownedAttachments: Set<ResourceLocation> = emptySet()
+    private var inventoryCheckTick = Long.MIN_VALUE
+    private var inventoryCreative = false
     private var hoveredItem: String? = null
     private var tooltipItem: String? = null
     private var tooltipLines: List<FormattedCharSequence> = emptyList()
@@ -91,6 +105,16 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         iconBounds.clear()
         panelIds = emptyList()
         panelType = null
+        panelInstalled = null
+        gridRows.clear()
+        gridFirstRow = -1
+        gridScrollTop = Double.NaN
+        gridSelected = null
+        candidateKey = null
+        compatibleBySlot.clear()
+        installableBySlot.clear()
+        ownedAttachments = emptySet()
+        inventoryCheckTick = Long.MIN_VALUE
         hoveredItem = null
         tooltipItem = null
         tooltipLines = emptyList()
@@ -113,6 +137,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         connectors.clear()
         iconBounds.clear()
         val data = GunData.from(held)
+        refreshAttachmentLists(player, data)
         var mounts = syncMounts(doc, data)
         val panel = syncPanel(doc, player, data, mounts)
         // 紧凑窗口的点位可能占满菜单四周；先确定菜单，再把点位移到剩余空间。
@@ -165,8 +190,9 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         documentGeneration = doc.refreshGeneration
         doc.addEventListener("wheel", { event ->
             val scroll = doc.getElementById("panel-scroll")
+            val list = doc.getElementById("panel-list")
             val inList = panelType != null && AttachmentSlots.slotAt(editingAttachmentType) == panelType &&
-                    scroll != null && event.composedPath().any { it === scroll }
+                scroll != null && list != null && event.composedPath().any { it === list }
             // 始终取消默认滚动，列表到边界时也不能把滚动传给 body 或其他祖先。
             event.preventDefault()
             event.stopPropagation()
@@ -207,6 +233,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
             name.addEventListener("mouseleave") { hoveredItem = null }
         }
         doc.getElementById("panel-empty")?.textContent = label("no_available")
+        prepareGrid(doc)
     }
 
     private fun addMount(doc: Document, id: String, name: String, action: () -> Unit) {
@@ -279,12 +306,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
             mounts += Mount(id, type, bounds, installed)
         }
         for (type in AttachmentType.entries) {
-            sync(
-                mountId(type),
-                type,
-                WeaponEditMountTracker.positionOf(type),
-                data.availableAttachments(type).isNotEmpty()
-            )
+            sync(mountId(type), type, WeaponEditMountTracker.positionOf(type), compatibleAttachments(data, type).isNotEmpty())
         }
         sync(AMMO_MOUNT_ID, null, WeaponEditMountTracker.ammoPosition, data.get(GunProp.AMMO_CONSUMER).size > 1)
         return mounts
@@ -301,28 +323,36 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
             return null
         }
         val installed = data.attachment.id(type)
-        doc.getElementById("panel-current")?.let {
-            setElementItem(it, installed?.toString() ?: AIR)
-            setClass(it, "filled", installed != null)
-        }
-        doc.getElementById("panel-name")?.let {
-            val current = itemStack(installed)
-            it.textContent = if (current.isEmpty) label("empty") else current.hoverName.string
-            it.style.color = if (current.isEmpty) "#bdbdbd" else rarityColor(current)
-        }
-        doc.getElementById("panel-slot")?.textContent = slotName(type)
-        doc.getElementById("panel-uninstall")?.let { setClass(it, "disabled", installed == null) }
-        val ids = installableAttachments(player, data, type)
         val changedSlot = panelType != type
-        if (changedSlot || panelIds != ids) {
-            rebuildGrid(doc, type, ids)
-            if (changedSlot) doc.getElementById("panel-scroll")?.scrollTo(0.0, 0.0)
+        if (changedSlot || panelInstalled != installed) {
+            doc.getElementById("panel-current")?.let {
+                setElementItem(it, installed?.toString() ?: AIR)
+                setClass(it, "filled", installed != null)
+            }
+            doc.getElementById("panel-name")?.let {
+                val current = itemStack(installed)
+                it.textContent = if (current.isEmpty) label("empty") else current.hoverName.string
+                it.style.color = if (current.isEmpty) "#bdbdbd" else rarityColor(current)
+            }
+            doc.getElementById("panel-slot")?.textContent = slotName(type)
+            doc.getElementById("panel-uninstall")?.let { setClass(it, "disabled", installed == null) }
+            panelInstalled = installed
+        }
+        val ids = installableAttachments(player, data, type)
+        if (changedSlot || panelIds !== ids) {
             panelIds = ids
             panelType = type
+            gridFirstRow = -1
+            val rowCount = (ids.size + GRID_COLUMNS - 1) / GRID_COLUMNS
+            val contentHeight = px((rowCount * GRID_ROW_PITCH - GRID_ROW_GAP).coerceAtLeast(0f))
+            doc.getElementById("panel-space")?.style?.height = contentHeight
+            // AUI 在 overflow 裁剪区按父容器矩形剔除整棵子树；绝对定位行不会撑开父容器。
+            // 格子容器必须覆盖整份列表，滚动到任意位置时都与固定视口相交。
+            doc.getElementById("panel-grid")?.style?.height = contentHeight
+            doc.getElementById("panel-empty")?.style?.display = if (ids.isEmpty()) "block" else "none"
+            if (changedSlot) doc.getElementById("panel-scroll")?.scrollTo(0.0, 0.0)
         }
-        for ((index, id) in panelIds.withIndex()) {
-            doc.getElementById("cell-$index")?.let { setClass(it, "selected", id == installed) }
-        }
+        syncGrid(doc, installed)
         // 小窗口为点位和图标保留半屏空间；所有避让使用缩放后的外框。
         val scale =
             minOf(1f, (viewportWidth - 8f) / (PANEL_WIDTH * 2f), usableHeight() / PANEL_HEIGHT).coerceAtLeast(0.1f)
@@ -336,29 +366,76 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         return bounds
     }
 
-    private fun rebuildGrid(doc: Document, type: AttachmentType, ids: List<ResourceLocation>) {
-        if (hoveredItem?.startsWith("cell-") == true) hoveredItem = null
-        shownItems.keys.removeAll { it.startsWith("cell-") }
+    private data class GridCell(val key: String, val element: Element, val item: Element)
+    private data class GridRow(val element: Element, val cells: List<GridCell>)
+
+    /** 格子只创建一次；长列表只保留可见三排及滚动前后的缓冲行。 */
+    private fun prepareGrid(doc: Document) {
         val grid = doc.getElementById("panel-grid") ?: return
-        // 每行五格，不依赖 AUI Grid 的隐式轨道；原生滚动区域容纳任意行数。
-        grid.innerHTML = ids.chunked(5).mapIndexed { row, entries ->
-            entries.mapIndexed { column, id ->
-                val index = row * 5 + column
-                """<div id="cell-$index" class="cell">${itemSlot(id.toString(), 15)}</div>"""
-            }.joinToString("", "<div class=\"row\">", "</div>")
-        }.joinToString("")
-        for ((index, id) in ids.withIndex()) {
-            val cell = doc.getElementById("cell-$index") ?: continue
-            shownItems["cell-$index"] = id.toString()
-            cell.addEventListener("click") {
-                if (AttachmentSlots.slotAt(editingAttachmentType) == type) {
-                    hoveredItem = null
-                    sendPacketToServer(AttachmentInstallMessage(type.attachmentName, id.toString()))
-                }
+        grid.innerHTML = (0 until GRID_WINDOW_ROWS).joinToString("") { row ->
+            (0 until GRID_COLUMNS).joinToString("", "<div id=\"grid-row-$row\" class=\"row\">", "</div>") { column ->
+                """<div id="cell-${row * GRID_COLUMNS + column}" class="cell">${itemSlot(size = 15)}</div>"""
             }
-            wireItemHover(cell)
         }
-        doc.getElementById("panel-empty")?.style?.display = if (ids.isEmpty()) "block" else "none"
+        for (row in 0 until GRID_WINDOW_ROWS) {
+            val rowElement = doc.getElementById("grid-row-$row") ?: continue
+            val cells = (0 until GRID_COLUMNS).mapNotNull { column ->
+                val key = "cell-${row * GRID_COLUMNS + column}"
+                val cell = doc.getElementById(key) ?: return@mapNotNull null
+                val item = cell.querySelector("item") ?: return@mapNotNull null
+                cell.addEventListener("click") {
+                    val type = panelType
+                    if (type != null && AttachmentSlots.slotAt(editingAttachmentType) == type) {
+                        val id = shownItems[key] ?: return@addEventListener
+                        hoveredItem = null
+                        sendPacketToServer(AttachmentInstallMessage(type.attachmentName, id))
+                    }
+                }
+                wireItemHover(cell)
+                GridCell(key, cell, item)
+            }
+            gridRows += GridRow(rowElement, cells)
+        }
+    }
+
+    private fun syncGrid(doc: Document, installed: ResourceLocation?) {
+        val scroll = doc.getElementById("panel-scroll") ?: return
+        val rowCount = (panelIds.size + GRID_COLUMNS - 1) / GRID_COLUMNS
+        // 列表缩短时 AUI 的滚动范围要到下一次布局才更新；当前窗口先夹到新范围。
+        val maxScroll = (rowCount * GRID_ROW_PITCH - GRID_ROW_GAP - GRID_VIEWPORT_HEIGHT).coerceAtLeast(0f)
+        val scrollTop = scroll.getScrollTop().coerceIn(0.0, maxScroll.toDouble())
+        if (gridScrollTop != scrollTop) {
+            doc.getElementById("panel-grid")?.style?.top = px(-scrollTop.toFloat())
+            gridScrollTop = scrollTop
+        }
+        val firstRow = (floor(scrollTop / GRID_ROW_PITCH).toInt() - 1)
+            .coerceIn(0, (rowCount - GRID_WINDOW_ROWS).coerceAtLeast(0))
+        val changedWindow = gridFirstRow != firstRow
+        if (!changedWindow && gridSelected == installed) return
+        if (changedWindow && hoveredItem?.startsWith("cell-") == true) hoveredItem = null
+        gridRows.forEachIndexed { offset, row ->
+            val index = firstRow + offset
+            if (changedWindow) {
+                row.element.style.display = if (index < rowCount) "flex" else "none"
+                row.element.style.top = px(index * GRID_ROW_PITCH)
+            }
+            row.cells.forEachIndexed { column, cell ->
+                val key = cell.key
+                val id = panelIds.getOrNull(index * GRID_COLUMNS + column)
+                if (changedWindow) {
+                    cell.element.style.display = if (id != null) "flex" else "none"
+                    if (id == null) {
+                        shownItems.remove(key)
+                    } else if (shownItems[key] != id.toString()) {
+                        cell.item.textContent = id.toString()
+                        shownItems[key] = id.toString()
+                    }
+                }
+                setClass(cell.element, "selected", id != null && id == installed)
+            }
+        }
+        gridFirstRow = firstRow
+        gridSelected = installed
     }
 
     private fun syncIcons(doc: Document, mounts: List<Mount>, panel: Box?): MutableList<Box> {
@@ -474,15 +551,49 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         }
     }
 
-    private fun installableAttachments(player: Player, data: GunData, type: AttachmentType): List<ResourceLocation> {
-        val available = data.availableAttachments(type).filter { data.canInstall(type, it) }.distinct()
-        if (player.isCreative) return available
-        val owned = (player.inventory.items + player.inventory.offhand).asSequence()
-            .filterNot { it.isEmpty }
-            .mapNotNull { (it.item as? AttachmentProvider)?.attachmentId?.let(ResourceLocation::tryParse) }
-            .toSet()
-        return available.filter { it in owned }
+    private data class CandidateKey(
+        val dataId: String, val version: Int, val tags: Long, val free: Boolean, val fullyFree: Boolean,
+        val installed: List<ResourceLocation?>,
+    )
+
+    private fun refreshAttachmentLists(player: Player, data: GunData) {
+        val key = CandidateKey(data.getDefault().itemId, GunData.DATA_VERSION, AvailableAttachments.reloadGeneration,
+            AttachmentConfig.freeAttachmentMode, AttachmentConfig.fullyFreeAttachmentMode,
+            AttachmentType.entries.map { data.attachment.id(it) })
+        if (candidateKey != key) {
+            candidateKey = key
+            compatibleBySlot.clear()
+            installableBySlot.clear()
+            tooltipItem = null
+        }
+        // 每 tick 扫一次背包，避免依赖客户端同步不一定递增的 inventory.timesChanged。
+        val tick = player.level().gameTime
+        if (inventoryCheckTick != tick || inventoryCreative != player.isCreative) {
+            val owned = if (player.isCreative) emptySet() else
+                (player.inventory.items.asSequence() + player.inventory.offhand.asSequence())
+                    .filterNot { it.isEmpty }
+                    .mapNotNull { (it.item as? AttachmentProvider)?.attachmentId?.let(ResourceLocation::tryParse) }
+                    .toSet()
+            if (ownedAttachments != owned || inventoryCreative != player.isCreative) installableBySlot.clear()
+            ownedAttachments = owned
+            inventoryCreative = player.isCreative
+            inventoryCheckTick = tick
+        }
     }
+
+    private fun compatibleAttachments(data: GunData, type: AttachmentType): List<ResourceLocation> =
+        compatibleBySlot.getOrPut(type) {
+            // availableAttachments 已检查枪械声明和互斥；只补数据存在/槽位检查。
+            // canInstall 会为每个候选再次生成并搜索整份列表，导致二次方开销。
+            data.availableAttachments(type)
+                .filter { AttachmentDefinition.from(it)?.acceptedSlots?.contains(type) == true }.distinct()
+        }
+
+    private fun installableAttachments(player: Player, data: GunData, type: AttachmentType): List<ResourceLocation> =
+        installableBySlot.getOrPut(type) {
+            val available = compatibleAttachments(data, type)
+            if (player.isCreative) available else available.filter { it in ownedAttachments }
+        }
 
     private data class Box(val left: Float, val top: Float, val width: Float, val height: Float) {
         val right get() = left + width
@@ -688,8 +799,14 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         private const val AMMO_MOUNT_ID = "mount-ammo_type"
         private const val MOUNT_SIZE = 9f
         private const val ICON_SIZE = 17f
-        private const val PANEL_WIDTH = 132f
-        private const val PANEL_HEIGHT = 94f
+        private const val PANEL_WIDTH = 180f
+        private const val PANEL_HEIGHT = 112f
+        private const val GRID_COLUMNS = 8
+        private const val GRID_VISIBLE_ROWS = 3
+        private const val GRID_WINDOW_ROWS = GRID_VISIBLE_ROWS + 3
+        private const val GRID_ROW_GAP = 4f
+        private const val GRID_ROW_PITCH = 20f
+        private const val GRID_VIEWPORT_HEIGHT = GRID_VISIBLE_ROWS * GRID_ROW_PITCH - GRID_ROW_GAP
         private fun mountId(type: AttachmentType) = "mount-" + type.attachmentName.lowercase(Locale.ROOT)
         private fun itemSlot(id: String = AIR, size: Int = 16) =
             """<slot render="item" interactive="0" pointer="0" size="$size" iconScale="${size / 16f}"><item>$id</item></slot>"""
