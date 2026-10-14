@@ -70,6 +70,15 @@
   "MeleeSound": {
     "Hit": "superbwarfare:bayonet_hit"
   },
+  "BayonetCharge": {
+    "Duration": 180,
+    "Speed": 2,
+    "Cooldown": 300,
+    "Sound": "superbwarfare:lunge_mine_growl",
+    "StrikeDuration": 18,
+    "StrikeHitTime": 1,
+    "StrikeDamage": 50
+  },
   "SoundRadius": 8,
   "RPM": 240,
   "Projectile": "superbwarfare:gun_grenade",
