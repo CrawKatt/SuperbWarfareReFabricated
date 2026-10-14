@@ -244,6 +244,7 @@ object ClientRenderHandler {
         event.registerBelowAll(AmmoCountOverlay.ID, AmmoCountOverlay)
         event.registerBelowAll(CrossHairOverlay.ID, CrossHairOverlay)
         event.registerBelowAll(HeatBarOverlay.ID, HeatBarOverlay)
+        event.registerBelowAll(BayonetChargeOverlay.ID, BayonetChargeOverlay)
         event.registerAbove(CrossHairOverlay.ID, GunShieldOverlay.ID, GunShieldOverlay)
         event.registerBelowAll(RedTriangleOverlay.ID, RedTriangleOverlay)
         event.registerBelowAll(HandsomeFrameOverlay.ID, HandsomeFrameOverlay)
