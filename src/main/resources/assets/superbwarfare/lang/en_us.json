@@ -1474,6 +1474,10 @@
 
   "screen.superbwarfare.weapon_edit.empty": "No attachment installed",
   "screen.superbwarfare.weapon_edit.no_available": "No compatible attachments in inventory",
+  "screen.superbwarfare.weapon_edit.settings": "Attachment settings",
+  "screen.superbwarfare.weapon_edit.rotation": "Angle",
+  "screen.superbwarfare.weapon_edit.offset": "Offset",
+  "screen.superbwarfare.weapon_edit.reset": "Reset",
 
   "gamerule.sbwDoGenerateLoots": "Generate Superb Warfare Chest Loots",
 
