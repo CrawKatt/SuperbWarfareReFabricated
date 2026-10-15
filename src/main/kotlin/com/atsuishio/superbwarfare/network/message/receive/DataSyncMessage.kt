@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.network.message.receive
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.data.DataLoader
+import com.atsuishio.superbwarfare.data.IDBasedData
 import com.atsuishio.superbwarfare.ksp.annotation.RegisterPacket
 import com.atsuishio.superbwarfare.network.ClientPacketPayload
 import com.atsuishio.superbwarfare.network.PayloadContext
@@ -23,7 +24,8 @@ data class DataSyncMessage(
             return
         }
 
-        val map = DataLoader.JSON.decodeFromString(data.mapSerializer, jsonData) as Map<String, Any>
+        val map = DataLoader.JSON.decodeFromString(data.mapSerializer, jsonData)
+        map.forEach { (id, value) -> (value as? IDBasedData<*>)?.setId(id) }
 
         data.dataMap.clear()
         data.dataMap.putAll(map)
