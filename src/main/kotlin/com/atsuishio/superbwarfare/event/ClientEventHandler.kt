@@ -2044,7 +2044,7 @@ object ClientEventHandler {
         val gunRecoilY = data.get(GunProp.RECOIL_Y) * 10
 
         recoilY = (2 * Math.random() - 1).toFloat() * gunRecoilY
-        noSprintTicks = 7f
+        noSprintTicks = 10f
 
         postEvent(ClientGunFireEvent(player, stack))
     }
@@ -2426,7 +2426,7 @@ object ClientEventHandler {
         // 冲锋窗口里不给程序性奔跑姿势：冲锋 clip 自己占姿势，两条层用同一个速率交叉淡入淡出
         val sprinting =
             entity.isSprinting && !data.reloading() && (firePosTimer == 0.0 || firePosTimer > 1.0) && !ModKeyMappings.FIRE.isDown &&
-                    zoomTime < 0.99 && !isGunMeleeActive(stack) && !isEditing && !GunChargeHandler.isCharging()
+                    zoomTime < 0.99 && !isGunMeleeActive(stack) && !isEditing && !GunChargeHandler.isCharging() && noSprintTicks == 0f
 
         sprintRotWeight = sprintRotTransition.weight(sprinting, sprintHandgun, delta, customWeight, switchSpeed)
         sprintPosWeight = sprintPosTransition.weight(sprinting, sprintHandgun, delta, customWeight, switchSpeed)
