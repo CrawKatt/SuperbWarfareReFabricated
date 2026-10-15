@@ -37,7 +37,8 @@ import org.joml.Matrix4f
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-private var currentServer: MinecraftServer? = null
+internal var currentServer: MinecraftServer? = null
+    private set
 
 fun registerMinecraftUtil() {
     ServerLifecycleEvents.SERVER_STARTED.register { server ->

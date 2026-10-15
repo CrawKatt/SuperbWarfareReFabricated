@@ -113,6 +113,7 @@ fun registerClientReceivers() {
     clientReceiver<ClientVehicleItemMessage>()
     clientReceiver<OpenVehicleSkinScreenMessage>()
     clientReceiver<OpenTacticalMapScreenMessage>()
+    clientReceiver<RealisticShootModeSyncMessage>()
 }
 
 fun registerPayloads() {

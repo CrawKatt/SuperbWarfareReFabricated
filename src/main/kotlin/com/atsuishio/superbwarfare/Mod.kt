@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.command.CommandRegister
 import com.atsuishio.superbwarfare.compat.thermoo.ThermooCompatHandler
 import com.atsuishio.superbwarfare.config.CLIENT_CONFIG
 import com.atsuishio.superbwarfare.config.COMMON_CONFIG
+import com.atsuishio.superbwarfare.config.RealisticShootModeSync
 import com.atsuishio.superbwarfare.config.SERVER_CONFIG
 import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.DataLoader
@@ -63,6 +64,7 @@ class Mod : ModInitializer {
         TestLoader.register()
 
         registerPayloads()
+        RealisticShootModeSync.register()
         DataLoader.register()
         AvailableAttachments.TagsUpdatedListener.register()
         WreckageLootDataManager.register()
