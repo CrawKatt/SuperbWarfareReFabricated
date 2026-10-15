@@ -1099,6 +1099,7 @@
   "commands.superbwarfare.attachment.success.random": "已为%1$s的%2$s随机抽取%3$s",
   "commands.superbwarfare.attachment.success.random.all": "已为%1$s的各槽位随机抽取配件：%2$s",
   "commands.superbwarfare.attachment.random.entry": "%1$s %2$s",
+  "commands.superbwarfare.attachment.random.empty": "无配件",
   "commands.superbwarfare.attachment.fail.empty": "%1$s上没有配件",
   "commands.superbwarfare.attachment.fail.skin.unknown": "%3$s上的配件没有皮肤%1$s（可用：%2$s）",
   "commands.superbwarfare.attachment.skin.current": "%1$s的%2$s配件皮肤为%3$s（%4$s）",

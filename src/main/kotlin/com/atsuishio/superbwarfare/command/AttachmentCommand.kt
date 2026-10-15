@@ -154,8 +154,7 @@ val ATTACHMENT_COMMAND = buildCommand("attachment") {
                 val rolls = rollAllSlots(data)
 
                 if (rolls.isEmpty()) {
-                    // 这把枪一个可用配件都没有（清空是空操作）。注意此时枪上不会剩任何配件，
-                    // 因为能抽的槽位在清空前也只有"已装的那一件"，而它本来就不在可用列表里。
+                    // 空配件也会保留一条抽签结果；空列表只表示没有任何可用配件。
                     fail { Component.translatable("commands.superbwarfare.attachment.fail.random") }
                 }
 
@@ -171,7 +170,7 @@ val ATTACHMENT_COMMAND = buildCommand("attachment") {
                             Component.translatable(
                                 "commands.superbwarfare.attachment.random.entry",
                                 type.slotName(),
-                                id.toString()
+                                randomAttachmentName(id)
                             )
                         }.reduce { acc, entry -> acc.append(Component.literal(", ")).append(entry) }
                     )
@@ -183,12 +182,15 @@ val ATTACHMENT_COMMAND = buildCommand("attachment") {
                     val type = enumArg
                     val data = mainHandGunData(entity) ?: fail { notGunMessage() }
 
-                    val id = randomAttachment(data, type)
-                        ?: fail {
+                    val options = installableAttachments(data, type)
+                    if (options.isEmpty()) {
+                        fail {
                             Component.translatable(
                                 "commands.superbwarfare.attachment.fail.random.type", type.slotName()
                             )
                         }
+                    }
+                    val id = randomAttachment(options)
 
                     applyAttachment(data, entity, type, id)
 
@@ -197,7 +199,7 @@ val ATTACHMENT_COMMAND = buildCommand("attachment") {
                             "commands.superbwarfare.attachment.success.random",
                             entity.displayName,
                             type.slotName(),
-                            id.toString()
+                            randomAttachmentName(id)
                         )
                     }
                 }
@@ -437,52 +439,51 @@ private fun parseRgb(raw: String): Int? {
     return match.groupValues[1].toInt(16)
 }
 
-/** 在 [type] 槽位的可用配件里随机抽一个，该槽位没有可用配件时返回 `null` */
-private fun randomAttachment(data: GunData, type: AttachmentType): ResourceLocation? =
-    installableAttachments(data, type).randomOrNull()
+/** 空配件与每个可用配件等概率；`null` 表示抽到了空配件。 */
+private fun randomAttachment(options: List<ResourceLocation>): ResourceLocation? =
+    options.getOrNull((0..options.size).random() - 1)
+
+private fun randomAttachmentName(id: ResourceLocation?): Component =
+    id?.let { Component.literal(it.toString()) }
+        ?: Component.translatable("commands.superbwarfare.attachment.random.empty")
 
 /**
- * 全量随机：**每个挂点组只出一个，且抽出来的组合本身必须装得上**。
+ * 全量随机：每个挂点组先选兼容的槽位，再从该槽位的配件与空配件中等概率抽取。
+ * 组的处理顺序也要随机，否则跨组互斥时，枚举靠前的握把总会先占位，副武器永远抽不到。
+ * 兼容性在选槽位前过滤，避免选中一个候选全被排除的槽位而跳过同组其它可用槽位。
  *
- * 挂点组内的槽位互斥（例如刺刀与枪口配件都挂在 `muzzle_device` 上），
- * 如果还按"每个槽位各抽一次"，就会把组里两个槽位同时抽上 —— 那是一个装不出来的组合。
- * 所以先按挂点组分组，每组在**有可用配件的槽位**里随机挑一个槽位，再在该槽位里随机挑配件。
+ * 自由改装模式下不限制互斥，每个可用槽位独立抽取。调用方必须先 [clearAllAttachments]，
+ * 保证候选不受旧配件影响；空配件保留在结果中，全部抽空也属于成功。
  *
- * 但"每组一个"还不够：互斥也可以是**跨挂点组**的（副武器与刺刀、副武器与握把互斥，
- * 而刺刀与握把可以共存；还有"这把枪的导轨太短"这类只在本枪成立的互斥 —— 见
- * `AttachmentSlots.conflicts`）。所以每组抽完还要拿已经抽中的槽位
- * 再过滤一遍，否则会抽出一个"指令都装不上"的组合（先抽到的组赢，后抽到的组让位）。
- *
- * 开了**自由改装模式**时上面那套"保证装得上"的逻辑整个失效 —— 互斥已经不存在了 ——
- * 于是改成**每个槽位各抽一个**：继续按挂点组抽的话，刺刀 / 枪口这类同组槽位里永远只有一个
- * 能被抽到，而那正是这一档要放开的东西。
- *
- * 调用方**必须先 [clearAllAttachments]**：否则已经装着配件的那一组里，其它槽位的候选会被
- * `availableAttachments` 的互斥过滤全部干掉，抽签退化成"重抽已经装着的那一个"
- * （自由改装模式下没有这层过滤，但"先清空"仍是"抽签结果与原配置无关"的保证）。
- *
- * @return `槽位 to 配件 id`，按挂点组顺序（注册表顺序）；没有任何可用配件时为空列表。
+ * @return `槽位 to 配件 id`，`id == null` 表示空配件；没有任何可用配件时为空列表。
  */
-private fun rollAllSlots(data: GunData): List<Pair<AttachmentType, ResourceLocation>> {
+private fun rollAllSlots(data: GunData): List<Pair<AttachmentType, ResourceLocation?>> {
+    val options = AttachmentType.entries.associateWith { installableAttachments(data, it) }
+        .filterValues { it.isNotEmpty() }
+
     if (AttachmentConfig.freeAttachmentMode) {
-        return AttachmentType.entries.mapNotNull { type ->
-            randomAttachment(data, type)?.let { type to it }
+        return options.map { (type, ids) ->
+            type to randomAttachment(ids)
         }
     }
 
-    val rolls = mutableListOf<Pair<AttachmentType, ResourceLocation>>()
+    val rolls = mutableListOf<Pair<AttachmentType, ResourceLocation?>>()
 
-    for ((_, slots) in AttachmentType.entries.groupBy { AttachmentSlots.mountOf(it) }) {
-        val type = slots.filter { installableAttachments(data, it).isNotEmpty() }.randomOrNull() ?: continue
-
-        val pick = installableAttachments(data, type).filter { id ->
-            val definition = AttachmentDefinition.from(id)
-            rolls.none { (picked, pickedId) ->
-                AttachmentSlots.conflicts(type, definition, picked, AttachmentDefinition.from(pickedId), data)
+    for (slots in options.keys.groupBy { AttachmentSlots.mountOf(it) }.values.shuffled()) {
+        val candidates = slots.mapNotNull { type ->
+            val compatible = options.getValue(type).filter { id ->
+                val definition = AttachmentDefinition.from(id)
+                rolls.none { (picked, pickedId) ->
+                    pickedId != null && AttachmentSlots.conflicts(
+                        type, definition, picked, AttachmentDefinition.from(pickedId), data
+                    )
+                }
             }
-        }.randomOrNull() ?: continue
+            if (compatible.isEmpty()) null else type to compatible
+        }
+        val (type, ids) = candidates.randomOrNull() ?: continue
 
-        rolls += type to pick
+        rolls += type to randomAttachment(ids)
     }
 
     return rolls

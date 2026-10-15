@@ -1099,6 +1099,7 @@
   "commands.superbwarfare.attachment.success.random": "Randomly picked %3$s for the %2$s of %1$s",
   "commands.superbwarfare.attachment.success.random.all": "Randomly picked attachments for %1$s: %2$s",
   "commands.superbwarfare.attachment.random.entry": "%1$s %2$s",
+  "commands.superbwarfare.attachment.random.empty": "No attachment",
   "commands.superbwarfare.attachment.fail.empty": "There is no attachment on the %1$s",
   "commands.superbwarfare.attachment.fail.skin.unknown": "The attachment on the %3$s has no skin %1$s (available: %2$s)",
   "commands.superbwarfare.attachment.skin.current": "The attachment skin on the %2$s of %1$s is %3$s (%4$s)",
