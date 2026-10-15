@@ -1858,17 +1858,8 @@ object ClientEventHandler {
 
         gunSpread = Mth.lerp(0.5 * times, gunSpread, spread)
 
-        if (fireModeInfo.isChargeMode()) {
-            updateChargeFireState(player, data, fireModeInfo)
-            return
-        }
-
-        if (!item.canShoot(data, player)) {
-            burstFireAmount = 0
-        }
-
-        // 开火部分
         // 冲刺后恢复开火的快慢按**主武器**的重量（`ActiveGun.handlingData`）与「疾跑切换速度」—— 这一项是手感不是弹道
+        // 蓄力模式也必须推进恢复计时，否则近战或切枪留下的冷却会永久挡住瞄准。
         val handling = ActiveGun.handlingData(player) ?: data
         val switchSpeed = handling.get(GunProp.SPRINT_TRANSITION_SPEED)
         val speed = 5 / (handling.get(GunProp.WEIGHT) + 4) * switchSpeed
@@ -1879,6 +1870,16 @@ object ClientEventHandler {
             (fireCooldown - 6 * speed * times).coerceIn(0.0, 40.0)
         }
 
+        if (fireModeInfo.isChargeMode()) {
+            updateChargeFireState(player, data, fireModeInfo)
+            return
+        }
+
+        if (!item.canShoot(data, player)) {
+            burstFireAmount = 0
+        }
+
+        // 开火部分
         val rpm = effectiveRpm(data)
         val rps = rpm / 60.0
 
@@ -3329,6 +3330,7 @@ object ClientEventHandler {
      */
     fun resetGunTransientState() {
         clientTimer.stop()
+        fireCooldown = 0.0
 //        holdingFireKey = false
         holdingFireKeyTicks = 0
         holdingFireKeyTicks0 = 0f
