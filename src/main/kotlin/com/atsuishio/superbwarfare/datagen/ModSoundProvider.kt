@@ -77,6 +77,10 @@ class ModSoundProvider(private val output: PackOutput) : DataProvider {
         register("car_horn") { stream(true).attenuationDistance(96) }
         register("steel_coil_move") { attenuationDistance(48) }
 
+        // -------------------- gun_shield --------------------
+        register("hit_shield", "gun_shield/hit_shield_1", "gun_shield/hit_shield_2", "gun_shield/hit_shield_3")
+        group("gun_shield", "shield_break")
+
         // -------------------- annihilator --------------------
         group(
             "annihilator", "annihilator_fire_1p", "annihilator_fire_3p", "annihilator_far", "annihilator_veryfar",
