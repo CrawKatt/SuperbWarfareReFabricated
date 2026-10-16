@@ -4,9 +4,7 @@ import java.time.Instant
 plugins {
     eclipse
     idea
-    id("net.minecraftforge.gradle") version "[6.0.16,6.2)"
-    id("org.spongepowered.mixin") version "0.7.+"
-    id("org.parchmentmc.librarian.forgegradle") version "1.+"
+    id("net.neoforged.moddev.legacyforge") version "2.0.91"
     id("org.jetbrains.kotlin.jvm") version "2.0.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
     id("com.google.devtools.ksp") version "2.0.0-1.0.24"
@@ -35,7 +33,7 @@ java {
 }
 
 // 测试用插件 mod（loader test）。它作为"展开目录"参与 dev 加载：
-// ForgeGradle 把 runs { } 里 mods { } 的每个 source set 转成环境变量
+// ModDevGradle 把 mods { } 的每个 source set 转成环境变量
 // MOD_CLASSES 中的 <modid>%%<绝对路径> 条目，由 FML 的 ExplodedDirectoryLocator
 // 当作普通 mod 文件加载 —— 改 localmod/ 下的 JSON 后无需打包 jar 即可生效。
 // 注意：run/mods/ 只接受 .jar，目录形式的 mod 必须走这条路径。
@@ -45,55 +43,57 @@ val loaderTest: SourceSet by sourceSets.creating {
     resources.srcDir("localmod/sbwloadertest/resources")
 }
 
-minecraft {
-    mappings("parchment", "2023.08.13-1.20.1") // 直接使用括号和逗号
-    accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
-    copyIdeResources.set(true)
+legacyForge {
+    version = "${project.property("minecraft_version")}-${project.property("forge_version")}"
+    parchment {
+        minecraftVersion = project.property("minecraft_version").toString()
+        mappingsVersion = "2023.08.13"
+    }
+
+    mods {
+        create(project.property("mod_id").toString()) {
+            sourceSet(sourceSets.main.get())
+        }
+        // 名字需与 localmod/sbwloadertest/resources/META-INF/mods.toml 里的 modId 一致。
+        create("sbwloadertest") {
+            sourceSet(loaderTest)
+        }
+    }
 
     runs {
-        all {
+        configureEach {
             // 需要使用 JetBrains 的 JBR 作为运行时才能发挥作用
-            jvmArgs(
+            jvmArguments.addAll(
                 "-XX:+IgnoreUnrecognizedVMOptions",
                 "-XX:+AllowEnhancedClassRedefinition"
             )
-            workingDirectory(project.file("run"))
-            property("forge.logging.markers", "REGISTRIES")
-            property("forge.logging.console.level", "info")
-            property("mixin.env.remapRefMap", "true")
-            property("mixin.env.refMapRemappingFile", "${projectDir}/build/createSrgToMcp/output.srg")
-            property("geckolib.disable_examples", "true")
-            mods {
-                create(project.property("mod_id").toString()) { // 创建 mod 配置
-                    source(sourceSets.main.get())
-                }
-
-                // 测试插件：名字即 modId，需与
-                // localmod/sbwloadertest/resources/META-INF/mods.toml 里的 modId 一致。
-                create("sbwloadertest") {
-                    source(loaderTest)
-                }
-            }
+            gameDirectory = project.file("run")
+            systemProperty("forge.logging.markers", "REGISTRIES")
+            systemProperty("forge.logging.console.level", "info")
+            systemProperty("geckolib.disable_examples", "true")
+            systemProperty("mixin.dumpTargetOnFailure", "true")
         }
 
         create("client") {
-            property("forge.enabledGameTestNamespaces", project.property("mod_id").toString())
-            property("geckolib.disable_examples", "true")
+            client()
+            systemProperty("forge.enabledGameTestNamespaces", project.property("mod_id").toString())
         }
 
         create("server") {
-            property("forge.enabledGameTestNamespaces", project.property("mod_id").toString())
+            server()
+            systemProperty("forge.enabledGameTestNamespaces", project.property("mod_id").toString())
         }
 
         create("data") {
-            args(
+            data()
+            programArguments.addAll(
                 "--mod",
                 "superbwarfare",
                 "--all",
                 "--output",
-                file("src/generated/resources/"),
+                file("src/generated/resources/").absolutePath,
                 "--existing",
-                file("src/main/resources/")
+                file("src/main/resources/").absolutePath
             )
         }
     }
@@ -178,7 +178,7 @@ repositories {
     }
 }
 
-fun DependencyHandler.jijImplement(dependency: String, maxVersion: String? = null, transitive: Boolean = true) {
+fun DependencyHandler.jijImplement(dependency: String, maxVersion: String? = null) {
     val (_, _, version) = dependency.split(":")
 
     val firstVersion = version.split(".")
@@ -197,17 +197,20 @@ fun DependencyHandler.jijImplement(dependency: String, maxVersion: String? = nul
         return@run "$firstVersionString." + versions.drop(1).joinToString(".") { "0" }
     }
 
-//    println("$name [$firstVersion,$maximumVersion)")
-
-    val dependencyImpl = implementation(fg.deobf(dependency))
-    (dependencyImpl as ModuleDependency).isTransitive = transitive
-    jarJar(dependencyImpl) {
-        jarJar.ranged(dependencyImpl, "[$firstVersion,$maximumVersion)")
+    // ModDevGradle 的 mod 配置不传递依赖；所需前置库在 dependencies 中显式声明。
+    modImplementation(dependency)
+    // 构建使用原来的固定版本，JarJar 元数据仍保留兼容范围，避免扫描范围内的新版。
+    configurations.named("jarJar") {
+        resolutionStrategy.force(dependency)
+    }
+    jarJar(dependency) {
+        isTransitive = false
+        version {
+            strictly("[$firstVersion,$maximumVersion)")
+            prefer(version)
+        }
     }
 }
-
-
-jarJar.enable()
 
 dependencies {
     ksp(project(":ksp"))
@@ -218,22 +221,29 @@ dependencies {
     // loaderTest 夹具要 import @TestLoaderTarget 注解类：只给编译期可见，
     // 运行期由 superbwarfare 本体提供（它在游戏的 module path 上）。
     // 夹具默认用 lowcodefml，不碰 Forge API；要自己写 @Mod 的插件才需要额外
-    // extendsFrom(configurations["minecraft"])。
+    // legacyForge.addModdingDependenciesTo(loaderTest)。
     add(loaderTest.compileOnlyConfigurationName, sourceSets.main.get().output)
 
-    minecraft("net.minecraftforge:forge:1.20.1-47.2.0")
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
     jijImplement("top.theillusivec4.curios:curios-forge:5.14.1+1.20.1")
 
     jijImplement("software.bernie.geckolib:geckolib-forge-1.20.1:4.4.6")
-    implementation(fg.deobf("com.eliotlash.mclib:mclib:20"))
+    // GeckoLib 已通过 JarJar 提供 mclib；独立运行时副本会造成同名 JPMS 模块冲突。
+    compileOnly("com.eliotlash.mclib:mclib:20")
 
     // 从ywzj毛来的Rhino
-    val rhino = dependencies.create("org.ywzj:rhino:1.8.1-SNAPSHOT")
-    minecraftLibrary(rhino)
+    val rhino = "org.ywzj:rhino:1.8.1-SNAPSHOT"
+    implementation(rhino)
+    add("additionalRuntimeClasspath", rhino)
+    configurations.named("jarJar") {
+        resolutionStrategy.force(rhino)
+    }
     jarJar(rhino) {
-        jarJar.ranged(rhino, "[1.8.0, 2.0.0)")
+        version {
+            strictly("[1.8.0,2.0.0)")
+            prefer("1.8.1-SNAPSHOT")
+        }
     }
 
     // SBM
@@ -245,7 +255,7 @@ dependencies {
     }
 
     // Ponder
-    jijImplement("net.createmod.ponder:Ponder-Forge-${project.property("minecraft_version")}:${project.property("ponder_version")}", transitive = false)
+    jijImplement("net.createmod.ponder:Ponder-Forge-${project.property("minecraft_version")}:${project.property("ponder_version")}")
 
     // 飞轮
     jijImplement("dev.engine-room.flywheel:flywheel-forge-${project.property("minecraft_version")}:${project.property("flywheel_version")}")
@@ -259,105 +269,75 @@ dependencies {
     // 可选 mod 依赖
 
     // 加速渲染
-    compileOnly(fg.deobf("curse.maven:accelerated-rendering-1314021:7342975"))
+    modCompileOnly("curse.maven:accelerated-rendering-1314021:7342975")
 
     // JEI相关
     // compile against the JEI API but do not include it at runtime
-    compileOnly(fg.deobf("mezz.jei:jei-${project.property("minecraft_version")}-common-api:${project.property("jei_version")}"))
-    compileOnly(fg.deobf("mezz.jei:jei-${project.property("minecraft_version")}-forge-api:${project.property("jei_version")}"))
+    modCompileOnly("mezz.jei:jei-${project.property("minecraft_version")}-common-api:${project.property("jei_version")}")
+    modCompileOnly("mezz.jei:jei-${project.property("minecraft_version")}-forge-api:${project.property("jei_version")}")
     // at runtime, use the full JEI jar for Forge
-    runtimeOnly(fg.deobf("mezz.jei:jei-${project.property("minecraft_version")}-forge:${project.property("jei_version")}"))
+    modRuntimeOnly("mezz.jei:jei-${project.property("minecraft_version")}-forge:${project.property("jei_version")}")
 
     // 帕秋莉手册
-    compileOnly(fg.deobf("vazkii.patchouli:Patchouli:1.20.1-84-FORGE:api"))
-    runtimeOnly(fg.deobf("vazkii.patchouli:Patchouli:1.20.1-84-FORGE"))
+    modCompileOnly("vazkii.patchouli:Patchouli:1.20.1-84-FORGE:api")
+    modRuntimeOnly("vazkii.patchouli:Patchouli:1.20.1-84-FORGE")
 
     // Cloth Config相关
-    jijImplement("me.shedaniel.cloth:cloth-config-forge:${project.property("cloth_config_version")}", transitive = false)
+    jijImplement("me.shedaniel.cloth:cloth-config-forge:${project.property("cloth_config_version")}")
 
     // Jade相关
-    implementation(fg.deobf("curse.maven:jade-324717:${project.property("jade_version")}"))
+    modImplementation("curse.maven:jade-324717:${project.property("jade_version")}")
 
     // 冷汗
-    implementation(fg.deobf("curse.maven:cold-sweat-506194:6503192"))
+    modImplementation("curse.maven:cold-sweat-506194:6503192")
 
     // 真实相机
-    compileOnly(fg.deobf("curse.maven:real-camera-851574:${project.property("real_camera_id")}"))
+    modCompileOnly("curse.maven:real-camera-851574:${project.property("real_camera_id")}")
 
     // 网络音乐机
-    implementation(fg.deobf("curse.maven:net-music-978569:6838602"))
+    modImplementation("curse.maven:net-music-978569:6838602")
 
     // 车万女仆
-    implementation(fg.deobf("curse.maven:touhou-little-maid-355044:7510714"))
+    modImplementation("curse.maven:touhou-little-maid-355044:7510714")
 
     // KubeJS
-    implementation(fg.deobf("curse.maven:kubejs-238086:5853326"))
-    implementation(fg.deobf("curse.maven:architectury-api-419699:5137938"))
-    implementation(fg.deobf("curse.maven:rhino-416294:6186971"))
+    modImplementation("curse.maven:kubejs-238086:5853326")
+    modImplementation("curse.maven:architectury-api-419699:5137938")
+    modImplementation("curse.maven:rhino-416294:6186971")
 
     // 测试用mod
     // 这俩是仅客户端mod
     if (!project.gradle.startParameter.taskNames.any { it.contains("runServer") }) {
-        runtimeOnly(fg.deobf("curse.maven:oculus-581495:6020952"))
-        runtimeOnly(fg.deobf("curse.maven:embeddium-908741:5681725"))
+        modRuntimeOnly("curse.maven:oculus-581495:6020952")
+        modRuntimeOnly("curse.maven:embeddium-908741:5681725")
     }
 
-    implementation(fg.deobf("curse.maven:timeless-and-classics-zero-1028108:6518539"))
-    implementation(fg.deobf("curse.maven:create-328085:7178761"))
-    implementation(fg.deobf("curse.maven:mmmmmmmmmmmm-225738:6237015"))
-    implementation(fg.deobf("curse.maven:selene-499980:6249659"))
-//    implementation(fg.deobf("curse.maven:limitless-vehicle-1446269:7675116"))
-    implementation(fg.deobf("curse.maven:create-power-loader-936020:6549987"))
+    modImplementation("curse.maven:timeless-and-classics-zero-1028108:6518539")
+    modImplementation("curse.maven:create-328085:7178761")
+    modImplementation("curse.maven:mmmmmmmmmmmm-225738:6237015")
+    modImplementation("curse.maven:selene-499980:6249659")
+//    modImplementation("curse.maven:limitless-vehicle-1446269:7675116")
+    modImplementation("curse.maven:create-power-loader-936020:6549987")
 
     // vs
     compileOnly("org.valkyrienskies.core:api:1.1.0+") {
         exclude("org.joml", "joml")
     }
-    implementation(fg.deobf("curse.maven:valkyrien-skies-258371:7906689"))
-    implementation(fg.deobf("curse.maven:eureka-ships-654384:7979379"))
+    modImplementation("curse.maven:valkyrien-skies-258371:7906689")
+    modImplementation("curse.maven:eureka-ships-654384:7979379")
 
     // better combat相关
-    implementation(fg.deobf("curse.maven:better-combat-by-daedelus-639842:5625757"))
-    implementation(fg.deobf("curse.maven:playeranimator-658587:4587214"))
-
-    // mek
-    implementation(fg.deobf("curse.maven:mekanism-268560:6123077"))
-
-//    implementation(fg.deobf("curse.maven:raise-sound-limit-simplified-unofficial-forge-port-1559322:8173274"))
-
-//    implementation(fg.deobf("curse.maven:lionfish-api-1001614:7923140"))
-//    implementation(fg.deobf("curse.maven:lendercataclysm-551586:7934870"))
-//    implementation(fg.deobf("curse.maven:citadel-331936:7476570"))
-//    implementation(fg.deobf("curse.maven:alexs-caves-924854:5848216"))
-
-//    implementation("curse.maven:spark-361579:4587309")
+    modImplementation("curse.maven:better-combat-by-daedelus-639842:5625757")
+    modImplementation("curse.maven:playeranimator-658587:4587214")
 }
 
 mixin {
     add(sourceSets.main.get(), "mixins.superbwarfare.refmap.json")
-
     config("mixins.superbwarfare.json")
-
-//    debug {
-//        verbose = true
-//        export = true
-//    }
-    dumpTargetOnFailure = true
-
-    isQuiet = true
 }
 
 tasks.withType<JavaCompile> {
-    // Ensure SRG mappings exist before compilation (needed for Mixin AP)
-    dependsOn("createSrgToMcp")
-
     options.encoding = "UTF-8"
-    options.compilerArgs.addAll(
-        listOf(
-            "-Amixin.refmap=mixins.superbwarfare.refmap.json",
-            "-Amixin.defaultRefmap=mixins.superbwarfare.refmap.json"
-        )
-    )
 }
 
 tasks.named<ProcessResources>("processResources") {
@@ -391,14 +371,10 @@ tasks.named<Jar>("jar") {
             "Implementation-Title" to project.name,
             "Implementation-Version" to project.version,
             "Implementation-Vendor" to project.property("mod_authors"),
-            "Implementation-Timestamp" to Instant.now().toString()
+            "Implementation-Timestamp" to Instant.now().toString(),
+            "MixinConfigs" to "mixins.superbwarfare.json"
         )
     }
-    finalizedBy("reobfJar")
-}
-
-tasks.named<Jar>("jarJar") {
-    from("COPYING", "COPYING.LESSER")
 }
 
 java {
@@ -419,10 +395,8 @@ kotlin {
 }
 
 // 保证测试插件 mod 的 classes / processResources 输出在启动前就位
-// （ForgeGradle 会把 source set 的输出目录整体塞进 MOD_CLASSES）。
+// （ModDevGradle 会把 source set 的输出目录整体塞进 MOD_CLASSES）。
 tasks.matching { it.name in listOf("runClient", "runServer", "runData") }
     .configureEach {
         dependsOn(loaderTest.classesTaskName, loaderTest.processResourcesTaskName)
     }
-
-// 确保 Mixin AP 能在 FG6 的编译管线中正确运行
