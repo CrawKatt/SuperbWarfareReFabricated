@@ -54,6 +54,7 @@ class ModSoundProvider(private val output: PackOutput) : DataProvider {
         register("ouch", subtitle = subKey("ouch"))
         register("step", "step1", "step2", "step3", "step4")
         register("growl", subtitle = subKey("growl"))
+        register("empty", subtitle = subKey("empty"))
         register("idle", "heng", "hengheng", "yarimasune", subtitle = subKey("idle"))
         root(
             "headshot", "mortar_fire", "mortar_distant", "mortar_load", "firerate", "adjust_fov", "grenade_throw",
