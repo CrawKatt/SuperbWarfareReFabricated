@@ -49,6 +49,10 @@ loom {
     }
 
     runs {
+        configureEach {
+            property("mixin.dumpTargetOnFailure", "true")
+        }
+
         named("client") {
             client()
             configName = "SuperbWarfare Fabric Client"
@@ -311,12 +315,6 @@ dependencies {
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    options.compilerArgs.addAll(
-        listOf(
-            "-Amixin.refmap=mixins.superbwarfare.refmap.json",
-            "-Amixin.defaultRefmap=mixins.superbwarfare.refmap.json"
-        )
-    )
 }
 
 tasks.named<ProcessResources>("processResources") {
@@ -354,7 +352,7 @@ tasks.named<ProcessResources>("processResources") {
     }
 
     filesMatching(listOf("fabric.mod.json", "pack.mcmeta")) {
-        expand(replaceProperties + mapOf("project" to project))
+        expand(replaceProperties)
     }
 }
 
