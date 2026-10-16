@@ -5,6 +5,11 @@ import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback
 import com.atsuishio.superbwarfare.tools.DamageTypeTool
+import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
+import com.atsuishio.superbwarfare.tools.SoundTool
+import com.atsuishio.superbwarfare.tools.sendPacketTo
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.tags.DamageTypeTags
@@ -169,6 +174,17 @@ object ShieldHandler {
             shield.info.breakSound?.let { playSound(victim, it, now, true) }
         } else {
             shield.info.blockSound?.let { playSound(victim, it, now, false) }
+        }
+
+        val shooter = source.entity as? ServerPlayer
+        if (shooter != null) {
+            if (broken) {
+                SoundTool.playLocalSound(shooter, ModSounds.SHIELD_BREAK)
+            } else {
+                SoundTool.playLocalSound(shooter, ModSounds.HIT_SHIELD)
+            }
+            sendPacketTo(shooter, ClientIndicatorMessage(0, 5))
+            sendPacketTo(shooter, ClientIndicatorMessage(3, 5))
         }
 
         // 破盾那一发按 BreakOverflow 决定放过多少，默认 0 = 全额穿透
