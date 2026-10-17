@@ -27,6 +27,7 @@ import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.*
+import com.atsuishio.superbwarfare.item.LungeMine
 import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.network.message.send.*
@@ -437,10 +438,28 @@ object ClientEventHandler {
     @JvmField
     var customRpm: Int = 0
 
-    // TODO 删了这个
+    // YSM联动保留字段，不要删除
     @JvmField
     @Deprecated("Use GunActionLock / ClientEventHandler.isGunMeleeActive instead")
     var gunMelee: Int = 0
+
+    // YSM联动保留字段，不要删除
+    @JvmField
+    @Deprecated("YSM 2.6.5 compat")
+    var lungeSprint: Int = 0
+
+    // YSM联动保留字段，不要删除
+    @JvmField
+    @Deprecated("YSM 2.6.5 compat")
+    var lungeDraw: Int = 0
+
+    // YSM联动保留字段，不要删除
+    @JvmField
+    @Deprecated("YSM 2.6.5 compat")
+    var lungeAttack: Int = 0
+
+    /** YSM 兼容：上一 tick 是否处于冲锋刺击段，用于检测结束并补 draw 恢复窗口 */
+    private var ysmLungeAttacking = false
 
     // 按住开火键的持续tick
     @JvmField
@@ -1625,6 +1644,7 @@ object ClientEventHandler {
         if (gunData == null) {
             // 手里换成别的东西也要把窗口收掉（状态得立刻同步回去）
             GunChargeHandler.cancelIfItemChanged(stack)
+            clearYsmCompatState()
             return
         }
 
@@ -1680,6 +1700,57 @@ object ClientEventHandler {
         if (swung && bayonetCharge) {
             GunChargeHandler.reset()
         }
+
+        // 把新状态同步给 YSM 读取的兼容字段
+        updateYsmCompatState(stack)
+    }
+
+    /**
+     * 把新版刺刀冲锋/近战状态同步到 YSM 读取的兼容字段
+     */
+    @Suppress("DEPRECATION")
+    private fun updateYsmCompatState(stack: ItemStack) {
+        val state = if (GunItem.isHeldWeapon(stack)) GunActionLock.of(stack) else null
+
+        // YSM 的近战分支读 gunMelee > 5，沿用“剩余 tick”的旧语义
+        gunMelee = state?.meleeTicks ?: 0
+
+        // 先按上一 tick 的状态递减 draw；刚补的 15 tick 不会在同一 tick 被减掉
+        if (lungeDraw > 0 && lungeSprint == 0 && lungeAttack == 0) {
+            lungeDraw--
+        }
+
+        if (stack.item !is LungeMine) {
+            lungeSprint = 0
+            lungeDraw = 0
+            lungeAttack = 0
+            ysmLungeAttacking = false
+            return
+        }
+
+        val charging = GunChargeHandler.isCharging()
+        val attacking = state != null && state.meleeTicks > 0 && state.meleeFromBayonetCharge
+
+        lungeSprint = if (charging) GunChargeHandler.chargeTicks else 0
+        lungeAttack = if (attacking) state.meleeTicks else 0
+
+        if (charging || attacking) {
+            lungeDraw = 0
+        }
+
+        if (!attacking && ysmLungeAttacking) {
+            lungeDraw = 15
+        }
+        ysmLungeAttacking = attacking
+    }
+
+    @Suppress("DEPRECATION")
+    private fun clearYsmCompatState() {
+        gunMelee = 0
+        lungeSprint = 0
+        lungeDraw = 0
+        lungeAttack = 0
+        ysmLungeAttacking = false
     }
 
     /**
@@ -3309,9 +3380,16 @@ object ClientEventHandler {
         zoomTime = 0.0
     }
 
+    @Suppress("DEPRECATION")
     fun resetUseActionStatus() {
         GunChargeHandler.reset()
         heavyStrikeRequested = false
+
+        // YSM联动保留字段，不要删除：旧版切枪时会把刺雷的 draw 窗口重置成 30 tick
+        lungeSprint = 0
+        lungeDraw = 30
+        lungeAttack = 0
+        ysmLungeAttacking = false
     }
 
     private fun handleWeaponDraw(entity: LivingEntity) {
