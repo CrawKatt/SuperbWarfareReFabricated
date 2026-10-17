@@ -148,10 +148,17 @@ class PlayerVariable : INBTSerializable<CompoundTag> {
         @SubscribeEvent
         fun clonePlayer(event: Clone) {
             event.original.revive()
-            val original = event.original.getData(ModDataAttachments.PLAYER_VARIABLE)
             if (event.entity.level().isClientSide()) return
-            // 复制发生在 PlayerList#respawn 的初始同步之前，客户端会收到复制后的数据
-            event.entity.setData(ModDataAttachments.PLAYER_VARIABLE, original.copy())
+
+            event.entity.setData(
+                ModDataAttachments.PLAYER_VARIABLE,
+                event.original.getData(ModDataAttachments.PLAYER_VARIABLE).copy()
+            )
+
+            event.entity.setData(
+                ModDataAttachments.INFINITE_AMMO,
+                event.original.getData(ModDataAttachments.INFINITE_AMMO).copy()
+            )
         }
     }
 
