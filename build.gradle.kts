@@ -106,11 +106,11 @@ val loaderTest: SourceSet by sourceSets.creating {
 loom {
     accessWidenerPath = file("src/main/resources/superbwarfare.accesswidener")
     mods {
-        create(project.property("mod_id") as String) {
+        create(project.property("mod_id") as String).apply {
             sourceSet(sourceSets.main.get())
         }
 
-        create("sbwloadertest") {
+        create("sbwloadertest").apply {
             sourceSet(loaderTest)
         }
     }
@@ -147,7 +147,6 @@ dependencies {
     modImplementation("dev.emi:trinkets:${project.property("trinkets_version")}")
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:15.0.140")
 
-    // Local build of SBM Fabric 1.21.1@0a52d1f with the existing client/AR fixes.
     include(modImplementation(":simplebedrockmodel-fabric:2.6.0+mc1.21.1")!!)
     include(modImplementation("com.github.Nova-Committee:ModernKeyBinding:17bf4f794ae3ce31aee90e0df67e2757c3533d10")!!)
     modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("parchment_minecraft_version")}:${project.property("ponder_version")}")
