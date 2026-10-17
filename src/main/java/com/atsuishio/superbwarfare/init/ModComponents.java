@@ -54,22 +54,9 @@ public class ModComponents implements EntityComponentInitializer {
         registry.registerForPlayers(PLAYER_CHARGE_STATE, player -> new PlayerChargeComponent(), RespawnCopyStrategy.NEVER_COPY);
         registry.registerFor(Entity.class, RADIATION, entity -> new RadiationComponent());
         registry.registerForPlayers(RADIATION, player -> new RadiationComponent(), RespawnCopyStrategy.NEVER_COPY);
-        registry.registerForPlayers(
-                PLAYER_VARIABLE,
-                PlayerVariable::new,
-                RespawnCopyStrategy.ALWAYS_COPY
-        );
-
-        registry.registerFor(
-                LivingEntity.class,
-                PHOSPHORUS_FIRE,
-                living -> new PhosphorusFireCapability()
-        );
-
-        registry.registerFor(
-                Entity.class,
-                INFINITE_AMMO,
-                entity -> new InfiniteAmmoCapability()
-        );
+        registry.registerForPlayers(PLAYER_VARIABLE, PlayerVariable::new, RespawnCopyStrategy.ALWAYS_COPY);
+        registry.registerFor(LivingEntity.class, PHOSPHORUS_FIRE, living -> new PhosphorusFireCapability());
+        registry.registerFor(Entity.class, INFINITE_AMMO, entity -> new InfiniteAmmoCapability());
+        registry.registerForPlayers(INFINITE_AMMO, player -> new InfiniteAmmoCapability(), RespawnCopyStrategy.ALWAYS_COPY);
     }
 }
