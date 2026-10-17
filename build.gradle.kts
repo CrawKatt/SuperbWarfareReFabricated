@@ -143,14 +143,14 @@ neoForge {
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
     runs {
-        create("client") {
+        create("client").apply {
             client()
 
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty("neoforge.enabledGameTestNamespaces", project.property("mod_id") as String)
         }
 
-        create("server") {
+        create("server").apply {
             server()
             programArgument("--nogui")
             systemProperty("neoforge.enabledGameTestNamespaces", project.property("mod_id") as String)
@@ -159,12 +159,12 @@ neoForge {
         // This run config launches GameTestServer and runs all registered gametests, then exits.
         // By default, the server will crash when no gametests are provided.
         // The gametest system is also enabled by default for other run configs under the /test command.
-        create("gameTestServer") {
+        create("gameTestServer").apply {
             type = "gameTestServer"
             systemProperty("neoforge.enabledGameTestNamespaces", project.property("mod_id") as String)
         }
 
-        create("data") {
+        create("data").apply {
             data()
 
             // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
@@ -208,13 +208,13 @@ neoForge {
         // these are used to tell the game which sources are for which mod
         // mostly optional in a single mod project
         // but multi mod projects should define one per mod
-        create(project.property("mod_id") as String) {
+        create(project.property("mod_id") as String).apply {
             sourceSet(sourceSets.main.get())
         }
 
         // 测试插件：名字即 modId，需与
         // localmod/sbwloadertest/resources/META-INF/neoforge.mods.toml 里的 modId 一致。
-        create("sbwloadertest") {
+        create("sbwloadertest").apply {
             sourceSet(loaderTest)
         }
     }
