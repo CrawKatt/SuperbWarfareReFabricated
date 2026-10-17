@@ -1,4 +1,3 @@
-import java.io.ByteArrayOutputStream
 import java.time.Instant
 
 plugins {
@@ -12,12 +11,9 @@ plugins {
 
 fun getGitCommitHash(): String {
     return runCatching {
-        val stdout = ByteArrayOutputStream()
-        project.exec {
+        providers.exec {
             commandLine("git", "rev-parse", "--short", "HEAD")
-            standardOutput = stdout
-        }
-        stdout.toString().trim()
+        }.standardOutput.asText.get().trim()
     }.getOrElse { "unknown" }
 }
 
@@ -356,7 +352,7 @@ tasks.named<ProcessResources>("processResources") {
     )
     inputs.properties(replaceProperties)
     filesMatching(listOf("META-INF/mods.toml", "pack.mcmeta")) {
-        expand(replaceProperties + mapOf("project" to project))
+        expand(replaceProperties)
     }
 }
 
