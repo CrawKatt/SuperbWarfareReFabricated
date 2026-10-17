@@ -29,10 +29,10 @@ class CapabilityHandler : EntityComponentInitializer {
         if (player.level().isClientSide) return
 
         val original = PlayerVariable.getOrDefault(oldPlayer)
-
-        // 复制发生在 PlayerList#respawn 的初始同步之前，客户端会收到复制后的数据；
-        // 而重生后客户端不会重建本地玩家实体，所以还要显式标记一次，让框架重推。
         ModCapabilities.PLAYER_VARIABLE.set(player, original.copy())
         ModCapabilities.PLAYER_VARIABLE.markDirty(player)
+
+        ModCapabilities.INFINITE_AMMO.set(player, ModCapabilities.INFINITE_AMMO.get(oldPlayer))
+        ModCapabilities.INFINITE_AMMO.markDirty(player)
     }
 }
