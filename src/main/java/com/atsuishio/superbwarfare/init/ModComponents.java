@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.capability.entity.InfiniteAmmoCapability;
 import com.atsuishio.superbwarfare.capability.living.PhosphorusFireCapability;
 import com.atsuishio.superbwarfare.capability.living.RadiationCapability;
 import com.atsuishio.superbwarfare.capability.living.RadiationComponent;
+import com.atsuishio.superbwarfare.capability.player.PlayerSpinState;
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable;
 import com.atsuishio.superbwarfare.capability.player.PlayerDeployComponent;
 import com.atsuishio.superbwarfare.capability.player.PlayerChargeComponent;
@@ -46,6 +47,10 @@ public class ModComponents implements EntityComponentInitializer {
             InfiniteAmmoCapability.class
     );
 
+    public static final ComponentKey<PlayerSpinState> PLAYER_SPIN_STATE = ComponentRegistry.getOrCreate(
+            Mod.loc("player_spin_state"), PlayerSpinState.class
+    );
+
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerFor(Entity.class, PLAYER_DEPLOY_STATE, entity -> new PlayerDeployComponent());
@@ -58,5 +63,7 @@ public class ModComponents implements EntityComponentInitializer {
         registry.registerFor(LivingEntity.class, PHOSPHORUS_FIRE, living -> new PhosphorusFireCapability());
         registry.registerFor(Entity.class, INFINITE_AMMO, entity -> new InfiniteAmmoCapability());
         registry.registerForPlayers(INFINITE_AMMO, player -> new InfiniteAmmoCapability(), RespawnCopyStrategy.ALWAYS_COPY);
+        registry.registerFor(Entity.class, PLAYER_SPIN_STATE, entity -> new PlayerSpinState());
+        registry.registerForPlayers(PLAYER_SPIN_STATE, player -> new PlayerSpinState(), RespawnCopyStrategy.NEVER_COPY);
     }
 }

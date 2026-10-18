@@ -35,7 +35,8 @@
       "superbwarfare:infinite_ammo_capability",
       "superbwarfare:radiation_capability",
       "superbwarfare:player_deploy_state",
-      "superbwarfare:player_charge_state"
+      "superbwarfare:player_charge_state",
+      "superbwarfare:player_spin_state"
     ]
   },
   "mixins": [

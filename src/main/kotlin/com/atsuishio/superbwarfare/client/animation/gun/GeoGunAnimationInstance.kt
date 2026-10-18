@@ -1222,10 +1222,7 @@ open class GeoGunAnimationInstance(
      * 与 `handleShootDelay` 里 `holdingFireKeyTicks` 的上限同源，所以转速升满、蓄力满、第一发子弹出膛
      * 是同一个瞬间。
      */
-    private fun spinDurationTicks(data: GunData): Int {
-        return (data.selectedFireModeInfo().chargeConfig()?.effectiveDuration
-            ?: data.get(GunProp.SHOOT_DELAY)).coerceAtLeast(1)
-    }
+    private fun spinDurationTicks(data: GunData): Int = barrelSpinUpTicks(data)
 
     /**
      * 满速时的播放倍率
@@ -1968,6 +1965,11 @@ open class GeoGunAnimationInstance(
          * `GeoGunRenderer.scriptFrameDeltaSeconds`，掉帧的时候是"跳帧"而不是"瞬移"。
          */
         private const val SPIN_MAX_FRAME_DELTA_TICKS = 0.8f
+
+        @JvmStatic
+        fun barrelSpinUpTicks(data: GunData): Int =
+            (data.selectedFireModeInfo().chargeConfig()?.effectiveDuration
+                ?: data.get(GunProp.SHOOT_DELAY)).coerceAtLeast(1)
 
         /** 一秒的 tick 数：数据里的秒（`FireLoopFadeIn` 这类）换算成缓动要的 tick */
         private const val TICKS_PER_SECOND = 20f

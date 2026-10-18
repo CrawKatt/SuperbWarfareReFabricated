@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.client.renderer.gun
 
 import com.atsuishio.superbwarfare.init.ModCapabilities
-
+import com.atsuishio.superbwarfare.capability.player.PlayerSpinState
 import com.atsuishio.superbwarfare.client.ClientRenderHandler
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance
@@ -71,6 +71,7 @@ import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.HumanoidArm
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
@@ -461,6 +462,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
             }
         } else if (!useLod) {
             applyLoopLayerPose(stack, model, partialTick)
+            applyThirdPersonSpinPose(stack, model, partialTick)
         }
         applyCustomAnimations(stack, model, transformType, partialTick)
         applyCustomAnimationsByScript(stack, model, transformType, partialTick)
@@ -1637,6 +1639,84 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val gameTime = Minecraft.getInstance().level?.gameTime ?: return
         val seconds = (gameTime + partialTick) / 20f
         model.applyPose(BLENDER.blend(model.getBindPose(), clip.evaluate(seconds % end)))
+    }
+
+    private fun applyThirdPersonSpinPose(stack: ItemStack, model: GeoGunModel, partialTick: Float) {
+        val holder = GunRenderContext.entity() ?: return
+        if (!GunRenderContext.isMainArm()) return
+        if (holder.mainHandItem.item !== stack.item) return
+
+        val resource = GunResource.compute(stack)
+        val clipName = resource.animation?.hold ?: return
+        val animationFile = resource.getModel().animation ?: return
+        val clip = GunModelReloadListener.getAnimation(animationFile)
+            ?.firstOrNull { it.name == clipName } ?: return
+        val end = clip.specifiedEndTimeS
+        if (end <= 0f) return
+
+        val data = GunData.from(stack)
+        val local = holder === Minecraft.getInstance().player
+        val spinning = if (local) ClientEventHandler.isBarrelSpinTriggered(stack)
+        else PlayerSpinState.isSpinning(holder)
+        val rpm = if (local) ClientEventHandler.effectiveRpm(data)
+        else (data.get(GunProp.RPM) * data.get(GunProp.RPM_MULTIPLIER)).roundToInt().coerceAtLeast(1)
+
+        val phase = ThirdPersonSpinClock.phase(
+            holder,
+            spinning,
+            GeoGunAnimationInstance.barrelSpinUpTicks(data),
+            end,
+            rpm,
+            partialTick
+        ) ?: return
+
+        model.applyPose(BLENDER.blend(model.instance.getPose(), clip.evaluate(phase)))
+    }
+
+    private object ThirdPersonSpinClock {
+        private class State {
+            var power = 0f
+            var phase = 0f
+            var lastTime = 0f
+        }
+
+        private val states = WeakHashMap<LivingEntity, State>()
+
+        fun phase(
+            holder: LivingEntity,
+            spinning: Boolean,
+            rampTicks: Int,
+            endSeconds: Float,
+            rpm: Int,
+            partialTick: Float
+        ): Float? {
+            val level = Minecraft.getInstance().level ?: return null
+            val now = level.gameTime + partialTick
+            val state = states.getOrPut(holder) {
+                State().also {
+                    it.power = if (spinning) 1f else 0f
+                    it.lastTime = now
+                }
+            }
+
+            val delta = (now - state.lastTime).coerceIn(0f, SPIN_MAX_FRAME_DELTA_TICKS)
+            state.lastTime = now
+
+            val target = if (spinning) 1f else 0f
+            state.power = approach(state.power, target, delta / rampTicks.coerceAtLeast(1))
+            state.phase = (state.phase + delta * smoothstep(state.power) * rpm / (360f / endSeconds) / 20f) % endSeconds
+
+            return if (state.power <= 0f && state.phase == 0f) null else state.phase
+        }
+
+        private fun smoothstep(power: Float): Float = power * power * (3f - 2f * power)
+
+        private fun approach(current: Float, target: Float, step: Float): Float {
+            return if (current < target) (current + step).coerceAtMost(target)
+            else (current - step).coerceAtLeast(target)
+        }
+
+        private const val SPIN_MAX_FRAME_DELTA_TICKS = 0.8f
     }
 
     open fun applyCustomAnimations(
