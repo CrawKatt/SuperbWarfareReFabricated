@@ -72,8 +72,8 @@ object DisplayConfig {
 
     @JvmField
     val ADVANCED_AMMO_HUD = buildClientConfig {
-        comment("Set true to show advanced ammo info on HUD")
-        comment("是否开启高级弹药显示HUD（显示弹种）")
+        comment("Show ammo source slots and type indices, and fire mode indices when more than 3 modes are available")
+        comment("是否开启高级弹药显示HUD（显示弹种框和序号，开火模式超过3种时显示模式序号）")
         define("advanced_ammo_hud", true)
     }
 
