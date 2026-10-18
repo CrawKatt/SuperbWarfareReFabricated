@@ -15,7 +15,6 @@ import net.minecraft.client.renderer.LightTexture
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 
-/** AUI handles geometry/clipping/transforms; Minecraft supplies the actual glyphs, metrics and shadow. */
 @OnlyIn(Dist.CLIENT)
 class AmmoHudText(document: Document) : Element(document, TAG), BodyRenderNodeProvider {
     private var label = ""

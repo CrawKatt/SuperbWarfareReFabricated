@@ -11,7 +11,6 @@ import net.minecraft.world.item.ItemStack
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 
-/** Icons describe sources, never their quantities. Extensions can register a strategy-specific icon. */
 @OnlyIn(Dist.CLIENT)
 object AmmoHudResources {
     sealed interface Icon {
@@ -41,7 +40,7 @@ object AmmoHudResources {
     private fun icon(source: AmmoSource): Icon = icons[source.strategy.javaClass]?.invoke(source)
         ?: Icon.Item(source.stack().takeUnless { it.isEmpty } ?: source.playerAmmoType?.itemStack ?: ItemStack.EMPTY)
 
-    /** Additional energy sources pay raw FE, even on magazine-fed energy guns. */
+    // 副能源直接消耗 FE，不能使用主来源的弹匣或百分比语义。
     private fun low(data: GunData, source: AmmoSource, index: Int, player: Player): Boolean {
         if (data.hasInfiniteBackupAmmo(player)) return false
         if (index == 0) {
