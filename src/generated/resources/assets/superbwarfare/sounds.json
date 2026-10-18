@@ -486,6 +486,22 @@
       }
     ]
   },
+  "bullet_sonic_boom": {
+    "sounds": [
+      "superbwarfare:bullet_sonic_boom/bullet_sonic_boom_1",
+      "superbwarfare:bullet_sonic_boom/bullet_sonic_boom_2",
+      "superbwarfare:bullet_sonic_boom/bullet_sonic_boom_3",
+      "superbwarfare:bullet_sonic_boom/bullet_sonic_boom_4",
+      "superbwarfare:bullet_sonic_boom/bullet_sonic_boom_5",
+      "superbwarfare:bullet_sonic_boom/bullet_sonic_boom_6",
+      "superbwarfare:bullet_sonic_boom/bullet_sonic_boom_7",
+      "superbwarfare:bullet_sonic_boom/bullet_sonic_boom_8",
+      "superbwarfare:bullet_sonic_boom/bullet_sonic_boom_9",
+      "superbwarfare:bullet_sonic_boom/bullet_sonic_boom_10",
+      "superbwarfare:bullet_sonic_boom/bullet_sonic_boom_11",
+      "superbwarfare:bullet_sonic_boom/bullet_sonic_boom_12"
+    ]
+  },
   "bullet_supply": {
     "sounds": [
       "superbwarfare:bullet_supply"
@@ -2853,6 +2869,20 @@
       "superbwarfare:gun_shield/shield_break"
     ]
   },
+  "shield_got_hit": {
+    "sounds": [
+      "superbwarfare:gun_shield/shield_got_hit_1",
+      "superbwarfare:gun_shield/shield_got_hit_2",
+      "superbwarfare:gun_shield/shield_got_hit_3",
+      "superbwarfare:gun_shield/shield_got_hit_4",
+      "superbwarfare:gun_shield/shield_got_hit_5"
+    ]
+  },
+  "shield_recharge": {
+    "sounds": [
+      "superbwarfare:gun_shield/shield_recharge"
+    ]
+  },
   "shock": {
     "sounds": [
       "superbwarfare:shock"
@@ -2926,6 +2956,18 @@
   "smoke_grenade_release": {
     "sounds": [
       "superbwarfare:smoke_grenade_release"
+    ]
+  },
+  "sniper_sonic_boom": {
+    "sounds": [
+      "superbwarfare:bullet_sonic_boom/sniper_sonic_boom_1",
+      "superbwarfare:bullet_sonic_boom/sniper_sonic_boom_2",
+      "superbwarfare:bullet_sonic_boom/sniper_sonic_boom_3",
+      "superbwarfare:bullet_sonic_boom/sniper_sonic_boom_4",
+      "superbwarfare:bullet_sonic_boom/sniper_sonic_boom_5",
+      "superbwarfare:bullet_sonic_boom/sniper_sonic_boom_6",
+      "superbwarfare:bullet_sonic_boom/sniper_sonic_boom_7",
+      "superbwarfare:bullet_sonic_boom/sniper_sonic_boom_8"
     ]
   },
   "sodayo_pick_up_engine": {

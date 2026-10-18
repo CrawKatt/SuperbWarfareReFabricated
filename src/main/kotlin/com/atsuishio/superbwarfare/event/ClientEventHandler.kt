@@ -53,6 +53,7 @@ import net.minecraft.world.entity.npc.AbstractVillager
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.ClipContext
+import net.minecraft.world.level.Level
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
@@ -467,6 +468,10 @@ object ClientEventHandler {
 
     @JvmField
     var holdingFireKeyTicks0: Float = 0f
+
+    private var lastSentBarrelSpin = false
+    private var lastBarrelSpinPlayer: Player? = null
+    private var lastBarrelSpinLevel: Level? = null
 
     @JvmField
     var shouldPlayDischargeSound: Boolean = true
@@ -899,6 +904,7 @@ object ClientEventHandler {
             lastOperatingGunUUID = uuid
 
             val spinTriggered = isBarrelSpinTriggered(stack)
+            syncBarrelSpin(player, spinTriggered && hasBarrelSpin(stack))
 
             if (spinTriggered && stack.`is`(ModItems.MINIGUN.get())) {
                 val rpm = data.get(GunProp.RPM) / 3600F
@@ -916,7 +922,21 @@ object ClientEventHandler {
             }
         } else {
             lastOperatingGunUUID = null
+            syncBarrelSpin(player, false)
         }
+    }
+
+    private fun syncBarrelSpin(player: Player, spinning: Boolean) {
+        val level = player.level()
+        if (player !== lastBarrelSpinPlayer || level !== lastBarrelSpinLevel) {
+            lastBarrelSpinPlayer = player
+            lastBarrelSpinLevel = level
+            lastSentBarrelSpin = false
+        }
+        if (spinning == lastSentBarrelSpin) return
+
+        lastSentBarrelSpin = spinning
+        sendPacketToServer(WeaponSpinMessage(spinning))
     }
 
     fun handleArtilleryIndicator(player: Player, stack: ItemStack) {
