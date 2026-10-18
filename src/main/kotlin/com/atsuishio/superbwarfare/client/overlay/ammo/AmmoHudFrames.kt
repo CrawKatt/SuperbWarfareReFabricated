@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.client.overlay.ammo
 
-/** Frame positions are independent of the item carousel. Only surplus frames enter or leave. */
 internal class AmmoHudFrames {
     data class Pose(val index: Int, val x: Double, val opacity: Double)
 

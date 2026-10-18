@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.client.overlay.ammo
 
+import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.gun.ActiveGun
 import com.atsuishio.superbwarfare.data.gun.AmmoConsumer.AmmoConsumeType
@@ -8,6 +9,7 @@ import com.atsuishio.superbwarfare.data.gun.GunProp
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.init.ModKeyMappings
 import com.atsuishio.superbwarfare.item.gun.GunItem
+import com.atsuishio.superbwarfare.tools.FormatTool.format1DZZ
 import com.sighs.apricityui.ApricityUI
 import com.sighs.apricityui.init.Document
 import com.sighs.apricityui.layout.Position
@@ -18,13 +20,17 @@ import net.neoforged.api.distmarker.Dist
 import net.neoforged.api.distmarker.OnlyIn
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.neoforge.capabilities.Capabilities
 import net.neoforged.neoforge.client.event.ClientTickEvent
+import java.util.regex.Pattern
+import kotlin.math.max
 
-/** Creative-only AUI host. Coordinates are MC GUI pixels, converted once at the document root. */
 @OnlyIn(Dist.CLIENT)
 @EventBusSubscriber(Dist.CLIENT)
 object AmmoBarHud {
     private const val PATH = "superbwarfare/ammo_bar.html"
+    private val FORMAT_CODE = Pattern.compile("§.")
+    private val LARGE_FIRE_MODE_ICONS = setOf("rpm600", "rpm1200", "rpm1800")
     private var document: Document? = null
     private var generation = -1L
     private val values = mutableMapOf<String, String>()
@@ -45,7 +51,7 @@ object AmmoBarHud {
 
     private var directionHint: DirectionHint? = null
 
-    /** Only disambiguates next/previous for two types; animation still waits for the confirmed data change. */
+    // 两种弹种循环时，仅凭新旧序号无法判断方向；动画仍等待服务器确认切换。
     fun noteAmmoSwitch(data: GunData, add: Boolean) {
         val count = data.get(GunProp.AMMO_CONSUMER).size
         if (count < 2) return
@@ -56,11 +62,8 @@ object AmmoBarHud {
         )
     }
 
-    fun render(
-        data: GunData, player: Player, gunName: String, ammoName: String,
-        ammo: String, backup: String, fireMode: String, fireModeSize: Int
-    ) {
-        if (!player.isCreative || Minecraft.getInstance().screen != null) {
+    fun render(data: GunData, player: Player) {
+        if (player.isSpectator || Minecraft.getInstance().screen != null) {
             close()
             return
         }
@@ -78,14 +81,11 @@ object AmmoBarHud {
             generation = active.refreshGeneration
         }
         Document.runWithContext(active) {
-            update(active, data, player, gunName, ammoName, ammo, backup, fireMode, fireModeSize)
+            update(active, data, player)
         }
     }
 
-    private fun update(
-        doc: Document, data: GunData, player: Player, gunName: String, ammoName: String,
-        ammo: String, backup: String, fireMode: String, fireModeSize: Int
-    ) {
+    private fun update(doc: Document, data: GunData, player: Player) {
         val now = Util.getMillis()
         val reduced = DisplayConfig.REDUCED_AMMO_HUD_MOTION.get()
         val mc = Minecraft.getInstance()
@@ -97,16 +97,14 @@ object AmmoBarHud {
         val anchor = doc.guiToDocumentPosition(Position(x, y))
         val scaleX = unit.x - origin.x
         val scaleY = unit.y - origin.y
-        // The raised ordinal ends at 66px including its shadow. Reserve 68px to keep it on screen
-        // while lowering the HUD by 3px, including when its configured Y offset is zero.
-        // Use AUI's actual viewport: its rounding can differ from MC's GUI height by one pixel.
+        // 序号及阴影占到 66px；使用 AUI 的视口尺寸预留底边，避免 GUI 尺寸取整差异导致裁剪。
         val top = anchor.y.coerceIn(0.0, (doc.viewportSize.height() - 68.0 * scaleY).coerceAtLeast(0.0))
         attr("ammo-bar", "style", "left:${anchor.x}px;top:${top}px;transform:scale($scaleX,$scaleY);")
-        text("gun-name", gunName)
-        text("ammo-name", ammoName)
-        text("ammo-count", ammo)
-        text("backup-ammo", backup)
-        // Match the original renderer's y - 38 direct-feed / y - 43 magazine baselines.
+        text("gun-name", ClientLanguageGetter.EN_US.getOrDefault(data.stack.descriptionId))
+        val ammoName = if (data.meleeOnly()) "Melee" else data.selectedAmmoConsumer().getDisplayName()
+        text("ammo-name", FORMAT_CODE.matcher(ammoName).replaceAll(""))
+        text("ammo-count", getGunAmmoString(data, player))
+        text("backup-ammo", getBackupAmmoString(data, player))
         attr("ammo-row", "style", "top:${if (data.useBackpackAmmo()) 26 else 21}px;")
         // Flex uses actual rendered text width; no fixed digit count or guessed font metrics.
         text("virtual-ammo", if (data.virtualAmmo.get() > 0 && !data.meleeOnly()) "+${data.virtualAmmo.get()}" else "")
@@ -135,6 +133,8 @@ object AmmoBarHud {
         animateGun(now, reloading, reduced)
         wasReloading = reloading
 
+        val fireMode = fireModeTextureName(data.selectedFireModeInfo().name)
+        val fireModeSize = if (fireMode in LARGE_FIRE_MODE_ICONS) 16 else 8
         if (fireMode != mode) {
             mode = fireMode
             modeAt = now
@@ -250,7 +250,7 @@ object AmmoBarHud {
     private fun progress(now: Long, start: Long, duration: Int) =
         ((now - start).toDouble() / duration).coerceIn(0.0, 1.0)
 
-    /** CSS default ease = cubic-bezier(.25,.1,.25,1), evaluated per segment like the original keyframes. */
+    // cubic-bezier(.25,.1,.25,1)
     private fun ease(t: Double): Double {
         if (t <= 0 || t >= 1) return t
         fun bezier(u: Double, a: Double, b: Double) =
@@ -272,6 +272,38 @@ object AmmoBarHud {
         reset()
     }
 
+    // 保留 RPM600 等连续缩写，SemiAuto 则转换为 semi_auto。
+    private fun fireModeTextureName(name: String): String = buildString(name.length + 4) {
+        for ((index, character) in name.withIndex()) {
+            if (character.isUpperCase()) {
+                val previous = name.getOrNull(index - 1)
+                if (previous != null && (previous.isLowerCase() || previous.isDigit())) append('_')
+                append(character.lowercaseChar())
+            } else append(character)
+        }
+    }
+
+    private fun getEnergyPercentString(data: GunData): String {
+        val storage = data.stack.getCapability(Capabilities.EnergyStorage.ITEM) ?: return "0%"
+        val rate = (storage.energyStored.toDouble() / max(1, storage.maxEnergyStored)).coerceIn(0.0, 1.0)
+        return format1DZZ(rate * 100) + "%"
+    }
+
+    private fun getGunAmmoString(data: GunData, player: Player): String {
+        if (data.isEnergyMagazine()) return data.ammo.get().toString()
+        if (data.selectedAmmoConsumer().type == AmmoConsumeType.ENERGY) return getEnergyPercentString(data)
+        if (data.meleeOnly() || data.useBackpackAmmo() && data.hasInfiniteBackupAmmo(player)) return "∞"
+        return if (data.useBackpackAmmo()) (data.countBackupAmmo(player) - data.virtualAmmo.get()).toString()
+        else data.ammo.get().toString()
+    }
+
+    private fun getBackupAmmoString(data: GunData, player: Player): String {
+        if (data.isEnergyMagazine()) return getEnergyPercentString(data)
+        if (data.meleeOnly() || data.useBackpackAmmo() || data.selectedAmmoConsumer().type == AmmoConsumeType.ENERGY) return ""
+        return if (data.hasInfiniteBackupAmmo(player)) "∞"
+        else (data.countBackupAmmo(player) - data.virtualAmmo.get()).toString()
+    }
+
     private fun reset() {
         values.clear()
         gunIdentity = null
@@ -289,13 +321,13 @@ object AmmoBarHud {
         directionHint = null
     }
 
-    /** Forge may skip rendering HUDs on logout, F1 or screens; don't leave a global AUI document alive. */
+    // 菜单、F1 和退出世界可能跳过渲染事件，仍需在 tick 中清理文档。
     @SubscribeEvent
     fun onClientTick(event: ClientTickEvent.Post) {
         if (document == null) return
         val mc = Minecraft.getInstance()
         val player = mc.player
-        if (player == null || !player.isCreative || player.isSpectator || mc.level == null || mc.screen != null ||
+        if (player == null || player.isSpectator || mc.level == null || mc.screen != null ||
             mc.options.hideGui || !DisplayConfig.AMMO_HUD.get()
         ) {
             close()
