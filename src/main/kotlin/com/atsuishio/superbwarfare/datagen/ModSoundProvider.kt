@@ -353,6 +353,11 @@ class ModSoundProvider(private val output: PackOutput) : DataProvider {
             "k_98_first_bullet_in",
         )
 
+        // -------------------- gun/hanyang_88 --------------------
+        group(
+            "gun/hanyang_88", "hanyang_88_fire_1p", "hanyang_88_fire_3p", "hanyang_88_bolt_open", "hanyang_88_bolt_close"
+        )
+
         // -------------------- gun/m_1897 --------------------
         group(
             "gun/m_1897", "m_1897_bolt_close", "m_1897_bolt_open", "m_1897_fire_1p", "m_1897_fire_3p",

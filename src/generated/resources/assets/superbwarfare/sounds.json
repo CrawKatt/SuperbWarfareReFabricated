@@ -848,6 +848,26 @@
       }
     ]
   },
+  "hanyang_88_bolt_close": {
+    "sounds": [
+      "superbwarfare:gun/hanyang_88/hanyang_88_bolt_close"
+    ]
+  },
+  "hanyang_88_bolt_open": {
+    "sounds": [
+      "superbwarfare:gun/hanyang_88/hanyang_88_bolt_open"
+    ]
+  },
+  "hanyang_88_fire_1p": {
+    "sounds": [
+      "superbwarfare:gun/hanyang_88/hanyang_88_fire_1p"
+    ]
+  },
+  "hanyang_88_fire_3p": {
+    "sounds": [
+      "superbwarfare:gun/hanyang_88/hanyang_88_fire_3p"
+    ]
+  },
   "happiest_ghast_door_close": {
     "sounds": [
       "superbwarfare:vehicle/happiest_ghast/happiest_ghast_door_close"
