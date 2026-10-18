@@ -788,18 +788,29 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             isShatterShot(data) -> soundInfo.fire3PShatter ?: soundInfo.fire3P
             else -> soundInfo.fire3P
         }
+
+        val serverLevel = shooter.level() as? ServerLevel ?: return
+        val soundPos = shooter.position()
+        val excludeShooter = shooter as? ServerPlayer
+
         if (sound3p != null) {
-            shooter.playSound(sound3p, soundRadius * 0.4f, pitch)
+            SoundTool.playDistantSound(
+                serverLevel, sound3p, soundPos, soundRadius * 0.4f, pitch, shooter, excludeShooter
+            )
         }
 
-        val soundFar = soundInfo.fire3PFar
-        if (soundFar != null) {
-            shooter.playSound(soundFar, soundRadius * 0.7f, pitch)
-        }
+        if (!isSilent) {
+            soundInfo.fire3PFar?.let {
+                SoundTool.playDistantSound(
+                    serverLevel, it, soundPos, soundRadius * 0.7f, pitch, shooter, excludeShooter
+                )
+            }
 
-        val soundVeryFar = soundInfo.fire3PVeryFar
-        if (soundVeryFar != null) {
-            shooter.playSound(soundVeryFar, soundRadius, pitch)
+            soundInfo.fire3PVeryFar?.let {
+                SoundTool.playDistantSound(
+                    serverLevel, it, soundPos, soundRadius, pitch, shooter, excludeShooter
+                )
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.capability.living.PhosphorusFireCapability
 import com.atsuishio.superbwarfare.capability.living.RadiationCapability
 import com.atsuishio.superbwarfare.capability.player.PlayerChargeState
 import com.atsuishio.superbwarfare.capability.player.PlayerDeployState
+import com.atsuishio.superbwarfare.capability.player.PlayerSpinState
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import net.minecraft.resources.ResourceLocation
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
@@ -78,6 +79,13 @@ object ModCapabilities {
     @JvmField
     val PLAYER_CHARGE_STATE = register<PlayerChargeState, PlayerChargeState.Holder>(
         id = PlayerChargeState.ID,
+        target = AttachTarget.PLAYER,
+    )
+
+    /** 转管枪的枪管旋转状态：同步给所有看得见该玩家的客户端 */
+    @JvmField
+    val PLAYER_SPIN_STATE = register<PlayerSpinState, PlayerSpinState.Holder>(
+        id = PlayerSpinState.ID,
         target = AttachTarget.PLAYER,
     )
 

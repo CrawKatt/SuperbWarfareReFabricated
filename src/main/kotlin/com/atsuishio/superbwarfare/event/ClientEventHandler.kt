@@ -21,6 +21,7 @@ import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.shader.RadiationShaderHandler
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
+import com.atsuishio.superbwarfare.client.sound.ClientSonicBoomHandler
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.data.attachment.AttachmentDefinition
@@ -28,6 +29,7 @@ import com.atsuishio.superbwarfare.data.attachment.SubWeaponInfo
 import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.LungeMine
 import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
@@ -55,9 +57,11 @@ import net.minecraft.world.entity.npc.AbstractVillager
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.ClipContext
+import net.minecraft.world.level.Level
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
@@ -102,6 +106,13 @@ object ClientEventHandler {
 
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             onPlayerLoggedIn()
+        }
+
+        ClientEntityEvents.ENTITY_UNLOAD.register { entity, _ ->
+            if (entity is ProjectileEntity) {
+                // 纯客户端：子弹在服务端打中东西就地消失时，客户端没走完最后一段位移，这里补判定
+                ClientSonicBoomHandler.handleProjectileRemoved(entity)
+            }
         }
 
         ClientGunFireEvent.EVENT.register { event -> onClientGunFire(event) }
@@ -522,6 +533,10 @@ object ClientEventHandler {
 
     @JvmField
     var holdingFireKeyTicks0: Float = 0f
+
+    private var lastSentBarrelSpin = false
+    private var lastBarrelSpinPlayer: Player? = null
+    private var lastBarrelSpinLevel: Level? = null
 
     @JvmField
     var shouldPlayDischargeSound: Boolean = true
@@ -955,6 +970,7 @@ object ClientEventHandler {
             lastOperatingGunUUID = uuid
 
             val spinTriggered = isBarrelSpinTriggered(stack)
+            syncBarrelSpin(player, spinTriggered && hasBarrelSpin(stack))
 
             if (spinTriggered && stack.`is`(ModItems.MINIGUN)) {
                 val rpm = data.get(GunProp.RPM) / 3600F
@@ -972,7 +988,21 @@ object ClientEventHandler {
             }
         } else {
             lastOperatingGunUUID = null
+            syncBarrelSpin(player, false)
         }
+    }
+
+    private fun syncBarrelSpin(player: Player, spinning: Boolean) {
+        val level = player.level()
+        if (player !== lastBarrelSpinPlayer || level !== lastBarrelSpinLevel) {
+            lastBarrelSpinPlayer = player
+            lastBarrelSpinLevel = level
+            lastSentBarrelSpin = false
+        }
+        if (spinning == lastSentBarrelSpin) return
+
+        lastSentBarrelSpin = spinning
+        sendPacketToServer(WeaponSpinMessage(spinning))
     }
 
     fun handleArtilleryIndicator(player: Player, stack: ItemStack) {
