@@ -143,7 +143,8 @@ object AmmoBarHud {
         val fade = if (reduced) 1.0 else progress(now, modeAt, 120)
         attr("fire-mode-icon", "style", "width:${fireModeSize}px;height:${fireModeSize}px;opacity:$fade;")
         val modes = data.get(GunProp.AVAILABLE_FIRE_MODES)
-        ordinal("fire-mode-index", data.selectedFireMode.get(), modes.size)
+        val showModeIndex = DisplayConfig.ADVANCED_AMMO_HUD.get() && modes.size > 3
+        ordinal("fire-mode-index", data.selectedFireMode.get(), if (showModeIndex) modes.size else 0)
         updateSources(data, player, now, reduced)
     }
 
