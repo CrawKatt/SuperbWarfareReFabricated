@@ -467,6 +467,7 @@ object ModItems {
     @JvmField val QBZ_191_BLUEPRINT = registerBlueprint("qbz_191_blueprint", Rarity.EPIC)
     @JvmField val K_98_BLUEPRINT = registerBlueprint("k_98_blueprint", Rarity.RARE)
     @JvmField val MOSIN_NAGANT_BLUEPRINT = registerBlueprint("mosin_nagant_blueprint", Rarity.RARE)
+    @JvmField val HANYANG_88_BLUEPRINT = registerBlueprint("hanyang_88_blueprint", Rarity.RARE)
     @JvmField val IGLA_BLUEPRINT = registerBlueprint("igla_9k38_blueprint", Rarity.EPIC)
     @JvmField val JAVELIN_BLUEPRINT = registerBlueprint("javelin_blueprint", LEGENDARY)
     @JvmField val M_2_HB_BLUEPRINT = registerBlueprint("m_2_hb_blueprint", Rarity.RARE)
