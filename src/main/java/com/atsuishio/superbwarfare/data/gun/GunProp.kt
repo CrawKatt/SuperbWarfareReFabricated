@@ -230,6 +230,10 @@ class GunProp<T, R>(
         val GUN_TYPE = complexProp(DefaultGunData::gunType) { it }
 
         @JvmField
+        val ARM_POSE = plainProp(DefaultGunData::armPose)
+
+        // 注意Nullable
+        @JvmField
         val AUTO_RELOAD = plainProp(DefaultGunData::autoReload)
 
         @JvmField

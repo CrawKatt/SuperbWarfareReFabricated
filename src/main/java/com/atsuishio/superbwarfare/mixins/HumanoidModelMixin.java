@@ -4,13 +4,10 @@ import com.atsuishio.superbwarfare.client.ArmPoseExtensible;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.DeployedWeaponHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
-import com.atsuishio.superbwarfare.item.gun.special.SuperStarShooterItem;
-import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem;
 import com.atsuishio.superbwarfare.item.curio.ParachuteItem;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
@@ -47,34 +44,6 @@ public abstract class HumanoidModelMixin {
     @Shadow protected HumanoidModel.ArmPose rightArmPose;
 
     @Shadow protected HumanoidModel.ArmPose leftArmPose;
-
-    @Inject(method = "poseRightArm", at = @At("HEAD"), cancellable = true)
-    private void superbwarfare$applyCustomRightArmPose(LivingEntity entity, CallbackInfo ci) {
-        if (!(entity instanceof Player)) return;
-
-        InteractionHand hand = entity.getUsedItemHand();
-        HumanoidArm arm = hand == InteractionHand.MAIN_HAND ? entity.getMainArm() : entity.getMainArm().getOpposite();
-        if (arm != HumanoidArm.RIGHT) return;
-
-        var item = entity.getItemInHand(hand).getItem();
-        var model = (HumanoidModel<?>) (Object) this;
-
-        if (item instanceof SuperStarShooterItem) {
-            model.rightArm.xRot = -70f * Mth.DEG_TO_RAD + model.head.xRot;
-            model.rightArm.yRot = 0f;
-            model.rightArm.zRot = 0f;
-            model.leftArm.xRot = -70f * Mth.DEG_TO_RAD + model.head.xRot;
-            model.leftArm.yRot = 0f;
-            model.leftArm.zRot = 0f;
-        } else if (item instanceof RepairToolItem) {
-            model.rightArm.xRot = -67.5f * Mth.DEG_TO_RAD + model.head.xRot + 0.05f * model.rightArm.xRot;
-            model.rightArm.yRot = 5f * Mth.DEG_TO_RAD + model.head.yRot;
-        } else {
-            return;
-        }
-
-        ci.cancel();
-    }
 
     @Inject(method = "poseRightArm", at = @At("TAIL"))
     private void superbwarfare$applyExtendedRightArmPose(LivingEntity entity, CallbackInfo ci) {

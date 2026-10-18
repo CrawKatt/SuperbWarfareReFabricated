@@ -3,8 +3,6 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.event.custom.RenderPlayerCallback;
 import com.atsuishio.superbwarfare.item.gun.GeoGunItem;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.item.gun.special.SuperStarShooterItem;
-import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
@@ -21,7 +19,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -42,17 +39,9 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
                                                   CallbackInfoReturnable<HumanoidModel.ArmPose> cir) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (superbwarfare$usesCustomArmPose(stack)) {
-            cir.setReturnValue(HumanoidModel.ArmPose.EMPTY);
-        } else if (stack.getItem() instanceof GeoGunItem geoGunItem) {
+        if (stack.getItem() instanceof GeoGunItem geoGunItem) {
             cir.setReturnValue(geoGunItem.getArmPose(player, hand, stack));
         }
-    }
-
-    @Unique
-    private static boolean superbwarfare$usesCustomArmPose(ItemStack stack) {
-        return stack.getItem() instanceof SuperStarShooterItem
-                || stack.getItem() instanceof RepairToolItem;
     }
 
     @Inject(method = "render(Lnet/minecraft/client/player/AbstractClientPlayer;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At("HEAD"), cancellable = true)

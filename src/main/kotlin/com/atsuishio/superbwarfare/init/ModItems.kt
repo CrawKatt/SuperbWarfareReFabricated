@@ -23,9 +23,6 @@ import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.item.gun.launcher.IglaItem
 import com.atsuishio.superbwarfare.item.gun.launcher.JavelinItem
-import com.atsuishio.superbwarfare.item.gun.launcher.RpgItem
-import com.atsuishio.superbwarfare.item.gun.machinegun.M2HBItem
-import com.atsuishio.superbwarfare.item.gun.machinegun.MinigunItem
 import com.atsuishio.superbwarfare.item.gun.shotgun.HomemadeShotgunItem
 import com.atsuishio.superbwarfare.item.gun.special.RepairToolItem
 import com.atsuishio.superbwarfare.item.gun.special.SuperStarShooterItem
@@ -153,12 +150,12 @@ object ModItems {
     @JvmField val DEVOTION = registerGun("devotion") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
     @JvmField val RPK = registerGun("rpk") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
     @JvmField val M_60 = registerGun("m_60") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
-    @JvmField val M_2_HB = registerGun<M2HBItem>()
-    @JvmField val MINIGUN = registerGun<MinigunItem>()
+    @JvmField val M_2_HB = registerGun("m_2_hb") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
+    @JvmField val MINIGUN = registerGun("minigun") { GeoGunItem(Properties().rarity(ModRarities.LEGENDARY)) }
     @JvmField val M_79 = registerGun("m_79") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
     @JvmField val GP_25 = registerGun("gp_25") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
     @JvmField val SECONDARY_CATACLYSM = registerGun("secondary_cataclysm") { GeoGunItem(Properties().rarity(ModRarities.VIRTUAL)) }
-    @JvmField val RPG = registerGun<RpgItem>()
+    @JvmField val RPG = registerGun("rpg") { GeoGunItem(Properties().rarity(Rarity.RARE)) }
     @JvmField val JAVELIN = registerGun<JavelinItem>()
     @JvmField val IGLA_9K38 = registerGun<IglaItem>()
     @JvmField val BOCEK = registerGun("bocek") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
