@@ -202,6 +202,7 @@ class ModItemTagProvider(
             ModItems.MK_14,
             ModItems.MARLIN,
             ModItems.K_98,
+            ModItems.HANYANG_88,
             ModItems.M_98B,
             ModItems.SENTINEL,
             ModItems.HUNTING_RIFLE,
@@ -258,6 +259,7 @@ class ModItemTagProvider(
             ModItems.SVD,
             ModItems.M_98B,
             ModItems.K_98,
+            ModItems.HANYANG_88,
             ModItems.MOSIN_NAGANT,
             ModItems.AWM,
             ModItems.QL_1031
