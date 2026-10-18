@@ -235,190 +235,6 @@ object ModItems {
 
     private fun registerBlueprint(id: String, rarity: Rarity) = registerItem(id) { BlueprintItem(rarity) }
 
-    /**
-     * 注册一个**副武器**配件：物品类换成 [SubWeaponItem]（`GunItem` + `AttachmentProvider`）。
-     *
-     * 物品注册 id 与配件数据 id 由 [registerAttachment] 保证一致，
-     * 而 `GunData` 在 `SubWeapon.Data` 为空时按物品注册 id 解析数据 —— 所以
-     * `sbw/attachments/<id>.json` 与 `sbw/guns/<id>.json` 同名成对出现即可；
-     * 想让多个配件共用一份副武器数据时才需要在配件里写 `Data`。
-     */
-    fun registerSubWeapon(id: String, rarity: Rarity = Rarity.COMMON): Item =
-        registerAttachment(id, rarity, ::SubWeaponItem)
-
-    // Stock
-    // @formatter:off
-    @JvmField val OEM_STOCK_LIGHT = registerAttachment("oem_stock_light")
-    @JvmField val OEM_STOCK_HEAVY = registerAttachment("oem_stock_heavy")
-    @JvmField val STOCK_UBR = registerAttachment("stock_ubr")
-    @JvmField val STOCK_PRS = registerAttachment("stock_prs")
-    @JvmField val STOCK_AR_TACTICAL = registerAttachment("stock_ar_tactical")
-    @JvmField val STOCK_ZENIT_PT_1 = registerAttachment("stock_zenit_pt_1")
-    @JvmField val STOCK_STR = registerAttachment("stock_str")
-    @JvmField val STOCK_ELITE = registerAttachment("stock_elite")
-    @JvmField val STEEL_PIPE_STOCK = registerAttachment("steel_pipe_stock", Rarity.RARE)
-    // @formatter:on
-
-    // Magazine
-    // @formatter:off
-    @JvmField val MAGAZINE_EXTEND = registerAttachment("magazine_extend", Rarity.RARE)
-    @JvmField val MAGAZINE_EXTEND_PRO = registerAttachment("magazine_extend_pro", Rarity.EPIC)
-    // @formatter:on
-
-    // Muzzle
-    // @formatter:off
-    @JvmField val MEOWLENCER = registerAttachment("meowlencer", Rarity.RARE)
-    @JvmField val HISSILENCER = registerAttachment("hissilencer", Rarity.RARE)
-    @JvmField val SILAOWUNCER = registerAttachment("silaowuncer", Rarity.RARE)
-    @JvmField val MILENCER = registerAttachment("milencer", ModRarities.VIRTUAL)
-    @JvmField val MUZZLE_BRAKE_RU = registerAttachment("muzzle_brake_ru")
-    @JvmField val MUZZLE_BRAKE_AR = registerAttachment("muzzle_brake_ar")
-    @JvmField val MUZZLE_BREAK_BIRDCAGE = registerAttachment("muzzle_break_birdcage")
-    @JvmField val MUZZLE_ZENIT_DTK_1 = registerAttachment("muzzle_zenit_dtk_1", Rarity.RARE)
-    @JvmField val MUZZLE_COMPENSATOR_R_17 = registerAttachment("muzzle_compensator_r_17")
-    @JvmField val RU_SILENCER = registerAttachment("ru_silencer")
-    @JvmField val SILENCER_SUPERB_12 = registerAttachment("silencer_superb_12")
-    @JvmField val SILENCER_50_CAL = registerAttachment("silencer_50_cal")
-    @JvmField val AR_SILENCER = registerAttachment("ar_silencer")
-    @JvmField val HANDGUN_SILENCER = registerAttachment("handgun_silencer")
-    @JvmField val STEEL_PIPE_SILENCER = registerAttachment("steel_pipe_silencer", Rarity.RARE)
-    @JvmField val OSPREY_SILENCER = registerAttachment("osprey_silencer", Rarity.RARE)
-    @JvmField val LOUDSPEAKER = registerAttachment("loudspeaker", ModRarities.LEGENDARY)
-    @JvmField val TRIANGULAR_MUZZLE = registerAttachment("triangular_muzzle", Rarity.RARE)
-    @JvmField val LINEAR_MUZZLE = registerAttachment("linear_muzzle", Rarity.RARE)
-    @JvmField val CROSS_MUZZLE = registerAttachment("cross_muzzle", Rarity.RARE)
-    @JvmField val STAR_MUZZLE = registerAttachment("star_muzzle", Rarity.EPIC)
-    @JvmField val LOVE_MUZZLE = registerAttachment("love_muzzle", ModRarities.VIRTUAL)
-    // @formatter:on
-
-    // Scope / sight
-    // @formatter:off
-    @JvmField val SCOPE_COYOTE = registerAttachment("scope_coyote")
-    @JvmField val SCOPE_AIMPOINT_T2 = registerAttachment("scope_aimpoint_t2")
-    @JvmField val SCOPE_HANDGUN_RED_DOT = registerAttachment("scope_handgun_red_dot")
-    @JvmField val SCOPE_EOTECH_551 = registerAttachment("scope_eotech_551")
-    @JvmField val SCOPE_OKP_7 = registerAttachment("scope_okp_7")
-    @JvmField val SCOPE_PKAS = registerAttachment("scope_pkas")
-    @JvmField val SCOPE_BRUISER = registerAttachment("scope_bruiser", Rarity.RARE)
-    @JvmField val SCOPE_ACOG = registerAttachment("scope_acog", Rarity.RARE)
-    @JvmField val SCOPE_1P_78 = registerAttachment("scope_1p_78", Rarity.RARE)
-    @JvmField val SCOPE_SPYGLASS = registerAttachment("scope_spyglass", Rarity.RARE)
-    @JvmField val SCOPE_PSO_1 = registerAttachment("scope_pso_1", Rarity.RARE)
-    @JvmField val SCOPE_PU = registerAttachment("scope_pu", Rarity.RARE)
-    @JvmField val SCOPE_PK_A = registerAttachment("scope_pk_a", Rarity.RARE)
-    @JvmField val STEEL_PIPE_SCOPE = registerAttachment("steel_pipe_scope", Rarity.RARE)
-    @JvmField val SCOPE_RANGER = registerAttachment("scope_ranger", Rarity.EPIC)
-    @JvmField val SCOPE_QMK171 = registerAttachment("scope_qmk171", Rarity.EPIC)
-    @JvmField val SCOPE_HAMR = registerAttachment("scope_hamr", Rarity.EPIC)
-    @JvmField val SCOPE_ELCAN_4X = registerAttachment("scope_elcan_4x", Rarity.EPIC)
-    @JvmField val SCOPE_LPVO = registerAttachment("scope_lpvo", Rarity.EPIC)
-    @JvmField val SCOPE_SNIPER = registerAttachment("scope_sniper", Rarity.EPIC)
-    @JvmField val SCOPE_WINEFOX = registerAttachment("scope_winefox", ModRarities.LEGENDARY)
-    // @formatter:on
-
-    // Grip
-    // @formatter:off
-    @JvmField val VERTICAL_GRIP = registerAttachment("vertical_grip")
-    @JvmField val GRIP_RECTANGLE_VERTICAL = registerAttachment("grip_rectangle_vertical")
-    @JvmField val TRIANGLE_GRIP = registerAttachment("triangle_grip")
-    @JvmField val GRIP_VERTICAL_PINEAPPLE = registerAttachment("grip_vertical_pineapple")
-    @JvmField val GRIP_CQR_GEN2 = registerAttachment("grip_cqr_gen2", Rarity.RARE)
-    @JvmField val GRIP_VERTICAL_BIPOD = registerAttachment("grip_vertical_bipod", Rarity.RARE)
-    @JvmField val STEEL_PIPE_GRIP = registerAttachment("steel_pipe_grip", Rarity.RARE)
-    // @formatter:on
-
-    // UpperRail
-    // @formatter:off
-    @JvmField val STANDARD_GUN_SHIELD = registerAttachment("standard_gun_shield")
-    @JvmField val HANDGUN_SHIELD = registerAttachment("handgun_shield")
-    @JvmField val HYPERION_SHIELD_MODULE = registerAttachment("hyperion_shield_module", ModRarities.LEGENDARY)
-    @JvmField val PEQ_15 = registerAttachment("peq_15")
-    // @formatter:on
-
-    // LowerRail
-    // @formatter:off
-    @JvmField val PISTOL_LASER = registerAttachment("pistol_laser")
-    @JvmField val LOWER_RAIL_BIPOD = registerAttachment("lower_rail_bipod", Rarity.RARE)
-    // @formatter:on
-
-    // LeftRail
-    // @formatter:off
-    @JvmField val RANGE_FINDER = registerAttachment("range_finder", Rarity.RARE)
-    // @formatter:on
-
-    // RightRail
-    // @formatter:off
-
-    // @formatter:on
-
-    // Bayonet
-    // @formatter:off
-    @JvmField val BAYONET_M_9 = registerAttachment("bayonet_m_9")
-    @JvmField val BAYONET_6KH2 = registerAttachment("bayonet_6kh2")
-    @JvmField val BAYONET_SEITENGEWEHR_84 = registerAttachment("bayonet_seitengewehr_84")
-    @JvmField val BAYONET_M_91_30 = registerAttachment("bayonet_m_91_30")
-    @JvmField val BAYONET_TRIANGULAR = registerAttachment("bayonet_triangular")
-    @JvmField val BAYONET_M1917 = registerAttachment("bayonet_m1917")
-    // @formatter:on
-
-    @JvmField val SUB_WEAPON_GP_25 = registerSubWeapon("sub_weapon_gp_25", Rarity.EPIC)
-
-    // Charm（吊坠：纯装饰，第一人称下会摆）
-    // @formatter:off
-    @JvmField val CHARM_PIG = registerAttachment("charm_pig")
-    @JvmField val CHARM_BEE = registerAttachment("charm_bee")
-    @JvmField val CHARM_CHEST = registerAttachment("charm_chest")
-    @JvmField val CHARM_AXOLOTL = registerAttachment("charm_axolotl")
-    @JvmField val CHARM_COW = registerAttachment("charm_cow")
-    @JvmField val CHARM_SNOWGOLEM = registerAttachment("charm_snowgolem")
-    @JvmField val CHARM_SMALL_CONTAINER = registerAttachment("charm_small_container")
-    @JvmField val CHARM_SHEEP = registerAttachment("charm_sheep")
-    @JvmField val CHARM_CHICKEN = registerAttachment("charm_chicken")
-    @JvmField val CHARM_PUFFERFISH = registerAttachment("charm_pufferfish")
-    @JvmField val CHARM_DOG_TAG = registerAttachment("charm_dog_tag")
-    @JvmField val CHARM_CONTAINER = registerAttachment("charm_container")
-    @JvmField val CHARM_M67_GRENADE = registerAttachment("charm_m67_grenade")
-    @JvmField val CHARM_ZOMBIE_HEAD = registerAttachment("charm_zombie_head", Rarity.RARE)
-    @JvmField val CHARM_SKELETON_SKULL = registerAttachment("charm_skeleton_skull", Rarity.RARE)
-    @JvmField val CHARM_CREEPER_HEAD = registerAttachment("charm_creeper_head", Rarity.RARE)
-    @JvmField val CHARM_AXOLOTL_BLUE = registerAttachment("charm_axolotl_blue", Rarity.RARE)
-    @JvmField val CHARM_MOOSHROOM = registerAttachment("charm_mooshroom", Rarity.RARE)
-    @JvmField val CHARM_PIGLIN_HEAD = registerAttachment("charm_piglin_head", Rarity.RARE)
-    @JvmField val CHARM_FUKAMIZU_FISH = registerAttachment("charm_fukamizu_fish", Rarity.RARE)
-    @JvmField val CHARM_SPIDER_HEAD = registerAttachment("charm_spider_head", Rarity.RARE)
-    @JvmField val CHARM_WITHER_SKELETON_SKULL = registerAttachment("charm_wither_skeleton_skull", Rarity.RARE)
-    @JvmField val CHARM_ELDER_GUARDIAN = registerAttachment("charm_elder_guardian", Rarity.RARE)
-    @JvmField val CHARM_MK_82 = registerAttachment("charm_mk_82", Rarity.RARE)
-    @JvmField val CHARM_RICE_CAKE_FOX_LOLITA = registerAttachment("charm_rice_cake_fox_lolita", Rarity.EPIC)
-    @JvmField val CHARM_WINEFOX_TAIL = registerAttachment("charm_winefox_tail", Rarity.EPIC)
-    @JvmField val CHARM_STARS_IL = registerAttachment("charm_stars_il", Rarity.EPIC)
-    @JvmField val CHARM_ORANGE_PLUSHIE = registerAttachment("charm_orange_plushie", Rarity.EPIC)
-    @JvmField val CHARM_HAKUREI_REIMU = registerAttachment("charm_hakurei_reimu", Rarity.EPIC)
-    @JvmField val CHARM_KIRISAME_MARISA = registerAttachment("charm_kirisame_marisa", Rarity.EPIC)
-    @JvmField val CHARM_FLANDRE_SCARLET = registerAttachment("charm_flandre_scarlet", Rarity.EPIC)
-    @JvmField val CHARM_SAIGYOUJI_YUYUKO = registerAttachment("charm_saigyouji_yuyuko", Rarity.EPIC)
-    @JvmField val CHARM_HOURAISAN_KAGUYA = registerAttachment("charm_houraisan_kaguya", Rarity.EPIC)
-    @JvmField val CHARM_MOON_HEART = registerAttachment("charm_moon_heart", Rarity.EPIC)
-    @JvmField val CHARM_TYPE_88_CLUSTER_GRENADES = registerAttachment("charm_type_88_cluster_grenades", Rarity.EPIC)
-    @JvmField val CHARM_SEPT_WOLVES = registerAttachment("charm_sept_wolves", ModRarities.LEGENDARY)
-    @JvmField val CHARM_ANCIENT_CPU = registerAttachment("charm_ancient_cpu", ModRarities.LEGENDARY)
-    @JvmField val CHARM_DRAGON_HEAD = registerAttachment("charm_dragon_head", ModRarities.LEGENDARY)
-    @JvmField val CHARM_THE_EMPERORS_NEW_CHARM = registerAttachment("charm_the_emperors_new_charm", ModRarities.LEGENDARY)
-    @JvmField val CHARM_BEAST = registerAttachment("charm_beast", ModRarities.LEGENDARY)
-    @JvmField val CHARM_CRYSTAL_POPCORN = registerAttachment("charm_crystal_popcorn", ModRarities.LEGENDARY)
-    @JvmField val CHARM_NETHER_STAR = registerAttachment("charm_nether_star", ModRarities.LEGENDARY)
-    @JvmField val CHARM_CONDUIT = registerAttachment("charm_conduit", ModRarities.LEGENDARY)
-    @JvmField val CHARM_SENPAI = registerAttachment("charm_senpai", ModRarities.SUPERB)
-    @JvmField val CHARM_MRAHC = registerAttachment("charm_mrahc", ModRarities.SUPERB)
-    @JvmField val CHARM_EXPERIENCE_BOTTLE = registerAttachment("charm_experience_bottle", ModRarities.SUPERB)
-    @JvmField val CHARM_TOTEM_OF_UNDYING = registerAttachment("charm_totem_of_undying", ModRarities.SUPERB)
-    @JvmField val CHARM_CHIRAM_CORE = registerAttachment("charm_chiram_core", ModRarities.VIRTUAL)
-    @JvmField val CHARM_LILY = registerAttachment("charm_lily", ModRarities.VIRTUAL)
-    @JvmField val CHARM_HIRU_HEAD = registerAttachment("charm_hiru_head", ModRarities.VIRTUAL)
-    @JvmField val CHARM_SUI_CONTAINER = registerAttachment("charm_sui_container", ModRarities.VIRTUAL)
-    @JvmField val CHARM_SWISS_COIL = registerAttachment("charm_swiss_coil", ModRarities.VIRTUAL)
-    // @formatter:on
-
     // @formatter:off
     @JvmField val SENPAI_SPAWN_EGG = registerItem("senpai_spawn_egg") {
         SpawnEggItem(ModEntities.SENPAI, -11584987, -14014413, Properties())
@@ -614,6 +430,7 @@ object ModItems {
     @JvmField val QBZ_191_BLUEPRINT = registerBlueprint("qbz_191_blueprint", Rarity.EPIC)
     @JvmField val K_98_BLUEPRINT = registerBlueprint("k_98_blueprint", Rarity.RARE)
     @JvmField val MOSIN_NAGANT_BLUEPRINT = registerBlueprint("mosin_nagant_blueprint", Rarity.RARE)
+    @JvmField val HANYANG_88_BLUEPRINT = registerBlueprint("hanyang_88_blueprint", Rarity.RARE)
     @JvmField val IGLA_BLUEPRINT = registerBlueprint("igla_9k38_blueprint", Rarity.EPIC)
     @JvmField val JAVELIN_BLUEPRINT = registerBlueprint("javelin_blueprint", LEGENDARY)
     @JvmField val M_2_HB_BLUEPRINT = registerBlueprint("m_2_hb_blueprint", Rarity.RARE)
@@ -771,6 +588,193 @@ object ModItems {
     // @formatter:off
     @JvmField val SHORTCUT_PACK = registerPerkItem("shortcut_pack") { ShortcutPackItem() }
     @JvmField val EMPTY_PERK = registerPerkItem("empty_perk") { Item(Properties()) }
+    // @formatter:on
+
+    /**
+     * Attachment Items
+     */
+    /**
+     * 注册一个**副武器**配件：物品类换成 [SubWeaponItem]（`GunItem` + `AttachmentProvider`）。
+     *
+     * 物品注册 id 与配件数据 id 由 [registerAttachment] 保证一致，
+     * 而 `GunData` 在 `SubWeapon.Data` 为空时按物品注册 id 解析数据 —— 所以
+     * `sbw/attachments/<id>.json` 与 `sbw/guns/<id>.json` 同名成对出现即可；
+     * 想让多个配件共用一份副武器数据时才需要在配件里写 `Data`。
+     */
+    fun registerSubWeapon(id: String, rarity: Rarity = Rarity.COMMON): Item =
+        registerAttachment(id, rarity, ::SubWeaponItem)
+
+    // Stock
+    // @formatter:off
+    @JvmField val OEM_STOCK_LIGHT = registerAttachment("oem_stock_light")
+    @JvmField val OEM_STOCK_HEAVY = registerAttachment("oem_stock_heavy")
+    @JvmField val STOCK_UBR = registerAttachment("stock_ubr")
+    @JvmField val STOCK_PRS = registerAttachment("stock_prs")
+    @JvmField val STOCK_AR_TACTICAL = registerAttachment("stock_ar_tactical")
+    @JvmField val STOCK_ZENIT_PT_1 = registerAttachment("stock_zenit_pt_1")
+    @JvmField val STOCK_STR = registerAttachment("stock_str")
+    @JvmField val STOCK_ELITE = registerAttachment("stock_elite")
+    @JvmField val STEEL_PIPE_STOCK = registerAttachment("steel_pipe_stock", Rarity.RARE)
+    // @formatter:on
+
+    // Magazine
+    // @formatter:off
+    @JvmField val MAGAZINE_EXTEND = registerAttachment("magazine_extend", Rarity.RARE)
+    @JvmField val MAGAZINE_EXTEND_PRO = registerAttachment("magazine_extend_pro", Rarity.EPIC)
+    // @formatter:on
+
+    // Muzzle
+    // @formatter:off
+    @JvmField val MEOWLENCER = registerAttachment("meowlencer", Rarity.RARE)
+    @JvmField val HISSILENCER = registerAttachment("hissilencer", Rarity.RARE)
+    @JvmField val SILAOWUNCER = registerAttachment("silaowuncer", Rarity.RARE)
+    @JvmField val MILENCER = registerAttachment("milencer", ModRarities.VIRTUAL)
+    @JvmField val MUZZLE_BRAKE_RU = registerAttachment("muzzle_brake_ru")
+    @JvmField val MUZZLE_BRAKE_AR = registerAttachment("muzzle_brake_ar")
+    @JvmField val MUZZLE_BREAK_BIRDCAGE = registerAttachment("muzzle_break_birdcage")
+    @JvmField val MUZZLE_ZENIT_DTK_1 = registerAttachment("muzzle_zenit_dtk_1", Rarity.RARE)
+    @JvmField val MUZZLE_COMPENSATOR_R_17 = registerAttachment("muzzle_compensator_r_17")
+    @JvmField val RU_SILENCER = registerAttachment("ru_silencer")
+    @JvmField val SILENCER_SUPERB_12 = registerAttachment("silencer_superb_12")
+    @JvmField val SILENCER_50_CAL = registerAttachment("silencer_50_cal")
+    @JvmField val AR_SILENCER = registerAttachment("ar_silencer")
+    @JvmField val HANDGUN_SILENCER = registerAttachment("handgun_silencer")
+    @JvmField val STEEL_PIPE_SILENCER = registerAttachment("steel_pipe_silencer", Rarity.RARE)
+    @JvmField val OSPREY_SILENCER = registerAttachment("osprey_silencer", Rarity.RARE)
+    @JvmField val LOUDSPEAKER = registerAttachment("loudspeaker", ModRarities.LEGENDARY)
+    @JvmField val TRIANGULAR_MUZZLE = registerAttachment("triangular_muzzle", Rarity.RARE)
+    @JvmField val LINEAR_MUZZLE = registerAttachment("linear_muzzle", Rarity.RARE)
+    @JvmField val CROSS_MUZZLE = registerAttachment("cross_muzzle", Rarity.RARE)
+    @JvmField val STAR_MUZZLE = registerAttachment("star_muzzle", Rarity.EPIC)
+    @JvmField val LOVE_MUZZLE = registerAttachment("love_muzzle", ModRarities.VIRTUAL)
+    // @formatter:on
+
+    // Scope / sight
+    // @formatter:off
+    @JvmField val SCOPE_COYOTE = registerAttachment("scope_coyote")
+    @JvmField val SCOPE_AIMPOINT_T2 = registerAttachment("scope_aimpoint_t2")
+    @JvmField val SCOPE_HANDGUN_RED_DOT = registerAttachment("scope_handgun_red_dot")
+    @JvmField val SCOPE_EOTECH_551 = registerAttachment("scope_eotech_551")
+    @JvmField val SCOPE_OKP_7 = registerAttachment("scope_okp_7")
+    @JvmField val SCOPE_PKAS = registerAttachment("scope_pkas")
+    @JvmField val SCOPE_BRUISER = registerAttachment("scope_bruiser", Rarity.RARE)
+    @JvmField val SCOPE_ACOG = registerAttachment("scope_acog", Rarity.RARE)
+    @JvmField val SCOPE_1P_78 = registerAttachment("scope_1p_78", Rarity.RARE)
+    @JvmField val SCOPE_SPYGLASS = registerAttachment("scope_spyglass", Rarity.RARE)
+    @JvmField val SCOPE_PSO_1 = registerAttachment("scope_pso_1", Rarity.RARE)
+    @JvmField val SCOPE_PU = registerAttachment("scope_pu", Rarity.RARE)
+    @JvmField val SCOPE_PK_A = registerAttachment("scope_pk_a", Rarity.RARE)
+    @JvmField val STEEL_PIPE_SCOPE = registerAttachment("steel_pipe_scope", Rarity.RARE)
+    @JvmField val SCOPE_RANGER = registerAttachment("scope_ranger", Rarity.EPIC)
+    @JvmField val SCOPE_QMK171 = registerAttachment("scope_qmk171", Rarity.EPIC)
+    @JvmField val SCOPE_HAMR = registerAttachment("scope_hamr", Rarity.EPIC)
+    @JvmField val SCOPE_ELCAN_4X = registerAttachment("scope_elcan_4x", Rarity.EPIC)
+    @JvmField val SCOPE_LPVO = registerAttachment("scope_lpvo", Rarity.EPIC)
+    @JvmField val SCOPE_SNIPER = registerAttachment("scope_sniper", Rarity.EPIC)
+    @JvmField val SCOPE_WINEFOX = registerAttachment("scope_winefox", ModRarities.LEGENDARY)
+    // @formatter:on
+
+    // Grip
+    // @formatter:off
+    @JvmField val VERTICAL_GRIP = registerAttachment("vertical_grip")
+    @JvmField val GRIP_RECTANGLE_VERTICAL = registerAttachment("grip_rectangle_vertical")
+    @JvmField val TRIANGLE_GRIP = registerAttachment("triangle_grip")
+    @JvmField val GRIP_VERTICAL_PINEAPPLE = registerAttachment("grip_vertical_pineapple")
+    @JvmField val GRIP_CQR_GEN2 = registerAttachment("grip_cqr_gen2", Rarity.RARE)
+    @JvmField val GRIP_VERTICAL_BIPOD = registerAttachment("grip_vertical_bipod", Rarity.RARE)
+    @JvmField val STEEL_PIPE_GRIP = registerAttachment("steel_pipe_grip", Rarity.RARE)
+    // @formatter:on
+
+    // UpperRail
+    // @formatter:off
+    @JvmField val STANDARD_GUN_SHIELD = registerAttachment("standard_gun_shield")
+    @JvmField val HANDGUN_SHIELD = registerAttachment("handgun_shield")
+    @JvmField val HYPERION_SHIELD_MODULE = registerAttachment("hyperion_shield_module", ModRarities.LEGENDARY)
+    @JvmField val PEQ_15 = registerAttachment("peq_15")
+    // @formatter:on
+
+    // LowerRail
+    // @formatter:off
+    @JvmField val PISTOL_LASER = registerAttachment("pistol_laser")
+    @JvmField val LOWER_RAIL_BIPOD = registerAttachment("lower_rail_bipod", Rarity.RARE)
+    // @formatter:on
+
+    // LeftRail
+    // @formatter:off
+    @JvmField val RANGE_FINDER = registerAttachment("range_finder", Rarity.RARE)
+    // @formatter:on
+
+    // RightRail
+    // @formatter:off
+
+    // @formatter:on
+
+    // Bayonet
+    // @formatter:off
+    @JvmField val BAYONET_M_9 = registerAttachment("bayonet_m_9")
+    @JvmField val BAYONET_6KH2 = registerAttachment("bayonet_6kh2")
+    @JvmField val BAYONET_SEITENGEWEHR_84 = registerAttachment("bayonet_seitengewehr_84")
+    @JvmField val BAYONET_M_91_30 = registerAttachment("bayonet_m_91_30")
+    @JvmField val BAYONET_TRIANGULAR = registerAttachment("bayonet_triangular")
+    @JvmField val BAYONET_M1917 = registerAttachment("bayonet_m1917")
+    // @formatter:on
+
+    @JvmField val SUB_WEAPON_GP_25 = registerSubWeapon("sub_weapon_gp_25", Rarity.EPIC)
+
+    // Charm（吊坠：纯装饰，第一人称下会摆）
+    // @formatter:off
+    @JvmField val CHARM_PIG = registerAttachment("charm_pig")
+    @JvmField val CHARM_BEE = registerAttachment("charm_bee")
+    @JvmField val CHARM_CHEST = registerAttachment("charm_chest")
+    @JvmField val CHARM_AXOLOTL = registerAttachment("charm_axolotl")
+    @JvmField val CHARM_COW = registerAttachment("charm_cow")
+    @JvmField val CHARM_SNOWGOLEM = registerAttachment("charm_snowgolem")
+    @JvmField val CHARM_SMALL_CONTAINER = registerAttachment("charm_small_container")
+    @JvmField val CHARM_SHEEP = registerAttachment("charm_sheep")
+    @JvmField val CHARM_CHICKEN = registerAttachment("charm_chicken")
+    @JvmField val CHARM_PUFFERFISH = registerAttachment("charm_pufferfish")
+    @JvmField val CHARM_DOG_TAG = registerAttachment("charm_dog_tag")
+    @JvmField val CHARM_CONTAINER = registerAttachment("charm_container")
+    @JvmField val CHARM_M67_GRENADE = registerAttachment("charm_m67_grenade")
+    @JvmField val CHARM_ZOMBIE_HEAD = registerAttachment("charm_zombie_head", Rarity.RARE)
+    @JvmField val CHARM_SKELETON_SKULL = registerAttachment("charm_skeleton_skull", Rarity.RARE)
+    @JvmField val CHARM_CREEPER_HEAD = registerAttachment("charm_creeper_head", Rarity.RARE)
+    @JvmField val CHARM_AXOLOTL_BLUE = registerAttachment("charm_axolotl_blue", Rarity.RARE)
+    @JvmField val CHARM_MOOSHROOM = registerAttachment("charm_mooshroom", Rarity.RARE)
+    @JvmField val CHARM_PIGLIN_HEAD = registerAttachment("charm_piglin_head", Rarity.RARE)
+    @JvmField val CHARM_FUKAMIZU_FISH = registerAttachment("charm_fukamizu_fish", Rarity.RARE)
+    @JvmField val CHARM_SPIDER_HEAD = registerAttachment("charm_spider_head", Rarity.RARE)
+    @JvmField val CHARM_WITHER_SKELETON_SKULL = registerAttachment("charm_wither_skeleton_skull", Rarity.RARE)
+    @JvmField val CHARM_ELDER_GUARDIAN = registerAttachment("charm_elder_guardian", Rarity.RARE)
+    @JvmField val CHARM_MK_82 = registerAttachment("charm_mk_82", Rarity.RARE)
+    @JvmField val CHARM_RICE_CAKE_FOX_LOLITA = registerAttachment("charm_rice_cake_fox_lolita", Rarity.EPIC)
+    @JvmField val CHARM_WINEFOX_TAIL = registerAttachment("charm_winefox_tail", Rarity.EPIC)
+    @JvmField val CHARM_STARS_IL = registerAttachment("charm_stars_il", Rarity.EPIC)
+    @JvmField val CHARM_ORANGE_PLUSHIE = registerAttachment("charm_orange_plushie", Rarity.EPIC)
+    @JvmField val CHARM_HAKUREI_REIMU = registerAttachment("charm_hakurei_reimu", Rarity.EPIC)
+    @JvmField val CHARM_KIRISAME_MARISA = registerAttachment("charm_kirisame_marisa", Rarity.EPIC)
+    @JvmField val CHARM_FLANDRE_SCARLET = registerAttachment("charm_flandre_scarlet", Rarity.EPIC)
+    @JvmField val CHARM_SAIGYOUJI_YUYUKO = registerAttachment("charm_saigyouji_yuyuko", Rarity.EPIC)
+    @JvmField val CHARM_HOURAISAN_KAGUYA = registerAttachment("charm_houraisan_kaguya", Rarity.EPIC)
+    @JvmField val CHARM_MOON_HEART = registerAttachment("charm_moon_heart", Rarity.EPIC)
+    @JvmField val CHARM_TYPE_88_CLUSTER_GRENADES = registerAttachment("charm_type_88_cluster_grenades", Rarity.EPIC)
+    @JvmField val CHARM_SEPT_WOLVES = registerAttachment("charm_sept_wolves", ModRarities.LEGENDARY)
+    @JvmField val CHARM_ANCIENT_CPU = registerAttachment("charm_ancient_cpu", ModRarities.LEGENDARY)
+    @JvmField val CHARM_DRAGON_HEAD = registerAttachment("charm_dragon_head", ModRarities.LEGENDARY)
+    @JvmField val CHARM_THE_EMPERORS_NEW_CHARM = registerAttachment("charm_the_emperors_new_charm", ModRarities.LEGENDARY)
+    @JvmField val CHARM_BEAST = registerAttachment("charm_beast", ModRarities.LEGENDARY)
+    @JvmField val CHARM_CRYSTAL_POPCORN = registerAttachment("charm_crystal_popcorn", ModRarities.LEGENDARY)
+    @JvmField val CHARM_NETHER_STAR = registerAttachment("charm_nether_star", ModRarities.LEGENDARY)
+    @JvmField val CHARM_CONDUIT = registerAttachment("charm_conduit", ModRarities.LEGENDARY)
+    @JvmField val CHARM_SENPAI = registerAttachment("charm_senpai", ModRarities.SUPERB)
+    @JvmField val CHARM_MRAHC = registerAttachment("charm_mrahc", ModRarities.SUPERB)
+    @JvmField val CHARM_EXPERIENCE_BOTTLE = registerAttachment("charm_experience_bottle", ModRarities.SUPERB)
+    @JvmField val CHARM_TOTEM_OF_UNDYING = registerAttachment("charm_totem_of_undying", ModRarities.SUPERB)
+    @JvmField val CHARM_CHIRAM_CORE = registerAttachment("charm_chiram_core", ModRarities.VIRTUAL)
+    @JvmField val CHARM_LILY = registerAttachment("charm_lily", ModRarities.VIRTUAL)
+    @JvmField val CHARM_HIRU_HEAD = registerAttachment("charm_hiru_head", ModRarities.VIRTUAL)
+    @JvmField val CHARM_SUI_CONTAINER = registerAttachment("charm_sui_container", ModRarities.VIRTUAL)
+    @JvmField val CHARM_SWISS_COIL = registerAttachment("charm_swiss_coil", ModRarities.VIRTUAL)
     // @formatter:on
 
     fun registerDispenserBehavior() {

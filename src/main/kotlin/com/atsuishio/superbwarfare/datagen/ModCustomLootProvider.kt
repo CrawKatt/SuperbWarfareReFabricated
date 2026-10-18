@@ -167,6 +167,7 @@ class ModCustomLootProvider() : LootTableSubProvider {
                     ModItems.SKS_BLUEPRINT,
                     ModItems.K_98_BLUEPRINT,
                     ModItems.MOSIN_NAGANT_BLUEPRINT,
+                    ModItems.HANYANG_88_BLUEPRINT,
                     ModItems.AK_47_BLUEPRINT,
                     ModItems.M_870_BLUEPRINT,
                     ModItems.M_1897_BLUEPRINT,
@@ -226,6 +227,7 @@ class ModCustomLootProvider() : LootTableSubProvider {
                 ModItems.SKS_BLUEPRINT weighted 30
                 ModItems.K_98_BLUEPRINT weighted 30
                 ModItems.MOSIN_NAGANT_BLUEPRINT weighted 30
+                ModItems.HANYANG_88_BLUEPRINT weighted 30
                 ModItems.AK_47_BLUEPRINT weighted 30
                 ModItems.M_870_BLUEPRINT weighted 30
                 ModItems.M_1897_BLUEPRINT weighted 30
@@ -344,6 +346,7 @@ class ModCustomLootProvider() : LootTableSubProvider {
                 ModItems.AK_47_BLUEPRINT weighted 42
                 ModItems.K_98_BLUEPRINT weighted 42
                 ModItems.MOSIN_NAGANT_BLUEPRINT weighted 42
+                ModItems.HANYANG_88_BLUEPRINT weighted 42
                 ModItems.HK_416_BLUEPRINT weighted 42
                 ModItems.AK_12_BLUEPRINT weighted 42
                 ModItems.QBZ_95_BLUEPRINT weighted 42
@@ -539,6 +542,7 @@ class ModCustomLootProvider() : LootTableSubProvider {
                     ModItems.QBZ_95_BLUEPRINT,
                     ModItems.SKS_BLUEPRINT,
                     ModItems.MOSIN_NAGANT_BLUEPRINT,
+                    ModItems.HANYANG_88_BLUEPRINT,
                     ModItems.M_870_BLUEPRINT,
                     ModItems.M_79_BLUEPRINT,
                     ModItems.GP_25_BLUEPRINT,

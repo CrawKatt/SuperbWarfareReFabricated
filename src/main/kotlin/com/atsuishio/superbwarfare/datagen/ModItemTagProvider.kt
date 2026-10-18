@@ -322,6 +322,7 @@ class ModItemTagProvider(
             ModItems.AK_47_BLUEPRINT,
             ModItems.K_98_BLUEPRINT,
             ModItems.MOSIN_NAGANT_BLUEPRINT,
+            ModItems.HANYANG_88_BLUEPRINT,
             ModItems.M_2_HB_BLUEPRINT,
             ModItems.HK_416_BLUEPRINT,
             ModItems.AK_12_BLUEPRINT,

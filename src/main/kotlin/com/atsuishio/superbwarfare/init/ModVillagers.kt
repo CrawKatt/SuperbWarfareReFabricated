@@ -262,6 +262,10 @@ object ModVillagers {
                 ),
                 BasicItemListing(
                     ItemStack(Items.EMERALD, 32),
+                    ItemStack(ModItems.HANYANG_88_BLUEPRINT), 10, 25, 0.05f
+                ),
+                BasicItemListing(
+                    ItemStack(Items.EMERALD, 32),
                     ItemStack(ModItems.RPG_BLUEPRINT), 10, 25, 0.05f
                 ),
                 BasicItemListing(
