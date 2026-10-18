@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.client.overlay.ammo
 
-/** Two reusable visual slots. Retargeting samples the current poses instead of restarting at the center. */
 internal class AmmoHudCarousel {
     data class Pose(val key: String?, val width: Double, val x: Double, val opacity: Double) {
         val visible get() = key != null && opacity > 0.0
@@ -34,8 +33,7 @@ internal class AmmoHudCarousel {
     private var current = 0
     private var seat = Tween(12.0, 12.0, 0, 160)
 
-    @JvmOverloads
-    fun select(key: String, width: Double, direction: Int, now: Long, reduced: Boolean, entryOpacity: Double = 0.28): Frame {
+    fun select(key: String, width: Double, direction: Int, now: Long, reduced: Boolean): Frame {
         val before = frame(now)
         if (slots[current].key == null || reduced) {
             val slot = slots[current]
@@ -54,7 +52,7 @@ internal class AmmoHudCarousel {
             // A -> B -> A reverses the two existing nodes without recreating either item.
             val reuse = entering.key == key && before.slots[next].visible
             val enteringX = if (reuse) before.slots[next].x else direction * travel
-            val enteringAlpha = if (reuse) before.slots[next].opacity else entryOpacity.coerceIn(0.0, 1.0)
+            val enteringAlpha = if (reuse) before.slots[next].opacity else 0.28
             entering.key = key
             entering.width = width
             entering.move(enteringX, 0.0, enteringAlpha, 1.0, now)
