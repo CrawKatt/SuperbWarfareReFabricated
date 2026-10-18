@@ -40,6 +40,7 @@ class ModItemModelProvider(output: PackOutput, existingFileHelper: ExistingFileH
         gunItem(ModItems.MARLIN)
         gunItem(ModItems.NAIL_GUN)
         gunItem(ModItems.K_98)
+        gunItem(ModItems.HANYANG_88)
         gunItem(ModItems.M_4)
         gunItem(ModItems.M_60)
         gunItem(ModItems.M_79)
