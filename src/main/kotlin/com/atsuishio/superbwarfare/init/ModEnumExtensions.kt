@@ -143,7 +143,7 @@ object ModEnumExtensions {
             get() = SUPERBWARFARE_SUPER_STAR_SHOOTER_POSE.getValue()
 
         @JvmField
-        val REPAIR_TOOL_POSE: EnumProxy<ArmPose> = EnumProxy(
+        val SINGLE_HAND_POSE: EnumProxy<ArmPose> = EnumProxy(
             ArmPose::class.java,
             false,
             IArmPoseTransformer { model, _, arm ->
@@ -154,7 +154,7 @@ object ModEnumExtensions {
             }
         )
 
-        val repairToolPose: ArmPose
-            get() = REPAIR_TOOL_POSE.getValue()
+        val singleHandPose: ArmPose
+            get() = SINGLE_HAND_POSE.getValue()
     }
 }
