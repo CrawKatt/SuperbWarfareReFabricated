@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 object ModEntityRenderers {
     @JvmStatic
     fun init() {
+        EntityRendererRegistry.register(ModEntities.REFORGING_LIGHTNING_BALL, ::ReforgingLightningBallRenderer)
         EntityRendererRegistry.register(ModEntities.MORTAR, ::MortarRenderer)
         EntityRendererRegistry.register(ModEntities.SENPAI, ::SenpaiRenderer)
         EntityRendererRegistry.register(ModEntities.CREEPING_SENPAI, ::CreepingSenpaiRenderer)
@@ -42,9 +43,9 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.FLARE_DECOY, ::FlareDecoyEntityRenderer)
         EntityRendererRegistry.register(ModEntities.CATAPULT_SHUTTLE, ::CatapultShuttleRenderer)
         EntityRendererRegistry.register(
-                ModEntities.WHITE_PHOSPHORUS_PROJECTILE,
-                ::WhitePhosphorusProjectileEntityRenderer
-            )
+            ModEntities.WHITE_PHOSPHORUS_PROJECTILE,
+            ::WhitePhosphorusProjectileEntityRenderer
+        )
         EntityRendererRegistry.register(ModEntities.PRISMATIC_BOLT, ::PrismaticBoltEntityRenderer)
         EntityRendererRegistry.register(ModEntities.SMOKE_DECOY, ::SmokeDecoyEntityRenderer)
         EntityRendererRegistry.register(ModEntities.LAV_150, ::Lav150Renderer)
