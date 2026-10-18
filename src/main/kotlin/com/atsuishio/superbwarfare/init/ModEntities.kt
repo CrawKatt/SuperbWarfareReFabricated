@@ -126,6 +126,13 @@ object ModEntities {
 
     // Projectiles
     @JvmField
+    val REFORGING_LIGHTNING_BALL: EntityType<ReforgingLightningBallEntity> = register(
+        "reforging_lightning_ball",
+        misc(::ReforgingLightningBallEntity).trackRangeChunks(64).trackedUpdateRate(1)
+            .forceTrackedVelocityUpdates(true).disableSaving().fireImmune().dimensions(EntityDimensions.scalable(2f, 2f))
+    )
+
+    @JvmField
     val TASER_BULLET: EntityType<TaserBulletEntity> =
         register("taser_bullet", fastProjectile(::TaserBulletEntity, true).dimensions(EntityDimensions.scalable(0.25f, 0.25f)))
 

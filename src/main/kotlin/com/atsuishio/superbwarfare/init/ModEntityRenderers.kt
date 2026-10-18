@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 object ModEntityRenderers {
     @JvmStatic
     fun init() {
+        EntityRendererRegistry.register(ModEntities.REFORGING_LIGHTNING_BALL, ::ReforgingLightningBallRenderer)
         EntityRendererRegistry.register(ModEntities.MORTAR, ::MortarRenderer)
         EntityRendererRegistry.register(ModEntities.SENPAI, ::SenpaiRenderer)
         EntityRendererRegistry.register(ModEntities.CREEPING_SENPAI, ::CreepingSenpaiRenderer)
