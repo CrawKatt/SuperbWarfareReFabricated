@@ -2672,6 +2672,13 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             )
             gunSmithing(
                 writer,
+                ModItems.HANYANG_88_BLUEPRINT,
+                GunRarity.RARE,
+                ItemTags.LOGS,
+                ModItems.HANYANG_88
+            )
+            gunSmithing(
+                writer,
                 ModItems.JAVELIN_BLUEPRINT,
                 GunRarity.LEGENDARY,
                 ModItems.ANCIENT_CPU,
@@ -2790,6 +2797,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             copyBlueprint(writer, ModItems.QBZ_191_BLUEPRINT)
             copyBlueprint(writer, ModItems.K_98_BLUEPRINT)
             copyBlueprint(writer, ModItems.MOSIN_NAGANT_BLUEPRINT)
+            copyBlueprint(writer, ModItems.HANYANG_88_BLUEPRINT)
             copyBlueprint(writer, ModItems.JAVELIN_BLUEPRINT)
             copyBlueprint(writer, ModItems.IGLA_BLUEPRINT)
             copyBlueprint(writer, ModItems.M_2_HB_BLUEPRINT)

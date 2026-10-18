@@ -104,6 +104,7 @@ object ModVillagers {
             trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.M_870_BLUEPRINT), 10, 25, 0.05f),
             trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.K_98_BLUEPRINT), 10, 25, 0.05f),
             trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.MOSIN_NAGANT_BLUEPRINT), 10, 25, 0.05f),
+            trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.HANYANG_88_BLUEPRINT), 10, 25, 0.05f),
             trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.RPG_BLUEPRINT), 10, 25, 0.05f),
             trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.HK_416_BLUEPRINT), 10, 25, 0.05f),
             trade(ItemStack(Items.EMERALD, 32), ItemStack(ModItems.QBZ_95_BLUEPRINT), 10, 25, 0.05f),
