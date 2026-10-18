@@ -16,7 +16,6 @@ import net.minecraft.client.renderer.LightTexture
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.api.distmarker.OnlyIn
 
-/** One stable AUI paint node. All moving icons and fixed frames share a coherent native snapshot. */
 @OnlyIn(Dist.CLIENT)
 class AmmoHudResourceGroup(document: Document) : Element(document, TAG), BodyRenderNodeProvider {
     internal data class Group(val resources: List<AmmoHudResources.Resource>, val x: Double, val opacity: Double)
@@ -102,7 +101,7 @@ class AmmoHudResourceGroup(document: Document) : Element(document, TAG), BodyRen
         }
     }
 
-    /** Clear the entire pooled layer, not just the moving viewport's scissor rectangle. */
+    // 完整清空复用缓冲，不能只清理局部裁剪区，否则会残留上一帧图标。
     private inline fun layer(
         opacity: Float, filter: Filter.FilterState = Filter.FilterState.EMPTY,
         force: Boolean = false, draw: () -> Unit
