@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.capability.living.PhosphorusFireCapability
 import com.atsuishio.superbwarfare.capability.living.RadiationCapability
 import com.atsuishio.superbwarfare.capability.player.PlayerChargeState
 import com.atsuishio.superbwarfare.capability.player.PlayerDeployState
+import com.atsuishio.superbwarfare.capability.player.PlayerSpinState
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.tools.createMapCodec
 import com.atsuishio.superbwarfare.tools.createStreamCodec
@@ -48,6 +49,9 @@ object ModDataAttachments {
 
     @JvmField
     val PLAYER_CHARGE_STATE = registerSynced<PlayerChargeState>("player_charge_state")
+
+    @JvmField
+    val PLAYER_SPIN_STATE = registerSynced<PlayerSpinState>("player_spin_state")
 
     private inline fun <reified T : INBTSerializable<CompoundTag>> register(
         name: String,
