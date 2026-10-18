@@ -78,6 +78,13 @@ object DisplayConfig {
     }
 
     @JvmField
+    val REDUCED_AMMO_HUD_MOTION = buildClientConfig {
+        comment("Reduce ammo HUD motion and replace reload blinking with a dimmed weapon icon")
+        comment("减少弹药HUD动态效果，使用静态暗色枪械图标代替换弹闪烁")
+        define("reduced_ammo_hud_motion", false)
+    }
+
+    @JvmField
     val VEHICLE_INFO = buildClientConfig {
         comment("Set true to display vehicle info when aiming at a vehicle")
         comment("是否开启看向载具时的信息显示")
