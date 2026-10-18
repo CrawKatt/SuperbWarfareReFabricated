@@ -18,6 +18,7 @@ import com.atsuishio.superbwarfare.client.lighting.VehicleLightingHandler
 import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
+import com.atsuishio.superbwarfare.client.overlay.ammo.AmmoBarHud
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.shader.RadiationShaderHandler
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
@@ -62,6 +63,7 @@ import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
@@ -103,6 +105,8 @@ object ClientEventHandler {
         RadiationShaderHandler.onRegisterReloadListeners()
         HudRenderCallback.EVENT.register { _, partialTick -> renderRadiationShader(partialTick) }
         WorldRenderEvents.END.register(::renderRadiationShaderOnHiddenGui)
+
+        ClientTickEvents.END_CLIENT_TICK.register { _ -> AmmoBarHud.onClientTick() }
 
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             onPlayerLoggedIn()
