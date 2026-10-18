@@ -13,10 +13,10 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.GameRenderer
 import net.minecraft.client.renderer.LightTexture
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 class AmmoHudResourceGroup(document: Document) : Element(document, TAG), BodyRenderNodeProvider {
     internal data class Group(val resources: List<AmmoHudResources.Resource>, val x: Double, val opacity: Double)
     private data class Scene(val groups: List<Group>, val frames: List<AmmoHudFrames.Pose>)

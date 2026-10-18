@@ -8,10 +8,10 @@ import com.atsuishio.superbwarfare.data.gun.ammo_consumer_strategy.*
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object AmmoHudResources {
     sealed interface Icon {
         data class Item(val stack: ItemStack) : Icon
@@ -50,7 +50,7 @@ object AmmoHudResources {
             return data.countBackupAmmo(player) < cost
         }
         if (source.strategy === EnergyAmmoStrategy) {
-            return (data.getEnergyProvider(player)?.energyStored ?: 0) < source.loadAmount
+            return (data.getEnergyProvider(player)?.amount ?: 0) < source.loadAmount
         }
         return !source.hasEnough(data, player)
     }

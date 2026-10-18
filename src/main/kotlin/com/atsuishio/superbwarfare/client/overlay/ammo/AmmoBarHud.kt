@@ -16,17 +16,14 @@ import com.sighs.apricityui.layout.Position
 import net.minecraft.Util
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.player.Player
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.capabilities.Capabilities
-import net.neoforged.neoforge.client.event.ClientTickEvent
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import team.reborn.energy.api.EnergyStorage
 import java.util.regex.Pattern
 import kotlin.math.max
 
-@OnlyIn(Dist.CLIENT)
-@EventBusSubscriber(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 object AmmoBarHud {
     private const val PATH = "superbwarfare/ammo_bar.html"
     private val FORMAT_CODE = Pattern.compile("§.")
@@ -50,6 +47,10 @@ object AmmoBarHud {
     private data class DirectionHint(val gun: Any, val target: Int, val direction: Int, val expires: Long)
 
     private var directionHint: DirectionHint? = null
+
+    init {
+        ClientTickEvents.END_CLIENT_TICK.register { onClientTick() }
+    }
 
     // 两种弹种循环时，仅凭新旧序号无法判断方向；动画仍等待服务器确认切换。
     fun noteAmmoSwitch(data: GunData, add: Boolean) {
@@ -284,8 +285,8 @@ object AmmoBarHud {
     }
 
     private fun getEnergyPercentString(data: GunData): String {
-        val storage = data.stack.getCapability(Capabilities.EnergyStorage.ITEM) ?: return "0%"
-        val rate = (storage.energyStored.toDouble() / max(1, storage.maxEnergyStored)).coerceIn(0.0, 1.0)
+        val storage = EnergyStorage.ITEM.find(data.stack, null) ?: return "0%"
+        val rate = (storage.amount.toDouble() / max(1L, storage.capacity)).coerceIn(0.0, 1.0)
         return format1DZZ(rate * 100) + "%"
     }
 
@@ -322,8 +323,7 @@ object AmmoBarHud {
     }
 
     // 菜单、F1 和退出世界可能跳过渲染事件，仍需在 tick 中清理文档。
-    @SubscribeEvent
-    fun onClientTick(event: ClientTickEvent.Post) {
+    fun onClientTick() {
         if (document == null) return
         val mc = Minecraft.getInstance()
         val player = mc.player

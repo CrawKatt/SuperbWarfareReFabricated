@@ -12,10 +12,10 @@ import com.sighs.apricityui.style.Text
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.LightTexture
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 class AmmoHudText(document: Document) : Element(document, TAG), BodyRenderNodeProvider {
     private var label = ""
     private var fontScale = 1f
