@@ -14,270 +14,221 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 
-public class RenderHelper {
-    // code from GuiGraphics
+/**
+ * 2D 纹理绘制与 GUI 辅助。
+ *
+ * <h2>blit 的唯一锚点是 {@link PoseStack}</h2>
+ * GUI 里传 {@code guiGraphics.pose()}，自绘节点里直接用当前 pose（例如 AUI 的
+ * {@code BodyRenderNodeProvider#drawContentOnly(PoseStack)}），不再需要 {@link GuiGraphics}，
+ * 也不再需要 {@code BufferSource}。
+ *
+ * <h2>三种画法</h2>
+ * <ul>
+ *   <li>{@link #blit}：源矩形与目标矩形同尺寸，只需要给 (u, v) 偏移。绝大多数场合用它。</li>
+ *   <li>{@link #blitRegion}：源矩形与目标矩形尺寸不同（拉伸 / 裁切）。</li>
+ *   <li>{@code preciseBlit} / {@code preciseBlitWithColor}：旧的 {@link GuiGraphics} 适配器，
+ *       已废弃，仅为一处不改就保留的老调用点存在。</li>
+ * </ul>
+ *
+ * <p>颜色统一为 ARGB：{@code 0xAARRGGBB}，alpha 参与混合。旧 {@code preciseBlitWithColor}
+ * 会把 alpha 强行改成 {@code 0xFF}（{@code color | 0xFF000000}），该行为只在那个废弃适配器里保留。
+ *
+ * <h2>跨版本</h2>
+ * 本文件只有 {@link #emitQuad} 一个方法随版本不同（1.20 用 {@code Tesselator#getBuilder()} +
+ * {@code vertex/uv/color/endVertex/end()}，1.21 用 {@code Tesselator#begin(mode, format)} +
+ * {@code addVertex/setUv/setColor/buildOrThrow()}），其余部分与 1.20 分支（sbw）逐行一致，
+ * 改动时请同步两边。
+ */
+public final class RenderHelper {
+    private RenderHelper() {
+    }
+
+    // ==================================================================================
+    //  新 API：与版本无关，只需要 PoseStack
+    // ==================================================================================
+
     /**
-     * Blits a portion of the texture specified by the atlas location onto the screen at the given coordinates.
+     * 把 {@code texture} 上 (u, v) 起、与目标矩形同尺寸的一块画到 (x, y, width, height)。
      *
-     * @param atlasLocation the location of the texture atlas.
-     * @param x             the x-coordinate of the blit position.
-     * @param y             the y-coordinate of the blit position.
-     * @param uOffset       the horizontal texture coordinate offset.
-     * @param vOffset       the vertical texture coordinate offset.
-     * @param uWidth        the width of the blitted portion in texture coordinates.
-     * @param vHeight       the height of the blitted portion in texture coordinates.
+     * <pre>
+     *   blit(pose, icon, x, y, 16, 16, 0, 0, 16, 16)        // 整张 16x16 图标，画在 (x, y)
+     *   blit(pose, atlas, x, y, w, h, u, v, 512, 512)       // 图集里的一块，图集 512x512
+     * </pre>
+     *
+     * @param pose          当前 PoseStack（GUI 里是 {@code guiGraphics.pose()}）
+     * @param texture       纹理
+     * @param x             目标左上角 X
+     * @param y             目标左上角 Y
+     * @param width         目标宽度，同时也是从纹理上截取出来的宽度
+     * @param height        目标高度，同时也是从纹理上截取出来的高度
+     * @param u             纹理内起点 X（单位为纹素）
+     * @param v             纹理内起点 Y（单位为纹素）
+     * @param textureWidth  整张纹理宽度，用于把 (u, v) 归一化成 UV
+     * @param textureHeight 整张纹理高度
      */
-    public static void preciseBlit(GuiGraphics gui, ResourceLocation atlasLocation, float x, float y, float uOffset, float vOffset, float uWidth, float vHeight) {
-        preciseBlit(gui, atlasLocation, x, y, 0, uOffset, vOffset, uWidth, vHeight, 256, 256);
+    public static void blit(PoseStack pose, ResourceLocation texture,
+                            float x, float y, float width, float height,
+                            float u, float v, float textureWidth, float textureHeight) {
+        blit(pose, texture, x, y, width, height, u, v, textureWidth, textureHeight, 0xFFFFFFFF);
     }
 
     /**
-     * Blits a portion of the texture specified by the atlas location onto the screen at the given coordinates with a blit offset and texture coordinates.
+     * 同 {@link #blit(PoseStack, ResourceLocation, float, float, float, float, float, float, float, float)}，
+     * 并乘上 ARGB 颜色。
      *
-     * @param atlasLocation the location of the texture atlas.
-     * @param x             the x-coordinate of the blit position.
-     * @param y             the y-coordinate of the blit position.
-     * @param blitOffset    the z-level offset for rendering order.
-     * @param uOffset       the horizontal texture coordinate offset.
-     * @param vOffset       the vertical texture coordinate offset.
-     * @param uWidth        the width of the blitted portion in texture coordinates.
-     * @param vHeight       the height of the blitted portion in texture coordinates.
-     * @param textureWidth  the width of the texture.
-     * @param textureHeight the height of the texture.
+     * @param argb 顶点颜色 {@code 0xAARRGGBB}，会和纹理采样结果相乘；alpha 参与混合
      */
-    public static void preciseBlit(
-            GuiGraphics gui, ResourceLocation atlasLocation,
-            float x, float y,
-            float blitOffset,
-            float uOffset, float vOffset,
-            float uWidth, float vHeight,
-            float textureWidth, float textureHeight
-    ) {
-        preciseBlit(
-                gui, atlasLocation,
-                x, x + uWidth,
-                y, y + vHeight,
-                blitOffset,
-                uWidth, vHeight,
-                uOffset, vOffset,
-                textureWidth, textureHeight
+    public static void blit(PoseStack pose, ResourceLocation texture,
+                            float x, float y, float width, float height,
+                            float u, float v, float textureWidth, float textureHeight, int argb) {
+        blitRegion(pose, texture, x, y, width, height, u, v, width, height, textureWidth, textureHeight, argb);
+    }
+
+    /**
+     * 把纹理上的源矩形 (u, v, uWidth, vHeight) 拉伸/裁切到目标矩形 (x, y, width, height)。
+     *
+     * <p>只有源矩形和目标矩形尺寸不同时才需要它；同尺寸请用 {@link #blit}。
+     *
+     * <p>需要 z 偏移时改 pose：{@code pose.pushPose(); pose.translate(0, 0, z); ...; pose.popPose()}，
+     * 顶点 z 会随之平移，效果等同于旧 API 的 {@code blitOffset}。
+     *
+     * @param argb 顶点颜色 {@code 0xAARRGGBB}，alpha 参与混合
+     */
+    public static void blitRegion(PoseStack pose, ResourceLocation texture,
+                                  float x, float y, float width, float height,
+                                  float u, float v, float uWidth, float vHeight,
+                                  float textureWidth, float textureHeight, int argb) {
+        blitRegionAt(pose, texture, x, y, width, height, u, v, uWidth, vHeight, textureWidth, textureHeight, 0f, argb);
+    }
+
+    private static void blitRegionAt(PoseStack pose, ResourceLocation texture,
+                                     float x, float y, float width, float height,
+                                     float u, float v, float uWidth, float vHeight,
+                                     float textureWidth, float textureHeight,
+                                     float z, int argb) {
+        // 空矩形直接跳过：HUD 里大量 0 高度/0 宽度（进度条、淡出中）的调用不该产生顶点。
+        if (width == 0f || height == 0f || uWidth == 0f || vHeight == 0f) return;
+        emitQuad(
+                pose.last().pose(), texture,
+                x, y, x + width, y + height, z,
+                u / textureWidth, v / textureHeight,
+                (u + uWidth) / textureWidth, (v + vHeight) / textureHeight,
+                argb
         );
     }
 
+    // ==================================================================================
+    //  旧 API：GuiGraphics 适配器（语义与旧实现一致，新代码不要用）
+    // ==================================================================================
+
     /**
-     * Blits a portion of the texture specified by the atlas location onto the screen at the given position and dimensions with texture coordinates.
-     *
-     * @param atlasLocation the location of the texture atlas.
-     * @param x             the x-coordinate of the top-left corner of the blit
-     *                      position.
-     * @param y             the y-coordinate of the top-left corner of the blit
-     *                      position.
-     * @param width         the width of the blitted portion.
-     * @param height        the height of the blitted portion.
-     * @param uOffset       the horizontal texture coordinate offset.
-     * @param vOffset       the vertical texture coordinate offset.
-     * @param uWidth        the width of the blitted portion in texture coordinates.
-     * @param vHeight       the height of the blitted portion in texture coordinates.
-     * @param textureWidth  the width of the texture.
-     * @param textureHeight the height of the texture.
+     * @deprecated 只给已有调用点用。新代码用
+     * {@link #blit(PoseStack, ResourceLocation, float, float, float, float, float, float, float, float)}。
      */
-    public static void preciseBlit(
-            GuiGraphics gui, ResourceLocation atlasLocation,
-            float x, float y,
-            float width, float height,
-            float uOffset, float vOffset,
-            float uWidth, float vHeight,
-            float textureWidth, float textureHeight
-    ) {
-        preciseBlit(
-                gui, atlasLocation, x, x + width, y, y + height, 0, uWidth, vHeight, uOffset, vOffset, textureWidth, textureHeight
-        );
+    @Deprecated
+    public static void preciseBlit(GuiGraphics gui, ResourceLocation atlasLocation,
+                                   float x, float y, float uOffset, float vOffset,
+                                   float uWidth, float vHeight) {
+        preciseBlit(gui, atlasLocation, x, y, uOffset, vOffset, uWidth, vHeight, 256f, 256f);
     }
 
     /**
-     * Blits a portion of the texture specified by the atlas location onto the screen at the given position and dimensions with texture coordinates.
-     *
-     * @param atlasLocation the location of the texture atlas.
-     * @param x             the x-coordinate of the top-left corner of the blit
-     *                      position.
-     * @param y             the y-coordinate of the top-left corner of the blit
-     *                      position.
-     * @param uOffset       the horizontal texture coordinate offset.
-     * @param vOffset       the vertical texture coordinate offset.
-     * @param width         the width of the blitted portion.
-     * @param height        the height of the blitted portion.
-     * @param textureWidth  the width of the texture.
-     * @param textureHeight the height of the texture.
+     * @deprecated 只给已有调用点用。
      */
-    public static void preciseBlit(
-            GuiGraphics gui,
-            ResourceLocation atlasLocation,
-            float x, float y,
-            float uOffset, float vOffset,
-            float width, float height,
-            float textureWidth, float textureHeight
-    ) {
-        preciseBlit(gui, atlasLocation, x, y, width, height, uOffset, vOffset, width, height, textureWidth, textureHeight);
-    }
-
-    public static void preciseBlitWithColor(
-            GuiGraphics gui,
-            ResourceLocation atlasLocation,
-            float x, float y,
-            float uOffset, float vOffset,
-            float width, float height,
-            float textureWidth, float textureHeight,
-            int color
-    ) {
-        preciseBlitWithColor(gui, atlasLocation, x, y, uOffset, vOffset, 0, width, height, textureWidth, textureHeight, color);
-    }
-
-    public static void preciseBlitWithColor(
-            GuiGraphics gui,
-            ResourceLocation atlasLocation,
-            float x, float y,
-            float uOffset, float vOffset,
-            float blitOffset,
-            float width, float height,
-            float textureWidth, float textureHeight,
-            int color
-    ) {
-        innerBlit(
-                gui, atlasLocation,
-                x, x + width,
-                y, y + height,
-                blitOffset,
-                uOffset / textureWidth,
-                (uOffset + width) / textureWidth,
-                vOffset / textureHeight,
-                (vOffset + height) / textureHeight,
-                color | 0xFF000000
-        );
+    @Deprecated
+    public static void preciseBlit(GuiGraphics gui, ResourceLocation atlasLocation,
+                                   float x, float y, float uOffset, float vOffset,
+                                   float uWidth, float vHeight,
+                                   float textureWidth, float textureHeight) {
+        blit(gui.pose(), atlasLocation, x, y, uWidth, vHeight, uOffset, vOffset, textureWidth, textureHeight);
     }
 
     /**
-     * Performs the inner blit operation for rendering a texture with the specified coordinates and texture coordinates.
-     *
-     * @param atlasLocation the location of the texture atlas.
-     * @param x1            the x-coordinate of the first corner of the blit position.
-     * @param x2            the x-coordinate of the second corner of the blit position
-     *                      .
-     * @param y1            the y-coordinate of the first corner of the blit position.
-     * @param y2            the y-coordinate of the second corner of the blit position
-     *                      .
-     * @param blitOffset    the z-level offset for rendering order.
-     * @param uWidth        the width of the blitted portion in texture coordinates.
-     * @param vHeight       the height of the blitted portion in texture coordinates.
-     * @param uOffset       the horizontal texture coordinate offset.
-     * @param vOffset       the vertical texture coordinate offset.
-     * @param textureWidth  the width of the texture.
-     * @param textureHeight the height of the texture.
+     * @deprecated 只给已有调用点用。
      */
-    public static void preciseBlit(
-            GuiGraphics gui, ResourceLocation atlasLocation,
-            float x1, float x2,
-            float y1, float y2,
-            float blitOffset,
-            float uWidth, float vHeight,
-            float uOffset, float vOffset,
-            float textureWidth, float textureHeight
-    ) {
-        innerBlit(
-                gui, atlasLocation,
-                x1, x2,
-                y1, y2,
-                blitOffset,
-                uOffset / textureWidth,
-                (uOffset + uWidth) / textureWidth,
-                vOffset / textureHeight,
-                (vOffset + vHeight) / textureHeight
-        );
+    @Deprecated
+    public static void preciseBlit(GuiGraphics gui, ResourceLocation atlasLocation,
+                                   float x, float y, float blitOffset,
+                                   float uOffset, float vOffset,
+                                   float uWidth, float vHeight,
+                                   float textureWidth, float textureHeight) {
+        blitRegionAt(gui.pose(), atlasLocation, x, y, uWidth, vHeight, uOffset, vOffset, uWidth, vHeight,
+                textureWidth, textureHeight, blitOffset, 0xFFFFFFFF);
     }
 
     /**
-     * Performs the inner blit operation for rendering a texture with the specified coordinates and texture coordinates without color tfloating.
-     *
-     * @param atlasLocation the location of the texture atlas.
-     * @param x1            the x-coordinate of the first corner of the blit position.
-     * @param x2            the x-coordinate of the second corner of the blit position
-     *                      .
-     * @param y1            the y-coordinate of the first corner of the blit position.
-     * @param y2            the y-coordinate of the second corner of the blit position
-     *                      .
-     * @param blitOffset    the z-level offset for rendering order.
-     * @param minU          the minimum horizontal texture coordinate.
-     * @param maxU          the maximum horizontal texture coordinate.
-     * @param minV          the minimum vertical texture coordinate.
-     * @param maxV          the maximum vertical texture coordinate.
+     * @deprecated 只给已有调用点用。
      */
-    public static void innerBlit(
-            GuiGraphics gui,
-            ResourceLocation atlasLocation,
-            float x1, float x2,
-            float y1, float y2,
-            float blitOffset,
-            float minU, float maxU,
-            float minV, float maxV
-    ) {
-        RenderSystem.setShaderTexture(0, atlasLocation);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        Matrix4f matrix4f = gui.pose().last().pose();
-        BufferBuilder bufferbuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferbuilder.addVertex(matrix4f, x1, y1, blitOffset).setUv(minU, minV);
-        bufferbuilder.addVertex(matrix4f, x1, y2, blitOffset).setUv(minU, maxV);
-        bufferbuilder.addVertex(matrix4f, x2, y2, blitOffset).setUv(maxU, maxV);
-        bufferbuilder.addVertex(matrix4f, x2, y1, blitOffset).setUv(maxU, minV);
-        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
+    @Deprecated
+    public static void preciseBlit(GuiGraphics gui, ResourceLocation atlasLocation,
+                                   float x, float y, float width, float height,
+                                   float uOffset, float vOffset,
+                                   float uWidth, float vHeight,
+                                   float textureWidth, float textureHeight) {
+        blitRegion(gui.pose(), atlasLocation, x, y, width, height, uOffset, vOffset, uWidth, vHeight,
+                textureWidth, textureHeight, 0xFFFFFFFF);
     }
 
     /**
-     * Performs the inner blit operation for rendering a texture with the specified coordinates, texture coordinates, and color tfloat.
-     *
-     * @param atlasLocation the location of the texture atlas.
-     * @param x1            the x-coordinate of the first corner of the blit position.
-     * @param x2            the x-coordinate of the second corner of the blit position
-     *                      .
-     * @param y1            the y-coordinate of the first corner of the blit position.
-     * @param y2            the y-coordinate of the second corner of the blit position
-     *                      .
-     * @param blitOffset    the z-level offset for rendering order.
-     * @param minU          the minimum horizontal texture coordinate.
-     * @param maxU          the maximum horizontal texture coordinate.
-     * @param minV          the minimum vertical texture coordinate.
-     * @param maxV          the maximum vertical texture coordinate.
-     * @param color         color
+     * @deprecated 只给已有调用点用。注意旧实现会把 alpha 强行改成 {@code 0xFF}。
      */
-    public static void innerBlit(
-            GuiGraphics gui,
-            ResourceLocation atlasLocation,
-            float x1, float x2,
-            float y1, float y2,
-            float blitOffset,
-            float minU, float maxU,
-            float minV, float maxV,
-            int color
-    ) {
-        RenderSystem.setShaderTexture(0, atlasLocation);
+    @Deprecated
+    public static void preciseBlitWithColor(GuiGraphics gui, ResourceLocation atlasLocation,
+                                            float x, float y, float uOffset, float vOffset,
+                                            float width, float height,
+                                            float textureWidth, float textureHeight,
+                                            int color) {
+        preciseBlitWithColor(gui, atlasLocation, x, y, 0f, uOffset, vOffset, width, height,
+                textureWidth, textureHeight, color);
+    }
+
+    /**
+     * @deprecated 只给已有调用点用。注意旧实现会把 alpha 强行改成 {@code 0xFF}。
+     */
+    @Deprecated
+    public static void preciseBlitWithColor(GuiGraphics gui, ResourceLocation atlasLocation,
+                                            float x, float y, float blitOffset,
+                                            float uOffset, float vOffset,
+                                            float width, float height,
+                                            float textureWidth, float textureHeight,
+                                            int color) {
+        blitRegionAt(gui.pose(), atlasLocation, x, y, width, height, uOffset, vOffset, width, height,
+                textureWidth, textureHeight, blitOffset, color | 0xFF000000);
+    }
+
+    // ==================================================================================
+    //  版本相关：1.21 的 Tesselator / VertexConsumer API
+    //  1.20 分支（sbw）里这一段用 getBuilder()/vertex/uv/color/endVertex/end()，
+    //  并且用 POSITION_COLOR_TEX + getPositionColorTexShader。其余部分两边一致。
+    // ==================================================================================
+
+    /**
+     * 立即画一个 POSITION_TEX_COLOR 四边形。
+     *
+     * <p>这里只管顶点和着色器；混合函数由调用方负责（AUI 的 content node、GuiGraphics 的 HUD
+     * 流程都会在调用前把 blend 打开并设好 blendFunc）。这里只保证 blend 是开着的，并且<b>绝不</b>
+     * 在画完把它关掉 —— 旧 {@code innerBlit(color)} 结尾的 {@code disableBlend()} 会把同一批次里
+     * 后续所有 untinted blit 的透明通道一起搞坏。
+     */
+    private static void emitQuad(Matrix4f matrix, ResourceLocation texture,
+                                 float x1, float y1, float x2, float y2, float z,
+                                 float minU, float minV, float maxU, float maxV,
+                                 int argb) {
+        RenderSystem.setShaderTexture(0, texture);
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.enableBlend();
-        Matrix4f matrix4f = gui.pose().last().pose();
-        BufferBuilder bufferbuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        bufferbuilder.addVertex(matrix4f, x1, y1, blitOffset)
-                .setUv(minU, minV)
-                .setColor(color);
-        bufferbuilder.addVertex(matrix4f, x1, y2, blitOffset)
-                .setUv(minU, maxV)
-                .setColor(color);
-        bufferbuilder.addVertex(matrix4f, x2, y2, blitOffset)
-                .setUv(maxU, maxV)
-                .setColor(color);
-        bufferbuilder.addVertex(matrix4f, x2, y1, blitOffset)
-                .setUv(maxU, minV)
-                .setColor(color);
-        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
-        RenderSystem.disableBlend();
+
+        BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        buffer.addVertex(matrix, x1, y1, z).setUv(minU, minV).setColor(argb);
+        buffer.addVertex(matrix, x1, y2, z).setUv(minU, maxV).setColor(argb);
+        buffer.addVertex(matrix, x2, y2, z).setUv(maxU, maxV).setColor(argb);
+        buffer.addVertex(matrix, x2, y1, z).setUv(maxU, minV).setColor(argb);
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
     }
 
+    // ==================================================================================
+    //  GUI 专用辅助（需要 GuiGraphics / BufferSource，与 blit 无关）
+    // ==================================================================================
 
     /**
      * Fills a rectangle with the specified color and z-level using the given render type and coordinates as the boundaries.
