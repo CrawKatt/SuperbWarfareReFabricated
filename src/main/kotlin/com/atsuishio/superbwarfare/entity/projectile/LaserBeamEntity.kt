@@ -2,7 +2,9 @@ package com.atsuishio.superbwarfare.entity.projectile
 
 import com.atsuishio.superbwarfare.entity.OBBEntity
 import com.atsuishio.superbwarfare.entity.getValue
+import com.atsuishio.superbwarfare.entity.getEntitiesWithParts
 import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback
+import com.atsuishio.superbwarfare.entity.multipartRoot
 import com.atsuishio.superbwarfare.entity.setValue
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
@@ -18,10 +20,12 @@ import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.boss.EnderDragonPart
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.level.ClipContext
@@ -120,12 +124,14 @@ open class LaserBeamEntity(type: EntityType<out LaserBeamEntity>, level: Level) 
     }
 
     open fun canDamage(target: Entity): Boolean {
+        val root = target.multipartRoot
         val shooter = owner
-        return target.isAlive && !target.isSpectator && target.canBeHitByProjectile()
-                && target !== shooter && target !is Projectile
-                && !(target is Player && target.isCreative)
-                && !SeekTool.IS_FRIENDLY.test(shooter, target)
-                && (shooter == null || !shooter.isPassengerOfSameVehicle(target))
+        return target.isAlive && root.isAlive && !root.isSpectator && target.canBeHitByProjectile()
+                && root !== shooter && root !is Projectile
+                && (target is EnderDragonPart || target !is EnderDragon)
+                && !(root is Player && root.isCreative)
+                && !SeekTool.IS_FRIENDLY.test(shooter, root)
+                && (shooter == null || !shooter.isPassengerOfSameVehicle(root))
     }
 
     private fun fireBeam() {
@@ -134,7 +140,7 @@ open class LaserBeamEntity(type: EntityType<out LaserBeamEntity>, level: Level) 
         val offset = end.subtract(start)
         val segments = ceil(offset.length() / 16.0).toInt().coerceAtLeast(1)
         val examined = hashSetOf<Int>()
-        val damaged = hashSetOf<Int>()
+        val hits = linkedMapOf<Int, Pair<Entity, Vec3>>()
         val source = ModDamageTypes.causeLaserDamage(level().registryAccess(), this, owner)
         val headshotSource = ModDamageTypes.causeLaserHeadshotDamage(level().registryAccess(), this, owner)
         var headshotHit = false
@@ -142,25 +148,35 @@ open class LaserBeamEntity(type: EntityType<out LaserBeamEntity>, level: Level) 
         for (segment in 0 until segments) {
             val from = start.add(offset.scale(segment.toDouble() / segments))
             val to = start.add(offset.scale((segment + 1.0) / segments))
-            for (candidate in level().getEntities(this, AABB(from, to).inflate(1.0), ::canDamage)) {
+            for (candidate in (level() as ServerLevel).getEntitiesWithParts(this, AABB(from, to).inflate(1.0), ::canDamage)) {
                 if (!examined.add(candidate.id)) continue
                 val hit = hitPosition(candidate, start, end) ?: continue
-                val target = if (candidate is EnderDragonPart) candidate.parentMob else candidate
-                if (!canDamage(target) || !damaged.add(target.id)) continue
-                val headshot = target is LivingEntity && isHeadshot(hit.y - target.y, target.eyeHeight.toDouble())
-                val knockback = if (target is LivingEntity) ICustomKnockback.getInstance(target) else null
-                val previousStrength = knockback?.`superbWarfare$getKnockbackStrength`()
-                knockback?.`superbWarfare$setKnockbackStrength`(0.0)
-                try {
-                    target.invulnerableTime = 0
-                    val hurt = target.forceHurt(
-                        if (headshot) headshotSource else source,
-                        getDamage() * if (headshot) getHeadShot() else 1f
-                    )
-                    if (hurt && headshot) headshotHit = true
-                } finally {
-                    if (previousStrength != null) knockback.`superbWarfare$setKnockbackStrength`(previousStrength)
+                val rootId = candidate.multipartRoot.id
+                val previous = hits[rootId]
+                if (previous == null || start.distanceToSqr(hit) < start.distanceToSqr(previous.second)) {
+                    hits[rootId] = candidate to hit
                 }
+            }
+        }
+        // Select the nearest intersected part per parent, independent of query/part iteration order.
+        for ((target, hit) in hits.values) {
+            if (!canDamage(target)) continue
+            val root = target.multipartRoot
+            val headshot = if (target is EnderDragonPart) target === target.parentMob.head
+            else root is LivingEntity && isHeadshot(hit.y - root.y, root.eyeHeight.toDouble())
+            val knockback = if (root is LivingEntity) ICustomKnockback.getInstance(root) else null
+            val previousStrength = knockback?.`superbWarfare$getKnockbackStrength`()
+            knockback?.`superbWarfare$setKnockbackStrength`(0.0)
+            try {
+                root.invulnerableTime = 0
+                target.invulnerableTime = 0
+                val hurt = target.forceHurt(
+                    if (headshot) headshotSource else source,
+                    getDamage() * if (headshot) getHeadShot() else 1f
+                )
+                if (hurt && headshot) headshotHit = true
+            } finally {
+                if (previousStrength != null) knockback.`superbWarfare$setKnockbackStrength`(previousStrength)
             }
         }
         if (headshotHit) (owner as? ServerPlayer)?.sendPacket(ClientIndicatorMessage(1, 5))
