@@ -172,36 +172,19 @@ object AircraftHud {
 
                 poseStack.pushPose()
                 poseStack.translate(x, y, 0f)
-                val component = vehicle.thirdPersonAmmoComponent(gunData!!, player)
+                val component = vehicle.thirdPersonAmmoComponent(gunData, player)
                 guiGraphics.drawString(mc.font, component, 25, -11, 1, false)
                 poseStack.popPose()
 
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    BOMB_SCOPE,
-                    x - 1.5f * i,
-                    y - 1.5f * j,
-                    0f,
-                    0f,
-                    (3 * i).toFloat(),
-                    (3 * j).toFloat(),
-                    (3 * i).toFloat(),
-                    (3 * j).toFloat()
+                RenderHelper.blit(
+                    guiGraphics.pose(), BOMB_SCOPE, x - 1.5f * i, y - 1.5f * j, (3 * i).toFloat(), (3 * j).toFloat(),
                 )
 
                 poseStack.pushPose()
                 poseStack.rotateAround(Axis.ZP.rotationDegrees(vehicle.getRoll(partialTick)), x, y, 0f)
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    BOMB_SCOPE_PITCH,
-                    x - 1.5f * i,
-                    y - 1.5f * j - 4 * vehicle.getPitch(partialTick),
-                    0f,
-                    0f,
-                    (3 * i).toFloat(),
-                    (3 * j).toFloat(),
-                    (3 * i).toFloat(),
-                    (3 * j).toFloat()
+                RenderHelper.blit(
+                    guiGraphics.pose(), BOMB_SCOPE_PITCH, x - 1.5f * i,
+                    y - 1.5f * j - 4 * vehicle.getPitch(partialTick), (3 * i).toFloat(), (3 * j).toFloat(),
                 )
                 renderKillIndicatorDynamic(
                     guiGraphics,
@@ -481,17 +464,9 @@ object AircraftHud {
                     bombHitPosX = Mth.lerp(0.25 * partialTick.toDouble(), bombHitPosX, xCross.toDouble())
                     bombHitPosY = Mth.lerp(0.25 * partialTick.toDouble(), bombHitPosY, yCross.toDouble())
 
-                    RenderHelper.preciseBlit(
-                        guiGraphics,
-                        BOMB_RING,
-                        bombHitPosX.toFloat() - 12f,
-                        bombHitPosY.toFloat() - 12f,
-                        0f,
-                        0f,
+                    RenderHelper.blit(
+                        guiGraphics.pose(), BOMB_RING, bombHitPosX.toFloat() - 12f, bombHitPosY.toFloat() - 12f, 24f,
                         24f,
-                        24f,
-                        24f,
-                        24f
                     )
                     x = p.x.toFloat()
                     y = p.y.toFloat()
@@ -499,9 +474,8 @@ object AircraftHud {
 
                 mouseX = Mth.lerp(0.1f * partialTick, mouseX, ClientMouseHandler.lerpSpeedX.toFloat())
                 mouseY = Mth.lerp(0.1f * partialTick, mouseY, ClientMouseHandler.lerpSpeedY.toFloat())
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    HelicopterHud.RING, x - 2 + mouseX, y - 2 + mouseY, 0f, 0f, 4f, 4f, 4f, 4f
+                RenderHelper.blit(
+                    guiGraphics.pose(), HelicopterHud.RING, x - 2 + mouseX, y - 2 + mouseY, 4f, 4f,
                 )
 
                 val originPos = Vec3(x.toDouble(), y.toDouble(), 0.0)
@@ -559,9 +533,8 @@ object AircraftHud {
 
                 poseStack.pushPose()
                 poseStack.rotateAround(Axis.ZP.rotationDegrees(vehicle.getRoll(partialTick)), x, y, 0f)
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    HelicopterHud.CROSSHAIR_3P, x - 34, y - 8.5f, 0f, 0f, 68f, 17f, 68f, 17f
+                RenderHelper.blit(
+                    guiGraphics.pose(), HelicopterHud.CROSSHAIR_3P, x - 34, y - 8.5f, 68f, 17f,
                 )
                 renderKillIndicatorDynamic(
                     guiGraphics,

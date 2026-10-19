@@ -78,17 +78,8 @@ object HeatBarOverlay : CommonOverlay("heat_bar") {
         val alpha: Float = ANIMATION_TIMER.lerp(1f, 0f, currentTime)
         RenderSystem.setShaderColor(1f, 1f, 1f, alpha)
 
-        RenderHelper.preciseBlit(
-            guiGraphics,
-            TEXTURE,
-            posX,
-            posY,
-            0f,
-            0f,
-            37 / 4f,
-            233 / 4f,
-            width.toFloat(),
-            height.toFloat()
+        RenderHelper.blit(
+            guiGraphics.pose(), TEXTURE, posX, posY, 0f, 0f, 37 / 4f, 233 / 4f, width.toFloat(), height.toFloat(),
         )
 
         val rate = Mth.clamp(heat / 100.0, 0.0, 1.0).toFloat()

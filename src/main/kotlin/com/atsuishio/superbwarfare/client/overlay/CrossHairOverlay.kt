@@ -256,53 +256,21 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
             )
         }
 
-        RenderHelper.preciseBlit(
-            guiGraphics,
-            REX_HORIZONTAL,
-            (w / 2f - 13.5f - 2.8f * spread).toFloat() + moveX,
-            h / 2f - 7.5f + moveY,
-            0f,
-            0f,
-            16f,
-            16f,
-            16f,
-            16f
+        RenderHelper.blit(
+            guiGraphics.pose(), REX_HORIZONTAL, (w / 2f - 13.5f - 2.8f * spread).toFloat() + moveX,
+            h / 2f - 7.5f + moveY, 16f, 16f,
         )
-        RenderHelper.preciseBlit(
-            guiGraphics,
-            REX_HORIZONTAL,
-            (w / 2f - 2.5f + 2.8f * spread).toFloat() + moveX,
-            h / 2f - 7.5f + moveY,
-            0f,
-            0f,
-            16f,
-            16f,
-            16f,
-            16f
+        RenderHelper.blit(
+            guiGraphics.pose(), REX_HORIZONTAL, (w / 2f - 2.5f + 2.8f * spread).toFloat() + moveX,
+            h / 2f - 7.5f + moveY, 16f, 16f,
         )
-        RenderHelper.preciseBlit(
-            guiGraphics,
-            REX_VERTICAL,
-            w / 2f - 7.5f + moveX,
-            (h / 2f - 2.5f + 2.8f * spread).toFloat() + moveY,
-            0f,
-            0f,
-            16f,
-            16f,
-            16f,
-            16f
+        RenderHelper.blit(
+            guiGraphics.pose(), REX_VERTICAL, w / 2f - 7.5f + moveX, (h / 2f - 2.5f + 2.8f * spread).toFloat() + moveY,
+            16f, 16f,
         )
-        RenderHelper.preciseBlit(
-            guiGraphics,
-            REX_VERTICAL,
-            w / 2f - 7.5f + moveX,
-            (h / 2f - 13.5f - 2.8f * spread).toFloat() + moveY,
-            0f,
-            0f,
-            16f,
-            16f,
-            16f,
-            16f
+        RenderHelper.blit(
+            guiGraphics.pose(), REX_VERTICAL, w / 2f - 7.5f + moveX, (h / 2f - 13.5f - 2.8f * spread).toFloat() + moveY,
+            16f, 16f,
         )
 
         poseStack.popPose()
@@ -311,18 +279,9 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
     /**
      * 渲染圆形准星
      */
-    fun shotgunCrossHair(guiGraphics: GuiGraphics?, finPosX: Float, finPosY: Float, finLength: Float) {
-        RenderHelper.preciseBlit(
-            guiGraphics,
-            SHOTGUN,
-            finPosX,
-            finPosY,
-            0f,
-            0f,
-            finLength,
-            finLength,
-            finLength,
-            finLength
+    fun shotgunCrossHair(guiGraphics: GuiGraphics, finPosX: Float, finPosY: Float, finLength: Float) {
+        RenderHelper.blit(
+            guiGraphics.pose(), SHOTGUN, finPosX, finPosY, finLength, finLength,
         )
     }
 
@@ -336,17 +295,8 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
             if (ClientEventHandler.zoomTime > 0.8 && GunResource.compute(stack).hideCrosshairWhenZoom) return
         }
 
-        RenderHelper.preciseBlit(
-            guiGraphics,
-            POINT,
-            screenWidth / 2f - 7.5f + moveX,
-            screenHeight / 2f - 7.5f + moveY,
-            0f,
-            0f,
-            16f,
-            16f,
-            16f,
-            16f
+        RenderHelper.blit(
+            guiGraphics.pose(), POINT, screenWidth / 2f - 7.5f + moveX, screenHeight / 2f - 7.5f + moveY, 16f, 16f,
         )
         if (!player.isSprinting || ClientEventHandler.noSprintTicks > 0) {
             if (data.get(GunProp.PROJECTILE_AMOUNT) > 1) {
@@ -376,17 +326,8 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
             health = lookingEntity.health / lookingEntity.getMaxHealth()
         }
 
-        RenderHelper.preciseBlit(
-            guiGraphics,
-            POINT,
-            screenWidth / 2f - 7.5f + moveX,
-            screenHeight / 2f - 7.5f + moveY,
-            0f,
-            0f,
-            16f,
-            16f,
-            16f,
-            16f
+        RenderHelper.blit(
+            guiGraphics.pose(), POINT, screenWidth / 2f - 7.5f + moveX, screenHeight / 2f - 7.5f + moveY, 16f, 16f,
         )
 
         if (health > 0) {
@@ -410,17 +351,8 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
     ) {
         if (ClientEventHandler.zoomTime > 0.8 && GunResource.compute(stack).hideCrosshairWhenZoom) return
 
-        RenderHelper.preciseBlit(
-            guiGraphics,
-            REX,
-            screenWidth / 2f - 16 + moveX,
-            screenHeight / 2f - 16 + moveY,
-            0f,
-            0f,
-            32f,
-            32f,
-            32f,
-            32f
+        RenderHelper.blit(
+            guiGraphics.pose(), REX, screenWidth / 2f - 16 + moveX, screenHeight / 2f - 16 + moveY, 32f, 32f,
         )
     }
 
@@ -448,7 +380,7 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
     }
 
     private fun renderKillIndicatorDynamic(
-        guiGraphics: GuiGraphics?,
+        guiGraphics: GuiGraphics,
         w: Int,
         h: Int,
         moveX: Float,
@@ -468,47 +400,20 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
         val rate: Float = (40 - killIndicator * 5) / 5.5f
 
         if (hitIndicator > 0) {
-            RenderHelper.preciseBlit(
-                guiGraphics,
-                HIT_MARKER,
-                posX + offsetX,
-                posY + offsetY,
-                0f,
-                0f,
-                16f,
-                16f,
-                16f,
-                16f
+            RenderHelper.blit(
+                guiGraphics.pose(), HIT_MARKER, posX + offsetX, posY + offsetY, 16f, 16f,
             )
         }
 
         if (vehicleIndicator > 0) {
-            RenderHelper.preciseBlit(
-                guiGraphics,
-                HIT_MARKER_VEHICLE,
-                posX + offsetX,
-                posY + offsetY,
-                0f,
-                0f,
-                16f,
-                16f,
-                16f,
-                16f
+            RenderHelper.blit(
+                guiGraphics.pose(), HIT_MARKER_VEHICLE, posX + offsetX, posY + offsetY, 16f, 16f,
             )
         }
 
         if (headIndicator > 0) {
-            RenderHelper.preciseBlit(
-                guiGraphics,
-                HEADSHOT_MARKER,
-                posX + offsetX,
-                posY + offsetY,
-                0f,
-                0f,
-                16f,
-                16f,
-                16f,
-                16f
+            RenderHelper.blit(
+                guiGraphics.pose(), HEADSHOT_MARKER, posX + offsetX, posY + offsetY, 16f, 16f,
             )
         }
 
@@ -518,10 +423,10 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
             val posX2 = baseX - 7.5f + 2 - rate + offsetX
             val posY2 = baseY - 7.5f + 2 - rate + offsetY
 
-            RenderHelper.preciseBlit(guiGraphics, KILL_MARKER_1, posX1, posY1, 0f, 0f, 16f, 16f, 16f, 16f)
-            RenderHelper.preciseBlit(guiGraphics, KILL_MARKER_2, posX2, posY1, 0f, 0f, 16f, 16f, 16f, 16f)
-            RenderHelper.preciseBlit(guiGraphics, KILL_MARKER_3, posX1, posY2, 0f, 0f, 16f, 16f, 16f, 16f)
-            RenderHelper.preciseBlit(guiGraphics, KILL_MARKER_4, posX2, posY2, 0f, 0f, 16f, 16f, 16f, 16f)
+            RenderHelper.blit(guiGraphics.pose(), KILL_MARKER_1, posX1, posY1, 16f, 16f)
+            RenderHelper.blit(guiGraphics.pose(), KILL_MARKER_2, posX2, posY1, 16f, 16f)
+            RenderHelper.blit(guiGraphics.pose(), KILL_MARKER_3, posX1, posY2, 16f, 16f)
+            RenderHelper.blit(guiGraphics.pose(), KILL_MARKER_4, posX2, posY2, 16f, 16f)
         }
     }
 

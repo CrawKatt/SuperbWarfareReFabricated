@@ -125,18 +125,9 @@ class Ac130GunnerHud {
                 // 电视
                 val addW = (screenWidth / screenHeight) * 48
                 val addH = (screenWidth / screenHeight) * 27
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    FRAME,
-                    -addW.toFloat() / 2,
-                    -addH.toFloat() / 2,
-                    10f,
-                    0f,
-                    0f,
-                    (screenWidth + addW).toFloat(),
-                    (screenHeight + addH).toFloat(),
-                    (screenWidth + addW).toFloat(),
-                    (screenHeight + addH).toFloat()
+                RenderHelper.blit(
+                    guiGraphics.pose(), FRAME, -addW.toFloat() / 2, -addH.toFloat() / 2, (screenWidth + addW).toFloat(),
+                    (screenHeight + addH).toFloat(), z = 10f,
                 )
                 RenderHelper.blit(
                     poseStack,

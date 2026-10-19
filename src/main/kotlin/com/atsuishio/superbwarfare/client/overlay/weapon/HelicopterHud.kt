@@ -144,18 +144,9 @@ object HelicopterHud {
                 // 电视
                 val addW = (screenWidth / screenHeight) * 48
                 val addH = (screenWidth / screenHeight) * 27
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    FRAME,
-                    -addW.toFloat() / 2,
-                    -addH.toFloat() / 2,
-                    10f,
-                    0f,
-                    0f,
-                    (screenWidth + addW).toFloat(),
-                    (screenHeight + addH).toFloat(),
-                    (screenWidth + addW).toFloat(),
-                    (screenHeight + addH).toFloat()
+                RenderHelper.blit(
+                    guiGraphics.pose(), FRAME, -addW.toFloat() / 2, -addH.toFloat() / 2, (screenWidth + addW).toFloat(),
+                    (screenHeight + addH).toFloat(), z = 10f,
                 )
                 RenderHelper.blit(
                     poseStack,
@@ -473,7 +464,7 @@ object HelicopterHud {
             } else if (pos.canBeSeen()) {
                 mouseX = Mth.lerp(0.1f * partialTick, mouseX, ClientMouseHandler.lerpSpeedX.toFloat())
                 mouseY = Mth.lerp(0.1f * partialTick, mouseY, ClientMouseHandler.lerpSpeedY.toFloat())
-                RenderHelper.preciseBlit(guiGraphics, RING, x - 2 + mouseX, y - 2 + mouseY, 0f, 0f, 4f, 4f, 4f, 4f)
+                RenderHelper.blit(guiGraphics.pose(), RING, x - 2 + mouseX, y - 2 + mouseY, 4f, 4f)
 
                 val originPos = Vec3(x.toDouble(), y.toDouble(), 0.0)
                 val ringPos = Vec3(x + mouseX.toDouble(), y + mouseY.toDouble(), 0.0)
@@ -530,7 +521,7 @@ object HelicopterHud {
 
                 poseStack.pushPose()
                 poseStack.rotateAround(Axis.ZP.rotationDegrees(vehicle.getRoll(partialTick)), x, y, 0f)
-                RenderHelper.preciseBlit(guiGraphics, CROSSHAIR_3P, x - 34, y - 8.5f, 0f, 0f, 68f, 17f, 68f, 17f)
+                RenderHelper.blit(guiGraphics.pose(), CROSSHAIR_3P, x - 34, y - 8.5f, 68f, 17f)
                 renderKillIndicatorDynamic(
                     guiGraphics,
                     x - 7.5f + (2 * (Math.random() - 0.5f)).toFloat(),
