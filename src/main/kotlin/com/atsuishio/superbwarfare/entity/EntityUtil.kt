@@ -18,6 +18,14 @@ operator fun <T : Any> EntityDataAccessor<T>.setValue(entity: Any?, prop: KPrope
     (entity as Entity).entityData.set(this, value)
 }
 
+/** Owner of a multipart hitbox, used for eligibility, cooldown resets and damage deduplication. */
+val Entity.multipartRoot: Entity
+    get() {
+        var root = this
+        while (root is EnderDragonPart) root = root.parentMob
+        return root
+    }
+
 fun ServerLevel.getEntitiesWithParts(
     except: Entity?,
     bounds: AABB,
