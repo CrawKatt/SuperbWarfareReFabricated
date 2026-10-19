@@ -106,6 +106,10 @@
           }
         ],
         "ShootAnimation": "animation.reforging.fire_lighting",
+        "SoundInfo": {
+          "Fire1P": "superbwarfare:reforging_fire_lightning",
+          "Fire3P": "superbwarfare:reforging_fire_3p_lightning"
+        },
         "Headshot": 1,
         "Magazine": 0,
         "AmmoCostPerShoot": 100,
@@ -129,6 +133,10 @@
           }
         },
         "ShootAnimation": "animation.reforging.fire_laser",
+        "SoundInfo": {
+          "Fire1P": "superbwarfare:reforging_fire_laser",
+          "Fire3P": "superbwarfare:reforging_fire_3p_laser"
+        },
         "Range": 128,
         "Magazine": 0,
         "AmmoCostPerShoot": 6,
@@ -153,5 +161,9 @@
       }
     }
   ],
+  "SoundInfo": {
+    "Fire1P": "superbwarfare:reforging_fire",
+    "Fire3P": "superbwarfare:reforging_fire_3p"
+  },
   "Icon": "superbwarfare:textures/gun_icon/reforging_icon.png"
 }
