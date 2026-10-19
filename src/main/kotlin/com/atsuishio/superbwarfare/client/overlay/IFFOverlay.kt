@@ -93,13 +93,10 @@ object IFFOverlay : CommonOverlay("iff") {
                         val yf = point.y.toFloat()
                         val icon = getResourceLocation(teammate)
 
-                        RenderHelper.preciseBlitWithColor(
-                            guiGraphics,
-                            icon,
-                            (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
-                            (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()),
-                            0f, 0f, 12f, 12f, 12f, 12f,
-                            0x7FFFAD
+                        RenderHelper.blit(
+                            guiGraphics.pose(), icon, (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
+                            (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()), 12f, 12f,
+                            argb = RenderHelper.opaque(0x7FFFAD),
                         )
 
                         if (Vec2(xf, yf).distanceToSqr(
@@ -166,13 +163,10 @@ object IFFOverlay : CommonOverlay("iff") {
                         val yf = point.y.toFloat()
                         val icon = getResourceLocation(enemy)
 
-                        RenderHelper.preciseBlitWithColor(
-                            guiGraphics,
-                            icon,
-                            (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
-                            (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()),
-                            0f, 0f, 12f, 12f, 12f, 12f,
-                            0xFFBD7F
+                        RenderHelper.blit(
+                            guiGraphics.pose(), icon, (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
+                            (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()), 12f, 12f,
+                            argb = RenderHelper.opaque(0xFFBD7F),
                         )
 
                         if (Vec2(xf, yf).distanceToSqr(
@@ -220,12 +214,12 @@ object IFFOverlay : CommonOverlay("iff") {
                     val yf = point.y.toFloat()
                     val icon = getResourceLocation(neutral)
 
-                    RenderHelper.preciseBlitWithColor(
-                        guiGraphics, icon,
+                    RenderHelper.blit(
+                        guiGraphics.pose(), icon,
                         (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
                         (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()),
-                        0f, 0f, 12f, 12f, 12f, 12f,
-                        -1 // 白色 = 中立
+                        12f, 12f, // 白色 = 中立
+                        argb = -1,
                     )
 
                     if (Vec2(xf, yf).distanceToSqr(
@@ -352,12 +346,9 @@ object IFFOverlay : CommonOverlay("iff") {
         var height = 10
 
         if (!info.onVehicle) {
-            RenderHelper.preciseBlitWithColor(
-                guiGraphics, FRIENDLY_INDICATOR,
-                (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
-                (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()),
-                0f, 0f, 12f, 12f, 12f, 12f,
-                color
+            RenderHelper.blit(
+                guiGraphics.pose(), FRIENDLY_INDICATOR, (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
+                (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()), 12f, 12f, argb = RenderHelper.opaque(color),
             )
         } else {
             height = 20

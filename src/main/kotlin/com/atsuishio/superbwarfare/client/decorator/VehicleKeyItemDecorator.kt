@@ -30,18 +30,9 @@ class VehicleKeyItemDecorator {
 
         val colorInt = (0xFF shl 24) or (color and 0xFFFFFF)
 
-        RenderHelper.preciseBlitWithColor(
-            guiGraphics,
-            TEXTURE,
-            xOffset.toFloat(),
-            yOffset.toFloat(),
-            0f,
-            0f,
-            16f,
-            16f,
-            16f,
-            16f,
-            colorInt
+        RenderHelper.blit(
+            guiGraphics.pose(), TEXTURE, xOffset.toFloat(), yOffset.toFloat(), 16f, 16f,
+            argb = RenderHelper.opaque(colorInt),
         )
 
         pose.popPose()

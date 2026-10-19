@@ -31,7 +31,7 @@ class ContainerItemDecorator {
         if (customIcon != null) {
             val pose = guiGraphics.pose()
             pose.pushPose()
-            RenderHelper.preciseBlit(guiGraphics, customIcon, xOffset.toFloat(), yOffset.toFloat(), 200f, 0f, 0f, 16f, 16f, 16f, 16f)
+            RenderHelper.blit(guiGraphics.pose(), customIcon, xOffset.toFloat(), yOffset.toFloat(), 16f, 16f, z = 200f)
             pose.popPose()
         }
 
@@ -51,7 +51,7 @@ class ContainerItemDecorator {
 
         val pose = guiGraphics.pose()
         pose.pushPose()
-        RenderHelper.preciseBlit(guiGraphics, icon, xOffset.toFloat(), yOffset.toFloat(), 200f, 0f, 0f, 8f, 8f, 8f, 8f)
+        RenderHelper.blit(guiGraphics.pose(), icon, xOffset.toFloat(), yOffset.toFloat(), 8f, 8f, z = 200f)
         pose.popPose()
         return true
     }

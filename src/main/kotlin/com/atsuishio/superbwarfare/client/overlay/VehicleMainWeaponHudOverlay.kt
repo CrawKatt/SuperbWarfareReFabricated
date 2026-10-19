@@ -243,18 +243,8 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                         )
                         poseStack.popPose()
 
-                        RenderHelper.preciseBlitWithColor(
-                            guiGraphics,
-                            FRAME_LOCK,
-                            x - 12,
-                            y - 12,
-                            0f,
-                            0f,
-                            24f,
-                            24f,
-                            24f,
-                            24f,
-                            -0x1f
+                        RenderHelper.blit(
+                            guiGraphics.pose(), FRAME_LOCK, x - 12, y - 12, 24f, 24f, argb = RenderHelper.opaque(-0x1f),
                         )
                         nearestEntity = targetEntity
                         if (seekInfo.calculateTrajectory) {
@@ -282,18 +272,9 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                                 val targetHudPos = Vec3(x.toDouble(), y.toDouble(), 0.0)
                                 val shootHudPos = Vec3(x0.toDouble(), y0.toDouble(), 0.0)
 
-                                RenderHelper.preciseBlitWithColor(
-                                    guiGraphics,
-                                    SHOOT_INDICATOR,
-                                    x0 - 12,
-                                    y0 - 12,
-                                    0f,
-                                    0f,
-                                    24f,
-                                    24f,
-                                    24f,
-                                    24f,
-                                    -0x1
+                                RenderHelper.blit(
+                                    guiGraphics.pose(), SHOOT_INDICATOR, x0 - 12, y0 - 12, 24f, 24f,
+                                    argb = RenderHelper.opaque(-0x1),
                                 )
                                 poseStack.popPose()
 
@@ -302,18 +283,9 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                                 while (i < dis - 3) {
                                     val toVec = targetHudPos.vectorTo(shootHudPos).normalize()
                                     val p0 = targetHudPos.add(toVec.scale(i))
-                                    RenderHelper.preciseBlitWithColor(
-                                        guiGraphics,
-                                        BLOCK,
-                                        (p0.x - 0.5).toFloat(),
-                                        (p0.y - 0.5).toFloat(),
-                                        0f,
-                                        0f,
-                                        1f,
-                                        1f,
-                                        1f,
-                                        1f,
-                                        -0x1
+                                    RenderHelper.blit(
+                                        guiGraphics.pose(), BLOCK, (p0.x - 0.5).toFloat(), (p0.y - 0.5).toFloat(), 1f,
+                                        1f, argb = RenderHelper.opaque(-0x1),
                                     )
                                     i += 3.0
                                 }
@@ -323,57 +295,21 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                         lerpLock = Mth.lerp(partialTick, lerpLock, ClientEventHandler.seekingTimeVehicle.toFloat())
                         val lockTime = ((seekTime - lerpLock) * (20f / seekTime)).coerceIn(0f, 20f)
                         if (ClientEventHandler.seekingTimeVehicle > 0) {
-                            RenderHelper.preciseBlitWithColor(
-                                guiGraphics,
-                                IND_1,
-                                x - 12,
-                                y - 12 - lockTime,
-                                0f,
-                                0f,
-                                24f,
-                                24f,
-                                24f,
-                                24f,
-                                -0x1
+                            RenderHelper.blit(
+                                guiGraphics.pose(), IND_1, x - 12, y - 12 - lockTime, 24f, 24f,
+                                argb = RenderHelper.opaque(-0x1),
                             )
-                            RenderHelper.preciseBlitWithColor(
-                                guiGraphics,
-                                IND_2,
-                                x - 12,
-                                y - 12 + lockTime,
-                                0f,
-                                0f,
-                                24f,
-                                24f,
-                                24f,
-                                24f,
-                                -0x1
+                            RenderHelper.blit(
+                                guiGraphics.pose(), IND_2, x - 12, y - 12 + lockTime, 24f, 24f,
+                                argb = RenderHelper.opaque(-0x1),
                             )
-                            RenderHelper.preciseBlitWithColor(
-                                guiGraphics,
-                                IND_3,
-                                x - 12 - lockTime,
-                                y - 12,
-                                0f,
-                                0f,
-                                24f,
-                                24f,
-                                24f,
-                                24f,
-                                -0x1
+                            RenderHelper.blit(
+                                guiGraphics.pose(), IND_3, x - 12 - lockTime, y - 12, 24f, 24f,
+                                argb = RenderHelper.opaque(-0x1),
                             )
-                            RenderHelper.preciseBlitWithColor(
-                                guiGraphics,
-                                IND_4,
-                                x - 12 + lockTime,
-                                y - 12,
-                                0f,
-                                0f,
-                                24f,
-                                24f,
-                                24f,
-                                24f,
-                                -0x1
+                            RenderHelper.blit(
+                                guiGraphics.pose(), IND_4, x - 12 + lockTime, y - 12, 24f, 24f,
+                                argb = RenderHelper.opaque(-0x1),
                             )
                         }
 
@@ -406,32 +342,14 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                         )
                         poseStack.popPose()
 
-                        RenderHelper.preciseBlitWithColor(
-                            guiGraphics,
+                        RenderHelper.blit(
+                            guiGraphics.pose(),
                             if (ClientEventHandler.seekingTimeVehicle > 0) FRAME_TARGET else FRAME_TARGET_TRIANGLE,
-                            x - 12,
-                            y - 12,
-                            0f,
-                            0f,
-                            24f,
-                            24f,
-                            24f,
-                            24f,
-                            -0x1
+                            x - 12, y - 12, 24f, 24f, argb = RenderHelper.opaque(-0x1),
                         )
                     } else {
-                        RenderHelper.preciseBlitWithColor(
-                            guiGraphics,
-                            FRAME_GREEN,
-                            x - 12,
-                            y - 12,
-                            0f,
-                            0f,
-                            24f,
-                            24f,
-                            24f,
-                            24f,
-                            -0x1
+                        RenderHelper.blit(
+                            guiGraphics.pose(), FRAME_GREEN, x - 12, y - 12, 24f, 24f, argb = RenderHelper.opaque(-0x1),
                         )
                     }
                     poseStack.popPose()
@@ -449,57 +367,21 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                     lerpLock = Mth.lerp(partialTick, lerpLock, ClientEventHandler.seekingTimeVehicle.toFloat())
                     val lockTime = ((seekTime - lerpLock) * (20f / seekTime)).coerceIn(0f, 20f)
                     if (ClientEventHandler.seekingTimeVehicle > 0 && !lockOn) {
-                        RenderHelper.preciseBlitWithColor(
-                            guiGraphics,
-                            IND_1,
-                            x - 12,
-                            y - 12 - lockTime,
-                            0f,
-                            0f,
-                            24f,
-                            24f,
-                            24f,
-                            24f,
-                            -0x1
+                        RenderHelper.blit(
+                            guiGraphics.pose(), IND_1, x - 12, y - 12 - lockTime, 24f, 24f,
+                            argb = RenderHelper.opaque(-0x1),
                         )
-                        RenderHelper.preciseBlitWithColor(
-                            guiGraphics,
-                            IND_2,
-                            x - 12,
-                            y - 12 + lockTime,
-                            0f,
-                            0f,
-                            24f,
-                            24f,
-                            24f,
-                            24f,
-                            -0x1
+                        RenderHelper.blit(
+                            guiGraphics.pose(), IND_2, x - 12, y - 12 + lockTime, 24f, 24f,
+                            argb = RenderHelper.opaque(-0x1),
                         )
-                        RenderHelper.preciseBlitWithColor(
-                            guiGraphics,
-                            IND_3,
-                            x - 12 - lockTime,
-                            y - 12,
-                            0f,
-                            0f,
-                            24f,
-                            24f,
-                            24f,
-                            24f,
-                            -0x1
+                        RenderHelper.blit(
+                            guiGraphics.pose(), IND_3, x - 12 - lockTime, y - 12, 24f, 24f,
+                            argb = RenderHelper.opaque(-0x1),
                         )
-                        RenderHelper.preciseBlitWithColor(
-                            guiGraphics,
-                            IND_4,
-                            x - 12 + lockTime,
-                            y - 12,
-                            0f,
-                            0f,
-                            24f,
-                            24f,
-                            24f,
-                            24f,
-                            -0x1
+                        RenderHelper.blit(
+                            guiGraphics.pose(), IND_4, x - 12 + lockTime, y - 12, 24f, 24f,
+                            argb = RenderHelper.opaque(-0x1),
                         )
                     }
 
@@ -519,18 +401,9 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                         poseStack.popPose()
                     }
 
-                    RenderHelper.preciseBlitWithColor(
-                        guiGraphics,
-                        if (lockOn) FRAME_LOCK else FRAME_TARGET,
-                        x - 12,
-                        y - 12,
-                        0f,
-                        0f,
-                        24f,
-                        24f,
-                        24f,
-                        24f,
-                        -0x1
+                    RenderHelper.blit(
+                        guiGraphics.pose(), if (lockOn) FRAME_LOCK else FRAME_TARGET, x - 12, y - 12, 24f, 24f,
+                        argb = RenderHelper.opaque(-0x1),
                     )
                     poseStack.popPose()
                 }
@@ -538,17 +411,8 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                 poseStack.pushPose()
                 poseStack.translate((screenWidth / 2).toDouble(), (screenHeight / 2).toDouble(), 0.0)
 
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    FRAME_TARGET,
-                    -12f,
-                    -12f,
-                    0f,
-                    0f,
-                    24f,
-                    24f,
-                    24f,
-                    24f,
+                RenderHelper.blit(
+                    guiGraphics.pose(), FRAME_TARGET, -12f, -12f, 24f, 24f,
                 )
 
                 val string = "[" + ModKeyMappings.VEHICLE_SEEK.key.displayName.string + "]"

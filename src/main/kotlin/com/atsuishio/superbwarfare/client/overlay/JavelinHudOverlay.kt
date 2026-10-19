@@ -76,33 +76,15 @@ object JavelinHudOverlay : CommonOverlay("javelin_hud") {
             val l = ((h - j) / 2) + moveY
             val i1 = k + i
             val j1 = l + j
-            RenderHelper.preciseBlit(guiGraphics, JAVELIN_HUD, k, l, 0f, 0f, i, j, i, j)
-            RenderHelper.preciseBlit(
-                guiGraphics,
-                if (data.selectedFireModeInfo().name == "Top") TOP else DIR,
-                k,
-                l,
-                0f,
-                0f,
-                i,
-                j,
-                i,
-                j
+            RenderHelper.blit(guiGraphics.pose(), JAVELIN_HUD, k, l, i, j)
+            RenderHelper.blit(
+                guiGraphics.pose(), if (data.selectedFireModeInfo().name == "Top") TOP else DIR, k, l, i, j,
             )
-            RenderHelper.preciseBlit(
-                guiGraphics,
-                if (data.hasEnoughAmmoToShoot(player)) MISSILE_GREEN else MISSILE_RED,
-                k,
-                l,
-                0f,
-                0f,
-                i,
-                j,
-                i,
-                j
+            RenderHelper.blit(
+                guiGraphics.pose(), if (data.hasEnoughAmmoToShoot(player)) MISSILE_GREEN else MISSILE_RED, k, l, i, j,
             )
             if (tag.getInt("SeekTime") in 2..<20) {
-                RenderHelper.preciseBlit(guiGraphics, SEEK, k, l, 0f, 0f, i, j, i, j)
+                RenderHelper.blit(guiGraphics.pose(), SEEK, k, l, i, j)
             }
 
             guiGraphics.fill(RenderType.guiOverlay(), 0, l.toInt(), k.toInt() + 3, j1.toInt(), -90, -16777216)
@@ -150,18 +132,9 @@ object JavelinHudOverlay : CommonOverlay("javelin_hud") {
                         val x = point.x.toFloat()
                         val y = point.y.toFloat()
 
-                        RenderHelper.preciseBlitWithColor(
-                            guiGraphics,
-                            if (lockOn) FRAME_LOCK else if (nearest) FRAME_TARGET else FRAME,
-                            x - 12,
-                            y - 12,
-                            0f,
-                            0f,
-                            24f,
-                            24f,
-                            24f,
-                            24f,
-                            -0x1
+                        RenderHelper.blit(
+                            guiGraphics.pose(), if (lockOn) FRAME_LOCK else if (nearest) FRAME_TARGET else FRAME,
+                            x - 12, y - 12, 24f, 24f, argb = RenderHelper.opaque(-0x1),
                         )
                         poseStack.popPose()
                     }
@@ -175,18 +148,9 @@ object JavelinHudOverlay : CommonOverlay("javelin_hud") {
                             val x = point.x.toFloat()
                             val y = point.y.toFloat()
 
-                            RenderHelper.preciseBlitWithColor(
-                                guiGraphics,
-                                if (lockOn) FRAME_LOCK else FRAME_TARGET,
-                                x - 12,
-                                y - 12,
-                                0f,
-                                0f,
-                                24f,
-                                24f,
-                                24f,
-                                24f,
-                                -0x1
+                            RenderHelper.blit(
+                                guiGraphics.pose(), if (lockOn) FRAME_LOCK else FRAME_TARGET, x - 12, y - 12, 24f, 24f,
+                                argb = RenderHelper.opaque(-0x1),
                             )
                             poseStack.popPose()
                         }

@@ -165,32 +165,15 @@ object AircraftHud {
                 guiGraphics.drawString(mc.font, component, 25, -11, 1, false)
                 poseStack.popPose()
 
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    BOMB_SCOPE,
-                    x - 1.5f * i,
-                    y - 1.5f * j,
-                    0f,
-                    0f,
-                    (3 * i).toFloat(),
-                    (3 * j).toFloat(),
-                    (3 * i).toFloat(),
-                    (3 * j).toFloat()
+                RenderHelper.blit(
+                    guiGraphics.pose(), BOMB_SCOPE, x - 1.5f * i, y - 1.5f * j, (3 * i).toFloat(), (3 * j).toFloat(),
                 )
 
                 poseStack.pushPose()
                 poseStack.rotateAround(Axis.ZP.rotationDegrees(vehicle.getRoll(partialTick)), x, y, 0f)
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    BOMB_SCOPE_PITCH,
-                    x - 1.5f * i,
-                    y - 1.5f * j - 4 * vehicle.getPitch(partialTick),
-                    0f,
-                    0f,
-                    (3 * i).toFloat(),
-                    (3 * j).toFloat(),
-                    (3 * i).toFloat(),
-                    (3 * j).toFloat()
+                RenderHelper.blit(
+                    guiGraphics.pose(), BOMB_SCOPE_PITCH, x - 1.5f * i,
+                    y - 1.5f * j - 4 * vehicle.getPitch(partialTick), (3 * i).toFloat(), (3 * j).toFloat(),
                 )
                 renderKillIndicatorDynamic(
                     guiGraphics,
@@ -225,114 +208,51 @@ object AircraftHud {
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
 
             if (gunData?.get(GunProp.CROSSHAIR) == "@AirCraftMissile") {
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    HUD_BASE_MISSILE,
-                    x - 160,
-                    y - 160,
-                    0f,
-                    0f,
-                    320f,
-                    320f,
-                    320f,
-                    320f,
-                    color
+                RenderHelper.blit(
+                    guiGraphics.pose(), HUD_BASE_MISSILE, x - 160, y - 160, 320f, 320f,
+                    argb = RenderHelper.opaque(color),
                 )
             } else {
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    HUD_BASE,
-                    x - 160,
-                    y - 160,
-                    0f,
-                    0f,
-                    320f,
-                    320f,
-                    320f,
-                    320f,
-                    color
+                RenderHelper.blit(
+                    guiGraphics.pose(), HUD_BASE, x - 160, y - 160, 320f, 320f, argb = RenderHelper.opaque(color),
                 )
             }
 
             //指南针
-            RenderHelper.preciseBlitWithColor(
-                guiGraphics,
-                COMPASS,
-                x - 128,
-                y - 122,
-                128 + (64f / 45 * vehicle.getYaw(partialTick)),
-                0f,
-                256f,
-                16f,
-                512f,
-                16f,
-                color
+            RenderHelper.blit(
+                guiGraphics.pose(), COMPASS, x - 128, y - 122, 128 + (64f / 45 * vehicle.getYaw(partialTick)), 0f, 256f,
+                16f, 512f, 16f, argb = RenderHelper.opaque(color),
             )
-            RenderHelper.preciseBlitWithColor(guiGraphics, COMPASS_IND, x - 4, y - 130, 0f, 0f, 8f, 8f, 8f, 8f, color)
+            RenderHelper.blit(
+                guiGraphics.pose(), COMPASS_IND, x - 4, y - 130, 8f, 8f, argb = RenderHelper.opaque(color),
+            )
 
             //滚转指示
             poseStack.pushPose()
             poseStack.rotateAround(Axis.ZP.rotationDegrees(vehicle.getRoll(partialTick)), x, y + 48, 0f)
-            RenderHelper.preciseBlitWithColor(
-                guiGraphics,
-                HELICOPTER_ROLL_IND,
-                x - 4,
-                y + 144,
-                0f,
-                0f,
-                8f,
-                8f,
-                8f,
-                8f,
-                color
+            RenderHelper.blit(
+                guiGraphics.pose(), HELICOPTER_ROLL_IND, x - 4, y + 144, 8f, 8f, argb = RenderHelper.opaque(color),
             )
             poseStack.popPose()
 
             val power = vehicle.power
             lerpPower = Mth.lerp(0.5f * partialTick, lerpPower, power)
 
-            RenderHelper.preciseBlitWithColor(
-                guiGraphics,
-                HelicopterHud.HELI_POWER,
-                x - 105f,
-                (y - 57f + 124f - Math.min(lerpPower, 1f) * 117.6f),
-                0f,
-                0f,
-                4f,
-                Math.min(lerpPower, 1f) * 117.6f,
-                4f,
-                Math.min(lerpPower, 1f) * 117.6f,
-                color
+            RenderHelper.blit(
+                guiGraphics.pose(), HelicopterHud.HELI_POWER, x - 105f,
+                (y - 57f + 124f - Math.min(lerpPower, 1f) * 117.6f), 4f, Math.min(lerpPower, 1f) * 117.6f,
+                argb = RenderHelper.opaque(color),
             )
 
             if (lerpPower > 1) {
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    HelicopterHud.HELI_POWER,
-                    x - 105f,
-                    (y - 57f + 124f - (lerpPower - 1f) * 58.8f),
-                    0f,
-                    0f,
-                    4f,
-                    (lerpPower - 1f) * 58.8f,
-                    4f,
-                    (lerpPower - 1f) * 58.8f,
-                    0xFF6B00
+                RenderHelper.blit(
+                    guiGraphics.pose(), HelicopterHud.HELI_POWER, x - 105f, (y - 57f + 124f - (lerpPower - 1f) * 58.8f),
+                    4f, (lerpPower - 1f) * 58.8f, argb = RenderHelper.opaque(0xFF6B00),
                 )
             }
 
-            RenderHelper.preciseBlitWithColor(
-                guiGraphics,
-                POWER_RULER,
-                x - 135f,
-                y - 57f,
-                0f,
-                0f,
-                64f,
-                128f,
-                64f,
-                128f,
-                color
+            RenderHelper.blit(
+                guiGraphics.pose(), POWER_RULER, x - 135f, y - 57f, 64f, 128f, argb = RenderHelper.opaque(color),
             )
 
             //一些文本
@@ -410,31 +330,13 @@ object AircraftHud {
             poseStack.popPose()
 
             //框
-            RenderHelper.preciseBlitWithColor(
-                guiGraphics,
-                HELICOPTER_SPEED_FRAME,
-                x - 108,
-                y - 64,
-                0f,
-                0f,
-                36f,
-                12f,
-                36f,
-                12f,
-                color
+            RenderHelper.blit(
+                guiGraphics.pose(), HELICOPTER_SPEED_FRAME, x - 108, y - 64, 36f, 12f,
+                argb = RenderHelper.opaque(color),
             )
-            RenderHelper.preciseBlitWithColor(
-                guiGraphics,
-                HELICOPTER_SPEED_FRAME,
-                x + 108 - 36,
-                y - 64,
-                0f,
-                0f,
-                36f,
-                12f,
-                36f,
-                12f,
-                color
+            RenderHelper.blit(
+                guiGraphics.pose(), HELICOPTER_SPEED_FRAME, x + 108 - 36, y - 64, 36f, 12f,
+                argb = RenderHelper.opaque(color),
             )
 
             //角度
@@ -454,47 +356,18 @@ object AircraftHud {
 
             poseStack.rotateAround(Axis.ZP.rotationDegrees(-vehicle.getRoll(partialTick)), x, y, 0f)
             val pitch = vehicle.getPitch(partialTick)
-            RenderHelper.preciseBlitWithColor(
-                guiGraphics,
-                HUD_LINE,
-                x - 144 + diffY,
-                y - 128,
-                0f,
-                722.5f + 4.725f * pitch,
-                288f,
-                256f,
-                288f,
-                1701f,
-                color
+            RenderHelper.blit(
+                guiGraphics.pose(), HUD_LINE, x - 144 + diffY, y - 128, 0f, 722.5f + 4.725f * pitch, 288f, 256f, 288f,
+                1701f, argb = RenderHelper.opaque(color),
             )
 
             if (bomb) {
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    HUD_BOMB,
-                    x - 64 + diffY,
-                    y - 64,
-                    0f,
-                    0f,
-                    128f,
-                    128f,
-                    128f,
-                    128f,
-                    color
+                RenderHelper.blit(
+                    guiGraphics.pose(), HUD_BOMB, x - 64 + diffY, y - 64, 128f, 128f, argb = RenderHelper.opaque(color),
                 )
             } else {
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    HUD_IND,
-                    x - 18 + diffY,
-                    y - 12,
-                    0f,
-                    0f,
-                    36f,
-                    24f,
-                    36f,
-                    24f,
-                    color
+                RenderHelper.blit(
+                    guiGraphics.pose(), HUD_IND, x - 18 + diffY, y - 12, 36f, 24f, argb = RenderHelper.opaque(color),
                 )
             }
 
@@ -524,35 +397,18 @@ object AircraftHud {
                     GlStateManager.DestFactor.ZERO
                 )
                 RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    HUD_BASE2,
-                    x - 72 + diffY,
-                    y - 72 + diffX,
-                    0f,
-                    0f,
-                    144f,
-                    144f,
-                    144f,
-                    144f,
-                    color
+                RenderHelper.blit(
+                    guiGraphics.pose(), HUD_BASE2, x - 72 + diffY, y - 72 + diffX, 144f, 144f,
+                    argb = RenderHelper.opaque(color),
                 )
             } else if (mc.options.cameraType != CameraType.FIRST_PERSON && !ClientEventHandler.zoomVehicle) {
                 if (gunData?.get(GunProp.CROSSHAIR) == "@AirBomb") {
                     bombHitPosX = Mth.lerp(0.25 * partialTick.toDouble(), bombHitPosX, xCross.toDouble())
                     bombHitPosY = Mth.lerp(0.25 * partialTick.toDouble(), bombHitPosY, yCross.toDouble())
 
-                    RenderHelper.preciseBlit(
-                        guiGraphics,
-                        BOMB_RING,
-                        bombHitPosX.toFloat() - 12f,
-                        bombHitPosY.toFloat() - 12f,
-                        0f,
-                        0f,
+                    RenderHelper.blit(
+                        guiGraphics.pose(), BOMB_RING, bombHitPosX.toFloat() - 12f, bombHitPosY.toFloat() - 12f, 24f,
                         24f,
-                        24f,
-                        24f,
-                        24f
                     )
                     x = p.x.toFloat()
                     y = p.y.toFloat()
@@ -560,9 +416,8 @@ object AircraftHud {
 
                 mouseX = Mth.lerp(0.1f * partialTick, mouseX, ClientMouseHandler.lerpSpeedX.toFloat())
                 mouseY = Mth.lerp(0.1f * partialTick, mouseY, ClientMouseHandler.lerpSpeedY.toFloat())
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    HelicopterHud.RING, x - 2 + mouseX, y - 2 + mouseY, 0f, 0f, 4f, 4f, 4f, 4f
+                RenderHelper.blit(
+                    guiGraphics.pose(), HelicopterHud.RING, x - 2 + mouseX, y - 2 + mouseY, 4f, 4f,
                 )
 
                 val originPos = Vec3(x.toDouble(), y.toDouble(), 0.0)
@@ -573,56 +428,27 @@ object AircraftHud {
                 while (i < distance - 3) {
                     val toVec = ringPos.vectorTo(originPos).normalize()
                     val p0 = ringPos.add(toVec.scale(i))
-                    RenderHelper.preciseBlitWithColor(
-                        guiGraphics,
-                        HelicopterHud.BLOCK,
-                        (p0.x - 0.25).toFloat(),
-                        (p0.y - 0.25).toFloat(),
-                        0f,
-                        0f,
-                        0.5f,
-                        0.5f,
-                        0.5f,
-                        0.5f,
-                        -1
+                    RenderHelper.blit(
+                        guiGraphics.pose(), HelicopterHud.BLOCK, (p0.x - 0.25).toFloat(), (p0.y - 0.25).toFloat(), 0.5f,
+                        0.5f, argb = RenderHelper.opaque(-1),
                     )
                     i += 3
                 }
 
                 val pitch = vehicle.getPitch(partialTick)
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    HUD_LINE_3P,
-                    x - 96,
-                    y - 48,
-                    0f,
-                    195 + 1.36f * pitch,
-                    192f,
-                    96f,
-                    192f,
-                    486f,
-                    -1
+                RenderHelper.blit(
+                    guiGraphics.pose(), HUD_LINE_3P, x - 96, y - 48, 0f, 195 + 1.36f * pitch, 192f, 96f, 192f, 486f,
+                    argb = RenderHelper.opaque(-1),
                 )
 
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    ROLL_HUD_3P,
-                    x - 48,
-                    y - 48,
-                    0f,
-                    0f,
-                    96f,
-                    96f,
-                    96f,
-                    96f,
-                    -1
+                RenderHelper.blit(
+                    guiGraphics.pose(), ROLL_HUD_3P, x - 48, y - 48, 96f, 96f, argb = RenderHelper.opaque(-1),
                 )
 
                 poseStack.pushPose()
                 poseStack.rotateAround(Axis.ZP.rotationDegrees(vehicle.getRoll(partialTick)), x, y, 0f)
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    HelicopterHud.CROSSHAIR_3P, x - 34, y - 8.5f, 0f, 0f, 68f, 17f, 68f, 17f
+                RenderHelper.blit(
+                    guiGraphics.pose(), HelicopterHud.CROSSHAIR_3P, x - 34, y - 8.5f, 68f, 17f,
                 )
                 renderKillIndicatorDynamic(
                     guiGraphics,

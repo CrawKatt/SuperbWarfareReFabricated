@@ -46,7 +46,7 @@ object RedTriangleOverlay : CommonOverlay("red_triangle") {
             val x = point.x.toFloat()
             val y = point.y.toFloat()
 
-            RenderHelper.preciseBlit(guiGraphics, TRIANGLE, x - 4, y - 4, 8f, 8f, 0f, 0f, 8f, 8f, 8f, 8f)
+            RenderHelper.blitRegion(guiGraphics.pose(), TRIANGLE, x - 4, y - 4, 8f, 8f, 0f, 0f, 8f, 8f, 8f, 8f)
 
             RenderSystem.depthMask(true)
             RenderSystem.defaultBlendFunc()
