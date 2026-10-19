@@ -30,7 +30,6 @@ import com.atsuishio.superbwarfare.client.renderer.item.KnifeSeitengewehr84Rende
 import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.TripodBlockItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.Type88ClusterGrenadesRenderer
-import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.DeployedWeaponRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.RadiationGlowRenderer
@@ -332,9 +331,11 @@ object ClientRenderHandler {
         MeleeClientHandler.installDebugHooks()
         MeleeDebugRenderer.register()
         DeployedWeaponRenderer.register()
-        val geoGunRenderer = GeoGunRenderer()
         BuiltInRegistries.ITEM.filterIsInstance<GeoGunItem>().forEach { item ->
-            BuiltinItemRendererRegistry.INSTANCE.register(item, geoGunRenderer)
+            val renderer by lazy { item.createRenderer() }
+            BuiltinItemRendererRegistry.INSTANCE.register(item) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
+                renderer.render(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
+            }
         }
 
         val tm62Renderer = lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
