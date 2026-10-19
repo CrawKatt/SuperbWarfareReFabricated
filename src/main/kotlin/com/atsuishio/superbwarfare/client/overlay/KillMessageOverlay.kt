@@ -183,7 +183,7 @@ object KillMessageOverlay : CommonOverlay("kill_message") {
             if (currentWeaponIcon != null) {
                 currentPosX -= 36f
                 RenderHelper.blit(
-                    guiGraphics.pose(), currentWeaponIcon, currentPosX, top, 0f, 0f, 32f, 8f, -32f, 8f,
+                    guiGraphics.pose(), currentWeaponIcon, currentPosX, top, 32f, 8f, 0f, 0f, -32f, 8f,
                 )
             }
 
@@ -231,7 +231,7 @@ object KillMessageOverlay : CommonOverlay("kill_message") {
             val currentWeaponIcon: ResourceLocation? = getWeaponIcon(record)
             if (currentWeaponIcon != null) {
                 RenderHelper.blit(
-                    guiGraphics.pose(), currentWeaponIcon, currentPosX, top, 0f, 0f, 32f, 8f, -32f, 8f,
+                    guiGraphics.pose(), currentWeaponIcon, currentPosX, top, 32f, 8f, 0f, 0f, -32f, 8f,
                 )
                 currentPosX += 36f
             }

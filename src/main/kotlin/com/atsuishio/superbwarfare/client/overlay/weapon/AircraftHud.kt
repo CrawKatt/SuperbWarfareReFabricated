@@ -209,9 +209,9 @@ object AircraftHud {
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
 
             if (gunData?.get(GunProp.CROSSHAIR) == "@AirCraftMissile") {
-                RenderHelper.blit(poseStack, HUD_BASE_MISSILE, x - 160, y - 160, 0f, 0f, 320f, 320f, 320f, 320f, color)
+                RenderHelper.blit(poseStack, HUD_BASE_MISSILE, x - 160, y - 160, 320f, 320f, 0f, 0f, 320f, 320f, color)
             } else {
-                RenderHelper.blit(poseStack, HUD_BASE, x - 160, y - 160, 0f, 0f, 320f, 320f, 320f, 320f, color)
+                RenderHelper.blit(poseStack, HUD_BASE, x - 160, y - 160, 320f, 320f, 0f, 0f, 320f, 320f, color)
             }
 
             //指南针
@@ -220,20 +220,20 @@ object AircraftHud {
                 COMPASS,
                 x - 128,
                 y - 122,
-                128 + (64f / 45 * vehicle.getYaw(partialTick)),
-                0f,
                 256f,
                 16f,
+                128 + (64f / 45 * vehicle.getYaw(partialTick)),
+                0f,
                 512f,
                 16f,
                 color
             )
-            RenderHelper.blit(poseStack, COMPASS_IND, x - 4, y - 130, 0f, 0f, 8f, 8f, 8f, 8f, color)
+            RenderHelper.blit(poseStack, COMPASS_IND, x - 4, y - 130, 8f, 8f, 0f, 0f, 8f, 8f, color)
 
             //滚转指示
             poseStack.pushPose()
             poseStack.rotateAround(Axis.ZP.rotationDegrees(vehicle.getRoll(partialTick)), x, y + 48, 0f)
-            RenderHelper.blit(poseStack, HELICOPTER_ROLL_IND, x - 4, y + 144, 0f, 0f, 8f, 8f, 8f, 8f, color)
+            RenderHelper.blit(poseStack, HELICOPTER_ROLL_IND, x - 4, y + 144, 8f, 8f, 0f, 0f, 8f, 8f, color)
             poseStack.popPose()
 
             val power = vehicle.power
@@ -244,10 +244,10 @@ object AircraftHud {
                 HelicopterHud.HELI_POWER,
                 x - 105f,
                 (y - 57f + 124f - Math.min(lerpPower, 1f) * 117.6f),
-                0f,
-                0f,
                 4f,
                 Math.min(lerpPower, 1f) * 117.6f,
+                0f,
+                0f,
                 4f,
                 Math.min(lerpPower, 1f) * 117.6f,
                 color
@@ -259,10 +259,10 @@ object AircraftHud {
                     HelicopterHud.HELI_POWER,
                     x - 105f,
                     (y - 57f + 124f - (lerpPower - 1f) * 58.8f),
-                    0f,
-                    0f,
                     4f,
                     (lerpPower - 1f) * 58.8f,
+                    0f,
+                    0f,
                     4f,
                     (lerpPower - 1f) * 58.8f,
                     0xFF6B00
@@ -274,10 +274,10 @@ object AircraftHud {
                 POWER_RULER,
                 x - 135f,
                 y - 57f,
-                0f,
-                0f,
                 64f,
                 128f,
+                0f,
+                0f,
                 64f,
                 128f,
                 color
@@ -358,16 +358,16 @@ object AircraftHud {
             poseStack.popPose()
 
             //框
-            RenderHelper.blit(poseStack, HELICOPTER_SPEED_FRAME, x - 108, y - 64, 0f, 0f, 36f, 12f, 36f, 12f, color)
+            RenderHelper.blit(poseStack, HELICOPTER_SPEED_FRAME, x - 108, y - 64, 36f, 12f, 0f, 0f, 36f, 12f, color)
             RenderHelper.blit(
                 poseStack,
                 HELICOPTER_SPEED_FRAME,
                 x + 108 - 36,
                 y - 64,
-                0f,
-                0f,
                 36f,
                 12f,
+                0f,
+                0f,
                 36f,
                 12f,
                 color
@@ -395,19 +395,19 @@ object AircraftHud {
                 HUD_LINE,
                 x - 144 + diffY,
                 y - 128,
-                0f,
-                722.5f + 4.725f * pitch,
                 288f,
                 256f,
+                0f,
+                722.5f + 4.725f * pitch,
                 288f,
                 1701f,
                 color
             )
 
             if (bomb) {
-                RenderHelper.blit(poseStack, HUD_BOMB, x - 64 + diffY, y - 64, 0f, 0f, 128f, 128f, 128f, 128f, color)
+                RenderHelper.blit(poseStack, HUD_BOMB, x - 64 + diffY, y - 64, 128f, 128f, 0f, 0f, 128f, 128f, color)
             } else {
-                RenderHelper.blit(poseStack, HUD_IND, x - 18 + diffY, y - 12, 0f, 0f, 36f, 24f, 36f, 24f, color)
+                RenderHelper.blit(poseStack, HUD_IND, x - 18 + diffY, y - 12, 36f, 24f, 0f, 0f, 36f, 24f, color)
             }
 
             poseStack.popPose()
@@ -441,10 +441,10 @@ object AircraftHud {
                     HUD_BASE2,
                     x - 72 + diffY,
                     y - 72 + diffX,
-                    0f,
-                    0f,
                     144f,
                     144f,
+                    0f,
+                    0f,
                     144f,
                     144f,
                     color
@@ -481,10 +481,10 @@ object AircraftHud {
                         HelicopterHud.BLOCK,
                         (p0.x - 0.25).toFloat(),
                         (p0.y - 0.25).toFloat(),
-                        0f,
-                        0f,
                         0.5f,
                         0.5f,
+                        0f,
+                        0f,
                         0.5f,
                         0.5f,
                         -1
@@ -498,10 +498,10 @@ object AircraftHud {
                     HUD_LINE_3P,
                     x - 96,
                     y - 48,
-                    0f,
-                    195 + 1.36f * pitch,
                     192f,
                     96f,
+                    0f,
+                    195 + 1.36f * pitch,
                     192f,
                     486f,
                     -1
@@ -512,10 +512,10 @@ object AircraftHud {
                     ROLL_HUD_3P,
                     x - 48,
                     y - 48,
-                    0f,
-                    0f,
                     96f,
                     96f,
+                    0f,
+                    0f,
                     96f,
                     96f,
                     -1

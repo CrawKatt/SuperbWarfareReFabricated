@@ -45,7 +45,7 @@ object RedTriangleOverlay : CommonOverlay("red_triangle") {
             poseStack.pushPose()
             val x = point.x.toFloat()
             val y = point.y.toFloat()
-            RenderHelper.blit(poseStack, TRIANGLE, x - 4, y - 4, 0f, 0f, 8f, 8f, 8f, 8f, -65536)
+            RenderHelper.blit(poseStack, TRIANGLE, x - 4, y - 4, 8f, 8f, 0f, 0f, 8f, 8f, -65536)
             RenderSystem.depthMask(true)
             RenderSystem.defaultBlendFunc()
             RenderSystem.enableDepthTest()
