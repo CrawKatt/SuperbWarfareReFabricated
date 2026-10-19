@@ -6,7 +6,6 @@ import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.world.item.BlockItem
 import software.bernie.geckolib.animatable.GeoItem
 import software.bernie.geckolib.animatable.client.RenderProvider
@@ -26,14 +25,11 @@ class BlueprintResearchTableBlockItem : BlockItem(ModBlocks.BLUEPRINT_RESEARCH_T
     @Environment(EnvType.CLIENT)
     override fun createRenderer(consumer: Consumer<Any>) {
         consumer.accept(object : RenderProvider {
-            private var renderer: BlockEntityWithoutLevelRenderer? = null
-
-            override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                if (this.renderer == null) {
-                    this.renderer = BlueprintResearchingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                }
-                return this.renderer!!
+            private val renderer by lazy {
+                BlueprintResearchingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
             }
+
+            override fun getCustomRenderer() = renderer
         })
     }
 

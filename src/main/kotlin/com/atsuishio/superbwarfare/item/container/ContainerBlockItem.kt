@@ -16,7 +16,6 @@ import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.tags.DamageTypeTags
@@ -147,14 +146,8 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER, Properties().stacksTo(
     @Environment(EnvType.CLIENT)
     override fun createRenderer(consumer: Consumer<Any>) {
         consumer.accept(object : RenderProvider {
-            private var renderer: BlockEntityWithoutLevelRenderer? = null
-
-            override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                if (renderer == null) {
-                    renderer = ContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                }
-                return renderer!!
-            }
+            private val renderer by lazy { ContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+            override fun getCustomRenderer() = renderer
         })
     }
 

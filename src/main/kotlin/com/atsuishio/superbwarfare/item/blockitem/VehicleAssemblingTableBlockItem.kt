@@ -8,7 +8,6 @@ import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.item.BlockItem
@@ -53,14 +52,11 @@ class VehicleAssemblingTableBlockItem : BlockItem(ModBlocks.VEHICLE_ASSEMBLING_T
     @Environment(EnvType.CLIENT)
     override fun createRenderer(consumer: Consumer<Any>) {
         consumer.accept(object : RenderProvider {
-            private var renderer: BlockEntityWithoutLevelRenderer? = null
-
-            override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                if (this.renderer == null) {
-                    this.renderer = VehicleAssemblingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                }
-                return this.renderer!!
+            private val renderer by lazy {
+                VehicleAssemblingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
             }
+
+            override fun getCustomRenderer() = renderer
         })
     }
 

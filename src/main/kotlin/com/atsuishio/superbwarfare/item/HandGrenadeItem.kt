@@ -10,7 +10,6 @@ import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.BlockSource
 import net.minecraft.core.Position
 import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior
@@ -49,14 +48,8 @@ open class HandGrenadeItem : Item(Properties().rarity(Rarity.UNCOMMON)), Dispens
     @Environment(EnvType.CLIENT)
     override fun createRenderer(consumer: Consumer<Any>) {
         consumer.accept(object : RenderProvider {
-            private var renderer: BlockEntityWithoutLevelRenderer? = null
-
-            override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                if (renderer == null) {
-                    renderer = HandGrenadeRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                }
-                return renderer!!
-            }
+            private val renderer by lazy { HandGrenadeRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+            override fun getCustomRenderer() = renderer
         })
     }
 

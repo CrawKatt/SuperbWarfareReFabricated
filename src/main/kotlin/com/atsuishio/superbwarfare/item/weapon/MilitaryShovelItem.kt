@@ -127,12 +127,8 @@ open class MilitaryShovelItem :
     @Environment(EnvType.CLIENT)
     override fun createRenderer(consumer: Consumer<Any>) {
         consumer.accept(object : RenderProvider {
-            private var renderer: net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer? = null
-
-            override fun getCustomRenderer(): net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer {
-                if (renderer == null) renderer = MilitaryShovelRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                return renderer!!
-            }
+            private val renderer by lazy { MilitaryShovelRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+            override fun getCustomRenderer() = renderer
         })
     }
 

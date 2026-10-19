@@ -9,7 +9,6 @@ import com.atsuishio.superbwarfare.tools.mc
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.DamageTypeTags
@@ -71,14 +70,11 @@ class LuckyContainerBlockItem :
     @Environment(EnvType.CLIENT)
     override fun createRenderer(consumer: Consumer<Any>) {
         consumer.accept(object : RenderProvider {
-            private var renderer: BlockEntityWithoutLevelRenderer? = null
-
-            override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                if (renderer == null) {
-                    renderer = LuckyContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                }
-                return renderer!!
+            private val renderer by lazy {
+                LuckyContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
             }
+
+            override fun getCustomRenderer() = renderer
         })
     }
 
