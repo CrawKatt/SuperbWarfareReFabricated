@@ -13,7 +13,6 @@ import com.atsuishio.superbwarfare.tools.component1
 import com.atsuishio.superbwarfare.tools.component2
 import com.atsuishio.superbwarfare.tools.component3
 import com.atsuishio.superbwarfare.tools.mc
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.tags.DamageTypeTags
@@ -135,14 +134,8 @@ class ContainerBlockItem : BlockItem(ModBlocks.CONTAINER.get(), Properties().sta
     override fun initializeClient(consumer: Consumer<IClientItemExtensions?>) {
         super.initializeClient(consumer)
         consumer.accept(object : IClientItemExtensions {
-            private var renderer: BlockEntityWithoutLevelRenderer? = null
-
-            override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                if (renderer == null) {
-                    renderer = ContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                }
-                return renderer!!
-            }
+            private val renderer by lazy { ContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+            override fun getCustomRenderer() = renderer
         })
     }
 
