@@ -199,7 +199,7 @@ object OldAircraftHud {
             )
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
 
-            RenderHelper.blit(poseStack, HUD_BASE, x - 24, y - 18, 0f, 0f, 48f, 48f, 48f, 48f, color)
+            RenderHelper.blit(poseStack, HUD_BASE, x - 24, y - 18, 48f, 48f, 0f, 0f, 48f, 48f, color)
 
             renderKillIndicatorDynamic(
                     guiGraphics,

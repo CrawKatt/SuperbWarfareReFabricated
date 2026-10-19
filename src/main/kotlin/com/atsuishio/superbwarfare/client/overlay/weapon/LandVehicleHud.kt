@@ -102,10 +102,10 @@ object LandVehicleHud {
                 LINE,
                 screenWidth / 2f - 64,
                 (screenHeight - 56).toFloat(),
-                0f,
-                0f,
                 128f,
                 1f,
+                0f,
+                0f,
                 128f,
                 1f,
                 color
@@ -117,15 +117,15 @@ object LandVehicleHud {
                 COMPASS,
                 screenWidth.toFloat() / 2 - 128,
                 10f,
-                128 + (64f / 45 * player.yRot),
-                0f,
                 256f,
                 16f,
+                128 + (64f / 45 * player.yRot),
+                0f,
                 512f,
                 16f,
                 color
             )
-            RenderHelper.blit(poseStack, ROLL_IND, screenWidth / 2f - 8, 30f, 0f, 0f, 16f, 16f, 16f, 16f, color)
+            RenderHelper.blit(poseStack, ROLL_IND, screenWidth / 2f - 8, 30f, 16f, 16f, 0f, 0f, 16f, 16f, color)
 
             val turretHeal = (100 - (100 * vehicle.turretHealth / vehicle.getTurretMaxHealth())).toInt()
             RenderHelper.blit(
@@ -133,10 +133,10 @@ object LandVehicleHud {
                 BARREL,
                 screenWidth / 2f + 112,
                 (screenHeight - 71).toFloat(),
-                0f,
-                0f,
                 1f,
                 16f,
+                0f,
+                0f,
                 1f,
                 16f,
                 getGradientColor(color, 0xFF0000, turretHeal, 2)
@@ -159,10 +159,10 @@ object LandVehicleHud {
                 BODY,
                 screenWidth / 2f + 96,
                 (screenHeight - 72).toFloat(),
-                0f,
-                0f,
                 32f,
                 32f,
+                0f,
+                0f,
                 32f,
                 32f,
                 getGradientColor(color, 0xFF0000, bodyHeal, 2)
@@ -173,10 +173,10 @@ object LandVehicleHud {
                 LEFT_WHEEL,
                 screenWidth / 2f + 96,
                 (screenHeight - 72).toFloat(),
-                0f,
-                0f,
                 32f,
                 32f,
+                0f,
+                0f,
                 32f,
                 32f,
                 getGradientColor(color, 0xFF0000, leftWheelHeal, 2)
@@ -187,10 +187,10 @@ object LandVehicleHud {
                 RIGHT_WHEEL,
                 screenWidth / 2f + 96,
                 (screenHeight - 72).toFloat(),
-                0f,
-                0f,
                 32f,
                 32f,
+                0f,
+                0f,
                 32f,
                 32f,
                 getGradientColor(color, 0xFF0000, rightWheelHeal, 2)
@@ -201,10 +201,10 @@ object LandVehicleHud {
                 ENGINE,
                 screenWidth / 2f + 96,
                 (screenHeight - 72).toFloat(),
-                0f,
-                0f,
                 32f,
                 32f,
+                0f,
+                0f,
                 32f,
                 32f,
                 getGradientColor(color, 0xFF0000, engineHeal, 2)

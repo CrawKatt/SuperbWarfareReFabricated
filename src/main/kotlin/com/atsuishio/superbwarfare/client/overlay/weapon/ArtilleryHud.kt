@@ -49,8 +49,8 @@ object ArtilleryHud {
         val pitch = -getXRotFromVector(vehicle.getBarrelVector(partialTick))
 
         RenderHelper.blit(
-            guiGraphics.pose(), COMPASS, screenWidth.toFloat() / 2 - 128, 10f, 128 + (64f / 45 * yaw.toFloat()), 0f,
-            256f, 16f, 512f, 16f,
+            guiGraphics.pose(), COMPASS, screenWidth.toFloat() / 2 - 128, 10f, 256f, 16f,
+            128 + (64f / 45 * yaw.toFloat()), 0f, 512f, 16f,
         )
         RenderHelper.blit(
             guiGraphics.pose(), ROLL_IND_WHITE, screenWidth.toFloat() / 2 - 4, 27f, 8f, 8f,
