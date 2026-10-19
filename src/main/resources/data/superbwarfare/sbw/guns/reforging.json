@@ -78,7 +78,7 @@
         "Velocity": 1.5,
         "Gravity": 0.04,
         "ProjectileLife": 300,
-        "RPM": 60,
+        "RPM": 90,
         "ClearHoldProgressAfterShoot": true
       }
     },
