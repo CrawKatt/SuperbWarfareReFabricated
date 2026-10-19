@@ -16,6 +16,7 @@ import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer.Companion.
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer.Companion.MERGE_BLENDER
 import com.atsuishio.superbwarfare.client.renderer.laser.LaserSightCapture
 import com.atsuishio.superbwarfare.client.renderer.laser.LaserSightRenderer
+import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensShader
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeStencilRenderHelper
 import com.atsuishio.superbwarfare.client.screens.WeaponEditMountTracker
 import com.atsuishio.superbwarfare.client.screens.WeaponEditScreen
@@ -1081,9 +1082,11 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         if (definition.usesGunStock) {
             val bone = definition.bone ?: GeoGunModel.OEM_STOCK_STANDARD_BONE
             model.showStockBone(bone)
-            adjustGunModelAttachment(stack, model, AttachmentType.STOCK,
+            adjustGunModelAttachment(
+                stack, model, AttachmentType.STOCK,
                 if (model.getBone(bone) != null) bone else GeoGunModel.OEM_STOCK_STANDARD_BONE,
-                AttachmentSlots.Bones.STOCK)
+                AttachmentSlots.Bones.STOCK
+            )
             return
         }
 
@@ -1116,7 +1119,10 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val mountTransform = model.getGlobalTransform(GeoGunModel.CUSTOM_STOCK_ADAPTER_BONE) ?: return
 
         poseStack.pushPose()
-        mulPoseWithNormal(poseStack, Matrix4f(mountTransform).mul(attachmentTransform(stack, AttachmentType.STOCK, definition)))
+        mulPoseWithNormal(
+            poseStack,
+            Matrix4f(mountTransform).mul(attachmentTransform(stack, AttachmentType.STOCK, definition))
+        )
         attachmentModel.renderToBuffer(
             poseStack, bufferSource, texture, packedLight, packedOverlay,
             null, resolveAmmoReadout(stack, definition.ammoBar, definition.textShow)
@@ -1252,7 +1258,10 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val mountTransform = model.getGlobalTransform(boneName) ?: return
 
         poseStack.pushPose()
-        mulPoseWithNormal(poseStack, Matrix4f(mountTransform).mul(attachmentTransform(stack, AttachmentType.MUZZLE, definition)))
+        mulPoseWithNormal(
+            poseStack,
+            Matrix4f(mountTransform).mul(attachmentTransform(stack, AttachmentType.MUZZLE, definition))
+        )
         attachmentModel.renderToBuffer(
             poseStack, bufferSource, texture, packedLight, packedOverlay,
             null, resolveAmmoReadout(stack, definition.ammoBar, definition.textShow)
@@ -1302,9 +1311,13 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         resolveAttachmentLocalTransform(stack, AttachmentType.MUZZLE)
 
     /** 所有渲染、出光口与瞄准锚点都用相同顺序：挂点 × 实例调整 × 配件基础旋转。 */
-    private fun attachmentTransform(stack: ItemStack, type: AttachmentType, definition: AttachmentDefinition): Matrix4f {
+    private fun attachmentTransform(
+        stack: ItemStack,
+        type: AttachmentType,
+        definition: AttachmentDefinition
+    ): Matrix4f {
         val transform = if (type == AttachmentType.MUZZLE) resolveMuzzleAttachmentLocalTransform(stack)
-            else resolveAttachmentLocalTransform(stack, type)
+        else resolveAttachmentLocalTransform(stack, type)
         attachmentRotation(definition)?.let { transform.mul(it) }
         return transform
     }
@@ -1520,8 +1533,10 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         try {
             // 动画文件里的平移是"相对绑定姿势的偏移"，不先垫绑定就会把绑定不为 0 的骨骼送到父节点原点
             attachmentModel.applyPose(BLENDER.blend(attachmentModel.getBindPose(), pose))
-            deployedArmAnchors = resolveSubWeaponHandAnchors(attachmentModel,
-                Matrix4f(mountTransform).mul(attachmentTransform(stack, slot.type, definition)))
+            deployedArmAnchors = resolveSubWeaponHandAnchors(
+                attachmentModel,
+                Matrix4f(mountTransform).mul(attachmentTransform(stack, slot.type, definition))
+            )
             deployedArmKey = "idle:${animation.subWeaponIdleClipName ?: ""}"
         } finally {
             attachmentModel.resetPose()
@@ -2630,6 +2645,23 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
          * 位形回退到宿主枪时倍率也必须跟着用宿主枪的，所以 FOV 那一侧（`ClientEventHandler.onFovUpdate`）
          * 与渲染这边要问同一个判据；它不吃 `GeoGunModel` 是因为 FOV 侧只有枪的数据。
          */
+        @JvmStatic
+        fun usesLensZoomSplit(gun: GunData): Boolean {
+            if (DisplayConfig.LENS_ZOOM_RATIO.get() <= 0.0) return false
+            if (!ScopeLensShader.isAvailable()
+            // TODO OculusCompat
+//                || OculusCompat.isShaderPackActive()
+            ) return false
+            val attachmentId = gun.attachment.id(AttachmentType.SCOPE) ?: return false
+            val definition = AttachmentDefinition.from(attachmentId) ?: return false
+            val scopeInfo = definition.scopeInfo ?: return false
+            val mode = scopeInfo.mode(gun.attachment.scopeMode(AttachmentType.SCOPE))
+            if (!mode.isScope()) return false
+            val modelPath = definition.modelOf(gun, AttachmentType.SCOPE) ?: return false
+            val attachmentModel = AttachmentModelReloadListener.getModel(modelPath) ?: return false
+            return attachmentModel.hasLensSurface(mode)
+        }
+
         @JvmStatic
         fun subWeaponHasOwnAimPose(gun: GunData): Boolean {
             val (slot, definition) = findSubWeapon(gun) ?: return false

@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview
 import com.atsuishio.superbwarfare.client.renderer.special.TowingChainRenderer;
 import com.atsuishio.superbwarfare.client.renderer.SyncedEntityWorldRenderer;
 import com.atsuishio.superbwarfare.client.renderer.ModParticleRenderTypes;
+import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensShader;
 import com.atsuishio.superbwarfare.client.screens.SnapshotWarningScreen;
 import com.atsuishio.superbwarfare.compat.ponder.SBWPonderPlugin;
 import com.atsuishio.superbwarfare.compat.acceleratedrendering.AcceleratedRenderingCompat;
@@ -56,6 +57,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         TowingChainRenderer.init();
         SyncedEntityWorldRenderer.init();
         ModParticleRenderTypes.init();
+        ScopeLensShader.init();
         SnapshotWarningScreen.register();
         TacticalMapChunkListener.init();
 
