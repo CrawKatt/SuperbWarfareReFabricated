@@ -332,10 +332,7 @@ object ClientRenderHandler {
         MeleeDebugRenderer.register()
         DeployedWeaponRenderer.register()
         BuiltInRegistries.ITEM.filterIsInstance<GeoGunItem>().forEach { item ->
-            val renderer by lazy { item.createRenderer() }
-            BuiltinItemRendererRegistry.INSTANCE.register(item) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
-                renderer.render(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
-            }
+            BuiltinItemRendererRegistry.INSTANCE.register(item, item.createRenderer())
         }
 
         val tm62Renderer = lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }

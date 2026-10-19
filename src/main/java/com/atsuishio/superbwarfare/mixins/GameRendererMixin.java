@@ -55,6 +55,7 @@ public class GameRendererMixin {
                 changingFov
         );
 
+        ClientEventHandler.handleWeaponTurn(partialTick);
         ClientEventHandler.onFovUpdate(context);
         ClientEventHandler.captureFov(context);
 

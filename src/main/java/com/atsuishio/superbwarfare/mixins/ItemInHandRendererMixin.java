@@ -1,6 +1,5 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.custom.RenderHandCallback;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.item.misc.MonitorItem;
@@ -60,7 +59,5 @@ public class ItemInHandRendererMixin {
             ci.cancel();
             return;
         }
-
-        ClientEventHandler.handleWeaponTurn(partialTick);
     }
 }
