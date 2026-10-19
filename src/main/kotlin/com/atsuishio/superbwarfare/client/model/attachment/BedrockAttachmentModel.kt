@@ -567,6 +567,13 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
             BufferUploader.drawWithShader(builder.end())
         }
 
+        val ringIndex = ocularRingIndex(info)
+        if (ringIndex >= 0 && ClientEventHandler.zoomTime > 0.8) {
+            RenderSystem.stencilFunc(GL11.GL_ALWAYS, 0, 0xFF)
+            RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_REPLACE)
+            renderBoneImmediate(ringIndex, poseStack, bufferSource, quadType, triangleType, light)
+        }
+
         RenderSystem.depthMask(true)
         RenderSystem.colorMask(true, true, true, true)
         RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
