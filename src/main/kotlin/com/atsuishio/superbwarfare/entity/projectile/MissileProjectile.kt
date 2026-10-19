@@ -85,8 +85,11 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile,
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
         super.defineSynchedData(builder)
-        builder.define(TARGET_UUID, "none")
-        builder.define(TARGET_POS, Vec3.ZERO)
+
+        with(builder) {
+            define(TARGET_UUID, "none")
+            define(TARGET_POS, Vec3.ZERO)
+        }
     }
 
     /**
