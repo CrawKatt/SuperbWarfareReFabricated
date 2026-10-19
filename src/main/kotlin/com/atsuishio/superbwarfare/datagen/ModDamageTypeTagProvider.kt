@@ -59,6 +59,7 @@ class ModDamageTypeTagProvider(
             .addOptional(mod(ModDamageTypes.LASER))
             .addOptional(mod(ModDamageTypes.LASER_HEADSHOT))
             .addOptional(mod(ModDamageTypes.SHOCK))
+            .addOptional(mod(ModDamageTypes.GRAVITY))
             .addOptional(mod(ModDamageTypes.BURN))
             .addOptional(mod(ModDamageTypes.REPAIR_TOOL))
             .addOptional(mod(ModDamageTypes.PROJECTILE_HIT))
