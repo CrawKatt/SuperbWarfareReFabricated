@@ -43,7 +43,7 @@ import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level) : LivingEntity(type, level){
+open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level) : LivingEntity(type, level) {
     val animationInstance: DPSGeneratorAnimationInstance? =
         if (this.level().isClientSide) DPSGeneratorAnimationInstance(this) else null
     open val modelInstance = EntityModelReloadListener.getModel(MODEL)?.createInstance()
@@ -56,9 +56,11 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
         super.defineSynchedData(builder)
 
-        builder.define(DOWN_TIME, 0)
-            .define(ENERGY, 0)
-            .define(LEVEL, 0)
+        with(builder) {
+            define(DOWN_TIME, 0)
+            define(ENERGY, 0)
+            define(LEVEL, 0)
+        }
     }
 
     override fun getArmorSlots(): Iterable<ItemStack> {

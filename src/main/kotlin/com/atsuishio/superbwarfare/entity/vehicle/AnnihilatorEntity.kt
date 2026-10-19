@@ -48,9 +48,12 @@ open class AnnihilatorEntity(type: EntityType<AnnihilatorEntity>, world: Level) 
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
         super.defineSynchedData(builder)
-        builder.define(LASER_LEFT_LENGTH, 0f)
-            .define(LASER_MIDDLE_LENGTH, 0f)
-            .define(LASER_RIGHT_LENGTH, 0f)
+
+        with(builder) {
+            define(LASER_LEFT_LENGTH, 0f)
+            define(LASER_MIDDLE_LENGTH, 0f)
+            define(LASER_RIGHT_LENGTH, 0f)
+        }
     }
 
     override fun interact(player: Player, hand: InteractionHand): InteractionResult {

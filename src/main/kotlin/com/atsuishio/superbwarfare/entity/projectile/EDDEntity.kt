@@ -92,8 +92,10 @@ open class EDDEntity : HangingEntity, OwnableEntity {
     }
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
-        builder.define(OWNER_UUID, Optional.empty())
-            .define(LAST_ATTACKER_UUID, "undefined")
+        with(builder) {
+            define(OWNER_UUID, Optional.empty())
+            define(LAST_ATTACKER_UUID, "undefined")
+        }
     }
 
     override fun addAdditionalSaveData(tag: CompoundTag) {
