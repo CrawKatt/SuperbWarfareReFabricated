@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare
 import com.atsuishio.superbwarfare.api.event.RegisterContainersEvent
 import com.atsuishio.superbwarfare.client.MouseMovementHandler
 import com.atsuishio.superbwarfare.client.renderer.ModParticleRenderTypes
+import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensShader
 import com.atsuishio.superbwarfare.compat.CompatHolder
 import com.atsuishio.superbwarfare.compat.acceleratedrendering.AcceleratedRenderingCompat
 import com.atsuishio.superbwarfare.compat.clothconfig.ClothConfigHelper
@@ -85,6 +86,7 @@ class Mod(bus: IEventBus, container: ModContainer) {
         bus.addListener<AddPackFindersEvent> { onRegisterBuiltInResourcePacks(it) }
         bus.addListener<DataPackRegistryEvent.NewRegistry> { ModDatapackRegistries.onNewRegistry(it) }
         bus.addListener<RegisterShadersEvent> { ModParticleRenderTypes.onRegisterShaders(it) }
+        bus.addListener<RegisterShadersEvent> { ScopeLensShader.onRegisterShaders(it) }
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             CompatHolder.hasMod(CompatHolder.CLOTH_CONFIG) { ClothConfigHelper.registerScreen() }

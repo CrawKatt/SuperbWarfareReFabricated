@@ -229,7 +229,7 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
                 screenHeight,
                 moveX,
                 moveY,
-                reticleScreen()
+                reticleScreen(data)
             )
         }
 
@@ -374,9 +374,10 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
         filteredTrajectoryY += (y - filteredTrajectoryY) * k
     }
 
-    private fun reticleScreen(): Vector2f? {
+    private fun reticleScreen(data: GunData): Vector2f? {
         if (mc.options.cameraType != CameraType.FIRST_PERSON) return null
         if (ClientEventHandler.zoomTime < BedrockAttachmentModel.DIVISION_MIN_ZOOM) return null
+        if (ActiveGun.isSubWeapon(data)) return null
         return ClientRenderHandler.freshScopeReticleScreen()
     }
 

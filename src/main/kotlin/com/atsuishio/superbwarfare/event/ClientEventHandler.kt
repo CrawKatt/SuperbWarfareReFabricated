@@ -87,6 +87,13 @@ object ClientEventHandler {
     fun aimingProgress(rawProgress: Double): Float =
         AnimationCurves.EASE_IN_OUT_QUINT.apply(rawProgress.coerceIn(0.0, 1.0)).toFloat()
 
+    @JvmStatic
+    fun lensZoomWorldScale(zoom: Double): Double {
+        val ratio = DisplayConfig.LENS_ZOOM_RATIO.get()
+        if (ratio <= 0.0) return zoom
+        return zoom.pow(1.0 - ratio)
+    }
+
     @JvmField
     var bipodViewTime: Double = 0.0
 
@@ -3238,7 +3245,8 @@ object ClientEventHandler {
             customZoom = Mth.lerp(0.6 * times, customZoom, this.movingZoom + if (breath) 0.75 else 0.0)
 
             if (mc.options.cameraType.isFirstPerson) {
-                event.fov /= (1 + p * (customZoom - 1))
+                val zoom = 1 + p * (customZoom - 1)
+                event.fov /= if (GeoGunRenderer.usesLensZoomSplit(zoomData)) lensZoomWorldScale(zoom) else zoom
             } else if (mc.options.cameraType == CameraType.THIRD_PERSON_BACK)
                 event.fov /= (1 + p * 0.01)
             currentFov = event.fov
