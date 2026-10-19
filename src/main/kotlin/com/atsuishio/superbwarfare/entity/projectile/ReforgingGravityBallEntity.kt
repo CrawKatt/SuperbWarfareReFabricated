@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback
 import com.atsuishio.superbwarfare.entity.setValue
 import com.atsuishio.superbwarfare.event.custom.ProjectileImpactCallback
 import com.atsuishio.superbwarfare.init.ModDamageTypes
+import com.atsuishio.superbwarfare.tools.EntityFindUtil
 import com.atsuishio.superbwarfare.tools.SeekTool
 import com.atsuishio.superbwarfare.tools.forceHurt
 import com.atsuishio.superbwarfare.tools.localPlayer
@@ -19,8 +20,10 @@ import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.MoverType
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.entity.projectile.ProjectileUtil
@@ -33,6 +36,8 @@ import net.minecraft.world.phys.Vec3
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import org.joml.Vector3f
+import java.util.*
+import kotlin.math.sqrt
 
 open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallEntity>, level: Level) :
     Projectile(type, level), IBulletProperties, BasicGeoProjectileEntity {
@@ -56,24 +61,43 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
     var fieldDuration by FIELD_DURATION
         private set
     private var damageInterval by DAMAGE_INTERVAL
-    private var ownerId by OWNER_ID
     private var syncedAttackRadius by ATTACK_RADIUS
     private var syncedCoreRadius by CORE_RADIUS
     private var syncedPullStrength by PULL_STRENGTH
+    private var syncedOwnerUUID by OWNER_UUID
 
     val attackRadius: Double get() = syncedAttackRadius.toDouble()
     val coreRadius: Double get() = syncedCoreRadius.toDouble()
     val pullStrength: Double get() = syncedPullStrength.toDouble()
+
+    fun getOwnerUUID(): UUID? = syncedOwnerUUID.orElse(null)
+
+    private fun setOwnerUUID(uuid: UUID?) {
+        syncedOwnerUUID = Optional.ofNullable(uuid)
+    }
+
+    override fun setOwner(pOwner: Entity?) {
+        super.setOwner(pOwner)
+        if (pOwner != null) setOwnerUUID(pOwner.uuid)
+    }
+
     private val collapseDuration: Int get() = minOf(COLLAPSE_DURATION, fieldDuration)
-    private val collapseStartTime: Long get() = activationTime + fieldDuration - collapseDuration
+    private val collapseStartTime: Long
+        get() = (activationTime + fieldDuration - collapseDuration).coerceAtLeast(activationTime)
+
     val collapsing: Boolean get() = anchored && level().gameTime >= collapseStartTime
+
     val fieldActive: Boolean
         get() = anchored && level().gameTime >= activationTime && level().gameTime < collapseStartTime
 
-    private val damageTick: Boolean
-        get() = (level().gameTime - activationTime) % damageInterval == (damageInterval / 2).toLong()
+    private val fieldHolding: Boolean
+        get() = anchored && level().gameTime >= activationTime && level().gameTime < activationTime + fieldDuration
 
-    private val attractionTick: Boolean get() = fieldActive && !damageTick
+    private val damageTick: Boolean
+        get() {
+            val interval = damageInterval.coerceAtLeast(2)
+            return (level().gameTime - activationTime) % interval == (interval / 2).toLong()
+        }
 
     fun expansionProgress(partialTicks: Float = 0f): Float =
         if (!anchored) 0f else {
@@ -103,7 +127,7 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
         entityData.define(ATTACK_RADIUS, 8f)
         entityData.define(CORE_RADIUS, 0.75f)
         entityData.define(PULL_STRENGTH, 0.6f)
-        entityData.define(OWNER_ID, -1)
+        entityData.define(OWNER_UUID, Optional.empty())
     }
 
     override fun getAnimationInstance() = animation
@@ -141,7 +165,6 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
         super.tick()
         age++
         if (!level().isClientSide) {
-            ownerId = owner?.id ?: -1
             if (anchored && level().gameTime >= activationTime + fieldDuration) {
                 collapseCore()
                 discard()
@@ -164,7 +187,7 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
 
         if (level().isClientSide) {
             tickClient()
-        } else if (fieldActive) {
+        } else if (fieldHolding) {
             if (level().gameTime == activationTime) {
                 level().playSound(null, x, y, z, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 0.7f, 1.4f)
             }
@@ -174,7 +197,7 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
 
     @Environment(EnvType.CLIENT)
     private fun tickClient() {
-        if (attractionTick) {
+        if (fieldHolding) {
             val player = localPlayer
             if (player != null && player.level() === level() && canAffect(player)) {
                 player.deltaMovement = attractedVelocity(player)
@@ -245,10 +268,19 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
         level().playSound(null, x, y, z, SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.PLAYERS, 0.65f, 0.8f)
     }
 
+    private fun shooter(): Entity? {
+        val current = owner
+        if (current != null && !current.isRemoved) return current
+        val uuid = getOwnerUUID() ?: return null
+        return level().getPlayerByUUID(uuid) ?: EntityFindUtil.findEntity(level(), uuid.toString())
+    }
+
     /** The same eligibility check is used for server damage and client-side player attraction. */
     fun canAffect(target: LivingEntity): Boolean {
-        val shooter = owner ?: level().getEntity(ownerId)
+        val shooter = shooter()
+        val shooterUUID = getOwnerUUID()
         return target.isAlive && !target.isSpectator && target !== shooter
+                && (shooterUUID == null || target.uuid != shooterUUID)
                 && !(target is Player && target.isCreative)
                 && !SeekTool.IS_FRIENDLY.test(shooter, target)
                 && (shooter == null || !shooter.isPassengerOfSameVehicle(target))
@@ -259,48 +291,65 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
         val toCenter = position().subtract(target.boundingBox.center)
         val distance = toCenter.length()
         val current = target.deltaMovement
-
-        if (attackRadius <= 0.0 || distance > attackRadius || pullStrength <= 0.0) {
-            return current
+        if (distance < 1.0E-4) {
+            return current.scale(CORE_DAMPING)
         }
+        if (attackRadius <= 0.0 || pullStrength <= 0.0 || distance > attackRadius) return current
 
         val core = coreRadius.coerceIn(0.0, attackRadius)
+        val direction = toCenter.scale(1.0 / distance)
 
         val motion = if (distance <= core) {
-            current.scale(0.15).add(toCenter.scale(0.5))
+            current.scale(CORE_DAMPING).add(direction.scale(CAPTURE_SPEED))
         } else {
-            val proximity = (attackRadius - distance) / (attackRadius - core)
-            val force = pullStrength * (0.35 + 0.65 * proximity)
-            current.add(toCenter.scale(force / distance))
+            val gap = (attackRadius - core).coerceAtLeast(1.0E-4)
+            val proximity = ((attackRadius - distance) / gap).coerceIn(0.0, 1.0)
+            val acceleration = pullStrength * (0.5 + 0.5 * proximity)
+            current.scale(PULL_MOMENTUM).add(direction.scale(acceleration))
         }
-
-        val speed = motion.length()
-        return if (speed > MAX_PULL_SPEED) {
-            motion.scale(MAX_PULL_SPEED / speed)
-        } else {
-            motion
-        }
+        return capSpeed(motion, MAX_PULL_SPEED)
     }
 
     private fun affectTargets() {
-        val targets =
-            level().getEntitiesOfClass(LivingEntity::class.java, boundingBox.inflate(attackRadius), ::canAffect)
-        // A damage pulse never writes attraction velocity in the same tick.
-        if (damageTick) damageTargets(targets) else attractTargets(targets)
+        val targets = livingTargets(attackRadius)
+        if (targets.isEmpty()) return
+        if (fieldActive && damageTick) {
+            damageTargets(targets)
+        }
+        attractTargets(targets)
+    }
+
+    private fun livingTargets(radius: Double): List<LivingEntity> {
+        if (radius <= 0.0) return emptyList()
+        return level().getEntitiesOfClass(
+            LivingEntity::class.java,
+            boundingBox.inflate(radius)
+        ) { it.isAlive && canAffect(it) }
     }
 
     private fun damageTargets(targets: List<LivingEntity>, finalPulse: Boolean = false) {
-        val source = ModDamageTypes.causeGravityDamage(level().registryAccess(), this, owner)
+        val source = ModDamageTypes.causeGravityDamage(level().registryAccess(), this, shooter())
         for (target in targets) {
-            val distance = target.boundingBox.center.distanceTo(position())
-            val damage = if (finalPulse) getExplosionDamage()
-            else damageValue * damageMultiplier(distance, attackRadius, coreRadius)
+            val damage = if (finalPulse) {
+                getExplosionDamage() * damageMultiplier(
+                    target.boundingBox.distanceToSqr(position()).let { sqrt(it) },
+                    attackRadius,
+                    coreRadius
+                )
+            } else {
+                damageValue * damageMultiplier(
+                    target.boundingBox.center.distanceTo(position()),
+                    attackRadius,
+                    coreRadius
+                )
+            }
             if (damage <= 0f) continue
+
             val knockback = ICustomKnockback.getInstance(target)
             val previousStrength = knockback.`superbWarfare$getKnockbackStrength`()
             knockback.`superbWarfare$setKnockbackStrength`(0.0)
             try {
-                if (finalPulse) target.invulnerableTime = 0
+                target.invulnerableTime = 0
                 target.forceHurt(source, damage)
             } finally {
                 knockback.`superbWarfare$setKnockbackStrength`(previousStrength)
@@ -309,21 +358,27 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
     }
 
     private fun collapseCore() {
-        val targets = level().getEntitiesOfClass(LivingEntity::class.java, boundingBox.inflate(coreRadius)) {
-            canAffect(it) && it.boundingBox.center.distanceToSqr(position()) <= coreRadius * coreRadius
+        val targets = livingTargets(attackRadius)
+        if (targets.isNotEmpty()) {
+            damageTargets(targets, finalPulse = true)
         }
-        damageTargets(targets, finalPulse = true)
         level().playSound(null, x, y, z, SoundEvents.RESPAWN_ANCHOR_DEPLETE.value(), SoundSource.PLAYERS, 0.8f, 1.7f)
     }
 
     private fun attractTargets(targets: List<LivingEntity>) {
+        if (pullStrength <= 0.0) return
         for (target in targets) {
-            // Player movement is owned by that player's client. Never send server pull velocities to players.
-            if (target !is Player) {
-                target.deltaMovement = attractedVelocity(target)
-                target.hasImpulse = true
-                target.hurtMarked = true
+            if (target is Player) continue
+
+            val motion = attractedVelocity(target)
+            if (motion.lengthSqr() < 1.0E-8) continue
+
+            if (!target.isPassenger) {
+                target.move(MoverType.SELF, motion.scale(DIRECT_PULL_FACTOR))
             }
+            target.deltaMovement = motion.scale(1.0 - DIRECT_PULL_FACTOR)
+            target.hasImpulse = true
+            target.hurtMarked = true
         }
     }
 
@@ -345,6 +400,7 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
         if (tag.contains("ActivationTime")) activationTime = tag.getLong("ActivationTime")
         if (tag.contains("AnchorTime")) anchorTime = tag.getLong("AnchorTime")
         else if (anchored) anchorTime = activationTime - maxOf(activationDelay, expansionDuration)
+        if (tag.hasUUID("Owner")) setOwnerUUID(tag.getUUID("Owner"))
         isNoGravity = anchored
     }
 
@@ -378,10 +434,21 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
             val core = coreRadius.coerceIn(0.0, radius)
             if (distance <= core) return 1f
             val falloff = ((distance - core) / (radius - core)).coerceIn(0.0, 1.0)
-            return (1.0 - 0.8 * falloff).toFloat()
+            return (1.0 - EDGE_DAMAGE_LOSS * falloff).toFloat()
         }
 
-        const val MAX_PULL_SPEED = 10f
+        private fun capSpeed(motion: Vec3, max: Double): Vec3 {
+            val speed = motion.length()
+            return if (speed > max && speed > 0.0) motion.scale(max / speed) else motion
+        }
+
+        const val MAX_PULL_SPEED = 0.8
+
+        private const val DIRECT_PULL_FACTOR = 0.5
+        private const val PULL_MOMENTUM = 0.85
+        private const val CORE_DAMPING = 0.35
+        private const val CAPTURE_SPEED = 0.08
+        private const val EDGE_DAMAGE_LOSS = 0.8
         private const val COLLAPSE_DURATION = 10
 
         @JvmField
@@ -421,7 +488,7 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
             SynchedEntityData.defineId(ReforgingGravityBallEntity::class.java, EntityDataSerializers.FLOAT)
 
         @JvmField
-        val OWNER_ID: EntityDataAccessor<Int> =
-            SynchedEntityData.defineId(ReforgingGravityBallEntity::class.java, EntityDataSerializers.INT)
+        val OWNER_UUID: EntityDataAccessor<Optional<UUID>> =
+            SynchedEntityData.defineId(ReforgingGravityBallEntity::class.java, EntityDataSerializers.OPTIONAL_UUID)
     }
 }
