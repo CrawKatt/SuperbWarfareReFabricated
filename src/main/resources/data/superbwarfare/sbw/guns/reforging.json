@@ -104,6 +104,7 @@
             "MaxTargets": 4
           }
         },
+        "ShootAnimation": "animation.reforging.fire_lighting",
         "Magazine": 0,
         "AmmoCostPerShoot": 8,
         "Damage": 50,
@@ -123,6 +124,7 @@
             "Owner": "@sbw:owner"
           }
         },
+        "ShootAnimation": "animation.reforging.fire_laser",
         "Range": 128,
         "Magazine": 0,
         "AmmoCostPerShoot": 4,
