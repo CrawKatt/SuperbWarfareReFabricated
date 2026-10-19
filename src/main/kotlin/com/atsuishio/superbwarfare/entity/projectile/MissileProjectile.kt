@@ -21,11 +21,14 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
-abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, CustomSpawnDataEntity, IBvrSyncableEntity {
+
+abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, CustomSpawnDataEntity,
+    IBvrSyncableEntity {
     override fun getTargetPos(): Vec3? {
         val v = entityData.get(TARGET_POS)
         return if (v == Vec3.ZERO) null else v
     }
+
     override fun setTargetPos(value: Vec3?) {
         entityData.set(TARGET_POS, value ?: Vec3.ZERO)
     }
@@ -83,8 +86,11 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
 
     override fun defineSynchedData() {
         super.defineSynchedData()
-        this.entityData.define(TARGET_UUID, "none")
-        this.entityData.define(TARGET_POS, Vec3.ZERO)
+
+        with(entityData) {
+            define(TARGET_UUID, "none")
+            define(TARGET_POS, Vec3.ZERO)
+        }
     }
 
     /**
@@ -124,11 +130,13 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
             setTargetUUID(compound.getString("TargetUuid"))
         }
         if (compound.contains("TargetPosX")) {
-            setTargetPos(Vec3(
-                compound.getDouble("TargetPosX"),
-                compound.getDouble("TargetPosY"),
-                compound.getDouble("TargetPosZ")
-            ))
+            setTargetPos(
+                Vec3(
+                    compound.getDouble("TargetPosX"),
+                    compound.getDouble("TargetPosY"),
+                    compound.getDouble("TargetPosZ")
+                )
+            )
         }
     }
 
@@ -164,6 +172,7 @@ abstract class MissileProjectile : DestroyableProjectile, ITrackableProjectile, 
         @JvmField
         val TARGET_UUID: EntityDataAccessor<String> =
             SynchedEntityData.defineId(MissileProjectile::class.java, EntityDataSerializers.STRING)
+
         @JvmField
         val TARGET_POS: EntityDataAccessor<Vec3> =
             SynchedEntityData.defineId(MissileProjectile::class.java, ModSerializers.VEC3_SERIALIZER)

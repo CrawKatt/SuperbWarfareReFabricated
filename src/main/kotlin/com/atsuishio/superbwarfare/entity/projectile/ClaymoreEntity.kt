@@ -45,9 +45,11 @@ open class ClaymoreEntity(type: EntityType<ClaymoreEntity>, level: Level) : Enti
     }
 
     override fun defineSynchedData() {
-        this.entityData.define(OWNER_UUID, Optional.empty())
-        this.entityData.define(LAST_ATTACKER_UUID, "undefined")
-        this.entityData.define(HEALTH, 10f)
+        with(entityData) {
+            define(OWNER_UUID, Optional.empty())
+            define(LAST_ATTACKER_UUID, "undefined")
+            define(HEALTH, 10f)
+        }
     }
 
     override fun isPickable(): Boolean {
@@ -178,7 +180,9 @@ open class ClaymoreEntity(type: EntityType<ClaymoreEntity>, level: Level) : Enti
                         && if (ExplosionConfig.FRIENDLY_MINES.get()) {
                     if (owner == null) true else owner != target && !owner!!.isAlliedTo(target)
                 } else {
-                    (owner != null && owner != target && !owner!!.isAlliedTo(target)) || target.team == null || enabledTDM(target)
+                    (owner != null && owner != target && !owner!!.isAlliedTo(target)) || target.team == null || enabledTDM(
+                        target
+                    )
                 }
                 if (!condition) continue
 

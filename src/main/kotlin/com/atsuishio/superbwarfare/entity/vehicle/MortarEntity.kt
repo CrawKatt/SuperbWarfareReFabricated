@@ -51,11 +51,14 @@ open class MortarEntity(type: EntityType<MortarEntity>, level: Level) : Artiller
 
     override fun defineSynchedData() {
         super.defineSynchedData()
-        this.entityData.define(INTELLIGENT, false)
-        this.entityData.define(TARGET_PITCH, -70f)
-        this.entityData.define(TARGET_YAW, this.yRot)
-        this.entityData.define(FIRE_TIME, 0)
-        this.entityData.define(NEED_RESET_TARGET, true)
+
+        with(entityData) {
+            define(INTELLIGENT, false)
+            define(TARGET_PITCH, -70f)
+            define(TARGET_YAW, yRot)
+            define(FIRE_TIME, 0)
+            define(NEED_RESET_TARGET, true)
+        }
     }
 
     override fun addAdditionalSaveData(compound: CompoundTag) {
