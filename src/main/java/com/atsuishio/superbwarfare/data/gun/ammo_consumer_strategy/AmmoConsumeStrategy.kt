@@ -64,7 +64,7 @@ abstract class AmmoConsumeStrategy {
     @Environment(EnvType.CLIENT)
     open fun getDisplayName(source: AmmoSource): String = "Invalid"
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     open fun getDisplayCount(data: GunData, source: AmmoSource, count: Int): Int = count
 
     companion object {
