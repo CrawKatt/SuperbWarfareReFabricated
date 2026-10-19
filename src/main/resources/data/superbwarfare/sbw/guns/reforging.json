@@ -113,6 +113,38 @@
         "RPM": 60,
         "ClearHoldProgressAfterShoot": true
       }
+    },
+    {
+      "Ammo": "health",
+      "Override": {
+        "Projectile": {
+          "Type": "superbwarfare:reforging_laser",
+          "Data": {
+            "Owner": "@sbw:owner"
+          }
+        },
+        "Range": 128,
+        "Magazine": 0,
+        "AmmoCostPerShoot": 4,
+        "Damage": 120,
+        "Velocity": 1,
+        "Gravity": 0,
+        "ProjectileLife": 8,
+        "RPM": 60,
+        "ClearHoldProgressAfterShoot": true,
+        "AvailableFireModes": [
+          {
+            "Mode": "Charge",
+            "Name": "HoldManual",
+            "Charge": {
+              "Duration": 40,
+              "Trigger": "OnRelease",
+              "PowerMode": "Current",
+              "MinPower": 0.25
+            }
+          }
+        ]
+      }
     }
   ],
   "Icon": "superbwarfare:textures/gun_icon/reforging_icon.png"
