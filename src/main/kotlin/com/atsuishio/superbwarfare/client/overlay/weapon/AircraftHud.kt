@@ -264,7 +264,7 @@ object AircraftHud {
                     0f,
                     4f,
                     (lerpPower - 1f) * 58.8f,
-                    0xFF6B00
+                    RenderHelper.opaque(0xFF6B00)
                 )
             }
 

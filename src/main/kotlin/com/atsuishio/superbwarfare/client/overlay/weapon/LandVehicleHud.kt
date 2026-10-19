@@ -137,7 +137,7 @@ object LandVehicleHud {
                 0f,
                 1f,
                 16f,
-                getGradientColor(color, 0xFF0000, turretHeal, 2)
+                RenderHelper.opaque(getGradientColor(color, 0xFF0000, turretHeal, 2))
             )
 
             // 车身方向
@@ -163,7 +163,7 @@ object LandVehicleHud {
                 0f,
                 32f,
                 32f,
-                getGradientColor(color, 0xFF0000, bodyHeal, 2)
+                RenderHelper.opaque(getGradientColor(color, 0xFF0000, bodyHeal, 2))
             )
             val leftWheelHeal = (100 - (100 * vehicle.leftWheelHealth / vehicle.getLeftWheelMaxHealth())).toInt()
             RenderHelper.blit(
@@ -177,7 +177,7 @@ object LandVehicleHud {
                 0f,
                 32f,
                 32f,
-                getGradientColor(color, 0xFF0000, leftWheelHeal, 2)
+                RenderHelper.opaque(getGradientColor(color, 0xFF0000, leftWheelHeal, 2))
             )
             val rightWheelHeal = (100 - (100 * vehicle.rightWheelHealth / vehicle.getRightWheelMaxHealth())).toInt()
             RenderHelper.blit(
@@ -191,7 +191,7 @@ object LandVehicleHud {
                 0f,
                 32f,
                 32f,
-                getGradientColor(color, 0xFF0000, rightWheelHeal, 2)
+                RenderHelper.opaque(getGradientColor(color, 0xFF0000, rightWheelHeal, 2))
             )
             val engineHeal = (100 - (100 * vehicle.mainEngineHealth / vehicle.getMainEngineMaxHealth())).toInt()
             RenderHelper.blit(
@@ -205,7 +205,7 @@ object LandVehicleHud {
                 0f,
                 32f,
                 32f,
-                getGradientColor(color, 0xFF0000, engineHeal, 2)
+                RenderHelper.opaque(getGradientColor(color, 0xFF0000, engineHeal, 2))
             )
             poseStack.popPose()
 

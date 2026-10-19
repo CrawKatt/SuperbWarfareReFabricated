@@ -105,7 +105,7 @@ object HeatBarOverlay : CommonOverlay("heat_bar") {
             0f,
             width.toFloat(),
             height.toFloat(),
-            if (rate >= 0.795f) calculateGradientColor(rate) else 0xFFFFFF
+            RenderHelper.opaque(if (rate >= 0.795f) calculateGradientColor(rate) else 0xFFFFFF)
         )
 
         poseStack.popPose()
