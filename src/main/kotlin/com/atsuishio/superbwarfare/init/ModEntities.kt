@@ -118,6 +118,13 @@ object ModEntities {
 
     // Projectiles
     @JvmField
+    val REFORGING_GRAVITY_BALL = register(
+        "reforging_gravity_ball",
+        misc(::ReforgingGravityBallEntity).clientTrackingRange(64).updateInterval(1)
+            .alwaysUpdateVelocity(true).noSave().fireImmune().sized(0.4f, 0.4f)
+    )
+
+    @JvmField
     val REFORGING_LIGHTNING_BALL = register(
         "reforging_lightning_ball",
         misc(::ReforgingLightningBallEntity).clientTrackingRange(64).updateInterval(1)

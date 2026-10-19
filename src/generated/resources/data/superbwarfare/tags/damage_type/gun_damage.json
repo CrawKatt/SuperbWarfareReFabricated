@@ -29,6 +29,10 @@
       "required": false
     },
     {
+      "id": "superbwarfare:gravity",
+      "required": false
+    },
+    {
       "id": "superbwarfare:burn",
       "required": false
     },
