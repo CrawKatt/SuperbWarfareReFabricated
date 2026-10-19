@@ -92,74 +92,28 @@ object LandVehicleHud {
         if (Minecraft.getInstance().options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle) {
             val addW = (screenWidth / screenHeight) * 48
             val addH = (screenWidth / screenHeight) * 27
-            RenderHelper.preciseBlit(
-                gui,
-                FRAME,
-                -addW.toFloat() / 2,
-                -addH.toFloat() / 2,
-                10f,
-                0f,
-                0f,
-                (screenWidth + addW).toFloat(),
-                (screenHeight + addH).toFloat(),
-                (screenWidth + addW).toFloat(),
-                (screenHeight + addH).toFloat()
+            RenderHelper.blit(
+                gui.pose(), FRAME, -addW.toFloat() / 2, -addH.toFloat() / 2, (screenWidth + addW).toFloat(),
+                (screenHeight + addH).toFloat(), z = 10f,
             )
-            RenderHelper.preciseBlitWithColor(
-                gui,
-                LINE,
-                screenWidth / 2f - 64,
-                (screenHeight - 56).toFloat(),
-                0f,
-                0f,
-                128f,
-                1f,
-                128f,
-                1f,
-                color
+            RenderHelper.blit(
+                gui.pose(), LINE, screenWidth / 2f - 64, (screenHeight - 56).toFloat(), 128f, 1f,
+                argb = RenderHelper.opaque(color),
             )
 
             // 指南针
-            RenderHelper.preciseBlitWithColor(
-                gui,
-                COMPASS,
-                screenWidth.toFloat() / 2 - 128,
-                10f,
-                128 + (64f / 45 * player.yRot),
-                0f,
-                256f,
-                16f,
-                512f,
-                16f,
-                color
+            RenderHelper.blit(
+                gui.pose(), COMPASS, screenWidth.toFloat() / 2 - 128, 10f, 128 + (64f / 45 * player.yRot), 0f, 256f,
+                16f, 512f, 16f, argb = RenderHelper.opaque(color),
             )
-            RenderHelper.preciseBlitWithColor(
-                gui,
-                ROLL_IND,
-                screenWidth / 2f - 8,
-                30f,
-                0f,
-                0f,
-                16f,
-                16f,
-                16f,
-                16f,
-                color
+            RenderHelper.blit(
+                gui.pose(), ROLL_IND, screenWidth / 2f - 8, 30f, 16f, 16f, argb = RenderHelper.opaque(color),
             )
 
             val turretHeal = (100 - (100 * vehicle.turretHealth / vehicle.getTurretMaxHealth())).toInt()
-            RenderHelper.preciseBlitWithColor(
-                gui,
-                BARREL,
-                screenWidth / 2f + 112,
-                (screenHeight - 71).toFloat(),
-                0f,
-                0f,
-                1f,
-                16f,
-                1f,
-                16f,
-                getGradientColor(color, 0xFF0000, turretHeal, 2)
+            RenderHelper.blit(
+                gui.pose(), BARREL, screenWidth / 2f + 112, (screenHeight - 71).toFloat(), 1f, 16f,
+                argb = RenderHelper.opaque(getGradientColor(color, 0xFF0000, turretHeal, 2)),
             )
 
             // 车身方向
@@ -174,60 +128,24 @@ object LandVehicleHud {
                 ), screenWidth / 2f + 112, (screenHeight - 56).toFloat(), 0f
             )
             val bodyHeal = (100 - (100 * vehicle.health / vehicle.getMaxHealth())).toInt()
-            RenderHelper.preciseBlitWithColor(
-                gui,
-                BODY,
-                screenWidth / 2f + 96,
-                (screenHeight - 72).toFloat(),
-                0f,
-                0f,
-                32f,
-                32f,
-                32f,
-                32f,
-                getGradientColor(color, 0xFF0000, bodyHeal, 2)
+            RenderHelper.blit(
+                gui.pose(), BODY, screenWidth / 2f + 96, (screenHeight - 72).toFloat(), 32f, 32f,
+                argb = RenderHelper.opaque(getGradientColor(color, 0xFF0000, bodyHeal, 2)),
             )
             val leftWheelHeal = (100 - (100 * vehicle.leftWheelHealth / vehicle.getLeftWheelMaxHealth())).toInt()
-            RenderHelper.preciseBlitWithColor(
-                gui,
-                LEFT_WHEEL,
-                screenWidth / 2f + 96,
-                (screenHeight - 72).toFloat(),
-                0f,
-                0f,
-                32f,
-                32f,
-                32f,
-                32f,
-                getGradientColor(color, 0xFF0000, leftWheelHeal, 2)
+            RenderHelper.blit(
+                gui.pose(), LEFT_WHEEL, screenWidth / 2f + 96, (screenHeight - 72).toFloat(), 32f, 32f,
+                argb = RenderHelper.opaque(getGradientColor(color, 0xFF0000, leftWheelHeal, 2)),
             )
             val rightWheelHeal = (100 - (100 * vehicle.rightWheelHealth / vehicle.getRightWheelMaxHealth())).toInt()
-            RenderHelper.preciseBlitWithColor(
-                gui,
-                RIGHT_WHEEL,
-                screenWidth / 2f + 96,
-                (screenHeight - 72).toFloat(),
-                0f,
-                0f,
-                32f,
-                32f,
-                32f,
-                32f,
-                getGradientColor(color, 0xFF0000, rightWheelHeal, 2)
+            RenderHelper.blit(
+                gui.pose(), RIGHT_WHEEL, screenWidth / 2f + 96, (screenHeight - 72).toFloat(), 32f, 32f,
+                argb = RenderHelper.opaque(getGradientColor(color, 0xFF0000, rightWheelHeal, 2)),
             )
             val engineHeal = (100 - (100 * vehicle.mainEngineHealth / vehicle.getMainEngineMaxHealth())).toInt()
-            RenderHelper.preciseBlitWithColor(
-                gui,
-                ENGINE,
-                screenWidth / 2f + 96,
-                (screenHeight - 72).toFloat(),
-                0f,
-                0f,
-                32f,
-                32f,
-                32f,
-                32f,
-                getGradientColor(color, 0xFF0000, engineHeal, 2)
+            RenderHelper.blit(
+                gui.pose(), ENGINE, screenWidth / 2f + 96, (screenHeight - 72).toFloat(), 32f, 32f,
+                argb = RenderHelper.opaque(getGradientColor(color, 0xFF0000, engineHeal, 2)),
             )
             poseStack.popPose()
 

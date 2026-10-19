@@ -106,32 +106,14 @@ class Ac130GunnerHud {
                 RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
 
                 // 指南针
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    COMPASS,
-                    screenWidth.toFloat() / 2 - 128,
-                    10f,
-                    128 - (64f / 45 * VehicleVecUtils.getYRotFromVector(Vec3(mc.gameRenderer.mainCamera.lookVector))
-                        .toFloat()),
-                    0f,
-                    256f,
-                    16f,
-                    512f,
-                    16f,
-                    color
+                RenderHelper.blit(
+                    guiGraphics.pose(), COMPASS, screenWidth.toFloat() / 2 - 128, 10f,
+                    128 - (64f / 45 * VehicleVecUtils.getYRotFromVector(Vec3(mc.gameRenderer.mainCamera.lookVector)) .toFloat()),
+                    0f, 256f, 16f, 512f, 16f, argb = RenderHelper.opaque(color),
                 )
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    ROLL_IND,
-                    screenWidth / 2f - 8,
-                    30f,
-                    0f,
-                    0f,
-                    16f,
-                    16f,
-                    16f,
-                    16f,
-                    color
+                RenderHelper.blit(
+                    guiGraphics.pose(), ROLL_IND, screenWidth / 2f - 8, 30f, 16f, 16f,
+                    argb = RenderHelper.opaque(color),
                 )
 
                 RenderSystem.enableBlend()
@@ -139,31 +121,13 @@ class Ac130GunnerHud {
                 // 电视
                 val addW = (screenWidth / screenHeight) * 48
                 val addH = (screenWidth / screenHeight) * 27
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    FRAME,
-                    -addW.toFloat() / 2,
-                    -addH.toFloat() / 2,
-                    10f,
-                    0f,
-                    0f,
-                    (screenWidth + addW).toFloat(),
-                    (screenHeight + addH).toFloat(),
-                    (screenWidth + addW).toFloat(),
-                    (screenHeight + addH).toFloat()
+                RenderHelper.blit(
+                    guiGraphics.pose(), FRAME, -addW.toFloat() / 2, -addH.toFloat() / 2, (screenWidth + addW).toFloat(),
+                    (screenHeight + addH).toFloat(), z = 10f,
                 )
-                RenderHelper.preciseBlitWithColor(
-                    guiGraphics,
-                    LINE,
-                    screenWidth / 2f - 64,
-                    (screenHeight - 56).toFloat(),
-                    0f,
-                    0f,
-                    128f,
-                    1f,
-                    128f,
-                    1f,
-                    color
+                RenderHelper.blit(
+                    guiGraphics.pose(), LINE, screenWidth / 2f - 64, (screenHeight - 56).toFloat(), 128f, 1f,
+                    argb = RenderHelper.opaque(color),
                 )
 
                 // 时速
