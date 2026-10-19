@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.capability.sync.ModSyncedCapabilities
 import com.atsuishio.superbwarfare.client.MouseMovementHandler
 import com.atsuishio.superbwarfare.client.PoseTool
 import com.atsuishio.superbwarfare.client.renderer.ModParticleRenderTypes
+import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensShader
 import com.atsuishio.superbwarfare.compat.acceleratedrendering.AcceleratedRenderingCompat
 import com.atsuishio.superbwarfare.compat.coldsweat.ColdSweatCompatHandler
 import com.atsuishio.superbwarfare.compat.ponder.SBWPonderPlugin
@@ -82,6 +83,7 @@ class Mod {
         bus.addListener<AddPackFindersEvent> { onRegisterBuiltInResourcePacks(it) }
         bus.addListener<DataPackRegistryEvent.NewRegistry> { ModDatapackRegistries.onNewRegistry(it) }
         bus.addListener<RegisterShadersEvent> { ModParticleRenderTypes.onRegisterShaders(it) }
+        bus.addListener<RegisterShadersEvent> { ScopeLensShader.onRegisterShaders(it) }
 
         if (TACZGunEventHandler.compatCondition()) {
             MinecraftForge.EVENT_BUS.addListener(TACZGunEventHandler::entityHurtByTACZGun)
