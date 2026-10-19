@@ -133,8 +133,16 @@ object JavelinHudOverlay : CommonOverlay("javelin_hud") {
                         val y = point.y.toFloat()
 
                         RenderHelper.blit(
-                            guiGraphics.pose(), if (lockOn) FRAME_LOCK else if (nearest) FRAME_TARGET else FRAME,
-                            x - 12, y - 12, 24f, 24f, argb = RenderHelper.opaque(-0x1),
+                            poseStack,
+                            if (lockOn) FRAME_LOCK else if (nearest) FRAME_TARGET else FRAME,
+                            x - 12,
+                            y - 12,
+                            24f,
+                            24f,
+                            0f,
+                            0f,
+                            24f,
+                            24f,
                         )
                         poseStack.popPose()
                     }
@@ -149,8 +157,16 @@ object JavelinHudOverlay : CommonOverlay("javelin_hud") {
                             val y = point.y.toFloat()
 
                             RenderHelper.blit(
-                                guiGraphics.pose(), if (lockOn) FRAME_LOCK else FRAME_TARGET, x - 12, y - 12, 24f, 24f,
-                                argb = RenderHelper.opaque(-0x1),
+                                poseStack,
+                                if (lockOn) FRAME_LOCK else FRAME_TARGET,
+                                x - 12,
+                                y - 12,
+                                24f,
+                                24f,
+                                0f,
+                                0f,
+                                24f,
+                                24f,
                             )
                             poseStack.popPose()
                         }

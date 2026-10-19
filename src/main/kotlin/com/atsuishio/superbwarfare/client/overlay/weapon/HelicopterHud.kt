@@ -139,20 +139,35 @@ object HelicopterHud {
                     (screenHeight + addH).toFloat(), z = 10f,
                 )
                 RenderHelper.blit(
-                    guiGraphics.pose(), LINE, screenWidth / 2f - 64, (screenHeight - 56).toFloat(), 128f, 1f,
-                    argb = RenderHelper.opaque(color),
+                    poseStack,
+                    LINE,
+                    screenWidth / 2f - 64,
+                    (screenHeight - 56).toFloat(),
+                    128f,
+                    1f,
+                    0f,
+                    0f,
+                    128f,
+                    1f,
+                    color
                 )
 
                 // 指南针
                 RenderHelper.blit(
-                    guiGraphics.pose(), COMPASS, screenWidth.toFloat() / 2 - 128, 10f,
-                    128 - (64f / 45 * VehicleVecUtils.getYRotFromVector(Vec3(mc.gameRenderer.mainCamera.lookVector)) .toFloat()),
-                    0f, 256f, 16f, 512f, 16f, argb = RenderHelper.opaque(color),
+                    poseStack,
+                    COMPASS,
+                    screenWidth.toFloat() / 2 - 128,
+                    10f,
+                    256f,
+                    16f,
+                    128 - (64f / 45 * VehicleVecUtils.getYRotFromVector(Vec3(mc.gameRenderer.mainCamera.lookVector))
+                        .toFloat()),
+                    0f,
+                    512f,
+                    16f,
+                    color
                 )
-                RenderHelper.blit(
-                    guiGraphics.pose(), ROLL_IND, screenWidth / 2f - 8, 30f, 16f, 16f,
-                    argb = RenderHelper.opaque(color),
-                )
+                RenderHelper.blit(poseStack, ROLL_IND, screenWidth / 2f - 8, 30f, 16f, 16f, 0f, 0f, 16f, 16f, color)
 
                 // 时速
                 guiGraphics.drawString(
@@ -266,8 +281,8 @@ object HelicopterHud {
             val x = screenPos.x.toFloat()
             val y = screenPos.y.toFloat()
 
-            if (mc.options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle) {
-                RenderHelper.blit(guiGraphics.pose(), HELI_BASE, k, l, i, j, argb = RenderHelper.opaque(color))
+            if (Minecraft.getInstance().options.cameraType == CameraType.FIRST_PERSON || ClientEventHandler.zoomVehicle) {
+                RenderHelper.blit(poseStack, HELI_BASE, k, l, i, j, 0f, 0f, i, j, color)
 
                 val diffY = -Mth.lerp(partialTick, vehicle.turretYRotO, vehicle.turretYRot) * 0.3f
                 val diffX = (Mth.wrapDegrees(
@@ -277,14 +292,20 @@ object HelicopterHud {
                         vehicle.xRot
                     )
                 ) * 0.072f).toFloat()
-                RenderHelper.blit(
-                    guiGraphics.pose(), HELI_DRIVER_ANGLE, k + diffY, l + diffX, i, j,
-                    argb = RenderHelper.opaque(color),
-                )
+                RenderHelper.blit(poseStack, HELI_DRIVER_ANGLE, k + diffY, l + diffX, i, j, 0f, 0f, i, j, color)
 
                 RenderHelper.blit(
-                    guiGraphics.pose(), COMPASS, screenWidth.toFloat() / 2 - 128, 6f, 128 + (64f / 45 * vehicle.yRot),
-                    0f, 256f, 16f, 512f, 16f, argb = RenderHelper.opaque(color),
+                    poseStack,
+                    COMPASS,
+                    screenWidth.toFloat() / 2 - 128,
+                    6f,
+                    256f,
+                    16f,
+                    128 + (64f / 45 * vehicle.yRot),
+                    0f,
+                    512f,
+                    16f,
+                    color
                 )
 
                 poseStack.pushPose()
@@ -296,8 +317,17 @@ object HelicopterHud {
                 )
                 val pitch = vehicle.getPitch(partialTick)
                 RenderHelper.blit(
-                    guiGraphics.pose(), AircraftHud.HUD_LINE, screenWidth / 2f - 144, screenHeight / 2f - 128, 0f,
-                    722.5f + 4.725f * pitch, 288f, 256f, 288f, 1701f, argb = RenderHelper.opaque(color),
+                    poseStack,
+                    AircraftHud.HUD_LINE,
+                    screenWidth / 2f - 144,
+                    screenHeight / 2f - 128,
+                    288f,
+                    256f,
+                    0f,
+                    722.5f + 4.725f * pitch,
+                    288f,
+                    1701f,
+                    color
                 )
                 poseStack.popPose()
 
@@ -309,28 +339,62 @@ object HelicopterHud {
                     0f
                 )
                 RenderHelper.blit(
-                    guiGraphics.pose(), ROLL_IND, screenWidth.toFloat() / 2 - 8, screenHeight.toFloat() / 2 - 88, 16f,
-                    16f, argb = RenderHelper.opaque(color),
+                    poseStack,
+                    ROLL_IND,
+                    screenWidth.toFloat() / 2 - 8,
+                    screenHeight.toFloat() / 2 - 88,
+                    16f,
+                    16f,
+                    0f,
+                    0f,
+                    16f,
+                    16f,
+                    color
                 )
                 poseStack.popPose()
 
                 RenderHelper.blit(
-                    guiGraphics.pose(), HELI_POWER_RULER, screenWidth.toFloat() / 2 + 100,
-                    screenHeight.toFloat() / 2 - 64, 64f, 128f, argb = RenderHelper.opaque(color),
+                    poseStack,
+                    HELI_POWER_RULER,
+                    screenWidth.toFloat() / 2 + 100,
+                    screenHeight.toFloat() / 2 - 64,
+                    64f,
+                    128f,
+                    0f,
+                    0f,
+                    64f,
+                    128f,
+                    color
                 )
 
                 val power = vehicle.power
                 lerpPower = Mth.lerp(0.5f * partialTick, lerpPower, power)
                 RenderHelper.blit(
-                    guiGraphics.pose(), HELI_POWER, screenWidth.toFloat() / 2 + 130f,
-                    (screenHeight.toFloat() / 2 - 64 + 124 - lerpPower * 980), 4f, lerpPower * 980,
-                    argb = RenderHelper.opaque(color),
+                    poseStack,
+                    HELI_POWER,
+                    screenWidth.toFloat() / 2 + 130f,
+                    (screenHeight.toFloat() / 2 - 64 + 124 - lerpPower * 980),
+                    4f,
+                    lerpPower * 980,
+                    0f,
+                    0f,
+                    4f,
+                    lerpPower * 980,
+                    color
                 )
 
                 RenderHelper.blit(
-                    guiGraphics.pose(), HELI_VY_MOVE, screenWidth.toFloat() / 2 + 138,
-                    (screenHeight.toFloat() / 2 - 3 - Mth.clamp(lerpVy * 3, -24f, 24f) * 2.5f), 8f, 8f,
-                    argb = RenderHelper.opaque(color),
+                    poseStack,
+                    HELI_VY_MOVE,
+                    screenWidth.toFloat() / 2 + 138,
+                    (screenHeight.toFloat() / 2 - 3 - Mth.clamp(lerpVy * 3, -24f, 24f) * 2.5f),
+                    8f,
+                    8f,
+                    0f,
+                    0f,
+                    8f,
+                    8f,
+                    color
                 )
 
                 guiGraphics.drawString(
@@ -346,8 +410,17 @@ object HelicopterHud {
                     screenWidth / 2 + 104, screenHeight / 2, color, false
                 )
                 RenderHelper.blit(
-                    guiGraphics.pose(), SPEED_FRAME, screenWidth.toFloat() / 2 - 144, screenHeight.toFloat() / 2 - 6,
-                    50f, 18f, argb = RenderHelper.opaque(color),
+                    poseStack,
+                    SPEED_FRAME,
+                    screenWidth.toFloat() / 2 - 144,
+                    screenHeight.toFloat() / 2 - 6,
+                    50f,
+                    18f,
+                    0f,
+                    0f,
+                    50f,
+                    18f,
+                    color
                 )
                 guiGraphics.drawString(
                     Minecraft.getInstance().font, Component.literal(format0D(speed, "km/h")),
@@ -372,9 +445,7 @@ object HelicopterHud {
 
                 renderEnergyInfo(vehicle, guiGraphics, screenWidth, screenHeight, mc.font)
 
-                RenderHelper.blit(
-                    guiGraphics.pose(), CROSSHAIR_IND, x - 8, y - 8, 16f, 16f, argb = RenderHelper.opaque(color),
-                )
+                RenderHelper.blit(poseStack, CROSSHAIR_IND, x - 8, y - 8, 16f, 16f, 0f, 0f, 16f, 16f, color)
                 renderKillIndicatorDynamic(
                     guiGraphics,
                     x - 7.5f + (2 * (Math.random() - 0.5f)).toFloat(),
@@ -394,21 +465,48 @@ object HelicopterHud {
                     val toVec = ringPos.vectorTo(originPos).normalize()
                     val p0 = ringPos.add(toVec.scale(i))
                     RenderHelper.blit(
-                        guiGraphics.pose(), BLOCK, (p0.x - 0.25).toFloat(), (p0.y - 0.25).toFloat(), 0.5f, 0.5f,
-                        argb = RenderHelper.opaque(-1),
+                        poseStack,
+                        BLOCK,
+                        (p0.x - 0.25).toFloat(),
+                        (p0.y - 0.25).toFloat(),
+                        0.5f,
+                        0.5f,
+                        0f,
+                        0f,
+                        0.5f,
+                        0.5f,
+                        -1
                     )
                     i += 3
                 }
 
                 val pitch = vehicle.getPitch(partialTick)
                 RenderHelper.blit(
-                    guiGraphics.pose(), AircraftHud.HUD_LINE_3P, x - 96, y - 48, 0f, 195 + 1.36f * pitch, 192f, 96f,
-                    192f, 486f, argb = RenderHelper.opaque(-1),
+                    poseStack,
+                    AircraftHud.HUD_LINE_3P,
+                    x - 96,
+                    y - 48,
+                    192f,
+                    96f,
+                    0f,
+                    195 + 1.36f * pitch,
+                    192f,
+                    486f,
+                    -1
                 )
 
                 RenderHelper.blit(
-                    guiGraphics.pose(), AircraftHud.ROLL_HUD_3P, x - 48, y - 48, 96f, 96f,
-                    argb = RenderHelper.opaque(-1),
+                    poseStack,
+                    AircraftHud.ROLL_HUD_3P,
+                    x - 48,
+                    y - 48,
+                    96f,
+                    96f,
+                    0f,
+                    0f,
+                    96f,
+                    96f,
+                    -1
                 )
 
                 poseStack.pushPose()

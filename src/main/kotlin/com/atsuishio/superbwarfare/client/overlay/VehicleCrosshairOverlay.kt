@@ -174,8 +174,17 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
 
                 if (crosshairPath == "@VehicleDynamicCross" && pos.canBeSeen()) {
                     RenderHelper.blit(
-                        guiGraphics.pose(), texture, x - scaledMinWH / 2, y - scaledMinWH / 2, scaledMinWH, scaledMinWH,
-                        argb = RenderHelper.opaque(color),
+                        poseStack,
+                        texture,
+                        x - scaledMinWH / 2,
+                        y - scaledMinWH / 2,
+                        scaledMinWH,
+                        scaledMinWH,
+                        0f,
+                        0f,
+                        scaledMinWH,
+                        scaledMinWH,
+                        color
                     )
                     renderKillIndicatorDynamic(
                         guiGraphics,
@@ -184,8 +193,17 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                     )
                     val fixedTexture = CROSSHAIR_MAP["@VehicleFixedPoint"]!!
                     RenderHelper.blit(
-                        guiGraphics.pose(), fixedTexture, centerW, centerH, scaledMinWH, scaledMinWH,
-                        argb = RenderHelper.opaque(color),
+                        poseStack,
+                        fixedTexture,
+                        centerW,
+                        centerH,
+                        scaledMinWH,
+                        scaledMinWH,
+                        0f,
+                        0f,
+                        scaledMinWH,
+                        scaledMinWH,
+                        color
                     )
                 } else if ((crosshairPath == "@AirCraftCommon"
                             || crosshairPath == "@VehicleLaserCannon"
@@ -195,8 +213,17 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                             ) && pos.canBeSeen()
                 ) {
                     RenderHelper.blit(
-                        guiGraphics.pose(), texture, x - scaledMinWH / 2, y - scaledMinWH / 2, scaledMinWH, scaledMinWH,
-                        argb = RenderHelper.opaque(color),
+                        poseStack,
+                        texture,
+                        x - scaledMinWH / 2,
+                        y - scaledMinWH / 2,
+                        scaledMinWH,
+                        scaledMinWH,
+                        0f,
+                        0f,
+                        scaledMinWH,
+                        scaledMinWH,
+                        color
                     )
                     renderKillIndicatorDynamic(
                         guiGraphics,
@@ -206,8 +233,17 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
 
                 } else if (crosshairPath == "@AirCraftNacelle") {
                     RenderHelper.blit(
-                        guiGraphics.pose(), texture, centerW, centerH, scaledMinWH, scaledMinWH,
-                        argb = RenderHelper.opaque(color),
+                        poseStack,
+                        texture,
+                        centerW,
+                        centerH,
+                        scaledMinWH,
+                        scaledMinWH,
+                        0f,
+                        0f,
+                        scaledMinWH,
+                        scaledMinWH,
+                        color
                     )
                     renderKillIndicator(guiGraphics, screenWidth.toFloat(), screenHeight.toFloat())
 
@@ -235,8 +271,17 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                 } else if (crosshairPath == "@VehicleCnHpjZooming") {
                     val dynamicTexture = CROSSHAIR_MAP["@VehicleDynamicCross"]!!
                     RenderHelper.blit(
-                        guiGraphics.pose(), dynamicTexture, x - scaledMinWH / 2, y - scaledMinWH / 2, scaledMinWH,
-                        scaledMinWH, argb = RenderHelper.opaque(color),
+                        poseStack,
+                        dynamicTexture,
+                        x - scaledMinWH / 2,
+                        y - scaledMinWH / 2,
+                        scaledMinWH,
+                        scaledMinWH,
+                        0f,
+                        0f,
+                        scaledMinWH,
+                        scaledMinWH,
+                        color
                     )
                     renderKillIndicatorDynamic(
                         guiGraphics,
@@ -267,8 +312,17 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                         val string = vec3.toFormattedString()
                         val width = Minecraft.getInstance().font.width(string)
                         RenderHelper.blit(
-                            guiGraphics.pose(), texture, centerW, centerH, scaledMinWH, scaledMinWH,
-                            argb = RenderHelper.opaque(color),
+                            poseStack,
+                            texture,
+                            centerW,
+                            centerH,
+                            scaledMinWH,
+                            scaledMinWH,
+                            0f,
+                            0f,
+                            scaledMinWH,
+                            scaledMinWH,
+                            color
                         )
                         guiGraphics.drawString(
                             Minecraft.getInstance().font,
@@ -282,8 +336,17 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
 
                 } else {
                     RenderHelper.blit(
-                        guiGraphics.pose(), texture, centerW, centerH, scaledMinWH, scaledMinWH,
-                        argb = RenderHelper.opaque(color),
+                        poseStack,
+                        texture,
+                        centerW,
+                        centerH,
+                        scaledMinWH,
+                        scaledMinWH,
+                        0f,
+                        0f,
+                        scaledMinWH,
+                        scaledMinWH,
+                        color
                     )
                     renderKillIndicator(guiGraphics, screenWidth.toFloat(), screenHeight.toFloat())
                 }
