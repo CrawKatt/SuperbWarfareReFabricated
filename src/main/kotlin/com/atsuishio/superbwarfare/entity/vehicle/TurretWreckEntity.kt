@@ -153,9 +153,11 @@ open class TurretWreckEntity(type: EntityType<TurretWreckEntity>, level: Level) 
     }
 
     override fun defineSynchedData() {
-        entityData.define(QUATERNION, Quaternionf())
-        entityData.define(VEHICLE_NAME, "GunMu")
-        entityData.define(HEALTH, 100f)
+        with(entityData) {
+            define(QUATERNION, Quaternionf())
+            define(VEHICLE_NAME, "GunMu")
+            define(HEALTH, 100f)
+        }
     }
 
     override fun readAdditionalSaveData(compound: CompoundTag) {

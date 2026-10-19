@@ -47,9 +47,12 @@ open class AnnihilatorEntity(type: EntityType<AnnihilatorEntity>, world: Level) 
 
     override fun defineSynchedData() {
         super.defineSynchedData()
-        this.entityData.define(LASER_LEFT_LENGTH, 0f)
-        this.entityData.define(LASER_MIDDLE_LENGTH, 0f)
-        this.entityData.define(LASER_RIGHT_LENGTH, 0f)
+
+        with(entityData) {
+            define(LASER_LEFT_LENGTH, 0f)
+            define(LASER_MIDDLE_LENGTH, 0f)
+            define(LASER_RIGHT_LENGTH, 0f)
+        }
     }
 
     override fun onCrowbarInteract(

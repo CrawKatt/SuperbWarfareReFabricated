@@ -118,16 +118,18 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
     }
 
     override fun defineSynchedData() {
-        entityData.define(ANCHORED, false)
-        entityData.define(ANCHOR_TIME, 0L)
-        entityData.define(ACTIVATION_TIME, 0L)
-        entityData.define(EXPANSION_DURATION, 20)
-        entityData.define(FIELD_DURATION, 100)
-        entityData.define(DAMAGE_INTERVAL, 10)
-        entityData.define(ATTACK_RADIUS, 8f)
-        entityData.define(CORE_RADIUS, 0.75f)
-        entityData.define(PULL_STRENGTH, 0.6f)
-        entityData.define(OWNER_UUID, Optional.empty())
+        with(entityData) {
+            define(ANCHORED, false)
+            define(ANCHOR_TIME, 0L)
+            define(ACTIVATION_TIME, 0L)
+            define(EXPANSION_DURATION, 20)
+            define(FIELD_DURATION, 100)
+            define(DAMAGE_INTERVAL, 10)
+            define(ATTACK_RADIUS, 8f)
+            define(CORE_RADIUS, 0.75f)
+            define(PULL_STRENGTH, 0.6f)
+            define(OWNER_UUID, Optional.empty())
+        }
     }
 
     override fun getAnimationInstance() = animation
@@ -388,7 +390,8 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
         if (tag.contains("DamageInterval")) damageInterval = tag.getInt("DamageInterval").coerceAtLeast(2)
         if (tag.contains("FieldDuration")) fieldDuration = tag.getInt("FieldDuration").coerceAtLeast(1)
         if (tag.contains("AttackRadius")) syncedAttackRadius = tag.getFloat("AttackRadius").coerceIn(0.5f, 32f)
-        if (tag.contains("CoreRadius")) syncedCoreRadius = tag.getFloat("CoreRadius").coerceIn(0.1f, attackRadius.toFloat())
+        if (tag.contains("CoreRadius")) syncedCoreRadius =
+            tag.getFloat("CoreRadius").coerceIn(0.1f, attackRadius.toFloat())
         if (tag.contains("PullStrength")) syncedPullStrength = tag.getFloat("PullStrength").coerceIn(0f, 1f)
         if (tag.contains("Anchored")) anchored = tag.getBoolean("Anchored")
         if (tag.contains("ActivationTime")) activationTime = tag.getLong("ActivationTime")

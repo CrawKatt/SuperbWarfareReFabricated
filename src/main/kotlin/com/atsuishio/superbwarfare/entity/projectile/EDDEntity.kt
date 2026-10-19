@@ -88,8 +88,11 @@ open class EDDEntity : HangingEntity, OwnableEntity {
 
     override fun defineSynchedData() {
         super.defineSynchedData()
-        this.entityData.define(OWNER_UUID, Optional.empty())
-        this.entityData.define(LAST_ATTACKER_UUID, "undefined")
+
+        with(entityData) {
+            define(OWNER_UUID, Optional.empty())
+            define(LAST_ATTACKER_UUID, "undefined")
+        }
     }
 
     override fun getEyeHeight(
