@@ -121,6 +121,13 @@ object ModEntities {
 
     // Projectiles
     @JvmField
+    val REFORGING_LASER = register(
+        "reforging_laser",
+        misc(::LaserBeamEntity).setTrackingRange(160).setUpdateInterval(1)
+            .noSave().noSummon().fireImmune().sized(0.1f, 0.1f)
+    )
+
+    @JvmField
     val REFORGING_GRAVITY_BALL = register(
         "reforging_gravity_ball",
         misc(::ReforgingGravityBallEntity).setTrackingRange(64).setUpdateInterval(1)

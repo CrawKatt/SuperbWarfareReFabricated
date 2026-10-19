@@ -21,6 +21,7 @@ import com.atsuishio.superbwarfare.item.food.CrustItem
 import com.atsuishio.superbwarfare.item.gun.EmptyGunItem
 import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
+import com.atsuishio.superbwarfare.item.gun.LaserGunItem
 import com.atsuishio.superbwarfare.item.gun.launcher.IglaItem
 import com.atsuishio.superbwarfare.item.gun.launcher.JavelinItem
 import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem
@@ -151,7 +152,7 @@ object ModItems {
     @JvmField val IGLA_9K38 = registerGun<IglaItem>()
     @JvmField val BOCEK = registerGun("bocek") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
     @JvmField val SUPER_STAR_SHOOTER = registerGun<SuperStarShooterItem>()
-    @JvmField val REFORGING = registerGun("reforging") { GeoGunItem(Properties().rarity(SUPERB)) }
+    @JvmField val REFORGING = registerGun("reforging") { LaserGunItem(Properties().rarity(SUPERB)) }
     @JvmField val RAUBTIER = registerGun("raubtier") { GeoGunItem(Properties().rarity(SUPERB)) }
 
     @JvmField val VEHICLE_GUN = registerGun<VehicleGunItem>()
