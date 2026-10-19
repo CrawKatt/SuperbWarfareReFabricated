@@ -11,7 +11,6 @@ import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.item.projectile.AbstractProjectileDispenseBehavior
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.mc
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.Position
 import net.minecraft.core.dispenser.BlockSource
 import net.minecraft.core.dispenser.DispenseItemBehavior
@@ -46,14 +45,9 @@ open class HandGrenadeItem : Item(Properties().rarity(Rarity.UNCOMMON)), Dispens
         @SubscribeEvent
         private fun registerItemExtensions(event: RegisterClientExtensionsEvent) {
             event.registerItem(object : IClientItemExtensions {
-                private var renderer: BlockEntityWithoutLevelRenderer? = null
+                private val renderer by lazy { HandGrenadeRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
 
-                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                    if (renderer == null) {
-                        renderer = HandGrenadeRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                    }
-                    return renderer!!
-                }
+                override fun getCustomRenderer() = renderer
             }, ModItems.HAND_GRENADE)
         }
     }

@@ -4,7 +4,6 @@ import com.atsuishio.superbwarfare.client.renderer.item.KnifeM1917Renderer
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.tools.mc
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions
@@ -18,14 +17,8 @@ class KnifeM1917Item : KnifeItem() {
         @SubscribeEvent
         private fun registerGunExtensions(event: RegisterClientExtensionsEvent) {
             event.registerItem(object : IClientItemExtensions {
-                private var renderer: BlockEntityWithoutLevelRenderer? = null
-
-                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                    if (renderer == null) {
-                        renderer = KnifeM1917Renderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                    }
-                    return renderer!!
-                }
+                private val renderer by lazy { KnifeM1917Renderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+                override fun getCustomRenderer() = renderer
             }, ModItems.KNIFE_M1917)
         }
     }

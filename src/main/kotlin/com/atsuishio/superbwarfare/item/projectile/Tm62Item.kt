@@ -8,7 +8,6 @@ import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.item.DispenserLaunchable
 import com.atsuishio.superbwarfare.tools.mc
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.dispenser.BlockSource
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior
 import net.minecraft.core.dispenser.DispenseItemBehavior
@@ -33,14 +32,8 @@ open class Tm62Item : Item(Properties().stacksTo(8)), DispenserLaunchable {
         @SubscribeEvent
         private fun registerItemExtensions(event: RegisterClientExtensionsEvent) {
             event.registerItem(object : IClientItemExtensions {
-                private var renderer: BlockEntityWithoutLevelRenderer? = null
-
-                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                    if (renderer == null) {
-                        renderer = Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                    }
-                    return renderer!!
-                }
+                private val renderer by lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+                override fun getCustomRenderer() = renderer
             }, ModItems.TM_62)
         }
     }

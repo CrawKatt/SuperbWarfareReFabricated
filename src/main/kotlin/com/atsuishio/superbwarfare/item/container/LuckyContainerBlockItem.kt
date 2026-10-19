@@ -8,7 +8,6 @@ import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.tools.mc
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.DamageTypeTags
@@ -79,14 +78,11 @@ class LuckyContainerBlockItem :
         @SubscribeEvent
         private fun registerItemExtensions(event: RegisterClientExtensionsEvent) {
             event.registerItem(object : IClientItemExtensions {
-                private var renderer: BlockEntityWithoutLevelRenderer? = null
-
-                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                    if (renderer == null) {
-                        renderer = LuckyContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                    }
-                    return renderer!!
+                private val renderer by lazy {
+                    LuckyContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
                 }
+
+                override fun getCustomRenderer() = renderer
             }, ModItems.LUCKY_CONTAINER)
         }
     }

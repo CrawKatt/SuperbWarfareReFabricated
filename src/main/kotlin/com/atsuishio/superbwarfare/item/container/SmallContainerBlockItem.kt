@@ -7,7 +7,6 @@ import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.tools.mc
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
@@ -59,14 +58,11 @@ class SmallContainerBlockItem : BlockItem(ModBlocks.SMALL_CONTAINER.get(), Prope
         @SubscribeEvent
         fun registerArmorExtensions(event: RegisterClientExtensionsEvent) {
             event.registerItem(object : IClientItemExtensions {
-                private var renderer: BlockEntityWithoutLevelRenderer? = null
-
-                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                    if (renderer == null) {
-                        renderer = SmallContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                    }
-                    return renderer!!
+                private val renderer by lazy {
+                    SmallContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
                 }
+
+                override fun getCustomRenderer() = renderer
             }, ModItems.SMALL_CONTAINER)
         }
     }

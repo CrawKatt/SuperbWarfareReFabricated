@@ -9,7 +9,6 @@ import com.atsuishio.superbwarfare.tiers.ModItemTier
 import com.atsuishio.superbwarfare.tools.mc
 import net.minecraft.ChatFormatting
 import net.minecraft.advancements.CriteriaTriggers
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.core.Direction
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
@@ -157,14 +156,8 @@ open class MilitaryShovelItem :
         @SubscribeEvent
         fun registerRenderer(event: RegisterClientExtensionsEvent) {
             event.registerItem(object : IClientItemExtensions {
-                private var renderer: BlockEntityWithoutLevelRenderer? = null
-
-                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                    if (renderer == null) {
-                        renderer = MilitaryShovelRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                    }
-                    return renderer!!
-                }
+                private val renderer by lazy { MilitaryShovelRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+                override fun getCustomRenderer() = renderer
             }, ModItems.MILITARY_SHOVEL.get())
         }
 

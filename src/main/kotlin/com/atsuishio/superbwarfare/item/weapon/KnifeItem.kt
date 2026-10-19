@@ -6,7 +6,6 @@ import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.item.CustomDamageProperty
 import com.atsuishio.superbwarfare.tiers.ModItemTier
 import com.atsuishio.superbwarfare.tools.mc
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
 import net.minecraft.world.item.SwordItem
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -24,14 +23,8 @@ open class KnifeItem : SwordItem(
         @SubscribeEvent
         private fun registerGunExtensions(event: RegisterClientExtensionsEvent) {
             event.registerItem(object : IClientItemExtensions {
-                private var renderer: BlockEntityWithoutLevelRenderer? = null
-
-                override fun getCustomRenderer(): BlockEntityWithoutLevelRenderer {
-                    if (renderer == null) {
-                        renderer = KnifeRenderer(mc.blockEntityRenderDispatcher, mc.entityModels)
-                    }
-                    return renderer!!
-                }
+                private val renderer by lazy { KnifeRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+                override fun getCustomRenderer() = renderer
             }, ModItems.KNIFE)
         }
     }
