@@ -189,7 +189,7 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                         x - 7.5f + (2 * (Math.random() - 0.5f)).toFloat(),
                         y - 7.5f + (2 * (Math.random() - 0.5f)).toFloat()
                     )
-                    val fixedTexture: ResourceLocation? = CROSSHAIR_MAP["@VehicleFixedPoint"]
+                    val fixedTexture = CROSSHAIR_MAP["@VehicleFixedPoint"]!!
                     RenderHelper.blit(
                         poseStack,
                         fixedTexture,
@@ -267,7 +267,7 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                     )
 
                 } else if (crosshairPath == "@VehicleCnHpjZooming") {
-                    val dynamicTexture: ResourceLocation? = CROSSHAIR_MAP["@VehicleDynamicCross"]
+                    val dynamicTexture = CROSSHAIR_MAP["@VehicleDynamicCross"]!!
                     RenderHelper.blit(
                         poseStack,
                         dynamicTexture,
@@ -295,17 +295,8 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                     val j = Mth.floor(f * f1)
                     val k = (screenWidth - i) / 2
                     val l = (screenHeight - j) / 2
-                    RenderHelper.preciseBlit(
-                        guiGraphics,
-                        texture,
-                        k.toFloat(),
-                        l.toFloat(),
-                        0f,
-                        0f,
-                        i.toFloat(),
-                        j.toFloat(),
-                        i.toFloat(),
-                        j.toFloat()
+                    RenderHelper.blit(
+                        guiGraphics.pose(), texture, k.toFloat(), l.toFloat(), i.toFloat(), j.toFloat(),
                     )
                     renderKillIndicator(guiGraphics, screenWidth.toFloat(), screenHeight.toFloat())
 
@@ -373,17 +364,8 @@ object VehicleCrosshairOverlay : CommonOverlay("vehicle_crosshair") {
                 val x = p.x.toFloat()
                 val y = p.y.toFloat()
 
-                RenderHelper.preciseBlit(
-                    guiGraphics,
-                    CROSSHAIR_THIRD_CAMERA,
-                    x - 12,
-                    y - 12,
-                    0f,
-                    0f,
-                    24f,
-                    24f,
-                    24f,
-                    24f
+                RenderHelper.blit(
+                    guiGraphics.pose(), CROSSHAIR_THIRD_CAMERA, x - 12, y - 12, 24f, 24f,
                 )
                 renderKillIndicatorDynamic(
                     guiGraphics,

@@ -79,7 +79,7 @@ object IglaHudOverlay : CommonOverlay("igla_9k38_hud") {
 
                     poseStack.translate(x, y, 0f)
                     //框
-                    RenderHelper.blit(poseStack, FRAME, -12f, -12f, 0f, 0f, 24f, 24f, 24f, 24f, 1f)
+                    RenderHelper.blit(poseStack, FRAME, -12f, -12f, 0f, 0f, 24f, 24f, 24f, 24f, 1)
 
                     //锁定进度
                     RenderHelper.blit(
@@ -93,7 +93,7 @@ object IglaHudOverlay : CommonOverlay("igla_9k38_hud") {
                         24f,
                         24f,
                         24f,
-                        1f
+                        1
                     )
                     RenderHelper.blit(
                         poseStack,
@@ -106,7 +106,7 @@ object IglaHudOverlay : CommonOverlay("igla_9k38_hud") {
                         24f,
                         24f,
                         24f,
-                        1f
+                        1
                     )
                     RenderHelper.blit(
                         poseStack,
@@ -119,7 +119,7 @@ object IglaHudOverlay : CommonOverlay("igla_9k38_hud") {
                         24f,
                         24f,
                         24f,
-                        1f
+                        1
                     )
                     RenderHelper.blit(
                         poseStack,
@@ -132,14 +132,14 @@ object IglaHudOverlay : CommonOverlay("igla_9k38_hud") {
                         24f,
                         24f,
                         24f,
-                        1f
+                        1
                     )
 
                     //状态
                     if (seekingTime >= data.get(GunProp.SEEK_TIME) && data.ammo.get() > 0) {
-                        RenderHelper.blit(poseStack, SHOOT, -12f, -26f, 0f, 0f, 24f, 24f, 24f, 24f, 1f)
+                        RenderHelper.blit(poseStack, SHOOT, -12f, -26f, 0f, 0f, 24f, 24f, 24f, 24f, 1)
                     } else {
-                        RenderHelper.blit(poseStack, HOLD, -12f, -26f, 0f, 0f, 24f, 24f, 24f, 24f, 1f)
+                        RenderHelper.blit(poseStack, HOLD, -12f, -26f, 0f, 0f, 24f, 24f, 24f, 24f, 1)
                     }
 
                     //测距
