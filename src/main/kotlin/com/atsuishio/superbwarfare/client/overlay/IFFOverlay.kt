@@ -97,9 +97,11 @@ object IFFOverlay : CommonOverlay("iff") {
                         val icon = getResourceLocation(teammate)
 
                         RenderHelper.blit(
-                            guiGraphics.pose(), icon, (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
-                            (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()), 12f, 12f,
-                            argb = RenderHelper.opaque(0x7FFFAD),
+                            guiGraphics.pose(), icon,
+                            (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
+                            (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()),
+                            12f, 12f, 0f, 0f, 12f, 12f,
+                            0x7FFFAD
                         )
 
                         if (Vec2(xf, yf).distanceToSqr(
@@ -167,9 +169,12 @@ object IFFOverlay : CommonOverlay("iff") {
                         val icon = getResourceLocation(enemy)
 
                         RenderHelper.blit(
-                            guiGraphics.pose(), icon, (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
-                            (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()), 12f, 12f,
-                            argb = RenderHelper.opaque(0xFFBD7F),
+                            guiGraphics.pose(),
+                            icon,
+                            (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
+                            (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()),
+                            12f, 12f, 0f, 0f, 12f, 12f,
+                            0xFFBD7F
                         )
 
                         if (Vec2(xf, yf).distanceToSqr(
@@ -221,8 +226,8 @@ object IFFOverlay : CommonOverlay("iff") {
                         guiGraphics.pose(), icon,
                         (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
                         (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()),
-                        12f, 12f, // 白色 = 中立
-                        argb = -1,
+                        12f, 12f, 0f, 0f, 12f, 12f,
+                        -1 // 白色 = 中立
                     )
 
                     if (Vec2(xf, yf).distanceToSqr(
@@ -350,8 +355,11 @@ object IFFOverlay : CommonOverlay("iff") {
 
         if (!info.onVehicle) {
             RenderHelper.blit(
-                guiGraphics.pose(), FRIENDLY_INDICATOR, (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
-                (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()), 12f, 12f, argb = RenderHelper.opaque(color),
+                guiGraphics.pose(), FRIENDLY_INDICATOR,
+                (xf - 6).coerceIn(0f, (screenWidth - 12).toFloat()),
+                (yf - 6).coerceIn(0f, (screenHeight - 12).toFloat()),
+                12f, 12f, 0f, 0f, 12f, 12f,
+                color
             )
         } else {
             height = 20

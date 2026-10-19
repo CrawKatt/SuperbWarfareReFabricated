@@ -80,7 +80,7 @@ object HeatBarOverlay : CommonOverlay("heat_bar") {
         RenderSystem.setShaderColor(1f, 1f, 1f, alpha)
 
         RenderHelper.blit(
-            guiGraphics.pose(), TEXTURE, posX, posY, 0f, 0f, 37 / 4f, 233 / 4f, width.toFloat(), height.toFloat(),
+            guiGraphics.pose(), TEXTURE, posX, posY, 37 / 4f, 233 / 4f, 0f, 0f, width.toFloat(), height.toFloat(),
         )
 
         val rate = Mth.clamp(heat / 100.0, 0.0, 1.0).toFloat()
@@ -95,8 +95,17 @@ object HeatBarOverlay : CommonOverlay("heat_bar") {
 
         RenderSystem.setShaderColor(red, green, blue, alpha)
         RenderHelper.blit(
-            guiGraphics.pose(), TEXTURE, posX + 2.5f, posY + 1.5f + 56 - barHeight, 10.5f, 0f, 2.25f, barHeight,
-            width.toFloat(), height.toFloat(),
+            poseStack,
+            TEXTURE,
+            posX + 2.5f,
+            posY + 1.5f + 56 - barHeight,
+            2.25f,
+            barHeight,
+            10.5f,
+            0f,
+            width.toFloat(),
+            height.toFloat(),
+            if (rate >= 0.795f) calculateGradientColor(rate) else 0xFFFFFF
         )
 
         poseStack.popPose()
