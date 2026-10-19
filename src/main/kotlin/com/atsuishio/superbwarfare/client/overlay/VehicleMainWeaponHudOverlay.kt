@@ -234,7 +234,7 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                         )
                         poseStack.popPose()
 
-                        RenderHelper.blit(poseStack, FRAME_LOCK, x - 12, y - 12, 0f, 0f, 24f, 24f, 24f, 24f, 1)
+                        RenderHelper.blit(poseStack, FRAME_LOCK, x - 12, y - 12, 24f, 24f)
                         nearestEntity = targetEntity
                         if (seekInfo.calculateTrajectory) {
                             val shootVector = calculateFiringSolution(
@@ -266,13 +266,8 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                                     SHOOT_INDICATOR,
                                     x0 - 12,
                                     y0 - 12,
-                                    0f,
-                                    0f,
                                     24f,
-                                    24f,
-                                    24f,
-                                    24f,
-                                    1
+                                    24f
                                 )
                                 poseStack.popPose()
 
@@ -286,13 +281,8 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                                         BLOCK,
                                         (p0.x - 0.5).toFloat(),
                                         (p0.y - 0.5).toFloat(),
-                                        0f,
-                                        0f,
                                         1f,
-                                        1f,
-                                        1f,
-                                        1f,
-                                        1
+                                        1f
                                     )
                                     i += 3.0
                                 }
@@ -307,52 +297,32 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                                 IND_1,
                                 x - 12,
                                 y - 12 - lockTime,
-                                0f,
-                                0f,
                                 24f,
-                                24f,
-                                24f,
-                                24f,
-                                1
+                                24f
                             )
                             RenderHelper.blit(
                                 poseStack,
                                 IND_2,
                                 x - 12,
                                 y - 12 + lockTime,
-                                0f,
-                                0f,
                                 24f,
-                                24f,
-                                24f,
-                                24f,
-                                1
+                                24f
                             )
                             RenderHelper.blit(
                                 poseStack,
                                 IND_3,
                                 x - 12 - lockTime,
                                 y - 12,
-                                0f,
-                                0f,
                                 24f,
-                                24f,
-                                24f,
-                                24f,
-                                1
+                                24f
                             )
                             RenderHelper.blit(
                                 poseStack,
                                 IND_4,
                                 x - 12 + lockTime,
                                 y - 12,
-                                0f,
-                                0f,
                                 24f,
-                                24f,
-                                24f,
-                                24f,
-                                1
+                                24f
                             )
                         }
 
@@ -390,16 +360,11 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                             if (ClientEventHandler.seekingTimeVehicle > 0) FRAME_TARGET else FRAME_TARGET_TRIANGLE,
                             x - 12,
                             y - 12,
-                            0f,
-                            0f,
                             24f,
-                            24f,
-                            24f,
-                            24f,
-                            1
+                            24f
                         )
                     } else {
-                        RenderHelper.blit(poseStack, FRAME_GREEN, x - 12, y - 12, 0f, 0f, 24f, 24f, 24f, 24f, 1)
+                        RenderHelper.blit(poseStack, FRAME_GREEN, x - 12, y - 12, 24f, 24f)
                     }
                     poseStack.popPose()
                 }
@@ -416,10 +381,10 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                     lerpLock = Mth.lerp(partialTick, lerpLock, ClientEventHandler.seekingTimeVehicle.toFloat())
                     val lockTime = ((seekTime - lerpLock) * (20f / seekTime)).coerceIn(0f, 20f)
                     if (ClientEventHandler.seekingTimeVehicle > 0 && !lockOn) {
-                        RenderHelper.blit(poseStack, IND_1, x - 12, y - 12 - lockTime, 0f, 0f, 24f, 24f, 24f, 24f, 1)
-                        RenderHelper.blit(poseStack, IND_2, x - 12, y - 12 + lockTime, 0f, 0f, 24f, 24f, 24f, 24f, 1)
-                        RenderHelper.blit(poseStack, IND_3, x - 12 - lockTime, y - 12, 0f, 0f, 24f, 24f, 24f, 24f, 1)
-                        RenderHelper.blit(poseStack, IND_4, x - 12 + lockTime, y - 12, 0f, 0f, 24f, 24f, 24f, 24f, 1)
+                        RenderHelper.blit(poseStack, IND_1, x - 12, y - 12 - lockTime, 24f, 24f)
+                        RenderHelper.blit(poseStack, IND_2, x - 12, y - 12 + lockTime, 24f, 24f)
+                        RenderHelper.blit(poseStack, IND_3, x - 12 - lockTime, y - 12, 24f, 24f)
+                        RenderHelper.blit(poseStack, IND_4, x - 12 + lockTime, y - 12, 24f, 24f)
                     }
 
                     if (ClientEventHandler.seekingTimeVehicle == 0) {
@@ -443,13 +408,8 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                         if (lockOn) FRAME_LOCK else FRAME_TARGET,
                         x - 12,
                         y - 12,
-                        0f,
-                        0f,
                         24f,
-                        24f,
-                        24f,
-                        24f,
-                        1
+                        24f
                     )
                     poseStack.popPose()
                 }
@@ -462,13 +422,8 @@ object VehicleMainWeaponHudOverlay : CommonOverlay("vehicle_main_weapon_hud") {
                     FRAME_TARGET,
                     -12f,
                     -12f,
-                    0f,
-                    0f,
                     24f,
-                    24f,
-                    24f,
-                    24f,
-                    1
+                    24f
                 )
 
                 val string = "[" + ModKeyMappings.VEHICLE_SEEK.getTranslatedKeyMessage().string + "]"

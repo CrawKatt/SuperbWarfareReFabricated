@@ -82,7 +82,7 @@ object HandsomeFrameOverlay : CommonOverlay("handsome_frame") {
                     FRAME_WEAK
                 }
 
-                RenderHelper.blit(poseStack, icon, x - 12, y - 12, 0f, 0f, 24f, 24f, 24f, 24f, 1)
+                RenderHelper.blit(poseStack, icon, x - 12, y - 12, 24f, 24f)
                 poseStack.popPose()
             }
         }
