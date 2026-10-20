@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.ShaderInstance
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 import net.minecraftforge.fml.ModList
+import org.joml.Matrix4f
 
 /**
  * Reflection-based bridge to Oculus/Iris internal and public APIs
@@ -51,6 +52,38 @@ object ShaderCompat {
             apiClass.getMethod("isRenderingShadowPass").invoke(instance) as? Boolean ?: false
         } catch (_: Exception) {
             false
+        }
+    }
+
+    /** Projection and depthtex2 after Iris/Oculus has finished its world composite passes. */
+    fun getPostProcessWorldState(requireCompositeComplete: Boolean = true): Pair<Matrix4f, Int>? {
+        if (!isInstalled || isRenderingShadowPass()) return null
+        return try {
+            val iris = Class.forName("net.irisshaders.iris.Iris")
+            val manager = iris.getMethod("getPipelineManager").invoke(null)
+            val pipeline = manager.javaClass.getMethod("getPipelineNullable").invoke(manager) ?: return null
+            val shaderPipeline = Class.forName("net.irisshaders.iris.pipeline.ShaderRenderingPipeline")
+            if (!shaderPipeline.isInstance(pipeline) ||
+                (requireCompositeComplete && shaderPipeline.getMethod("shouldOverrideShaders").invoke(pipeline) != false)
+            ) return null // Custom core shaders are suppressed until world rendering has ended.
+
+            val targetsField = pipeline.javaClass.getDeclaredField("renderTargets")
+            if (!targetsField.trySetAccessible()) return null
+            val targets = targetsField.get(pipeline) ?: return null
+            val noHand = targets.javaClass.getMethod("getDepthTextureNoHand").invoke(targets) ?: return null
+            val depthTexture = noHand.javaClass.getMethod("getTextureId").invoke(noHand) as? Int ?: return null
+            if (depthTexture <= 0) return null
+
+            val stateClass = Class.forName("net.irisshaders.iris.uniforms.CapturedRenderingState")
+            val state = stateClass.getField("INSTANCE").get(null)
+            val projection = stateClass.getMethod("getGbufferProjection").invoke(state) as? Matrix4f ?: return null
+            Matrix4f(projection) to depthTexture
+        } catch (_: ReflectiveOperationException) {
+            null
+        } catch (_: RuntimeException) {
+            null
+        } catch (_: LinkageError) {
+            null
         }
     }
 
