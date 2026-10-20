@@ -137,8 +137,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2() {
         val definition: AttachmentDefinition,
     )
 
-    override fun createAnimationInstance(stack: ItemStack, entity: Entity?): IFPAnimationInstance {
-        return GeoGunAnimationInstance(stack, entity, InteractionHand.MAIN_HAND)
+    override fun createAnimationInstance(stack: ItemStack?, entity: Entity?): IFPAnimationInstance? {
+        return GeoGunAnimationInstance(stack ?: return null, entity, InteractionHand.MAIN_HAND)
     }
 
     override fun createAnimationInstance(
