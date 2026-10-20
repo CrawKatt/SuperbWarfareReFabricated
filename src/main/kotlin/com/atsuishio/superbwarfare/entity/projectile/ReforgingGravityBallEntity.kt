@@ -105,6 +105,13 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
             expansionFraction(elapsed, expansionDuration) * (1f - collapseProgress(partialTicks))
         }
 
+    /** Synced world times also keep the orbit timer correct for late tracking clients. */
+    fun orbitProgress(partialTicks: Float = 0f): Float =
+        if (!anchored) 0f else {
+            val duration = (collapseStartTime - anchorTime).coerceAtLeast(1L)
+            ((level().gameTime - anchorTime + partialTicks.toDouble()) / duration).coerceIn(0.0, 1.0).toFloat()
+        }
+
     private fun collapseProgress(partialTicks: Float = 0f): Float =
         if (!anchored) 0f else expansionFraction(
             level().gameTime - collapseStartTime + partialTicks.toDouble(),

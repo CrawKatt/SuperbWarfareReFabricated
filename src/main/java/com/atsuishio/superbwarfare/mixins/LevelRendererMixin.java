@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
@@ -9,6 +10,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.culling.Frustum;
 import org.joml.Matrix4f;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -24,6 +26,27 @@ public class LevelRendererMixin {
     @Shadow
     @Final
     private EntityRenderDispatcher entityRenderDispatcher;
+
+    @Shadow
+    private int ticks;
+
+    @Shadow
+    private Frustum cullingFrustum;
+
+    @Shadow
+    private Frustum capturedFrustum;
+
+    @Inject(method = "renderLevel", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/LevelRenderer;renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V",
+            shift = At.Shift.AFTER))
+    private void superbwarfare$afterSky(PoseStack poseStack, float partialTick, long finishTimeNano,
+                                      boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer,
+                                      LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
+        Frustum frustum = capturedFrustum != null ? capturedFrustum : cullingFrustum;
+        RenderLevelStageCallback.EVENT.invoker().onRenderLevelStage(new RenderLevelStageCallback.Context(
+                RenderLevelStageCallback.Context.Stage.AFTER_SKY, (LevelRenderer) (Object) this,
+                poseStack, projectionMatrix, ticks, partialTick, camera, frustum));
+    }
 
     // 感谢 Minecraft-Ping-Wheel 开源
     // https://github.com/LukenSkyne/Minecraft-Ping-Wheel/blob/138295954dab9d2451ad19e16d8d413ef018a2d8/fabric/src/main/java/nx/pingwheel/fabric/mixin/LevelRendererMixin.java

@@ -36,6 +36,7 @@ import com.atsuishio.superbwarfare.client.renderer.item.TripodBlockItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.Type88ClusterGrenadesRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.DeployedWeaponRenderer
+import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.RadiationGlowRenderer
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
@@ -67,6 +68,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback
+import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphics
@@ -117,6 +119,11 @@ object ClientRenderHandler {
         ArmorPlateOverlay,
         KillMessageOverlay
     )
+
+    @JvmStatic
+    fun registerGravityLensingShader(event: CoreShaderRegistrationCallback.RegistrationContext) {
+        ReforgingGravityBallRenderer.registerLensingShader(event)
+    }
 
     /** [bulletRenderOffset] 的采样时刻（`System.nanoTime()`），超过 [OFFSET_TTL] 就当它过期 */
     private var bulletRenderOffsetTime: Long = 0L

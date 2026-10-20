@@ -56,6 +56,7 @@ public class ClientMod implements ClientModInitializer {
         PonderIndex.addPlugin(SBWPonderPlugin.INSTANCE);
         ModParticleRenderTypes.INSTANCE.register();
         CoreShaderRegistrationCallback.EVENT.register(ScopeLensShader.INSTANCE::onRegisterShaders);
+        CoreShaderRegistrationCallback.EVENT.register(ClientRenderHandler::registerGravityLensingShader);
         DragonTeethObjModelLoader.register();
         registerBuiltinResourcePacks();
 

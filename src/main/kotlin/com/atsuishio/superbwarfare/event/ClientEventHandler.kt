@@ -20,6 +20,7 @@ import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.overlay.ammo.AmmoBarHud
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
+import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
 import com.atsuishio.superbwarfare.client.shader.RadiationShaderHandler
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
 import com.atsuishio.superbwarfare.client.sound.ClientSonicBoomHandler
@@ -72,6 +73,8 @@ import com.atsuishio.superbwarfare.event.custom.RenderGuiOverlayCallback
 import com.atsuishio.superbwarfare.event.custom.RenderHandCallback
 import com.atsuishio.superbwarfare.event.custom.RenderNameTagCallback
 import com.atsuishio.superbwarfare.event.custom.RenderPlayerCallback
+import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback
+import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback.Context as RenderLevelStageEvent
 import net.minecraft.client.Camera
 import net.minecraft.core.registries.BuiltInRegistries
 import org.joml.Matrix4f
@@ -105,6 +108,9 @@ object ClientEventHandler {
         RadiationShaderHandler.onRegisterReloadListeners()
         HudRenderCallback.EVENT.register { _, partialTick -> renderRadiationShader(partialTick) }
         WorldRenderEvents.END.register(::renderRadiationShaderOnHiddenGui)
+
+        RenderLevelStageCallback.EVENT.register(RenderLevelStageCallback.LOWEST_PHASE, ::renderGravityLensing)
+        ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> clearGravityLensing() }
 
         ClientTickEvents.END_CLIENT_TICK.register { _ -> AmmoBarHud.onClientTick() }
 
@@ -822,6 +828,14 @@ object ClientEventHandler {
     @JvmStatic
     fun renderRadiationShaderOnHiddenGui(event: WorldRenderContext) {
         RadiationShaderHandler.renderLevel(event)
+    }
+
+    fun renderGravityLensing(event: RenderLevelStageEvent) {
+        ReforgingGravityBallRenderer.renderLensing(event)
+    }
+
+    fun clearGravityLensing() {
+        ReforgingGravityBallRenderer.clearLensing()
     }
 
     @JvmStatic
