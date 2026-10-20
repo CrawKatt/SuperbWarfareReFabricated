@@ -4,6 +4,8 @@ import com.atsuishio.superbwarfare.config.client.DisplayConfig;
 import com.atsuishio.superbwarfare.data.vehicle.VehicleData;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
@@ -14,12 +16,15 @@ import net.minecraft.client.CameraType;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
@@ -32,6 +37,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
+
+    @Inject(method = "renderLevel", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lnet/minecraft/client/renderer/GameRenderer;Lnet/minecraft/client/renderer/LightTexture;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;)V",
+            shift = At.Shift.AFTER))
+    private void superbwarfare$afterLevel(DeltaTracker deltaTracker, CallbackInfo ci,
+                                        @Local(ordinal = 0) Matrix4f projectionMatrix,
+                                        @Local(ordinal = 1) Matrix4f modelViewMatrix) {
+        Minecraft client = Minecraft.getInstance();
+        LevelRenderer renderer = client.levelRenderer;
+        Frustum frustum = renderer.capturedFrustum != null ? renderer.capturedFrustum : renderer.cullingFrustum;
+        RenderLevelStageCallback.EVENT.invoker().onRenderLevelStage(new RenderLevelStageCallback.Context(
+                RenderLevelStageCallback.Context.Stage.AFTER_LEVEL, renderer, null,
+                modelViewMatrix, projectionMatrix, renderer.ticks, client.getTimer(), mainCamera, frustum
+        ));
+    }
 
     @Inject(method = "render", at = @At("HEAD"))
     private void superbWarfare$renderFramePre(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) {

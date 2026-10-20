@@ -29,6 +29,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 
 public class SuperbWarfareFabricClient implements ClientModInitializer {
@@ -58,6 +59,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         SyncedEntityWorldRenderer.init();
         ModParticleRenderTypes.init();
         ScopeLensShader.init();
+        CoreShaderRegistrationCallback.EVENT.register(ClientRenderHandler::registerGravityLensingShader);
         SnapshotWarningScreen.register();
         TacticalMapChunkListener.init();
 

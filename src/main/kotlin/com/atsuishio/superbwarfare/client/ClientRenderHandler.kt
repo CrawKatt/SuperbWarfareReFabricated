@@ -65,6 +65,7 @@ import com.atsuishio.superbwarfare.client.tooltip.component.CellImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.ChargingStationImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.DogTagImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent
+import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.RadiationGlowRenderer
 import com.atsuishio.superbwarfare.client.tooltip.*
 import com.atsuishio.superbwarfare.client.tooltip.component.*
@@ -87,6 +88,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback
+import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
@@ -139,6 +141,11 @@ object ClientRenderHandler {
         ArmorPlateOverlay,
         KillMessageOverlay
     )
+
+    @JvmStatic
+    fun registerGravityLensingShader(event: CoreShaderRegistrationCallback.RegistrationContext) {
+        ReforgingGravityBallRenderer.registerLensingShader(event)
+    }
 
     /** [bulletRenderOffset] 的采样时刻（`System.nanoTime()`），超过 [OFFSET_TTL] 就当它过期 */
     private var bulletRenderOffsetTime: Long = 0L

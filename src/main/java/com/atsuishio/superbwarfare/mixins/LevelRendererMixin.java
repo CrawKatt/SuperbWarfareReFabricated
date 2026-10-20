@@ -1,14 +1,18 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -26,6 +30,22 @@ public class LevelRendererMixin {
     @Shadow
     @Final
     private EntityRenderDispatcher entityRenderDispatcher;
+
+    @Shadow
+    private int ticks;
+
+    @Inject(method = "renderLevel", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/LevelRenderer;renderSky(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V",
+            shift = At.Shift.AFTER))
+    private void superbwarfare$afterSky(DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera,
+                                      GameRenderer gameRenderer, LightTexture lightTexture,
+                                      Matrix4f modelViewMatrix, Matrix4f projectionMatrix, CallbackInfo ci,
+                                      @Local Frustum frustum) {
+        RenderLevelStageCallback.EVENT.invoker().onRenderLevelStage(new RenderLevelStageCallback.Context(
+                RenderLevelStageCallback.Context.Stage.AFTER_SKY, (LevelRenderer) (Object) this, null,
+                modelViewMatrix, projectionMatrix, ticks, Minecraft.getInstance().getTimer(), camera, frustum
+        ));
+    }
 
     // 感谢 Minecraft-Ping-Wheel 开源
     // https://github.com/LukenSkyne/Minecraft-Ping-Wheel/blob/ede72b18f57bd9dfe55ef44afe61190421fbc084/common/src/main/java/nx/pingwheel/common/mixin/LevelRendererMixin.java

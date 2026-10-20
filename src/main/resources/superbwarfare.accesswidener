@@ -1,5 +1,9 @@
 accessWidener v2 named
 
+accessible field net/minecraft/client/renderer/LevelRenderer ticks I
+accessible field net/minecraft/client/renderer/LevelRenderer cullingFrustum Lnet/minecraft/client/renderer/culling/Frustum;
+accessible field net/minecraft/client/renderer/LevelRenderer capturedFrustum Lnet/minecraft/client/renderer/culling/Frustum;
+
 accessible field net/minecraft/world/item/crafting/ShapedRecipe pattern Lnet/minecraft/world/item/crafting/ShapedRecipePattern;
 
 accessible field net/minecraft/world/entity/Entity passengers Lcom/google/common/collect/ImmutableList;

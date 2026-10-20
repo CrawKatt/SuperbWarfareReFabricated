@@ -19,6 +19,7 @@ import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
+import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
 import com.atsuishio.superbwarfare.client.shader.RadiationShaderHandler
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
@@ -28,6 +29,8 @@ import com.atsuishio.superbwarfare.data.attachment.SubWeaponInfo
 import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback
+import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback.Context as RenderLevelStageEvent
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.LungeMine
 import com.atsuishio.superbwarfare.item.attachment.SubWeaponItem
@@ -93,6 +96,8 @@ object ClientEventHandler {
         RadiationShaderHandler.onRegisterReloadListeners()
         net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register(::renderRadiationShader)
         net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.END.register(::renderRadiationShaderOnHiddenGui)
+        RenderLevelStageCallback.EVENT.register(RenderLevelStageCallback.LOWEST_PHASE, ::renderGravityLensing)
+        ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> clearGravityLensing() }
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             onPlayerLoggedIn()
         }
@@ -776,6 +781,14 @@ object ClientEventHandler {
     @JvmStatic
     fun renderRadiationShaderOnHiddenGui(event: net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext) {
         RadiationShaderHandler.renderLevel(event)
+    }
+
+    fun renderGravityLensing(event: RenderLevelStageEvent) {
+        ReforgingGravityBallRenderer.renderLensing(event)
+    }
+
+    fun clearGravityLensing() {
+        ReforgingGravityBallRenderer.clearLensing()
     }
 
     @JvmStatic
@@ -2730,13 +2743,13 @@ object ClientEventHandler {
 
         // 自定义偏移按权重淡：过渡期间 [sprintPosFade] 是 1（姿势在片段里），照它乘会在起跑那一帧整块挪过去
         val sprintCustomFade = (sprintPosWeight * i).toFloat()
-        val sprintPosX = (sprintPoseSample.x * sprintPosFade + customX * sprintCustomFade).toFloat()
-        val sprintPosY = (sprintPoseSample.y * sprintPosFade + customY * sprintCustomFade).toFloat()
-        val sprintPosZ = (sprintPoseSample.z * sprintPosFade + customZ * sprintCustomFade).toFloat()
+        val sprintPosX = (sprintPoseSample.x * sprintPosFade + customX * sprintCustomFade)
+        val sprintPosY = (sprintPoseSample.y * sprintPosFade + customY * sprintCustomFade)
+        val sprintPosZ = (sprintPoseSample.z * sprintPosFade + customZ * sprintCustomFade)
 
-        val sprintRotX = (sprintPoseRotation.x * sprintRotFade).toFloat()
-        val sprintRotY = (sprintPoseRotation.y * sprintRotFade).toFloat()
-        val sprintRotZ = (sprintPoseRotation.z * sprintRotFade).toFloat()
+        val sprintRotX = (sprintPoseRotation.x * sprintRotFade)
+        val sprintRotY = (sprintPoseRotation.y * sprintRotFade)
+        val sprintRotZ = (sprintPoseRotation.z * sprintRotFade)
 
         val drawAnimT = GunDrawAnimation.timeAt(drawTime)
         GunDrawAnimation.rotationAt(drawAnimT, drawAnimRotation)
