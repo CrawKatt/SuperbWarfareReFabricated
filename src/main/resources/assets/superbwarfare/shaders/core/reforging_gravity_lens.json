@@ -10,9 +10,19 @@
     },
     {
       "name": "SceneDepth"
+    },
+    {
+      "name": "EntitiesBefore"
+    },
+    {
+      "name": "EntitiesAfter"
+    },
+    {
+      "name": "WorldDepth"
     }
   ],
   "uniforms": [
+    {"name":"EntityImageMask","type":"int","count":1,"values":[0]},
     {
       "name": "LensProjection",
       "type": "matrix4x4",
@@ -182,6 +192,14 @@
         0,
         0,
         0,
+        0
+      ]
+    },
+    {
+      "name": "ShaderPackMode",
+      "type": "int",
+      "count": 1,
+      "values": [
         0
       ]
     }

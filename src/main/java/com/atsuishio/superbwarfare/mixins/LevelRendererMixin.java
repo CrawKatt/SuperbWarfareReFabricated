@@ -47,6 +47,44 @@ public class LevelRendererMixin {
         ));
     }
 
+    // Hook the caller because Sodium replaces renderSectionLayer.
+    @Inject(method = "renderLevel", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/LevelRenderer;renderSectionLayer(Lnet/minecraft/client/renderer/RenderType;DDDLorg/joml/Matrix4f;Lorg/joml/Matrix4f;)V",
+            ordinal = 2, shift = At.Shift.AFTER))
+    private void superbwarfare$afterCutoutBlocks(DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera,
+                                               GameRenderer gameRenderer, LightTexture lightTexture,
+                                               Matrix4f modelViewMatrix, Matrix4f projectionMatrix, CallbackInfo ci,
+                                               @Local Frustum frustum) {
+        RenderLevelStageCallback.EVENT.invoker().onRenderLevelStage(new RenderLevelStageCallback.Context(
+                RenderLevelStageCallback.Context.Stage.AFTER_CUTOUT_BLOCKS, (LevelRenderer) (Object) this, null,
+                modelViewMatrix, projectionMatrix, ticks, Minecraft.getInstance().getTimer(), camera, frustum
+        ));
+    }
+
+    @Inject(method = "renderLevel", at = @At(value = "CONSTANT", args = "stringValue=destroyProgress"))
+    private void superbwarfare$afterBlockEntities(DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera,
+                                               GameRenderer gameRenderer, LightTexture lightTexture,
+                                               Matrix4f modelViewMatrix, Matrix4f projectionMatrix, CallbackInfo ci,
+                                               @Local PoseStack poseStack, @Local Frustum frustum) {
+        RenderLevelStageCallback.EVENT.invoker().onRenderLevelStage(new RenderLevelStageCallback.Context(
+                RenderLevelStageCallback.Context.Stage.AFTER_BLOCK_ENTITIES, (LevelRenderer) (Object) this, poseStack,
+                modelViewMatrix, projectionMatrix, ticks, Minecraft.getInstance().getTimer(), camera, frustum
+        ));
+    }
+
+    @Inject(method = "renderLevel", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/particle/ParticleEngine;render(Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/client/Camera;F)V",
+            shift = At.Shift.AFTER))
+    private void superbwarfare$afterParticles(DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera,
+                                            GameRenderer gameRenderer, LightTexture lightTexture,
+                                            Matrix4f modelViewMatrix, Matrix4f projectionMatrix, CallbackInfo ci,
+                                            @Local PoseStack poseStack, @Local Frustum frustum) {
+        RenderLevelStageCallback.EVENT.invoker().onRenderLevelStage(new RenderLevelStageCallback.Context(
+                RenderLevelStageCallback.Context.Stage.AFTER_PARTICLES, (LevelRenderer) (Object) this, poseStack,
+                modelViewMatrix, projectionMatrix, ticks, Minecraft.getInstance().getTimer(), camera, frustum
+        ));
+    }
+
     // 感谢 Minecraft-Ping-Wheel 开源
     // https://github.com/LukenSkyne/Minecraft-Ping-Wheel/blob/ede72b18f57bd9dfe55ef44afe61190421fbc084/common/src/main/java/nx/pingwheel/common/mixin/LevelRendererMixin.java
 

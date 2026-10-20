@@ -95,6 +95,9 @@ public interface RenderLevelStageCallback {
 
         public enum Stage {
             AFTER_SKY,
+            AFTER_CUTOUT_BLOCKS,
+            AFTER_BLOCK_ENTITIES,
+            AFTER_PARTICLES,
             AFTER_LEVEL
         }
     }
