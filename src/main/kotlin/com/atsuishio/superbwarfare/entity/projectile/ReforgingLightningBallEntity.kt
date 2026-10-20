@@ -22,6 +22,7 @@ import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
+import java.util.function.Consumer
 
 open class ReforgingLightningBallEntity(type: EntityType<out ReforgingLightningBallEntity>, level: Level) :
     Projectile(type, level), IBulletProperties, BasicGeoProjectileEntity {
@@ -91,6 +92,7 @@ open class ReforgingLightningBallEntity(type: EntityType<out ReforgingLightningB
         setPos(previousPosition.add(deltaMovement))
 
         if (level().isClientSide) {
+            if (tickCount == 1) playFlySound.accept(this)
             lightningArcs.removeAll { --it.ticks <= 0 }
             if (tickCount % 2 == 0) {
                 level().addParticle(
@@ -155,7 +157,7 @@ open class ReforgingLightningBallEntity(type: EntityType<out ReforgingLightningB
             target.forceHurt(source, getExplosionDamage())
             dischargeVisual(target)
         }
-        level().playSound(null, x, y, z, ModSounds.ELECTRIC, SoundSource.PLAYERS, 0.6f, 1.25f)
+        level().playSound(null, x, y, z, ModSounds.LIGHTNING_BALL_ATTACK, SoundSource.PLAYERS, 3f, 1f)
     }
 
     private fun dischargeVisual(target: Entity) {
@@ -226,6 +228,8 @@ open class ReforgingLightningBallEntity(type: EntityType<out ReforgingLightningB
 
     companion object {
         private const val MAX_VISIBLE_ARCS = 16
+
+        var playFlySound: Consumer<ReforgingLightningBallEntity> = Consumer { }
 
         private fun touchesTarget(
             bounds: AABB,
