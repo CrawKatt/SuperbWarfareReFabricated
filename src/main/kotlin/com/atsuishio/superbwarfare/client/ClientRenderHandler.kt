@@ -17,6 +17,7 @@ import com.atsuishio.superbwarfare.client.overlay.*
 import com.atsuishio.superbwarfare.client.renderer.block.*
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
+import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.RadiationGlowRenderer
 import com.atsuishio.superbwarfare.client.tooltip.*
 import com.atsuishio.superbwarfare.client.tooltip.component.*
@@ -35,10 +36,7 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.phys.Vec3
 import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.client.event.EntityRenderersEvent
-import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent
-import net.minecraftforge.client.event.RegisterItemDecorationsEvent
+import net.minecraftforge.client.event.*
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent
 import net.minecraftforge.registries.ForgeRegistries
@@ -53,6 +51,11 @@ import kotlin.math.min
     value = [Dist.CLIENT]
 )
 object ClientRenderHandler {
+
+    @SubscribeEvent
+    fun registerGravityLensingShader(event: RegisterShadersEvent) {
+        ReforgingGravityBallRenderer.registerLensingShader(event)
+    }
 
     /** [bulletRenderOffset] 的采样时刻（`System.nanoTime()`），超过 [OFFSET_TTL] 就当它过期 */
     private var bulletRenderOffsetTime: Long = 0L

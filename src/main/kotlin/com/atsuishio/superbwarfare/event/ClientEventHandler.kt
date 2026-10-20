@@ -17,6 +17,7 @@ import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
+import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
 import com.atsuishio.superbwarfare.client.shader.RadiationShaderHandler
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
@@ -753,6 +754,16 @@ object ClientEventHandler {
     @SubscribeEvent
     fun renderRadiationShaderOnHiddenGui(event: RenderLevelStageEvent) {
         RadiationShaderHandler.renderLevel(event)
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun renderGravityLensing(event: RenderLevelStageEvent) {
+        ReforgingGravityBallRenderer.renderLensing(event)
+    }
+
+    @SubscribeEvent
+    fun clearGravityLensing(event: ClientPlayerNetworkEvent.LoggingOut) {
+        ReforgingGravityBallRenderer.clearLensing()
     }
 
     @SubscribeEvent
