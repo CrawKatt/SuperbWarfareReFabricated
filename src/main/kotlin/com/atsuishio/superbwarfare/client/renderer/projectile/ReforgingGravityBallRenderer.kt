@@ -67,21 +67,26 @@ class ReforgingGravityBallRenderer(context: EntityRendererProvider.Context) :
         buffer: VertexConsumer, pose: Matrix4f, outerRadius: Double, expansion: Double, time: Double,
     ) {
         if (outerRadius <= 0.0) return
+        // Keep the disk denser than the original 18 rings / 22 motes, even at small radii.
+        val ringCount = ceil(outerRadius * 3.0).toInt().coerceIn(24, 96)
+        val moteCount = ceil(outerRadius * 6.0).toInt().coerceIn(40, 192)
         // All rings stay in the world XZ plane, independent of projectile and camera rotations.
-        repeat(18) { ring ->
-            val fraction = ring / 17.0
+        repeat(ringCount) { ring ->
+            val fraction = ring.toDouble() / (ringCount - 1)
             val radius = outerRadius * (0.12 + 0.88 * fraction.pow(1.6))
             val rotation = time * (0.012 + (1.0 - fraction) * 0.045) + ring * 2.39996
-            repeat(64) { segment ->
-                val angle = segment * PI / 32
-                val nextAngle = (segment + 1) * PI / 32
+            // Add segments on wider rings so a large disk keeps smooth arcs.
+            val segmentCount = ceil(2.0 * PI * radius / 0.65).toInt().coerceIn(48, 128)
+            repeat(segmentCount) { segment ->
+                val angle = segment * PI * 2.0 / segmentCount
+                val nextAngle = (segment + 1) * PI * 2.0 / segmentCount
                 val wave = 0.5 + 0.5 * sin(angle * 2.0 + rotation)
                 val alpha = ((0.06 + 0.3 * wave.pow(3)) * (1.0 - fraction * 0.65) * expansion).toFloat()
                 goldBeam(buffer, pose, diskPoint(radius, angle, rotation),
                     diskPoint(radius, nextAngle, rotation), (0.004 + wave * 0.004) * expansion, alpha)
             }
         }
-        repeat(22) { index ->
+        repeat(moteCount) { index ->
             // Each mote spirals inward, then respawns at the edge.
             val travel = (time / (48.0 + index % 5 * 7) + index * 0.618034) % 1.0
             val radius = outerRadius * (1.0 - travel).pow(0.8)
