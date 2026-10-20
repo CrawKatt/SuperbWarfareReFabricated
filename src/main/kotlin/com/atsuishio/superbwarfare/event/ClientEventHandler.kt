@@ -21,6 +21,7 @@ import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.overlay.ammo.AmmoBarHud
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
+import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensPostProcessor
 import com.atsuishio.superbwarfare.client.shader.RadiationShaderHandler
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
 import com.atsuishio.superbwarfare.client.sound.ClientSonicBoomHandler
@@ -836,6 +837,7 @@ object ClientEventHandler {
 
     fun clearGravityLensing() {
         ReforgingGravityBallRenderer.clearWorldEffects()
+        ScopeLensPostProcessor.close()
     }
 
     @JvmStatic
