@@ -1,6 +1,10 @@
 package com.atsuishio.superbwarfare.client
 
 import com.atsuishio.superbwarfare.client.ClientRenderHandler.OFFSET_TTL
+import com.atsuishio.superbwarfare.client.ClientRenderHandler.bulletRenderOffset
+import com.atsuishio.superbwarfare.client.ClientRenderHandler.muzzleOffsetFor
+import com.atsuishio.superbwarfare.client.ClientRenderHandler.transformVirtualRenderPosition
+import com.atsuishio.superbwarfare.client.ClientRenderHandler.virtualOffsetRate
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.decorator.ContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.LuckyContainerItemDecorator
@@ -119,6 +123,16 @@ object ClientRenderHandler {
 
     /**
      * 本地玩家**枪口相对视角定位点的偏移**（世界轴向量），由枪械渲染在开火窗口里写进来
+     * （`GeoGunRenderer.submitMuzzleSample`，取的是 `flare` / 配件枪口骨骼）。
+     *
+     * 两种消费方式，别混：
+     * - **弹体**（`ProjectileEntityRenderer`、`SmallCannonShellEntityRenderer`、
+     *   `ReforgingGravityBallRenderer`、`ReforgingLightningBallRenderer`）：调
+     *   [transformVirtualRenderPosition]，按 [virtualOffsetRate] 在几 tick 内淡回真实位置；
+     * - **光束**（`LaserBeamRenderer`）：调 [muzzleOffsetFor]，把偏移当**固定的初始起点**钉住，不淡出。
+     *
+     * 只在**第一人称**写：`submitMuzzleSample` 整个挂在 `transformType.firstPerson()` 分支里，
+     * 所以这份偏移的参照点就是眼位（= 第一人称的相机），可以直接加到弹体出生点上。
      */
     var bulletRenderOffset: Vec3? = null
         set(value) {
@@ -239,6 +253,22 @@ object ClientRenderHandler {
         if (rate <= 0.0) return
 
         stack.translate(offset.x * rate, offset.y * rate, offset.z * rate)
+    }
+
+    /**
+     * [bulletRenderOffset] 里那份样本（前提是它属于**本地玩家自己刚打的这一发**），**不带**时间淡出。
+     *
+     * 这是给**光束**用的：`LaserBeamRenderer` 拿它当光束的**固定初始起点**
+     * （`眼位 + 偏移`，一次钉死）。
+     *
+     * ⚠ 别把这里换成 [transformVirtualRenderPosition]：那个会在几 tick 内把偏移淡回真实位置，
+     * 对一颗点状弹体是对的，对一条从枪口拉到落点的线就是"整根横移 + 命中封口跟着爬"。
+     * 光束只有十来 tick 寿命，起点定下来就不该再动。
+     */
+    @JvmStatic
+    fun muzzleOffsetFor(projectile: Projectile): Vec3? {
+        if (!isOwnFreshProjectile(projectile)) return null
+        return bulletRenderOffset
     }
 
     @JvmStatic
