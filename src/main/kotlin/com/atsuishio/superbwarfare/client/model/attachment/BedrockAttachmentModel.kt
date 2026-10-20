@@ -8,7 +8,7 @@ import com.atsuishio.superbwarfare.client.renderer.ammo.AmmoDisplayRenderer.Ammo
 import com.atsuishio.superbwarfare.client.renderer.ammo.AmmoReadout
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensShader
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeStencilRenderHelper
-import com.atsuishio.superbwarfare.compat.oculus.OculusCompat
+import com.atsuishio.superbwarfare.compat.shader.ShaderCompat
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.attachment.ScopeMode
 import com.atsuishio.superbwarfare.data.attachment.ScopeType
@@ -601,7 +601,7 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
                 val shaderBone = shaderBoneIndex(info)
                 val lensSurface = if (shaderBone >= 0) getLensSurface(poseStack, shaderBone) else null
                 RenderSystem.stencilFunc(GL11.GL_EQUAL, b, 0xFF)
-                if (!OculusCompat.isShaderPackActive() && shaderBone >= 0 && lensSurface != null) {
+                if (!ShaderCompat.isShaderPackActive() && shaderBone >= 0 && lensSurface != null) {
                     val magnification = if (DisplayConfig.LENS_ZOOM_RATIO.get() > 0.0) {
                         val progress = ClientEventHandler.aimingProgress(ClientEventHandler.zoomTime)
                         1f + progress * (ClientEventHandler.customZoom.coerceAtLeast(1.0) - 1.0).toFloat()
@@ -937,7 +937,7 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
         quadType: RenderType,
         triangleType: RenderType
     ) {
-        if (!com.atsuishio.superbwarfare.compat.oculus.OculusCompat.endBatch(bufferSource)) {
+        if (!com.atsuishio.superbwarfare.compat.shader.ShaderCompat.endBatch(bufferSource)) {
             bufferSource.endBatch(quadType)
             bufferSource.endBatch(triangleType)
         }

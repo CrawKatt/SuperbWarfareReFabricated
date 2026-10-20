@@ -1,7 +1,7 @@
 package com.atsuishio.superbwarfare.client.renderer
 
 import com.atsuishio.superbwarfare.Mod
-import com.atsuishio.superbwarfare.compat.oculus.OculusCompat
+import com.atsuishio.superbwarfare.compat.shader.ShaderCompat
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
@@ -92,16 +92,16 @@ object ModParticleRenderTypes {
          */
         private fun resolveShader() {
             // 1. Shadow pass — skip translucent rendering entirely.
-            if (OculusCompat.isRenderingShadowPass()) {
+            if (ShaderCompat.isRenderingShadowPass()) {
                 RenderSystem.setShader(GameRenderer::getParticleShader)
                 return
             }
 
             // 2. Shader pack active — use the pack's native translucent particle
             //    program (which typically has no hard discard threshold).
-            if (OculusCompat.isShaderPackActive()) {
-                val oculusShader = OculusCompat.getParticleTranslucentShader()
-                    ?: OculusCompat.getParticleShader()
+            if (ShaderCompat.isShaderPackActive()) {
+                val oculusShader = ShaderCompat.getParticleTranslucentShader()
+                    ?: ShaderCompat.getParticleShader()
                 if (oculusShader != null) {
                     RenderSystem.setShader { oculusShader }
                 } else {

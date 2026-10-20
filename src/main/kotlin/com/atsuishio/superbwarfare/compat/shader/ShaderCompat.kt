@@ -1,7 +1,6 @@
-package com.atsuishio.superbwarfare.compat.oculus
+package com.atsuishio.superbwarfare.compat.shader
 
-import com.atsuishio.superbwarfare.compat.oculus.OculusCompat.getParticleShader
-import com.atsuishio.superbwarfare.compat.oculus.OculusCompat.getParticleTranslucentShader
+import com.atsuishio.superbwarfare.compat.shader.ShaderCompat.getParticleTranslucentShader
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.ShaderInstance
 import net.fabricmc.api.EnvType
@@ -9,26 +8,10 @@ import net.fabricmc.api.Environment
 import net.fabricmc.loader.api.FabricLoader
 
 /**
- * Reflection-based bridge to Oculus/Iris internal and public APIs.
- *
- * All calls are guarded with try/catch so the mod loads safely when Oculus is
- * absent — no compile-time dependency on Iris classes is required.
- *
- * ## Why reflection?
- *
- * Oculus is a client-only mod.  Making it a hard `implementation` dependency
- * would prevent the mod from loading on servers and on clients that don't
- * install Oculus.  Reflection keeps the dependency optional while still
- * giving us access to Iris internals that are *not* exposed through the
- * public [net.irisshaders.iris.api.v0.IrisApi].
- *
- * Key internal class used:
- * - [net.irisshaders.iris.pipeline.programs.ShaderAccess] — exposes the
- *   shader-pack-compiled particle programs ([getParticleTranslucentShader],
- *   [getParticleShader]) that replace vanilla core shaders when a pack is active.
+ * Reflection-based bridge to Oculus/Iris internal and public APIs
  */
 @Environment(EnvType.CLIENT)
-object OculusCompat {
+object ShaderCompat {
 
     /** True when Oculus or Iris mod id is present in the mod list. */
     val isInstalled: Boolean by lazy {

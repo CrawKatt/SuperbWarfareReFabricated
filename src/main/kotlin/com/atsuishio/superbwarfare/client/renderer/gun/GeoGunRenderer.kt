@@ -21,7 +21,7 @@ import com.atsuishio.superbwarfare.client.renderer.scope.ScopeStencilRenderHelpe
 import com.atsuishio.superbwarfare.client.screens.WeaponEditMountTracker
 import com.atsuishio.superbwarfare.client.screens.WeaponEditScreen
 import com.atsuishio.superbwarfare.compat.acceleratedrendering.AcceleratedRenderingCompat
-import com.atsuishio.superbwarfare.compat.oculus.OculusCompat
+import com.atsuishio.superbwarfare.compat.shader.ShaderCompat
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.attachment.*
 import com.atsuishio.superbwarfare.data.gun.*
@@ -484,7 +484,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val muzzleFlashScale = resolveMuzzleAttachmentMuzzleFlashScale(stack)
 
         val canStencil = transformType.firstPerson()
-                && !OculusCompat.isRenderingShadowPass()
+                && !ShaderCompat.isRenderingShadowPass()
                 && bufferSource is MultiBufferSource.BufferSource
         val stencilScope = if (canStencil) findStencilScope(stack, model) else null
         var gunCulled = false
@@ -691,7 +691,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
             return
         }
         // 阴影 pass 里画激光只会往阴影贴图里写颜色（与吊坠那边同一个判据）
-        if (OculusCompat.isRenderingShadowPass()) return
+        if (ShaderCompat.isRenderingShadowPass()) return
 
         val data = from(stack)
         val preview = attachmentEditPreview(stack, data, slot)
@@ -782,7 +782,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
             // 吊坠摆动：只有本地玩家自己的第一人称才推进物理（阴影 pass 不推进，免得一帧推进两次）
             val charm = slot.type == AttachmentType.CHARM &&
                     localFirstPersonHand != null &&
-                    !OculusCompat.isRenderingShadowPass()
+                    !ShaderCompat.isRenderingShadowPass()
 
             // 挂点变换 + 配件自己的基础旋转，合成一份；手臂锚点也必须用它，否则手臂会从配件上脱开
             val mount = Matrix4f(mountTransform).mul(attachmentTransform(stack, slot.type, definition))
@@ -1059,7 +1059,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         gunStencilCulling = false
 
         if (bufferSource is MultiBufferSource.BufferSource) {
-            if (!OculusCompat.endBatch(bufferSource)) {
+            if (!ShaderCompat.endBatch(bufferSource)) {
                 bufferSource.endBatch()
             }
         }
@@ -2639,7 +2639,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         @JvmStatic
         fun usesLensZoomSplit(gun: GunData): Boolean {
             if (DisplayConfig.LENS_ZOOM_RATIO.get() <= 0.0) return false
-            if (!ScopeLensShader.isAvailable() || OculusCompat.isShaderPackActive()) return false
+            if (!ScopeLensShader.isAvailable() || ShaderCompat.isShaderPackActive()) return false
             val attachmentId = gun.attachment.id(AttachmentType.SCOPE) ?: return false
             val definition = AttachmentDefinition.from(attachmentId) ?: return false
             val scopeInfo = definition.scopeInfo ?: return false

@@ -5,7 +5,7 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.ClientRenderHandler
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
-import com.atsuishio.superbwarfare.compat.oculus.OculusCompat
+import com.atsuishio.superbwarfare.compat.shader.ShaderCompat
 import com.atsuishio.superbwarfare.entity.projectile.ReforgingGravityBallEntity
 import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback.Context as RenderLevelStageEvent
 import com.mojang.blaze3d.pipeline.RenderTarget
@@ -231,7 +231,7 @@ class ReforgingGravityBallRenderer(context: EntityRendererProvider.Context) :
                 lenses.clear()
                 lensStrengths.clear()
                 canLensThisFrame = lensShader != null && !lensFailed &&
-                    !OculusCompat.isShaderPackActive() && !OculusCompat.isRenderingShadowPass() &&
+                    !ShaderCompat.isShaderPackActive() && !ShaderCompat.isRenderingShadowPass() &&
                     !ThermalShaderHandler.isActive()
                 if (!canLensThisFrame && lensScene != null) clearLensing()
             } else if (event.stage === RenderLevelStageEvent.Stage.AFTER_LEVEL) {
