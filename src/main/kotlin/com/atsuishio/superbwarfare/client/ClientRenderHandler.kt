@@ -16,6 +16,7 @@ import com.atsuishio.superbwarfare.client.overlay.*
 import com.atsuishio.superbwarfare.client.renderer.block.*
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
+import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.RadiationGlowRenderer
 import com.atsuishio.superbwarfare.client.tooltip.*
 import com.atsuishio.superbwarfare.client.tooltip.component.*
@@ -38,12 +39,9 @@ import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
-import net.neoforged.neoforge.client.event.EntityRenderersEvent
+import net.neoforged.neoforge.client.event.*
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers
-import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent
-import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent
 import org.joml.Vector2f
 import org.joml.Vector3f
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry
@@ -52,6 +50,11 @@ import kotlin.math.min
 
 @EventBusSubscriber(Dist.CLIENT)
 object ClientRenderHandler {
+
+    @SubscribeEvent
+    fun registerGravityLensingShader(event: RegisterShadersEvent) {
+        ReforgingGravityBallRenderer.registerLensingShader(event)
+    }
 
     /** [bulletRenderOffset] 的采样时刻（`System.nanoTime()`），超过 [OFFSET_TTL] 就当它过期 */
     private var bulletRenderOffsetTime: Long = 0L

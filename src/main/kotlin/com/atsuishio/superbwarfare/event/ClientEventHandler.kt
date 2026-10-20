@@ -18,6 +18,7 @@ import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
+import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
 import com.atsuishio.superbwarfare.client.shader.RadiationShaderHandler
 import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
@@ -753,6 +754,16 @@ object ClientEventHandler {
     @SubscribeEvent
     fun renderRadiationShaderOnHiddenGui(event: RenderLevelStageEvent) {
         RadiationShaderHandler.renderLevel(event)
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun renderGravityLensing(event: RenderLevelStageEvent) {
+        ReforgingGravityBallRenderer.renderLensing(event)
+    }
+
+    @SubscribeEvent
+    fun clearGravityLensing(event: ClientPlayerNetworkEvent.LoggingOut) {
+        ReforgingGravityBallRenderer.clearLensing()
     }
 
     @SubscribeEvent
@@ -2711,13 +2722,13 @@ object ClientEventHandler {
 
         // 自定义偏移按权重淡：过渡期间 [sprintPosFade] 是 1（姿势在片段里），照它乘会在起跑那一帧整块挪过去
         val sprintCustomFade = (sprintPosWeight * i).toFloat()
-        val sprintPosX = (sprintPoseSample.x * sprintPosFade + customX * sprintCustomFade).toFloat()
-        val sprintPosY = (sprintPoseSample.y * sprintPosFade + customY * sprintCustomFade).toFloat()
-        val sprintPosZ = (sprintPoseSample.z * sprintPosFade + customZ * sprintCustomFade).toFloat()
+        val sprintPosX = (sprintPoseSample.x * sprintPosFade + customX * sprintCustomFade)
+        val sprintPosY = (sprintPoseSample.y * sprintPosFade + customY * sprintCustomFade)
+        val sprintPosZ = (sprintPoseSample.z * sprintPosFade + customZ * sprintCustomFade)
 
-        val sprintRotX = (sprintPoseRotation.x * sprintRotFade).toFloat()
-        val sprintRotY = (sprintPoseRotation.y * sprintRotFade).toFloat()
-        val sprintRotZ = (sprintPoseRotation.z * sprintRotFade).toFloat()
+        val sprintRotX = (sprintPoseRotation.x * sprintRotFade)
+        val sprintRotY = (sprintPoseRotation.y * sprintRotFade)
+        val sprintRotZ = (sprintPoseRotation.z * sprintRotFade)
 
         val drawAnimT = GunDrawAnimation.timeAt(drawTime)
         GunDrawAnimation.rotationAt(drawAnimT, drawAnimRotation)
