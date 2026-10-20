@@ -37,6 +37,7 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import org.joml.Vector3f
 import java.util.*
+import java.util.function.Consumer
 import kotlin.math.sqrt
 
 open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallEntity>, level: Level) :
@@ -49,6 +50,8 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
     private var age = 0
     private var gravityValue = 0.04f
     private var activationDelay = 10
+    var collapseVisualPlayed = false
+        private set
 
     var anchored by ANCHORED
         private set
@@ -108,8 +111,10 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
     /** Synced world times also keep the orbit timer correct for late tracking clients. */
     fun orbitProgress(partialTicks: Float = 0f): Float =
         if (!anchored) 0f else {
-            val duration = (collapseStartTime - anchorTime).coerceAtLeast(1L)
-            ((level().gameTime - anchorTime + partialTicks.toDouble()) / duration).coerceIn(0.0, 1.0).toFloat()
+            val start = (anchorTime + expansionDuration).coerceAtMost(collapseStartTime)
+            val duration = (collapseStartTime - start).coerceAtLeast(1L)
+            if (level().gameTime - collapseStartTime + partialTicks.toDouble() >= 0.0) 1f
+            else ((level().gameTime - start + partialTicks.toDouble()) / duration).coerceIn(0.0, 1.0).toFloat()
         }
 
     private fun collapseProgress(partialTicks: Float = 0f): Float =
@@ -293,6 +298,7 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
         val shooter = shooter()
         val shooterUUID = getOwnerUUID()
         return target !== this && target !is HangingEntity && target.isAlive && !target.isSpectator && target !== shooter
+                && target !is ReforgingGravityBallEntity
                 && (shooterUUID == null || target.uuid != shooterUUID)
                 && !(target is Player && target.isCreative)
                 && !SeekTool.IS_FRIENDLY.test(shooter, target)
@@ -372,11 +378,24 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
     }
 
     private fun collapseCore() {
+        // Send before removal so tracking clients can keep the flash alive independently.
+        level().broadcastEntityEvent(this, COLLAPSE_EVENT)
         val targets = livingTargets(attackRadius)
         if (targets.isNotEmpty()) {
             damageTargets(targets, finalPulse = true)
         }
         level().playSound(null, x, y, z, SoundEvents.RESPAWN_ANCHOR_DEPLETE.value(), SoundSource.PLAYERS, 0.8f, 1.7f)
+    }
+
+    override fun handleEntityEvent(event: Byte) {
+        if (event == COLLAPSE_EVENT) {
+            if (!collapseVisualPlayed) {
+                collapseVisualPlayed = true
+                playCollapseEffect.accept(this)
+            }
+        } else {
+            super.handleEntityEvent(event)
+        }
     }
 
     private fun attractTargets(targets: List<Entity>) {
@@ -431,6 +450,12 @@ open class ReforgingGravityBallEntity(type: EntityType<out ReforgingGravityBallE
     }
 
     companion object {
+        private const val COLLAPSE_EVENT: Byte = 67
+
+        // Installed by the client renderer; dedicated servers never load client rendering classes.
+        @JvmField
+        var playCollapseEffect: Consumer<ReforgingGravityBallEntity> = Consumer { }
+
         private fun expansionFraction(elapsed: Double, duration: Int): Float {
             val progress = (elapsed / duration.coerceAtLeast(1)).coerceIn(0.0, 1.0)
             return (progress * progress * (3.0 - 2.0 * progress)).toFloat()

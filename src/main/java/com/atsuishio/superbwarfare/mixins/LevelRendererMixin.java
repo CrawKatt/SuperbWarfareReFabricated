@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
@@ -45,6 +46,41 @@ public class LevelRendererMixin {
         Frustum frustum = capturedFrustum != null ? capturedFrustum : cullingFrustum;
         RenderLevelStageCallback.EVENT.invoker().onRenderLevelStage(new RenderLevelStageCallback.Context(
                 RenderLevelStageCallback.Context.Stage.AFTER_SKY, (LevelRenderer) (Object) this,
+                poseStack, projectionMatrix, ticks, partialTick, camera, frustum));
+    }
+
+    // Hook the caller because Sodium replaces renderChunkLayer.
+    @Inject(method = "renderLevel", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/LevelRenderer;renderChunkLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/vertex/PoseStack;DDDLorg/joml/Matrix4f;)V",
+            ordinal = 2, shift = At.Shift.AFTER))
+    private void superbwarfare$afterCutoutBlocks(PoseStack poseStack, float partialTick, long finishTimeNano,
+                                               boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer,
+                                               LightTexture lightTexture, Matrix4f projectionMatrix,
+                                               CallbackInfo ci, @Local Frustum frustum) {
+        RenderLevelStageCallback.EVENT.invoker().onRenderLevelStage(new RenderLevelStageCallback.Context(
+                RenderLevelStageCallback.Context.Stage.AFTER_CUTOUT_BLOCKS, (LevelRenderer) (Object) this,
+                poseStack, projectionMatrix, ticks, partialTick, camera, frustum));
+    }
+
+    @Inject(method = "renderLevel", at = @At(value = "CONSTANT", args = "stringValue=destroyProgress"))
+    private void superbwarfare$afterBlockEntities(PoseStack poseStack, float partialTick, long finishTimeNano,
+                                               boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer,
+                                               LightTexture lightTexture, Matrix4f projectionMatrix,
+                                               CallbackInfo ci, @Local Frustum frustum) {
+        RenderLevelStageCallback.EVENT.invoker().onRenderLevelStage(new RenderLevelStageCallback.Context(
+                RenderLevelStageCallback.Context.Stage.AFTER_BLOCK_ENTITIES, (LevelRenderer) (Object) this,
+                poseStack, projectionMatrix, ticks, partialTick, camera, frustum));
+    }
+
+    @Inject(method = "renderLevel", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/particle/ParticleEngine;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/client/Camera;F)V",
+            shift = At.Shift.AFTER))
+    private void superbwarfare$afterParticles(PoseStack poseStack, float partialTick, long finishTimeNano,
+                                            boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer,
+                                            LightTexture lightTexture, Matrix4f projectionMatrix,
+                                            CallbackInfo ci, @Local Frustum frustum) {
+        RenderLevelStageCallback.EVENT.invoker().onRenderLevelStage(new RenderLevelStageCallback.Context(
+                RenderLevelStageCallback.Context.Stage.AFTER_PARTICLES, (LevelRenderer) (Object) this,
                 poseStack, projectionMatrix, ticks, partialTick, camera, frustum));
     }
 

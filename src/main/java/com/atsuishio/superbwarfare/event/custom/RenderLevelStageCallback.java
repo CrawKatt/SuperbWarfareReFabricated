@@ -27,7 +27,7 @@ public interface RenderLevelStageCallback {
     void onRenderLevelStage(Context event);
 
     class Context {
-        public enum Stage { AFTER_SKY, AFTER_LEVEL }
+        public enum Stage { AFTER_SKY, AFTER_CUTOUT_BLOCKS, AFTER_BLOCK_ENTITIES, AFTER_PARTICLES, AFTER_LEVEL }
 
         private final Stage stage;
         private final LevelRenderer levelRenderer;

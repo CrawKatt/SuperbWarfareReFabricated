@@ -835,7 +835,7 @@ object ClientEventHandler {
     }
 
     fun clearGravityLensing() {
-        ReforgingGravityBallRenderer.clearLensing()
+        ReforgingGravityBallRenderer.clearWorldEffects()
     }
 
     @JvmStatic
