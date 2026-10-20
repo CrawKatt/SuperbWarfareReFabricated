@@ -2648,10 +2648,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         @JvmStatic
         fun usesLensZoomSplit(gun: GunData): Boolean {
             if (DisplayConfig.LENS_ZOOM_RATIO.get() <= 0.0) return false
-            if (!ScopeLensShader.isAvailable()
-            // TODO OculusCompat
-//                || OculusCompat.isShaderPackActive()
-            ) return false
+            if (!ScopeLensShader.isAvailable()) return false
             val attachmentId = gun.attachment.id(AttachmentType.SCOPE) ?: return false
             val definition = AttachmentDefinition.from(attachmentId) ?: return false
             val scopeInfo = definition.scopeInfo ?: return false

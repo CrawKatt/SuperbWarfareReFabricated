@@ -6,8 +6,10 @@ import com.atsuishio.superbwarfare.client.renderer.ammo.AmmoDisplayRenderer
 import com.atsuishio.superbwarfare.client.renderer.ammo.AmmoDisplayRenderer.AmmoBarState
 import com.atsuishio.superbwarfare.client.renderer.ammo.AmmoDisplayRenderer.AmmoText
 import com.atsuishio.superbwarfare.client.renderer.ammo.AmmoReadout
+import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensPostProcessor
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensShader
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeStencilRenderHelper
+import com.atsuishio.superbwarfare.compat.shader.ShaderCompat
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.attachment.ScopeMode
 import com.atsuishio.superbwarfare.data.attachment.ScopeType
@@ -621,11 +623,7 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
                 val shaderBone = shaderBoneIndex(info)
                 val lensSurface = if (shaderBone >= 0) getLensSurface(poseStack, shaderBone) else null
                 RenderSystem.stencilFunc(GL11.GL_EQUAL, b, 0xFF)
-                if (
-                // TODO OculusCompat
-//                    !OculusCompat.isShaderPackActive() &&
-                    shaderBone >= 0 && lensSurface != null
-                ) {
+                if (shaderBone >= 0 && lensSurface != null) {
                     val magnification = if (DisplayConfig.LENS_ZOOM_RATIO.get() > 0.0) {
                         val progress = ClientEventHandler.aimingProgress(ClientEventHandler.zoomTime)
                         1f + progress * (ClientEventHandler.customZoom.coerceAtLeast(1.0) - 1.0).toFloat()
@@ -633,7 +631,34 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
                         1f
                     }
                     val tint = info.lensTint
-                    if (ScopeLensShader.beginSurface(
+                    if (ShaderCompat.isShaderPackActive()) {
+                        if (ScopeLensPostProcessor.defer(
+                                b, lensSurface, info.lensEdgeWidth, magnification,
+                                tint?.get() ?: 0xFFFFFF,
+                                if (tint == null) 0f else info.lensTintStrength,
+                                { surfaceBuffer -> buildLensSurface(poseStack, shaderBone, light, surfaceBuffer) },
+                                { deferredBuffers ->
+                                    if (divisionDue) {
+                                        withShaderBonesHidden {
+                                            renderBoneVertices(
+                                                divisions[i],
+                                                poseStack,
+                                                deferredBuffers,
+                                                quadType,
+                                                triangleType,
+                                                light
+                                            )
+                                        }
+                                        for (text in texts) {
+                                            if (text.divisionIndex == divisions[i]) {
+                                                ammo.renderText(text, poseStack, deferredBuffers)
+                                            }
+                                        }
+                                    }
+                                }
+                            )
+                        ) continue
+                    } else if (ScopeLensShader.beginSurface(
                             lensSurface.x(), lensSurface.y(), lensSurface.z(),
                             info.lensEdgeWidth, magnification,
                             tint?.get() ?: 0xFFFFFF,
@@ -810,12 +835,30 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
     private fun renderLensSurface(poseStack: PoseStack, boneIndex: Int, light: Int) {
         val radius = surfaceRadius(boneIndex)
         if (radius <= 1.0e-4f) return
+        val builder = Tesselator.getInstance().begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.NEW_ENTITY)
+        BufferUploader.drawWithShader(buildLensSurface(poseStack, boneIndex, light, builder))
+    }
+
+    private fun buildLensSurface(
+        poseStack: PoseStack, boneIndex: Int, light: Int, buffer: ByteBufferBuilder
+    ): MeshData = buildLensSurface(
+        poseStack, boneIndex, light,
+        BufferBuilder(buffer, VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.NEW_ENTITY)
+    )
+
+    /**
+     * 只往传进来的 [builder] 写顶点，不自己上传：1.21 的 [BufferBuilder] 是一次性的，
+     * 由调用方决定立刻 [BufferUploader.drawWithShader] 还是交给 [ScopeLensPostProcessor] 延后绘制。
+     */
+    private fun buildLensSurface(
+        poseStack: PoseStack, boneIndex: Int, light: Int, builder: BufferBuilder
+    ): MeshData {
+        val radius = surfaceRadius(boneIndex)
 
         poseStack.pushPose()
         instance.mulGlobalTransform(poseStack, boneIndex)
         val matrix = poseStack.last().pose()
 
-        val builder = Tesselator.getInstance().begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.NEW_ENTITY)
         lensVertex(builder, matrix, 0f, 0f, light)
         for (i in 0..LENS_SEGMENTS) {
             val angle = i * ((Math.PI * 2.0) / LENS_SEGMENTS)
@@ -826,11 +869,12 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
                 light
             )
         }
-        BufferUploader.drawWithShader(builder.buildOrThrow())
+        val mesh = builder.buildOrThrow()
         poseStack.popPose()
+        return mesh
     }
 
-    // Shader-pack path: no custom core shader, so the vignette is baked into vertex colours.
+    // Fallback when the lens shader is unavailable: bake the vignette into vertex colours.
     // Rings are spaced quadratically to put more geometry where the falloff is steepest.
     private fun renderLensFallback(poseStack: PoseStack, boneIndex: Int, edgeWidth: Float) {
         val radius = surfaceRadius(boneIndex)
@@ -927,6 +971,18 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
         triangleType: RenderType,
         light: Int
     ) {
+        renderBoneVertices(boneIndex, poseStack, bufferSource, quadType, triangleType, light)
+        flush(bufferSource, quadType, triangleType)
+    }
+
+    private fun renderBoneVertices(
+        boneIndex: Int,
+        poseStack: PoseStack,
+        bufferSource: MultiBufferSource,
+        quadType: RenderType,
+        triangleType: RenderType,
+        light: Int
+    ) {
         if (boneIndex < 0) return
         val bone = instance.getBone(boneIndex) ?: return
         val originalVisible = bone.visible
@@ -946,8 +1002,6 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
             instance, boneIndex, poseStack, bufferSource.getBuffer(triangleType),
             light, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f, false
         )
-        flush(bufferSource, quadType, triangleType)
-
         poseStack.popPose()
         bone.visible = originalVisible
     }
