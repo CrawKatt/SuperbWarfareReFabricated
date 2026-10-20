@@ -763,7 +763,7 @@ object ClientEventHandler {
 
     @SubscribeEvent
     fun clearGravityLensing(event: ClientPlayerNetworkEvent.LoggingOut) {
-        ReforgingGravityBallRenderer.clearLensing()
+        ReforgingGravityBallRenderer.clearWorldEffects()
     }
 
     @SubscribeEvent
