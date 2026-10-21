@@ -1726,7 +1726,7 @@ object ClientEventHandler {
         val bayonetCharge = chargeTarget != null
         val requestedIndex = when {
             heavyStrike -> MeleeClientHandler.indexOfHeavy(gunData)
-            bayonetCharge -> 0
+            bayonetCharge -> GunChargeHandler.STRIKE_ACTION_INDEX
             else -> -1
         }
 
