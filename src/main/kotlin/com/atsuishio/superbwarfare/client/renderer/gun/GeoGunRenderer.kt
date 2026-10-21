@@ -1790,6 +1790,10 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         return progress
     }
 
+    open fun scriptAmmoType(stack: ItemStack): Int {
+        return from(stack).selectedAmmoType.get()
+    }
+
     open fun scriptFrameDeltaSeconds(): Float {
         return Minecraft.getInstance().deltaFrameTime.coerceIn(0f, 0.8f)
     }
