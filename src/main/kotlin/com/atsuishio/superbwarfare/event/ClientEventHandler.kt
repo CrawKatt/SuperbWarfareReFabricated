@@ -791,6 +791,7 @@ object ClientEventHandler {
     fun clearGravityLensing() {
         ReforgingGravityBallRenderer.clearWorldEffects()
         ScopeLensPostProcessor.close()
+        com.atsuishio.superbwarfare.client.renderer.scope.ScopeThermalRenderer.close()
     }
 
     @JvmStatic
