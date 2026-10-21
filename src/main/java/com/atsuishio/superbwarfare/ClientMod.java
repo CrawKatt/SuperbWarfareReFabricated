@@ -14,6 +14,7 @@ import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview
 import com.atsuishio.superbwarfare.client.renderer.SyncedEntityWorldRenderer;
 import com.atsuishio.superbwarfare.client.renderer.ModParticleRenderTypes;
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensShader;
+import com.atsuishio.superbwarfare.client.renderer.scope.ScopeThermalRenderer;
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
 import com.atsuishio.superbwarfare.client.renderer.special.TowingChainRenderer;
 import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
@@ -56,6 +57,7 @@ public class ClientMod implements ClientModInitializer {
         PonderIndex.addPlugin(SBWPonderPlugin.INSTANCE);
         ModParticleRenderTypes.INSTANCE.register();
         CoreShaderRegistrationCallback.EVENT.register(ScopeLensShader.INSTANCE::onRegisterShaders);
+        CoreShaderRegistrationCallback.EVENT.register(ScopeThermalRenderer.INSTANCE::onRegisterShaders);
         CoreShaderRegistrationCallback.EVENT.register(ClientRenderHandler::registerGravityLensingShader);
         DragonTeethObjModelLoader.register();
         registerBuiltinResourcePacks();
