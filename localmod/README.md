@@ -5,7 +5,7 @@
 
 | 路径               | 说明                                                                                                                                         |
 |------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| `sbwloadertest/` | 当前夹具（modId = `sbwloadertest`），声明注册 `sbwloadertest:test`，**没有 `@Mod`、没有 Forge 依赖**；带 Java class 与 Kotlin object 两个 `@TestLoaderTarget` 入口样例 |
+| `sbwloadertest/` | 当前夹具（modId = `sbwloadertest`），声明普通物品、AK-74 和测试吊坠，**没有 `@Mod`、没有 Forge 依赖**；带 Java class 与 Kotlin object 两个 `@TestLoaderTarget` 入口样例 |
 | `sbwtest.jar`    | 历史遗留：早期 `lowcodefml` 方案的实验产物，已不参与加载（本地文件，已被 `.gitignore` 的 `*.jar` 忽略）                                                                     |
 
 加载端实现在 `src/main/kotlin/com/atsuishio/superbwarfare/init/LoaderTest.kt`，
@@ -91,7 +91,7 @@ source set 的 resources / java / kotlin / ksp 输出目录。）
 - 日志里出现这四行（运行期字符串统一英文，避免 GBK 控制台把中文转义成乱码）：
   - `[sbw-loader] loaded entrypoint com.sbwloadertest.LoaderTargetClass (mod=sbwloadertest)`
   - `[sbw-loader] loaded entrypoint com.sbwloadertest.LoaderTargetKClass (mod=sbwloadertest)`
-  - `[sbw-loader] discovered plugin sbwloadertest: 1 item declaration(s), 2 entrypoint class(es)`
+  - `[sbw-loader] discovered plugin sbwloadertest: 1 item(s), 1 gun(s), 1 attachment(s), 2 entrypoint class(es)`
   - `[sbw-loader] registered sbwloadertest:test (declared by mod sbwloadertest)`
 - 拿得到「测试物品」：配方书里用 `superbwarfare:beast` 合成，或 `/give @s sbwloadertest:test`
 
@@ -189,14 +189,23 @@ javafml 也可以零代码 —— 这是两个分支之间唯一一处"协议级
 ## 三、`registry.json` 字段
 
 解析由 `LoaderTest.kt` 里的 `LoaderInfo` / `ItemRegisterInfo`（`@Serializable`，kotlinx.serialization）
-负责，字段名就是 `@SerialName` 的值，**PascalCase**。`Items` 是**对象**而非数组：
-**物品 id 就是 key**，唯一性由 JSON 对象语义天然保证，value 里不再重复写 id。
+负责，字段名就是 `@SerialName` 的值，**PascalCase**。`Items`、`Guns`、`Attachments` 都是**对象**而非数组：
+**物品 id 就是 key**，value 里不再重复写 id；不同分组不能声明同一个路径。
 
 ```json
 {
   "FormatVersion": 1,
   "Items": {
-    "test": { "Rarity": "common" }
+    "test": { "ItemTabs": ["superbwarfare:item"] }
+  },
+  "Guns": {
+    "ak_74": { "ItemTabs": ["superbwarfare:guns"] }
+  },
+  "Attachments": {
+    "charm_loader_senpai": {
+      "Rarity": "superb",
+      "ItemTabs": ["superbwarfare:attachment"]
+    }
   }
 }
 ```
@@ -204,12 +213,39 @@ javafml 也可以零代码 —— 这是两个分支之间唯一一处"协议级
 | 字段 | 必需 | 默认 | 说明 / 落点 |
 | --- | --- | --- | --- |
 | `FormatVersion` | ✅ | — | 协议版本，当前只支持 `1`，不匹配直接报错 |
-| `Items` | ✅ | — | 物品声明对象：key = 物品路径，value = 声明（允许为空对象 `{}`） |
+| `Items` / `Guns` / `Attachments` | ❌ | `{}` | 分别创建 `Item`、`GeoGunItem`、`BasicAttachmentItem`，共用以下条目字段 |
 | `Items.<key>` | ✅ | — | 纯路径，**不允许 `:`**；须是合法资源路径（小写 a-z、0-9、`_`、`-`、`.`） |
-| `Items.<key>.Rarity` | ✅ | — | `Item.Properties#rarity`，可选 `common`/`uncommon`/`rare`/`epic` |
+| `Items.<key>.Rarity` | ❌ | `common` | `common`/`uncommon`/`rare`/`epic`/`legendary`/`superb`/`virtual`/`beast` |
 | `Items.<key>.MaxStackSize` | ❌ | `64` | `Item.Properties#stacksTo`，取值 1..99 |
 | `Items.<key>.FireResistant` | ❌ | `false` | `Item.Properties#fireResistant` |
 | `Items.<key>.Durability` | ❌ | 无 | `Item.Properties#durability`，≥ 1 |
+| `Items.<key>.ItemTabs` | ❌ | `[]` | 完整 tab id 的数组，三类条目均可使用；可指定多个 tab，重复 id 只加入一次 |
+
+`ItemTabs` 可以指向本体、原版或其它 mod 已注册的创造页，例如 `superbwarfare:attachment`、
+`superbwarfare:guns`、`superbwarfare:item`、`minecraft:ingredients`。不写或写空数组时，
+物品仍会注册，但 loader 不把它加入任何分类页。这里只引用已有页签，不负责新建页签。
+
+### 配件数据与跨 mod 枪械适配
+
+`Attachments` 的物品 id 同时就是配件数据 id。声明 `charm_loader_senpai` 后，还需要：
+
+- `data/sbwloadertest/sbw/attachments/charm_loader_senpai.json`：沿用本体 `AttachmentDefinition` 格式。
+- `assets/sbwloadertest/models/item/charm_loader_senpai.json` 和背包图标。
+- 配件定义所引用的 Bedrock 模型、贴图，以及中英文物品名称。
+- 对应槽位标签或目标枪 `AvailableAttachments` 的显式声明。
+
+夹具复制了本体先辈吊坠，改名为 **Loader 测试先辈吊坠 / Loader Test Senpai Charm**，
+所有模型、贴图路径都位于 `sbwloadertest` 命名空间；稀有度 `superb` 对应 `Level: 4`。
+配件定义中的 `Slot`、`Level` 与物品分类 `ItemTabs` 是三件独立的事情。
+
+夹具通过 `data/superbwarfare/tags/items/attachment/charm/superb.json`，以 `replace: false`
+追加 `sbwloadertest:charm_loader_senpai`。本体标签链会把它汇总到
+`#superbwarfare:attachment/charm`，因此 AK-47 等已声明该标签的本体枪械无需逐枪修改。
+只写插件自己的标签、却没有让枪械引用它，不会自动获得安装资格。
+
+游戏内验证：在配件创造页取得新吊坠，在枪械创造页取得本体 AK-47，打开改装界面确认
+Charm 候选中有测试吊坠，并检查安装、拆卸和显示；AK-47 模型已有 `charm_pos` 挂点。
+也可以用 `/give @s sbwloadertest:charm_loader_senpai` 取得测试物品。
 
 声明顺序 = 文件里的书写顺序（kotlinx 解码成 `LinkedHashMap`），注册顺序与之相同。
 未识别的字段会被忽略（`Json { ignoreUnknownKeys = true }`），便于协议向前演进；
