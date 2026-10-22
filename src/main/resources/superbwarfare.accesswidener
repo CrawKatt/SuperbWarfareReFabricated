@@ -37,3 +37,5 @@ accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platfor
 accessible field net/minecraft/client/renderer/LevelRenderer ticks I
 accessible field net/minecraft/client/renderer/LevelRenderer cullingFrustum Lnet/minecraft/client/renderer/culling/Frustum;
 accessible field net/minecraft/client/renderer/LevelRenderer capturedFrustum Lnet/minecraft/client/renderer/culling/Frustum;
+
+accessible method net/minecraft/resources/ResourceLocation isValidPath (Ljava/lang/String;)Z
