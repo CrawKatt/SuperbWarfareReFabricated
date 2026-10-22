@@ -250,6 +250,7 @@ dependencies {
         exclude("org.joml", "joml")
     }
 
+    compileOnly("io.github.llamalad7:mixinextras-common:0.3.6")
     annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.6")
     jijImplement("io.github.llamalad7:mixinextras-forge:0.3.6")
 
