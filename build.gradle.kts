@@ -250,6 +250,9 @@ dependencies {
         exclude("org.joml", "joml")
     }
 
+    annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.6")
+    jijImplement("io.github.llamalad7:mixinextras-forge:0.3.6")
+
     // Ponder
     jijImplement("net.createmod.ponder:Ponder-Forge-${project.property("minecraft_version")}:${project.property("ponder_version")}")
 
