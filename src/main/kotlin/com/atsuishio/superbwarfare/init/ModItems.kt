@@ -257,7 +257,7 @@ object ModItems {
     @JvmField val DETONATOR = registerItem("detonator") { DetonatorItem() }
     @JvmField val TARGET_DEPLOYER = registerItem("target_deployer") { TargetDeployerItem() }
     @JvmField val DPS_GENERATOR_DEPLOYER = registerItem("dps_generator_deployer") { DPSGeneratorDeployerItem() }
-    @JvmField val KNIFE = registerItem("knife") { KnifeItem() }
+    @JvmField val KNIFE = registerAmmo("knife") { GeoGunItem(Properties().rarity(Rarity.COMMON)) }
     @JvmField val KNIFE_6KH2 = registerItem("knife_6kh2") { Knife6kh2Item() }
     @JvmField val KNIFE_SEITENGEWEHR_84 = registerItem("knife_seitengewehr_84") { KnifeSeitengewehr84Item() }
     @JvmField val KNIFE_M1917 = registerItem("knife_m1917") { KnifeM1917Item() }
