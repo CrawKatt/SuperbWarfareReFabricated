@@ -201,16 +201,7 @@ object ClickEventHandler {
         }
 
         // 未按下shift时，为有武器的载具切换武器
-        if (!shiftDown
-            && vehicle is VehicleEntity
-            && vehicle.hasWeapon(vehicle.getSeatIndex(player))
-            && vehicle.banHand(player)
-        ) {
-            if (ClientEventHandler.switchVehicleWeaponCooldown <= 0) {
-                val index = vehicle.getSeatIndex(player)
-                sendPacketToServer(SwitchVehicleWeaponMessage(index, -scroll, true))
-                ClientEventHandler.switchVehicleWeaponCooldown = 3
-            }
+        if (!shiftDown && switchVehicleWeapon(player, scroll)) {
             handled = true
         }
 
@@ -240,6 +231,19 @@ object ClickEventHandler {
             handled = true
         }
         return handled
+    }
+
+    fun switchVehicleWeapon(player: Player, scroll: Double): Boolean {
+        val vehicle = player.vehicle
+        if (vehicle !is VehicleEntity) return false
+        val index = vehicle.getSeatIndex(player)
+        if (!vehicle.hasWeapon(index) || !vehicle.banHand(player)) return false
+
+        if (ClientEventHandler.switchVehicleWeaponCooldown <= 0) {
+            sendPacketToServer(SwitchVehicleWeaponMessage(index, -scroll, true))
+            ClientEventHandler.switchVehicleWeaponCooldown = 3
+        }
+        return true
     }
 
     @SubscribeEvent
