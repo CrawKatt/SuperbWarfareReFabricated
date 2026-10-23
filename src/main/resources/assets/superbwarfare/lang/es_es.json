@@ -1,4 +1,7 @@
 {
+    "controlify.binding.superbwarfare.next_weapon": "Siguiente arma / mira / aumento",
+    "controlify.binding.superbwarfare.previous_weapon": "Arma / mira / aumento anterior",
+    "controlify.binding.superbwarfare.vehicle_reload": "Recargar arma del vehículo",
     "attribute.superbwarfare.bullet_resistance": "Resistencia a Balas",
     "block.superbwarfare.aircraft_catapult": "Catapulta de Aeronaves",
     "block.superbwarfare.barbed_wire": "Alambre de Púas",
