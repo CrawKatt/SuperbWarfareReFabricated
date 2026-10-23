@@ -33,6 +33,7 @@ object PoseTool {
             GunArmPose.SUPER_STAR_SHOOTER -> SUPER_STAR_SHOOTER_POSE
             GunArmPose.SINGLE_HAND -> SINGLE_HAND_POSE
             GunArmPose.LUNGE_MINE -> LUNGE_MINE_POSE
+            GunArmPose.ITEM -> HumanoidModel.ArmPose.ITEM
         }
         if (held != null) {
             if (entityLiving is Player && DeployedWeaponHandler.isDeployed(entityLiving)) return ArmPose.EMPTY
