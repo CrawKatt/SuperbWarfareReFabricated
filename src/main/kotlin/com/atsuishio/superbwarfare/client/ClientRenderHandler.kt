@@ -27,9 +27,6 @@ import com.atsuishio.superbwarfare.client.renderer.block.VehicleAssemblingTableB
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.BlueprintResearchingTableBlockItemRenderer
-import com.atsuishio.superbwarfare.client.renderer.item.Knife6kh2Renderer
-import com.atsuishio.superbwarfare.client.renderer.item.KnifeM1917Renderer
-import com.atsuishio.superbwarfare.client.renderer.item.KnifeSeitengewehr84Renderer
 import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.TripodBlockItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.Type88ClusterGrenadesRenderer
@@ -408,35 +405,6 @@ object ClientRenderHandler {
             ModItems.TRIPOD
         ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
             tripodRenderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
-        }
-
-        val knife6kh2Renderer = lazy { Knife6kh2Renderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
-        BuiltinItemRendererRegistry.INSTANCE.register(
-            ModItems.KNIFE_6KH2
-        ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
-            knife6kh2Renderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
-        }
-
-        val knifeSeitengewehr84Renderer =
-            lazy { KnifeSeitengewehr84Renderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
-        BuiltinItemRendererRegistry.INSTANCE.register(
-            ModItems.KNIFE_SEITENGEWEHR_84
-        ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
-            knifeSeitengewehr84Renderer.value.renderByItem(
-                stack,
-                displayContext,
-                poseStack,
-                buffer,
-                packedLight,
-                packedOverlay
-            )
-        }
-
-        val knifeM1917Renderer = lazy { KnifeM1917Renderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
-        BuiltinItemRendererRegistry.INSTANCE.register(
-            ModItems.KNIFE_M1917
-        ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
-            knifeM1917Renderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
         }
 
         TrinketRendererRegistry.registerRenderer(ModItems.PARACHUTE, ParachuteRenderer())

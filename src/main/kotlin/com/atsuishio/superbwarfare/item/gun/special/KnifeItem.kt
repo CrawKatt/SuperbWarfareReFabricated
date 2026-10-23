@@ -5,8 +5,8 @@ import com.atsuishio.superbwarfare.client.renderer.gun.KnifeRenderer
 import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import net.minecraft.world.inventory.tooltip.TooltipComponent
 import net.minecraft.world.item.ItemStack
-import net.minecraftforge.api.distmarker.Dist
-import net.minecraftforge.api.distmarker.OnlyIn
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import java.util.*
 
 open class KnifeItem(properties: Properties) : GeoGunItem(properties) {
@@ -15,6 +15,6 @@ open class KnifeItem(properties: Properties) : GeoGunItem(properties) {
         return Optional.empty()
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     override fun createRenderer(): GeoGunRenderer = KnifeRenderer()
 }
