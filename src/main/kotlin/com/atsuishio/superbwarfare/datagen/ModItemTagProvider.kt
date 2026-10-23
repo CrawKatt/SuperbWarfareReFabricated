@@ -395,9 +395,6 @@ class ModItemTagProvider(
 
         this.tag(ItemTags.SWORDS).add(
             ModItems.MILITARY_SHOVEL,
-            ModItems.KNIFE_6KH2,
-            ModItems.KNIFE_SEITENGEWEHR_84,
-            ModItems.KNIFE_M1917,
             ModItems.T_BATON,
             ModItems.ELECTRIC_BATON,
             ModItems.STEEL_PIPE,

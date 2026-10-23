@@ -417,9 +417,6 @@ object ClientRenderHandler {
             ModItems.SKIN_SPRAY to lazy { SkinSprayRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.PTKM_1R to lazy { Ptkm1rItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.MILITARY_SHOVEL to lazy { MilitaryShovelRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
-            ModItems.KNIFE_6KH2 to lazy { Knife6kh2Renderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
-            ModItems.KNIFE_SEITENGEWEHR_84 to lazy { KnifeSeitengewehr84Renderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
-            ModItems.KNIFE_M1917 to lazy { KnifeM1917Renderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
         )
         renderers.forEach { (item, renderer) ->
             BuiltinItemRendererRegistry.INSTANCE.register(item) { stack, displayContext, poseStack, buffer, light, overlay ->
