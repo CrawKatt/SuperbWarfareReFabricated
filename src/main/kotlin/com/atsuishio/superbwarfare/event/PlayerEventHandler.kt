@@ -10,6 +10,7 @@ import com.atsuishio.superbwarfare.init.ModParticleTypes
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.item.gun.GunItem
+import com.atsuishio.superbwarfare.network.message.send.UseActionMessage
 import com.atsuishio.superbwarfare.tools.InventoryTool
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import com.atsuishio.superbwarfare.tools.TraceTool
@@ -23,6 +24,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraftforge.event.AnvilUpdateEvent
 import net.minecraftforge.event.TickEvent
+import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.entity.player.AttackEntityEvent
 import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
@@ -31,6 +33,14 @@ import kotlin.math.ceil
 
 @Mod.EventBusSubscriber
 object PlayerEventHandler {
+    @SubscribeEvent
+    fun onPlayerDeath(event: LivingDeathEvent) {
+        val player = event.entity as? ServerPlayer ?: return
+
+        ChargeWindowHandler.clear(player)
+        UseActionMessage.clearChargeCooldown(player)
+    }
+
     @SubscribeEvent
     fun onPlayerRespawned(event: PlayerEvent.PlayerRespawnEvent) {
         val player = event.entity ?: return
