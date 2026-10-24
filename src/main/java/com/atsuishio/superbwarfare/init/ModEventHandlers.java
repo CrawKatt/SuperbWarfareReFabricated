@@ -22,6 +22,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import com.atsuishio.superbwarfare.tools.ServerSyncedEntityHandler;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 
 public class ModEventHandlers {
@@ -44,6 +45,12 @@ public class ModEventHandlers {
         });
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) ->
                 PlayerEventHandler.onPlayerChangedDimension(player));
+
+        ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
+            if (entity instanceof ServerPlayer player) {
+                PlayerEventHandler.onPlayerDeath(player);
+            }
+        });
 
         ServerLivingEntityEvents.AFTER_DEATH.register(LivingEventHandler::onEntityDeath);
         ServerLivingEntityEvents.ALLOW_DEATH.register(TargetEntity::onTargetDown);

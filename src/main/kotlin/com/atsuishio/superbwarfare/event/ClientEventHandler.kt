@@ -829,7 +829,11 @@ object ClientEventHandler {
         CrossHairOverlay.handleRenderDamageIndicator()
         staminaSystem()
         handlePlayerSprint()
-        handleGunMelee(player, stack)
+        if (player.isDeadOrDying) {
+            resetMeleeOnDeath()
+        } else {
+            handleGunMelee(player, stack)
+        }
         weaponZooming(stack)
         lockWeaponSeeking(player, stack)
         vehicleWeaponSeeking(player)
@@ -1693,6 +1697,14 @@ object ClientEventHandler {
 
     private fun isGunSupported(player: Player, data: GunData, item: GunItem): Boolean {
         return DeployedWeaponHandler.isDeployed(player) || data.attachment.hasBipod() || item.hasBipod(data)
+    }
+
+    private fun resetMeleeOnDeath() {
+        GunActionLock.clearAll()
+        GunChargeHandler.clear()
+        heavyStrikeRequested = false
+        holdingFireKey = false
+        clearYsmCompatState()
     }
 
     /**
