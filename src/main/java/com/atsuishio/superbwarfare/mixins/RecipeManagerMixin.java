@@ -1,9 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.init.ModItems;
-import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.item.material.VehicleResetKitItem;
-import com.atsuishio.superbwarfare.item.weapon.HammerItem;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
@@ -33,11 +31,6 @@ public abstract class RecipeManagerMixin {
 
         for (int i = 0; i < recipeInput.size() && i < remainingItems.size(); i++) {
             var itemStack = recipeInput.getItem(i);
-
-            if (itemStack.is(ModTags.Items.HAMMER) && remainingItems.get(i).isEmpty()) {
-                remainingItems.set(i, HammerItem.getCraftingRemainingStack(itemStack));
-                changed = true;
-            }
 
             if (itemStack.is(ModItems.VEHICLE_RESET_KIT) && remainingItems.get(i).isEmpty()) {
                 remainingItems.set(i, VehicleResetKitItem.getCraftingRemainingItem(itemStack));

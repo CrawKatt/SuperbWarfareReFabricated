@@ -19,7 +19,7 @@ import net.minecraft.world.item.Tier
 import net.minecraft.world.item.TooltipFlag
 import org.joml.Math
 
-open class HammerItem(tier: Tier, attackDamage: Int, attackSpeed: Float, properties: Properties) :
+open class CraftingHammerItem(tier: Tier, attackDamage: Int, attackSpeed: Float, properties: Properties) :
     SwordItem(tier, properties.attributes(createAttributes(tier, attackDamage, attackSpeed))) {
 
     constructor(tier: Tier, attackDamage: Int, attackSpeed: Float, maxDamage: Int) : this(
@@ -28,6 +28,8 @@ open class HammerItem(tier: Tier, attackDamage: Int, attackSpeed: Float, propert
         attackSpeed,
         CustomDamageProperty(maxDamage)
     )
+
+    override fun getRecipeRemainder(itemstack: ItemStack): ItemStack = getCraftingRemainingStack(itemstack)
 
     @Environment(EnvType.CLIENT)
     override fun appendHoverText(
@@ -84,9 +86,7 @@ open class HammerItem(tier: Tier, attackDamage: Int, attackSpeed: Float, propert
                     if (container.getItem(i).`is`(ModTags.Items.HAMMER)) count++
                 }
                 if (count == 2) {
-                    for (i in 0..<container.containerSize) {
-                        container.setItem(i, ItemStack.EMPTY)
-                    }
+                    container.clearContent()
                 }
             }
         }

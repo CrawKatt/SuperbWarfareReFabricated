@@ -6,10 +6,7 @@ import net.minecraft.world.item.Tiers
 import net.minecraft.world.item.component.Unbreakable
 
 @RegistryName("netherite_hammer")
-class NetheriteHammerItem : HammerItem(
-    Tiers.NETHERITE,
-    75,
-    -3.5f,
-    Properties().durability(2800).fireResistant()
+class NetheriteHammerItem : CraftingHammerItem(
+    Tiers.NETHERITE, 75, -3.5f, Properties().durability(2800).fireResistant()
         .component(DataComponents.UNBREAKABLE, Unbreakable(false))
 )
