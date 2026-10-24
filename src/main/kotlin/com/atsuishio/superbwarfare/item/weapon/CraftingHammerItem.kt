@@ -17,7 +17,7 @@ import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 import org.joml.Math
 
-open class HammerItem(tier: Tier, attackDamage: Int, attackSpeed: Float, properties: Properties) :
+open class CraftingHammerItem(tier: Tier, attackDamage: Int, attackSpeed: Float, properties: Properties) :
     SwordItem(tier, attackDamage, attackSpeed, properties) {
 
     constructor(tier: Tier, attackDamage: Int, attackSpeed: Float, maxDamage: Int) : this(

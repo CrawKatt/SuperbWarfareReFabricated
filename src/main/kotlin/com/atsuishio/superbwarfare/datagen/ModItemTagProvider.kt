@@ -372,8 +372,13 @@ class ModItemTagProvider(
             ModItems.ELECTRIC_BATON,
             ModItems.STEEL_PIPE,
             ModItems.CROWBAR,
-            ModItems.CEMENTED_CARBIDE_SWORD
-        ).addTag(ModTags.Items.HAMMER)
+            ModItems.CEMENTED_CARBIDE_SWORD,
+            ModItems.GOLDEN_HAMMER,
+            ModItems.STEEL_HAMMER,
+            ModItems.DIAMOND_HAMMER,
+            ModItems.CEMENTED_CARBIDE_HAMMER,
+            ModItems.NETHERITE_HAMMER
+        )
 
         this.tag(ItemTags.AXES).add(ModItems.MILITARY_SHOVEL, ModItems.CEMENTED_CARBIDE_AXE)
         this.tag(ItemTags.SHOVELS).add(ModItems.MILITARY_SHOVEL, ModItems.CEMENTED_CARBIDE_SHOVEL)
