@@ -3,9 +3,12 @@ package com.atsuishio.superbwarfare.item.gun.special
 import com.atsuishio.superbwarfare.client.TooltipTool
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.renderer.gun.HammerRenderer
+import com.atsuishio.superbwarfare.init.ModTags
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.util.RandomSource
+import net.minecraft.world.Container
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
@@ -44,4 +47,21 @@ open class HammerItem(properties: Properties) : KnifeItem(properties) {
 
     @Environment(EnvType.CLIENT)
     override fun createRenderer(): GeoGunRenderer = HammerRenderer()
+
+    companion object {
+        @JvmStatic
+        fun onItemCraftedByHammer(item: ItemStack, container: Container, player: Player) {
+            if (player.level().isClientSide) return
+
+            if (item.`is`(ModTags.Items.HAMMER)) {
+                var count = 0
+                for (i in 0..<container.containerSize) {
+                    if (container.getItem(i).`is`(ModTags.Items.HAMMER)) count++
+                }
+                if (count == 2) {
+                    container.clearContent()
+                }
+            }
+        }
+    }
 }
