@@ -91,6 +91,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.LivingEntity
 import net.minecraftforge.fml.config.ModConfig
@@ -209,6 +210,10 @@ class Mod : ModInitializer {
 
         ServerPlayerEvents.AFTER_RESPAWN.register { _, player, alive ->
             PlayerEventHandler.onPlayerRespawned(player, alive)
+        }
+
+        ServerLivingEntityEvents.AFTER_DEATH.register { entity, _ ->
+            if (entity is ServerPlayer) PlayerEventHandler.onPlayerDeath(entity)
         }
 
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register { player, _, _ ->

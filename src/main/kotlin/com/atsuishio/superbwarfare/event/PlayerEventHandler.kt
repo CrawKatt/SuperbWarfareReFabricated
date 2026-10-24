@@ -10,6 +10,7 @@ import com.atsuishio.superbwarfare.init.ModParticleTypes
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.item.gun.GunItem
+import com.atsuishio.superbwarfare.network.message.send.UseActionMessage
 import com.atsuishio.superbwarfare.tools.InventoryTool
 import com.atsuishio.superbwarfare.tools.NBTTool
 import com.atsuishio.superbwarfare.tools.ParticleTool
@@ -27,6 +28,12 @@ import net.minecraft.world.item.ItemStack
 import kotlin.math.ceil
 
 object PlayerEventHandler {
+    @JvmStatic
+    fun onPlayerDeath(player: ServerPlayer) {
+        ChargeWindowHandler.clear(player)
+        UseActionMessage.clearChargeCooldown(player)
+    }
+
     @JvmStatic
     fun onPlayerRespawned(player: ServerPlayer, conquered: Boolean) {
         handleRespawnReload(player)
