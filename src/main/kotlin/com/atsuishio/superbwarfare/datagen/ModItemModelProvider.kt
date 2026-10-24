@@ -92,6 +92,11 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         gunItem(ModItems.KNIFE_SEITENGEWEHR_84)
         gunItem(ModItems.KNIFE_M1917)
         gunItem(ModItems.HAMMER)
+        gunItem(ModItems.GOLDEN_HAMMER)
+        gunItem(ModItems.STEEL_HAMMER)
+        gunItem(ModItems.DIAMOND_HAMMER)
+        gunItem(ModItems.CEMENTED_CARBIDE_HAMMER)
+        gunItem(ModItems.NETHERITE_HAMMER)
 
         simpleItem(ModItems.VEHICLE_GUN)
         addModel(
