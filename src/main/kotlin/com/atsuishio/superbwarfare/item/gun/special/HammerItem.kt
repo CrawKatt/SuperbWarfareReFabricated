@@ -1,37 +1,26 @@
-package com.atsuishio.superbwarfare.item.weapon
+package com.atsuishio.superbwarfare.item.gun.special
 
 import com.atsuishio.superbwarfare.client.TooltipTool
-import com.atsuishio.superbwarfare.init.ModSounds
+import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
+import com.atsuishio.superbwarfare.client.renderer.gun.HammerRenderer
 import com.atsuishio.superbwarfare.init.ModTags
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
-import net.minecraft.sounds.SoundSource
 import net.minecraft.util.RandomSource
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.SwordItem
-import net.minecraft.world.item.Tier
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
+import net.minecraftforge.api.distmarker.Dist
+import net.minecraftforge.api.distmarker.OnlyIn
 import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
-import org.joml.Math
 
-open class HammerItem(tier: Tier, attackDamage: Int, attackSpeed: Float, properties: Properties) :
-    SwordItem(tier, attackDamage, attackSpeed, properties) {
-    override fun appendHoverText(
-        pStack: ItemStack,
-        pLevel: Level?,
-        pTooltipComponents: MutableList<Component>,
-        pIsAdvanced: TooltipFlag
-    ) {
-        TooltipTool.addHideText(
-            pTooltipComponents,
-            Component.translatable("des.superbwarfare.hammer", pStack.getOrCreateTag().getInt("CraftCount"))
-                .withStyle(ChatFormatting.GRAY)
-        )
-    }
+open class HammerItem(properties: Properties) : KnifeItem(properties) {
+
+    override fun canBeDepleted(): Boolean = true
+
+    override fun isDamageable(stack: ItemStack?): Boolean = true
 
     override fun hasCraftingRemainingItem(stack: ItemStack?): Boolean {
         return true
@@ -47,21 +36,22 @@ open class HammerItem(tier: Tier, attackDamage: Int, attackSpeed: Float, propert
         return stack
     }
 
-    override fun isRepairable(itemstack: ItemStack): Boolean {
-        return true
+    override fun appendHoverText(
+        stack: ItemStack,
+        level: Level?,
+        tooltip: MutableList<Component>,
+        flag: TooltipFlag
+    ) {
+        super.appendHoverText(stack, level, tooltip, flag)
+        TooltipTool.addHideText(
+            tooltip,
+            Component.translatable("des.superbwarfare.hammer", stack.getOrCreateTag().getInt("CraftCount"))
+                .withStyle(ChatFormatting.GRAY)
+        )
     }
 
-    override fun hurtEnemy(pStack: ItemStack, pTarget: LivingEntity, pAttacker: LivingEntity): Boolean {
-        pAttacker.level().playSound(
-            null,
-            pTarget.onPos,
-            ModSounds.MELEE_HIT.get(),
-            SoundSource.PLAYERS,
-            1f,
-            ((2 * Math.random() - 1) * 0.1f + 1.0f).toFloat()
-        )
-        return super.hurtEnemy(pStack, pTarget, pAttacker)
-    }
+    @OnlyIn(Dist.CLIENT)
+    override fun createRenderer(): GeoGunRenderer = HammerRenderer()
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
     companion object {
