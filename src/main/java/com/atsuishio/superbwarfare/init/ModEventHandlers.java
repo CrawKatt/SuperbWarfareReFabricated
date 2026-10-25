@@ -20,14 +20,22 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import com.atsuishio.superbwarfare.tools.ServerSyncedEntityHandler;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
 
 public class ModEventHandlers {
 
     public static void init() {
+        ResourceLocation meleeRespawnPhase = ResourceLocation.fromNamespaceAndPath("superbwarfare", "melee_respawn");
+        LivingIncomingDamageCallback.EVENT.addPhaseOrdering(meleeRespawnPhase, Event.DEFAULT_PHASE);
+        LivingIncomingDamageCallback.EVENT.register(meleeRespawnPhase, PlayerEventHandler::blockRespawnMeleeDamage);
+        AttackEntityCallback.EVENT.addPhaseOrdering(meleeRespawnPhase, Event.DEFAULT_PHASE);
+        AttackEntityCallback.EVENT.register(meleeRespawnPhase, (player, world, hand, entity, hitResult) ->
+                PlayerEventHandler.blockRespawnMeleeAttack(player) ? InteractionResult.FAIL : InteractionResult.PASS);
         LivingIncomingDamageCallback.EVENT.register(ShieldHandler::onEntityHurt);
         SuperbWarfareEvents.register(MobEffectAddedEvent.class, event ->
                 BurnMobEffect.onBurnAdded(event.getEntity(), event.getEffectInstance(), event.getEffectSource()));
