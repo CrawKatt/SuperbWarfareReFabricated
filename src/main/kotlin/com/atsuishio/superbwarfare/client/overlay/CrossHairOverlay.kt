@@ -87,6 +87,7 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
         if (!GunItem.isOperable(stack) || (vehicle is VehicleEntity && vehicle.banHand(player))) return
 
         val data = from(stack)
+        val meleeOnly = data.meleeOnly()
 
         val crosshair = data.get(GunProp.CROSSHAIR)
         if (crosshair == CROSSHAIR_EMPTY || crosshair == CROSSHAIR_CUSTOM) return
@@ -121,7 +122,7 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
         }
 
         if (flag) {
-            val rawOffset = if (mc.options.cameraType == CameraType.FIRST_PERSON) {
+            val rawOffset = if (!meleeOnly && mc.options.cameraType == CameraType.FIRST_PERSON) {
                 ClientRenderHandler.shotAimOffset()
             } else {
                 null
@@ -140,6 +141,11 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
                 // GUI 的 y 向下为正，弹道偏上 = moveY 减小
                 moveY -= (riseAtRange * perBlock).toFloat()
             }
+        }
+
+        if (meleeOnly) {
+            moveX = 0f
+            moveY = 0f
         }
 
         RenderSystem.disableDepthTest()
@@ -296,6 +302,7 @@ object CrossHairOverlay : CommonOverlay("cross_hair") {
         RenderHelper.blit(
             guiGraphics.pose(), POINT, screenWidth / 2f - 7.5f + moveX, screenHeight / 2f - 7.5f + moveY, 16f, 16f,
         )
+        if (data.meleeOnly()) return
         if (!player.isSprinting || ClientEventHandler.noSprintTicks > 0) {
             if (data.get(GunProp.PROJECTILE_AMOUNT) > 1) {
                 shotgunCrossHair(guiGraphics, finPosX, finPosY, finLength)

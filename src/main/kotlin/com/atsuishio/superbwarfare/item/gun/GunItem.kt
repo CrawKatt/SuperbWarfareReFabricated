@@ -175,7 +175,9 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
 
     fun updateStackComponents(data: GunData) {
         val stack = data.stack
-        val list = ArrayList<ItemAttributeModifiers.Entry>()
+        val list = ArrayList<ItemAttributeModifiers.Entry>(
+            components().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY).modifiers()
+        )
 
         if (useAsWeaponInHand()) {
             // 移速
@@ -198,7 +200,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
                         Attributes.ATTACK_DAMAGE,
                         AttributeModifier(
                             BASE_ATTACK_DAMAGE_ID,
-                            data.get(GunProp.MELEE_DAMAGE),
+                            data.get(GunProp.MELEE_DAMAGE) - 1.0,
                             AttributeModifier.Operation.ADD_VALUE
                         ),
                         EquipmentSlotGroup.MAINHAND
@@ -890,7 +892,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
                 player.connection.send(
                     ClientboundStopSoundPacket(dischargeSound.location, SoundSource.PLAYERS)
                 )
-        }
+            }
         }
     }
 
@@ -910,7 +912,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
                 player.connection.send(
                     ClientboundStopSoundPacket(chargeSound.location, SoundSource.PLAYERS)
                 )
-        }
+            }
         }
     }
 
