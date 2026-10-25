@@ -199,12 +199,11 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             )
         )
 
-        // 近战伤害
         if (data.get(GunProp.MELEE_DAMAGE) > 0) {
             map.put(
                 Attributes.ATTACK_DAMAGE, AttributeModifier(
                     BASE_ATTACK_DAMAGE_UUID, Mod.ATTRIBUTE_MODIFIER,
-                    data.get(GunProp.MELEE_DAMAGE),
+                    data.get(GunProp.MELEE_DAMAGE) - 1.0,
                     AttributeModifier.Operation.ADDITION
                 )
             )
