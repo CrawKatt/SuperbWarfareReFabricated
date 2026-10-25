@@ -59,7 +59,6 @@ object ScopeLensPostProcessor {
         val thermal: Boolean,
         val thermalBackgroundColor: Int?,
         val thermalEntityColor: Int?,
-        val thermalPalette: Int,
         val shaderPack: Boolean,
         var surface: BufferBuilder.RenderedBuffer?,
         val reticle: List<Draw>
@@ -90,8 +89,7 @@ object ScopeLensPostProcessor {
         reticle: (MultiBufferSource) -> Unit,
         thermal: Boolean = false,
         thermalBackgroundColor: Int? = null,
-        thermalEntityColor: Int? = null,
-        thermalPalette: Int = 0
+        thermalEntityColor: Int? = null
     ): Boolean {
         val shaderPack = ShaderCompat.isShaderPackActive()
         if ((!shaderPack && !thermal) || ShaderCompat.isRenderingShadowPass() ||
@@ -136,7 +134,7 @@ object ScopeLensPostProcessor {
                 target, stencil, Matrix4f(RenderSystem.getProjectionMatrix()),
                 Matrix4f(RenderSystem.getModelViewMatrix()), ScopeLensShader.screenScale(),
                 Vector3f(center), edgeWidth, magnification, tint, tintStrength,
-                thermal, thermalBackgroundColor, thermalEntityColor, thermalPalette, shaderPack,
+                thermal, thermalBackgroundColor, thermalEntityColor, shaderPack,
                 surface?.invoke(capture.surface), buffers.finish()
             )
             return true
@@ -153,12 +151,11 @@ object ScopeLensPostProcessor {
     }
 
     fun deferThermalSight(
-        stencil: Int, backgroundColor: Int? = null, entityColor: Int? = null, palette: Int = 0,
+        stencil: Int, backgroundColor: Int? = null, entityColor: Int? = null,
         reticle: (MultiBufferSource) -> Unit
     ): Boolean = defer(
         stencil, Vector3f(), 0f, 1f, 0xFFFFFF, 0f, null, reticle,
-        thermal = true, thermalBackgroundColor = backgroundColor, thermalEntityColor = entityColor,
-        thermalPalette = palette
+        thermal = true, thermalBackgroundColor = backgroundColor, thermalEntityColor = entityColor
     )
 
     /** Called after AFTER_LEVEL, before vanilla clears hand depth and Iris converts colour space. */
@@ -224,13 +221,11 @@ object ScopeLensPostProcessor {
                     RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP)
                     val center = lens.center
                     if (lens.surface == null && lens.thermal) {
-                        ScopeThermalRenderer.drawSurface(
-                            lens.thermalBackgroundColor, lens.thermalEntityColor, lens.thermalPalette
-                        )
+                        ScopeThermalRenderer.drawSurface(lens.thermalBackgroundColor, lens.thermalEntityColor)
                     } else if (ScopeLensShader.beginSurface(
                             center.x, center.y, center.z, lens.edgeWidth, lens.magnification,
                             lens.tint, lens.tintStrength, lens.screenScale, lens.thermal,
-                            lens.thermalBackgroundColor, lens.thermalEntityColor, lens.thermalPalette
+                            lens.thermalBackgroundColor, lens.thermalEntityColor
                         )
                     ) {
                         val vertices = lens.surface
