@@ -512,8 +512,7 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
                 RenderSystem.stencilFunc(GL11.GL_EQUAL, i + 1, 0xFF)
                 val division = divisions.getOrNull(i)
                 if (info.thermal && ScopeLensPostProcessor.deferThermalSight(
-                        i + 1, info.thermalBackgroundColor?.get(), info.thermalEntityColor?.get(),
-                        info.thermalMode().ordinal
+                        i + 1, info.thermalBackgroundColor?.get(), info.thermalEntityColor?.get()
                     ) { deferred ->
                         if (division != null) {
                             renderDivisionVertices(division, poseStack, deferred, texture, quadType, triangleType, light)
@@ -648,8 +647,7 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
                 RenderSystem.stencilFunc(GL11.GL_EQUAL, b, 0xFF)
                 if (info.thermal && lensSurface == null) {
                     if (ScopeLensPostProcessor.deferThermalSight(
-                            b, info.thermalBackgroundColor?.get(), info.thermalEntityColor?.get(),
-                            info.thermalMode().ordinal
+                            b, info.thermalBackgroundColor?.get(), info.thermalEntityColor?.get()
                         ) { deferred ->
                             if (divisionDue) {
                                 withShaderBonesHidden {
@@ -692,8 +690,7 @@ class BedrockAttachmentModel(internal val baseModel: TreeBedrockModel) {
                                 },
                                 thermal = info.thermal,
                                 thermalBackgroundColor = info.thermalBackgroundColor?.get(),
-                                thermalEntityColor = info.thermalEntityColor?.get(),
-                                thermalPalette = info.thermalMode().ordinal
+                                thermalEntityColor = info.thermalEntityColor?.get()
                             )
                         ) continue
                     } else if (ScopeLensShader.beginSurface(
