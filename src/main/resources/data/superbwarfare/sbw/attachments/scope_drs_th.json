@@ -14,6 +14,7 @@
   "ScopeInfo": {
     "Type": "Scope",
     "Thermal": true,
+    "ThermalPalette": "RedBlue",
     "Modes": [
       {
         "Type": "Scope",

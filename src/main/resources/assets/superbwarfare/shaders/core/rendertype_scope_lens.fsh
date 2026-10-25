@@ -5,6 +5,7 @@
 uniform sampler2D Sampler0;
 uniform sampler2D Sampler1;
 uniform int ThermalEnabled;
+uniform int ThermalPalette;
 uniform vec2 LensCenter;
 uniform float LensRadius;
 uniform float LensEdgeWidth;
@@ -184,7 +185,9 @@ void main() {
     vec2 uvB = screenUv(center + vec3(rel * split, 0.0));
 
     if (ThermalEnabled != 0) {
-        vec3 thermal = scopeThermalColour(Sampler0, Sampler1, uvG, LensTexelSize * scale * LensScreenScale);
+        vec3 thermal = scopeThermalColour(
+            Sampler0, Sampler1, uvG, LensTexelSize * scale * LensScreenScale, ThermalPalette
+        );
         fragColor = vec4(thermal * (1.0 - edge), 1.0);
         return;
     }

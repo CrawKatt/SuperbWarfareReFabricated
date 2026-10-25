@@ -99,7 +99,8 @@ object ScopeLensShader {
         screenScale: Float = screenScale(),
         thermal: Boolean = false,
         thermalBackgroundColor: Int? = null,
-        thermalEntityColor: Int? = null
+        thermalEntityColor: Int? = null,
+        thermalPalette: Int = 0
     ): Boolean {
         if (radius <= 1.0e-4f) return false
         val custom = shader ?: return false
@@ -112,7 +113,7 @@ object ScopeLensShader {
         custom.safeGetUniform("LensScreenScale").set(screenScale)
         custom.safeGetUniform("LensTexelSize").set(1f / screenWidth, 1f / screenHeight)
         custom.safeGetUniform("ThermalEnabled").set(if (thermal) 1 else 0)
-        ScopeThermalRenderer.applyColors(custom, thermalBackgroundColor, thermalEntityColor)
+        ScopeThermalRenderer.applyColors(custom, thermalBackgroundColor, thermalEntityColor, thermalPalette)
         if (thermal) RenderSystem.setShaderTexture(1, ScopeThermalRenderer.maskTexture())
         val tint = lensTint(tintColor, tintStrength)
         custom.safeGetUniform("LensTint").set(tint[0], tint[1], tint[2])
