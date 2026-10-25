@@ -200,7 +200,7 @@ object ScopeThermalRenderer {
 
     fun maskTexture(): Int = target?.colorTextureId ?: 0
 
-    internal fun applyColors(shader: ShaderInstance, backgroundColor: Int?, entityColor: Int?) {
+    internal fun applyColors(shader: ShaderInstance, backgroundColor: Int?, entityColor: Int?, palette: Int = 0) {
         fun setColor(name: String, color: Int?) {
             val rgb = color ?: 0
             shader.safeGetUniform(name).set(
@@ -210,16 +210,17 @@ object ScopeThermalRenderer {
         }
         setColor("ThermalBackgroundColor", backgroundColor)
         setColor("ThermalEntityColor", entityColor)
+        shader.safeGetUniform("ThermalPalette").set(palette)
     }
 
-    fun beginSurface(backgroundColor: Int? = null, entityColor: Int? = null): Boolean {
+    fun beginSurface(backgroundColor: Int? = null, entityColor: Int? = null, palette: Int = 0): Boolean {
         val custom = surfaceShader ?: return false
         if (!ScopeLensShader.captureScreen()) return false
         RenderSystem.setShader { custom }
         RenderSystem.setShaderTexture(1, maskTexture())
         val main = Minecraft.getInstance().mainRenderTarget
         custom.safeGetUniform("ThermalTexelSize").set(1f / main.width, 1f / main.height)
-        applyColors(custom, backgroundColor, entityColor)
+        applyColors(custom, backgroundColor, entityColor, palette)
         RenderSystem.enableBlend()
         RenderSystem.defaultBlendFunc()
         RenderSystem.disableDepthTest()
@@ -227,8 +228,8 @@ object ScopeThermalRenderer {
         return true
     }
 
-    fun drawSurface(backgroundColor: Int? = null, entityColor: Int? = null) {
-        if (!beginSurface(backgroundColor, entityColor)) return
+    fun drawSurface(backgroundColor: Int? = null, entityColor: Int? = null, palette: Int = 0) {
+        if (!beginSurface(backgroundColor, entityColor, palette)) return
         val builder = Tesselator.getInstance().builder
         builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX)
         builder.vertex(-1.0, -1.0, 0.0).uv(0f, 0f).endVertex()

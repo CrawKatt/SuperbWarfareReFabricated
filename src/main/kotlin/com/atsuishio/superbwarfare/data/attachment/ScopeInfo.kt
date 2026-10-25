@@ -41,6 +41,19 @@ enum class ScopeType {
     SCOPE,
 }
 
+/** 热成像调色板，序号与 `scope_thermal.glsl` 里的判定一致 */
+@Serializable
+enum class ThermalPalette {
+    @SerialName("RedBlue")
+    RED_BLUE,
+
+    @SerialName("BlackWhite")
+    BLACK_WHITE,
+
+    @SerialName("BlackGreen")
+    BLACK_GREEN,
+}
+
 /** 弹药条骨骼被压缩的轴向，写成 `"NONE"` 表示只染色、不改缩放 */
 @Serializable
 enum class AmmoBarAxis {
@@ -354,6 +367,9 @@ data class ScopeInfo(
     @SerialName("ThermalEntityColor")
     val thermalEntityColor: ModColor? = null,
 
+    @SerialName("ThermalPalette")
+    val thermalPalette: ThermalPalette = ThermalPalette.RED_BLUE,
+
     // 移动时的瞄准倍率，用于能够自动调整焦距的瞄准镜，设置成null相当于禁用该功能
     @SerialName("MovingZoom")
     val movingZoom: Double? = null,
@@ -372,9 +388,12 @@ data class ScopeInfo(
     fun mode(index: Int = 0): ScopeMode {
         if (modes.isNotEmpty()) {
             val mode = modes[index.coerceIn(modes.indices)]
-            return if (thermalBackgroundColor == null && thermalEntityColor == null) mode else mode.copy(
+            return if (thermalBackgroundColor == null && thermalEntityColor == null &&
+                thermalPalette == ThermalPalette.RED_BLUE
+            ) mode else mode.copy(
                 thermalBackgroundColor = mode.thermalBackgroundColor ?: thermalBackgroundColor,
                 thermalEntityColor = mode.thermalEntityColor ?: thermalEntityColor,
+                thermalPalette = mode.thermalPalette ?: thermalPalette,
             )
         }
         return ScopeMode(
@@ -387,6 +406,7 @@ data class ScopeInfo(
             thermal = thermal,
             thermalBackgroundColor = thermalBackgroundColor,
             thermalEntityColor = thermalEntityColor,
+            thermalPalette = thermalPalette,
             zoomLengthScale = zoomLengthScale,
             zoom = zoom,
         )
@@ -428,6 +448,10 @@ data class ScopeMode(
     @SerialName("ThermalEntityColor")
     val thermalEntityColor: ModColor? = null,
 
+    /** 本档的热成像调色板；不写则沿用 [ScopeInfo] 上的配置 */
+    @SerialName("ThermalPalette")
+    val thermalPalette: ThermalPalette? = null,
+
     // 完全瞄准后枪械沿 Z 轴（长度方向）压缩到的比例，默认 0.75
     @SerialName("ZoomLengthScale")
     val zoomLengthScale: Float = 0.75f,
@@ -435,6 +459,8 @@ data class ScopeMode(
     @SerialName("Zoom")
     val zoom: AttachmentZoom? = null,
 ) {
+    fun thermalMode(): ThermalPalette = thermalPalette ?: ThermalPalette.RED_BLUE
+
     fun viewBone(): String = nameWithIndex(DEFAULT_SCOPE_VIEW_BONE)
 
     fun divisionBone(): String = nameWithIndex(DEFAULT_DIVISION_BONE)
