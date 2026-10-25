@@ -83,6 +83,7 @@ import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
+import net.fabricmc.fabric.api.event.Event
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
@@ -200,6 +201,16 @@ class Mod : ModInitializer {
     }
 
     private fun registerCommonEvents() {
+        val respawnMeleePhase = loc("respawn_melee")
+        AttackEntityCallback.EVENT.addPhaseOrdering(respawnMeleePhase, Event.DEFAULT_PHASE)
+        AttackEntityCallback.EVENT.register(respawnMeleePhase) { player, _, _, _, _ ->
+            if (PlayerEventHandler.blockRespawnMeleeAttack(player)) InteractionResult.FAIL else InteractionResult.PASS
+        }
+        LivingAttackCallback.EVENT.addPhaseOrdering(respawnMeleePhase, Event.DEFAULT_PHASE)
+        LivingAttackCallback.EVENT.register(respawnMeleePhase) { _, source, _ ->
+            !PlayerEventHandler.blockRespawnMeleeDamage(source)
+        }
+
         PlayerMenuOpenedCallback.EVENT.register { player, menu ->
             if (menu is EnergyMenu) menu.onOpened(player)
         }

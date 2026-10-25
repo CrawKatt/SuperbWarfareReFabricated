@@ -1,13 +1,17 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.event.custom.ClientPlayerCloneCallback;
 import com.atsuishio.superbwarfare.event.custom.TagsUpdatedCallback;
 import com.atsuishio.superbwarfare.init.ModKeyMappings;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.PacketUtils;
+import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
 import net.minecraft.network.protocol.game.ClientboundSetPassengersPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateTagsPacket;
 import net.minecraft.world.entity.Entity;
@@ -82,5 +86,12 @@ public abstract class ClientPacketListenerMixin {
     @Inject(method = "handleUpdateTags", at = @At("TAIL"))
     private void superbwarfare$onTagsUpdated(ClientboundUpdateTagsPacket packet, CallbackInfo ci) {
         TagsUpdatedCallback.EVENT.invoker().onTagsUpdated(!this.minecraft.hasSingleplayerServer());
+    }
+
+    @Inject(method = "handleRespawn", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/multiplayer/ClientLevel;addPlayer(ILnet/minecraft/client/player/AbstractClientPlayer;)V"))
+    private void superbwarfare$onPlayerClone(ClientboundRespawnPacket packet, CallbackInfo ci,
+                                           @Local(ordinal = 0) LocalPlayer oldPlayer) {
+        ClientPlayerCloneCallback.EVENT.invoker().onClone(oldPlayer, this.minecraft.player);
     }
 }

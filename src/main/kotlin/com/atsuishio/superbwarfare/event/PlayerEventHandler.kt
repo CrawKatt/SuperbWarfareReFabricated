@@ -11,16 +11,19 @@ import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.network.message.send.UseActionMessage
+import com.atsuishio.superbwarfare.perk.MeleeAttackContext
 import com.atsuishio.superbwarfare.tools.InventoryTool
 import com.atsuishio.superbwarfare.tools.NBTTool
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import com.atsuishio.superbwarfare.tools.PlayerReachTool
 import com.atsuishio.superbwarfare.tools.TraceTool
+import com.atsuishio.superbwarfare.tools.persistentData
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
+import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.player.Player
@@ -28,6 +31,36 @@ import net.minecraft.world.item.ItemStack
 import kotlin.math.ceil
 
 object PlayerEventHandler {
+    private const val MELEE_RESPAWN_UNTIL = "sbwMeleeRespawnUntil"
+    private const val MELEE_RESPAWN_GRACE_TICKS = 5L
+
+    /** 服务器世界总 tick，不受立即复活、昼夜规则或玩家实体计数重置影响。 */
+    fun isMeleeBlockedAfterRespawn(player: Player): Boolean {
+        if (player !is ServerPlayer) return false
+        val tag = player.persistentData
+        if (!tag.contains(MELEE_RESPAWN_UNTIL)) return false
+        if (player.server.overworld().gameTime < tag.getLong(MELEE_RESPAWN_UNTIL)) return true
+        tag.remove(MELEE_RESPAWN_UNTIL)
+        return false
+    }
+
+    fun blockRespawnMeleeAttack(player: Player): Boolean {
+        if (!isMeleeBlockedAfterRespawn(player)) return false
+        if (player.mainHandItem.item is GunItem || MeleeAttackContext.get(player.uuid) != null) {
+            return true
+        }
+        return false
+    }
+
+    fun blockRespawnMeleeDamage(source: DamageSource): Boolean {
+        val attacker = source.entity as? ServerPlayer ?: return false
+        // 同一近战调用栈里的 Perk 伤害也受限；普通射击不走这个上下文。
+        if (MeleeAttackContext.get(attacker.uuid) != null && isMeleeBlockedAfterRespawn(attacker)) {
+            return true
+        }
+        return false
+    }
+
     @JvmStatic
     fun onPlayerDeath(player: ServerPlayer) {
         ChargeWindowHandler.clear(player)
@@ -36,6 +69,11 @@ object PlayerEventHandler {
 
     @JvmStatic
     fun onPlayerRespawned(player: ServerPlayer, conquered: Boolean) {
+        if (!conquered) {
+            player.persistentData.putLong(MELEE_RESPAWN_UNTIL,
+                player.server.overworld().gameTime + MELEE_RESPAWN_GRACE_TICKS)
+        }
+
         handleRespawnReload(player)
         handleRespawnAutoArmor(player)
     }
