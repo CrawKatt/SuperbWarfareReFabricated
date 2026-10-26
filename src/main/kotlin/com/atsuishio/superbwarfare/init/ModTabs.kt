@@ -125,9 +125,6 @@ object ModTabs {
                     if (item is BatteryItem) {
                         output.accept(item.makeFullEnergyStack())
                     }
-                    if (item === ModItems.ELECTRIC_BATON) {
-                        output.accept(ElectricBatonItem.makeFullEnergyStack())
-                    }
                 }
             }
             .build()

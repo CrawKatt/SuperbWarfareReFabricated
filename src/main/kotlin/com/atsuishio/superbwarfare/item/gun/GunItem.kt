@@ -28,6 +28,7 @@ import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModPerks
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.EnergyStorageItem
+import com.atsuishio.superbwarfare.item.ItemDamageExtension
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
 import com.atsuishio.superbwarfare.item.gun.GunItem.Companion.resolveShootDirection
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
@@ -74,7 +75,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), ItemScreenProvider,
-    EnergyStorageItem, PropertyModifier<GunData, DefaultGunData> {
+    EnergyStorageItem, PropertyModifier<GunData, DefaultGunData>, ItemDamageExtension {
 
     protected val random: RandomSource = RandomSource.create()
 
@@ -263,6 +264,11 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
 
     /*
     override fun supportsEnchantment(stack: ItemStack, enchantment: Holder<Enchantment?>) = false
+    */
+
+    override fun isDamageable(stack: ItemStack?): Boolean =
+        stack != null && stack.has(DataComponents.MAX_DAMAGE) &&
+            !stack.has(DataComponents.UNBREAKABLE) && stack.has(DataComponents.DAMAGE)
 
     override fun getMaxDamage(stack: ItemStack): Int {
         val maxDurability = GunData.from(stack).get(GunProp.MAX_DURABILITY)
@@ -277,7 +283,6 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         }
         return maxDurability
     }
-    */
 
     /**
      * 开膛待击
