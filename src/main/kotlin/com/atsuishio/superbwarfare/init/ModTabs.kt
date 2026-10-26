@@ -6,7 +6,6 @@ import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
 import com.atsuishio.superbwarfare.item.material.BatteryItem
 import com.atsuishio.superbwarfare.item.misc.ArmorPlateItem
 import com.atsuishio.superbwarfare.item.projectile.C4BombItem
-import com.atsuishio.superbwarfare.item.weapon.ElectricBatonItem
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
@@ -107,9 +106,6 @@ object ModTabs {
                     }
                     if (item is BatteryItem) {
                         output.accept(item.makeFullEnergyStack())
-                    }
-                    if (item === ModItems.ELECTRIC_BATON) {
-                        output.accept(ElectricBatonItem.makeFullEnergyStack())
                     }
                 }
             }

@@ -1,34 +1,37 @@
 package com.atsuishio.superbwarfare.item.weapon
 
-import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.RegistryName
-import com.atsuishio.superbwarfare.tiers.ModItemTier
-import net.minecraft.sounds.SoundSource
+import com.atsuishio.superbwarfare.item.gun.GeoGunItem
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.inventory.tooltip.TooltipComponent
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import net.minecraft.world.item.SwordItem
-import org.joml.Math
+import java.util.*
+import java.util.function.Consumer
 
 @RegistryName("steel_pipe")
-class SteelPipeItem : SwordItem(ModItemTier.STEEL, 4, -3.0f, Properties().durability(810)) {
-    override fun hurtEnemy(stack: ItemStack, target: LivingEntity, attacker: LivingEntity): Boolean {
-        attacker.level().playSound(
-            null,
-            target.onPos,
-            ModSounds.STEEL_PIPE_HIT,
-            SoundSource.PLAYERS,
-            1f,
-            ((2 * Math.random() - 1) * 0.1f + 1.0f).toFloat()
-        )
+class SteelPipeItem : GeoGunItem(FabricItemSettings().customDamage { stack, amount, entity, onBroken ->
+    (stack.item as SteelPipeItem).damageItem(stack, amount, entity, onBroken)
+}) {
 
-        val result = super.hurtEnemy(stack, target, attacker)
-        if (stack.isEmpty) {
-            val stick = ItemStack(Items.STICK)
-            stick.tag = stack.tag
-            attacker.setItemSlot(EquipmentSlot.MAINHAND, stick)
+    override fun isDamageable(stack: ItemStack?): Boolean = true
+
+    fun <T : LivingEntity> damageItem(
+        stack: ItemStack,
+        amount: Int,
+        entity: T,
+        onBroken: Consumer<T>,
+    ): Int {
+        if (stack.damageValue + amount >= stack.maxDamage) {
+            entity.setItemSlot(EquipmentSlot.MAINHAND, ItemStack(Items.STICK))
+            return 0
         }
-        return result
+        return amount
+    }
+
+    override fun getTooltipImage(pStack: ItemStack): Optional<TooltipComponent> {
+        return Optional.empty()
     }
 }
