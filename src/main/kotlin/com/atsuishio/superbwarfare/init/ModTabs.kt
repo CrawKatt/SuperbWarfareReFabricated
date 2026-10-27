@@ -73,6 +73,7 @@ object ModTabs {
             .withTabsBefore(ATTACHMENT_TAB.getKey())
             .displayItems { param: CreativeModeTab.ItemDisplayParameters, output: CreativeModeTab.Output ->
                 output.accept(ModItems.REFORGING_TABLE.get())
+                output.accept(ModItems.RESONANCE_BASE.get())
                 ModItems.PERKS.getEntries().forEach { output.accept(it.get()) }
             }
             .build()
