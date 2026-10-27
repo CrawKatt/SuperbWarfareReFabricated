@@ -39,6 +39,7 @@ class ModBlockTagProvider(
             ModBlocks.DEEPSLATE_SCHEELITE_ORE,
             ModBlocks.DRAGON_TEETH,
             ModBlocks.REFORGING_TABLE,
+            ModBlocks.RESONANCE_BASE,
             ModBlocks.LEAD_BLOCK,
             ModBlocks.STEEL_BLOCK,
             ModBlocks.TUNGSTEN_BLOCK,
