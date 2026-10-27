@@ -2037,7 +2037,7 @@ object ClientEventHandler {
         // 蓄力模式也必须推进恢复计时，否则近战或切枪留下的冷却会永久挡住瞄准。
         val handling = ActiveGun.handlingData(player) ?: data
         val switchSpeed = handling.get(GunProp.SPRINT_TRANSITION_SPEED)
-        val speed = 5 / (handling.get(GunProp.WEIGHT) + 4) * switchSpeed
+        val speed = 5 / (handling.item.getHandlingWeight(handling) + 4) * switchSpeed
 
         fireCooldown = if (noSprintTicks == 0f && player.isSprinting && !zoom && !holdingFireKey) {
             (fireCooldown + 3 * times).coerceIn(0.0, 24.0)
@@ -2448,7 +2448,8 @@ object ClientEventHandler {
         }
 
         // 气息摇摆的幅度按**主武器**的重量（`ActiveGun.handlingData`）：手里那把枪是主武器
-        val customWeight = (ActiveGun.handlingData(player) ?: data).get(GunProp.WEIGHT).toFloat().coerceIn(1f, 30f)
+        val handling = ActiveGun.handlingData(player) ?: data
+        val customWeight = handling.item.getHandlingWeight(handling).toFloat().coerceIn(1f, 30f)
 
         if (!breath && zoom) {
             val newPitch = (
@@ -2638,7 +2639,7 @@ object ClientEventHandler {
 
         // 冲刺/行走摇摆的阻尼按**主武器**的重量与枪型（`ActiveGun.handlingData`）
         val handling = ActiveGun.handlingData(player) ?: data
-        val customWeight = handling.get(GunProp.WEIGHT).coerceIn(1.0, 50.0)
+        val customWeight = handling.item.getHandlingWeight(handling).coerceIn(1.0, 50.0)
         val switchSpeed = handling.get(GunProp.SPRINT_TRANSITION_SPEED)
         sprintHandgun = handling.get(GunProp.GUN_TYPE) == GunType.HANDGUN
 
@@ -2875,7 +2876,7 @@ object ClientEventHandler {
         val times = getDelta()
 
         val handling = ActiveGun.handlingData(player) ?: data
-        val weight = (handling.stack.item as? GunItem)?.getCustomWeight(handling) ?: 0.0
+        val weight = handling.item.getHandlingCustomWeight(handling)
         val duration = handling.get(GunProp.ZOOM_TIME).coerceAtLeast(1) + 0.4 * weight
         val stepIn = times / duration
         val stepOut = times / (duration * 0.75f)
@@ -3161,7 +3162,8 @@ object ClientEventHandler {
 
         // 后坐的**重量阻尼**按主武器（`ActiveGun.handlingData`）：后坐是打进来之后被"手里的质量"吃掉的，
         // 而手里是整把主武器加挂在它身上的副武器。至于后坐**幅度**（`RECOIL_X`）仍然是操控的枪的 —— 那一发是谁打的。
-        val customWeight = (ActiveGun.handlingData(player) ?: data).get(GunProp.WEIGHT)
+        val handling = ActiveGun.handlingData(player) ?: data
+        val customWeight = handling.item.getHandlingWeight(handling)
         // 同上：抬枪是逐帧算的，充能射击要取开火时记下的 RECOIL_X
         val gunRecoilX = effectiveRecoilX(data)
 
@@ -3547,7 +3549,7 @@ object ClientEventHandler {
     private fun handleWeaponDraw(entity: LivingEntity) {
         val times = getDelta()
         val handling = ActiveGun.handlingData(entity) ?: return
-        val weight = (handling.stack.item as? GunItem)?.getCustomWeight(handling) ?: 0.0
+        val weight = handling.item.getHandlingCustomWeight(handling)
         val duration = handling.get(GunProp.DRAW_TIME).coerceAtLeast(1) + 0.5 * weight
         val decay = ln(100.0) / duration
         drawTime = (drawTime - decay * times * drawTime).coerceAtLeast(0.0)
