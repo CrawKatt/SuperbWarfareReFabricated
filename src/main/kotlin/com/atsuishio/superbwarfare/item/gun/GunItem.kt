@@ -31,9 +31,7 @@ import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
 import com.atsuishio.superbwarfare.item.EnergyStorageItem
 import com.atsuishio.superbwarfare.item.ReequipAnimationHook
-import com.atsuishio.superbwarfare.item.gun.GunItem.Companion.isHeldWeapon
-import com.atsuishio.superbwarfare.item.gun.GunItem.Companion.isOperable
-import com.atsuishio.superbwarfare.item.gun.GunItem.Companion.resolveShootDirection
+import com.atsuishio.superbwarfare.item.gun.GunItem.Companion.HANDLING_WEIGHT_SCALE
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
@@ -67,7 +65,6 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
-import net.minecraft.world.item.enchantment.Enchantment
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
@@ -152,7 +149,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     open fun init(data: GunData) {
         if (isInitialized(data)) return
 
-        data.update { it.copy(uuid = UUID.randomUUID()) }
+        data.update { it.copy(uuid = UUID.randomUUID(), createdTime = System.currentTimeMillis()) }
     }
 
     /**
