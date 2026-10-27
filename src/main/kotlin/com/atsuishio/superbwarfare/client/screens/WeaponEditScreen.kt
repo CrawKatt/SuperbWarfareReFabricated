@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.client.screens
 
+import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.client.tooltip.ClientAttachmentImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.component.AttachmentImageComponent
 import com.atsuishio.superbwarfare.config.server.AttachmentConfig
@@ -49,6 +50,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
+import net.minecraftforge.fml.loading.LoadingModList
 import net.minecraftforge.registries.ForgeRegistries
 import org.joml.Matrix4f
 import org.lwjgl.glfw.GLFW
@@ -202,8 +204,12 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
             val scale = editorPanelScale()
             if (statsOpen && stats != null) {
                 val chartTop = STATS_CHART_TOP * scale
-                drawPanelBackground(vertices, matrix,
-                    Box(stats.left, stats.top + chartTop, stats.width, stats.height - chartTop), scale, PANEL_BACKGROUND)
+                val chart = Box(stats.left, stats.top + chartTop, stats.width, stats.height - chartTop)
+                drawPanelBackground(vertices, matrix, chart, scale, PANEL_BACKGROUND)
+                drawQuad(vertices, matrix, chart.left + 7.5f * scale, chart.top + 20.5f * scale,
+                    chart.right - 7.5f * scale, chart.top + 21f * scale, PANEL_BORDER)
+                drawAccentDashes(vertices, matrix, chart.left + 7.5f * scale, chart.top + 20.25f * scale, scale)
+                drawDotGrid(vertices, matrix, chart.right - 6f * scale, chart.top + 15.5f * scale, 2, 2, scale)
             }
             panel?.let {
                 drawPanelBackground(vertices, matrix, it, scale, PANEL_BACKGROUND)
@@ -212,11 +218,18 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
                 // 与设置分隔线一样独立绘制，不依赖滚动容器或按钮悬停触发 AUI 边框批次。
                 drawQuad(vertices, matrix, it.left + 6f * scale, it.top + 67f * scale,
                     it.left + 174f * scale, it.top + 67.5f * scale, PANEL_BORDER)
+                drawQuad(vertices, matrix, it.left + 5f * scale, it.top + 129f * scale,
+                    it.right - 5f * scale, it.top + 129.5f * scale, PANEL_BORDER)
+                drawAccentDashes(vertices, matrix, it.left + 6f * scale, it.top + 22.75f * scale, scale)
+                drawDotGrid(vertices, matrix, it.right - 6f * scale, it.top + 15.5f * scale, 3, 2, scale)
+                drawDotGrid(vertices, matrix, it.right - 6f * scale, it.top + 138.8f * scale, 3, 2, scale)
             }
             settings?.let {
                 drawPanelBackground(vertices, matrix, it, scale, PANEL_BACKGROUND)
                 drawQuad(vertices, matrix, it.left + 5f * scale, it.top + 23f * scale,
                     it.left + 173f * scale, it.top + 23.5f * scale, PANEL_BORDER)
+                drawAccentDashes(vertices, matrix, it.left + 5f * scale, it.top + 22.75f * scale, scale)
+                drawDotGrid(vertices, matrix, it.right - 6f * scale, it.top + 15.5f * scale, 2, 2, scale)
             }
         }
         // 平面 UI 不应与物品模型残留的深度互相遮挡；由 AUI Screen 统一绘制，避免全局 overlay 再画一次。
@@ -263,6 +276,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         clearUiState()
         documentGeneration = doc.refreshGeneration
         doc.getElementById("title-mode")?.textContent = label("title")
+        doc.getElementById("title-version")?.textContent = "v" + modVersion()
         doc.addEventListener("wheel", { event ->
             // 原生 select 的顶层弹出列表自行处理滚动，不交给底下的配件列表。
             if (event.composedPath().any { (it as? Element)?.classList?.contains("aui-select-popup") == true }) return@addEventListener
@@ -746,6 +760,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
             }
             doc.getElementById("panel-registry-name")?.textContent = installed?.toString().orEmpty()
             doc.getElementById("panel-title")?.textContent = slotName(type)
+            doc.getElementById("panel-code")?.textContent = englishTypeName(type)
             doc.getElementById("panel-uninstall")?.let { setClass(it, "disabled", installed == null) }
             panelInstalled = installed
         }
@@ -762,6 +777,8 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
             // 格子容器必须覆盖整份列表，滚动到任意位置时都与固定视口相交。
             setStyle(doc.getElementById("panel-grid"), "height", contentHeight)
             setStyle(doc.getElementById("panel-empty"), "display", if (ids.isEmpty()) "block" else "none")
+            doc.getElementById("panel-count")?.textContent = Component.translatable(
+                "screen.superbwarfare.weapon_edit.available_attachments", ids.size).string
             if (changedSlot) doc.getElementById("panel-scroll")?.scrollTo(0.0, 0.0)
         }
         syncGrid(doc, installed)
@@ -1261,6 +1278,30 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         drawQuad(vertices, matrix, bounds.right - scale, bounds.bottom - corner, bounds.right, bounds.bottom, UI_ACCENT)
     }
 
+    private fun drawDotGrid(
+        vertices: VertexConsumer, matrix: Matrix4f, right: Float, top: Float,
+        columns: Int, rows: Int, scale: Float
+    ) {
+        val dot = 0.8f * scale
+        val pitch = 2.4f * scale
+        val left = right - (columns - 1) * pitch - dot
+        for (row in 0 until rows) {
+            for (column in 0 until columns) {
+                val x = left + column * pitch
+                val y = top + row * pitch
+                drawQuad(vertices, matrix, x, y, x + dot, y + dot, UI_DETAIL)
+            }
+        }
+    }
+
+    private fun drawAccentDashes(vertices: VertexConsumer, matrix: Matrix4f, left: Float, top: Float, scale: Float) {
+        val first = 11f * scale
+        val gap = 3f * scale
+        val second = 6f * scale
+        drawQuad(vertices, matrix, left, top, left + first, top + scale, UI_ACCENT)
+        drawQuad(vertices, matrix, left + first + gap, top, left + first + gap + second, top + scale, UI_ACCENT)
+    }
+
     private fun vertex(vertices: VertexConsumer, matrix: Matrix4f, x: Float, y: Float, color: Int) {
         vertices.vertex(matrix, x, y, 0f)
             .color((color ushr 16) and 255, (color ushr 8) and 255, color and 255, (color ushr 24) and 255)
@@ -1338,13 +1379,13 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
                 val rpm = it.get(GunProp.RPM) * it.get(GunProp.RPM_MULTIPLIER)
                 if (rpm.isFinite()) rpm.roundToInt().coerceIn(1, 114514).toDouble() else Double.NaN
             }),
-        DAMAGE("damage", 25.0, firearmOnly = true, read = { it.get(GunProp.DAMAGE) }),
+        DAMAGE("damage", 100.0, firearmOnly = true, read = { it.get(GunProp.DAMAGE) }),
         HEADSHOT("headshot", 4.0, unit = "×", firearmOnly = true, read = { it.get(GunProp.HEADSHOT) }),
-        RECOIL_X("recoil_x", 0.005, higherIsBetter = false, firearmOnly = true, read = { it.get(GunProp.RECOIL_X) }),
-        RECOIL_Y("recoil_y", 0.04, higherIsBetter = false, firearmOnly = true, read = { it.get(GunProp.RECOIL_Y) }),
-        MAGAZINE("magazine", 60.0, 0, optional = true, firearmOnly = true, read = { it.get(GunProp.MAGAZINE).toDouble() }),
+        RECOIL_X("recoil_x", 0.005, 5, higherIsBetter = false, firearmOnly = true, read = { it.get(GunProp.RECOIL_X) }),
+        RECOIL_Y("recoil_y", 0.04, 5, higherIsBetter = false, firearmOnly = true, read = { it.get(GunProp.RECOIL_Y) }),
+        MAGAZINE("magazine", 100.0, 0, optional = true, firearmOnly = true, read = { it.get(GunProp.MAGAZINE).toDouble() }),
         ARMOR_BYPASS("bypasses_armor", 100.0, unit = "%", optional = true, firearmOnly = true, read = { it.get(GunProp.BYPASSES_ARMOR) * 100.0 }),
-        VELOCITY("velocity", 600.0, unit = " m/s", optional = true, firearmOnly = true, read = { it.get(GunProp.VELOCITY) * 20.0 }),
+        VELOCITY("velocity", 1000.0, unit = " m/s", optional = true, firearmOnly = true, read = { it.get(GunProp.VELOCITY) * 20.0 }),
         SPREAD("spread", 10.0, higherIsBetter = false, firearmOnly = true, read = { it.get(GunProp.SPREAD) }),
         AIMED_SPREAD("zoom_spread_rate", 1.0, unit = "×", higherIsBetter = false, firearmOnly = true,
             read = { it.get(GunProp.ZOOM_SPREAD_RATE) }),
@@ -1364,7 +1405,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         EXPLOSION_RADIUS("explosion_radius", 12.0, unit = " m", optional = true, read = { it.get(GunProp.EXPLOSION_RADIUS) }),
         MAX_ENERGY("max_energy", 100000.0, 0, " FE", optional = true, read = { it.get(GunProp.MAX_ENERGY).toDouble() }),
         ENERGY_REGEN("energy_regeneration", 100.0, unit = " FE/s", optional = true, read = { it.get(GunProp.ENERGY_REGENERATION) * 20.0 }),
-        MELEE_DAMAGE("melee_damage", 20.0, optional = true, read = { it.get(GunProp.MELEE_DAMAGE) });
+        MELEE_DAMAGE("melee_damage", 100.0, optional = true, read = { it.get(GunProp.MELEE_DAMAGE) });
 
         fun format(value: Double): String {
             val number = String.format(Locale.ROOT, "%.${decimals}f", value)
@@ -1561,7 +1602,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
             row.lastBaseline = original
             val comparison = StatComparison(current, original, stat.reference, stat.higherIsBetter)
             row.value.textContent = stat.format(current)
-            // 三位小数以下的真实变化仍保留方向，不能把微小的后坐力增减显示成零。
+            // 低于显示精度的真实变化仍保留方向，不能把微小的后坐力增减显示成零。
             val precision = 10.0.pow(stat.decimals)
             val roundedDelta = round(comparison.delta * precision) / precision
             val changed = abs(comparison.delta) > max(1e-9, max(Math.ulp(current), Math.ulp(original)) * 4.0)
@@ -1595,6 +1636,13 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
     private fun px(value: Float) = "${round(value.toDouble() * 100.0) / 100.0}px"
     private fun slotName(type: AttachmentType) =
         Component.translatable("attachment.superbwarfare.slot.${type.attachmentName.lowercase(Locale.ROOT)}").string
+
+    private fun englishTypeName(type: AttachmentType) = type.name.replace('_', ' ')
+
+    private fun modVersion(): String = runCatching {
+        LoadingModList.get().getModFileById(Mod.MODID)?.versionString()?.substringBefore("-mc")
+    }.getOrNull()?.takeIf { it.isNotBlank() } ?: "dev"
+
     private fun label(key: String) = Component.translatable("screen.superbwarfare.weapon_edit.$key").string
 
     companion object {
@@ -1608,6 +1656,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         // 与 weapon_edit.html 的主题色及 title-bar 高度保持一致。
         private const val UI_ACCENT = 0xff52fcda.toInt()
         private const val PANEL_BORDER = 0xff237b87.toInt()
+        private const val UI_DETAIL = 0xff338997.toInt()
         private const val PANEL_BACKGROUND = 0xe6001219.toInt()
         private const val CONNECTOR_COLOR = 0xcc52fcda.toInt()
         private const val MOUNT_EMPTY_COLOR = 0xffffffff.toInt()
@@ -1620,7 +1669,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         private const val MOUNT_SIZE = 9f
         private const val ICON_SIZE = 17f
         private const val PANEL_WIDTH = 180f
-        private const val PANEL_HEIGHT = 134f
+        private const val PANEL_HEIGHT = 148f
         private const val SETTINGS_WIDTH = PANEL_WIDTH
         private val ADJUSTMENT_NUMBER = Regex("-?[0-9]*(\\.[0-9]*)?")
         private val RGB_NUMBER = Regex("[0-9]*")
