@@ -28,6 +28,7 @@ import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.init.ModPerks
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
+import com.atsuishio.superbwarfare.item.gun.GunItem.Companion.HANDLING_WEIGHT_SCALE
 import com.atsuishio.superbwarfare.item.gun.GunItem.Companion.resolveShootDirection
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
 import com.atsuishio.superbwarfare.perk.Perk
@@ -171,7 +172,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     open fun init(data: GunData) {
         if (isInitialized(data)) return
 
-        data.update { it.copy(uuid = UUID.randomUUID()) }
+        data.update { it.copy(uuid = UUID.randomUUID(), createdTime = System.currentTimeMillis()) }
     }
 
     /**
