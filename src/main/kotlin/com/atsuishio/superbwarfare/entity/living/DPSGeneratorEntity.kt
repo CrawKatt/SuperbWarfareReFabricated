@@ -41,7 +41,7 @@ import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level) : LivingEntity(type, level){
+open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level) : LivingEntity(type, level) {
     val animationInstance: DPSGeneratorAnimationInstance? =
         if (this.level().isClientSide) DPSGeneratorAnimationInstance(this) else null
     open val modelInstance = EntityModelReloadListener.getModel(MODEL)?.createInstance()
@@ -52,6 +52,8 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
     open var downTime by DOWN_TIME
     open var energy by ENERGY
     open var generatorLevel by LEVEL
+
+    private var hitByBeast = false
 
     val maxEnergy: Int
         get() = when (this.generatorLevel) {
@@ -128,6 +130,10 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
         if (source.`is`(DamageTypes.GENERIC_KILL)) {
             this.remove(RemovalReason.KILLED)
             return super.hurt(source, amount)
+        }
+
+        if (source.`is`(ModDamageTypes.BEAST)) {
+            hitByBeast = true
         }
 
         damageDealt += amount
@@ -228,7 +234,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
                     val attacker = lastSource.entity
                     if (attacker is Player && !this.level().isClientSide) {
                         val displayDamage =
-                            if (lastSource.`is`(ModDamageTypes.BEAST)) Float.POSITIVE_INFINITY else damageDealt
+                            if (hitByBeast) Float.POSITIVE_INFINITY else damageDealt
                         attacker.displayClientMessage(
                             Component.translatable(
                                 "tips.superbwarfare.dps_generator.dps",
@@ -281,6 +287,7 @@ open class DPSGeneratorEntity(type: EntityType<DPSGeneratorEntity>, level: Level
             }
             this.health = this.maxHealth
             damageDealt = 0f
+            hitByBeast = false
         }
     }
 
