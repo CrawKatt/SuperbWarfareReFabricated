@@ -76,6 +76,7 @@ object ModTabs {
             .icon { ItemStack(ModItems.AP_BULLET) }
             .displayItems { _, output ->
                 output.accept(ModItems.REFORGING_TABLE)
+                output.accept(ModItems.RESONANCE_BASE)
                 ModItems.PERK_ITEMS.values.forEach(output::accept)
             }
             .build()

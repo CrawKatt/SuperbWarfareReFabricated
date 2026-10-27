@@ -38,6 +38,7 @@ class ModBlockLootProvider(provider: HolderLookup.Provider) :
         this.dropSelf(ModBlocks.JUMP_PAD)
         this.dropSelf(ModBlocks.DRAGON_TEETH)
         this.dropSelf(ModBlocks.REFORGING_TABLE)
+        this.dropSelf(ModBlocks.RESONANCE_BASE)
         this.dropSelf(ModBlocks.LEAD_BLOCK)
         this.dropSelf(ModBlocks.STEEL_BLOCK)
         this.dropSelf(ModBlocks.TUNGSTEN_BLOCK)
