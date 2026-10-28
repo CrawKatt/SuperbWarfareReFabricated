@@ -11,6 +11,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
@@ -178,6 +179,22 @@ public abstract class GameRendererMixin {
                 matrices.mulPose(Axis.XP.rotationDegrees(-mainCamera.getXRot()));
             }
         }
+    }
+
+    // 1.21 的视图矩阵由 GameRenderer 直接以 Matrix4f 构建（不再传入 PoseStack），
+    // 且 RenderSystem.setInverseViewRotationMatrix 已被移除，只需要旋转该矩阵即可。
+    @ModifyExpressionValue(method = "renderLevel",
+            at = @At(value = "INVOKE",
+                    target = "Lorg/joml/Matrix4f;rotation(Lorg/joml/Quaternionfc;)Lorg/joml/Matrix4f;"))
+    private Matrix4f superbWarfare$applyGunCameraAnimation(Matrix4f viewRotation) {
+        Quaternionf rotation = ClientEventHandler.firstPersonCameraRotation();
+        if (rotation == null) {
+            return viewRotation;
+        }
+
+        // 与 1.20 的 poseStack.mulPose(rotation) 一致：在相机视图矩阵右侧叠加动画旋转
+        viewRotation.mul(new Matrix4f().rotation(rotation));
+        return viewRotation;
     }
 
     @Inject(method = "bobHurt", at = @At("HEAD"), cancellable = true)
