@@ -14,7 +14,7 @@ import java.util.function.Consumer
 @RegistryName("steel_pipe")
 class SteelPipeItem : GeoGunItem(Properties()) {
 
-    override fun isDamageable(stack: ItemStack?): Boolean = true
+    override fun isDamageable(stack: ItemStack): Boolean = true
 
     override fun <T : LivingEntity?> damageItem(
         stack: ItemStack,

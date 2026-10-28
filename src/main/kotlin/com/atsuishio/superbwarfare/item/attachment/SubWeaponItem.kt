@@ -50,7 +50,8 @@ open class SubWeaponItem @JvmOverloads constructor(
     /** 不带耐久条 */
     override fun getMaxDamage(stack: ItemStack): Int = 0
 
-    override fun isDamageable(stack: ItemStack?): Boolean = false
+    override fun isDamageable(stack: ItemStack): Boolean = false
+
     /** 物品提示走**配件**那套图，而不是枪械 tooltip */
     override fun getTooltipImage(stack: ItemStack): Optional<TooltipComponent> {
         return if (definition() == null) {

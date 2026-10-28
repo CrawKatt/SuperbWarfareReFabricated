@@ -268,8 +268,8 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     override fun supportsEnchantment(stack: ItemStack, enchantment: Holder<Enchantment?>) = false
     */
 
-    override fun isDamageable(stack: ItemStack?): Boolean =
-        stack != null && stack.has(DataComponents.MAX_DAMAGE) &&
+    override fun isDamageable(stack: ItemStack): Boolean =
+        stack.has(DataComponents.MAX_DAMAGE) &&
             !stack.has(DataComponents.UNBREAKABLE) && stack.has(DataComponents.DAMAGE)
 
     override fun getMaxDamage(stack: ItemStack): Int {

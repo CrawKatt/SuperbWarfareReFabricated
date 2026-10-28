@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 public interface ItemDamageExtension {
     int getMaxDamage(ItemStack stack);
 
-    boolean isDamageable(@Nullable ItemStack stack);
+    boolean isDamageable(ItemStack stack);
 
     default <T extends LivingEntity> int damageItem(ItemStack stack, int amount, @Nullable T entity, Consumer<Item> onBroken) {
         return amount;

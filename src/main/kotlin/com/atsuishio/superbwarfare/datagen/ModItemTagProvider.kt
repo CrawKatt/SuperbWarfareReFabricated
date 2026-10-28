@@ -395,7 +395,6 @@ class ModItemTagProvider(
 
         val swords = arrayOf<Item>(
             ModItems.MILITARY_SHOVEL,
-            ModItems.T_BATON,
             ModItems.CROWBAR,
             ModItems.CEMENTED_CARBIDE_SWORD,
             ModItems.GOLDEN_HAMMER,
