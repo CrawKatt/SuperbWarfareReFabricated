@@ -368,7 +368,6 @@ class ModItemTagProvider(
 
         this.tag(ItemTags.SWORDS).add(
             ModItems.MILITARY_SHOVEL,
-            ModItems.T_BATON,
             ModItems.CROWBAR,
             ModItems.CEMENTED_CARBIDE_SWORD,
             ModItems.GOLDEN_HAMMER,
