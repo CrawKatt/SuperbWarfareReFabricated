@@ -21,6 +21,7 @@ import com.atsuishio.superbwarfare.client.renderer.block.ChargingStationBlockEnt
 import com.atsuishio.superbwarfare.client.renderer.block.ContainerBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.FuMO25BlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.LuckyContainerBlockEntityRenderer
+import com.atsuishio.superbwarfare.client.renderer.block.ResonanceBaseBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.SmallContainerBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.TripodBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.VehicleAssemblingTableBlockEntityRenderer
@@ -319,13 +320,10 @@ object ClientRenderHandler {
         BlockEntityRenderers.register(ModBlockEntities.CHARGING_STATION) { ChargingStationBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.SMALL_CONTAINER) { SmallContainerBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.LUCKY_CONTAINER) { LuckyContainerBlockEntityRenderer() }
-        BlockEntityRenderers.register(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE) {
-            VehicleAssemblingTableBlockEntityRenderer()
-        }
-        BlockEntityRenderers.register(ModBlockEntities.BLUEPRINT_RESEARCH_TABLE) {
-            BlueprintResearchTableBlockEntityRenderer()
-        }
+        BlockEntityRenderers.register(ModBlockEntities.VEHICLE_ASSEMBLING_TABLE) { VehicleAssemblingTableBlockEntityRenderer() }
+        BlockEntityRenderers.register(ModBlockEntities.BLUEPRINT_RESEARCH_TABLE) { BlueprintResearchTableBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.TRIPOD) { TripodBlockEntityRenderer() }
+        BlockEntityRenderers.register(ModBlockEntities.RESONANCE_BASE) { ResonanceBaseBlockEntityRenderer() }
     }
 
     @JvmStatic

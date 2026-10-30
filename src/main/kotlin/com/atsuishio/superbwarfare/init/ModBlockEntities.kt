@@ -100,6 +100,14 @@ object ModBlockEntities {
     }
 
     @JvmField
+    val RESONANCE_BASE = registerBlockEntity("resonance_base") {
+        BlockEntityType.Builder.of(
+            { pos, state -> ResonanceBaseBlockEntity(pos, state) },
+            ModBlocks.RESONANCE_BASE
+        ).build(null)
+    }
+
+    @JvmField
     val TRIPOD = registerBlockEntity("tripod") {
         BlockEntityType.Builder.of(
             { pos, state -> TripodBlockEntity(pos, state) },
