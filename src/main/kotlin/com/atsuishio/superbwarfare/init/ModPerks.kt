@@ -74,6 +74,8 @@ object ModPerks {
     @JvmField val HE_BULLET = autoRegistryObjects["he_bullet"] ?: registerAmmoPerk("he_bullet") { HEBullet }
     @JvmField val SILVER_BULLET = autoRegistryObjects["silver_bullet"] ?: registerAmmoPerk("silver_bullet") { SilverBullet }
     @JvmField val SILVER_BLADE = autoRegistryObjects.getValue("silver_blade")
+    @JvmField val FLAME_BLADE = autoRegistryObjects.getValue("flame_blade")
+    @JvmField val FROSTMOURNE = autoRegistryObjects.getValue("frostmourne")
     @JvmField val POISONOUS_BULLET = autoRegistryObjects["poisonous_bullet"] ?: registerAmmoPerk("poisonous_bullet") {
         AmmoPerk(
             AmmoPerk.Builder("poisonous_bullet", Perk.Type.AMMO).bypassArmorRate(0.0).damageRate(1.0)

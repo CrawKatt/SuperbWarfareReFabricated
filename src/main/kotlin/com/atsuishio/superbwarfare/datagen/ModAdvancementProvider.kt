@@ -145,6 +145,11 @@ class ModAdvancementProvider(private val packOutput: PackOutput) : DataProvider 
                 .whenIconCollected()
                 .parent(enclave)
         }
+        val flameBlade = advancement("flame_blade") {
+            it.icon(ModItems.PERK_ITEMS[ModPerks.FLAME_BLADE]!!)
+                .whenIconCollected()
+                .parent(enclave)
+        }
 
         // 哑弹棒（？）
         val boomstickMelee = advancement("boomstick_melee") {

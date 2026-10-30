@@ -6,7 +6,12 @@ import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.InventoryTool
 import com.atsuishio.superbwarfare.tools.TraceTool
 import com.atsuishio.superbwarfare.tools.sendPacketTo
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.OwnableEntity
@@ -24,6 +29,27 @@ class EntityProxy(val entity: Entity?) {
     fun isProjectile(): Boolean = entity is ProjectileEntity
 
     fun isZoom(): Boolean = (entity as? ProjectileEntity)?.isZoom() ?: false
+
+    // ── Status effects ──
+    fun setSecondsOnFire(seconds: Int) {
+        val e = entity ?: return
+        if (!e.level().isClientSide && seconds > 0) e.setSecondsOnFire(seconds)
+    }
+
+    fun addEffect(effectId: String, duration: Int, amplifier: Int, source: EntityProxy): Boolean {
+        val e = entity as? LivingEntity ?: return false
+        if (e.level().isClientSide || duration <= 0) return false
+        val id = ResourceLocation.tryParse(effectId) ?: return false
+        val effect = BuiltInRegistries.MOB_EFFECT.getHolder(ResourceKey.create(Registries.MOB_EFFECT, id)).orElse(null) ?: return false
+        return e.addEffect(MobEffectInstance(effect.value(), duration, amplifier.coerceAtLeast(0)), source.entity)
+    }
+
+    /** Vanilla freezing thaws by two ticks per tick outside powder snow. */
+    fun freeze(duration: Int) {
+        val e = entity as? LivingEntity ?: return
+        if (e.level().isClientSide || !e.canFreeze() || duration <= 0) return
+        e.ticksFrozen = maxOf(e.ticksFrozen, e.ticksRequiredToFreeze + 2 * duration)
+    }
 
     // ── Creative / Inventory ──
     fun isCreative(): Boolean = (entity as? Player)?.isCreative == true
