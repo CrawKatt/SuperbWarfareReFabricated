@@ -191,6 +191,8 @@ object ModPerks {
     @JvmField val STOP_GAP = autoRegistryObjects["stop_gap"] ?: registerDamagePerk("stop_gap") {
         EmptyPerk("stop_gap", Perk.Type.DAMAGE)
     }
+    @JvmField val INVISIBLE_BLADE_SHAPENESS = autoRegistryObjects["invisible_blade_shapeness"]
+        ?: registerDamagePerk("invisible_blade_shapeness") { InvisibleBladeShapeness }
     // @formatter:on
 
     private fun autoRegisterFromJsons() {
