@@ -42,7 +42,12 @@ class ModBlockStateProvider(private val output: PackOutput) : DataProvider {
         horizontalBlock(ModBlocks.BARBED_WIRE, blockModel("barbed_wire"))
         horizontalBlock(ModBlocks.JUMP_PAD, blockModel("jump_pad"))
         horizontalBlock(ModBlocks.REFORGING_TABLE, blockModel("reforging_table"))
-        simpleBlock(ModBlocks.RESONANCE_BASE, blockModel("resonance_base"))
+        simpleBlock(
+            ModBlocks.RESONANCE_BASE,
+            addModel(blockModel("resonance_base"), JsonObject().apply {
+                add("textures", JsonObject().apply { addProperty("particle", "minecraft:block/gray_glazed_terracotta") })
+            })
+        )
         horizontalBlock(ModBlocks.CONTAINER, blockModel("container"))
         horizontalBlock(ModBlocks.SMALL_CONTAINER, blockModel("small_container"))
         horizontalBlock(ModBlocks.LUCKY_CONTAINER, blockModel("container"))

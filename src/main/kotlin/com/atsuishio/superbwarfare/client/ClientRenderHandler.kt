@@ -28,6 +28,7 @@ import com.atsuishio.superbwarfare.client.renderer.block.VehicleAssemblingTableB
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.BlueprintResearchingTableBlockItemRenderer
+import com.atsuishio.superbwarfare.client.renderer.item.ResonanceBaseBlockItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.Tm62ItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.TripodBlockItemRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.Type88ClusterGrenadesRenderer
@@ -396,6 +397,13 @@ object ClientRenderHandler {
                 packedLight,
                 packedOverlay
             )
+        }
+
+        val resonanceBaseRenderer = lazy { ResonanceBaseBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
+        BuiltinItemRendererRegistry.INSTANCE.register(
+            ModItems.RESONANCE_BASE
+        ) { stack, displayContext, poseStack, buffer, packedLight, packedOverlay ->
+            resonanceBaseRenderer.value.renderByItem(stack, displayContext, poseStack, buffer, packedLight, packedOverlay)
         }
 
         val tripodRenderer = lazy { TripodBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }

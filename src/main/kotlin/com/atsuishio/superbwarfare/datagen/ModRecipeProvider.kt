@@ -2091,6 +2091,18 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                     has(ModTags.Items.ATTACHMENT_BY_SLOT[AttachmentType.CHARM]!!)
                 )
                 .save(writer, loc(getItemName(ModItems.SMALL_CONTAINER) + "_charms_recycle"))
+            ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, ModItems.RESONANCE_BASE)
+                .pattern("aba")
+                .pattern("cde")
+                .pattern("afa")
+                .define('a', ModTags.Items.STORAGE_BLOCKS_NETHERITE)
+                .define('b', Items.RED_GLAZED_TERRACOTTA)
+                .define('c', Items.WHITE_GLAZED_TERRACOTTA)
+                .define('e', Items.GRAY_GLAZED_TERRACOTTA)
+                .define('f', Items.BLUE_GLAZED_TERRACOTTA)
+                .define('d', Items.LODESTONE)
+                .unlockedBy(getHasName(Items.LODESTONE), has(Items.LODESTONE))
+                .save(writer, loc(getItemName(ModItems.RESONANCE_BASE)))
         }
 
         private fun buildVehicleRecipes(writer: Consumer<FinishedRecipe>) {
