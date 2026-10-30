@@ -3,11 +3,13 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback;
+import com.atsuishio.superbwarfare.event.custom.PlayerXpChangeCallback;
 import com.atsuishio.superbwarfare.item.weapon.BeastItem;
 import com.atsuishio.superbwarfare.item.curio.ParachuteItem;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -46,6 +48,17 @@ public abstract class PlayerMixin extends Entity {
         LivingHurtCallback.EVENT.invoker().onLivingHurt(event);
         amount.set(event.getAmount());
         return event.isCanceled() || event.getAmount() <= 0.0F;
+    }
+
+    @Inject(method = "giveExperiencePoints(I)V", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$onXpChange(int amount, CallbackInfo ci, @Local(argsOnly = true) LocalIntRef experience) {
+        PlayerXpChangeCallback.Event event = new PlayerXpChangeCallback.Event((Player) (Object) this, amount);
+        PlayerXpChangeCallback.EVENT.invoker().onXpChange(event);
+        if (event.isCanceled()) {
+            ci.cancel();
+        } else {
+            experience.set(event.getAmount());
+        }
     }
 
     @Inject(method = "tick", at = @At("TAIL"))

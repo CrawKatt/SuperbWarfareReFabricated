@@ -37,6 +37,7 @@ import com.atsuishio.superbwarfare.event.custom.LootingLevelCallback
 import com.atsuishio.superbwarfare.event.custom.MobEffectAddedCallback
 import com.atsuishio.superbwarfare.event.custom.MobEffectRemovedCallback
 import com.atsuishio.superbwarfare.event.custom.PlayerMenuOpenedCallback
+import com.atsuishio.superbwarfare.event.custom.PlayerXpChangeCallback
 import com.atsuishio.superbwarfare.init.ModAttributes
 import com.atsuishio.superbwarfare.init.ModBlockEntities
 import com.atsuishio.superbwarfare.init.ModBlocks
@@ -72,6 +73,7 @@ import com.atsuishio.superbwarfare.network.NetworkRegistry
 import com.atsuishio.superbwarfare.sound.SoundLimit
 import com.atsuishio.superbwarfare.perk.damage.BattleOfWits
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction
+import com.atsuishio.superbwarfare.perk.functional.StrivingForPerfection
 import com.atsuishio.superbwarfare.procedures.WelcomeProcedure
 import com.atsuishio.superbwarfare.recipe.ModPotionRecipes
 import com.atsuishio.superbwarfare.resource.BedrockModelLoader
@@ -187,6 +189,7 @@ class Mod : ModInitializer {
         ModCommandArguments.init()
         ModTabs.init()
         ModPerks.init()
+        PlayerXpChangeCallback.EVENT.register(StrivingForPerfection::onXpChange)
         LootingLevelCallback.EVENT.register(PowerfulAttraction::onLootingLevel)
         ServerLivingEntityEvents.ALLOW_DEATH.register(TargetEntity::onTargetDown)
         ServerLivingEntityEvents.ALLOW_DEATH.register(DPSGeneratorEntity::onDPSGeneratorDown)

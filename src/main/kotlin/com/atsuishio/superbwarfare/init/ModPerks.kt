@@ -151,6 +151,8 @@ object ModPerks {
     @JvmField val TRIPLE_TAP = autoRegistryObjects["triple_tap"] ?: registerFuncPerk("triple_tap") {
         EmptyPerk("triple_tap", Perk.Type.FUNCTIONAL)
     }
+    @JvmField val STRIVING_FOR_PERFECTION = autoRegistryObjects["striving_for_perfection"]
+        ?: registerFuncPerk("striving_for_perfection") { StrivingForPerfection }
     // @formatter:on
 
     private fun registerDamagePerk(id: String, perk: () -> Perk): Perk {
