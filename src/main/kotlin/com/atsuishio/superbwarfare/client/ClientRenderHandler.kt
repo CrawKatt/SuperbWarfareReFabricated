@@ -126,6 +126,7 @@ object ClientRenderHandler {
         RedTriangleOverlay,
         BayonetChargeOverlay,
         HeatBarOverlay,
+        InvisibleBladeChargeOverlay,
         CrossHairOverlay,
         GunShieldOverlay,
         AmmoCountOverlay,
