@@ -588,6 +588,7 @@ object LivingEventHandler {
                     damage = it.perk.getModifiedDamage(damage, data, it, entity, source)
                     it.perk.onHurtEntity(damage, data, it, entity, source)
                 } else if (DamageTypeTool.isMeleeDamage(source)) {
+                    damage = it.perk.getModifiedMeleeDamage(damage, data, it, entity, source)
                     it.perk.onMeleeAttack(data, it, entity, source, meleeContext)
                     it.perk.onMeleeAttack(data, it, entity, source)
                 }
