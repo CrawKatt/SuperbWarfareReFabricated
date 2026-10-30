@@ -177,8 +177,8 @@ object AircraftHud {
                 )
                 renderKillIndicatorDynamic(
                     guiGraphics,
-                    x - 7.5f + (2 * (Math.random() - 0.5f)).toFloat(),
-                    y - 7.5f + (2 * (Math.random() - 0.5f)).toFloat()
+                    x - 8f,
+                    y - 8f
                 )
                 poseStack.popPose()
                 return
@@ -527,8 +527,8 @@ object AircraftHud {
                 )
                 renderKillIndicatorDynamic(
                     guiGraphics,
-                    x - 7.5f + (2 * (Math.random() - 0.5f)).toFloat(),
-                    y - 7.5f + (2 * (Math.random() - 0.5f)).toFloat()
+                    x - 8f,
+                    y - 8f
                 )
 
                 //
