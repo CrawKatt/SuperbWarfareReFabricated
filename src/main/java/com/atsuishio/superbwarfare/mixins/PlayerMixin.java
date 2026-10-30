@@ -3,6 +3,9 @@ package com.atsuishio.superbwarfare.mixins;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.trinket.ParachuteItem;
 import com.atsuishio.superbwarfare.item.weapon.BeastItem;
+import com.atsuishio.superbwarfare.event.custom.PlayerXpChangeCallback;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
@@ -23,6 +26,13 @@ public abstract class PlayerMixin extends Entity {
 
     public PlayerMixin(EntityType<?> type, Level world) {
         super(type, world);
+    }
+
+    @WrapMethod(method = "giveExperiencePoints")
+    private void superbwarfare$onXpChange(int amount, Operation<Void> original) {
+        PlayerXpChangeCallback.Event event = new PlayerXpChangeCallback.Event((Player) (Object) this, amount);
+        PlayerXpChangeCallback.EVENT.invoker().onXpChange(event);
+        if (!event.isCanceled()) original.call(event.getAmount());
     }
 
     /**

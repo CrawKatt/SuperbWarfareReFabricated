@@ -5,6 +5,8 @@ import com.atsuishio.superbwarfare.event.custom.MobEffectAddedEvent;
 import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
+import com.atsuishio.superbwarfare.event.custom.PlayerXpChangeCallback;
+import com.atsuishio.superbwarfare.perk.functional.StrivingForPerfection;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
 import com.atsuishio.superbwarfare.event.GunEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
@@ -30,6 +32,7 @@ import net.minecraft.world.InteractionResult;
 public class ModEventHandlers {
 
     public static void init() {
+        PlayerXpChangeCallback.EVENT.register(StrivingForPerfection.INSTANCE::onXpChange);
         ResourceLocation meleeRespawnPhase = ResourceLocation.fromNamespaceAndPath("superbwarfare", "melee_respawn");
         LivingIncomingDamageCallback.EVENT.addPhaseOrdering(meleeRespawnPhase, Event.DEFAULT_PHASE);
         LivingIncomingDamageCallback.EVENT.register(meleeRespawnPhase, PlayerEventHandler::blockRespawnMeleeDamage);
