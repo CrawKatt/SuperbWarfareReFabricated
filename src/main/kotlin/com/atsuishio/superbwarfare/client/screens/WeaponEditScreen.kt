@@ -436,7 +436,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
             reset.setAttribute("title", label("reset"))
             reset.setAttribute("aria-label", label("reset"))
             reset.addEventListener("click") {
-                playUiSound(ModSounds.ATTACHMENT_BUTTON.get())
+                playUiSound(ModSounds.ATTACHMENT_BUTTON)
                 adjustAttachment(reset = true)
             }
         }
@@ -445,17 +445,17 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
             confirm.setAttribute("title", label("confirm"))
             confirm.setAttribute("aria-label", label("confirm"))
             confirm.addEventListener("click") {
-                playUiSound(ModSounds.ATTACHMENT_BUTTON.get())
+                playUiSound(ModSounds.ATTACHMENT_BUTTON)
                 confirmAdjustments()
             }
         }
         for (property in ADJUSTMENT_PROPERTIES) {
             doc.getElementById("settings-$property-minus")?.addEventListener("click") {
-                playUiSound(ModSounds.ATTACHMENT_BUTTON.get())
+                playUiSound(ModSounds.ATTACHMENT_BUTTON)
                 stepAdjustment(property, -1)
             }
             doc.getElementById("settings-$property-plus")?.addEventListener("click") {
-                playUiSound(ModSounds.ATTACHMENT_BUTTON.get())
+                playUiSound(ModSounds.ATTACHMENT_BUTTON)
                 stepAdjustment(property, 1)
             }
             doc.getElementById("settings-$property-label")?.textContent = label(property)
@@ -868,7 +868,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         hoveredItem = null
         editingAttachmentType = index
         editModelShake()
-        localPlayer?.playSound(ModSounds.EDIT.get(), 1f, 1f)
+        localPlayer?.playSound(ModSounds.EDIT, 1f, 1f)
     }
 
     private fun playUiSound(sound: SoundEvent, volume: Float = 1f, pitch: Float = 1f) {
@@ -879,7 +879,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
         val now = System.currentTimeMillis()
         if (now - lastSlideSoundAt < SLIDE_SOUND_INTERVAL_MS) return
         lastSlideSoundAt = now
-        playUiSound(ModSounds.ATTACHMENT_SLIDE.get(), 0.8f, 1f)
+        playUiSound(ModSounds.ATTACHMENT_SLIDE, 0.8f, 1f)
     }
 
     private data class Mount(
@@ -2200,7 +2200,7 @@ class WeaponEditScreen(private val stack: ItemStack) : ApricityScreen(DOCUMENT_P
                     statsCollapseSuppressed = true
                 }
                 statsRefreshTick = Long.MIN_VALUE
-                playUiSound(ModSounds.ATTACHMENT_INFO.get())
+                playUiSound(ModSounds.ATTACHMENT_INFO)
             }
         }
         doc.getElementById("stats-title")?.textContent = statLabel("title")

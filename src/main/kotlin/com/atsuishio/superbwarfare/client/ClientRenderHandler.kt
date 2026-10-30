@@ -54,6 +54,7 @@ import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer
 import com.atsuishio.superbwarfare.client.renderer.curio.ThermalImagingGogglesRenderer
 import com.atsuishio.superbwarfare.client.renderer.item.*
+import com.atsuishio.superbwarfare.client.renderer.block.ResonanceBaseBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.TripodBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.tooltip.ClientAttachmentImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
@@ -332,6 +333,7 @@ object ClientRenderHandler {
         BlockEntityRenderers.register(ModBlockEntities.BLUEPRINT_RESEARCH_TABLE) {
             BlueprintResearchTableBlockEntityRenderer()
         }
+        BlockEntityRenderers.register(ModBlockEntities.RESONANCE_BASE) { ResonanceBaseBlockEntityRenderer() }
     }
 
     @JvmStatic

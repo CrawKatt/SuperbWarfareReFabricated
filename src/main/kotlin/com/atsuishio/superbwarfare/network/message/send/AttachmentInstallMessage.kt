@@ -103,7 +103,7 @@ private fun install(player: ServerPlayer, data: GunData, type: AttachmentType, i
 
 /** 安装失败时的提示音（只发给发起安装的玩家） */
 private fun fail(player: ServerPlayer) {
-    player.playLocalSound(ModSounds.ATTACHMENT_FAIL.get(), 1f, 1f)
+    player.playLocalSound(ModSounds.ATTACHMENT_FAIL, 1f, 1f)
 }
 
 /** 换这个槽位的配件前先把已装填的弹药退还给玩家（目前只有弹匣槽位需要）。 */
