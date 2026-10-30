@@ -409,6 +409,7 @@ object ClientRenderHandler {
         val renderers: List<Pair<net.minecraft.world.item.Item, Lazy<BlockEntityWithoutLevelRenderer>>> = listOf(
             ModItems.TM_62 to lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.TRIPOD to lazy { TripodBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
+            ModItems.RESONANCE_BASE to lazy { ResonanceBaseBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.BLUEPRINT_RESEARCH_TABLE to lazy { BlueprintResearchingTableBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.CONTAINER to lazy { ContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.LUCKY_CONTAINER to lazy { LuckyContainerBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
