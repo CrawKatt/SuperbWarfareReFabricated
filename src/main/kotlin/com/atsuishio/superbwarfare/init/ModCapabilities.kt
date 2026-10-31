@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.block.entity.ChargingStationBlockEntity
 import com.atsuishio.superbwarfare.block.entity.CreativeChargingStationBlockEntity
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.block.entity.SuperbItemInterfaceBlockEntity
+import com.atsuishio.superbwarfare.block.entity.WeaponRepairStationBlockEntity
 import com.atsuishio.superbwarfare.capability.api.IItemHandler
 import com.atsuishio.superbwarfare.capability.api.InvWrapper
 import com.atsuishio.superbwarfare.capability.api.PlayerInvWrapper
@@ -69,6 +70,17 @@ object ModCapabilities {
 
     private fun registerItemHandlers() {
         ITEM_HANDLER_BLOCK.registerForBlockEntity(
+            { blockEntity: WeaponRepairStationBlockEntity, direction: Direction? ->
+                if (blockEntity.isRemoved || direction == null) {
+                    null
+                } else {
+                    val side = if (direction == Direction.UP || direction == Direction.DOWN) direction else Direction.NORTH
+                    SidedInvWrapper(blockEntity, side)
+                }
+            },
+            ModBlockEntities.WEAPON_REPAIR_STATION
+        )
+        ITEM_HANDLER_BLOCK.registerForBlockEntity(
             { blockEntity: ChargingStationBlockEntity, direction: Direction? ->
                 if (blockEntity.isRemoved || direction == null) null else SidedInvWrapper(blockEntity, direction)
             },
@@ -94,6 +106,17 @@ object ModCapabilities {
             ModBlockEntities.BLUEPRINT_RESEARCH_TABLE
         )
 
+        ItemStorage.SIDED.registerForBlockEntity(
+            { blockEntity: WeaponRepairStationBlockEntity, direction: Direction? ->
+                if (blockEntity.isRemoved || direction == null) {
+                    null
+                } else {
+                    val side = if (direction == Direction.UP || direction == Direction.DOWN) direction else Direction.NORTH
+                    InventoryStorage.of(blockEntity, side)
+                }
+            },
+            ModBlockEntities.WEAPON_REPAIR_STATION
+        )
         ItemStorage.SIDED.registerForBlockEntity(
             { blockEntity: ChargingStationBlockEntity, direction: Direction? ->
                 if (blockEntity.isRemoved || direction == null) null else InventoryStorage.of(blockEntity, direction)

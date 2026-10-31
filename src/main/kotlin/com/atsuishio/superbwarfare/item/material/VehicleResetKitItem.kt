@@ -10,7 +10,7 @@ import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.Level
 
 @RegistryName("vehicle_reset_kit")
-class VehicleResetKitItem : Item(Properties().rarity(Rarity.UNCOMMON).stacksTo(1)) {
+class VehicleResetKitItem : Item(Properties().rarity(Rarity.UNCOMMON)) {
     override fun getRecipeRemainder(itemstack: ItemStack): ItemStack {
         return itemstack.copy()
     }
@@ -26,6 +26,9 @@ class VehicleResetKitItem : Item(Properties().rarity(Rarity.UNCOMMON).stacksTo(1
         )
         pTooltipComponents.add(
             Component.translatable("des.superbwarfare.vehicle_reset_kit_2").withStyle(ChatFormatting.GRAY)
+        )
+        pTooltipComponents.add(
+            Component.translatable("des.superbwarfare.vehicle_reset_kit_3").withStyle(ChatFormatting.GRAY)
         )
     }
 

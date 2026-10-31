@@ -12,6 +12,8 @@ import com.atsuishio.superbwarfare.inventory.menu.ReforgingTableMenu
 import com.atsuishio.superbwarfare.inventory.menu.SmallVehicleContainerMenu
 import com.atsuishio.superbwarfare.inventory.menu.SuperbItemInterfaceMenu
 import com.atsuishio.superbwarfare.inventory.menu.VehicleAssemblingMenu
+import com.atsuishio.superbwarfare.inventory.menu.WeaponRepairStationMenu
+import com.sighs.apricityui.screen.ApricityContainerMenu
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.flag.FeatureFlagSet
@@ -30,6 +32,12 @@ object ModMenuTypes {
     val CHARGING_STATION_MENU: MenuType<ChargingStationMenu> =
         register("charging_station_menu", MenuType.MenuSupplier { windowId, inv ->
             ChargingStationMenu(windowId, inv)
+        })
+
+    @JvmField
+    val WEAPON_REPAIR_STATION_MENU: MenuType<ApricityContainerMenu> =
+        register("weapon_repair_station", MenuType.MenuSupplier { id, inventory ->
+            WeaponRepairStationMenu(id, inventory)
         })
 
     @JvmField

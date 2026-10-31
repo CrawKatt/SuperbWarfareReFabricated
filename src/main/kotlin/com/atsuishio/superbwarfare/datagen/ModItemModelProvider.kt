@@ -484,6 +484,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         evenSimplerBlockItem(ModBlocks.REFORGING_TABLE)
         addModel(loc("item/resonance_base"), model(loc("displaysettings/resonance_base")))
         evenSimplerBlockItem(ModBlocks.CHARGING_STATION)
+        evenSimplerBlockItem(ModBlocks.WEAPON_REPAIR_STATION)
         evenSimplerBlockItem(ModBlocks.CREATIVE_CHARGING_STATION)
         evenSimplerBlockItem(ModBlocks.VEHICLE_DEPLOYER)
         evenSimplerBlockItem(ModBlocks.AIRCRAFT_CATAPULT)

@@ -12,6 +12,11 @@ object ModBlockEntities {
     ): BlockEntityType<T> = Registration.blockEntity(id, Supplier(blockEntity))
 
     @JvmField
+    val WEAPON_REPAIR_STATION = registerBlockEntity("weapon_repair_station") {
+        BlockEntityType.Builder.of(::WeaponRepairStationBlockEntity, ModBlocks.WEAPON_REPAIR_STATION).build(null)
+    }
+
+    @JvmField
     val CONTAINER = registerBlockEntity("container") {
         BlockEntityType.Builder.of(
             { pos, state -> ContainerBlockEntity(pos, state) },

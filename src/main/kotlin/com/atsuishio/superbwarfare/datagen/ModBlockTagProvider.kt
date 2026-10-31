@@ -50,6 +50,7 @@ class ModBlockTagProvider(
             ModBlocks.JUMP_PAD,
             ModBlocks.CONTAINER,
             ModBlocks.CHARGING_STATION,
+            ModBlocks.WEAPON_REPAIR_STATION,
             ModBlocks.FUMO_25,
             ModBlocks.SMALL_CONTAINER,
             ModBlocks.VEHICLE_DEPLOYER,
