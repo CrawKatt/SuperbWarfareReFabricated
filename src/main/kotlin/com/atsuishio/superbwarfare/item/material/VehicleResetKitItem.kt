@@ -10,7 +10,7 @@ import net.minecraft.world.item.TooltipFlag
 import javax.annotation.ParametersAreNonnullByDefault
 
 @RegistryName("vehicle_reset_kit")
-class VehicleResetKitItem : Item(Properties().rarity(Rarity.UNCOMMON).stacksTo(1)) {
+class VehicleResetKitItem : Item(Properties().rarity(Rarity.UNCOMMON)) {
     override fun hasCraftingRemainingItem(): Boolean {
         return true
     }
@@ -27,6 +27,9 @@ class VehicleResetKitItem : Item(Properties().rarity(Rarity.UNCOMMON).stacksTo(1
         )
         tooltipComponents.add(
             Component.translatable("des.superbwarfare.vehicle_reset_kit_2").withStyle(ChatFormatting.GRAY)
+        )
+        tooltipComponents.add(
+            Component.translatable("des.superbwarfare.vehicle_reset_kit_3").withStyle(ChatFormatting.GRAY)
         )
     }
 

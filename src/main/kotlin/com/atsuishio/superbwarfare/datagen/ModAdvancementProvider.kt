@@ -151,7 +151,7 @@ class ModAdvancementProvider(
                 .parent(enclave)
         }
         val flameBlade = advancement("flame_blade") {
-            it.icon(ModItems.PERK_ITEMS[ModPerks.FLAME_BLADE]!!.get())
+            it.icon(ModItems.PERK_ITEMS[ModPerks.FLAME_BLADE]!!)
                 .whenIconCollected()
                 .parent(enclave)
         }

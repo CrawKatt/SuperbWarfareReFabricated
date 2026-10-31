@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.inventory.menu.ReforgingTableMenu
 import com.atsuishio.superbwarfare.inventory.menu.SmallVehicleContainerMenu
 import com.atsuishio.superbwarfare.inventory.menu.SuperbItemInterfaceMenu
 import com.atsuishio.superbwarfare.inventory.menu.VehicleAssemblingMenu
+import com.atsuishio.superbwarfare.inventory.menu.WeaponRepairStationMenu
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.flag.FeatureFlagSet
@@ -75,6 +76,10 @@ object ModMenuTypes {
         register("blueprint_research_table_menu", MenuType.MenuSupplier { windowId, inv ->
             BlueprintResearchTableMenu(windowId, inv)
         })
+
+    @JvmField
+    val WEAPON_REPAIR_STATION_MENU: MenuType<WeaponRepairStationMenu> =
+        register("weapon_repair_station", MenuType.MenuSupplier { id, inventory -> WeaponRepairStationMenu(id, inventory) })
 
     private fun <T : AbstractContainerMenu> register(
         name: String,

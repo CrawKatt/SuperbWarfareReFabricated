@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.block.entity.BlueprintResearchTableBlockEntit
 import com.atsuishio.superbwarfare.block.entity.CreativeChargingStationBlockEntity
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.block.entity.SuperbItemInterfaceBlockEntity
+import com.atsuishio.superbwarfare.block.entity.WeaponRepairStationBlockEntity
 import com.atsuishio.superbwarfare.capability.api.IItemHandler
 import com.atsuishio.superbwarfare.capability.api.InvWrapper
 import com.atsuishio.superbwarfare.capability.api.SidedInvWrapper
@@ -96,6 +97,19 @@ object ModCapabilities {
                 )
             },
             ModBlockEntities.BLUEPRINT_RESEARCH_TABLE
+        )
+
+        ITEM_HANDLER_BLOCK.registerForBlockEntity(
+            { be: WeaponRepairStationBlockEntity, context: Direction? ->
+                if (context == null || be.isRemoved) null else SidedInvWrapper(
+                    be, when (context) {
+                        Direction.UP -> Direction.UP
+                        Direction.DOWN -> Direction.DOWN
+                        else -> Direction.NORTH
+                    }
+                )
+            },
+            ModBlockEntities.WEAPON_REPAIR_STATION
         )
 
         for (item in BuiltInRegistries.ITEM) {

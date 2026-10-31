@@ -2,10 +2,13 @@ package com.atsuishio.superbwarfare.init
 
 import com.atsuishio.superbwarfare.client.screens.*
 import net.minecraft.client.gui.screens.MenuScreens
+import net.minecraft.world.inventory.MenuType
+import com.sighs.apricityui.screen.ApricityContainerMenu
 
 object ModScreens {
 
     @JvmStatic
+    @Suppress("UNCHECKED_CAST")
     fun init() {
         MenuScreens.register(ModMenuTypes.MINI_VEHICLE_CONTAINER_MENU, ::MiniVehicleContainerScreen)
         MenuScreens.register(ModMenuTypes.SMALL_VEHICLE_CONTAINER_MENU, ::SmallVehicleContainerScreen)
@@ -15,6 +18,7 @@ object ModScreens {
 
         MenuScreens.register(ModMenuTypes.REFORGING_TABLE_MENU, ::ReforgingTableScreen)
         MenuScreens.register(ModMenuTypes.CHARGING_STATION_MENU, ::ChargingStationScreen)
+        MenuScreens.register(ModMenuTypes.WEAPON_REPAIR_STATION_MENU as MenuType<ApricityContainerMenu>, ::WeaponRepairStationScreen)
         MenuScreens.register(ModMenuTypes.SUPERB_ITEM_INTERFACE_MENU, ::SuperbItemInterfaceScreen)
         MenuScreens.register(ModMenuTypes.FUMO_25_MENU, ::FuMO25Screen)
         MenuScreens.register(ModMenuTypes.VEHICLE_ASSEMBLING_MENU, ::VehicleAssemblingScreen)

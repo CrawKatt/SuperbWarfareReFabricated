@@ -22,6 +22,7 @@ import com.atsuishio.superbwarfare.client.overlay.GunShieldOverlay
 import com.atsuishio.superbwarfare.client.overlay.GPWSOverlay
 import com.atsuishio.superbwarfare.client.overlay.HandsomeFrameOverlay
 import com.atsuishio.superbwarfare.client.overlay.HeatBarOverlay
+import com.atsuishio.superbwarfare.client.overlay.InvisibleBladeChargeOverlay
 import com.atsuishio.superbwarfare.client.overlay.IFFOverlay
 import com.atsuishio.superbwarfare.client.overlay.IglaHudOverlay
 import com.atsuishio.superbwarfare.client.overlay.JavelinHudOverlay
