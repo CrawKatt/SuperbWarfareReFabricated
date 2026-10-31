@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.data.gun.melee
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.capability.energy.ModEnergyApi
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.subdata.Cooldown
@@ -84,6 +85,11 @@ class MeleeEffectDispatcher(
                 continue
             }
 
+            if (!payEnergy(effect, simulate = true)) {
+                debug { "effect '${effect.key}' skipped: needs ${effect.energy} FE" }
+                continue
+            }
+
             val behavior = ModMeleeEffects.get(effect.type)
             if (behavior == null) {
                 Mod.LOGGER.warn(
@@ -113,6 +119,8 @@ class MeleeEffectDispatcher(
                 continue
             }
 
+            payEnergy(effect, simulate = false)
+
             // 只有真的触发了才上冷却
             if (effect.cooldown > 0) {
                 data.cooldown.set(cooldownKey, effect.cooldown)
@@ -122,6 +130,19 @@ class MeleeEffectDispatcher(
                         (if (target != null) " target=${target.type}" else "")
             }
         }
+    }
+
+    private fun payEnergy(effect: ResolvedMeleeEffect, simulate: Boolean): Boolean {
+        if (effect.energy <= 0) return true
+
+        var paid = false
+        ModEnergyApi.get(data.stack)?.let { storage ->
+            if (storage.amount >= effect.energy) {
+                ModEnergyApi.extractEnergy(storage, effect.energy, simulate)
+                paid = true
+            }
+        }
+        return paid
     }
 
     /** 没有目标也没有命中点时的作用点：攻击者视线前方 1.5 格（枪口大致的位置）。 */
