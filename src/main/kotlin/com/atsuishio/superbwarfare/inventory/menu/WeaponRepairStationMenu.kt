@@ -86,7 +86,7 @@ open class WeaponRepairStationMenu(
             override fun stillValid(player: ServerPlayer) = container.stillValid(player)
 
             // Slot restrictions are server-owned and cannot be replaced by DOM filter packets.
-            override fun createSlot(index: Int, x: Int, y: Int, filter: FilterUtil): Slot =
+            override fun createSlot(index: Int, x: Int, y: Int, filter: FilterUtil?): Slot =
                 object : Slot(container, index, x, y) {
                     override fun mayPlace(stack: ItemStack) =
                         if (index == 0) WeaponRepairStationBlockEntity.isMaterial(stack) else WeaponRepairStationBlockEntity.isRepairTarget(
