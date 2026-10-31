@@ -6,12 +6,13 @@ import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.subdata.Cooldown
 import com.atsuishio.superbwarfare.event.PlayerEventHandler
 import com.atsuishio.superbwarfare.init.ModMeleeEffects
+import com.atsuishio.superbwarfare.capability.energy.EnergyStorageHelper
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.phys.Vec3
-import net.neoforged.neoforge.capabilities.Capabilities
+import team.reborn.energy.api.EnergyStorage
 
 /**
  * 近战额外效果的结算器（服务端专用）
@@ -136,9 +137,10 @@ class MeleeEffectDispatcher(
         if (effect.energy <= 0) return true
 
         var paid = false
-        data.stack.getCapability(Capabilities.EnergyStorage.ITEM)?.let { storage ->
-            if (storage.energyStored >= effect.energy) {
-                storage.extractEnergy(effect.energy, simulate)
+        EnergyStorage.ITEM.find(data.stack, null)?.let { storage ->
+            if (storage.amount >= effect.energy) {
+                if (simulate) EnergyStorageHelper.simulateExtract(storage, effect.energy.toLong())
+                else EnergyStorageHelper.extract(storage, effect.energy.toLong())
                 paid = true
             }
         }
