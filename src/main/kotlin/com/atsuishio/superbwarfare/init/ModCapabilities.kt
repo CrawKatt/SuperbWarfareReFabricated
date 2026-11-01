@@ -55,6 +55,10 @@ object ModCapabilities {
 
     private fun registerEnergyBlocks() {
         ENERGY_BLOCK.registerForBlockEntity(
+            WeaponRepairStationBlockEntity::getEnergyStorage,
+            ModBlockEntities.WEAPON_REPAIR_STATION
+        )
+        ENERGY_BLOCK.registerForBlockEntity(
             ChargingStationBlockEntity::getEnergyStorage,
             ModBlockEntities.CHARGING_STATION
         )
