@@ -28,9 +28,6 @@ class VehicleResetKitItem : Item(Properties().rarity(Rarity.UNCOMMON)) {
         tooltipComponents.add(
             Component.translatable("des.superbwarfare.vehicle_reset_kit_2").withStyle(ChatFormatting.GRAY)
         )
-        tooltipComponents.add(
-            Component.translatable("des.superbwarfare.vehicle_reset_kit_3").withStyle(ChatFormatting.GRAY)
-        )
     }
 
     companion object {
