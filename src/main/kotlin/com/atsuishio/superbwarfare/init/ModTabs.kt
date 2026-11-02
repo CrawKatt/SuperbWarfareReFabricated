@@ -49,6 +49,17 @@ object ModTabs {
     }
 
     @JvmField
+    val MELEE_TAB: CreativeModeTab = Registration.creativeTab("melee") {
+        FabricItemGroup.builder()
+            .title(Component.translatable("item_group.superbwarfare.melee"))
+            .icon { ItemStack(ModItems.KNIFE) }
+            .displayItems { _, output ->
+                ModItems.MELEE.forEach { output.accept(it) }
+            }
+            .build()
+    }
+
+    @JvmField
     val ATTACHMENT_TAB: CreativeModeTab = Registration.creativeTab("attachment") {
         FabricItemGroup.builder()
             .title(Component.translatable("item_group.superbwarfare.attachment"))
