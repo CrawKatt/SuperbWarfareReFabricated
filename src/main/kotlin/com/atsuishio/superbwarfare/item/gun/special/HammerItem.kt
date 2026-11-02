@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.TooltipTool
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.renderer.gun.HammerRenderer
 import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.item.gun.MeleeGunItem
 import com.atsuishio.superbwarfare.tools.NBTTool
 import com.atsuishio.superbwarfare.tools.getOrCreateTag
 import net.fabricmc.api.EnvType
@@ -16,7 +17,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
 
-open class HammerItem(properties: Properties) : KnifeItem(properties) {
+open class HammerItem(properties: Properties) : MeleeGunItem(properties) {
 
     override fun getRecipeRemainder(itemstack: ItemStack): ItemStack {
         val stack = itemstack.copy()

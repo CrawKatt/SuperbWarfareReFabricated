@@ -7,7 +7,6 @@ import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
 import com.atsuishio.superbwarfare.item.material.BatteryItem
 import com.atsuishio.superbwarfare.item.misc.ArmorPlateItem
 import com.atsuishio.superbwarfare.item.projectile.C4BombItem
-import com.atsuishio.superbwarfare.item.weapon.ElectricBatonItem
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
@@ -53,6 +52,16 @@ object ModTabs {
                     }
                 }
             }
+            .build()
+    )
+
+    @JvmField
+    val MELEE_TAB: CreativeModeTab = register(
+        "melee",
+        FabricItemGroup.builder()
+            .title(Component.translatable("item_group.superbwarfare.melee"))
+            .icon { ItemStack(ModItems.KNIFE) }
+            .displayItems { _, output -> ModItems.MELEE.forEach(output::accept) }
             .build()
     )
 
@@ -170,7 +179,7 @@ object ModTabs {
 
     @JvmStatic
     fun init() {
-        listOf("vehicle", "block", "item", "ammo", "perk", "attachment", "guns").forEach { name ->
+        listOf("vehicle", "block", "item", "ammo", "perk", "attachment", "melee", "guns").forEach { name ->
             Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, Mod.loc(name), tabs.getValue(name))
         }
 
