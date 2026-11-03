@@ -286,7 +286,7 @@ dependencies {
     implementation("com.eliotlash.mclib:mclib:20")
 
     // ApricityUI (upstream creative ammo HUD and weapon editing screen)
-    include(modImplementation("curse.maven:apricityui-1470115:9066025")!!)
+    include(modImplementation("maven.modrinth:UfPdUeGy:X6qtRnld")!!)
 
     // JEI Fabric
     modCompileOnly("mezz.jei:jei-${project.property("minecraft_version")}-fabric-api:${project.property("jei_version")}")
