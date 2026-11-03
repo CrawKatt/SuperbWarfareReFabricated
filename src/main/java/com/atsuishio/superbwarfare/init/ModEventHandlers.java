@@ -58,8 +58,10 @@ public class ModEventHandlers {
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             PlayerEventHandler.onPlayerRespawned(newPlayer, alive);
         });
-        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) ->
-                PlayerEventHandler.onPlayerChangedDimension(player));
+        ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
+            PlayerEventHandler.onPlayerChangedDimension(player);
+            HitboxHelperEventHandler.onPlayerChangedDimension(player);
+        });
 
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
             if (entity instanceof ServerPlayer player) {

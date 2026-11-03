@@ -15,4 +15,9 @@ object HitboxHelperEventHandler {
     fun onPlayerLoggedOut(player: Player) {
         HitboxHelper.onPlayerLoggedOut(player)
     }
+
+    @JvmStatic
+    fun onPlayerChangedDimension(player: Player) {
+        HitboxHelper.onPlayerLoggedOut(player)
+    }
 }
