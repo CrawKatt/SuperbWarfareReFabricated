@@ -51,7 +51,7 @@
     "geckolib": "*",
     "cloth-config": "*",
     "forgeconfigapiport": "*",
-    "apricityui": ">=1.2.7",
+    "apricityui": ">=1.3.0",
     "extensibleenums": "*",
     "trinkets": "*",
     "mkb": "*"

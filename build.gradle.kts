@@ -199,7 +199,7 @@ dependencies {
     include("com.maydaymemory:mae:1.1.4")
 
     // AUI
-    include(modImplementation("curse.maven:apricityui-1470115:9066027")!!)
+    include(modImplementation("curse.maven:apricityui-1470115:9403760")!!)
 
     modCompileOnly("maven.modrinth:accrelatedrendering-refabricated:1.0.11-1.21.1-alpha-fabric.1")
 }
