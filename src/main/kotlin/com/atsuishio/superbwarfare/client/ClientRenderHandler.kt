@@ -84,6 +84,7 @@ import com.atsuishio.superbwarfare.item.armor.RuChest6b43Item
 import com.atsuishio.superbwarfare.item.armor.RuHelmet6b47Item
 import com.atsuishio.superbwarfare.item.armor.UsChestIotvItem
 import com.atsuishio.superbwarfare.item.armor.UsHelmetPasgtItem
+import com.atsuishio.superbwarfare.item.projectile.MolotovItem
 import com.atsuishio.superbwarfare.item.projectile.DecoyGrenadeItem
 import com.atsuishio.superbwarfare.item.projectile.M84StunGrenadeItem
 import com.atsuishio.superbwarfare.item.projectile.SeaMineItem
@@ -454,6 +455,7 @@ object ClientRenderHandler {
         UsHelmetPasgtItem.registerRenderer()
         M84StunGrenadeItem.registerRenderer()
         DecoyGrenadeItem.registerRenderer()
+        MolotovItem.registerRender()
         SeaMineItem.ClientEvents.registerRender()
     }
 

@@ -87,7 +87,7 @@ object ModEntities {
     @JvmField
     val SMOKE_DECOY = register(
         "smoke_decoy",
-        misc(::SmokeDecoyEntity).clientTrackingRange(64).updateInterval(1).noSave().sized(5.5f, 5.5f)
+        misc(::SmokeDecoyEntity).clientTrackingRange(64).updateInterval(1).noSave().fireImmune().sized(5.5f, 5.5f)
     )
 
     @JvmField
@@ -222,6 +222,9 @@ object ModEntities {
 
     @JvmField
     val DECOY_GRENADE = register("decoy_grenade", fastProjectile(::DecoyGrenadeEntity, true).sized(0.25f, 0.25f))
+
+    @JvmField
+    val MOLOTOV = register("molotov", fastProjectile(::MolotovEntity, true).sized(0.25f, 0.25f))
 
     @JvmField
     val SMOKE_GUN_GRENADE =

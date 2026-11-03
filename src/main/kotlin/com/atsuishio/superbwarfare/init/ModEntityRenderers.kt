@@ -40,6 +40,7 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.M18_SMOKE_GRENADE, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.M84_STUN_GRENADE, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.DECOY_GRENADE, ::BasicProjectileRenderer)
+        EntityRendererRegistry.register(ModEntities.MOLOTOV, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.MLE_1934, ::Mle1934Renderer)
         EntityRendererRegistry.register(ModEntities.JAVELIN_MISSILE, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.ANNIHILATOR, ::AnnihilatorRenderer)
