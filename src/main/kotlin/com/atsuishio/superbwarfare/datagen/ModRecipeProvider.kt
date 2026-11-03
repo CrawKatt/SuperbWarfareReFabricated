@@ -2730,7 +2730,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             gunSmithing(
                 writer,
                 ModItems.HANYANG_88_RE_BLUEPRINT,
-                GunRarity.VIRTUAL,
+                GunRarity.LEGENDARY,
                 ModItems.BATTERY,
                 ModItems.HANYANG_88_RE
             )
