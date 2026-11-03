@@ -256,6 +256,7 @@ class ModCustomLootProvider() : LootTableSubProvider {
                 ModItems.TRACHELIUM_BLUEPRINT weighted 5
                 ModItems.SECONDARY_CATACLYSM_BLUEPRINT weighted 5
                 ModItems.QL_1031_BLUEPRINT weighted 5
+                ModItems.HANYANG_88_RE_BLUEPRINT weighted 5
 
                 ModItems.AA_12_BLUEPRINT weighted 3
                 ModItems.NTW_20_BLUEPRINT weighted 3
@@ -301,6 +302,7 @@ class ModCustomLootProvider() : LootTableSubProvider {
                 ModItems.TRACHELIUM_BLUEPRINT weighted 15
                 ModItems.SECONDARY_CATACLYSM_BLUEPRINT weighted 15
                 ModItems.QL_1031_BLUEPRINT weighted 15
+                ModItems.HANYANG_88_RE_BLUEPRINT weighted 15
 
                 ModItems.AA_12_BLUEPRINT weighted 20
                 ModItems.NTW_20_BLUEPRINT weighted 20
@@ -372,6 +374,7 @@ class ModCustomLootProvider() : LootTableSubProvider {
                 ModItems.TRACHELIUM_BLUEPRINT weighted 8
                 ModItems.SECONDARY_CATACLYSM_BLUEPRINT weighted 8
                 ModItems.QL_1031_BLUEPRINT weighted 8
+                ModItems.HANYANG_88_RE_BLUEPRINT weighted 8
 
                 ModItems.AA_12_BLUEPRINT weighted 5
                 ModItems.NTW_20_BLUEPRINT weighted 5
@@ -550,6 +553,7 @@ class ModCustomLootProvider() : LootTableSubProvider {
 
                     ModItems.BOCEK_BLUEPRINT,
                     ModItems.TRACHELIUM_BLUEPRINT,
+                    ModItems.HANYANG_88_RE_BLUEPRINT,
                     ModItems.VECTOR_BLUEPRINT,
                     ModItems.DEVOTION_BLUEPRINT,
                     ModItems.M_98B_BLUEPRINT,
