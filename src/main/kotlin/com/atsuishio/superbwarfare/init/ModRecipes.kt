@@ -33,6 +33,10 @@ object ModRecipes {
         registerSerializer("researching", ResearchingRecipe.Serializer)
 
     @JvmField
+    val UPGRADE_SERIALIZER: RecipeSerializer<UpgradeRecipe> =
+        registerSerializer("upgrade", UpgradeRecipe.Serializer())
+
+    @JvmField
     val VEHICLE_ASSEMBLING_TYPE: RecipeType<VehicleAssemblingRecipe> =
         registerType("vehicle_assembling", object : RecipeType<VehicleAssemblingRecipe> {
             override fun toString(): String {
