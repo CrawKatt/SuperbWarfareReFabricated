@@ -8,6 +8,12 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.custom.LivingHealCallback;
+import com.atsuishio.superbwarfare.event.custom.LivingDeathCallback;
+import com.atsuishio.superbwarfare.event.custom.LivingDropsCallback;
+import com.atsuishio.superbwarfare.event.custom.LivingExperienceDropCallback;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback;
 import com.atsuishio.superbwarfare.event.custom.LivingIncomingDamageCallback;
 import com.atsuishio.superbwarfare.event.custom.MobEffectAddedEvent;
@@ -16,7 +22,6 @@ import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect;
-import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import com.atsuishio.superbwarfare.tools.MinecraftUtil;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
@@ -314,47 +319,39 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
         ShockMobEffect.onLivingTick(self);
     }
 
-    @Inject(
-            method = "dropAllDeathLoot(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;)V",
-            at = @At("HEAD")
-    )
-    private void superbwarfare$beginPowerfulAttractionDrops(ServerLevel level, DamageSource source, CallbackInfo ci) {
-        PowerfulAttraction.beginDropCapture(source);
-        LivingEventHandler.beginLivingDrops();
+    @Shadow
+    protected int lastHurtByPlayerTime;
+
+    @Shadow
+    @Nullable
+    protected Player lastHurtByPlayer;
+
+    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$onLivingDeath(DamageSource source, CallbackInfo ci) {
+        var event = new LivingDeathCallback.Event((LivingEntity) (Object) this, source);
+        LivingDeathCallback.EVENT.invoker().onDeath(event);
+        if (event.isCanceled()) ci.cancel();
     }
 
-    @Inject(
-            method = "dropAllDeathLoot(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;)V",
-            at = @At("RETURN")
-    )
-    private void superbwarfare$endPowerfulAttractionDrops(ServerLevel level, DamageSource source, CallbackInfo ci) {
-        PowerfulAttraction.endDropCapture();
-        LivingEventHandler.finishLivingDrops((LivingEntity) (Object) this, source, level);
-    }
-
-    @Inject(
-            method = "getExperienceReward(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;)I",
-            at = @At("RETURN"),
-            cancellable = true
-    )
-    private void superbwarfare$powerfulAttractionExperience(
-            ServerLevel level,
-            Entity attackingEntity,
-            CallbackInfoReturnable<Integer> cir
-    ) {
-        LivingEntity self = (LivingEntity) (Object) this;
-        Player player = attackingEntity instanceof Player attacker ? attacker : null;
-        int result = PowerfulAttraction.handleExperienceDrop(
-                player,
-                self.getLastDamageSource(),
-                cir.getReturnValue()
-        );
-
-        if (LivingEventHandler.onLivingExperienceDrop(self, player, result)) {
-            result = 0;
+    @WrapMethod(method = "dropAllDeathLoot")
+    private void superbwarfare$onLivingDrops(ServerLevel level, DamageSource source, Operation<Void> original) {
+        var event = new LivingDropsCallback.Event((LivingEntity) (Object) this, source, lastHurtByPlayerTime > 0);
+        LivingDropsCallback.beginCapture(event);
+        try {
+            original.call(level, source);
+        } finally {
+            LivingDropsCallback.endCapture();
         }
+        LivingDropsCallback.EVENT.invoker().onDrops(event);
+        if (!event.isCanceled()) event.getDrops().forEach(level::addFreshEntity);
+    }
 
-        cir.setReturnValue(result);
+    @WrapOperation(method = "dropExperience",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getExperienceReward(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;)I"))
+    private int superbwarfare$onExperienceDrop(LivingEntity entity, ServerLevel level, Entity attacker, Operation<Integer> original) {
+        var event = new LivingExperienceDropCallback.Event(entity, lastHurtByPlayer, original.call(entity, level, attacker));
+        LivingExperienceDropCallback.EVENT.invoker().onExperienceDrop(event);
+        return event.isCanceled() ? 0 : event.getDroppedExperience();
     }
 
     @Shadow

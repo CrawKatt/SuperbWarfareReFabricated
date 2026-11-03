@@ -1,13 +1,14 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.capability.PersistentDataAccessor;
-import com.atsuishio.superbwarfare.data.mob_guns.MobGunState;
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
-import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.DeployedWeaponHandler;
+import com.atsuishio.superbwarfare.event.custom.LivingDropsCallback;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
-import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.world.level.Level;
 import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem;
 import com.atsuishio.superbwarfare.tools.OBB;
 import net.minecraft.core.BlockPos;
@@ -15,11 +16,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -196,38 +195,10 @@ public abstract class EntityMixin implements OBBHitter, PersistentDataAccessor {
         }
     }
 
-    @Inject(
-            method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private void superbwarfare$powerfulAttractionDrop(
-            ItemStack stack,
-            float yOffset,
-            CallbackInfoReturnable<ItemEntity> cir
-    ) {
-        Entity entity = (Entity) (Object) this;
-        if (entity instanceof Mob mob && MobGunState.INSTANCE.selectionKey(mob) != null && stack.getItem() instanceof GunItem) {
-            return;
-        }
-
-        if (PowerfulAttraction.tryMoveCurrentDropToPlayer(stack)) {
-            cir.setReturnValue(null);
-        }
-    }
-
-    @Inject(
-            method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
-            at = @At("RETURN")
-    )
-    private void superbwarfare$captureLivingDrop(
-            ItemStack stack,
-            float yOffset,
-            CallbackInfoReturnable<ItemEntity> cir
-    ) {
-        ItemEntity drop = cir.getReturnValue();
-        if (drop != null) {
-            LivingEventHandler.captureLivingDrop(drop);
-        }
+    @WrapOperation(method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean superbwarfare$captureLivingDrop(Level level, Entity drop, Operation<Boolean> original) {
+        if (drop instanceof ItemEntity item && LivingDropsCallback.captureDrop((Entity) (Object) this, item)) return true;
+        return original.call(level, drop);
     }
 }

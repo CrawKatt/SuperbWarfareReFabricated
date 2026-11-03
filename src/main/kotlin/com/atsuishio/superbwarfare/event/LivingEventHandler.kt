@@ -52,8 +52,6 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 object LivingEventHandler {
-    private val capturedDrops = ThreadLocal<MutableList<ItemEntity>?>()
-
     @JvmStatic
     fun onLivingChangeTargetEvent(entity: Mob, target: LivingEntity?) {
         val vehicle = entity.vehicle
@@ -629,27 +627,6 @@ object LivingEventHandler {
         EntityUseGunEventHandler.onLivingDrops(entity, source, drops)
         playerDropAmmoBox(entity, source, drops)
         vehicleCollectDrops(entity, source, drops)
-    }
-
-    @JvmStatic
-    fun beginLivingDrops() {
-        capturedDrops.set(arrayListOf())
-    }
-
-    @JvmStatic
-    fun captureLivingDrop(drop: ItemEntity) {
-        capturedDrops.get()?.add(drop)
-    }
-
-    @JvmStatic
-    fun finishLivingDrops(entity: LivingEntity, source: DamageSource, level: ServerLevel) {
-        val drops = capturedDrops.get() ?: return
-        capturedDrops.remove()
-
-        val originalDrops = drops.toSet()
-        onLivingDrops(entity, source, drops)
-        (originalDrops - drops.toSet()).forEach(ItemEntity::discard)
-        (drops - originalDrops).forEach(level::addFreshEntity)
     }
 
     /**

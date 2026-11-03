@@ -10,7 +10,6 @@ import com.atsuishio.superbwarfare.data.mob_guns.effectiveClearAmmo
 import com.atsuishio.superbwarfare.data.mob_guns.effectivePlayerKillOnly
 import com.atsuishio.superbwarfare.data.mob_guns.effectiveStripOverride
 import com.atsuishio.superbwarfare.item.gun.GunItem
-import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
@@ -68,10 +67,7 @@ object EntityUseGunEventHandler {
 
         sanitizeDrop(stack, drop)
 
-        // Powerful Attraction must see the stack only after its gun-drop policy is applied.
-        if (!PowerfulAttraction.tryMoveDropToPlayer(source, stack)) {
-            drops += ItemEntity(mob.level(), mob.x, mob.y + 0.5, mob.z, stack)
-        }
+        drops += ItemEntity(mob.level(), mob.x, mob.y + 0.5, mob.z, stack)
     }
 
     /** Clear mob-only properties before the gun becomes a player drop. */

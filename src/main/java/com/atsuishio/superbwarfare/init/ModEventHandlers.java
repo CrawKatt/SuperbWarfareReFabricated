@@ -6,6 +6,10 @@ import com.atsuishio.superbwarfare.mobeffect.BurnMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect;
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect;
 import com.atsuishio.superbwarfare.event.custom.PlayerXpChangeCallback;
+import com.atsuishio.superbwarfare.event.custom.LivingDeathCallback;
+import com.atsuishio.superbwarfare.event.custom.LivingDropsCallback;
+import com.atsuishio.superbwarfare.event.custom.LivingExperienceDropCallback;
+import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import com.atsuishio.superbwarfare.perk.functional.StrivingForPerfection;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
 import com.atsuishio.superbwarfare.event.GunEventHandler;
@@ -63,7 +67,18 @@ public class ModEventHandlers {
             }
         });
 
-        ServerLivingEntityEvents.AFTER_DEATH.register(LivingEventHandler::onEntityDeath);
+        LivingDeathCallback.EVENT.register(event -> LivingEventHandler.onEntityDeath(event.getEntity(), event.getSource()));
+        ResourceLocation lowestDeathPhase = ResourceLocation.fromNamespaceAndPath("superbwarfare", "lowest_death");
+        LivingDeathCallback.EVENT.addPhaseOrdering(Event.DEFAULT_PHASE, lowestDeathPhase);
+        LivingDeathCallback.EVENT.register(lowestDeathPhase, PowerfulAttraction.INSTANCE::onLivingDeath);
+        LivingDropsCallback.EVENT.register(event -> LivingEventHandler.onLivingDrops(event.getEntity(), event.getSource(), event.getDrops()));
+        LivingDropsCallback.EVENT.register(PowerfulAttraction.INSTANCE::onLivingDrops);
+        LivingExperienceDropCallback.EVENT.register(event -> {
+            if (LivingEventHandler.onLivingExperienceDrop(event.getEntity(), event.getAttackingPlayer(), event.getDroppedExperience())) {
+                event.setCanceled(true);
+            }
+        });
+        LivingExperienceDropCallback.EVENT.register(PowerfulAttraction.INSTANCE::onLivingExperienceDrop);
         ServerLivingEntityEvents.ALLOW_DEATH.register(TargetEntity::onTargetDown);
         ServerLivingEntityEvents.ALLOW_DEATH.register(DPSGeneratorEntity::onDPSGeneratorDown);
         ServerEntityEvents.EQUIPMENT_CHANGE.register(LivingEventHandler::handleChangeSlot);

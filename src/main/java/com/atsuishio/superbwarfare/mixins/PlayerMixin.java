@@ -4,6 +4,8 @@ import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.trinket.ParachuteItem;
 import com.atsuishio.superbwarfare.item.weapon.BeastItem;
 import com.atsuishio.superbwarfare.event.custom.PlayerXpChangeCallback;
+import com.atsuishio.superbwarfare.event.custom.LivingDeathCallback;
+import net.minecraft.world.damagesource.DamageSource;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.world.entity.Entity;
@@ -26,6 +28,13 @@ public abstract class PlayerMixin extends Entity {
 
     public PlayerMixin(EntityType<?> type, Level world) {
         super(type, world);
+    }
+
+    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$onPlayerDeath(DamageSource source, CallbackInfo ci) {
+        var event = new LivingDeathCallback.Event((Player) (Object) this, source);
+        LivingDeathCallback.EVENT.invoker().onDeath(event);
+        if (event.isCanceled()) ci.cancel();
     }
 
     @WrapMethod(method = "giveExperiencePoints")
