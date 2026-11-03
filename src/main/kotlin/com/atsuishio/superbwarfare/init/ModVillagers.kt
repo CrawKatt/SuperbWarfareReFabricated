@@ -138,6 +138,7 @@ object ModVillagers {
             trade(ItemStack(Items.EMERALD, 64), ItemStack(ModItems.AWM_BLUEPRINT), 10, 30, 0.05f),
             trade(ItemStack(Items.EMERALD, 64), ItemStack(ModItems.DEVOTION_BLUEPRINT), 10, 30, 0.05f),
             trade(ItemStack(Items.EMERALD, 64), ItemStack(ModItems.HUNTING_RIFLE_BLUEPRINT), 10, 30, 0.05f),
+            trade(ItemStack(Items.EMERALD, 64), ItemStack(ModItems.HANYANG_88_RE_BLUEPRINT), 10, 30, 0.05f),
             trade(ItemStack(Items.EMERALD, 8), ItemStack(ModItems.LARGE_SHELL_HE, 1), 8, 10, 0.05f),
             trade(ItemStack(Items.EMERALD, 8), ItemStack(ModItems.LARGE_SHELL_AP, 1), 8, 10, 0.05f),
             trade(ItemStack(Items.EMERALD, 8), ItemStack(ModItems.LARGE_SHELL_CM, 1), 8, 10, 0.05f),

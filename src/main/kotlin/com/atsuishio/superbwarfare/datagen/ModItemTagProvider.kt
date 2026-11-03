@@ -203,6 +203,7 @@ class ModItemTagProvider(
             ModItems.MARLIN,
             ModItems.K_98,
             ModItems.HANYANG_88,
+            ModItems.HANYANG_88_RE,
             ModItems.M_98B,
             ModItems.SENTINEL,
             ModItems.HUNTING_RIFLE,
@@ -260,6 +261,7 @@ class ModItemTagProvider(
             ModItems.M_98B,
             ModItems.K_98,
             ModItems.HANYANG_88,
+            ModItems.HANYANG_88_RE,
             ModItems.MOSIN_NAGANT,
             ModItems.AWM,
             ModItems.QL_1031
@@ -345,7 +347,10 @@ class ModItemTagProvider(
         )
 
         this.tag(ModTags.Items.VIRTUAL_BLUEPRINT).add(
-            ModItems.TRACHELIUM_BLUEPRINT, ModItems.SECONDARY_CATACLYSM_BLUEPRINT, ModItems.QL_1031_BLUEPRINT
+            ModItems.TRACHELIUM_BLUEPRINT,
+            ModItems.SECONDARY_CATACLYSM_BLUEPRINT,
+            ModItems.QL_1031_BLUEPRINT,
+            ModItems.HANYANG_88_RE_BLUEPRINT
         )
 
         this.tag(ModTags.Items.CANNON_BLUEPRINT).add(
