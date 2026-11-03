@@ -1,9 +1,8 @@
 package com.atsuishio.superbwarfare.mixins;
 
-import com.atsuishio.superbwarfare.Mod;
-import com.atsuishio.superbwarfare.init.ModAttributes;
 import com.atsuishio.superbwarfare.init.ModRarities;
 import com.atsuishio.superbwarfare.item.ItemDamageExtension;
+import com.atsuishio.superbwarfare.item.armor.BulletproofArmorItem;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.network.chat.Component;
@@ -11,7 +10,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -81,23 +79,11 @@ public class ItemStackMixin {
                     target = "Lnet/minecraft/world/item/Item;getDefaultAttributeModifiers()Lnet/minecraft/world/item/component/ItemAttributeModifiers;"
             )
     )
-    private ItemAttributeModifiers superbwarfare$durabilityScaledAttributes(Item item) {
-        ItemAttributeModifiers modifiers = item.getDefaultAttributeModifiers();
-        ItemStack stack = (ItemStack) (Object) this;
-        if (stack.getDamageValue() <= 0) return modifiers;
-
-        double scale = Math.max(0.0, 1.0 - (double) stack.getDamageValue() / stack.getMaxDamage());
-        return new ItemAttributeModifiers(modifiers.modifiers().stream().map(entry -> {
-            AttributeModifier modifier = entry.modifier();
-            if (entry.attribute().value() != ModAttributes.BULLET_RESISTANCE || !modifier.is(Mod.ATTRIBUTE_MODIFIER)) {
-                return entry;
-            }
-            return new ItemAttributeModifiers.Entry(
-                    entry.attribute(),
-                    new AttributeModifier(modifier.id(), modifier.amount() * scale, modifier.operation()),
-                    entry.slot()
-            );
-        }).toList(), modifiers.showInTooltip());
+    private ItemAttributeModifiers superbwarfare$stackAttributeModifiers(Item item) {
+        if (item instanceof BulletproofArmorItem armor) {
+            return armor.getDefaultAttributeModifiers((ItemStack) (Object) this);
+        }
+        return item.getDefaultAttributeModifiers();
     }
 
     @Inject(method = "getTooltipLines", at = @At("RETURN"))
