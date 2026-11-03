@@ -403,6 +403,7 @@ class ModItemTagProvider(
             ModItems.KNIFE,
             ModItems.KNIFE_6KH2,
             ModItems.KNIFE_SEITENGEWEHR_84,
+            ModItems.KNIFE_HANYANG_88_RE_STANDARD,
             ModItems.KNIFE_M1917,
             ModItems.MIAODAO,
             ModItems.T_BATON,
@@ -612,6 +613,7 @@ class ModItemTagProvider(
             ModItems.BAYONET_M_9,
             ModItems.BAYONET_6KH2,
             ModItems.BAYONET_SEITENGEWEHR_84,
+            ModItems.BAYONET_HANYANG_88_RE_STANDARD,
             ModItems.BAYONET_M_91_30,
             ModItems.BAYONET_TRIANGULAR,
             ModItems.BAYONET_M1917
