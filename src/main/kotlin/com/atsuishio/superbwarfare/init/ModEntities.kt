@@ -126,6 +126,13 @@ object ModEntities {
 
     // Projectiles
     @JvmField
+    val HIGH_ENERGY_LASER: EntityType<HighEnergyLaserEntity> = register(
+        "high_energy_laser",
+        misc(::HighEnergyLaserEntity).trackRangeChunks(160).trackedUpdateRate(1)
+            .disableSaving().disableSummon().fireImmune().dimensions(EntityDimensions.scalable(0.1f, 0.1f))
+    )
+
+    @JvmField
     val REFORGING_LASER: EntityType<LaserBeamEntity> = register(
         "reforging_laser",
         misc(::LaserBeamEntity).trackRangeChunks(160).trackedUpdateRate(1)

@@ -233,6 +233,7 @@ class Mod : ModInitializer {
 
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register { player, _, _ ->
             PlayerEventHandler.onPlayerChangedDimension(player)
+            HitboxHelperEventHandler.onPlayerChangedDimension(player)
         }
 
         ServerEntityEvents.EQUIPMENT_CHANGE.register(LivingEventHandler::handleChangeSlot)
