@@ -30,6 +30,10 @@ object ModRecipes {
         }
 
     @JvmField
+    val UPGRADE_SERIALIZER: RecipeSerializer<UpgradeRecipe> =
+        Registration.recipeSerializer("upgrade") { UpgradeRecipe.Serializer() }
+
+    @JvmField
     val VEHICLE_ASSEMBLING_SERIALIZER: RecipeSerializer<VehicleAssemblingRecipe> =
         Registration.recipeSerializer("vehicle_assembling") { VehicleAssemblingRecipeSerializer() }
 
