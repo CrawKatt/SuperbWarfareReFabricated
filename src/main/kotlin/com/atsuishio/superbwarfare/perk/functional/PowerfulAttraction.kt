@@ -1,55 +1,85 @@
 package com.atsuishio.superbwarfare.perk.functional
 
 import com.atsuishio.superbwarfare.data.gun.GunData
+import com.atsuishio.superbwarfare.event.custom.LivingDeathCallback
+import com.atsuishio.superbwarfare.event.custom.LivingDropsCallback
+import com.atsuishio.superbwarfare.event.custom.LivingExperienceDropCallback
+import com.atsuishio.superbwarfare.event.custom.LootingLevelCallback
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.perk.Perk
-import com.atsuishio.superbwarfare.event.custom.LivingDropsCallback
-import com.atsuishio.superbwarfare.event.custom.LootingLevelCallback
 import com.atsuishio.superbwarfare.tools.DamageTypeTool
+import com.atsuishio.superbwarfare.tools.persistentData
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.OwnableEntity
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.entity.projectile.Projectile
 
 object PowerfulAttraction : Perk("powerful_attraction", Type.FUNCTIONAL) {
-    fun onLivingDrops(event: LivingDropsCallback.Event) {
-        val source = event.source
-        val player = source.entity as? Player ?: return
-        val stack = player.mainHandItem
 
+    private const val ABSORBED = "sbw_absorbed_experience"
+
+    fun onLivingDrops(event: LivingDropsCallback.Event) {
+        val player = resolveAttacker(event.source) ?: return
+        val stack = player.mainHandItem
+        if (stack.item !is GunItem) return
+
+        val level = GunData.from(stack).perk.getLevel(this)
+        if (level > 0 && isWeaponDamage(event.source)) {
+            val drops = event.drops
+            drops.forEach {
+                val item = it.item
+                if (!player.addItem(item.copy())) {
+                    player.drop(item, false)
+                }
+            }
+            event.isCanceled = true
+        }
+    }
+
+    fun onLivingDeath(event: LivingDeathCallback.Event) {
+        if (event.isCanceled) return
+        val entity = event.entity
+        if (entity is Player) return
+        if (!entity.shouldDropExperience() || entity.wasExperienceConsumed()) return
+        val source = event.source
+        if (!isWeaponDamage(source)) return
+
+        val player = resolveAttacker(source) ?: return
+        val stack = player.mainHandItem
         if (stack.item !is GunItem) return
 
         val level = GunData.from(stack).perk.getLevel(this)
         if (level <= 0) return
-        if (!DamageTypeTool.isGunDamage(source) && !DamageTypeTool.isMeleeDamage(source)) return
 
-        event.drops.forEach {
-            val item = it.item
-            if (!player.addItem(item.copy())) {
-                player.drop(item, false)
-            }
-        }
-        event.isCanceled = true
+        val experience = entity.getExperienceReward()
+        if (experience <= 0) return
+
+        entity.skipDropExperience()
+        entity.persistentData.putBoolean(ABSORBED, true)
+        player.giveExperiencePoints((experience * (0.8f + 0.2f * level)).toInt())
     }
 
-    @JvmStatic
-    fun handleExperienceDrop(player: Player?, source: DamageSource?, originalXp: Int): Int {
-        if (player == null || source == null) return originalXp
+    fun onLivingExperienceDrop(event: LivingExperienceDropCallback.Event) {
+        val entity = event.entity
+        if (entity.persistentData.getBoolean(ABSORBED)) {
+            event.isCanceled = true
+            return
+        }
 
+        val player = event.attackingPlayer ?: resolveAttacker(entity.lastDamageSource) ?: return
         val stack = player.mainHandItem
-
-        if (stack.item !is GunItem) return originalXp
+        if (stack.item !is GunItem) return
 
         val level = GunData.from(stack).perk.getLevel(this)
-        if (level <= 0) return originalXp
-        if (!DamageTypeTool.isGunDamage(source) && !DamageTypeTool.isMeleeDamage(source)) return originalXp
-
-        player.giveExperiencePoints((originalXp * (0.8f + 0.2f * level)).toInt())
-
-        return 0
+        if (level > 0 && isWeaponDamage(entity.lastDamageSource)) {
+            player.giveExperiencePoints((event.droppedExperience * (0.8f + 0.2f * level)).toInt())
+            event.isCanceled = true
+        }
     }
 
     fun onLootingLevel(event: LootingLevelCallback.Event) {
-        val source = event.damageSource
+        val source = event.damageSource ?: return
         val sourceEntity = source.entity
         if (sourceEntity !is LivingEntity) return
 
@@ -57,8 +87,28 @@ object PowerfulAttraction : Perk("powerful_attraction", Type.FUNCTIONAL) {
         if (stack.item !is GunItem) return
 
         val level = GunData.from(stack).perk.getLevel(this)
-        if (level > 0 && (DamageTypeTool.isGunDamage(source) || DamageTypeTool.isMeleeDamage(source))) {
+        if (level > 0 && isWeaponDamage(source)) {
             event.lootingLevel = level / 4
         }
+    }
+
+    private fun isWeaponDamage(source: DamageSource?): Boolean {
+        if (source == null) return false
+        return DamageTypeTool.isGunDamage(source) || DamageTypeTool.isMeleeDamage(source)
+    }
+
+    private fun resolveAttacker(source: DamageSource?): Player? {
+        if (source == null) return null
+        for (entity in listOfNotNull(source.entity, source.directEntity)) {
+            if (entity is Player) return entity
+            val owner = when (entity) {
+                is Projectile -> entity.owner
+                is OwnableEntity -> entity.owner
+                else -> null
+            }
+            if (owner is Player) return owner
+            if (owner is OwnableEntity) (owner.owner as? Player)?.let { return it }
+        }
+        return null
     }
 }

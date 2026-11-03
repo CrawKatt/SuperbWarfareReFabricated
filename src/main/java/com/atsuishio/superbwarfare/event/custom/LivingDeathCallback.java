@@ -1,11 +1,14 @@
 package com.atsuishio.superbwarfare.event.custom;
 
+import com.atsuishio.superbwarfare.Mod;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 
 public interface LivingDeathCallback {
-    net.fabricmc.fabric.api.event.Event<LivingDeathCallback> EVENT = EventFactory.createArrayBacked(
+    ResourceLocation LOWEST_PHASE = new ResourceLocation(Mod.MODID, "living_death_lowest");
+    net.fabricmc.fabric.api.event.Event<LivingDeathCallback> EVENT = EventFactory.createWithPhases(
             LivingDeathCallback.class,
             callbacks -> event -> {
                 for (LivingDeathCallback callback : callbacks) {
@@ -14,7 +17,8 @@ public interface LivingDeathCallback {
                         return;
                     }
                 }
-            }
+            },
+            net.fabricmc.fabric.api.event.Event.DEFAULT_PHASE, LOWEST_PHASE
     );
 
     void onLivingDeath(Event event);

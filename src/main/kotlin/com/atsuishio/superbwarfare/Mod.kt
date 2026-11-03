@@ -28,6 +28,7 @@ import com.atsuishio.superbwarfare.world.saveddata.ProjectileChunkSavedData
 import com.atsuishio.superbwarfare.event.PlayerEventHandler
 import com.atsuishio.superbwarfare.event.ShieldHandler
 import com.atsuishio.superbwarfare.event.custom.LivingAttackCallback
+import com.atsuishio.superbwarfare.event.custom.LivingDeathCallback
 import com.atsuishio.superbwarfare.event.custom.LivingDropsCallback
 import com.atsuishio.superbwarfare.event.custom.LivingExperienceDropCallback
 import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback
@@ -261,18 +262,19 @@ class Mod : ModInitializer {
             LivingEventHandler.onEntityHurt(event)
         }
         LivingHurtCallback.EVENT.register(ShieldHandler::onEntityHurt)
+        LivingDeathCallback.EVENT.register { event ->
+            if (!event.entity.level().isClientSide) {
+                LivingEventHandler.onEntityDeath(event.entity, event.source)
+            }
+        }
+        LivingDeathCallback.EVENT.register(LivingDeathCallback.LOWEST_PHASE, PowerfulAttraction::onLivingDeath)
         LivingDropsCallback.EVENT.register { event ->
             LivingEventHandler.onLivingDrops(event.entity, event.source, event.drops)
         }
         LivingDropsCallback.EVENT.register(PowerfulAttraction::onLivingDrops)
+        LivingExperienceDropCallback.EVENT.register(PowerfulAttraction::onLivingExperienceDrop)
         LivingExperienceDropCallback.EVENT.register { event ->
-            val experience = PowerfulAttraction.handleExperienceDrop(
-                event.attackingPlayer,
-                event.entity.lastDamageSource,
-                event.droppedExperience
-            )
-            event.droppedExperience = experience
-            if (LivingEventHandler.onLivingExperienceDrop(event.entity, event.attackingPlayer, experience)) {
+            if (LivingEventHandler.onLivingExperienceDrop(event.entity, event.attackingPlayer, event.droppedExperience)) {
                 event.isCanceled = true
             }
         }
