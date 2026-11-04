@@ -102,9 +102,10 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
         val stack = this.getItem(SLOT_CHARGE)
         if (stack.isEmpty) return
 
-        val consumer = ContainerItemContext.ofSingleSlot(
-            InventoryStorage.of(this, null).getSlot(SLOT_CHARGE)
-        ).find(EnergyStorage.ITEM)
+        val consumer = EnergyStorage.ITEM.find(
+            stack,
+            ContainerItemContext.ofSingleSlot(InventoryStorage.of(this, null).getSlot(SLOT_CHARGE))
+        )
         if (consumer != null && consumer.amount < consumer.capacity) {
             val charged = EnergyStorageHelper.insert(
                 consumer,
@@ -301,9 +302,10 @@ open class ChargingStationBlockEntity(pos: BlockPos, state: BlockState) :
                 val fuel = blockEntity.getItem(SLOT_FUEL)
                 val burnTime = AbstractFurnaceBlockEntity.getFuel().getOrDefault(fuel.item, 0)
 
-                val fuelEnergy = ContainerItemContext.ofSingleSlot(
-                    InventoryStorage.of(blockEntity, null).getSlot(SLOT_FUEL)
-                ).find(EnergyStorage.ITEM)
+                val fuelEnergy = EnergyStorage.ITEM.find(
+                    fuel,
+                    ContainerItemContext.ofSingleSlot(InventoryStorage.of(blockEntity, null).getSlot(SLOT_FUEL))
+                )
 
                 if (fuelEnergy != null) {
                     val energyToExtract = min(
