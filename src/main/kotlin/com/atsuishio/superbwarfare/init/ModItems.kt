@@ -537,6 +537,7 @@ object ModItems {
     @JvmField val VEHICLE_ASSEMBLING_TABLE = registerBlock("vehicle_assembling_table") { VehicleAssemblingTableBlockItem() }
     @JvmField val BLUEPRINT_RESEARCH_TABLE = registerBlock("blueprint_research_table") { BlueprintResearchTableBlockItem() }
     @JvmField val TRIPOD = registerBlock("tripod") { TripodBlockItem() }
+    @JvmField val ITEM_DISPLAY_BOARD = registerBlock(ModBlocks.ITEM_DISPLAY_BOARD)
     @JvmField val BIOGAS_GENERATOR = registerBlock(ModBlocks.BIOGAS_GENERATOR)
     // @formatter:on
 

@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.event.custom.LivingExperienceDropCallback;
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import com.atsuishio.superbwarfare.perk.functional.StrivingForPerfection;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
+import com.atsuishio.superbwarfare.event.ItemDisplayBoardEventHandler;
 import com.atsuishio.superbwarfare.event.GunEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.ShieldHandler;
@@ -26,6 +27,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import com.atsuishio.superbwarfare.tools.ServerSyncedEntityHandler;
@@ -36,6 +38,8 @@ import net.minecraft.world.InteractionResult;
 public class ModEventHandlers {
 
     public static void init() {
+        UseBlockCallback.EVENT.register((player, level, hand, hit) ->
+                ItemDisplayBoardEventHandler.onRightClickBlock(player, level, hit.getBlockPos()));
         PlayerXpChangeCallback.EVENT.register(StrivingForPerfection.INSTANCE::onXpChange);
         ResourceLocation meleeRespawnPhase = ResourceLocation.fromNamespaceAndPath("superbwarfare", "melee_respawn");
         LivingIncomingDamageCallback.EVENT.addPhaseOrdering(meleeRespawnPhase, Event.DEFAULT_PHASE);

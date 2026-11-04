@@ -49,6 +49,7 @@ class ModBlockLootProvider(provider: HolderLookup.Provider) :
         this.dropSelf(ModBlocks.CREATIVE_CHARGING_STATION)
         this.dropSelf(ModBlocks.FUMO_25)
         this.dropSelf(ModBlocks.TRIPOD)
+        this.dropSelf(ModBlocks.ITEM_DISPLAY_BOARD)
         this.dropSelf(ModBlocks.VEHICLE_DEPLOYER)
         this.dropSelf(ModBlocks.AIRCRAFT_CATAPULT)
         this.dropSelf(ModBlocks.CATAPULT_CONTROLLER)
