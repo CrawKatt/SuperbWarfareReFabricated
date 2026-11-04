@@ -41,9 +41,11 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
         this.dropSelf(ModBlocks.TUNGSTEN_BLOCK)
         this.dropSelf(ModBlocks.CEMENTED_CARBIDE_BLOCK)
         this.dropSelf(ModBlocks.SILVER_BLOCK)
+        this.dropSelf(ModBlocks.URANIUM_BLOCK)
         this.dropSelf(ModBlocks.CREATIVE_CHARGING_STATION)
         this.dropSelf(ModBlocks.FUMO_25)
         this.dropSelf(ModBlocks.TRIPOD)
+        this.dropSelf(ModBlocks.ITEM_DISPLAY_BOARD)
         this.dropSelf(ModBlocks.VEHICLE_DEPLOYER)
         this.dropSelf(ModBlocks.AIRCRAFT_CATAPULT)
         this.dropSelf(ModBlocks.CATAPULT_CONTROLLER)
@@ -52,10 +54,9 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
         this.dropSelf(ModBlocks.RAW_GALENA_BLOCK)
         this.dropSelf(ModBlocks.RAW_SCHEELITE_BLOCK)
         this.dropSelf(ModBlocks.RAW_SILVER_BLOCK)
-        this.dropSelf(ModBlocks.URANIUM_BLOCK)
+        this.dropSelf(ModBlocks.RAW_URANIUM_BLOCK)
         this.dropSelf(ModBlocks.SULFUR_BLOCK)
         this.dropSelf(ModBlocks.NITER_BLOCK)
-        this.dropSelf(ModBlocks.RAW_URANIUM_BLOCK)
         this.add(
             ModBlocks.BLUEPRINT_RESEARCH_TABLE,
             this.applyExplosionDecay(

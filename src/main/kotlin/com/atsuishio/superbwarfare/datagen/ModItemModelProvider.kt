@@ -497,6 +497,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         evenSimplerBlockItem(ModBlocks.SUPERB_ITEM_INTERFACE)
         evenSimplerBlockItem(ModBlocks.CREATIVE_SUPERB_ITEM_INTERFACE)
         evenSimplerBlockItem(ModBlocks.BIOGAS_GENERATOR)
+        addModel(loc("item/item_display_board"), model(loc("displaysettings/item_display_board_display_settings")))
         simpleItem(ModItems.FUMO_25)
     }
 

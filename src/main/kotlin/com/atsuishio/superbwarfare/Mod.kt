@@ -21,6 +21,7 @@ import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.event.CustomEventHandler
 import com.atsuishio.superbwarfare.event.GunEventHandler
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
+import com.atsuishio.superbwarfare.event.ItemDisplayBoardEventHandler
 import com.atsuishio.superbwarfare.event.LivingEventHandler
 import com.atsuishio.superbwarfare.event.ModVersionEventHandler
 import com.atsuishio.superbwarfare.tools.ServerSyncedEntityHandler
@@ -91,6 +92,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback
+import net.fabricmc.fabric.api.event.player.UseBlockCallback
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.resources.ResourceLocation
@@ -205,6 +207,10 @@ class Mod : ModInitializer {
     }
 
     private fun registerCommonEvents() {
+        UseBlockCallback.EVENT.register { player, level, _, hit ->
+            ItemDisplayBoardEventHandler.onRightClickBlock(player, level, hit.blockPos)
+        }
+
         val respawnMeleePhase = loc("respawn_melee")
         AttackEntityCallback.EVENT.addPhaseOrdering(respawnMeleePhase, Event.DEFAULT_PHASE)
         AttackEntityCallback.EVENT.register(respawnMeleePhase) { player, _, _, _, _ ->

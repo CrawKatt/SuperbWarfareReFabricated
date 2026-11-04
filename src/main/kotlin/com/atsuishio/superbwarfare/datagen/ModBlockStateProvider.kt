@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.datagen
 
 import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.block.ItemDisplayBoardBlock
 import com.atsuishio.superbwarfare.init.ModBlocks
 import com.google.gson.JsonObject
 import net.minecraft.core.Direction
@@ -176,6 +177,24 @@ class ModBlockStateProvider(private val output: PackOutput) : DataProvider {
 
         simpleBlock(ModBlocks.FUMO_25, blockModel("fumo_25"))
         simpleBlock(ModBlocks.TRIPOD, blockModel("tripod"))
+
+        val variants = JsonObject()
+        for (facing in ItemDisplayBoardBlock.FACING.possibleValues) {
+            val (rotationX, rotationY) = when (facing) {
+                Direction.DOWN -> 90 to 0
+                Direction.UP -> 270 to 0
+                Direction.NORTH -> 0 to 0
+                Direction.EAST -> 0 to 90
+                Direction.SOUTH -> 0 to 180
+                Direction.WEST -> 0 to 270
+            }
+            variants.add("facing=${facing.serializedName}", JsonObject().apply {
+                addProperty("model", blockModel("item_display_board").toString())
+                if (rotationX != 0) addProperty("x", rotationX)
+                if (rotationY != 0) addProperty("y", rotationY)
+            })
+        }
+        addBlockState(ModBlocks.ITEM_DISPLAY_BOARD, JsonObject().apply { add("variants", variants) })
     }
 
     private fun simpleBlock(block: Block, model: ResourceLocation) {
