@@ -474,6 +474,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.CHARM_THE_EMPERORS_NEW_CHARM)
         simpleItem(ModItems.CHARM_BEAST)
         simpleItem(ModItems.CHARM_CRYSTAL_POPCORN)
+        simpleItem(ModItems.CHARM_GOLDEN_RINGO_GUN_KING_MEDAL)
         simpleItem(ModItems.CHARM_SENPAI)
         simpleItem(ModItems.CHARM_MRAHC)
         simpleItem(ModItems.CHARM_EXPERIENCE_BOTTLE)
