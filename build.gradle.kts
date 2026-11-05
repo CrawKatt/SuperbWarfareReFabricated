@@ -46,6 +46,9 @@ loom {
         create("sbwloadertest") {
             sourceSet(loaderTest)
         }
+        create("superbwarfare_test") {
+            sourceSet(sourceSets.test.get())
+        }
     }
 
     runs {
@@ -89,6 +92,29 @@ sourceSets.main {
         srcDir("src/generated/resources")
         exclude(".cache/**")
     }
+}
+
+sourceSets.test {
+    compileClasspath += sourceSets.main.get().compileClasspath
+    runtimeClasspath += sourceSets.main.get().runtimeClasspath
+}
+
+fabricApi {
+    configureTests {
+        createSourceSet.set(false)
+        enableClientGameTests.set(false)
+    }
+}
+
+loom.runs.named("gameTest") {
+    sourceSet.set("test")
+    vmArg("-Xmx1G")
+    vmArg("-Dfabric-api.gametest.report-file=${layout.buildDirectory.file("reports/gametest.xml").get().asFile}")
+}
+
+tasks.named<Test>("test") {
+    exclude("**/ChargingStationBatteryTest*.class")
+    dependsOn("runGameTest")
 }
 
 repositories {
@@ -390,7 +416,7 @@ idea {
     }
 }
 // Ensure the addon source set is built before a development run.
-tasks.matching { it.name in listOf("runClient", "runServer", "runData") }
+tasks.matching { it.name in listOf("runClient", "runServer", "runData", "runGameTest") }
     .configureEach {
         dependsOn(loaderTest.classesTaskName, loaderTest.processResourcesTaskName)
     }

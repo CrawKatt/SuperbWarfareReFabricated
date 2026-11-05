@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "superbwarfare_test",
+  "version": "1.0.0",
+  "environment": "server",
+  "entrypoints": {
+    "fabric-gametest": [
+      "com.atsuishio.superbwarfare.block.entity.ChargingStationBatteryTest"
+    ]
+  },
+  "depends": {
+    "superbwarfare": "*",
+    "fabric-gametest-api-v1": "*"
+  }
+}
