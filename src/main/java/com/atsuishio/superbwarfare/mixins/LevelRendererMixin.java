@@ -17,10 +17,8 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import org.joml.Matrix4f;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,10 +27,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin {
-
-    @Shadow
-    @Final
-    private EntityRenderDispatcher entityRenderDispatcher;
 
     @Shadow
     private int ticks;
@@ -97,22 +91,7 @@ public class LevelRendererMixin {
         ClientEventHandler.projectionMatrix = RenderSystem.getProjectionMatrix();
     }
 
-    // TODO 找到真正把实体渲染在世界中的位置进行mixin
-    @Inject(method = "renderEntity(Lnet/minecraft/world/entity/Entity;DDDFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V",
-            at = @At("HEAD"), cancellable = true)
-    private void renderEntity(Entity pEntity, double pCamX, double pCamY, double pCamZ, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBufferSource, CallbackInfo ci) {
-        // 这里只改实体的亮度
-        if (ClientEventHandler.activeThermalImaging) {
-            ci.cancel();
-            double d0 = Mth.lerp(pPartialTick, pEntity.xOld, pEntity.getX());
-            double d1 = Mth.lerp(pPartialTick, pEntity.yOld, pEntity.getY());
-            double d2 = Mth.lerp(pPartialTick, pEntity.zOld, pEntity.getZ());
-            float f = Mth.lerp(pPartialTick, pEntity.yRotO, pEntity.getYRot());
-            this.entityRenderDispatcher.render(pEntity, d0 - pCamX, d1 - pCamY, d2 - pCamZ, f, pPartialTick, pPoseStack,
-                    pBufferSource, LightTexture.FULL_BRIGHT);
-        }
-    }
-
+    // Capture heat-source geometry without changing normal entity lighting.
     @WrapOperation(method = "renderEntity(Lnet/minecraft/world/entity/Entity;DDDFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;render(Lnet/minecraft/world/entity/Entity;DDDFFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"))
     private void superbWarfare$captureThermalEntity(EntityRenderDispatcher dispatcher, Entity entity,

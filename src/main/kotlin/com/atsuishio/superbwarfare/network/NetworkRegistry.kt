@@ -118,6 +118,7 @@ fun registerClientReceivers() {
     clientReceiver<OpenResonanceReforgingScreenMessage>()
     clientReceiver<OpenTacticalMapScreenMessage>()
     clientReceiver<RealisticShootModeSyncMessage>()
+    clientReceiver<UnrestrictedModificationSyncMessage>()
 }
 
 fun registerPayloads() {

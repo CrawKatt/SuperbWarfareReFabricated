@@ -5,11 +5,11 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.accessor.RenderTargetStencilAccessor
 import com.atsuishio.superbwarfare.client.ClientRenderHandler
 import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
-import com.atsuishio.superbwarfare.client.shader.ThermalShaderHandler
 import com.atsuishio.superbwarfare.compat.shader.ShaderCompat
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.entity.projectile.ReforgingGravityBallEntity
 import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback.Context as RenderLevelStageEvent
+import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.mojang.blaze3d.pipeline.RenderTarget
 import com.mojang.blaze3d.pipeline.TextureTarget
 import com.mojang.blaze3d.platform.GlStateManager
@@ -430,7 +430,7 @@ class ReforgingGravityBallRenderer(context: EntityRendererProvider.Context) :
                 entityBeforeReady = false
                 entityMaskReady = false
                 canLensThisFrame = DisplayConfig.ENABLE_SPECIAL_PROJECTILE_EFFECTS.get() && lensShader != null && !lensFailed &&
-                    !ThermalShaderHandler.isActive() &&
+                    !ClientEventHandler.activeThermalImaging &&
                     // Fabulous composites additional entity targets later; a single-color mask is incomplete there.
                     !Minecraft.useShaderTransparency() &&
                     (!shaderPackActive || ShaderCompat.getPostProcessWorldState(false) != null)

@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.config.server.GunConfig
 import com.atsuishio.superbwarfare.ksp.annotation.RegisterPacket
 import com.atsuishio.superbwarfare.network.ClientPacketPayload
 import com.atsuishio.superbwarfare.network.PayloadContext
+import com.atsuishio.superbwarfare.tools.mc
 import kotlinx.serialization.Serializable
 
 /**
@@ -19,7 +20,7 @@ import kotlinx.serialization.Serializable
 data class UnrestrictedModificationSyncMessage(val enabled: Boolean) : ClientPacketPayload() {
     override fun PayloadContext.handler() {
         // 单人游戏客户端与内置服务端共享同一份配置对象，旧包不应覆盖服务端的新值
-        if (connection().isMemoryConnection || !SERVER_CONFIG.isLoaded) return
+        if (mc.connection?.connection?.isMemoryConnection != false || !SERVER_CONFIG.isLoaded) return
 
         GunConfig.UNRESTRICTED_MODIFICATION.set(enabled)
     }

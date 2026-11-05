@@ -63,14 +63,6 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
         }
     }
 
-    @Inject(method = "isBodyVisible(Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At("HEAD"), cancellable = true)
-    protected void isBodyVisible(T pLivingEntity, CallbackInfoReturnable<Boolean> cir) {
-        if (ClientEventHandler.activeThermalImaging) {
-            cir.cancel();
-            cir.setReturnValue(true);
-        }
-    }
-
     @Inject(
             method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
             at = @At("HEAD"),
