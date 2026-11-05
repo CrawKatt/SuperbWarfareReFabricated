@@ -9,6 +9,7 @@ import com.atsuishio.superbwarfare.compat.tacz.TACZGunEventHandler
 import com.atsuishio.superbwarfare.compat.tacz.TaczCompat
 import com.atsuishio.superbwarfare.config.CommonConfig
 import com.atsuishio.superbwarfare.config.RealisticShootModeSync
+import com.atsuishio.superbwarfare.config.UnrestrictedModificationSync
 import com.atsuishio.superbwarfare.config.ServerConfig
 import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.DataLoader
@@ -133,6 +134,7 @@ class Mod : ModInitializer {
 
         NetworkRegistry.register()
         RealisticShootModeSync.register()
+        UnrestrictedModificationSync.register()
         ModSyncedCapabilities.register()
         DataLoader.register()
         WreckageLootDataManager.register()
