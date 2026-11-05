@@ -71,6 +71,19 @@ sourceSets.main {
     }
 }
 
+fabricApi {
+    configureTests {
+        createSourceSet.set(true)
+        modId.set("superbwarfare_gametest")
+        enableClientGameTests.set(false)
+    }
+}
+
+loom.runs.named("gameTest") {
+    vmArg("-Xmx1G")
+    vmArg("-Dfabric-api.gametest.report-file=${layout.buildDirectory.file("reports/gametest.xml").get().asFile}")
+}
+
 val sbwRecipeResources = fileTree("src/generated/resources/data/superbwarfare") {
     include("recipes/**/*.json", "advancements/recipes/**/*.json")
 }
