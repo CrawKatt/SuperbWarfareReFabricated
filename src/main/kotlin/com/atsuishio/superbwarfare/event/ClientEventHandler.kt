@@ -775,6 +775,9 @@ object ClientEventHandler {
     @JvmField
     var activeThermalImaging: Boolean = false
 
+    @JvmField
+    var scopeThermalEnabled: Boolean = true
+
     // 原VectorUtil的属性
     @JvmField
     var fov: Double = 70.0
@@ -863,6 +866,8 @@ object ClientEventHandler {
         resetMeleeOnDeath()
         meleePlayer = null
         meleeLevel = null
+        // 退出世界后热融合开关回到默认开启，避免把上一个存档里关掉的状态带过来
+        scopeThermalEnabled = true
         ReforgingGravityBallRenderer.clearWorldEffects()
         ScopeLensPostProcessor.close()
         com.atsuishio.superbwarfare.client.renderer.scope.ScopeThermalRenderer.close()
