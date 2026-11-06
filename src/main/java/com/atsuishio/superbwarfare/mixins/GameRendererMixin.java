@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.data.vehicle.VehicleData;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback;
+import com.atsuishio.superbwarfare.event.custom.RenderFrameCallback;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.init.ModTags;
@@ -59,6 +60,7 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "render", at = @At("HEAD"))
     private void superbWarfare$renderFramePre(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) {
+        RenderFrameCallback.EVENT.invoker().onRenderFrame(deltaTracker);
         ClientEventHandler.handleWeaponFire();
         ClientEventHandler.handleWeaponBreathSway();
     }

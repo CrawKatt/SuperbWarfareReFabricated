@@ -60,6 +60,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         SyncedEntityWorldRenderer.init();
         ModParticleRenderTypes.init();
         ScopeLensShader.init();
+        com.atsuishio.superbwarfare.client.renderer.gun.StaticGunRenderer.INSTANCE.register();
         CoreShaderRegistrationCallback.EVENT.register(ScopeThermalRenderer.INSTANCE::onRegisterShaders);
         CoreShaderRegistrationCallback.EVENT.register(ClientRenderHandler::registerGravityLensingShader);
         SnapshotWarningScreen.register();

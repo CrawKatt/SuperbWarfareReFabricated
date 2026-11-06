@@ -30,6 +30,7 @@ import com.atsuishio.superbwarfare.data.gun.GunData.Companion.from
 import com.atsuishio.superbwarfare.data.gun.subdata.ScopeStackEntry
 import com.atsuishio.superbwarfare.data.gun.value.AttachmentType
 import com.atsuishio.superbwarfare.data.gun_skin.GunSkin
+import com.atsuishio.superbwarfare.data.gun_skin.GunSkinInfo
 import com.atsuishio.superbwarfare.event.ClientEventHandler
 import com.atsuishio.superbwarfare.event.DeployedWeaponHandler
 import com.atsuishio.superbwarfare.event.ShieldRuntime
@@ -313,7 +314,22 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         var shown: Matrix4f? = null
     )
 
-    override fun renderModel(
+    protected data class SelectedGunModel(val model: GeoGunModel, val texture: ResourceLocation, val useLod: Boolean)
+
+    /** Keep model/texture selection together; a missing LOD must not hide the gun. */
+    protected fun selectGunModel(resource: ModelResource, skin: GunSkinInfo?, preferLod: Boolean): SelectedGunModel? {
+        val activeSkin = skin?.takeIf { it.texture != null }
+        if (preferLod && resource.hasLOD() && (activeSkin == null || activeSkin.lodTexture != null)) {
+            val texture = activeSkin?.lodTexture ?: resource.getLODTexture(1)
+            val model = GeoGunModel.create(resource, 1)
+            if (model != null && texture != null) return SelectedGunModel(model, texture, true)
+        }
+        val model = GeoGunModel.create(resource) ?: return null
+        val texture = activeSkin?.texture ?: resource.texture ?: return null
+        return SelectedGunModel(model, texture, false)
+    }
+
+    public override fun renderModel(
         poseStack: PoseStack,
         transformType: ItemDisplayContext,
         stack: ItemStack,
@@ -323,6 +339,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         partialTick: Float
     ) {
         handledScopeAttachment = null
+        if (StaticGunRenderer.tryRender(stack, transformType, poseStack, bufferSource, packedLight, packedOverlay)) return
         scopedBeamTailBone = null
         if (transformType.firstPerson()) {
             lastBoneTransforms[handForContext(transformType)]?.clear()
@@ -335,23 +352,10 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         val resource = GunResource.compute(stack)
         val modelResource = resource.getModel()
 
-        val skin = GunSkin.getSkin(stack)?.takeIf { it.texture != null }
-        val useLod = !transformType.firstPerson()
-                && (skin == null || skin.lodTexture != null)
-                && !GunMountContext.active
-                && DisplayConfig.ENABLE_GUN_LOD.get()
-                && !RenderDistanceHelper.isInGui()
-        val model = if (useLod) {
-            GeoGunModel.create(modelResource, 1)
-        } else {
-            GeoGunModel.create(modelResource)
-        } ?: return
-
-        val texture = (if (useLod) skin?.lodTexture else skin?.texture) ?: if (useLod) {
-            modelResource.getLODTexture(1)
-        } else {
-            modelResource.texture
-        } ?: return
+        val selected = selectGunModel(modelResource, GunSkin.getSkin(stack), StaticGunRenderer.shouldUseLOD(transformType)) ?: return
+        val model = selected.model
+        val texture = selected.texture
+        val useLod = selected.useLod
 
         model.renderHand = transformType.firstPerson()
         subWeaponFollow = null
@@ -1377,7 +1381,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         resolveAttachmentLocalTransform(stack, AttachmentType.MUZZLE)
 
     /** 所有渲染、出光口与瞄准锚点都用相同顺序：挂点 × 实例调整 × 配件基础旋转。 */
-    private fun attachmentTransform(
+    protected fun attachmentTransform(
         stack: ItemStack,
         type: AttachmentType,
         definition: AttachmentDefinition

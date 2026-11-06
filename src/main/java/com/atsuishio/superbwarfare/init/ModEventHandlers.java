@@ -39,7 +39,7 @@ public class ModEventHandlers {
 
     public static void init() {
         UseBlockCallback.EVENT.register((player, level, hand, hit) ->
-                ItemDisplayBoardEventHandler.onRightClickBlock(player, level, hit.getBlockPos()));
+                ItemDisplayBoardEventHandler.onRightClickBlock(player, level, hit));
         PlayerXpChangeCallback.EVENT.register(StrivingForPerfection.INSTANCE::onXpChange);
         ResourceLocation meleeRespawnPhase = ResourceLocation.fromNamespaceAndPath("superbwarfare", "melee_respawn");
         LivingIncomingDamageCallback.EVENT.addPhaseOrdering(meleeRespawnPhase, Event.DEFAULT_PHASE);
