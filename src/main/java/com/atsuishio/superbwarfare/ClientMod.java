@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.client.PoseTool;
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
 import com.atsuishio.superbwarfare.client.renderer.SyncedEntityWorldRenderer;
+import com.atsuishio.superbwarfare.client.renderer.gun.StaticGunRenderer;
 import com.atsuishio.superbwarfare.client.renderer.ModParticleRenderTypes;
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensShader;
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeThermalRenderer;
@@ -95,6 +96,7 @@ public class ClientMod implements ClientModInitializer {
         DataDumpChatHandler.register();
         TacticalMapChunkListener.register();
         SyncedEntityWorldRenderer.register();
+        StaticGunRenderer.register();
         TowingChainRenderer.register();
         OverlayTraceHandler.register();
         ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> {
