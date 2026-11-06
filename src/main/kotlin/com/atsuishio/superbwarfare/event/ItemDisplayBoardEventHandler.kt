@@ -23,7 +23,7 @@ object ItemDisplayBoardEventHandler {
         if (!player.isShiftKeyDown) return InteractionResult.PASS
 
         val blockEntity = level.getBlockEntity(pos) as? ItemDisplayBoardBlockEntity ?: return InteractionResult.PASS
-        if (blockEntity.item.isEmpty) return InteractionResult.PASS
+        if (!blockEntity.hasItem) return InteractionResult.PASS
 
         if (level.isClientSide) return InteractionResult.SUCCESS
 
