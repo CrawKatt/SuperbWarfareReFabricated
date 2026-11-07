@@ -20,6 +20,7 @@ import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.overlay.ammo.AmmoBarHud
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
+import com.atsuishio.superbwarfare.client.renderer.gun.MuzzleFlashRenderer
 import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensPostProcessor
 import com.atsuishio.superbwarfare.client.shader.RadiationShaderHandler
@@ -952,6 +953,7 @@ object ClientEventHandler {
     }
 
     fun clearGravityLensing() {
+        MuzzleFlashRenderer.clear()
         resetMeleeOnDeath()
         meleePlayer = null
         meleeLevel = null
@@ -2417,6 +2419,7 @@ object ClientEventHandler {
         recoilY = (2 * Math.random() - 1).toFloat() * gunRecoilY
         noSprintTicks = 10f
 
+        MuzzleFlashRenderer.recordShot(player, stack)
         ClientGunFireEvent.post(ClientGunFireEvent(player, stack))
     }
 

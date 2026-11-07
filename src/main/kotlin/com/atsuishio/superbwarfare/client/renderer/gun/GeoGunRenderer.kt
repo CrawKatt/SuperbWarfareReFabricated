@@ -57,7 +57,6 @@ import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.firstperson.Firs
 import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.render.CameraStateCache
 import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.resource.ParticleDefinitionLoader
 import com.github.mcmodderanchor.simplebedrockmodel.v1.particle.runtime.ParticleEmitterInstance
-import com.github.mcmodderanchor.simplebedrockmodel.v1.molang.runtime.value.NumberValue
 import com.github.mcmodderanchor.simplebedrockmodel.v2.client.renderer.AbstractGeoItemRendererV2
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BoneDefinition
 import com.github.mcmodderanchor.simplebedrockmodel.v2.common.model.runtime.BoneState
@@ -84,14 +83,9 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
-import org.joml.Matrix3f
-import org.joml.Matrix4f
-import org.joml.Quaternionf
-import org.joml.Vector2f
-import org.joml.Vector3f
+import org.joml.*
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.opengl.GL11
-import java.lang.Math
 import java.util.*
 import kotlin.math.atan2
 import kotlin.math.ceil
@@ -114,6 +108,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
     override fun blockOffhandRender(): Boolean = true
 
     protected val capturedRenderPose = mutableMapOf<InteractionHand, Matrix4f>()
+    private val shotParticles = mutableMapOf<InteractionHand, MutableList<ResourceLocation>>()
     protected val lastBoneTransforms = mutableMapOf<InteractionHand, MutableMap<String, Matrix4f>>()
     protected val muzzleEmitterLocators =
         mutableMapOf<InteractionHand, MutableMap<ParticleEmitterInstance, String>>()
@@ -356,6 +351,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         scopedBeamTailBone = null
         if (transformType.firstPerson()) {
             lastBoneTransforms[handForContext(transformType)]?.clear()
+            shotParticles[handForContext(transformType)]?.clear()
         }
 
         if (transformType.firstPerson() || transformType == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
@@ -613,16 +609,17 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
             val subWeaponFlare = if (subWeaponFire) resolveSubWeaponFlareTransform(stack, model) else null
             val subWeaponFlashScale = if (subWeaponFire) resolveSubWeaponMuzzleFlashScale(stack) else 1.0f
 
-            MuzzleFlashRenderer.render(
-                poseStack,
-                model,
-                stack,
-                bufferSource,
-                attachmentMuzzleTransform,
-                muzzleFlashScale,
-                subWeaponFlare,
-                subWeaponFlashScale
-            )
+            val deployed = ActiveGun.isDeployed(from(stack), true)
+            val anchor = MuzzleFlashRenderer.resolveFlareTransform(model, stack, attachmentMuzzleTransform, subWeaponFlare, deployed)
+            val holder = localPlayer
+            if (holder != null && localFirstPersonHand == InteractionHand.MAIN_HAND && hand == InteractionHand.MAIN_HAND) {
+                MuzzleFlashRenderer.renderShot(holder, stack, true, poseStack, bufferSource, anchor,
+                    if (deployed) subWeaponFlashScale else muzzleFlashScale, partialTick) { fx, smoke, sparks ->
+                    MuzzleParticles.layers(fx, smoke, sparks, 0.0) { effect ->
+                        shotParticles.getOrPut(hand) { mutableListOf() }.add(effect)
+                    }
+                }
+            }
 
             // 枪口焰刚从这个挂点钻出来，顺手把同一个挂点交给子弹：
             // 每帧交一份"枪管现在指向哪儿"，开火窗口里再交一份"虚拟出膛点"的偏移
@@ -638,14 +635,26 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
             val transforms = lastBoneTransforms.getOrPut(hand) { mutableMapOf() }
             // 副武器开火时枪口定位点改挂副武器模型自己的枪口，且不注册枪口配件的 `MUZZLE_BONE`
             // （`resolveMuzzleLocator` 优先取它，留着会把榴弹的枪口烟吸到枪管前端去）
-            val subWeaponMuzzle = subWeaponFlare?.takeIf { animation?.isSubWeaponFire() == true }
-            if (subWeaponMuzzle != null) {
-                transforms[FLARE_BONE] = Matrix4f(subWeaponMuzzle)
+            anchor?.let { transforms[MuzzleParticles.ANCHOR] = Matrix4f(it) }
+            if (deployed) {
+                subWeaponFlare?.let { transforms[FLARE_BONE] = Matrix4f(it) }
             } else {
                 for (boneName in listOf(FLARE_BONE, MUZZLE_FLASH_BONE)) {
                     model.getGlobalTransform(boneName)?.let { transforms[boneName] = Matrix4f(it) }
                 }
                 attachmentMuzzleTransform?.let { transforms[MUZZLE_BONE] = Matrix4f(it) }
+            }
+        } else if ((transformType == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND ||
+                    transformType == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) && GunRenderContext.isMainArm()) {
+            val holder = GunRenderContext.entity()
+            if (holder != null && MuzzleFlashRenderer.hasShot(holder)) {
+                val deployed = ActiveGun.isDeployed(from(stack), true)
+                val sub = if (deployed) resolveSubWeaponFlareTransform(stack, model) else null
+                val anchor = MuzzleFlashRenderer.resolveFlareTransform(model, stack, attachmentMuzzleTransform, sub, deployed)
+                MuzzleFlashRenderer.renderShot(holder, stack, false, poseStack, bufferSource, anchor,
+                    if (deployed) resolveSubWeaponMuzzleFlashScale(stack) else muzzleFlashScale, partialTick) { fx, smoke, sparks ->
+                    MuzzleParticles.spawnWorld(Matrix4f(poseStack.last().pose()).mul(anchor!!), fx, smoke, sparks)
+                }
             }
         }
 
@@ -1904,48 +1913,35 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         stack: ItemStack,
         hand: InteractionHand
     ) {
-        val resource = GunResource.compute(stack)
-        if (!resource.hasSmoke) return
-
+        val animation = FirstPersonRenderHandler.getActiveAnimationInstance(hand) as? GeoGunAnimationInstance
+        val events = animation?.consumePendingParticles().orEmpty()
+        val pending = shotParticles.remove(hand).orEmpty()
         val basePose = capturedRenderPose[hand] ?: return
         val boneTransforms = lastBoneTransforms[hand] ?: return
-        if (boneTransforms.isEmpty()) return
-
-        val animation = FirstPersonRenderHandler.getActiveAnimationInstance(hand) as? GeoGunAnimationInstance ?: return
+        val active = ActiveGun.stackOf(from(stack), true)
+        val resource = GunResource.compute(active)
         val system = FirstPersonRenderHandler.getParticleSystem()
         val newEmitters = ArrayList<ParticleEmitterInstance>()
         val locators = muzzleEmitterLocators.getOrPut(hand) { WeakHashMap() }
 
-        for (data in animation.consumePendingParticles()) {
-            val definition = ParticleDefinitionLoader.getInstance().getDefinition(data.effect()) ?: continue
+        fun spawn(effect: ResourceLocation, locator: String?) {
+            if (locator == null || locator !in boneTransforms || system.emitters.size >= 64) return
+            val definition = ParticleDefinitionLoader.getInstance().getDefinition(effect) ?: return
             val emitter = system.addEmitter(definition, hand)
-            val smoke = resource.smoke
-            val shotRandom = Math.random().toFloat()
-            val sizeJitter = 1f - smoke.randomSize + shotRandom * 2f * smoke.randomSize
-            val growthJitter = 1f - smoke.randomGrowth + shotRandom * 2f * smoke.randomGrowth
-            val lifetimeJitter = 1f - smoke.randomLifetime + shotRandom * 2f * smoke.randomLifetime
-            val speedJitter = 1f - smoke.randomSpeed + shotRandom * 2f * smoke.randomSpeed
-            val countJitter = 1f - smoke.randomCount + shotRandom * 2f * smoke.randomCount
-            val opacityJitter = 1f - smoke.randomOpacity + shotRandom * 2f * smoke.randomOpacity
-
-            val variables = emitter.molang.variableStorage
-            variables.set("smoke_size", NumberValue.of((smoke.size * sizeJitter).toDouble()))
-            variables.set("smoke_growth", NumberValue.of((smoke.growth * growthJitter).toDouble()))
-            variables.set("smoke_lifetime", NumberValue.of((smoke.lifetime * lifetimeJitter).toDouble()))
-            variables.set("smoke_speed", NumberValue.of((smoke.speed * speedJitter).toDouble()))
-            variables.set(
-                "smoke_count",
-                NumberValue.of((smoke.count * countJitter).roundToInt().coerceAtLeast(1).toDouble())
-            )
-            variables.set("smoke_opacity", NumberValue.of((smoke.opacity * opacityJitter).toDouble()))
-            variables.set("smoke_drag", NumberValue.of(resource.smoke.drag.toDouble()))
-            val locator = resolveMuzzleLocator(data, boneTransforms)
-            if (locator == null) {
-                emitter.setRemoved(true)
-                continue
-            }
+            MuzzleParticles.configure(emitter, resource, effect)
             locators[emitter] = locator
             newEmitters += emitter
+        }
+
+        for (effect in pending) spawn(effect, MuzzleParticles.ANCHOR)
+        for (data in events) {
+            if (data.effect() == MuzzleParticles.smoke) {
+                if (resource.muzzleFx?.trigger == "shot") continue
+                val anchor = if (MuzzleParticles.ANCHOR in boneTransforms) MuzzleParticles.ANCHOR else resolveMuzzleLocator(data, boneTransforms)
+                MuzzleParticles.layers(resource, true, false, 0.0) { spawn(it, anchor) }
+            } else {
+                spawn(data.effect(), resolveMuzzleLocator(data, boneTransforms))
+            }
         }
 
         if (locators.isEmpty()) return
