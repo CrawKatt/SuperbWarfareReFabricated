@@ -8,27 +8,31 @@ import com.atsuishio.superbwarfare.tools.mc
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.world.phys.Vec3
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
+import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback
+import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback.Context as RenderLevelStageEvent
 import org.joml.Matrix4f
 import java.util.Random
 import kotlin.collections.ArrayDeque
 import kotlin.math.abs
 
 /** Shared seeded lightning geometry and short-lived, world-space discharge effects. */
-@EventBusSubscriber(modid = Mod.MODID, value = [Dist.CLIENT])
+@Environment(EnvType.CLIENT)
 object LightningArcRenderer {
+    fun register() {
+        RenderLevelStageCallback.EVENT.register(::render)
+        ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> logout() }
+    }
+
     private val WHITE_TINT = Vec3(1.0, 1.0, 1.0)
     private val arcRandom = Random()
     private data class Arc(val start: Vec3, val end: Vec3, val seed: Long, val expires: Long)
     private var world: ClientLevel? = null
     private val arcs = ArrayDeque<Arc>()
 
-    @SubscribeEvent
-    fun logout(event: ClientPlayerNetworkEvent.LoggingOut) {
+    fun logout() {
         arcs.clear()
         world = null
     }
@@ -43,7 +47,6 @@ object LightningArcRenderer {
         arcs.addLast(Arc(start, end, seed, level.gameTime + 4))
     }
 
-    @SubscribeEvent
     fun render(event: RenderLevelStageEvent) {
         if (event.stage != RenderLevelStageEvent.Stage.AFTER_PARTICLES) return
         if (ShaderCompat.isRenderingShadowPass()) return

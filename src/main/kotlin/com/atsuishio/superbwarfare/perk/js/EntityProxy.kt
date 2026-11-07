@@ -19,7 +19,7 @@ import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.*
 import net.minecraft.world.entity.monster.Creeper
 import net.minecraft.world.entity.player.Player
-import net.neoforged.neoforge.network.PacketDistributor
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -51,7 +51,7 @@ class EntityProxy(val entity: Entity?) {
     fun showHitFeedback() {
         val player = entity as? ServerPlayer ?: return
         player.connection.send(ClientboundSoundPacket(
-            Holder.direct(ModSounds.INDICATION.get()), SoundSource.PLAYERS,
+            Holder.direct(ModSounds.INDICATION), SoundSource.PLAYERS,
             player.x, player.y, player.z, 1f, 1f, player.level().random.nextLong()
         ))
         sendPacketTo(player, ClientIndicatorMessage(0, 5))
@@ -102,8 +102,8 @@ class EntityProxy(val entity: Entity?) {
         val level = start.level() as? ServerLevel ?: return
         val from = start.boundingBox.center
         val to = end.boundingBox.center
-        PacketDistributor.sendToPlayersNear(level, null, from.x, from.y, from.z, 96.0,
-            LightningArcMessage(from.x, from.y, from.z, to.x, to.y, to.z, level.random.nextLong()))
+        val packet = LightningArcMessage(from.x, from.y, from.z, to.x, to.y, to.z, level.random.nextLong())
+        PlayerLookup.around(level, from, 96.0).forEach { sendPacketTo(it, packet) }
     }
 
     // ── Type checks ──
