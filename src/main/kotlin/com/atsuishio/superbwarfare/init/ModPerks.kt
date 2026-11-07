@@ -157,6 +157,7 @@ object ModPerks {
     }
     @JvmField val STRIVING_FOR_PERFECTION = autoRegistryObjects["striving_for_perfection"]
         ?: registerFuncPerk("striving_for_perfection") { StrivingForPerfection }
+    @JvmField val PRACTICE_MAKES_PERFECT = autoRegistryObjects.getValue("practice_makes_perfect")
     // @formatter:on
 
     private fun registerDamagePerk(id: String, perk: () -> Perk): Perk {
