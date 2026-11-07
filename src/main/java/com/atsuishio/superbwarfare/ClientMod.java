@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.client.model.DragonTeethObjModelLoader;
 import com.atsuishio.superbwarfare.client.PoseTool;
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
+import com.atsuishio.superbwarfare.client.renderer.special.LightningArcRenderer;
 import com.atsuishio.superbwarfare.client.renderer.SyncedEntityWorldRenderer;
 import com.atsuishio.superbwarfare.client.renderer.gun.StaticGunRenderer;
 import com.atsuishio.superbwarfare.client.renderer.ModParticleRenderTypes;
@@ -97,6 +98,7 @@ public class ClientMod implements ClientModInitializer {
         TacticalMapChunkListener.register();
         SyncedEntityWorldRenderer.register();
         StaticGunRenderer.register();
+        LightningArcRenderer.register();
         TowingChainRenderer.register();
         OverlayTraceHandler.register();
         ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> {

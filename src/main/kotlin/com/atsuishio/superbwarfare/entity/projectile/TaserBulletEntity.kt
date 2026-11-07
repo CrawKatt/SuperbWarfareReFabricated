@@ -1,6 +1,8 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
+import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent
 import com.atsuishio.superbwarfare.event.ShieldHandler
+import com.atsuishio.superbwarfare.event.custom.ProjectileHitCallback
 import com.atsuishio.superbwarfare.init.ModDamageTypes.causeShockDamage
 import com.atsuishio.superbwarfare.init.ModMobEffects
 import com.atsuishio.superbwarfare.init.ModSounds
@@ -64,6 +66,11 @@ open class TaserBulletEntity(type: EntityType<out TaserBulletEntity>, level: Lev
                 this.discard()
                 return
             }
+        }
+
+        if (!level().isClientSide && ProjectileHitCallback.postHitEntity(ProjectileHitEvent.HitEntity(owner, this, entity, result.location))) {
+            discard()
+            return
         }
 
         if (owner is ServerPlayer) {
