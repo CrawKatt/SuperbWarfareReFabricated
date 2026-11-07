@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.PlayerEventHandler;
+import com.atsuishio.superbwarfare.event.custom.LivingDamageCallback;
 import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback;
 import com.atsuishio.superbwarfare.event.custom.PlayerXpChangeCallback;
 import com.atsuishio.superbwarfare.item.weapon.BeastItem;
@@ -23,6 +24,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
@@ -48,6 +51,14 @@ public abstract class PlayerMixin extends Entity {
         LivingHurtCallback.EVENT.invoker().onLivingHurt(event);
         amount.set(event.getAmount());
         return event.isCanceled() || event.getAmount() <= 0.0F;
+    }
+
+    @ModifyVariable(method = "actuallyHurt", at = @At("LOAD"), argsOnly = true, ordinal = 0,
+            slice = @Slice(from = @At(value = "INVOKE", target = "Ljava/lang/Math;round(F)I")))
+    private float superbwarfare$onLivingDamage(float damage, DamageSource source) {
+        LivingDamageCallback.Event event = new LivingDamageCallback.Event((Player) (Object) this, source, damage);
+        LivingDamageCallback.EVENT.invoker().onLivingDamage(event);
+        return event.isCanceled() ? 0.0F : event.getAmount();
     }
 
     @Inject(method = "giveExperiencePoints(I)V", at = @At("HEAD"), cancellable = true)

@@ -17,6 +17,7 @@ import com.atsuishio.superbwarfare.entity.mixin.ICustomKnockback
 import com.atsuishio.superbwarfare.entity.mixin.ExplosionAccess
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.event.custom.LivingDamageCallback
 import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback
 import com.atsuishio.superbwarfare.event.custom.PreKillCallback
 import com.atsuishio.superbwarfare.init.*
@@ -66,6 +67,34 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 object LivingEventHandler {
+    // LivingDamageEvent runs after absorption has already been consumed. Weak keys also
+    // release snapshots whose hurt event was canceled before reaching that stage.
+    private val meleeAbsorption = WeakHashMap<LivingEntity, Pair<DamageSource, Float>>()
+
+    fun captureMeleeAbsorption(event: LivingHurtCallback.Event) {
+        if (event.entity.level().isClientSide || !DamageTypeTool.isMeleeDamage(event.source)) return
+        meleeAbsorption[event.entity] = event.source to event.entity.absorptionAmount
+    }
+
+    fun onMeleeDamage(event: LivingDamageCallback.Event) {
+        val target = event.entity
+        if (target.level().isClientSide || !DamageTypeTool.isMeleeDamage(event.source)) return
+        val snapshot = meleeAbsorption.remove(target)
+        val absorbed = if (snapshot?.first === event.source) {
+            (snapshot.second - target.absorptionAmount).coerceAtLeast(0f)
+        } else 0f
+        val damage = (if (event.isCanceled) 0f else event.amount.coerceAtLeast(0f)) + absorbed
+        if (damage <= 0f) return
+        val attacker = event.source.entity as? LivingEntity ?: return
+        val stack = attacker.mainHandItem
+        if (stack.item !is GunItem) return
+        val data = GunData.from(stack)
+        for (type in Perk.Type.entries) {
+            data.perk.getInstances(type).forEach {
+                it.perk.onMeleeDamage(damage, data, it, target, event.source)
+            }
+        }
+    }
 
     @JvmStatic
     fun onLivingChangeTargetEvent(entity: Mob, target: LivingEntity?) {

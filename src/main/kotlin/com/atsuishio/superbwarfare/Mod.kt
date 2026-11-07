@@ -30,6 +30,7 @@ import com.atsuishio.superbwarfare.world.saveddata.ProjectileChunkSavedData
 import com.atsuishio.superbwarfare.event.PlayerEventHandler
 import com.atsuishio.superbwarfare.event.ShieldHandler
 import com.atsuishio.superbwarfare.event.custom.LivingAttackCallback
+import com.atsuishio.superbwarfare.event.custom.LivingDamageCallback
 import com.atsuishio.superbwarfare.event.custom.LivingDeathCallback
 import com.atsuishio.superbwarfare.event.custom.LivingDropsCallback
 import com.atsuishio.superbwarfare.event.custom.LivingExperienceDropCallback
@@ -271,6 +272,8 @@ class Mod : ModInitializer {
             LivingEventHandler.onEntityHurt(event)
         }
         LivingHurtCallback.EVENT.register(ShieldHandler::onEntityHurt)
+        LivingHurtCallback.EVENT.register(LivingEventHandler::captureMeleeAbsorption)
+        LivingDamageCallback.EVENT.register(LivingEventHandler::onMeleeDamage)
         LivingDeathCallback.EVENT.register { event ->
             if (!event.entity.level().isClientSide) {
                 LivingEventHandler.onEntityDeath(event.entity, event.source)

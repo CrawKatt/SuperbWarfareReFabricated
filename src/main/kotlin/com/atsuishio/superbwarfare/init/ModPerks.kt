@@ -196,6 +196,7 @@ object ModPerks {
     }
     @JvmField val INVISIBLE_BLADE_SHAPENESS = autoRegistryObjects["invisible_blade_shapeness"]
         ?: registerDamagePerk("invisible_blade_shapeness") { InvisibleBladeShapeness }
+    @JvmField val CRUSHING_FORCE = autoRegistryObjects.getValue("crushing_force")
     // @formatter:on
 
     private fun autoRegisterFromJsons() {
