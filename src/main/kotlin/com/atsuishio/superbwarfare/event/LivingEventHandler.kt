@@ -46,12 +46,31 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Explosion
+import net.minecraft.world.phys.Vec3
 import java.util.*
 import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 object LivingEventHandler {
+    @JvmStatic
+    fun onMeleeDamage(target: LivingEntity, source: DamageSource, newDamage: Float, absorptionReduction: Float) {
+        if (target.level().isClientSide || !DamageTypeTool.isMeleeDamage(source)) return
+        // Post includes actual absorption consumption, even when no health damage remains.
+        val damage = newDamage.coerceAtLeast(0f) +
+                absorptionReduction.coerceAtLeast(0f)
+        if (damage <= 0f) return
+        val attacker = source.entity as? LivingEntity ?: return
+        val stack = attacker.mainHandItem
+        if (stack.item !is GunItem) return
+        val data = GunData.from(stack)
+        for (type in Perk.Type.entries) {
+            data.perk.getInstances(type).forEach {
+                it.perk.onMeleeDamage(damage, data, it, target, source)
+            }
+        }
+    }
+
     @JvmStatic
     fun onLivingChangeTargetEvent(entity: Mob, target: LivingEntity?) {
         val vehicle = entity.vehicle

@@ -17,6 +17,7 @@ import com.atsuishio.superbwarfare.event.GunEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.ShieldHandler;
 import com.atsuishio.superbwarfare.event.custom.LivingIncomingDamageCallback;
+import com.atsuishio.superbwarfare.event.custom.LivingDamagePostCallback;
 import com.atsuishio.superbwarfare.event.PlayerEventHandler;
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity;
 import com.atsuishio.superbwarfare.entity.living.TargetEntity;
@@ -48,6 +49,7 @@ public class ModEventHandlers {
         AttackEntityCallback.EVENT.register(meleeRespawnPhase, (player, world, hand, entity, hitResult) ->
                 PlayerEventHandler.blockRespawnMeleeAttack(player) ? InteractionResult.FAIL : InteractionResult.PASS);
         LivingIncomingDamageCallback.EVENT.register(ShieldHandler::onEntityHurt);
+        LivingDamagePostCallback.EVENT.register(LivingDamagePostCallback.LOWEST_PHASE, LivingEventHandler::onMeleeDamage);
         SuperbWarfareEvents.register(MobEffectAddedEvent.class, event ->
                 BurnMobEffect.onBurnAdded(event.getEntity(), event.getEffectInstance(), event.getEffectSource()));
         SuperbWarfareEvents.register(MobEffectAddedEvent.class, event ->

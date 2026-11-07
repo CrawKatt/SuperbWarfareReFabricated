@@ -1,5 +1,8 @@
 package com.atsuishio.superbwarfare.mixins;
 
+import org.spongepowered.asm.mixin.injection.Slice;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.atsuishio.superbwarfare.event.custom.LivingDamagePostCallback;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.item.trinket.ParachuteItem;
 import com.atsuishio.superbwarfare.item.weapon.BeastItem;
@@ -100,5 +103,14 @@ public abstract class PlayerMixin extends Entity {
             args.set(1, (Double) args.get(1) + 3.0D);
             args.set(2, (Double) args.get(2) + 3.0D);
         }
+    }
+
+    @Inject(method = "actuallyHurt", at = @At("RETURN"), slice = @Slice(from = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/player/Player;setAbsorptionAmount(F)V", ordinal = 0, shift = At.Shift.AFTER)))
+    private void superbwarfare$afterDamage(DamageSource source, float amount, CallbackInfo ci,
+                                          @Local(argsOnly = true) float newDamage,
+                                          @Local(ordinal = 1) float damageBeforeAbsorption) {
+        LivingDamagePostCallback.EVENT.invoker().onDamage((Player) (Object) this, source,
+                newDamage, damageBeforeAbsorption - newDamage);
     }
 }

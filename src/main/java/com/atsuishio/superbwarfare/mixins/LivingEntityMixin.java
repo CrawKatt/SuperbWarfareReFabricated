@@ -1,5 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
+import org.spongepowered.asm.mixin.injection.Slice;
+import com.atsuishio.superbwarfare.event.custom.LivingDamagePostCallback;
 import com.atsuishio.superbwarfare.entity.mixin.DamageAccess;
 import com.atsuishio.superbwarfare.entity.mixin.DamageContainer;
 import com.atsuishio.superbwarfare.entity.mixin.ForceMobEffectAccess;
@@ -380,5 +382,14 @@ public abstract class LivingEntityMixin implements ICustomKnockback, DamageAcces
             this.lastDamageSource = pSource;
             this.lastDamageStamp = living.level().getGameTime();
         }
+    }
+
+    @Inject(method = "actuallyHurt", at = @At("RETURN"), slice = @Slice(from = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/LivingEntity;setAbsorptionAmount(F)V", ordinal = 0, shift = At.Shift.AFTER)))
+    private void superbwarfare$afterDamage(DamageSource source, float amount, CallbackInfo ci,
+                                          @Local(argsOnly = true) float newDamage,
+                                          @Local(ordinal = 1) float damageBeforeAbsorption) {
+        LivingDamagePostCallback.EVENT.invoker().onDamage((LivingEntity) (Object) this, source,
+                newDamage, damageBeforeAbsorption - newDamage);
     }
 }

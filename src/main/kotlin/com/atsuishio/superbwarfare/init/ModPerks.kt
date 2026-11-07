@@ -145,6 +145,7 @@ object ModPerks {
     lateinit var STEADY_RESOLVE: PERK
     lateinit var STOP_GAP: PERK
     lateinit var INVISIBLE_BLADE_SHAPENESS: PERK
+    lateinit var CRUSHING_FORCE: PERK
     // @formatter:on
 
     @JvmStatic
@@ -320,5 +321,6 @@ object ModPerks {
         }
         INVISIBLE_BLADE_SHAPENESS = autoRegistryObjects["invisible_blade_shapeness"]
             ?: registerDamagePerk("invisible_blade_shapeness") { InvisibleBladeShapeness }
+        CRUSHING_FORCE = autoRegistryObjects.getValue("crushing_force")
     }
 }
