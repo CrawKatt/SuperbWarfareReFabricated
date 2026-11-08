@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.atsuishio.superbwarfare.client.overlay.FlashbangOverlay;
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensPostProcessor;
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeThermalRenderer;
 import com.atsuishio.superbwarfare.compat.shader.ShaderCompat;
@@ -105,6 +106,7 @@ public class GameRendererMixin {
     private void superbWarfare$renderVanillaThermalScopes(float partialTicks, long finishTime, PoseStack poseStack, CallbackInfo ci) {
         if (!ShaderCompat.isShaderPackActive()) ScopeThermalRenderer.renderFullScreen();
         ScopeLensPostProcessor.render();
+        FlashbangOverlay.finishWorldFrame(partialTicks);
     }
 
     @Inject(method = "bobView(Lcom/mojang/blaze3d/vertex/PoseStack;F)V", at = @At("HEAD"), cancellable = true)
