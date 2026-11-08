@@ -78,8 +78,7 @@ object ModCapabilities {
                 if (blockEntity.isRemoved || direction == null) {
                     null
                 } else {
-                    val side = if (direction == Direction.UP || direction == Direction.DOWN) direction else Direction.NORTH
-                    SidedInvWrapper(blockEntity, side)
+                    SidedInvWrapper(blockEntity, direction)
                 }
             },
             ModBlockEntities.WEAPON_REPAIR_STATION
@@ -115,8 +114,7 @@ object ModCapabilities {
                 if (blockEntity.isRemoved || direction == null) {
                     null
                 } else {
-                    val side = if (direction == Direction.UP || direction == Direction.DOWN) direction else Direction.NORTH
-                    InventoryStorage.of(blockEntity, side)
+                    InventoryStorage.of(blockEntity, direction)
                 }
             },
             ModBlockEntities.WEAPON_REPAIR_STATION
