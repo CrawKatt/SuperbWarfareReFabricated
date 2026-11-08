@@ -56,6 +56,7 @@ import com.atsuishio.superbwarfare.item.armor.RuHelmet6b47Item
 import com.atsuishio.superbwarfare.item.armor.UsChestIotvItem
 import com.atsuishio.superbwarfare.item.armor.UsHelmetPasgtItem
 import com.atsuishio.superbwarfare.item.gun.GeoGunItem
+import com.atsuishio.superbwarfare.item.projectile.M84StunGrenadeItem
 import com.atsuishio.superbwarfare.tools.mc
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.tools.BedrockBoneCoordinateTool
@@ -370,6 +371,7 @@ object ClientRenderHandler {
             BuiltinItemRendererRegistry.INSTANCE.register(item, item.createRenderer())
         }
 
+        M84StunGrenadeItem.registerRenderer()
         val tm62Renderer = lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
         BuiltinItemRendererRegistry.INSTANCE.register(
             ModItems.TM_62
