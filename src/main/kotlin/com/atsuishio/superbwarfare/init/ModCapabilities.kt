@@ -100,15 +100,7 @@ object ModCapabilities {
         )
 
         ITEM_HANDLER_BLOCK.registerForBlockEntity(
-            { be: WeaponRepairStationBlockEntity, context: Direction? ->
-                if (context == null || be.isRemoved) null else SidedInvWrapper(
-                    be, when (context) {
-                        Direction.UP -> Direction.UP
-                        Direction.DOWN -> Direction.DOWN
-                        else -> Direction.NORTH
-                    }
-                )
-            },
+            { be: WeaponRepairStationBlockEntity, side: Direction? -> be.getItemHandler(side) },
             ModBlockEntities.WEAPON_REPAIR_STATION
         )
 
