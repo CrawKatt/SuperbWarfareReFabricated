@@ -81,6 +81,7 @@ import com.atsuishio.superbwarfare.item.armor.RuChest6b43Item
 import com.atsuishio.superbwarfare.item.armor.RuHelmet6b47Item
 import com.atsuishio.superbwarfare.item.armor.UsChestIotvItem
 import com.atsuishio.superbwarfare.item.armor.UsHelmetPasgtItem
+import com.atsuishio.superbwarfare.item.projectile.M84StunGrenadeItem
 import com.atsuishio.superbwarfare.tools.mc
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.tools.BedrockBoneCoordinateTool
@@ -439,6 +440,7 @@ object ClientRenderHandler {
         RuHelmet6b47Item.registerRenderer()
         UsChestIotvItem.registerRenderer()
         UsHelmetPasgtItem.registerRenderer()
+        M84StunGrenadeItem.registerRenderer()
     }
 
     @JvmStatic

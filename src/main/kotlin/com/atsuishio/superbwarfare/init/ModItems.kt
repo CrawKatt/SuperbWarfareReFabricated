@@ -222,7 +222,7 @@ object ModItems {
     @JvmField val RGO_GRENADE = registerAmmo("rgo_grenade") { RgoGrenadeItem() }
     @JvmField val TYPE_88_CLUSTER_GRENADES = registerAmmo("type_88_cluster_grenades") { Type88ClusterGrenadesItem() }
     @JvmField val M18_SMOKE_GRENADE = registerAmmo("m18_smoke_grenade") { M18SmokeGrenadeItem() }
-    @JvmField val FLASHBANG = registerAmmo("flashbang") { FlashbangItem() }
+    @JvmField val M84_STUN_GRENADE = registerAmmo("m84_stun_grenade") { M84StunGrenadeItem() }
     @JvmField val CLAYMORE_MINE = registerAmmo("claymore_mine") { ClaymoreMineItem() }
     @JvmField val TM_62 = registerAmmo("tm_62") { Tm62Item() }
     @JvmField val PTKM_1R = registerAmmo("ptkm_1r") { Ptkm1rItem() }
