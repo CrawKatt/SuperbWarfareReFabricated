@@ -76,6 +76,7 @@
     "PlayerItemInHandLayerMixin",
     "PlayerRendererMixin",
     "PostPassMixin",
+    "SoundEngineMixin",
     "accessor.KeyMappingAccessor",
     "tacz.CameraEventHandlerMixin"
   ],

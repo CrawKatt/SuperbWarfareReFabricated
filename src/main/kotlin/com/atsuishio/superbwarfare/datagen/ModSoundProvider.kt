@@ -45,6 +45,7 @@ class ModSoundProvider(private val output: PackOutput) : DataProvider {
     override fun getName(): String = Mod.MODID + " sound definitions"
 
     private fun registerSounds() {
+        root("flashbang_burst", "flashbang_ringing")
         // ==================== 杂项 ====================
         // -------------------- sounds 根目录 --------------------
         root(

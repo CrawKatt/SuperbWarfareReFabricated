@@ -10,6 +10,9 @@ object ModMobEffects {
     val SHOCK: MobEffect = Registration.effect("shock") { ShockMobEffect() }
 
     @JvmField
+    val STUN: MobEffect = Registration.effect("stun") { StunMobEffect() }
+
+    @JvmField
     val BURN: MobEffect = Registration.effect("burn") { BurnMobEffect }
 
     @JvmField
