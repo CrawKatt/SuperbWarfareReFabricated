@@ -86,6 +86,7 @@ object ModPerks {
     @JvmField val BEAST_BULLET = autoRegistryObjects["beast_bullet"] ?: registerAmmoPerk("beast_bullet") { BeastBullet }
     @JvmField val LONGER_WIRE = autoRegistryObjects["longer_wire"] ?: registerAmmoPerk("longer_wire") { LongerWire }
     @JvmField val CHAIN_LIGHTNING = autoRegistryObjects.getValue("chain_lightning")
+    @JvmField val HOMING_BULLET = autoRegistryObjects.getValue("homing_bullet")
     @JvmField val INCENDIARY_BULLET = autoRegistryObjects["incendiary_bullet"] ?: registerAmmoPerk("incendiary_bullet") { IncendiaryBullet }
     @JvmField val MICRO_MISSILE = autoRegistryObjects["micro_missile"] ?: registerAmmoPerk("micro_missile") { MicroMissile }
     @JvmField val CUPID_ARROW = autoRegistryObjects["cupid_arrow"] ?: registerAmmoPerk("cupid_arrow") { CupidArrow }

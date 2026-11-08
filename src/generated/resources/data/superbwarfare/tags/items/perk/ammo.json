@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
+    "superbwarfare:homing_bullet",
     "superbwarfare:acid_bullet",
     "superbwarfare:ap_bullet",
     "superbwarfare:aqua_bullet",
