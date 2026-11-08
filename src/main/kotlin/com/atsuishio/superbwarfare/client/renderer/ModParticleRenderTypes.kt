@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.texture.TextureManager
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback
+import net.minecraft.resources.ResourceLocation
 
 @Environment(EnvType.CLIENT)
 object ModParticleRenderTypes {
@@ -35,7 +36,10 @@ object ModParticleRenderTypes {
      * This prevents hard transparency edges on high-resolution soft-edged
      * semi-transparent particle textures (e.g. flares, smoke, explosions).
      */
-    val PARTICLE_SHEET_SOFT_TRANSLUCENT: ParticleRenderType = object : ParticleRenderType {
+    val PARTICLE_SHEET_SOFT_TRANSLUCENT: ParticleRenderType = softTranslucent(TextureAtlas.LOCATION_PARTICLES)
+
+    /** The same soft alpha pipeline for particles using a standalone texture or flipbook. */
+    fun softTranslucent(texture: ResourceLocation): ParticleRenderType = object : ParticleRenderType {
         override fun begin(builder: Tesselator, textureManager: TextureManager): BufferBuilder {
             // Override the shader set by ParticleEngine with our no-discard variant
             val shader = softParticleShader
@@ -49,7 +53,7 @@ object ModParticleRenderTypes {
             RenderSystem.enableBlend()
             RenderSystem.defaultBlendFunc()
             RenderSystem.depthMask(false)
-            RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES)
+            RenderSystem.setShaderTexture(0, texture)
             return builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE)
         }
 
