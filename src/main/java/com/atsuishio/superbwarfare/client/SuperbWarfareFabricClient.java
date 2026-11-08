@@ -76,6 +76,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
             PonderIndex.addPlugin(SBWPonderPlugin.INSTANCE);
         }
         ClientEventHandler.register();
+        com.atsuishio.superbwarfare.client.overlay.FlashbangOverlay.INSTANCE.register();
         NetworkRegistryKt.registerClientReceivers();
         ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> {
             if (entity instanceof ArtilleryEntity artillery) {

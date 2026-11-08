@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.mobeffect.PhosphorusFireMobEffect
 import com.atsuishio.superbwarfare.mobeffect.RadiationMobEffect
 import com.atsuishio.superbwarfare.mobeffect.ShockMobEffect
 import com.atsuishio.superbwarfare.mobeffect.StrikeProtectionMobEffect
+import com.atsuishio.superbwarfare.mobeffect.StunMobEffect
 import com.atsuishio.superbwarfare.mobeffect.TraumaMobEffect
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
@@ -19,6 +20,9 @@ import net.minecraft.world.effect.MobEffect
 object ModMobEffects {
     @JvmField
     val SHOCK: Holder<MobEffect> = register("shock", ShockMobEffect())
+
+    @JvmField
+    val STUN: Holder<MobEffect> = register("stun", StunMobEffect())
 
     @JvmField
     val BURN: Holder<MobEffect> = register("burn", BurnMobEffect)

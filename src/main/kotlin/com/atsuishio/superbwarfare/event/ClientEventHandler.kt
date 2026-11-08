@@ -16,6 +16,7 @@ import com.atsuishio.superbwarfare.client.lighting.LightPositionRegistry
 import com.atsuishio.superbwarfare.client.lighting.MuzzleFlashHelper
 import com.atsuishio.superbwarfare.client.lighting.VehicleLightingHandler
 import com.atsuishio.superbwarfare.client.overlay.CrossHairOverlay
+import com.atsuishio.superbwarfare.client.overlay.FlashbangOverlay
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.VehicleMainWeaponHudOverlay
 import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
@@ -906,6 +907,7 @@ object ClientEventHandler {
     }
 
     fun clearGravityLensing() {
+        FlashbangOverlay.clear()
         MuzzleFlashRenderer.clear()
         resetMeleeOnDeath()
         meleePlayer = null
@@ -918,6 +920,7 @@ object ClientEventHandler {
     }
 
     fun resetMeleeOnRespawn(newPlayer: Player) {
+        FlashbangOverlay.clear()
         // 立即复活可能完全跳过客户端的死亡 tick，不能只靠 isDeadOrDying 清理。
         resetMeleeOnDeath()
         meleePlayer = newPlayer
@@ -926,6 +929,7 @@ object ClientEventHandler {
 
     @JvmStatic
     fun handleClientTick() {
+        FlashbangOverlay.tick()
         val player = localPlayer ?: run {
             syncMeleePlayer(null)
             RadiationShaderHandler.setDosage(0f)

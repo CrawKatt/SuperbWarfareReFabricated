@@ -69,7 +69,8 @@
     "PlayerRendererMixin",
     "PostPassMixin",
     "RenderTargetMixin",
-    "ScreenAccessor"
+    "ScreenAccessor",
+    "SoundEngineMixin"
   ],
   "injectors": {
     "defaultRequire": 1
