@@ -3,8 +3,7 @@ package com.atsuishio.superbwarfare.command
 import com.atsuishio.superbwarfare.command.builder.CommandNode
 import com.atsuishio.superbwarfare.command.builder.boolArg
 import com.atsuishio.superbwarfare.command.builder.buildCommand
-import com.atsuishio.superbwarfare.config.RealisticShootModeSync
-import com.atsuishio.superbwarfare.config.UnrestrictedModificationSync
+import com.atsuishio.superbwarfare.config.ServerConfigSync
 import com.atsuishio.superbwarfare.config.server.*
 import net.minecraft.network.chat.Component
 import net.neoforged.neoforge.common.ModConfigSpec
@@ -38,9 +37,7 @@ val CONFIG_COMMAND = buildCommand("config") {
 
     booleanConfig(GunConfig::FREE_ATTACHMENT_MODE)
     booleanConfig(GunConfig::FULLY_FREE_ATTACHMENT_MODE)
-    booleanConfig(GunConfig::UNRESTRICTED_MODIFICATION) {
-        UnrestrictedModificationSync.broadcast()
-    }
+    booleanConfig(GunConfig::UNRESTRICTED_MODIFICATION)
     booleanConfig(GunConfig::FREE_PERK_MODE)
     booleanConfig(GunConfig::FULLY_FREE_PERK_MODE)
 
@@ -53,9 +50,7 @@ val CONFIG_COMMAND = buildCommand("config") {
     booleanConfig(MiscConfig::SMOKE_HIDE_TARGET)
     booleanConfig(MiscConfig::CREEPING_SENPAI_ADVANCED_PATHFINDING)
     booleanConfig(MiscConfig::THROW_MEDICAL_KIT)
-    booleanConfig(MiscConfig::REALISTIC_SHOOT_MODE) {
-        RealisticShootModeSync.broadcast()
-    }
+    booleanConfig(MiscConfig::REALISTIC_SHOOT_MODE)
 
     booleanConfig(SyncConfig::SYNC_ENTITY_OVER_RANGE)
     booleanConfig(SyncConfig::ENABLE_RENDER_SYNCED_ENTITIES)
@@ -105,10 +100,7 @@ private fun saveCollisionConfigs() {
     VehicleConfig.COLLISION_DESTROY_BLOCKS_BEASTLY.save()
 }
 
-private fun CommandNode.booleanConfig(
-    prop: KProperty0<ModConfigSpec.BooleanValue>,
-    effect: (Boolean) -> Unit = {}
-) {
+private fun CommandNode.booleanConfig(prop: KProperty0<ModConfigSpec.BooleanValue>) {
     val name = buildString {
         val propName = prop.name
         append(propName[0].lowercase())
@@ -130,13 +122,12 @@ private fun CommandNode.booleanConfig(
         }
     }
 
-    booleanConfig(name, prop.get(), effect)
+    booleanConfig(name, prop.get())
 }
 
 private fun CommandNode.booleanConfig(
     name: String,
-    config: ModConfigSpec.BooleanValue,
-    effect: (Boolean) -> Unit = {}
+    config: ModConfigSpec.BooleanValue
 ) {
     name {
         requirePermission(2)
@@ -147,7 +138,7 @@ private fun CommandNode.booleanConfig(
                 config.set(value)
                 config.save()
 
-                effect(value)
+                ServerConfigSync.broadcast(config)
 
                 success {
                     Component.translatable(
