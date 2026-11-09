@@ -1066,6 +1066,16 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('d', Items.GUNPOWDER)
                 .unlockedBy(getHasName(Items.TRIPWIRE_HOOK), has(Items.TRIPWIRE_HOOK))
                 .save(writer, loc(getItemName(ModItems.M84_STUN_GRENADE)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.DECOY_GRENADE, 2)
+                .pattern(" a ")
+                .pattern("bcb")
+                .pattern("bdb")
+                .define('a', Items.TRIPWIRE_HOOK)
+                .define('b', ModTags.Items.NUGGETS_IRON)
+                .define('c', Items.REDSTONE)
+                .define('d', Items.GUNPOWDER)
+                .unlockedBy(getHasName(Items.TRIPWIRE_HOOK), has(Items.TRIPWIRE_HOOK))
+                .save(writer, loc(getItemName(ModItems.DECOY_GRENADE)))
         }
 
         private fun buildMaterialRecipes(writer: Consumer<FinishedRecipe>) {

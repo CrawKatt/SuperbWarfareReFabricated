@@ -6,7 +6,7 @@ import com.atsuishio.superbwarfare.data.DataLoader
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.mob_guns.MobGunData.Companion.grant
 import com.atsuishio.superbwarfare.data.mob_guns.MobGunData.Companion.restore
-import com.atsuishio.superbwarfare.entity.goal.GunShootGoal
+import com.atsuishio.superbwarfare.entity.ai.goal.GunShootGoal
 import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.tools.TagDataParser
 import com.google.common.cache.Cache
