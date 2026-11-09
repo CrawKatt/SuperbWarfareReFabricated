@@ -4,7 +4,9 @@ import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.screens.BlueprintResearchTableScreen
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModRecipes
+import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.item.gun.GunItem
+import com.atsuishio.superbwarfare.item.projectile.SeaMineItem
 import com.atsuishio.superbwarfare.recipe.UpgradeRecipe
 import com.atsuishio.superbwarfare.tools.clientLevel
 import mezz.jei.api.IModPlugin
@@ -18,12 +20,15 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration
 import mezz.jei.api.registration.IRecipeRegistration
 import mezz.jei.api.registration.ISubtypeRegistration
 import mezz.jei.api.runtime.IJeiRuntime
+import net.fabricmc.fabric.api.recipe.v1.ingredient.DefaultCustomIngredients
+import net.minecraft.core.NonNullList
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import net.minecraft.world.item.alchemy.PotionUtils
-import net.minecraft.world.item.crafting.RecipeType
+import net.minecraft.world.item.crafting.*
 import java.util.Optional
 
 @JeiPlugin
@@ -98,12 +103,48 @@ class SbwJEIPlugin : IModPlugin {
 
         val specialCraftingRecipes = PotionMortarShellRecipeMaker.createRecipes()
         registration.addRecipes(RecipeTypes.CRAFTING, specialCraftingRecipes)
+        registration.addRecipes(RecipeTypes.CRAFTING, createSeaMineRecipes())
+    }
+
+    private fun createSeaMineRecipes(): List<CraftingRecipe> = buildList {
+        val group = "superbwarfare.sea_mine"
+        val iron = Ingredient.of(ModTags.Items.INGOTS_IRON)
+        add(ShapedRecipe(
+            loc("jei/sea_mine/ballast"), group, CraftingBookCategory.MISC,
+            3, 3,
+            NonNullList.of(Ingredient.EMPTY,
+                Ingredient.EMPTY, iron, Ingredient.EMPTY,
+                iron, DefaultCustomIngredients.nbt(SeaMineItem.makeInstance(), true), iron,
+                Ingredient.EMPTY, iron, Ingredient.EMPTY),
+            SeaMineItem.makeInstance(ballast = true)
+        ))
+        // A crafting table has eight free slots beside the floating mine.
+        for (length in 1..8) {
+            val ingredients = NonNullList.create<Ingredient>()
+            ingredients.add(DefaultCustomIngredients.nbt(SeaMineItem.makeInstance(), true))
+            repeat(length) { ingredients.add(Ingredient.of(Items.CHAIN)) }
+            add(ShapelessRecipe(
+                loc("jei/sea_mine/chain_$length"), group, CraftingBookCategory.MISC,
+                SeaMineItem.makeInstance(chainLength = length), ingredients
+            ))
+        }
+        for (length in 1 until SeaMineItem.MAX_CHAIN_LENGTH) {
+            add(ShapelessRecipe(
+                loc("jei/sea_mine/extend_$length"), group, CraftingBookCategory.MISC,
+                SeaMineItem.makeInstance(chainLength = length + 1),
+                NonNullList.of(Ingredient.EMPTY,
+                    DefaultCustomIngredients.nbt(SeaMineItem.makeInstance(chainLength = length), true), Ingredient.of(Items.CHAIN))
+            ))
+        }
     }
 
     override fun registerItemSubtypes(registration: ISubtypeRegistration) {
+        registration.registerSubtypeInterpreter(ModItems.SEA_MINE) { stack, _ ->
+            "${SeaMineItem.hasBallast(stack)};${SeaMineItem.chainLength(stack)}"
+        }
         registration.registerSubtypeInterpreter(ModItems.CONTAINER) { ingredient, _ ->
-            val tag = ingredient.tag ?: return@registerSubtypeInterpreter IIngredientSubtypeInterpreter.NONE
-            tag.getCompound("BlockEntityTag").getString("EntityType")
+            if (ingredient.tag == null) return@registerSubtypeInterpreter IIngredientSubtypeInterpreter.NONE
+            ingredient.tag!!.getCompound("BlockEntityTag").getString("EntityType")
         }
 
         registration.registerSubtypeInterpreter(ModItems.POTION_MORTAR_SHELL) { stack, _ ->

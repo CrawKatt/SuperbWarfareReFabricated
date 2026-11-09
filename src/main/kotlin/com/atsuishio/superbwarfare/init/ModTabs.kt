@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
 import com.atsuishio.superbwarfare.item.material.BatteryItem
 import com.atsuishio.superbwarfare.item.misc.ArmorPlateItem
 import com.atsuishio.superbwarfare.item.projectile.C4BombItem
+import com.atsuishio.superbwarfare.item.projectile.SeaMineItem
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
@@ -90,10 +91,16 @@ object ModTabs {
             .icon { ItemStack(ModItems.SHOTGUN_AMMO_BOX) }
             .displayItems { parameters, output ->
                 ModItems.AMMO.forEach { item ->
-                    if (item === ModItems.POTION_MORTAR_SHELL) return@forEach
-                    output.accept(item)
-                    if (item === ModItems.C4_BOMB) {
-                        output.accept(C4BombItem.makeInstance())
+                    if (item === ModItems.SEA_MINE) {
+                        output.accept(SeaMineItem.makeInstance())
+                        output.accept(SeaMineItem.makeInstance(ballast = true))
+                        output.accept(SeaMineItem.makeInstance(ballast = true, chainLength = 32))
+                    } else if (item !== ModItems.POTION_MORTAR_SHELL) {
+                        output.accept(item)
+
+                        if (item === ModItems.C4_BOMB) {
+                            output.accept(C4BombItem.makeInstance())
+                        }
                     }
                 }
 

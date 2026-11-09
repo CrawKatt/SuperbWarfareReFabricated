@@ -727,7 +727,15 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                     has(ModItems.MEDIUM_ANTI_GROUND_MISSILE)
                 )
                 .save(writer, loc(getItemName(ModItems.JAVELIN_MISSILE) + "_convert"))
-
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.SEA_MINE)
+                .pattern("bcb")
+                .pattern("aaa")
+                .pattern("bab")
+                .define('a', ModItems.HIGH_ENERGY_EXPLOSIVES)
+                .define('b', ModTags.Items.INGOTS_IRON)
+                .define('c', ModItems.FUSEE)
+                .unlockedBy(getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES), has(ModItems.HIGH_ENERGY_EXPLOSIVES))
+                .save(writer, loc(getItemName(ModItems.SEA_MINE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.LUNGE_MINE)
                 .pattern(" ba")
                 .pattern(" cb")
@@ -3336,6 +3344,8 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
         }
 
         private fun buildSpecialRecipes(writer: Consumer<FinishedRecipe>) {
+            SpecialRecipeBuilder.special(ModRecipes.SEA_MINE_UPGRADE_SERIALIZER)
+                .save(writer, "superbwarfare:sea_mine_upgrade")
             SpecialRecipeBuilder.special(ModRecipes.POTION_MORTAR_SHELL_SERIALIZER)
                 .save(writer, "superbwarfare:potion_mortar_shell")
             SpecialRecipeBuilder.special(ModRecipes.SMOKE_DYE_SERIALIZER).save(writer, "superbwarfare:smoke_dye")

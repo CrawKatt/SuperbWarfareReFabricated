@@ -102,6 +102,9 @@ object ModEntities {
     )
 
     @JvmField
+    val SEA_MINE = register("sea_mine", misc(::SeaMineEntity).trackRangeChunks(64).trackedUpdateRate(2).dimensions(EntityDimensions.scalable(0.75f, 0.75f)))
+
+    @JvmField
     val TM_62: EntityType<Tm62Entity> =
         register("tm_62", misc(::Tm62Entity).trackRangeChunks(32).trackedUpdateRate(1).dimensions(EntityDimensions.scalable(0.5f, 0.15f)))
 

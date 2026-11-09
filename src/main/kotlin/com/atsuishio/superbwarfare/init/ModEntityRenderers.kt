@@ -15,6 +15,7 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.SENPAI, ::SenpaiRenderer)
         EntityRendererRegistry.register(ModEntities.CREEPING_SENPAI, ::CreepingSenpaiRenderer)
         EntityRendererRegistry.register(ModEntities.CLAYMORE, ::ClaymoreRenderer)
+        EntityRendererRegistry.register(ModEntities.SEA_MINE, ::SeaMineRenderer)
         EntityRendererRegistry.register(ModEntities.C4, ::C4Renderer)
         EntityRendererRegistry.register(ModEntities.TASER_BULLET, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.GUN_GRENADE, ::BasicProjectileRenderer)

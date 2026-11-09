@@ -34,6 +34,12 @@ object ModRecipes {
         Registration.recipeSerializer("upgrade") { UpgradeRecipe.Serializer() }
 
     @JvmField
+    val SEA_MINE_UPGRADE_SERIALIZER: RecipeSerializer<SeaMineUpgradeRecipe> =
+        Registration.recipeSerializer("sea_mine_upgrade") {
+            SimpleCraftingRecipeSerializer(::SeaMineUpgradeRecipe)
+        }
+
+    @JvmField
     val VEHICLE_ASSEMBLING_SERIALIZER: RecipeSerializer<VehicleAssemblingRecipe> =
         Registration.recipeSerializer("vehicle_assembling") { VehicleAssemblingRecipeSerializer() }
 
