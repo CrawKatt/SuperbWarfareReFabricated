@@ -26,7 +26,7 @@ import net.minecraft.world.item.UseAnim
 import net.minecraft.world.level.Level
 
 @RegistryName("decoy_grenade")
-class DecoyGrenadeItem : Item(Properties().rarity(Rarity.UNCOMMON).stacksTo(16)), DispenserLaunchable {
+class DecoyGrenadeItem : Item(Properties().rarity(Rarity.UNCOMMON)), DispenserLaunchable {
     companion object {
         @JvmStatic
         @Environment(EnvType.CLIENT)
