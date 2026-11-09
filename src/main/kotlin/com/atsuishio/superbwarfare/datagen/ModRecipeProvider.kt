@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.init.ModTags.commonItemTag
 import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.recipe.PotionMortarShellRecipe
+import com.atsuishio.superbwarfare.recipe.SeaMineUpgradeRecipe
 import com.atsuishio.superbwarfare.recipe.SmokeDyeRecipe
 import com.atsuishio.superbwarfare.recipe.VehicleResetRecipe
 import com.atsuishio.superbwarfare.recipe.vehicle.VehicleAssemblingRecipe
@@ -775,6 +776,15 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 )
                 .save(writer, loc(getItemName(ModItems.JAVELIN_MISSILE) + "_convert"))
 
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.SEA_MINE)
+                .pattern("bcb")
+                .pattern("aaa")
+                .pattern("bab")
+                .define('a', ModItems.HIGH_ENERGY_EXPLOSIVES)
+                .define('b', ModTags.Items.INGOTS_IRON)
+                .define('c', ModItems.FUSEE)
+                .unlockedBy(getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES), has(ModItems.HIGH_ENERGY_EXPLOSIVES))
+                .save(writer, loc(getItemName(ModItems.SEA_MINE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.LUNGE_MINE)
                 .pattern(" ba")
                 .pattern(" cb")
@@ -3525,6 +3535,7 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
         }
 
         private fun buildSpecialRecipes(writer: RecipeOutput) {
+            SpecialRecipeBuilder.special(::SeaMineUpgradeRecipe).save(writer, "superbwarfare:sea_mine_upgrade")
             SpecialRecipeBuilder.special(::PotionMortarShellRecipe)
                 .save(writer, "superbwarfare:potion_mortar_shell")
             SpecialRecipeBuilder.special(::SmokeDyeRecipe).save(writer, "superbwarfare:smoke_dye")

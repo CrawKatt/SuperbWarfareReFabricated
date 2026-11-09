@@ -96,6 +96,9 @@ object ModEntities {
     )
 
     @JvmField
+    val SEA_MINE = register("sea_mine", misc(::SeaMineEntity).clientTrackingRange(64).updateInterval(2).sized(0.75f, 0.75f))
+
+    @JvmField
     val TM_62 = register("tm_62", misc(::Tm62Entity).clientTrackingRange(32).updateInterval(1).sized(0.5f, 0.15f))
 
     @JvmField
