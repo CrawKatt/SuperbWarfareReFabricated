@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.datagen
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.block.BoobyTrapBlock
 import com.atsuishio.superbwarfare.block.ItemDisplayBoardBlock
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.init.ModBlocks
@@ -41,9 +42,15 @@ class ModBlockStateProvider(private val output: PackOutput) : DataProvider {
 
     private fun registerStatesAndModels() {
         horizontalBlock(ModBlocks.BARBED_WIRE, blockModel("barbed_wire"))
+        val boobyTrapOn = cubeAll("booby_trap")
+        val boobyTrapOff = cubeAll("booby_trap_off")
         addBlockState(ModBlocks.BOOBY_TRAP, JsonObject().apply {
             add("variants", JsonObject().apply {
-                add("", JsonObject().apply { addProperty("model", cubeAll("booby_trap").toString()) })
+                for (state in ModBlocks.BOOBY_TRAP.stateDefinition.possibleStates) {
+                    add(variantKey(state), JsonObject().apply {
+                        addProperty("model", (if (state.getValue(BoobyTrapBlock.OFF)) boobyTrapOff else boobyTrapOn).toString())
+                    })
+                }
             })
         })
         horizontalBlock(ModBlocks.JUMP_PAD, blockModel("jump_pad"))

@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.command.CommandRegister
 import com.atsuishio.superbwarfare.compat.thermoo.ThermooCompatHandler
 import com.atsuishio.superbwarfare.config.CLIENT_CONFIG
 import com.atsuishio.superbwarfare.config.COMMON_CONFIG
+import com.atsuishio.superbwarfare.block.BoobyTrapBlock
 import com.atsuishio.superbwarfare.config.ServerConfigSync
 import com.atsuishio.superbwarfare.config.SERVER_CONFIG
 import com.atsuishio.superbwarfare.data.CustomData
@@ -65,6 +66,7 @@ class Mod : ModInitializer {
 
         registerPayloads()
         ServerConfigSync.register()
+        BoobyTrapBlock.register()
         DataLoader.register()
         AvailableAttachments.TagsUpdatedListener.register()
         WreckageLootDataManager.register()
