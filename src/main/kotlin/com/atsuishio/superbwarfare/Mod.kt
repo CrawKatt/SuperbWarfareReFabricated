@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare
 
 import com.atsuishio.superbwarfare.advancement.CriteriaRegister
+import com.atsuishio.superbwarfare.block.BoobyTrapBlock
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.command.CommandRegister
@@ -121,6 +122,7 @@ class Mod : ModInitializer {
         triggerInit()
         callInits()
         ModWorldgen.register()
+        BoobyTrapBlock.registerEvents()
         CustomEventHandler.register()
         TestLoader.register()
         if (TaczCompat.isCompatible()) {

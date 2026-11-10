@@ -48,6 +48,7 @@ class ModBlockTagProvider(
             ModBlocks.DEEPSLATE_SILVER_ORE,
             ModBlocks.SILVER_BLOCK,
             ModBlocks.JUMP_PAD,
+            ModBlocks.BOOBY_TRAP,
             ModBlocks.CONTAINER,
             ModBlocks.CHARGING_STATION,
             ModBlocks.WEAPON_REPAIR_STATION,

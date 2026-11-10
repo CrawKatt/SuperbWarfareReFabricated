@@ -41,6 +41,7 @@ class ModBlockStateProvider(private val output: PackOutput) : DataProvider {
 
     private fun registerStatesAndModels() {
         horizontalBlock(ModBlocks.BARBED_WIRE, blockModel("barbed_wire"))
+        simpleBlock(ModBlocks.BOOBY_TRAP, cubeAll("booby_trap"))
         horizontalBlock(ModBlocks.JUMP_PAD, blockModel("jump_pad"))
         horizontalBlock(ModBlocks.REFORGING_TABLE, blockModel("reforging_table"))
         horizontalBlock(ModBlocks.WEAPON_REPAIR_STATION, blockModel("weapon_repair_station"))

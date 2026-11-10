@@ -35,6 +35,7 @@
     "PlayerShieldMixin",
     "PotionBrewingMixin",
     "ProjectileUtilMixin",
+    "RedStoneWireBlockMixin",
     "RepairItemRecipeMixin",
     "ResultSlotMixin",
     "ShapedRecipeMixin",

@@ -32,6 +32,7 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
         this.dropSelf(ModBlocks.SANDBAG)
         this.dropSelf(ModBlocks.BARBED_WIRE)
         this.dropSelf(ModBlocks.JUMP_PAD)
+        this.dropSelf(ModBlocks.BOOBY_TRAP)
         this.dropSelf(ModBlocks.DRAGON_TEETH)
         this.dropSelf(ModBlocks.REFORGING_TABLE)
         this.dropSelf(ModBlocks.RESONANCE_BASE)

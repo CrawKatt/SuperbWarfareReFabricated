@@ -17,6 +17,7 @@ import com.atsuishio.superbwarfare.client.overlay.weapon.AircraftHud
 import com.atsuishio.superbwarfare.client.overlay.weapon.HelicopterHud
 import com.atsuishio.superbwarfare.client.overlay.weapon.OldAircraftHud
 import com.atsuishio.superbwarfare.client.renderer.block.BlueprintResearchTableBlockEntityRenderer
+import com.atsuishio.superbwarfare.client.renderer.block.BoobyTrapBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.ChargingStationBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.ContainerBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.FuMO25BlockEntityRenderer
@@ -330,6 +331,7 @@ object ClientRenderHandler {
         BlockEntityRenderers.register(ModBlockEntities.BLUEPRINT_RESEARCH_TABLE) { BlueprintResearchTableBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.TRIPOD) { TripodBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.RESONANCE_BASE) { ResonanceBaseBlockEntityRenderer() }
+        BlockEntityRenderers.register(ModBlockEntities.BOOBY_TRAP) { BoobyTrapBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.ITEM_DISPLAY_BOARD) { ItemDisplayBoardBlockEntityRenderer() }
     }
 

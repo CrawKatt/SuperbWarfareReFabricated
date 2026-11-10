@@ -14,6 +14,7 @@ object ModBlocks {
     @JvmField val SANDBAG = registerBlock("sandbag") { Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.SNARE).sound(SoundType.SAND).strength(10f, 20f)) }
     @JvmField val BARBED_WIRE = registerBlock("barbed_wire") { BarbedWireBlock() }
     @JvmField val JUMP_PAD = registerBlock("jump_pad") { JumpPadBlock() }
+    @JvmField val BOOBY_TRAP = registerBlock("booby_trap") { BoobyTrapBlock() }
     @JvmField val GALENA_ORE = registerBlock("galena_ore") { Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.BASEDRUM).sound(SoundType.STONE).strength(3f, 5f).requiresCorrectToolForDrops()) }
     @JvmField val DEEPSLATE_GALENA_ORE = registerBlock("deepslate_galena_ore") { Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.BASEDRUM).sound(SoundType.STONE).strength(3f, 8f).requiresCorrectToolForDrops()) }
     @JvmField val SCHEELITE_ORE = registerBlock("scheelite_ore") { Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.BASEDRUM).sound(SoundType.STONE).strength(3f, 5f).requiresCorrectToolForDrops()) }
