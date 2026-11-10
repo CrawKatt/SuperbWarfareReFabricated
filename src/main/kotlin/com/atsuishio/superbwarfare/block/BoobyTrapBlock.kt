@@ -2,17 +2,17 @@ package com.atsuishio.superbwarfare.block
 
 import com.atsuishio.superbwarfare.block.entity.BoobyTrapBlockEntity
 import com.atsuishio.superbwarfare.config.server.ExplosionConfig
-import com.atsuishio.superbwarfare.event.custom.ExplosionStartCallback
-import com.atsuishio.superbwarfare.event.custom.RedstoneConnectionCallback
-import com.atsuishio.superbwarfare.init.ModTags
+import com.atsuishio.superbwarfare.item.misc.DefuserItem
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.ParticleTool
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.BlockItem
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
@@ -23,22 +23,53 @@ import net.minecraft.world.level.block.SoundType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.material.FluidState
+import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
+import com.atsuishio.superbwarfare.event.custom.ExplosionStartCallback
+import com.atsuishio.superbwarfare.event.custom.RedstoneConnectionCallback
+import com.atsuishio.superbwarfare.event.custom.ClientPlayerDestroyBlockCallback
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents
 
-open class BoobyTrapBlock : BaseEntityBlock(Properties.of().strength(2f, 3f).sound(SoundType.METAL).noOcclusion()) {
+open class BoobyTrapBlock : BaseEntityBlock(
+    Properties.of().strength(2f, 3f).sound(SoundType.METAL).dynamicShape()
+        .pushReaction(PushReaction.BLOCK)
+) {
     init {
-        registerDefaultState(stateDefinition.any().setValue(CAMOUFLAGED, false))
+        registerDefaultState(stateDefinition.any().setValue(CAMOUFLAGED, false).setValue(OFF, false))
     }
 
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
-        builder.add(CAMOUFLAGED)
+        builder.add(CAMOUFLAGED, OFF)
     }
 
     override fun newBlockEntity(pos: BlockPos, state: BlockState) = BoobyTrapBlockEntity(pos, state)
 
     override fun getRenderShape(state: BlockState) =
-        if (state.getValue(CAMOUFLAGED)) RenderShape.INVISIBLE else RenderShape.MODEL
+        if (state.getValue(CAMOUFLAGED) && !state.getValue(OFF)) RenderShape.INVISIBLE else RenderShape.MODEL
+
+    private fun lightMaterial(state: BlockState, world: BlockGetter, pos: BlockPos): BlockState? {
+        if (!state.getValue(CAMOUFLAGED) || state.getValue(OFF)) return null
+        return (world.getBlockEntity(pos) as? BoobyTrapBlockEntity)?.camouflage
+    }
+
+    override fun getLightBlock(state: BlockState, world: BlockGetter, pos: BlockPos): Int =
+        lightMaterial(state, world, pos)?.getLightBlock(world, pos) ?: world.maxLightLevel
+
+    override fun propagatesSkylightDown(state: BlockState, world: BlockGetter, pos: BlockPos): Boolean =
+        lightMaterial(state, world, pos)?.propagatesSkylightDown(world, pos) ?: false
+
+    override fun getShadeBrightness(state: BlockState, world: BlockGetter, pos: BlockPos): Float =
+        lightMaterial(state, world, pos)?.getShadeBrightness(world, pos) ?: 0.2f
+
+    override fun getOcclusionShape(state: BlockState, world: BlockGetter, pos: BlockPos): VoxelShape {
+        val material = lightMaterial(state, world, pos) ?: return Shapes.block()
+        return if (material.canOcclude()) material.getOcclusionShape(world, pos) else Shapes.empty()
+    }
 
     open fun canConnectRedstone(state: BlockState, level: BlockGetter, pos: BlockPos, side: Direction?) =
         side != null
@@ -53,16 +84,35 @@ open class BoobyTrapBlock : BaseEntityBlock(Properties.of().strength(2f, 3f).sou
     ): InteractionResult {
         val entity = level.getBlockEntity(pos) as? BoobyTrapBlockEntity ?: return InteractionResult.PASS
         val stack = player.getItemInHand(hand)
-        if (stack.`is`(ModTags.Items.TOOLS_CROWBAR)) {
-            if (!state.getValue(CAMOUFLAGED) || entity.camouflage == null) return InteractionResult.FAIL
-            if (!level.isClientSide) entity.applyCamouflage(null)
+        if (stack.item is DefuserItem) {
+            if (state.getValue(OFF)) return InteractionResult.FAIL
+            if (!level.isClientSide) {
+                if (entity.camouflage != null) entity.applyCamouflage(null)
+                else {
+                    if (!level.setBlock(pos, state.setValue(OFF, true), 3)) return InteractionResult.FAIL
+                    stack.hurtAndBreak(1, player) { it.broadcastBreakEvent(hand) }
+                }
+            }
+            return InteractionResult.sidedSuccess(level.isClientSide)
+        }
+        if (!state.getValue(OFF) && !entity.isOwnerOrAlly(player)) {
+            if (!level.isClientSide) detonate(level, pos)
             return InteractionResult.sidedSuccess(level.isClientSide)
         }
         val item = stack.item as? BlockItem ?: return InteractionResult.PASS
+        if (state.getValue(OFF) || item.block === this) return InteractionResult.PASS
+        val current = entity.camouflage
+        if (current != null) {
+            if (item.block !== current.block) return InteractionResult.PASS
+            val properties = current.block.stateDefinition
+            val canRotate = properties.getProperty("axis")?.valueClass == Direction.Axis::class.java ||
+                    properties.getProperty("facing")?.valueClass == Direction::class.java
+            if (!canRotate) return InteractionResult.PASS
+        }
         val material = item.block.defaultBlockState()
-        if (item.block === this || material.renderShape != RenderShape.MODEL ||
+        if (material.renderShape != RenderShape.MODEL ||
             !material.isCollisionShapeFullBlock(level, pos) || !Block.isShapeFullBlock(material.getShape(level, pos))
-        ) return InteractionResult.CONSUME
+        ) return InteractionResult.PASS
         if (!level.isClientSide) entity.applyCamouflage(material)
         return InteractionResult.sidedSuccess(level.isClientSide)
     }
@@ -71,6 +121,38 @@ open class BoobyTrapBlock : BaseEntityBlock(Properties.of().strength(2f, 3f).sou
         super.onPlace(state, level, pos, oldState, moving)
         if (oldState.block !== this) checkPower(level, pos)
     }
+
+    override fun setPlacedBy(level: Level, pos: BlockPos, state: BlockState, placer: LivingEntity?, stack: ItemStack) {
+        super.setPlacedBy(level, pos, state, placer, stack)
+        if (!level.isClientSide && placer != null) (level.getBlockEntity(pos) as? BoobyTrapBlockEntity)?.recordOwner(
+            placer
+        )
+    }
+
+    override fun attack(state: BlockState, level: Level, pos: BlockPos, player: Player) {
+        if (!level.isClientSide && !canMineSafely(state, level, pos, player)) detonate(level, pos)
+    }
+
+    open fun onDestroyedByPlayer(
+        state: BlockState,
+        level: Level,
+        pos: BlockPos,
+        player: Player,
+        willHarvest: Boolean,
+        fluid: FluidState
+    ): Boolean {
+        if (!canMineSafely(state, level, pos, player)) {
+            if (!level.isClientSide) detonate(level, pos)
+            return false
+        }
+        // Vanilla performs the removal after the callback allows it.
+        return true
+    }
+
+    private fun canMineSafely(state: BlockState, level: Level, pos: BlockPos, player: Player): Boolean =
+        state.getValue(OFF) || player.isCreative || (level.getBlockEntity(pos) as? BoobyTrapBlockEntity)?.isOwnerOrAlly(
+            player
+        ) == true
 
     override fun neighborChanged(
         state: BlockState,
@@ -84,7 +166,12 @@ open class BoobyTrapBlock : BaseEntityBlock(Properties.of().strength(2f, 3f).sou
     }
 
     private fun checkPower(level: Level, pos: BlockPos) {
-        if (level.isClientSide || level.getBlockState(pos).block !== this || !level.hasNeighborSignal(pos)) return
+        if (!level.isClientSide && level.hasNeighborSignal(pos)) detonate(level, pos)
+    }
+
+    private fun detonate(level: Level, pos: BlockPos) {
+        val state = level.getBlockState(pos)
+        if (level.isClientSide || state.block !== this || state.getValue(OFF)) return
         // Remove first so neighbor updates and overlapping explosions cannot detonate this block twice.
         level.removeBlock(pos, false)
         val radius = ExplosionConfig.BOOBY_TRAP_EXPLOSION_RADIUS.get().toFloat()
@@ -100,7 +187,7 @@ open class BoobyTrapBlock : BaseEntityBlock(Properties.of().strength(2f, 3f).sou
             pos.z + 0.5,
             radius,
             interaction
-        )
+        ).setSphericalBlockDestruction(true)
         if (ExplosionStartCallback.EVENT.invoker().onExplosionStart(level, explosion)) return
         explosion.explode()
         explosion.finalizeExplosion(false)
@@ -114,9 +201,24 @@ open class BoobyTrapBlock : BaseEntityBlock(Properties.of().strength(2f, 3f).sou
                 val block = state.block as? BoobyTrapBlock
                 block?.canConnectRedstone(state, level, pos, side)
             }
+            PlayerBlockBreakEvents.BEFORE.register { level, player, pos, state, _ ->
+                val block = state.block as? BoobyTrapBlock
+                block?.onDestroyedByPlayer(state, level, pos, player,
+                    !player.isCreative && player.hasCorrectToolForDrops(state), level.getFluidState(pos)) ?: true
+            }
+            ClientPlayerDestroyBlockCallback.EVENT.register { state, level, pos, player, willHarvest, fluid ->
+                val block = state.block as? BoobyTrapBlock
+                block?.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid) ?: true
+            }
+            ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register { entity, _ ->
+                if (entity is BoobyTrapBlockEntity) entity.refreshLighting()
+            }
         }
 
         @JvmField
         val CAMOUFLAGED: BooleanProperty = BooleanProperty.create("camouflaged")
+
+        @JvmField
+        val OFF: BooleanProperty = BooleanProperty.create("off")
     }
 }

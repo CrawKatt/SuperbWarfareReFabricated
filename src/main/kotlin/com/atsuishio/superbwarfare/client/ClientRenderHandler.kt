@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.client.ClientRenderHandler.bulletRenderOffset
 import com.atsuishio.superbwarfare.client.ClientRenderHandler.muzzleOffsetFor
 import com.atsuishio.superbwarfare.client.ClientRenderHandler.transformVirtualRenderPosition
 import com.atsuishio.superbwarfare.client.ClientRenderHandler.virtualOffsetRate
+import com.atsuishio.superbwarfare.block.entity.BoobyTrapBlockEntity
 import com.atsuishio.superbwarfare.client.animation.AnimationCurves
 import com.atsuishio.superbwarfare.client.decorator.ContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.LuckyContainerItemDecorator
@@ -68,6 +69,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import dev.emi.trinkets.api.client.TrinketRendererRegistry
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback
@@ -332,6 +334,9 @@ object ClientRenderHandler {
         BlockEntityRenderers.register(ModBlockEntities.TRIPOD) { TripodBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.RESONANCE_BASE) { ResonanceBaseBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.BOOBY_TRAP) { BoobyTrapBlockEntityRenderer() }
+        ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register { entity, _ ->
+            if (entity is BoobyTrapBlockEntity) entity.refreshLighting()
+        }
         BlockEntityRenderers.register(ModBlockEntities.ITEM_DISPLAY_BOARD) { ItemDisplayBoardBlockEntityRenderer() }
     }
 
