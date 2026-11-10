@@ -29,6 +29,7 @@
     "PlayerMixin",
     "ProjectileUtilMixin",
     "RecipeManagerMixin",
+    "RedStoneWireBlockMixin",
     "ResultSlotMixin",
     "ServerPlayerMenuMixin",
     "ServerPlayerMixin",
