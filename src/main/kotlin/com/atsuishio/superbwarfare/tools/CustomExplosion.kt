@@ -516,7 +516,7 @@ open class CustomExplosion(
             val blockstate = this.level.getBlockState(blockpos)
             val blockpos1 = blockpos.immutable()
 
-            if (this.level is ServerLevel && blockstate.canDropFromExplosion(this.level, blockpos, this)) {
+            if (this.level is ServerLevel && blockstate.block.dropFromExplosion(this)) {
                 val blockEntity = if (blockstate.hasBlockEntity()) this.level.getBlockEntity(blockpos) else null
                 val lootParamsBuilder = LootParams.Builder(level)
                     .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockpos))
