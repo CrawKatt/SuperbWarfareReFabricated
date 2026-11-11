@@ -39,10 +39,10 @@ data class GunModificationApplyMessage(
             GunModificationService.apply(player, data, prepared)
             player.inventory.setChanged()
             player.containerMenu.broadcastChanges()
-            player.playLocalSound(ModSounds.ATTACHMENT_SET.get(), 1f, 1f)
+            player.playLocalSound(ModSounds.ATTACHMENT_SET, 1f, 1f)
             player.sendPacket(GunModificationResultMessage(requestId, true))
         } catch (e: GunModificationException) {
-            player.playLocalSound(ModSounds.ATTACHMENT_FAIL.get(), 1f, 1f)
+            player.playLocalSound(ModSounds.ATTACHMENT_FAIL, 1f, 1f)
             player.sendPacket(GunModificationResultMessage(requestId, false, e.reason, e.details.toList()))
         }
     }
