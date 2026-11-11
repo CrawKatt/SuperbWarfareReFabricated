@@ -156,6 +156,8 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.CEMENTED_CARBIDE_INGOT)
         simpleItem(ModItems.URANIUM_INGOT)
         simpleItem(ModItems.RAW_URANIUM)
+        simpleItem(ModItems.YELLOW_CAKE)
+        simpleItem(ModItems.SUSPICIOUS_YELLOW_CAKE)
         simpleItem(ModItems.HIGH_ENERGY_EXPLOSIVES)
         simpleItem(ModItems.GRAIN)
         simpleItem(ModItems.IRON_POWDER)
