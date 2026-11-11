@@ -58,7 +58,7 @@ open class CustomExplosion(
     val y: Double,
     val z: Double,
     val radius: Float,
-    blockInteraction: BlockInteraction
+    private val blockInteraction: BlockInteraction
 ) : Explosion(
     level,
     entity, source, null,
@@ -74,6 +74,7 @@ open class CustomExplosion(
     private var beast = false
     private var excludeDirectSource = true
     private var sphericalBlockDestruction = false
+    private var deferredBlockDrops: ObjectArrayList<Pair<ItemStack, BlockPos>>? = null
 
     init {
         this.damageCalculator = damageCalculator ?: ExplosionDamageCalculator()
@@ -157,10 +158,20 @@ open class CustomExplosion(
 
     override fun explode() {
         this.level.gameEvent(this.entity, GameEvent.EXPLODE, Vec3(this.x, this.y, this.z))
-        if (ExplosionConfig.EXPLOSION_DESTROY.get() && this.interactsWithBlocks()) {
-            explodeBlocks()
+        val drops = ObjectArrayList<Pair<ItemStack, BlockPos>>()
+        deferredBlockDrops = drops
+        try {
+            if (ExplosionConfig.EXPLOSION_DESTROY.get() && this.interactsWithBlocks()) {
+                explodeBlocks()
+            }
+            damageEntities()
+        } finally {
+            // Do not let this explosion's entity damage destroy the loot it just generated.
+            deferredBlockDrops = null
+            for (pair in drops) {
+                Block.popResource(this.level, pair.second, pair.first)
+            }
         }
-        damageEntities()
     }
 
     /**
@@ -505,14 +516,18 @@ open class CustomExplosion(
             val blockstate = this.level.getBlockState(blockpos)
             val blockpos1 = blockpos.immutable()
 
-            if (this.level is ServerLevel) {
+            if (this.level is ServerLevel && blockstate.canDropFromExplosion(this.level, blockpos, this)) {
                 val blockEntity = if (blockstate.hasBlockEntity()) this.level.getBlockEntity(blockpos) else null
                 val lootParamsBuilder = LootParams.Builder(level)
                     .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(blockpos))
                     .withParameter(LootContextParams.TOOL, ItemStack.EMPTY)
                     .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity)
                     .withOptionalParameter(LootContextParams.THIS_ENTITY, this.entity)
-                    .withParameter(LootContextParams.EXPLOSION_RADIUS, this.radius)
+
+                // This parameter enables loot decay; ordinary DESTROY explosions keep normal drops.
+                if (blockInteraction == BlockInteraction.DESTROY_WITH_DECAY) {
+                    lootParamsBuilder.withParameter(LootContextParams.EXPLOSION_RADIUS, this.radius)
+                }
 
                 blockstate.spawnAfterBreak(level, blockpos, ItemStack.EMPTY, flag1)
                 blockstate.getDrops(lootParamsBuilder).forEach {
@@ -525,8 +540,13 @@ open class CustomExplosion(
             blockstate.block.wasExploded(this.level, blockpos, this)
         }
 
-        for (pair in dropList) {
-            Block.popResource(this.level, pair.getSecond(), pair.getFirst())
+        val deferred = deferredBlockDrops
+        if (deferred != null) {
+            deferred.addAll(dropList)
+        } else {
+            for (pair in dropList) {
+                Block.popResource(this.level, pair.getSecond(), pair.getFirst())
+            }
         }
 
         this.level.profiler.pop()
