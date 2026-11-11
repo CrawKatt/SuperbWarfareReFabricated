@@ -17,6 +17,7 @@ import net.minecraft.world.effect.MobEffect
 import net.minecraft.world.effect.MobEffectCategory
 import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.AreaEffectCloud
 import net.minecraft.world.entity.LivingEntity
 
 object BurnMobEffect : MobEffect(MobEffectCategory.HARMFUL, -12708330) {
@@ -59,21 +60,21 @@ object BurnMobEffect : MobEffect(MobEffectCategory.HARMFUL, -12708330) {
     fun onBurnAdded(living: LivingEntity, instance: MobEffectInstance, source: Entity?) {
         if (instance.effect != ModMobEffects.BURN) return
 
+        val attacker = if (source is AreaEffectCloud) source.owner else source as? LivingEntity
         DamageHandler.doDamage(
             living,
             DamageSource(
                 living.level().registryAccess()
                     .registryOrThrow(Registries.DAMAGE_TYPE)
                     .getHolderOrThrow(DamageTypes.IN_FIRE),
-                source
-            ),
-            0.6f + 0.3f * instance.amplifier
+                attacker ?: source
+            ), 0.6f + (0.3f * instance.amplifier)
         )
 
         living.invulnerableTime = 0
 
-        if (source is LivingEntity) {
-            persistentData(living).putInt(TAG_ATTACKER, source.id)
+        if (attacker != null) {
+            persistentData(living).putInt(TAG_ATTACKER, attacker.id)
         }
     }
 
