@@ -20,6 +20,7 @@
     "ExplosionDetonateMixin",
     "ExplosionMixin",
     "FishingHookMixin",
+    "FireBlockMixin",
     "GrindstoneMenuMixin",
     "ItemEntityMixin",
     "ItemStackLegacyIdMixin",
@@ -42,6 +43,7 @@
     "ServerEntityMixin",
     "ServerPlayerMixin",
     "SteelPipeFallMixin",
+    "TntBlockMixin",
     "VillagerMixin",
     "accessor.CreativeModeTabAccessor",
     "tacz.EntityUtilMixin"

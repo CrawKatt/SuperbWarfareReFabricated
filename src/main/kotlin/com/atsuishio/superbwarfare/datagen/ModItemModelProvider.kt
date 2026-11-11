@@ -495,6 +495,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         // blocks
         evenSimplerBlockItem(ModBlocks.BARBED_WIRE)
         evenSimplerBlockItem(ModBlocks.JUMP_PAD)
+        evenSimplerBlockItem(ModBlocks.HIGH_ENERGY_EXPLOSIVES_BLOCK)
         evenSimplerBlockItem(ModBlocks.BOOBY_TRAP)
         evenSimplerBlockItem(ModBlocks.REFORGING_TABLE)
         addModel(loc("item/resonance_base"), model(loc("displaysettings/resonance_base")))

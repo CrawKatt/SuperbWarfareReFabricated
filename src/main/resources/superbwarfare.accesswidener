@@ -39,3 +39,5 @@ accessible field net/minecraft/client/renderer/LevelRenderer cullingFrustum Lnet
 accessible field net/minecraft/client/renderer/LevelRenderer capturedFrustum Lnet/minecraft/client/renderer/culling/Frustum;
 
 accessible method net/minecraft/resources/ResourceLocation isValidPath (Ljava/lang/String;)Z
+
+extendable method net/minecraft/world/entity/item/PrimedTnt explode ()V

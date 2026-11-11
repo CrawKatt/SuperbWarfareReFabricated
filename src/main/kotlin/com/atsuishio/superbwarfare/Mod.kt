@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare
 
 import com.atsuishio.superbwarfare.advancement.CriteriaRegister
 import com.atsuishio.superbwarfare.block.BoobyTrapBlock
+import com.atsuishio.superbwarfare.block.HighEnergyExplosivesBlock
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.command.CommandRegister
@@ -123,6 +124,7 @@ class Mod : ModInitializer {
         callInits()
         ModWorldgen.register()
         BoobyTrapBlock.registerEvents()
+        HighEnergyExplosivesBlock.registerEvents()
         CustomEventHandler.register()
         TestLoader.register()
         if (TaczCompat.isCompatible()) {

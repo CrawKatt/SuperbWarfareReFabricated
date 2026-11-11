@@ -42,6 +42,14 @@ class ModBlockStateProvider(private val output: PackOutput) : DataProvider {
 
     private fun registerStatesAndModels() {
         horizontalBlock(ModBlocks.BARBED_WIRE, blockModel("barbed_wire"))
+        simpleBlock(
+            ModBlocks.HIGH_ENERGY_EXPLOSIVES_BLOCK,
+            cubeBottomTop(
+                "high_energy_explosives_block", texture("high_energy_explosives_block_side"),
+                texture("high_energy_explosives_block_bottom"), texture("high_energy_explosives_block_top"),
+                texture("high_energy_explosives_block_side")
+            )
+        )
         val boobyTrapOn = cubeAll("booby_trap")
         val boobyTrapOff = cubeAll("booby_trap_off")
         val boobyTrapVariants = JsonObject()

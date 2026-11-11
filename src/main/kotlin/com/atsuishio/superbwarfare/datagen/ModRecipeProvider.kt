@@ -57,6 +57,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
     }
 
     companion object {
+        val COBBLESTONE: TagKey<Item> = commonItemTag("cobblestone")
         val PLATES_COPPER: TagKey<Item> = commonItemTag("plates/copper")
         val PLATES_STEEL: TagKey<Item> = commonItemTag("plates/steel")
         val PLATES_PLASTIC: TagKey<Item> = commonItemTag("plates/plastic")
@@ -366,7 +367,10 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('a', ModTags.Items.STORAGE_BLOCK_CEMENTED_CARBIDE)
                 .define('b', ModTags.Items.INGOTS_CEMENTED_CARBIDE)
                 .define('c', Items.STICK)
-                .unlockedBy(getHasName(ModItems.CEMENTED_CARBIDE_INGOT), has(ModTags.Items.INGOTS_CEMENTED_CARBIDE))
+                .unlockedBy(
+                    getHasName(ModItems.CEMENTED_CARBIDE_INGOT),
+                    has(ModTags.Items.INGOTS_CEMENTED_CARBIDE)
+                )
                 .save(writer, loc(getItemName(ModItems.MIAODAO)))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.FIRE_AXE)
                 .pattern("aac")
@@ -734,7 +738,10 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('a', ModItems.HIGH_ENERGY_EXPLOSIVES)
                 .define('b', ModTags.Items.INGOTS_IRON)
                 .define('c', ModItems.FUSEE)
-                .unlockedBy(getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES), has(ModItems.HIGH_ENERGY_EXPLOSIVES))
+                .unlockedBy(
+                    getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES),
+                    has(ModItems.HIGH_ENERGY_EXPLOSIVES)
+                )
                 .save(writer, loc(getItemName(ModItems.SEA_MINE)))
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.LUNGE_MINE)
                 .pattern(" ba")
@@ -2194,6 +2201,29 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('d', Items.LODESTONE)
                 .unlockedBy(getHasName(Items.LODESTONE), has(Items.LODESTONE))
                 .save(writer, loc(getItemName(ModItems.RESONANCE_BASE)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModItems.HIGH_ENERGY_EXPLOSIVES_BLOCK)
+                .pattern("aba")
+                .pattern("bab")
+                .pattern("aba")
+                .define('a', ModItems.HIGH_ENERGY_EXPLOSIVES)
+                .define('b', ItemTags.SAND)
+                .unlockedBy(
+                    getHasName(ModItems.HIGH_ENERGY_EXPLOSIVES),
+                    has(ModItems.HIGH_ENERGY_EXPLOSIVES)
+                )
+                .save(writer, loc(getItemName(ModItems.HIGH_ENERGY_EXPLOSIVES_BLOCK)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModItems.BOOBY_TRAP, 2)
+                .pattern("aba")
+                .pattern("bcb")
+                .pattern("aba")
+                .define('a', PLATES_STEEL)
+                .define('b', COBBLESTONE)
+                .define('c', ModItems.HIGH_ENERGY_EXPLOSIVES_BLOCK)
+                .unlockedBy(
+                    getHasName(ModItems.STEEL_PLATE),
+                    has(PLATES_STEEL)
+                )
+                .save(writer, loc(getItemName(ModItems.BOOBY_TRAP)))
         }
 
         private fun buildVehicleRecipes(writer: Consumer<FinishedRecipe>) {

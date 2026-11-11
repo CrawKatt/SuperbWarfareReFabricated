@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.entity.living.SenpaiEntity
 import com.atsuishio.superbwarfare.entity.living.SteelCoilEntity
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
+import com.atsuishio.superbwarfare.entity.misc.HighEnergyExplosivesEntity
 import com.atsuishio.superbwarfare.entity.projectile.*
 import com.atsuishio.superbwarfare.entity.vehicle.*
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
@@ -64,6 +65,12 @@ object ModEntities {
     )
 
     // Misc Entities
+    @JvmField
+    val HIGH_ENERGY_EXPLOSIVES = register(
+        "high_energy_explosives",
+        misc(::HighEnergyExplosivesEntity).trackRangeChunks(64).trackedUpdateRate(1).fireImmune().dimensions(EntityDimensions.scalable(0.98f, 0.98f))
+    )
+
     @JvmField
     val FLARE_DECOY: EntityType<FlareDecoyEntity> = register(
         "flare_decoy",
