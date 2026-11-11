@@ -11,6 +11,7 @@ import com.atsuishio.superbwarfare.client.decorator.ContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.LuckyContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.VehicleKeyItemDecorator
 import com.atsuishio.superbwarfare.client.gun.MeleeClientHandler
+import com.atsuishio.superbwarfare.client.lighting.GunMuzzleLightRenderer
 import com.atsuishio.superbwarfare.client.model.curio.ParachuteModel
 import com.atsuishio.superbwarfare.client.model.curio.ThermalImagingGogglesModel
 import com.atsuishio.superbwarfare.client.overlay.*
@@ -129,6 +130,7 @@ object ClientRenderHandler {
     @JvmStatic
     fun registerGravityLensingShader(event: CoreShaderRegistrationCallback.RegistrationContext) {
         ReforgingGravityBallRenderer.registerLensingShader(event)
+        GunMuzzleLightRenderer.onRegisterShaders(event)
     }
 
     /** [bulletRenderOffset] 的采样时刻（`System.nanoTime()`），超过 [OFFSET_TTL] 就当它过期 */
