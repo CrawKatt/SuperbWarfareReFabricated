@@ -2116,6 +2116,13 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 .define('b', INGOTS_STEEL)
                 .unlockedBy(getHasName(Items.PAPER), has(Items.PAPER))
                 .save(writer, loc(getItemName(ModItems.VEHICLE_RESET_KIT)))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.YELLOW_CAKE)
+                .requires(Ingredient.of(INGOTS_URANIUM), 4)
+                .requires(Items.WATER_BUCKET)
+                .requires(Items.PAPER)
+                .requires(ItemTags.COALS)
+                .unlockedBy(getHasName(ModItems.URANIUM_INGOT), has(INGOTS_URANIUM))
+                .save(writer, loc(getItemName(ModItems.YELLOW_CAKE)))
         }
 
         private fun buildBlockRecipes(writer: RecipeOutput) {
@@ -3580,6 +3587,11 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                 .define('d', Items.REDSTONE)
                 .unlockedBy(getHasName(Items.TRIPWIRE_HOOK), has(Items.TRIPWIRE_HOOK))
                 .save(writer, loc("${getItemName(ModItems.CATAPULT_SHUTTLE)}"))
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.SUSPICIOUS_YELLOW_CAKE)
+                .requires(ModItems.YELLOW_CAKE)
+                .requires(ModItems.CRUST)
+                .unlockedBy(getHasName(ModItems.YELLOW_CAKE), has(ModItems.YELLOW_CAKE))
+                .save(writer, loc(getItemName(ModItems.SUSPICIOUS_YELLOW_CAKE)))
         }
 
         private fun buildSpecialRecipes(writer: RecipeOutput) {
