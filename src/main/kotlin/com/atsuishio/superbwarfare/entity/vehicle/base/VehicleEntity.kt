@@ -117,6 +117,7 @@ import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.gameevent.GameEvent
+import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec2
@@ -2241,7 +2242,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         return super.updateInWaterStateAndDoFluidPushing()
     }
 
-    private fun isInFluidType(fallback: Boolean, matches: (net.minecraft.world.level.material.FluidState) -> Boolean): Boolean {
+    private fun isInFluidType(fallback: Boolean, matches: (FluidState) -> Boolean): Boolean {
         val collisionOBB = getCollisionOBB() ?: return fallback
 
         // 对于有碰撞OBB的载具，只有当OBB接触到流体时才判定为处于流体中

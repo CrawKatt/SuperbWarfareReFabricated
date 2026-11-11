@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.client.decorator.ContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.LuckyContainerItemDecorator
 import com.atsuishio.superbwarfare.client.decorator.VehicleKeyItemDecorator
 import com.atsuishio.superbwarfare.client.gun.MeleeClientHandler
+import com.atsuishio.superbwarfare.client.lighting.GunMuzzleLightRenderer
 import com.atsuishio.superbwarfare.client.model.trinket.ParachuteModel
 import com.atsuishio.superbwarfare.client.model.trinket.ThermalImagingGogglesModel
 import com.atsuishio.superbwarfare.client.overlay.AmmoBarOverlay
@@ -96,8 +97,10 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
@@ -111,6 +114,7 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.projectile.Projectile
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 
@@ -155,6 +159,7 @@ object ClientRenderHandler {
     @JvmStatic
     fun registerGravityLensingShader(event: CoreShaderRegistrationCallback.RegistrationContext) {
         ReforgingGravityBallRenderer.registerLensingShader(event)
+        GunMuzzleLightRenderer.onRegisterShaders(event)
     }
 
     /** [bulletRenderOffset] 的采样时刻（`System.nanoTime()`），超过 [OFFSET_TTL] 就当它过期 */
@@ -327,7 +332,7 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun registerRenderers() {
-        net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.AFTER_ENTITIES.register(DeployedWeaponRenderer::onRenderLevelStage)
+        WorldRenderEvents.AFTER_ENTITIES.register(DeployedWeaponRenderer::onRenderLevelStage)
         addRadiationGlowLayers()
         MeleeDebugRenderer.init()
         BlockEntityRenderers.register(ModBlockEntities.CONTAINER) { ContainerBlockEntityRenderer() }
@@ -350,7 +355,7 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun addRadiationGlowLayers() {
-        net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback.EVENT.register { type, renderer, helper, _ ->
+        LivingEntityFeatureRendererRegistrationCallback.EVENT.register { type, renderer, helper, _ ->
             attachRadiationGlowLayer(type, renderer, helper)
         }
     }
@@ -360,7 +365,7 @@ object ClientRenderHandler {
     fun attachRadiationGlowLayer(
         type: EntityType<out LivingEntity>,
         renderer: LivingEntityRenderer<*, *>,
-        helper: net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper
+        helper: LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper
     ) {
         if (type == EntityType.ENDER_DRAGON) return
         val livingRenderer = try {
@@ -418,7 +423,7 @@ object ClientRenderHandler {
             BuiltinItemRendererRegistry.INSTANCE.register(item, item.createRenderer())
         }
 
-        val renderers: List<Pair<net.minecraft.world.item.Item, Lazy<BlockEntityWithoutLevelRenderer>>> = listOf(
+        val renderers: List<Pair<Item, Lazy<BlockEntityWithoutLevelRenderer>>> = listOf(
             ModItems.TM_62 to lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.TRIPOD to lazy { TripodBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },
             ModItems.RESONANCE_BASE to lazy { ResonanceBaseBlockItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) },

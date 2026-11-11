@@ -7,6 +7,7 @@ import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.loader.api.FabricLoader
 import org.joml.Matrix4f
+import org.joml.Matrix4fc
 
 /**
  * Reflection-based bridge to Oculus/Iris internal and public APIs
@@ -107,7 +108,7 @@ object ShaderCompat {
 
             val stateClass = Class.forName("net.irisshaders.iris.uniforms.CapturedRenderingState")
             val state = stateClass.getField("INSTANCE").get(null)
-            val projection = stateClass.getMethod("getGbufferProjection").invoke(state) as? Matrix4f ?: return null
+            val projection = stateClass.getMethod("getGbufferProjection").invoke(state) as? Matrix4fc ?: return null
             Matrix4f(projection) to depthTexture
         } catch (_: ReflectiveOperationException) {
             null

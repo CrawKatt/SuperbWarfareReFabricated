@@ -5,9 +5,12 @@ import com.atsuishio.superbwarfare.client.language.ClientLanguageGetter;
 import com.atsuishio.superbwarfare.client.DataDumpChatHandler;
 import com.atsuishio.superbwarfare.client.map.TacticalMapChunkListener;
 import com.atsuishio.superbwarfare.client.model.DragonTeethObjModelLoader;
+import com.atsuishio.superbwarfare.client.overlay.FlashbangOverlay;
 import com.atsuishio.superbwarfare.client.renderer.curio.ParachuteRenderer;
+import com.atsuishio.superbwarfare.client.renderer.gun.StaticGunRenderer;
 import com.atsuishio.superbwarfare.client.screens.FuMO25ScreenHelper;
 import com.atsuishio.superbwarfare.client.renderer.special.ContainerBlockPreview;
+import com.atsuishio.superbwarfare.client.renderer.special.LightningArcRenderer;
 import com.atsuishio.superbwarfare.client.renderer.special.TowingChainRenderer;
 import com.atsuishio.superbwarfare.client.renderer.SyncedEntityWorldRenderer;
 import com.atsuishio.superbwarfare.client.renderer.ModParticleRenderTypes;
@@ -60,8 +63,8 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
         SyncedEntityWorldRenderer.init();
         ModParticleRenderTypes.init();
         ScopeLensShader.init();
-        com.atsuishio.superbwarfare.client.renderer.special.LightningArcRenderer.INSTANCE.register();
-        com.atsuishio.superbwarfare.client.renderer.gun.StaticGunRenderer.INSTANCE.register();
+        LightningArcRenderer.INSTANCE.register();
+        StaticGunRenderer.INSTANCE.register();
         CoreShaderRegistrationCallback.EVENT.register(ScopeThermalRenderer.INSTANCE::onRegisterShaders);
         CoreShaderRegistrationCallback.EVENT.register(ClientRenderHandler::registerGravityLensingShader);
         SnapshotWarningScreen.register();
@@ -76,7 +79,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
             PonderIndex.addPlugin(SBWPonderPlugin.INSTANCE);
         }
         ClientEventHandler.register();
-        com.atsuishio.superbwarfare.client.overlay.FlashbangOverlay.INSTANCE.register();
+        FlashbangOverlay.INSTANCE.register();
         NetworkRegistryKt.registerClientReceivers();
         ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> {
             if (entity instanceof ArtilleryEntity artillery) {

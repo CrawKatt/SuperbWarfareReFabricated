@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.client.animation.gun.GeoGunAnimationInstance
 import com.atsuishio.superbwarfare.client.animation.gun.GunDrawAnimation
 import com.atsuishio.superbwarfare.client.animation.gun.GunSprintAnimation
 import com.atsuishio.superbwarfare.client.gun.*
+import com.atsuishio.superbwarfare.client.lighting.GunMuzzleLightRenderer
 import com.atsuishio.superbwarfare.client.lighting.LightPositionRegistry
 import com.atsuishio.superbwarfare.client.lighting.MuzzleFlashHelper
 import com.atsuishio.superbwarfare.client.lighting.VehicleLightingHandler
@@ -46,8 +47,12 @@ import com.atsuishio.superbwarfare.world.saveddata.TDMSavedData
 import com.github.mcmodderanchor.simplebedrockmodel.v1.client.handler.FirstPersonRenderHandler
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.minecraft.ChatFormatting
 import net.minecraft.client.CameraType
+import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.BlockPos
@@ -97,8 +102,8 @@ object ClientEventHandler {
     @JvmStatic
     fun register() {
         RadiationShaderHandler.onRegisterReloadListeners()
-        net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback.EVENT.register(::renderRadiationShader)
-        net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.END.register(::renderRadiationShaderOnHiddenGui)
+        HudRenderCallback.EVENT.register(::renderRadiationShader)
+        WorldRenderEvents.END.register(::renderRadiationShaderOnHiddenGui)
         RenderLevelStageCallback.EVENT.register(RenderLevelStageCallback.LOWEST_PHASE, ::renderGravityLensing)
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> clearGravityLensing() }
         ClientPlayerCloneCallback.EVENT.register { _, _, newPlayer, _ -> resetMeleeOnRespawn(newPlayer) }
@@ -893,12 +898,12 @@ object ClientEventHandler {
     }
 
     @JvmStatic
-    fun renderRadiationShader(guiGraphics: GuiGraphics, deltaTracker: net.minecraft.client.DeltaTracker) {
+    fun renderRadiationShader(guiGraphics: GuiGraphics, deltaTracker: DeltaTracker) {
         RadiationShaderHandler.render(deltaTracker)
     }
 
     @JvmStatic
-    fun renderRadiationShaderOnHiddenGui(event: net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext) {
+    fun renderRadiationShaderOnHiddenGui(event: WorldRenderContext) {
         RadiationShaderHandler.renderLevel(event)
     }
 
@@ -916,6 +921,7 @@ object ClientEventHandler {
         scopeThermalEnabled = true
         ReforgingGravityBallRenderer.clearWorldEffects()
         ScopeLensPostProcessor.close()
+        GunMuzzleLightRenderer.close()
         com.atsuishio.superbwarfare.client.renderer.scope.ScopeThermalRenderer.close()
     }
 
@@ -2359,12 +2365,6 @@ object ClientEventHandler {
             subWeaponFireRotTimer = 0.0
             subWeaponRecoilTimer = 0.0
             fireRecoilTime = 10.0
-        }
-
-        // Spawn dynamic block light muzzle flash for firearms using unified muzzle node
-        val flashParams = MuzzleFlashHelper.calculateFromStack(stack)
-        if (flashParams != null) {
-            MuzzleFlashHelper.spawnFlashCone(player.eyePosition, player.lookAngle, flashParams)
         }
 
         // 真实后坐（

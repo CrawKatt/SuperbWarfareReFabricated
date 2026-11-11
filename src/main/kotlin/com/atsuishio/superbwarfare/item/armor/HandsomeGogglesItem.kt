@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.item.armor
 import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.renderer.armor.HandsomeGogglesRenderer
 import com.atsuishio.superbwarfare.init.ModEntities
+import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.RegistryName
 import com.atsuishio.superbwarfare.resource.model.ArmorModelReloadListener
@@ -67,7 +68,7 @@ class HandsomeGogglesItem :
                         HandsomeGogglesRenderer.GLASS
                     )
                 },
-                com.atsuishio.superbwarfare.init.ModItems.HANDSOME_GOGGLES
+                ModItems.HANDSOME_GOGGLES
             )
         }
 

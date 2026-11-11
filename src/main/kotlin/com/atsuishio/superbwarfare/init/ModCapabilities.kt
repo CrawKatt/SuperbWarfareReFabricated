@@ -19,6 +19,7 @@ import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
 import net.fabricmc.fabric.api.lookup.v1.entity.EntityApiLookup
 import net.minecraft.core.Direction
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import team.reborn.energy.api.EnergyStorage
 import team.reborn.energy.api.base.SimpleEnergyItem
@@ -144,7 +145,7 @@ object ModCapabilities {
     }
 
     @JvmStatic
-    fun getEntityEnergyStorage(entity: net.minecraft.world.entity.Entity): EnergyStorage? = when {
+    fun getEntityEnergyStorage(entity: Entity): EnergyStorage? = when {
         entity is DPSGeneratorEntity -> entity.energyStorage
         entity is VehicleEntity && entity.hasEnergyStorage() -> entity.getEnergyStorage()
         else -> null
