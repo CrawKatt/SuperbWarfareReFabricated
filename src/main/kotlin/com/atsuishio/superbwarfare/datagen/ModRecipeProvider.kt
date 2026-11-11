@@ -1083,6 +1083,15 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
                 .define('d', Items.GUNPOWDER)
                 .unlockedBy(getHasName(Items.TRIPWIRE_HOOK), has(Items.TRIPWIRE_HOOK))
                 .save(writer, loc(getItemName(ModItems.DECOY_GRENADE)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ModItems.MOLOTOV)
+                .pattern("a")
+                .pattern("b")
+                .pattern("c")
+                .define('a', Items.PAPER)
+                .define('b', Items.BLAZE_POWDER)
+                .define('c', Items.GLASS_BOTTLE)
+                .unlockedBy(getHasName(Items.BLAZE_POWDER), has(Items.BLAZE_POWDER))
+                .save(writer, loc(getItemName(ModItems.MOLOTOV)))
         }
 
         private fun buildMaterialRecipes(writer: Consumer<FinishedRecipe>) {

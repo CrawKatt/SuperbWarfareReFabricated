@@ -5,14 +5,17 @@ import com.atsuishio.superbwarfare.config.server.ExplosionConfig
 import com.atsuishio.superbwarfare.item.misc.DefuserItem
 import com.atsuishio.superbwarfare.tools.CustomExplosion
 import com.atsuishio.superbwarfare.tools.ParticleTool
+import net.minecraft.ChatFormatting
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
+import net.minecraft.network.chat.Component
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
@@ -32,6 +35,7 @@ import net.minecraft.world.phys.shapes.VoxelShape
 import com.atsuishio.superbwarfare.event.custom.ExplosionStartCallback
 import com.atsuishio.superbwarfare.event.custom.RedstoneConnectionCallback
 import com.atsuishio.superbwarfare.event.custom.ClientPlayerDestroyBlockCallback
+import com.atsuishio.superbwarfare.event.custom.BlockLightEmissionCallback
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents
 
@@ -43,12 +47,22 @@ open class BoobyTrapBlock : BaseEntityBlock(
         registerDefaultState(stateDefinition.any().setValue(CAMOUFLAGED, false).setValue(OFF, false))
     }
 
+    override fun appendHoverText(
+        stack: ItemStack,
+        level: BlockGetter?,
+        tooltip: MutableList<Component>,
+        flag: TooltipFlag
+    ) {
+        tooltip.add(Component.translatable("des.superbwarfare.booby_trap").withStyle(ChatFormatting.GRAY))
+    }
+
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
         builder.add(CAMOUFLAGED, OFF)
     }
 
     override fun newBlockEntity(pos: BlockPos, state: BlockState) = BoobyTrapBlockEntity(pos, state)
 
+    @Deprecated("Deprecated in Java")
     override fun getRenderShape(state: BlockState) =
         if (state.getValue(CAMOUFLAGED) && !state.getValue(OFF)) RenderShape.INVISIBLE else RenderShape.MODEL
 
@@ -57,18 +71,23 @@ open class BoobyTrapBlock : BaseEntityBlock(
         return (world.getBlockEntity(pos) as? BoobyTrapBlockEntity)?.camouflage
     }
 
+    @Deprecated("Deprecated in Java")
     override fun getLightBlock(state: BlockState, world: BlockGetter, pos: BlockPos): Int =
         lightMaterial(state, world, pos)?.getLightBlock(world, pos) ?: world.maxLightLevel
 
-    override fun getLightEmission(state: BlockState, world: BlockGetter, pos: BlockPos): Int =
-        lightMaterial(state, world, pos)?.getLightEmission(world, pos) ?: 0
+    open fun getLightEmission(state: BlockState, world: BlockGetter, pos: BlockPos): Int =
+        lightMaterial(state, world, pos)?.let { material ->
+            BlockLightEmissionCallback.EVENT.invoker().getLightEmission(material, world, pos, material.lightEmission)
+        } ?: 0
 
     override fun propagatesSkylightDown(state: BlockState, world: BlockGetter, pos: BlockPos): Boolean =
         lightMaterial(state, world, pos)?.propagatesSkylightDown(world, pos) ?: false
 
+    @Deprecated("Deprecated in Java")
     override fun getShadeBrightness(state: BlockState, world: BlockGetter, pos: BlockPos): Float =
         lightMaterial(state, world, pos)?.getShadeBrightness(world, pos) ?: 0.2f
 
+    @Deprecated("Deprecated in Java")
     override fun getOcclusionShape(state: BlockState, world: BlockGetter, pos: BlockPos): VoxelShape {
         val material = lightMaterial(state, world, pos) ?: return Shapes.block()
         return if (material.canOcclude()) material.getOcclusionShape(world, pos) else Shapes.empty()
@@ -77,6 +96,7 @@ open class BoobyTrapBlock : BaseEntityBlock(
     open fun canConnectRedstone(state: BlockState, level: BlockGetter, pos: BlockPos, side: Direction?) =
         side != null
 
+    @Deprecated("Deprecated in Java")
     override fun use(
         state: BlockState,
         level: Level,
@@ -114,12 +134,13 @@ open class BoobyTrapBlock : BaseEntityBlock(
         }
         val material = item.block.defaultBlockState()
         if (material.renderShape != RenderShape.MODEL ||
-            !material.isCollisionShapeFullBlock(level, pos) || !Block.isShapeFullBlock(material.getShape(level, pos))
+            !material.isCollisionShapeFullBlock(level, pos) || !isShapeFullBlock(material.getShape(level, pos))
         ) return InteractionResult.PASS
         if (!level.isClientSide) entity.applyCamouflage(material)
         return InteractionResult.sidedSuccess(level.isClientSide)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPlace(state: BlockState, level: Level, pos: BlockPos, oldState: BlockState, moving: Boolean) {
         super.onPlace(state, level, pos, oldState, moving)
         if (oldState.block !== this) checkPower(level, pos)
@@ -132,6 +153,7 @@ open class BoobyTrapBlock : BaseEntityBlock(
         )
     }
 
+    @Deprecated("Deprecated in Java")
     override fun attack(state: BlockState, level: Level, pos: BlockPos, player: Player) {
         if (!level.isClientSide && !canMineSafely(state, level, pos, player)) detonate(level, pos)
     }
@@ -157,6 +179,7 @@ open class BoobyTrapBlock : BaseEntityBlock(
             player
         ) == true
 
+    @Deprecated("Deprecated in Java")
     override fun neighborChanged(
         state: BlockState,
         level: Level,
@@ -200,6 +223,10 @@ open class BoobyTrapBlock : BaseEntityBlock(
     companion object {
         @JvmStatic
         fun registerEvents() {
+            BlockLightEmissionCallback.EVENT.register { state, level, pos, emission ->
+                val block = state.block as? BoobyTrapBlock
+                block?.getLightEmission(state, level, pos) ?: emission
+            }
             RedstoneConnectionCallback.EVENT.register { state, level, pos, side ->
                 val block = state.block as? BoobyTrapBlock
                 block?.canConnectRedstone(state, level, pos, side)
