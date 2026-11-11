@@ -204,6 +204,7 @@ object ModTags {
         @JvmField val GLASS_BLOCKS = commonItemTag("glass_blocks")
         @JvmField val GLASS_PANES = commonItemTag("glass_panes")
         @JvmField val SANDS = commonItemTag("sands")
+        @JvmField val COBBLESTONES = commonItemTag("cobblestones")
         @JvmField val DYES_BLACK = commonItemTag("dyes/black")
         @JvmField val DYES_GREEN = commonItemTag("dyes/green")
         @JvmField val ORES_NETHERITE_SCRAP = commonItemTag("ores/netherite_scrap")

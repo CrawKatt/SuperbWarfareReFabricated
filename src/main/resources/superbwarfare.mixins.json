@@ -16,6 +16,7 @@
     "EntityOnGroundAccessor",
     "EntityTypeMixin",
     "ExplosionMixin",
+    "FireBlockMixin",
     "FishingHookMixin",
     "ItemEntityMixin",
     "ItemStackMixin",
@@ -35,6 +36,7 @@
     "ServerPlayerMixin",
     "ServerLevelMixin",
     "SteelPipeFallMixin",
+    "TntBlockMixin",
     "VillagerMixin"
   ],
   "client": [

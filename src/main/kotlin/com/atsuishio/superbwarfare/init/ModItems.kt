@@ -514,6 +514,7 @@ object ModItems {
     @JvmField val SULFUR_BLOCK = registerBlock(ModBlocks.SULFUR_BLOCK)
     @JvmField val NITER_BLOCK = registerBlock(ModBlocks.NITER_BLOCK)
     @JvmField val JUMP_PAD = registerBlock(ModBlocks.JUMP_PAD)
+    @JvmField val HIGH_ENERGY_EXPLOSIVES_BLOCK = registerBlock(ModBlocks.HIGH_ENERGY_EXPLOSIVES_BLOCK)
     @JvmField val BOOBY_TRAP = registerBlock(ModBlocks.BOOBY_TRAP)
     @JvmField val SANDBAG = registerBlock(ModBlocks.SANDBAG)
     @JvmField val BARBED_WIRE = registerBlock(ModBlocks.BARBED_WIRE)

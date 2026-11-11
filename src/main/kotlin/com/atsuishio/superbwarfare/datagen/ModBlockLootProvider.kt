@@ -36,6 +36,7 @@ class ModBlockLootProvider(provider: HolderLookup.Provider) :
         this.dropSelf(ModBlocks.SANDBAG)
         this.dropSelf(ModBlocks.BARBED_WIRE)
         this.dropSelf(ModBlocks.JUMP_PAD)
+        this.dropSelf(ModBlocks.HIGH_ENERGY_EXPLOSIVES_BLOCK)
         this.dropSelf(ModBlocks.BOOBY_TRAP)
         this.dropSelf(ModBlocks.DRAGON_TEETH)
         this.dropSelf(ModBlocks.REFORGING_TABLE)
