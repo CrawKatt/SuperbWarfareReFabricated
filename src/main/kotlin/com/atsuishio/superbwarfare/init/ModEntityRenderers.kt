@@ -116,5 +116,6 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.AC_130H, ::Ac130hRenderer)
         EntityRendererRegistry.register(ModEntities.J_16, ::J16Renderer)
         EntityRendererRegistry.register(ModEntities.FIM_92_MISSILE, ::BasicProjectileRenderer)
+        EntityRendererRegistry.register(ModEntities.FOOD_RAIN_ATOM_BOMB, ::BasicProjectileRenderer)
     }
 }

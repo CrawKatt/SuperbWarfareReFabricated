@@ -330,6 +330,10 @@ object ModEntities {
     val BOR_57: EntityType<Bor57Entity> =
         register("bor_57", fastProjectile(::Bor57Entity).dimensions(EntityDimensions.scalable(0.8f, 0.8f)))
 
+    @JvmField
+    val FOOD_RAIN_ATOM_BOMB: EntityType<NuclearBombEntity> =
+        register("food_rain_atom_bomb", fastProjectile(::NuclearBombEntity).dimensions(EntityDimensions.scalable(0.8f, 0.8f)))
+
     // Vehicles
     // Turrets
     @JvmField

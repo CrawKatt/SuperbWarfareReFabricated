@@ -39,6 +39,7 @@ import com.atsuishio.superbwarfare.client.renderer.item.Type88ClusterGrenadesRen
 import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.DeployedWeaponRenderer
 import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
+import com.atsuishio.superbwarfare.client.renderer.special.NuclearExplosionRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.RadiationGlowRenderer
 import com.atsuishio.superbwarfare.client.tooltip.ClientCellImageTooltip
 import com.atsuishio.superbwarfare.client.tooltip.ClientChargingStationImageTooltip
@@ -61,6 +62,7 @@ import com.atsuishio.superbwarfare.item.armor.UsHelmetPasgtItem
 import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import com.atsuishio.superbwarfare.item.projectile.M84StunGrenadeItem
 import com.atsuishio.superbwarfare.item.projectile.DecoyGrenadeItem
+import com.atsuishio.superbwarfare.item.projectile.FoodRainAtomBombItem
 import com.atsuishio.superbwarfare.item.projectile.MolotovItem
 import com.atsuishio.superbwarfare.item.projectile.SeaMineItem
 import com.atsuishio.superbwarfare.tools.mc
@@ -132,6 +134,7 @@ object ClientRenderHandler {
     fun registerGravityLensingShader(event: CoreShaderRegistrationCallback.RegistrationContext) {
         ReforgingGravityBallRenderer.registerLensingShader(event)
         GunMuzzleLightRenderer.onRegisterShaders(event)
+        NuclearExplosionRenderer.registerShader(event)
     }
 
     /** [bulletRenderOffset] 的采样时刻（`System.nanoTime()`），超过 [OFFSET_TTL] 就当它过期 */
@@ -386,6 +389,7 @@ object ClientRenderHandler {
         M84StunGrenadeItem.registerRenderer()
         DecoyGrenadeItem.registerRenderer()
         MolotovItem.registerRenderer()
+        FoodRainAtomBombItem.registerRenderer()
         SeaMineItem.registerRenderer()
         val tm62Renderer = lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
         BuiltinItemRendererRegistry.INSTANCE.register(

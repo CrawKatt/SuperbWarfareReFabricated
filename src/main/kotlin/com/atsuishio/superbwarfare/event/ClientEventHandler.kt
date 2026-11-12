@@ -25,6 +25,7 @@ import com.atsuishio.superbwarfare.client.renderer.gun.GeoGunRenderer
 import com.atsuishio.superbwarfare.client.renderer.gun.MuzzleFlashRenderer
 import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensPostProcessor
+import com.atsuishio.superbwarfare.client.renderer.special.NuclearExplosionRenderer
 import com.atsuishio.superbwarfare.client.shader.RadiationShaderHandler
 import com.atsuishio.superbwarfare.client.sound.ClientSonicBoomHandler
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
@@ -964,6 +965,7 @@ object ClientEventHandler {
         // 退出世界后热融合开关回到默认开启，避免把上一个存档里关掉的状态带过来
         scopeThermalEnabled = true
         ReforgingGravityBallRenderer.clearWorldEffects()
+        NuclearExplosionRenderer.clear()
         ScopeLensPostProcessor.close()
         GunMuzzleLightRenderer.close()
         com.atsuishio.superbwarfare.client.renderer.scope.ScopeThermalRenderer.close()
@@ -980,6 +982,7 @@ object ClientEventHandler {
     @JvmStatic
     fun handleClientTick() {
         FlashbangOverlay.tick()
+        NuclearExplosionRenderer.tick()
         val player = localPlayer ?: run {
             syncMeleePlayer(null)
             RadiationShaderHandler.setDosage(0f)
