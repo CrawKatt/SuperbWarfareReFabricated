@@ -760,6 +760,74 @@ class ModItemTagProvider(
             ModItems.SCOPE_SPYGLASS,
             ModItems.STEEL_PIPE_SCOPE,
         )
+
+        // 其余槽位的通用配件 tag，条目顺序取现有枪械列表的多数派顺序
+        this.tag(ModTags.Items.ATTACHMENT_GRIP_STANDARD).add(
+            ModItems.VERTICAL_GRIP,
+            ModItems.GRIP_VERTICAL_PINEAPPLE,
+            ModItems.GRIP_VERTICAL_BIPOD,
+            ModItems.GRIP_RECTANGLE_VERTICAL,
+            ModItems.TRIANGLE_GRIP,
+            ModItems.GRIP_CQR_GEN2,
+            ModItems.STEEL_PIPE_GRIP,
+        )
+
+        this.tag(ModTags.Items.ATTACHMENT_LOWER_RAIL_STANDARD).add(
+            ModItems.LOWER_RAIL_BIPOD,
+            ModItems.PEQ_15,
+            ModItems.PISTOL_LASER,
+        )
+
+        this.tag(ModTags.Items.ATTACHMENT_UPPER_RAIL_STANDARD).add(
+            ModItems.PEQ_15,
+            ModItems.STANDARD_GUN_SHIELD,
+            ModItems.PISTOL_LASER,
+            ModItems.HYPERION_SHIELD_MODULE,
+        )
+
+        this.tag(ModTags.Items.ATTACHMENT_LEFT_RAIL_STANDARD).add(
+            ModItems.PEQ_15,
+            ModItems.RANGE_FINDER,
+            ModItems.PISTOL_LASER,
+        )
+
+        this.tag(ModTags.Items.ATTACHMENT_RIGHT_RAIL_STANDARD).add(
+            ModItems.PEQ_15,
+            ModItems.PISTOL_LASER,
+        )
+
+        // stock_zenit_pt_1 是 AK 系专属，不进通用 tag
+        this.tag(ModTags.Items.ATTACHMENT_STOCK_STANDARD).add(
+            ModItems.STOCK_AR_TACTICAL,
+            ModItems.STOCK_ELITE,
+            ModItems.STOCK_STR,
+            ModItems.STOCK_UBR,
+            ModItems.STOCK_PRS,
+            ModItems.STEEL_PIPE_STOCK,
+        )
+
+        this.tag(ModTags.Items.ATTACHMENT_SUBWEAPON_STANDARD).add(
+            ModItems.SUB_WEAPON_GP_25,
+        )
+
+        this.tag(ModTags.Items.ATTACHMENT_MUZZLE_STANDARD).add(
+            ModItems.MEOWLENCER,
+            ModItems.HISSILENCER,
+            ModItems.SILAOWUNCER,
+            ModItems.LOUDSPEAKER,
+            ModItems.MILENCER,
+            ModItems.STEEL_PIPE_SILENCER,
+        )
+
+        this.tag(ModTags.Items.ATTACHMENT_MUZZLE_RIFLE).add(
+            ModItems.RU_SILENCER,
+            ModItems.MUZZLE_BRAKE_RU,
+            ModItems.MUZZLE_BRAKE_AR,
+            ModItems.MUZZLE_BREAK_BIRDCAGE,
+            ModItems.MUZZLE_ZENIT_DTK_1,
+            ModItems.MUZZLE_COMPENSATOR_R_17,
+            ModItems.AR_SILENCER,
+        )
     }
 
     /** 按物品自身的稀有度把它落进 [slot] 的对应子 tag */
