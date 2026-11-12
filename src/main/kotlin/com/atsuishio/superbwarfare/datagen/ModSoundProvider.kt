@@ -292,6 +292,11 @@ class ModSoundProvider(private val output: PackOutput) : DataProvider {
             "ak_47_veryfar", "ak_47_mag_in", "ak_47_mag_out", "ak_47_bolt",
         )
 
+        // -------------------- gun/a_762 --------------------
+        group(
+            "gun/a_762", "a_762_fire_1p", "a_762_fire_3p", "a_762_fire_1p_s", "a_762_fire_3p_s",
+        )
+
         // -------------------- gun/aurelia_sceptre --------------------
         group("gun/aurelia_sceptre", "aurelia_sceptre_fire_1p", "aurelia_sceptre_fire_3p")
 

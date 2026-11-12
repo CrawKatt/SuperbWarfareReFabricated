@@ -2777,6 +2777,13 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             )
             gunSmithing(
                 writer,
+                ModItems.A_762_BLUEPRINT,
+                GunRarity.LEGENDARY,
+                PLATES_PLASTIC,
+                ModItems.A_762
+            )
+            gunSmithing(
+                writer,
                 ModItems.DEVOTION_BLUEPRINT,
                 GunRarity.EPIC,
                 ModTags.Items.INGOTS_CEMENTED_CARBIDE,
@@ -2946,6 +2953,7 @@ class ModRecipeProvider(pOutput: PackOutput) : RecipeProvider(pOutput) {
             copyBlueprint(writer, ModItems.M_98B_BLUEPRINT)
             copyBlueprint(writer, ModItems.AK_47_BLUEPRINT)
             copyBlueprint(writer, ModItems.AK_12_BLUEPRINT)
+            copyBlueprint(writer, ModItems.A_762_BLUEPRINT)
             copyBlueprint(writer, ModItems.DEVOTION_BLUEPRINT)
             copyBlueprint(writer, ModItems.TASER_BLUEPRINT)
             copyBlueprint(writer, ModItems.M_1911_BLUEPRINT)
