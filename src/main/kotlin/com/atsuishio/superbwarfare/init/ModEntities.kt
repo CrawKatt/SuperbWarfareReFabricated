@@ -334,6 +334,11 @@ object ModEntities {
     val FOOD_RAIN_ATOM_BOMB: EntityType<NuclearBombEntity> =
         register("food_rain_atom_bomb", fastProjectile(::NuclearBombEntity).dimensions(EntityDimensions.scalable(0.8f, 0.8f)))
 
+    @JvmField
+    val SMELLY_BOY: EntityType<NuclearBombEntity> = register("smelly_boy", fastProjectile<NuclearBombEntity>({ type, level ->
+        NuclearBombEntity(type, level, animated = false)
+    }).dimensions(EntityDimensions.scalable(0.8f, 0.8f)))
+
     // Vehicles
     // Turrets
     @JvmField
