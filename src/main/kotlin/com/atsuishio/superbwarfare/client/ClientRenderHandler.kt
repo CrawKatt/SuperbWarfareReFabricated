@@ -32,6 +32,7 @@ import com.atsuishio.superbwarfare.client.overlay.KillMessageOverlay
 import com.atsuishio.superbwarfare.client.overlay.MortarInfoOverlay
 import com.atsuishio.superbwarfare.client.overlay.DeployWeaponTipOverlay
 import com.atsuishio.superbwarfare.client.renderer.special.DeployedWeaponRenderer
+import com.atsuishio.superbwarfare.client.overlay.PerkOverlay
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.RedTriangleOverlay
 import com.atsuishio.superbwarfare.client.overlay.SodayoRocketInfoOverlay
@@ -142,6 +143,7 @@ object ClientRenderHandler {
         BayonetChargeOverlay,
         HeatBarOverlay,
         InvisibleBladeChargeOverlay,
+        PerkOverlay,
         CrossHairOverlay,
         GunShieldOverlay,
         AmmoCountOverlay,
@@ -382,10 +384,12 @@ object ClientRenderHandler {
 
     @JvmStatic
     fun registerOverlays() {
+        PerkOverlay.registerReloadListener()
         ClientTickEvents.END_CLIENT_TICK.register {
             OverlayTraceHandler.onOverlayTraceClientTick()
             VehicleMainWeaponHudOverlay.onVehicleMainWeaponHudOverlayClientTick()
             GPWSOverlay.onClientTick()
+            PerkOverlay.onClientTick()
             AircraftHud.onAircraftHudClientTick()
             HelicopterHud.onHelicopterHudClientTick()
             OldAircraftHud.onOldAircraftHudClientTick()
