@@ -72,6 +72,7 @@ public class ClientMod implements ClientModInitializer {
         ModProperties.init();
         ModParticles.init();
         DataLoader.registerClient();
+        ClientRenderHandler.registerPerkHudRules();
 
         ClientLanguageGetter.register();
         ResourceOnceLogger.register();

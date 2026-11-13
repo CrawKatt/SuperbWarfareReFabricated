@@ -96,6 +96,11 @@ import kotlin.math.atan2
 import kotlin.math.min
 
 object ClientRenderHandler {
+
+    @JvmStatic
+    fun registerPerkHudRules() {
+        PerkOverlay.registerReloadListener()
+    }
     private val containerDecorator = ContainerItemDecorator()
     private val luckyContainerDecorator = LuckyContainerItemDecorator()
     private val vehicleKeyDecorator = VehicleKeyItemDecorator()
@@ -112,8 +117,9 @@ object ClientRenderHandler {
         RedTriangleOverlay,
         BayonetChargeOverlay,
         HeatBarOverlay,
-        CrossHairOverlay,
+        PerkOverlay,
         InvisibleBladeChargeOverlay,
+        CrossHairOverlay,
         GunShieldOverlay,
         AmmoCountOverlay,
         StaminaOverlay,
@@ -350,6 +356,7 @@ object ClientRenderHandler {
     fun registerOverlays() {
         GPWSOverlay.register()
         ClientTickEvents.END_CLIENT_TICK.register {
+            PerkOverlay.onClientTick()
             VehicleTeamOverlay.onVehicleTeamOverlayClientTick()
             VehicleMainWeaponHudOverlay.onVehicleMainWeaponHudOverlayClientTick()
             Type63InfoOverlay.tracingEntity()
