@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.entity.living.SenpaiEntity
 import com.atsuishio.superbwarfare.entity.living.SteelCoilEntity
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
+import com.atsuishio.superbwarfare.entity.misc.FoodRainItemEntity
 import com.atsuishio.superbwarfare.entity.misc.HighEnergyExplosivesEntity
 import com.atsuishio.superbwarfare.entity.projectile.*
 import com.atsuishio.superbwarfare.entity.vehicle.*
@@ -331,8 +332,12 @@ object ModEntities {
         register("bor_57", fastProjectile(::Bor57Entity).dimensions(EntityDimensions.scalable(0.8f, 0.8f)))
 
     @JvmField
-    val FOOD_RAIN_ATOM_BOMB: EntityType<NuclearBombEntity> =
-        register("food_rain_atom_bomb", fastProjectile(::NuclearBombEntity).dimensions(EntityDimensions.scalable(0.8f, 0.8f)))
+    val FOOD_RAIN_ATOM_BOMB: EntityType<FoodRainAtomBombEntity> =
+        register("food_rain_atom_bomb", fastProjectile(::FoodRainAtomBombEntity).dimensions(EntityDimensions.scalable(0.8f, 0.8f)))
+
+    @JvmField
+    val FOOD_RAIN_ITEM: EntityType<FoodRainItemEntity> = register("food_rain_item",
+        misc(::FoodRainItemEntity).dimensions(EntityDimensions.scalable(0.25f, 0.25f)).trackRangeChunks(32).trackedUpdateRate(20))
 
     @JvmField
     val SMELLY_BOY: EntityType<NuclearBombEntity> = register("smelly_boy", fastProjectile<NuclearBombEntity>({ type, level ->

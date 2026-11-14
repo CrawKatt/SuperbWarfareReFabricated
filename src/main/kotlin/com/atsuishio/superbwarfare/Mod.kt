@@ -26,6 +26,7 @@ import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
 import com.atsuishio.superbwarfare.event.ItemDisplayBoardEventHandler
 import com.atsuishio.superbwarfare.event.LivingEventHandler
 import com.atsuishio.superbwarfare.event.ModVersionEventHandler
+import com.atsuishio.superbwarfare.tools.FoodRainHandler
 import com.atsuishio.superbwarfare.tools.ServerSyncedEntityHandler
 import com.atsuishio.superbwarfare.world.saveddata.ProjectileChunkSavedData
 import com.atsuishio.superbwarfare.event.PlayerEventHandler
@@ -144,6 +145,7 @@ class Mod : ModInitializer {
         ModLootModifier.register()
         FastThrowableProjectile.init()
         FastProjectileManualTicker.register()
+        FoodRainHandler.register()
         TraumaMobEffect.registerEvents()
         registerLivingEvents()
 
