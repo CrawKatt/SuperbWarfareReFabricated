@@ -2426,6 +2426,17 @@ class ModRecipeProvider(output: PackOutput, registries: CompletableFuture<Holder
                     has(PLATES_STEEL)
                 )
                 .save(writer, loc(getItemName(ModItems.BOOBY_TRAP)))
+            ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModItems.SHELF, 8)
+                .pattern("aba")
+                .pattern(" b ")
+                .pattern("aba")
+                .define('a', ModTags.Items.INGOTS_IRON)
+                .define('b', PLATES_STEEL)
+                .unlockedBy(
+                    getHasName(ModItems.STEEL_PLATE),
+                    has(PLATES_STEEL)
+                )
+                .save(writer, loc(getItemName(ModItems.SHELF)))
         }
 
         private fun buildVehicleRecipes(writer: RecipeOutput) {
