@@ -63,7 +63,7 @@ object PlayerEventHandler {
 
     @JvmStatic
     fun onPlayerDeath(player: ServerPlayer) {
-        ChargeWindowHandler.clear(player)
+        UseActionMessage.clear(player)
         UseActionMessage.clearChargeCooldown(player)
     }
 

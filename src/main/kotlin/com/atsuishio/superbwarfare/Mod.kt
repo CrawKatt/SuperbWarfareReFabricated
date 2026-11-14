@@ -23,7 +23,6 @@ import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.event.CustomEventHandler
 import com.atsuishio.superbwarfare.event.GunEventHandler
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
-import com.atsuishio.superbwarfare.event.ItemDisplayBoardEventHandler
 import com.atsuishio.superbwarfare.event.LivingEventHandler
 import com.atsuishio.superbwarfare.event.ModVersionEventHandler
 import com.atsuishio.superbwarfare.tools.FoodRainHandler
@@ -215,7 +214,7 @@ class Mod : ModInitializer {
 
     private fun registerCommonEvents() {
         UseBlockCallback.EVENT.register { player, level, _, hit ->
-            ItemDisplayBoardEventHandler.onRightClickBlock(player, level, hit.blockPos)
+            LivingEventHandler.onRightClickBlock(player, level, hit.blockPos)
         }
 
         val respawnMeleePhase = loc("respawn_melee")

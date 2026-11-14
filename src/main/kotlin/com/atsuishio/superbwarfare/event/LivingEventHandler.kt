@@ -2,6 +2,8 @@ package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.api.event.PreKillEvent.Indicator
 import com.atsuishio.superbwarfare.api.event.PreKillEvent.SendKillMessage
+import com.atsuishio.superbwarfare.block.ItemDisplayBoardBlock
+import com.atsuishio.superbwarfare.block.entity.ItemDisplayBoardBlockEntity
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.config.common.GameplayConfig
 import com.atsuishio.superbwarfare.config.server.MiscConfig
@@ -35,12 +37,14 @@ import com.atsuishio.superbwarfare.tools.DamageTypeTool.isHeadshotDamage
 import com.atsuishio.superbwarfare.tools.DamageTypeTool.isModDamage
 import com.atsuishio.superbwarfare.tools.FormatTool.format1D
 import com.atsuishio.superbwarfare.tools.FormatTool.format2D
+import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundStopSoundPacket
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundSource
 import net.minecraft.util.Mth
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.damagesource.DamageTypes
 import net.minecraft.world.effect.MobEffectInstance
@@ -61,6 +65,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Explosion
+import net.minecraft.world.level.Level
 import java.util.*
 import kotlin.math.max
 import kotlin.math.pow
@@ -837,5 +842,21 @@ object LivingEventHandler {
                 }
             }
         }
+    }
+
+    fun onRightClickBlock(player: Player, level: Level, pos: BlockPos): InteractionResult {
+        val state = level.getBlockState(pos)
+        if (state.block !is ItemDisplayBoardBlock) return InteractionResult.PASS
+
+        if (player.isSpectator) return InteractionResult.PASS
+        if (!player.isShiftKeyDown) return InteractionResult.PASS
+
+        val blockEntity = level.getBlockEntity(pos) as? ItemDisplayBoardBlockEntity ?: return InteractionResult.PASS
+        if (!blockEntity.hasItem) return InteractionResult.PASS
+
+        if (level.isClientSide) return InteractionResult.SUCCESS
+
+        ItemDisplayBoardBlock.takeDisplayedItem(level, pos, state, player)
+        return InteractionResult.SUCCESS
     }
 }
