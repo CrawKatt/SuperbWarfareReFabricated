@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModItems.Materials
 import com.atsuishio.superbwarfare.init.ModPerks
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.data.CachedOutput
 import net.minecraft.data.DataProvider
@@ -503,7 +504,21 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         evenSimplerBlockItem(ModBlocks.BOOBY_TRAP)
         evenSimplerBlockItem(ModBlocks.REFORGING_TABLE)
         addModel(loc("item/resonance_base"), model(loc("displaysettings/resonance_base")))
-        evenSimplerBlockItem(ModBlocks.SHELF)
+        addModel(loc("item/shelf"), JsonParser.parseString("""
+            {
+              "parent": "builtin/entity",
+              "gui_light": "side",
+              "textures": {"particle": "minecraft:block/white_concrete"},
+              "display": {
+                "gui": {"rotation": [30, 225, 0], "translation": [0, 0, 0], "scale": [0.625, 0.625, 0.625]},
+                "ground": {"rotation": [0, 0, 0], "translation": [0, 3, 0], "scale": [0.25, 0.25, 0.25]},
+                "fixed": {"rotation": [0, 0, 0], "translation": [0, 0, 0], "scale": [0.5, 0.5, 0.5]},
+                "thirdperson_righthand": {"rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.375, 0.375, 0.375]},
+                "firstperson_righthand": {"rotation": [0, 45, 0], "translation": [0, 0, 0], "scale": [0.4, 0.4, 0.4]},
+                "firstperson_lefthand": {"rotation": [0, 225, 0], "translation": [0, 0, 0], "scale": [0.4, 0.4, 0.4]}
+              }
+            }
+        """).asJsonObject)
         evenSimplerBlockItem(ModBlocks.CHARGING_STATION)
         evenSimplerBlockItem(ModBlocks.WEAPON_REPAIR_STATION)
         evenSimplerBlockItem(ModBlocks.CREATIVE_CHARGING_STATION)

@@ -138,6 +138,7 @@ object ClientEventHandler {
                 event.setSwingHand(false)
             }
         }
+        InteractionKeyMappingTriggeredCallback.EVENT.register(ClickEventHandler::onShelfAttack)
         RenderHandCallback.EVENT.register { event ->
             if (shouldCancelHandRender(event.hand)) {
                 event.isCanceled = true

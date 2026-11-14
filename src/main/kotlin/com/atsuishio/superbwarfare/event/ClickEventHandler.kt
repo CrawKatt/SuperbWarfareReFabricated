@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.event
 
+import com.atsuishio.superbwarfare.block.ShelfBlock
 import com.atsuishio.superbwarfare.client.gun.GunChargeHandler
 import com.atsuishio.superbwarfare.client.gun.MeleeClientHandler
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
@@ -18,6 +19,7 @@ import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
 import com.atsuishio.superbwarfare.entity.vehicle.MortarEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.event.custom.InteractionKeyMappingTriggeredCallback
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
 import com.atsuishio.superbwarfare.item.curio.TacticalTerminalItem
@@ -39,6 +41,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import org.lwjgl.glfw.GLFW
 import dev.emi.trinkets.api.TrinketsApi
@@ -193,6 +196,10 @@ object ClickEventHandler {
             return true
         }
 
+        if (mc.options.keyAttack.matchesMouse(button) && handleShelfAttack(true)) {
+            return true
+        }
+
         val stack = player.mainHandItem
 
         if (ModKeyMappings.FIRE.matchesMouse(button) && cancelFireKey(player, stack)) {
@@ -251,6 +258,28 @@ object ClickEventHandler {
             ClientEventHandler.burstFireAmount = 0
         }
         return canceled
+    }
+
+    fun onShelfAttack(event: InteractionKeyMappingTriggeredCallback.Event) {
+        if (!event.isAttack || !handleShelfAttack(false)) return
+        event.isCanceled = true
+        event.setSwingHand(false)
+    }
+
+    private fun handleShelfAttack(take: Boolean): Boolean {
+        if (notInGame) return false
+        val player = localPlayer ?: return false
+        if (player.isSpectator || player.isUsingItem || player.isHandsBusy) return false
+        val hit = mc.hitResult as? BlockHitResult ?: return false
+        val state = player.level().getBlockState(hit.blockPos)
+        if (state.block !is ShelfBlock || hit.direction != state.getValue(ShelfBlock.FACING)) return false
+        val gameMode = mc.gameMode ?: return false
+        gameMode.stopDestroyBlock()
+        if (take) {
+            gameMode.startDestroyBlock(hit.blockPos, hit.direction)
+            player.swing(InteractionHand.MAIN_HAND)
+        }
+        return true
     }
 
     /**
@@ -351,6 +380,9 @@ object ClickEventHandler {
 
         if (player.isSpectator) return false
         if (player.hasEffect(ModMobEffects.SHOCK)) return false
+
+        if (action == InputConstants.PRESS && mc.options.keyAttack.matches(key, scanCode)
+            && handleShelfAttack(true)) return false
 
         val stack = player.mainHandItem
         val vehicle = player.vehicle

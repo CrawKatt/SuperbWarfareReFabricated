@@ -32,6 +32,7 @@ import com.atsuishio.superbwarfare.world.saveddata.ProjectileChunkSavedData
 import com.atsuishio.superbwarfare.event.PlayerEventHandler
 import com.atsuishio.superbwarfare.event.ShieldHandler
 import com.atsuishio.superbwarfare.event.custom.LivingAttackCallback
+import com.atsuishio.superbwarfare.event.custom.LeftClickBlockCallback
 import com.atsuishio.superbwarfare.event.custom.LivingDamageCallback
 import com.atsuishio.superbwarfare.event.custom.LivingDeathCallback
 import com.atsuishio.superbwarfare.event.custom.LivingDropsCallback
@@ -96,10 +97,12 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback
 import net.fabricmc.fabric.api.event.player.UseBlockCallback
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionResult
@@ -214,6 +217,18 @@ class Mod : ModInitializer {
     }
 
     private fun registerCommonEvents() {
+        LeftClickBlockCallback.EVENT.register(ShelfBlock::onLeftClick)
+        AttackBlockCallback.EVENT.register { player, level, _, pos, face ->
+            if (!level.isClientSide) {
+                InteractionResult.PASS
+            } else {
+                val event = LeftClickBlockCallback.Event(
+                    player, pos, face, ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK
+                )
+                LeftClickBlockCallback.EVENT.invoker().onLeftClick(event)
+                if (event.isCanceled) InteractionResult.CONSUME else InteractionResult.PASS
+            }
+        }
         UseBlockCallback.EVENT.register(ShelfBlock::onRightClick)
         UseBlockCallback.EVENT.register { player, level, _, hit ->
             LivingEventHandler.onRightClickBlock(player, level, hit.blockPos)

@@ -74,7 +74,6 @@ import com.atsuishio.superbwarfare.tools.toVec3
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.emi.trinkets.api.client.TrinketRendererRegistry
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
@@ -354,16 +353,6 @@ object ClientRenderHandler {
         }
         BlockEntityRenderers.register(ModBlockEntities.ITEM_DISPLAY_BOARD) { ItemDisplayBoardBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.SHELF) { ShelfBlockEntityRenderer() }
-        modifyShelfItemModel()
-    }
-
-    @JvmStatic
-    fun modifyShelfItemModel() {
-        ModelLoadingPlugin.register { plugin ->
-            plugin.modifyModelAfterBake().register { model, context ->
-                ShelfBlockEntityRenderer.modifyItemModel(model, context.id())
-            }
-        }
     }
 
     @JvmStatic

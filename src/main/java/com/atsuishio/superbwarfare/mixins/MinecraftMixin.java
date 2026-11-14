@@ -14,6 +14,9 @@ import com.atsuishio.superbwarfare.tools.MinecraftUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
@@ -26,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Minecraft.class)
 public class MinecraftMixin {
@@ -127,6 +131,38 @@ public class MinecraftMixin {
 
     @Unique
     private boolean superbwarfare$cancelSwing = false;
+
+    @Unique
+    private boolean superbwarfare$cancelAttackSwing = false;
+
+    @Inject(method = "startAttack", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/phys/HitResult;getType()Lnet/minecraft/world/phys/HitResult$Type;"),
+            cancellable = true)
+    private void superbwarfare$onStartAttack(CallbackInfoReturnable<Boolean> cir) {
+        var event = new InteractionKeyMappingTriggeredCallback.Event(InteractionHand.MAIN_HAND, true);
+        InteractionKeyMappingTriggeredCallback.EVENT.invoker().interact(event);
+        superbwarfare$cancelAttackSwing = !event.shouldSwingHand();
+        if (event.isCanceled()) {
+            if (event.shouldSwingHand()) player.swing(InteractionHand.MAIN_HAND);
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Redirect(method = "startAttack", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/player/LocalPlayer;swing(Lnet/minecraft/world/InteractionHand;)V"))
+    private void superbwarfare$redirectAttackSwing(LocalPlayer player, InteractionHand hand) {
+        if (!superbwarfare$cancelAttackSwing) player.swing(hand);
+        superbwarfare$cancelAttackSwing = false;
+    }
+
+    @Redirect(method = "continueAttack", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;continueDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z"))
+    private boolean superbwarfare$onContinueAttack(MultiPlayerGameMode gameMode, BlockPos pos, Direction face) {
+        var event = new InteractionKeyMappingTriggeredCallback.Event(InteractionHand.MAIN_HAND, true);
+        InteractionKeyMappingTriggeredCallback.EVENT.invoker().interact(event);
+        if (event.isCanceled()) return event.shouldSwingHand();
+        return gameMode.continueDestroyBlock(pos, face) && event.shouldSwingHand();
+    }
 
     @Inject(method = "startUseItem", at = @At("HEAD"))
     private void superbwarfare$onStartUseItem(CallbackInfo ci) {

@@ -17,14 +17,33 @@ public interface InteractionKeyMappingTriggeredCallback {
 
     class Event {
         private final InteractionHand hand;
+        private final boolean attack;
+        private boolean canceled;
         private boolean swingHand = true;
 
         public Event(InteractionHand hand) {
+            this(hand, false);
+        }
+
+        public Event(InteractionHand hand, boolean attack) {
             this.hand = hand;
+            this.attack = attack;
         }
 
         public InteractionHand getHand() {
             return this.hand;
+        }
+
+        public boolean isAttack() {
+            return attack;
+        }
+
+        public boolean isCanceled() {
+            return canceled;
+        }
+
+        public void setCanceled(boolean canceled) {
+            this.canceled = canceled;
         }
 
         public boolean shouldSwingHand() {
