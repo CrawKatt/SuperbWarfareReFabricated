@@ -77,7 +77,8 @@ class ModBlockTagProvider(
             ModBlocks.DEEPSLATE_NITER_ORE,
             ModBlocks.NITER_BLOCK,
             ModBlocks.TRIPOD,
-            ModBlocks.ITEM_DISPLAY_BOARD
+            ModBlocks.ITEM_DISPLAY_BOARD,
+            ModBlocks.SHELF
         )
         this.tag(BlockTags.MINEABLE_WITH_SHOVEL).add(ModBlocks.SANDBAG)
 

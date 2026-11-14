@@ -141,6 +141,11 @@ object ModBlockEntities {
         ).build(null)
     }
 
+    @JvmField
+    val SHELF = registerBlockEntity("shelf") {
+        BlockEntityType.Builder.of(::ShelfBlockEntity, ModBlocks.SHELF).build(null)
+    }
+
     @JvmStatic
     fun init() {
 

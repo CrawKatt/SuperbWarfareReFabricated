@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare
 import com.atsuishio.superbwarfare.advancement.CriteriaRegister
 import com.atsuishio.superbwarfare.block.BoobyTrapBlock
 import com.atsuishio.superbwarfare.block.HighEnergyExplosivesBlock
+import com.atsuishio.superbwarfare.block.ShelfBlock
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.command.CommandRegister
@@ -213,6 +214,7 @@ class Mod : ModInitializer {
     }
 
     private fun registerCommonEvents() {
+        UseBlockCallback.EVENT.register(ShelfBlock::onRightClick)
         UseBlockCallback.EVENT.register { player, level, _, hit ->
             LivingEventHandler.onRightClickBlock(player, level, hit.blockPos)
         }

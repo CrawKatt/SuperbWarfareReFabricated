@@ -68,6 +68,13 @@ class ModBlockStateProvider(private val output: PackOutput) : DataProvider {
                 add("textures", JsonObject().apply { addProperty("particle", "minecraft:block/gray_glazed_terracotta") })
             })
         )
+        simpleBlock(
+            ModBlocks.SHELF,
+            addModel(blockModel("shelf"), model(ResourceLocation("minecraft", "block/cube_all"), linkedMapOf(
+                "all" to loc("bedrock/block/shelf_top"),
+                "particle" to ResourceLocation("minecraft", "block/white_concrete")
+            )))
+        )
         horizontalBlock(ModBlocks.CONTAINER, blockModel("container"))
         horizontalBlock(ModBlocks.SMALL_CONTAINER, blockModel("small_container"))
         horizontalBlock(ModBlocks.LUCKY_CONTAINER, blockModel("container"))

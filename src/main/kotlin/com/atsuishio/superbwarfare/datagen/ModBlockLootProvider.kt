@@ -48,6 +48,7 @@ class ModBlockLootProvider : BlockLootSubProvider(mutableSetOf<Item>(), FeatureF
         this.dropSelf(ModBlocks.FUMO_25)
         this.dropSelf(ModBlocks.TRIPOD)
         this.dropSelf(ModBlocks.ITEM_DISPLAY_BOARD)
+        this.dropSelf(ModBlocks.SHELF)
         this.dropSelf(ModBlocks.VEHICLE_DEPLOYER)
         this.dropSelf(ModBlocks.AIRCRAFT_CATAPULT)
         this.dropSelf(ModBlocks.CATAPULT_CONTROLLER)

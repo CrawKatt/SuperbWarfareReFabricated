@@ -26,6 +26,7 @@ import com.atsuishio.superbwarfare.client.renderer.block.FuMO25BlockEntityRender
 import com.atsuishio.superbwarfare.client.renderer.block.ItemDisplayBoardBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.LuckyContainerBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.ResonanceBaseBlockEntityRenderer
+import com.atsuishio.superbwarfare.client.renderer.block.ShelfBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.SmallContainerBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.TripodBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.VehicleAssemblingTableBlockEntityRenderer
@@ -60,6 +61,7 @@ import com.atsuishio.superbwarfare.item.armor.RuHelmet6b47Item
 import com.atsuishio.superbwarfare.item.armor.UsChestIotvItem
 import com.atsuishio.superbwarfare.item.armor.UsHelmetPasgtItem
 import com.atsuishio.superbwarfare.item.gun.GeoGunItem
+import com.atsuishio.superbwarfare.item.blockitem.ShelfBlockItem
 import com.atsuishio.superbwarfare.item.projectile.M84StunGrenadeItem
 import com.atsuishio.superbwarfare.item.projectile.DecoyGrenadeItem
 import com.atsuishio.superbwarfare.item.projectile.MolotovItem
@@ -72,6 +74,7 @@ import com.atsuishio.superbwarfare.tools.toVec3
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.emi.trinkets.api.client.TrinketRendererRegistry
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
@@ -350,6 +353,17 @@ object ClientRenderHandler {
             if (entity is BoobyTrapBlockEntity) entity.refreshLighting()
         }
         BlockEntityRenderers.register(ModBlockEntities.ITEM_DISPLAY_BOARD) { ItemDisplayBoardBlockEntityRenderer() }
+        BlockEntityRenderers.register(ModBlockEntities.SHELF) { ShelfBlockEntityRenderer() }
+        modifyShelfItemModel()
+    }
+
+    @JvmStatic
+    fun modifyShelfItemModel() {
+        ModelLoadingPlugin.register { plugin ->
+            plugin.modifyModelAfterBake().register { model, context ->
+                ShelfBlockEntityRenderer.modifyItemModel(model, context.id())
+            }
+        }
     }
 
     @JvmStatic
@@ -399,6 +413,7 @@ object ClientRenderHandler {
         (ModItems.FOOD_RAIN_ATOM_BOMB as NuclearBombItem).registerRenderer()
         (ModItems.SMELLY_BOY as NuclearBombItem).registerRenderer()
         SeaMineItem.registerRenderer()
+        (ModItems.SHELF as ShelfBlockItem).registerRenderer()
         val tm62Renderer = lazy { Tm62ItemRenderer(mc.blockEntityRenderDispatcher, mc.entityModels) }
         BuiltinItemRendererRegistry.INSTANCE.register(
             ModItems.TM_62
