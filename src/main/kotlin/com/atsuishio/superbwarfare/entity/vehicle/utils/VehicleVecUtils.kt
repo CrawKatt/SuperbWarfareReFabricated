@@ -431,6 +431,10 @@ object VehicleVecUtils {
         val index = vehicle.getSeatIndex(entity)
         val seat = vehicle.computed().seats().getOrNull(index) ?: return entityEyePos(entity, partialTicks)
 
+        if (VehicleCameraBoneUtils.getCameraBone(seat) != null) {
+            VehicleCameraBoneUtils.getCameraPosition(vehicle, partialTicks, false, index)?.let { return it }
+        }
+
         val data = seat.cameraPos ?: return entityEyePos(entity, partialTicks)
 
         if (data.useSimulate3P) {
@@ -459,6 +463,11 @@ object VehicleVecUtils {
     fun getCameraDirection(vehicle: VehicleEntity, entity: Entity, partialTicks: Float): Vec3 {
         val index = vehicle.getSeatIndex(entity)
         val seat = vehicle.computed().seats().getOrNull(index) ?: return entity.getViewVector(partialTicks)
+
+        if (VehicleCameraBoneUtils.getCameraBone(seat) != null) {
+            VehicleCameraBoneUtils.getCameraDirection(vehicle, partialTicks, ClientEventHandler.zoomVehicle, index)
+                ?.let { return it }
+        }
 
         val data = seat.cameraPos ?: return entity.getViewVector(partialTicks)
 
@@ -506,6 +515,10 @@ object VehicleVecUtils {
         val index = vehicle.getSeatIndex(entity)
         val seat = vehicle.computed().seats().getOrNull(index) ?: return entityEyePos(entity, partialTicks)
 
+        if (VehicleCameraBoneUtils.getCameraBone(seat) != null) {
+            VehicleCameraBoneUtils.getCameraPosition(vehicle, partialTicks, true, index)?.let { return it }
+        }
+
         val data = seat.cameraPos ?: return entityEyePos(entity, partialTicks)
 
         val vec3 = data.zoomPosition
@@ -531,6 +544,10 @@ object VehicleVecUtils {
     fun getZoomDirection(vehicle: VehicleEntity, entity: Entity, partialTicks: Float): Vec3 {
         val index = vehicle.getSeatIndex(entity)
         val seat = vehicle.computed().seats().getOrNull(index) ?: return entity.getViewVector(partialTicks)
+
+        if (VehicleCameraBoneUtils.getCameraBone(seat) != null) {
+            VehicleCameraBoneUtils.getCameraDirection(vehicle, partialTicks, true, index)?.let { return it }
+        }
 
         val data = seat.cameraPos ?: return entity.getViewVector(partialTicks)
 

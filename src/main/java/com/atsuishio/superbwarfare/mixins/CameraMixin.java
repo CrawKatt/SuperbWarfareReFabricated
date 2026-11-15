@@ -1,18 +1,20 @@
 package com.atsuishio.superbwarfare.mixins;
 
+import com.atsuishio.superbwarfare.client.camera.VehicleBoneCamera;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
-import com.atsuishio.superbwarfare.event.ClientMouseHandler;
-import org.spongepowered.asm.mixin.injection.ModifyArgs;
-import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import net.minecraft.client.Camera;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -25,58 +27,33 @@ import static com.atsuishio.superbwarfare.event.ClientEventHandler.zoomTime;
 @Mixin(Camera.class)
 public abstract class CameraMixin {
 
-    @Unique
-    private boolean superbWarfare$anglesComputed;
-
-    @Unique
-    private float superbWarfare$computedYaw;
-
-    @Unique
-    private float superbWarfare$computedPitch;
-
-    @Unique
-    private float superbWarfare$partialTicks;
     @Shadow(aliases = "Lnet/minecraft/client/Camera;setRotation(FF)V")
     protected abstract void setRotation(float p_90573_, float p_90574_);
 
     @Shadow(aliases = "Lnet/minecraft/client/Camera;setPosition(DDD)V")
     protected abstract void setPosition(double p_90585_, double p_90586_, double p_90587_);
 
-    @Inject(method = "setup", at = @At("HEAD"))
-    private void superbWarfare$capturePartialTicks(BlockGetter level, Entity entity, boolean detached,
-                                                    boolean mirrored, float partialTicks, CallbackInfo ci) {
-        superbWarfare$anglesComputed = false;
-        superbWarfare$partialTicks = partialTicks;
-    }
+    @Shadow
+    @Final
+    private Quaternionf rotation;
 
-    @ModifyArgs(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0))
-    private void superbWarfare$applyComputedAngles(Args args) {
-        superbWarfare$computeAngles(args.get(0), args.get(1));
-        args.set(0, superbWarfare$computedYaw);
-        args.set(1, superbWarfare$computedPitch);
-    }
+    @Shadow
+    @Final
+    private Vector3f forwards;
 
-    @Unique
-    private void superbWarfare$computeAngles(float yaw, float pitch) {
-        if (superbWarfare$anglesComputed) return;
-        superbWarfare$anglesComputed = true;
+    @Shadow
+    @Final
+    private Vector3f up;
 
-        Camera camera = (Camera) (Object) this;
-        ClientMouseHandler.handleClientTick(camera, superbWarfare$partialTicks);
+    @Shadow
+    @Final
+    private Vector3f left;
 
-        ClientEventHandler.CameraAnglesContext context = new ClientEventHandler.CameraAnglesContext(
-                camera,
-                superbWarfare$partialTicks,
-                yaw,
-                pitch,
-                0f
-        );
+    @Shadow
+    private float xRot;
 
-        ClientEventHandler.computeCameraAngles(context);
-        superbWarfare$computedYaw = context.getYaw();
-        superbWarfare$computedPitch = context.getPitch();
-    }
-
+    @Shadow
+    private float yRot;
 
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0),
             method = "setup(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/world/entity/Entity;ZZF)V",
@@ -87,11 +64,26 @@ public abstract class CameraMixin {
 
         if (player != null) {
             if (player.getVehicle() instanceof VehicleEntity vehicle) {
-                var rotation = vehicle.getCameraRotation(partialTicks, player, ClientEventHandler.zoomVehicle, Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON);
+                boolean zoom = ClientEventHandler.zoomVehicle;
+                boolean firstPerson = mc.options.getCameraType() == CameraType.FIRST_PERSON;
+
+                if (VehicleBoneCamera.shouldNailCamera(vehicle, player)) {
+                    VehicleBoneCamera.RigidView view =
+                            VehicleBoneCamera.resolve(vehicle, vehicle.getSeatIndex(player), partialTicks, zoom);
+                    if (view != null) {
+                        setPosition(view.getPosition().x, view.getPosition().y, view.getPosition().z);
+                        applyRigidOrientation(view.getOrientation());
+                        VehicleBoneCamera.markActive(view.getOrientation());
+                        info.cancel();
+                        return;
+                    }
+                }
+
+                var rotation = vehicle.getCameraRotation(partialTicks, player, zoom, firstPerson);
                 if (rotation != null) {
                     setRotation(rotation.x, rotation.y);
                 }
-                var position = vehicle.getCameraPosition(partialTicks, player, ClientEventHandler.zoomVehicle, Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON);
+                var position = vehicle.getCameraPosition(partialTicks, player, zoom, firstPerson);
                 if (position != null) {
                     setPosition(position.x, position.y, position.z);
                 }
@@ -99,9 +91,23 @@ public abstract class CameraMixin {
                 if (rotation != null || position != null) {
                     info.cancel();
                 }
-
             }
         }
+    }
+
+    @Unique
+    private void applyRigidOrientation(Quaternionf orientation) {
+        this.rotation.set(orientation);
+        this.forwards.set(0.0f, 0.0f, 1.0f).rotate(orientation);
+        this.up.set(0.0f, 1.0f, 0.0f).rotate(orientation);
+        this.left.set(1.0f, 0.0f, 0.0f).rotate(orientation);
+
+        // 兼容仍然读取 xRot/yRot 的旧代码：只由前向量反推 pitch/yaw（无滚转分量），不参与真实渲染朝向
+        float fx = this.forwards.x();
+        float fy = this.forwards.y();
+        float fz = this.forwards.z();
+        this.yRot = (float) Math.toDegrees(Math.atan2(-fx, fz));
+        this.xRot = (float) Math.toDegrees(-Math.asin(Mth.clamp(fy, -1.0f, 1.0f)));
     }
 
     @Inject(method = "setup", at = @At("TAIL"))

@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.atsuishio.superbwarfare.client.camera.VehicleBoneCamera;
 import com.atsuishio.superbwarfare.client.lighting.GunMuzzleLightRenderer;
 import com.atsuishio.superbwarfare.client.overlay.FlashbangOverlay;
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeLensPostProcessor;
@@ -11,10 +12,12 @@ import com.atsuishio.superbwarfare.config.client.DisplayConfig;
 import com.atsuishio.superbwarfare.data.vehicle.VehicleData;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
+import com.atsuishio.superbwarfare.event.custom.ComputeCameraAnglesCallback;
 import com.atsuishio.superbwarfare.event.custom.RenderLevelStageCallback;
 import com.atsuishio.superbwarfare.init.ModMobEffects;
 import com.atsuishio.superbwarfare.init.ModTags;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
+import com.atsuishio.superbwarfare.mixins.accessor.CameraAnglesAccessor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -94,6 +97,7 @@ public class GameRendererMixin {
         GunMuzzleLightRenderer.beginFrame();
         ScopeLensPostProcessor.beginFrame();
         ScopeThermalRenderer.beginFrame();
+        VehicleBoneCamera.clearFrame();
     }
 
     // Iris has completed its composite at this point; its final colour-space conversion is later.
@@ -131,14 +135,32 @@ public class GameRendererMixin {
     @Final
     private Camera mainCamera;
 
+    @Inject(method = "renderLevel", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/Camera;setup(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/world/entity/Entity;ZZF)V",
+            shift = At.Shift.AFTER))
+    private void superbwarfare$computeCameraAngles(float partialTicks, long finishTime, PoseStack poseStack, CallbackInfo ci) {
+        var event = new ComputeCameraAnglesCallback.Event(
+                mainCamera, partialTicks, mainCamera.getYRot(), mainCamera.getXRot(), 0f);
+        ComputeCameraAnglesCallback.EVENT.invoker().onComputeCameraAngles(event);
+        var angles = (CameraAnglesAccessor) mainCamera;
+        angles.superbwarfare$setYaw(event.getYaw());
+        angles.superbwarfare$setPitch(event.getPitch());
+        poseStack.mulPose(Axis.ZP.rotationDegrees(event.getRoll()));
+    }
+
     @SuppressWarnings("ConstantValue")
     @Inject(method = "renderLevel", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/Camera;setup(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/world/entity/Entity;ZZF)V",
-            shift = At.Shift.AFTER
+            target = "Lnet/minecraft/client/Camera;setup(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/world/entity/Entity;ZZF)V"
     ))
     public void superbWarfare$renderWorld(float tickDelta, long limitTime, PoseStack matrices, CallbackInfo ci) {
         Entity entity = mainCamera.getEntity();
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player != null && minecraft.player == entity
+                && entity.getVehicle() instanceof VehicleEntity boneVehicle
+                && VehicleBoneCamera.shouldNailCamera(boneVehicle, minecraft.player)) {
+            return;
+        }
 
         matrices.mulPose(Axis.ZP.rotationDegrees(ClientEventHandler.cameraRoll));
 
@@ -202,7 +224,19 @@ public class GameRendererMixin {
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/client/renderer/LevelRenderer;prepareCullFrustum(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;Lorg/joml/Matrix4f;)V",
                     shift = At.Shift.BEFORE))
+    private void superbWarfare$applyBoneCameraOrientation(float partialTicks, long finishTime, PoseStack poseStack, CallbackInfo ci) {
+        VehicleBoneCamera.applyViewCorrection(poseStack, mainCamera);
+    }
+
+    @Inject(method = "renderLevel",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/LevelRenderer;prepareCullFrustum(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;Lorg/joml/Matrix4f;)V",
+                    shift = At.Shift.BEFORE))
     private void superbWarfare$applyGunCameraAnimation(float partialTicks, long finishTime, PoseStack poseStack, CallbackInfo ci) {
+        if (VehicleBoneCamera.activeThisFrame) {
+            return;
+        }
+
         Quaternionf rotation = ClientEventHandler.firstPersonCameraRotation();
         if (rotation == null) {
             return;

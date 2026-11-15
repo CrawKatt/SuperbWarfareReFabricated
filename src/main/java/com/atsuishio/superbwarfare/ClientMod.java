@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare;
 
 import com.atsuishio.superbwarfare.client.ClientRenderHandler;
+import com.atsuishio.superbwarfare.client.camera.VehicleBoneCamera;
 import com.atsuishio.superbwarfare.client.DataDumpChatHandler;
 import com.atsuishio.superbwarfare.client.MouseMovementHandler;
 import com.atsuishio.superbwarfare.client.ParachuteVisibilityHandler;
@@ -27,6 +28,7 @@ import com.atsuishio.superbwarfare.compat.ponder.SBWPonderPlugin;
 import com.atsuishio.superbwarfare.data.DataLoader;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
+import com.atsuishio.superbwarfare.event.custom.ComputeCameraAnglesCallback;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
 import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity;
 import com.atsuishio.superbwarfare.init.ModBlocks;
@@ -95,6 +97,16 @@ public class ClientMod implements ClientModInitializer {
         AcceleratedRenderingCompat.INSTANCE.init();
         ModSoundInstances.init();
         ClientEventHandler.register();
+        ComputeCameraAnglesCallback.EVENT.register(event -> {
+            ClientMouseHandler.handleClientTick(event.getCamera(), (float) event.getPartialTick());
+            var context = new ClientEventHandler.CameraAnglesContext(
+                    event.getCamera(), event.getPartialTick(), event.getYaw(), event.getPitch(), event.getRoll());
+            ClientEventHandler.computeCameraAngles(context);
+            event.setYaw(context.getYaw());
+            event.setPitch(context.getPitch());
+            event.setRoll(context.getRoll());
+        });
+        VehicleBoneCamera.register();
         DataDumpChatHandler.register();
         TacticalMapChunkListener.register();
         SyncedEntityWorldRenderer.register();
@@ -112,6 +124,7 @@ public class ClientMod implements ClientModInitializer {
     }
 
     private static void registerClientTicks() {
+        ClientTickEvents.START_CLIENT_TICK.register(ClientMouseHandler::handleClientTickStart);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             Mod.tickClient();
             ClientEventHandler.handleClientTick();

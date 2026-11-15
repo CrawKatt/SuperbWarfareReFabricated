@@ -85,6 +85,7 @@
     "PlayerRendererMixin",
     "PostPassMixin",
     "SoundEngineMixin",
+    "accessor.CameraAnglesAccessor",
     "accessor.KeyMappingAccessor",
     "tacz.CameraEventHandlerMixin"
   ],

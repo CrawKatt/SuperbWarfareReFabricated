@@ -2,15 +2,18 @@ package com.atsuishio.superbwarfare.event.custom;
 
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.client.Camera;
+import net.minecraft.resources.ResourceLocation;
 
 public interface ComputeCameraAnglesCallback {
-    net.fabricmc.fabric.api.event.Event<ComputeCameraAnglesCallback> EVENT = EventFactory.createArrayBacked(
+    ResourceLocation LOWEST_PHASE = new ResourceLocation("superbwarfare", "camera_angles_lowest");
+    net.fabricmc.fabric.api.event.Event<ComputeCameraAnglesCallback> EVENT = EventFactory.createWithPhases(
             ComputeCameraAnglesCallback.class,
             callbacks -> event -> {
                 for (ComputeCameraAnglesCallback callback : callbacks) {
                     callback.onComputeCameraAngles(event);
                 }
-            }
+            },
+            net.fabricmc.fabric.api.event.Event.DEFAULT_PHASE, LOWEST_PHASE
     );
 
     void onComputeCameraAngles(Event event);
