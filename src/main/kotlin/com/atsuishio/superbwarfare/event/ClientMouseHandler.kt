@@ -79,6 +79,14 @@ object ClientMouseHandler {
     fun handleClientTick(minecraft: Minecraft) {
         val player = localPlayer ?: return
 
+        val vehicle = player.vehicle
+        if (vehicle is VehicleEntity && vehicle.isDirectTurretController(player)) {
+            val directMode = isDirectTurretMode()
+            if (!notInGame || directMode != vehicle.entityData.get(VehicleEntity.DIRECT_TURRET_ACTIVE)) {
+                sendPacketToServer(TurretAngleMessage(directMode, vehicle.turretYRot, vehicle.turretXRot))
+            }
+        }
+
         posO = posN
         posN = MouseMovementHandler.getMousePos()
         val speed = 256f
@@ -86,7 +94,6 @@ object ClientMouseHandler {
         val moveSpeedY = Mth.clamp(posN.y - posO.y, -speed, speed)
 
 
-        val vehicle = player.vehicle
         if (vehicle is VehicleEntity && (vehicle.vehicleType == VehicleType.AIRPLANE || vehicle.vehicleType == VehicleType.HELICOPTER)) {
             val y = if (ControlConfig.INVERT_AIRCRAFT_CONTROL.get()) -1 else 1
             val sensitivity = vehicle.mouseSensitivity
@@ -133,7 +140,7 @@ object ClientMouseHandler {
                 i *= (1 - (Mth.abs(vehicle.roll) - 90) / 90)
             }
 
-            if (player != vehicle.firstPassenger) return
+            if (player != vehicle.firstPassenger || vehicle.getSeatIndex(player) != 0) return
 
             if (notInGame) {
                 sendPacketToServer(MouseMoveMessage(0.0, 0.0))
@@ -158,15 +165,6 @@ object ClientMouseHandler {
 
         }
 
-        val directVehicle = player.vehicle as? VehicleEntity
-        if (directVehicle?.isDirectTurretController(player) == true) {
-            val directMode = isDirectTurretMode()
-            if (!notInGame || directMode != directVehicle.entityData.get(VehicleEntity.DIRECT_TURRET_ACTIVE)) {
-                sendPacketToServer(
-                    TurretAngleMessage(directMode, directVehicle.turretYRot, directVehicle.turretXRot)
-                )
-            }
-        }
     }
 
     private var directTurretLastPos: Vec2? = null
