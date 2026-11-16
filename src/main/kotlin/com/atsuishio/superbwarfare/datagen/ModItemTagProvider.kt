@@ -777,95 +777,95 @@ class ModItemTagProvider(
         // 皮卡汀尼标准瞄准镜：标准导轨枪械通用的那一组镜，顺序与枪械 Scope 列表保持一致。
         // 枪械的 AvailableAttachments.Scope 里写 "#superbwarfare:attachment/scope/picatinny" 即可整组引用。
         this.tag(ModTags.Items.ATTACHMENT_SCOPE_PICATINNY).add(
-            ModItems.SCOPE_RAISER.get(),
-            ModItems.SCOPE_COYOTE.get(),
-            ModItems.SCOPE_AIMPOINT_T2.get(),
-            ModItems.SCOPE_EOTECH_551.get(),
-            ModItems.SCOPE_DRS_TH.get(),
-            ModItems.SCOPE_OKP_7.get(),
-            ModItems.SCOPE_PKAS.get(),
-            ModItems.SCOPE_BRUISER.get(),
-            ModItems.SCOPE_RANGER.get(),
-            ModItems.SCOPE_1P_78.get(),
-            ModItems.SCOPE_PK_A.get(),
-            ModItems.SCOPE_ACOG.get(),
-            ModItems.SCOPE_QMK171.get(),
-            ModItems.SCOPE_HAMR.get(),
-            ModItems.SCOPE_ELCAN_4X.get(),
-            ModItems.SCOPE_LPVO.get(),
-            ModItems.SCOPE_SNIPER.get(),
-            ModItems.SCOPE_HANYANG_88_RE_STANDARD.get(),
-            ModItems.SCOPE_WINEFOX.get(),
-            ModItems.SCOPE_SPYGLASS.get(),
-            ModItems.STEEL_PIPE_SCOPE.get(),
+            ModItems.SCOPE_RAISER,
+            ModItems.SCOPE_COYOTE,
+            ModItems.SCOPE_AIMPOINT_T2,
+            ModItems.SCOPE_EOTECH_551,
+            ModItems.SCOPE_DRS_TH,
+            ModItems.SCOPE_OKP_7,
+            ModItems.SCOPE_PKAS,
+            ModItems.SCOPE_BRUISER,
+            ModItems.SCOPE_RANGER,
+            ModItems.SCOPE_1P_78,
+            ModItems.SCOPE_PK_A,
+            ModItems.SCOPE_ACOG,
+            ModItems.SCOPE_QMK171,
+            ModItems.SCOPE_HAMR,
+            ModItems.SCOPE_ELCAN_4X,
+            ModItems.SCOPE_LPVO,
+            ModItems.SCOPE_SNIPER,
+            ModItems.SCOPE_HANYANG_88_RE_STANDARD,
+            ModItems.SCOPE_WINEFOX,
+            ModItems.SCOPE_SPYGLASS,
+            ModItems.STEEL_PIPE_SCOPE,
         )
 
         // 其余槽位的通用配件 tag，条目顺序取现有枪械列表的多数派顺序
         this.tag(ModTags.Items.ATTACHMENT_GRIP_STANDARD).add(
-            ModItems.VERTICAL_GRIP.get(),
-            ModItems.GRIP_VERTICAL_PINEAPPLE.get(),
-            ModItems.GRIP_VERTICAL_BIPOD.get(),
-            ModItems.GRIP_RECTANGLE_VERTICAL.get(),
-            ModItems.TRIANGLE_GRIP.get(),
-            ModItems.GRIP_CQR_GEN2.get(),
-            ModItems.STEEL_PIPE_GRIP.get(),
+            ModItems.VERTICAL_GRIP,
+            ModItems.GRIP_VERTICAL_PINEAPPLE,
+            ModItems.GRIP_VERTICAL_BIPOD,
+            ModItems.GRIP_RECTANGLE_VERTICAL,
+            ModItems.TRIANGLE_GRIP,
+            ModItems.GRIP_CQR_GEN2,
+            ModItems.STEEL_PIPE_GRIP,
         )
 
         this.tag(ModTags.Items.ATTACHMENT_LOWER_RAIL_STANDARD).add(
-            ModItems.LOWER_RAIL_BIPOD.get(),
-            ModItems.PEQ_15.get(),
-            ModItems.PISTOL_LASER.get(),
+            ModItems.LOWER_RAIL_BIPOD,
+            ModItems.PEQ_15,
+            ModItems.PISTOL_LASER,
         )
 
         this.tag(ModTags.Items.ATTACHMENT_UPPER_RAIL_STANDARD).add(
-            ModItems.PEQ_15.get(),
-            ModItems.STANDARD_GUN_SHIELD.get(),
-            ModItems.PISTOL_LASER.get(),
-            ModItems.HYPERION_SHIELD_MODULE.get(),
+            ModItems.PEQ_15,
+            ModItems.STANDARD_GUN_SHIELD,
+            ModItems.PISTOL_LASER,
+            ModItems.HYPERION_SHIELD_MODULE,
         )
 
         this.tag(ModTags.Items.ATTACHMENT_LEFT_RAIL_STANDARD).add(
-            ModItems.PEQ_15.get(),
-            ModItems.RANGE_FINDER.get(),
-            ModItems.PISTOL_LASER.get(),
+            ModItems.PEQ_15,
+            ModItems.RANGE_FINDER,
+            ModItems.PISTOL_LASER,
         )
 
         this.tag(ModTags.Items.ATTACHMENT_RIGHT_RAIL_STANDARD).add(
-            ModItems.PEQ_15.get(),
-            ModItems.PISTOL_LASER.get(),
+            ModItems.PEQ_15,
+            ModItems.PISTOL_LASER,
         )
 
         // stock_zenit_pt_1 是 AK 系专属，不进通用 tag
         this.tag(ModTags.Items.ATTACHMENT_STOCK_STANDARD).add(
-            ModItems.STOCK_AR_TACTICAL.get(),
-            ModItems.STOCK_ELITE.get(),
-            ModItems.STOCK_STR.get(),
-            ModItems.STOCK_UBR.get(),
-            ModItems.STOCK_PRS.get(),
-            ModItems.STEEL_PIPE_STOCK.get(),
+            ModItems.STOCK_AR_TACTICAL,
+            ModItems.STOCK_ELITE,
+            ModItems.STOCK_STR,
+            ModItems.STOCK_UBR,
+            ModItems.STOCK_PRS,
+            ModItems.STEEL_PIPE_STOCK,
         )
 
         this.tag(ModTags.Items.ATTACHMENT_SUBWEAPON_STANDARD).add(
-            ModItems.SUB_WEAPON_GP_25.get(),
+            ModItems.SUB_WEAPON_GP_25,
         )
 
         this.tag(ModTags.Items.ATTACHMENT_MUZZLE_STANDARD).add(
-            ModItems.MEOWLENCER.get(),
-            ModItems.HISSILENCER.get(),
-            ModItems.SILAOWUNCER.get(),
-            ModItems.LOUDSPEAKER.get(),
-            ModItems.MILENCER.get(),
-            ModItems.STEEL_PIPE_SILENCER.get(),
+            ModItems.MEOWLENCER,
+            ModItems.HISSILENCER,
+            ModItems.SILAOWUNCER,
+            ModItems.LOUDSPEAKER,
+            ModItems.MILENCER,
+            ModItems.STEEL_PIPE_SILENCER,
         )
 
         this.tag(ModTags.Items.ATTACHMENT_MUZZLE_RIFLE).add(
-            ModItems.RU_SILENCER.get(),
-            ModItems.MUZZLE_BRAKE_RU.get(),
-            ModItems.MUZZLE_BRAKE_AR.get(),
-            ModItems.MUZZLE_BREAK_BIRDCAGE.get(),
-            ModItems.MUZZLE_ZENIT_DTK_1.get(),
-            ModItems.MUZZLE_COMPENSATOR_R_17.get(),
-            ModItems.AR_SILENCER.get(),
+            ModItems.RU_SILENCER,
+            ModItems.MUZZLE_BRAKE_RU,
+            ModItems.MUZZLE_BRAKE_AR,
+            ModItems.MUZZLE_BREAK_BIRDCAGE,
+            ModItems.MUZZLE_ZENIT_DTK_1,
+            ModItems.MUZZLE_COMPENSATOR_R_17,
+            ModItems.AR_SILENCER,
         )
     }
 
