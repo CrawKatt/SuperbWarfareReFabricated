@@ -603,9 +603,9 @@ class ReforgingGravityBallRenderer(context: EntityRendererProvider.Context) :
             val shader = lensShader ?: return false
             if (main.width <= 0 || main.height <= 0 || main.depthTextureId < 0) return false
             if (preHandDepth != 0 && !GL11.glIsTexture(preHandDepth)) return false
-            val previousShader = RenderSystem.getShader()
             val previousProgram = GL11.glGetInteger(GL20.GL_CURRENT_PROGRAM)
             val drawFramebuffer = GL11.glGetInteger(GL30.GL_DRAW_FRAMEBUFFER_BINDING)
+            if (drawFramebuffer != main.frameBufferId) return false
             val readFramebuffer = GL11.glGetInteger(GL30.GL_READ_FRAMEBUFFER_BINDING)
             val viewport = BufferUtils.createIntBuffer(4)
             GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport)
@@ -674,16 +674,20 @@ class ReforgingGravityBallRenderer(context: EntityRendererProvider.Context) :
 
                 RenderSystem.disableDepthTest()
                 RenderSystem.depthMask(false)
-                RenderSystem.disableBlend()
                 RenderSystem.disableCull()
-                RenderSystem.setShader { shader }
-                val builder = Tesselator.getInstance().builder
-                builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION)
-                builder.vertex(-1.0, -1.0, 0.0).endVertex()
-                builder.vertex(1.0, -1.0, 0.0).endVertex()
-                builder.vertex(1.0, 1.0, 0.0).endVertex()
-                builder.vertex(-1.0, 1.0, 0.0).endVertex()
-                BufferUploader.drawWithShader(builder.end())
+                try {
+                    shader.apply()
+                    GL11.glDisable(GL11.GL_BLEND)
+                    val builder = Tesselator.getInstance().builder
+                    builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION)
+                    builder.vertex(-1.0, -1.0, 0.0).endVertex()
+                    builder.vertex(1.0, -1.0, 0.0).endVertex()
+                    builder.vertex(1.0, 1.0, 0.0).endVertex()
+                    builder.vertex(-1.0, 1.0, 0.0).endVertex()
+                    BufferUploader.draw(builder.end())
+                } finally {
+                    shader.clear()
+                }
                 true
             } catch (exception: Exception) {
                 lensFailed = true
@@ -702,7 +706,13 @@ class ReforgingGravityBallRenderer(context: EntityRendererProvider.Context) :
                 if (stencil) GL11.glEnable(GL11.GL_STENCIL_TEST)
                 RenderSystem.depthMask(depthWrite)
                 if (depthTest) RenderSystem.enableDepthTest() else RenderSystem.disableDepthTest()
-                if (blending) RenderSystem.enableBlend() else RenderSystem.disableBlend()
+                if (blending) {
+                    RenderSystem.enableBlend()
+                    GL11.glEnable(GL11.GL_BLEND)
+                } else {
+                    RenderSystem.disableBlend()
+                    GL11.glDisable(GL11.GL_BLEND)
+                }
                 if (culling) RenderSystem.enableCull() else RenderSystem.disableCull()
                 textureBindings.forEachIndexed { unit, texture ->
                     RenderSystem.activeTexture(GL13.GL_TEXTURE0 + unit)
@@ -710,7 +720,6 @@ class ReforgingGravityBallRenderer(context: EntityRendererProvider.Context) :
                 }
                 samplerBindings?.forEachIndexed { unit, sampler -> GL33.glBindSampler(unit, sampler) }
                 RenderSystem.activeTexture(activeTexture)
-                RenderSystem.setShader { previousShader }
                 GlStateManager._glUseProgram(previousProgram)
             }
         }

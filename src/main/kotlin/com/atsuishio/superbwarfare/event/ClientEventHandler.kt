@@ -114,7 +114,7 @@ object ClientEventHandler {
         HudRenderCallback.EVENT.register { _, partialTick -> renderRadiationShader(partialTick) }
         WorldRenderEvents.END.register(::renderRadiationShaderOnHiddenGui)
 
-        RenderLevelStageCallback.EVENT.register(RenderLevelStageCallback.LOWEST_PHASE, ::renderGravityLensing)
+        RenderLevelStageCallback.EVENT.register(RenderLevelStageCallback.LOWEST_PHASE, ::renderWorldPostEffects)
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> clearGravityLensing() }
         ClientPlayerCloneCallback.EVENT.register { _, newPlayer -> resetMeleeOnRespawn(newPlayer) }
 
@@ -947,7 +947,8 @@ object ClientEventHandler {
         RadiationShaderHandler.renderLevel(event)
     }
 
-    fun renderGravityLensing(event: RenderLevelStageEvent) {
+    fun renderWorldPostEffects(event: RenderLevelStageEvent) {
+        if (event.stage === RenderLevelStageEvent.Stage.AFTER_LEVEL) GunMuzzleLightRenderer.render()
         ReforgingGravityBallRenderer.renderLensing(event)
     }
 
