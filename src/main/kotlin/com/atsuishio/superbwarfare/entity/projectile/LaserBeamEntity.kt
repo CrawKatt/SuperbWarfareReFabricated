@@ -28,6 +28,7 @@ import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaterniond
@@ -38,9 +39,10 @@ import kotlin.math.min
 import kotlin.math.sqrt
 
 open class LaserBeamEntity(type: EntityType<out LaserBeamEntity>, level: Level) :
-    Projectile(type, level), IBulletProperties {
+    PerkAwareProjectile(type, level) {
 
     private var damageValue = 0f
+    private var blockImpact: BlockHitResult? = null
     private var headShotMultiplier = 1f
     private var fired = false
     var power by POWER
@@ -124,7 +126,8 @@ open class LaserBeamEntity(type: EntityType<out LaserBeamEntity>, level: Level) 
         val direction = deltaMovement.normalize()
         val end = position().add(direction.scale(range.coerceAtLeast(0.0)))
         val hit = level().clip(ClipContext(position(), end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this))
-        hitBlock = hit.type == HitResult.Type.BLOCK
+        blockImpact = hit.takeIf { it.type == HitResult.Type.BLOCK }
+        hitBlock = blockImpact != null
         val offset = hit.location.subtract(position())
         endX = offset.x.toFloat()
         endY = offset.y.toFloat()
@@ -139,6 +142,8 @@ open class LaserBeamEntity(type: EntityType<out LaserBeamEntity>, level: Level) 
             // Mark before dealing damage: piercing and the visual lifetime must never repeat the shot.
             fired = true
             fireBeam()
+            blockImpact?.let { dispatchBlockHit(it) }
+            blockImpact = null
         }
         if (level().gameTime - startTime >= visualLife) discard()
     }
@@ -187,8 +192,10 @@ open class LaserBeamEntity(type: EntityType<out LaserBeamEntity>, level: Level) 
         // Rewound players can lie completely outside the current-position segment queries.
         (level() as? ServerLevel)?.players()?.forEach(::examine)
         // Select the nearest intersected part per parent, independent of query/part iteration order.
-        for ((target, _, headshot) in hits.values) {
+        for ((target, point, headshot) in hits.values) {
             if (!canDamage(target)) continue
+            val damage = getDamage() * if (headshot) getHeadShot() else 1f
+            if (!dispatchEntityHit(target, point, damage, headshot)) continue
             val root = target.multipartRoot
             val knockback = if (root is LivingEntity) ICustomKnockback.getInstance(root) else null
             val previousStrength = knockback?.`superbWarfare$getKnockbackStrength`()
@@ -200,7 +207,10 @@ open class LaserBeamEntity(type: EntityType<out LaserBeamEntity>, level: Level) 
                     if (headshot) headshotSource else source,
                     getDamage() * if (headshot) getHeadShot() else 1f
                 )
-                if (hurt && headshot) headshotHit = true
+                if (hurt) {
+                    applyAmmoEffects(root)
+                    if (headshot) headshotHit = true
+                }
             } finally {
                 if (previousStrength != null) knockback.`superbWarfare$setKnockbackStrength`(previousStrength)
             }

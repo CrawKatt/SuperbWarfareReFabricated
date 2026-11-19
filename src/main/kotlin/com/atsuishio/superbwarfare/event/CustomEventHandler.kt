@@ -6,10 +6,7 @@ import com.atsuishio.superbwarfare.api.event.ReloadEvent
 import com.atsuishio.superbwarfare.config.server.ProjectileConfig
 import com.atsuishio.superbwarfare.data.gun.GunData
 import com.atsuishio.superbwarfare.data.gun.GunProp
-import com.atsuishio.superbwarfare.entity.projectile.GrapeshotEntity
-import com.atsuishio.superbwarfare.entity.projectile.IAdvancedHitDetection
-import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity
-import com.atsuishio.superbwarfare.entity.projectile.SuperStarProjectileEntity
+import com.atsuishio.superbwarfare.entity.projectile.*
 import com.atsuishio.superbwarfare.event.custom.PreKillCallback
 import com.atsuishio.superbwarfare.event.custom.ProjectileHitCallback
 import com.atsuishio.superbwarfare.event.custom.ReloadCallback
@@ -69,18 +66,20 @@ object CustomEventHandler {
         val entity = event.owner
         if (entity !is LivingEntity) return
 
-        val stack = entity.mainHandItem
-        if (stack.item !is GunItem) return
-
         val projectile = event.projectile
-        val data = GunData.from(stack)
-        val key = BuiltInRegistries.ENTITY_TYPE.getKey(projectile.type) ?: return
-
-        if (data.get(GunProp.PROJECTILE).itemId != key.toString()) return
+        val shot = (projectile as? PerkAwareProjectile)?.shotPerks
+        val data = shot?.data ?: run {
+            val stack = entity.mainHandItem
+            if (stack.item !is GunItem) return
+            val currentData = GunData.from(stack)
+            val key = BuiltInRegistries.ENTITY_TYPE.getKey(projectile.type) ?: return
+            if (currentData.get(GunProp.PROJECTILE).itemId != key.toString()) return
+            currentData
+        }
 
         for (type in Perk.Type.entries) {
-            val instance = data.perk.getInstances(type)
-            instance.forEach {
+            val instances = shot?.instances?.get(type) ?: data.perk.getInstances(type)
+            instances.forEach {
                 val perk = it.perk
                 if (perk is JsPerk) {
                     perk.onHit(entity, data, it, event.target, projectile)

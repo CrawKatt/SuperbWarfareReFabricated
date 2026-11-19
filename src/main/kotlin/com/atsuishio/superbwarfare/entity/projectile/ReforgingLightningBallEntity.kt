@@ -1,10 +1,8 @@
 package com.atsuishio.superbwarfare.entity.projectile
 
-import com.atsuishio.superbwarfare.api.event.ProjectileHitEvent
 import com.atsuishio.superbwarfare.client.animation.entity.BasicProjectileAnimationInstance
 import com.atsuishio.superbwarfare.entity.multipartRoot
 import com.atsuishio.superbwarfare.entity.getEntitiesWithParts
-import com.atsuishio.superbwarfare.event.custom.ProjectileHitCallback
 import com.atsuishio.superbwarfare.init.ModDamageTypes
 import com.atsuishio.superbwarfare.init.ModMobEffects
 import com.atsuishio.superbwarfare.init.ModSounds
@@ -24,14 +22,13 @@ import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.boss.EnderDragonPart
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import java.util.function.Consumer
 
 open class ReforgingLightningBallEntity(type: EntityType<out ReforgingLightningBallEntity>, level: Level) :
-    Projectile(type, level), IBulletProperties, BasicGeoProjectileEntity {
+    PerkAwareProjectile(type, level), BasicGeoProjectileEntity {
 
     private val animation = if (level.isClientSide) BasicProjectileAnimationInstance(this, true) else null
 
@@ -48,10 +45,6 @@ open class ReforgingLightningBallEntity(type: EntityType<out ReforgingLightningB
     private var detonated = false
     var volt: Int = 0
         set(value) { field = value.coerceAtLeast(0) }
-
-    /** Damage of the contact/discharge currently being dispatched to onHit scripts. */
-    var currentHitDamage: Float? = null
-        private set
 
     // Populated only by server-to-client discharge notifications; never used for damage.
     val lightningArcs = mutableListOf<LightningArc>()
@@ -178,16 +171,13 @@ open class ReforgingLightningBallEntity(type: EntityType<out ReforgingLightningB
 
     private fun hit(target: Entity, damage: Float) {
         val root = target.multipartRoot as? LivingEntity ?: return
-        currentHitDamage = damage
-        try {
-            if (ProjectileHitCallback.postHitEntity(ProjectileHitEvent.HitEntity(owner, this, root, target.boundingBox.center))) return
-        } finally {
-            currentHitDamage = null
-        }
+        if (!dispatchEntityHit(root, target.boundingBox.center, damage)) return
         root.invulnerableTime = 0
         target.invulnerableTime = 0
         // Preserve native part-specific damage routing, but apply the effect to the living root.
-        target.forceHurt(ModDamageTypes.causeShockDamage(level().registryAccess(), this, owner), damage)
+        if (target.forceHurt(ModDamageTypes.causeShockDamage(level().registryAccess(), this, owner), damage)) {
+            applyAmmoEffects(root)
+        }
         root.forceApplyEffect(MobEffectInstance(ModMobEffects.SHOCK, 100 + volt * 30, volt), owner)
         dischargeVisual(target)
     }
@@ -215,6 +205,7 @@ open class ReforgingLightningBallEntity(type: EntityType<out ReforgingLightningB
                 }
                 CustomExplosion.Builder(this)
                     .damageSource(ModDamageTypes.causeShockDamage(level().registryAccess(), this, owner))
+                    .withProjectilePerks(this)
                     .damage(getExplosionDamage())
                     .radius(getExplosionRadius())
                     .position(position())
