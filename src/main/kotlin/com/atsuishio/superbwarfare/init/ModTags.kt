@@ -291,6 +291,7 @@ object ModTags {
         @JvmField val MINE = modEntityTag("mine")
         @JvmField val AT_ROCKET = modEntityTag("at_rocket")
         @JvmField val AA_MISSILE = modEntityTag("aa_missile")
+        @JvmField val BEAM = modEntityTag("beam")
         @JvmField val SEEK_BLACKLIST = modEntityTag("seek_blacklist")
         @JvmField val BIOGAS_GENERATOR_WHITELIST = modEntityTag("biogas_generator_whitelist")
     }

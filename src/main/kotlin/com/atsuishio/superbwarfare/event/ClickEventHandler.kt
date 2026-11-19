@@ -26,6 +26,7 @@ import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.mixins.KeyMappingAccessor
 import com.atsuishio.superbwarfare.mixins.MinecraftAccessor
 import com.atsuishio.superbwarfare.network.message.send.*
+import com.atsuishio.superbwarfare.perk.AutoAimHelper
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.*
 import com.mojang.blaze3d.platform.InputConstants
@@ -900,16 +901,9 @@ object ClickEventHandler {
         ClientEventHandler.zoom = true
 
         val level = data.perk.getLevel(ModPerks.INTELLIGENT_CHIP)
-        if (level > 0) {
-            if (ClientEventHandler.lockedEntity == null) {
-                ClientEventHandler.lockedEntity =
-                    if (data.perk.has(ModPerks.PHASE_PENETRATING_BULLET) || data.perk.has(ModPerks.BEAST_BULLET)) {
-                        SeekTool.seekEntityThroughWall(player, 32 + 8 * (level - 1).toDouble(), 20.0)
-                    } else {
-                        SeekTool.seekLivingEntity(player, 32 + 8 * (level - 1).toDouble(), 20.0)
-                    }
-            }
-        }
+        ClientEventHandler.lockedEntity = if (level > 0 && !player.isShiftKeyDown) {
+            AutoAimHelper.findTarget(player, data, ClientEventHandler.lockedEntity, 32.0 + 8.0 * (level - 1), 20.0)
+        } else null
     }
 
     fun handleWeaponUseRelease() {
