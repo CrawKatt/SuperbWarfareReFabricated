@@ -132,12 +132,7 @@ object ModPerks {
     @JvmField val REGENERATION = autoRegistryObjects["regeneration"] ?: registerFuncPerk("regeneration") { Regeneration }
     @JvmField val TURBO_CHARGER = autoRegistryObjects["turbo_charger"] ?: registerFuncPerk("turbo_charger") { TurboCharger }
     @JvmField val POWERFUL_ATTRACTION = autoRegistryObjects["powerful_attraction"] ?: registerFuncPerk("powerful_attraction") { PowerfulAttraction }
-    @JvmField val INTELLIGENT_CHIP = autoRegistryObjects["intelligent_chip"] ?: registerFuncPerk("intelligent_chip") {
-        Perk(
-            "intelligent_chip",
-            Perk.Type.FUNCTIONAL
-        )
-    }
+    @JvmField val INTELLIGENT_CHIP = autoRegistryObjects["intelligent_chip"] ?: registerFuncPerk("intelligent_chip") { IntelligentChip }
     @JvmField val BACKPACK_LINKED_MAGAZINE = autoRegistryObjects["backpack_linked_magazine"]
         ?: registerFuncPerk("backpack_linked_magazine") { BackpackLinkedMagazine }
     @JvmField val POWERFUL_COOLER = autoRegistryObjects["powerful_cooler"] ?: registerFuncPerk("powerful_cooler") { PowerfulCooler }
