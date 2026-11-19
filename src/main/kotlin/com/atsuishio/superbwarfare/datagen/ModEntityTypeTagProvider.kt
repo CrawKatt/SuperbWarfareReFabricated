@@ -71,6 +71,11 @@ class ModEntityTypeTagProvider(
             ModEntities.FIM_92_MISSILE
         )
 
+        this.tag(ModTags.EntityTypes.BEAM).add(
+            ModEntities.HIGH_ENERGY_LASER,
+            ModEntities.REFORGING_LASER
+        )
+
         this.tag(ModTags.EntityTypes.SEEK_BLACKLIST).add(
             EntityType.ITEM,
             EntityType.ARMOR_STAND,

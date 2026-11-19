@@ -3556,9 +3556,7 @@ object ClientEventHandler {
 
                     if (intelligentChipLevel > 0) {
                         if (lockedEntity == null || !lockedEntity!!.isAlive) {
-                            lockedEntity = if (data.perk.has(ModPerks.PHASE_PENETRATING_BULLET)
-                                || data.perk.has(ModPerks.BEAST_BULLET)
-                            ) {
+                            lockedEntity = if (data.get(GunProp.PROJECTILE_PENETRATING)) {
                                 SeekTool.seekEntityThroughWall(player, seekRange, 16 / customZoom)
                             } else {
                                 SeekTool.seekLivingEntity(player, seekRange, 16 / customZoom)

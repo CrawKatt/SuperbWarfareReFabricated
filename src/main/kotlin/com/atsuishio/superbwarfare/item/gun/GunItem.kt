@@ -34,6 +34,7 @@ import com.atsuishio.superbwarfare.item.ReequipAnimationHook
 import com.atsuishio.superbwarfare.item.gun.GunItem.Companion.HANDLING_WEIGHT_SCALE
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
 import com.atsuishio.superbwarfare.network.message.receive.GunMuzzleFxMessage
+import com.atsuishio.superbwarfare.perk.AutoAimHelper
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.*
@@ -722,7 +723,9 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         val chargeAction = data.chargeActionFor(parameters.zoom, parameters.ammoSupplier)
         data.setChargeAction(chargeAction)
         try {
-            doShoot(parameters, chargeAction)
+            val correctedDirection = AutoAimHelper.compensatedDirection(parameters)
+            val shot = if (correctedDirection == null) parameters else parameters.copy(shootDirection = correctedDirection)
+            doShoot(shot, chargeAction)
         } finally {
             data.setChargeAction(null)
         }
@@ -980,6 +983,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
                     setVelocity(finalVelocity)
                     setKnockback(data.get(GunProp.KNOCKBACK))
                     setUnderwaterMotionScale(data.get(GunProp.UNDERWATER_MOTION_SCALE))
+                    setPenetrating(data.get(GunProp.PROJECTILE_PENETRATING))
                     setExplosionDestroy(data.get(GunProp.EXPLOSION_DESTROY))
                     setProjectileSplitCount(data.get(GunProp.PROJECTILE_SPLIT_COUNT))
                     setProjectileSplitAmount(data.get(GunProp.PROJECTILE_SPLIT_AMOUNT))

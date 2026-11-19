@@ -323,17 +323,41 @@ object ModTags {
     }
 
     object EntityTypes {
-        @JvmField val AERIAL_BOMB = modEntityTag("aerial_bomb")
-        @JvmField val DESTROYABLE_PROJECTILE = modEntityTag("destroyable_projectile")
-        @JvmField val DECOY = modEntityTag("decoy")
-        @JvmField val NO_EXPERIENCE = modEntityTag("no_experience")
-        @JvmField val CAN_REPAIR = modEntityTag("can_repair")
-        @JvmField val MINE = modEntityTag("mine")
-        @JvmField val AT_ROCKET = modEntityTag("at_rocket")
-        @JvmField val AA_MISSILE = modEntityTag("aa_missile")
-        @JvmField val SEEK_BLACKLIST = modEntityTag("seek_blacklist")
-        @JvmField val BIOGAS_GENERATOR_WHITELIST = modEntityTag("biogas_generator_whitelist")
-        @JvmField val SENPAI = modEntityTag("senpai")
+        @JvmField
+        val AERIAL_BOMB = modEntityTag("aerial_bomb")
+
+        @JvmField
+        val DESTROYABLE_PROJECTILE = modEntityTag("destroyable_projectile")
+
+        @JvmField
+        val DECOY = modEntityTag("decoy")
+
+        @JvmField
+        val NO_EXPERIENCE = modEntityTag("no_experience")
+
+        @JvmField
+        val CAN_REPAIR = modEntityTag("can_repair")
+
+        @JvmField
+        val MINE = modEntityTag("mine")
+
+        @JvmField
+        val AT_ROCKET = modEntityTag("at_rocket")
+
+        @JvmField
+        val AA_MISSILE = modEntityTag("aa_missile")
+
+        @JvmField
+        val BEAM = modEntityTag("beam")
+
+        @JvmField
+        val SEEK_BLACKLIST = modEntityTag("seek_blacklist")
+
+        @JvmField
+        val BIOGAS_GENERATOR_WHITELIST = modEntityTag("biogas_generator_whitelist")
+
+        @JvmField
+        val SENPAI = modEntityTag("senpai")
     }
 
     object Perks {
