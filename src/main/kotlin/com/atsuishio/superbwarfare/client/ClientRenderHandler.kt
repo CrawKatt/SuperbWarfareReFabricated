@@ -72,6 +72,7 @@ import com.atsuishio.superbwarfare.client.tooltip.component.ChargingStationImage
 import com.atsuishio.superbwarfare.client.tooltip.component.DogTagImageComponent
 import com.atsuishio.superbwarfare.client.tooltip.component.GunImageComponent
 import com.atsuishio.superbwarfare.client.renderer.projectile.ReforgingGravityBallRenderer
+import com.atsuishio.superbwarfare.client.renderer.special.NuclearExplosionRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.RadiationGlowRenderer
 import com.atsuishio.superbwarfare.client.tooltip.*
 import com.atsuishio.superbwarfare.client.tooltip.component.*
@@ -84,6 +85,7 @@ import com.atsuishio.superbwarfare.item.armor.RuChest6b43Item
 import com.atsuishio.superbwarfare.item.armor.RuHelmet6b47Item
 import com.atsuishio.superbwarfare.item.armor.UsChestIotvItem
 import com.atsuishio.superbwarfare.item.armor.UsHelmetPasgtItem
+import com.atsuishio.superbwarfare.item.projectile.NuclearBombItem
 import com.atsuishio.superbwarfare.item.projectile.MolotovItem
 import com.atsuishio.superbwarfare.item.projectile.DecoyGrenadeItem
 import com.atsuishio.superbwarfare.item.projectile.M84StunGrenadeItem
@@ -161,6 +163,7 @@ object ClientRenderHandler {
     fun registerGravityLensingShader(event: CoreShaderRegistrationCallback.RegistrationContext) {
         ReforgingGravityBallRenderer.registerLensingShader(event)
         GunMuzzleLightRenderer.onRegisterShaders(event)
+        NuclearExplosionRenderer.registerShader(event)
     }
 
     /** [bulletRenderOffset] 的采样时刻（`System.nanoTime()`），超过 [OFFSET_TTL] 就当它过期 */
@@ -456,6 +459,7 @@ object ClientRenderHandler {
         M84StunGrenadeItem.registerRenderer()
         DecoyGrenadeItem.registerRenderer()
         MolotovItem.registerRender()
+        NuclearBombItem.registerItemExtensions()
         SeaMineItem.ClientEvents.registerRender()
     }
 

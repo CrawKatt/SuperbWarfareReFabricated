@@ -246,6 +246,8 @@ object ModItems {
     @JvmField val SMALL_AERIAL_BOMB = registerAmmo("small_aerial_bomb") { Item(Properties().stacksTo(4)) }
     @JvmField val MEDIUM_AERIAL_BOMB = registerAmmo("medium_aerial_bomb") { Item(Properties().stacksTo(2)) }
     @JvmField val LARGE_AERIAL_BOMB = registerAmmo("large_aerial_bomb") { Item(Properties().stacksTo(1)) }
+    @JvmField val FOOD_RAIN_ATOM_BOMB = registerAmmo("food_rain_atom_bomb") { FoodRainAtomBombItem() }
+    @JvmField val SMELLY_BOY = registerAmmo("smelly_boy") { SmellyBoyItem() }
     // @formatter:on
 
     /**

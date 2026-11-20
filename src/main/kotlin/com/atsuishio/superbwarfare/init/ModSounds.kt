@@ -35,6 +35,9 @@ object ModSounds {
     @JvmField val HUGE_EXPLOSION_CLOSE = register("huge_explosion_close")
     @JvmField val HUGE_EXPLOSION_FAR = register("huge_explosion_far")
     @JvmField val HUGE_EXPLOSION_VERY_FAR = register("huge_explosion_very_far")
+    @JvmField val NUKE_EXPLOSION_CLOSE = register("nuke_explosion_close")
+    @JvmField val NUKE_EXPLOSION_FAR = register("nuke_explosion_far")
+    @JvmField val NUKE_EXPLOSION_VERY_FAR = register("nuke_explosion_very_far")
     @JvmField val EXPLOSION_WATER = register("explosion_water")
     @JvmField val EXPLOSION_AIR = register("explosion_air")
 

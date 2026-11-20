@@ -105,6 +105,7 @@ fun registerClientReceivers() {
     clientReceiver<ReforgingLightningArcMessage>()
     clientReceiver<LightningArcMessage>()
     clientReceiver<GunMuzzleFxMessage>()
+    clientReceiver<NuclearExplosionMessage>()
     clientReceiver<ShakeClientMessage>()
     clientReceiver<ShootClientMessage>()
     clientReceiver<SubWeaponDeployedMessage>()
