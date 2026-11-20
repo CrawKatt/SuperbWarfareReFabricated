@@ -505,6 +505,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         evenSimplerBlockItem(ModBlocks.HIGH_ENERGY_EXPLOSIVES_BLOCK)
         evenSimplerBlockItem(ModBlocks.BOOBY_TRAP)
         evenSimplerBlockItem(ModBlocks.REFORGING_TABLE)
+        evenSimplerBlockItem(ModBlocks.SHELF)
         addModel(loc("item/resonance_base"), model(loc("displaysettings/resonance_base")))
         evenSimplerBlockItem(ModBlocks.CHARGING_STATION)
         evenSimplerBlockItem(ModBlocks.WEAPON_REPAIR_STATION)

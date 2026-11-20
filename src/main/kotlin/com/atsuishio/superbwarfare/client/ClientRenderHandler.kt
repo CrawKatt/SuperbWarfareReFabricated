@@ -54,6 +54,7 @@ import com.atsuishio.superbwarfare.client.renderer.block.ContainerBlockEntityRen
 import com.atsuishio.superbwarfare.client.renderer.block.ItemDisplayBoardBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.FuMO25BlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.LuckyContainerBlockEntityRenderer
+import com.atsuishio.superbwarfare.client.renderer.block.ShelfBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.SmallContainerBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.VehicleAssemblingTableBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.special.MeleeDebugRenderer
@@ -86,6 +87,7 @@ import com.atsuishio.superbwarfare.item.armor.RuChest6b43Item
 import com.atsuishio.superbwarfare.item.armor.RuHelmet6b47Item
 import com.atsuishio.superbwarfare.item.armor.UsChestIotvItem
 import com.atsuishio.superbwarfare.item.armor.UsHelmetPasgtItem
+import com.atsuishio.superbwarfare.item.blockitem.ShelfBlockItem
 import com.atsuishio.superbwarfare.item.projectile.NuclearBombItem
 import com.atsuishio.superbwarfare.item.projectile.MolotovItem
 import com.atsuishio.superbwarfare.item.projectile.DecoyGrenadeItem
@@ -100,6 +102,7 @@ import dev.emi.trinkets.api.client.TrinketRendererRegistry
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback
@@ -356,6 +359,12 @@ object ClientRenderHandler {
         BlockEntityRenderers.register(ModBlockEntities.RESONANCE_BASE) { ResonanceBaseBlockEntityRenderer() }
         BlockEntityRenderers.register(ModBlockEntities.BOOBY_TRAP) { BoobyTrapBlockEntityRenderer() }
         ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register { blockEntity, _ -> (blockEntity as? BoobyTrapBlockEntity)?.onLoad() }
+        BlockEntityRenderers.register(ModBlockEntities.SHELF) { ShelfBlockEntityRenderer() }
+        ModelLoadingPlugin.register { plugin ->
+            plugin.modifyModelAfterBake().register { model, context ->
+                ShelfBlockEntityRenderer.modifyItemModel(model, context.topLevelId())
+            }
+        }
         BlockEntityRenderers.register(ModBlockEntities.ITEM_DISPLAY_BOARD) { ItemDisplayBoardBlockEntityRenderer() }
     }
 
@@ -463,6 +472,7 @@ object ClientRenderHandler {
         M84StunGrenadeItem.registerRenderer()
         DecoyGrenadeItem.registerRenderer()
         MolotovItem.registerRender()
+        ShelfBlockItem.registerRenderer()
         NuclearBombItem.registerItemExtensions()
         SeaMineItem.ClientEvents.registerRender()
     }

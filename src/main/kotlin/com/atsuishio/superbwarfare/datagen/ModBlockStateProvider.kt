@@ -171,6 +171,13 @@ class ModBlockStateProvider(private val output: PackOutput) : DataProvider {
         blockWithItem(ModBlocks.SULFUR_BLOCK)
         blockWithItem(ModBlocks.NITER_BLOCK)
 
+        simpleBlock(
+            ModBlocks.SHELF,
+            addModel(blockModel("shelf"), model(ResourceLocation.withDefaultNamespace("block/cube_all"), linkedMapOf(
+                "all" to loc("bedrock/block/shelf_top"),
+                "particle" to ResourceLocation.withDefaultNamespace("block/white_concrete")
+            )))
+        )
         simpleBlock(ModBlocks.FUMO_25, blockModel("fumo_25"))
         simpleBlock(ModBlocks.TRIPOD, blockModel("tripod"))
 

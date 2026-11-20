@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import com.atsuishio.superbwarfare.block.ShelfBlock;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -38,6 +39,7 @@ import net.minecraft.world.InteractionResult;
 public class ModEventHandlers {
 
     public static void init() {
+        UseBlockCallback.EVENT.register(ShelfBlock::onRightClick);
         UseBlockCallback.EVENT.register((player, level, hand, hit) ->
                 LivingEventHandler.onRightClickBlock(player, level, hit));
         PlayerXpChangeCallback.EVENT.register(StrivingForPerfection.INSTANCE::onXpChange);

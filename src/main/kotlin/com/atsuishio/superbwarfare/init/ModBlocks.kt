@@ -64,6 +64,7 @@ object ModBlocks {
     @JvmField val BLUEPRINT_RESEARCH_TABLE = registerBlock("blueprint_research_table") { BlueprintResearchTableBlock() }
     @JvmField val TRIPOD = registerBlock("tripod") { TripodBlock() }
     @JvmField val ITEM_DISPLAY_BOARD = registerBlock("item_display_board") { ItemDisplayBoardBlock() }
+    @JvmField val SHELF = registerBlock("shelf") { ShelfBlock() }
     // @formatter:on
 
     private fun <T : Block> registerBlock(name: String, block: () -> T): T {
