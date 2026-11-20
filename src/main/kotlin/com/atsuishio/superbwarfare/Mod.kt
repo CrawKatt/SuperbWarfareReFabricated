@@ -32,6 +32,7 @@ import com.atsuishio.superbwarfare.perk.damage.BattleOfWits
 import com.atsuishio.superbwarfare.recipe.ModPotionRecipes
 import com.atsuishio.superbwarfare.resource.BedrockModelLoader
 import com.atsuishio.superbwarfare.tiers.ModArmorMaterials
+import com.atsuishio.superbwarfare.tools.FoodRainHandler
 import com.atsuishio.superbwarfare.tools.ResourceOnceLogger
 import com.atsuishio.superbwarfare.tools.registerMinecraftUtil
 import com.atsuishio.superbwarfare.world.saveddata.ChunkPosSavedData
@@ -135,6 +136,7 @@ class Mod : ModInitializer {
         ModDamageTypes.init()
         ModEventHandlers.init()
         FastProjectileManualTicker.init()
+        FoodRainHandler.register()
         ModTags.init()
         ModGameRules.bootstrap()
     }

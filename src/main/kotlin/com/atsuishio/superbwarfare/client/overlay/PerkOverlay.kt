@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.client.overlay
 
+import com.atsuishio.superbwarfare.Mod.Companion.loc
 import com.atsuishio.superbwarfare.client.overlay.ammo.AmmoHudText
 import com.atsuishio.superbwarfare.config.client.DisplayConfig
 import com.atsuishio.superbwarfare.config.server.MiscConfig
@@ -54,8 +55,7 @@ object PerkOverlay : CommonOverlay("perks") {
         val effect: Effect = Effect.BUFF
     ) {
         val icon: ResourceLocation
-            get() = ResourceLocation.fromNamespaceAndPath(
-                "superbwarfare",
+            get() = loc(
                 "textures/overlay/perk/${type.typeName.lowercase(Locale.ROOT)}_perk_${effect.name.lowercase(Locale.ROOT)}.png"
             )
     }

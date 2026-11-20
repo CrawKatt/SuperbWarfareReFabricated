@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.item.projectile
 
 import com.atsuishio.superbwarfare.client.renderer.item.NuclearBombItemRenderer
+import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.projectile.NuclearBombEntity
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModSounds
@@ -22,7 +23,7 @@ import net.minecraft.world.item.Rarity
 import net.minecraft.world.level.Level
 
 open class NuclearBombItem(
-    private val entityType: () -> EntityType<NuclearBombEntity>,
+    private val entityType: () -> EntityType<out FastThrowableProjectile>,
     private val modelId: String
 ) : Item(Properties().stacksTo(1).rarity(Rarity.EPIC)) {
     companion object {
@@ -47,7 +48,7 @@ open class NuclearBombItem(
                 if (tag.contains("Radius", Tag.TAG_ANY_NUMERIC.toInt())) bomb.setExplosionRadius(tag.getFloat("Radius"))
                 if (tag.contains("ExplosionDamage", Tag.TAG_ANY_NUMERIC.toInt())) bomb.setExplosionDamage(tag.getFloat("ExplosionDamage"))
                 if (tag.contains("ExplosionDestroy")) bomb.setExplosionDestroy(tag.getBoolean("ExplosionDestroy"))
-                bomb.readNuclearEffectData(tag)
+                if (bomb is NuclearBombEntity) bomb.readNuclearEffectData(tag)
             }
             bomb.owner = player
             bomb.setPos(player.x, player.eyeY - 0.1, player.z)

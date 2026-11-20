@@ -8,6 +8,7 @@ import com.atsuishio.superbwarfare.entity.living.SenpaiEntity
 import com.atsuishio.superbwarfare.entity.living.SteelCoilEntity
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
 import com.atsuishio.superbwarfare.entity.misc.CatapultShuttleEntity
+import com.atsuishio.superbwarfare.entity.misc.FoodRainItemEntity
 import com.atsuishio.superbwarfare.entity.misc.HighEnergyExplosivesEntity
 import com.atsuishio.superbwarfare.entity.projectile.*
 import com.atsuishio.superbwarfare.entity.vehicle.*
@@ -291,7 +292,11 @@ object ModEntities {
     val BOR_57 = register("bor_57", fastProjectile(::Bor57Entity).sized(0.8f, 0.8f))
 
     @JvmField
-    val FOOD_RAIN_ATOM_BOMB = register("food_rain_atom_bomb", fastProjectile(::NuclearBombEntity).sized(0.8f, 0.8f))
+    val FOOD_RAIN_ATOM_BOMB = register("food_rain_atom_bomb", fastProjectile(::FoodRainAtomBombEntity).sized(0.8f, 0.8f))
+
+    @JvmField
+    val FOOD_RAIN_ITEM = register("food_rain_item",
+        misc(::FoodRainItemEntity).sized(0.25f, 0.25f).clientTrackingRange(32).updateInterval(20))
 
     @JvmField
     val SMELLY_BOY = register("smelly_boy", fastProjectile<NuclearBombEntity>({ type, level ->
