@@ -167,7 +167,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
 
     override fun createAnimationInstance(
         stack: ItemStack,
-        entity: Entity,
+        entity: Entity?,
         hand: InteractionHand
     ): IFPAnimationInstance {
         return GeoGunAnimationInstance(stack, entity, hand)
