@@ -3334,7 +3334,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private fun tickClientTurret(controller: Player) {
         val localController = controller === mc.player
         if (localController && ClientMouseHandler.isDirectTurretMode()) {
