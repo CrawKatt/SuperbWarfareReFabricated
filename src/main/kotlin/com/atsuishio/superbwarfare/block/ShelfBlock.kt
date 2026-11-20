@@ -11,7 +11,6 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.ItemInteractionResult
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.BlockGetter
@@ -22,13 +21,15 @@ import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.block.state.properties.BooleanProperty
+import net.minecraft.world.level.block.state.properties.DirectionProperty
 import net.minecraft.world.level.block.state.properties.EnumProperty
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.level.material.MapColor
 import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.HitResult
 import java.util.*
 
-class ShelfBlock(properties: Properties) : BaseEntityBlock(properties) {
+open class ShelfBlock(properties: Properties) : BaseEntityBlock(properties) {
     constructor() : this(Properties.of().mapColor(MapColor.METAL).sound(SoundType.METAL).strength(2.5f).noOcclusion())
 
     override fun codec(): MapCodec<ShelfBlock> = CODEC
@@ -91,28 +92,25 @@ class ShelfBlock(properties: Properties) : BaseEntityBlock(properties) {
         hand: InteractionHand, hit: BlockHitResult
     ): ItemInteractionResult {
         val pass = ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
-        if (hit.direction != state.getValue(FACING) || player.isSpectator) return pass
-        if (player.isShiftKeyDown && isShelfItem(held)) return pass
+        if (hit.direction != state.getValue(FACING) || player.isSpectator || held.isEmpty) return pass
         val shelf = level.getBlockEntity(pos) as? ShelfBlockEntity ?: return pass
-        val slot = clickedSlot(pos, hit)
-        val take = player.isShiftKeyDown || held.isEmpty
-        val stored = shelf.getItem(slot)
-        if (take && stored.isEmpty || !take && !stored.isEmpty) return pass
         if (level.isClientSide) return ItemInteractionResult.SUCCESS
-        if (take) {
-            val removed = shelf.removeItem(slot, if (player.isShiftKeyDown) stored.count else 1)
-            if (!player.inventory.add(removed)) player.drop(removed, false)
-        } else {
-            if (!shelf.insertItem(slot, held)) return pass
-            if (!player.abilities.instabuild) player.setItemInHand(hand, ItemStack.EMPTY)
-        }
-        level.playSound(null, pos, if (take) SoundEvents.ITEM_FRAME_REMOVE_ITEM else SoundEvents.ITEM_FRAME_ADD_ITEM,
+        val inserted = shelf.insertItem(clickedSlot(pos, hit), held, if (player.isShiftKeyDown) held.count else 1)
+        if (inserted == 0) return ItemInteractionResult.CONSUME
+        if (!player.abilities.instabuild) held.shrink(inserted)
+        level.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM,
             SoundSource.BLOCKS, 1f, 1f)
         level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos)
         return ItemInteractionResult.CONSUME
     }
 
-    private fun isShelfItem(stack: ItemStack): Boolean = (stack.item as? BlockItem)?.block === this
+    private fun takeItem(level: Level, pos: BlockPos, player: Player, hit: BlockHitResult) {
+        val shelf = level.getBlockEntity(pos) as? ShelfBlockEntity ?: return
+        val count = if (player.isShiftKeyDown) Int.MAX_VALUE else 1
+        if (shelf.takeItem(clickedSlot(pos, hit), player.inventory, count) == 0) return
+        level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 1f, 1f)
+        level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos)
+    }
 
     override fun onRemove(state: BlockState, level: Level, pos: BlockPos, newState: BlockState, moving: Boolean) {
         if (!state.`is`(newState.block) && !level.isClientSide) {
@@ -147,14 +145,30 @@ class ShelfBlock(properties: Properties) : BaseEntityBlock(properties) {
 
     companion object {
         val CODEC: MapCodec<ShelfBlock> = simpleCodec(::ShelfBlock)
-        val FACING = BlockStateProperties.HORIZONTAL_FACING
-        val BASE = BooleanProperty.create("base")
+        @JvmField val FACING: DirectionProperty = BlockStateProperties.HORIZONTAL_FACING
+        @JvmField val BASE: BooleanProperty = BooleanProperty.create("base")
+        @JvmField
         val PART: EnumProperty<Part> = EnumProperty.create("part", Part::class.java)
-        val SEPARATE_LEFT = BooleanProperty.create("separate_left")
-        val SEPARATE_RIGHT = BooleanProperty.create("separate_right")
+        @JvmField val SEPARATE_LEFT: BooleanProperty = BooleanProperty.create("separate_left")
+        @JvmField val SEPARATE_RIGHT: BooleanProperty = BooleanProperty.create("separate_right")
 
         private fun clickedSlot(pos: BlockPos, hit: BlockHitResult): Int =
             if (hit.location.y - pos.y >= 9.0 / 16.0) 1 else 0
+
+        @JvmStatic
+        fun onLeftClick(player: Player, level: Level, hand: InteractionHand, pos: BlockPos, face: Direction): InteractionResult {
+            if (player.isSpectator) return InteractionResult.PASS
+            val state = level.getBlockState(pos)
+            val shelf = state.block as? ShelfBlock ?: return InteractionResult.PASS
+            if (face != state.getValue(FACING)) return InteractionResult.PASS
+            if (!level.isClientSide && player.isAlive && level.mayInteract(player, pos) && player.canInteractWithBlock(pos, 1.0)) {
+                val hit = player.pick(player.blockInteractionRange(), 1f, false) as? BlockHitResult
+                if (hit != null && hit.type == HitResult.Type.BLOCK && hit.blockPos == pos && hit.direction == face) {
+                    shelf.takeItem(level, pos, player, hit)
+                }
+            }
+            return InteractionResult.CONSUME
+        }
 
         @JvmStatic
         fun onRightClick(player: Player, level: Level, hand: InteractionHand, hit: BlockHitResult): InteractionResult {
@@ -162,11 +176,9 @@ class ShelfBlock(properties: Properties) : BaseEntityBlock(properties) {
             val pos = hit.blockPos
             val state = level.getBlockState(pos)
             val shelf = state.block as? ShelfBlock ?: return InteractionResult.PASS
+            if (hit.direction != state.getValue(FACING)) return InteractionResult.PASS
             val held = player.getItemInHand(hand)
-            if (hit.direction != state.getValue(FACING) || shelf.isShelfItem(held)) return InteractionResult.PASS
-            val blockEntity = level.getBlockEntity(pos) as? ShelfBlockEntity ?: return InteractionResult.PASS
-            if (blockEntity.getItem(clickedSlot(pos, hit)).isEmpty) return InteractionResult.PASS
-
+            if (held.isEmpty) return InteractionResult.PASS
             return shelf.useItemOn(held, state, level, pos, player, hand, hit).result()
         }
     }

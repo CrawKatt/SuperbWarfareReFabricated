@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.tools
 import com.atsuishio.superbwarfare.entity.misc.FoodRainItemEntity
 import com.atsuishio.superbwarfare.entity.projectile.NuclearBombEntity.NuclearExplosionParameters
 import com.atsuishio.superbwarfare.init.ModEntities
+import com.atsuishio.superbwarfare.init.ModSounds
 import com.atsuishio.superbwarfare.init.ModTags
 import com.atsuishio.superbwarfare.network.message.receive.NuclearExplosionMessage
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
@@ -39,6 +40,10 @@ object FoodRainHandler {
 
     fun detonate(level: ServerLevel, center: Vec3) {
         NuclearExplosionMessage.send(level, center, NuclearExplosionParameters(renderMushroomCloud = false))
+        SoundTool.playDistantSound(level, ModSounds.NUKE_EXPLOSION_CLOSE, center, 32f, 1f, null)
+        SoundTool.playDistantSound(level, ModSounds.NUKE_EXPLOSION_FAR, center, 64f, 1f, null)
+        SoundTool.playDistantSound(level, ModSounds.NUKE_EXPLOSION_VERY_FAR, center, 192f, 1f, null)
+
         val food = BuiltInRegistries.ITEM.getTagOrEmpty(ModTags.Items.FOOD_RAIN_FOODS)
             .map { it.value() }.filter { it != Items.AIR }
         if (food.isEmpty()) return

@@ -6,6 +6,7 @@ import com.atsuishio.superbwarfare.init.ModBlocks
 import com.atsuishio.superbwarfare.init.ModItems
 import com.atsuishio.superbwarfare.init.ModItems.Materials
 import com.atsuishio.superbwarfare.init.ModPerks
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.data.CachedOutput
@@ -505,7 +506,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         evenSimplerBlockItem(ModBlocks.HIGH_ENERGY_EXPLOSIVES_BLOCK)
         evenSimplerBlockItem(ModBlocks.BOOBY_TRAP)
         evenSimplerBlockItem(ModBlocks.REFORGING_TABLE)
-        evenSimplerBlockItem(ModBlocks.SHELF)
+        shelfItem()
         addModel(loc("item/resonance_base"), model(loc("displaysettings/resonance_base")))
         evenSimplerBlockItem(ModBlocks.CHARGING_STATION)
         evenSimplerBlockItem(ModBlocks.WEAPON_REPAIR_STATION)
@@ -525,6 +526,30 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(materials.barrel)
         simpleItem(materials.trigger)
         simpleItem(materials.spring)
+    }
+
+    private fun shelfItem() {
+        fun vector(vararg values: Number) = JsonArray().apply { values.forEach { add(it) } }
+        fun transform(scale: Number, rotation: JsonArray? = null, y: Number? = null) = JsonObject().apply {
+            if (rotation != null) add("rotation", rotation)
+            add("scale", vector(scale, scale, scale))
+            if (y != null) add("translation", vector(0, y, 0))
+        }
+
+        val json = model(
+            ResourceLocation.withDefaultNamespace("builtin/entity"),
+            mapOf("particle" to ResourceLocation.withDefaultNamespace("block/white_concrete")),
+            guiLight = "side"
+        )
+        json.add("display", JsonObject().apply {
+            add("firstperson_lefthand", transform(0.4, vector(0, 225, 0)))
+            add("firstperson_righthand", transform(0.4, vector(0, 45, 0)))
+            add("fixed", transform(0.5))
+            add("ground", transform(0.25, y = 3))
+            add("gui", transform(0.625, vector(30, 225, 0)))
+            add("thirdperson_righthand", transform(0.375, vector(75, 45, 0), y = 2.5))
+        })
+        addModel(loc("item/shelf"), json)
     }
 
     private fun simpleItem(item: Item, location: String = "") {

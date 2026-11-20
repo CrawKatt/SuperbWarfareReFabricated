@@ -2,6 +2,7 @@ package com.atsuishio.superbwarfare.mixins;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.event.ClickEventHandler;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.init.ModKeyMappings;
 import com.atsuishio.superbwarfare.network.message.send.ChangeVehicleSeatMessage;
@@ -16,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
 
@@ -29,6 +31,16 @@ public class MinecraftMixin {
     @Shadow
     @Final
     public Options options;
+
+    @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$onShelfAttack(CallbackInfoReturnable<Boolean> cir) {
+        if (ClickEventHandler.onShelfAttack()) cir.setReturnValue(false);
+    }
+
+    @Inject(method = "continueAttack", at = @At("HEAD"), cancellable = true)
+    private void superbwarfare$onShelfContinueAttack(boolean leftClick, CallbackInfo ci) {
+        if (leftClick && ClickEventHandler.onShelfAttack()) ci.cancel();
+    }
 
     /**
      * 在可切换座位的载具上，按下潜行键+数字键时切换座位
