@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.init.ModCapabilities
 
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.command.CommandRegister
+import com.atsuishio.superbwarfare.compat.tacz.TACZGunEventHandler
 import com.atsuishio.superbwarfare.compat.thermoo.ThermooCompatHandler
 import com.atsuishio.superbwarfare.config.CLIENT_CONFIG
 import com.atsuishio.superbwarfare.config.COMMON_CONFIG
@@ -135,6 +136,9 @@ class Mod : ModInitializer {
         ModSerializers.init()
         ModDamageTypes.init()
         ModEventHandlers.init()
+        if (TACZGunEventHandler.compatCondition()) {
+            TACZGunEventHandler.register()
+        }
         FastProjectileManualTicker.init()
         FoodRainHandler.register()
         ModTags.init()

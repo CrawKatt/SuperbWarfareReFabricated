@@ -71,6 +71,22 @@
     {
       "id": "superbwarfare:radiation",
       "required": false
+    },
+    {
+      "id": "tacz:bullet",
+      "required": false
+    },
+    {
+      "id": "tacz:bullet_void",
+      "required": false
+    },
+    {
+      "id": "tacz:bullet_ignore_armor",
+      "required": false
+    },
+    {
+      "id": "tacz:bullet_void_ignore_armor",
+      "required": false
     }
   ]
 }

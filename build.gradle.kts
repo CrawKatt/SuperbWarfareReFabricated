@@ -168,8 +168,8 @@ dependencies {
 
     modCompileOnly("com.github.thedeathlycow:thermoo:v4.8.0")
     modRuntimeOnly("com.github.thedeathlycow:thermoo:v4.8.0")
-    modCompileOnly("maven.modrinth:1j76DVHU:sqMweCpe")
-    modRuntimeOnly("maven.modrinth:1j76DVHU:sqMweCpe")
+    modCompileOnly("maven.modrinth:1j76DVHU:PFmhVjJo")
+    modRuntimeOnly("maven.modrinth:1j76DVHU:PFmhVjJo")
     runtimeOnly("org.apache.commons:commons-math3:3.6.1")
     runtimeOnly("com.github.FiguraMC.luaj:luaj-core:3.0.8-figura")
     runtimeOnly("com.github.FiguraMC.luaj:luaj-jse:3.0.8-figura")

@@ -39,7 +39,8 @@
     "ServerLevelMixin",
     "SteelPipeFallMixin",
     "TntBlockMixin",
-    "VillagerMixin"
+    "VillagerMixin",
+    "tacz.EntityUtilMixin"
   ],
   "client": [
     "BlockLightEngineMixin",

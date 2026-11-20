@@ -70,6 +70,10 @@ class ModDamageTypeTagProvider(
             .addOptional(mod(ModDamageTypes.PHOSPHORUS_FIRE))
             .addOptional(mod(ModDamageTypes.CUSTOM_EXPLOSION))
             .addOptional(mod(ModDamageTypes.RADIATION))
+            .addOptional(ResourceLocation.fromNamespaceAndPath("tacz", "bullet"))
+            .addOptional(ResourceLocation.fromNamespaceAndPath("tacz", "bullet_void"))
+            .addOptional(ResourceLocation.fromNamespaceAndPath("tacz", "bullet_ignore_armor"))
+            .addOptional(ResourceLocation.fromNamespaceAndPath("tacz", "bullet_void_ignore_armor"))
         // 近战伤害：枪械近战 + 原版玩家近战。数据包/其它模组可以往里加自己的近战类型
         this.tag(ModTags.DamageTypes.MELEE).add(
             ModDamageTypes.GUN_MELEE,
