@@ -196,21 +196,6 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
                     EquipmentSlotGroup.MAINHAND
                 )
             )
-
-            // 近战伤害
-            if (data.get(GunProp.MELEE_DAMAGE) > 0) {
-                list.add(
-                    ItemAttributeModifiers.Entry(
-                        Attributes.ATTACK_DAMAGE,
-                        AttributeModifier(
-                            BASE_ATTACK_DAMAGE_ID,
-                            data.get(GunProp.MELEE_DAMAGE) - 1.0,
-                            AttributeModifier.Operation.ADD_VALUE
-                        ),
-                        EquipmentSlotGroup.MAINHAND
-                    )
-                )
-            }
         }
 
         val modifiers = ItemAttributeModifiers(list, true)
