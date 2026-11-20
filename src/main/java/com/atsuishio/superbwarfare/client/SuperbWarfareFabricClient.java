@@ -91,6 +91,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
     }
 
     private static void registerClientTicks() {
+        ClientTickEvents.START_CLIENT_TICK.register(client -> ClientMouseHandler.handleClientTickStart());
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             Mod.tickClient();
             ClientEventHandler.handleClientTick();
