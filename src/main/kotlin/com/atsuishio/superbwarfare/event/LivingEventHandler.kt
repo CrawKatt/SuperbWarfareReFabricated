@@ -2,6 +2,8 @@ package com.atsuishio.superbwarfare.event
 
 import com.atsuishio.superbwarfare.api.event.PreKillEvent.Indicator
 import com.atsuishio.superbwarfare.api.event.PreKillEvent.SendKillMessage
+import com.atsuishio.superbwarfare.block.ItemDisplayBoardBlock
+import com.atsuishio.superbwarfare.block.entity.ItemDisplayBoardBlockEntity
 import com.atsuishio.superbwarfare.config.common.GameplayConfig
 import com.atsuishio.superbwarfare.config.server.MiscConfig
 import com.atsuishio.superbwarfare.config.server.VehicleConfig
@@ -47,6 +49,9 @@ import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.level.Level
 import java.util.*
 import kotlin.math.max
 import kotlin.math.pow
@@ -785,5 +790,19 @@ object LivingEventHandler {
     @JvmStatic
     fun onExplosionKnockback(entity: Entity): Boolean {
         return entity is VehicleEntity
+    }
+
+    @JvmStatic
+    fun onRightClickBlock(player: Player, level: Level, hitResult: BlockHitResult): InteractionResult {
+        val pos = hitResult.blockPos
+        val state = level.getBlockState(pos)
+        if (state.block !is ItemDisplayBoardBlock) return InteractionResult.PASS
+
+        if (player.isSpectator || !player.isShiftKeyDown) return InteractionResult.PASS
+
+        val blockEntity = level.getBlockEntity(pos) as? ItemDisplayBoardBlockEntity ?: return InteractionResult.PASS
+        if (!blockEntity.hasItem) return InteractionResult.PASS
+
+        return state.useWithoutItem(level, player, hitResult)
     }
 }

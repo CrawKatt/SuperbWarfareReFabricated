@@ -12,7 +12,6 @@ import com.atsuishio.superbwarfare.event.custom.LivingExperienceDropCallback;
 import com.atsuishio.superbwarfare.perk.functional.PowerfulAttraction;
 import com.atsuishio.superbwarfare.perk.functional.StrivingForPerfection;
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler;
-import com.atsuishio.superbwarfare.event.ItemDisplayBoardEventHandler;
 import com.atsuishio.superbwarfare.event.GunEventHandler;
 import com.atsuishio.superbwarfare.event.LivingEventHandler;
 import com.atsuishio.superbwarfare.event.ShieldHandler;
@@ -40,7 +39,7 @@ public class ModEventHandlers {
 
     public static void init() {
         UseBlockCallback.EVENT.register((player, level, hand, hit) ->
-                ItemDisplayBoardEventHandler.onRightClickBlock(player, level, hit));
+                LivingEventHandler.onRightClickBlock(player, level, hit));
         PlayerXpChangeCallback.EVENT.register(StrivingForPerfection.INSTANCE::onXpChange);
         ResourceLocation meleeRespawnPhase = ResourceLocation.fromNamespaceAndPath("superbwarfare", "melee_respawn");
         LivingIncomingDamageCallback.EVENT.addPhaseOrdering(meleeRespawnPhase, Event.DEFAULT_PHASE);
