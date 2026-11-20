@@ -93,6 +93,7 @@ class ResearchingRecipe(
                 && base.test(container.getItem(1))
                 && addition.test(container.getItem(2))
                 && special.test(container.getItem(3))
+                && !result.getResult().isEmpty
     }
 
     override fun assemble(input: RecipeInput, registries: HolderLookup.Provider): ItemStack =
@@ -143,10 +144,9 @@ class ResearchingRecipe(
                 } else {
                     resultStack = ItemStack(itemValue, count)
                 }
-            } else if (getResultList().isNotEmpty()) {
-                resultStack = ItemStack(getResultList().random(), count)
             } else {
-                resultStack = ItemStack.EMPTY
+                val resultItem = getResultList().randomOrNull() ?: return ItemStack.EMPTY
+                this.resultStack = ItemStack(resultItem, count)
             }
 
             return resultStack!!
@@ -240,7 +240,7 @@ class ResearchingRecipe(
             if (buffer.readBoolean()) {
                 res.tag = buffer.readUtf()
             } else {
-                res.resultStack = ItemStack.STREAM_CODEC.decode(buffer)
+                res.resultStack = ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer)
             }
 
             return ResearchingRecipe(input, base, addition, special, selectable, color, time, res)
@@ -261,7 +261,7 @@ class ResearchingRecipe(
             if (random) {
                 buffer.writeUtf(result.tag)
             } else {
-                ItemStack.STREAM_CODEC.encode(buffer, result.getResult())
+                ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, result.getResult())
             }
         }
 

@@ -292,6 +292,7 @@ open class BlueprintResearchTableBlockEntity(pos: BlockPos, state: BlockState) :
         } else {
             result.getResult()
         }
+        if (item.isEmpty) return
 
         val input = this.items[SLOT_INPUT]
         input.shrink(1)
