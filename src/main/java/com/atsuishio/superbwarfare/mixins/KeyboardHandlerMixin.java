@@ -13,6 +13,7 @@ public class KeyboardHandlerMixin {
     @Inject(method = "keyPress(JIIII)V", at = @At("HEAD"), cancellable = true)
     private void superbwarfare$onKeyPressed(long window, int keyCode, int scanCode, int action, int modifiers, CallbackInfo ci) {
         if (ClickEventHandler.onKeyPressed(keyCode, scanCode, action, modifiers)) {
+            ClickEventHandler.syncModKeyConflictState(keyCode, scanCode, action);
             ci.cancel();
         }
     }

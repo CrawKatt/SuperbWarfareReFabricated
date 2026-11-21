@@ -335,8 +335,6 @@ object ClickEventHandler {
         val key = keyCode
         if (key < 0) return false
 
-        syncModKeyConflictState(key, scanCode, action)
-
         if (player.isSpectator) return false
         if (player.hasEffect(ModMobEffects.SHOCK)) return false
 
@@ -585,7 +583,8 @@ object ClickEventHandler {
         return false
     }
 
-    private fun syncModKeyConflictState(key: Int, scanCode: Int, action: Int) {
+    @JvmStatic
+    fun syncModKeyConflictState(key: Int, scanCode: Int, action: Int) {
         if (action != GLFW.GLFW_PRESS && action != GLFW.GLFW_RELEASE) {
             return
         }
