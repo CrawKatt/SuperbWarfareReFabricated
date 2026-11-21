@@ -392,7 +392,7 @@ object ClickEventHandler {
                 handleParachute()
             }
 
-            if (ModKeyMappings.CONFIG.matches(key, scanCode)) {
+            if (ModKeyMappings.CONFIG.matches(key, scanCode) && Screen.hasAltDown()) {
                 handleConfigScreen(player)
             }
             if (key == ModKeyMappings.RELOAD.key.value) {
