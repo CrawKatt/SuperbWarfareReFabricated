@@ -54,7 +54,7 @@
     "apricityui": ">=1.3.0",
     "extensibleenums": "*",
     "trinkets": "*",
-    "mkb": "*"
+    "keybindfixplus": "*"
   },
   "suggests": {
     "jei": "*",

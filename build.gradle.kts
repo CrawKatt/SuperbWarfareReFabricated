@@ -148,7 +148,7 @@ dependencies {
     modImplementation("me.shedaniel.cloth:cloth-config-fabric:15.0.140")
 
     include(modImplementation(":simplebedrockmodel-fabric:2.6.0+mc1.21.1")!!)
-    include(modImplementation("com.github.Nova-Committee:ModernKeyBinding:17bf4f794ae3ce31aee90e0df67e2757c3533d10")!!)
+    include(modImplementation("maven.modrinth:keybind-fix-plus:2.0.0")!!)
     modImplementation("net.createmod.ponder:Ponder-Fabric-${project.property("parchment_minecraft_version")}:${project.property("ponder_version")}")
 
     modCompileOnly("maven.modrinth:sable:e11C0I1A") {

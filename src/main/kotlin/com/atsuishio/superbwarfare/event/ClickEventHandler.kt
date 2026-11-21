@@ -23,7 +23,6 @@ import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
 import com.atsuishio.superbwarfare.item.trinket.TacticalTerminalItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
-import com.atsuishio.superbwarfare.mixins.KeyMappingAccessor
 import com.atsuishio.superbwarfare.mixins.MinecraftAccessor
 import com.atsuishio.superbwarfare.network.message.send.*
 import com.atsuishio.superbwarfare.perk.AutoAimHelper
@@ -122,27 +121,6 @@ object ClickEventHandler {
         }
     }
 
-    @JvmStatic
-    fun forwardVanillaMouseButtonIfNeeded(button: Int, action: Int) {
-        if (FabricLoader.getInstance().isModLoaded("kilt") || notInGame || !hasModMouseConflict(button)) {
-            return
-        }
-
-        val options = mc.options
-        forwardVanillaMouseButton(options.keyAttack, button, action)
-        forwardVanillaMouseButton(options.keyUse, button, action)
-        forwardVanillaMouseButton(options.keyPickItem, button, action)
-    }
-
-    private fun hasModMouseConflict(button: Int): Boolean {
-        return ModKeyMappings.FIRE.matchesMouse(button)
-                || ModKeyMappings.HOLD_ZOOM.matchesMouse(button)
-                || ModKeyMappings.SWITCH_ZOOM.matchesMouse(button)
-                || ModKeyMappings.FIRE_MODE.matchesMouse(button)
-                || ModKeyMappings.MELEE.matchesMouse(button)
-                || ModKeyMappings.MARK.matchesMouse(button)
-    }
-
     private fun syncModMouseConflictState(button: Int, action: Int) {
         if (action != InputConstants.PRESS && action != InputConstants.RELEASE) {
             return
@@ -157,25 +135,6 @@ object ClickEventHandler {
         if (keyMapping.matchesMouse(button)) {
             keyMapping.setDown(down)
         }
-    }
-
-    private fun forwardVanillaMouseButton(keyMapping: KeyMapping, button: Int, action: Int) {
-        if (!keyMapping.matchesMouse(button) || !isShadowedMouseMapping(keyMapping, button)) {
-            return
-        }
-
-        if (action == InputConstants.PRESS) {
-            keyMapping.setDown(true)
-            val accessor = keyMapping as KeyMappingAccessor
-            accessor.`superbwarfare$setClickCount`(accessor.`superbwarfare$getClickCount`() + 1)
-        } else if (action == InputConstants.RELEASE) {
-            keyMapping.setDown(false)
-        }
-    }
-
-    private fun isShadowedMouseMapping(keyMapping: KeyMapping, button: Int): Boolean {
-        val key = InputConstants.Type.MOUSE.getOrCreate(button)
-        return KeyMappingAccessor.`superbwarfare$getMap`()[key] != keyMapping
     }
 
     @JvmStatic

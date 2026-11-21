@@ -59,7 +59,6 @@
     "ItemInHandRendererMixin",
     "KeyboardHandlerMixin",
     "KeyboardInputMixin",
-    "KeyMappingAccessor",
     "KeymappingMixin",
     "LevelRendererMixin",
     "LibraryMixin",

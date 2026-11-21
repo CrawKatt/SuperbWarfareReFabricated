@@ -40,17 +40,13 @@ public class MouseHandlerMixin {
         if (ClickEventHandler.onButtonPressed(button, action, modifiers)) {
             ClickEventHandler.releaseVanillaMouseButton(button);
             ci.cancel();
-            return;
         }
-
-        ClickEventHandler.forwardVanillaMouseButtonIfNeeded(button, action);
     }
 
     @Inject(method = "onPress(JIII)V", at = @At("TAIL"))
     private void superbwarfare$onMouseReleased(long window, int button, int action, int modifiers, CallbackInfo ci) {
         if (action == GLFW.GLFW_RELEASE) {
             ClickEventHandler.onButtonReleased(button, action, modifiers);
-            ClickEventHandler.forwardVanillaMouseButtonIfNeeded(button, action);
         }
     }
 
