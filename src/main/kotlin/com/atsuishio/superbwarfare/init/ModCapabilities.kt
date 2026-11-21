@@ -56,6 +56,11 @@ object ModCapabilities {
             ModBlockEntities.FUMO_25
         )
 
+        EnergyStorage.SIDED.registerForBlockEntity(
+            { be: WeaponRepairStationBlockEntity, _ -> be.getEnergyStorage() },
+            ModBlockEntities.WEAPON_REPAIR_STATION
+        )
+
         EnergyStorage.ITEM.registerForItems(
             { stack, _ -> (stack.item as CreativeChargingStationBlockItem).energyStorage },
             ModItems.CREATIVE_CHARGING_STATION

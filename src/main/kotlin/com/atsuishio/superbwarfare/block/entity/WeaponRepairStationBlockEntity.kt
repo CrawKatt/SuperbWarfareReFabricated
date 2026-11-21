@@ -20,6 +20,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
+import team.reborn.energy.api.EnergyStorage
 import team.reborn.energy.api.base.SimpleEnergyStorage
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant
@@ -83,6 +84,8 @@ open class WeaponRepairStationBlockEntity(pos: BlockPos, state: BlockState) :
         private set
 
     private val itemHandlers = Direction.entries.associateWith { SidedInvWrapper(this, it) }
+
+    fun getEnergyStorage(): EnergyStorage? = if (isRemoved) null else energyStorage
 
     fun getItemHandler(side: Direction?): IItemHandler? =
         if (isRemoved || side == null) null else itemHandlers[side]
