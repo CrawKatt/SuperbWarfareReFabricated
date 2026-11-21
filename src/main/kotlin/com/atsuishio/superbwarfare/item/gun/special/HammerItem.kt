@@ -16,6 +16,7 @@ import net.minecraft.world.Container
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.TooltipFlag
+import java.util.function.Supplier
 
 open class HammerItem(properties: Properties) : MeleeGunItem(properties) {
 
@@ -26,7 +27,7 @@ open class HammerItem(properties: Properties) : MeleeGunItem(properties) {
         tag.putInt("CraftCount", tag.getInt("CraftCount") + 1)
         NBTTool.saveTag(stack, tag)
 
-        if (!itemstack.isDamageableItem) return stack
+        if (creativeCrafting.get() == true || !itemstack.isDamageableItem) return stack
 
         stack.damageValue = itemstack.damageValue + 1
 
@@ -54,6 +55,19 @@ open class HammerItem(properties: Properties) : MeleeGunItem(properties) {
     override fun createRenderer(): GeoGunRenderer = HammerRenderer()
 
     companion object {
+        private val creativeCrafting = ThreadLocal<Boolean>()
+
+        @JvmStatic
+        fun <T> withCraftingPlayer(player: Player, calculateRemainders: Supplier<T>): T {
+            val previous = creativeCrafting.get()
+            creativeCrafting.set(player.hasInfiniteMaterials())
+            return try {
+                calculateRemainders.get()
+            } finally {
+                if (previous == null) creativeCrafting.remove() else creativeCrafting.set(previous)
+            }
+        }
+
         @JvmStatic
         fun onItemCraftedByHammer(item: ItemStack, container: Container, player: Player) {
             if (player.level().isClientSide) return
