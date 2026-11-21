@@ -161,6 +161,9 @@ dependencies {
     modCompileOnly("mezz.jei:jei-1.21.1-fabric-api:${project.property("jei_version")}")
     modRuntimeOnly("mezz.jei:jei-1.21.1-fabric:${project.property("jei_version")}")
 
+    modCompileOnly("com.terraformersmc:modmenu:11.0.5")
+    modRuntimeOnly("com.terraformersmc:modmenu:11.0.5")
+
     modImplementation("curse.maven:jade-324717:6291517")
 
     //modCompileOnly("vazkii.patchouli:Patchouli:1.21.1-93-FABRIC")

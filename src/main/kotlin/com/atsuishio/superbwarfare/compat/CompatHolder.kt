@@ -5,7 +5,7 @@ import net.fabricmc.loader.api.FabricLoader
 object CompatHolder {
     const val DMV: String = "dreamaticvoyage"
     const val VRC: String = "virtuarealcraft"
-    const val CLOTH_CONFIG: String = "cloth_config"
+    const val CLOTH_CONFIG: String = "cloth-config"
     const val COLD_SWEAT: String = "cold_sweat"
     const val THERMOO: String = "thermoo"
     const val SCORCHFUL: String = "scorchful"

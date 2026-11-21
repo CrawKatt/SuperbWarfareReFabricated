@@ -26,6 +26,9 @@
     ],
     "cardinal-components": [
       "com.atsuishio.superbwarfare.init.ModComponents"
+    ],
+    "modmenu": [
+      "com.atsuishio.superbwarfare.compat.modmenu.ModMenuCompat"
     ]
   },
   "custom": {
