@@ -819,7 +819,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
                         attachmentModel,
                         definition,
                         boneName,
-                        poseStack.last().pose(),
+                        BedrockBoneCoordinateTool.modelToView(poseStack.last().pose()),
                         cameraRotationInverse(),
                         hand
                     )
