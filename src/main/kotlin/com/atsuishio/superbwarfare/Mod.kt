@@ -16,6 +16,7 @@ import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.DataLoader
 import com.atsuishio.superbwarfare.data.attachment.AvailableAttachments
 import com.atsuishio.superbwarfare.data.container.ContainerDataManager
+import com.atsuishio.superbwarfare.data.gun.melee.MeleeHarvest
 import com.atsuishio.superbwarfare.data.loot.WreckageLootDataManager
 import com.atsuishio.superbwarfare.event.CustomEventHandler
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
@@ -141,6 +142,7 @@ class Mod : ModInitializer {
         }
         FastProjectileManualTicker.init()
         FoodRainHandler.register()
+        MeleeHarvest.register()
         ModTags.init()
         ModGameRules.bootstrap()
     }

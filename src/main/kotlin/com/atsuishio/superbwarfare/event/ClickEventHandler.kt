@@ -19,6 +19,7 @@ import com.atsuishio.superbwarfare.data.gun.*
 import com.atsuishio.superbwarfare.data.vehicle.subdata.EngineType
 import com.atsuishio.superbwarfare.entity.vehicle.MortarEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.event.custom.InteractionKeyMappingTriggeredCallback
 import com.atsuishio.superbwarfare.init.*
 import com.atsuishio.superbwarfare.item.ItemScreenProvider
 import com.atsuishio.superbwarfare.item.trinket.TacticalTerminalItem
@@ -243,12 +244,14 @@ object ClickEventHandler {
      * 枪械交互时禁止挥舞手臂
      */
     @JvmStatic
-    fun stopSwing(hand: InteractionHand): Boolean {
-        val player = localPlayer ?: return false
-        if (GunItem.isHeldWeapon(player.getItemInHand(hand))) {
-            return true
+    fun stopSwing(event: InteractionKeyMappingTriggeredCallback.Event) {
+        val player = localPlayer ?: return
+        // 手持副武器时按普通物品处理
+        val stack = player.getItemInHand(event.hand)
+        if (GunItem.isHeldWeapon(stack)) {
+            event.setSwingHand(false)
+            if (event.isAttack && GunData.from(stack).get(GunProp.CAN_HARVEST)) event.isCanceled = true
         }
-        return false
     }
 
     @JvmStatic

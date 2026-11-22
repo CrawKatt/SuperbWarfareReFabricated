@@ -20,9 +20,11 @@ import com.atsuishio.superbwarfare.client.screens.SnapshotWarningScreen;
 import com.atsuishio.superbwarfare.compat.ponder.SBWPonderPlugin;
 import com.atsuishio.superbwarfare.compat.acceleratedrendering.AcceleratedRenderingCompat;
 import com.atsuishio.superbwarfare.data.DataLoader;
+import com.atsuishio.superbwarfare.event.ClickEventHandler;
 import com.atsuishio.superbwarfare.event.ClientEventHandler;
 import com.atsuishio.superbwarfare.event.ClientMouseHandler;
 import com.atsuishio.superbwarfare.event.KillMessageHandler;
+import com.atsuishio.superbwarfare.event.custom.InteractionKeyMappingTriggeredCallback;
 import com.atsuishio.superbwarfare.entity.vehicle.base.ArtilleryEntity;
 import com.atsuishio.superbwarfare.init.*;
 import com.atsuishio.superbwarfare.item.projectile.PotionMortarShellItem;
@@ -79,6 +81,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
             PonderIndex.addPlugin(SBWPonderPlugin.INSTANCE);
         }
         ClientEventHandler.register();
+        InteractionKeyMappingTriggeredCallback.EVENT.register(ClickEventHandler::stopSwing);
         FlashbangOverlay.INSTANCE.register();
         NetworkRegistryKt.registerClientReceivers();
         ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> {
