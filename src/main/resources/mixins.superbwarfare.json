@@ -27,6 +27,7 @@
     "FireBlockMixin",
     "GrindstoneMenuMixin",
     "ItemEntityMixin",
+    "ItemStackHarvestMixin",
     "ItemStackLegacyIdMixin",
     "ItemStackRarityMixin",
     "LevelMixin",

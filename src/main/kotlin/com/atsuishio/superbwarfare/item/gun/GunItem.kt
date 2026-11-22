@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.data.CustomData
 import com.atsuishio.superbwarfare.data.PMC
 import com.atsuishio.superbwarfare.data.PropertyModifier
 import com.atsuishio.superbwarfare.data.gun.*
+import com.atsuishio.superbwarfare.data.gun.melee.MeleeHarvest
 import com.atsuishio.superbwarfare.data.gun.melee.ProjectileMarker
 import com.atsuishio.superbwarfare.data.gun.melee.isEngineProjectileMarker
 import com.atsuishio.superbwarfare.data.gun.melee.normalizeProjectileMarker
@@ -45,6 +46,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundStopSoundPacket
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
@@ -66,6 +68,7 @@ import net.minecraft.world.entity.projectile.ProjectileUtil
 import net.minecraft.world.inventory.tooltip.TooltipComponent
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Tiers
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
@@ -74,6 +77,7 @@ import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
+import net.fabricmc.fabric.api.mininglevel.v1.MiningLevelManager
 import org.joml.Math
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
@@ -162,7 +166,36 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
      */
     open fun isInitialized(data: GunData) = data.uuid != null
 
-    override fun canAttackBlock(pState: BlockState, pLevel: Level, pPos: BlockPos, pPlayer: Player) = false
+    internal fun canHarvest(data: GunData): Boolean =
+        data.get(GunProp.CAN_HARVEST) && useAsWeaponInHand() && hasMeleeAttack(data) && !isBroken(data.stack)
+
+    private fun isHarvestToolFor(data: GunData, state: BlockState): Boolean =
+        canHarvest(data) && data.get(GunProp.MINEABLE_BLOCK_TAGS).any { state.`is`(it) }
+
+    override fun canAttackBlock(state: BlockState, level: Level, pos: BlockPos, player: Player): Boolean =
+        MeleeHarvest.isFinishing(player, pos, this)
+
+    override fun mineBlock(stack: ItemStack, level: Level, state: BlockState, pos: BlockPos, miner: LivingEntity): Boolean {
+        if (!canHarvest(GunData.from(stack))) return false
+        if (!level.isClientSide && state.getDestroySpeed(level, pos) != 0f) {
+            stack.hurtAndBreak(1, miner) { it.broadcastBreakEvent(InteractionHand.MAIN_HAND) }
+        }
+        return true
+    }
+
+    override fun getDestroySpeed(stack: ItemStack, state: BlockState): Float {
+        val data = GunData.from(stack)
+        return if (isHarvestToolFor(data, state)) data.get(GunProp.MINE_SPEED) else 1f
+    }
+
+    fun isCorrectToolForDrops(stack: ItemStack, state: BlockState): Boolean {
+        val data = GunData.from(stack)
+        if (!isHarvestToolFor(data, state)) return false
+
+        val tierId = data.get(GunProp.HARVEST_TIER) ?: return false
+        val tier = HARVEST_TIERS[tierId] ?: return false
+        return tier.level >= MiningLevelManager.getRequiredMiningLevel(state)
+    }
 
     override fun inventoryTick(stack: ItemStack, level: Level, entity: Entity, slot: Int, selected: Boolean) {
         // 副武器物品（`useAsWeaponInHand() == false`）躺在背包/手上时不跑枪械状态机：
@@ -1422,6 +1455,10 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     }
 
     companion object {
+        private val HARVEST_TIERS = Tiers.values().associateBy {
+            ResourceLocation("minecraft", it.name.lowercase(Locale.ROOT))
+        }
+
         /**
          * 这个物品算不算一把枪
          */

@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.block.BoobyTrapBlock
 import com.atsuishio.superbwarfare.block.HighEnergyExplosivesBlock
 import com.atsuishio.superbwarfare.block.ShelfBlock
 import com.atsuishio.superbwarfare.block.entity.FuMO25BlockEntity
+import com.atsuishio.superbwarfare.data.gun.melee.MeleeHarvest
 import com.atsuishio.superbwarfare.capability.player.PlayerVariable
 import com.atsuishio.superbwarfare.command.CommandRegister
 import com.atsuishio.superbwarfare.capability.sync.ModSyncedCapabilities
@@ -149,6 +150,7 @@ class Mod : ModInitializer {
         FastThrowableProjectile.init()
         FastProjectileManualTicker.register()
         FoodRainHandler.register()
+        MeleeHarvest.register()
         TraumaMobEffect.registerEvents()
         registerLivingEvents()
 

@@ -133,11 +133,7 @@ object ClientEventHandler {
 
         ClientGunFireEvent.EVENT.register { event -> onClientGunFire(event) }
 
-        InteractionKeyMappingTriggeredCallback.EVENT.register { event ->
-            if (ClickEventHandler.stopSwing(event.hand)) {
-                event.setSwingHand(false)
-            }
-        }
+        InteractionKeyMappingTriggeredCallback.EVENT.register(ClickEventHandler::stopSwing)
         InteractionKeyMappingTriggeredCallback.EVENT.register(ClickEventHandler::onShelfAttack)
         RenderHandCallback.EVENT.register { event ->
             if (shouldCancelHandRender(event.hand)) {
