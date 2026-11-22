@@ -3,6 +3,7 @@ package com.atsuishio.superbwarfare.event
 import com.atsuishio.superbwarfare.block.ShelfBlock
 import com.atsuishio.superbwarfare.client.gun.GunChargeHandler
 import com.atsuishio.superbwarfare.client.gun.MeleeClientHandler
+import com.atsuishio.superbwarfare.client.lighting.FlashlightHandler
 import com.atsuishio.superbwarfare.client.overlay.OverlayTraceHandler
 import com.atsuishio.superbwarfare.client.overlay.ammo.AmmoBarHud
 import com.atsuishio.superbwarfare.client.renderer.scope.ScopeThermalRenderer
@@ -29,6 +30,7 @@ import com.atsuishio.superbwarfare.network.message.send.*
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.*
 import com.mojang.blaze3d.platform.InputConstants
+import committee.nova.mkb.api.IKeyBinding
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.ChatFormatting
 import net.minecraft.client.KeyMapping
@@ -421,6 +423,13 @@ object ClickEventHandler {
                     }
                 }
                 return true
+            }
+
+            val flashlight = ModKeyMappings.TOGGLE_FLASHLIGHT as IKeyBinding
+            if (flashlight.isActiveAndMatches(InputConstants.getKey(key, scanCode))) {
+                FlashlightHandler.toggleLocal()?.let {
+                    player.playSound(ModSounds.CANNON_ZOOM_OUT, 1f, 1f)
+                }
             }
 
             if (key == ModKeyMappings.DISMOUNT.key.value) {
