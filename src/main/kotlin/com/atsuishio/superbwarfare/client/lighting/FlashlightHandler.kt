@@ -18,7 +18,6 @@ import net.minecraft.world.phys.Vec3
 @Environment(EnvType.CLIENT)
 object FlashlightHandler {
 
-    const val NBT_KEY = "FlashlightOn"
     private const val MAX_LIGHTS = 4
 
     /** 超过该距离的其他玩家手电不渲染（格）。 */
@@ -44,7 +43,7 @@ object FlashlightHandler {
     @JvmStatic
     fun isOn(stack: ItemStack): Boolean {
         val gun = gunOf(stack) ?: return false
-        return AttachmentDefinition.findFlashlights(gun).isNotEmpty() && gun.data().getBoolean(NBT_KEY)
+        return gun.state.flashlightOn && AttachmentDefinition.findFlashlights(gun).isNotEmpty()
     }
     @JvmStatic
     fun toggleLocal(): Boolean? {
@@ -110,9 +109,9 @@ object FlashlightHandler {
         for (player in level.players()) {
             if (player.position().distanceToSqr(camera) > MAX_DISTANCE * MAX_DISTANCE) continue
 
-            val stack = player.mainHandItem
-            if (!isOn(stack)) continue
-            val emitter = AttachmentDefinition.findFlashlights(GunData.from(stack)).firstOrNull() ?: continue
+            val gun = gunOf(player.mainHandItem) ?: continue
+            if (!gun.state.flashlightOn) continue
+            val emitter = AttachmentDefinition.findFlashlights(gun).firstOrNull() ?: continue
             val info = emitter.info
             if (info.safeIntensity <= 0f) continue
 
