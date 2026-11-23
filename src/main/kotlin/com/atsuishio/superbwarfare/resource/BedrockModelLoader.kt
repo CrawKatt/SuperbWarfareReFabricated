@@ -1,5 +1,6 @@
 package com.atsuishio.superbwarfare.resource
 
+import com.atsuishio.superbwarfare.client.animation.gun.GunAnimationControllers
 import com.atsuishio.superbwarfare.client.animation.gun.GunSprintAnimationLoader
 import com.atsuishio.superbwarfare.client.renderer.gun.GunEmissiveTextures
 import com.atsuishio.superbwarfare.client.renderer.gun.StaticGunRenderer
@@ -22,6 +23,7 @@ object BedrockModelLoader {
         resources.registerReloadListener(BlockModelReloadListener)
         resources.registerReloadListener(ItemModelReloadListener)
         resources.registerReloadListener(GunModelReloadListener)
+        resources.registerReloadListener(GunAnimationControllers)
         resources.registerReloadListener(GunLODModelReloadListener)
         resources.registerReloadListener(ShellModelReloadListener)
         resources.registerReloadListener(AttachmentModelReloadListener)

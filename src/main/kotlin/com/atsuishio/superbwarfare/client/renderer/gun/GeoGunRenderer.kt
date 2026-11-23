@@ -375,7 +375,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
         idleViewAnchor = null
         if (transformType.firstPerson()) {
             val hand = handForContext(transformType)
-            val pose = FirstPersonRenderHandler.getActiveAnimationInstance(hand)?.cachedPose
+            val instance = FirstPersonRenderHandler.getActiveAnimationInstance(hand)
+            val pose = instance?.cachedPose
             // 副武器换弹：让**主武器（含玩家手臂）**跟着副武器动画的 `root` 运动走
             val follow = resolveSubWeaponFollowPose(stack, model)
             subWeaponFollow = follow
@@ -407,7 +408,8 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
                 sprintOffset.y,
                 sprintOffset.z,
                 // 有 Animation.Run 的枪不走程序性奔跑（连进出过渡片段一起关）
-                resource.useCustomSprintAnimation || resource.animation?.run != null
+                resource.useCustomSprintAnimation || resource.animation?.run != null ||
+                        (instance as? GeoGunAnimationInstance)?.ownsSprint == true
             )
 
             val shootRecoil = resource.shootRecoil
@@ -1697,7 +1699,7 @@ open class GeoGunRenderer : AbstractGeoItemRendererV2(), BuiltinItemRendererRegi
 
         val animation = FirstPersonRenderHandler.getActiveAnimationInstance(hand) as? GeoGunAnimationInstance
         // 宿主枪自己换弹/近战 → 让位。状态还没解析出来（等同没有主武器动画）时照旧接管。
-        if (animation?.currentGunState?.takesHandAway == true) return
+        if (animation?.takesHands == true) return
 
         val (slot, definition) = findSubWeapon(data) ?: return
         val modelPath = definition.modelOf(data, slot.type) ?: return
