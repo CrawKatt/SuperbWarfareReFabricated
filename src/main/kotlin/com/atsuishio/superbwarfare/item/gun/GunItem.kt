@@ -128,8 +128,8 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         }
 
         if (data.get(GunProp.MAX_ENERGY) > 0) {
-            val cap = EnergyStorage.ITEM.find(stack, null)
-            return Math.round((cap?.amount ?: 0).toFloat() * 13f / GunData.get(stack, GunProp.MAX_ENERGY))
+            val energy = EnergyStorage.ITEM.find(stack, null)?.amount ?: 0L
+            return Math.round(energy * 13f / GunData.get(stack, GunProp.MAX_ENERGY)).coerceIn(0, 13)
         }
 
         return super.getBarWidth(stack)
