@@ -133,8 +133,8 @@ object ModKeyMappings {
     val TOGGLE_TACTICAL_MAP = registerKey("toggle_tactical_map", GLFW.GLFW_KEY_M)
 
     @JvmField
-    val TOGGLE_FLASHLIGHT: KeyMapping = object : KeyMapping(
-        "key.superbwarfare.toggle_flashlight",
+    val TOGGLE_LIGHT: KeyMapping = object : KeyMapping(
+        "key.superbwarfare.toggle_light",
         InputConstants.Type.KEYSYM,
         GLFW.GLFW_KEY_Y,
         CATEGORY

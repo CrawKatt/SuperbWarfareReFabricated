@@ -425,8 +425,8 @@ object ClickEventHandler {
                 return true
             }
 
-            val flashlight = ModKeyMappings.TOGGLE_FLASHLIGHT as IKeyBinding
-            if (flashlight.isActiveAndMatches(InputConstants.getKey(key, scanCode))) {
+            val light = ModKeyMappings.TOGGLE_LIGHT as IKeyBinding
+            if (light.isActiveAndMatches(InputConstants.getKey(key, scanCode))) {
                 FlashlightHandler.toggleLocal()?.let {
                     player.playSound(ModSounds.CANNON_ZOOM_OUT, 1f, 1f)
                 }
