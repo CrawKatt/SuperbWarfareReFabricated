@@ -15,7 +15,6 @@ import com.atsuishio.superbwarfare.item.container.SmallContainerBlockItem
 import com.atsuishio.superbwarfare.item.food.CrustItem
 import com.atsuishio.superbwarfare.item.food.SuspiciousYellowCakeItem
 import com.atsuishio.superbwarfare.item.gun.EmptyGunItem
-import com.atsuishio.superbwarfare.item.gun.MeleeGunItem
 import com.atsuishio.superbwarfare.item.trinket.DogTagItem
 import com.atsuishio.superbwarfare.item.trinket.IffItem
 import com.atsuishio.superbwarfare.item.trinket.ParachuteItem
@@ -23,7 +22,7 @@ import com.atsuishio.superbwarfare.item.trinket.TacticalTerminalItem
 import com.atsuishio.superbwarfare.item.trinket.ThermalImagingGogglesItem
 import com.atsuishio.superbwarfare.item.gun.GeoGunItem
 import com.atsuishio.superbwarfare.item.gun.GunItem
-import com.atsuishio.superbwarfare.item.gun.LaserGunItem
+import com.atsuishio.superbwarfare.item.gun.MeleeGunItem
 import com.atsuishio.superbwarfare.item.gun.launcher.IglaItem
 import com.atsuishio.superbwarfare.item.gun.launcher.JavelinItem
 import com.atsuishio.superbwarfare.item.gun.launcher.SuperStarShooterItem
@@ -129,7 +128,7 @@ object ModItems {
     @JvmField val IGLA_9K38 = registerGun("igla_9k38") { IglaItem }
     @JvmField val BOCEK = registerGun("bocek") { GeoGunItem(Properties().rarity(Rarity.EPIC)) }
     @JvmField val SUPER_STAR_SHOOTER = registerGun("super_star_shooter") { SuperStarShooterItem() }
-    @JvmField val REFORGING = registerGun("reforging") { LaserGunItem(Properties().rarity(SUPERB)) }
+    @JvmField val REFORGING = registerGun("reforging") { GeoGunItem(Properties().rarity(SUPERB)) }
     @JvmField val RAUBTIER = registerGun("raubtier") { GeoGunItem(Properties().rarity(SUPERB)) }
 
     @JvmField val VEHICLE_GUN = registerGun("vehicle_gun") { VehicleGunItem() }
