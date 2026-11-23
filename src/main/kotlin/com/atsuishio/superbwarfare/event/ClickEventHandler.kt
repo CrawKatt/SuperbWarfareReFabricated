@@ -381,7 +381,7 @@ object ClickEventHandler {
                 return true
             }
 
-            if (ModKeyMappings.TOGGLE_FLASHLIGHT.matches(key, scanCode) && Screen.hasControlDown()) {
+            if (ModKeyMappings.TOGGLE_LIGHT.matches(key, scanCode) && Screen.hasControlDown()) {
                 FlashlightHandler.toggleLocal()?.let {
                     player.playSound(ModSounds.CANNON_ZOOM_OUT, 1f, 1f)
                 }

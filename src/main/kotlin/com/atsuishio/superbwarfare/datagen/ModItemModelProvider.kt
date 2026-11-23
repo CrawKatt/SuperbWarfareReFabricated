@@ -430,6 +430,7 @@ class ModItemModelProvider(private val output: PackOutput) : DataProvider {
         simpleItem(ModItems.HANDGUN_SHIELD)
         simpleItem(ModItems.HYPERION_SHIELD_MODULE)
         simpleItem(ModItems.PISTOL_LASER)
+        simpleItem(ModItems.SUREFIRE_X400_ULTRA_FLASHLIGHT)
         simpleItem(ModItems.RANGE_FINDER)
         simpleItem(ModItems.BAYONET_M_9)
         simpleItem(ModItems.BAYONET_6KH2)
