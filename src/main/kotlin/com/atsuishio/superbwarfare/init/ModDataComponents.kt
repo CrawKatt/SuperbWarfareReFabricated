@@ -4,6 +4,7 @@ import com.atsuishio.superbwarfare.Mod
 import com.atsuishio.superbwarfare.data.gun.Ammo
 import com.atsuishio.superbwarfare.init.ModDataComponents.ITEM_TAG
 import com.atsuishio.superbwarfare.item.ammo.AmmoBoxInfo
+import com.atsuishio.superbwarfare.item.gun.GunItem
 import com.atsuishio.superbwarfare.item.misc.FiringParametersItem
 import com.mojang.datafixers.util.Pair
 import com.mojang.serialization.Codec
@@ -14,6 +15,10 @@ import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.codec.ByteBufCodecs
+import net.minecraft.world.item.ItemStack
+import java.lang.ref.WeakReference
+import java.util.function.Function
+import java.util.function.UnaryOperator
 
 @Suppress("unused")
 object ModDataComponents {
@@ -73,8 +78,8 @@ object ModDataComponents {
     @JvmField
     val ITEM_TAG: DataComponentType<ItemTag> =
         register("item_tag") {
-            it.persistent(CompoundTag.CODEC.xmap({ tag -> ItemTag(tag) }, ItemTag::tag))
-                .networkSynchronized(ByteBufCodecs.COMPOUND_TAG.map({ tag -> ItemTag(tag) }, ItemTag::tag))
+            it.persistent(CompoundTag.CODEC.xmap({ tag -> ItemTag(tag) }, ItemTag::serializedTag))
+                .networkSynchronized(ByteBufCodecs.COMPOUND_TAG.map({ tag -> ItemTag(tag) }, ItemTag::serializedTag))
         }
 
     /**
@@ -87,9 +92,21 @@ object ModDataComponents {
      *   副武器的状态住在主武器 tag 的子 compound 里，主武器自己一个字段都没写、内容也会变，
      *   只比对当前内容是看不出来的
      */
-    class ItemTag(@JvmField val tag: CompoundTag, written: CompoundTag? = null) {
+    class ItemTag @JvmOverloads constructor(
+        @JvmField val tag: CompoundTag,
+        written: CompoundTag? = null,
+        owner: ItemStack? = null,
+    ) {
+        private val owner = owner?.let(::WeakReference)
+        private val gunTag = owner?.item is GunItem
+
         @JvmField
         val written: CompoundTag = written ?: tag.copy()
+
+        // GunData publishes via save(); inventory packets must see that revision even if the live tag advances.
+        internal val serializedTag: CompoundTag get() = if (gunTag) written.copy() else tag.copy()
+
+        internal fun belongsTo(stack: ItemStack): Boolean = owner?.get() === stack
 
         // 组件值必须自己实现 equals / hashCode（NeoForge 在 IDE 里会校验，普通类没有豁免）。
         // 要的是**身份**语义：tag 是就地改的，内容判等永远相等，"变了"只能靠换新实例表达。
