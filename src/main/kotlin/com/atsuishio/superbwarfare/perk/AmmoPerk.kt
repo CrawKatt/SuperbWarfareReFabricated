@@ -18,6 +18,7 @@ open class AmmoPerk : Perk {
     @JvmField
     val slug: Boolean
     val rgb: FloatArray
+    override val ammoRgb: FloatArray get() = rgb
     val hideParticle: Boolean
     val mobEffects: () -> ArrayList<MobEffect>
 
