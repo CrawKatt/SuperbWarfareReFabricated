@@ -4,14 +4,13 @@ import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.projectile.IBulletProperties
 import com.atsuishio.superbwarfare.entity.projectile.ProjectileEntity
 import com.atsuishio.superbwarfare.entity.vehicle.TurretWreckEntity
-import com.atsuishio.superbwarfare.client.lighting.VehicleLightingHandler
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
-import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.projectile.Projectile
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
+import net.minecraft.world.phys.Vec3
 
 /**
  * Client-side bridge that routes projectile lifecycle events to the lighting system.
@@ -54,6 +53,23 @@ object ClientLightingHandler {
     }
 
     /**
+     * 信号弹（FlareDecoyEntity）每 tick 的跟随光：暖白、大半径、无遮挡 march。
+     * 之前信号弹只靠贴图自发光，完全没有世界光照。
+     */
+    @JvmStatic
+    fun handleFlareTick(entity: Entity) {
+        WorldLightHandler.put(
+            "flare_${entity.id}",
+            entity.position().add(0.0, entity.bbHeight * 0.5, 0.0),
+            Vec3.ZERO,
+            strength = 0.9f,
+            radius = 10f,
+            durationTicks = 2,
+            color = Vec3(1.0, 0.86, 0.72),
+        )
+    }
+
+    /**
      * Called when a projectile entity is added to the client world.
      *
      * @param entity the projectile that was just added to the client world
@@ -79,7 +95,8 @@ object ClientLightingHandler {
      */
     @JvmStatic
     fun handleProjectileRemoved(entity: Entity) {
-        LightPositionRegistry.removeAround(entity.blockPosition(), 2)
+        // 弹丸消失后立即移除跟随光（曳光主光 + 尾焰光）。
+        ProjectileLightHelper.clear(entity)
 
         val radius = getExplosionRadius(entity)
         if (radius > 0f) {
