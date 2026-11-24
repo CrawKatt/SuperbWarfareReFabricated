@@ -141,6 +141,7 @@ object ModPerks {
     @JvmField val EAGER_EDGE = autoRegistryObjects["eager_edge"] ?: registerFuncPerk("eager_edge") {
         EmptyPerk("eager_edge", Perk.Type.FUNCTIONAL)
     }
+    @JvmField val SHADOWS_OF_SWORD = autoRegistryObjects.getValue("shadows_of_sword")
     @JvmField val ADRENALINE_RUSH = autoRegistryObjects["adrenaline_rush"] ?: registerFuncPerk("adrenaline_rush") {
         EmptyPerk("adrenaline_rush", Perk.Type.FUNCTIONAL)
     }

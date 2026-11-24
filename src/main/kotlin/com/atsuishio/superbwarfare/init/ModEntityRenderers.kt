@@ -86,6 +86,7 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.BL_132, ::Bl132Renderer)
         EntityRendererRegistry.register(ModEntities.GRAPESHOT, ::GrapeshotRenderer)
         EntityRendererRegistry.register(ModEntities.SUPER_STAR_PROJECTILE, ::SuperStarProjectileRenderer)
+        EntityRendererRegistry.register(ModEntities.SWORD_WAVE, ::SwordWaveRenderer)
         EntityRendererRegistry.register(ModEntities.VEHICLE_ASSEMBLING_TABLE, ::VehicleAssemblingTableVehicleRenderer)
         EntityRendererRegistry.register(ModEntities.WAVEFORCE_TOWER, ::WaveforceTowerRenderer)
         EntityRendererRegistry.register(ModEntities.IGLA_MISSILE, ::BasicProjectileRenderer)

@@ -180,6 +180,10 @@ object ModEntities {
         register("super_star_projectile", fastProjectile(::SuperStarProjectileEntity).dimensions(EntityDimensions.scalable(0.75f, 0.75f)))
 
     @JvmField
+    val SWORD_WAVE: EntityType<SwordWaveEntity> =
+        register("sword_wave", fastProjectile(::SwordWaveEntity).dimensions(EntityDimensions.scalable(0.45f, 0.45f)).disableSaving())
+
+    @JvmField
     val SMALL_CANNON_SHELL: EntityType<SmallCannonShellEntity> =
         register("small_cannon_shell", fastProjectile(::SmallCannonShellEntity).dimensions(EntityDimensions.scalable(0.25f, 0.25f)))
 
