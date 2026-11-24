@@ -120,6 +120,7 @@ object ClientEventHandler {
         ClientPlayerCloneCallback.EVENT.register { _, newPlayer -> resetMeleeOnRespawn(newPlayer) }
 
         ClientTickEvents.END_CLIENT_TICK.register { _ -> AmmoBarHud.onClientTick() }
+        ClientTickEvents.END_CLIENT_TICK.register(ClickEventHandler::onClientTick)
 
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             onPlayerLoggedIn()

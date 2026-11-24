@@ -30,7 +30,6 @@ import com.atsuishio.superbwarfare.network.message.send.*
 import com.atsuishio.superbwarfare.resource.gun.GunResource
 import com.atsuishio.superbwarfare.tools.*
 import com.mojang.blaze3d.platform.InputConstants
-import committee.nova.mkb.api.IKeyBinding
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.ChatFormatting
 import net.minecraft.client.KeyMapping
@@ -56,6 +55,12 @@ object ClickEventHandler {
     /** 右键是否按着；枪械会 cancel 掉这个按键，`KeyMapping.isDown()` 之后就不再更新了 */
     var useKeyHeld: Boolean = false
         private set
+
+    /** 手电/激光键的长按判定阈值（tick）。 */
+    private const val LIGHT_LONG_PRESS_TICKS = 9
+    private var lightKeyDown = false
+    private var lightPressTicks = 0
+    private var lightLongFired = false
 
     private fun isUseMouseButton(button: Int): Boolean =
         (ModKeyMappings.HOLD_ZOOM.key.type == InputConstants.Type.MOUSE
@@ -360,6 +365,32 @@ object ClickEventHandler {
         return canceled
     }
 
+    fun onClientTick(mc: Minecraft) {
+        val inactive = notInGame || mc.screen != null
+        val down = if (inactive) false else ModKeyMappings.TOGGLE_LIGHT.isDown
+
+        if (down) {
+            if (!lightKeyDown) {
+                lightPressTicks = 0
+                lightLongFired = false
+            }
+            lightPressTicks++
+            if (!lightLongFired && lightPressTicks >= LIGHT_LONG_PRESS_TICKS) {
+                if (FlashlightHandler.turnOffAllLocal()) {
+                    localPlayer?.playSound(ModSounds.CANNON_ZOOM_OUT, 1f, 1f)
+                }
+                lightLongFired = true
+            }
+        } else if (lightKeyDown && !lightLongFired && !inactive) {
+            if (FlashlightHandler.cycleAllLocal()) {
+                localPlayer?.playSound(ModSounds.CANNON_ZOOM_OUT, 1f, 1f)
+            }
+        }
+
+        lightKeyDown = down
+        if (!down) lightLongFired = false
+    }
+
     @JvmStatic
     fun handleScopeThermalKey(player: Player): Boolean {
         if (!ScopeThermalRenderer.isAimingThermalScope(player.mainHandItem)) return false
@@ -423,13 +454,6 @@ object ClickEventHandler {
                     }
                 }
                 return true
-            }
-
-            val light = ModKeyMappings.TOGGLE_LIGHT as IKeyBinding
-            if (light.isActiveAndMatches(InputConstants.getKey(key, scanCode))) {
-                FlashlightHandler.toggleLocal()?.let {
-                    player.playSound(ModSounds.CANNON_ZOOM_OUT, 1f, 1f)
-                }
             }
 
             if (key == ModKeyMappings.DISMOUNT.key.value) {
