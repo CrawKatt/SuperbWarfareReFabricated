@@ -251,7 +251,7 @@ dependencies {
     modRuntimeOnly("io.github.fabricators_of_create.Porting-Lib:base:2.3.8+1.20.1")
     runtimeOnly("org.openjdk.nashorn:nashorn-core:15.4")
 
-    include(modImplementation("maven.modrinth:modernkeybinding:1.20.X-1.2.0")!!)
+    include(modImplementation("maven.modrinth:keybind-fix:1.0.0")!!)
     include(implementation("org.apache.commons:commons-math3:3.6.1")!!)
     include(implementation("com.github.FiguraMC.luaj:luaj-core:3.0.8-figura") {
         exclude("org.apache.commons", "commons-lang3")
@@ -318,6 +318,9 @@ dependencies {
     modCompileOnly("mezz.jei:jei-${project.property("minecraft_version")}-fabric-api:${project.property("jei_version")}")
     modRuntimeOnly("mezz.jei:jei-${project.property("minecraft_version")}-fabric:${project.property("jei_version")}")
 
+    modCompileOnly("com.terraformersmc:modmenu:7.2.2") { isTransitive = false }
+    modRuntimeOnly("com.terraformersmc:modmenu:7.2.2") { isTransitive = false }
+
     // Patchouli Fabric
     modCompileOnly("vazkii.patchouli:Patchouli:1.20.1-84-FABRIC")
     modRuntimeOnly("vazkii.patchouli:Patchouli:1.20.1-84-FABRIC")
@@ -327,8 +330,8 @@ dependencies {
 
     // Optional integrations.
     modCompileOnly("maven.modrinth:nvQzSEkH:oJx1UoWN") // Jade 11.12.3 Fabric
-    modCompileOnly("maven.modrinth:1j76DVHU:c6sOTqZb")
-    modLocalRuntime("maven.modrinth:1j76DVHU:c6sOTqZb")
+    modCompileOnly("maven.modrinth:tacz-refabricated:1.0.1-forge1.2.0-hotfix+mc1.20.1")
+    modLocalRuntime("maven.modrinth:tacz-refabricated:1.0.1-forge1.2.0-hotfix+mc1.20.1")
     modCompileOnly("maven.modrinth:lhGA9TYQ:WbL7MStR") // Architectury API 9.2.14 Fabric
     modCompileOnly("maven.modrinth:sk9knFPE:MLIu0Tct") // Rhino 2001.2.3-build.10 Fabric
     modCompileOnly("maven.modrinth:umyGl7zF:kPLHkyoJ") // KubeJS 2001.6.5-build.16 Fabric

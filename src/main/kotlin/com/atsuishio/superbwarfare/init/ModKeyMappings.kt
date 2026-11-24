@@ -1,8 +1,5 @@
 package com.atsuishio.superbwarfare.init
 
-import committee.nova.mkb.api.IKeyBinding
-import committee.nova.mkb.keybinding.KeyConflictContext
-import committee.nova.mkb.keybinding.KeyModifier
 import com.mojang.blaze3d.platform.InputConstants
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.minecraft.client.KeyMapping
@@ -133,19 +130,7 @@ object ModKeyMappings {
     val TOGGLE_TACTICAL_MAP = registerKey("toggle_tactical_map", GLFW.GLFW_KEY_M)
 
     @JvmField
-    val TOGGLE_LIGHT: KeyMapping = object : KeyMapping(
-        "key.superbwarfare.toggle_light",
-        InputConstants.Type.KEYSYM,
-        GLFW.GLFW_KEY_Y,
-        CATEGORY
-    ) {
-        fun getKeyModifierDefault(): KeyModifier = KeyModifier.CONTROL
-    }.also { key ->
-        val binding = key as IKeyBinding
-        binding.setKeyConflictContext(KeyConflictContext.IN_GAME)
-        binding.setKeyModifierAndCode(binding.keyModifierDefault, key.defaultKey)
-        KEYS.add(key)
-    }
+    val TOGGLE_LIGHT = registerKey("toggle_light", GLFW.GLFW_KEY_Y)
 
     private fun registerKey(
         name: String,

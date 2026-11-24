@@ -22,6 +22,9 @@
     ],
     "cardinal-components-entity": [
       "com.atsuishio.superbwarfare.capability.CapabilityHandler"
+    ],
+    "modmenu": [
+      "com.atsuishio.superbwarfare.compat.modmenu.ModMenuCompat"
     ]
   },
   "custom": {

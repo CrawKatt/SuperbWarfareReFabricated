@@ -131,27 +131,6 @@ object ClickEventHandler {
         }
     }
 
-    @JvmStatic
-    fun forwardVanillaMouseButtonIfNeeded(button: Int, action: Int) {
-        if (FabricLoader.getInstance().isModLoaded("kilt") || notInGame || !hasModMouseConflict(button)) {
-            return
-        }
-
-        val options = mc.options
-        forwardVanillaMouseButton(options.keyAttack, button, action)
-        forwardVanillaMouseButton(options.keyUse, button, action)
-        forwardVanillaMouseButton(options.keyPickItem, button, action)
-    }
-
-    private fun hasModMouseConflict(button: Int): Boolean {
-        return ModKeyMappings.FIRE.matchesMouse(button)
-                || ModKeyMappings.HOLD_ZOOM.matchesMouse(button)
-                || ModKeyMappings.SWITCH_ZOOM.matchesMouse(button)
-                || ModKeyMappings.FIRE_MODE.matchesMouse(button)
-                || ModKeyMappings.MELEE.matchesMouse(button)
-                || ModKeyMappings.MARK.matchesMouse(button)
-    }
-
     private fun syncModMouseConflictState(button: Int, action: Int) {
         if (action != InputConstants.PRESS && action != InputConstants.RELEASE) {
             return
@@ -166,25 +145,6 @@ object ClickEventHandler {
         if (keyMapping.matchesMouse(button)) {
             keyMapping.setDown(down)
         }
-    }
-
-    private fun forwardVanillaMouseButton(keyMapping: KeyMapping, button: Int, action: Int) {
-        if (!keyMapping.matchesMouse(button) || !isShadowedMouseMapping(keyMapping, button)) {
-            return
-        }
-
-        if (action == InputConstants.PRESS) {
-            keyMapping.setDown(true)
-            val accessor = keyMapping as KeyMappingAccessor
-            accessor.`superbwarfare$setClickCount`(accessor.`superbwarfare$getClickCount`() + 1)
-        } else if (action == InputConstants.RELEASE) {
-            keyMapping.setDown(false)
-        }
-    }
-
-    private fun isShadowedMouseMapping(keyMapping: KeyMapping, button: Int): Boolean {
-        val key = InputConstants.Type.MOUSE.getOrCreate(button)
-        return KeyMappingAccessor.`superbwarfare$getMap`()[key] != keyMapping
     }
 
     @JvmStatic
@@ -370,7 +330,7 @@ object ClickEventHandler {
 
     fun onClientTick(mc: Minecraft) {
         val inactive = notInGame || mc.screen != null
-        val down = if (inactive) false else ModKeyMappings.TOGGLE_LIGHT.isDown
+        val down = if (inactive) false else ModKeyMappings.TOGGLE_LIGHT.isDown && Screen.hasControlDown()
 
         if (down) {
             if (!lightKeyDown) {
@@ -415,8 +375,6 @@ object ClickEventHandler {
 
         val key = keyCode
         if (key < 0) return false
-
-        syncModKeyConflictState(key, scanCode, action)
 
         if (player.isSpectator) return false
         if (player.hasEffect(ModMobEffects.SHOCK)) return false
@@ -666,7 +624,8 @@ object ClickEventHandler {
         return false
     }
 
-    private fun syncModKeyConflictState(key: Int, scanCode: Int, action: Int) {
+    @JvmStatic
+    fun syncModKeyConflictState(key: Int, scanCode: Int, action: Int) {
         if (action != GLFW.GLFW_PRESS && action != GLFW.GLFW_RELEASE) {
             return
         }
