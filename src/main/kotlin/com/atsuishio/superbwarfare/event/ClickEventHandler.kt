@@ -56,6 +56,12 @@ object ClickEventHandler {
     var useKeyHeld: Boolean = false
         private set
 
+    /** 手电/激光键的长按判定阈值（tick）。 */
+    private const val LIGHT_LONG_PRESS_TICKS = 9
+    private var lightKeyDown = false
+    private var lightPressTicks = 0
+    private var lightLongFired = false
+
     private fun isUseMouseButton(button: Int): Boolean =
         (ModKeyMappings.HOLD_ZOOM.key.type == InputConstants.Type.MOUSE
                 && ModKeyMappings.HOLD_ZOOM.key.value == button) ||
@@ -318,6 +324,40 @@ object ClickEventHandler {
     }
 
     @JvmStatic
+    fun onClientTick() {
+        val inactive = notInGame
+        val mapping = ModKeyMappings.TOGGLE_LIGHT
+        val key = mapping.key
+        // Vanilla only updates one mapping for each key, and towing shares Y by default.
+        val down = !inactive && Screen.hasControlDown() && !mapping.isUnbound && when (key.type) {
+            InputConstants.Type.KEYSYM -> InputConstants.isKeyDown(mc.window.window, key.value)
+            InputConstants.Type.MOUSE -> GLFW.glfwGetMouseButton(mc.window.window, key.value) == GLFW.GLFW_PRESS
+            InputConstants.Type.SCANCODE -> mapping.isDown
+        }
+
+        if (down) {
+            if (!lightKeyDown) {
+                lightPressTicks = 0
+                lightLongFired = false
+            }
+            lightPressTicks++
+            if (!lightLongFired && lightPressTicks >= LIGHT_LONG_PRESS_TICKS) {
+                if (FlashlightHandler.turnOffAllLocal()) {
+                    localPlayer?.playSound(ModSounds.CANNON_ZOOM_OUT, 1f, 1f)
+                }
+                lightLongFired = true
+            }
+        } else if (lightKeyDown && !lightLongFired && !inactive) {
+            if (FlashlightHandler.cycleAllLocal()) {
+                localPlayer?.playSound(ModSounds.CANNON_ZOOM_OUT, 1f, 1f)
+            }
+        }
+
+        lightKeyDown = down
+        if (!down) lightLongFired = false
+    }
+
+    @JvmStatic
     fun handleScopeThermalKey(player: Player): Boolean {
         if (!ScopeThermalRenderer.isAimingThermalScope(player.mainHandItem)) return false
 
@@ -379,12 +419,6 @@ object ClickEventHandler {
                     }
                 }
                 return true
-            }
-
-            if (ModKeyMappings.TOGGLE_LIGHT.matches(key, scanCode) && Screen.hasControlDown()) {
-                FlashlightHandler.toggleLocal()?.let {
-                    player.playSound(ModSounds.CANNON_ZOOM_OUT, 1f, 1f)
-                }
             }
 
             if (key == ModKeyMappings.DISMOUNT.key.value) {

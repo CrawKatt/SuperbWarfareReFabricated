@@ -99,6 +99,7 @@ public class SuperbWarfareFabricClient implements ClientModInitializer {
             Mod.tickClient();
             ClientEventHandler.handleClientTick();
             ClientMouseHandler.handleClientTick(client);
+            ClickEventHandler.onClientTick();
             KillMessageHandler.onClientTick();
             FuMO25ScreenHelper.onClientTick();
         });
