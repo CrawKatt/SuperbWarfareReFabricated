@@ -22,6 +22,7 @@ import com.atsuishio.superbwarfare.entity.projectile.FastProjectileManualTicker
 import com.atsuishio.superbwarfare.entity.projectile.FastThrowableProjectile
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.atsuishio.superbwarfare.entity.living.TargetEntity
+import com.atsuishio.superbwarfare.entity.vehicle.remote.RemoteControl
 import com.atsuishio.superbwarfare.event.CustomEventHandler
 import com.atsuishio.superbwarfare.event.GunEventHandler
 import com.atsuishio.superbwarfare.event.HitboxHelperEventHandler
@@ -124,6 +125,7 @@ class Mod : ModInitializer {
         ModDatapackRegistries.init()
         WelcomeProcedure.onCommonSetup()
 
+        RemoteControl.register()
         registerClientBedrockModels()
         triggerInit()
         callInits()

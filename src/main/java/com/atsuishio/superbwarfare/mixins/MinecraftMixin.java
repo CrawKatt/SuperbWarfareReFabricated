@@ -7,6 +7,7 @@ import com.atsuishio.superbwarfare.init.ModKeyMappings;
 import com.atsuishio.superbwarfare.event.custom.InteractionKeyMappingTriggeredCallback;
 import com.atsuishio.superbwarfare.event.custom.ClientLevelLifecycleCallback;
 import com.atsuishio.superbwarfare.event.custom.ScreenOpeningCallback;
+import com.atsuishio.superbwarfare.item.misc.MonitorItem;
 import com.atsuishio.superbwarfare.network.NetworkRegistry;
 import com.atsuishio.superbwarfare.network.message.send.ChangeVehicleSeatMessage;
 import com.atsuishio.superbwarfare.network.message.send.SwitchVehicleWeaponMessage;
@@ -83,7 +84,8 @@ public class MinecraftMixin {
 
         var seatIndex = vehicle.getSeatIndex(player);
 
-        if (vehicle.banHand(player)) {
+        boolean selectsMonitor = MonitorItem.isCarrierMonitor(player, player.getInventory().getItem(index));
+        if (vehicle.banHand(player) && !selectsMonitor) {
             ci.cancel();
             options.keyHotbarSlots[index].consumeClick();
 

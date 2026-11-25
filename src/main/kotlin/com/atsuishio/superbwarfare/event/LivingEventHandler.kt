@@ -20,6 +20,7 @@ import com.atsuishio.superbwarfare.entity.mixin.ExplosionAccess
 import com.atsuishio.superbwarfare.entity.projectile.PerkAwareProjectile
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.remote.RemoteControl
 import com.atsuishio.superbwarfare.event.custom.LivingDamageCallback
 import com.atsuishio.superbwarfare.event.custom.LivingHurtCallback
 import com.atsuishio.superbwarfare.event.custom.PreKillCallback
@@ -670,6 +671,7 @@ object LivingEventHandler {
 
     @JvmStatic
     fun onPickup(pickUp: ItemEntity, entity: Player): Boolean {
+        if (RemoteControl.isOperating(entity)) return false
         if (!VehicleConfig.VEHICLE_ITEM_PICKUP.get()) return true
         val vehicle = entity.vehicle as? VehicleEntity ?: return true
         if (!vehicle.level().isClientSide) {

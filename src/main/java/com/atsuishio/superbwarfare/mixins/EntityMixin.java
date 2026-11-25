@@ -2,11 +2,14 @@ package com.atsuishio.superbwarfare.mixins;
 
 import com.atsuishio.superbwarfare.entity.mixin.OBBHitter;
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity;
+import com.atsuishio.superbwarfare.entity.vehicle.remote.RCOperatorBodyEntity;
+import com.atsuishio.superbwarfare.entity.vehicle.remote.RemoteControl;
 import com.atsuishio.superbwarfare.event.DeployedWeaponHandler;
 import com.atsuishio.superbwarfare.item.gun.GunItem;
 import com.atsuishio.superbwarfare.item.gun.special.SuperStarShooterItem;
 import com.atsuishio.superbwarfare.tools.OBB;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -65,6 +68,23 @@ public abstract class EntityMixin implements OBBHitter {
 
     @Unique
     public OBB.Part sbw$currentHitPart;
+
+    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At("HEAD"), cancellable = true)
+    private void sbw$checkRemoteMount(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
+        if (!RemoteControl.canMount((Entity) (Object) this, vehicle)) cir.setReturnValue(false);
+    }
+
+    @Inject(method = "removeVehicle", at = @At("HEAD"))
+    private void sbw$updateRemoteAnchor(CallbackInfo ci) {
+        if ((Object) this instanceof RCOperatorBodyEntity body && this.getVehicle() instanceof VehicleEntity vehicle) {
+            RemoteControl.onDismount(body, vehicle);
+        }
+    }
+
+    @Inject(method = "changeDimension", at = @At("HEAD"), cancellable = true)
+    private void sbw$checkRemoteTravel(ServerLevel destination, CallbackInfoReturnable<Entity> cir) {
+        if (!RemoteControl.canTravel((Entity) (Object) this)) cir.setReturnValue(null);
+    }
 
     @Inject(method = "collide", at = @At("HEAD"))
     private void sbw$spoofGroundStart(Vec3 movement, CallbackInfoReturnable<Vec3> cir) {

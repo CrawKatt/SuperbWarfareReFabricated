@@ -13,12 +13,14 @@ import com.atsuishio.superbwarfare.entity.projectile.*
 import com.atsuishio.superbwarfare.entity.vehicle.*
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.entity.vehicle.remote.RCOperatorBodyEntity
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilder
 import net.minecraft.world.Difficulty
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityDimensions
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.entity.SpawnPlacements
@@ -458,6 +460,17 @@ object ModEntities {
         register("ah_6", vehicle().dimensions(EntityDimensions.scalable(2.25f, 2.175f)))
 
     @JvmField
+    val DRONE: EntityType<DroneEntity> =
+        register("drone", vehicle(::DroneEntity).dimensions(EntityDimensions.scalable(0.63f, 0.25f)))
+
+    @JvmField
+    val RC_OPERATOR_BODY: EntityType<RCOperatorBodyEntity> = register(
+        "rc_operator_body",
+        misc(::RCOperatorBodyEntity).dimensions(EntityDimensions.scalable(0.6f, 1.8f))
+            .trackRangeChunks(32).disableSaving().disableSummon()
+    )
+
+    @JvmField
     val MI_28: EntityType<VehicleEntity> =
         register("mi_28", vehicle().dimensions(EntityDimensions.scalable(3.375f, 3.375f)))
 
@@ -564,6 +577,7 @@ object ModEntities {
     fun registerAttributes() {
         FabricDefaultAttributeRegistry.register(TARGET, TargetEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(DPS_GENERATOR, DPSGeneratorEntity.createAttributes().build())
+        FabricDefaultAttributeRegistry.register(RC_OPERATOR_BODY, LivingEntity.createLivingAttributes().build())
         FabricDefaultAttributeRegistry.register(SENPAI, SenpaiEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(CREEPING_SENPAI, CreepingSenpaiEntity.createAttributes().build())
         FabricDefaultAttributeRegistry.register(STEEL_COIL, SteelCoilEntity.createAttributes().build())
