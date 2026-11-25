@@ -1,6 +1,9 @@
 package com.atsuishio.superbwarfare.perk.js
 
 import com.atsuishio.superbwarfare.entity.projectile.*
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.effect.MobEffectInstance
 import net.minecraft.world.entity.Entity
 
 class ProjectileProxy(private val entity: Entity) {
@@ -18,6 +21,15 @@ class ProjectileProxy(private val entity: Entity) {
 
     fun setRGB(r: Number, g: Number, b: Number) {
         projectile?.setRGB(floatArrayOf(r.toFloat(), g.toFloat(), b.toFloat()))
+    }
+
+    fun addEffect(effectId: String, duration: Int, amplifier: Int): Boolean {
+        val projectile = projectile ?: return false
+        if (duration <= 0) return false
+        val id = ResourceLocation.tryParse(effectId) ?: return false
+        val effect = BuiltInRegistries.MOB_EFFECT.getOptional(id).orElse(null) ?: return false
+        projectile.setEffects(listOf(MobEffectInstance(effect, duration, amplifier.coerceAtLeast(0))))
+        return true
     }
 
     fun beast() {
