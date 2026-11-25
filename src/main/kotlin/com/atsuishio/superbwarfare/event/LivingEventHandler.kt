@@ -128,8 +128,12 @@ object LivingEventHandler {
     @JvmStatic
     fun onEntityAttacked(entity: LivingEntity, source: DamageSource, amount: Float): Boolean {
         val vehicle = entity.vehicle
-        if (!source.`is`(ModDamageTypes.VEHICLE_EXPLOSION) && !source.`is`(ModDamageTypes.AIR_CRASH)
-            && vehicle is VehicleEntity
+        if (vehicle !is VehicleEntity
+            || !vehicle.canAbsorbPassengerDamage(entity)
+            || RemoteControl.isForwardingBodyDamage(entity)
+        ) return false
+        if (!source.`is`(ModDamageTypes.VEHICLE_EXPLOSION)
+            && !source.`is`(ModDamageTypes.AIR_CRASH)
             && vehicle.isEnclosed(entity)
         ) {
             if (!source.`is`(ModTags.DamageTypes.VEHICLE_NOT_ABSORB)) {
@@ -168,7 +172,10 @@ object LivingEventHandler {
 
     fun handleVehicleHurt(entity: LivingEntity, source: DamageSource, amount: Float): Float {
         val vehicle = entity.vehicle
-        if (vehicle is VehicleEntity) {
+        if (vehicle is VehicleEntity && vehicle.canAbsorbPassengerDamage(entity) && !RemoteControl.isForwardingBodyDamage(
+                entity
+            )
+        ) {
             if (source.`is`(ModTags.DamageTypes.VEHICLE_IGNORE)) return amount
 
             if (vehicle.isEnclosed(entity)) {
@@ -845,7 +852,12 @@ object LivingEventHandler {
 
                         val amount = damage.toFloat()
                         if (isCustom) {
-                            explosion.applyDamageWithPerks(entity, amount) { entity.hurt(explosion.damageSource, amount) }
+                            explosion.applyDamageWithPerks(entity, amount) {
+                                entity.hurt(
+                                    explosion.damageSource,
+                                    amount
+                                )
+                            }
                         } else {
                             entity.hurt(explosion.damageSource, amount)
                         }

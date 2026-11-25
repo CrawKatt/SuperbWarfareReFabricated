@@ -76,8 +76,9 @@ public abstract class EntityMixin implements OBBHitter {
 
     @Inject(method = "removeVehicle", at = @At("HEAD"))
     private void sbw$updateRemoteAnchor(CallbackInfo ci) {
-        if ((Object) this instanceof RCOperatorBodyEntity body && this.getVehicle() instanceof VehicleEntity vehicle) {
-            RemoteControl.onDismount(body, vehicle);
+        if ((Object) this instanceof RCOperatorBodyEntity body) {
+            Entity vehicle = this.getVehicle();
+            if (vehicle != null) RemoteControl.onDismount(body, vehicle);
         }
     }
 

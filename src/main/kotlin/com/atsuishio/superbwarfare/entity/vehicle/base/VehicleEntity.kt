@@ -723,6 +723,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     override fun remove(reason: RemovalReason) {
         if (!this.level().isClientSide) {
             ServerSyncedEntityHandler.unregister(this)
+            if (reason == RemovalReason.KILLED) mounts.dropAll()
         }
         if (!this.level().isClientSide && reason != RemovalReason.DISCARDED && reason != RemovalReason.UNLOADED_WITH_PLAYER) {
             for (i in 0 until inventory.slots) {
@@ -942,6 +943,10 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
      */
     open fun computed(): DefaultVehicleData = data().compute()
 
+    open val mounts: VehicleMounts by lazy { createMounts() }
+
+    open fun createMounts(): VehicleMounts = VehicleMounts(this)
+
     override fun maxUpStep() = computed().upStep
 
     override fun getFirstPassenger(): Entity? {
@@ -1070,6 +1075,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             define(LAST_DRIVER_UUID, "undefined")
             define(DOG_TAG_ICON, List(16) { List(16) { -1 } })
             define(GUN_DATA_MAP, mapOf())
+            define(MOUNT_STATE, CompoundTag())
 
             define(AI_TURRET_TARGET_UUID, "undefined")
             define(AI_PASSENGER_WEAPON_TARGET_UUID, "undefined")
@@ -1684,6 +1690,7 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     }
 
     override fun readAdditionalSaveData(compound: CompoundTag) {
+        entityData.set(MOUNT_STATE, compound.getCompound("MountState").copy())
         VehicleData.from(this).update()
         override = compound.getString("Override")
         skinId = compound.getString("SkinId")
@@ -1842,6 +1849,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     public override fun addAdditionalSaveData(compound: CompoundTag) {
         checkSeatsSize()
 
+        val mountState = entityData.get(MOUNT_STATE)
+        if (!mountState.isEmpty) compound.put("MountState", mountState.copy())
         compound.putFloat("Health", health)
 
         val overrideString = override
@@ -4309,6 +4318,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     }
 
     open fun destroy() {
+        val finishMountDestruction = mounts.beforeDestroy()
+        beforeVehicleDestruction()
         val driver = this.lastDriver
         if (this.locked && driver is Player) {
             driver.displayClientMessage(
@@ -4323,7 +4334,10 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         }
 
         VehicleDestroyUtils.destroy(this)
+        finishMountDestruction()
     }
+
+    open fun beforeVehicleDestruction() = Unit
 
     open fun vehicleExplosion(destroyInfo: DestroyInfo) {
         VehicleDestroyUtils.vehicleExplosion(this, destroyInfo)
@@ -4917,6 +4931,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         return isEnclosed(getSeatIndex(passenger))
     }
 
+    open fun canAbsorbPassengerDamage(passenger: Entity): Boolean = passenger !is RCOperatorBodyEntity
+
     /**
      * 是否禁用玩家手臂
      *
@@ -5213,6 +5229,8 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
     }
 
     override fun move(movementType: MoverType, movement: Vec3) {
+        val impactOrigin = if (!level().isClientSide && movementType == MoverType.SELF &&
+            !entityData.get(MOUNT_STATE).isEmpty) position() else null
         if (!this.level().isClientSide()) {
             ignoreEntityGroundCheckStepping = true
         }
@@ -5223,6 +5241,10 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
             super.move(movementType, movement)
         }
 
+        if (impactOrigin != null) {
+            mounts.onImpact(impactOrigin, movement)
+            if (isRemoved) return
+        }
         if (lastTickSpeed < 0.2 || collisionCoolDown > 0) return
         val driver = this.lastDriver
 
@@ -5951,6 +5973,10 @@ open class VehicleEntity(pEntityType: EntityType<*>, pLevel: Level) : Entity(pEn
         /** 正在牵引的实体UUID列表（支持多目标牵引） */
         @JvmField
         val TOWING_UUIDS: EntityDataAccessor<CompoundTag> =
+            SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.COMPOUND_TAG)
+
+        @JvmField
+        val MOUNT_STATE: EntityDataAccessor<CompoundTag> =
             SynchedEntityData.defineId(VehicleEntity::class.java, EntityDataSerializers.COMPOUND_TAG)
 
         /** 正在被牵引的载具UUID */
