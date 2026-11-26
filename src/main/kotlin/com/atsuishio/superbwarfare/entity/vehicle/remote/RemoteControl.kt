@@ -1,6 +1,7 @@
 package com.atsuishio.superbwarfare.entity.vehicle.remote
 
 import com.atsuishio.superbwarfare.Mod.Companion.loc
+import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.RCEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils
@@ -65,6 +66,9 @@ object RemoteControl {
     }
 
     fun register() {
+        ServerEntityEvents.ENTITY_LOAD.register { entity, _ ->
+            if (entity is DroneEntity) entity.initializeEnergy()
+        }
         ServerEntityEvents.ENTITY_UNLOAD.register { entity, _ ->
             if (entity is RCEntity) entity.onUnloaded()
         }
