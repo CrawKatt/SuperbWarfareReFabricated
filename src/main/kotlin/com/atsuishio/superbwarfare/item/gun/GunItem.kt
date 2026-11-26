@@ -35,6 +35,7 @@ import com.atsuishio.superbwarfare.item.ReequipAnimationHook
 import com.atsuishio.superbwarfare.item.gun.GunItem.Companion.HANDLING_WEIGHT_SCALE
 import com.atsuishio.superbwarfare.network.message.receive.ClientIndicatorMessage
 import com.atsuishio.superbwarfare.network.message.receive.GunMuzzleFxMessage
+import com.atsuishio.superbwarfare.network.message.receive.MountedGunSoundMessage
 import com.atsuishio.superbwarfare.perk.AutoAimHelper
 import com.atsuishio.superbwarfare.perk.Perk
 import com.atsuishio.superbwarfare.resource.gun.GunResource
@@ -507,7 +508,6 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
     open fun resolveFire1PSounds(data: GunData, stack: ItemStack): List<LocalSound> {
         val sounds = ArrayList<LocalSound>(3)
 
-        val soundInfo = data.get(GunProp.SOUND_INFO)
         val pitch = if (data.heat.get() <= 75) 1f else (1 - 0.02 * Math.abs(75 - data.heat.get())).toFloat()
 
         if (data.perk.get(Perk.Type.AMMO) === ModPerks.BEAST_BULLET) {
@@ -515,11 +515,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         }
 
         val isSilent = data.isBarrelSilenced()
-        val fire1p = when {
-            isSilent -> soundInfo.fire1PSilent
-            isShatterShot(data) -> soundInfo.fire1PShatter ?: soundInfo.fire1P
-            else -> soundInfo.fire1P
-        }
+        val fire1p = resolveFire1PSound(data, data.get(GunProp.SOUND_INFO), isSilent)
         val volumeMultiplier = getCustomSoundRadius(data).coerceAtLeast(1.0)
 
         if (fire1p != null) {
@@ -541,6 +537,12 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
         }
 
         return sounds
+    }
+
+    protected open fun resolveFire1PSound(data: GunData, soundInfo: SoundInfo, isSilent: Boolean): SoundEvent? = when {
+        isSilent -> soundInfo.fire1PSilent
+        isShatterShot(data) -> soundInfo.fire1PShatter ?: soundInfo.fire1P
+        else -> soundInfo.fire1P
     }
 
     /**
@@ -796,7 +798,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             if (!shootBullet(parameters.copy(shootDirection = spreadDirections[index]))) return
         }
 
-        if (shooter is LivingEntity && parameters.ammoSupplier === shooter && shooter.mainHandItem.item is GunItem) {
+        if (!parameters.mounted && shooter is LivingEntity && parameters.ammoSupplier === shooter && shooter.mainHandItem.item is GunItem) {
             shooter.sendPacketToTrackingThis(GunMuzzleFxMessage(shooter.id, data.id, ActiveGun.isSubWeapon(data)))
         }
 
@@ -824,7 +826,7 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             }
         }
 
-        playFireSounds(data, shooter, zoom)
+        if (parameters.mounted) playMountedFireSounds(parameters) else playFireSounds(data, shooter, zoom)
 
         // 开火后事件
         data.item.afterShoot(parameters)
@@ -845,12 +847,24 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
      */
     open fun playFireSounds(data: GunData, shooter: Entity?, zoom: Boolean) {
         if (shooter == null) return
+        playFireSoundsAt(data, shooter, shooter.position(), false)
+    }
+
+    open fun playMountedFireSounds(parameters: ShootParameters) {
+        val shooter = parameters.shooter ?: return
+        playFireSoundsAt(parameters.data, shooter, parameters.shootPosition, true)
+    }
+
+    private fun playFireSoundsAt(data: GunData, shooter: Entity, soundPos: Vec3, mounted: Boolean) {
+        val serverLevel = shooter.level() as? ServerLevel ?: return
 
         val pitch = if (data.heat.get() <= 75) 1f else (1 - 0.02 * Math.abs(75 - data.heat.get())).toFloat()
 
         val perk = data.perk.get(Perk.Type.AMMO)
         if (perk === ModPerks.BEAST_BULLET) {
-            shooter.playSound(ModSounds.HENG, 4f, pitch)
+            val sound = ModSounds.HENG
+            if (mounted) serverLevel.playSound(null, soundPos.x, soundPos.y, soundPos.z, sound, SoundSource.PLAYERS, 4f, pitch)
+            else shooter.playSound(sound, 4f, pitch)
         }
 
         val soundRadius = data.get(GunProp.SOUND_RADIUS).toFloat()
@@ -863,14 +877,35 @@ abstract class GunItem(properties: Properties) : Item(properties.stacksTo(1)), I
             else -> soundInfo.fire3P
         }
 
-        val serverLevel = shooter.level() as? ServerLevel ?: return
-        val soundPos = shooter.position()
         val excludeShooter = shooter as? ServerPlayer
+        val thirdPersonVolume = soundRadius * 0.4f
 
         if (sound3p != null) {
-            SoundTool.playDistantSound(
-                serverLevel, sound3p, soundPos, soundRadius * 0.4f, pitch, shooter, excludeShooter
-            )
+            if (mounted) {
+                serverLevel.playSound(
+                    excludeShooter, soundPos.x, soundPos.y, soundPos.z, sound3p, SoundSource.PLAYERS, thirdPersonVolume, pitch
+                )
+            } else {
+                SoundTool.playDistantSound(serverLevel, sound3p, soundPos, thirdPersonVolume, pitch, shooter, excludeShooter)
+            }
+        }
+
+        if (mounted && excludeShooter != null) {
+            val sound1p = resolveFire1PSound(data, soundInfo, isSilent)
+            if (sound1p != null || sound3p != null) {
+                sendPacketTo(
+                    excludeShooter,
+                    MountedGunSoundMessage(
+                        shooter.vehicle?.id ?: -1,
+                        soundPos,
+                        sound1p?.location,
+                        sound3p?.location,
+                        0.5f * getCustomSoundRadius(data).coerceAtLeast(1.0).toFloat(),
+                        thirdPersonVolume,
+                        pitch,
+                    )
+                )
+            }
         }
 
         if (!isSilent) {
