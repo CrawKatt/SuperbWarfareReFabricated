@@ -5,6 +5,7 @@ import com.atsuishio.superbwarfare.entity.vehicle.DroneEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.RCEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.utils.VehicleVecUtils
+import com.atsuishio.superbwarfare.event.custom.EntitySectionChangeCallback
 import com.atsuishio.superbwarfare.event.custom.LivingAttackCallback
 import com.atsuishio.superbwarfare.init.ModEntities
 import com.atsuishio.superbwarfare.item.misc.MonitorItem
@@ -23,6 +24,7 @@ import net.fabricmc.fabric.api.event.player.UseEntityCallback
 import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.minecraft.core.BlockPos
+import net.minecraft.core.SectionPos
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
@@ -33,6 +35,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.server.level.TicketType
 import net.minecraft.tags.DamageTypeTags
+import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.InteractionResultHolder
 import net.minecraft.world.damagesource.DamageSource
@@ -48,8 +51,28 @@ object RemoteControl {
     // A region distance of 2 applies level 31 to the anchor chunk, so its entities tick.
     private const val ANCHOR_DISTANCE = 2
     private val anchorTicket = TicketType.create("superbwarfare_remote_anchor", Comparator.naturalOrder<UUID>())
+    // Level 33 loads and tracks saved entities without requiring entity ticking.
+    private const val CONNECTION_DISTANCE = 0
+    private const val CONNECTION_TIMEOUT = 200
+    private const val CONNECTION_HANDOFF_TICKS = 2
+    private const val MAX_CONNECTIONS = 8
+    private val connectionTicket = TicketType.create(
+        "superbwarfare_remote_connection", Comparator.naturalOrder<UUID>(), CONNECTION_TIMEOUT + CONNECTION_HANDOFF_TICKS
+    )
+    private val pendingConnections = mutableMapOf<UUID, PendingConnection>()
     private val sessions = mutableMapOf<UUID, Session>()
     private val forwardingBodyDamage = mutableMapOf<ServerPlayer, DamageSource>()
+
+    private class PendingConnection(
+        val player: ServerPlayer,
+        val hand: InteractionHand,
+        val vehicleId: UUID,
+        val chunk: ChunkPos,
+    ) {
+        val level: ServerLevel = player.serverLevel()
+        val deadline = player.server.tickCount + CONNECTION_TIMEOUT
+        var releaseAt: Int? = null
+    }
 
     private class Session(
         val player: ServerPlayer,
@@ -66,14 +89,17 @@ object RemoteControl {
     }
 
     fun register() {
-        ServerEntityEvents.ENTITY_LOAD.register { entity, _ ->
+        ServerEntityEvents.ENTITY_LOAD.register { entity, level ->
+            if (entity is RCEntity) RemoteBindingData.get(level.server).recordVehicleLocation(entity)
             if (entity is DroneEntity) entity.initializeEnergy()
         }
         ServerEntityEvents.ENTITY_UNLOAD.register { entity, _ ->
             if (entity is RCEntity) entity.onUnloaded()
         }
+        EntitySectionChangeCallback.EVENT.register(::onEnteringSection)
         ServerTickEvents.END_SERVER_TICK.register(::onServerTick)
         ServerLifecycleEvents.SERVER_STOPPING.register { server ->
+            pendingConnections.values.filter { it.level.server === server }.forEach(::releaseConnection)
             sessions.values.filter { it.player.server === server }.forEach { endSession(it.player) }
         }
         ServerPlayConnectionEvents.JOIN.register { handler, _, server ->
@@ -81,7 +107,10 @@ object RemoteControl {
             restoreReturn(player)
             RemoteBindingData.get(server).syncTo(player)
         }
-        ServerPlayConnectionEvents.DISCONNECT.register { handler, _ -> endSession(handler.player) }
+        ServerPlayConnectionEvents.DISCONNECT.register { handler, _ ->
+            cancelConnection(handler.player)
+            endSession(handler.player)
+        }
 
         LivingAttackCallback.EVENT.register { entity, source, _ ->
             !isOperating(entity) || forwardingBodyDamage[entity] === source || source.`is`(DamageTypeTags.BYPASSES_INVULNERABILITY)
@@ -89,8 +118,11 @@ object RemoteControl {
         val remoteDeathPhase = loc("remote_operator_death")
         ServerLivingEntityEvents.ALLOW_DEATH.addPhaseOrdering(Event.DEFAULT_PHASE, remoteDeathPhase)
         ServerLivingEntityEvents.ALLOW_DEATH.register(remoteDeathPhase) { entity, source, _ ->
-            if (entity is ServerPlayer && forwardingBodyDamage[entity] === source && isOperating(entity)) {
-                endSession(entity, true)
+            if (entity is ServerPlayer) {
+                cancelConnection(entity)
+                if (forwardingBodyDamage[entity] === source && isOperating(entity)) {
+                    endSession(entity, true)
+                }
             }
             true
         }
@@ -112,12 +144,117 @@ object RemoteControl {
     }
 
     @JvmStatic
+    fun connect(player: ServerPlayer, hand: InteractionHand) {
+        if (player.getItemInHand(hand).item !is MonitorItem) return
+        val bindings = RemoteBindingData.get(player.server)
+        val vehicleId = bindings.getVehicle(player.uuid)
+        if (vehicleId == null) {
+            showConnectionMessage(player, "needs_binding")
+            return
+        }
+        if (!canBeginSession(player)) {
+            showConnectionMessage(player, "denied")
+            return
+        }
+        val level = player.serverLevel()
+        val pending = pendingConnections[player.uuid]
+        if (pending != null) {
+            if (pending.player === player && pending.level === level && pending.vehicleId == vehicleId &&
+                player.getItemInHand(pending.hand).item is MonitorItem
+            ) return
+            releaseConnection(pending)
+        }
+
+        val vehicle = level.getEntity(vehicleId) as? RCEntity
+        if (vehicle != null) {
+            if (!startSession(player, vehicle)) showConnectionMessage(player, "denied")
+            return
+        }
+
+        val location = bindings.getVehicleLocation(vehicleId)
+        if (location == null || location.dimension != level.dimension().location()) {
+            showConnectionMessage(player, "unavailable")
+            return
+        }
+        if (pendingConnections.values.count { it.level.server === player.server } >= MAX_CONNECTIONS) {
+            showConnectionMessage(player, "connection_busy")
+            return
+        }
+
+        val connection = PendingConnection(player, hand, vehicleId, location.chunk)
+        level.chunkSource.addRegionTicket(connectionTicket, connection.chunk, CONNECTION_DISTANCE, player.uuid)
+        pendingConnections[player.uuid] = connection
+        showConnectionMessage(player, "connecting")
+    }
+
+    @JvmStatic
+    fun cancelConnection(player: ServerPlayer) {
+        val connection = pendingConnections[player.uuid] ?: return
+        if (connection.player === player) releaseConnection(connection)
+    }
+
+    private fun releaseConnection(connection: PendingConnection) {
+        val key = connection.player.uuid
+        if (pendingConnections.remove(key, connection)) {
+            connection.level.chunkSource.removeRegionTicket(connectionTicket, connection.chunk, CONNECTION_DISTANCE, key)
+        }
+    }
+
+    private fun showConnectionMessage(player: ServerPlayer, message: String) {
+        player.displayClientMessage(Component.translatable("tips.superbwarfare.monitor.$message"), true)
+    }
+
+    private fun tickConnection(connection: PendingConnection) {
+        val player = connection.player
+        val level = connection.level
+        val tick = level.server.tickCount
+        val releaseAt = connection.releaseAt
+        if (releaseAt != null) {
+            if (tick - releaseAt >= 0) releaseConnection(connection)
+            return
+        }
+
+        if (level.server.playerList.getPlayer(player.uuid) !== player || player.serverLevel() !== level ||
+            player.getItemInHand(connection.hand).item !is MonitorItem || !canBeginSession(player) ||
+            RemoteBindingData.get(level.server).getVehicle(player.uuid) != connection.vehicleId
+        ) {
+            releaseConnection(connection)
+            return
+        }
+
+        val source = level.chunkSource
+        val vehicle = level.getEntity(connection.vehicleId) as? RCEntity
+        val targetChunk = vehicle?.chunkPosition() ?: connection.chunk
+        if (vehicle != null && source.getChunkNow(targetChunk.x, targetChunk.z) != null) {
+            try {
+                if (startSession(player, vehicle)) {
+                    // Register the new player position before releasing the temporary ticket.
+                    source.move(player)
+                    connection.releaseAt = tick + CONNECTION_HANDOFF_TICKS
+                } else {
+                    showConnectionMessage(player, "denied")
+                }
+            } finally {
+                if (connection.releaseAt == null) releaseConnection(connection)
+            }
+        } else if (tick - connection.deadline >= 0 ||
+            vehicle == null && level.areEntitiesLoaded(connection.chunk.toLong()) &&
+            source.getChunkNow(connection.chunk.x, connection.chunk.z) != null
+        ) {
+            releaseConnection(connection)
+            showConnectionMessage(player, "unavailable")
+        }
+    }
+
+    private fun canBeginSession(player: ServerPlayer): Boolean =
+        player !is FakePlayer && player.isAlive && !player.isSpectator && !player.isSleeping &&
+            player.containerMenu === player.inventoryMenu && player.uuid !in sessions &&
+            !player.persistentData.contains(RETURN_DATA)
+
+    @JvmStatic
     fun startSession(player: ServerPlayer, vehicle: RCEntity): Boolean {
-        if (player is FakePlayer || !player.isAlive || player.isSpectator ||
-            player.isSleeping || player.level() !== vehicle.level() ||
-            player.containerMenu !== player.inventoryMenu || sessions.containsKey(player.uuid) ||
-            sessions.values.any { it.vehicle === vehicle } ||
-            player.persistentData.contains(RETURN_DATA) || !vehicle.canStartRemoteControl(player)
+        if (!canBeginSession(player) || player.level() !== vehicle.level() ||
+            sessions.values.any { it.vehicle === vehicle } || !vehicle.canStartRemoteControl(player)
         ) return false
 
         val level = player.serverLevel()
@@ -206,6 +343,7 @@ object RemoteControl {
             if (player.isAlive || returnOnDeath) restoreReturn(player, !returnOnDeath && (session.mounting || bodyInSeat))
             else player.persistentData.remove(RETURN_DATA)
         } finally {
+            cancelConnection(player)
             sessions.remove(player.uuid)
             session.body.discard()
             session.anchorLevel.chunkSource.removeRegionTicket(anchorTicket, session.chunk, ANCHOR_DISTANCE, player.uuid)
@@ -366,6 +504,9 @@ object RemoteControl {
     }
 
     private fun onServerTick(server: MinecraftServer) {
+        for (connection in pendingConnections.values.toList()) {
+            if (connection.level.server === server) tickConnection(connection)
+        }
         for (session in sessions.values.toList()) {
             val player = session.player
             if (player.server !== server || session.mounting || session.ending) continue
@@ -379,6 +520,14 @@ object RemoteControl {
                 updateAnchor(session)
             }
         }
+    }
+
+    private fun onEnteringSection(entity: Entity, oldSection: Long, newSection: Long) {
+        val vehicle = entity as? RCEntity ?: return
+        val level = vehicle.level() as? ServerLevel ?: return
+        if (SectionPos.x(oldSection) != SectionPos.x(newSection) ||
+            SectionPos.z(oldSection) != SectionPos.z(newSection)
+        ) RemoteBindingData.get(level.server).recordVehicleLocation(vehicle)
     }
 
     @JvmStatic
