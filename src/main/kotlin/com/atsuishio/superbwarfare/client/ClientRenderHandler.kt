@@ -18,6 +18,7 @@ import com.atsuishio.superbwarfare.client.overlay.*
 import com.atsuishio.superbwarfare.client.overlay.weapon.AircraftHud
 import com.atsuishio.superbwarfare.client.overlay.weapon.HelicopterHud
 import com.atsuishio.superbwarfare.client.overlay.weapon.OldAircraftHud
+import com.atsuishio.superbwarfare.client.renderer.ModRenderTypes
 import com.atsuishio.superbwarfare.client.renderer.block.BlueprintResearchTableBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.BoobyTrapBlockEntityRenderer
 import com.atsuishio.superbwarfare.client.renderer.block.ChargingStationBlockEntityRenderer
@@ -143,6 +144,7 @@ object ClientRenderHandler {
         ReforgingGravityBallRenderer.registerLensingShader(event)
         GunMuzzleLightRenderer.onRegisterShaders(event)
         NuclearExplosionRenderer.registerShader(event)
+        ModRenderTypes.registerSwordWaveShader(event)
     }
 
     /** [bulletRenderOffset] 的采样时刻（`System.nanoTime()`），超过 [OFFSET_TTL] 就当它过期 */
