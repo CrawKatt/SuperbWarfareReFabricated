@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.capability.api.InvWrapper
 import com.atsuishio.superbwarfare.capability.api.PlayerInvWrapper
 import com.atsuishio.superbwarfare.capability.api.SidedInvWrapper
 import com.atsuishio.superbwarfare.capability.energy.ItemEnergyStorage
+import com.atsuishio.superbwarfare.compat.touhou.MaidInventoryCompat
 import com.atsuishio.superbwarfare.entity.living.DPSGeneratorEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.item.EnergyStorageItem
@@ -20,6 +21,7 @@ import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
 import net.fabricmc.fabric.api.lookup.v1.entity.EntityApiLookup
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.core.Direction
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.entity.player.Player
@@ -51,6 +53,9 @@ object ModCapabilities {
         registerItemHandlers()
         registerEnergyItems()
         registerEntityHandlers()
+        if (FabricLoader.getInstance().isModLoaded("touhou_little_maid")) {
+            MaidInventoryCompat.register()
+        }
     }
 
     private fun registerEnergyBlocks() {
