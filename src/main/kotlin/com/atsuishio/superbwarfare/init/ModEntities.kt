@@ -464,6 +464,10 @@ object ModEntities {
         register("drone", vehicle(::DroneEntity).dimensions(EntityDimensions.scalable(0.63f, 0.25f)))
 
     @JvmField
+    val FPV_DRONE: EntityType<FpvDroneEntity> =
+        register("fpv_drone", vehicle(::FpvDroneEntity).dimensions(EntityDimensions.scalable(0.63f, 0.25f)))
+
+    @JvmField
     val RC_OPERATOR_BODY: EntityType<RCOperatorBodyEntity> = register(
         "rc_operator_body",
         misc(::RCOperatorBodyEntity).dimensions(EntityDimensions.scalable(0.6f, 1.8f))

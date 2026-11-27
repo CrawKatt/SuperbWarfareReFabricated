@@ -26,6 +26,7 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.TARGET, ::TargetRenderer)
         EntityRendererRegistry.register(ModEntities.RC_OPERATOR_BODY, ::RCOperatorBodyRenderer)
         EntityRendererRegistry.register(ModEntities.DRONE, ::DroneRenderer)
+        EntityRendererRegistry.register(ModEntities.FPV_DRONE, ::FpvDroneRenderer)
         EntityRendererRegistry.register(ModEntities.DPS_GENERATOR, ::DPSGeneratorRenderer)
         EntityRendererRegistry.register(ModEntities.RPG_ROCKET_TBG, ::BasicProjectileRenderer)
         EntityRendererRegistry.register(ModEntities.RPG_ROCKET_STANDARD, ::BasicProjectileRenderer)
