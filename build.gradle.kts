@@ -177,6 +177,7 @@ dependencies {
     runtimeOnly("com.github.FiguraMC.luaj:luaj-core:3.0.8-figura")
     runtimeOnly("com.github.FiguraMC.luaj:luaj-jse:3.0.8-figura")
     runtimeOnly("org.apache.bcel:bcel:6.6.1")
+    modCompileOnly("maven.modrinth:touhoulittlemaid-orihime:0.8.3-neo1.5.3+mc1.21.1")
     modRuntimeOnly("maven.modrinth:touhoulittlemaid-orihime:0.8.3-neo1.5.3+mc1.21.1")
     runtimeOnly("org.openjdk.nashorn:nashorn-core:15.4")
 
