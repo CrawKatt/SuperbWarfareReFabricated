@@ -22,6 +22,9 @@ object ModParticleRenderTypes {
 
     private var softParticleShader: ShaderInstance? = null
 
+    @JvmStatic
+    fun softShader(): ShaderInstance? = softParticleShader
+
     /**
      * Registers the custom particle shader via Fabric's core shader registration.
      * The shader does NOT use alpha cutoff (discard), enabling smooth soft-edged
@@ -63,7 +66,12 @@ object ModParticleRenderTypes {
     val PARTICLE_SHEET_SOFT_TRANSLUCENT: ParticleRenderType = softTranslucent(TextureAtlas.LOCATION_PARTICLES)
 
     /** The same soft alpha pipeline for particles using a standalone texture or flipbook. */
-    fun softTranslucent(texture: ResourceLocation): ParticleRenderType = object : ParticleRenderType {
+    fun softTranslucent(texture: ResourceLocation): ParticleRenderType = SoftTranslucent(texture)
+
+    @JvmStatic
+    fun isSoftTranslucent(type: ParticleRenderType): Boolean = type is SoftTranslucent
+
+    private class SoftTranslucent(private val texture: ResourceLocation) : ParticleRenderType {
 
         override fun begin(builder: BufferBuilder, textureManager: TextureManager) {
             // Match vanilla PARTICLE_SHEET_TRANSLUCENT call order exactly —
