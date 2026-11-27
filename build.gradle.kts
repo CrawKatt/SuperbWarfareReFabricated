@@ -227,6 +227,7 @@ dependencies {
     // Built from Sh1roCu/SimpleBedrockModel-Fabric@926992e (the upstream JitPack build is broken).
     include(modImplementation(":simplebedrockmodel-fabric:2.5.1+mc1.20.1-sbw1")!!)
 
+    modCompileOnly("maven.modrinth:touhoulittlemaid-orihime:0.6.2-forge1.5.0")
     modRuntimeOnly("maven.modrinth:touhoulittlemaid-orihime:0.6.2-forge1.5.0")
     modRuntimeOnly("io.github.fabricators_of_create.Porting-Lib:base:2.3.8+1.20.1")
     runtimeOnly("org.openjdk.nashorn:nashorn-core:15.4")
