@@ -453,8 +453,8 @@ object ModEntities {
 
     // Aircraft
     @JvmField
-    val TOM_6: EntityType<Tom6Entity> =
-        register("tom_6", vehicle(::Tom6Entity).dimensions(EntityDimensions.scalable(1.05f, 1.0f)))
+    val TOM_6: EntityType<VehicleEntity> =
+        register("tom_6", vehicle().dimensions(EntityDimensions.scalable(1.05f, 1.0f)))
 
     @JvmField
     val AH_6: EntityType<VehicleEntity> =
@@ -556,10 +556,7 @@ object ModEntities {
         EntityType.EntityFactory { type, level -> entity(type, level) }
     )
 
-    private fun vehicle(): FabricEntityTypeBuilder<VehicleEntity> = misc(::VehicleEntity)
-        .trackRangeChunks(512)
-        .trackedUpdateRate(1)
-        .fireImmune()
+    internal fun vehicle(): FabricEntityTypeBuilder<VehicleEntity> = vehicle(::VehicleEntity)
 
     private fun <T : Entity> vehicle(
         entity: (EntityType<T>, Level) -> T

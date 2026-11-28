@@ -357,6 +357,9 @@ class Mod : ModInitializer {
             return ResourceLocation(MODID, path)
         }
 
+        @JvmStatic
+        fun rl(namespace: String, path: String): ResourceLocation = ResourceLocation(namespace, path)
+
         private var serverInstance: MinecraftServer? = null
         private val SERVER_QUEUE = ConcurrentLinkedQueue<Task>()
         private val CLIENT_QUEUE = ConcurrentLinkedQueue<Task>()

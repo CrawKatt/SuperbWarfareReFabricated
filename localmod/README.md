@@ -1,6 +1,6 @@
 # localmod/ — accesorio de prueba del loader
 
-`sbwloadertest` es un mod Fabric de prueba que declara objetos, armas y accesorios
+`sbwloadertest` es un mod Fabric de prueba que declara objetos, armas, accesorios y vehículos
 en `META-INF/sbw/registry.json`; Superb Warfare los descubre y registra.
 Incluye dos clases anotadas con `@TestLoaderTarget`: una Java y una Kotlin.
 
@@ -66,8 +66,9 @@ Durante el arranque deberían aparecer:
 ```text
 [sbw-loader] loaded entrypoint com.sbwloadertest.LoaderTargetClass (mod=sbwloadertest)
 [sbw-loader] loaded entrypoint com.sbwloadertest.LoaderTargetKClass (mod=sbwloadertest)
-[sbw-loader] discovered plugin sbwloadertest: 1 item(s), 1 gun(s), 1 attachment(s), 2 entrypoint class(es)
+[sbw-loader] discovered plugin sbwloadertest: 1 item(s), 1 gun(s), 1 attachment(s), 1 vehicle(s), 2 entrypoint class(es)
 [sbw-loader] registered sbwloadertest:test (declared by mod sbwloadertest)
+[sbw-loader] registered vehicle sbwloadertest:tom_7 (declared by mod sbwloadertest)
 ```
 
 El objeto se puede obtener con `/give @s sbwloadertest:test` o mediante la
@@ -92,6 +93,9 @@ locales:
       "Rarity": "superb",
       "ItemTabs": ["superbwarfare:attachment"]
     }
+  },
+  "Vehicles": {
+    "tom_7": { "Width": 1.05, "Height": 1.0, "CreativeContainer": true }
   }
 }
 ```
@@ -107,8 +111,12 @@ Campos admitidos por esta versión:
 | `<grupo>.<id>.FireResistant` | no | `false` |
 | `<grupo>.<id>.Durability` | no | ninguno |
 | `<grupo>.<id>.ItemTabs` | no | `[]` |
+| `Vehicles` | no | `{}` |
+| `Vehicles.<id>.Width` | sí | ninguno |
+| `Vehicles.<id>.Height` | sí | ninguno |
+| `Vehicles.<id>.CreativeContainer` | no | `false` |
 
-Los tres grupos son opcionales y crean `Item`, `GeoGunItem` y `BasicAttachmentItem`,
+Los tres grupos de ítems son opcionales y crean `Item`, `GeoGunItem` y `BasicAttachmentItem`,
 respectivamente. Las rarezas admitidas son `common`, `uncommon`, `rare`, `epic`,
 `legendary`, `superb`, `virtual` y `beast`.
 
@@ -119,11 +127,24 @@ no impide registrar el objeto, pero no lo añade a ninguna pestaña. Solo se añ
 a las pestañas las declaraciones que se hayan registrado correctamente.
 
 Los ids no pueden contener `:` y deben ser rutas válidas de Minecraft. No se
-puede repetir el mismo id entre grupos. Se conserva el orden de declaración y se
+puede repetir el mismo id entre los grupos de ítems. Se conserva el orden de declaración y se
 ignoran los campos desconocidos. El manifiesto solo se lee del mod, nunca de un
 datapack. Un manifest inválido detiene el arranque; una clase de entrada que no pueda
 instanciarse se registra y se omite. Si el mod propietario ya registró el
 mismo objeto, el loader no lo reemplaza.
+
+## Vehículos de otros mods
+
+Cada entrada de `Vehicles` registra un tipo de vehículo y su renderer genérico bajo
+el namespace del mod que la declara. `Width` y `Height` deben ser números finitos
+mayores que cero. `CreativeContainer` añade su caja a la lista de vehículos del
+modo creativo si está activado. La mecánica y el aspecto se definen mediante los
+datos y recursos del vehículo.
+
+`sbwloadertest:tom_7` usa `data/sbwloadertest/sbw/vehicles/tom_7.json` para sus datos
+y `assets/sbwloadertest/sbw/vehicles/tom_7.json` para el modelo, la textura y el
+script. Puedes generarlo con `/summon sbwloadertest:tom_7`. Los cambios al registro
+requieren reiniciar el cliente o el servidor.
 
 ## Accesorios de otros mods
 

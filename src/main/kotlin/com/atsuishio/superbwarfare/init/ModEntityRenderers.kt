@@ -7,6 +7,10 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 object ModEntityRenderers {
     @JvmStatic
     fun init() {
+        TestLoader.registeredVehicles.forEach { type ->
+            EntityRendererRegistry.register(type, ::BasicVehicleRenderer)
+        }
+
         EntityRendererRegistry.register(ModEntities.REFORGING_LASER, ::ReforgingLaserRenderer)
         EntityRendererRegistry.register(ModEntities.HIGH_ENERGY_LASER, ::HighEnergyLaserRenderer)
         EntityRendererRegistry.register(ModEntities.REFORGING_GRAVITY_BALL, ::ReforgingGravityBallRenderer)
@@ -61,7 +65,7 @@ object ModEntityRenderers {
         EntityRendererRegistry.register(ModEntities.SMOKE_DECOY, ::SmokeDecoyEntityRenderer)
         EntityRendererRegistry.register(ModEntities.LAV_150, ::BasicVehicleRenderer)
         EntityRendererRegistry.register(ModEntities.SMALL_CANNON_SHELL, ::SmallCannonShellEntityRenderer)
-        EntityRendererRegistry.register(ModEntities.TOM_6, ::Tom6Renderer)
+        EntityRendererRegistry.register(ModEntities.TOM_6, ::BasicVehicleRenderer)
         EntityRendererRegistry.register(ModEntities.MELON_BOMB, ::MelonBombEntityRenderer)
         EntityRendererRegistry.register(ModEntities.BMP_2, ::Bmp2Renderer)
         EntityRendererRegistry.register(ModEntities.WIRE_GUIDE_MISSILE, ::BasicProjectileRenderer)

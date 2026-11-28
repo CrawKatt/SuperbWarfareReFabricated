@@ -1,6 +1,8 @@
 package com.atsuishio.superbwarfare.init
 
 import com.atsuishio.superbwarfare.Mod
+import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
+import com.atsuishio.superbwarfare.event.custom.RegisterContainersCallback
 import com.atsuishio.superbwarfare.init.TestLoader.parseManifest
 import com.atsuishio.superbwarfare.item.attachment.BasicAttachmentItem
 import com.atsuishio.superbwarfare.item.gun.GeoGunItem
@@ -13,6 +15,8 @@ import net.fabricmc.loader.api.ModContainer
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.entity.EntityDimensions
+import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Rarity
 import org.objectweb.asm.AnnotationVisitor
@@ -34,6 +38,18 @@ data class LoaderInfo(
     val guns: Map<String, ItemRegisterInfo> = emptyMap(),
     @SerialName("Attachments")
     val attachments: Map<String, ItemRegisterInfo> = emptyMap(),
+    @SerialName("Vehicles")
+    val vehicles: Map<String, VehicleRegisterInfo> = emptyMap(),
+)
+
+@Serializable
+data class VehicleRegisterInfo(
+    @SerialName("Width")
+    val width: Float,
+    @SerialName("Height")
+    val height: Float,
+    @SerialName("CreativeContainer")
+    val creativeContainer: Boolean = false,
 )
 
 @Serializable
@@ -56,7 +72,7 @@ data class ItemRegisterInfo(
  * 当前行为：
  *  1. 遍历所有 Fabric mod，读取 `META-INF/sbw/registry.json`；
  *  2. 扫描 mod 的 class roots，找出被 [TestLoaderTarget] 标注的类并加载它们；
- *  3. 以「描述文件所属 mod id」为命名空间注册物品。
+ *  3. 以「描述文件所属 mod id」为命名空间注册物品和载具。
  *
  * 协议与设计约定见 `localmod/README.md`。跑通后再决定是否迁到独立的 plugin 包。
  *
@@ -91,11 +107,17 @@ object TestLoader {
         )
     }
 
-    /** 命名空间 -> 该 mod 声明的物品。命名空间由 [ModContainer] 推导，不从 JSON 读。 */
+    /** 命名空间 -> 该 mod 的注册声明。命名空间由 [ModContainer] 推导，不从 JSON 读。 */
     private val manifests = linkedMapOf<String, LoaderInfo>()
 
     /** Only successfully registered declarations contribute entries to creative tabs. */
     private val tabItems = linkedMapOf<ResourceLocation, MutableList<Item>>()
+
+    private val vehicles = mutableListOf<EntityType<VehicleEntity>>()
+    internal val registeredVehicles: List<EntityType<VehicleEntity>>
+        get() = vehicles
+
+    private val creativeContainers = mutableListOf<EntityType<VehicleEntity>>()
 
     /** 被 [TestLoaderTarget] 标注、且成功实例化的入口类，便于后续扩展时取用。 */
     @JvmField
@@ -104,8 +126,14 @@ object TestLoader {
     fun register() {
         discover()
         registerItems()
+        for ((namespace, info) in manifests) {
+            registerVehicles(namespace, info.vehicles)
+        }
         ItemGroupEvents.MODIFY_ENTRIES_ALL.register { tab, entries ->
             tabItems[BuiltInRegistries.CREATIVE_MODE_TAB.getKey(tab)]?.forEach { entries.accept(it) }
+        }
+        RegisterContainersCallback.EVENT.register { event ->
+            creativeContainers.forEach { event.add(it) }
         }
     }
 
@@ -116,6 +144,22 @@ object TestLoader {
             registerItems(namespace, info.attachments) { id, properties ->
                 BasicAttachmentItem(id.toString(), properties)
             }
+        }
+    }
+
+    private fun registerVehicles(namespace: String, entries: Map<String, VehicleRegisterInfo>) {
+        for ((id, info) in entries) {
+            val location = ResourceLocation(namespace, id)
+            if (BuiltInRegistries.ENTITY_TYPE.containsKey(location)) {
+                Mod.LOGGER.error("[sbw-loader] entity {} already exists, skipping {}", location, MANIFEST_PATH)
+                continue
+            }
+
+            val type = ModEntities.vehicle().dimensions(EntityDimensions.scalable(info.width, info.height)).build()
+            Registry.register(BuiltInRegistries.ENTITY_TYPE, location, type)
+            vehicles += type
+            if (info.creativeContainer) creativeContainers += type
+            Mod.LOGGER.info("[sbw-loader] registered vehicle {} (declared by mod {})", location, namespace)
         }
     }
 
@@ -169,8 +213,8 @@ object TestLoader {
             val info = parseManifest(manifestPath, namespace)
             manifests[namespace] = info
             Mod.LOGGER.info(
-                "[sbw-loader] discovered plugin {}: {} item(s), {} gun(s), {} attachment(s), {} entrypoint class(es)",
-                namespace, info.items.size, info.guns.size, info.attachments.size, entrypoints.size
+                "[sbw-loader] discovered plugin {}: {} item(s), {} gun(s), {} attachment(s), {} vehicle(s), {} entrypoint class(es)",
+                namespace, info.items.size, info.guns.size, info.attachments.size, info.vehicles.size, entrypoints.size
             )
         }
     }
@@ -309,6 +353,19 @@ object TestLoader {
                         fail("$entry.ItemTabs contains an invalid tab id '$tab' (expected namespace:path)")
                     }
                 }
+            }
+        }
+
+        for ((id, vehicle) in info.vehicles) {
+            val entry = "Vehicles['$id']"
+            if (id.isEmpty() || !ResourceLocation.isValidPath(id)) {
+                fail("$entry must be a valid path without a namespace")
+            }
+            if (!vehicle.width.isFinite() || vehicle.width <= 0f) {
+                fail("$entry.Width must be finite and greater than 0")
+            }
+            if (!vehicle.height.isFinite() || vehicle.height <= 0f) {
+                fail("$entry.Height must be finite and greater than 0")
             }
         }
 
