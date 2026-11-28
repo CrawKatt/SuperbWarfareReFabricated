@@ -335,11 +335,14 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
     }
 
     open fun shouldRenderMounts(entity: T): Boolean {
-        if (entity is RCEntity && localPlayer?.vehicle === entity &&
-            (mc.options.cameraType.isFirstPerson || ClientEventHandler.zoomVehicle)
-        ) return false
+        if (entity.entityData.get(VehicleEntity.MOUNT_STATE).isEmpty) return false
 
-        return !entity.entityData.get(VehicleEntity.MOUNT_STATE).isEmpty && VehicleResource.compute(entity).renderMounts
+        val resource = VehicleResource.compute(entity)
+        if (!resource.renderMounts) return false
+
+        val inRemoteFirstPerson = entity is RCEntity && localPlayer?.vehicle === entity &&
+                (mc.options.cameraType.isFirstPerson || ClientEventHandler.zoomVehicle)
+        return resource.renderMountsInFirstPerson || !inRemoteFirstPerson
     }
 
     open fun renderMounts(
@@ -480,6 +483,7 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
 
         recoilShake = Mth.lerp(partialTicks, entity.recoilShakeO.toFloat(), entity.recoilShake.toFloat())
 
+        hideFlare = false
         hideForTurretControllerWhileZooming =
             ClientEventHandler.zoomVehicle && entity.getNthEntity(entity.turretControllerIndex) === localPlayer
         hideForPassengerWeaponStationControllerWhileZooming =
@@ -617,14 +621,16 @@ open class GeoVehicleRenderer<T>(manager: EntityRendererProvider.Context) :
         }
 
         // 瞄准时隐藏车体
+        val hideWhenZooming = hideForTurretControllerWhileZooming() ||
+                VehicleResource.compute(entity).hideForTurretControllerWhileZooming
         val root = instance.getBone("root")
-        if (root != null && hideForTurretControllerWhileZooming()) {
+        if (root != null && hideWhenZooming) {
             root.visible = !hideForTurretControllerWhileZooming
         }
 
         // 瞄准时隐藏乘客武器站
         val passengerWeaponStation = instance.getBone("passengerWeaponStation")
-        if (passengerWeaponStation != null && hideForTurretControllerWhileZooming()) {
+        if (passengerWeaponStation != null && hideWhenZooming) {
             passengerWeaponStation.visible = !hideForPassengerWeaponStationControllerWhileZooming
         }
 

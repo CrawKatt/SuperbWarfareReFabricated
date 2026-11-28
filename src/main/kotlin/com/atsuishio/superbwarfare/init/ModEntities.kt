@@ -12,6 +12,7 @@ import com.atsuishio.superbwarfare.entity.misc.HighEnergyExplosivesEntity
 import com.atsuishio.superbwarfare.entity.projectile.*
 import com.atsuishio.superbwarfare.entity.vehicle.*
 import com.atsuishio.superbwarfare.entity.vehicle.base.AutoAimableEntity
+import com.atsuishio.superbwarfare.entity.vehicle.base.RCEntity
 import com.atsuishio.superbwarfare.entity.vehicle.base.VehicleEntity
 import com.atsuishio.superbwarfare.entity.vehicle.remote.RCOperatorBodyEntity
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
@@ -460,12 +461,12 @@ object ModEntities {
         register("ah_6", vehicle().dimensions(EntityDimensions.scalable(2.25f, 2.175f)))
 
     @JvmField
-    val DRONE: EntityType<DroneEntity> =
-        register("drone", vehicle(::DroneEntity).dimensions(EntityDimensions.scalable(0.63f, 0.25f)))
+    val DRONE: EntityType<RCEntity> =
+        register("drone", vehicle(::RCEntity).dimensions(EntityDimensions.scalable(0.63f, 0.25f)))
 
     @JvmField
-    val FPV_DRONE: EntityType<FpvDroneEntity> =
-        register("fpv_drone", vehicle(::FpvDroneEntity).dimensions(EntityDimensions.scalable(0.63f, 0.25f)))
+    val FPV_DRONE: EntityType<RCEntity> =
+        register("fpv_drone", vehicle(::RCEntity).dimensions(EntityDimensions.scalable(0.63f, 0.25f)))
 
     @JvmField
     val RC_OPERATOR_BODY: EntityType<RCOperatorBodyEntity> = register(
